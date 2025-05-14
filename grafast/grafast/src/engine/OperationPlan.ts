@@ -1982,31 +1982,20 @@ export class OperationPlan {
           // TODO: Check assumption: the different groups should relate to
           // different types.
 
-          const parentObjectTypes = new Set(
-            entries.map((e) => e.parentObjectType),
-          );
-          const typeNames = [...parentObjectTypes].map((t) => t.name);
+          const typeNames = entries.map((e) => e.parentObjectType.name);
 
           // TODO: eliminate this
           const polymorphicPaths = new Set(
             entries.flatMap((e) => [...(e.polymorphicPaths ?? [])]),
           );
-          const newLayerPlanByLayerPlan = new Map<
-            LayerPlan,
-            LayerPlan<LayerPlanReasonPolymorphicPartition>
-          >();
-          const filtered = parentLayerPlan.getFiltered(
+          const partitionedLayerPlan = parentLayerPlan.getPartition(
             typeNames,
             polymorphicPaths,
           );
-          newLayerPlanByLayerPlan.set(parentLayerPlan, filtered);
 
-          // TODO: create a new (or find an existing) LayerPlan<PolymorphicPartition> for ${parentObjectTypes}
-          // and then update these {entries} to run in that new layerPlan
-          // ???: Do we need to update the outputPlan.layerPlan too?
-          // Need to find the nearest polymorphicFilter, polymorphic, or combination layer plan. Maybe. Maybe not.
+          // TODO: Do we need to update the outputPlan.layerPlan too?
           for (const entry of entries) {
-            entry.layerPlan = newLayerPlanByLayerPlan.get(entry.layerPlan)!;
+            entry.layerPlan = partitionedLayerPlan;
           }
         }
       }

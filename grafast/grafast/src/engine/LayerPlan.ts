@@ -1141,7 +1141,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
   }
 
   /** @internal */
-  public getFiltered(
+  public getPartition(
     typeNames: string[],
     polymorphicPaths: ReadonlySet<string>,
   ): LayerPlan<LayerPlanReasonPolymorphicPartition> {
