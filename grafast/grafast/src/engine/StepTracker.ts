@@ -182,7 +182,6 @@ export class StepTracker {
         break;
       }
       case "combined": {
-        // TODO: tell the parent layer plans to expect me ;)
         break;
       }
       default: {
