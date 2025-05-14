@@ -119,6 +119,17 @@ import {
   withGlobalLayerPlan,
 } from "./lib/withGlobalLayerPlan.js";
 import { lock, unlock } from "./lock.js";
+import type {
+  CommonPlanningDetails,
+  PlanFieldReturnTypeDetails,
+  PlanIntoOutputPlanDetails,
+  PlanListItemDetails,
+  PlanSelectionSetDetails,
+  PolymorphicPlanObjectTypeDetails,
+  PolymorphicResolveTypeDetails,
+  ProcessGroupedFieldSetDetails,
+  StreamDetails,
+} from "./OperationPlanTypes.js";
 import type { OutputPlanTypePolymorphicObject } from "./OutputPlan.js";
 import { OutputPlan } from "./OutputPlan.js";
 import { StepTracker } from "./StepTracker.js";
@@ -1058,18 +1069,7 @@ export class OperationPlan {
     return itemStep;
   }
 
-  processGroupedFieldSet(details: {
-    outputPlan: OutputPlan;
-    path: readonly string[];
-    planningPath: string;
-    polymorphicPaths: ReadonlySet<string> | null;
-    parentStep: Step;
-    positionType: GraphQLObjectType;
-    layerPlan: LayerPlan;
-    objectTypeFields: GraphQLFieldMap<any, any>;
-    isMutation: boolean;
-    groupedFieldSet: SelectionSetDigest;
-  }) {
+  processGroupedFieldSet(details: ProcessGroupedFieldSetDetails) {
     const {
       outputPlan,
       path,
@@ -1489,18 +1489,7 @@ export class OperationPlan {
    * @param selections - The GraphQL selections (fields, fragment spreads, inline fragments) to evaluate
    * @param isMutation - If true this selection set should be executed serially rather than in parallel (each field gets its own LayerPlan)
    */
-  private planSelectionSet(details: {
-    outputPlan: OutputPlan;
-    path: readonly string[];
-    planningPath: string;
-    polymorphicPaths: ReadonlySet<string> | null;
-    parentStep: Step;
-    positionType: GraphQLObjectType;
-    layerPlan: LayerPlan;
-    selections: readonly SelectionNode[];
-    resolverEmulation: boolean;
-    isMutation?: boolean;
-  }) {
+  private planSelectionSet(details: PlanSelectionSetDetails) {
     const {
       outputPlan,
       path,
@@ -2010,35 +1999,11 @@ export class OperationPlan {
     return $step;
   }
 
-  private planFieldReturnType(
-    details: Omit<
-      Parameters<typeof this.planIntoOutputPlan>[0],
-      "listDepth" | "parentObjectType"
-    > & {
-      parentObjectType: GraphQLObjectType;
-    },
-  ): void {
+  private planFieldReturnType(details: PlanFieldReturnTypeDetails): void {
     return this.planIntoOutputPlan({ ...details, listDepth: 0 });
   }
 
-  private planIntoOutputPlan(details: {
-    outputPlan: OutputPlan;
-    // This is the LAYER-RELATIVE path, not the absolute path! It resets!
-    path: readonly string[];
-    planningPath: string;
-    polymorphicPaths: ReadonlySet<string> | null;
-    parentStep: Step;
-    positionType: GraphQLOutputType;
-    // Typically this is parentOutputPlan.layerPlan; but in the case of mutationFields it isn't.
-    layerPlan: LayerPlan;
-    selections: readonly SelectionNode[] | undefined;
-    parentObjectType: GraphQLObjectType | null;
-    responseKey: string | null;
-    locationDetails: LocationDetails;
-    resolverEmulation: boolean;
-    listDepth: number;
-    streamDetails: StreamDetails | null;
-  }): void {
+  private planIntoOutputPlan(details: PlanIntoOutputPlanDetails): void {
     const {
       outputPlan: parentOutputPlan,
       path,
@@ -2347,20 +2312,7 @@ export class OperationPlan {
   }
 
   /** @internal */
-  private planListItem(details: {
-    outputPlan: OutputPlan;
-    path: readonly string[];
-    planningPath: string;
-    polymorphicPaths: ReadonlySet<string> | null;
-    parentStep: Step;
-    positionType: GraphQLList<GraphQLOutputType>;
-    layerPlan: LayerPlan;
-    selections: readonly SelectionNode[] | undefined;
-    listDepth: number;
-    stream: LayerPlanReasonListItemStream | undefined;
-    locationDetails: LocationDetails;
-    resolverEmulation: boolean;
-  }) {
+  private planListItem(details: PlanListItemDetails) {
     const {
       outputPlan: listOutputPlan,
       path,
@@ -2420,25 +2372,7 @@ export class OperationPlan {
   }
 
   /** @internal */
-  private polymorphicResolveType(details: {
-    outputPlan: OutputPlan;
-    path: readonly string[];
-    planningPath: string;
-    polymorphicPaths: ReadonlySet<string> | null;
-    parentStep: Step;
-    positionType: GraphQLInterfaceType | GraphQLUnionType;
-    layerPlan: LayerPlan;
-    selections: readonly SelectionNode[];
-    allPossibleObjectTypes: readonly GraphQLObjectType<any, any>[];
-    locationDetails: LocationDetails;
-    parentObjectType: GraphQLObjectType | null; // Used by this.mutateTodos
-    responseKey: string | null; // Used by this.mutateTodos
-    isNonNull: boolean;
-    resolverEmulation: boolean;
-
-    // Populated by mutateTodos
-    stepForType?: ReadonlyMap<GraphQLObjectType, Step>;
-  }) {
+  private polymorphicResolveType(details: PolymorphicResolveTypeDetails) {
     const {
       outputPlan,
       path,
@@ -2526,19 +2460,7 @@ export class OperationPlan {
   // should have taken place, and for each step that survives, a polymorphic
   // layer plan matching those relevant types should be created, and passed
   // through here as `polymorphicLayerPlan`.
-  private polymorphicPlanObjectType(details: {
-    outputPlan: OutputPlan;
-    path: readonly string[];
-    planningPath: string;
-    polymorphicPaths: ReadonlySet<string> | null;
-    parentStep: Step;
-    positionType: GraphQLObjectType;
-    layerPlan: LayerPlan;
-    fieldNodes: readonly FieldNode[];
-    locationDetails: LocationDetails;
-    isNonNull: boolean;
-    resolverEmulation: boolean;
-  }) {
+  private polymorphicPlanObjectType(details: PolymorphicPlanObjectTypeDetails) {
     const {
       outputPlan,
       path,
@@ -5202,26 +5124,6 @@ function throwNoNewStepsError(
   );
 }
 
-type StreamDetails = {
-  if: Step<boolean>;
-  initialCount: Step<number>;
-  label: Step<Maybe<string>>;
-};
-
-interface CommonPlanningDetails<
-  TType extends
-    | GraphQLOutputType
-    | GraphQLInterfaceType
-    | GraphQLUnionType = GraphQLOutputType,
-> {
-  outputPlan: OutputPlan;
-  path: readonly string[];
-  planningPath: string;
-  polymorphicPaths: ReadonlySet<string> | null;
-  parentStep: Step;
-  positionType: TType;
-  layerPlan: LayerPlan;
-}
 type QueueTuple<T extends CommonPlanningDetails> = [
   (details: T) => void,
   T,
