@@ -714,7 +714,7 @@ export class OperationPlan {
       locationDetails,
     );
     this.rootOutputPlan = outputPlan;
-    this.queueNextLayer(this.actuallyPlanSelectionSet, {
+    this.queueNextLayer(this.planSelectionSet, {
       outputPlan,
       path: [],
       planningPath: rootType.name + ".",
@@ -755,7 +755,7 @@ export class OperationPlan {
       locationDetails,
     );
     this.rootOutputPlan = outputPlan;
-    this.queueNextLayer(this.actuallyPlanSelectionSet, {
+    this.queueNextLayer(this.planSelectionSet, {
       outputPlan,
       path: [],
       planningPath: rootType.name + ".",
@@ -895,7 +895,7 @@ export class OperationPlan {
         locationDetails,
       );
       this.rootOutputPlan = outputPlan;
-      this.queueNextLayer(this.actuallyPlanSelectionSet, {
+      this.queueNextLayer(this.planSelectionSet, {
         outputPlan,
         path: [],
         planningPath,
@@ -982,7 +982,7 @@ export class OperationPlan {
         locationDetails,
       );
       this.rootOutputPlan = outputPlan;
-      this.queueNextLayer(this.actuallyPlanSelectionSet, {
+      this.queueNextLayer(this.planSelectionSet, {
         outputPlan,
         path: [],
         planningPath,
@@ -1510,7 +1510,7 @@ export class OperationPlan {
    * @param selections - The GraphQL selections (fields, fragment spreads, inline fragments) to evaluate
    * @param isMutation - If true this selection set should be executed serially rather than in parallel (each field gets its own LayerPlan)
    */
-  private actuallyPlanSelectionSet(details: {
+  private planSelectionSet(details: {
     outputPlan: OutputPlan;
     path: readonly string[];
     planningPath: string;
@@ -2336,7 +2336,7 @@ export class OperationPlan {
           isNonNull,
           locationDetails,
         });
-        this.queueNextLayer(this.actuallyPlanSelectionSet, {
+        this.queueNextLayer(this.planSelectionSet, {
           outputPlan: objectOutputPlan,
           path,
           planningPath: planningPath + ".",
@@ -2656,7 +2656,7 @@ export class OperationPlan {
       },
       locationDetails,
     );
-    this.actuallyPlanSelectionSet({
+    this.planSelectionSet({
       outputPlan: objectOutputPlan,
       path,
       planningPath: polymorphicPlanningPath + ".",
