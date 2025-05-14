@@ -259,6 +259,7 @@ create table c.edge_case (
 alter table c.edge_case drop column drop_me;
 
 create function c.edge_case_computed(edge_case c.edge_case) returns text as $$ select 'hello world'::text $$ language sql stable;
+comment on function c.edge_case_computed is E'@sortable';
 
 create domain a.an_int as integer;
 create domain b.another_int as a.an_int;

@@ -1,0 +1,26 @@
+{
+  allEdgeCases: {
+    nodes: [
+      {
+        computed: "hello world",
+        wontCastEasy: 20,
+        rowId: 1,
+      },
+      {
+        computed: "hello world",
+        wontCastEasy: null,
+        rowId: 2,
+      },
+      {
+        computed: "hello world",
+        wontCastEasy: -512,
+        rowId: 3,
+      },
+      {
+        computed: "hello world",
+        wontCastEasy: null,
+        rowId: 4,
+      },
+    ],
+  },
+}
