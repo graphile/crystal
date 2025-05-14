@@ -802,11 +802,6 @@ async function processStream(
       spec.bucket.layerPlan,
       spec.outputPlan.layerPlan,
     );
-    if (directLayerPlanChild === null) {
-      throw new Error(
-        `GrafastInternalError<f6179ee1-ace2-429c-8f30-8fe6cd53ed03>: Invalid heirarchy - could not find direct layerPlan child of ${spec.bucket.layerPlan}`,
-      );
-    }
     const { id: listItemStepId, _isUnary: isUnary } =
       directLayerPlanChild.rootStep!;
 

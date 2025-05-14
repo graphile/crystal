@@ -578,11 +578,6 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
           this.layerPlan,
           this.child.layerPlan,
         );
-        if (directLayerPlanChild == null) {
-          throw new Error(
-            `GrafastInternalError<d43e06d8-c533-4e7b-b3e7-af399f19c83f>: Invalid heirarchy - could not find direct layerPlan child of ${this}`,
-          );
-        }
         const canStream =
           directLayerPlanChild.reason.type === "listItem" &&
           !!directLayerPlanChild.reason.stream;
@@ -1790,6 +1785,19 @@ function withFastExpression(
 export function getDirectLayerPlanChild(
   targetParent: LayerPlan,
   descendent: LayerPlan,
+): LayerPlan {
+  const child = _getDirectLayerPlanChild(targetParent, descendent);
+  if (child == null) {
+    throw new Error(
+      `GrafastInternalError<d43e06d8-c533-4e7b-b3e7-af399f19c83f>: Invalid heirarchy - could not find direct layerPlan child of ${targetParent} that leads to ${descendent}`,
+    );
+  }
+  return child;
+}
+
+function _getDirectLayerPlanChild(
+  targetParent: LayerPlan,
+  descendent: LayerPlan,
 ): LayerPlan | null {
   let directLayerPlanChild = descendent;
   let parent: LayerPlan;
@@ -1801,7 +1809,7 @@ export function getDirectLayerPlanChild(
   }
   if (directLayerPlanChild.reason.type === "combined") {
     for (const plp of directLayerPlanChild.reason.parentLayerPlans) {
-      const dlpc = getDirectLayerPlanChild(targetParent, plp);
+      const dlpc = _getDirectLayerPlanChild(targetParent, plp);
       if (dlpc) return dlpc;
     }
     return null;
