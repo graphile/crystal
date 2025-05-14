@@ -1360,12 +1360,11 @@ export class OperationPlan {
             polymorphicPaths,
             fieldPlanningPath,
             () => {
-              const $args = object(
-                field.arguments?.reduce((memo, arg) => {
-                  memo[arg.name.value] = trackedArguments.get(arg.name.value);
-                  return memo;
-                }, Object.create(null)) ?? Object.create(null),
-              );
+              const spec = Object.create(null);
+              for (const arg of field.arguments ?? EMPTY_ARRAY) {
+                spec[arg.name.value] = trackedArguments.get(arg.name.value);
+              }
+              const $args = object(spec);
               return graphqlResolver(resolver, subscriber, step, $args, {
                 ...this.resolveInfoOperationBase,
                 fieldName,
