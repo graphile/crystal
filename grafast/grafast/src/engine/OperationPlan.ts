@@ -1058,18 +1058,30 @@ export class OperationPlan {
     return itemStep;
   }
 
-  processGroupedFieldSet(
-    // Deliberately shadows
-    outputPlan: OutputPlan,
-    path: readonly string[],
-    planningPath: string,
-    polymorphicPaths: ReadonlySet<string> | null,
-    parentStep: Step,
-    objectType: GraphQLObjectType,
-    objectTypeFields: GraphQLFieldMap<any, any>,
-    isMutation: boolean,
-    groupedFieldSet: SelectionSetDigest,
-  ) {
+  processGroupedFieldSet(details: {
+    outputPlan: OutputPlan;
+    path: readonly string[];
+    planningPath: string;
+    polymorphicPaths: ReadonlySet<string> | null;
+    parentStep: Step;
+    positionType: GraphQLObjectType;
+    layerPlan: LayerPlan;
+    objectTypeFields: GraphQLFieldMap<any, any>;
+    isMutation: boolean;
+    groupedFieldSet: SelectionSetDigest;
+  }) {
+    const {
+      outputPlan,
+      path,
+      planningPath,
+      polymorphicPaths,
+      parentStep,
+      positionType: objectType,
+      // layerPlan,
+      objectTypeFields,
+      isMutation,
+      groupedFieldSet,
+    } = details;
     // `__typename` shouldn't bump the mutation index since it has no side effects.
     let mutationIndex = -1;
     const $sideEffect = outputPlan.layerPlan.latestSideEffectStep;
@@ -1449,7 +1461,7 @@ export class OperationPlan {
         const $sideEffect = deferredOutputPlan.layerPlan.latestSideEffectStep;
         try {
           outputPlan.deferredOutputPlans.push(deferredOutputPlan);
-          this.queueNextLayer(this.processDeferredFieldSet, {
+          this.queueNextLayer(this.processGroupedFieldSet, {
             outputPlan: deferredOutputPlan,
             path,
             planningPath: planningPath + "#",
@@ -1466,30 +1478,6 @@ export class OperationPlan {
         }
       }
     }
-  }
-  processDeferredFieldSet(details: {
-    outputPlan: OutputPlan;
-    path: readonly string[];
-    planningPath: string;
-    polymorphicPaths: ReadonlySet<string> | null;
-    parentStep: Step;
-    positionType: GraphQLObjectType;
-    layerPlan: LayerPlan;
-    objectTypeFields: GraphQLFieldMap<any, any>;
-    isMutation: boolean;
-    groupedFieldSet: SelectionSetDigest;
-  }) {
-    this.processGroupedFieldSet(
-      details.outputPlan,
-      details.path,
-      details.planningPath,
-      details.polymorphicPaths,
-      details.parentStep,
-      details.positionType,
-      details.objectTypeFields,
-      details.isMutation,
-      details.groupedFieldSet,
-    );
   }
 
   /**
@@ -1555,17 +1543,18 @@ export class OperationPlan {
       isMutation,
     );
     const objectTypeFields = objectType.getFields();
-    this.processGroupedFieldSet(
+    this.processGroupedFieldSet({
       outputPlan,
       path,
       planningPath,
       polymorphicPaths,
       parentStep,
-      objectType,
+      positionType: objectType,
+      layerPlan,
       objectTypeFields,
       isMutation,
       groupedFieldSet,
-    );
+    });
 
     if (this.loc !== null) this.loc.pop();
   }
