@@ -2303,10 +2303,6 @@ export class OperationPlan {
           isNonNull,
           resolverEmulation,
         });
-
-        //if (allPossibleObjectTypes.length > 0) {
-        //  this.analyzePlanningPath(polymorphicPlanningPath);
-        //}
       }
     }
   }
@@ -2399,23 +2395,6 @@ export class OperationPlan {
     const polymorphicOutputPlan =
       outputPlan as OutputPlan<OutputPlanTypePolymorphicObject>;
 
-    //if (!($stepOrSpecifier instanceof __ValueStep)) {
-    //  throw new Error(
-    //    `GrafastInternalError<83b32e45-5d18-45e9-a8e4-f20986697162>: expected ${$stepOrSpecifier} to be a __ValueStep`,
-    //  );
-    //}
-
-    // const parentLayerPlan = polymorphicOutputPlan.layerPlan;
-    ///*
-    // * Now a polymorphic layer plan for all the plans to live in
-    // */
-    //const polymorphicLayerPlan = this.getPolymorphicLayerPlan(
-    //  parentLayerPlan,
-    //  path,
-    //  $step,
-    //  allPossibleObjectTypes,
-    //);
-
     /*
      * Now we need to loop through each type and plan it.
      */
@@ -2483,8 +2462,8 @@ export class OperationPlan {
       outputPlan as OutputPlan<OutputPlanTypePolymorphicObject>;
 
     if (polymorphicLayerPlan.reason.type !== "polymorphic") {
-      // NOTE: when queued, this method will be queued with a `resolveType`
-      // layer plan, but `planPending` should go through and convert it to the
+      // NOTE: when queued, this method will be queued with a different layer
+      // plan, but `planPending` should go through and convert it to the
       // relevant polymorphic layer plans for us.
       throw new Error(
         `GrafastInternalError<877eaa1c-30c9-4526-ada4-3ccce020ee0e>: expected ${polymorphicLayerPlan} to be a polymorphic layer plan`,
@@ -3614,6 +3593,7 @@ export class OperationPlan {
     if (winner.polymorphicPaths !== null) {
       const polymorphicPaths = new Set<string>();
       const layerPolymorphicPaths = polymorphicPathsForLayer(winner.layerPlan)!;
+      // PERF: this is hideous
       for (const s of [step, ...equivalentSteps]) {
         for (const p of s.polymorphicPaths!) {
           let trimmed = p;
@@ -5129,15 +5109,6 @@ type QueueTuple<T extends CommonPlanningDetails> = [
   T,
   string[] | null,
 ];
-
-/*
-function setsOverlap(s1: ReadonlySet<string>, s2: ReadonlySet<string>) {
-  for (const p of s1) {
-    if (s2.has(p)) return true;
-  }
-  return false;
-}
-*/
 
 function isSafeForUnbatched(step: UnbatchedExecutableStep): boolean {
   // Non-unary steps are safe for unbatched execution
