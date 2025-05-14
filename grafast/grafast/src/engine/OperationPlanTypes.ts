@@ -28,19 +28,20 @@ export interface CommonPlanningDetails<
     | GraphQLUnionType = GraphQLOutputType,
 > {
   outputPlan: OutputPlan;
+  // This is the LAYER-RELATIVE path, not the absolute path! It resets!
   path: readonly string[];
   planningPath: string;
   polymorphicPaths: ReadonlySet<string> | null;
   parentStep: Step;
   positionType: TType;
+  // Typically this is parentOutputPlan.layerPlan; but in the case of
+  // mutationFields it isn't; there's probably a lot of other examples too.
   layerPlan: LayerPlan;
 }
 
 export interface PlanIntoOutputPlanDetails
   extends CommonPlanningDetails<GraphQLOutputType> {
   resolverEmulation: boolean;
-  // This is the LAYER-RELATIVE path, not the absolute path! It resets!
-  // Typically this is parentOutputPlan.layerPlan; but in the case of mutationFields it isn't.
   selections: readonly SelectionNode[] | undefined;
   parentObjectType: GraphQLObjectType | null;
   responseKey: string | null;
