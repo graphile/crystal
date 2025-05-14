@@ -1601,7 +1601,7 @@ export class OperationPlan {
       if (l === 0) break;
       if (depth === this.maxPlanningDepth) {
         throw new Error(
-          `Query is too complex, Grafast refuses to continue processing at planning depth ${this.maxPlanningDepth}`,
+          `Query is too complex, Grafast refuses to continue processing at planning depth ${this.maxPlanningDepth}. You can configure this through \`preset.grafast.maxPlanningDepth\``,
         );
       }
 
