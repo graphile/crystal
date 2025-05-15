@@ -177,3 +177,24 @@ export const batchGetCrawlersByIds: LoadManyCallback<
     ids.map((id) => data.crawlers.find((c) => c.id === id)),
   );
 };
+
+export const batchGetNpcById: LoadOneCallback<
+  number,
+  NpcData,
+  never,
+  Database
+> = (ids, { unary: data }) => {
+  return ids.map((id) => data.npcs.find((c) => c.id === id));
+};
+
+export const batchGetNpcsByIds: LoadManyCallback<
+  number[],
+  NpcData | undefined,
+  never,
+  Database
+> = (idsList, { unary: data }) => {
+  console.dir(idsList);
+  return idsList.map((ids) =>
+    ids.map((id) => data.npcs.find((c) => c.id === id)),
+  );
+};
