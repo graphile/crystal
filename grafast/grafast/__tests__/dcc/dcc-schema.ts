@@ -10,6 +10,7 @@ import {
   Step,
   get,
   loadMany,
+  inhibitOnNull,
 } from "../../dist/index.js";
 import {
   CrawlerData,
@@ -18,6 +19,7 @@ import {
   batchGetCrawlersByIds,
   makeData,
 } from "./dcc-data.js";
+import { GraphQLInterfaceType } from "graphql";
 
 const resolvedPreset = resolvePreset({});
 const requestContext = {};
@@ -126,6 +128,20 @@ export const makeBaseArgs = () => {
             $crawler as Step<CrawlerData>,
             crawlerToTypeName,
           );
+          return { $__typename };
+        },
+      },
+      Character: {
+        __planType($specifier) {
+          const $crawlerId = inhibitOnNull(
+            lambda($specifier, extractCrawlerId),
+          );
+          const $crawler = loadOne($crawlerId, batchGetCrawlerById);
+          const $crawlerTypename = (
+            schema.getType("Crawler") as GraphQLInterfaceType
+          ).extensions.grafast.planType!($crawler).$__typename;
+          const $npcId = inhibitOnNull(lambda($specifier, extractNpcId));
+          const $npc = loadOne($npcId, batchGetNpcById);
           return { $__typename };
         },
       },
