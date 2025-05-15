@@ -1,6 +1,8 @@
 /* ALL OF THIS IS TYPESCRIPT, NOT GRAPHQL */
 
-interface Crawler {
+import { LoadManyCallback, LoadOneCallback } from "../../dist";
+
+export interface CrawlerData {
   id: number;
   species: "Human" | "Cat" | "Crocodilian";
   name: string;
@@ -8,28 +10,32 @@ interface Crawler {
   favouriteItem?: number;
   friends?: number[];
   bestFriend?: number;
+  crawlerNumber?: number;
+  deleted?: true;
 }
 
-interface Npc {
+interface NpcData {
   id: number;
   type: "Manager" | "Security";
   species: "Changeling" | "Rock Monster" | "Half Elf";
   name: string;
+  exCrawler?: boolean;
   items?: number[];
   friends?: number[];
 }
 
-interface Item {
+interface ItemData {
   id: number;
   name: string;
   type: "Equipment" | "Consumable";
   creator?: number;
+  items?: number[];
 }
 
-interface Database {
-  crawlers: readonly Crawler[];
-  npcs: readonly Npc[];
-  items: readonly Item[];
+export interface Database {
+  crawlers: readonly CrawlerData[];
+  npcs: readonly NpcData[];
+  items: readonly ItemData[];
 }
 
 export function makeData(): Database {
@@ -78,6 +84,7 @@ export function makeData(): Database {
         bestFriend: 104,
       },
       { id: 106, species: "Crocodilian", name: "Dolores", items: [214] },
+      { id: 107, species: "Human", name: "Hekla", deleted: true },
     ],
     npcs: [
       {
@@ -149,3 +156,24 @@ export function makeData(): Database {
     ],
   };
 }
+
+export const batchGetCrawlerById: LoadOneCallback<
+  number,
+  CrawlerData,
+  never,
+  Database
+> = (ids, { unary: data }) => {
+  return ids.map((id) => data.crawlers.find((c) => c.id === id));
+};
+
+export const batchGetCrawlersByIds: LoadManyCallback<
+  number[],
+  CrawlerData | undefined,
+  never,
+  Database
+> = (idsList, { unary: data }) => {
+  console.dir(idsList);
+  return idsList.map((ids) =>
+    ids.map((id) => data.crawlers.find((c) => c.id === id)),
+  );
+};

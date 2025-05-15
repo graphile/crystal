@@ -10,13 +10,26 @@ it("test", async () => {
   const baseArgs = makeBaseArgs();
   const source = /* GraphQL */ `
     {
-      a
+      crawler(id: 101) {
+        id
+        name
+        ... on ActiveCrawler {
+          species
+          friends {
+            id
+            name
+          }
+        }
+      }
     }
   `;
   const result = (await grafast({
     ...baseArgs,
     source,
   })) as ExecutionResult;
+  if (result.errors) {
+    console.dir(result.errors);
+  }
   expect(result.errors).not.to.exist;
   expect(result.data).to.deep.equal({ a: 42 });
 });
