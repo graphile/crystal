@@ -17,6 +17,7 @@ import {
   Database,
   batchGetCrawlerById,
   batchGetCrawlersByIds,
+  batchGetNpcById,
   makeData,
 } from "./dcc-data.js";
 import { GraphQLInterfaceType } from "graphql";
@@ -132,15 +133,18 @@ export const makeBaseArgs = () => {
         },
       },
       Character: {
-        __planType($specifier) {
+        __planType($specifier: Step<number>) {
           const $crawlerId = inhibitOnNull(
             lambda($specifier, extractCrawlerId),
           );
           const $crawler = loadOne($crawlerId, batchGetCrawlerById);
-          const $crawlerTypename = (
-            schema.getType("Crawler") as GraphQLInterfaceType
-          ).extensions.grafast.planType!($crawler).$__typename;
-          const $npcId = inhibitOnNull(lambda($specifier, extractNpcId));
+          const $crawlerTypename = lambda(
+            $crawler as Step<CrawlerData>,
+            crawlerToTypeName,
+          );
+          const $npcId = inhibitOnNull(
+            lambda($specifier, extractNpcId),
+          ) as Step<number>;
           const $npc = loadOne($npcId, batchGetNpcById);
           return { $__typename };
         },
@@ -160,4 +164,14 @@ export const makeBaseArgs = () => {
 function crawlerToTypeName(crawler: CrawlerData): string | null {
   if (crawler.deleted) return "DeletedCrawler";
   return "ActiveCrawler";
+}
+
+function extractCrawlerId(id: number) {
+  if (id > 100 && id < 200) return id;
+  else return null;
+}
+
+function extractNpcId(id: number) {
+  if (id > 300 && id < 400) return id;
+  else return null;
 }
