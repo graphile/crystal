@@ -4,8 +4,6 @@
 
 // IMPORTANT: This file should only be available via direct (path) import, it should not be included in the main package exports.
 
-import "../interfaces.js";
-
 import LRU from "@graphile/lru";
 import EventEmitter from "eventemitter3";
 import type { Deferred, GrafastSubscriber, PromiseOrDirect } from "grafast";
