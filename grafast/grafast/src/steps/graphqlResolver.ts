@@ -27,46 +27,6 @@ type ResolveInfoBase = Omit<
   "path" | "rootValue" | "variableValues"
 >;
 
-interface DCR {
-  data: unknown;
-  context: unknown;
-  resolveInfo: GraphQLResolveInfo;
-}
-
-function dcr(
-  data: unknown, // but not a promise
-  context: unknown,
-  resolveInfo: GraphQLResolveInfo,
-):
-  | DCR
-  | FlaggedValue
-  | null
-  | undefined
-  | PromiseLike<DCR | FlaggedValue | null | undefined> {
-  if (data == null) {
-    return data;
-  } else if (data instanceof Error) {
-    return flagError(data);
-  } else if (isPromiseLike(data)) {
-    return data.then((data) => dcr(data, context, resolveInfo));
-  }
-  if (isIterable(data)) {
-    const list = Array.isArray(data) ? data : [...data];
-    if (list.some(isPromiseLike)) {
-      const resolved = Promise.all(
-        list.map((entry) =>
-          isPromiseLike(entry) ? entry.then(null, flagError) : entry,
-        ),
-      );
-      // TODO: this does recursion which is inefficient and also incorrect. We
-      // should only traverse as deep as the GraphQL type has lists.
-      return dcr(resolved, context, resolveInfo);
-    }
-  }
-  // TODO: support async iterables
-  return { data, context, resolveInfo };
-}
-
 /**
  * Calls the given GraphQL resolver for each input - emulates GraphQL
  * resolution.
@@ -172,79 +132,6 @@ export class GraphQLResolverStep extends UnbatchedStep {
 }
 
 /** @internal */
-export class GraphQLItemHandlerStep extends Step {
-  static $$export = {
-    moduleName: "grafast",
-    exportName: "GraphQLItemHandlerStep",
-  };
-  private nullableInnerType: GraphQLNullableType & GraphQLOutputType;
-  public isSyncAndSafe = false;
-  constructor(
-    $parent: Step,
-    nullableType: GraphQLNullableType & GraphQLOutputType,
-  ) {
-    super();
-    this.addDependency($parent);
-    if (isListType(nullableType)) {
-      const innerType = nullableType.ofType;
-      if (isNonNullType(innerType)) {
-        this.nullableInnerType = innerType.ofType;
-      } else {
-        this.nullableInnerType = innerType;
-      }
-    } else {
-      throw new Error(
-        `GrafastInternalError<0a293e88-0f38-43f6-9179-f3ef9a720872>: Expected nullableType to be a list or abstract type, instead found ${nullableType}`,
-      );
-    }
-  }
-
-  public toStringMeta(): string | null {
-    return String(this.getDepOptions(0).step.id);
-  }
-
-  listItem($item: __ItemStep<any>) {
-    return graphqlItemHandler($item, this.nullableInnerType);
-  }
-
-  wrapListData(
-    data: unknown,
-    context: unknown,
-    resolveInfo: GraphQLResolveInfo,
-  ) {
-    if (data == null) {
-      return null;
-    }
-    if (!Array.isArray(data)) {
-      console.warn(`${this}: data wasn't an array, so we're returning null`);
-      return null;
-    }
-    return data.map((data) => dcr(data, context, resolveInfo));
-  }
-
-  execute({
-    indexMap,
-    values: [values0],
-  }: ExecutionDetails<[DCR]>): GrafastResultsList<any> {
-    return indexMap((i) => {
-      const d = values0.at(i);
-      if (d == null) {
-        return null;
-      } else {
-        const { data, context, resolveInfo } = d;
-        if (isPromiseLike(data)) {
-          return data.then((data) =>
-            this.wrapListData(data, context, resolveInfo),
-          );
-        } else {
-          return this.wrapListData(data, context, resolveInfo);
-        }
-      }
-    });
-  }
-}
-
-/** @internal */
 export class GraphQLResolveTypeStep extends Step {
   static $$export = {
     moduleName: "grafast",
@@ -328,13 +215,6 @@ export class GraphQLResolveTypeStep extends Step {
 
 export function graphqlResolveType($stepOrSpecifier: Step, info: PlanTypeInfo) {
   return new GraphQLResolveTypeStep($stepOrSpecifier, info);
-}
-
-export function graphqlItemHandler(
-  $item: Step,
-  nullableType: GraphQLNullableType & GraphQLOutputType,
-) {
-  return new GraphQLItemHandlerStep($item, nullableType);
 }
 
 /**
