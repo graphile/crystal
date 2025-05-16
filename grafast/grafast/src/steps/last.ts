@@ -1,5 +1,5 @@
-import type { UnbatchedExecutionExtra } from "../interfaces.js";
 import { $$deepDepSkip } from "../constants.js";
+import type { UnbatchedExecutionExtra } from "../interfaces.js";
 import type { Step } from "../step.js";
 import { UnbatchedStep } from "../step.js";
 import type { ConnectionCapableStep } from "./connection.js";

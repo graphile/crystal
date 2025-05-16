@@ -16,6 +16,15 @@ import * as graphql from "graphql";
 import te from "tamedevil";
 
 import * as assert from "../assert.js";
+import {
+  $$contextPlanCache,
+  $$proxy,
+  $$subroutine,
+  $$timeout,
+  $$ts,
+  ALL_FLAGS,
+  DEFAULT_ACCEPT_FLAGS,
+} from "../constants.js";
 import type { Constraint } from "../constraints.js";
 import {
   graphqlCollectFields,
@@ -53,15 +62,6 @@ import type {
   PolymorphicTypePlanner,
   TrackedArguments,
 } from "../interfaces.js";
-import {
-  $$contextPlanCache,
-  $$proxy,
-  $$subroutine,
-  $$timeout,
-  $$ts,
-  ALL_FLAGS,
-  DEFAULT_ACCEPT_FLAGS,
-} from "../constants.js";
 import type { ApplyAfterModeArg } from "../operationPlan-input.js";
 import { withFieldArgsForArguments } from "../operationPlan-input.js";
 import type { GrafastOperationOptions } from "../prepare.js";

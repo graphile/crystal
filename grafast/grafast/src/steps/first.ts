@@ -1,9 +1,9 @@
+import { $$deepDepSkip } from "../constants.js";
 import type {
   ExecutionDetails,
   GrafastResultsList,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
-import { $$deepDepSkip } from "../constants.js";
 import type { Step } from "../step.js";
 import { UnbatchedStep } from "../step.js";
 import type { ConnectionCapableStep } from "./connection.js";

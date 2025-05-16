@@ -2,6 +2,7 @@ import LRU from "@graphile/lru";
 import debugFactory from "debug";
 import type { GraphQLSchema, OperationDefinitionNode } from "graphql";
 
+import { $$cacheByOperation, $$timeout, $$ts } from "./constants.js";
 import type { Constraint } from "./constraints.js";
 import { matchesConstraints } from "./constraints.js";
 import { isDev, noop } from "./dev.js";
@@ -13,7 +14,6 @@ import type {
   Fragments,
   LinkedList,
 } from "./interfaces.js";
-import { $$cacheByOperation, $$timeout, $$ts } from "./constants.js";
 import type { GrafastOperationOptions } from "./prepare.js";
 import { timeSource } from "./timeSource.js";
 

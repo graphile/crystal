@@ -32,8 +32,8 @@ import type {
   SubsequentStreamSpec,
 } from "./engine/executeOutputPlan.js";
 import { executeOutputPlan } from "./engine/executeOutputPlan.js";
-import { POLYMORPHIC_ROOT_PATH } from "./engine/OperationPlan.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
+import { POLYMORPHIC_ROOT_PATH } from "./engine/OperationPlan.js";
 import type { OutputPlan } from "./engine/OutputPlan.js";
 import {
   coerceError,
@@ -41,9 +41,9 @@ import {
   getDirectLayerPlanChild,
 } from "./engine/OutputPlan.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
-import type { GrafastExecutionArgs } from "./interfaces.js";
 import type {
   EstablishOperationPlanEvent,
+  GrafastExecutionArgs,
   GrafastTimeouts,
   JSONValue,
   PromiseOrDirect,

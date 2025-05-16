@@ -2,6 +2,14 @@ import chalk from "chalk";
 import type { TE } from "tamedevil";
 import te from "tamedevil";
 
+import {
+  $$deepDepSkip,
+  $$proxy,
+  $$subroutine,
+  ALL_FLAGS,
+  DEFAULT_FORBIDDEN_FLAGS,
+  TRAPPABLE_FLAGS,
+} from "./constants.js";
 import { isDev, noop } from "./dev.js";
 import type {
   LayerPlan,
@@ -31,14 +39,6 @@ import type {
   StepOptions,
   UnbatchedExecutionExtra,
 } from "./interfaces.js";
-import {
-  $$deepDepSkip,
-  $$proxy,
-  $$subroutine,
-  ALL_FLAGS,
-  DEFAULT_FORBIDDEN_FLAGS,
-  TRAPPABLE_FLAGS,
-} from "./constants.js";
 import type { __DataOnlyStep } from "./steps/__dataOnly.js";
 import type { __FlagStep, __ItemStep } from "./steps/index.js";
 import { stepADependsOnStepB, stepAMayDependOnStepB } from "./utils.js";

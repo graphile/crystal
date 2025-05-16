@@ -6,6 +6,7 @@ import type {
 } from "graphql";
 import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 
+import { $$eventEmitter, $$extensions } from "./constants.js";
 import { isDev } from "./dev.js";
 import { inspect } from "./inspect.js";
 import type {
@@ -14,7 +15,6 @@ import type {
   ExecutionEventMap,
   GrafastExecutionArgs,
 } from "./interfaces.js";
-import { $$eventEmitter, $$extensions } from "./constants.js";
 import { getGrafastMiddleware } from "./middleware.js";
 import type { GrafastOperationOptions } from "./prepare.js";
 import { grafastPrepare } from "./prepare.js";

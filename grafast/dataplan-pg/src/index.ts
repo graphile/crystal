@@ -67,10 +67,6 @@ import { PgClassFilter } from "./filters/pgClassFilter.js";
 import { PgManyFilter } from "./filters/pgManyFilter.js";
 import { PgOrFilter } from "./filters/pgOrFilter.js";
 import type {
-  PgSelectQueryBuilderCallback,
-  PgUnionAllQueryBuilderCallback,
-} from "./interfaces.js";
-import type {
   GetPgCodecAttributes,
   GetPgRegistryCodecRelations,
   GetPgRegistryCodecs,
@@ -109,7 +105,9 @@ import type {
   PgRefDefinitionExtensions,
   PgRefDefinitions,
   PgRegistry,
+  PgSelectQueryBuilderCallback,
   PgTypedStep,
+  PgUnionAllQueryBuilderCallback,
   PlanByUniques,
   TuplePlanMap,
 } from "./interfaces.js";

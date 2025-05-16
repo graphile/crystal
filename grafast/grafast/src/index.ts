@@ -30,6 +30,19 @@ import {
 // HACK: doing this here feels "naughty".
 debugFactory.formatters.c = grafastPrint;
 
+import type {
+  $$cacheByOperation,
+  $$hooked,
+  $$queryCache,
+} from "./constants.js";
+import {
+  $$bypassGraphQL,
+  $$eventEmitter,
+  $$extensions,
+  $$idempotent,
+  $$verbatim,
+  DEFAULT_ACCEPT_FLAGS,
+} from "./constants.js";
 import { defer, Deferred } from "./deferred.js";
 // Handy for debugging
 import { isDev, noop } from "./dev.js";
@@ -50,32 +63,19 @@ import { grafast, grafastSync } from "./grafastGraphql.js";
 import { inspect } from "./inspect.js";
 import type {
   ArgumentApplyPlanResolver,
+  BaseEventMap,
+  BaseGraphQLArguments,
+  BaseGraphQLRootValue,
+  BaseGraphQLVariables,
   BatchExecutionValue,
   CacheByOperationEntry,
   DataFromStep,
   EnumValueApplyResolver,
   EstablishOperationPlanEvent,
-  ExecuteEvent,
-  ExecuteStepEvent,
-  ExecutionValue,
-  GrafastExecutionArgs,
-  GrafastTimeouts,
-  InputObjectFieldApplyResolver,
-  InputObjectTypeBakedInfo,
-  InputObjectTypeBakedResolver,
-  ParseAndValidateEvent,
-  PlanTypeInfo,
-  PolymorphicTypePlanner,
-  PrepareArgsEvent,
-  ScalarInputPlanResolver,
-  UnaryExecutionValue,
-  ValidateSchemaEvent,
-  BaseEventMap,
-  BaseGraphQLArguments,
-  BaseGraphQLRootValue,
-  BaseGraphQLVariables,
   EventCallback,
   EventMapKey,
+  ExecuteEvent,
+  ExecuteStepEvent,
   ExecutionDetails,
   ExecutionDetailsStream,
   ExecutionEventEmitter,
@@ -83,11 +83,13 @@ import type {
   ExecutionExtra,
   ExecutionResults,
   ExecutionResultValue,
+  ExecutionValue,
   FieldArg,
   FieldArgs,
   FieldInfo,
   FieldPlanResolver,
   GrafastArgumentConfig,
+  GrafastExecutionArgs,
   GrafastFieldConfig,
   GrafastFieldConfigArgumentMap,
   GrafastInputFieldConfig,
@@ -95,7 +97,11 @@ import type {
   GrafastResultsList,
   GrafastResultStreamList,
   GrafastSubscriber,
+  GrafastTimeouts,
   GrafastValuesList,
+  InputObjectFieldApplyResolver,
+  InputObjectTypeBakedInfo,
+  InputObjectTypeBakedResolver,
   JSONArray,
   JSONObject,
   JSONValue,
@@ -103,24 +109,20 @@ import type {
   NodeIdCodec,
   NodeIdHandler,
   OutputPlanForType,
+  ParseAndValidateEvent,
+  PlanTypeInfo,
+  PolymorphicTypePlanner,
+  PrepareArgsEvent,
   PromiseOrDirect,
+  ScalarInputPlanResolver,
   ScalarPlanResolver,
   StepOptimizeOptions,
   StepStreamOptions,
   TypedEventEmitter,
+  UnaryExecutionValue,
   UnbatchedExecutionExtra,
+  ValidateSchemaEvent,
 } from "./interfaces.js";
-import {
-  $$cacheByOperation,
-  $$hooked,
-  $$queryCache,
-  $$bypassGraphQL,
-  $$eventEmitter,
-  $$extensions,
-  $$idempotent,
-  $$verbatim,
-  DEFAULT_ACCEPT_FLAGS,
-} from "./constants.js";
 import { getGrafastMiddleware } from "./middleware.js";
 import type { Multistep, UnwrapMultistep } from "./multistep.js";
 import { multistep } from "./multistep.js";

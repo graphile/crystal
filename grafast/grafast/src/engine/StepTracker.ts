@@ -1,3 +1,4 @@
+import { $$subroutine, ALL_FLAGS } from "../constants.js";
 import { isDev } from "../dev.js";
 import type { OperationPlan } from "../index.js";
 import { inspect } from "../inspect.js";
@@ -5,7 +6,6 @@ import type {
   AddDependencyOptions,
   AddUnaryDependencyOptions,
 } from "../interfaces.js";
-import { $$subroutine, ALL_FLAGS } from "../constants.js";
 import { Step } from "../step.js";
 import { __dataOnly, __DataOnlyStep } from "../steps/__dataOnly.js";
 import { __FlagStep } from "../steps/__flag.js";

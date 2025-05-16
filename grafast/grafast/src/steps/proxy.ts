@@ -1,9 +1,9 @@
+import { $$proxy } from "../constants.js";
 import type {
   ExecutionDetails,
   GrafastResultsList,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
-import { $$proxy } from "../constants.js";
 import type { Step } from "../step.js";
 import { UnbatchedStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
