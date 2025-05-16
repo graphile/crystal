@@ -1,5 +1,7 @@
 import chalk from "chalk";
 import type { GraphQLObjectType } from "graphql";
+import type { TE } from "tamedevil";
+import te from "tamedevil";
 
 import { isDev, noop } from "./dev.js";
 import type {
@@ -46,6 +48,8 @@ import { stepADependsOnStepB, stepAMayDependOnStepB } from "./utils.js";
  * @internal
  */
 export const $$noExec = Symbol("noExec");
+
+const ref_flagError = te.ref(flagError, "flagError");
 
 function throwDestroyed(this: Step): any {
   let message: string;
@@ -698,6 +702,88 @@ ${printDeps(step, 1)}
   }
 }
 
+function _buildOptimizedExecuteV2Expression(
+  depCount: number,
+  isSyncAndSafe: boolean,
+) {
+  const identifiers: TE[] = [];
+  for (let i = 0; i < depCount; i++) {
+    identifiers.push(te.identifier(`value${i}`));
+  }
+  const tryOrNot = (inFrag: TE): TE => {
+    if (isSyncAndSafe) {
+      return inFrag;
+    } else {
+      return te`\
+    try {
+  ${te.indent(inFrag)}
+    } catch (e) {
+      results[i] = ${ref_flagError}(e);
+    }\
+`;
+    }
+  };
+  return te`\
+(function execute({
+  count,
+  values: [${te.join(identifiers, ", ")}],
+  extra,
+}) {
+  const results = [];
+  for (let i = 0; i < count; i++) {
+${tryOrNot(te`\
+    results[i] = this.unbatchedExecute(extra, ${te.join(
+      identifiers.map((identifier) => te`${identifier}.at(i)`),
+      ", ",
+    )});\
+`)}
+  }
+  return results;
+})`;
+}
+
+const MAX_DEPENDENCIES_TO_CACHE = 10;
+const unsafeCache: any[] = [];
+const safeCache: any[] = [];
+te.batch(() => {
+  for (let i = 0; i <= MAX_DEPENDENCIES_TO_CACHE; i++) {
+    const depCount = i;
+    const unsafeExpression = _buildOptimizedExecuteV2Expression(
+      depCount,
+      false,
+    );
+    te.runInBatch(unsafeExpression, (fn) => {
+      unsafeCache[depCount] = fn;
+    });
+    const safeExpression = _buildOptimizedExecuteV2Expression(depCount, true);
+    te.runInBatch(safeExpression, (fn) => {
+      safeCache[depCount] = fn;
+    });
+  }
+});
+
+function buildOptimizedExecute(
+  depCount: number,
+  isSyncAndSafe: boolean,
+  callback: (fn: any) => void,
+) {
+  // Try and satisfy from cache
+  const cache = isSyncAndSafe ? safeCache : unsafeCache;
+  if (depCount <= MAX_DEPENDENCIES_TO_CACHE) {
+    callback(cache[depCount]);
+    return;
+  }
+
+  // Build it
+  const expression = _buildOptimizedExecuteV2Expression(
+    depCount,
+    isSyncAndSafe,
+  );
+  te.runInBatch<any>(expression, (fn) => {
+    callback(fn);
+  });
+}
+
 export abstract class UnbatchedStep<TData = any> extends Step<TData> {
   static $$export = {
     moduleName: "grafast",
@@ -705,15 +791,17 @@ export abstract class UnbatchedStep<TData = any> extends Step<TData> {
   };
 
   finalize() {
-    if (this.dependencies.length === 0) {
-      this.execute = this.execute0;
-    } else if (this.dependencies.length === 1) {
-      this.execute = this.execute1;
-    } else if (this.dependencies.length === 2) {
-      this.execute = this.execute2;
-    } else if (this.dependencies.length === 3) {
-      this.execute = this.execute3;
+    if (this.execute === UnbatchedStep.prototype.execute) {
+      // If they've not replaced 'execute', use our optimized form
+      buildOptimizedExecute(
+        this.dependencies.length,
+        this.isSyncAndSafe,
+        (fn) => {
+          this.execute = fn;
+        },
+      );
     }
+    super.finalize();
   }
 
   execute({
@@ -733,68 +821,6 @@ export abstract class UnbatchedStep<TData = any> extends Step<TData> {
         return flagError(e);
       }
     });
-  }
-
-  execute0({ extra, count }: ExecutionDetails): GrafastResultsList<TData> {
-    const result = [] as ExecutionResultValue<PromiseOrDirect<TData>>[];
-    for (let i = 0; i < count; i++) {
-      try {
-        result[i] = this.unbatchedExecute(extra);
-      } catch (e) {
-        result[i] = flagError<Error>(e);
-      }
-    }
-    return result;
-  }
-  execute1({
-    extra,
-    count,
-    values: [val0],
-  }: ExecutionDetails): GrafastResultsList<TData> {
-    const result = [] as ExecutionResultValue<PromiseOrDirect<TData>>[];
-    for (let i = 0; i < count; i++) {
-      try {
-        result[i] = this.unbatchedExecute(extra, val0.at(i));
-      } catch (e) {
-        result[i] = flagError<Error>(e);
-      }
-    }
-    return result;
-  }
-  execute2({
-    extra,
-    count,
-    values: [val0, val1],
-  }: ExecutionDetails): GrafastResultsList<TData> {
-    const result = [] as ExecutionResultValue<PromiseOrDirect<TData>>[];
-    for (let i = 0; i < count; i++) {
-      try {
-        result[i] = this.unbatchedExecute(extra, val0.at(i), val1.at(i));
-      } catch (e) {
-        result[i] = flagError<Error>(e);
-      }
-    }
-    return result;
-  }
-  execute3({
-    extra,
-    count,
-    values: [val0, val1, val2],
-  }: ExecutionDetails): GrafastResultsList<TData> {
-    const result = [] as ExecutionResultValue<PromiseOrDirect<TData>>[];
-    for (let i = 0; i < count; i++) {
-      try {
-        result[i] = this.unbatchedExecute(
-          extra,
-          val0.at(i),
-          val1.at(i),
-          val2.at(i),
-        );
-      } catch (e) {
-        result[i] = flagError<Error>(e);
-      }
-    }
-    return result;
   }
 
   abstract unbatchedExecute(
