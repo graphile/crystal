@@ -1,10 +1,9 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import { resolvePreset } from "graphile-config";
-import { GraphQLInterfaceType } from "graphql";
 
 import type { Step } from "../../dist/index.js";
 import {
-  constant,
+  coalesce,
   context,
   get,
   inhibitOnNull,
@@ -13,7 +12,7 @@ import {
   loadOne,
   makeGrafastSchema,
 } from "../../dist/index.js";
-import type { CrawlerData, Database } from "./dcc-data.js";
+import type { CrawlerData, Database, NpcData } from "./dcc-data.js";
 import {
   batchGetCrawlerById,
   batchGetCrawlersByIds,
@@ -61,6 +60,13 @@ export const makeBaseArgs = () => {
         species: Species
         exCrawler: Boolean
         client: ActiveCrawler
+      }
+      type Security implements NPC & Character {
+        id: Int!
+        name: String!
+        species: Species
+        exCrawler: Boolean
+        clients: [ActiveCrawler!]
       }
       interface NPC implements Character {
         id: Int!
@@ -150,6 +156,8 @@ export const makeBaseArgs = () => {
             lambda($specifier, extractNpcId),
           ) as Step<number>;
           const $npc = loadOne($npcId, batchGetNpcById);
+          const $npcTypename = lambda($npc, npcToTypeName);
+          const $__typename = coalesce([$crawlerTypename, $npcTypename]);
           return { $__typename };
         },
       },
@@ -168,6 +176,15 @@ export const makeBaseArgs = () => {
 function crawlerToTypeName(crawler: CrawlerData): string | null {
   if (crawler.deleted) return "DeletedCrawler";
   return "ActiveCrawler";
+}
+
+function npcToTypeName(npc: NpcData): string | null {
+  if (["Manager", "Security", "Guide"].includes(npc.type)) {
+    return npc.type;
+  } else {
+    console.warn(`${npc.type} is not yet a supported type of NPC in GraphQL`);
+    return null;
+  }
 }
 
 function extractCrawlerId(id: number) {
