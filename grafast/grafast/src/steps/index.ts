@@ -11,6 +11,7 @@ export {
   TRAP_INHIBITED,
 } from "./__flag.js";
 export { access, AccessStep, get } from "./access.js";
+export { coalesce, CoalesceStep } from "./coalesce.js";
 export {
   assertEdgeCapableStep,
   assertPageInfoCapableStep,
