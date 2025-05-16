@@ -191,8 +191,12 @@ export class AccessStep<TData> extends UnbatchedStep<TData> {
   }
 
   // An access of an access can become a single access
-  optimize(): AccessStep<TData> {
+  optimize(): Step<TData> {
     const $dep = this.getDep(0);
+    if (this.fallback === undefined && this.path.length === 0) {
+      // I don't do anything
+      return $dep;
+    }
     if ($dep instanceof AccessStep && $dep.fallback === undefined) {
       return access(
         $dep.getDep(0),
