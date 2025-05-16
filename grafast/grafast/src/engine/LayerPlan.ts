@@ -613,8 +613,8 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             iterators[newIndex] = parentBucket.iterators[originalIndex];
           }
         } else {
-          const itemStepIdList: any[] = [];
-          store.set(itemStepId, batchExecutionValue(itemStepIdList));
+          const ev = batchExecutionValue([]);
+          store.set(itemStepId, ev);
 
           for (const stepId of copyStepIds) {
             const ev = parentBucket.store.get(stepId)!;
@@ -652,9 +652,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             ) {
               const newIndex = size++;
               map.set(originalIndex, newIndex);
-              const fieldValue: any[] | null | undefined | Error =
-                nullableStepStore.at(originalIndex);
-              itemStepIdList[newIndex] = fieldValue;
+              ev._copyResult(newIndex, nullableStepStore, originalIndex);
 
               polymorphicPathList[newIndex] =
                 parentBucket.polymorphicPathList[originalIndex];
@@ -726,9 +724,9 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             for (let j = 0, l = list.length; j < l; j++) {
               const newIndex = size++;
               newIndexes.push(newIndex);
-              (ev.entries as any[])[newIndex] = list[j];
+              const val = list[j];
               // TODO: are these the right flags?
-              ev._flags[newIndex] = list[j] == null ? FLAG_NULL : NO_FLAGS;
+              ev._setResult(newIndex, val, val == null ? FLAG_NULL : NO_FLAGS);
 
               polymorphicPathList[newIndex] =
                 parentBucket.polymorphicPathList[originalIndex];
