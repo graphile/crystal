@@ -20,7 +20,12 @@ import type {
   JSONValue,
   LocationDetails,
 } from "../interfaces.js";
-import { $$concreteType, $$streamMore, FLAG_ERROR } from "../interfaces.js";
+import {
+  $$concreteType,
+  $$streamMore,
+  DEFAULT_ACCEPT_FLAGS,
+  FLAG_ERROR,
+} from "../interfaces.js";
 import { isPolymorphicData } from "../polymorphic.js";
 import type { Step } from "../step.js";
 import { expressionSymbol } from "../steps/access.js";
@@ -464,9 +469,13 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
       const expressionDetails:
         | [ReadonlyArray<string | number>, any]
         | undefined = ($root.unbatchedExecute! as any)[expressionSymbol];
-      if (expressionDetails !== undefined) {
-        // @ts-ignore
-        const { step: $parent } = $root.getDepOptions(0);
+      // @ts-ignore
+      const { step: $parent, onReject, acceptFlags } = $root.getDepOptions(0);
+      if (
+        expressionDetails !== undefined &&
+        onReject == null &&
+        acceptFlags === DEFAULT_ACCEPT_FLAGS
+      ) {
         this.layerPlan.operationPlan.stepTracker.setOutputPlanRootStep(
           this,
           $parent,
