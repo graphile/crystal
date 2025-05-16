@@ -2506,7 +2506,7 @@ export class OperationPlan {
     path: readonly string[],
     polymorphicPaths: ReadonlySet<string> | null,
     planningPath: string,
-    planResolver: FieldPlanResolver<any, Step, Step>,
+    planResolver: FieldPlanResolver,
     applyAfterMode: ApplyAfterModeArg,
     rawParentStep: Step,
     field: GraphQLField<any, any>,

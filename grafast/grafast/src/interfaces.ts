@@ -333,9 +333,9 @@ export interface FieldInfo {
  * executions.
  */
 export type FieldPlanResolver<
-  _TArgs extends BaseGraphQLArguments,
-  TParentStep extends Step | null,
-  TResultStep extends Step | null,
+  _TArgs extends BaseGraphQLArguments = BaseGraphQLArguments,
+  TParentStep extends Step = Step,
+  TResultStep extends Step | null = Step | null,
 > = ($parentPlan: TParentStep, args: FieldArgs, info: FieldInfo) => TResultStep;
 
 export type InputObjectFieldApplyResolver<TParent> = (
@@ -436,7 +436,7 @@ export type OutputPlanForType<TType extends GraphQLOutputType> =
  */
 export type GrafastFieldConfig<
   TType extends GraphQLOutputType,
-  TParentStep extends Step | null,
+  TParentStep extends Step,
   TFieldStep extends Step, // TODO: should be OutputPlanForType<TType>, but that results in everything thinking it should be a ListStep
   TArgs extends BaseGraphQLArguments,
 > = Omit<GraphQLFieldConfig<any, any>, "args" | "type"> & {
