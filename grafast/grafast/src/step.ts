@@ -1,7 +1,5 @@
 import chalk from "chalk";
 import type { GraphQLObjectType } from "graphql";
-import type { TE } from "tamedevil";
-import te from "tamedevil";
 
 import { isDev, noop } from "./dev.js";
 import type {
@@ -47,8 +45,6 @@ import { stepADependsOnStepB, stepAMayDependOnStepB } from "./utils.js";
  * @internal
  */
 export const $$noExec = Symbol("noExec");
-
-const ref_flagError = te.ref(flagError, "flagError");
 
 function throwDestroyed(this: Step): any {
   let message: string;
@@ -701,107 +697,11 @@ ${printDeps(step, 1)}
   }
 }
 
-function _buildOptimizedExecuteV2Expression(
-  depCount: number,
-  isSyncAndSafe: boolean,
-) {
-  const identifiers: TE[] = [];
-  for (let i = 0; i < depCount; i++) {
-    identifiers.push(te.identifier(`value${i}`));
-  }
-  const tryOrNot = (inFrag: TE): TE => {
-    if (isSyncAndSafe) {
-      return inFrag;
-    } else {
-      return te`\
-    try {
-  ${te.indent(inFrag)}
-    } catch (e) {
-      results[i] = ${ref_flagError}(e);
-    }\
-`;
-    }
-  };
-  return te`\
-(function execute({
-  count,
-  values: [${te.join(identifiers, ", ")}],
-  extra,
-}) {
-  const results = [];
-  for (let i = 0; i < count; i++) {
-${tryOrNot(te`\
-    results[i] = this.unbatchedExecute(extra, ${te.join(
-      identifiers.map((identifier) => te`${identifier}.at(i)`),
-      ", ",
-    )});\
-`)}
-  }
-  return results;
-})`;
-}
-
-const MAX_DEPENDENCIES_TO_CACHE = 10;
-const unsafeCache: any[] = [];
-const safeCache: any[] = [];
-te.batch(() => {
-  for (let i = 0; i <= MAX_DEPENDENCIES_TO_CACHE; i++) {
-    const depCount = i;
-    const unsafeExpression = _buildOptimizedExecuteV2Expression(
-      depCount,
-      false,
-    );
-    te.runInBatch(unsafeExpression, (fn) => {
-      unsafeCache[depCount] = fn;
-    });
-    const safeExpression = _buildOptimizedExecuteV2Expression(depCount, true);
-    te.runInBatch(safeExpression, (fn) => {
-      safeCache[depCount] = fn;
-    });
-  }
-});
-
-function buildOptimizedExecute(
-  depCount: number,
-  isSyncAndSafe: boolean,
-  callback: (fn: any) => void,
-) {
-  // Try and satisfy from cache
-  const cache = isSyncAndSafe ? safeCache : unsafeCache;
-  if (depCount <= MAX_DEPENDENCIES_TO_CACHE) {
-    callback(cache[depCount]);
-    return;
-  }
-
-  // Build it
-  const expression = _buildOptimizedExecuteV2Expression(
-    depCount,
-    isSyncAndSafe,
-  );
-  te.runInBatch<any>(expression, (fn) => {
-    callback(fn);
-  });
-}
-
 export abstract class UnbatchedStep<TData = any> extends Step<TData> {
   static $$export = {
     moduleName: "grafast",
     exportName: "UnbatchedStep",
   };
-
-  finalize() {
-    if (this.execute === UnbatchedStep.prototype.execute) {
-      // If they've not replaced 'execute', use our optimized form
-      buildOptimizedExecute(
-        this.dependencies.length,
-        this.isSyncAndSafe,
-        (fn) => {
-          this.execute = fn;
-        },
-      );
-    }
-    super.finalize();
-  }
 
   execute({
     indexMap,
