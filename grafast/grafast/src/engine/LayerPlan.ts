@@ -449,6 +449,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     let chain = "";
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     let prev: LayerPlan = this;
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     let current: LayerPlan | null = this;
     while (
       (current = hasParentLayerPlan(current.reason)

@@ -30,12 +30,7 @@ import type { PgCodecAttributes } from "../codecs.js";
 import { TYPES } from "../codecs.js";
 import type { PgResource, PgResourceUnique } from "../datasource.js";
 import type { PgExecutor, PgExecutorInput } from "../executor.js";
-import type {
-  PgCodecRefPath,
-  PgCodecRelation,
-  PgCodecWithAttributes,
-  PgGroupSpec,
-} from "../index.js";
+import type { PgCodecRefPath, PgCodecRelation, PgGroupSpec } from "../index.js";
 import type {
   PgCodec,
   PgOrderFragmentSpec,

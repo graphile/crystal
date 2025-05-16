@@ -4,23 +4,19 @@ import type {
   FragmentDefinitionNode,
   GraphQLArgument,
   GraphQLField,
-  GraphQLFieldMap,
   GraphQLFieldResolver,
   GraphQLInterfaceType,
-  GraphQLList,
   GraphQLObjectType,
   GraphQLOutputType,
   GraphQLSchema,
   GraphQLUnionType,
   OperationDefinitionNode,
-  SelectionNode,
 } from "graphql";
 import * as graphql from "graphql";
 import te from "tamedevil";
 
 import * as assert from "../assert.js";
 import type { Constraint } from "../constraints.js";
-import type { SelectionSetDigest } from "../graphqlCollectFields.js";
 import {
   graphqlCollectFields,
   newSelectionSetDigest,
@@ -108,7 +104,6 @@ import type {
   LayerPlanPhase,
   LayerPlanReasonCombined,
   LayerPlanReasonListItemStream,
-  LayerPlanReasonPolymorphicPartition,
   LayerPlanReasonSubroutine,
 } from "./LayerPlan.js";
 import { LayerPlan } from "./LayerPlan.js";
