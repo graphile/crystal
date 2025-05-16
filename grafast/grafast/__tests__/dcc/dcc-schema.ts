@@ -1,7 +1,7 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import { resolvePreset } from "graphile-config";
 
-import type { Step } from "../../dist/index.js";
+import type { PolymorphicTypePlanner, Step } from "../../dist/index.js";
 import {
   coalesce,
   context,
@@ -147,7 +147,13 @@ export const makeBaseArgs = () => {
           const $crawlerId = inhibitOnNull(
             lambda($specifier, extractCrawlerId),
           );
-          const $crawler = loadOne($crawlerId, batchGetCrawlerById);
+          const $data = context().get("data");
+          const $crawler = loadOne(
+            $crawlerId,
+            $data,
+            null,
+            batchGetCrawlerById,
+          );
           const $crawlerTypename = lambda(
             $crawler as Step<CrawlerData>,
             crawlerToTypeName,
@@ -155,10 +161,23 @@ export const makeBaseArgs = () => {
           const $npcId = inhibitOnNull(
             lambda($specifier, extractNpcId),
           ) as Step<number>;
-          const $npc = loadOne($npcId, batchGetNpcById);
+          const $npc = loadOne($npcId, $data, null, batchGetNpcById);
           const $npcTypename = lambda($npc, npcToTypeName);
           const $__typename = coalesce([$crawlerTypename, $npcTypename]);
-          return { $__typename };
+          return {
+            $__typename,
+            planForType(t) {
+              if (t.getInterfaces().some((iface) => iface.name === "Crawler")) {
+                return $crawler;
+              } else if (
+                t.getInterfaces().some((iface) => iface.name === "NPC")
+              ) {
+                return $npc;
+              } else {
+                return null;
+              }
+            },
+          } as PolymorphicTypePlanner;
         },
       },
     },
