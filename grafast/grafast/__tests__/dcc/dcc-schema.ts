@@ -123,14 +123,12 @@ export const makeBaseArgs = () => {
       },
       ActiveCrawler: {
         bestFriend($activeCrawler) {
-          const $data = context().get("data");
           const $id = get($activeCrawler, "bestFriend") as Step<number>;
-          return loadOne($id, $data, null, batchGetCrawlerById);
+          return $id;
         },
         friends($activeCrawler) {
-          const $data = context().get("data");
           const $ids = get($activeCrawler, "friends") as Step<number[]>;
-          return loadMany($ids, $data, null, batchGetCrawlersByIds);
+          return $ids;
         },
       },
       Crawler: {
