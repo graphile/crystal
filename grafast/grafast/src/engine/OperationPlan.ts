@@ -2409,8 +2409,13 @@ export class OperationPlan {
           newPolymorphicPaths.add(newPolymorphicPath);
         }
 
-        // TODO: fall back to null output plan?
-        const $root = stepForType.get(type)!;
+        let $root = stepForType.get(type);
+        if ($root == null) {
+          console.warn(
+            `${details.positionType}'s planType().planForType(${type}) returned ${$root}`,
+          );
+          $root = this.withRootLayerPlan(() => constant(null));
+        }
 
         // find all selections compatible with `type`
         const fieldNodes = fieldSelectionsForType(this, type, selections);
