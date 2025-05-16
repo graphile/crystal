@@ -1,26 +1,25 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import { resolvePreset } from "graphile-config";
+import { GraphQLInterfaceType } from "graphql";
 
+import type { Step } from "../../dist/index.js";
 import {
   constant,
   context,
+  get,
+  inhibitOnNull,
   lambda,
+  loadMany,
   loadOne,
   makeGrafastSchema,
-  Step,
-  get,
-  loadMany,
-  inhibitOnNull,
 } from "../../dist/index.js";
+import type { CrawlerData, Database } from "./dcc-data.js";
 import {
-  CrawlerData,
-  Database,
   batchGetCrawlerById,
   batchGetCrawlersByIds,
   batchGetNpcById,
   makeData,
 } from "./dcc-data.js";
-import { GraphQLInterfaceType } from "graphql";
 
 const resolvedPreset = resolvePreset({});
 const requestContext = {};
