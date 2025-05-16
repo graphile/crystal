@@ -294,7 +294,7 @@ export function inhibitOnNull<TStep extends Step>(
   return new __FlagStep<TStep>($step, {
     ...options,
     acceptFlags: DEFAULT_ACCEPT_FLAGS & ~FLAG_NULL,
-  });
+  }) as Step<TStep extends Step<infer U> ? Exclude<U, null | undefined> : any>;
 }
 
 /**
