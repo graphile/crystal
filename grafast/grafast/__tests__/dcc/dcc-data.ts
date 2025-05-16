@@ -1,6 +1,6 @@
 /* ALL OF THIS IS TYPESCRIPT, NOT GRAPHQL */
 
-import { LoadManyCallback, LoadOneCallback } from "../../dist";
+import type { LoadManyCallback, LoadOneCallback } from "../../dist";
 
 export interface CrawlerData {
   id: number;
