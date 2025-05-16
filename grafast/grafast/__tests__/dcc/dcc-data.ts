@@ -14,9 +14,9 @@ export interface CrawlerData {
   deleted?: true;
 }
 
-interface NpcData {
+export interface NpcData {
   id: number;
-  type: "Manager" | "Security";
+  type: "Manager" | "Security" | "Guide";
   species: "Changeling" | "Rock Monster" | "Half Elf";
   name: string;
   exCrawler?: boolean;
@@ -25,7 +25,7 @@ interface NpcData {
   friends?: number[];
 }
 
-interface ItemData {
+export interface ItemData {
   id: number;
   name: string;
   type: "Equipment" | "Consumable" | "Misc";
