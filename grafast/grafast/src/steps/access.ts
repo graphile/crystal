@@ -1,6 +1,4 @@
 import chalk from "chalk";
-import type { TE } from "tamedevil";
-import te from "tamedevil";
 
 import { inspect } from "../inspect.js";
 import type { ExecutionExtra, UnbatchedExecutionExtra } from "../interfaces.js";
@@ -34,25 +32,21 @@ function constructDestructureFunction(
   callback: (fn: (_extra: ExecutionExtra, value: any) => any) => void,
 ): void {
   const n = path.length;
-  /** 0 - slow mode; 1 - middle mode; 2 - turbo mode */
-  let mode: 0 | 1 | 2 = n > 50 || n < 1 ? 0 : n > 5 ? 1 : 2;
+  if (n === 0) {
+    throw new Error("Empty path is not valid");
+  }
 
   for (let i = 0; i < n; i++) {
     const pathItem = path[i];
     const t = typeof pathItem;
     if (t === "symbol") {
-      // Cannot use in superfast mode (because cannot create signature)
-      if (mode === 2) mode = 1;
+      // Fine
     } else if (t === "string") {
-      // Cannot use in superfast mode (because signature becomes ambiguous)
-      if (mode === 2 && (pathItem as string).includes("|")) mode = 1;
+      // Fine
     } else if (t === "number") {
-      if (!Number.isFinite(pathItem)) {
-        mode = 0;
-      }
+      // Fine
     } else if (pathItem == null) {
-      // Slow mode required
-      mode = 0;
+      // Fine
     } else {
       throw new Error(
         `Invalid path item: ${inspect(pathItem)} in path '${JSON.stringify(
@@ -62,66 +56,39 @@ function constructDestructureFunction(
     }
   }
 
-  if (mode === 0) {
+  if (n === 1) {
+    const key0 = path[0];
+    if (fallback !== undefined) {
+      callback((_, v) => v?.[key0] ?? fallback);
+    } else {
+      callback((_, v) => v?.[key0]);
+    }
+  } else if (n === 2) {
+    const key0 = path[0];
+    const key1 = path[1];
+    if (fallback !== undefined) {
+      callback((_, v) => v?.[key0]?.[key1] ?? fallback);
+    } else {
+      callback((_, v) => v?.[key0]?.[key1]);
+    }
+  } else if (n === 3) {
+    const key0 = path[0];
+    const key1 = path[1];
+    const key2 = path[2];
+    if (fallback !== undefined) {
+      callback((_, v) => v?.[key0]?.[key1]?.[key2] ?? fallback);
+    } else {
+      callback((_, v) => v?.[key0]?.[key1]?.[key2]);
+    }
+  } else {
     // Slow mode
     callback(function slowlyExtractValueAtPath(_meta: any, value: any): any {
       let current = value;
-      for (let i = 0, l = path.length; i < l && current != null; i++) {
-        const pathItem = path[i];
-        current = current[pathItem];
+      for (let i = 0; i < n && current != null; i++) {
+        current = current[path[i]];
       }
       return current ?? fallback;
     });
-  } else {
-    const signature = (fallback !== undefined ? "f" : "n") + n;
-
-    const done =
-      mode === 2
-        ? (factory: Factory) => {
-            const fn = factory(fallback, ...path);
-            // ?.blah?.bog?.["!!!"]?.[0]
-            const expressionDetail = [path, fallback];
-            (fn as any)[expressionSymbol] = expressionDetail;
-            callback(fn);
-          }
-        : (factory: Factory) => callback(factory(fallback, ...path));
-
-    const fn = makeDestructureCache[signature];
-    if (fn !== undefined) {
-      done(fn);
-      return;
-    }
-    const making = makingDestructureCache[signature];
-    if (making !== undefined) {
-      making.push(done);
-      return;
-    }
-    const doneHandlers: Array<(fn: Factory) => void> = [done];
-    makingDestructureCache[signature] = doneHandlers;
-
-    // DO NOT REFERENCE 'path' BELOW HERE!
-
-    const names: TE[] = [];
-    const access: TE[] = [];
-    for (let i = 0; i < n; i++) {
-      const te_name = te.identifier(`p${i}`);
-      names.push(te_name);
-      access.push(te`[${te_name}]`);
-    }
-    te.runInBatch<Factory>(
-      te`function (fallback, ${te.join(names, ", ")}) {
-return (_meta, value) => value?.${te.join(access, "?.")}${
-        fallback === undefined ? te.blank : te.cache` ?? fallback`
-      };
-}`,
-      (factory) => {
-        makeDestructureCache[signature] = factory;
-        delete makingDestructureCache[signature];
-        for (const doneHandler of doneHandlers) {
-          doneHandler(factory);
-        }
-      },
-    );
   }
 }
 
