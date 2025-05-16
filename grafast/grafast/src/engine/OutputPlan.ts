@@ -1,4 +1,4 @@
-import type LRU from "@graphile/lru";
+import LRU from "@graphile/lru";
 import type {
   DocumentNode,
   FieldNode,
@@ -7,7 +7,8 @@ import type {
   GraphQLScalarType,
 } from "graphql";
 import * as graphql from "graphql";
-import { stringifyJSON, stringifyString } from "tamedevil";
+import type { TE } from "tamedevil";
+import te, { stringifyJSON, stringifyString } from "tamedevil";
 
 import * as assert from "../assert.js";
 import type { Bucket } from "../bucket.js";
@@ -19,14 +20,10 @@ import type {
   JSONValue,
   LocationDetails,
 } from "../interfaces.js";
-import {
-  $$concreteType,
-  $$streamMore,
-  DEFAULT_ACCEPT_FLAGS,
-  FLAG_ERROR,
-} from "../interfaces.js";
+import { $$concreteType, $$streamMore, FLAG_ERROR } from "../interfaces.js";
 import { isPolymorphicData } from "../polymorphic.js";
 import type { Step } from "../step.js";
+import { expressionSymbol } from "../steps/access.js";
 import type { PayloadRoot } from "./executeOutputPlan.js";
 import type { LayerPlan, LayerPlanReasonListItem } from "./LayerPlan.js";
 
@@ -460,18 +457,24 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     );
     if (
       $root instanceof AccessStep &&
+      $root.fallback === undefined &&
       $root.implicitSideEffectStep === null &&
       (!this.sideEffectStep || !stepADependsOnStepB($root, this.sideEffectStep))
     ) {
-      // @ts-ignore
-      const { step: $parent, acceptFlags, onReject } = $root.getDepOptions(0);
-      if (onReject == null && acceptFlags === DEFAULT_ACCEPT_FLAGS) {
+      const expressionDetails:
+        | [ReadonlyArray<string | number>, any]
+        | undefined = ($root.unbatchedExecute! as any)[expressionSymbol];
+      if (expressionDetails !== undefined) {
+        // @ts-ignore
+        const { step: $parent } = $root.getDepOptions(0);
         this.layerPlan.operationPlan.stepTracker.setOutputPlanRootStep(
           this,
           $parent,
         );
-        const d = $root.unbatchedExecute;
-        this.processRoot = (v) => d(null as any, v);
+        const [path, fallback] = expressionDetails;
+        withFastExpression(path, fallback, (fn) => {
+          this.processRoot = fn;
+        });
       }
     }
   }
@@ -1707,4 +1710,49 @@ function makeObjectExecutor<TAsString extends boolean>(
     asString,
     skipNullHandling: isRoot,
   });
+}
+
+const makeCache = new LRU<string, (value: any) => any>({
+  maxLength: 1000,
+});
+const makingCache = new Map<string, Array<(fn: (value: any) => any) => void>>();
+
+function withFastExpression(
+  path: ReadonlyArray<string | number>,
+  fallback: any,
+  callback: (fn: (value: any) => any) => void,
+) {
+  const signature = (fallback === undefined ? "d" : "f") + "_" + path.join("|");
+  const existing = makeCache.get(signature);
+  if (existing !== undefined) {
+    callback(existing);
+    return;
+  }
+  const existingCallbacks = makingCache.get(signature);
+  if (existingCallbacks !== undefined) {
+    existingCallbacks.push(callback);
+    return;
+  }
+  const callbacks = [callback];
+  makingCache.set(signature, callbacks);
+
+  const jitParts: TE[] = [];
+
+  for (let i = 0, l = path.length; i < l; i++) {
+    const part = path[i];
+    jitParts.push(te.optionalGet(part));
+  }
+  const expression = te.join(jitParts, "");
+  te.runInBatch<(value: any) => any>(
+    te`(value => (value${expression})${
+      fallback !== undefined ? te` ?? ${te.lit(fallback)}` : te.blank
+    })`,
+    (fn) => {
+      makeCache.set(signature, fn);
+      makingCache.delete(signature);
+      for (const callback of callbacks) {
+        callback(fn);
+      }
+    },
+  );
 }
