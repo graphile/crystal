@@ -56,6 +56,7 @@ export function currentPolymorphicPaths(): ReadonlySet<string> | null {
   return globalData_polymorphicPaths;
 }
 
+/** UNUSED */
 export function currentPlanningPath(): string | undefined {
   const opPlan = operationPlan();
   if (opPlan.phase === "plan" && globalData_planningPath === undefined) {
