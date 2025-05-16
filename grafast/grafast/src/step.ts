@@ -872,10 +872,7 @@ export abstract class UnbatchedStep<TData = any> extends Step<TData> {
     indexMap,
     values,
     extra,
-  }: ExecutionDetails): PromiseOrDirect<GrafastResultsList<TData>> {
-    console.warn(
-      `${this} didn't call 'super.finalize()' in the finalize method.`,
-    );
+  }: ExecutionDetails): GrafastResultsList<TData> {
     const depCount = this.dependencies.length;
     return indexMap((i) => {
       try {

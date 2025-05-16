@@ -13,7 +13,11 @@ import te, { stringifyJSON, stringifyString } from "tamedevil";
 
 import * as assert from "../assert.js";
 import type { Bucket } from "../bucket.js";
-import { $$streamMore, FLAG_ERROR } from "../constants.js";
+import {
+  $$streamMore,
+  DEFAULT_ACCEPT_FLAGS,
+  FLAG_ERROR,
+} from "../constants.js";
 import { isDev } from "../dev.js";
 import { AccessStep, stepADependsOnStepB, stripAnsi } from "../index.js";
 import { inspect } from "../inspect.js";
@@ -495,9 +499,13 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
       const expressionDetails:
         | [ReadonlyArray<string | number>, any]
         | undefined = ($root.unbatchedExecute! as any)[expressionSymbol];
-      if (expressionDetails !== undefined) {
-        // @ts-ignore
-        const { step: $parent } = $root.getDepOptions(0);
+      // @ts-ignore
+      const { step: $parent, onReject, acceptFlags } = $root.getDepOptions(0);
+      if (
+        expressionDetails !== undefined &&
+        onReject == null &&
+        acceptFlags === DEFAULT_ACCEPT_FLAGS
+      ) {
         this.layerPlan.operationPlan.stepTracker.setOutputPlanRootStep(
           this,
           $parent,
