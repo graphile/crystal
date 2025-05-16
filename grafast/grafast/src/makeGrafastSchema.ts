@@ -673,5 +673,14 @@ export function makeGrafastSchema(details: {
     }
   }
   const schema = new GraphQLSchema(schemaConfig);
+  const errors = graphql.validateSchema(schema);
+  if (errors.length === 1) {
+    throw errors[0];
+  } else if (errors.length > 1) {
+    throw new AggregateError(
+      errors,
+      `Invalid schema; first few errors:\n${errors.slice(0, 5).join("\n")}`,
+    );
+  }
   return schema;
 }
