@@ -5,6 +5,7 @@ import type { PolymorphicTypePlanner, Step } from "../../dist/index.js";
 import {
   coalesce,
   context,
+  each,
   get,
   inhibitOnNull,
   lambda,
@@ -122,13 +123,29 @@ export const makeBaseArgs = () => {
         },
       },
       ActiveCrawler: {
-        bestFriend($activeCrawler) {
-          const $id = get($activeCrawler, "bestFriend") as Step<number>;
+        bestFriend($activeCrawler: Step<CrawlerData>) {
+          const $id = get($activeCrawler, "bestFriend");
           return $id;
         },
-        friends($activeCrawler) {
-          const $ids = get($activeCrawler, "friends") as Step<number[]>;
+        friends($activeCrawler: Step<CrawlerData>) {
+          const $ids = get($activeCrawler, "friends");
           return $ids;
+        },
+      },
+      Manager: {
+        client($manager: Step<NpcData>) {
+          const $id = inhibitOnNull(get($manager, "client"));
+          const $data = context().get("data");
+          return loadOne($id, $data, null, batchGetCrawlerById);
+        },
+      },
+      Security: {
+        clients($security: Step<NpcData>) {
+          const $ids = inhibitOnNull(get($security, "clients"));
+          return each($ids, ($id) => {
+            const $data = context().get("data");
+            return loadOne($id, $data, null, batchGetCrawlerById);
+          });
         },
       },
       Crawler: {
@@ -142,10 +159,11 @@ export const makeBaseArgs = () => {
       },
       Character: {
         __planType($specifier: Step<number>) {
+          const $data = context().get("data");
+
           const $crawlerId = inhibitOnNull(
             lambda($specifier, extractCrawlerId),
           );
-          const $data = context().get("data");
           const $crawler = loadOne(
             $crawlerId,
             $data,
@@ -156,11 +174,13 @@ export const makeBaseArgs = () => {
             $crawler as Step<CrawlerData>,
             crawlerToTypeName,
           );
+
           const $npcId = inhibitOnNull(
             lambda($specifier, extractNpcId),
           ) as Step<number>;
           const $npc = loadOne($npcId, $data, null, batchGetNpcById);
           const $npcTypename = lambda($npc, npcToTypeName);
+
           const $__typename = coalesce([$crawlerTypename, $npcTypename]);
           return {
             $__typename,
