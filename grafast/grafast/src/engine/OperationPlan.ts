@@ -54,6 +54,7 @@ import type {
   LocationDetails,
   Maybe,
   PlanTypeInfo,
+  PolymorphicTypePlanner,
   TrackedArguments,
 } from "../interfaces.js";
 import {
@@ -64,7 +65,6 @@ import {
   ALL_FLAGS,
   DEFAULT_ACCEPT_FLAGS,
 } from "../interfaces.js";
-import type { PolymorphicTypePlanner } from "../makeGrafastSchema.js";
 import type { ApplyAfterModeArg } from "../operationPlan-input.js";
 import { withFieldArgsForArguments } from "../operationPlan-input.js";
 import type { GrafastOperationOptions } from "../prepare.js";

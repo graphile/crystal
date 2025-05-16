@@ -16,7 +16,6 @@ type PromiseOrValue<T> = T | Promise<T>;
 
 import { exportAs, exportAsMany } from "./exportAs.js";
 import { grafastPrint } from "./grafastPrint.js";
-import type { PolymorphicTypePlanner } from "./makeGrafastSchema.js";
 import {
   EnumPlans,
   FieldPlans,
@@ -73,6 +72,7 @@ import type {
   ScalarInputPlanResolver,
   UnaryExecutionValue,
   ValidateSchemaEvent,
+  PolymorphicTypePlanner,
 } from "./interfaces.js";
 import {
   $$bypassGraphQL,

@@ -6,6 +6,7 @@ import type {
   GrafastInputFieldConfig,
   GrafastInputFieldConfigMap,
   OutputPlanForType,
+  PolymorphicTypePlanner,
   Step,
 } from "grafast";
 import type {
@@ -37,7 +38,6 @@ import type {
   GraphQLUnionTypeConfig,
 } from "grafast/graphql";
 
-import type { PolymorphicTypePlanner } from "../../../grafast/grafast/src/makeGrafastSchema.js";
 import type { Behavior, BehaviorDynamicMethods } from "./behavior.js";
 import type { InflectionBase } from "./inflection.js";
 import type { stringTypeSpec, wrapDescription } from "./utils.js";
