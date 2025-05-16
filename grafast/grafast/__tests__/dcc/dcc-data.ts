@@ -27,7 +27,7 @@ interface NpcData {
 interface ItemData {
   id: number;
   name: string;
-  type: "Equipment" | "Consumable";
+  type: "Equipment" | "Consumable" | "Misc";
   creator?: number;
   items?: number[];
 }
@@ -54,8 +54,8 @@ export function makeData(): Database {
         id: 102,
         species: "Cat",
         name: "Princess Donut",
-        items: [204, 205, 206, 207, 211, 212, 213, 214],
-        favouriteItem: 206,
+        items: [204, 206, 207, 211, 212, 213, 214],
+        favouriteItem: 205 /* Favourite item is not in inventory */,
         friends: [101, 103, 104, 105, 301, 302, 303],
         bestFriend: 101,
       },
@@ -64,8 +64,9 @@ export function makeData(): Database {
         species: "Human",
         name: "Katia",
         items: [208, 213, 214, 216],
-        favouriteItem: 209,
+        favouriteItem: 216 /* Favourite item has a creator */,
         friends: [101, 102],
+        bestFriend: 107 /* Best friend is deleted */,
       },
       {
         id: 104,
@@ -73,7 +74,6 @@ export function makeData(): Database {
         name: "Imani",
         items: [209, 210, 210, 212, 213],
         friends: [101, 102, 105, 304],
-        bestFriend: 105,
       },
       {
         id: 105,
@@ -81,7 +81,6 @@ export function makeData(): Database {
         name: "Elle",
         items: [212, 213],
         friends: [101, 102, 104, 304],
-        bestFriend: 104,
       },
       { id: 106, species: "Crocodilian", name: "Dolores", items: [214] },
       { id: 107, species: "Human", name: "Hekla", deleted: true },
@@ -92,7 +91,7 @@ export function makeData(): Database {
         type: "Manager",
         species: "Changeling",
         name: "Mordecai",
-        items: [],
+        items: [212, 212, 212],
         friends: [101, 102, 103],
       },
       {
@@ -100,7 +99,6 @@ export function makeData(): Database {
         type: "Security",
         species: "Rock Monster",
         name: "Bomo",
-        items: [],
         friends: [102, 303],
       },
       {
@@ -108,7 +106,6 @@ export function makeData(): Database {
         type: "Security",
         species: "Rock Monster",
         name: "Sledge",
-        items: [],
         friends: [102, 302],
       },
 
@@ -117,7 +114,6 @@ export function makeData(): Database {
         type: "Manager",
         species: "Half Elf",
         name: "Tiatha",
-        items: [],
         friends: [104, 105],
       },
     ],
@@ -148,10 +144,27 @@ export function makeData(): Database {
         creator: 101,
       },
       {
+        /* This item can have an inventory */
         id: 216,
         name: "Ugly Backpack With a Completely Useless Design",
         type: "Equipment",
         creator: 101,
+        items: [217, 217, 218, 218, 219, 219],
+      },
+      {
+        id: 217,
+        name: "Scrap Metal",
+        type: "Misc",
+      },
+      {
+        id: 218,
+        name: "Scrap Metal Pole",
+        type: "Misc",
+      },
+      {
+        id: 219,
+        name: "Metal Bearing",
+        type: "Misc",
       },
     ],
   };
