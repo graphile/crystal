@@ -6,20 +6,6 @@ import type { Step } from "../step.js";
 import { UnbatchedStep } from "../step.js";
 import { arraysMatch, digestKeys } from "../utils.js";
 
-/** @internal */
-export const expressionSymbol = Symbol("expression");
-
-// We could use an LRU here, but there's no need - there's only 100 possible values;
-type Factory = (
-  fallback: any,
-  ...path: Array<string | number | symbol>
-) => (_extra: ExecutionExtra, value: any) => any;
-const makeDestructureCache: { [signature: string]: Factory | undefined } =
-  Object.create(null);
-const makingDestructureCache: {
-  [signature: string]: Array<(factory: Factory) => void> | undefined;
-} = Object.create(null);
-
 /**
  * Returns a function that will extract the value at the given path from an
  * incoming object. If possible it will return a dynamically constructed
@@ -32,9 +18,6 @@ function constructDestructureFunction(
   callback: (fn: (_extra: ExecutionExtra, value: any) => any) => void,
 ): void {
   const n = path.length;
-  if (n === 0) {
-    throw new Error("Empty path is not valid");
-  }
 
   for (let i = 0; i < n; i++) {
     const pathItem = path[i];
@@ -56,7 +39,13 @@ function constructDestructureFunction(
     }
   }
 
-  if (n === 1) {
+  if (n === 0) {
+    if (fallback !== undefined) {
+      callback((_, v) => v ?? fallback);
+    } else {
+      callback((_, v) => v);
+    }
+  } else if (n === 1) {
     const key0 = path[0];
     if (fallback !== undefined) {
       callback((_, v) => v?.[key0] ?? fallback);
@@ -158,8 +147,12 @@ export class AccessStep<TData> extends UnbatchedStep<TData> {
   }
 
   // An access of an access can become a single access
-  optimize(): AccessStep<TData> {
+  optimize(): Step {
     const $dep = this.getDep(0);
+    if (this.fallback === undefined && this.path.length === 0) {
+      // I don't do anything!
+      return $dep;
+    }
     if ($dep instanceof AccessStep && $dep.fallback === undefined) {
       return access(
         $dep.getDep(0),
