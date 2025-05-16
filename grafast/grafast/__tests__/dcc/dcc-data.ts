@@ -21,6 +21,7 @@ export interface NpcData {
   name: string;
   exCrawler?: boolean;
   client?: number;
+  clients?: number[];
   items?: number[];
   friends?: number[];
 }
@@ -96,7 +97,7 @@ export function makeData(): Database {
         species: "Changeling",
         name: "Mordecai",
         exCrawler: true,
-        client: 101,
+        client: 102,
         items: [212, 212, 212],
         friends: [101, 102, 103],
       },
@@ -106,6 +107,7 @@ export function makeData(): Database {
         species: "Rock Monster",
         name: "Bomo",
         friends: [102, 303],
+        clients: [101, 102, 103],
       },
       {
         id: 303,
@@ -113,6 +115,7 @@ export function makeData(): Database {
         species: "Rock Monster",
         name: "Sledge",
         friends: [102, 302],
+        clients: [101, 102, 103],
       },
 
       {
