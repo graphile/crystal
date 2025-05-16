@@ -70,7 +70,7 @@ import type {
   PgSelectQueryBuilderCallback,
   PgUnionAllQueryBuilderCallback,
 } from "./interfaces.js";
-import {
+import type {
   GetPgCodecAttributes,
   GetPgRegistryCodecRelations,
   GetPgRegistryCodecs,

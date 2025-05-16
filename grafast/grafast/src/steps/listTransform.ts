@@ -16,7 +16,7 @@ import type {
   ExecutionDetails,
 } from "../index.js";
 import type { GrafastResultsList } from "../interfaces.js";
-import { $$deepDepSkip } from "../interfaces.js";
+import { $$deepDepSkip } from "../constants.js";
 import type { ListCapableStep } from "../step.js";
 import { isListCapableStep, Step } from "../step.js";
 import { __ItemStep } from "./__item.js";

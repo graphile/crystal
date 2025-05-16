@@ -1,16 +1,16 @@
 import chalk from "chalk";
 
 import type { Bucket } from "./bucket.js";
-import { bucketToString } from "./engine/executeBucket.js";
-import { OutputPlan } from "./engine/OutputPlan.js";
-import { inspect } from "./inspect.js";
 import {
   FLAG_ERROR,
   FLAG_INHIBITED,
   FLAG_NULL,
   FLAG_POLY_SKIPPED,
   FLAG_STOPPED,
-} from "./interfaces.js";
+} from "./constants.js";
+import { bucketToString } from "./engine/executeBucket.js";
+import { OutputPlan } from "./engine/OutputPlan.js";
+import { inspect } from "./inspect.js";
 import { Step } from "./step.js";
 import { stripAnsi } from "./stripAnsi.js";
 import {

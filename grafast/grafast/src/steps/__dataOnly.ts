@@ -1,11 +1,11 @@
-import { currentPolymorphicPaths } from "../engine/lib/withGlobalLayerPlan.js";
-import type { ExecutionDetails } from "../index.js";
-import { $$inhibit, operationPlan } from "../index.js";
 import {
   FLAG_INHIBITED,
   FLAG_POLY_SKIPPED,
   TRAPPABLE_FLAGS,
-} from "../interfaces.js";
+} from "../constants.js";
+import { currentPolymorphicPaths } from "../engine/lib/withGlobalLayerPlan.js";
+import type { ExecutionDetails } from "../index.js";
+import { $$inhibit, operationPlan } from "../index.js";
 import { Step } from "../step.js";
 
 const TRAPPABLE_OR_POLY_SKIPPED = TRAPPABLE_FLAGS | FLAG_POLY_SKIPPED;

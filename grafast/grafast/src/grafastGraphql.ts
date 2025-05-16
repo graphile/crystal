@@ -17,7 +17,7 @@ import type {
   ParseAndValidateEvent,
   ValidateSchemaEvent,
 } from "./interfaces.js";
-import { $$queryCache } from "./interfaces.js";
+import { $$queryCache } from "./constants.js";
 import { getGrafastMiddleware } from "./middleware.js";
 import { isPromiseLike } from "./utils.js";
 

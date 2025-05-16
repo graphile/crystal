@@ -14,7 +14,7 @@ import type {
   ExecutionEventMap,
   GrafastExecutionArgs,
 } from "./interfaces.js";
-import { $$eventEmitter, $$extensions } from "./interfaces.js";
+import { $$eventEmitter, $$extensions } from "./constants.js";
 import { getGrafastMiddleware } from "./middleware.js";
 import type { GrafastOperationOptions } from "./prepare.js";
 import { grafastPrepare } from "./prepare.js";

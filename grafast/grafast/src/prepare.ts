@@ -8,6 +8,13 @@ import { isAsyncIterable } from "iterall";
 
 import * as assert from "./assert.js";
 import type { Bucket, RequestTools } from "./bucket.js";
+import {
+  $$eventEmitter,
+  $$extensions,
+  $$streamMore,
+  FLAG_ERROR,
+  NO_FLAGS,
+} from "./constants.js";
 import type { Deferred } from "./deferred.js";
 import { defer } from "./deferred.js";
 import { isDev } from "./dev.js";
@@ -44,13 +51,6 @@ import type {
   PromiseOrDirect,
   StreamMaybeMoreableArray,
   StreamMoreableArray,
-} from "./interfaces.js";
-import {
-  $$eventEmitter,
-  $$extensions,
-  $$streamMore,
-  FLAG_ERROR,
-  NO_FLAGS,
 } from "./interfaces.js";
 import { timeSource } from "./timeSource.js";
 import { arrayOfLength, isPromiseLike } from "./utils.js";

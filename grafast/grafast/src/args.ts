@@ -5,7 +5,7 @@ import type {
   PrepareArgsEvent,
   PromiseOrDirect,
 } from "./interfaces.js";
-import { $$hooked } from "./interfaces.js";
+import { $$hooked } from "./constants.js";
 import { getGrafastMiddleware } from "./middleware.js";
 import { isPromiseLike } from "./utils.js";
 const EMPTY_OBJECT: Record<string, never> = Object.freeze(Object.create(null));

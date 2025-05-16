@@ -1,13 +1,3 @@
-import type { FlaggedValue } from "../error.js";
-import { $$inhibit, flagError, SafeError } from "../error.js";
-import { inspect } from "../inspect.js";
-import type {
-  AddDependencyOptions,
-  DataFromStep,
-  ExecutionDetails,
-  ExecutionEntryFlags,
-  GrafastResultsList,
-} from "../interfaces.js";
 import {
   $$deepDepSkip,
   ALL_FLAGS,
@@ -17,6 +7,16 @@ import {
   FLAG_INHIBITED,
   FLAG_NULL,
   TRAPPABLE_FLAGS,
+} from "../constants.js";
+import type { FlaggedValue } from "../error.js";
+import { $$inhibit, flagError, SafeError } from "../error.js";
+import { inspect } from "../inspect.js";
+import type {
+  AddDependencyOptions,
+  DataFromStep,
+  ExecutionDetails,
+  ExecutionEntryFlags,
+  GrafastResultsList,
 } from "../interfaces.js";
 import type { ListCapableStep } from "../step.js";
 import { isListCapableStep, Step } from "../step.js";

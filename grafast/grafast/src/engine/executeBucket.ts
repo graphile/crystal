@@ -2,6 +2,16 @@ import { isAsyncIterable, isIterable } from "iterall";
 
 import * as assert from "../assert.js";
 import type { Bucket, RequestTools, SharedBucketState } from "../bucket.js";
+import {
+  $$streamMore,
+  $$timeout,
+  FLAG_ERROR,
+  FLAG_INHIBITED,
+  FLAG_NULL,
+  FLAG_POLY_SKIPPED,
+  FLAG_STOPPED,
+  NO_FLAGS,
+} from "../constants.js";
 import { isDev } from "../dev.js";
 import { isFlaggedValue, SafeError } from "../error.js";
 import { inspect } from "../inspect.js";
@@ -22,16 +32,6 @@ import type {
   StreamMaybeMoreableArray,
   UnaryExecutionValue,
   UnbatchedExecutionExtra,
-} from "../interfaces.js";
-import {
-  $$streamMore,
-  $$timeout,
-  FLAG_ERROR,
-  FLAG_INHIBITED,
-  FLAG_NULL,
-  FLAG_POLY_SKIPPED,
-  FLAG_STOPPED,
-  NO_FLAGS,
 } from "../interfaces.js";
 import type { Step, UnbatchedStep } from "../step.js";
 import { __ItemStep } from "../steps/__item.js";

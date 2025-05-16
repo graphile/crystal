@@ -13,7 +13,7 @@ import type {
   Fragments,
   LinkedList,
 } from "./interfaces.js";
-import { $$cacheByOperation, $$timeout, $$ts } from "./interfaces.js";
+import { $$cacheByOperation, $$timeout, $$ts } from "./constants.js";
 import type { GrafastOperationOptions } from "./prepare.js";
 import { timeSource } from "./timeSource.js";
 

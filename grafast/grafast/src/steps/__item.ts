@@ -1,7 +1,7 @@
 import chalk from "chalk";
 
 import type { GrafastResultsList, JSONValue } from "../index.js";
-import { $$deepDepSkip } from "../interfaces.js";
+import { $$deepDepSkip } from "../constants.js";
 import type { Step } from "../step.js";
 import { $$noExec, UnbatchedStep } from "../step.js";
 

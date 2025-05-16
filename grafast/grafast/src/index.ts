@@ -49,9 +49,6 @@ import {
 import { grafast, grafastSync } from "./grafastGraphql.js";
 import { inspect } from "./inspect.js";
 import type {
-  $$cacheByOperation,
-  $$hooked,
-  $$queryCache,
   ArgumentApplyPlanResolver,
   BatchExecutionValue,
   CacheByOperationEntry,
@@ -73,18 +70,10 @@ import type {
   ScalarInputPlanResolver,
   UnaryExecutionValue,
   ValidateSchemaEvent,
-} from "./interfaces.js";
-import {
-  $$bypassGraphQL,
-  $$eventEmitter,
-  $$extensions,
-  $$idempotent,
-  $$verbatim,
   BaseEventMap,
   BaseGraphQLArguments,
   BaseGraphQLRootValue,
   BaseGraphQLVariables,
-  DEFAULT_ACCEPT_FLAGS,
   EventCallback,
   EventMapKey,
   ExecutionDetails,
@@ -121,6 +110,17 @@ import {
   TypedEventEmitter,
   UnbatchedExecutionExtra,
 } from "./interfaces.js";
+import {
+  $$cacheByOperation,
+  $$hooked,
+  $$queryCache,
+  $$bypassGraphQL,
+  $$eventEmitter,
+  $$extensions,
+  $$idempotent,
+  $$verbatim,
+  DEFAULT_ACCEPT_FLAGS,
+} from "./constants.js";
 import { getGrafastMiddleware } from "./middleware.js";
 import type { Multistep, UnwrapMultistep } from "./multistep.js";
 import { multistep } from "./multistep.js";

@@ -37,7 +37,7 @@ import {
   ALL_FLAGS,
   DEFAULT_FORBIDDEN_FLAGS,
   TRAPPABLE_FLAGS,
-} from "./interfaces.js";
+} from "./constants.js";
 import type { __DataOnlyStep } from "./steps/__dataOnly.js";
 import type { __FlagStep, __ItemStep } from "./steps/index.js";
 import { stepADependsOnStepB, stepAMayDependOnStepB } from "./utils.js";

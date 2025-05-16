@@ -21,7 +21,7 @@ import type {
   JSONValue,
   LocationDetails,
 } from "../interfaces.js";
-import { $$streamMore, FLAG_ERROR } from "../interfaces.js";
+import { $$streamMore, FLAG_ERROR } from "../constants.js";
 import type { Step } from "../step.js";
 import { expressionSymbol } from "../steps/access.js";
 import { pathsFromAncestorToTargetLayerPlan } from "../utils.js";
