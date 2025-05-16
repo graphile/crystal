@@ -20,6 +20,7 @@ interface NpcData {
   species: "Changeling" | "Rock Monster" | "Half Elf";
   name: string;
   exCrawler?: boolean;
+  client?: number;
   items?: number[];
   friends?: number[];
 }
@@ -49,6 +50,7 @@ export function makeData(): Database {
         favouriteItem: 203,
         friends: [102, 103, 104, 105, 301],
         bestFriend: 102,
+        crawlerNumber: 4122,
       },
       {
         id: 102,
@@ -58,6 +60,7 @@ export function makeData(): Database {
         favouriteItem: 205 /* Favourite item is not in inventory */,
         friends: [101, 103, 104, 105, 301, 302, 303],
         bestFriend: 101,
+        crawlerNumber: 4119,
       },
       {
         id: 103,
@@ -67,20 +70,21 @@ export function makeData(): Database {
         favouriteItem: 216 /* Favourite item has a creator */,
         friends: [101, 102],
         bestFriend: 107 /* Best friend is deleted */,
+        crawlerNumber: 9077265,
       },
       {
         id: 104,
         species: "Human",
         name: "Imani",
         items: [209, 210, 210, 212, 213],
-        friends: [101, 102, 105, 304],
+        friends: [101, 102, 105],
       },
       {
         id: 105,
         species: "Human",
         name: "Elle",
         items: [212, 213],
-        friends: [101, 102, 104, 304],
+        friends: [101, 102, 104],
       },
       { id: 106, species: "Crocodilian", name: "Dolores", items: [214] },
       { id: 107, species: "Human", name: "Hekla", deleted: true },
@@ -91,6 +95,8 @@ export function makeData(): Database {
         type: "Manager",
         species: "Changeling",
         name: "Mordecai",
+        exCrawler: true,
+        client: 101,
         items: [212, 212, 212],
         friends: [101, 102, 103],
       },
@@ -114,7 +120,8 @@ export function makeData(): Database {
         type: "Manager",
         species: "Half Elf",
         name: "Tiatha",
-        friends: [104, 105],
+        exCrawler: true,
+        client: 105,
       },
     ],
     items: [
