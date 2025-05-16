@@ -22,6 +22,7 @@ import type {
   ExecutionDetails,
   ExecutionEntryFlags,
   ExecutionResults,
+  ExecutionResultValue,
   GrafastResultsList,
   JSONValue,
   PromiseOrDirect,
@@ -703,14 +704,23 @@ export abstract class UnbatchedStep<TData = any> extends Step<TData> {
     exportName: "UnbatchedStep",
   };
 
+  finalize() {
+    if (this.dependencies.length === 0) {
+      this.execute = this.execute0;
+    } else if (this.dependencies.length === 1) {
+      this.execute = this.execute1;
+    } else if (this.dependencies.length === 2) {
+      this.execute = this.execute2;
+    } else if (this.dependencies.length === 3) {
+      this.execute = this.execute3;
+    }
+  }
+
   execute({
     indexMap,
     values,
     extra,
-  }: ExecutionDetails): PromiseOrDirect<GrafastResultsList<TData>> {
-    console.warn(
-      `${this} didn't call 'super.finalize()' in the finalize method.`,
-    );
+  }: ExecutionDetails): GrafastResultsList<TData> {
     const depCount = this.dependencies.length;
     return indexMap((i) => {
       try {
@@ -723,6 +733,68 @@ export abstract class UnbatchedStep<TData = any> extends Step<TData> {
         return flagError(e);
       }
     });
+  }
+
+  execute0({ extra, count }: ExecutionDetails): GrafastResultsList<TData> {
+    const result = [] as ExecutionResultValue<PromiseOrDirect<TData>>[];
+    for (let i = 0; i < count; i++) {
+      try {
+        result[i] = this.unbatchedExecute(extra);
+      } catch (e) {
+        result[i] = flagError<Error>(e);
+      }
+    }
+    return result;
+  }
+  execute1({
+    extra,
+    count,
+    values: [val0],
+  }: ExecutionDetails): GrafastResultsList<TData> {
+    const result = [] as ExecutionResultValue<PromiseOrDirect<TData>>[];
+    for (let i = 0; i < count; i++) {
+      try {
+        result[i] = this.unbatchedExecute(extra, val0.at(i));
+      } catch (e) {
+        result[i] = flagError<Error>(e);
+      }
+    }
+    return result;
+  }
+  execute2({
+    extra,
+    count,
+    values: [val0, val1],
+  }: ExecutionDetails): GrafastResultsList<TData> {
+    const result = [] as ExecutionResultValue<PromiseOrDirect<TData>>[];
+    for (let i = 0; i < count; i++) {
+      try {
+        result[i] = this.unbatchedExecute(extra, val0.at(i), val1.at(i));
+      } catch (e) {
+        result[i] = flagError<Error>(e);
+      }
+    }
+    return result;
+  }
+  execute3({
+    extra,
+    count,
+    values: [val0, val1, val2],
+  }: ExecutionDetails): GrafastResultsList<TData> {
+    const result = [] as ExecutionResultValue<PromiseOrDirect<TData>>[];
+    for (let i = 0; i < count; i++) {
+      try {
+        result[i] = this.unbatchedExecute(
+          extra,
+          val0.at(i),
+          val1.at(i),
+          val2.at(i),
+        );
+      } catch (e) {
+        result[i] = flagError<Error>(e);
+      }
+    }
+    return result;
   }
 
   abstract unbatchedExecute(
