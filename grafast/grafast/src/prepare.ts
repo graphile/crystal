@@ -9,6 +9,7 @@ import { isAsyncIterable } from "iterall";
 import * as assert from "./assert.js";
 import type { Bucket, RequestTools } from "./bucket.js";
 import {
+  $$contextPlanCache,
   $$eventEmitter,
   $$extensions,
   $$streamMore,
@@ -32,6 +33,7 @@ import type {
 } from "./engine/executeOutputPlan.js";
 import { executeOutputPlan } from "./engine/executeOutputPlan.js";
 import { POLYMORPHIC_ROOT_PATH } from "./engine/OperationPlan.js";
+import type { OperationPlan } from "./engine/OperationPlan.js";
 import type { OutputPlan } from "./engine/OutputPlan.js";
 import {
   coerceError,
@@ -39,11 +41,7 @@ import {
   getDirectLayerPlanChild,
 } from "./engine/OutputPlan.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
-import type {
-  GrafastExecutionArgs,
-  GrafastPlanJSON,
-  OperationPlan,
-} from "./index.js";
+import type { GrafastExecutionArgs } from "./interfaces.js";
 import type {
   EstablishOperationPlanEvent,
   GrafastTimeouts,
@@ -57,7 +55,6 @@ import { arrayOfLength, isPromiseLike } from "./utils.js";
 
 const { GraphQLError } = graphql;
 
-const $$contextPlanCache = Symbol("contextPlanCache");
 const $$bypassGraphQL = Symbol("bypassGraphQL");
 
 export interface GrafastOperationOptions {
@@ -551,12 +548,6 @@ function executePreemptive(
     return bucketPromise.then(output);
   } else {
     return output();
-  }
-}
-
-declare module "./engine/OperationPlan.js" {
-  interface OperationPlan {
-    [$$contextPlanCache]?: GrafastPlanJSON;
   }
 }
 

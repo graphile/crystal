@@ -66,6 +66,8 @@ export const $$queryCache = Symbol("queryCache");
  */
 export const $$cacheByOperation = Symbol("cacheByOperation");
 
+export const $$contextPlanCache = Symbol("contextPlanCache");
+
 /**
  * A bitwise number representing a number of flags:
  *

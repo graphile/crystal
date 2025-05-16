@@ -54,6 +54,7 @@ import type {
   TrackedArguments,
 } from "../interfaces.js";
 import {
+  $$contextPlanCache,
   $$proxy,
   $$subroutine,
   $$timeout,
@@ -226,6 +227,8 @@ export class OperationPlan {
   /* This only exists to make establishOperationPlan easier for TypeScript */
   public readonly [$$timeout]: undefined;
   public readonly [$$ts]: undefined;
+  /** @internal */
+  public [$$contextPlanCache]?: GrafastPlanJSON;
 
   public readonly queryType: GraphQLObjectType;
   public readonly mutationType: GraphQLObjectType | null;
