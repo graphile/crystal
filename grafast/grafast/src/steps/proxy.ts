@@ -48,12 +48,6 @@ export class ProxyStep<T> extends UnbatchedStep<T> {
   stream = undefined;
 }
 
-declare module "../step.js" {
-  interface Step {
-    [$$proxy]?: any;
-  }
-}
-
 function makeProxyHandler<T>($toStep: Step<T>): ProxyHandler<Step<T>> {
   return {
     // $proxy - the ProxyStep instance

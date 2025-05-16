@@ -33,6 +33,7 @@ import type {
 } from "./interfaces.js";
 import {
   $$deepDepSkip,
+  $$proxy,
   $$subroutine,
   ALL_FLAGS,
   DEFAULT_FORBIDDEN_FLAGS,
@@ -113,6 +114,8 @@ export /* abstract */ class Step<TData = any> {
   public readonly layerPlan: LayerPlan;
   public readonly operationPlan: OperationPlan;
   public [$$subroutine]: LayerPlan<LayerPlanReasonSubroutine> | null = null;
+  /** @internal */
+  public [$$proxy]?: any;
   public isArgumentsFinalized: boolean;
   public isFinalized: boolean;
   /** @internal */
