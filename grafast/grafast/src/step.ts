@@ -966,12 +966,12 @@ export function assertListCapableStep<TData, TItemStep extends Step<TData>>(
 }
 
 export function stepHasToSpecifier<TStep extends Step>(
-  $step: TStep & { toSpecifier?: () => Step },
+  $step: TStep,
 ): $step is TStep & { toSpecifier(): Step } {
   return typeof $step.toSpecifier === "function";
 }
 export function stepHasToRecord<TStep extends Step>(
-  $step: TStep & { toRecord?: () => Step },
+  $step: TStep,
 ): $step is TStep & { toRecord(): Step } {
   return typeof $step.toRecord === "function";
 }
