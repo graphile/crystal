@@ -1,13 +1,5 @@
 import type { FieldPlanResolver } from "../../interfaces.js";
-import type { Step } from "../../step.js";
-import { access } from "../../steps/access.js";
+import { get } from "../../steps/access.js";
 
-export const defaultPlanResolver: FieldPlanResolver<
-  any,
-  Step & { get?: (field: string) => Step },
-  any
-> = ($step, _, { fieldName }) => {
-  return typeof $step.get === "function"
-    ? $step.get(fieldName)
-    : access($step, [fieldName]);
-};
+export const defaultPlanResolver: FieldPlanResolver = ($step, _, info) =>
+  get($step, info.fieldName);

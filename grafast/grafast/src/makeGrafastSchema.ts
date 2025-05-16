@@ -14,6 +14,7 @@ import type {
   FieldPlanResolver,
   InputObjectFieldApplyResolver,
   InputObjectTypeBakedResolver,
+  PolymorphicTypePlanner,
   ScalarPlanResolver,
 } from "./interfaces.js";
 import type { Step } from "./step.js";
@@ -83,7 +84,34 @@ export type InputObjectPlans = {
  * The plan config for an interface or union type.
  */
 export type InterfaceOrUnionPlans = {
-  __resolveType?: (o: unknown) => string;
+  /**
+   * Runtime. If the polymorphic data just needs resolving to a type name, this
+   * method can be used to return said type name. If planning of polymorphism
+   * is more complex for this polymorphic type (for example, if it includes
+   * fetching of data) then the `__planType` method should be used instead.
+   *
+   * Warning: this method is more expensive than __planType because it requires
+   * the implementation of GraphQL.js emulation.
+   */
+  __resolveType?: graphql.GraphQLTypeResolver<any, Grafast.Context>;
+
+  /**
+   * Takes a step representing this polymorphic position, and returns a
+   * "specifier" step that will be input to __planType. If not specified, the
+   * step's own `.toSpecifier()` will be used, if present, otherwise the
+   * step's own `.toRecord()`, and failing that the step itself.
+   */
+  __toSpecifier?($step: Step): Step;
+
+  /**
+   * Plantime. `$specifier` is either a step returned from a polymorphic field
+   * or list position, or a `__ValueStep` that represents the combined values
+   * of such steps (to prevent unbounded plan branching). `__planType` must
+   * then construct a step that represents the `__typename` related to this
+   * given specifier (or `null` if no match can be found) and a `planForType`
+   * method which, when called, should return the step for the given type.
+   */
+  __planType?: ($specifier: Step) => PolymorphicTypePlanner;
 };
 
 /**
@@ -481,6 +509,18 @@ export function makeGrafastSchema(details: {
           exportNameHint(polyPlans.__resolveType, `${typeName}_resolveType`);
           config.resolveType = polyPlans.__resolveType;
         }
+        if (polyPlans?.__toSpecifier) {
+          exportNameHint(polyPlans.__toSpecifier, `${typeName}_toSpecifier`);
+          config.extensions ??= Object.create(null);
+          (config.extensions as any).grafast ??= Object.create(null);
+          config.extensions!.grafast!.toSpecifier = polyPlans.__toSpecifier;
+        }
+        if (polyPlans?.__planType) {
+          exportNameHint(polyPlans.__planType, `${typeName}_planType`);
+          config.extensions ??= Object.create(null);
+          (config.extensions as any).grafast ??= Object.create(null);
+          config.extensions!.grafast!.planType = polyPlans.__planType;
+        }
         return new graphql.GraphQLInterfaceType(config);
       } else if (isUnionType(astType)) {
         const rawConfig = astType.toConfig();
@@ -497,6 +537,18 @@ export function makeGrafastSchema(details: {
         if (polyPlans?.__resolveType) {
           exportNameHint(polyPlans.__resolveType, `${typeName}_resolveType`);
           config.resolveType = polyPlans.__resolveType;
+        }
+        if (polyPlans?.__toSpecifier) {
+          exportNameHint(polyPlans.__toSpecifier, `${typeName}_toSpecifier`);
+          config.extensions ??= Object.create(null);
+          (config.extensions as any).grafast ??= Object.create(null);
+          config.extensions!.grafast!.toSpecifier = polyPlans.__toSpecifier;
+        }
+        if (polyPlans?.__planType) {
+          exportNameHint(polyPlans.__planType, `${typeName}_planType`);
+          config.extensions ??= Object.create(null);
+          (config.extensions as any).grafast ??= Object.create(null);
+          config.extensions!.grafast!.planType = polyPlans.__planType;
         }
         return new graphql.GraphQLUnionType(config);
       } else if (isScalarType(astType)) {
@@ -621,5 +673,14 @@ export function makeGrafastSchema(details: {
     }
   }
   const schema = new GraphQLSchema(schemaConfig);
+  const errors = graphql.validateSchema(schema);
+  if (errors.length === 1) {
+    throw errors[0];
+  } else if (errors.length > 1) {
+    throw new AggregateError(
+      errors,
+      `Invalid schema; first few errors:\n${errors.slice(0, 5).join("\n")}`,
+    );
+  }
   return schema;
 }

@@ -1,4 +1,5 @@
 ## expect(errors).toHaveLength(3)
+#> dontLogErrors: true
 {
   randomUser {
     username

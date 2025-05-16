@@ -87,14 +87,14 @@ export class RemapKeysStep extends UnbatchedStep {
     );
   }
 
-  optimize() {
+  optimize(): Step {
     for (const [key, val] of Object.entries(this.actualKeyByDesiredKey)) {
       if (String(key) !== String(val)) {
         return this;
       }
     }
     // If we're not actually remapping, just return the parent
-    return this.getDep(0);
+    return this.getDep(0) as Step;
   }
 
   finalize(): void {

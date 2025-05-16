@@ -304,9 +304,8 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                                 } else {
                                   const identifiers = getIdentifiers(nodeId);
                                   if (identifiers == null) {
-                                    console.log(identifiers, nodeId, typeName);
                                     throw new Error(
-                                      `Invalid node identifier for '${typeName}'`,
+                                      `Invalid node identifier for '${typeName}': ${JSON.stringify(nodeId)}`,
                                     );
                                   }
                                   for (let i = 0; i < attributeCount; i++) {

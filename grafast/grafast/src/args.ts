@@ -1,11 +1,11 @@
 import type { ExecutionArgs } from "graphql";
 
+import { $$hooked } from "./constants.js";
 import type {
   GrafastExecutionArgs,
   PrepareArgsEvent,
   PromiseOrDirect,
 } from "./interfaces.js";
-import { $$hooked } from "./interfaces.js";
 import { getGrafastMiddleware } from "./middleware.js";
 import { isPromiseLike } from "./utils.js";
 const EMPTY_OBJECT: Record<string, never> = Object.freeze(Object.create(null));

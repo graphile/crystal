@@ -481,7 +481,9 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
             pgClass.relname
           }', but a relation by that name already exists; consider renaming the relation by overriding the 'sourceRelationName' inflector`;
           if (isEquivalent) {
-            console.warn(message);
+            if (!info.options.muteWarnings) {
+              console.warn(message);
+            }
             return;
           } else {
             throw new Error(message);

@@ -7,10 +7,11 @@ import {
   isScalarType,
 } from "graphql";
 
+import { operationPlan } from "../global.js";
 import type { AnyInputStep, UnbatchedExecutionExtra } from "../interfaces.js";
 import type { Step } from "../step.js";
 import { UnbatchedStep } from "../step.js";
-import { constant, ConstantStep, operationPlan } from "./index.js";
+import { constant, ConstantStep } from "./constant.js";
 
 let currentModifiers: Modifier<any>[] = [];
 let applyingModifiers = false;

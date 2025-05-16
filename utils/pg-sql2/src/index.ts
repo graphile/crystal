@@ -33,6 +33,9 @@ const isDev =
   (process.env.GRAPHILE_ENV === "development" ||
     process.env.GRAPHILE_ENV === "test");
 
+const includeComments =
+  typeof process !== "undefined" && process.env.PGSQL2_DEBUG === "1";
+
 const nodeInspect: CustomInspectFunction = function (
   this: SQLNode | SQLQuery,
   depth,
@@ -78,6 +81,16 @@ export interface SQLRawNode {
   readonly [$$type]: "RAW";
   /** text @internal */
   readonly t: string;
+}
+
+/**
+ * An SQL comment, ignored during comparisons
+ */
+export interface SQLCommentNode {
+  __proto__?: PgSQL2Proto;
+  readonly [$$type]: "COMMENT";
+  /** @internal */
+  readonly commentText: string;
 }
 
 /**
@@ -152,6 +165,7 @@ export interface SQLPlaceholderNode {
 
 export type SQLNode =
   | SQLRawNode
+  | SQLCommentNode
   | SQLValueNode
   | SQLIdentifierNode
   | SQLIndentNode
@@ -256,6 +270,25 @@ function makeRawNode(text: string, exportName?: string): SQLRawNode {
   return newNode;
 }
 
+function makeCommentNode(commentText: string): SQLCommentNode {
+  if (typeof commentText !== "string") {
+    throw new Error(
+      `[pg-sql2] Invalid argument to makeCommentNode - expected string, but received '${inspect(
+        commentText,
+      )}'`,
+    );
+  }
+  if (commentText.includes("*/") || commentText.includes("/*")) {
+    throw new Error(`Forbidden comment text!`);
+  }
+  const newNode: SQLCommentNode = {
+    __proto__: pgSQL2Proto,
+    [$$type]: "COMMENT" as const,
+    commentText,
+  };
+  return newNode;
+}
+
 // Simple function to help V8 optimize it.
 function makeIdentifierNode(
   s: symbol,
@@ -316,6 +349,9 @@ function makeQueryNode(nodes: ReadonlyArray<SQLNode>, flags = 0): SQLQuery {
         for (let i = 0, l = t.length, l2 = l > 10000 ? 10000 : l; i < l2; i++) {
           checksum += t.charCodeAt(i);
         }
+        break;
+      }
+      case "COMMENT": {
         break;
       }
       case "VALUE": {
@@ -500,6 +536,10 @@ export function compile(
           sqlFragments.push(
             isDev ? item.t.replace(/\n/g, "\n" + "  ".repeat(indent)) : item.t,
           );
+          break;
+        }
+        case "COMMENT": {
+          sqlFragments.push(`/* ${item.commentText} */`);
           break;
         }
         case "IDENTIFIER": {
@@ -1032,6 +1072,8 @@ export function parens(frag: SQL, force?: boolean): SQL {
     return frag;
   } else if (frag[$$type] === "IDENTIFIER") {
     return frag;
+  } else if (frag[$$type] === "COMMENT") {
+    return frag;
   } else if (frag[$$type] === "RAW") {
     const expr = frag.t;
     if (expr.match(NUMBER_REGEX_1) || expr.match(NUMBER_REGEX_2)) {
@@ -1058,6 +1100,14 @@ export function placeholder(
   fallback?: SQL,
 ): SQLPlaceholderNode {
   return makePlaceholderNode(symbol, fallback);
+}
+
+export function comment(commentText: string): SQLCommentNode | SQLRawNode {
+  if (includeComments) {
+    return makeCommentNode(commentText);
+  } else {
+    return sql.blank;
+  }
 }
 
 export function arraysMatch<T>(
@@ -1140,6 +1190,9 @@ export function isEquivalent(
         }
         return isEquivalent(sql1.c, sql2.c, options);
       }
+      case "COMMENT": {
+        return true;
+      }
       case "IDENTIFIER": {
         if (sql2[$$type] !== sql1[$$type]) {
           return false;
@@ -1181,6 +1234,7 @@ function replaceSymbolInNode(
   replacement: symbol,
 ): SQLNode {
   switch (frag[$$type]) {
+    case "COMMENT":
     case "RAW": {
       return frag;
     }
@@ -1329,6 +1383,7 @@ export interface PgSQL<TEmbed = never> {
   indent: typeof indent;
   indentIf: typeof indentIf;
   parens: typeof parens;
+  comment: typeof comment;
   symbolAlias: typeof symbolAlias;
   placeholder: typeof placeholder;
   blank: typeof blank;
@@ -1359,6 +1414,7 @@ const attributes = {
   indent,
   indentIf,
   parens,
+  comment,
   symbolAlias,
   placeholder,
   blank,

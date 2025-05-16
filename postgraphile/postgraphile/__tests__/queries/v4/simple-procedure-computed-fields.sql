@@ -41,7 +41,7 @@ select
     where (
       __post__."author_id" = __person__."id"
     )
-    order by __post__."id" desc
+    order by __post__."id" asc
     limit 2
   )::text as "4",
   array(
@@ -65,12 +65,36 @@ select
       )::text
     ]::text[]
     from "a"."post" as __post_2
-    where (
-      __post_2."author_id" = __person__."id"
-    )
+    where
+      (
+        __post_2."author_id" = __person__."id"
+      ) and (
+        __post_2."headline" = $1::"text"
+      )
     order by __post_2."id" asc
-    limit 2
   )::text as "5",
+  array(
+    select array[
+      __compound_key__."person_id_1"::text,
+      __compound_key__."person_id_2"::text
+    ]::text[]
+    from "c"."compound_key" as __compound_key__
+    where (
+      __compound_key__."person_id_1" = __person__."id"
+    )
+    order by __compound_key__."person_id_1" asc, __compound_key__."person_id_2" asc
+  )::text as "6",
+  array(
+    select array[
+      __compound_key_2."person_id_1"::text,
+      __compound_key_2."person_id_2"::text
+    ]::text[]
+    from "c"."compound_key" as __compound_key_2
+    where (
+      __compound_key_2."person_id_2" = __person__."id"
+    )
+    order by __compound_key_2."person_id_1" asc, __compound_key_2."person_id_2" asc
+  )::text as "7",
   array(
     select array[
       __post_3."headline",
@@ -92,14 +116,12 @@ select
       )::text
     ]::text[]
     from "a"."post" as __post_3
-    where
-      (
-        __post_3."author_id" = __person__."id"
-      ) and (
-        __post_3."headline" = $1::"text"
-      )
-    order by __post_3."id" asc
-  )::text as "6",
+    where (
+      __post_3."author_id" = __person__."id"
+    )
+    order by __post_3."id" desc
+    limit 2
+  )::text as "8",
   array(
     select array[
       __post_4."headline",
@@ -128,28 +150,6 @@ select
         __post_4."headline" = $2::"text"
       )
     order by __post_4."id" asc
-  )::text as "7",
-  array(
-    select array[
-      __compound_key__."person_id_1"::text,
-      __compound_key__."person_id_2"::text
-    ]::text[]
-    from "c"."compound_key" as __compound_key__
-    where (
-      __compound_key__."person_id_1" = __person__."id"
-    )
-    order by __compound_key__."person_id_1" asc, __compound_key__."person_id_2" asc
-  )::text as "8",
-  array(
-    select array[
-      __compound_key_2."person_id_1"::text,
-      __compound_key_2."person_id_2"::text
-    ]::text[]
-    from "c"."compound_key" as __compound_key_2
-    where (
-      __compound_key_2."person_id_2" = __person__."id"
-    )
-    order by __compound_key_2."person_id_1" asc, __compound_key_2."person_id_2" asc
   )::text as "9",
   array(
     select array[
@@ -203,7 +203,7 @@ select
     where (
       __post__."author_id" = __person__."id"
     )
-    order by __post__."id" desc
+    order by __post__."id" asc
     limit 2
   )::text as "2",
   array(
@@ -227,12 +227,36 @@ select
       )::text
     ]::text[]
     from "a"."post" as __post_2
-    where (
-      __post_2."author_id" = __person__."id"
-    )
+    where
+      (
+        __post_2."author_id" = __person__."id"
+      ) and (
+        __post_2."headline" = $1::"text"
+      )
     order by __post_2."id" asc
-    limit 2
   )::text as "3",
+  array(
+    select array[
+      __compound_key__."person_id_1"::text,
+      __compound_key__."person_id_2"::text
+    ]::text[]
+    from "c"."compound_key" as __compound_key__
+    where (
+      __compound_key__."person_id_1" = __person__."id"
+    )
+    order by __compound_key__."person_id_1" asc, __compound_key__."person_id_2" asc
+  )::text as "4",
+  array(
+    select array[
+      __compound_key_2."person_id_1"::text,
+      __compound_key_2."person_id_2"::text
+    ]::text[]
+    from "c"."compound_key" as __compound_key_2
+    where (
+      __compound_key_2."person_id_2" = __person__."id"
+    )
+    order by __compound_key_2."person_id_1" asc, __compound_key_2."person_id_2" asc
+  )::text as "5",
   array(
     select array[
       __post_3."headline",
@@ -254,14 +278,12 @@ select
       )::text
     ]::text[]
     from "a"."post" as __post_3
-    where
-      (
-        __post_3."author_id" = __person__."id"
-      ) and (
-        __post_3."headline" = $1::"text"
-      )
-    order by __post_3."id" asc
-  )::text as "4",
+    where (
+      __post_3."author_id" = __person__."id"
+    )
+    order by __post_3."id" desc
+    limit 2
+  )::text as "6",
   array(
     select array[
       __post_4."headline",
@@ -290,28 +312,6 @@ select
         __post_4."headline" = $2::"text"
       )
     order by __post_4."id" asc
-  )::text as "5",
-  array(
-    select array[
-      __compound_key__."person_id_1"::text,
-      __compound_key__."person_id_2"::text
-    ]::text[]
-    from "c"."compound_key" as __compound_key__
-    where (
-      __compound_key__."person_id_1" = __person__."id"
-    )
-    order by __compound_key__."person_id_1" asc, __compound_key__."person_id_2" asc
-  )::text as "6",
-  array(
-    select array[
-      __compound_key_2."person_id_1"::text,
-      __compound_key_2."person_id_2"::text
-    ]::text[]
-    from "c"."compound_key" as __compound_key_2
-    where (
-      __compound_key_2."person_id_2" = __person__."id"
-    )
-    order by __compound_key_2."person_id_1" asc, __compound_key_2."person_id_2" asc
   )::text as "7",
   array(
     select array[

@@ -152,6 +152,8 @@ order by __post__."id" asc;
 select
   __person__."person_full_name" as "0",
   "c"."person_first_name"(__person__) as "1",
+  __person_first_post__."id"::text as "2",
+  __person_first_post__."headline" as "3",
   array(
     select array[
       __person_friends__."person_full_name",
@@ -166,9 +168,7 @@ select
       )::text
     ]::text[]
     from "c"."person_friends"(__person__) as __person_friends__
-  )::text as "2",
-  __person_first_post__."id"::text as "3",
-  __person_first_post__."headline" as "4"
+  )::text as "4"
 from "c"."person" as __person__
 left outer join "c"."person_first_post"(__person__) as __person_first_post__
 on TRUE

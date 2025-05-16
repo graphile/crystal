@@ -13,6 +13,7 @@ import { makeV4Preset } from "../../../src/presets/v4.js";
 import {
   snapshot,
   StripOidsPlugin,
+  SwallowAllErrorsPlugin,
   withPoolClientTransaction,
 } from "../../helpers.js";
 
@@ -32,6 +33,7 @@ export const test =
   ) =>
   () =>
     withPoolClientTransaction(async (client) => {
+      const muteWarnings = additionalPreset.gather?.muteWarnings ?? true;
       if (setup) {
         if (typeof setup === "function") {
           await setup(client);
@@ -44,7 +46,13 @@ export const test =
       const graphileBuildOptions = {};
       const preset: GraphileConfig.Preset = {
         extends: [AmberPreset, v4Preset, additionalPreset],
-        plugins: [StripOidsPlugin],
+        plugins: [
+          StripOidsPlugin,
+          ...(muteWarnings ? [SwallowAllErrorsPlugin] : []),
+        ],
+        gather: {
+          muteWarnings,
+        },
         pgServices: [
           {
             adaptor,
@@ -71,6 +79,7 @@ export const test =
           } satisfies GraphileConfig.PgServiceConfiguration<"@dataplan/pg/adaptors/pg">,
         ],
         schema: {
+          muteWarnings,
           ...graphileBuildOptions,
         },
       };

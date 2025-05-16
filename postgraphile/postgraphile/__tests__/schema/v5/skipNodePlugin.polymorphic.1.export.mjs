@@ -1,5 +1,5 @@
-import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgFromExpression, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUnionAll, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, ConstantStep, EdgeStep, ObjectStep, __ValueStep, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, lambda, makeGrafastSchema, object, rootValue, stepAMayDependOnStepB } from "grafast";
+import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, PgUnionAllSingleStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgFromExpression, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUnionAll, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
+import { ConnectionStep, ConstantStep, EdgeStep, ObjectStep, __ValueStep, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, lambda, makeGrafastSchema, object, rootValue, stepAMayDependOnStepB } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 const EMPTY_ARRAY = [];
@@ -4591,6 +4591,13 @@ function qbWhereBuilder(qb) {
 }
 const otherSource_single_table_item_relationsPgResource = registry.pgResources["single_table_item_relations"];
 const otherSource_single_table_item_relation_composite_pksPgResource = registry.pgResources["single_table_item_relation_composite_pks"];
+const SingleTableItem_typeNameFromType = ((interfaceTypeName, polymorphism) => {
+  function typeNameFromType(typeVal) {
+    return polymorphism.types[typeVal]?.name ?? null;
+  }
+  typeNameFromType.displayName = `${interfaceTypeName}_typeNameFromType`;
+  return typeNameFromType;
+})("SingleTableItem", spec_singleTableItems.polymorphism);
 function BigIntSerialize(value) {
   return "" + value;
 }
@@ -4776,6 +4783,21 @@ const resourceByTypeName4 = {
   Person: otherSource_peoplePgResource,
   Organization: otherSource_organizationsPgResource
 };
+const resourceByTypeName5 = {
+  __proto__: null,
+  AwsApplication: otherSource_aws_applicationsPgResource,
+  GcpApplication: otherSource_gcp_applicationsPgResource
+};
+const resourceByTypeName6 = {
+  __proto__: null,
+  FirstPartyVulnerability: paths_0_resource_first_party_vulnerabilitiesPgResource,
+  ThirdPartyVulnerability: paths_1_resource_third_party_vulnerabilitiesPgResource
+};
+const resourceByTypeName7 = {
+  __proto__: null,
+  Organization: otherSource_organizationsPgResource,
+  Person: otherSource_peoplePgResource
+};
 const resource_first_party_vulnerabilities_cvss_score_intPgResource = registry.pgResources["first_party_vulnerabilities_cvss_score_int"];
 const otherSource_gcp_application_first_party_vulnerabilitiesPgResource = registry.pgResources["gcp_application_first_party_vulnerabilities"];
 const members5 = [{
@@ -4826,7 +4848,7 @@ const paths5 = [{
     isUnique: true
   }]
 }];
-const resourceByTypeName5 = {
+const resourceByTypeName8 = {
   __proto__: null,
   AwsApplication: otherSource_aws_applicationsPgResource,
   GcpApplication: otherSource_gcp_applicationsPgResource
@@ -4958,7 +4980,7 @@ const paths6 = [{
     isUnique: true
   }]
 }];
-const resourceByTypeName6 = {
+const resourceByTypeName9 = {
   __proto__: null,
   Person: otherSource_peoplePgResource,
   Organization: otherSource_organizationsPgResource
@@ -5012,7 +5034,7 @@ const paths7 = [{
     isUnique: true
   }]
 }];
-const resourceByTypeName7 = {
+const resourceByTypeName10 = {
   __proto__: null,
   FirstPartyVulnerability: paths_0_resource_first_party_vulnerabilitiesPgResource,
   ThirdPartyVulnerability: paths_1_resource_third_party_vulnerabilitiesPgResource
@@ -5050,7 +5072,7 @@ const paths8 = [{
     isUnique: true
   }]
 }];
-const resourceByTypeName8 = {
+const resourceByTypeName11 = {
   __proto__: null,
   Person: otherSource_peoplePgResource,
   Organization: otherSource_organizationsPgResource
@@ -5104,7 +5126,7 @@ const paths9 = [{
     isUnique: true
   }]
 }];
-const resourceByTypeName9 = {
+const resourceByTypeName12 = {
   __proto__: null,
   AwsApplication: otherSource_aws_applicationsPgResource,
   GcpApplication: otherSource_gcp_applicationsPgResource
@@ -5236,11 +5258,18 @@ const paths10 = [{
     isUnique: true
   }]
 }];
-const resourceByTypeName10 = {
+const resourceByTypeName13 = {
   __proto__: null,
   Person: otherSource_peoplePgResource,
   Organization: otherSource_organizationsPgResource
 };
+const RelationalItem_typeNameFromType = ((interfaceTypeName, polymorphism) => {
+  function typeNameFromType(typeVal) {
+    return polymorphism.types[typeVal]?.name ?? null;
+  }
+  typeNameFromType.displayName = `${interfaceTypeName}_typeNameFromType`;
+  return typeNameFromType;
+})("RelationalItem", spec_relationalItems.polymorphism);
 const otherSource_prioritiesPgResource = registry.pgResources["priorities"];
 const relational_topics_relational_topicsPgResource = registry.pgResources["relational_topics"];
 const relational_item_relations_relational_item_relationsPgResource = registry.pgResources["relational_item_relations"];
@@ -5286,7 +5315,7 @@ const members11 = [{
   resource: paths_1_resource_third_party_vulnerabilitiesPgResource,
   typeName: "ThirdPartyVulnerability"
 }];
-const resourceByTypeName11 = {
+const resourceByTypeName14 = {
   __proto__: null,
   FirstPartyVulnerability: paths_0_resource_first_party_vulnerabilitiesPgResource,
   ThirdPartyVulnerability: paths_1_resource_third_party_vulnerabilitiesPgResource
@@ -5298,13 +5327,16 @@ const members12 = [{
   resource: otherSource_gcp_applicationsPgResource,
   typeName: "GcpApplication"
 }];
-const resourceByTypeName12 = {
+const resourceByTypeName15 = {
   __proto__: null,
   AwsApplication: otherSource_aws_applicationsPgResource,
   GcpApplication: otherSource_gcp_applicationsPgResource
 };
 const members13 = [];
-const resourceByTypeName13 = {
+const resourceByTypeName16 = {
+  __proto__: null
+};
+const resourceByTypeName17 = {
   __proto__: null
 };
 export const typeDefs = /* GraphQL */`type SingleTableTopic implements SingleTableItem {
@@ -14072,6 +14104,32 @@ export const plans = {
       });
     }
   },
+  SingleTableItem: {
+    __toSpecifier(step) {
+      if (step instanceof PgSelectSingleStep) {
+        return object(Object.fromEntries(single_table_itemsUniques[0].attributes.map(attrName => [attrName, get2(step, attrName)])));
+      } else {
+        return step;
+      }
+    },
+    __planType($specifier, {
+      $original
+    }) {
+      const $step = $original ?? $specifier;
+      const $typeVal = get2($step, "type");
+      const $__typename = lambda($typeVal, SingleTableItem_typeNameFromType, true);
+      return {
+        $__typename,
+        planForType() {
+          if ($step instanceof PgSelectSingleStep) {
+            return $step;
+          } else {
+            return otherSource_single_table_itemsPgResource.get(Object.fromEntries(single_table_itemsUniques[0].attributes.map(attrName => [attrName, get2($step, attrName)])));
+          }
+        }
+      };
+    }
+  },
   BigInt: {
     serialize: BigIntSerialize,
     parseValue: BigIntSerialize,
@@ -14770,10 +14828,64 @@ export const plans = {
       return $list.single();
     }
   },
+  Application: {
+    __toSpecifier($step) {
+      if ($step instanceof PgUnionAllSingleStep) {
+        return $step.toSpecifier();
+      } else {
+        return $step;
+      }
+    },
+    __planType($specifier) {
+      const $__typename = get2($specifier, "__typename");
+      return {
+        $__typename,
+        planForType(t) {
+          const resource = resourceByTypeName5[t.name];
+          if (!resource) {
+            throw new Error(`Type ${t.name} has no associated resource`);
+          }
+          const pk = resource.uniques.find(u => u.isPrimary) ?? resource.uniques[0];
+          const spec = Object.create(null);
+          for (const attrName of pk.attributes) {
+            spec[attrName] = get2($specifier, attrName);
+          }
+          return resource.get(spec);
+        }
+      };
+    }
+  },
   VulnerabilityConnection: {
     __assertStep: ConnectionStep,
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+    }
+  },
+  Vulnerability: {
+    __toSpecifier($step) {
+      if ($step instanceof PgUnionAllSingleStep) {
+        return $step.toSpecifier();
+      } else {
+        return $step;
+      }
+    },
+    __planType($specifier) {
+      const $__typename = get2($specifier, "__typename");
+      return {
+        $__typename,
+        planForType(t) {
+          const resource = resourceByTypeName6[t.name];
+          if (!resource) {
+            throw new Error(`Type ${t.name} has no associated resource`);
+          }
+          const pk = resource.uniques.find(u => u.isPrimary) ?? resource.uniques[0];
+          const spec = Object.create(null);
+          for (const attrName of pk.attributes) {
+            spec[attrName] = get2($specifier, attrName);
+          }
+          return resource.get(spec);
+        }
+      };
     }
   },
   ApplicationConnection: {
@@ -14808,6 +14920,26 @@ export const plans = {
   },
   PersonOrOrganizationConnection: {
     __assertStep: ConnectionStep
+  },
+  PersonOrOrganization: {
+    __planType($specifier) {
+      const $__typename = get2($specifier, "__typename");
+      return {
+        $__typename,
+        planForType(t) {
+          const resource = resourceByTypeName7[t.name];
+          if (!resource) {
+            throw new Error(`Could not determine resource for ${t.name}`);
+          }
+          const pk = resource.uniques.find(u => u.isPrimary) ?? resource.uniques[0];
+          const spec = Object.create(null);
+          for (const attrName of pk.attributes) {
+            spec[attrName] = get2($specifier, attrName);
+          }
+          return resource.get(spec);
+        }
+      };
+    }
   },
   PersonOrOrganizationEdge: {
     __assertStep: assertEdgeCapableStep,
@@ -14953,7 +15085,7 @@ export const plans = {
         }
         const $list = pgUnionAll({
           attributes: spec_Application.attributes,
-          resourceByTypeName: resourceByTypeName5,
+          resourceByTypeName: resourceByTypeName8,
           members: members5,
           name: "applications"
         });
@@ -15009,7 +15141,7 @@ export const plans = {
       }
       const $list = pgUnionAll({
         attributes: attributes3,
-        resourceByTypeName: resourceByTypeName6,
+        resourceByTypeName: resourceByTypeName9,
         members: members6,
         name: "owners"
       });
@@ -15216,7 +15348,7 @@ export const plans = {
         }
         const $list = pgUnionAll({
           attributes: spec_Vulnerability.attributes,
-          resourceByTypeName: resourceByTypeName7,
+          resourceByTypeName: resourceByTypeName10,
           members: members7,
           name: "vulnerabilities"
         });
@@ -15272,7 +15404,7 @@ export const plans = {
       }
       const $list = pgUnionAll({
         attributes: attributes4,
-        resourceByTypeName: resourceByTypeName8,
+        resourceByTypeName: resourceByTypeName11,
         members: members8,
         name: "owner"
       });
@@ -15471,7 +15603,7 @@ export const plans = {
         }
         const $list = pgUnionAll({
           attributes: spec_Application.attributes,
-          resourceByTypeName: resourceByTypeName9,
+          resourceByTypeName: resourceByTypeName12,
           members: members9,
           name: "applications"
         });
@@ -15527,7 +15659,7 @@ export const plans = {
       }
       const $list = pgUnionAll({
         attributes: attributes5,
-        resourceByTypeName: resourceByTypeName10,
+        resourceByTypeName: resourceByTypeName13,
         members: members10,
         name: "owners"
       });
@@ -16447,6 +16579,54 @@ export const plans = {
     __assertStep: ConnectionStep,
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+    }
+  },
+  RelationalItem: {
+    __toSpecifier(step) {
+      if (step instanceof PgSelectSingleStep) {
+        return object({
+          ...Object.fromEntries(relational_itemsUniques[0].attributes.map(attrName => [attrName, get2(step, attrName)])),
+          ["type"]: get2(step, "type")
+        });
+      } else {
+        return step;
+      }
+    },
+    __planType($specifier, {
+      $original
+    }) {
+      const $step = $original ?? $specifier;
+      const $typeVal = get2($step, "type");
+      const $__typename = lambda($typeVal, RelationalItem_typeNameFromType, true);
+      return {
+        $__typename,
+        planForType(type) {
+          const spec = Object.values(spec_relationalItems.polymorphism.types).find(s => s.name === type.name);
+          if (!spec) {
+            throw new Error(`${this} Could not find matching name for relational polymorphic '${type.name}'`);
+          }
+          const relationIdentifier = spec.relationName;
+          if ($step instanceof PgSelectSingleStep) {
+            if ($step.resource === otherSource_relational_itemsPgResource) {
+              // It's the core table, redirect to the relation
+              return $step.singleRelation(relationIdentifier);
+            } else {
+              return $step;
+            }
+          } else {
+            const relation = otherSource_relational_itemsPgResource.getRelation(relationIdentifier);
+            if (!relation || !relation.isUnique) {
+              throw new Error(`${String(relationIdentifier)} is not a unique relation on ${otherSource_relational_itemsPgResource}`);
+            }
+            const {
+              remoteResource,
+              remoteAttributes,
+              localAttributes
+            } = relation;
+            return remoteResource.get(Object.fromEntries(remoteAttributes.map((remoteAttribute, idx) => [remoteAttribute, get2($step, localAttributes[idx])])));
+          }
+        }
+      };
     }
   },
   RelationalItemRelationConnection: {
@@ -19697,7 +19877,7 @@ export const plans = {
       plan() {
         const $list = pgUnionAll({
           attributes: spec_Vulnerability.attributes,
-          resourceByTypeName: resourceByTypeName11,
+          resourceByTypeName: resourceByTypeName14,
           members: members11,
           name: "Vulnerability"
         });
@@ -19742,7 +19922,7 @@ export const plans = {
       plan() {
         const $list = pgUnionAll({
           attributes: spec_Application.attributes,
-          resourceByTypeName: resourceByTypeName12,
+          resourceByTypeName: resourceByTypeName15,
           members: members12,
           name: "Application"
         });
@@ -19787,7 +19967,7 @@ export const plans = {
       plan() {
         const $list = pgUnionAll({
           attributes: spec_ZeroImplementation.attributes,
-          resourceByTypeName: resourceByTypeName13,
+          resourceByTypeName: resourceByTypeName16,
           members: members13,
           name: "ZeroImplementation"
         });
@@ -20514,6 +20694,33 @@ export const plans = {
     __assertStep: ConnectionStep,
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+    }
+  },
+  ZeroImplementation: {
+    __toSpecifier($step) {
+      if ($step instanceof PgUnionAllSingleStep) {
+        return $step.toSpecifier();
+      } else {
+        return $step;
+      }
+    },
+    __planType($specifier) {
+      const $__typename = get2($specifier, "__typename");
+      return {
+        $__typename,
+        planForType(t) {
+          const resource = resourceByTypeName17[t.name];
+          if (!resource) {
+            throw new Error(`Type ${t.name} has no associated resource`);
+          }
+          const pk = resource.uniques.find(u => u.isPrimary) ?? resource.uniques[0];
+          const spec = Object.create(null);
+          for (const attrName of pk.attributes) {
+            spec[attrName] = get2($specifier, attrName);
+          }
+          return resource.get(spec);
+        }
+      };
     }
   },
   ZeroImplementationEdge: {

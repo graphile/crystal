@@ -36,8 +36,8 @@ where (
 
 select
   __relational_items__."id"::text as "0",
-  __relational_items__."constructor" as "1",
-  __relational_items__."type"::text as "2"
+  __relational_items__."type"::text as "1",
+  __relational_items__."constructor" as "2"
 from "js_reserved"."relational_items" as __relational_items__
 order by __relational_items__."id" asc;
 

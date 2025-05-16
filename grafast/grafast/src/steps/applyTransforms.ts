@@ -1,5 +1,6 @@
 import * as assert from "../assert.js";
 import type { Bucket } from "../bucket.js";
+import { FLAG_ERROR } from "../constants.js";
 import { isDev } from "../dev.js";
 import {
   batchExecutionValue,
@@ -11,11 +12,7 @@ import type { LayerPlanReasonSubroutine } from "../engine/LayerPlan.js";
 import { LayerPlan } from "../engine/LayerPlan.js";
 import { withGlobalLayerPlan } from "../engine/lib/withGlobalLayerPlan.js";
 import { flagError } from "../error.js";
-import {
-  type ExecutionDetails,
-  FLAG_ERROR,
-  type GrafastResultsList,
-} from "../interfaces.js";
+import type { ExecutionDetails, GrafastResultsList } from "../interfaces.js";
 import type { ListCapableStep } from "../step.js";
 import { isListCapableStep, Step } from "../step.js";
 import { __ItemStep } from "./__item.js";
@@ -47,16 +44,18 @@ export class ApplyTransformsStep extends Step {
   ) {
     super();
     const listPlan = itemsOrStep($step);
-    this.addDependency(listPlan);
+    this.addDataDependency(listPlan);
 
     // Plan this subroutine
-    this.subroutineLayer = new LayerPlan(this.operationPlan, this.layerPlan, {
+    this.subroutineLayer = new LayerPlan(this.operationPlan, {
       type: "subroutine",
+      parentLayerPlan: this.layerPlan,
       parentStep: this,
     });
     const itemPlan = withGlobalLayerPlan(
       this.subroutineLayer,
       listPlan.polymorphicPaths,
+      null,
       () => {
         // This does NOT use `itemPlanFor` because __ListTransformPlans are special.
         const $__listItem = new __ItemStep(listPlan);
@@ -168,17 +167,15 @@ export class ApplyTransformsStep extends Step {
     });
 
     if (size > 0) {
-      const childBucket = newBucket(
-        {
-          layerPlan: childLayerPlan,
-          size,
-          store,
-          flagUnion: bucket.flagUnion,
-          polymorphicPathList,
-          iterators,
-        },
-        bucket.metaByMetaKey,
-      );
+      const childBucket = newBucket(bucket, {
+        layerPlan: childLayerPlan,
+        size,
+        store,
+        flagUnion: bucket.flagUnion,
+        polymorphicPathList,
+        polymorphicType: null,
+        iterators,
+      });
       await executeBucket(childBucket, extra._requestContext);
     }
 

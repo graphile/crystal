@@ -1,13 +1,18 @@
+import { $$subroutine, ALL_FLAGS } from "../constants.js";
 import { isDev } from "../dev.js";
 import type { OperationPlan } from "../index.js";
 import { inspect } from "../inspect.js";
-import type { AddDependencyOptions } from "../interfaces.js";
-import { $$subroutine, ALL_FLAGS, TRAPPABLE_FLAGS } from "../interfaces.js";
+import type {
+  AddDependencyOptions,
+  AddUnaryDependencyOptions,
+} from "../interfaces.js";
 import { Step } from "../step.js";
+import { __dataOnly, __DataOnlyStep } from "../steps/__dataOnly.js";
 import { __FlagStep } from "../steps/__flag.js";
 import { sudo, writeableArray } from "../utils.js";
 import type {
   LayerPlan,
+  LayerPlanReasonCombined,
   LayerPlanReasonSubroutine,
   LayerPlanReasonsWithParentStep,
 } from "./LayerPlan.js";
@@ -55,6 +60,11 @@ export class StepTracker {
   public layerPlansByParentStep = new Map<
     Step,
     Set<LayerPlan<LayerPlanReasonsWithParentStep>>
+  >();
+  /** @internal */
+  public layerPlansByDependentStep = new Map<
+    Step,
+    Set<LayerPlan<LayerPlanReasonCombined>>
   >();
 
   /** @internal */
@@ -134,6 +144,7 @@ export class StepTracker {
       case "root":
       case "subscription":
       case "mutationField":
+      case "polymorphicPartition":
       case "defer": {
         break;
       }
@@ -168,6 +179,9 @@ export class StepTracker {
         }
         parent[$$subroutine] =
           layerPlan as LayerPlan<LayerPlanReasonSubroutine>;
+        break;
+      }
+      case "combined": {
         break;
       }
       default: {
@@ -223,13 +237,25 @@ export class StepTracker {
       });
     }
     this.layerPlans[layerPlan.id] = null;
+
     // Remove layerPlan from its parent
-    if (layerPlan.parentLayerPlan !== null) {
-      const idx = layerPlan.parentLayerPlan.children.indexOf(layerPlan);
+    if (layerPlan.reason.type === "root") {
+      // no action
+    } else if (layerPlan.reason.type === "combined") {
+      for (const parentLayerPlan of layerPlan.reason.parentLayerPlans) {
+        const idx = parentLayerPlan.children.indexOf(layerPlan);
+        if (idx >= 0) {
+          parentLayerPlan.children.splice(idx, 1);
+        }
+      }
+    } else {
+      const parentLayerPlan = layerPlan.reason.parentLayerPlan;
+      const idx = parentLayerPlan.children.indexOf(layerPlan);
       if (idx >= 0) {
-        layerPlan.parentLayerPlan.children.splice(idx, 1);
+        parentLayerPlan.children.splice(idx, 1);
       }
     }
+
     // Remove references
     const $root = layerPlan.rootStep;
     if ($root) {
@@ -242,6 +268,16 @@ export class StepTracker {
         this.layerPlansByParentStep
           .get($parent)!
           .delete(layerPlan as LayerPlan<LayerPlanReasonsWithParentStep>);
+      }
+    }
+    if (layerPlan.reason.type === "combined") {
+      for (const combo of layerPlan.combinations) {
+        for (const source of combo.sources) {
+          const step = this.getStepById(source.stepId);
+          this.layerPlansByDependentStep
+            .get(step)!
+            .delete(layerPlan as LayerPlan<LayerPlanReasonCombined>);
+        }
       }
     }
     // Remove all plans in this layer
@@ -292,7 +328,9 @@ export class StepTracker {
     options: AddDependencyOptions,
   ): number {
     const $dependent = sudo(raw$dependent);
-    const $dependency = sudo(options.step);
+    const $dependency = options.dataOnly
+      ? sudo(__dataOnly(options.step))
+      : sudo(options.step);
     if (!this.activeSteps.has($dependent)) {
       throw new Error(
         `Cannot add ${$dependency} as a dependency of ${$dependent}; the latter is deleted!`,
@@ -337,15 +375,28 @@ export class StepTracker {
       skipDeduplication,
       acceptFlags = ALL_FLAGS & ~$dependent.defaultForbiddenFlags,
       onReject,
+      dataOnly = false,
     } = options;
     // When copying dependencies between classes, we might not want to
     // deduplicate because we might refer to the dependency by its index. As
     // such, we should only dedupe by default but allow opting out.
     // TODO: change this to `!skipDeduplication`
     if (skipDeduplication === false) {
-      const existingIndex = dependentDependencies.indexOf($dependency);
+      const $searchForMe = options.step;
+      const existingIndex = dependentDependencies.indexOf($searchForMe);
       if (existingIndex >= 0) {
         return existingIndex;
+      }
+      if (dataOnly) {
+        for (let i = 0, l = dependentDependencies.length; i < l; i++) {
+          const dep = dependentDependencies[i];
+          if (
+            dep instanceof __DataOnlyStep &&
+            sudo(dep).dependencies[0] === $searchForMe
+          ) {
+            return i;
+          }
+        }
       }
     }
 
@@ -358,7 +409,8 @@ export class StepTracker {
       $dependent._isUnary = false;
     }
 
-    const forbiddenFlags = ALL_FLAGS & ~(acceptFlags & TRAPPABLE_FLAGS);
+    const forbiddenFlags =
+      ALL_FLAGS & ~(acceptFlags & $dependent.__trappableFlags);
 
     this.stepsWithNoDependenciesByConstructor
       .get($dependent.constructor)
@@ -376,15 +428,20 @@ export class StepTracker {
 
   public addStepUnaryDependency(
     $dependent: Step,
-    options: AddDependencyOptions,
+    options: AddUnaryDependencyOptions,
   ): number {
+    if (options.dataOnly) {
+      throw new Error(
+        `${$dependent} attempted to add dataOnly unary dependency; this is not permitted.`,
+      );
+    }
     const $dependency = options.step;
+    const { nonUnaryMessage = defaultNonUnaryMessage, ...rest } = options;
     if (!$dependency._isUnary) {
-      const { nonUnaryMessage = defaultNonUnaryMessage } = options;
       throw new Error(nonUnaryMessage($dependent, $dependency));
     }
     $dependency._isUnaryLocked = true;
-    return this.addStepDependency($dependent, options);
+    return this.addStepDependency($dependent, { ...rest, dataOnly: false });
   }
 
   public setOutputPlanRootStep(outputPlan: OutputPlan, $dependency: Step) {
@@ -530,6 +587,33 @@ export class StepTracker {
       }
     }
 
+    // Update combos
+    {
+      const layerPlans = this.layerPlansByDependentStep.get($original);
+      if (layerPlans?.size) {
+        let layerPlansByReplacementDependentStep =
+          this.layerPlansByDependentStep.get($replacement);
+        if (!layerPlansByReplacementDependentStep) {
+          layerPlansByReplacementDependentStep = new Set();
+          this.layerPlansByDependentStep.set(
+            $replacement,
+            layerPlansByReplacementDependentStep,
+          );
+        }
+        for (const layerPlan of layerPlans) {
+          for (const combo of layerPlan.combinations) {
+            for (const source of combo.sources) {
+              if (source.stepId === $original.id) {
+                source.stepId = $replacement.id;
+              }
+            }
+          }
+          layerPlansByReplacementDependentStep.add(layerPlan);
+        }
+        layerPlans.clear();
+      }
+    }
+
     // NOTE: had to add the code ensuring all the layer plan parentStepId's
     // existed to fix polymorphism, but it feels wrong. Should we be doing
     // something different?
@@ -588,6 +672,8 @@ export class StepTracker {
     if (s2 && s2.size !== 0) return false;
     const s3 = this.layerPlansByParentStep.get($step);
     if (s3 && s3.size !== 0) return false;
+    const s4 = this.layerPlansByDependentStep.get($step);
+    if (s4 && s4.size !== 0) return false;
     return true;
   }
 

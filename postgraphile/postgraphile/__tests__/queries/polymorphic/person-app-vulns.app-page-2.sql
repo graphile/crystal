@@ -221,10 +221,3 @@ lateral (
     __first_party_vulnerabilities__."id" = __first_party_vulnerabilities_identifiers__."id0"
   )
 ) as __first_party_vulnerabilities_result__;
-
-select
-  __first_party_vulnerabilities__."id"::text as "0"
-from "polymorphic"."first_party_vulnerabilities" as __first_party_vulnerabilities__
-where (
-  __first_party_vulnerabilities__."id" = $1::"int4"
-);

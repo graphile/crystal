@@ -57,6 +57,18 @@ import { makeSchema } from "../src/index.js";
 import AmberPreset from "../src/presets/amber.js";
 import { makeV4Preset } from "../src/presets/v4.js";
 
+export const SwallowAllErrorsPlugin: GraphileConfig.Plugin = {
+  name: "SwallowAllErrorsPlugin",
+  schema: {
+    hooks: {
+      build(build) {
+        build.handleRecoverableError = () => {};
+        return build;
+      },
+    },
+  },
+};
+
 /**
  * We go beyond what Jest snapshots allow; so we have to manage it ourselves.
  * If UPDATE_SNAPSHOTS is set then we'll write updated snapshots, otherwise
@@ -66,7 +78,9 @@ import { makeV4Preset } from "../src/presets/v4.js";
  * comma separated list of snapshot types to update.
  */
 const { UPDATE_SNAPSHOTS } = process.env;
-const updateSnapshotExtensions = UPDATE_SNAPSHOTS?.split(",");
+const updateSnapshotExtensions = UPDATE_SNAPSHOTS?.split(",")
+  .map((s) => s.trim())
+  .filter((s) => s.length > 0);
 function shouldUpdateSnapshot(filePath: string) {
   // Never update snapshots in CI
   if (process.env.CI) return false;
@@ -249,6 +263,8 @@ export async function runTestQuery(
     extends?: string | string[];
     pgIdentifiers?: "qualified" | "unqualified";
     search_path?: string;
+    muteWarnings?: boolean;
+    dontLogErrors?: boolean;
   },
   options: {
     callback?: (
@@ -276,6 +292,8 @@ export async function runTestQuery(
     cleanupSql,
     pgIdentifiers,
     search_path,
+    muteWarnings = true,
+    dontLogErrors = false,
   } = config;
   const { path } = options;
 
@@ -305,9 +323,13 @@ export async function runTestQuery(
       return imported;
     }),
   );
+
   const preset: GraphileConfig.Preset = {
     extends: [AmberPreset, ...presets],
-    plugins: [StreamDeferPlugin],
+    plugins: [
+      StreamDeferPlugin,
+      ...(muteWarnings ? [SwallowAllErrorsPlugin] : []),
+    ],
     pgServices: [
       {
         adaptor,
@@ -341,10 +363,12 @@ export async function runTestQuery(
     schema: {
       pgForbidSetofFunctionsToReturnNull:
         config.setofFunctionsContainNulls === false,
+      muteWarnings,
       ...graphileBuildOptions,
     },
     gather: {
       pgIdentifiers,
+      muteWarnings,
     },
     grafast: {
       explain: ["plan"],
@@ -558,7 +582,7 @@ export async function runTestQuery(
             const { data, errors, extensions } = JSON.parse(
               JSON.stringify(result),
             );
-            if (errors) {
+            if (errors && !dontLogErrors) {
               console.error(result.errors?.[0].originalError || errors[0]);
             }
             if (options.callback) {

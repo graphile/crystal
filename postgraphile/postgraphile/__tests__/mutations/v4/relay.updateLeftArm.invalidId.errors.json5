@@ -1,6 +1,6 @@
 [
   {
-    message: "Invalid node identifier for 'Person'",
+    message: 'Invalid node identifier for \'Person\': "WyJteV90YWJsZXMiLDFd"',
     locations: [
       {
         line: 2,

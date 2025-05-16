@@ -142,17 +142,26 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
         const typeNames = build.getNodeTypeNames();
         const nodeIdFieldName = build.inflection.nodeIdFieldName();
 
-        return typeNames.reduce((memo, typeName) => {
+        const recoverableForEachType = (
+          cb: (typeName: string) => typeof fields,
+        ) => {
+          for (const typeName of typeNames) {
+            fields = build.recoverable(fields, () => cb(typeName));
+          }
+          return fields;
+        };
+
+        return recoverableForEachType((typeName) => {
           // Don't add a field for 'Query'
           if (typeName === build.inflection.builtin("Query")) {
-            return memo;
+            return fields;
           }
           const fetcher = build.nodeFetcherByTypeName!(typeName);
           if (!fetcher) {
-            return memo;
+            return fields;
           }
           return build.extend(
-            memo,
+            fields,
             {
               [build.inflection.nodeById(typeName)]: {
                 args: {
@@ -178,7 +187,7 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
             },
             `Adding ${typeName} by NodeId field`,
           );
-        }, fields);
+        });
       },
     },
   },

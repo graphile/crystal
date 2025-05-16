@@ -5,6 +5,7 @@
 
 ## expect(data.d2).toBe(null)
 ## expect(errors).toHaveLength(1)
+#> dontLogErrors: true
 
 mutation {
   d1: deleteRelationalPostById(input: { id: 4 }) {

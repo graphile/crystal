@@ -1,12 +1,12 @@
-import { isDev } from "./dev.js";
-import { inspect } from "./inspect.js";
-import type { ExecutionEntryFlags } from "./interfaces.js";
 import {
   $$safeError,
   FLAG_ERROR,
   FLAG_INHIBITED,
   FLAG_NULL,
-} from "./interfaces.js";
+} from "./constants.js";
+import { isDev } from "./dev.js";
+import { inspect } from "./inspect.js";
+import type { ExecutionEntryFlags } from "./interfaces.js";
 
 const $$flagged = Symbol("grafastFlaggedValue");
 

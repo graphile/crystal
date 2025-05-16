@@ -1,4 +1,5 @@
 ## expect(errors).toHaveLength(1);
+#> dontLogErrors: true
 ## expect(errors[0].message).toMatch(/invalid node identifier/i);
 #> schema: ["a", "b", "c"]
 #> extends: ["postgraphile/presets/relay:PgRelayPreset"]

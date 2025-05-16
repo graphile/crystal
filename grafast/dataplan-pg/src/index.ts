@@ -67,10 +67,6 @@ import { PgClassFilter } from "./filters/pgClassFilter.js";
 import { PgManyFilter } from "./filters/pgManyFilter.js";
 import { PgOrFilter } from "./filters/pgOrFilter.js";
 import type {
-  PgSelectQueryBuilderCallback,
-  PgUnionAllQueryBuilderCallback,
-} from "./interfaces.js";
-import {
   GetPgCodecAttributes,
   GetPgRegistryCodecRelations,
   GetPgRegistryCodecs,
@@ -109,7 +105,9 @@ import {
   PgRefDefinitionExtensions,
   PgRefDefinitions,
   PgRegistry,
+  PgSelectQueryBuilderCallback,
   PgTypedStep,
+  PgUnionAllQueryBuilderCallback,
   PlanByUniques,
   TuplePlanMap,
 } from "./interfaces.js";
@@ -145,11 +143,6 @@ import {
 } from "./steps/pgInsertSingle.js";
 import { pgPageInfo, PgPageInfoStep } from "./steps/pgPageInfo.js";
 import {
-  pgPolymorphic,
-  PgPolymorphicStep,
-  PgPolymorphicTypeMap,
-} from "./steps/pgPolymorphic.js";
-import {
   generatePgParameterAnalysis,
   pgFromExpression,
   pgFromExpressionRuntime,
@@ -174,10 +167,6 @@ import {
   PgSelectSinglePlanOptions,
   PgSelectSingleStep,
 } from "./steps/pgSelectSingle.js";
-import {
-  pgSingleTablePolymorphic,
-  PgSingleTablePolymorphicStep,
-} from "./steps/pgSingleTablePolymorphic.js";
 import { PgTempTable } from "./steps/pgTempTable.js";
 import {
   pgUnionAll,
@@ -312,9 +301,6 @@ export {
   PgPath,
   PgPoint,
   PgPolygon,
-  pgPolymorphic,
-  PgPolymorphicStep,
-  PgPolymorphicTypeMap,
   PgRecordTypeCodecSpec,
   PgRefDefinition,
   PgRefDefinitionExtensions,
@@ -344,8 +330,6 @@ export {
   PgSelectSinglePlanOptions,
   PgSelectSingleStep,
   PgSelectStep,
-  pgSingleTablePolymorphic,
-  PgSingleTablePolymorphicStep,
   PgTempTable,
   PgTypedStep,
   pgUnionAll,
@@ -416,8 +400,6 @@ exportAsMany("@dataplan/pg", {
   PgInsertSingleStep,
   pgPageInfo,
   PgPageInfoStep,
-  pgPolymorphic,
-  PgPolymorphicStep,
   pgSelect,
   pgFromExpressionRuntime,
   pgFromExpression,
@@ -429,12 +411,10 @@ exportAsMany("@dataplan/pg", {
   pgSelectFromRecord,
   pgSelectSingleFromRecord,
   PgSelectSingleStep,
-  pgSingleTablePolymorphic,
   pgUnionAll,
   PgUnionAllSingleStep,
   PgUnionAllRowsStep,
   PgUnionAllStep,
-  PgSingleTablePolymorphicStep,
   pgUpdateSingle,
   PgUpdateSingleStep,
   pgValidateParsedCursor,

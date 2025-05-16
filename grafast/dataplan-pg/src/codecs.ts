@@ -116,6 +116,9 @@ export interface PgCodecAttribute<
   identicalVia?: PgCodecAttributeVia;
   // ENHANCE: can identicalVia be plural? Is that useful? Maybe a attribute that has
   // multiple foreign key references?
+  // Answer: yes it can be plural - consider `parent.id` is identical to
+  // `child.parent_id` via the `parent` relation. This is in addition to the
+  // existing `item.id` being identical to `topic.id` used by polymorphism.
 
   /**
    * Set this true if you're using column-level select privileges and there are

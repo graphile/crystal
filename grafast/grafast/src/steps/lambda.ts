@@ -26,7 +26,7 @@ export class LambdaStep<TIn, TOut> extends UnbatchedStep<TOut> {
     private fn: (value: TIn) => PromiseOrDirect<TOut>,
   ) {
     super();
-    this.depId = $plan != null ? this.addDependency($plan) : null;
+    this.depId = $plan != null ? this.addDataDependency($plan) : null;
     if ((fn as any).hasSideEffects) {
       this.hasSideEffects = true;
     } else if ((fn as any).isSyncAndSafe) {

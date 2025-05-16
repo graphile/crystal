@@ -154,6 +154,15 @@ Note: you only need to create/change the `.test.graphql` file; the `.sql`,
 `.errors.json5` snapshot if the test does not include a
 `## expect(errors).toBeFalsy();` comment.
 
+If you're making planning updates (e.g. optimizations) that shouldn't affect the
+resulting data, you can tell the system to only update certain types of
+snapshots:
+
+```shell
+cd postgraphile/postgraphile
+UPDATE_SNAPSHOTS="sql,mermaid" yarn jest __tests__/path/to/test.file.graphql
+```
+
 ## ASK FIRST!
 
 There's nothing worse than having your PR with 3 days of work in it rejected

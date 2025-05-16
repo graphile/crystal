@@ -24,8 +24,8 @@ import type {
   GrafastArgumentConfig,
   GrafastFieldConfig,
   GrafastSubscriber,
-  ListStep,
   Maybe,
+  Step,
 } from "grafast";
 import {
   __ListTransformStep,
@@ -39,10 +39,11 @@ import {
   error,
   ExecutableStep,
   filter,
+  get,
   getNullableInputTypeAtPath,
   groupBy,
+  inhibitOnNull,
   lambda,
-  list,
   listen,
   newGrafastFieldConfigBuilder,
   newInputObjectTypeBuilder,
@@ -97,12 +98,10 @@ import {
   PgExecutor,
   pgInsertSingle,
   PgManyFilter,
-  pgPolymorphic,
   PgResource,
   pgSelect,
   pgSelectSingleFromRecord,
   PgSelectSingleStep,
-  pgSingleTablePolymorphic,
   pgUpdateSingle,
   PgUpdateSingleStep,
   recordCodec,
@@ -114,7 +113,6 @@ import type {
   PgSelectQueryBuilderCallback,
 } from "../interfaces";
 import { PgPageInfoStep } from "../steps/pgPageInfo.js";
-import type { PgPolymorphicTypeMap } from "../steps/pgPolymorphic.js";
 import type {
   PgSelectParsedCursorStep,
   PgSelectQueryBuilder,
@@ -1924,6 +1922,14 @@ export function makeExampleSchema(
 
   const User = newObjectTypeBuilder<UserStep>(PgSelectSingleStep)({
     name: "User",
+    planType: EXPORTABLE(
+      (get, userResource) =>
+        function planType($specifier) {
+          const $id = get($specifier, "id") as Step<string>;
+          return userResource.get({ id: $id });
+        },
+      [get, userResource],
+    ),
     fields: () => ({
       // Here we don't use `attrField` because we want to explicitly test the default plan resolver
       // username: attrField("username", GraphQLString),
@@ -2066,6 +2072,14 @@ export function makeExampleSchema(
   });
   const Message = newObjectTypeBuilder<MessageStep>(PgSelectSingleStep)({
     name: "Message",
+    planType: EXPORTABLE(
+      (get, messageResource) =>
+        function planType($specifier) {
+          const $id = get($specifier, "id") as Step<string>;
+          return messageResource.get({ id: $id });
+        },
+      [get, messageResource],
+    ),
     fields: () => ({
       id: attrField("id", GraphQLString),
       featured: attrField("featured", GraphQLBoolean),
@@ -2427,6 +2441,14 @@ export function makeExampleSchema(
   type GQLObj = GraphQLObjectType<any, OurGraphQLContext>;
   const Forum: GQLObj = newObjectTypeBuilder<ForumStep>(PgSelectSingleStep)({
     name: "Forum",
+    planType: EXPORTABLE(
+      (forumResource, get) =>
+        function planType($specifier) {
+          const $id = get($specifier, "id") as Step<string>;
+          return forumResource.get({ id: $id });
+        },
+      [forumResource, get],
+    ),
     fields: () => ({
       id: attrField("id", GraphQLString),
       name: attrField("name", GraphQLString),
@@ -2795,214 +2817,86 @@ export function makeExampleSchema(
   });
 
   const singleTableTypeNameCallback = EXPORTABLE(
-    () => (v: string) => {
-      if (v == null) {
-        return v;
-      }
-      const type = {
+    () => (v: string) =>
+      ({
         TOPIC: "SingleTableTopic",
         POST: "SingleTablePost",
         DIVIDER: "SingleTableDivider",
         CHECKLIST: "SingleTableChecklist",
         CHECKLIST_ITEM: "SingleTableChecklistItem",
-      }[v];
-      if (!type) {
-        throw new Error(`Could not determine type for '${v}'`);
-      }
-      return type;
-    },
+      })[v] ?? null,
     [],
   );
 
-  const singleTableTypeName = EXPORTABLE(
-    (lambda, singleTableTypeNameCallback) => ($entity: SingleTableItemStep) => {
-      const $type = $entity.get("type");
-      const $typeName = lambda($type, singleTableTypeNameCallback, true);
-      return $typeName;
-    },
-    [lambda, singleTableTypeNameCallback],
-  );
+  const relationalItemTypeNameFromType = (type: string) =>
+    ({
+      TOPIC: "RelationalTopic",
+      POST: "RelationalPost",
+      DIVIDER: "RelationalDivider",
+      CHECKLIST: "RelationalChecklist",
+      CHECKLIST_ITEM: "RelationalChecklistItem",
+    })[type] ?? null;
 
-  const singleTableItemInterface = EXPORTABLE(
-    (pgSingleTablePolymorphic, singleTableTypeName) =>
-      ($item: SingleTableItemStep) =>
-        pgSingleTablePolymorphic(singleTableTypeName($item), $item),
-    [pgSingleTablePolymorphic, singleTableTypeName],
-  );
-
-  const relationalItemPolymorphicTypeMap = EXPORTABLE(
-    (
-      deoptimizeIfAppropriate,
-    ): PgPolymorphicTypeMap<RelationalItemStep, string> => ({
-      RelationalTopic: {
-        match: (t) => t === "TOPIC",
-        plan: (_, $item) =>
-          deoptimizeIfAppropriate($item.singleRelation("topic")),
-      },
-      RelationalPost: {
-        match: (t) => t === "POST",
-        plan: (_, $item) =>
-          deoptimizeIfAppropriate($item.singleRelation("post")),
-      },
-      RelationalDivider: {
-        match: (t) => t === "DIVIDER",
-        plan: (_, $item) =>
-          deoptimizeIfAppropriate($item.singleRelation("divider")),
-      },
-      RelationalChecklist: {
-        match: (t) => t === "CHECKLIST",
-        plan: (_, $item) =>
-          deoptimizeIfAppropriate($item.singleRelation("checklist")),
-      },
-      RelationalChecklistItem: {
-        match: (t) => t === "CHECKLIST_ITEM",
-        plan: (_, $item) =>
-          deoptimizeIfAppropriate($item.singleRelation("checklistItem")),
-      },
-    }),
-    [deoptimizeIfAppropriate],
-  );
-
-  const relationalItemInterface = EXPORTABLE(
-    (pgPolymorphic, relationalItemPolymorphicTypeMap) =>
-      ($item: RelationalItemStep) =>
-        pgPolymorphic(
-          $item,
-          $item.get("type"),
-          relationalItemPolymorphicTypeMap,
-        ),
-    [pgPolymorphic, relationalItemPolymorphicTypeMap],
-  );
-
-  const unionItemPolymorphicTypeMap = EXPORTABLE(
-    (deoptimizeIfAppropriate): PgPolymorphicTypeMap<UnionItemStep, string> => ({
-      UnionTopic: {
-        match: (t) => t === "TOPIC",
-        plan: (_, $item) =>
-          deoptimizeIfAppropriate($item.singleRelation("topic")),
-      },
-      UnionPost: {
-        match: (t) => t === "POST",
-        plan: (_, $item) =>
-          deoptimizeIfAppropriate($item.singleRelation("post")),
-      },
-      UnionDivider: {
-        match: (t) => t === "DIVIDER",
-        plan: (_, $item) =>
-          deoptimizeIfAppropriate($item.singleRelation("divider")),
-      },
-      UnionChecklist: {
-        match: (t) => t === "CHECKLIST",
-        plan: (_, $item) =>
-          deoptimizeIfAppropriate($item.singleRelation("checklist")),
-      },
-      UnionChecklistItem: {
-        match: (t) => t === "CHECKLIST_ITEM",
-        plan: (_, $item) =>
-          deoptimizeIfAppropriate($item.singleRelation("checklistItem")),
-      },
-    }),
-    [deoptimizeIfAppropriate],
-  );
-
-  const unionItemUnion = EXPORTABLE(
-    (pgPolymorphic, unionItemPolymorphicTypeMap) => ($item: UnionItemStep) =>
-      pgPolymorphic($item, $item.get("type"), unionItemPolymorphicTypeMap),
-    [pgPolymorphic, unionItemPolymorphicTypeMap],
-  );
-
-  const relationalCommentablePolymorphicTypeMap = EXPORTABLE(
-    (
-      deoptimizeIfAppropriate,
-    ): PgPolymorphicTypeMap<RelationalCommentableStep, string> => ({
-      RelationalPost: {
-        match: (t) => t === "POST",
-        plan: (_, $item) =>
-          deoptimizeIfAppropriate($item.singleRelation("post")),
-      },
-      RelationalChecklist: {
-        match: (t) => t === "CHECKLIST",
-        plan: (_, $item) =>
-          deoptimizeIfAppropriate($item.singleRelation("checklist")),
-      },
-      RelationalChecklistItem: {
-        match: (t) => t === "CHECKLIST_ITEM",
-        plan: (_, $item) =>
-          deoptimizeIfAppropriate($item.singleRelation("checklistItem")),
-      },
-    }),
-    [deoptimizeIfAppropriate],
-  );
+  const unionItemTypeNameFromType = (type: string) =>
+    ({
+      TOPIC: "UnionTopic",
+      POST: "UnionPost",
+      DIVIDER: "UnionDivider",
+      CHECKLIST: "UnionChecklist",
+      CHECKLIST_ITEM: "UnionChecklistItem",
+    })[type] ?? null;
 
   const relationalCommentableInterface = EXPORTABLE(
-    (pgPolymorphic, relationalCommentablePolymorphicTypeMap) =>
-      ($item: RelationalCommentableStep) =>
-        pgPolymorphic(
-          $item,
-          $item.get("type"),
-          relationalCommentablePolymorphicTypeMap,
-        ),
-    [pgPolymorphic, relationalCommentablePolymorphicTypeMap],
+    (inhibitOnNull, lambda, object, relationalItemTypeNameFromType) =>
+      ($item: RelationalCommentableStep) => {
+        const $id = inhibitOnNull($item.get("id"));
+        const $type = inhibitOnNull($item.get("type"));
+        const $__typename = lambda($type, relationalItemTypeNameFromType, true);
+        return object({ __typename: $__typename, id: $id });
+      },
+    [inhibitOnNull, lambda, object, relationalItemTypeNameFromType],
   );
 
-  const entityPolymorphicTypeMap = EXPORTABLE(
-    (
-      commentResource,
-      personResource,
-      postResource,
-    ): PgPolymorphicTypeMap<
-      PgSelectSingleStep<any> | PgClassExpressionStep<PgCodec, any>,
-      readonly number[],
-      ListStep<readonly ExecutableStep[]>
-    > => ({
-      Person: {
-        match: (v) => v[0] != null,
-        plan: ($list) => personResource.get({ person_id: $list.at(0) }),
-      },
-      Post: {
-        match: (v) => v[1] != null,
-        plan: ($list) => postResource.get({ post_id: $list.at(1) }),
-      },
-      Comment: {
-        match: (v) => v[2] != null,
-        plan: ($list) => commentResource.get({ comment_id: $list.at(2) }),
-      },
-    }),
-    [commentResource, personResource, postResource],
-  );
-
-  /**
-   * This makes a polymorphic plan that returns the "entity" represented by the
-   * "interfaces_and_unions.union__entity" type in the database (a composite
-   * type with an attribute that's a "foreign key" to each table that's
-   * included in the union).
-   *
-   * i.e. if `$item.get('person_id')` is set, then it's a Person and we should
-   * grab that person from the `personResource`. If `post_id` is set it's a Post,
-   * and so on.
-   */
   const entityUnion = EXPORTABLE(
-    (entityPolymorphicTypeMap, list, pgPolymorphic) =>
+    (lambda) =>
       <TCodec extends typeof unionEntityCodec>(
         $item:
           | PgSelectSingleStep<PgResource<any, TCodec, any, any, any>>
           | PgClassExpressionStep<TCodec, PgResource<any, any, any, any, any>>,
-      ) =>
-        pgPolymorphic(
-          $item,
-          list([
+      ) => {
+        return lambda(
+          [
             $item.get("person_id"),
             $item.get("post_id"),
             $item.get("comment_id"),
-          ]),
-          entityPolymorphicTypeMap,
-        ),
-    [entityPolymorphicTypeMap, list, pgPolymorphic],
+          ],
+          ([person_id, post_id, comment_id]) => {
+            if (person_id != null) {
+              return { __typename: "Person", person_id };
+            } else if (post_id != null) {
+              return { __typename: "Post", post_id };
+            } else if (comment_id != null) {
+              return { __typename: "Comment", comment_id };
+            } else {
+              return null;
+            }
+          },
+        );
+      },
+    [lambda],
   );
 
   const PersonBookmark: GraphQLObjectType<any, OurGraphQLContext> =
     newObjectTypeBuilder<PersonBookmarkStep>(PgSelectSingleStep)({
       name: "PersonBookmark",
+      planType: EXPORTABLE(
+        (get, personBookmarksResource) =>
+          function planType($specifier) {
+            const $id = get($specifier, "id") as Step<number>;
+            return personBookmarksResource.get({ id: $id });
+          },
+        [get, personBookmarksResource],
+      ),
       fields: () => ({
         id: attrField("id", GraphQLInt),
         person: singleRelationField("person", Person),
@@ -3023,60 +2917,54 @@ export function makeExampleSchema(
   const Person: GraphQLObjectType<any, OurGraphQLContext> =
     newObjectTypeBuilder<PersonStep>(PgSelectSingleStep)({
       name: "Person",
+      planType: EXPORTABLE(
+        (get, personResource) =>
+          function planType($specifier) {
+            const $personId = get($specifier, "person_id") as Step<number>;
+            return personResource.get({ person_id: $personId });
+          },
+        [get, personResource],
+      ),
       fields: () => ({
         personId: attrField("person_id", GraphQLInt),
         username: attrField("username", GraphQLString),
         singleTableItemsList: {
           type: new GraphQLList(SingleTableItem),
+          args: { first: { type: GraphQLInt }, offset: { type: GraphQLInt } },
           plan: EXPORTABLE(
-            (
-              deoptimizeIfAppropriate,
-              each,
-              singleTableItemInterface,
-              singleTableItemsResource,
-            ) =>
-              function plan($person) {
+            (deoptimizeIfAppropriate, singleTableItemsResource) =>
+              function plan($person, { $first, $offset }) {
                 const $personId = $person.get("person_id");
                 const $items: SingleTableItemsStep =
                   singleTableItemsResource.find({
                     author_id: $personId,
                   });
+                $items.setFirst($first);
+                $items.setOffset($offset);
                 deoptimizeIfAppropriate($items);
-                return each($items, singleTableItemInterface);
+                return $items;
               },
-            [
-              deoptimizeIfAppropriate,
-              each,
-              singleTableItemInterface,
-              singleTableItemsResource,
-            ],
+            [deoptimizeIfAppropriate, singleTableItemsResource],
           ),
         },
 
         relationalItemsList: {
           type: new GraphQLList(RelationalItem),
+          args: { first: { type: GraphQLInt }, offset: { type: GraphQLInt } },
           plan: EXPORTABLE(
-            (
-              deoptimizeIfAppropriate,
-              each,
-              relationalItemInterface,
-              relationalItemsResource,
-            ) =>
-              function plan($person) {
+            (deoptimizeIfAppropriate, relationalItemsResource) =>
+              function plan($person, { $first, $offset }) {
                 const $personId = $person.get("person_id");
                 const $items: RelationalItemsStep =
                   relationalItemsResource.find({
                     author_id: $personId,
                   });
+                $items.setFirst($first);
+                $items.setOffset($offset);
                 deoptimizeIfAppropriate($items);
-                return each($items, ($item) => relationalItemInterface($item));
+                return $items;
               },
-            [
-              deoptimizeIfAppropriate,
-              each,
-              relationalItemInterface,
-              relationalItemsResource,
-            ],
+            [deoptimizeIfAppropriate, relationalItemsResource],
           ),
         },
 
@@ -3095,6 +2983,14 @@ export function makeExampleSchema(
 
   const Post: GQLObj = newObjectTypeBuilder<PostStep>(PgSelectSingleStep)({
     name: "Post",
+    planType: EXPORTABLE(
+      (get, postResource) =>
+        function planType($specifier) {
+          const $postId = get($specifier, "post_id") as Step<number>;
+          return postResource.get({ post_id: $postId });
+        },
+      [get, postResource],
+    ),
     fields: () => ({
       postId: attrField("post_id", GraphQLInt),
       body: attrField("body", GraphQLString),
@@ -3105,6 +3001,14 @@ export function makeExampleSchema(
   const Comment: GraphQLObjectType<any, OurGraphQLContext> =
     newObjectTypeBuilder<CommentStep>(PgSelectSingleStep)({
       name: "Comment",
+      planType: EXPORTABLE(
+        (commentResource, get) =>
+          function planType($specifier) {
+            const $commentId = get($specifier, "comment_id") as Step<number>;
+            return commentResource.get({ comment_id: $commentId });
+          },
+        [commentResource, get],
+      ),
       fields: () => ({
         commentId: attrField("comment_id", GraphQLInt),
         author: singleRelationField("author", Person),
@@ -3129,6 +3033,49 @@ export function makeExampleSchema(
       isExplicitlyArchived: { type: GraphQLBoolean },
       archivedAt: { type: GraphQLString },
     }),
+    extensions: {
+      grafast: {
+        planType: EXPORTABLE(
+          (
+            PgSelectSingleStep,
+            get,
+            lambda,
+            singleTableItemsResource,
+            singleTableTypeNameCallback,
+          ) =>
+            function planType($stepOrSpecifier) {
+              const $type = get($stepOrSpecifier, "type");
+              const $__typename = lambda(
+                $type,
+                singleTableTypeNameCallback,
+                true,
+              );
+              return {
+                $__typename,
+                planForType() {
+                  if (
+                    $stepOrSpecifier instanceof PgSelectSingleStep &&
+                    ($stepOrSpecifier.resource as PgResource).codec ===
+                      singleTableItemsResource.codec
+                  ) {
+                    return $stepOrSpecifier;
+                  } else {
+                    const $id = get($stepOrSpecifier, "id");
+                    return singleTableItemsResource.get({ id: $id });
+                  }
+                },
+              };
+            },
+          [
+            PgSelectSingleStep,
+            get,
+            lambda,
+            singleTableItemsResource,
+            singleTableTypeNameCallback,
+          ],
+        ),
+      },
+    },
   });
 
   const commonSingleTableItemFields = {
@@ -3138,13 +3085,13 @@ export function makeExampleSchema(
     parent: {
       type: SingleTableItem,
       plan: EXPORTABLE(
-        (deoptimizeIfAppropriate, singleTableItemInterface) =>
+        (deoptimizeIfAppropriate) =>
           function plan($entity) {
             const $plan = $entity.singleRelation("parent");
             deoptimizeIfAppropriate($plan);
-            return singleTableItemInterface($plan);
+            return $plan;
           },
-        [deoptimizeIfAppropriate, singleTableItemInterface],
+        [deoptimizeIfAppropriate],
       ),
     },
     author: singleRelationField("author", Person),
@@ -3168,6 +3115,10 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "SingleTableTopic",
+    planType($specifier) {
+      const $id = get($specifier, "id") as Step<number>;
+      return singleTableItemsResource.get({ id: $id });
+    },
     interfaces: [SingleTableItem],
     fields: () => ({
       ...commonSingleTableItemFields,
@@ -3179,6 +3130,10 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "SingleTablePost",
+    planType($specifier) {
+      const $id = get($specifier, "id") as Step<number>;
+      return singleTableItemsResource.get({ id: $id });
+    },
     interfaces: [SingleTableItem],
     fields: () => ({
       ...commonSingleTableItemFields,
@@ -3192,6 +3147,10 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "SingleTableDivider",
+    planType($specifier) {
+      const $id = get($specifier, "id") as Step<number>;
+      return singleTableItemsResource.get({ id: $id });
+    },
     interfaces: [SingleTableItem],
     fields: () => ({
       ...commonSingleTableItemFields,
@@ -3204,6 +3163,10 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "SingleTableChecklist",
+    planType($specifier) {
+      const $id = get($specifier, "id") as Step<number>;
+      return singleTableItemsResource.get({ id: $id });
+    },
     interfaces: [SingleTableItem],
     fields: () => ({
       ...commonSingleTableItemFields,
@@ -3215,6 +3178,10 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "SingleTableChecklistItem",
+    planType($specifier) {
+      const $id = get($specifier, "id") as Step<number>;
+      return singleTableItemsResource.get({ id: $id });
+    },
     interfaces: [SingleTableItem],
     fields: () => ({
       ...commonSingleTableItemFields,
@@ -3224,6 +3191,32 @@ export function makeExampleSchema(
   });
 
   ////////////////////////////////////////
+  const RELATIONAL_LOOKUP = EXPORTABLE(
+    (
+      relationalChecklistItemsResource,
+      relationalChecklistsResource,
+      relationalDividersResource,
+      relationalPostsResource,
+      relationalTopicsResource,
+    ) =>
+      ({
+        RelationalTopic: ["topic", relationalTopicsResource],
+        RelationalPost: ["post", relationalPostsResource],
+        RelationalDivider: ["divider", relationalDividersResource],
+        RelationalChecklist: ["checklist", relationalChecklistsResource],
+        RelationalChecklistItem: [
+          "checklistItem",
+          relationalChecklistItemsResource,
+        ],
+      }) as const,
+    [
+      relationalChecklistItemsResource,
+      relationalChecklistsResource,
+      relationalDividersResource,
+      relationalPostsResource,
+      relationalTopicsResource,
+    ],
+  );
 
   const RelationalItem: GraphQLInterfaceType = new GraphQLInterfaceType({
     name: "RelationalItem",
@@ -3239,6 +3232,64 @@ export function makeExampleSchema(
       isExplicitlyArchived: { type: GraphQLBoolean },
       archivedAt: { type: GraphQLString },
     }),
+    extensions: {
+      grafast: {
+        planType: EXPORTABLE(
+          (
+            PgSelectSingleStep,
+            RELATIONAL_LOOKUP,
+            deoptimizeIfAppropriate,
+            get,
+            lambda,
+            relationalItemTypeNameFromType,
+            relationalItemsResource,
+          ) =>
+            function planType($stepOrSpecifier) {
+              const $type = get($stepOrSpecifier, "type");
+              const $__typename = lambda(
+                $type,
+                relationalItemTypeNameFromType,
+                true,
+              );
+              return {
+                $__typename,
+                planForType(t) {
+                  const deets =
+                    RELATIONAL_LOOKUP[t.name as keyof typeof RELATIONAL_LOOKUP];
+                  if (!deets) {
+                    throw new Error(`Unexpected type ${t}`);
+                  }
+                  const [relation, resource] = deets;
+                  if (
+                    $stepOrSpecifier instanceof PgSelectSingleStep &&
+                    $stepOrSpecifier.resource === relationalItemsResource
+                  ) {
+                    const $relation = $stepOrSpecifier.singleRelation(relation);
+                    return deoptimizeIfAppropriate($relation);
+                  } else if (
+                    $stepOrSpecifier instanceof PgSelectSingleStep &&
+                    $stepOrSpecifier.resource === resource
+                  ) {
+                    return $stepOrSpecifier;
+                  } else {
+                    const $id = get($stepOrSpecifier, "id") as Step<number>;
+                    return resource.get({ id: $id });
+                  }
+                },
+              };
+            },
+          [
+            PgSelectSingleStep,
+            RELATIONAL_LOOKUP,
+            deoptimizeIfAppropriate,
+            get,
+            lambda,
+            relationalItemTypeNameFromType,
+            relationalItemsResource,
+          ],
+        ),
+      },
+    },
   });
 
   const RelationalCommentable: GraphQLInterfaceType = new GraphQLInterfaceType({
@@ -3260,13 +3311,13 @@ export function makeExampleSchema(
       parent: {
         type: RelationalItem,
         plan: EXPORTABLE(
-          (deoptimizeIfAppropriate, relationalItemInterface) =>
+          (deoptimizeIfAppropriate) =>
             function plan($entity) {
               const $plan = $entity.singleRelation("parent");
               deoptimizeIfAppropriate($plan);
-              return relationalItemInterface($plan);
+              return $plan;
             },
-          [deoptimizeIfAppropriate, relationalItemInterface],
+          [deoptimizeIfAppropriate],
         ),
       },
       author: singleRelationField("author", Person),
@@ -3283,6 +3334,10 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "RelationalTopic",
+    planType($specifier) {
+      const $id = get($specifier, "id") as Step<number>;
+      return relationalTopicsResource.get({ id: $id });
+    },
     interfaces: [RelationalItem],
     fields: () => ({
       ...commonRelationalItemFields(),
@@ -3294,6 +3349,10 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "RelationalPost",
+    planType($specifier) {
+      const $id = get($specifier, "id") as Step<number>;
+      return relationalPostsResource.get({ id: $id });
+    },
     interfaces: [RelationalItem, RelationalCommentable],
     fields: () => ({
       ...commonRelationalItemFields(),
@@ -3331,6 +3390,10 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "RelationalDivider",
+    planType($specifier) {
+      const $id = get($specifier, "id") as Step<number>;
+      return relationalDividersResource.get({ id: $id });
+    },
     interfaces: [RelationalItem],
     fields: () => ({
       ...commonRelationalItemFields(),
@@ -3343,6 +3406,10 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "RelationalChecklist",
+    planType($specifier) {
+      const $id = get($specifier, "id") as Step<number>;
+      return relationalChecklistsResource.get({ id: $id });
+    },
     interfaces: [RelationalItem, RelationalCommentable],
     fields: () => ({
       ...commonRelationalItemFields(),
@@ -3354,6 +3421,10 @@ export function makeExampleSchema(
   type RC = RelationalChecklistItemStep;
   const RelationalChecklistItem = newObjectTypeBuilder<RC>(PgSelectSingleStep)({
     name: "RelationalChecklistItem",
+    planType($specifier) {
+      const $id = get($specifier, "id") as Step<number>;
+      return relationalChecklistItemsResource.get({ id: $id });
+    },
     interfaces: [RelationalItem, RelationalCommentable],
     fields: () => ({
       ...commonRelationalItemFields(),
@@ -3373,10 +3444,39 @@ export function makeExampleSchema(
       UnionChecklist,
       UnionChecklistItem,
     ],
+    extensions: {
+      grafast: {
+        planType: EXPORTABLE(
+          (get) =>
+            function planType($stepOrSpecifier) {
+              const $specifier =
+                $stepOrSpecifier.toSpecifier?.() ?? $stepOrSpecifier;
+              const $__typename = get($specifier, "__typename");
+              return {
+                $__typename,
+                planForType(t) {
+                  return (
+                    t.extensions?.grafast?.planType?.($specifier) ?? $specifier
+                  );
+                },
+              };
+            },
+          [get],
+        ),
+      },
+    },
   });
 
   const UnionTopic = newObjectTypeBuilder<UnionTopicStep>(PgSelectSingleStep)({
     name: "UnionTopic",
+    planType: EXPORTABLE(
+      (get, unionTopicsResource) =>
+        function planType($specifier) {
+          const $id = get($specifier, "id") as Step<number>;
+          return unionTopicsResource.get({ id: $id });
+        },
+      [get, unionTopicsResource],
+    ),
     fields: () => ({
       id: attrField("id", GraphQLInt),
       title: attrField("title", GraphQLString),
@@ -3385,6 +3485,14 @@ export function makeExampleSchema(
 
   const UnionPost = newObjectTypeBuilder<UnionPostStep>(PgSelectSingleStep)({
     name: "UnionPost",
+    planType: EXPORTABLE(
+      (get, unionPostsResource) =>
+        function planType($specifier) {
+          const $id = get($specifier, "id") as Step<number>;
+          return unionPostsResource.get({ id: $id });
+        },
+      [get, unionPostsResource],
+    ),
     fields: () => ({
       id: attrField("id", GraphQLInt),
       title: attrField("title", GraphQLString),
@@ -3397,6 +3505,14 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "UnionDivider",
+    planType: EXPORTABLE(
+      (get, unionDividersResource) =>
+        function planType($specifier) {
+          const $id = get($specifier, "id") as Step<number>;
+          return unionDividersResource.get({ id: $id });
+        },
+      [get, unionDividersResource],
+    ),
     fields: () => ({
       id: attrField("id", GraphQLInt),
       title: attrField("title", GraphQLString),
@@ -3408,6 +3524,14 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "UnionChecklist",
+    planType: EXPORTABLE(
+      (get, unionChecklistsResource) =>
+        function planType($specifier) {
+          const $id = get($specifier, "id") as Step<number>;
+          return unionChecklistsResource.get({ id: $id });
+        },
+      [get, unionChecklistsResource],
+    ),
     fields: () => ({
       id: attrField("id", GraphQLInt),
       title: attrField("title", GraphQLString),
@@ -3418,6 +3542,14 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "UnionChecklistItem",
+    planType: EXPORTABLE(
+      (get, unionChecklistItemsResource) =>
+        function planType($specifier) {
+          const $id = get($specifier, "id") as Step<number>;
+          return unionChecklistItemsResource.get({ id: $id });
+        },
+      [get, unionChecklistItemsResource],
+    ),
     fields: () => ({
       id: attrField("id", GraphQLInt),
       description: attrField("description", GraphQLString),
@@ -3445,6 +3577,11 @@ export function makeExampleSchema(
 
   const FirstPartyVulnerability = newObjectTypeBuilder(ExecutableStep)({
     name: "FirstPartyVulnerability",
+    planType($stepOrSpecifier) {
+      const $specifier = $stepOrSpecifier.toSpecifier?.() ?? $stepOrSpecifier;
+      const $id = get($specifier, "id") as Step<number>;
+      return firstPartyVulnerabilitiesResource.get({ id: $id });
+    },
     interfaces: [Vulnerability],
     fields: {
       id: {
@@ -3492,6 +3629,11 @@ export function makeExampleSchema(
 
   const ThirdPartyVulnerability = newObjectTypeBuilder(ExecutableStep)({
     name: "ThirdPartyVulnerability",
+    planType($stepOrSpecifier) {
+      const $specifier = $stepOrSpecifier.toSpecifier?.() ?? $stepOrSpecifier;
+      const $id = get($specifier, "id") as Step<number>;
+      return thirdPartyVulnerabilitiesResource.get({ id: $id });
+    },
     interfaces: [Vulnerability],
     fields: {
       id: {
@@ -4026,10 +4168,12 @@ export function makeExampleSchema(
 
       people: {
         type: new GraphQLList(Person),
+        args: { first: { type: GraphQLInt } },
         plan: EXPORTABLE(
           (deoptimizeIfAppropriate, personResource) =>
-            function plan() {
+            function plan(_, { $first }) {
               const $people = personResource.find();
+              $people.setFirst($first);
               deoptimizeIfAppropriate($people);
               return $people;
             },
@@ -4045,14 +4189,14 @@ export function makeExampleSchema(
           },
         },
         plan: EXPORTABLE(
-          (singleTableItemInterface, singleTableItemsResource) =>
+          (singleTableItemsResource) =>
             function plan(_$root, { $id }) {
               const $item: SingleTableItemStep = singleTableItemsResource.get({
                 id: $id as ExecutableStep<number>,
               });
-              return singleTableItemInterface($item);
+              return $item;
             },
-          [singleTableItemInterface, singleTableItemsResource],
+          [singleTableItemsResource],
         ),
       },
 
@@ -4084,14 +4228,14 @@ export function makeExampleSchema(
           },
         },
         plan: EXPORTABLE(
-          (relationalItemInterface, relationalItemsResource) =>
+          (relationalItemsResource) =>
             function plan(_$root, { $id }) {
               const $item: RelationalItemStep = relationalItemsResource.get({
                 id: $id as ExecutableStep<number>,
               });
-              return relationalItemInterface($item);
+              return $item;
             },
-          [relationalItemInterface, relationalItemsResource],
+          [relationalItemsResource],
         ),
       },
 
@@ -4167,14 +4311,35 @@ export function makeExampleSchema(
           },
         },
         plan: EXPORTABLE(
-          (unionItemUnion, unionItemsResource) =>
+          (
+            inhibitOnNull,
+            lambda,
+            object,
+            unionItemTypeNameFromType,
+            unionItemsResource,
+          ) =>
             function plan(_$root, { $id }) {
               const $item: UnionItemStep = unionItemsResource.get({
                 id: $id as ExecutableStep<number>,
               });
-              return unionItemUnion($item);
+              const $type = inhibitOnNull($item.get("type"));
+              const $__typename = lambda(
+                $type,
+                unionItemTypeNameFromType,
+                true,
+              );
+              return object({
+                __typename: $__typename,
+                id: $item.get("id"),
+              });
             },
-          [unionItemUnion, unionItemsResource],
+          [
+            inhibitOnNull,
+            lambda,
+            object,
+            unionItemTypeNameFromType,
+            unionItemsResource,
+          ],
         ),
       },
 
@@ -4245,7 +4410,7 @@ export function makeExampleSchema(
       allUnionItemsList: {
         type: new GraphQLList(new GraphQLNonNull(UnionItem)),
         plan: EXPORTABLE(
-          (TYPES, each, sql, unionItemUnion, unionItemsResource) =>
+          (TYPES, sql, unionItemsResource) =>
             function plan() {
               const $items: UnionItemsStep = unionItemsResource.find();
               $items.orderBy({
@@ -4253,9 +4418,9 @@ export function makeExampleSchema(
                 fragment: sql`${$items.alias}.id`,
                 direction: "ASC",
               });
-              return each($items, ($item) => unionItemUnion($item));
+              return $items;
             },
-          [TYPES, each, sql, unionItemUnion, unionItemsResource],
+          [TYPES, sql, unionItemsResource],
         ),
       },
 

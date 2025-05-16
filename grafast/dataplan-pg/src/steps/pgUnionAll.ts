@@ -1,4 +1,3 @@
-import { jsonParse } from "@dataplan/json";
 import { createHash } from "crypto";
 import type {
   __InputStaticLeafStep,
@@ -9,7 +8,6 @@ import type {
   GrafastResultsList,
   GrafastValuesList,
   Maybe,
-  PolymorphicStep,
 } from "grafast";
 import {
   __ItemStep,
@@ -20,12 +18,11 @@ import {
   first,
   isDev,
   isPromiseLike,
-  polymorphicWrap,
+  lambda,
   reverseArray,
   SafeError,
   Step,
 } from "grafast";
-import type { GraphQLObjectType } from "grafast/graphql";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import { $$symbolToIdentifier, $$toSQL, sql } from "pg-sql2";
 
@@ -189,10 +186,7 @@ export interface PgUnionAllStepOrder<TAttributes extends string> {
   direction: "ASC" | "DESC";
 }
 
-export class PgUnionAllSingleStep
-  extends Step
-  implements PolymorphicStep, EdgeCapableStep<any>
-{
+export class PgUnionAllSingleStep extends Step implements EdgeCapableStep<any> {
   static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "PgUnionAllSingleStep",
@@ -201,9 +195,11 @@ export class PgUnionAllSingleStep
   private typeKey: number | null;
   private pkKey: number | null;
   private readonly spec: PgUnionAllStepConfig<string, string>;
+  private parentRefId: number | null;
   constructor($parent: PgUnionAllStep<any, any>, $item: Step) {
     super();
     this.addDependency($item);
+    this.parentRefId = this.addRef($parent);
     this.spec = $parent.spec;
     if ($parent.mode === "normal") {
       this.typeKey = $parent.selectType();
@@ -214,32 +210,29 @@ export class PgUnionAllSingleStep
     }
   }
 
-  planForType(objectType: GraphQLObjectType<any, any>): Step {
+  toSpecifier() {
     if (this.pkKey === null || this.typeKey === null) {
       throw new Error(
         `${this} not polymorphic because parent isn't in normal mode`,
       );
     }
-    const resource = this.spec.resourceByTypeName[objectType.name];
-    if (!resource) {
-      // This type isn't handled; so it should never occur
-      return constant(null);
-    }
-    const pk = (resource.uniques as PgResourceUnique[] | undefined)?.find(
-      (u) => u.isPrimary === true,
+    const $__typename = access(this, this.typeKey) as Step<string>;
+    const $pk = access(this, this.pkKey) as Step<string>;
+    const { resourceByTypeName } = this.spec;
+    return lambda(
+      [$__typename, $pk, constant(resourceByTypeName)],
+      toSpecifier,
+      true,
     );
-    if (!pk) {
+  }
+
+  toTypename() {
+    if (this.typeKey === null) {
       throw new Error(
-        `No PK found for ${objectType.name}; this should have been caught earlier?!`,
+        `${this} not polymorphic because parent isn't in normal mode`,
       );
     }
-    const spec = Object.create(null);
-    const $parsed = jsonParse(access(this, [this.pkKey]));
-    for (let i = 0, l = pk.attributes.length; i < l; i++) {
-      const col = pk.attributes[i];
-      spec[col] = access($parsed, [i]);
-    }
-    return resource.get(spec);
+    return access(this, this.typeKey) as Step<string>;
   }
 
   /**
@@ -256,11 +249,13 @@ export class PgUnionAllSingleStep
   }
 
   public getClassStep(): PgUnionAllStep<string, string> {
-    // TODO: we should add validation of this!
-    const $item = this.getDep<any>(0);
-    const $rows = $item.getDep(0);
-    const $pgUnionAll = $rows.getDep(0);
-    return $pgUnionAll;
+    const $parent = this.getRef(this.parentRefId);
+    if (!($parent instanceof PgUnionAllStep)) {
+      throw new Error(
+        `${this} failed to get the parent PgUnionAllStep; last step found was ${$parent}`,
+      );
+    }
+    return $parent;
   }
 
   public getMeta(key: string) {
@@ -318,30 +313,48 @@ export class PgUnionAllSingleStep
     return sqlExpr`${this.scopedSQL(fragment)}`;
   }
 
+  // Not needed at runtime
+  optimize() {
+    return this.getDep(0);
+  }
+
   execute({
     count,
     values: [values0],
   }: ExecutionDetails): GrafastResultsList<any> {
-    if (this.typeKey !== null) {
-      const typeKey = this.typeKey;
-      return values0.isBatch
-        ? values0.entries.map((v) => {
-            if (v == null) return null;
-            const type = v[typeKey];
-            return polymorphicWrap(type, v);
-          })
-        : arrayOfLength(
-            count,
-            values0.value == null
-              ? null
-              : polymorphicWrap(values0.value[typeKey], values0.value),
-          );
-    } else {
-      return values0.isBatch
-        ? values0.entries
-        : arrayOfLength(count, values0.value);
-    }
+    return values0.isBatch
+      ? values0.entries
+      : arrayOfLength(count, values0.value);
   }
+
+  [$$toSQL]() {
+    return this.getClassStep().alias;
+  }
+}
+
+function toSpecifier([__typename, pkValue, resourceByTypeName]: readonly [
+  string,
+  string,
+  Record<string, PgResource<any, any, any, any, any>>,
+]) {
+  const resource = resourceByTypeName[__typename];
+  if (!resource) return null;
+  const pk = (resource.uniques as PgResourceUnique[] | undefined)?.find(
+    (u) => u.isPrimary === true,
+  );
+  if (!pk) {
+    throw new Error(
+      `No PK found for ${__typename}; this should have been caught earlier?!`,
+    );
+  }
+  const spec = Object.create(null);
+  spec.__typename = __typename;
+  const parsed = JSON.parse(pkValue);
+  for (let i = 0, l = pk.attributes.length; i < l; i++) {
+    const col = pk.attributes[i];
+    spec[col] = parsed[i];
+  }
+  return spec;
 }
 
 interface MemberDigest<TTypeNames extends string> {
@@ -601,7 +614,7 @@ export class PgUnionAllStep<
       for (const member of members) {
         if (!this.executor) {
           this.executor = member.resource.executor;
-          this.contextId = this.addDependency(this.executor.context());
+          this.contextId = this.addDataDependency(this.executor.context());
         }
         const { path = [] } = member;
         const conditions: SQL[] = [];
@@ -684,6 +697,10 @@ on (${sql.indent(
         });
       }
     }
+  }
+
+  toStringMeta() {
+    return this.memberDigests.map((d) => d.member.typeName).join(",");
   }
 
   connectionClone(

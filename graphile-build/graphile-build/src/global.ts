@@ -6,6 +6,7 @@ import type {
   GrafastInputFieldConfig,
   GrafastInputFieldConfigMap,
   OutputPlanForType,
+  PolymorphicTypePlanner,
   Step,
 } from "grafast";
 import type {
@@ -148,7 +149,15 @@ declare global {
     // Options in the config
 
     interface InflectionOptions {}
-    interface GatherOptions {}
+    interface GatherOptions {
+      /**
+       * Used in tests to mute expected warnings. Likely to be replaced when
+       * we add a diagnostics system.
+       *
+       * @experimental
+       */
+      muteWarnings?: boolean;
+    }
     interface SchemaOptions {
       /**
        * A behavior string to prepend to all behavior checks, can be overriden
@@ -195,6 +204,14 @@ declare global {
       exportSchemaSDLPath?: string;
       exportSchemaIntrospectionResultPath?: string;
       sortExport?: boolean;
+
+      /**
+       * Used in tests to mute expected warnings. Likely to be replaced when
+       * we add a diagnostics system.
+       *
+       * @experimental
+       */
+      muteWarnings?: boolean;
     }
 
     /**
@@ -235,6 +252,7 @@ declare global {
             | ((step: Step) => asserts step is TParentStep)
             | { new (...args: any[]): TParentStep }
         : null;
+      planType?: ($specifier: Step) => TParentStep;
     }
 
     /** Our take on GraphQLInputObjectTypeConfig that allows for plans */
@@ -253,6 +271,24 @@ declare global {
       types?:
         | GraphQLObjectType[]
         | ((context: ContextUnionTypes) => GraphQLObjectType[]);
+
+      /**
+       * Takes a step representing this polymorphic position, and returns a
+       * "specifier" step that will be input to planType. If not specified, the
+       * step's own `.toSpecifier()` will be used, if present, otherwise the
+       * step's own `.toRecord()`, and failing that the step itself.
+       */
+      toSpecifier?($step: Step): Step;
+
+      /**
+       * Plantime. `$specifier` is either a step returned from a polymorphic field
+       * or list position, or a `__ValueStep` that represents the combined values
+       * of such steps (to prevent unbounded plan branching). `__planType` must
+       * then construct a step that represents the `__typename` related to this
+       * given specifier (or `null` if no match can be found) and a `planForType`
+       * method which, when called, should return the step for the given type.
+       */
+      planType?($specifier: Step): PolymorphicTypePlanner;
     }
 
     /** Our take on GraphQLInterfaceTypeConfig that allows for plans */
@@ -269,6 +305,24 @@ declare global {
       interfaces?:
         | GraphQLInterfaceType[]
         | ((context: ContextInterfaceInterfaces) => GraphQLInterfaceType[]);
+
+      /**
+       * Takes a step representing this polymorphic position, and returns a
+       * "specifier" step that will be input to planType. If not specified, the
+       * step's own `.toSpecifier()` will be used, if present, otherwise the
+       * step's own `.toRecord()`, and failing that the step itself.
+       */
+      toSpecifier?($step: Step): Step;
+
+      /**
+       * Plantime. `$specifier` is either a step returned from a polymorphic field
+       * or list position, or a `__ValueStep` that represents the combined values
+       * of such steps (to prevent unbounded plan branching). `__planType` must
+       * then construct a step that represents the `__typename` related to this
+       * given specifier (or `null` if no match can be found) and a `planForType`
+       * method which, when called, should return the step for the given type.
+       */
+      planType?($specifier: Step): PolymorphicTypePlanner;
     }
 
     interface BuildVersions {

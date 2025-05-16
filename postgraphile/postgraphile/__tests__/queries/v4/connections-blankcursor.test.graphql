@@ -1,4 +1,5 @@
 ## expect(errors).toHaveLength(2);
+#> dontLogErrors: true
 query {
   blankCursor: allPeople(first: 2, after: "") { ...personConnection }
   invalidCursor: allPeople(first: 2, after: "27") { ...personConnection }

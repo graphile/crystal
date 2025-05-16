@@ -1,5 +1,5 @@
 import type { EdgeCapableStep, Step, UnbatchedExecutionExtra } from "grafast";
-import { exportAs, polymorphicWrap, UnbatchedStep } from "grafast";
+import { exportAs, UnbatchedStep } from "grafast";
 import type { GraphQLObjectType } from "grafast/graphql";
 import type { SQL, SQLable } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
@@ -451,6 +451,10 @@ export class PgSelectSingleStep<
     )`${this.getClassStep().alias}`;
   }
 
+  public toRecord(): Step {
+    return this.record();
+  }
+
   /**
    * When selecting a connection we need to be able to get the cursor. The
    * cursor is built from the values of the `ORDER BY` clause so that we can
@@ -510,45 +514,12 @@ export class PgSelectSingleStep<
     }
   }
 
-  /**
-   * The polymorphism if this is a "regular" (non-aggregate) request over a
-   * single/relational polymorphic codec; otherwise null.
-   */
-  private singleOrRelationalPolyIfRegular() {
-    const poly = (this.resource.codec as PgCodec).polymorphism;
-    if (
-      this.mode !== "aggregate" &&
-      (poly?.mode === "single" || poly?.mode === "relational")
-    ) {
-      return poly;
-    } else {
-      return null;
-    }
-  }
-
   private nonNullAttribute: {
     attribute: PgCodecAttribute;
     attr: string;
   } | null = null;
   private nullCheckAttributeIndex: number | null = null;
   optimize() {
-    const poly = this.singleOrRelationalPolyIfRegular();
-    if (poly) {
-      const $class = this.getClassStep();
-      this.typeStepIndexList = poly.typeAttributes.map((col) => {
-        const attr = this.resource.codec.attributes![col];
-        const expr = sql`${$class.alias}.${sql.identifier(String(col))}`;
-
-        return $class.selectAndReturnIndex(
-          attr.codec.castFromPg
-            ? attr.codec.castFromPg(expr)
-            : sql`${expr}::text`,
-        );
-      });
-    } else {
-      this.typeStepIndexList = null;
-    }
-
     const attributes = this.resource.codec.attributes;
     if (attributes && this.getClassStep().mode !== "aggregate") {
       // We need to see if this row is null. The cheapest way is to select a
@@ -593,25 +564,6 @@ export class PgSelectSingleStep<
     return this;
   }
 
-  finalize() {
-    const poly = this.singleOrRelationalPolyIfRegular();
-    if (poly) {
-      this.handlePolymorphism = (val) => {
-        if (val == null) return val;
-        const typeList = this.typeStepIndexList!.map((i) => val[i]);
-        const key = String(typeList);
-        const entry = poly.types[key];
-        if (entry) {
-          return polymorphicWrap(entry.name, val);
-        }
-        return null;
-      };
-    }
-    return super.finalize();
-  }
-
-  handlePolymorphism?: (result: any) => any;
-
   unbatchedExecute(
     _extra: UnbatchedExecutionExtra,
     result: string[] | null,
@@ -632,7 +584,7 @@ export class PgSelectSingleStep<
         return this._coalesceToEmptyObject ? EMPTY_TUPLE : null;
       }
     }
-    return this.handlePolymorphism ? this.handlePolymorphism(result) : result;
+    return result;
   }
 
   [$$toSQL]() {
@@ -681,7 +633,9 @@ export function pgSelectSingleFromRecord<
   TResource extends PgResource<any, any, any, any>,
 >(
   resource: TResource,
-  $record: PgClassExpressionStep<GetPgResourceCodec<TResource>, TResource>,
+  $record:
+    | PgClassExpressionStep<GetPgResourceCodec<TResource>, TResource>
+    | Step,
 ): PgSelectSingleStep<TResource> {
   // OPTIMIZE: we should be able to optimise this so that `plan.record()` returns the original record again.
   return pgSelectFromRecord(

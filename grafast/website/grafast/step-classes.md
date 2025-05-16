@@ -539,6 +539,72 @@ class MyQueryStep extends Step {
 }
 ```
 
+### toTypename()
+
+Enables a step to return a step resolving to the typename, used by the
+`defaultPlanType` polymorphic type resolver function when the GraphQL union or
+interface type does not implement the `planType` method. If not implemented,
+this default function will fall back to `$step.get('__typename')`, and failing
+that, `access($step, '__typename')`.
+
+### toSpecifier()
+
+When we plan a polymorphic field, each different object type the polymorphic
+type could be needs planning. If we were to do this naively then after a few
+layers of planning, this would result in an exponentially increasing number of
+branches. To avoid this issue, we always "recombine" polymorphic values before
+branching out again.
+
+Depending on your planning logic, the "recombine" mentioned above may result in
+the same data being fetched twice. The `$step.toSpecifier()` method exists to
+give you a chance to turn a step that represents a record into a "specifier"
+for that record, something that details the information required to fetch it.
+Often this can be determined without actually fetching the record itself (e.g.
+if you are fetching a User by their ID, then the specifier can be simply the ID
+and the fact it was a User, avoiding up-front fetching altogether). This then
+means you can delay the actual fetch of the data until the polymorphic
+`planType($stepOrSpecifier)` is called
+
+Importantly, <grafast /> does not require that a specifier takes a
+particular form, it's an agreement between the steps you're using and the
+polymorphic types (unions and interfaces) that you've implemented. We strongly
+recommend it's a plain-old JavaScript object though!
+
+```ts
+class MyStep extends Step {
+  // ...
+  toSpecifier() {
+    return object({
+      __typename: this.get("type"),
+      id: this.get("id"),
+    });
+  }
+}
+
+const Animal = new GraphQLInterfaceType({
+  name: "Animal",
+  // ... fields ...
+  resolveType(specifier) {
+    // Extract the property that indicates the type from above
+    return specifier.__typename;
+  },
+});
+
+const Cat = new GraphQLObjectType({
+  name: "Cat",
+  interfaces: [Animal],
+  // ... fields ...
+  extensions: {
+    grafast: {
+      planType($specifier) {
+        const $id = get($specifier, "id");
+        return cats.get({ id: $id });
+      },
+    },
+  },
+});
+```
+
 ## Built in methods
 
 Your custom step class will have access to all the built-in methods that come

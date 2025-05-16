@@ -1,4 +1,9 @@
-import type { ExecutableStep, FieldPlanResolver } from "grafast";
+import type {
+  ExecutableStep,
+  FieldPlanResolver,
+  PolymorphicTypePlanner,
+  Step,
+} from "grafast";
 import type {
   DefinitionNode,
   DirectiveDefinitionNode,
@@ -92,6 +97,8 @@ export type EnumResolver = {
 
 export interface TypeResolver {
   __resolveType?: GraphQLTypeResolver<any, any>;
+  __toSpecifier?($step: Step): Step;
+  __planType?($specifier: Step): PolymorphicTypePlanner;
   __scope?: GraphileBuild.ScopeUnion | GraphileBuild.ScopeInterface;
 }
 
@@ -487,14 +494,23 @@ export function makeExtendSchemaPlugin(
               const name = getName(definition.name);
               const description = getDescription(definition.description);
               const directives = getDirectives(definition.directives);
+              const tp = plans[name] as Maybe<TypeResolver>;
+              const tr = resolvers[name] as Maybe<TypeResolver>;
+              if (tp && tr) {
+                throw new Error(
+                  `You must set only plans.${name} or resolvers.${name} - not both!`,
+                );
+              }
+              const t = tp ?? tr;
               const scope = {
                 __origin: `makeExtendSchemaPlugin`,
                 directives,
                 ...scopeFromDirectives(directives),
-                ...plans[name]?.__scope,
+                ...t?.__scope,
               };
-              const resolveType = (resolvers[name] as Maybe<TypeResolver>)
-                ?.__resolveType;
+              const resolveType = t?.__resolveType;
+              const toSpecifier = t?.__toSpecifier;
+              const planType = t?.__planType;
               build.registerUnionType(
                 name,
                 scope,
@@ -512,6 +528,8 @@ export function makeExtendSchemaPlugin(
                     }
                   },
                   ...(resolveType ? { resolveType } : null),
+                  ...(toSpecifier ? { toSpecifier } : null),
+                  ...(planType ? { planType } : null),
                   ...(description ? { description } : null),
                 }),
                 uniquePluginName,
@@ -522,19 +540,30 @@ export function makeExtendSchemaPlugin(
               const name = getName(definition.name);
               const description = getDescription(definition.description);
               const directives = getDirectives(definition.directives);
+              const tp = plans[name] as Maybe<TypeResolver>;
+              const tr = resolvers[name] as Maybe<TypeResolver>;
+              if (tp && tr) {
+                throw new Error(
+                  `You must set only plans.${name} or resolvers.${name} - not both!`,
+                );
+              }
+              const t = tp ?? tr;
               const scope = {
                 __origin: `makeExtendSchemaPlugin`,
                 directives,
                 ...scopeFromDirectives(directives),
-                ...plans[name]?.__scope,
+                ...t?.__scope,
               };
-              const resolveType = (resolvers[name] as Maybe<TypeResolver>)
-                ?.__resolveType;
+              const resolveType = t?.__resolveType;
+              const toSpecifier = t?.__toSpecifier;
+              const planType = t?.__planType;
               build.registerInterfaceType(
                 name,
                 scope,
                 () => ({
                   ...(resolveType ? { resolveType } : null),
+                  ...(toSpecifier ? { toSpecifier } : null),
+                  ...(planType ? { planType } : null),
                   ...(description ? { description } : null),
                   fields: (fieldsContext) =>
                     getFields(

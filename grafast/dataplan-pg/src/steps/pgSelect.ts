@@ -20,6 +20,7 @@ import {
   access,
   arrayOfLength,
   ConstantStep,
+  DEFAULT_ACCEPT_FLAGS,
   exportAs,
   first,
   isAsyncIterable,
@@ -30,7 +31,7 @@ import {
   SafeError,
   Step,
   stepAMayDependOnStepB,
-  stepsAreInSamePhase,
+  stepAShouldTryAndInlineIntoStepB,
   UnbatchedStep,
 } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
@@ -648,7 +649,7 @@ export class PgSelectStep<
       }
     }
 
-    this.contextId = this.addDependency(
+    this.contextId = this.addDataDependency(
       inContext ?? resource.executor.context(),
     );
 
@@ -870,7 +871,7 @@ export class PgSelectStep<
   ): PgSelectStep<TResource> {
     const $plan = this.clone(mode);
     // In case any errors are raised
-    $plan.connectionDepId = $plan.addDependency($connection);
+    $plan.connectionDepId = $plan.addStrongDependency($connection);
     return $plan;
   }
 
@@ -1488,7 +1489,18 @@ export class PgSelectStep<
         // for now.
         continue;
       }
-      let $dep = this.getDep(dependencyIndex);
+      const depOptions = this.getDepOptions(dependencyIndex);
+      let $dep = depOptions.step;
+      if (
+        depOptions.acceptFlags !== DEFAULT_ACCEPT_FLAGS ||
+        depOptions.onReject != null
+      ) {
+        console.info(
+          `Forbidding inlining of ${$pgSelect} due to dependency ${dependencyIndex}/${$dep} having custom flags`,
+        );
+        // Forbid inlining
+        return null;
+      }
       if ($dep instanceof PgFromExpressionStep) {
         const digest0 = $dep.getDigest(0);
         if (digest0?.step && digest0.step instanceof PgClassExpressionStep) {
@@ -1513,7 +1525,7 @@ export class PgSelectStep<
         }
 
         // Don't allow merging across a stream/defer/subscription boundary
-        if (!stepsAreInSamePhase($depPgSelect, this)) {
+        if (!stepAShouldTryAndInlineIntoStepB(this, $depPgSelect)) {
           continue;
         }
 
@@ -1632,7 +1644,8 @@ export class PgSelectStep<
   ): void {
     for (const placeholder of this.placeholders) {
       const { dependencyIndex, symbol, codec, alreadyEncoded } = placeholder;
-      const dep = this.getDep(dependencyIndex);
+      const depOptions = this.getDepOptions(dependencyIndex);
+      const $dep = depOptions.step;
       /*
        * We have dependency `dep`. We're attempting to merge ourself into
        * `otherPlan`. We have two situations we need to handle:
@@ -1647,23 +1660,23 @@ export class PgSelectStep<
       // PERF: we know dep can't depend on otherPlan if
       // `isStaticInputStep(dep)` or `dep`'s layerPlan is an ancestor of
       // `otherPlan`'s layerPlan.
-      if (stepAMayDependOnStepB($target, dep)) {
+      if (stepAMayDependOnStepB($target, $dep)) {
         // Either dep is a static input plan (which isn't dependent on anything
         // else) or otherPlan is deeper than dep; either way we can use the dep
         // directly within otherPlan.
-        const newPlanIndex = $target.addDependency(dep);
+        const newPlanIndex = $target.addDataDependency(depOptions);
         $target.placeholders.push({
           dependencyIndex: newPlanIndex,
           codec,
           symbol,
           alreadyEncoded,
         });
-      } else if (dep instanceof PgClassExpressionStep) {
+      } else if ($dep instanceof PgClassExpressionStep) {
         // Replace with a reference.
-        $target.fixedPlaceholderValues.set(placeholder.symbol, dep.toSQL());
+        $target.fixedPlaceholderValues.set(placeholder.symbol, $dep.toSQL());
       } else {
         throw new Error(
-          `Could not merge placeholder from unsupported plan type: ${dep}`,
+          `Could not merge placeholder from unsupported plan type: ${$dep}`,
         );
       }
     }
@@ -1683,23 +1696,24 @@ export class PgSelectStep<
     }
 
     for (const { symbol, dependencyIndex } of this.deferreds) {
-      const dep = this.getDep(dependencyIndex);
-      if (stepAMayDependOnStepB($target, dep)) {
-        const newPlanIndex = $target.addDependency(dep);
+      const depOptions = this.getDepOptions(dependencyIndex);
+      const $dep = depOptions.step;
+      if (stepAMayDependOnStepB($target, $dep)) {
+        const newPlanIndex = $target.addDataDependency(depOptions);
         $target.deferreds.push({
           dependencyIndex: newPlanIndex,
           symbol,
         });
-      } else if (dep instanceof PgFromExpressionStep) {
-        const newDep = $target.withLayerPlan(() => dep.inlineInto($target));
-        const newPlanIndex = $target.addDependency(newDep);
+      } else if ($dep instanceof PgFromExpressionStep) {
+        const $newDep = $target.withLayerPlan(() => $dep.inlineInto($target));
+        const newPlanIndex = $target.addStrongDependency($newDep);
         $target.deferreds.push({
           dependencyIndex: newPlanIndex,
           symbol,
         });
       } else {
         throw new Error(
-          `Could not merge placeholder from unsupported plan type: ${dep}`,
+          `Could not merge placeholder from unsupported plan type: ${$dep}`,
         );
       }
     }
@@ -1969,6 +1983,7 @@ export class PgSelectStep<
     $source: PgSelectStep<TResource>,
   ): StaticInfo<TResource> {
     return {
+      sourceStepDescription: `PgSelectStep[${$source.id}]`,
       forceIdentity: $source.forceIdentity,
       havingConditions: $source.havingConditions,
       mode: $source.mode,
@@ -2011,7 +2026,7 @@ export class PgSelectRowsStep<
 
   constructor($pgSelect: PgSelectStep<TResource>) {
     super();
-    this.addDependency($pgSelect);
+    this.addStrongDependency($pgSelect);
   }
 
   public getClassStep(): PgSelectStep<TResource> {
@@ -2280,7 +2295,7 @@ class PgFromExpressionStep extends UnbatchedStep<SQL> {
     this.digests = digests.map((digest) => {
       if (digest.step) {
         const { step, ...rest } = digest;
-        const depId = this.addDependency(digest.step);
+        const depId = this.addDataDependency(digest.step);
         return { ...rest, depId };
       } else {
         return digest;
@@ -2584,6 +2599,8 @@ interface PgSelectQueryInfo<
   TResource extends PgResource<any, any, any, any, any> = PgResource,
 > extends PgStmtCommonQueryInfo,
     PgStmtCompileQueryInfo {
+  /** For debugging only */
+  readonly sourceStepDescription: string;
   readonly name: string;
   readonly resource: TResource;
   readonly mode: PgSelectMode;
@@ -3230,6 +3247,7 @@ ${lateralText};`;
 }
 
 type StaticKeys =
+  | "sourceStepDescription"
   | "forceIdentity"
   | "havingConditions"
   | "mode"
@@ -3325,6 +3343,7 @@ class PgSelectInlineApplyStep<
 
           // Data that's independent of dependencies
           ...this.staticInfo,
+          sourceStepDescription: `PgSelectInlineApplyStep[${this.id}] (from ${this.staticInfo.sourceStepDescription})`,
         });
 
         const { cursorDigest, cursorIndicies, groupIndicies } = info;
@@ -3628,6 +3647,7 @@ function buildQueryParts<TResource extends PgResource<any, any, any, any, any>>(
   const extraSelectIndexes = extraSelects.map((_, i) => i + l);
 
   return {
+    comment: sql.comment(`From ${info.sourceStepDescription}`),
     selects,
     from,
     joins: info.joins,
@@ -3660,6 +3680,7 @@ function buildQueryFromParts(
   options: { asArray?: boolean } = {},
 ) {
   const {
+    comment,
     selects,
     from,
     joins,
@@ -3676,7 +3697,7 @@ function buildQueryFromParts(
   const where = buildWhereOrHaving(sql`where`, whereConditions);
   const having = buildWhereOrHaving(sql`having`, havingConditions);
 
-  const baseQuery = sql`${aliases}${select}${from}${join}${where}${groupBy}${having}${orderBy}${limitAndOffset}`;
+  const baseQuery = sql`${comment}${aliases}${select}${from}${join}${where}${groupBy}${having}${orderBy}${limitAndOffset}`;
   return { sql: baseQuery, extraSelectIndexes };
 }
 

@@ -1,9 +1,9 @@
+import { $$proxy } from "../constants.js";
 import type {
   ExecutionDetails,
   GrafastResultsList,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
-import { $$proxy } from "../interfaces.js";
 import type { Step } from "../step.js";
 import { UnbatchedStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
@@ -46,12 +46,6 @@ export class ProxyStep<T> extends UnbatchedStep<T> {
   }
   // Do not proxy stream requests
   stream = undefined;
-}
-
-declare module "../step.js" {
-  interface Step {
-    [$$proxy]?: any;
-  }
 }
 
 function makeProxyHandler<T>($toStep: Step<T>): ProxyHandler<Step<T>> {

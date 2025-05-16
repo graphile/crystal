@@ -5,7 +5,6 @@ select
     select array[
       __person_bookmarks__."id"::text,
       __person_bookmarks__."person_id"::text,
-      __person_bookmarks__."bookmarked_entity"::text,
       ((__person_bookmarks__."bookmarked_entity")."person_id")::text,
       ((__person_bookmarks__."bookmarked_entity")."post_id")::text,
       ((__person_bookmarks__."bookmarked_entity")."comment_id")::text
