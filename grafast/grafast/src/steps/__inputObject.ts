@@ -1,6 +1,5 @@
 import type { GraphQLInputObjectType } from "graphql";
 import * as graphql from "graphql";
-import te from "tamedevil";
 
 import { inputStep } from "../input.js";
 import type {
@@ -71,39 +70,6 @@ export class __InputObjectStep<
       return constant(null);
     }
     return this;
-  }
-
-  finalize() {
-    te.runInBatch<typeof this.unbatchedExecute>(
-      te`(function (extra, ${te.join(
-        this.dependencies.map((_, dependencyIndex) =>
-          te.identifier(`val${dependencyIndex}`),
-        ),
-        ", ",
-      )}) {
-  const resultValues = Object.create(null);
-  ${te.join(
-    Object.entries(this.inputFields).map(
-      ([inputFieldName, { dependencyIndex }]) => {
-        if (dependencyIndex == null) {
-          throw new Error("inputFieldPlan has gone missing.");
-        }
-        const teVal = te.identifier(`val${dependencyIndex}`);
-        return te`\
-  if (${teVal} !== undefined) {
-    resultValues${te.set(inputFieldName, true)} = ${teVal};
-  }`;
-      },
-    ),
-    "\n",
-  )}
-  return resultValues;
-})`,
-      (fn) => {
-        this.unbatchedExecute = fn;
-      },
-    );
-    super.finalize();
   }
 
   unbatchedExecute(_extra: UnbatchedExecutionExtra, ...values: any[]) {
