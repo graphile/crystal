@@ -1,0 +1,287 @@
+---
+title: Polymorphic soup
+description: How we addressed Grafast's polymorphic woes
+slug: 2025-05-13-polymorphic-soup
+authors:
+  - name: Benjie
+    title: Inventor of Grafast
+    url: https://github.com/Benjie
+    image_url: https://github.com/Benjie.png
+hide_table_of_contents: true
+---
+
+import Mermaid from "@theme/Mermaid";
+
+You're the IT service for a vetinary practice. You have "notes" for a
+"patient". The patient might be a cat, dog, fish, hamster, parrot, budgie,
+rabbit or any number of other types of animal, and though they all share
+some common properties such as `name`, each of them may
+have attributes that are specific to that type of animal. We thus say that "patient" is polymorphic, and in GraphQL terms we'd probably implement it as an interface with a number of implementations, one for each type of animal:
+
+```graphql
+interface Patient {
+  id: ID!
+  name: String!
+  dateOfBirth: Datetime
+  registeredSince: Datetime
+  owner: Customer
+}
+
+type Dog implements Patient {
+  # Shared fields
+  id: ID!
+  name: String!
+  dateOfBirth: Datetime
+  registeredSince: Datetime
+  owner: Customer
+
+  # Fields specific to Dog
+  breed: String
+  microchipNumber: String
+  neutered: Boolean
+}
+
+type Parrot implements Patient {
+  # Shared fields
+  id: ID!
+  name: String!
+  dateOfBirth: Datetime
+  registeredSince: Datetime
+  owner: Customer
+
+  # Fields specific to Parrot
+  species: String
+  wingClipped: Boolean
+  vocabularySize: Int
+}
+```
+
+We can then indicate that an individual `Note` has an associated patient:
+
+```graphql
+type Note {
+  # ...
+  patient: Patient!
+}
+```
+
+Grafast aims to leverage the declarative nature of GraphQL to enable far more
+efficient execution than the traditional layer-by-layer resolver-based
+execution model that the GraphQL specification suggests and the reference
+implementation demonstrates. Grafast achieves this by having a "planning"
+phase that outlines the "steps" required to execute an operation, and allowing
+these steps to de-duplicate, combine and optimize themselves, before we
+move on to executing them.
+
+But polymorphism makes this complex.
+
+In earlier versions of the Grafast beta, we focussed on enabling the most
+efficient execution without concerning ourselves too much with planning costs.
+We knew this would be an issue that needed solving (and even called it out in
+our initial Grafast working group) but weren't sure what the solution would be
+so we ploughed on to build up Grafast into a system that could power production
+systems, recommending that users only use it with [trusted
+documents](https://benjie.dev/graphql/trusted-documents) to avoid planning
+attacks. (We also added planning timeouts to prevent planning locking up the
+event loop for too long.)
+
+In earlier versions of the Grafast beta, we focussed on enabling the most
+efficient execution without concerning ourselves too much with planning costs.
+This resulted (as we knew it would) in lots of plan branching:
+
+<Mermaid chart={`
+flowchart TD
+  subgraph "Operation"
+  Root["Query"]
+  end
+  subgraph "allAnimals"
+  Root --> A["Dog"]
+  Root --> B["Parrot"]
+  end
+  subgraph "owner"
+  A --> AA["Human"]
+  A --> AB["Company"]
+  B --> BA["Human"]
+  B --> BB["Company"]
+  end
+  subgraph "animals"
+  AA --> AAA["Dog"]
+  AA --> AAB["Parrot"]
+  AB --> ABA["Dog"]
+  AB --> ABB["Parrot"]
+  BA --> BAA["Dog"]
+  BA --> BAB["Parrot"]
+  BB --> BBA["Dog*"]
+  BB --> BBB["Parrot"]
+  end
+`} />
+
+This branching would increase exponentially with the number of layers of
+polymorphism you were deep, significantly increasing the cost of planning. It
+was clear this approach wouldn't suit us for the long term.
+
+An early attempt to solve this was to "recombine" polymorphic branches together
+before branching out again:
+
+
+<Mermaid chart={`
+flowchart TD
+  subgraph "Operation"
+  Root["Query"]
+  end
+  subgraph "allAnimals"
+  Root --> A["Dog"]
+  Root --> B["Parrot"]
+  end
+  subgraph "owner"
+  A --> R1@{ shape: f-circ, label: "Collate" }
+  B --> R1
+  R1 --> R1A["Human"]
+  R1 --> R1B["Company"]
+  end
+  subgraph "animals"
+  R1A --> R2@{ shape: f-circ, label: "Collate" }
+  R1B --> R2
+  R2 --> R2A["Dog*"]
+  R2 --> R2B["Parrot"]
+  end
+`} />
+
+This solved the exponential branching issue, but it broke our ability to
+optimize the steps as fully, since the node `Dog*` no longer had a single path
+of nodes to the root, instead it comes from a combination of steps that may
+work in different ways.
+
+After a lot of thought, a realisation dawned about the nature of polymorphism
+in general: sometimes you need to retrieve something to determine what type it
+is ("what behind door number 1?"), but sometimes you need to know what type
+something is in order to retrieve it (to get fruit you might go to the
+greengrocer; to get a book you might go to the library; to get a bank statement
+you might log in online).
+
+It turns out that we commonly deal with both of these approaches to
+polymorphism (fetch-to-type, and type-to-fetch) when programming; it depends
+entirely on our data sources.
+
+Revisiting the vetinary practice above, there's multiple ways to model this in
+a relational database. Perhaps you store all patients to a "patients" table,
+with a "type" column to indicate the kind of animal:
+
+```sql
+create table patients (
+  id int primary key,
+  type text not null, -- "dog" or "parrot"
+  name text not null
+  -- ...
+);
+create table notes (
+  id int primary key,
+  patient_id int not null references patients
+  -- ...
+);
+```
+
+Here if you were to have a note, you would need to fetch the patient from the
+`patients` table in order to determine what kind of animal it was.
+
+However, an alternative way of modelling this would be to each type of animal
+in its own table. For this, you'd probably use something like Rails-style
+polymorphism: a `patient_type` column to indicate the type, and a `patient_id`
+column to indicate the record within the table for that type) to reference
+them.
+
+```sql
+create table dogs (
+  id int primary key,
+  name text not null,
+  breed text,
+  microchipNumber text,
+  neutered boolean
+);
+create table parrots (
+  id int primary key,
+  name text not null,
+  species text,
+  wingClipped boolean,
+  vocabularySize int
+);
+create table notes (
+  id int primary key,
+  patient_type text not null,
+  patient_id int not null
+  -- ...
+);
+```
+
+Sometimes you even have a hybrid situation, for example when dealing with the
+Node interface, the identifier will encode where to get the record from, and
+which record it is, but that alone might not be enough to determine the GraphQL
+object type it represents - for some nodes you might need to fetch them to
+determine the type.
+
+<!--
+<Mermaid chart={`
+flowchart TD
+  typename["__typename"]
+  NodeId --.> parse["base64Decode + JSON.parse"]
+  parse --.> lambda1["nodeIdToTypeName<br/><em>(if direct)</em>"]
+  lambda1 -----.> coalesce
+  coalesce --.> typename
+  parse --.> lambda2["nodeIdToAnimalId<br/><em>(if compatible)</em>"]
+  lambda2 --.> loadAnimal["loadAnimalByIdIfNotNull"]
+  loadAnimal --.> getType["get('type')"]
+  getType --.> lambda3["animalTypeToTypeName"]
+  lambda3 --.> coalesce
+`} /.>
+-->
+
+Once you've determined the type, you should only perform steps relevant for
+that type (i.e. don't execute the `getDog` step when we know we're looking at a
+Parrot), but determining the type may itself involve a fetch or other complex
+logic.
+
+At this point we realised the following ideas were key:
+
+- The polymorphic type itself is responsible for determining which type a value
+  represents (this mirrors GraphQL.js' `resolveType` method)
+- If a polymorphic position has more than one source step (i.e. we got there
+  through multiple polymorphic paths), we need to combine these steps to avoid
+  exponential branching
+- This combination should not result fetching the record up front if we need to
+  fetch it again after combination; to solve: steps can optionally implement
+  `.toSpecifier()` to produce a "specifier object" step that details which
+  record to fetch
+- If a polymorphic position had exactly one source step, we should use this
+  step directly so that we can optimize into it, we should not use
+  `.toSpecifier()` here
+- The split between "steps before determining typename" and "steps after
+  determining typename" is critical
+
+Essentially we had a soup of steps, and we needed to split them up into the
+right layer plans and positions so that we could continue with planning... But
+how would a user write the code to produce this soup and extract the right
+parts without it being overwhelmingly complex?
+
+After much scribbling in notebooks, pacing of lounges, stroking of cats, and
+scratching of chins, we landed on the following:
+
+1. The user can add a `planType` method to polymorphic types (interfaces and unions)
+2. This method would be called with a single step, `$stepOrSpecifier`
+3. This step, `$stepOrSpecifier`, would either be the step returned from that
+   polymorphic position, if only one existed, or a `__ValueStep` representing
+   the set of values returned from the underlying steps (or their
+   `.toSpecifier()` methods, if implemented).
+4. The method must return not a step, but an object that we call a "polymorphic type resolver". The object would contain:
+   1. A `$__typename` step (required) which details the GraphQL object type name that the `$stepOrSpecifier` is related to
+   2. A `planForType(t)` method (optional) that the system will call automatically for each possible object type for this polymorphic type. This method should return the step to use for this type. If not specified, `$stepOrSpecifier` will be used for all types.
+
+Returning this "polymorphic type resolver" object is a bit of a break from the
+Grafast norm of returning steps directly, but because it has a method on it,
+the method can access ambient steps from the typename planning phase without
+having to do awkward graph traversal - instead, it can just leverage the JS
+closure. This actually made it quite ergonomic:
+
+```ts
+// Example of planType implementation
+```
+
