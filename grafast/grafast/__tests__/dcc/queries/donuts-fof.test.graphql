@@ -9,6 +9,7 @@
         id
         name
         ... on ActiveCrawler {
+          crawlerNumber
           friends {
             id
             name
@@ -16,6 +17,10 @@
         }
         ... on NPC {
           exCrawler
+          friends {
+            id
+            name
+          }
         }
         ... on Manager {
           client {

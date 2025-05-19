@@ -8,6 +8,7 @@
         __typename: 'ActiveCrawler',
         id: 101,
         name: 'Carl',
+        crawlerNumber: 4122,
         friends: [
           {
             id: 102,
@@ -35,6 +36,7 @@
         __typename: 'ActiveCrawler',
         id: 103,
         name: 'Katia',
+        crawlerNumber: 9077265,
         friends: [
           {
             id: 101,
@@ -50,6 +52,7 @@
         __typename: 'ActiveCrawler',
         id: 104,
         name: 'Imani',
+        crawlerNumber: null,
         friends: [
           {
             id: 101,
@@ -69,6 +72,7 @@
         __typename: 'ActiveCrawler',
         id: 105,
         name: 'Elle',
+        crawlerNumber: null,
         friends: [
           {
             id: 101,
@@ -89,6 +93,20 @@
         id: 301,
         name: 'Mordecai',
         exCrawler: true,
+        friends: [
+          {
+            id: 101,
+            name: 'Carl',
+          },
+          {
+            id: 102,
+            name: 'Princess Donut',
+          },
+          {
+            id: 103,
+            name: 'Katia',
+          },
+        ],
         client: {
           id: 102,
           name: 'Princess Donut',
@@ -99,6 +117,16 @@
         id: 302,
         name: 'Bomo',
         exCrawler: null,
+        friends: [
+          {
+            id: 102,
+            name: 'Princess Donut',
+          },
+          {
+            id: 303,
+            name: 'Sledge',
+          },
+        ],
         clients: [
           {
             id: 101,
@@ -119,6 +147,16 @@
         id: 303,
         name: 'Sledge',
         exCrawler: null,
+        friends: [
+          {
+            id: 102,
+            name: 'Princess Donut',
+          },
+          {
+            id: 302,
+            name: 'Bomo',
+          },
+        ],
         clients: [
           {
             id: 101,

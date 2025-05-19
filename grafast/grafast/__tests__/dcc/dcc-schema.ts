@@ -57,6 +57,7 @@ export const makeBaseArgs = () => {
         name: String!
         species: Species
         exCrawler: Boolean
+        friends: [Character]
         saferoomLocation: String
       }
       type Manager implements NPC & Character {
@@ -64,6 +65,7 @@ export const makeBaseArgs = () => {
         name: String!
         species: Species
         exCrawler: Boolean
+        friends: [Character]
         client: ActiveCrawler
       }
       type Security implements NPC & Character {
@@ -71,6 +73,7 @@ export const makeBaseArgs = () => {
         name: String!
         species: Species
         exCrawler: Boolean
+        friends: [Character]
         clients: [ActiveCrawler!]
       }
       interface NPC implements Character {
@@ -78,6 +81,7 @@ export const makeBaseArgs = () => {
         name: String!
         species: Species
         exCrawler: Boolean
+        friends: [Character]
       }
       interface Character {
         id: Int!
