@@ -1220,7 +1220,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                           // A PgSelectSingleStep representing the base relational table
                           const $base = (() => {
                             if ($inStep instanceof PgSelectSingleStep) {
-                              if ($inStep.resource === resource) {
+                              if ($inStep.resource.codec === resource.codec) {
                                 // It's the core table; that's what we want!
                                 return $inStep;
                               } else {
