@@ -21,7 +21,11 @@ import {
   makeData,
 } from "./dcc-data.js";
 
-const resolvedPreset = resolvePreset({});
+const resolvedPreset = resolvePreset({
+  grafast: {
+    explain: true,
+  },
+});
 const requestContext = {};
 
 declare global {
