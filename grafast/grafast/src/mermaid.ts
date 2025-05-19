@@ -182,8 +182,10 @@ export function planToMermaid(
       const raisonDEtre =
         ` (${layerPlan.reason.type})` +
         (layerPlan.reason.type === "polymorphicPartition"
-          ? `\n${layerPlan.reason.typeNames}`
-          : ``);
+          ? `\n|${layerPlan.reason.typeNames.join("\n|")}`
+          : layerPlan.reason.type === "polymorphic"
+            ? `\n__typename: ${shortStep(stepById[layerPlan.reason.parentStepId])}`
+            : ``);
       graph.push(
         `    Bucket${layerPlan.id}(${mermaidEscape(
           `Bucket ${layerPlan.id}${raisonDEtre}${
@@ -205,10 +207,6 @@ export function planToMermaid(
           }\n${
             layerPlan.rootStepId != null && layerPlan.reason.type !== "root"
               ? `\nROOT ${stepToString(stepById[layerPlan.rootStepId])}`
-              : ""
-          }\n${
-            layerPlan.reason.type === "polymorphic"
-              ? `\n__typename: ${stepToString(stepById[layerPlan.reason.parentStepId])}`
               : ""
           }${startSteps(layerPlan)}`,
         )}):::bucket`,
@@ -460,22 +458,6 @@ export function planToMermaid(
   const graphString = graph.join("\n");
   return graphString;
   function startSteps(layerPlan: GrafastPlanBucketJSONv1) {
-    function shortStep(step: GrafastPlanStepJSONv1) {
-      return `${step.stepClass.replace(/Step$/, "") ?? ""}[${step.id}]`;
-    }
-    function shortSteps(
-      steps: ReadonlyArray<GrafastPlanStepJSONv1> | undefined,
-    ) {
-      if (!steps) {
-        return "";
-      }
-      const str = steps.map(shortStep).join(", ");
-      if (str.length < 40) {
-        return str;
-      } else {
-        return steps.map((s) => s.id).join(", ");
-      }
-    }
     return layerPlan.phases.length === 1
       ? ``
       : `\n${layerPlan.phases
@@ -492,6 +474,22 @@ export function planToMermaid(
               }`,
           )
           .join("\n")}`;
+  }
+}
+
+function shortStep(step: GrafastPlanStepJSONv1) {
+  return `${step.stepClass.replace(/Step$/, "") ?? ""}[${step.id}]`;
+}
+
+function shortSteps(steps: ReadonlyArray<GrafastPlanStepJSONv1> | undefined) {
+  if (!steps) {
+    return "";
+  }
+  const str = steps.map(shortStep).join(", ");
+  if (str.length < 40) {
+    return str;
+  } else {
+    return steps.map((s) => s.id).join(", ");
   }
 }
 
