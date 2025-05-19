@@ -6743,10 +6743,25 @@ export const plans = {
   RelationalItem: {
     __toSpecifier(step) {
       if (step instanceof PgSelectSingleStep) {
-        return object({
-          ...Object.fromEntries(relational_itemsUniques[0].attributes.map(attrName => [attrName, get2(step, attrName)])),
-          ["type"]: get2(step, "type")
-        });
+        if (step.resource === relational_items_relational_itemsPgResource) {
+          // It's the core table; that's what we want!
+          return object({
+            ...Object.fromEntries(relational_itemsUniques[0].attributes.map(attrName => [attrName, get2(step, attrName)]))
+          });
+        } else {
+          // Assume it's a child; return description of base
+          // PERF: ideally we'd use relationship
+          // traversal instead, this would both be
+          // shorter and also cacheable.
+          const stepPk = step.resource.uniques.find(u => u.isPrimary);
+          if (!stepPk) {
+            throw new Error(`Expected a relational record for ${relational_items_relational_itemsPgResource.name}, but found one for ${step.resource.name} which has no primary key!`);
+          }
+          if (stepPk.attributes.length !== relational_itemsUniques[0].attributes.length) {
+            throw new Error(`Expected a relational record for ${relational_items_relational_itemsPgResource.name}, but found one for ${step.resource.name} which has a primary key with a different number of columns!`);
+          }
+          return object(Object.fromEntries(relational_itemsUniques[0].attributes.map((attrName, idx) => [attrName, get2(step, stepPk.attributes[idx])])));
+        }
       } else {
         return step;
       }
@@ -6754,8 +6769,33 @@ export const plans = {
     __planType($specifier, {
       $original
     }) {
-      const $step = $original ?? $specifier;
-      const $typeVal = get2($step, "type");
+      const $inStep = $original ?? $specifier;
+      // A PgSelectSingleStep representing the base relational table
+      const $base = (() => {
+        if ($inStep instanceof PgSelectSingleStep) {
+          if ($inStep.resource === relational_items_relational_itemsPgResource) {
+            // It's the core table; that's what we want!
+            return $inStep;
+          } else {
+            // Assume it's a child; get base record by primary key
+            // PERF: ideally we'd use relationship
+            // traversal instead, this would both be
+            // shorter and also cacheable.
+            const stepPk = $inStep.resource.uniques.find(u => u.isPrimary);
+            if (!stepPk) {
+              throw new Error(`Expected a relational record for ${relational_items_relational_itemsPgResource.name}, but found one for ${$inStep.resource.name} which has no primary key!`);
+            }
+            if (stepPk.attributes.length !== relational_itemsUniques[0].attributes.length) {
+              throw new Error(`Expected a relational record for ${relational_items_relational_itemsPgResource.name}, but found one for ${$inStep.resource.name} which has a primary key with a different number of columns!`);
+            }
+            return relational_items_relational_itemsPgResource.get(Object.fromEntries(relational_itemsUniques[0].attributes.map((attrName, idx) => [attrName, get2($inStep, stepPk.attributes[idx])])));
+          }
+        } else {
+          // Assume it's an object representing the base table
+          return relational_items_relational_itemsPgResource.get(Object.fromEntries(relational_itemsUniques[0].attributes.map(attrName => [attrName, get2($inStep, attrName)])));
+        }
+      })();
+      const $typeVal = get2($base, "type");
       const $__typename = lambda($typeVal, RelationalItem_typeNameFromType, true);
       return {
         $__typename,
@@ -6764,26 +6804,7 @@ export const plans = {
           if (!spec) {
             throw new Error(`${this} Could not find matching name for relational polymorphic '${type.name}'`);
           }
-          const relationIdentifier = spec.relationName;
-          if ($step instanceof PgSelectSingleStep) {
-            if ($step.resource === relational_items_relational_itemsPgResource) {
-              // It's the core table, redirect to the relation
-              return $step.singleRelation(relationIdentifier);
-            } else {
-              return $step;
-            }
-          } else {
-            const relation = relational_items_relational_itemsPgResource.getRelation(relationIdentifier);
-            if (!relation || !relation.isUnique) {
-              throw new Error(`${String(relationIdentifier)} is not a unique relation on ${relational_items_relational_itemsPgResource}`);
-            }
-            const {
-              remoteResource,
-              remoteAttributes,
-              localAttributes
-            } = relation;
-            return remoteResource.get(Object.fromEntries(remoteAttributes.map((remoteAttribute, idx) => [remoteAttribute, get2($step, localAttributes[idx])])));
-          }
+          return $base.singleRelation(spec.relationName);
         }
       };
     }

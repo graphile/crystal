@@ -14,7 +14,7 @@ graph TD
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 4, 38, 61, 168, 136, 142, 148, 154, 160<br /><br />ROOT __ValueᐸrootValueᐳ[4]"):::bucket
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 38, 61, 168, 136, 142, 148, 154, 160<br /><br />ROOT Connection{2}ᐸ57ᐳ[61]<br />1: PgSelect[63]<br />2: PgSelectRows[64]"):::bucket
     Bucket5("Bucket 5 (listItem)<br />Deps: 38, 136, 142, 148, 154, 160<br /><br />ROOT __Item{5}ᐸ64ᐳ[65]"):::bucket
-    Bucket6("Bucket 6 (polymorphic)<br />Deps: 38, 67, 136, 142, 148, 154, 160, 70, 68<br /><br />1: 72, 85, 98, 111, 124<br />2: 81, 94, 107, 120, 133<br />ᐳ: 80, 83, 93, 96, 106, 109, 119, 122, 132, 135, 137, 138, 143, 144, 149, 150, 155, 156, 161, 162<br />3: __DataOnly[140]<br />ᐳ: Lambda[139]"):::bucket
+    Bucket6("Bucket 6 (polymorphic)<br />Deps: 38, 67, 136, 142, 148, 154, 160, 70, 69<br /><br />1: 72, 85, 98, 111, 124<br />2: 81, 94, 107, 120, 133<br />ᐳ: 80, 83, 93, 96, 106, 109, 119, 122, 132, 135, 137, 138, 143, 144, 149, 150, 155, 156, 161, 162<br />3: __DataOnly[140]<br />ᐳ: Lambda[139]"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
@@ -111,10 +111,10 @@ graph TD
     __Item65 --> PgSelectSingle66
     PgClassExpression67{{"PgClassExpression[67∈5]<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
     PgSelectSingle66 --> PgClassExpression67
-    PgClassExpression68{{"PgClassExpression[68∈5]<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
-    PgSelectSingle66 --> PgClassExpression68
+    PgClassExpression69{{"PgClassExpression[69∈5]<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
+    PgSelectSingle66 --> PgClassExpression69
     Lambda70{{"Lambda[70∈5]<br />ᐸRelationalItem_typeNameFromTypeᐳ"}}:::plan
-    PgClassExpression68 --> Lambda70
+    PgClassExpression69 --> Lambda70
     __DataOnly140["__DataOnly[140∈6]<br />ᐸ138,144,150,156,162ᐳ<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem"]:::plan
     List138{{"List[138∈6]^<br />ᐸ136,137ᐳ"}}:::plan
     List144{{"List[144∈6]^<br />ᐸ142,143ᐳ"}}:::plan
@@ -196,7 +196,7 @@ graph TD
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgSelect63,PgSelectRows64 bucket4
     classDef bucket5 stroke:#7fff00
-    class Bucket5,__Item65,PgSelectSingle66,PgClassExpression67,PgClassExpression68,Lambda70 bucket5
+    class Bucket5,__Item65,PgSelectSingle66,PgClassExpression67,PgClassExpression69,Lambda70 bucket5
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgSelect72,First80,PgSelectRows81,PgSelectSingle83,PgSelect85,First93,PgSelectRows94,PgSelectSingle96,PgSelect98,First106,PgSelectRows107,PgSelectSingle109,PgSelect111,First119,PgSelectRows120,PgSelectSingle122,PgSelect124,First132,PgSelectRows133,PgSelectSingle135,PgClassExpression137,List138,Lambda139,__DataOnly140,PgClassExpression143,List144,PgClassExpression149,List150,PgClassExpression155,List156,PgClassExpression161,List162 bucket6
 
