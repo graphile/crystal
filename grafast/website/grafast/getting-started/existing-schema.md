@@ -23,10 +23,12 @@ following hold:
 - `context` must be an object (anything suitable to be used as the key to a
   `WeakMap`); if you do not need a context then `{}` is perfectly acceptable
 - `rootValue`, if specified, must be an object or `null`/`undefined`
-- `resolveType` and `isTypeOf`, if specified, must be synchronous (must not
-  return promises) and must only make use of the first argument ([relevant
-  issue](https://github.com/graphile/crystal/issues/2457)), and must return the
-  GraphQL type name as a string, rather than returning the object itself.
+- `resolveType` and `isTypeOf`, if specified, must return the
+  GraphQL type name as a string (rather than returning the object type itself)
+  and their version of `GraphQLResolveInfo` is even more cut down (but you
+  shouldn't be using that anyway?). We only have tests of synchronous
+  `resolveType` currently, so if you're going to rely on this we suggest you submit
+  tests matching the patterns you use to our test suite.
 
 (If you face any issues with your resolvers, please file an issue - it's
 possible that this list of constraints is not complete.)
