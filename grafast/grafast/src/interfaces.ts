@@ -846,5 +846,5 @@ export interface PolymorphicTypePlanner {
   /**
    * If not provided, will call `t.planType($specifier)`
    */
-  planForType?(t: GraphQLObjectType): Step;
+  planForType?(t: GraphQLObjectType): Step | null;
 }

@@ -33,6 +33,7 @@ import {
 import { fieldSelectionsForType } from "../graphqlMergeSelectionSets.js";
 import type { GrafastPlanJSON } from "../index.js";
 import {
+  $$inhibit,
   __FlagStep,
   __ItemStep,
   __TrackedValueStep,
@@ -1870,25 +1871,34 @@ export class OperationPlan {
           const polymorphicPaths = new Set(
             basePaths.map((p) => `${p}>${type.name}`),
           );
-          const $stepForType = polymorphicTypePlanner.planForType
-            ? withGlobalLayerPlan(
-                polymorphicLayerPlan,
-                polymorphicPaths,
-                planningPath + "?",
-                polymorphicTypePlanner.planForType,
-                polymorphicTypePlanner,
-                type,
-              )
-            : type.extensions?.grafast?.planType
+          const $stepForType =
+            (polymorphicTypePlanner.planForType
               ? withGlobalLayerPlan(
                   polymorphicLayerPlan,
                   polymorphicPaths,
                   planningPath + "?",
-                  type.extensions.grafast.planType,
-                  type.extensions.grafast,
-                  commonStep,
+                  polymorphicTypePlanner.planForType,
+                  polymorphicTypePlanner,
+                  type,
                 )
-              : commonStep;
+              : type.extensions?.grafast?.planType
+                ? withGlobalLayerPlan(
+                    polymorphicLayerPlan,
+                    polymorphicPaths,
+                    planningPath + "?",
+                    type.extensions.grafast.planType,
+                    type.extensions.grafast,
+                    commonStep,
+                  )
+                : commonStep) ??
+            withGlobalLayerPlan(
+              polymorphicLayerPlan,
+              polymorphicPaths,
+              planningPath + "?",
+              constant,
+              null,
+              $$inhibit,
+            );
           stepForType.set(type, $stepForType);
           if (isDev) {
             // Check that this plan is compatible with every poly path
