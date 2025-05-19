@@ -1171,13 +1171,13 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                             // shorter and also cacheable.
                             const stepPk = (
                               step.resource.uniques as PgResourceUnique[]
-                            ).find((u) => u.isPrimary);
+                            ).find((u) => u.isPrimary)?.attributes;
                             if (!stepPk) {
                               throw new Error(
                                 `Expected a relational record for ${resource.name}, but found one for ${step.resource.name} which has no primary key!`,
                               );
                             }
-                            if (stepPk.attributes.length !== pk.length) {
+                            if (stepPk.length !== pk.length) {
                               throw new Error(
                                 `Expected a relational record for ${resource.name}, but found one for ${step.resource.name} which has a primary key with a different number of columns!`,
                               );
@@ -1186,20 +1186,20 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                               Object.fromEntries(
                                 pk.map((attrName, idx) => [
                                   attrName,
-                                  get(step, stepPk.attributes[idx]),
+                                  get(step, stepPk[idx]),
                                 ]),
                               ),
                             );
                           } else {
                             // Assume it is or describes the base:
-                            return object({
-                              ...Object.fromEntries(
+                            return object(
+                              Object.fromEntries(
                                 pk.map((attrName) => [
                                   attrName,
                                   get(step, attrName),
                                 ]),
                               ),
-                            });
+                            );
                           }
                         },
                       [PgSelectSingleStep, get, object, pk, resource],
@@ -1230,13 +1230,13 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                                 // shorter and also cacheable.
                                 const stepPk = (
                                   $inStep.resource.uniques as PgResourceUnique[]
-                                ).find((u) => u.isPrimary);
+                                ).find((u) => u.isPrimary)?.attributes;
                                 if (!stepPk) {
                                   throw new Error(
                                     `Expected a relational record for ${resource.name}, but found one for ${$inStep.resource.name} which has no primary key!`,
                                   );
                                 }
-                                if (stepPk.attributes.length !== pk.length) {
+                                if (stepPk.length !== pk.length) {
                                   throw new Error(
                                     `Expected a relational record for ${resource.name}, but found one for ${$inStep.resource.name} which has a primary key with a different number of columns!`,
                                   );
@@ -1245,7 +1245,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                                   Object.fromEntries(
                                     pk.map((attrName, idx) => [
                                       attrName,
-                                      get($inStep, stepPk.attributes[idx]),
+                                      get($inStep, stepPk[idx]),
                                     ]),
                                   ),
                                 );
