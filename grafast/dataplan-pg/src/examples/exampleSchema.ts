@@ -3115,10 +3115,14 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "SingleTableTopic",
-    planType($specifier) {
-      const $id = get($specifier, "id") as Step<number>;
-      return singleTableItemsResource.get({ id: $id });
-    },
+    planType: EXPORTABLE(
+      (get, singleTableItemsResource) =>
+        function planType($specifier) {
+          const $id = get($specifier, "id") as Step<number>;
+          return singleTableItemsResource.get({ id: $id });
+        },
+      [get, singleTableItemsResource],
+    ),
     interfaces: [SingleTableItem],
     fields: () => ({
       ...commonSingleTableItemFields,
@@ -3130,10 +3134,14 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "SingleTablePost",
-    planType($specifier) {
-      const $id = get($specifier, "id") as Step<number>;
-      return singleTableItemsResource.get({ id: $id });
-    },
+    planType: EXPORTABLE(
+      (get, singleTableItemsResource) =>
+        function planType($specifier) {
+          const $id = get($specifier, "id") as Step<number>;
+          return singleTableItemsResource.get({ id: $id });
+        },
+      [get, singleTableItemsResource],
+    ),
     interfaces: [SingleTableItem],
     fields: () => ({
       ...commonSingleTableItemFields,
@@ -3147,10 +3155,14 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "SingleTableDivider",
-    planType($specifier) {
-      const $id = get($specifier, "id") as Step<number>;
-      return singleTableItemsResource.get({ id: $id });
-    },
+    planType: EXPORTABLE(
+      (get, singleTableItemsResource) =>
+        function planType($specifier) {
+          const $id = get($specifier, "id") as Step<number>;
+          return singleTableItemsResource.get({ id: $id });
+        },
+      [get, singleTableItemsResource],
+    ),
     interfaces: [SingleTableItem],
     fields: () => ({
       ...commonSingleTableItemFields,
@@ -3163,10 +3175,14 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "SingleTableChecklist",
-    planType($specifier) {
-      const $id = get($specifier, "id") as Step<number>;
-      return singleTableItemsResource.get({ id: $id });
-    },
+    planType: EXPORTABLE(
+      (get, singleTableItemsResource) =>
+        function planType($specifier) {
+          const $id = get($specifier, "id") as Step<number>;
+          return singleTableItemsResource.get({ id: $id });
+        },
+      [get, singleTableItemsResource],
+    ),
     interfaces: [SingleTableItem],
     fields: () => ({
       ...commonSingleTableItemFields,
@@ -3178,10 +3194,14 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "SingleTableChecklistItem",
-    planType($specifier) {
-      const $id = get($specifier, "id") as Step<number>;
-      return singleTableItemsResource.get({ id: $id });
-    },
+    planType: EXPORTABLE(
+      (get, singleTableItemsResource) =>
+        function planType($specifier) {
+          const $id = get($specifier, "id") as Step<number>;
+          return singleTableItemsResource.get({ id: $id });
+        },
+      [get, singleTableItemsResource],
+    ),
     interfaces: [SingleTableItem],
     fields: () => ({
       ...commonSingleTableItemFields,
@@ -3334,10 +3354,14 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "RelationalTopic",
-    planType($specifier) {
-      const $id = get($specifier, "id") as Step<number>;
-      return relationalTopicsResource.get({ id: $id });
-    },
+    planType: EXPORTABLE(
+      (get, relationalTopicsResource) =>
+        function planType($specifier) {
+          const $id = get($specifier, "id") as Step<number>;
+          return relationalTopicsResource.get({ id: $id });
+        },
+      [get, relationalTopicsResource],
+    ),
     interfaces: [RelationalItem],
     fields: () => ({
       ...commonRelationalItemFields(),
@@ -3349,10 +3373,14 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "RelationalPost",
-    planType($specifier) {
-      const $id = get($specifier, "id") as Step<number>;
-      return relationalPostsResource.get({ id: $id });
-    },
+    planType: EXPORTABLE(
+      (get, relationalPostsResource) =>
+        function planType($specifier) {
+          const $id = get($specifier, "id") as Step<number>;
+          return relationalPostsResource.get({ id: $id });
+        },
+      [get, relationalPostsResource],
+    ),
     interfaces: [RelationalItem, RelationalCommentable],
     fields: () => ({
       ...commonRelationalItemFields(),
@@ -3390,10 +3418,14 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "RelationalDivider",
-    planType($specifier) {
-      const $id = get($specifier, "id") as Step<number>;
-      return relationalDividersResource.get({ id: $id });
-    },
+    planType: EXPORTABLE(
+      (get, relationalDividersResource) =>
+        function planType($specifier) {
+          const $id = get($specifier, "id") as Step<number>;
+          return relationalDividersResource.get({ id: $id });
+        },
+      [get, relationalDividersResource],
+    ),
     interfaces: [RelationalItem],
     fields: () => ({
       ...commonRelationalItemFields(),
@@ -3406,10 +3438,14 @@ export function makeExampleSchema(
     PgSelectSingleStep,
   )({
     name: "RelationalChecklist",
-    planType($specifier) {
-      const $id = get($specifier, "id") as Step<number>;
-      return relationalChecklistsResource.get({ id: $id });
-    },
+    planType: EXPORTABLE(
+      (get, relationalChecklistsResource) =>
+        function planType($specifier) {
+          const $id = get($specifier, "id") as Step<number>;
+          return relationalChecklistsResource.get({ id: $id });
+        },
+      [get, relationalChecklistsResource],
+    ),
     interfaces: [RelationalItem, RelationalCommentable],
     fields: () => ({
       ...commonRelationalItemFields(),
@@ -3421,10 +3457,14 @@ export function makeExampleSchema(
   type RC = RelationalChecklistItemStep;
   const RelationalChecklistItem = newObjectTypeBuilder<RC>(PgSelectSingleStep)({
     name: "RelationalChecklistItem",
-    planType($specifier) {
-      const $id = get($specifier, "id") as Step<number>;
-      return relationalChecklistItemsResource.get({ id: $id });
-    },
+    planType: EXPORTABLE(
+      (get, relationalChecklistItemsResource) =>
+        function planType($specifier) {
+          const $id = get($specifier, "id") as Step<number>;
+          return relationalChecklistItemsResource.get({ id: $id });
+        },
+      [get, relationalChecklistItemsResource],
+    ),
     interfaces: [RelationalItem, RelationalCommentable],
     fields: () => ({
       ...commonRelationalItemFields(),
@@ -3577,11 +3617,16 @@ export function makeExampleSchema(
 
   const FirstPartyVulnerability = newObjectTypeBuilder(ExecutableStep)({
     name: "FirstPartyVulnerability",
-    planType($stepOrSpecifier) {
-      const $specifier = $stepOrSpecifier.toSpecifier?.() ?? $stepOrSpecifier;
-      const $id = get($specifier, "id") as Step<number>;
-      return firstPartyVulnerabilitiesResource.get({ id: $id });
-    },
+    planType: EXPORTABLE(
+      (firstPartyVulnerabilitiesResource, get) =>
+        function planType($stepOrSpecifier) {
+          const $specifier =
+            $stepOrSpecifier.toSpecifier?.() ?? $stepOrSpecifier;
+          const $id = get($specifier, "id") as Step<number>;
+          return firstPartyVulnerabilitiesResource.get({ id: $id });
+        },
+      [firstPartyVulnerabilitiesResource, get],
+    ),
     interfaces: [Vulnerability],
     fields: {
       id: {
@@ -3629,11 +3674,16 @@ export function makeExampleSchema(
 
   const ThirdPartyVulnerability = newObjectTypeBuilder(ExecutableStep)({
     name: "ThirdPartyVulnerability",
-    planType($stepOrSpecifier) {
-      const $specifier = $stepOrSpecifier.toSpecifier?.() ?? $stepOrSpecifier;
-      const $id = get($specifier, "id") as Step<number>;
-      return thirdPartyVulnerabilitiesResource.get({ id: $id });
-    },
+    planType: EXPORTABLE(
+      (get, thirdPartyVulnerabilitiesResource) =>
+        function planType($stepOrSpecifier) {
+          const $specifier =
+            $stepOrSpecifier.toSpecifier?.() ?? $stepOrSpecifier;
+          const $id = get($specifier, "id") as Step<number>;
+          return thirdPartyVulnerabilitiesResource.get({ id: $id });
+        },
+      [get, thirdPartyVulnerabilitiesResource],
+    ),
     interfaces: [Vulnerability],
     fields: {
       id: {
