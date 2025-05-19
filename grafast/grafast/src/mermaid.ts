@@ -324,16 +324,14 @@ export function planToMermaid(
     (plan) => {
       if (shouldHideStep(plan)) return;
       const planNode = planId(plan);
-      const depNodes = plan.dependencyIds
-        .map((depId) => {
-          const step = stepById[depId];
-          if (shouldHideStep(step)) {
-            return null;
-          } else {
-            return planId(step);
-          }
-        })
-        .filter((n): n is string => n !== null);
+      const depNodes = plan.dependencyIds.map((depId) => {
+        const step = stepById[depId];
+        if (shouldHideStep(step)) {
+          return null;
+        } else {
+          return planId(step);
+        }
+      });
       const transformItemPlanNode = null;
       /*
       plan.stepClass === '__ListTransformStep'
@@ -342,24 +340,25 @@ export function planToMermaid(
           )
         : null;
         */
-      if (depNodes.length > 0) {
+      const firstDep = depNodes.find((n) => n != null);
+      if (depNodes.length > 0 && firstDep) {
         if (plan.stepClass === "__ItemStep") {
-          const [firstDep, ...rest] = depNodes;
           const arrow = plan.extra?.transformStepId == null ? "==>" : "-.->";
           graph.push(
             `    ${firstDep} ${arrow}${depDeets(plan, 0)} ${planNode}`,
           );
-          if (rest.length > 0) {
-            const normal: string[] = [];
-            for (let i = 0; i < rest.length; i++) {
-              const r = rest[i];
-              const deets = depDeets(plan, i + 1);
-              if (deets) {
-                graph.push(`    ${r} -->${deets} ${planNode}`);
-              } else {
-                normal.push(r);
-              }
+          const normal: string[] = [];
+          for (let i = 0; i < depNodes.length; i++) {
+            const r = depNodes[i];
+            if (r == null || r === firstDep) continue;
+            const deets = depDeets(plan, i);
+            if (deets) {
+              graph.push(`    ${r} -->${deets} ${planNode}`);
+            } else {
+              normal.push(r);
             }
+          }
+          if (normal.length > 0) {
             outputGroupedNormalLinks(graph, planNode, normal);
           }
         } else {
@@ -369,23 +368,23 @@ export function planToMermaid(
             depNodes.length === 1
           ) {
             // Try alternating the nodes so they render closer together
-            const depNode = depNodes[0];
-            if (chainByDep[depNode] === undefined) {
-              graph.push(`    ${depNode} -->${depDeets(plan, 0)} ${planNode}`);
+            if (chainByDep[firstDep] === undefined) {
+              graph.push(`    ${firstDep} -->${depDeets(plan, 0)} ${planNode}`);
             } else {
               graph.push(
-                `    ${chainByDep[depNode]} o--o${depDeets(
+                `    ${chainByDep[firstDep]} o--o${depDeets(
                   plan,
                   0,
                 )} ${planNode}`,
               );
             }
-            chainByDep[depNode] = planNode;
+            chainByDep[firstDep] = planNode;
           } else {
             const normal: string[] = [];
             for (let i = 0; i < depNodes.length; i++) {
               const r = depNodes[i];
-              const deets = depDeets(plan, i + 1);
+              if (r == null) continue;
+              const deets = depDeets(plan, i);
               if (deets) {
                 graph.push(`    ${r} -->${deets} ${planNode}`);
               } else {
