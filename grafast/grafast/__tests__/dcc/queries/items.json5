@@ -1,52 +1,62 @@
 {
   crawler: {
-    id: 101,
-    name: 'Carl',
+    id: 103,
+    name: 'Katia',
     items: [
       {
         __typename: 'Equipment',
-        id: 201,
-        name: 'Cloak of Stoutness',
-      },
-      {
-        __typename: 'Equipment',
-        id: 202,
-        name: 'Toe Ring of the Splatter Skunk',
-      },
-      {
-        __typename: 'Equipment',
-        id: 203,
-        name: 'Enchanted War Gauntlet',
-      },
-      {
-        __typename: 'Consumable',
-        id: 201,
-        name: 'Rev-Up Immunity Smoothie',
-      },
-      {
-        __typename: 'Consumable',
-        id: 202,
-        name: 'Bandage',
+        id: 207,
+        name: 'Enchanted Repeating Crossbow',
+        contents: null,
       },
       {
         __typename: 'Consumable',
         id: 203,
         name: 'Mana Potion',
+        contents: null,
       },
       {
         __typename: 'Consumable',
         id: 204,
         name: 'Healing Potion',
+        contents: null,
       },
       {
-        __typename: 'Consumable',
-        id: 205,
-        name: "Dolores Doesn't Splat Potion",
-      },
-      {
-        __typename: 'Consumable',
-        id: 206,
-        name: "Carl's Jug O' Boom",
+        __typename: 'Equipment',
+        id: 210,
+        name: 'Ugly Backpack With a Completely Useless Design',
+        contents: [
+          {
+            __typename: 'MiscItem',
+            id: 201,
+            name: 'Scrap Metal',
+          },
+          {
+            __typename: 'MiscItem',
+            id: 201,
+            name: 'Scrap Metal',
+          },
+          {
+            __typename: 'MiscItem',
+            id: 202,
+            name: 'Scrap Metal Pole',
+          },
+          {
+            __typename: 'MiscItem',
+            id: 202,
+            name: 'Scrap Metal Pole',
+          },
+          {
+            __typename: 'MiscItem',
+            id: 203,
+            name: 'Metal Bearing',
+          },
+          {
+            __typename: 'MiscItem',
+            id: 203,
+            name: 'Metal Bearing',
+          },
+        ],
       },
     ],
   },
