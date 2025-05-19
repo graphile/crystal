@@ -2,11 +2,11 @@ select
   __people__."username" as "0",
   array(
     select array[
-      __relational_items_2."type"::text,
       __relational_items_2."id"::text,
+      __relational_items_2."type"::text,
       __relational_items_2."type2"::text,
-      __relational_items__."type"::text,
       __relational_items__."id"::text,
+      __relational_items__."type"::text,
       __relational_items__."type2"::text
     ]::text[]
     from interfaces_and_unions.relational_items as __relational_items_2

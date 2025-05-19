@@ -2,16 +2,16 @@ select
   __people_3."username" as "0",
   array(
     select array[
-      __relational_items_2."type"::text,
       __relational_items_2."id"::text,
+      __relational_items_2."type"::text,
       __relational_items_2."type2"::text,
       __relational_items_2."position"::text,
       to_char(__relational_items_2."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text),
       to_char(__relational_items_2."updated_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text),
       __relational_items_2."is_explicitly_archived"::text,
       to_char(__relational_items_2."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text),
-      __relational_items__."type"::text,
       __relational_items__."id"::text,
+      __relational_items__."type"::text,
       __relational_items__."type2"::text,
       __relational_items__."position"::text,
       to_char(__relational_items__."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text),

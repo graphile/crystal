@@ -1,7 +1,7 @@
 select
-  __single_table_items_2."type"::text as "0",
-  __single_table_items_2."parent_id"::text as "1",
-  __single_table_items_2."id"::text as "2",
+  __single_table_items_2."id"::text as "0",
+  __single_table_items_2."type"::text as "1",
+  __single_table_items_2."parent_id"::text as "2",
   __single_table_items__."type"::text as "3",
   __people__."username" as "4"
 from interfaces_and_unions.single_table_items as __single_table_items_2

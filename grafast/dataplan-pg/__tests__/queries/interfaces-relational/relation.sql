@@ -1,8 +1,8 @@
 select
-  __relational_items_2."type"::text as "0",
-  __relational_items_2."id"::text as "1",
-  __relational_items__."type"::text as "2",
-  __relational_items__."id"::text as "3",
+  __relational_items_2."id"::text as "0",
+  __relational_items_2."type"::text as "1",
+  __relational_items__."id"::text as "2",
+  __relational_items__."type"::text as "3",
   __people__."username" as "4"
 from interfaces_and_unions.relational_items as __relational_items_2
 left outer join interfaces_and_unions.relational_items as __relational_items__
