@@ -6,6 +6,7 @@ import type {
   GrafastInputFieldConfig,
   GrafastInputFieldConfigMap,
   OutputPlanForType,
+  PlanTypeInfo,
   PolymorphicTypePlanner,
   Step,
 } from "grafast";
@@ -288,7 +289,7 @@ declare global {
        * given specifier (or `null` if no match can be found) and a `planForType`
        * method which, when called, should return the step for the given type.
        */
-      planType?($specifier: Step): PolymorphicTypePlanner;
+      planType?($specifier: Step, info: PlanTypeInfo): PolymorphicTypePlanner;
     }
 
     /** Our take on GraphQLInterfaceTypeConfig that allows for plans */
@@ -322,7 +323,7 @@ declare global {
        * given specifier (or `null` if no match can be found) and a `planForType`
        * method which, when called, should return the step for the given type.
        */
-      planType?($specifier: Step): PolymorphicTypePlanner;
+      planType?($specifier: Step, info: PlanTypeInfo): PolymorphicTypePlanner;
     }
 
     interface BuildVersions {
