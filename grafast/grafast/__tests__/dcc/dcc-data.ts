@@ -2,7 +2,7 @@
 
 import type { LoadManyCallback, LoadOneCallback } from "../../dist";
 
-type ItemSpec = `${"Equipment" | "Consumable" | "MiscItem"}:${number}`;
+export type ItemSpec = `${"Equipment" | "Consumable" | "MiscItem"}:${number}`;
 
 export interface CrawlerData {
   id: number;
@@ -32,7 +32,7 @@ export interface ItemData {
   id: number;
   name: string;
   creator?: number;
-  items?: ItemSpec[];
+  contents?: ItemSpec[];
   /** @deprecated */
   type?: string;
 }
@@ -187,7 +187,7 @@ export function makeData(): Database {
         id: 210,
         name: "Ugly Backpack With a Completely Useless Design",
         creator: 101,
-        items: [
+        contents: [
           "MiscItem:201",
           "MiscItem:201",
           "MiscItem:202",
@@ -275,4 +275,31 @@ export const batchGetNpcsByIds: LoadManyCallback<
   return idsList.map((ids) =>
     ids.map((id) => data.npcs.find((c) => c.id === id)),
   );
+};
+
+export const batchGetEquipmentById: LoadOneCallback<
+  number,
+  EquipmentData,
+  never,
+  Database
+> = (ids, { unary: data }) => {
+  return ids.map((id) => data.equipment.find((c) => c.id === id));
+};
+
+export const batchGetConsumableById: LoadOneCallback<
+  number,
+  ConsumableData,
+  never,
+  Database
+> = (ids, { unary: data }) => {
+  return ids.map((id) => data.consumables.find((c) => c.id === id));
+};
+
+export const batchGetMiscItemById: LoadOneCallback<
+  number,
+  MiscItemData,
+  never,
+  Database
+> = (ids, { unary: data }) => {
+  return ids.map((id) => data.miscItems.find((c) => c.id === id));
 };

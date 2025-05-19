@@ -16,8 +16,15 @@ import {
   loadOne,
   makeGrafastSchema,
 } from "../../dist/index.js";
-import type { CrawlerData, Database, NpcData } from "./dcc-data.js";
-import { batchGetCrawlerById, batchGetNpcById, makeData } from "./dcc-data.js";
+import type { CrawlerData, Database, ItemSpec, NpcData } from "./dcc-data.js";
+import {
+  batchGetConsumableById,
+  batchGetCrawlerById,
+  batchGetEquipmentById,
+  batchGetMiscItemById,
+  batchGetNpcById,
+  makeData,
+} from "./dcc-data.js";
 
 const resolvedPreset = resolvePreset({
   grafast: {
@@ -105,8 +112,25 @@ export const makeBaseArgs = () => {
         bestFriend: Character
         crawlerNumber: Int
       }
-      type Item {
+      interface Item {
         id: Int!
+        name: String
+        contents: [Item]
+      }
+      type Equipment implements Item {
+        id: Int!
+        name: String
+        contents: [Item]
+      }
+      type Consumable implements Item {
+        id: Int!
+        name: String
+        contents: [Item]
+      }
+      type MiscItem implements Item {
+        id: Int!
+        name: String
+        contents: [Item]
       }
       type Query {
         crawler(id: Int!): Crawler
@@ -201,6 +225,30 @@ export const makeBaseArgs = () => {
           } as PolymorphicTypePlanner;
         },
       },
+      Item: {
+        __planType($itemSpec: Step<ItemSpec>): PolymorphicTypePlanner {
+          const $decoded = lambda($itemSpec, decodeItemSpec);
+          const $__typename = get($decoded, "__typename");
+          return {
+            $__typename,
+            planForType(t) {
+              const $id = get($decoded, "id");
+              const $data = context().get("data");
+
+              if (t.name === "Equipment") {
+                return loadOne($id, $data, null, batchGetEquipmentById);
+              }
+              if (t.name === "Consumable") {
+                return loadOne($id, $data, null, batchGetConsumableById);
+              }
+              if (t.name === "MiscItem") {
+                return loadOne($id, $data, null, batchGetMiscItemById);
+              }
+              return null;
+            },
+          };
+        },
+      },
     },
   });
   const data = makeData();
@@ -234,4 +282,13 @@ function extractCrawlerId(id: number) {
 function extractNpcId(id: number) {
   if (id > 300 && id < 400) return id;
   else return null;
+}
+
+function decodeItemSpec(itemSpec: ItemSpec): {
+  __typename: string;
+  id: number;
+} {
+  const [__typename, rawID] = itemSpec.split(":");
+  const id = parseInt(rawID, 10);
+  return { __typename, id };
 }
