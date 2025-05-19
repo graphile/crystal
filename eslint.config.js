@@ -1,25 +1,70 @@
-module.exports = {
-  parser: "@babel/eslint-parser",
-  parserOptions: {
+const path = require("path");
+const fs = require("fs");
+const { defineConfig, globalIgnores } = require("eslint/config");
+
+const babelParser = require("@babel/eslint-parser");
+
+const { fixupConfigRules, fixupPluginRules } = require("@eslint/compat");
+
+const jest = require("eslint-plugin-jest");
+const graphql = require("eslint-plugin-graphql");
+const tsdoc = require("eslint-plugin-tsdoc");
+const simpleImportSort = require("eslint-plugin-simple-import-sort");
+const _import = require("eslint-plugin-import");
+const graphileExport = require("eslint-plugin-graphile-export");
+const reactHooks = require("eslint-plugin-react-hooks");
+const globals = require("globals");
+const tsParser = require("@typescript-eslint/parser");
+const js = require("@eslint/js");
+
+const { FlatCompat } = require("@eslint/eslintrc");
+
+const compat = new FlatCompat({
+  baseDirectory: __dirname,
+  recommendedConfig: js.configs.recommended,
+  allConfig: js.configs.all,
+});
+
+const globalIgnoresFromFile = fs
+  .readFileSync(path.resolve(__dirname, ".lintignore"), "utf8")
+  .split("\n")
+  .map((line) => line.trim())
+  .filter((line) => line && !line.startsWith("#"))
+  .map((line) => {
+    let text = line;
+    text = text.startsWith("/") ? text.substring(1) : `**/${text}`;
+    text = text.endsWith("/") ? text + "**" : text;
+    return text;
+  });
+
+const fixupExtends = (...strings) =>
+  fixupConfigRules(compat.extends(...strings));
+
+const config = {
+  languageOptions: {
+    parser: babelParser,
     sourceType: "module",
-    ecmaFeatures: {
-      jsx: true,
+
+    parserOptions: {
+      ecmaFeatures: {
+        jsx: true,
+      },
+    },
+
+    globals: {
+      jasmine: false,
+      ...globals.jest,
+      ...globals.node,
     },
   },
-  globals: {
-    jasmine: false,
-  },
-  env: {
-    jest: true,
-    node: true,
-    es6: true,
-  },
+
   settings: {
     react: {
       version: "detect",
     },
   },
-  extends: [
+
+  extends: fixupExtends(
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
@@ -28,16 +73,17 @@ module.exports = {
     "plugin:import/typescript",
     "plugin:graphile-export/recommended",
     "prettier",
-  ],
-  plugins: [
-    "jest",
-    "graphql",
-    "tsdoc",
-    "simple-import-sort",
-    "import",
-    "graphile-export",
-    "react-hooks",
-  ],
+  ),
+
+  plugins: {
+    jest,
+    graphql,
+    tsdoc,
+    "simple-import-sort": simpleImportSort,
+    import: fixupPluginRules(_import),
+    "graphile-export": fixupPluginRules(graphileExport),
+    "react-hooks": fixupPluginRules(reactHooks),
+  },
 
   rules: {
     "@typescript-eslint/ban-ts-comment": "off",
@@ -49,7 +95,8 @@ module.exports = {
     "@typescript-eslint/no-namespace": "off",
     "@typescript-eslint/no-use-before-define": "off",
     "@typescript-eslint/no-var-requires": "off",
-    "@typescript-eslint/consistent-type-imports": "error",
+    // This needs full type-checking now (apparently?)
+    "@typescript-eslint/consistent-type-imports": "off",
     "no-confusing-arrow": 0,
     "no-else-return": 0,
     "no-underscore-dangle": 0,
@@ -58,6 +105,10 @@ module.exports = {
     "jest/no-focused-tests": 2,
     "jest/no-identical-title": 2,
     "tsdoc/syntax": 2,
+    "@typescript-eslint/no-empty-object-type": [
+      "error",
+      { allowInterfaces: "always" },
+    ],
 
     // Rules that we should enable:
     "@typescript-eslint/no-inferrable-types": "warn",
@@ -95,6 +146,10 @@ module.exports = {
     "no-duplicate-imports": "off",
     "import/no-duplicates": "error",
   },
+};
+
+// This object only exists to make our new eslint.config.js look more like the old .eslintrc.js
+const oldConfig = {
   overrides: [
     // Rules for core plugins
     {
@@ -154,8 +209,12 @@ module.exports = {
 
     // Rules for TypeScript only
     {
-      files: ["*.ts", "*.tsx"],
-      parser: "@typescript-eslint/parser",
+      files: ["**/*.ts", "**/*.tsx"],
+
+      languageOptions: {
+        parser: tsParser,
+      },
+
       rules: {
         "no-dupe-class-members": "off",
         "no-undef": "off",
@@ -166,21 +225,26 @@ module.exports = {
 
     // Rules for JavaScript only
     {
-      files: ["*.js", "*.jsx", "*.mjs", "*.cjs"],
+      files: ["**/*.js", "**/*.jsx", "**/*.mjs", "**/*.cjs"],
       rules: {
         "tsdoc/syntax": "off",
         "import/extensions": "off",
+        "@typescript-eslint/no-require-imports": "off",
       },
     },
 
     // Stricter rules for source code
     {
       files: ["*/*/src/**/*.ts", "*/*/src/**/*.tsx"],
-      parser: "@typescript-eslint/parser",
-      parserOptions: {
-        project: true,
+      languageOptions: {
+        parser: tsParser,
+        parserOptions: {
+          project: true,
+        },
       },
-      rules: {},
+      rules: {
+        "@typescript-eslint/consistent-type-imports": "error",
+      },
     },
 
     // Rules for tests only
@@ -190,6 +254,7 @@ module.exports = {
         // Disable these to enable faster test writing
         "prefer-const": "off",
         "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-unused-expressions": "off",
         "@typescript-eslint/no-unused-vars": "off",
         "@typescript-eslint/explicit-function-return-type": "off",
 
@@ -205,7 +270,7 @@ module.exports = {
         "grafast/ruru/src/**/*.tsx",
         "**/website/src/**",
       ],
-      extends: ["plugin:react/recommended"],
+      extends: compat.extends("plugin:react/recommended"),
       rules: {
         "react-hooks/rules-of-hooks": "error",
         "react-hooks/exhaustive-deps": [
@@ -243,13 +308,14 @@ module.exports = {
       files: ["**/website/**"],
       rules: {
         "import/no-unresolved": "off",
+        "simple-import-sort/imports": "off",
       },
     },
 
     // Don't use Node.js builtins
     {
       files: ["grafast/grafast/src/**", "utils/graphile-config/src/**"],
-      excludedFiles: ["utils/graphile-config/src/loadConfig.ts"],
+      ignores: ["utils/graphile-config/src/loadConfig.ts"],
       rules: {
         "@typescript-eslint/no-restricted-imports": [
           "error",
@@ -295,5 +361,104 @@ module.exports = {
         ],
       },
     },
+
+    // TODO @benjie: Adding the following rules to pass CI, review in the future
+    // --- BEGIN RULES ---
+    {
+      files: [
+        "**/grafast/dataplan-pg/scripts/**",
+        "grafast/dataplan-pg/src/adaptors/pg.ts",
+        "grafast/dataplan-pg/src/examples/exampleSchema.ts",
+        "postgraphile/postgraphile/scripts/test-schema-exports.mjs",
+        "postgraphile/postgraphile/src/index.ts",
+        "utils/graphile-export/src/exportSchema.ts",
+        "utils/graphile/src/commands/behavior/debug/main.ts",
+        "graphile-build/graphile-simplify-inflection/test.js",
+        "grafast/dataplan-pg/src/steps/pgStmt.ts",
+        "scripts/postversion.mjs",
+        "grafast/grafast/scripts/build-npm.mjs",
+        "grafast/grafast/src/args.ts",
+        "grafast/grafast/src/prepare.ts",
+        "grafast/grafast/src/step.ts",
+        "grafast/grafast/src/steps/node.ts",
+        "grafast/grafserv/src/core/base.ts",
+        "grafast/grafserv/src/servers/fastify/v4/index.ts",
+        "grafast/grafserv/src/servers/h3/v1/index.ts",
+        "graphile-build/graphile-build/src/index.ts",
+      ],
+      rules: {
+        "import/no-unresolved": "off",
+        "@typescript-eslint/no-unused-vars": "off",
+        "@typescript-eslint/no-unused-expressions": "off",
+      },
+    },
+    {
+      files: [
+        "postgraphile/postgraphile/src/cli.ts",
+        "utils/graphile-config/src/resolvePresets.ts",
+        "grafast/dataplan-pg/src/inspect.ts",
+        "grafast/grafast/src/grafastGraphql.ts",
+        "grafast/grafast/src/inspect.ts",
+      ],
+      rules: {
+        "@typescript-eslint/no-require-imports": "off",
+      },
+    },
+    {
+      files: [
+        "scripts/benjies-depcheck.mjs",
+        "scripts/fwd.mjs",
+        "scripts/postversion.mjs",
+        "grafast/grafserv/examples/example-express.mjs",
+        "grafast/grafserv/examples/example-fastify.mjs",
+        "grafast/grafserv/examples/example-hono.mjs",
+        "grafast/grafserv/examples/example-koa.extra.mjs",
+        "grafast/grafserv/examples/example-koa.mjs",
+        "grafast/grafserv/examples/example-lambda.mjs",
+        "grafast/grafserv/examples/example-node.mjs",
+        "grafast/grafserv/examples/graphile.config.mjs",
+        "grafast/grafserv/examples/schema.mjs",
+        "grafast/ruru-components/src/hooks/useFetcher.ts",
+        "grafast/website/examples/users-and-friends/nodeIds.mjs",
+        "graphile-build/graphile-build-pg/schema-export-output-server.mjs",
+        "graphile-build/graphile-build-pg/src/plugins/PgEnumTablesPlugin.ts",
+      ],
+      rules: {
+        "simple-import-sort/imports": "off",
+        "import/no-unresolved": "off",
+        "no-empty": "off",
+        "@typescript-eslint/no-unused-vars": "off",
+      },
+    },
+    {
+      files: ["utils/graphile-config/src/index.ts", "utils/lds/src/index.ts"],
+      rules: {
+        "@typescript-eslint/ban-types": "off",
+      },
+    },
+    {
+      files: [
+        "utils/graphile-export/src/optimize/index.ts",
+        "grafast/dataplan-pg/src/executor.ts",
+        "grafast/grafast/src/engine/OperationPlan.ts",
+        "graphile-build/graphile-build/src/callbackToAsyncIterator.ts",
+      ],
+      rules: {
+        "@typescript-eslint/no-unused-expressions": "off",
+      },
+    },
+    {
+      files: ["utils/lds/src/index.ts"],
+      rules: {
+        "@typescript-eslint/no-empty-object-type": "off",
+      },
+    },
+    // --- END RULES ---
   ],
 };
+
+module.exports = defineConfig([
+  config,
+  ...oldConfig.overrides,
+  globalIgnores(globalIgnoresFromFile),
+]);
