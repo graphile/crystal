@@ -29,12 +29,17 @@ const ALLOWED_SIBLING_KEYS: string[] = [
   "astNode",
 
   // GraphQLInterfaceType
+  "interfaces",
   "fields",
   "planType",
   "toSpecifier",
+  "resolveType",
 
   // GraphQLUnionType
   "types",
+
+  // GraphQLObjectTypeConfig
+  "isTypeOf",
 
   // GraphQLArgumentConfig
   "defaultValue",
