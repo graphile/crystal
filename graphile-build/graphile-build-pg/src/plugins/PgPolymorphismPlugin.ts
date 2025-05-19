@@ -1164,21 +1164,51 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 } else if (polymorphism.mode === "relational") {
                   grafastExtensions = {
                     toSpecifier: EXPORTABLE(
-                      (PgSelectSingleStep, get, object, pk) => (step: Step) => {
-                        if (step instanceof PgSelectSingleStep) {
-                          return object({
-                            ...Object.fromEntries(
-                              pk.map((attrName) => [
-                                attrName,
-                                get(step, attrName),
-                              ]),
-                            ),
-                          });
-                        } else {
-                          return step;
-                        }
-                      },
-                      [PgSelectSingleStep, get, object, pk],
+                      (PgSelectSingleStep, get, object, pk, resource) =>
+                        (step: Step) => {
+                          if (step instanceof PgSelectSingleStep) {
+                            if (step.resource === resource) {
+                              // It's the core table; that's what we want!
+                              return object({
+                                ...Object.fromEntries(
+                                  pk.map((attrName) => [
+                                    attrName,
+                                    get(step, attrName),
+                                  ]),
+                                ),
+                              });
+                            } else {
+                              // Assume it's a child; return description of base
+                              // PERF: ideally we'd use relationship
+                              // traversal instead, this would both be
+                              // shorter and also cacheable.
+                              const stepPk = (
+                                step.resource.uniques as PgResourceUnique[]
+                              ).find((u) => u.isPrimary);
+                              if (!stepPk) {
+                                throw new Error(
+                                  `Expected a relational record for ${resource.name}, but found one for ${step.resource.name} which has no primary key!`,
+                                );
+                              }
+                              if (stepPk.attributes.length !== pk.length) {
+                                throw new Error(
+                                  `Expected a relational record for ${resource.name}, but found one for ${step.resource.name} which has a primary key with a different number of columns!`,
+                                );
+                              }
+                              return object(
+                                Object.fromEntries(
+                                  pk.map((attrName, idx) => [
+                                    attrName,
+                                    get(step, stepPk.attributes[idx]),
+                                  ]),
+                                ),
+                              );
+                            }
+                          } else {
+                            return step;
+                          }
+                        },
+                      [PgSelectSingleStep, get, object, pk, resource],
                     ),
                     planType: EXPORTABLE(
                       (
