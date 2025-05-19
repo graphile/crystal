@@ -3035,6 +3035,10 @@ export function makeExampleSchema(
     }),
     extensions: {
       grafast: {
+        toSpecifier: EXPORTABLE(
+          (get, object) => ($step) => object({ id: get($step, "id") }),
+          [get, object],
+        ),
         planType: EXPORTABLE(
           (
             PgSelectSingleStep,
@@ -3044,7 +3048,15 @@ export function makeExampleSchema(
             singleTableTypeNameCallback,
           ) =>
             function planType($stepOrSpecifier) {
-              const $type = get($stepOrSpecifier, "type");
+              const $record =
+                $stepOrSpecifier instanceof PgSelectSingleStep &&
+                ($stepOrSpecifier.resource as PgResource).codec ===
+                  singleTableItemsResource.codec
+                  ? $stepOrSpecifier
+                  : singleTableItemsResource.get({
+                      id: get($stepOrSpecifier, "id"),
+                    });
+              const $type = get($record, "type");
               const $__typename = lambda(
                 $type,
                 singleTableTypeNameCallback,
@@ -3053,16 +3065,7 @@ export function makeExampleSchema(
               return {
                 $__typename,
                 planForType() {
-                  if (
-                    $stepOrSpecifier instanceof PgSelectSingleStep &&
-                    ($stepOrSpecifier.resource as PgResource).codec ===
-                      singleTableItemsResource.codec
-                  ) {
-                    return $stepOrSpecifier;
-                  } else {
-                    const $id = get($stepOrSpecifier, "id");
-                    return singleTableItemsResource.get({ id: $id });
-                  }
+                  return $record;
                 },
               };
             },
@@ -3254,6 +3257,13 @@ export function makeExampleSchema(
     }),
     extensions: {
       grafast: {
+        toSpecifier: EXPORTABLE(
+          (get, object) =>
+            function toSpecifier($step) {
+              return object({ id: get($step, "id") });
+            },
+          [get, object],
+        ),
         planType: EXPORTABLE(
           (
             PgSelectSingleStep,
@@ -3264,8 +3274,16 @@ export function makeExampleSchema(
             relationalItemTypeNameFromType,
             relationalItemsResource,
           ) =>
-            function planType($stepOrSpecifier) {
-              const $type = get($stepOrSpecifier, "type");
+            function planType($stepOrSpecifier, { $original }) {
+              const $inStep = $original ?? $stepOrSpecifier;
+              const $base =
+                $inStep instanceof PgSelectSingleStep &&
+                $inStep.resource.codec === relationalItemsResource.codec
+                  ? $inStep
+                  : relationalItemsResource.get({
+                      id: get($stepOrSpecifier, "id"),
+                    });
+              const $type = get($base, "type");
               const $__typename = lambda(
                 $type,
                 relationalItemTypeNameFromType,
@@ -3279,22 +3297,11 @@ export function makeExampleSchema(
                   if (!deets) {
                     throw new Error(`Unexpected type ${t}`);
                   }
-                  const [relation, resource] = deets;
-                  if (
-                    $stepOrSpecifier instanceof PgSelectSingleStep &&
-                    $stepOrSpecifier.resource === relationalItemsResource
-                  ) {
-                    const $relation = $stepOrSpecifier.singleRelation(relation);
-                    return deoptimizeIfAppropriate($relation);
-                  } else if (
-                    $stepOrSpecifier instanceof PgSelectSingleStep &&
-                    $stepOrSpecifier.resource === resource
-                  ) {
-                    return $stepOrSpecifier;
-                  } else {
-                    const $id = get($stepOrSpecifier, "id") as Step<number>;
-                    return resource.get({ id: $id });
-                  }
+                  const [relation] = deets;
+                  const $relation = (
+                    $base as PgSelectSingleStep
+                  ).singleRelation(relation);
+                  return deoptimizeIfAppropriate($relation);
                 },
               };
             },
