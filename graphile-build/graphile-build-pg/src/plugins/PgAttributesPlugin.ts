@@ -430,66 +430,6 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
         }
         return fields;
       },
-      GraphQLObjectType_fields_field(field, build, context) {
-        const {
-          graphql: { Kind },
-          grafast: { access },
-          input: {
-            pgRegistry: { pgResources },
-          },
-        } = build;
-        const rf = field.astNode?.directives?.find(
-          (d) => d.name.value === "resolvedFrom",
-        );
-        if (rf) {
-          const attributeAttr = rf.arguments?.find(
-            (a) => a.name.value === "attribute",
-          );
-          const sourceAttributeName =
-            attributeAttr?.value.kind === Kind.STRING
-              ? attributeAttr.value.value
-              : null;
-          const resourceAttr = rf.arguments?.find(
-            (a) => a.name.value === "resource",
-          );
-          const resourceName =
-            resourceAttr?.value.kind === Kind.STRING
-              ? resourceAttr.value.value
-              : null;
-          const pkAttr = rf.arguments?.find((a) => a.name.value === "resource");
-          const pkName =
-            pkAttr?.value.kind === Kind.STRING ? pkAttr.value.value : "id"; // < Default
-          if (!sourceAttributeName) {
-            throw new Error(
-              `Field ${context.Self.name}.${context.scope.fieldName} has '@resolvedFrom' directive, but no 'attribute: "..."' argument (or argument is wrong type)`,
-            );
-          }
-          if (!resourceName) {
-            throw new Error(
-              `Field ${context.Self.name}.${context.scope.fieldName} has '@resolvedFrom' directive, but no 'resource: "..."' argument (or argument is wrong type)`,
-            );
-          }
-          const resource = pgResources[resourceName];
-          if (!resource) {
-            console.log(
-              `Known resource names:\n- ${Object.keys(pgResources).join("\n- ")}`,
-            );
-            throw new Error(
-              `Field ${context.Self.name}.${context.scope.fieldName} references non-existent resource ${resourceName}`,
-            );
-          }
-          if (field.plan) {
-            throw new Error(
-              `Field ${context.Self.name}.${context.scope.fieldName} already has a plan; refusing to overwrite!`,
-            );
-          }
-          field.plan = ($parent) => {
-            const $val = access($parent, sourceAttributeName);
-            return resource.get({ [pkName]: $val });
-          };
-        }
-        return field;
-      },
       GraphQLObjectType_fields(fields, build, context) {
         const {
           scope: {
