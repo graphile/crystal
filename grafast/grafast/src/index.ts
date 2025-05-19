@@ -467,6 +467,7 @@ export {
   OutputPlanForType,
   PageInfoCapableStep,
   partitionByIndex,
+  PlanTypeInfo,
   PolymorphicTypePlanner,
   PromiseOrDirect,
   proxy,

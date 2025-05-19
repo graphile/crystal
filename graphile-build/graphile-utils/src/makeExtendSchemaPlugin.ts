@@ -1,6 +1,7 @@
 import type {
   ExecutableStep,
   FieldPlanResolver,
+  PlanTypeInfo,
   PolymorphicTypePlanner,
   Step,
 } from "grafast";
@@ -98,7 +99,7 @@ export type EnumResolver = {
 export interface TypeResolver {
   __resolveType?: GraphQLTypeResolver<any, any>;
   __toSpecifier?($step: Step): Step;
-  __planType?($specifier: Step): PolymorphicTypePlanner;
+  __planType?($specifier: Step, info: PlanTypeInfo): PolymorphicTypePlanner;
   __scope?: GraphileBuild.ScopeUnion | GraphileBuild.ScopeInterface;
 }
 
