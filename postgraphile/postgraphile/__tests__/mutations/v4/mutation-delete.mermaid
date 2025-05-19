@@ -192,8 +192,8 @@ graph TD
     Constant219{{"Constant[219∈0] ➊<br />ᐸ'people'ᐳ"}}:::plan
     Constant259{{"Constant[259∈0] ➊<br />ᐸ'query'ᐳ"}}:::plan
     PgDeleteSingle12[["PgDeleteSingle[12∈1] ➊<br />ᐸpost(id)ᐳ"]]:::sideeffectplan
-    Object15 -->|rejectNull| PgDeleteSingle12
-    Access10 & ApplyInput16 --> PgDeleteSingle12
+    Access10 -->|rejectNull| PgDeleteSingle12
+    Object15 & ApplyInput16 --> PgDeleteSingle12
     Object17{{"Object[17∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgDeleteSingle12 --> Object17
     List154{{"List[154∈15] ➊<br />ᐸ151,152ᐳ"}}:::plan
@@ -213,8 +213,8 @@ graph TD
     PgDeleteSingle24[["PgDeleteSingle[24∈2] ➊<br />ᐸpost(id)ᐳ"]]:::sideeffectplan
     Object27{{"Object[27∈2] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access22{{"Access[22∈2] ➊<br />ᐸ21.1ᐳ"}}:::plan
-    Object27 -->|rejectNull| PgDeleteSingle24
-    Access22 & ApplyInput28 --> PgDeleteSingle24
+    Access22 -->|rejectNull| PgDeleteSingle24
+    Object27 & ApplyInput28 --> PgDeleteSingle24
     Access25{{"Access[25∈2] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access26{{"Access[26∈2] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access25 & Access26 --> Object27
@@ -242,8 +242,8 @@ graph TD
     PgDeleteSingle36[["PgDeleteSingle[36∈3] ➊<br />ᐸpost(id)ᐳ"]]:::sideeffectplan
     Object39{{"Object[39∈3] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access34{{"Access[34∈3] ➊<br />ᐸ33.1ᐳ"}}:::plan
-    Object39 -->|rejectNull| PgDeleteSingle36
-    Access34 & ApplyInput40 --> PgDeleteSingle36
+    Access34 -->|rejectNull| PgDeleteSingle36
+    Object39 & ApplyInput40 --> PgDeleteSingle36
     Access37{{"Access[37∈3] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access38{{"Access[38∈3] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access37 & Access38 --> Object39
@@ -271,8 +271,8 @@ graph TD
     PgDeleteSingle48[["PgDeleteSingle[48∈4] ➊<br />ᐸpost(id)ᐳ"]]:::sideeffectplan
     Object51{{"Object[51∈4] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access46{{"Access[46∈4] ➊<br />ᐸ45.1ᐳ"}}:::plan
-    Object51 -->|rejectNull| PgDeleteSingle48
-    Access46 & ApplyInput52 --> PgDeleteSingle48
+    Access46 -->|rejectNull| PgDeleteSingle48
+    Object51 & ApplyInput52 --> PgDeleteSingle48
     Access49{{"Access[49∈4] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access50{{"Access[50∈4] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access49 & Access50 --> Object51
@@ -415,9 +415,9 @@ graph TD
     Object110{{"Object[110∈10] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access103{{"Access[103∈10] ➊<br />ᐸ102.1ᐳ"}}:::plan
     Access105{{"Access[105∈10] ➊<br />ᐸ102.2ᐳ"}}:::plan
-    Object110 -->|rejectNull| PgDeleteSingle107
     Access103 -->|rejectNull| PgDeleteSingle107
-    Access105 & ApplyInput111 --> PgDeleteSingle107
+    Access105 -->|rejectNull| PgDeleteSingle107
+    Object110 & ApplyInput111 --> PgDeleteSingle107
     Access108{{"Access[108∈10] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access109{{"Access[109∈10] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access108 & Access109 --> Object110

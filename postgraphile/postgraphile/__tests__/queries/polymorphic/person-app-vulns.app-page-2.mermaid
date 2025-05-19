@@ -14,17 +14,17 @@ graph TD
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 18, 12, 27, 28, 154, 37, 103, 111<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[18]<br />1: <br />ᐳ: 19, 20<br />2: PgUnionAll[29]<br />ᐳ: Access[152]"):::bucket
     Bucket4("Bucket 4 (listItem)<br />Deps: 29, 37, 12, 154, 103, 111<br /><br />ROOT __Item{4}ᐸ152ᐳ[31]"):::bucket
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 31, 33, 37, 12, 154, 103, 111<br /><br />ROOT __Item{4}ᐸ152ᐳ[31]"):::bucket
-    Bucket6("Bucket 6 (polymorphic)<br />Deps: 12, 41, 154, 40, 103, 111<br /><br />1: 43, 57, 76, 84<br />2: PgSelectRows[52], PgSelectRows[66]<br />ᐳ: 51, 54, 65, 68, 69, 77"):::bucket
-    Bucket7("Bucket 7 (polymorphicPartition)<br />AwsApplication<br />Deps: 12, 69, 76, 154, 103<br />ᐳAwsApplication"):::bucket
-    Bucket8("Bucket 8 (polymorphicPartition)<br />GcpApplication<br />Deps: 12, 77, 84, 154, 111<br />ᐳGcpApplication"):::bucket
+    Bucket6("Bucket 6 (polymorphic)<br />__typename: Access[40]<br />Deps: 12, 41, 154, 40, 103, 111<br /><br />1: 43, 57, 76, 84<br />2: PgSelectRows[52], PgSelectRows[66]<br />ᐳ: 51, 54, 65, 68, 69, 77"):::bucket
+    Bucket7("Bucket 7 (polymorphicPartition)<br />|AwsApplication<br />Deps: 12, 69, 76, 154, 103<br />ᐳAwsApplication"):::bucket
+    Bucket8("Bucket 8 (polymorphicPartition)<br />|GcpApplication<br />Deps: 12, 77, 84, 154, 111<br />ᐳGcpApplication"):::bucket
     Bucket9("Bucket 9 (listItem)<br />Deps: 85, 103, 12<br /><br />ROOT __Item{9}ᐸ150ᐳ[89]"):::bucket
     Bucket10("Bucket 10 (listItem)<br />Deps: 86, 111, 12<br /><br />ROOT __Item{10}ᐸ151ᐳ[91]"):::bucket
     Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 89, 93, 103, 12<br /><br />ROOT __Item{9}ᐸ150ᐳ[89]"):::bucket
     Bucket12("Bucket 12 (nullableBoundary)<br />Deps: 91, 96, 111, 12<br /><br />ROOT __Item{10}ᐸ151ᐳ[91]"):::bucket
     Bucket13("Bucket 13 (combined)<br />Deps: 12"):::bucket
-    Bucket14("Bucket 14 (polymorphic)<br />Deps: 12, 118, 116<br /><br />1: PgSelect[120], PgSelect[134]<br />2: PgSelectRows[129], PgSelectRows[143]<br />ᐳ: 128, 131, 142, 145, 146, 147"):::bucket
-    Bucket15("Bucket 15 (polymorphicPartition)<br />FirstPartyVulnerability<br />Deps: 146<br />ᐳAwsApplicationᐳFirstPartyVulnerability<br />ᐳGcpApplicationᐳFirstPartyVulnerability"):::bucket
-    Bucket16("Bucket 16 (polymorphicPartition)<br />ThirdPartyVulnerability<br />Deps: 147<br />ᐳAwsApplicationᐳThirdPartyVulnerability<br />ᐳGcpApplicationᐳThirdPartyVulnerability"):::bucket
+    Bucket14("Bucket 14 (polymorphic)<br />__typename: Access[116]<br />Deps: 12, 118, 116<br /><br />1: PgSelect[120], PgSelect[134]<br />2: PgSelectRows[129], PgSelectRows[143]<br />ᐳ: 128, 131, 142, 145, 146, 147"):::bucket
+    Bucket15("Bucket 15 (polymorphicPartition)<br />|FirstPartyVulnerability<br />Deps: 146<br />(2) ...ᐳFirstPartyVulnerability"):::bucket
+    Bucket16("Bucket 16 (polymorphicPartition)<br />|ThirdPartyVulnerability<br />Deps: 147<br />(2) ...ᐳThirdPartyVulnerability"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
@@ -144,9 +144,9 @@ graph TD
     __Value115 --> Access116
     Access118{{"Access[118∈13]^<br />ᐸ115.idᐳ"}}:::plan
     __Value115 --> Access118
-    PgSelect120[["PgSelect[120∈14]<br />ᐸfirst_party_vulnerabilitiesᐳ<br />ᐳAwsApplicationᐳFirstPartyVulnerability<br />ᐳGcpApplicationᐳFirstPartyVulnerability"]]:::plan
+    PgSelect120[["PgSelect[120∈14]<br />ᐸfirst_party_vulnerabilitiesᐳ<br />(2) ...ᐳFirstPartyVulnerability"]]:::plan
     Object12 & Access118 --> PgSelect120
-    PgSelect134[["PgSelect[134∈14]<br />ᐸthird_party_vulnerabilitiesᐳ<br />ᐳAwsApplicationᐳThirdPartyVulnerability<br />ᐳGcpApplicationᐳThirdPartyVulnerability"]]:::plan
+    PgSelect134[["PgSelect[134∈14]<br />ᐸthird_party_vulnerabilitiesᐳ<br />(2) ...ᐳThirdPartyVulnerability"]]:::plan
     Object12 & Access118 --> PgSelect134
     First128{{"First[128∈14]^"}}:::plan
     PgSelectRows129[["PgSelectRows[129∈14]^"]]:::plan

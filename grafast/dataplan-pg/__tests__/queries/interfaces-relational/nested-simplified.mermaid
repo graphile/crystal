@@ -12,8 +12,8 @@ graph TD
     Bucket1("Bucket 1 (listItem)<br />Deps: 299, 10<br /><br />ROOT __Item{1}ᐸ11ᐳ[12]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 13, 299, 12, 10<br /><br />ROOT PgSelectSingle{1}ᐸpeopleᐳ[13]<br />1: <br />ᐳ: 14, 300, 301<br />2: PgSelectRows[22]"):::bucket
     Bucket3("Bucket 3 (listItem)<br />Deps: 301, 10<br /><br />ROOT __Item{3}ᐸ22ᐳ[23]<br />1: <br />ᐳ: 24, 295, 25, 27, 28, 95, 296, 297<br />2: PgSelectRows[102]<br />ᐳ: 101, 104, 149, 151, 152, 221"):::bucket
-    Bucket4("Bucket 4 (polymorphic)<br />Deps: 10, 25, 28, 149, 152, 27, 95, 151, 221<br /><br />1: 30, 43, 56, 69, 82<br />2: 39, 52, 65, 78, 91<br />ᐳ: 38, 41, 51, 54, 64, 67, 77, 80, 90, 93"):::bucket
-    Bucket5("Bucket 5 (polymorphic)<br />Deps: 10, 149, 152, 151, 221<br /><br />1: 155, 168, 181, 194, 207<br />2: 164, 177, 190, 203, 216<br />ᐳ: 163, 166, 176, 179, 189, 192, 202, 205, 215, 218"):::bucket
+    Bucket4("Bucket 4 (polymorphic)<br />__typename: Lambda[28]<br />Deps: 10, 25, 28, 149, 152, 27, 95, 151, 221<br /><br />1: 30, 43, 56, 69, 82<br />2: 39, 52, 65, 78, 91<br />ᐳ: 38, 41, 51, 54, 64, 67, 77, 80, 90, 93"):::bucket
+    Bucket5("Bucket 5 (polymorphic)<br />__typename: Lambda[152]<br />Deps: 10, 149, 152, 151, 221<br /><br />1: 155, 168, 181, 194, 207<br />2: 164, 177, 190, 203, 216<br />ᐳ: 163, 166, 176, 179, 189, 192, 202, 205, 215, 218"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
@@ -125,15 +125,15 @@ graph TD
     PgSelect82 --> PgSelectRows91
     PgSelectSingle93{{"PgSelectSingle[93∈4]^<br />ᐸrelational_checklist_itemsᐳ"}}:::plan
     First90 --> PgSelectSingle93
-    PgSelect155[["PgSelect[155∈5]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopicᐳRelationalTopic<br />ᐳRelationalPostᐳRelationalTopic<br />ᐳRelationalDividerᐳRelationalTopic<br />ᐳRelationalChecklistᐳRelationalTopic<br />ᐳRelationalChecklistItemᐳRelationalTopic"]]:::plan
+    PgSelect155[["PgSelect[155∈5]<br />ᐸrelational_topicsᐳ<br />(5) ...ᐳRelationalTopic"]]:::plan
     Object10 & PgClassExpression149 --> PgSelect155
-    PgSelect168[["PgSelect[168∈5]<br />ᐸrelational_postsᐳ<br />ᐳRelationalTopicᐳRelationalPost<br />ᐳRelationalPostᐳRelationalPost<br />ᐳRelationalDividerᐳRelationalPost<br />ᐳRelationalChecklistᐳRelationalPost<br />ᐳRelationalChecklistItemᐳRelationalPost"]]:::plan
+    PgSelect168[["PgSelect[168∈5]<br />ᐸrelational_postsᐳ<br />(5) ...ᐳRelationalPost"]]:::plan
     Object10 & PgClassExpression149 --> PgSelect168
-    PgSelect181[["PgSelect[181∈5]<br />ᐸrelational_dividersᐳ<br />ᐳRelationalTopicᐳRelationalDivider<br />ᐳRelationalPostᐳRelationalDivider<br />ᐳRelationalDividerᐳRelationalDivider<br />ᐳRelationalChecklistᐳRelationalDivider<br />ᐳRelationalChecklistItemᐳRelationalDivider"]]:::plan
+    PgSelect181[["PgSelect[181∈5]<br />ᐸrelational_dividersᐳ<br />(5) ...ᐳRelationalDivider"]]:::plan
     Object10 & PgClassExpression149 --> PgSelect181
-    PgSelect194[["PgSelect[194∈5]<br />ᐸrelational_checklistsᐳ<br />ᐳRelationalTopicᐳRelationalChecklist<br />ᐳRelationalPostᐳRelationalChecklist<br />ᐳRelationalDividerᐳRelationalChecklist<br />ᐳRelationalChecklistᐳRelationalChecklist<br />ᐳRelationalChecklistItemᐳRelationalChecklist"]]:::plan
+    PgSelect194[["PgSelect[194∈5]<br />ᐸrelational_checklistsᐳ<br />(5) ...ᐳRelationalChecklist"]]:::plan
     Object10 & PgClassExpression149 --> PgSelect194
-    PgSelect207[["PgSelect[207∈5]<br />ᐸrelational_checklist_itemsᐳ<br />ᐳRelationalTopicᐳRelationalChecklistItem<br />ᐳRelationalPostᐳRelationalChecklistItem<br />ᐳRelationalDividerᐳRelationalChecklistItem<br />ᐳRelationalChecklistᐳRelationalChecklistItem<br />ᐳRelationalChecklistItemᐳRelationalChecklistItem"]]:::plan
+    PgSelect207[["PgSelect[207∈5]<br />ᐸrelational_checklist_itemsᐳ<br />(5) ...ᐳRelationalChecklistItem"]]:::plan
     Object10 & PgClassExpression149 --> PgSelect207
     First163{{"First[163∈5]^"}}:::plan
     PgSelectRows164[["PgSelectRows[164∈5]^"]]:::plan

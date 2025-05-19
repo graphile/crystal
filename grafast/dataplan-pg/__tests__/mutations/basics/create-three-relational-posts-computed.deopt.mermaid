@@ -12,9 +12,9 @@ graph TD
     Bucket1("Bucket 1 (mutationField)<br />Deps: 11, 12, 19, 26, 267, 268, 269, 4<br /><br />1: PgSelect[8]<br />2: PgSelect[15]<br />3: PgSelect[22]<br />4: PgSelectRows[28]<br />ᐳ: 27, 29, 30"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 11, 267, 268, 269, 30, 4<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[30]<br />1: 32, 40, 46<br />2: 37, 43, 49<br />ᐳ: 36, 38, 42, 44, 48, 50, 51, 53, 54, 120, 122, 123, 189, 191, 192"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 4, 11, 51, 54, 120, 123, 189, 192<br /><br />ROOT __ValueᐸrootValueᐳ[4]"):::bucket
-    Bucket4("Bucket 4 (polymorphic)<br />Deps: 11, 51, 54<br /><br />1: 56, 69, 82, 95, 108<br />2: 65, 78, 91, 104, 117<br />ᐳ: 64, 67, 77, 80, 90, 93, 103, 106, 116, 119, 258, 259, 260"):::bucket
-    Bucket5("Bucket 5 (polymorphic)<br />Deps: 11, 120, 123<br /><br />1: 125, 138, 151, 164, 177<br />2: 134, 147, 160, 173, 186<br />ᐳ: 133, 136, 146, 149, 159, 162, 172, 175, 185, 188, 261, 262, 263"):::bucket
-    Bucket6("Bucket 6 (polymorphic)<br />Deps: 11, 189, 192<br /><br />1: 194, 207, 220, 233, 246<br />2: 203, 216, 229, 242, 255<br />ᐳ: 202, 205, 215, 218, 228, 231, 241, 244, 254, 257, 264, 265, 266"):::bucket
+    Bucket4("Bucket 4 (polymorphic)<br />__typename: Lambda[54]<br />Deps: 11, 51, 54<br /><br />1: 56, 69, 82, 95, 108<br />2: 65, 78, 91, 104, 117<br />ᐳ: 64, 67, 77, 80, 90, 93, 103, 106, 116, 119, 258, 259, 260"):::bucket
+    Bucket5("Bucket 5 (polymorphic)<br />__typename: Lambda[123]<br />Deps: 11, 120, 123<br /><br />1: 125, 138, 151, 164, 177<br />2: 134, 147, 160, 173, 186<br />ᐳ: 133, 136, 146, 149, 159, 162, 172, 175, 185, 188, 261, 262, 263"):::bucket
+    Bucket6("Bucket 6 (polymorphic)<br />__typename: Lambda[192]<br />Deps: 11, 189, 192<br /><br />1: 194, 207, 220, 233, 246<br />2: 203, 216, 229, 242, 255<br />ᐳ: 202, 205, 215, 218, 228, 231, 241, 244, 254, 257, 264, 265, 266"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2

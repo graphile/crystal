@@ -11,14 +11,14 @@ graph TD
     Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 7, 11, 12, 16, 22, 37, 103, 147, 148, 149, 13, 15, 14<br />2: PgUnionAll[20]<br />ᐳ: Access[142]"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 16, 14, 15, 147, 7, 103<br /><br />ROOT Connectionᐸ10ᐳ[14]"):::bucket
     Bucket2("Bucket 2 (listItem)<br />Deps: 37, 13<br /><br />ROOT __Item{2}ᐸ142ᐳ[32]"):::bucket
-    Bucket3("Bucket 3 (polymorphic)<br />Deps: 13, 41, 40<br /><br />1: PgSelect[43], PgSelect[57]<br />2: PgSelectRows[52], PgSelectRows[66]<br />ᐳ: 51, 54, 65, 68, 92, 93, 94, 95, 96, 97, 98"):::bucket
+    Bucket3("Bucket 3 (polymorphic)<br />__typename: Access[40]<br />Deps: 13, 41, 40<br /><br />1: PgSelect[43], PgSelect[57]<br />2: PgSelectRows[52], PgSelectRows[66]<br />ᐳ: 51, 54, 65, 68, 92, 93, 94, 95, 96, 97, 98"):::bucket
     Bucket4("Bucket 4 (listItem)<br />Deps: 99, 103, 13<br /><br />ROOT __Item{4}ᐸ143ᐳ[69]"):::bucket
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 69, 99, 103, 13<br /><br />ROOT __Item{4}ᐸ143ᐳ[69]"):::bucket
-    Bucket6("Bucket 6 (polymorphicPartition)<br />FirstPartyVulnerability<br />Deps: 92, 93, 94<br />ᐳFirstPartyVulnerability"):::bucket
-    Bucket7("Bucket 7 (polymorphicPartition)<br />ThirdPartyVulnerability<br />Deps: 95, 96, 97<br />ᐳThirdPartyVulnerability"):::bucket
-    Bucket8("Bucket 8 (polymorphic)<br />Deps: 13, 107, 106<br /><br />1: PgSelect[109], PgSelect[123]<br />2: PgSelectRows[118], PgSelectRows[132]<br />ᐳ: 117, 120, 131, 134, 135, 136, 137, 138, 139, 140, 141"):::bucket
-    Bucket9("Bucket 9 (polymorphicPartition)<br />FirstPartyVulnerability<br />Deps: 135, 136, 137<br />ᐳFirstPartyVulnerability"):::bucket
-    Bucket10("Bucket 10 (polymorphicPartition)<br />ThirdPartyVulnerability<br />Deps: 138, 139, 140<br />ᐳThirdPartyVulnerability"):::bucket
+    Bucket6("Bucket 6 (polymorphicPartition)<br />|FirstPartyVulnerability<br />Deps: 92, 93, 94<br />ᐳFirstPartyVulnerability"):::bucket
+    Bucket7("Bucket 7 (polymorphicPartition)<br />|ThirdPartyVulnerability<br />Deps: 95, 96, 97<br />ᐳThirdPartyVulnerability"):::bucket
+    Bucket8("Bucket 8 (polymorphic)<br />__typename: Access[106]<br />Deps: 13, 107, 106<br /><br />1: PgSelect[109], PgSelect[123]<br />2: PgSelectRows[118], PgSelectRows[132]<br />ᐳ: 117, 120, 131, 134, 135, 136, 137, 138, 139, 140, 141"):::bucket
+    Bucket9("Bucket 9 (polymorphicPartition)<br />|FirstPartyVulnerability<br />Deps: 135, 136, 137<br />ᐳFirstPartyVulnerability"):::bucket
+    Bucket10("Bucket 10 (polymorphicPartition)<br />|ThirdPartyVulnerability<br />Deps: 138, 139, 140<br />ᐳThirdPartyVulnerability"):::bucket
     end
     Bucket0 --> Bucket1 & Bucket2
     Bucket1 --> Bucket4

@@ -11,13 +11,13 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12, 161, 19, 51, 65, 91, 99, 134, 140<br /><br />ROOT Connectionᐸ8ᐳ[12]"):::bucket
     Bucket2("Bucket 2 (listItem)<br />Deps: 19, 11, 51, 65, 91, 99, 134, 140<br /><br />ROOT __Item{2}ᐸ160ᐳ[15]"):::bucket
-    Bucket3("Bucket 3 (polymorphic)<br />Deps: 11, 23, 51, 65, 22, 91, 99, 134, 140<br /><br />1: 25, 39, 64, 78<br />2: PgSelectRows[34], PgSelectRows[48]<br />ᐳ: 33, 36, 47, 50, 52, 53, 56, 66, 67, 70<br />3: __DataOnly[55]<br />ᐳ: Lambda[54]"):::bucket
-    Bucket4("Bucket 4 (polymorphicPartition)<br />FirstPartyVulnerability<br />Deps: 11, 52, 64, 91, 134, 140, 56<br />ᐳFirstPartyVulnerability"):::bucket
-    Bucket5("Bucket 5 (polymorphicPartition)<br />ThirdPartyVulnerability<br />Deps: 11, 66, 78, 99, 134, 140, 70<br />ᐳThirdPartyVulnerability"):::bucket
+    Bucket3("Bucket 3 (polymorphic)<br />__typename: Access[22]<br />Deps: 11, 23, 51, 65, 22, 91, 99, 134, 140<br /><br />1: 25, 39, 64, 78<br />2: PgSelectRows[34], PgSelectRows[48]<br />ᐳ: 33, 36, 47, 50, 52, 53, 56, 66, 67, 70<br />3: __DataOnly[55]<br />ᐳ: Lambda[54]"):::bucket
+    Bucket4("Bucket 4 (polymorphicPartition)<br />|FirstPartyVulnerability<br />Deps: 11, 52, 64, 91, 134, 140, 56<br />ᐳFirstPartyVulnerability"):::bucket
+    Bucket5("Bucket 5 (polymorphicPartition)<br />|ThirdPartyVulnerability<br />Deps: 11, 66, 78, 99, 134, 140, 70<br />ᐳThirdPartyVulnerability"):::bucket
     Bucket6("Bucket 6 (listItem)<br />Deps: 91, 11, 134, 140<br /><br />ROOT __Item{6}ᐸ158ᐳ[83]"):::bucket
     Bucket7("Bucket 7 (listItem)<br />Deps: 99, 11, 134, 140<br /><br />ROOT __Item{7}ᐸ159ᐳ[85]"):::bucket
     Bucket8("Bucket 8 (combined)<br />Deps: 11, 134, 140"):::bucket
-    Bucket9("Bucket 9 (polymorphic)<br />Deps: 103, 11, 134, 140, 104<br /><br />1: <br />ᐳ: Access[106], Access[120]<br />2: PgSelect[108], PgSelect[122]<br />3: PgSelectRows[117], PgSelectRows[131]<br />ᐳ: 116, 119, 130, 133, 135, 136, 139, 141, 142, 145<br />4: __DataOnly[138]<br />ᐳ: Lambda[137]"):::bucket
+    Bucket9("Bucket 9 (polymorphic)<br />__typename: Access[104]<br />Deps: 103, 11, 134, 140, 104<br /><br />1: <br />ᐳ: Access[106], Access[120]<br />2: PgSelect[108], PgSelect[122]<br />3: PgSelectRows[117], PgSelectRows[131]<br />ᐳ: 116, 119, 130, 133, 135, 136, 139, 141, 142, 145<br />4: __DataOnly[138]<br />ᐳ: Lambda[137]"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
@@ -76,7 +76,7 @@ graph TD
     __DataOnly55["__DataOnly[55∈3]<br />ᐸ53,67ᐳ<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability"]:::plan
     List67{{"List[67∈3]^<br />ᐸ65,66ᐳ"}}:::plan
     List53 -->|"trapError;trapInhibited"| __DataOnly55
-    List67 --> __DataOnly55
+    List67 -->|"trapError;trapInhibited"| __DataOnly55
     PgClassExpression66{{"PgClassExpression[66∈3]^<br />ᐸ__third_pa...ies__.”id”ᐳ"}}:::plan
     Constant65 & PgClassExpression66 --> List67
     First33{{"First[33∈3]^"}}:::plan
@@ -118,18 +118,18 @@ graph TD
     Access104{{"Access[104∈8]^<br />ᐸ103.__typenameᐳ"}}:::plan
     __Value103:::plan@{shape: docs, label: "__Combined[103∈8]<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability"}
     __Value103 --> Access104
-    __DataOnly138["__DataOnly[138∈9]<br />ᐸ136,142,136,142ᐳ<br />ᐳFirstPartyVulnerabilityᐳOrganization<br />ᐳFirstPartyVulnerabilityᐳPerson<br />ᐳThirdPartyVulnerabilityᐳOrganization<br />ᐳThirdPartyVulnerabilityᐳPerson"]:::plan
+    __DataOnly138["__DataOnly[138∈9]<br />ᐸ136,142,136,142ᐳ<br />(2) ...ᐳOrganization<br />(2) ...ᐳPerson"]:::plan
     List136{{"List[136∈9]^<br />ᐸ134,135ᐳ"}}:::plan
     List142{{"List[142∈9]^<br />ᐸ140,141ᐳ"}}:::plan
     List136 -->|"trapError;trapInhibited"| __DataOnly138
     List142 -->|"trapError;trapInhibited"| __DataOnly138
     List136 -->|"trapError;trapInhibited"| __DataOnly138
-    List142 --> __DataOnly138
+    List142 -->|"trapError;trapInhibited"| __DataOnly138
     PgSelect108[["PgSelect[108∈9]^<br />ᐸorganizationsᐳ"]]:::plan
-    Access106{{"Access[106∈9]<br />ᐸ103.organization_idᐳ<br />ᐳFirstPartyVulnerabilityᐳOrganization<br />ᐳThirdPartyVulnerabilityᐳOrganization"}}:::plan
+    Access106{{"Access[106∈9]<br />ᐸ103.organization_idᐳ<br />(2) ...ᐳOrganization"}}:::plan
     Object11 & Access106 --> PgSelect108
     PgSelect122[["PgSelect[122∈9]^<br />ᐸpeopleᐳ"]]:::plan
-    Access120{{"Access[120∈9]<br />ᐸ103.person_idᐳ<br />ᐳFirstPartyVulnerabilityᐳPerson<br />ᐳThirdPartyVulnerabilityᐳPerson"}}:::plan
+    Access120{{"Access[120∈9]<br />ᐸ103.person_idᐳ<br />(2) ...ᐳPerson"}}:::plan
     Object11 & Access120 --> PgSelect122
     PgClassExpression135{{"PgClassExpression[135∈9]^<br />ᐸ__organiza...zation_id”ᐳ"}}:::plan
     Constant134 & PgClassExpression135 --> List136

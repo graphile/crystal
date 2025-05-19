@@ -14,7 +14,7 @@ graph TD
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 4, 38, 61, 168, 136, 142, 148, 154, 160<br /><br />ROOT __ValueᐸrootValueᐳ[4]"):::bucket
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 38, 61, 168, 136, 142, 148, 154, 160<br /><br />ROOT Connection{2}ᐸ57ᐳ[61]<br />1: PgSelect[63]<br />2: PgSelectRows[64]"):::bucket
     Bucket5("Bucket 5 (listItem)<br />Deps: 38, 136, 142, 148, 154, 160<br /><br />ROOT __Item{5}ᐸ64ᐳ[65]"):::bucket
-    Bucket6("Bucket 6 (polymorphic)<br />Deps: 38, 67, 136, 142, 148, 154, 160, 70, 69<br /><br />1: 72, 85, 98, 111, 124<br />2: 81, 94, 107, 120, 133<br />ᐳ: 80, 83, 93, 96, 106, 109, 119, 122, 132, 135, 137, 138, 143, 144, 149, 150, 155, 156, 161, 162<br />3: __DataOnly[140]<br />ᐳ: Lambda[139]"):::bucket
+    Bucket6("Bucket 6 (polymorphic)<br />__typename: Lambda[70]<br />Deps: 38, 67, 136, 142, 148, 154, 160, 70, 69<br /><br />1: 72, 85, 98, 111, 124<br />2: 81, 94, 107, 120, 133<br />ᐳ: 80, 83, 93, 96, 106, 109, 119, 122, 132, 135, 137, 138, 143, 144, 149, 150, 155, 156, 161, 162<br />3: __DataOnly[140]<br />ᐳ: Lambda[139]"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
@@ -35,7 +35,7 @@ graph TD
     Constant167 --> Lambda9
     List14{{"List[14∈0] ➊<br />ᐸ166ᐳ"}}:::plan
     Access166{{"Access[166∈0] ➊<br />ᐸ9.base64JSON.1ᐳ"}}:::plan
-    Access166 --> List14
+    Access166 -->|rejectNull| List14
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access36
     __Value2 --> Access37
@@ -125,7 +125,7 @@ graph TD
     List144 -->|"trapError;trapInhibited"| __DataOnly140
     List150 -->|"trapError;trapInhibited"| __DataOnly140
     List156 -->|"trapError;trapInhibited"| __DataOnly140
-    List162 --> __DataOnly140
+    List162 -->|"trapError;trapInhibited"| __DataOnly140
     PgSelect72[["PgSelect[72∈6]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic"]]:::plan
     Object38 & PgClassExpression67 --> PgSelect72
     PgSelect85[["PgSelect[85∈6]<br />ᐸrelational_postsᐳ<br />ᐳRelationalPost"]]:::plan

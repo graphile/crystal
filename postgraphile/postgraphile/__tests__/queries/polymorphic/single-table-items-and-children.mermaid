@@ -11,9 +11,9 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12<br /><br />ROOT Connectionᐸ8ᐳ[12]<br />1: PgSelect[14]<br />2: PgSelectRows[15]"):::bucket
     Bucket2("Bucket 2 (listItem)<br />Deps: 11<br /><br />ROOT __Item{2}ᐸ15ᐳ[16]"):::bucket
-    Bucket3("Bucket 3 (polymorphic)<br />Deps: 11, 18, 21, 17, 20<br /><br />1: PgSelect[24]<br />2: PgSelectRows[72]"):::bucket
+    Bucket3("Bucket 3 (polymorphic)<br />__typename: Lambda[21]<br />Deps: 11, 18, 21, 17, 20<br /><br />1: PgSelect[24]<br />2: PgSelectRows[72]"):::bucket
     Bucket4("Bucket 4 (listItem)<br /><br />ROOT __Item{4}ᐸ72ᐳ[77]"):::bucket
-    Bucket5("Bucket 5 (polymorphic)<br />Deps: 86, 78, 83, 89"):::bucket
+    Bucket5("Bucket 5 (polymorphic)<br />__typename: Lambda[86]<br />Deps: 86, 78, 83, 89"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2

@@ -16,7 +16,7 @@ graph TD
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 11, 43, 2701, 4619, 2708, 3273, 3280, 4631, 2715, 4635, 2722, 3297, 3304, 4647, 1973, 4651, 1980, 2622, 2629, 4663, 1987, 4667, 1994, 2646, 2653, 4679, 6<br /><br />ROOT Connectionᐸ41ᐳ[43]<br />1: PgSelect[657], PgSelect[663]<br />ᐳ: 669, 1231, 1235, 1236, 1237, 1240, 1241, 4620, 4632, 4636, 4648, 4652, 4664, 4668, 4680<br />2: PgSelectRows[660], PgSelectRows[665]<br />ᐳ: 664, 666, 667, 1243, 1245, 1247, 1249, 1251, 1253<br />3: __ListTransform[659]"):::bucket
     Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 4338, 4408, 4413, 6, 4291, 49, 688, 11, 1353<br /><br />ROOT PgSelectSingleᐸpersonᐳ[49]<br />1: 806, 1344, 1349<br />ᐳ: 2192, 2196, 4292, 4295, 4299, 4303, 4315, 4319, 4331, 4341, 4353, 4357, 4369, 4373, 4385, 4389, 4401, 1348, 1350, 1351, 2197, 2198, 2201, 2202, 2204, 2206, 2208, 2210, 2212, 2214, 4293, 4242, 4246, 4251, 4266, 4271, 4286<br />2: 678, 1343<br />ᐳ: First[677], PgSelectSingle[679]"):::bucket
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 55, 4545, 4541, 6, 4463, 701, 1447<br /><br />ROOT PgSelectSingleᐸpostᐳ[55]<br />1: PgSelectRows[1443], PgSelectRows[1556]<br />ᐳ: 689, 690, 2295, 2306, 4464, 4467, 4471, 4475, 4479, 4491, 4503, 4507, 4511, 4523, 4535, 1442, 1444, 1445, 2296, 2297, 2300, 2301, 2303, 2305, 2307, 2309, 2311, 2313, 4465, 4415, 4419, 4424, 4439, 4444, 4459<br />2: PgSelectRows[696]<br />ᐳ: First[695], PgSelectSingle[697]"):::bucket
-    Bucket8("Bucket 8 (polymorphic)<br />Deps: 11, 58, 59, 4<br /><br />1: 4683, 4687, 4691, 4692, 4696, 4697, 4701, 4702, 4706, 4711, 4712, 4716, 4717, 4721, 4722, 4726, 4733, 4734<br />2: 67, 84, 101, 118, 135, 152, 172, 190, 207, 241, 258, 275, 292, 309, 326, 343, 360, 377, 4707, 4727<br />3: 76, 93, 110, 127, 144, 161, 182, 199, 216, 224, 250, 267, 284, 301, 318, 335, 352, 369, 386<br />ᐳ: 75, 78, 92, 95, 109, 112, 126, 129, 143, 146, 160, 163, 181, 184, 198, 201, 215, 218, 249, 252, 266, 269, 283, 286, 300, 303, 317, 320, 334, 337, 351, 354, 368, 371, 385, 388, 4684, 4688, 4693, 4708, 4713, 4728<br />4: PgSelectRows[233]<br />ᐳ: 232, 235, 704, 705, 706, 707, 708, 709, 710, 711, 712, 713, 714, 715, 716, 717, 718, 719, 720, 721, 722, 723, 724, 725, 726, 727, 728, 729, 770, 771, 772, 773, 774, 775, 776, 777, 778, 779, 780, 781, 782, 783, 784, 785, 786, 803, 804, 1454, 1456, 1458, 1460, 1462, 1464, 4685, 4686, 4689, 4690, 4694, 4695, 4709, 4710, 4714, 4715, 4729, 4730, 4698, 4703, 4718, 4723<br />5: 737, 747, 757, 767, 792, 800<br />ᐳ: 736, 739, 746, 749, 756, 759, 766, 769, 791, 794, 799, 802, 1479, 1480, 1481, 1482, 1483, 1484, 1485, 1506, 4699, 4700, 4704, 4705<br />6: PgSelectRows[1493], PgSelectRows[1503]<br />ᐳ: 1492, 1495, 1502, 1505"):::bucket
+    Bucket8("Bucket 8 (polymorphic)<br />__typename: Lambda[59]<br />Deps: 11, 58, 59, 4<br /><br />1: 4683, 4687, 4691, 4692, 4696, 4697, 4701, 4702, 4706, 4711, 4712, 4716, 4717, 4721, 4722, 4726, 4733, 4734<br />2: 67, 84, 101, 118, 135, 152, 172, 190, 207, 241, 258, 275, 292, 309, 326, 343, 360, 377, 4707, 4727<br />3: 76, 93, 110, 127, 144, 161, 182, 199, 216, 224, 250, 267, 284, 301, 318, 335, 352, 369, 386<br />ᐳ: 75, 78, 92, 95, 109, 112, 126, 129, 143, 146, 160, 163, 181, 184, 198, 201, 215, 218, 249, 252, 266, 269, 283, 286, 300, 303, 317, 320, 334, 337, 351, 354, 368, 371, 385, 388, 4684, 4688, 4693, 4708, 4713, 4728<br />4: PgSelectRows[233]<br />ᐳ: 232, 235, 704, 705, 706, 707, 708, 709, 710, 711, 712, 713, 714, 715, 716, 717, 718, 719, 720, 721, 722, 723, 724, 725, 726, 727, 728, 729, 770, 771, 772, 773, 774, 775, 776, 777, 778, 779, 780, 781, 782, 783, 784, 785, 786, 803, 804, 1454, 1456, 1458, 1460, 1462, 1464, 4685, 4686, 4689, 4690, 4694, 4695, 4709, 4710, 4714, 4715, 4729, 4730, 4698, 4703, 4718, 4723<br />5: 737, 747, 757, 767, 792, 800<br />ᐳ: 736, 739, 746, 749, 756, 759, 766, 769, 791, 794, 799, 802, 1479, 1480, 1481, 1482, 1483, 1484, 1485, 1506, 4699, 4700, 4704, 4705<br />6: PgSelectRows[1493], PgSelectRows[1503]<br />ᐳ: 1492, 1495, 1502, 1505"):::bucket
     Bucket9("Bucket 9 (listItem)<br />Deps: 4018, 4022, 4026, 4038, 4042, 4054<br /><br />ROOT __Item{9}ᐸ56ᐳ[398]<br />1: <br />ᐳ: 399, 831, 832, 833, 834, 835, 836, 837, 838, 839, 840, 841, 842, 843, 844, 845, 846, 847, 848, 849, 850, 851, 852, 853, 854, 855, 856, 887, 888, 889, 890, 891, 892, 893, 894, 895, 896, 897, 898, 899, 900, 901, 902, 903, 914, 915, 1646, 1647, 1648, 1649, 1650, 1651, 4019, 4020, 4023, 4024, 4027, 4028, 4039, 4040, 4043, 4044, 4055, 4056, 4030, 4034<br />2: 864, 871, 878, 885, 907, 912<br />ᐳ: 863, 865, 870, 872, 877, 879, 884, 886, 906, 908, 911, 913, 1659, 1660, 1661, 1662, 1663, 1664, 1665, 1680, 4031, 4032, 4035, 4036<br />3: PgSelectRows[1671], PgSelectRows[1678]<br />ᐳ: 1670, 1672, 1677, 1679"):::bucket
     Bucket10("Bucket 10 (listItem)<br />Deps: 4202, 4206, 4210, 4222, 4226, 4238<br /><br />ROOT __Item{10}ᐸ57ᐳ[655]"):::bucket
     Bucket11("Bucket 11 (subroutine)<br /><br />ROOT PgSelectSingle{11}ᐸtype_function_connectionᐳ[662]"):::bucket
@@ -628,8 +628,8 @@ graph TD
     PgFromExpression4138{{"PgFromExpression[4138∈0] ➊"}}:::plan
     PgFromExpression4143{{"PgFromExpression[4143∈0] ➊"}}:::plan
     PgSelectInlineApply4149["PgSelectInlineApply[4149∈0] ➊"]:::plan
-    Object11 -->|rejectNull| PgSelect26
-    Access24 & PgSelectInlineApply4105 & PgSelectInlineApply4109 & PgFromExpression4113 & PgSelectInlineApply4114 & PgFromExpression4128 & PgFromExpression4118 & PgFromExpression4123 & PgSelectInlineApply4129 & PgFromExpression4133 & PgSelectInlineApply4134 & PgFromExpression4148 & PgFromExpression4138 & PgFromExpression4143 & PgSelectInlineApply4149 --> PgSelect26
+    Access24 -->|rejectNull| PgSelect26
+    Object11 & PgSelectInlineApply4105 & PgSelectInlineApply4109 & PgFromExpression4113 & PgSelectInlineApply4114 & PgFromExpression4128 & PgFromExpression4118 & PgFromExpression4123 & PgSelectInlineApply4129 & PgFromExpression4133 & PgSelectInlineApply4134 & PgFromExpression4148 & PgFromExpression4138 & PgFromExpression4143 & PgSelectInlineApply4149 --> PgSelect26
     PgSelect33[["PgSelect[33∈0] ➊<br />ᐸtype_functionᐳ"]]:::plan
     PgFromExpression35{{"PgFromExpression[35∈0] ➊"}}:::plan
     PgSelectInlineApply4153["PgSelectInlineApply[4153∈0] ➊"]:::plan
@@ -5585,64 +5585,64 @@ graph TD
     PgFromExpression4716{{"PgFromExpression[4716∈8] ➊<br />ᐳType"}}:::plan
     PgFromExpression4721{{"PgFromExpression[4721∈8] ➊<br />ᐳType"}}:::plan
     PgSelectInlineApply4727["PgSelectInlineApply[4727∈8] ➊^"]:::plan
-    Object11 -->|rejectNull| PgSelect224
-    Access4733 & PgSelectInlineApply4683 & PgSelectInlineApply4687 & PgFromExpression4691 & PgSelectInlineApply4692 & PgFromExpression4706 & PgFromExpression4696 & PgFromExpression4701 & PgSelectInlineApply4707 & PgFromExpression4711 & PgSelectInlineApply4712 & PgFromExpression4726 & PgFromExpression4716 & PgFromExpression4721 & PgSelectInlineApply4727 --> PgSelect224
+    Access4733 -->|rejectNull| PgSelect224
+    Object11 & PgSelectInlineApply4683 & PgSelectInlineApply4687 & PgFromExpression4691 & PgSelectInlineApply4692 & PgFromExpression4706 & PgFromExpression4696 & PgFromExpression4701 & PgSelectInlineApply4707 & PgFromExpression4711 & PgSelectInlineApply4712 & PgFromExpression4726 & PgFromExpression4716 & PgFromExpression4721 & PgSelectInlineApply4727 --> PgSelect224
     PgSelect172[["PgSelect[172∈8] ➊<br />ᐸcompound_keyᐳ<br />ᐳCompoundKey"]]:::plan
     Access4734{{"Access[4734∈8] ➊<br />ᐸ58.base64JSON.2ᐳ<br />ᐳCompoundKey"}}:::plan
-    Object11 -->|rejectNull| PgSelect172
     Access4733 -->|rejectNull| PgSelect172
-    Access4734 --> PgSelect172
+    Access4734 -->|rejectNull| PgSelect172
+    Object11 --> PgSelect172
     PgSelect67[["PgSelect[67∈8] ➊<br />ᐸinputsᐳ<br />ᐳInput"]]:::plan
-    Object11 -->|rejectNull| PgSelect67
-    Access4733 --> PgSelect67
+    Access4733 -->|rejectNull| PgSelect67
+    Object11 --> PgSelect67
     PgSelect84[["PgSelect[84∈8] ➊<br />ᐸpatchsᐳ<br />ᐳPatch"]]:::plan
-    Object11 -->|rejectNull| PgSelect84
-    Access4733 --> PgSelect84
+    Access4733 -->|rejectNull| PgSelect84
+    Object11 --> PgSelect84
     PgSelect101[["PgSelect[101∈8] ➊<br />ᐸreservedᐳ<br />ᐳReserved"]]:::plan
-    Object11 -->|rejectNull| PgSelect101
-    Access4733 --> PgSelect101
+    Access4733 -->|rejectNull| PgSelect101
+    Object11 --> PgSelect101
     PgSelect118[["PgSelect[118∈8] ➊<br />ᐸreservedPatchsᐳ<br />ᐳReservedPatchRecord"]]:::plan
-    Object11 -->|rejectNull| PgSelect118
-    Access4733 --> PgSelect118
+    Access4733 -->|rejectNull| PgSelect118
+    Object11 --> PgSelect118
     PgSelect135[["PgSelect[135∈8] ➊<br />ᐸreserved_inputᐳ<br />ᐳReservedInputRecord"]]:::plan
-    Object11 -->|rejectNull| PgSelect135
-    Access4733 --> PgSelect135
+    Access4733 -->|rejectNull| PgSelect135
+    Object11 --> PgSelect135
     PgSelect152[["PgSelect[152∈8] ➊<br />ᐸdefault_valueᐳ<br />ᐳDefaultValue"]]:::plan
-    Object11 -->|rejectNull| PgSelect152
-    Access4733 --> PgSelect152
+    Access4733 -->|rejectNull| PgSelect152
+    Object11 --> PgSelect152
     PgSelect190[["PgSelect[190∈8] ➊<br />ᐸpersonᐳ<br />ᐳPerson"]]:::plan
-    Object11 -->|rejectNull| PgSelect190
-    Access4733 --> PgSelect190
+    Access4733 -->|rejectNull| PgSelect190
+    Object11 --> PgSelect190
     PgSelect207[["PgSelect[207∈8] ➊<br />ᐸpostᐳ<br />ᐳPost"]]:::plan
-    Object11 -->|rejectNull| PgSelect207
-    Access4733 --> PgSelect207
+    Access4733 -->|rejectNull| PgSelect207
+    Object11 --> PgSelect207
     PgSelect241[["PgSelect[241∈8] ➊<br />ᐸperson_secretᐳ<br />ᐳPersonSecret"]]:::plan
-    Object11 -->|rejectNull| PgSelect241
-    Access4733 --> PgSelect241
+    Access4733 -->|rejectNull| PgSelect241
+    Object11 --> PgSelect241
     PgSelect258[["PgSelect[258∈8] ➊<br />ᐸleft_armᐳ<br />ᐳLeftArm"]]:::plan
-    Object11 -->|rejectNull| PgSelect258
-    Access4733 --> PgSelect258
+    Access4733 -->|rejectNull| PgSelect258
+    Object11 --> PgSelect258
     PgSelect275[["PgSelect[275∈8] ➊<br />ᐸmy_tableᐳ<br />ᐳMyTable"]]:::plan
-    Object11 -->|rejectNull| PgSelect275
-    Access4733 --> PgSelect275
+    Access4733 -->|rejectNull| PgSelect275
+    Object11 --> PgSelect275
     PgSelect292[["PgSelect[292∈8] ➊<br />ᐸview_tableᐳ<br />ᐳViewTable"]]:::plan
-    Object11 -->|rejectNull| PgSelect292
-    Access4733 --> PgSelect292
+    Access4733 -->|rejectNull| PgSelect292
+    Object11 --> PgSelect292
     PgSelect309[["PgSelect[309∈8] ➊<br />ᐸsimilar_table_1ᐳ<br />ᐳSimilarTable1"]]:::plan
-    Object11 -->|rejectNull| PgSelect309
-    Access4733 --> PgSelect309
+    Access4733 -->|rejectNull| PgSelect309
+    Object11 --> PgSelect309
     PgSelect326[["PgSelect[326∈8] ➊<br />ᐸsimilar_table_2ᐳ<br />ᐳSimilarTable2"]]:::plan
-    Object11 -->|rejectNull| PgSelect326
-    Access4733 --> PgSelect326
+    Access4733 -->|rejectNull| PgSelect326
+    Object11 --> PgSelect326
     PgSelect343[["PgSelect[343∈8] ➊<br />ᐸnull_test_recordᐳ<br />ᐳNullTestRecord"]]:::plan
-    Object11 -->|rejectNull| PgSelect343
-    Access4733 --> PgSelect343
+    Access4733 -->|rejectNull| PgSelect343
+    Object11 --> PgSelect343
     PgSelect360[["PgSelect[360∈8] ➊<br />ᐸissue756ᐳ<br />ᐳIssue756"]]:::plan
-    Object11 -->|rejectNull| PgSelect360
-    Access4733 --> PgSelect360
+    Access4733 -->|rejectNull| PgSelect360
+    Object11 --> PgSelect360
     PgSelect377[["PgSelect[377∈8] ➊<br />ᐸlistsᐳ<br />ᐳList"]]:::plan
-    Object11 -->|rejectNull| PgSelect377
-    Access4733 --> PgSelect377
+    Access4733 -->|rejectNull| PgSelect377
+    Object11 --> PgSelect377
     List4685{{"List[4685∈8] ➊^<br />ᐸ4684,235ᐳ"}}:::plan
     Access4684{{"Access[4684∈8] ➊^<br />ᐸ224.m.joinDetailsFor795ᐳ"}}:::plan
     PgSelectSingle235{{"PgSelectSingle[235∈8] ➊^<br />ᐸtypesᐳ"}}:::plan

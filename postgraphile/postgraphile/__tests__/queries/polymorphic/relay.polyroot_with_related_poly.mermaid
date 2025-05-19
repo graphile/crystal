@@ -19,20 +19,20 @@ graph TD
     Bucket8("Bucket 8 (listItem)<br />Deps: 142, 1002, 1006, 11, 255, 269, 283, 297, 311<br /><br />ROOT __Item{8}ᐸ42ᐳ[49]"):::bucket
     Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 48, 124, 994, 998, 160, 179, 198, 217, 236<br /><br />ROOT PgSelectSingle{7}ᐸsingle_table_item_relationsᐳ[48]<br />1: <br />ᐳ: 125, 995, 999, 126, 127, 996, 1000<br />2: PgSelectRows[134], PgSelectRows[140]<br />ᐳ: 133, 135, 139, 141, 325, 327, 328, 329, 331, 332"):::bucket
     Bucket10("Bucket 10 (nullableBoundary)<br />Deps: 50, 142, 1002, 1006, 11, 255, 269, 283, 297, 311<br /><br />ROOT PgSelectSingle{8}ᐸrelational_item_relationsᐳ[50]<br />1: <br />ᐳ: 143, 1003, 1007, 144, 145, 1004, 1008<br />2: PgSelectRows[152], PgSelectRows[158]<br />ᐳ: 151, 153, 157, 159, 333, 335, 336, 402, 404, 405"):::bucket
-    Bucket11("Bucket 11 (polymorphic)<br />Deps: 160, 51, 179, 198, 217, 236, 54, 471, 474, 44, 53, 178, 473<br /><br />1: <br />ᐳ: 162, 181, 200, 219, 238<br />2: __DataOnly[164]<br />ᐳ: Lambda[163]"):::bucket
-    Bucket12("Bucket 12 (polymorphic)<br />Deps: 11, 55, 255, 269, 283, 297, 311, 58, 57<br /><br />1: 60, 73, 86, 99, 112<br />2: 69, 82, 95, 108, 121<br />ᐳ: 68, 71, 81, 84, 94, 97, 107, 110, 120, 123, 256, 257, 270, 271, 284, 285, 298, 299, 312, 313<br />3: 259, 261, 275, 289, 303, 317<br />ᐳ: Lambda[258]<br />4: 266, 280, 294, 308, 322<br />ᐳ: 265, 268, 279, 282, 293, 296, 307, 310, 321, 324"):::bucket
-    Bucket13("Bucket 13 (polymorphicPartition)<br />RelationalTopic<br />Deps: 268, 11, 255, 269, 283, 297, 311<br />ᐳRelationalTopic"):::bucket
-    Bucket14("Bucket 14 (polymorphicPartition)<br />RelationalPost<br />Deps: 282, 11, 255, 269, 283, 297, 311<br />ᐳRelationalPost"):::bucket
-    Bucket15("Bucket 15 (polymorphicPartition)<br />RelationalDivider<br />Deps: 296, 11, 255, 269, 283, 297, 311<br />ᐳRelationalDivider"):::bucket
-    Bucket16("Bucket 16 (polymorphicPartition)<br />RelationalChecklist<br />Deps: 310, 11, 255, 269, 283, 297, 311<br />ᐳRelationalChecklist"):::bucket
-    Bucket17("Bucket 17 (polymorphicPartition)<br />RelationalChecklistItem<br />Deps: 324, 11, 255, 269, 283, 297, 311<br />ᐳRelationalChecklistItem"):::bucket
-    Bucket18("Bucket 18 (polymorphic)<br />Deps: 160, 325, 179, 198, 217, 236, 328, 135, 327<br /><br />1: <br />ᐳ: 571, 577, 583, 589, 595<br />2: __DataOnly[573]<br />ᐳ: Lambda[572]"):::bucket
-    Bucket19("Bucket 19 (polymorphic)<br />Deps: 160, 329, 179, 198, 217, 236, 332, 141, 331<br /><br />1: <br />ᐳ: 601, 607, 613, 619, 625<br />2: __DataOnly[603]<br />ᐳ: Lambda[602]"):::bucket
-    Bucket20("Bucket 20 (polymorphic)<br />Deps: 11, 333, 255, 269, 283, 297, 311, 336, 335<br /><br />1: 338, 351, 364, 377, 390<br />2: 347, 360, 373, 386, 399<br />ᐳ: 346, 349, 359, 362, 372, 375, 385, 388, 398, 401, 630, 631, 636, 637, 642, 643, 648, 649, 654, 655<br />3: __DataOnly[633]<br />ᐳ: Lambda[632]"):::bucket
-    Bucket21("Bucket 21 (polymorphic)<br />Deps: 11, 402, 255, 269, 283, 297, 311, 405, 404<br /><br />1: 407, 420, 433, 446, 459<br />2: 416, 429, 442, 455, 468<br />ᐳ: 415, 418, 428, 431, 441, 444, 454, 457, 467, 470, 660, 661, 666, 667, 672, 673, 678, 679, 684, 685<br />3: __DataOnly[663]<br />ᐳ: Lambda[662]"):::bucket
-    Bucket22("Bucket 22 (polymorphic)<br />Deps: 160, 471, 179, 198, 217, 236, 474, 178, 473<br /><br />1: <br />ᐳ: 691, 697, 703, 709, 715<br />2: __DataOnly[693]<br />ᐳ: Lambda[692]"):::bucket
+    Bucket11("Bucket 11 (polymorphic)<br />__typename: Lambda[54]<br />Deps: 160, 51, 179, 198, 217, 236, 54, 471, 474, 44, 53, 178, 473<br /><br />1: <br />ᐳ: 162, 181, 200, 219, 238<br />2: __DataOnly[164]<br />ᐳ: Lambda[163]"):::bucket
+    Bucket12("Bucket 12 (polymorphic)<br />__typename: Lambda[58]<br />Deps: 11, 55, 255, 269, 283, 297, 311, 58, 57<br /><br />1: 60, 73, 86, 99, 112<br />2: 69, 82, 95, 108, 121<br />ᐳ: 68, 71, 81, 84, 94, 97, 107, 110, 120, 123, 256, 257, 270, 271, 284, 285, 298, 299, 312, 313<br />3: 259, 261, 275, 289, 303, 317<br />ᐳ: Lambda[258]<br />4: 266, 280, 294, 308, 322<br />ᐳ: 265, 268, 279, 282, 293, 296, 307, 310, 321, 324"):::bucket
+    Bucket13("Bucket 13 (polymorphicPartition)<br />|RelationalTopic<br />Deps: 268, 11, 255, 269, 283, 297, 311<br />ᐳRelationalTopic"):::bucket
+    Bucket14("Bucket 14 (polymorphicPartition)<br />|RelationalPost<br />Deps: 282, 11, 255, 269, 283, 297, 311<br />ᐳRelationalPost"):::bucket
+    Bucket15("Bucket 15 (polymorphicPartition)<br />|RelationalDivider<br />Deps: 296, 11, 255, 269, 283, 297, 311<br />ᐳRelationalDivider"):::bucket
+    Bucket16("Bucket 16 (polymorphicPartition)<br />|RelationalChecklist<br />Deps: 310, 11, 255, 269, 283, 297, 311<br />ᐳRelationalChecklist"):::bucket
+    Bucket17("Bucket 17 (polymorphicPartition)<br />|RelationalChecklistItem<br />Deps: 324, 11, 255, 269, 283, 297, 311<br />ᐳRelationalChecklistItem"):::bucket
+    Bucket18("Bucket 18 (polymorphic)<br />__typename: Lambda[328]<br />Deps: 160, 325, 179, 198, 217, 236, 328, 135, 327<br /><br />1: <br />ᐳ: 571, 577, 583, 589, 595<br />2: __DataOnly[573]<br />ᐳ: Lambda[572]"):::bucket
+    Bucket19("Bucket 19 (polymorphic)<br />__typename: Lambda[332]<br />Deps: 160, 329, 179, 198, 217, 236, 332, 141, 331<br /><br />1: <br />ᐳ: 601, 607, 613, 619, 625<br />2: __DataOnly[603]<br />ᐳ: Lambda[602]"):::bucket
+    Bucket20("Bucket 20 (polymorphic)<br />__typename: Lambda[336]<br />Deps: 11, 333, 255, 269, 283, 297, 311, 336, 335<br /><br />1: 338, 351, 364, 377, 390<br />2: 347, 360, 373, 386, 399<br />ᐳ: 346, 349, 359, 362, 372, 375, 385, 388, 398, 401, 630, 631, 636, 637, 642, 643, 648, 649, 654, 655<br />3: __DataOnly[633]<br />ᐳ: Lambda[632]"):::bucket
+    Bucket21("Bucket 21 (polymorphic)<br />__typename: Lambda[405]<br />Deps: 11, 402, 255, 269, 283, 297, 311, 405, 404<br /><br />1: 407, 420, 433, 446, 459<br />2: 416, 429, 442, 455, 468<br />ᐳ: 415, 418, 428, 431, 441, 444, 454, 457, 467, 470, 660, 661, 666, 667, 672, 673, 678, 679, 684, 685<br />3: __DataOnly[663]<br />ᐳ: Lambda[662]"):::bucket
+    Bucket22("Bucket 22 (polymorphic)<br />__typename: Lambda[474]<br />Deps: 160, 471, 179, 198, 217, 236, 474, 178, 473<br /><br />1: <br />ᐳ: 691, 697, 703, 709, 715<br />2: __DataOnly[693]<br />ᐳ: Lambda[692]"):::bucket
     Bucket23("Bucket 23 (combined)<br />Deps: 11, 255, 269, 283, 297, 311<br /><br />1: <br />ᐳ: Access[487]<br />2: PgSelect[489]<br />3: PgSelectRows[498]<br />ᐳ: 497, 500, 501, 502, 504"):::bucket
-    Bucket24("Bucket 24 (polymorphic)<br />Deps: 11, 504, 255, 269, 283, 297, 311, 502, 501<br /><br />1: 505, 518, 531, 544, 557<br />2: 514, 527, 540, 553, 566<br />ᐳ: 513, 516, 526, 529, 539, 542, 552, 555, 565, 568, 840, 841, 846, 847, 852, 853, 858, 859, 864, 865<br />3: __DataOnly[843]<br />ᐳ: Lambda[842]"):::bucket
+    Bucket24("Bucket 24 (polymorphic)<br />__typename: Lambda[502]<br />Deps: 11, 504, 255, 269, 283, 297, 311, 502, 501<br /><br />1: 505, 518, 531, 544, 557<br />2: 514, 527, 540, 553, 566<br />ᐳ: 513, 516, 526, 529, 539, 542, 552, 555, 565, 568, 840, 841, 846, 847, 852, 853, 858, 859, 864, 865<br />3: __DataOnly[843]<br />ᐳ: Lambda[842]"):::bucket
     end
     Bucket0 --> Bucket1 & Bucket2 & Bucket3 & Bucket4
     Bucket1 --> Bucket5
@@ -136,7 +136,7 @@ graph TD
     List181 -->|"trapError;trapInhibited"| __DataOnly164
     List200 -->|"trapError;trapInhibited"| __DataOnly164
     List219 -->|"trapError;trapInhibited"| __DataOnly164
-    List238 --> __DataOnly164
+    List238 -->|"trapError;trapInhibited"| __DataOnly164
     Constant160 & PgClassExpression51 --> List162
     Constant179 & PgClassExpression51 --> List181
     Constant198 & PgClassExpression51 --> List200
@@ -144,12 +144,12 @@ graph TD
     Constant236 & PgClassExpression51 --> List238
     Lambda163{{"Lambda[163∈11]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     __DataOnly164 --> Lambda163
-    __DataOnly693["__DataOnly[693∈22]<br />ᐸ691,697,703,709,715,691,697,703,709,715,691,697,703,709,715,691,697,703,709,715,691,697,703,709,715ᐳ<br />ᐳSingleTableTopicᐳSingleTableTopic<br />ᐳSingleTableTopicᐳSingleTablePost<br />ᐳSingleTableTopicᐳSingleTableDivider<br />ᐳSingleTableTopicᐳSingleTableChecklist<br />ᐳSingleTableTopicᐳSingleTableChecklistItem<br />ᐳSingleTablePostᐳSingleTableTopic<br />ᐳSingleTablePostᐳSingleTablePost<br />ᐳSingleTablePostᐳSingleTableDivider<br />ᐳSingleTablePostᐳSingleTableChecklist<br />ᐳSingleTablePostᐳSingleTableChecklistItem<br />ᐳSingleTableDividerᐳSingleTableTopic<br />ᐳSingleTableDividerᐳSingleTablePost<br />ᐳSingleTableDividerᐳSingleTableDivider<br />ᐳSingleTableDividerᐳSingleTableChecklist<br />ᐳSingleTableDividerᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistᐳSingleTableTopic<br />ᐳSingleTableChecklistᐳSingleTablePost<br />ᐳSingleTableChecklistᐳSingleTableDivider<br />ᐳSingleTableChecklistᐳSingleTableChecklist<br />ᐳSingleTableChecklistᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistItemᐳSingleTableTopic<br />ᐳSingleTableChecklistItemᐳSingleTablePost<br />ᐳSingleTableChecklistItemᐳSingleTableDivider<br />ᐳSingleTableChecklistItemᐳSingleTableChecklist<br />ᐳSingleTableChecklistItemᐳSingleTableChecklistItem"]:::plan
-    List691{{"List[691∈22]<br />ᐸ160,471ᐳ<br />ᐳSingleTableTopicᐳSingleTableTopic<br />ᐳSingleTablePostᐳSingleTableTopic<br />ᐳSingleTableDividerᐳSingleTableTopic<br />ᐳSingleTableChecklistᐳSingleTableTopic<br />ᐳSingleTableChecklistItemᐳSingleTableTopic"}}:::plan
-    List697{{"List[697∈22]<br />ᐸ179,471ᐳ<br />ᐳSingleTableTopicᐳSingleTablePost<br />ᐳSingleTablePostᐳSingleTablePost<br />ᐳSingleTableDividerᐳSingleTablePost<br />ᐳSingleTableChecklistᐳSingleTablePost<br />ᐳSingleTableChecklistItemᐳSingleTablePost"}}:::plan
-    List703{{"List[703∈22]<br />ᐸ198,471ᐳ<br />ᐳSingleTableTopicᐳSingleTableDivider<br />ᐳSingleTablePostᐳSingleTableDivider<br />ᐳSingleTableDividerᐳSingleTableDivider<br />ᐳSingleTableChecklistᐳSingleTableDivider<br />ᐳSingleTableChecklistItemᐳSingleTableDivider"}}:::plan
-    List709{{"List[709∈22]<br />ᐸ217,471ᐳ<br />ᐳSingleTableTopicᐳSingleTableChecklist<br />ᐳSingleTablePostᐳSingleTableChecklist<br />ᐳSingleTableDividerᐳSingleTableChecklist<br />ᐳSingleTableChecklistᐳSingleTableChecklist<br />ᐳSingleTableChecklistItemᐳSingleTableChecklist"}}:::plan
-    List715{{"List[715∈22]<br />ᐸ236,471ᐳ<br />ᐳSingleTableTopicᐳSingleTableChecklistItem<br />ᐳSingleTablePostᐳSingleTableChecklistItem<br />ᐳSingleTableDividerᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistItemᐳSingleTableChecklistItem"}}:::plan
+    __DataOnly693["__DataOnly[693∈22]<br />ᐸ691,697,703,709,715,691,697,703,709,715,691,697,703,709,715,691,697,703,709,715,691,697,703,709,715ᐳ<br />(5) ...ᐳSingleTableTopic<br />(5) ...ᐳSingleTablePost<br />(5) ...ᐳSingleTableDivider<br />(5) ...ᐳSingleTableChecklist<br />(5) ...ᐳSingleTableChecklistItem"]:::plan
+    List691{{"List[691∈22]<br />ᐸ160,471ᐳ<br />(5) ...ᐳSingleTableTopic"}}:::plan
+    List697{{"List[697∈22]<br />ᐸ179,471ᐳ<br />(5) ...ᐳSingleTablePost"}}:::plan
+    List703{{"List[703∈22]<br />ᐸ198,471ᐳ<br />(5) ...ᐳSingleTableDivider"}}:::plan
+    List709{{"List[709∈22]<br />ᐸ217,471ᐳ<br />(5) ...ᐳSingleTableChecklist"}}:::plan
+    List715{{"List[715∈22]<br />ᐸ236,471ᐳ<br />(5) ...ᐳSingleTableChecklistItem"}}:::plan
     List691 -->|"trapError;trapInhibited"| __DataOnly693
     List697 -->|"trapError;trapInhibited"| __DataOnly693
     List703 -->|"trapError;trapInhibited"| __DataOnly693
@@ -174,7 +174,7 @@ graph TD
     List697 -->|"trapError;trapInhibited"| __DataOnly693
     List703 -->|"trapError;trapInhibited"| __DataOnly693
     List709 -->|"trapError;trapInhibited"| __DataOnly693
-    List715 --> __DataOnly693
+    List715 -->|"trapError;trapInhibited"| __DataOnly693
     Constant160 & PgClassExpression471 --> List691
     Constant179 & PgClassExpression471 --> List697
     Constant198 & PgClassExpression471 --> List703
@@ -206,7 +206,7 @@ graph TD
     List271 -->|"trapError;trapInhibited"| __DataOnly259
     List285 -->|"trapError;trapInhibited"| __DataOnly259
     List299 -->|"trapError;trapInhibited"| __DataOnly259
-    List313 --> __DataOnly259
+    List313 -->|"trapError;trapInhibited"| __DataOnly259
     PgSelect60[["PgSelect[60∈12]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic"]]:::plan
     Object11 & PgClassExpression55 --> PgSelect60
     PgSelect73[["PgSelect[73∈12]<br />ᐸrelational_postsᐳ<br />ᐳRelationalPost"]]:::plan
@@ -325,7 +325,7 @@ graph TD
     PgClassExpression501 --> Lambda502
     PgClassExpression504{{"PgClassExpression[504∈23]^<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
     PgSelectSingle500 --> PgClassExpression504
-    __DataOnly843["__DataOnly[843∈24]<br />ᐸ841,847,853,859,865,841,847,853,859,865,841,847,853,859,865,841,847,853,859,865,841,847,853,859,865ᐳ<br />ᐳRelationalTopicᐳRelationalTopic<br />ᐳRelationalTopicᐳRelationalPost<br />ᐳRelationalTopicᐳRelationalDivider<br />ᐳRelationalTopicᐳRelationalChecklist<br />ᐳRelationalTopicᐳRelationalChecklistItem<br />ᐳRelationalPostᐳRelationalTopic<br />ᐳRelationalPostᐳRelationalPost<br />ᐳRelationalPostᐳRelationalDivider<br />ᐳRelationalPostᐳRelationalChecklist<br />ᐳRelationalPostᐳRelationalChecklistItem<br />ᐳRelationalDividerᐳRelationalTopic<br />ᐳRelationalDividerᐳRelationalPost<br />ᐳRelationalDividerᐳRelationalDivider<br />ᐳRelationalDividerᐳRelationalChecklist<br />ᐳRelationalDividerᐳRelationalChecklistItem<br />ᐳRelationalChecklistᐳRelationalTopic<br />ᐳRelationalChecklistᐳRelationalPost<br />ᐳRelationalChecklistᐳRelationalDivider<br />ᐳRelationalChecklistᐳRelationalChecklist<br />ᐳRelationalChecklistᐳRelationalChecklistItem<br />ᐳRelationalChecklistItemᐳRelationalTopic<br />ᐳRelationalChecklistItemᐳRelationalPost<br />ᐳRelationalChecklistItemᐳRelationalDivider<br />ᐳRelationalChecklistItemᐳRelationalChecklist<br />ᐳRelationalChecklistItemᐳRelationalChecklistItem"]:::plan
+    __DataOnly843["__DataOnly[843∈24]<br />ᐸ841,847,853,859,865,841,847,853,859,865,841,847,853,859,865,841,847,853,859,865,841,847,853,859,865ᐳ<br />(5) ...ᐳRelationalTopic<br />(5) ...ᐳRelationalPost<br />(5) ...ᐳRelationalDivider<br />(5) ...ᐳRelationalChecklist<br />(5) ...ᐳRelationalChecklistItem"]:::plan
     List841{{"List[841∈24]^<br />ᐸ255,840ᐳ"}}:::plan
     List847{{"List[847∈24]^<br />ᐸ269,846ᐳ"}}:::plan
     List853{{"List[853∈24]^<br />ᐸ283,852ᐳ"}}:::plan
@@ -355,16 +355,16 @@ graph TD
     List847 -->|"trapError;trapInhibited"| __DataOnly843
     List853 -->|"trapError;trapInhibited"| __DataOnly843
     List859 -->|"trapError;trapInhibited"| __DataOnly843
-    List865 --> __DataOnly843
-    PgSelect505[["PgSelect[505∈24]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopicᐳRelationalTopic<br />ᐳRelationalPostᐳRelationalTopic<br />ᐳRelationalDividerᐳRelationalTopic<br />ᐳRelationalChecklistᐳRelationalTopic<br />ᐳRelationalChecklistItemᐳRelationalTopic"]]:::plan
+    List865 -->|"trapError;trapInhibited"| __DataOnly843
+    PgSelect505[["PgSelect[505∈24]<br />ᐸrelational_topicsᐳ<br />(5) ...ᐳRelationalTopic"]]:::plan
     Object11 & PgClassExpression504 --> PgSelect505
-    PgSelect518[["PgSelect[518∈24]<br />ᐸrelational_postsᐳ<br />ᐳRelationalTopicᐳRelationalPost<br />ᐳRelationalPostᐳRelationalPost<br />ᐳRelationalDividerᐳRelationalPost<br />ᐳRelationalChecklistᐳRelationalPost<br />ᐳRelationalChecklistItemᐳRelationalPost"]]:::plan
+    PgSelect518[["PgSelect[518∈24]<br />ᐸrelational_postsᐳ<br />(5) ...ᐳRelationalPost"]]:::plan
     Object11 & PgClassExpression504 --> PgSelect518
-    PgSelect531[["PgSelect[531∈24]<br />ᐸrelational_dividersᐳ<br />ᐳRelationalTopicᐳRelationalDivider<br />ᐳRelationalPostᐳRelationalDivider<br />ᐳRelationalDividerᐳRelationalDivider<br />ᐳRelationalChecklistᐳRelationalDivider<br />ᐳRelationalChecklistItemᐳRelationalDivider"]]:::plan
+    PgSelect531[["PgSelect[531∈24]<br />ᐸrelational_dividersᐳ<br />(5) ...ᐳRelationalDivider"]]:::plan
     Object11 & PgClassExpression504 --> PgSelect531
-    PgSelect544[["PgSelect[544∈24]<br />ᐸrelational_checklistsᐳ<br />ᐳRelationalTopicᐳRelationalChecklist<br />ᐳRelationalPostᐳRelationalChecklist<br />ᐳRelationalDividerᐳRelationalChecklist<br />ᐳRelationalChecklistᐳRelationalChecklist<br />ᐳRelationalChecklistItemᐳRelationalChecklist"]]:::plan
+    PgSelect544[["PgSelect[544∈24]<br />ᐸrelational_checklistsᐳ<br />(5) ...ᐳRelationalChecklist"]]:::plan
     Object11 & PgClassExpression504 --> PgSelect544
-    PgSelect557[["PgSelect[557∈24]<br />ᐸrelational_checklist_itemsᐳ<br />ᐳRelationalTopicᐳRelationalChecklistItem<br />ᐳRelationalPostᐳRelationalChecklistItem<br />ᐳRelationalDividerᐳRelationalChecklistItem<br />ᐳRelationalChecklistᐳRelationalChecklistItem<br />ᐳRelationalChecklistItemᐳRelationalChecklistItem"]]:::plan
+    PgSelect557[["PgSelect[557∈24]<br />ᐸrelational_checklist_itemsᐳ<br />(5) ...ᐳRelationalChecklistItem"]]:::plan
     Object11 & PgClassExpression504 --> PgSelect557
     PgClassExpression840{{"PgClassExpression[840∈24]^<br />ᐸ__relation...c_item_id”ᐳ"}}:::plan
     Constant255 & PgClassExpression840 --> List841
@@ -489,7 +489,7 @@ graph TD
     List577 -->|"trapError;trapInhibited"| __DataOnly573
     List583 -->|"trapError;trapInhibited"| __DataOnly573
     List589 -->|"trapError;trapInhibited"| __DataOnly573
-    List595 --> __DataOnly573
+    List595 -->|"trapError;trapInhibited"| __DataOnly573
     Constant160 & PgClassExpression325 --> List571
     Constant179 & PgClassExpression325 --> List577
     Constant198 & PgClassExpression325 --> List583
@@ -507,7 +507,7 @@ graph TD
     List607 -->|"trapError;trapInhibited"| __DataOnly603
     List613 -->|"trapError;trapInhibited"| __DataOnly603
     List619 -->|"trapError;trapInhibited"| __DataOnly603
-    List625 --> __DataOnly603
+    List625 -->|"trapError;trapInhibited"| __DataOnly603
     Constant160 & PgClassExpression329 --> List601
     Constant179 & PgClassExpression329 --> List607
     Constant198 & PgClassExpression329 --> List613
@@ -575,7 +575,7 @@ graph TD
     List637 -->|"trapError;trapInhibited"| __DataOnly633
     List643 -->|"trapError;trapInhibited"| __DataOnly633
     List649 -->|"trapError;trapInhibited"| __DataOnly633
-    List655 --> __DataOnly633
+    List655 -->|"trapError;trapInhibited"| __DataOnly633
     PgSelect338[["PgSelect[338∈20]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic"]]:::plan
     Object11 & PgClassExpression333 --> PgSelect338
     PgSelect351[["PgSelect[351∈20]<br />ᐸrelational_postsᐳ<br />ᐳRelationalPost"]]:::plan
@@ -643,7 +643,7 @@ graph TD
     List667 -->|"trapError;trapInhibited"| __DataOnly663
     List673 -->|"trapError;trapInhibited"| __DataOnly663
     List679 -->|"trapError;trapInhibited"| __DataOnly663
-    List685 --> __DataOnly663
+    List685 -->|"trapError;trapInhibited"| __DataOnly663
     PgSelect407[["PgSelect[407∈21]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic"]]:::plan
     Object11 & PgClassExpression402 --> PgSelect407
     PgSelect420[["PgSelect[420∈21]<br />ᐸrelational_postsᐳ<br />ᐳRelationalPost"]]:::plan

@@ -14,9 +14,9 @@ graph TD
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 18, 12, 27, 26, 36<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[18]<br />1: <br />ᐳ: 19, 20<br />2: PgUnionAll[28]<br />ᐳ: Access[74]"):::bucket
     Bucket4("Bucket 4 (listItem)<br />Deps: 28, 36, 12<br /><br />ROOT __Item{4}ᐸ74ᐳ[30]"):::bucket
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 30, 32, 36, 12<br /><br />ROOT __Item{4}ᐸ74ᐳ[30]"):::bucket
-    Bucket6("Bucket 6 (polymorphic)<br />Deps: 12, 40, 39<br /><br />1: PgSelect[42], PgSelect[56]<br />2: PgSelectRows[51], PgSelectRows[65]<br />ᐳ: 50, 53, 64, 67, 68, 69, 70, 71, 72, 73"):::bucket
-    Bucket7("Bucket 7 (polymorphicPartition)<br />AwsApplication<br />Deps: 68, 69, 70<br />ᐳAwsApplication"):::bucket
-    Bucket8("Bucket 8 (polymorphicPartition)<br />GcpApplication<br />Deps: 71, 72, 73<br />ᐳGcpApplication"):::bucket
+    Bucket6("Bucket 6 (polymorphic)<br />__typename: Access[39]<br />Deps: 12, 40, 39<br /><br />1: PgSelect[42], PgSelect[56]<br />2: PgSelectRows[51], PgSelectRows[65]<br />ᐳ: 50, 53, 64, 67, 68, 69, 70, 71, 72, 73"):::bucket
+    Bucket7("Bucket 7 (polymorphicPartition)<br />|AwsApplication<br />Deps: 68, 69, 70<br />ᐳAwsApplication"):::bucket
+    Bucket8("Bucket 8 (polymorphicPartition)<br />|GcpApplication<br />Deps: 71, 72, 73<br />ᐳGcpApplication"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2

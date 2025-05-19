@@ -14,7 +14,7 @@ graph TD
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 10, 24<br /><br />ROOT Connectionᐸ22ᐳ[24]<br />1: PgSelect[44]<br />2: PgSelectRows[45]"):::bucket
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 33<br /><br />ROOT PgSelectSingle{1}ᐸbuildingᐳ[33]"):::bucket
     Bucket5("Bucket 5 (listItem)<br />Deps: 10<br /><br />ROOT __Item{5}ᐸ45ᐳ[49]"):::bucket
-    Bucket6("Bucket 6 (polymorphic)<br />Deps: 10, 52, 55, 84, 54<br /><br />1: PgSelect[57], PgSelect[70]<br />2: PgSelectRows[66], PgSelectRows[79]<br />ᐳ: 65, 68, 78, 81, 86, 89"):::bucket
+    Bucket6("Bucket 6 (polymorphic)<br />__typename: Lambda[55]<br />Deps: 10, 52, 55, 84, 54<br /><br />1: PgSelect[57], PgSelect[70]<br />2: PgSelectRows[66], PgSelectRows[79]<br />ᐳ: 65, 68, 78, 81, 86, 89"):::bucket
     Bucket7("Bucket 7 (listItem)<br /><br />ROOT __Item{7}ᐸ51ᐳ[82]"):::bucket
     Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 83<br /><br />ROOT PgSelectSingle{7}ᐸmachineᐳ[83]"):::bucket
     end

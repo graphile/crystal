@@ -44,8 +44,8 @@ graph TD
     Constant21{{"Constant[21∈0] ➊<br />ᐸ'left_arms'ᐳ"}}:::plan
     Constant36{{"Constant[36∈0] ➊<br />ᐸ'people'ᐳ"}}:::plan
     PgUpdateSingle15[["PgUpdateSingle[15∈1] ➊<br />ᐸleft_arm(id;)ᐳ"]]:::sideeffectplan
-    Object18 -->|rejectNull| PgUpdateSingle15
-    Access13 & ApplyInput19 --> PgUpdateSingle15
+    Access13 -->|rejectNull| PgUpdateSingle15
+    Object18 & ApplyInput19 --> PgUpdateSingle15
     Object20{{"Object[20∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgUpdateSingle15 --> Object20
     List24{{"List[24∈3] ➊<br />ᐸ21,22ᐳ"}}:::plan

@@ -9,18 +9,18 @@ graph TD
 
     subgraph "Buckets for queries/unions-table/by-id-18"
     Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 87, 190, 10<br />2: PgSelect[7], PgUnionAll[20]<br />ᐳ: 189, 22, 85, 86, 88, 89, 90, 91<br />3: PgSelectRows[12]<br />ᐳ: 11, 13, 14, 16, 17"):::bucket
-    Bucket1("Bucket 1 (polymorphic)<br />Deps: 10, 17, 16<br /><br />1: 25, 37, 49, 61, 73<br />2: 34, 46, 58, 70, 82<br />ᐳ: 33, 36, 45, 48, 57, 60, 69, 72, 81, 84, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174"):::bucket
-    Bucket2("Bucket 2 (polymorphic)<br />Deps: 10, 91, 90<br /><br />1: 93, 107, 121, 135, 149<br />2: 102, 116, 130, 144, 158<br />ᐳ: 101, 104, 115, 118, 129, 132, 143, 146, 157, 160, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188"):::bucket
-    Bucket3("Bucket 3 (polymorphicPartition)<br />UnionTopic<br />Deps: 161, 162<br />ᐳUnionTopic"):::bucket
-    Bucket4("Bucket 4 (polymorphicPartition)<br />UnionPost<br />Deps: 163, 164, 165, 166<br />ᐳUnionPost"):::bucket
-    Bucket5("Bucket 5 (polymorphicPartition)<br />UnionDivider<br />Deps: 167, 168<br />ᐳUnionDivider"):::bucket
-    Bucket6("Bucket 6 (polymorphicPartition)<br />UnionChecklist<br />Deps: 170, 171<br />ᐳUnionChecklist"):::bucket
-    Bucket7("Bucket 7 (polymorphicPartition)<br />UnionChecklistItem<br />Deps: 172, 173, 174<br />ᐳUnionChecklistItem"):::bucket
-    Bucket8("Bucket 8 (polymorphicPartition)<br />UnionTopic<br />Deps: 175, 176<br />ᐳUnionTopic"):::bucket
-    Bucket9("Bucket 9 (polymorphicPartition)<br />UnionPost<br />Deps: 177, 178, 179, 180<br />ᐳUnionPost"):::bucket
-    Bucket10("Bucket 10 (polymorphicPartition)<br />UnionDivider<br />Deps: 181, 182<br />ᐳUnionDivider"):::bucket
-    Bucket11("Bucket 11 (polymorphicPartition)<br />UnionChecklist<br />Deps: 184, 185<br />ᐳUnionChecklist"):::bucket
-    Bucket12("Bucket 12 (polymorphicPartition)<br />UnionChecklistItem<br />Deps: 186, 187, 188<br />ᐳUnionChecklistItem"):::bucket
+    Bucket1("Bucket 1 (polymorphic)<br />__typename: Lambda[16]<br />Deps: 10, 17, 16<br /><br />1: 25, 37, 49, 61, 73<br />2: 34, 46, 58, 70, 82<br />ᐳ: 33, 36, 45, 48, 57, 60, 69, 72, 81, 84, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174"):::bucket
+    Bucket2("Bucket 2 (polymorphic)<br />__typename: Access[90]<br />Deps: 10, 91, 90<br /><br />1: 93, 107, 121, 135, 149<br />2: 102, 116, 130, 144, 158<br />ᐳ: 101, 104, 115, 118, 129, 132, 143, 146, 157, 160, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188"):::bucket
+    Bucket3("Bucket 3 (polymorphicPartition)<br />|UnionTopic<br />Deps: 161, 162<br />ᐳUnionTopic"):::bucket
+    Bucket4("Bucket 4 (polymorphicPartition)<br />|UnionPost<br />Deps: 163, 164, 165, 166<br />ᐳUnionPost"):::bucket
+    Bucket5("Bucket 5 (polymorphicPartition)<br />|UnionDivider<br />Deps: 167, 168<br />ᐳUnionDivider"):::bucket
+    Bucket6("Bucket 6 (polymorphicPartition)<br />|UnionChecklist<br />Deps: 170, 171<br />ᐳUnionChecklist"):::bucket
+    Bucket7("Bucket 7 (polymorphicPartition)<br />|UnionChecklistItem<br />Deps: 172, 173, 174<br />ᐳUnionChecklistItem"):::bucket
+    Bucket8("Bucket 8 (polymorphicPartition)<br />|UnionTopic<br />Deps: 175, 176<br />ᐳUnionTopic"):::bucket
+    Bucket9("Bucket 9 (polymorphicPartition)<br />|UnionPost<br />Deps: 177, 178, 179, 180<br />ᐳUnionPost"):::bucket
+    Bucket10("Bucket 10 (polymorphicPartition)<br />|UnionDivider<br />Deps: 181, 182<br />ᐳUnionDivider"):::bucket
+    Bucket11("Bucket 11 (polymorphicPartition)<br />|UnionChecklist<br />Deps: 184, 185<br />ᐳUnionChecklist"):::bucket
+    Bucket12("Bucket 12 (polymorphicPartition)<br />|UnionChecklistItem<br />Deps: 186, 187, 188<br />ᐳUnionChecklistItem"):::bucket
     end
     Bucket0 --> Bucket1 & Bucket2
     Bucket1 --> Bucket3 & Bucket4 & Bucket5 & Bucket6 & Bucket7
@@ -53,7 +53,7 @@ graph TD
     PgClassExpression14{{"PgClassExpression[14∈0] ➊<br />ᐸ__union_items__.”type”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression14
     Lambda16{{"Lambda[16∈0] ➊<br />ᐸunionItemTypeNameFromTypeᐳ"}}:::plan
-    PgClassExpression14 --> Lambda16
+    PgClassExpression14 -->|rejectNull| Lambda16
     PgClassExpression17{{"PgClassExpression[17∈0] ➊<br />ᐸ__union_items__.”id”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression17
     First22{{"First[22∈0] ➊"}}:::plan

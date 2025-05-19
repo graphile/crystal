@@ -12,9 +12,9 @@ graph TD
     Bucket1("Bucket 1 (listItem)<br />Deps: 10, 6<br /><br />ROOT __Item{1}ᐸ11ᐳ[12]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 13, 10, 6<br /><br />ROOT PgSelectSingle{1}ᐸpeopleᐳ[13]<br />1: <br />ᐳ: 14, 15<br />2: PgSelect[16]<br />3: PgSelectRows[20]"):::bucket
     Bucket3("Bucket 3 (listItem)<br />Deps: 10<br /><br />ROOT __Item{3}ᐸ20ᐳ[21]<br />1: <br />ᐳ: 22, 23, 25, 26, 27, 42, 43, 52, 53, 54, 55, 56<br />2: PgSelect[28], PgSelect[44]<br />3: PgSelectRows[37], PgSelectRows[49]<br />ᐳ: 36, 39, 48, 51, 178, 179, 188, 189, 202, 203, 204, 205, 206<br />4: PgSelect[190]<br />5: PgSelectRows[199]<br />ᐳ: First[198], PgSelectSingle[201]"):::bucket
-    Bucket4("Bucket 4 (polymorphic)<br />Deps: 26, 51, 179, 201, 22, 23, 25, 42, 52, 53, 54, 55, 56, 39, 27, 178, 188, 202, 203, 204, 205, 206"):::bucket
+    Bucket4("Bucket 4 (polymorphic)<br />__typename: Lambda[26]<br />Deps: 26, 51, 179, 201, 22, 23, 25, 42, 52, 53, 54, 55, 56, 39, 27, 178, 188, 202, 203, 204, 205, 206"):::bucket
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 51<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[51]"):::bucket
-    Bucket6("Bucket 6 (polymorphic)<br />Deps: 179, 201, 39, 27, 178, 188, 202, 203, 204, 205, 206"):::bucket
+    Bucket6("Bucket 6 (polymorphic)<br />__typename: Lambda[179]<br />Deps: 179, 201, 39, 27, 178, 188, 202, 203, 204, 205, 206"):::bucket
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 201<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[201]"):::bucket
     end
     Bucket0 --> Bucket1
@@ -119,7 +119,7 @@ graph TD
     PgSelectSingle39 --> PgClassExpression206
     PgClassExpression181{{"PgClassExpression[181∈5]<br />ᐸ__people__.”username”ᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"}}:::plan
     PgSelectSingle51 --> PgClassExpression181
-    PgClassExpression711{{"PgClassExpression[711∈7]<br />ᐸ__people__.”username”ᐳ<br />ᐳSingleTableTopicᐳSingleTableTopic<br />ᐳSingleTableTopicᐳSingleTablePost<br />ᐳSingleTableTopicᐳSingleTableDivider<br />ᐳSingleTableTopicᐳSingleTableChecklist<br />ᐳSingleTableTopicᐳSingleTableChecklistItem<br />ᐳSingleTablePostᐳSingleTableTopic<br />ᐳSingleTablePostᐳSingleTablePost<br />ᐳSingleTablePostᐳSingleTableDivider<br />ᐳSingleTablePostᐳSingleTableChecklist<br />ᐳSingleTablePostᐳSingleTableChecklistItem<br />ᐳSingleTableDividerᐳSingleTableTopic<br />ᐳSingleTableDividerᐳSingleTablePost<br />ᐳSingleTableDividerᐳSingleTableDivider<br />ᐳSingleTableDividerᐳSingleTableChecklist<br />ᐳSingleTableDividerᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistᐳSingleTableTopic<br />ᐳSingleTableChecklistᐳSingleTablePost<br />ᐳSingleTableChecklistᐳSingleTableDivider<br />ᐳSingleTableChecklistᐳSingleTableChecklist<br />ᐳSingleTableChecklistᐳSingleTableChecklistItem<br />ᐳSingleTableChecklistItemᐳSingleTableTopic<br />ᐳSingleTableChecklistItemᐳSingleTablePost<br />ᐳSingleTableChecklistItemᐳSingleTableDivider<br />ᐳSingleTableChecklistItemᐳSingleTableChecklist<br />ᐳSingleTableChecklistItemᐳSingleTableChecklistItem"}}:::plan
+    PgClassExpression711{{"PgClassExpression[711∈7]<br />ᐸ__people__.”username”ᐳ<br />(5) ...ᐳSingleTableTopic<br />(5) ...ᐳSingleTablePost<br />(5) ...ᐳSingleTableDivider<br />(5) ...ᐳSingleTableChecklist<br />(5) ...ᐳSingleTableChecklistItem"}}:::plan
     PgSelectSingle201 --> PgClassExpression711
 
     %% define steps

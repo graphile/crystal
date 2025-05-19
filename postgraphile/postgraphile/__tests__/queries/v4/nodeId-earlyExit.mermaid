@@ -34,15 +34,15 @@ graph TD
     Access15 & Access16 --> Object17
     PgSelect25[["PgSelect[25∈0] ➊<br />ᐸpersonᐳ"]]:::plan
     Access23{{"Access[23∈0] ➊<br />ᐸ22.1ᐳ"}}:::plan
-    Object17 -->|rejectNull| PgSelect25
-    Access23 --> PgSelect25
+    Access23 -->|rejectNull| PgSelect25
+    Object17 --> PgSelect25
     __InputObject30{{"__InputObject[30∈0] ➊"}}:::plan
     Constant69{{"Constant[69∈0] ➊<br />ᐸ'Is that a cooking show?'ᐳ"}}:::plan
     Constant69 --> __InputObject30
     PgSelect42[["PgSelect[42∈0] ➊<br />ᐸpersonᐳ"]]:::plan
     Access40{{"Access[40∈0] ➊<br />ᐸ39.1ᐳ"}}:::plan
-    Object17 -->|rejectNull| PgSelect42
-    Access40 --> PgSelect42
+    Access40 -->|rejectNull| PgSelect42
+    Object17 --> PgSelect42
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access15
     __Value2 --> Access16

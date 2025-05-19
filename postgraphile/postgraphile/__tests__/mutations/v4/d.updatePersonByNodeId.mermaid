@@ -43,8 +43,8 @@ graph TD
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Constant25{{"Constant[25∈0] ➊<br />ᐸ'people'ᐳ"}}:::plan
     PgUpdateSingle17[["PgUpdateSingle[17∈1] ➊<br />ᐸperson(id;)ᐳ"]]:::sideeffectplan
-    Object20 -->|rejectNull| PgUpdateSingle17
-    Access15 & ApplyInput21 --> PgUpdateSingle17
+    Access15 -->|rejectNull| PgUpdateSingle17
+    Object20 & ApplyInput21 --> PgUpdateSingle17
     Object22{{"Object[22∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgUpdateSingle17 --> Object22
     List27{{"List[27∈3] ➊<br />ᐸ25,23ᐳ"}}:::plan

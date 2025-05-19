@@ -57,13 +57,13 @@ graph TD
     PgSelect30[["PgSelect[30∈0] ➊<br />ᐸpersonᐳ"]]:::plan
     Access28{{"Access[28∈0] ➊<br />ᐸ27.1ᐳ"}}:::plan
     PgSelectInlineApply227["PgSelectInlineApply[227∈0] ➊"]:::plan
-    Object10 -->|rejectNull| PgSelect30
-    Access28 & PgSelectInlineApply227 --> PgSelect30
+    Access28 -->|rejectNull| PgSelect30
+    Object10 & PgSelectInlineApply227 --> PgSelect30
     PgSelect39[["PgSelect[39∈0] ➊<br />ᐸpersonᐳ"]]:::plan
     Access37{{"Access[37∈0] ➊<br />ᐸ36.1ᐳ"}}:::plan
     PgSelectInlineApply231["PgSelectInlineApply[231∈0] ➊"]:::plan
-    Object10 -->|rejectNull| PgSelect39
-    Access37 & PgSelectInlineApply231 --> PgSelect39
+    Access37 -->|rejectNull| PgSelect39
+    Object10 & PgSelectInlineApply231 --> PgSelect39
     PgSelect56[["PgSelect[56∈0] ➊<br />ᐸpersonᐳ"]]:::plan
     Constant248{{"Constant[248∈0] ➊<br />ᐸ2ᐳ"}}:::plan
     PgSelectInlineApply235["PgSelectInlineApply[235∈0] ➊"]:::plan

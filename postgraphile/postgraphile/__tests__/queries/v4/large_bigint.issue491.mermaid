@@ -26,12 +26,12 @@ graph TD
     Access9 & Access10 --> Object11
     PgSelect18[["PgSelect[18∈0] ➊<br />ᐸlarge_node_idᐳ"]]:::plan
     Access16{{"Access[16∈0] ➊<br />ᐸ15.1ᐳ"}}:::plan
-    Object11 -->|rejectNull| PgSelect18
-    Access16 --> PgSelect18
+    Access16 -->|rejectNull| PgSelect18
+    Object11 --> PgSelect18
     PgSelect27[["PgSelect[27∈0] ➊<br />ᐸlarge_node_idᐳ"]]:::plan
     Access25{{"Access[25∈0] ➊<br />ᐸ24.1ᐳ"}}:::plan
-    Object11 -->|rejectNull| PgSelect27
-    Access25 --> PgSelect27
+    Access25 -->|rejectNull| PgSelect27
+    Object11 --> PgSelect27
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10

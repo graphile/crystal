@@ -69,9 +69,9 @@ graph TD
     PgSelect27[["PgSelect[27∈0] ➊<br />ᐸhousesᐳ"]]:::plan
     Access23{{"Access[23∈0] ➊<br />ᐸ22.1ᐳ"}}:::plan
     Access25{{"Access[25∈0] ➊<br />ᐸ22.2ᐳ"}}:::plan
-    Object11 -->|rejectNull| PgSelect27
     Access23 -->|rejectNull| PgSelect27
-    Access25 --> PgSelect27
+    Access25 -->|rejectNull| PgSelect27
+    Object11 --> PgSelect27
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11

@@ -10,9 +10,9 @@ graph TD
     subgraph "Buckets for queries/interfaces-via-union-all/vulnerabilities"
     Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 9, 10, 12, 18, 59, 60, 11<br />2: PgUnionAll[8]<br />ᐳ: Access[58]"):::bucket
     Bucket1("Bucket 1 (listItem)<br />Deps: 18, 11<br /><br />ROOT __Item{1}ᐸ58ᐳ[14]"):::bucket
-    Bucket2("Bucket 2 (polymorphic)<br />Deps: 11, 22, 21<br /><br />1: PgSelect[24], PgSelect[38]<br />2: PgSelectRows[33], PgSelectRows[47]<br />ᐳ: 32, 35, 46, 49, 50, 51, 52, 53, 54, 55, 56, 57"):::bucket
-    Bucket3("Bucket 3 (polymorphicPartition)<br />FirstPartyVulnerability<br />Deps: 50, 51, 52<br />ᐳFirstPartyVulnerability"):::bucket
-    Bucket4("Bucket 4 (polymorphicPartition)<br />ThirdPartyVulnerability<br />Deps: 54, 55, 56<br />ᐳThirdPartyVulnerability"):::bucket
+    Bucket2("Bucket 2 (polymorphic)<br />__typename: Access[21]<br />Deps: 11, 22, 21<br /><br />1: PgSelect[24], PgSelect[38]<br />2: PgSelectRows[33], PgSelectRows[47]<br />ᐳ: 32, 35, 46, 49, 50, 51, 52, 53, 54, 55, 56, 57"):::bucket
+    Bucket3("Bucket 3 (polymorphicPartition)<br />|FirstPartyVulnerability<br />Deps: 50, 51, 52<br />ᐳFirstPartyVulnerability"):::bucket
+    Bucket4("Bucket 4 (polymorphicPartition)<br />|ThirdPartyVulnerability<br />Deps: 54, 55, 56<br />ᐳThirdPartyVulnerability"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2

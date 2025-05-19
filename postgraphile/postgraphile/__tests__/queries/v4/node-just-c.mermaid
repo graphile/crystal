@@ -9,27 +9,27 @@ graph TD
 
     subgraph "Buckets for queries/v4/node-just-c"
     Bucket0("Bucket 0 (root)"):::bucket
-    Bucket1("Bucket 1 (polymorphic)<br />Deps: 2, 338, 341, 346, 351, 356, 361, 366, 371, 377, 382, 387, 392, 397, 402, 407, 412, 417, 422, 427, 432, 7, 8, 4<br /><br />1: 17, 19, 339, 437, 438<br />ᐳ: Object[21]<br />2: 16, 33, 50, 67, 84, 101, 121, 139, 156, 173, 190, 207, 224, 241, 258, 275, 292, 309, 326<br />3: 25, 42, 59, 76, 93, 110, 131, 148, 165, 182, 199, 216, 233, 250, 267, 284, 301, 318, 335<br />ᐳ: 24, 27, 41, 44, 58, 61, 75, 78, 92, 95, 109, 112, 130, 133, 147, 150, 164, 167, 181, 184, 198, 201, 215, 218, 232, 235, 249, 252, 266, 269, 283, 286, 300, 303, 317, 320, 334, 337, 342, 343, 344, 347, 348, 349, 352, 353, 354, 357, 358, 359, 362, 363, 364, 367, 368, 369, 372, 373, 374, 375, 378, 379, 380, 383, 384, 385, 388, 389, 390, 393, 394, 395, 398, 399, 400, 403, 404, 405, 408, 409, 410, 413, 414, 415, 418, 419, 420, 423, 424, 425, 428, 429, 430, 433, 434, 435"):::bucket
-    Bucket2("Bucket 2 (polymorphicPartition)<br />Query<br />Deps: 339<br />ᐳQuery"):::bucket
-    Bucket3("Bucket 3 (polymorphicPartition)<br />Input<br />Deps: 344<br />ᐳInput"):::bucket
-    Bucket4("Bucket 4 (polymorphicPartition)<br />Patch<br />Deps: 349<br />ᐳPatch"):::bucket
-    Bucket5("Bucket 5 (polymorphicPartition)<br />Reserved<br />Deps: 354<br />ᐳReserved"):::bucket
-    Bucket6("Bucket 6 (polymorphicPartition)<br />ReservedPatchRecord<br />Deps: 359<br />ᐳReservedPatchRecord"):::bucket
-    Bucket7("Bucket 7 (polymorphicPartition)<br />ReservedInputRecord<br />Deps: 364<br />ᐳReservedInputRecord"):::bucket
-    Bucket8("Bucket 8 (polymorphicPartition)<br />DefaultValue<br />Deps: 369<br />ᐳDefaultValue"):::bucket
-    Bucket9("Bucket 9 (polymorphicPartition)<br />CompoundKey<br />Deps: 375<br />ᐳCompoundKey"):::bucket
-    Bucket10("Bucket 10 (polymorphicPartition)<br />Person<br />Deps: 380<br />ᐳPerson"):::bucket
-    Bucket11("Bucket 11 (polymorphicPartition)<br />Post<br />Deps: 385<br />ᐳPost"):::bucket
-    Bucket12("Bucket 12 (polymorphicPartition)<br />Type<br />Deps: 390<br />ᐳType"):::bucket
-    Bucket13("Bucket 13 (polymorphicPartition)<br />PersonSecret<br />Deps: 395<br />ᐳPersonSecret"):::bucket
-    Bucket14("Bucket 14 (polymorphicPartition)<br />LeftArm<br />Deps: 400<br />ᐳLeftArm"):::bucket
-    Bucket15("Bucket 15 (polymorphicPartition)<br />MyTable<br />Deps: 405<br />ᐳMyTable"):::bucket
-    Bucket16("Bucket 16 (polymorphicPartition)<br />ViewTable<br />Deps: 410<br />ᐳViewTable"):::bucket
-    Bucket17("Bucket 17 (polymorphicPartition)<br />SimilarTable1<br />Deps: 415<br />ᐳSimilarTable1"):::bucket
-    Bucket18("Bucket 18 (polymorphicPartition)<br />SimilarTable2<br />Deps: 420<br />ᐳSimilarTable2"):::bucket
-    Bucket19("Bucket 19 (polymorphicPartition)<br />NullTestRecord<br />Deps: 425<br />ᐳNullTestRecord"):::bucket
-    Bucket20("Bucket 20 (polymorphicPartition)<br />Issue756<br />Deps: 430<br />ᐳIssue756"):::bucket
-    Bucket21("Bucket 21 (polymorphicPartition)<br />List<br />Deps: 435<br />ᐳList"):::bucket
+    Bucket1("Bucket 1 (polymorphic)<br />__typename: Lambda[8]<br />Deps: 2, 338, 341, 346, 351, 356, 361, 366, 371, 377, 382, 387, 392, 397, 402, 407, 412, 417, 422, 427, 432, 7, 8, 4<br /><br />1: 17, 19, 339, 437, 438<br />ᐳ: Object[21]<br />2: 16, 33, 50, 67, 84, 101, 121, 139, 156, 173, 190, 207, 224, 241, 258, 275, 292, 309, 326<br />3: 25, 42, 59, 76, 93, 110, 131, 148, 165, 182, 199, 216, 233, 250, 267, 284, 301, 318, 335<br />ᐳ: 24, 27, 41, 44, 58, 61, 75, 78, 92, 95, 109, 112, 130, 133, 147, 150, 164, 167, 181, 184, 198, 201, 215, 218, 232, 235, 249, 252, 266, 269, 283, 286, 300, 303, 317, 320, 334, 337, 342, 343, 344, 347, 348, 349, 352, 353, 354, 357, 358, 359, 362, 363, 364, 367, 368, 369, 372, 373, 374, 375, 378, 379, 380, 383, 384, 385, 388, 389, 390, 393, 394, 395, 398, 399, 400, 403, 404, 405, 408, 409, 410, 413, 414, 415, 418, 419, 420, 423, 424, 425, 428, 429, 430, 433, 434, 435"):::bucket
+    Bucket2("Bucket 2 (polymorphicPartition)<br />|Query<br />Deps: 339<br />ᐳQuery"):::bucket
+    Bucket3("Bucket 3 (polymorphicPartition)<br />|Input<br />Deps: 344<br />ᐳInput"):::bucket
+    Bucket4("Bucket 4 (polymorphicPartition)<br />|Patch<br />Deps: 349<br />ᐳPatch"):::bucket
+    Bucket5("Bucket 5 (polymorphicPartition)<br />|Reserved<br />Deps: 354<br />ᐳReserved"):::bucket
+    Bucket6("Bucket 6 (polymorphicPartition)<br />|ReservedPatchRecord<br />Deps: 359<br />ᐳReservedPatchRecord"):::bucket
+    Bucket7("Bucket 7 (polymorphicPartition)<br />|ReservedInputRecord<br />Deps: 364<br />ᐳReservedInputRecord"):::bucket
+    Bucket8("Bucket 8 (polymorphicPartition)<br />|DefaultValue<br />Deps: 369<br />ᐳDefaultValue"):::bucket
+    Bucket9("Bucket 9 (polymorphicPartition)<br />|CompoundKey<br />Deps: 375<br />ᐳCompoundKey"):::bucket
+    Bucket10("Bucket 10 (polymorphicPartition)<br />|Person<br />Deps: 380<br />ᐳPerson"):::bucket
+    Bucket11("Bucket 11 (polymorphicPartition)<br />|Post<br />Deps: 385<br />ᐳPost"):::bucket
+    Bucket12("Bucket 12 (polymorphicPartition)<br />|Type<br />Deps: 390<br />ᐳType"):::bucket
+    Bucket13("Bucket 13 (polymorphicPartition)<br />|PersonSecret<br />Deps: 395<br />ᐳPersonSecret"):::bucket
+    Bucket14("Bucket 14 (polymorphicPartition)<br />|LeftArm<br />Deps: 400<br />ᐳLeftArm"):::bucket
+    Bucket15("Bucket 15 (polymorphicPartition)<br />|MyTable<br />Deps: 405<br />ᐳMyTable"):::bucket
+    Bucket16("Bucket 16 (polymorphicPartition)<br />|ViewTable<br />Deps: 410<br />ᐳViewTable"):::bucket
+    Bucket17("Bucket 17 (polymorphicPartition)<br />|SimilarTable1<br />Deps: 415<br />ᐳSimilarTable1"):::bucket
+    Bucket18("Bucket 18 (polymorphicPartition)<br />|SimilarTable2<br />Deps: 420<br />ᐳSimilarTable2"):::bucket
+    Bucket19("Bucket 19 (polymorphicPartition)<br />|NullTestRecord<br />Deps: 425<br />ᐳNullTestRecord"):::bucket
+    Bucket20("Bucket 20 (polymorphicPartition)<br />|Issue756<br />Deps: 430<br />ᐳIssue756"):::bucket
+    Bucket21("Bucket 21 (polymorphicPartition)<br />|List<br />Deps: 435<br />ᐳList"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2 & Bucket3 & Bucket4 & Bucket5 & Bucket6 & Bucket7 & Bucket8 & Bucket9 & Bucket10 & Bucket11 & Bucket12 & Bucket13 & Bucket14 & Bucket15 & Bucket16 & Bucket17 & Bucket18 & Bucket19 & Bucket20 & Bucket21
@@ -66,70 +66,70 @@ graph TD
     Object21{{"Object[21∈1] ➊^<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access437{{"Access[437∈1] ➊<br />ᐸ7.base64JSON.1ᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756<br />ᐳList"}}:::plan
     Access438{{"Access[438∈1] ➊<br />ᐸ7.base64JSON.2ᐳ<br />ᐳCompoundKey"}}:::plan
-    Object21 -->|rejectNull| PgSelect121
     Access437 -->|rejectNull| PgSelect121
-    Access438 --> PgSelect121
+    Access438 -->|rejectNull| PgSelect121
+    Object21 --> PgSelect121
     List374{{"List[374∈1] ➊^<br />ᐸ371,372,373ᐳ"}}:::plan
     PgClassExpression372{{"PgClassExpression[372∈1] ➊^<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
     PgClassExpression373{{"PgClassExpression[373∈1] ➊^<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
     Constant371 & PgClassExpression372 & PgClassExpression373 --> List374
     PgSelect16[["PgSelect[16∈1] ➊<br />ᐸinputsᐳ<br />ᐳInput"]]:::plan
-    Object21 -->|rejectNull| PgSelect16
-    Access437 --> PgSelect16
+    Access437 -->|rejectNull| PgSelect16
+    Object21 --> PgSelect16
     Access17{{"Access[17∈1] ➊<br />ᐸ2.pgSettingsᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756<br />ᐳList"}}:::plan
     Access19{{"Access[19∈1] ➊<br />ᐸ2.withPgClientᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756<br />ᐳList"}}:::plan
     Access17 & Access19 --> Object21
     PgSelect33[["PgSelect[33∈1] ➊<br />ᐸpatchsᐳ<br />ᐳPatch"]]:::plan
-    Object21 -->|rejectNull| PgSelect33
-    Access437 --> PgSelect33
+    Access437 -->|rejectNull| PgSelect33
+    Object21 --> PgSelect33
     PgSelect50[["PgSelect[50∈1] ➊<br />ᐸreservedᐳ<br />ᐳReserved"]]:::plan
-    Object21 -->|rejectNull| PgSelect50
-    Access437 --> PgSelect50
+    Access437 -->|rejectNull| PgSelect50
+    Object21 --> PgSelect50
     PgSelect67[["PgSelect[67∈1] ➊<br />ᐸreservedPatchsᐳ<br />ᐳReservedPatchRecord"]]:::plan
-    Object21 -->|rejectNull| PgSelect67
-    Access437 --> PgSelect67
+    Access437 -->|rejectNull| PgSelect67
+    Object21 --> PgSelect67
     PgSelect84[["PgSelect[84∈1] ➊<br />ᐸreserved_inputᐳ<br />ᐳReservedInputRecord"]]:::plan
-    Object21 -->|rejectNull| PgSelect84
-    Access437 --> PgSelect84
+    Access437 -->|rejectNull| PgSelect84
+    Object21 --> PgSelect84
     PgSelect101[["PgSelect[101∈1] ➊<br />ᐸdefault_valueᐳ<br />ᐳDefaultValue"]]:::plan
-    Object21 -->|rejectNull| PgSelect101
-    Access437 --> PgSelect101
+    Access437 -->|rejectNull| PgSelect101
+    Object21 --> PgSelect101
     PgSelect139[["PgSelect[139∈1] ➊<br />ᐸpersonᐳ<br />ᐳPerson"]]:::plan
-    Object21 -->|rejectNull| PgSelect139
-    Access437 --> PgSelect139
+    Access437 -->|rejectNull| PgSelect139
+    Object21 --> PgSelect139
     PgSelect156[["PgSelect[156∈1] ➊<br />ᐸpostᐳ<br />ᐳPost"]]:::plan
-    Object21 -->|rejectNull| PgSelect156
-    Access437 --> PgSelect156
+    Access437 -->|rejectNull| PgSelect156
+    Object21 --> PgSelect156
     PgSelect173[["PgSelect[173∈1] ➊<br />ᐸtypesᐳ<br />ᐳType"]]:::plan
-    Object21 -->|rejectNull| PgSelect173
-    Access437 --> PgSelect173
+    Access437 -->|rejectNull| PgSelect173
+    Object21 --> PgSelect173
     PgSelect190[["PgSelect[190∈1] ➊<br />ᐸperson_secretᐳ<br />ᐳPersonSecret"]]:::plan
-    Object21 -->|rejectNull| PgSelect190
-    Access437 --> PgSelect190
+    Access437 -->|rejectNull| PgSelect190
+    Object21 --> PgSelect190
     PgSelect207[["PgSelect[207∈1] ➊<br />ᐸleft_armᐳ<br />ᐳLeftArm"]]:::plan
-    Object21 -->|rejectNull| PgSelect207
-    Access437 --> PgSelect207
+    Access437 -->|rejectNull| PgSelect207
+    Object21 --> PgSelect207
     PgSelect224[["PgSelect[224∈1] ➊<br />ᐸmy_tableᐳ<br />ᐳMyTable"]]:::plan
-    Object21 -->|rejectNull| PgSelect224
-    Access437 --> PgSelect224
+    Access437 -->|rejectNull| PgSelect224
+    Object21 --> PgSelect224
     PgSelect241[["PgSelect[241∈1] ➊<br />ᐸview_tableᐳ<br />ᐳViewTable"]]:::plan
-    Object21 -->|rejectNull| PgSelect241
-    Access437 --> PgSelect241
+    Access437 -->|rejectNull| PgSelect241
+    Object21 --> PgSelect241
     PgSelect258[["PgSelect[258∈1] ➊<br />ᐸsimilar_table_1ᐳ<br />ᐳSimilarTable1"]]:::plan
-    Object21 -->|rejectNull| PgSelect258
-    Access437 --> PgSelect258
+    Access437 -->|rejectNull| PgSelect258
+    Object21 --> PgSelect258
     PgSelect275[["PgSelect[275∈1] ➊<br />ᐸsimilar_table_2ᐳ<br />ᐳSimilarTable2"]]:::plan
-    Object21 -->|rejectNull| PgSelect275
-    Access437 --> PgSelect275
+    Access437 -->|rejectNull| PgSelect275
+    Object21 --> PgSelect275
     PgSelect292[["PgSelect[292∈1] ➊<br />ᐸnull_test_recordᐳ<br />ᐳNullTestRecord"]]:::plan
-    Object21 -->|rejectNull| PgSelect292
-    Access437 --> PgSelect292
+    Access437 -->|rejectNull| PgSelect292
+    Object21 --> PgSelect292
     PgSelect309[["PgSelect[309∈1] ➊<br />ᐸissue756ᐳ<br />ᐳIssue756"]]:::plan
-    Object21 -->|rejectNull| PgSelect309
-    Access437 --> PgSelect309
+    Access437 -->|rejectNull| PgSelect309
+    Object21 --> PgSelect309
     PgSelect326[["PgSelect[326∈1] ➊<br />ᐸlistsᐳ<br />ᐳList"]]:::plan
-    Object21 -->|rejectNull| PgSelect326
-    Access437 --> PgSelect326
+    Access437 -->|rejectNull| PgSelect326
+    Object21 --> PgSelect326
     List343{{"List[343∈1] ➊^<br />ᐸ341,342ᐳ"}}:::plan
     PgClassExpression342{{"PgClassExpression[342∈1] ➊^<br />ᐸ__inputs__.”id”ᐳ"}}:::plan
     Constant341 & PgClassExpression342 --> List343

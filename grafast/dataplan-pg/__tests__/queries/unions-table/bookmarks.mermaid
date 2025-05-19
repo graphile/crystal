@@ -13,9 +13,9 @@ graph TD
     Bucket2("Bucket 2 (listItem)<br />Deps: 119, 10<br /><br />ROOT __Item{2}ᐸ20ᐳ[21]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 22, 119, 10<br /><br />ROOT PgSelectSingle{2}ᐸperson_bookmarksᐳ[22]<br />1: <br />ᐳ: 23, 33, 34, 35, 120, 36, 121<br />2: PgSelectRows[30], Lambda[37]<br />ᐳ: 29, 31, 38"):::bucket
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 31<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[31]"):::bucket
-    Bucket5("Bucket 5 (polymorphic)<br />Deps: 37, 10, 38<br /><br />1: 122, 126, 130<br />ᐳ: Access[39], Access[53], Access[67]<br />2: 41, 55, 69<br />ᐳ: Access[123], Access[127], Access[131]<br />3: 50, 64, 78<br />ᐳ: 49, 52, 63, 66, 77, 80, 82, 83, 84, 94, 95, 114, 124, 125, 128, 129, 132, 133<br />4: 91, 102, 111<br />ᐳ: 90, 93, 101, 104, 110, 113"):::bucket
-    Bucket6("Bucket 6 (polymorphicPartition)<br />Post<br />Deps: 93, 94<br />ᐳPost"):::bucket
-    Bucket7("Bucket 7 (polymorphicPartition)<br />Comment<br />Deps: 104, 114<br />ᐳComment"):::bucket
+    Bucket5("Bucket 5 (polymorphic)<br />__typename: Access[38]<br />Deps: 37, 10, 38<br /><br />1: 122, 126, 130<br />ᐳ: Access[39], Access[53], Access[67]<br />2: 41, 55, 69<br />ᐳ: Access[123], Access[127], Access[131]<br />3: 50, 64, 78<br />ᐳ: 49, 52, 63, 66, 77, 80, 82, 83, 84, 94, 95, 114, 124, 125, 128, 129, 132, 133<br />4: 91, 102, 111<br />ᐳ: 90, 93, 101, 104, 110, 113"):::bucket
+    Bucket6("Bucket 6 (polymorphicPartition)<br />|Post<br />Deps: 93, 94<br />ᐳPost"):::bucket
+    Bucket7("Bucket 7 (polymorphicPartition)<br />|Comment<br />Deps: 104, 114<br />ᐳComment"):::bucket
     Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 93<br /><br />ROOT PgSelectSingle{5}ᐸpeopleᐳ[93]"):::bucket
     Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 104<br /><br />ROOT PgSelectSingle{5}ᐸpeopleᐳ[104]"):::bucket
     Bucket10("Bucket 10 (nullableBoundary)<br />Deps: 113<br /><br />ROOT PgSelectSingle{5}ᐸpostsᐳ[113]"):::bucket

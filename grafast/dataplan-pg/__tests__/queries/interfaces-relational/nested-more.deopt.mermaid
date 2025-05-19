@@ -12,9 +12,9 @@ graph TD
     Bucket1("Bucket 1 (listItem)<br />Deps: 10, 6<br /><br />ROOT __Item{1}ᐸ11ᐳ[12]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 13, 10, 6<br /><br />ROOT PgSelectSingle{1}ᐸpeopleᐳ[13]<br />1: <br />ᐳ: 14, 15<br />2: PgSelect[16]<br />3: PgSelectRows[20]"):::bucket
     Bucket3("Bucket 3 (listItem)<br />Deps: 10<br /><br />ROOT __Item{3}ᐸ20ᐳ[21]<br />1: <br />ᐳ: 22, 23, 25, 26, 92, 102, 103, 112, 113, 114, 115, 116<br />2: PgSelect[93], PgSelect[104]<br />3: PgSelectRows[98], PgSelectRows[109]<br />ᐳ: 97, 100, 108, 111, 217, 219, 220, 294, 295, 308, 309, 310, 311, 312<br />4: PgSelect[296]<br />5: PgSelectRows[305]<br />ᐳ: First[304], PgSelectSingle[307]"):::bucket
-    Bucket4("Bucket 4 (polymorphic)<br />Deps: 10, 23, 26, 111, 217, 220, 307, 25, 102, 112, 113, 114, 115, 116, 219, 294, 308, 309, 310, 311, 312<br /><br />1: 28, 41, 54, 67, 80<br />2: 37, 50, 63, 76, 89<br />ᐳ: 36, 39, 49, 52, 62, 65, 75, 78, 88, 91"):::bucket
+    Bucket4("Bucket 4 (polymorphic)<br />__typename: Lambda[26]<br />Deps: 10, 23, 26, 111, 217, 220, 307, 25, 102, 112, 113, 114, 115, 116, 219, 294, 308, 309, 310, 311, 312<br /><br />1: 28, 41, 54, 67, 80<br />2: 37, 50, 63, 76, 89<br />ᐳ: 36, 39, 49, 52, 62, 65, 75, 78, 88, 91"):::bucket
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 111<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[111]"):::bucket
-    Bucket6("Bucket 6 (polymorphic)<br />Deps: 10, 217, 220, 307, 219, 294, 308, 309, 310, 311, 312<br /><br />1: 223, 236, 249, 262, 275<br />2: 232, 245, 258, 271, 284<br />ᐳ: 231, 234, 244, 247, 257, 260, 270, 273, 283, 286"):::bucket
+    Bucket6("Bucket 6 (polymorphic)<br />__typename: Lambda[220]<br />Deps: 10, 217, 220, 307, 219, 294, 308, 309, 310, 311, 312<br /><br />1: 223, 236, 249, 262, 275<br />2: 232, 245, 258, 271, 284<br />ᐳ: 231, 234, 244, 247, 257, 260, 270, 273, 283, 286"):::bucket
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 307<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[307]"):::bucket
     end
     Bucket0 --> Bucket1
@@ -161,15 +161,15 @@ graph TD
     First88 --> PgSelectSingle91
     PgClassExpression287{{"PgClassExpression[287∈5]<br />ᐸ__people__.”username”ᐳ<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem"}}:::plan
     PgSelectSingle111 --> PgClassExpression287
-    PgSelect223[["PgSelect[223∈6]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopicᐳRelationalTopic<br />ᐳRelationalPostᐳRelationalTopic<br />ᐳRelationalDividerᐳRelationalTopic<br />ᐳRelationalChecklistᐳRelationalTopic<br />ᐳRelationalChecklistItemᐳRelationalTopic"]]:::plan
+    PgSelect223[["PgSelect[223∈6]<br />ᐸrelational_topicsᐳ<br />(5) ...ᐳRelationalTopic"]]:::plan
     Object10 & PgClassExpression217 --> PgSelect223
-    PgSelect236[["PgSelect[236∈6]<br />ᐸrelational_postsᐳ<br />ᐳRelationalTopicᐳRelationalPost<br />ᐳRelationalPostᐳRelationalPost<br />ᐳRelationalDividerᐳRelationalPost<br />ᐳRelationalChecklistᐳRelationalPost<br />ᐳRelationalChecklistItemᐳRelationalPost"]]:::plan
+    PgSelect236[["PgSelect[236∈6]<br />ᐸrelational_postsᐳ<br />(5) ...ᐳRelationalPost"]]:::plan
     Object10 & PgClassExpression217 --> PgSelect236
-    PgSelect249[["PgSelect[249∈6]<br />ᐸrelational_dividersᐳ<br />ᐳRelationalTopicᐳRelationalDivider<br />ᐳRelationalPostᐳRelationalDivider<br />ᐳRelationalDividerᐳRelationalDivider<br />ᐳRelationalChecklistᐳRelationalDivider<br />ᐳRelationalChecklistItemᐳRelationalDivider"]]:::plan
+    PgSelect249[["PgSelect[249∈6]<br />ᐸrelational_dividersᐳ<br />(5) ...ᐳRelationalDivider"]]:::plan
     Object10 & PgClassExpression217 --> PgSelect249
-    PgSelect262[["PgSelect[262∈6]<br />ᐸrelational_checklistsᐳ<br />ᐳRelationalTopicᐳRelationalChecklist<br />ᐳRelationalPostᐳRelationalChecklist<br />ᐳRelationalDividerᐳRelationalChecklist<br />ᐳRelationalChecklistᐳRelationalChecklist<br />ᐳRelationalChecklistItemᐳRelationalChecklist"]]:::plan
+    PgSelect262[["PgSelect[262∈6]<br />ᐸrelational_checklistsᐳ<br />(5) ...ᐳRelationalChecklist"]]:::plan
     Object10 & PgClassExpression217 --> PgSelect262
-    PgSelect275[["PgSelect[275∈6]<br />ᐸrelational_checklist_itemsᐳ<br />ᐳRelationalTopicᐳRelationalChecklistItem<br />ᐳRelationalPostᐳRelationalChecklistItem<br />ᐳRelationalDividerᐳRelationalChecklistItem<br />ᐳRelationalChecklistᐳRelationalChecklistItem<br />ᐳRelationalChecklistItemᐳRelationalChecklistItem"]]:::plan
+    PgSelect275[["PgSelect[275∈6]<br />ᐸrelational_checklist_itemsᐳ<br />(5) ...ᐳRelationalChecklistItem"]]:::plan
     Object10 & PgClassExpression217 --> PgSelect275
     First231{{"First[231∈6]^"}}:::plan
     PgSelectRows232[["PgSelectRows[232∈6]^"]]:::plan
@@ -201,7 +201,7 @@ graph TD
     PgSelect275 --> PgSelectRows284
     PgSelectSingle286{{"PgSelectSingle[286∈6]^<br />ᐸrelational_checklist_itemsᐳ"}}:::plan
     First283 --> PgSelectSingle286
-    PgClassExpression817{{"PgClassExpression[817∈7]<br />ᐸ__people__.”username”ᐳ<br />ᐳRelationalTopicᐳRelationalTopic<br />ᐳRelationalTopicᐳRelationalPost<br />ᐳRelationalTopicᐳRelationalDivider<br />ᐳRelationalTopicᐳRelationalChecklist<br />ᐳRelationalTopicᐳRelationalChecklistItem<br />ᐳRelationalPostᐳRelationalTopic<br />ᐳRelationalPostᐳRelationalPost<br />ᐳRelationalPostᐳRelationalDivider<br />ᐳRelationalPostᐳRelationalChecklist<br />ᐳRelationalPostᐳRelationalChecklistItem<br />ᐳRelationalDividerᐳRelationalTopic<br />ᐳRelationalDividerᐳRelationalPost<br />ᐳRelationalDividerᐳRelationalDivider<br />ᐳRelationalDividerᐳRelationalChecklist<br />ᐳRelationalDividerᐳRelationalChecklistItem<br />ᐳRelationalChecklistᐳRelationalTopic<br />ᐳRelationalChecklistᐳRelationalPost<br />ᐳRelationalChecklistᐳRelationalDivider<br />ᐳRelationalChecklistᐳRelationalChecklist<br />ᐳRelationalChecklistᐳRelationalChecklistItem<br />ᐳRelationalChecklistItemᐳRelationalTopic<br />ᐳRelationalChecklistItemᐳRelationalPost<br />ᐳRelationalChecklistItemᐳRelationalDivider<br />ᐳRelationalChecklistItemᐳRelationalChecklist<br />ᐳRelationalChecklistItemᐳRelationalChecklistItem"}}:::plan
+    PgClassExpression817{{"PgClassExpression[817∈7]<br />ᐸ__people__.”username”ᐳ<br />(5) ...ᐳRelationalTopic<br />(5) ...ᐳRelationalPost<br />(5) ...ᐳRelationalDivider<br />(5) ...ᐳRelationalChecklist<br />(5) ...ᐳRelationalChecklistItem"}}:::plan
     PgSelectSingle307 --> PgClassExpression817
 
     %% define steps

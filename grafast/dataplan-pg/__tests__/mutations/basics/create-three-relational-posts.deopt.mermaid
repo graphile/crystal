@@ -12,9 +12,9 @@ graph TD
     Bucket1("Bucket 1 (mutationField)<br />Deps: 11, 6, 7, 14, 15, 16, 29, 30, 44, 45, 289, 290, 291, 4<br /><br />1: PgInsertSingle[8]<br />2: Access[13]<br />3: PgClassExpression[12]<br />4: PgInsertSingle[17]<br />5: PgInsertSingle[23]<br />6: Access[28]<br />7: PgClassExpression[27]<br />8: PgInsertSingle[32]<br />9: PgInsertSingle[38]<br />10: Access[43]<br />11: PgClassExpression[42]<br />12: PgInsertSingle[47]<br />13: <br />ᐳ: Access[52], PgClassExpression[51]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 11, 289, 290, 291, 51, 4<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[51]<br />1: 54, 62, 68<br />2: 59, 65, 71<br />ᐳ: 58, 60, 64, 66, 70, 72, 73, 75, 76, 142, 144, 145, 211, 213, 214"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 4, 11, 73, 76, 142, 145, 211, 214<br /><br />ROOT __ValueᐸrootValueᐳ[4]"):::bucket
-    Bucket4("Bucket 4 (polymorphic)<br />Deps: 11, 73, 76<br /><br />1: 78, 91, 104, 117, 130<br />2: 87, 100, 113, 126, 139<br />ᐳ: 86, 89, 99, 102, 112, 115, 125, 128, 138, 141, 280, 281, 282"):::bucket
-    Bucket5("Bucket 5 (polymorphic)<br />Deps: 11, 142, 145<br /><br />1: 147, 160, 173, 186, 199<br />2: 156, 169, 182, 195, 208<br />ᐳ: 155, 158, 168, 171, 181, 184, 194, 197, 207, 210, 283, 284, 285"):::bucket
-    Bucket6("Bucket 6 (polymorphic)<br />Deps: 11, 211, 214<br /><br />1: 216, 229, 242, 255, 268<br />2: 225, 238, 251, 264, 277<br />ᐳ: 224, 227, 237, 240, 250, 253, 263, 266, 276, 279, 286, 287, 288"):::bucket
+    Bucket4("Bucket 4 (polymorphic)<br />__typename: Lambda[76]<br />Deps: 11, 73, 76<br /><br />1: 78, 91, 104, 117, 130<br />2: 87, 100, 113, 126, 139<br />ᐳ: 86, 89, 99, 102, 112, 115, 125, 128, 138, 141, 280, 281, 282"):::bucket
+    Bucket5("Bucket 5 (polymorphic)<br />__typename: Lambda[145]<br />Deps: 11, 142, 145<br /><br />1: 147, 160, 173, 186, 199<br />2: 156, 169, 182, 195, 208<br />ᐳ: 155, 158, 168, 171, 181, 184, 194, 197, 207, 210, 283, 284, 285"):::bucket
+    Bucket6("Bucket 6 (polymorphic)<br />__typename: Lambda[214]<br />Deps: 11, 211, 214<br /><br />1: 216, 229, 242, 255, 268<br />2: 225, 238, 251, 264, 277<br />ᐳ: 224, 227, 237, 240, 250, 253, 263, 266, 276, 279, 286, 287, 288"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2

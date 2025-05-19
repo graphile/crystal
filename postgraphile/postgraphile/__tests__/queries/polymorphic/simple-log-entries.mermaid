@@ -12,7 +12,7 @@ graph TD
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12, 30<br /><br />ROOT Connectionᐸ8ᐳ[12]<br />1: PgSelect[14]<br />2: PgSelectRows[15]"):::bucket
     Bucket2("Bucket 2 (listItem)<br />Deps: 11, 30<br /><br />ROOT __Item{2}ᐸ15ᐳ[16]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 17, 11, 30<br /><br />ROOT PgSelectSingle{2}ᐸlog_entriesᐳ[17]<br />1: <br />ᐳ: 18, 19, 20<br />2: PgUnionAll[21]<br />ᐳ: 64, 25, 28, 29, 31, 32, 33"):::bucket
-    Bucket4("Bucket 4 (polymorphic)<br />Deps: 32, 11, 33<br /><br />1: <br />ᐳ: Access[34], Access[48]<br />2: PgSelect[36], PgSelect[50]<br />3: PgSelectRows[45], PgSelectRows[59]<br />ᐳ: 44, 47, 58, 61, 62, 63"):::bucket
+    Bucket4("Bucket 4 (polymorphic)<br />__typename: Access[33]<br />Deps: 32, 11, 33<br /><br />1: <br />ᐳ: Access[34], Access[48]<br />2: PgSelect[36], PgSelect[50]<br />3: PgSelectRows[45], PgSelectRows[59]<br />ᐳ: 44, 47, 58, 61, 62, 63"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2

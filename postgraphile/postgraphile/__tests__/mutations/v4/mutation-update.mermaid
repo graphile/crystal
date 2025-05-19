@@ -226,8 +226,8 @@ graph TD
     Constant303{{"Constant[303∈0] ➊<br />ᐸ'query'ᐳ"}}:::plan
     Constant425{{"Constant[425∈0] ➊<br />ᐸ'compound_keys'ᐳ"}}:::plan
     PgUpdateSingle15[["PgUpdateSingle[15∈1] ➊<br />ᐸperson(id;)ᐳ"]]:::sideeffectplan
-    Object18 -->|rejectNull| PgUpdateSingle15
-    Access13 & ApplyInput19 --> PgUpdateSingle15
+    Access13 -->|rejectNull| PgUpdateSingle15
+    Object18 & ApplyInput19 --> PgUpdateSingle15
     Object20{{"Object[20∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgUpdateSingle15 --> Object20
     Edge179{{"Edge[179∈13] ➊"}}:::plan
@@ -286,8 +286,8 @@ graph TD
     PgUpdateSingle31[["PgUpdateSingle[31∈2] ➊<br />ᐸperson(id;)ᐳ"]]:::sideeffectplan
     Object34{{"Object[34∈2] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access29{{"Access[29∈2] ➊<br />ᐸ28.1ᐳ"}}:::plan
-    Object34 -->|rejectNull| PgUpdateSingle31
-    Access29 & ApplyInput35 --> PgUpdateSingle31
+    Access29 -->|rejectNull| PgUpdateSingle31
+    Object34 & ApplyInput35 --> PgUpdateSingle31
     Access32{{"Access[32∈2] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access33{{"Access[33∈2] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access32 & Access33 --> Object34
@@ -354,8 +354,8 @@ graph TD
     PgUpdateSingle46[["PgUpdateSingle[46∈3] ➊<br />ᐸperson(id;)ᐳ"]]:::sideeffectplan
     Object49{{"Object[49∈3] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access44{{"Access[44∈3] ➊<br />ᐸ43.1ᐳ"}}:::plan
-    Object49 -->|rejectNull| PgUpdateSingle46
-    Access44 & ApplyInput50 --> PgUpdateSingle46
+    Access44 -->|rejectNull| PgUpdateSingle46
+    Object49 & ApplyInput50 --> PgUpdateSingle46
     Access47{{"Access[47∈3] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access48{{"Access[48∈3] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access47 & Access48 --> Object49
@@ -422,8 +422,8 @@ graph TD
     PgUpdateSingle60[["PgUpdateSingle[60∈4] ➊<br />ᐸperson(id;)ᐳ"]]:::sideeffectplan
     Object63{{"Object[63∈4] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access58{{"Access[58∈4] ➊<br />ᐸ57.1ᐳ"}}:::plan
-    Object63 -->|rejectNull| PgUpdateSingle60
-    Access58 & ApplyInput64 --> PgUpdateSingle60
+    Access58 -->|rejectNull| PgUpdateSingle60
+    Object63 & ApplyInput64 --> PgUpdateSingle60
     Access61{{"Access[61∈4] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access62{{"Access[62∈4] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access61 & Access62 --> Object63
@@ -617,9 +617,9 @@ graph TD
     Object103{{"Object[103∈7] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access96{{"Access[96∈7] ➊<br />ᐸ95.1ᐳ"}}:::plan
     Access98{{"Access[98∈7] ➊<br />ᐸ95.2ᐳ"}}:::plan
-    Object103 -->|rejectNull| PgUpdateSingle100
     Access96 -->|rejectNull| PgUpdateSingle100
-    Access98 & ApplyInput104 --> PgUpdateSingle100
+    Access98 -->|rejectNull| PgUpdateSingle100
+    Object103 & ApplyInput104 --> PgUpdateSingle100
     Access101{{"Access[101∈7] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access102{{"Access[102∈7] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access101 & Access102 --> Object103

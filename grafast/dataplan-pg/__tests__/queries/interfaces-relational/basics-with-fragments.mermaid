@@ -12,12 +12,12 @@ graph TD
     Bucket1("Bucket 1 (listItem)<br />Deps: 137, 10<br /><br />ROOT __Item{1}ᐸ11ᐳ[12]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 13, 137, 12, 10<br /><br />ROOT PgSelectSingle{1}ᐸpeopleᐳ[13]<br />1: <br />ᐳ: 14, 138, 139<br />2: PgSelectRows[20]"):::bucket
     Bucket3("Bucket 3 (listItem)<br />Deps: 10<br /><br />ROOT __Item{3}ᐸ20ᐳ[21]"):::bucket
-    Bucket4("Bucket 4 (polymorphic)<br />Deps: 10, 23, 26, 25, 93, 94, 95, 96, 97, 98<br /><br />1: 28, 41, 54, 67, 80<br />2: 37, 50, 63, 76, 89<br />ᐳ: 36, 39, 49, 52, 62, 65, 75, 78, 88, 91, 99, 107, 108, 109, 117, 118, 126, 134, 135"):::bucket
-    Bucket5("Bucket 5 (polymorphicPartition)<br />RelationalTopic<br />Deps: 99<br />ᐳRelationalTopic"):::bucket
-    Bucket6("Bucket 6 (polymorphicPartition)<br />RelationalPost<br />Deps: 107, 108, 109<br />ᐳRelationalPost"):::bucket
-    Bucket7("Bucket 7 (polymorphicPartition)<br />RelationalDivider<br />Deps: 117<br />ᐳRelationalDivider"):::bucket
-    Bucket8("Bucket 8 (polymorphicPartition)<br />RelationalChecklist<br />Deps: 126<br />ᐳRelationalChecklist"):::bucket
-    Bucket9("Bucket 9 (polymorphicPartition)<br />RelationalChecklistItem<br />Deps: 134, 135<br />ᐳRelationalChecklistItem"):::bucket
+    Bucket4("Bucket 4 (polymorphic)<br />__typename: Lambda[26]<br />Deps: 10, 23, 26, 25, 93, 94, 95, 96, 97, 98<br /><br />1: 28, 41, 54, 67, 80<br />2: 37, 50, 63, 76, 89<br />ᐳ: 36, 39, 49, 52, 62, 65, 75, 78, 88, 91, 99, 107, 108, 109, 117, 118, 126, 134, 135"):::bucket
+    Bucket5("Bucket 5 (polymorphicPartition)<br />|RelationalTopic<br />Deps: 99<br />ᐳRelationalTopic"):::bucket
+    Bucket6("Bucket 6 (polymorphicPartition)<br />|RelationalPost<br />Deps: 107, 108, 109<br />ᐳRelationalPost"):::bucket
+    Bucket7("Bucket 7 (polymorphicPartition)<br />|RelationalDivider<br />Deps: 117<br />ᐳRelationalDivider"):::bucket
+    Bucket8("Bucket 8 (polymorphicPartition)<br />|RelationalChecklist<br />Deps: 126<br />ᐳRelationalChecklist"):::bucket
+    Bucket9("Bucket 9 (polymorphicPartition)<br />|RelationalChecklistItem<br />Deps: 134, 135<br />ᐳRelationalChecklistItem"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2

@@ -9,12 +9,12 @@ graph TD
 
     subgraph "Buckets for queries/unions-table/by-id-1"
     Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 93, 10<br />2: PgSelect[7]<br />3: PgSelectRows[12]<br />ᐳ: 11, 13, 14, 16, 17"):::bucket
-    Bucket1("Bucket 1 (polymorphic)<br />Deps: 10, 17, 16<br /><br />1: 19, 31, 43, 55, 67<br />2: 28, 40, 52, 64, 76<br />ᐳ: 27, 30, 39, 42, 51, 54, 63, 66, 75, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92"):::bucket
-    Bucket2("Bucket 2 (polymorphicPartition)<br />UnionTopic<br />Deps: 79, 80<br />ᐳUnionTopic"):::bucket
-    Bucket3("Bucket 3 (polymorphicPartition)<br />UnionPost<br />Deps: 81, 82, 83, 84<br />ᐳUnionPost"):::bucket
-    Bucket4("Bucket 4 (polymorphicPartition)<br />UnionDivider<br />Deps: 85, 86<br />ᐳUnionDivider"):::bucket
-    Bucket5("Bucket 5 (polymorphicPartition)<br />UnionChecklist<br />Deps: 88, 89<br />ᐳUnionChecklist"):::bucket
-    Bucket6("Bucket 6 (polymorphicPartition)<br />UnionChecklistItem<br />Deps: 90, 91, 92<br />ᐳUnionChecklistItem"):::bucket
+    Bucket1("Bucket 1 (polymorphic)<br />__typename: Lambda[16]<br />Deps: 10, 17, 16<br /><br />1: 19, 31, 43, 55, 67<br />2: 28, 40, 52, 64, 76<br />ᐳ: 27, 30, 39, 42, 51, 54, 63, 66, 75, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92"):::bucket
+    Bucket2("Bucket 2 (polymorphicPartition)<br />|UnionTopic<br />Deps: 79, 80<br />ᐳUnionTopic"):::bucket
+    Bucket3("Bucket 3 (polymorphicPartition)<br />|UnionPost<br />Deps: 81, 82, 83, 84<br />ᐳUnionPost"):::bucket
+    Bucket4("Bucket 4 (polymorphicPartition)<br />|UnionDivider<br />Deps: 85, 86<br />ᐳUnionDivider"):::bucket
+    Bucket5("Bucket 5 (polymorphicPartition)<br />|UnionChecklist<br />Deps: 88, 89<br />ᐳUnionChecklist"):::bucket
+    Bucket6("Bucket 6 (polymorphicPartition)<br />|UnionChecklistItem<br />Deps: 90, 91, 92<br />ᐳUnionChecklistItem"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2 & Bucket3 & Bucket4 & Bucket5 & Bucket6
@@ -39,7 +39,7 @@ graph TD
     PgClassExpression14{{"PgClassExpression[14∈0] ➊<br />ᐸ__union_items__.”type”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression14
     Lambda16{{"Lambda[16∈0] ➊<br />ᐸunionItemTypeNameFromTypeᐳ"}}:::plan
-    PgClassExpression14 --> Lambda16
+    PgClassExpression14 -->|rejectNull| Lambda16
     PgClassExpression17{{"PgClassExpression[17∈0] ➊<br />ᐸ__union_items__.”id”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression17
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
