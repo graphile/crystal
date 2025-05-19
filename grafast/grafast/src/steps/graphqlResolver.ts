@@ -1,26 +1,18 @@
 import type {
   GraphQLFieldResolver,
   GraphQLInterfaceType,
-  GraphQLNullableType,
-  GraphQLOutputType,
   GraphQLResolveInfo,
   GraphQLUnionType,
 } from "graphql";
 import * as graphql from "graphql";
-import { isIterable } from "iterall";
 
-import type { FlaggedValue } from "../error.js";
 import type { __ItemStep, ExecutionDetails, ObjectStep } from "../index.js";
 import { context, flagError } from "../index.js";
-import type {
-  GrafastResultsList,
-  PlanTypeInfo,
-  UnbatchedExecutionExtra,
-} from "../interfaces.js";
+import type { PlanTypeInfo, UnbatchedExecutionExtra } from "../interfaces.js";
 import { Step, UnbatchedStep } from "../step.js";
 import { isPromiseLike } from "../utils.js";
 
-const { defaultTypeResolver, isListType, isNonNullType } = graphql;
+const { defaultTypeResolver } = graphql;
 
 type ResolveInfoBase = Omit<
   GraphQLResolveInfo,
