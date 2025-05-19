@@ -1125,8 +1125,19 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                         typeNameFromType,
                       ) =>
                         function planType($specifier, { $original }) {
-                          const $step = $original ?? $specifier;
-                          const $typeVal = get($step, typeAttrName);
+                          const $inStep = $original ?? $specifier;
+                          const $record =
+                            $inStep instanceof PgSelectSingleStep
+                              ? $inStep
+                              : resource.get(
+                                  Object.fromEntries(
+                                    pk.map((attrName) => [
+                                      attrName,
+                                      get($inStep, attrName),
+                                    ]),
+                                  ),
+                                );
+                          const $typeVal = get($record, typeAttrName);
                           const $__typename = lambda(
                             $typeVal,
                             typeNameFromType,
@@ -1135,18 +1146,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                           return {
                             $__typename,
                             planForType() {
-                              if ($step instanceof PgSelectSingleStep) {
-                                return $step;
-                              } else {
-                                return resource.get(
-                                  Object.fromEntries(
-                                    pk.map((attrName) => [
-                                      attrName,
-                                      get($step, attrName),
-                                    ]),
-                                  ),
-                                );
-                              }
+                              return $record;
                             },
                           };
                         },
@@ -1164,37 +1164,81 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 } else if (polymorphism.mode === "relational") {
                   grafastExtensions = {
                     toSpecifier: EXPORTABLE(
-                      (PgSelectSingleStep, get, object, pk, typeAttrName) =>
-                        (step: Step) => {
-                          if (step instanceof PgSelectSingleStep) {
-                            return object({
-                              ...Object.fromEntries(
-                                pk.map((attrName) => [
-                                  attrName,
-                                  get(step, attrName),
-                                ]),
-                              ),
-                              [typeAttrName]: get(step, typeAttrName),
-                            });
-                          } else {
-                            return step;
-                          }
-                        },
-                      [PgSelectSingleStep, get, object, pk, typeAttrName],
+                      (PgSelectSingleStep, get, object, pk) => (step: Step) => {
+                        if (step instanceof PgSelectSingleStep) {
+                          return object({
+                            ...Object.fromEntries(
+                              pk.map((attrName) => [
+                                attrName,
+                                get(step, attrName),
+                              ]),
+                            ),
+                          });
+                        } else {
+                          return step;
+                        }
+                      },
+                      [PgSelectSingleStep, get, object, pk],
                     ),
                     planType: EXPORTABLE(
                       (
                         PgSelectSingleStep,
                         get,
                         lambda,
+                        pk,
                         polymorphism,
                         resource,
                         typeAttrName,
                         typeNameFromType,
                       ) =>
                         ($specifier, { $original }) => {
-                          const $step = $original ?? $specifier;
-                          const $typeVal = get($step, typeAttrName);
+                          const $inStep = $original ?? $specifier;
+                          // A PgSelectSingleStep representing the base relational table
+                          const $base = (() => {
+                            if ($inStep instanceof PgSelectSingleStep) {
+                              if ($inStep.resource === resource) {
+                                // It's the core table; that's what we want!
+                                return $inStep;
+                              } else {
+                                // Assume it's a child; get base record by primary key
+                                // PERF: ideally we'd use relationship
+                                // traversal instead, this would both be
+                                // shorter and also cacheable.
+                                const stepPk = (
+                                  $inStep.resource.uniques as PgResourceUnique[]
+                                ).find((u) => u.isPrimary);
+                                if (!stepPk) {
+                                  throw new Error(
+                                    `Expected a relational record for ${resource.name}, but found one for ${$inStep.resource.name} which has no primary key!`,
+                                  );
+                                }
+                                if (stepPk.attributes.length !== pk.length) {
+                                  throw new Error(
+                                    `Expected a relational record for ${resource.name}, but found one for ${$inStep.resource.name} which has a primary key with a different number of columns!`,
+                                  );
+                                }
+                                return resource.get(
+                                  Object.fromEntries(
+                                    pk.map((attrName, idx) => [
+                                      attrName,
+                                      get($inStep, stepPk.attributes[idx]),
+                                    ]),
+                                  ),
+                                );
+                              }
+                            } else {
+                              // Assume it's an object representing the base table
+                              return resource.get(
+                                Object.fromEntries(
+                                  pk.map((attrName) => [
+                                    attrName,
+                                    get($inStep, attrName),
+                                  ]),
+                                ),
+                              );
+                            }
+                          })();
+                          const $typeVal = get($base, typeAttrName);
                           const $__typename = lambda(
                             $typeVal,
                             typeNameFromType,
@@ -1211,44 +1255,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                                   `${this} Could not find matching name for relational polymorphic '${type.name}'`,
                                 );
                               }
-                              const relationIdentifier = spec.relationName;
-                              if ($step instanceof PgSelectSingleStep) {
-                                if ($step.resource === resource) {
-                                  // It's the core table, redirect to the relation
-                                  return $step.singleRelation(
-                                    relationIdentifier,
-                                  );
-                                } else {
-                                  return $step;
-                                }
-                              } else {
-                                const relation = resource.getRelation(
-                                  relationIdentifier,
-                                ) as PgCodecRelation;
-                                if (!relation || !relation.isUnique) {
-                                  throw new Error(
-                                    `${String(relationIdentifier)} is not a unique relation on ${
-                                      resource
-                                    }`,
-                                  );
-                                }
-                                const {
-                                  remoteResource,
-                                  remoteAttributes,
-                                  localAttributes,
-                                } = relation;
-
-                                return remoteResource.get(
-                                  Object.fromEntries(
-                                    remoteAttributes.map(
-                                      (remoteAttribute, idx) => [
-                                        remoteAttribute,
-                                        get($step, localAttributes[idx]),
-                                      ],
-                                    ),
-                                  ),
-                                );
-                              }
+                              return $base.singleRelation(spec.relationName);
                             },
                           };
                         },
@@ -1256,6 +1263,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                         PgSelectSingleStep,
                         get,
                         lambda,
+                        pk,
                         polymorphism,
                         resource,
                         typeAttrName,
