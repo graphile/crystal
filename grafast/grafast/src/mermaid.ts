@@ -492,10 +492,30 @@ export function planToMermaid(
 }
 
 function pp(polymorphicPaths: ReadonlyArray<string> | null | undefined) {
-  if (!polymorphicPaths) {
+  if (polymorphicPaths == null) {
     return "";
   }
-  return polymorphicPaths.map((p) => `${p}`).join("\n");
+  const counts: Record<string, number> = Object.create(null);
+  const out: string[] = [];
+  const last: Record<string, string> = Object.create(null);
+  for (const p of polymorphicPaths) {
+    const i = p.lastIndexOf(">");
+    if (i <= 0) {
+      out.push(p);
+    } else {
+      const end = p.slice(i);
+      last[end] = p;
+      if (counts[end]) {
+        counts[end]++;
+      } else {
+        counts[end] = 1;
+      }
+    }
+  }
+  for (const [end, count] of Object.entries(counts)) {
+    out.push(count === 1 ? last[end] : `(${count}) ...${end}`);
+  }
+  return out.join("\n");
 }
 
 export * from "./planJSONInterfaces.js";
