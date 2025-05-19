@@ -206,6 +206,10 @@ export function planToMermaid(
             layerPlan.rootStepId != null && layerPlan.reason.type !== "root"
               ? `\nROOT ${stepToString(stepById[layerPlan.rootStepId])}`
               : ""
+          }\n${
+            layerPlan.reason.type === "polymorphic"
+              ? `\n__typename: ${stepToString(stepById[layerPlan.reason.parentStepId])}`
+              : ""
           }${startSteps(layerPlan)}`,
         )}):::bucket`,
       );
