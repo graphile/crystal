@@ -3047,14 +3047,15 @@ export function makeExampleSchema(
             singleTableItemsResource,
             singleTableTypeNameCallback,
           ) =>
-            function planType($stepOrSpecifier) {
+            function planType($stepOrSpecifier, { $original }) {
+              const $inStep = $original ?? $stepOrSpecifier;
               const $record =
-                $stepOrSpecifier instanceof PgSelectSingleStep &&
-                ($stepOrSpecifier.resource as PgResource).codec ===
+                $inStep instanceof PgSelectSingleStep &&
+                ($inStep.resource as PgResource).codec ===
                   singleTableItemsResource.codec
-                  ? $stepOrSpecifier
+                  ? $inStep
                   : singleTableItemsResource.get({
-                      id: get($stepOrSpecifier, "id"),
+                      id: get($inStep, "id"),
                     });
               const $type = get($record, "type");
               const $__typename = lambda(
@@ -3281,7 +3282,7 @@ export function makeExampleSchema(
                 $inStep.resource.codec === relationalItemsResource.codec
                   ? $inStep
                   : relationalItemsResource.get({
-                      id: get($stepOrSpecifier, "id"),
+                      id: get($inStep, "id"),
                     });
               const $type = get($base, "type");
               const $__typename = lambda(
