@@ -24,7 +24,7 @@ describe("queries", () => {
   for (const file of files) {
     const baseName = file.substring(0, file.length - SUFFIX.length);
     describe(file, () => {
-      let result;
+      let result: ExecutionResult;
       before(async () => {
         const baseArgs = makeBaseArgs();
         const source = await readFile(BASE_DIR + "/" + file, "utf8");
@@ -46,7 +46,7 @@ describe("queries", () => {
         );
       });
       it("matched plan snapshot", async () => {
-        const plan = result.extensions.explain.operations?.find(
+        const plan = (result.extensions as any)?.explain?.operations?.find(
           (o: any) => o.type === "plan",
         )?.plan;
         const mermaid = planToMermaid(plan).trim() + "\n";

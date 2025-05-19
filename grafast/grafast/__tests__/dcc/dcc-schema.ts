@@ -1,7 +1,11 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import { resolvePreset } from "graphile-config";
 
-import type { PolymorphicTypePlanner, Step } from "../../dist/index.js";
+import type {
+  FieldArgs,
+  PolymorphicTypePlanner,
+  Step,
+} from "../../dist/index.js";
 import {
   coalesce,
   context,
@@ -9,17 +13,11 @@ import {
   get,
   inhibitOnNull,
   lambda,
-  loadMany,
   loadOne,
   makeGrafastSchema,
 } from "../../dist/index.js";
 import type { CrawlerData, Database, NpcData } from "./dcc-data.js";
-import {
-  batchGetCrawlerById,
-  batchGetCrawlersByIds,
-  batchGetNpcById,
-  makeData,
-} from "./dcc-data.js";
+import { batchGetCrawlerById, batchGetNpcById, makeData } from "./dcc-data.js";
 
 const resolvedPreset = resolvePreset({
   grafast: {
@@ -125,7 +123,7 @@ export const makeBaseArgs = () => {
       },
 
       Query: {
-        crawler(_, { $id }) {
+        crawler(_: any, { $id }: FieldArgs) {
           const $data = context().get("data");
           return loadOne($id as Step<number>, $data, null, batchGetCrawlerById);
         },
@@ -157,11 +155,8 @@ export const makeBaseArgs = () => {
         },
       },
       Crawler: {
-        __planType($crawler) {
-          const $__typename = lambda(
-            $crawler as Step<CrawlerData>,
-            crawlerToTypeName,
-          );
+        __planType($crawler: Step<CrawlerData>) {
+          const $__typename = lambda($crawler, crawlerToTypeName);
           return { $__typename };
         },
       },
@@ -236,7 +231,6 @@ function extractCrawlerId(id: number) {
   if (id > 100 && id < 200) return id;
   else return null;
 }
-
 function extractNpcId(id: number) {
   if (id > 300 && id < 400) return id;
   else return null;
