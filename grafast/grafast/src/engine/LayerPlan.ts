@@ -403,11 +403,31 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           "GrafastInternalError<e9290db3-9a1b-45af-a50e-baa9e161d7cc>: expected the 0'th entry in ancestry to be the root layer plan",
         );
       }
-      // We don't allow references beyond a combined layer plan (except to the root)
-      this.ancestry = [rootLp, this];
-      this.depth = 1;
+      let deferBoundaryDepth = 0;
+      let commonAncestryDepth = -1;
+      outer: for (
+        let i = 0, l = firstParentLayerPlan.ancestry.length;
+        i < l;
+        i++
+      ) {
+        const ancestor = firstParentLayerPlan.ancestry[i];
+        for (const lp of reason.parentLayerPlans) {
+          if (lp.ancestry[i] !== ancestor) {
+            // Shared ancestry fails here
+            break outer;
+          }
+        }
+        // Everyone has the same LP at this level
+        commonAncestryDepth = i;
+        deferBoundaryDepth = ancestor.deferBoundaryDepth;
+      }
+      this.ancestry = [
+        ...firstParentLayerPlan.ancestry.slice(0, commonAncestryDepth + 1),
+        this,
+      ];
+      this.depth = this.ancestry.length - 1;
       // TODO: is this correct?
-      this.deferBoundaryDepth = 0;
+      this.deferBoundaryDepth = deferBoundaryDepth;
 
       this.id = operationPlan.addLayerPlan(this);
 
