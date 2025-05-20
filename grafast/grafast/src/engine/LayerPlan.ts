@@ -403,30 +403,39 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           "GrafastInternalError<e9290db3-9a1b-45af-a50e-baa9e161d7cc>: expected the 0'th entry in ancestry to be the root layer plan",
         );
       }
+
+      // TODO: is this calculated correctly?
       let deferBoundaryDepth = 0;
-      let commonAncestryDepth = -1;
-      outer: for (
-        let i = 0, l = firstParentLayerPlan.ancestry.length;
-        i < l;
-        i++
-      ) {
+
+      const commonAncestryDepth = -1;
+      this.ancestry = [];
+      /** Unskipped because it comes from the raw layer plans, we skip over those that don't match */
+      let prevUnskippedDeferBoundaryDepth = 0;
+      for (let i = 0, l = firstParentLayerPlan.ancestry.length; i < l; i++) {
         const ancestor = firstParentLayerPlan.ancestry[i];
+        let match = true;
         for (const lp of reason.parentLayerPlans) {
           if (lp.ancestry[i] !== ancestor) {
             // Shared ancestry fails here
-            break outer;
+            match = false;
           }
         }
-        // Everyone has the same LP at this level
-        commonAncestryDepth = i;
-        deferBoundaryDepth = ancestor.deferBoundaryDepth;
+        if (match) {
+          this.ancestry.push(ancestor);
+          if (ancestor.deferBoundaryDepth > prevUnskippedDeferBoundaryDepth) {
+            if (ancestor.deferBoundaryDepth === ancestor.depth) {
+              // They're the boundary
+              deferBoundaryDepth = this.ancestry.length - 1;
+            } else {
+              // Treat the previous ancestor as the defer boundary
+              deferBoundaryDepth = this.ancestry.length - 2;
+            }
+            prevUnskippedDeferBoundaryDepth = ancestor.deferBoundaryDepth;
+          }
+        }
       }
-      this.ancestry = [
-        ...firstParentLayerPlan.ancestry.slice(0, commonAncestryDepth + 1),
-        this,
-      ];
+      this.ancestry.push(this);
       this.depth = this.ancestry.length - 1;
-      // TODO: is this correct?
       this.deferBoundaryDepth = deferBoundaryDepth;
 
       this.id = operationPlan.addLayerPlan(this);
