@@ -1993,7 +1993,19 @@ export class OperationPlan {
             polymorphicPaths,
           );
 
-          this.stepTracker.moveStepToLayerPlan(step, partitionedLayerPlan);
+          /**
+           * Moves all the steps that match these polymorphic paths only into
+           * the polymorphicPartition layer plan
+           */
+          const recursivelyMoveSteps = (step: Step) => {
+            if (step.layerPlan !== parentLayerPlan) return;
+            if (!setsMatch(step.polymorphicPaths, polymorphicPaths)) return;
+            this.stepTracker.moveStepToLayerPlan(step, partitionedLayerPlan);
+            for (const dep of sudo(step).dependencies) {
+              recursivelyMoveSteps(dep);
+            }
+          };
+          recursivelyMoveSteps(step);
 
           // TODO: Do we need to update the outputPlan.layerPlan too?
           for (const entry of entries) {

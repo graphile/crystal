@@ -422,6 +422,7 @@ export function setsMatch(
   s1: ReadonlySet<string> | null,
   s2: ReadonlySet<string> | null,
 ) {
+  if (s1 === s2) return true;
   if (s1 == null) return false;
   if (s2 == null) return false;
   if (s1.size !== s2.size) return false;
