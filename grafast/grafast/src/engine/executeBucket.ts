@@ -1103,13 +1103,13 @@ export function executeBucket(
   }
 
   function executeSamePhaseChildren(): PromiseOrDirect<void> {
-    const childPromises = completeBucketAndExecuteSamePhaseChildren(
+    const result = completeBucketAndExecuteSamePhaseChildren(
       bucket,
       requestContext,
     );
 
-    if (childPromises.length > 0) {
-      return Promise.all(childPromises).then(() => {
+    if (result != null) {
+      return result.then(() => {
         // PERF: this seems like a bad idea! We're forcing the bucket to be
         // retained in this closure? Why?
         bucket.isComplete = true;
@@ -1128,7 +1128,7 @@ function completeBucketAndExecuteSamePhaseChildren(
 ) {
   const { layerPlan, sharedState } = bucket;
 
-  const childPromises = markLayerPlanAsDone(
+  const result = markLayerPlanAsDone(
     requestContext,
     sharedState,
     layerPlan,
@@ -1137,7 +1137,7 @@ function completeBucketAndExecuteSamePhaseChildren(
 
   bucket.sharedState.release(bucket);
 
-  return childPromises;
+  return result;
 }
 
 function markLayerPlanAsDone(
@@ -1145,7 +1145,7 @@ function markLayerPlanAsDone(
   sharedState: SharedBucketState,
   layerPlan: LayerPlan,
   bucket: Bucket | null,
-) {
+): PromiseOrDirect<void> {
   if (sharedState._doneBucketIds.has(layerPlan.id)) {
     throw new Error(
       `${bucket} has already completed, it cannot complete again!`,
@@ -1182,7 +1182,7 @@ function markLayerPlanAsDone(
         const childBucket =
           bucket == null ? null : childLayerPlan.newBucket(bucket);
         // Execute
-        const result =
+        const result: PromiseOrDirect<void> =
           childBucket !== null
             ? executeBucket(childBucket, requestContext)
             : markLayerPlanAsDone(
@@ -1200,7 +1200,7 @@ function markLayerPlanAsDone(
         const childBucket =
           bucket == null ? null : childLayerPlan.newBucket(bucket);
         // Enqueue for execution (mutations must run in order)
-        const promise = enqueue(() =>
+        const promise: PromiseOrDirect<void> = enqueue(() =>
           childBucket !== null
             ? executeBucket(childBucket, requestContext)
             : markLayerPlanAsDone(
@@ -1270,7 +1270,12 @@ function markLayerPlanAsDone(
       }
     }
   }
-  return childPromises;
+  if (childPromises.length > 0) {
+    // These should never reject; rejections will bubble up through the promise chain
+    return Promise.all(childPromises).then(noop);
+  } else {
+    return;
+  }
 }
 
 function makeSharedState(): SharedBucketState {
