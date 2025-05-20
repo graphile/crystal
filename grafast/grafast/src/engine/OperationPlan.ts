@@ -4304,15 +4304,41 @@ export class OperationPlan {
           for (const lp of reason.parentLayerPlans) {
             const paths = processPolymorphicPathsInLayerPlan(lp);
             for (const p of paths) {
-              if (newPolyPaths.has(p)) {
-                throw new Error(
-                  `GrafastInternalError<f2d906fe-7f52-4234-a172-42691613f733>: Overlapping path ${p} found for ${layerPlan}`,
-                );
-              }
               newPolyPaths.add(p);
             }
           }
           polyPaths = newPolyPaths;
+
+          if (isDev) {
+            // Let's check we're being sensible - each poly path should only be
+            // sourceable from one step, and these steps should only have poly
+            // paths that we understand
+            for (const { sources } of layerPlan.combinations) {
+              const overlapCheck = new Map<string, Step>();
+              for (const { stepId } of sources) {
+                const step = this.stepTracker.getStepById(stepId);
+                const paths = step.polymorphicPaths;
+                if (paths === null) {
+                  throw new Error(
+                    `GrafastInternalError<170ac297-e7b2-4d15-bf3b-1c0c50a0da40>: Step ${step} shouldn't be used in a combo because it's valid in all polymorphic paths`,
+                  );
+                }
+                for (const p of paths) {
+                  if (overlapCheck.has(p)) {
+                    throw new Error(
+                      `GrafastInternalError<f2d906fe-7f52-4234-a172-42691613f733>: Overlapping path ${p} in ${layerPlan} found; sourced from both ${step} and ${overlapCheck.get(p)}`,
+                    );
+                  }
+                  if (!newPolyPaths.has(p)) {
+                    throw new Error(
+                      `GrafastInternalError<c697df8f-e194-42f0-9f73-c510bc2e9b74>: path ${p} in ${layerPlan} not expected; sourced from ${step}`,
+                    );
+                  }
+                  overlapCheck.set(p, step);
+                }
+              }
+            }
+          }
           break;
         }
         case "polymorphic":
