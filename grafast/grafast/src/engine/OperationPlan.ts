@@ -4337,13 +4337,15 @@ export class OperationPlan {
           }
           polyPaths = newPolyPaths;
 
+          // Check that everything is sensible
           if (isDev) {
             // Let's check we're being sensible - each poly path should only be
             // sourceable from one step, and these steps should only have poly
             // paths that we understand
             for (const { sources } of layerPlan.combinations) {
-              const overlapCheck = new Map<string, Step>();
-              for (const { stepId } of sources) {
+              const overlapCheck = new Map<string, (typeof sources)[number]>();
+              for (const source of sources) {
+                const { layerPlanId, stepId } = source;
                 const step = this.stepTracker.getStepById(stepId);
                 const paths = step.polymorphicPaths;
                 if (paths === null) {
@@ -4353,8 +4355,12 @@ export class OperationPlan {
                 }
                 for (const p of paths) {
                   if (overlapCheck.has(p)) {
+                    const sourceLp = this.stepTracker.layerPlans[layerPlanId];
+                    const dup = overlapCheck.get(p)!;
+                    const dupStep = this.stepTracker.getStepById(dup.stepId);
+                    const dupLp = this.stepTracker.layerPlans[dup.layerPlanId];
                     throw new Error(
-                      `GrafastInternalError<f2d906fe-7f52-4234-a172-42691613f733>: Overlapping path ${p} in ${layerPlan} found; sourced from both ${step} and ${overlapCheck.get(p)}`,
+                      `GrafastInternalError<f2d906fe-7f52-4234-a172-42691613f733>: Overlapping path ${p} in ${layerPlan} found; sourced from both ${step} in ${sourceLp} and ${dupStep} in ${dupLp}`,
                     );
                   }
                   if (!newPolyPaths.has(p)) {
@@ -4362,7 +4368,7 @@ export class OperationPlan {
                       `GrafastInternalError<c697df8f-e194-42f0-9f73-c510bc2e9b74>: path ${p} in ${layerPlan} not expected; sourced from ${step}`,
                     );
                   }
-                  overlapCheck.set(p, step);
+                  overlapCheck.set(p, source);
                 }
               }
             }
