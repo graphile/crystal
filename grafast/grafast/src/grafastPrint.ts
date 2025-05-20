@@ -9,6 +9,7 @@ import {
   FLAG_STOPPED,
 } from "./constants.js";
 import { bucketToString } from "./engine/executeBucket.js";
+import { LayerPlan } from "./engine/LayerPlan.js";
 import { OutputPlan } from "./engine/OutputPlan.js";
 import { inspect } from "./inspect.js";
 import { Step } from "./step.js";
@@ -68,6 +69,9 @@ export function _grafastPrint(
     return chalk.gray`(blank)`;
   }
   if (symbol instanceof Step) {
+    return String(symbol);
+  }
+  if (symbol instanceof LayerPlan) {
     return String(symbol);
   }
   if (Array.isArray(symbol)) {
