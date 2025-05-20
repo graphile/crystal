@@ -71,8 +71,8 @@ function isSQL(thing: unknown): thing is SQL {
   } else {
     // An approximation
     if (typeof sql === "object" && sql !== null) {
-      return Object.getOwnPropertySymbols(thing).some(
-        (s) => s.description === "pg-sql2-type",
+      return Object.getOwnPropertySymbols(thing).some((s) =>
+        s.description?.startsWith("pg-sql2-type"),
       );
     } else {
       return false;
@@ -1036,9 +1036,15 @@ function _convertToAST(
   } else if (typeof thing === "object" && thing != null) {
     const prototype = Object.getPrototypeOf(thing);
     if (prototype !== null && prototype !== Object.prototype) {
-      throw new Error(
-        `Attempting to export an instance of a class (at ${locationHint}); you should wrap this definition in EXPORTABLE! (Class: ${thing.constructor})`,
-      );
+      if (thing.constructor) {
+        throw new Error(
+          `Attempting to export an instance of a class (at ${locationHint}); you should wrap this definition in EXPORTABLE! (Class: ${thing.constructor})`,
+        );
+      } else {
+        throw new Error(
+          `Attempting to export non-POJO object (at ${locationHint}); you should wrap this definition in EXPORTABLE! (Prototype: ${inspect(prototype)})`,
+        );
+      }
     }
     const propertyPairs: Array<
       [
