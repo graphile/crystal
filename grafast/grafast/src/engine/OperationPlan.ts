@@ -33,11 +33,11 @@ import {
 import { fieldSelectionsForType } from "../graphqlMergeSelectionSets.js";
 import type { GrafastPlanJSON } from "../index.js";
 import {
-  $$inhibit,
   __FlagStep,
   __ItemStep,
   __TrackedValueStep,
   __ValueStep,
+  $$inhibit,
   error,
   get,
   isDev,
@@ -1649,7 +1649,7 @@ export class OperationPlan {
       >();
       const planFieldReturnTypeEntriesByStepByLayerPlan = new Map<
         LayerPlan,
-        Map<Step, Array<Parameters<typeof this.planFieldReturnType>[0]>>
+        Map<Step, Array<Parameters<typeof this.polymorphicPlanObjectType>[0]>>
       >();
       for (const entry of batch) {
         const [method, rawArgs] = entry;
@@ -1669,9 +1669,9 @@ export class OperationPlan {
             polymorphicResolveTypeEntriesByPolyType.set(polyType, list);
           }
           list.push(args);
-        } else if (method == this.planFieldReturnType) {
+        } else if (method == this.polymorphicPlanObjectType) {
           const args = rawArgs as Parameters<
-            typeof this.planFieldReturnType
+            typeof this.polymorphicPlanObjectType
           >[0];
           const lp = args.layerPlan;
           let planFieldReturnTypeEntriesByStep =
@@ -1964,7 +1964,7 @@ export class OperationPlan {
         if (planFieldReturnTypeEntriesByStep.size <= 1) {
           continue;
         }
-        for (const [_step, entries] of planFieldReturnTypeEntriesByStep) {
+        for (const [step, entries] of planFieldReturnTypeEntriesByStep) {
           // We already know the planningPath lines up.
           // We know all `entries` resolved to the same `step`.
           // We know all `entries` come from the same layer plan.
@@ -1981,7 +1981,7 @@ export class OperationPlan {
           // different types.
 
           const typeNameSet = new Set<string>();
-          entries.forEach((e) => void typeNameSet.add(e.parentObjectType.name));
+          entries.forEach((e) => void typeNameSet.add(e.positionType.name));
           const typeNames = [...typeNameSet];
 
           // TODO: eliminate this
@@ -1992,6 +1992,8 @@ export class OperationPlan {
             typeNames,
             polymorphicPaths,
           );
+
+          this.stepTracker.moveStepToLayerPlan(step, partitionedLayerPlan);
 
           // TODO: Do we need to update the outputPlan.layerPlan too?
           for (const entry of entries) {
@@ -2474,12 +2476,15 @@ export class OperationPlan {
     const polymorphicOutputPlan =
       outputPlan as OutputPlan<OutputPlanTypePolymorphicObject>;
 
-    if (polymorphicLayerPlan.reason.type !== "polymorphic") {
+    if (
+      polymorphicLayerPlan.reason.type !== "polymorphic" &&
+      polymorphicLayerPlan.reason.type !== "polymorphicPartition"
+    ) {
       // NOTE: when queued, this method will be queued with a different layer
       // plan, but `planPending` should go through and convert it to the
       // relevant polymorphic layer plans for us.
       throw new Error(
-        `GrafastInternalError<877eaa1c-30c9-4526-ada4-3ccce020ee0e>: expected ${polymorphicLayerPlan} to be a polymorphic layer plan`,
+        `GrafastInternalError<877eaa1c-30c9-4526-ada4-3ccce020ee0e>: expected ${polymorphicLayerPlan} to be a polymorphic or polymorphicPartition layer plan`,
       );
     }
 
