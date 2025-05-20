@@ -1653,6 +1653,12 @@ export class OperationPlan {
       >();
       for (const entry of batch) {
         const [method, rawArgs] = entry;
+
+        // Tidy up after dedupe
+        rawArgs.parentStep = this.stepTracker.getStepById(
+          rawArgs.parentStep.id,
+        );
+
         if (method === this.polymorphicResolveType) {
           const args = rawArgs as Parameters<
             typeof this.polymorphicResolveType
@@ -1683,7 +1689,7 @@ export class OperationPlan {
               planFieldReturnTypeEntriesByStep,
             );
           }
-          const step = this.stepTracker.getStepById(args.parentStep.id);
+          const step = args.parentStep;
           let list = planFieldReturnTypeEntriesByStep.get(step);
           if (list) {
             list.push(args);
