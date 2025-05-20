@@ -1002,12 +1002,6 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         sourceIndex++
       ) {
         const { stepId, layerPlanId } = sources[sourceIndex];
-        // PERF: isDev
-        if (layerPlanId !== this.reason.parentLayerPlans[sourceIndex]?.id) {
-          throw new Error(
-            `GrafastInternalError<9a03a1b9-7125-41bb-b99c-532ec05a3030>: layer plans out of order in ${this}?!`,
-          );
-        }
         const map = mapByParentLayerPlanId[layerPlanId]!;
         const parentBucket = sharedState._retainedBuckets.get(layerPlanId);
         if (parentBucket != null) {
