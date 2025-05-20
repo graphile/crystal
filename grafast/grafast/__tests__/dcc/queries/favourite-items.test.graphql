@@ -16,6 +16,19 @@
                 __typename
                 id
                 name
+                ... on HasInventory {
+                  items {
+                    __typename
+                    id
+                    name
+                    ... on Equipment {
+                      currentDurability
+                    }
+                    ... on Consumable {
+                      effect
+                    }
+                  }
+                }
               }
             }
           }
@@ -34,6 +47,33 @@
                 __typename
                 id
                 name
+                ... on ActiveCrawler {
+                  favouriteItem {
+                    id
+                    name
+                  }
+                }
+              }
+              friends {
+                __typename
+                id
+                name
+                ... on Crawler {
+                  crawlerNumber
+                }
+                ... on NPC {
+                  exCrawler
+                }
+                ... on Manager {
+                  client {
+                    id
+                    name
+                  }
+                  items {
+                    id
+                    name
+                  }
+                }
               }
             }
           }

@@ -58,6 +58,10 @@ export const makeBaseArgs = () => {
         ROCK_MONSTER
         HALF_ELF
       }
+      interface HasInventory {
+        items: [Item]
+      }
+
       type Guide implements NPC & Character {
         id: Int!
         name: String!
@@ -66,10 +70,11 @@ export const makeBaseArgs = () => {
         friends: [Character]
         saferoomLocation: String
       }
-      type Manager implements NPC & Character {
+      type Manager implements NPC & Character & HasInventory {
         id: Int!
         name: String!
         species: Species
+        items: [Item]
         exCrawler: Boolean
         friends: [Character]
         client: ActiveCrawler
@@ -103,7 +108,7 @@ export const makeBaseArgs = () => {
         name: String!
         crawlerNumber: Int
       }
-      type ActiveCrawler implements Crawler & Character {
+      type ActiveCrawler implements Crawler & Character & HasInventory {
         id: Int!
         name: String!
         species: Species

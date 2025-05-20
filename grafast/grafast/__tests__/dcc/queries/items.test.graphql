@@ -18,6 +18,13 @@
           __typename
           id
           name
+          ... on Equipment {
+            currentDurability
+            maxDurability
+          }
+          ... on Consumable {
+            effect
+          }
         }
       }
     }
