@@ -7,6 +7,19 @@
         __typename
         id
         name
+        ... on Created {
+          creator {
+            id
+            name
+            ... on ActiveCrawler {
+              friends {
+                __typename
+                id
+                name
+              }
+            }
+          }
+        }
       }
       favouriteItem {
         __typename
@@ -18,6 +31,7 @@
             name
             ... on ActiveCrawler {
               bestFriend {
+                __typename
                 id
                 name
               }

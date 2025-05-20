@@ -58,11 +58,6 @@ export const makeBaseArgs = () => {
         ROCK_MONSTER
         HALF_ELF
       }
-      enum ItemType {
-        EQUIPMENT
-        CONSUMABLE
-        MISC
-      }
       type Guide implements NPC & Character {
         id: Int!
         name: String!

@@ -7,21 +7,55 @@
         __typename: 'Equipment',
         id: 207,
         name: 'Enchanted Repeating Crossbow',
+        creator: null,
       },
       {
         __typename: 'Consumable',
         id: 203,
         name: 'Mana Potion',
+        creator: null,
       },
       {
         __typename: 'Consumable',
         id: 204,
         name: 'Healing Potion',
+        creator: null,
       },
       {
         __typename: 'Equipment',
         id: 210,
         name: 'Ugly Backpack With a Completely Useless Design',
+        creator: {
+          id: 101,
+          name: 'Carl',
+          friends: [
+            {
+              __typename: 'ActiveCrawler',
+              id: 102,
+              name: 'Princess Donut',
+            },
+            {
+              __typename: 'ActiveCrawler',
+              id: 103,
+              name: 'Katia',
+            },
+            {
+              __typename: 'ActiveCrawler',
+              id: 104,
+              name: 'Imani',
+            },
+            {
+              __typename: 'ActiveCrawler',
+              id: 105,
+              name: 'Elle',
+            },
+            {
+              __typename: 'Manager',
+              id: 301,
+              name: 'Mordecai',
+            },
+          ],
+        },
       },
     ],
     favouriteItem: {
@@ -31,7 +65,11 @@
       creator: {
         id: 101,
         name: 'Carl',
-        bestFriend: null,
+        bestFriend: {
+          __typename: 'ActiveCrawler',
+          id: 102,
+          name: 'Princess Donut',
+        },
       },
     },
   },

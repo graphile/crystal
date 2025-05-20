@@ -37,9 +37,14 @@ export interface ItemData {
   type?: string;
 }
 
-export interface EquipmentData extends ItemData {}
+export interface EquipmentData extends ItemData {
+  currentDurability?: number;
+  maxDurability: number;
+}
 
-export interface ConsumableData extends ItemData {}
+export interface ConsumableData extends ItemData {
+  effect?: string;
+}
 
 export interface MiscItemData extends ItemData {}
 
@@ -173,20 +178,57 @@ export function makeData(): Database {
       },
     ],
     equipment: [
-      { id: 201, name: "Cloak of Stoutness" },
-      { id: 202, name: "Toe Ring of the Splatter Skunk" },
-      { id: 203, name: "Enchanted War Gauntlet" },
-      { id: 204, name: "Enchanted Crown" },
-      { id: 205, name: "Enchanted Tiara of Mana" },
-      { id: 206, name: "Enchanted Anklet" },
-      { id: 207, name: "Enchanted Repeating Crossbow" },
-      { id: 208, name: "Longsword" },
-      { id: 209, name: "Enchanted Cloak" },
+      {
+        id: 201,
+        name: "Cloak of Stoutness",
+        currentDurability: 300,
+        maxDurability: 300,
+      },
+      {
+        id: 202,
+        name: "Toe Ring of the Splatter Skunk",
+        currentDurability: 50,
+        maxDurability: 1000,
+      },
+      {
+        id: 203,
+        name: "Enchanted War Gauntlet",
+        currentDurability: 50,
+        maxDurability: 1800,
+      },
+      { id: 204, name: "Enchanted Crown", maxDurability: 5000 },
+      {
+        id: 205,
+        name: "Enchanted Tiara of Mana",
+        currentDurability: 0,
+        maxDurability: 2500,
+      },
+      { id: 206, name: "Enchanted Anklet", maxDurability: 100 },
+      {
+        id: 207,
+        name: "Enchanted Repeating Crossbow",
+        currentDurability: 1500,
+        maxDurability: 3000,
+      },
+      {
+        id: 208,
+        name: "Longsword",
+        currentDurability: 10000,
+        maxDurability: 10000,
+      },
+      {
+        id: 209,
+        name: "Enchanted Cloak",
+        currentDurability: 70,
+        maxDurability: 400,
+      },
       {
         /* This item can have an inventory */
         id: 210,
         name: "Ugly Backpack With a Completely Useless Design",
         creator: 101,
+        currentDurability: 100,
+        maxDurability: 100,
         contents: [
           "MiscItem:201",
           "MiscItem:201",
@@ -198,21 +240,40 @@ export function makeData(): Database {
       },
     ],
     consumables: [
-      { id: 201, name: "Rev-Up Immunity Smoothie", type: "Consumable" },
+      {
+        id: 201,
+        name: "Rev-Up Immunity Smoothie",
+        type: "Consumable",
+        effect:
+          "Temporary immunity to all health-seeping conditions and debuffs",
+      },
       { id: 202, name: "Bandage", type: "Consumable" },
-      { id: 203, name: "Mana Potion", type: "Consumable" },
-      { id: 204, name: "Healing Potion", type: "Consumable" },
+      {
+        id: 203,
+        name: "Mana Potion",
+        type: "Consumable",
+        effect: "Fully restores MP",
+      },
+      {
+        id: 204,
+        name: "Healing Potion",
+        type: "Consumable",
+        effect: "Heal 50%+ total health",
+      },
       {
         id: 205,
         name: "Dolores Doesn't Splat Potion",
         type: "Consumable",
         creator: 106,
+        effect: "Soften impact surface. Impact x 5",
       },
       {
         id: 206,
         name: "Carl's Jug O' Boom",
         type: "Consumable",
         creator: 101,
+        effect:
+          "Intense Fire for (Incendiary Device Handling Skill Level x 15) sec.",
       },
     ],
     miscItems: [
