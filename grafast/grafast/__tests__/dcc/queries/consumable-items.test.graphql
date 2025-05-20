@@ -1,0 +1,37 @@
+{
+  crawler(id: 101) {
+    id
+    name
+    ... on HasInventory {
+      items {
+        __typename
+        id
+        name
+        ... on Created {
+          __typename
+          creator {
+            id
+            name
+          }
+          ... on Equipment {
+            maxDurability
+          }
+          ... on Consumable {
+            effect
+          }
+          contents {
+            __typename
+            id
+            name
+            ... on Equipment {
+              maxDurability
+            }
+            ... on Consumable {
+              effect
+            }
+          }
+        }
+      }
+    }
+  }
+}

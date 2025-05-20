@@ -69,7 +69,10 @@
                     id
                     name
                   }
+                }
+                ... on HasInventory {
                   items {
+                    __typename
                     id
                     name
                   }

@@ -169,6 +169,26 @@
               __typename: 'Manager',
               id: 301,
               name: 'Mordecai',
+              items: [
+                {
+                  __typename: 'Consumable',
+                  id: 203,
+                  name: 'Mana Potion',
+                  effect: 'Fully restores MP',
+                },
+                {
+                  __typename: 'Consumable',
+                  id: 203,
+                  name: 'Mana Potion',
+                  effect: 'Fully restores MP',
+                },
+                {
+                  __typename: 'Consumable',
+                  id: 203,
+                  name: 'Mana Potion',
+                  effect: 'Fully restores MP',
+                },
+              ],
             },
           ],
         },
@@ -196,24 +216,122 @@
             id: 102,
             name: 'Princess Donut',
             crawlerNumber: 4119,
+            items: [
+              {
+                __typename: 'Equipment',
+                id: 204,
+                name: 'Enchanted Crown',
+              },
+              {
+                __typename: 'Equipment',
+                id: 206,
+                name: 'Enchanted Anklet',
+              },
+              {
+                __typename: 'Consumable',
+                id: 201,
+                name: 'Rev-Up Immunity Smoothie',
+              },
+              {
+                __typename: 'Consumable',
+                id: 202,
+                name: 'Bandage',
+              },
+              {
+                __typename: 'Consumable',
+                id: 203,
+                name: 'Mana Potion',
+              },
+              {
+                __typename: 'Consumable',
+                id: 204,
+                name: 'Healing Potion',
+              },
+              {
+                __typename: 'Consumable',
+                id: 205,
+                name: "Dolores Doesn't Splat Potion",
+              },
+            ],
           },
           {
             __typename: 'ActiveCrawler',
             id: 103,
             name: 'Katia',
             crawlerNumber: 9077265,
+            items: [
+              {
+                __typename: 'Equipment',
+                id: 207,
+                name: 'Enchanted Repeating Crossbow',
+              },
+              {
+                __typename: 'Consumable',
+                id: 203,
+                name: 'Mana Potion',
+              },
+              {
+                __typename: 'Consumable',
+                id: 204,
+                name: 'Healing Potion',
+              },
+              {
+                __typename: 'Equipment',
+                id: 210,
+                name: 'Ugly Backpack With a Completely Useless Design',
+              },
+            ],
           },
           {
             __typename: 'ActiveCrawler',
             id: 104,
             name: 'Imani',
             crawlerNumber: null,
+            items: [
+              {
+                __typename: 'Equipment',
+                id: 208,
+                name: 'Longsword',
+              },
+              {
+                __typename: 'Equipment',
+                id: 209,
+                name: 'Enchanted Cloak',
+              },
+              {
+                __typename: 'Consumable',
+                id: 204,
+                name: 'Healing Potion',
+              },
+              {
+                __typename: 'Consumable',
+                id: 202,
+                name: 'Bandage',
+              },
+              {
+                __typename: 'Consumable',
+                id: 203,
+                name: 'Mana Potion',
+              },
+            ],
           },
           {
             __typename: 'ActiveCrawler',
             id: 105,
             name: 'Elle',
             crawlerNumber: null,
+            items: [
+              {
+                __typename: 'Consumable',
+                id: 202,
+                name: 'Bandage',
+              },
+              {
+                __typename: 'Consumable',
+                id: 203,
+                name: 'Mana Potion',
+              },
+            ],
           },
           {
             __typename: 'Manager',
@@ -226,14 +344,17 @@
             },
             items: [
               {
+                __typename: 'Consumable',
                 id: 203,
                 name: 'Mana Potion',
               },
               {
+                __typename: 'Consumable',
                 id: 203,
                 name: 'Mana Potion',
               },
               {
+                __typename: 'Consumable',
                 id: 203,
                 name: 'Mana Potion',
               },

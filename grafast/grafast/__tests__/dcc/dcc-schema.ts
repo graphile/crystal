@@ -125,6 +125,7 @@ export const makeBaseArgs = () => {
       }
       interface Created {
         creator: Crawler
+        contents: [Item]
       }
       type Equipment implements Item & Created {
         id: Int!

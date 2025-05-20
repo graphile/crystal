@@ -40,10 +40,12 @@ export interface ItemData {
 export interface EquipmentData extends ItemData {
   currentDurability?: number;
   maxDurability: number;
+  contents?: ItemSpec[];
 }
 
 export interface ConsumableData extends ItemData {
   effect?: string;
+  contents?: ItemSpec[];
 }
 
 export interface MiscItemData extends ItemData {}
@@ -64,6 +66,7 @@ export function makeData(): Database {
         species: "Human",
         name: "Carl",
         items: [
+          "MiscItem:206",
           "Equipment:201",
           "Equipment:202",
           "Equipment:203",
@@ -73,8 +76,9 @@ export function makeData(): Database {
           "Consumable:204",
           "Consumable:205",
           "Consumable:206",
+          "Equipment:211",
         ],
-        favouriteItem: "Equipment:203",
+        favouriteItem: "Equipment:211",
         friends: [102, 103, 104, 105, 301],
         bestFriend: 102,
         crawlerNumber: 4122,
@@ -238,12 +242,20 @@ export function makeData(): Database {
           "MiscItem:203",
         ],
       },
+      {
+        id: 211,
+        name: "Enchanted Anarchist's Battle Rattle",
+        maxDurability: 10000,
+        currentDurability: 10000,
+        contents: ["Equipment:212", "Equipment:213"],
+      },
+      { id: 212, name: "Earth Upgrade Patch", maxDurability: 10000 },
+      { id: 213, name: "Skyfowl Upgrade Patch", maxDurability: 10000 },
     ],
     consumables: [
       {
         id: 201,
         name: "Rev-Up Immunity Smoothie",
-        type: "Consumable",
         effect:
           "Temporary immunity to all health-seeping conditions and debuffs",
       },
@@ -251,46 +263,68 @@ export function makeData(): Database {
       {
         id: 203,
         name: "Mana Potion",
-        type: "Consumable",
         effect: "Fully restores MP",
       },
       {
         id: 204,
         name: "Healing Potion",
-        type: "Consumable",
         effect: "Heal 50%+ total health",
       },
       {
         id: 205,
         name: "Dolores Doesn't Splat Potion",
-        type: "Consumable",
         creator: 106,
         effect: "Soften impact surface. Impact x 5",
+        contents: ["Consumable:207", "Consumable:208"],
       },
       {
         id: 206,
         name: "Carl's Jug O' Boom",
-        type: "Consumable",
         creator: 101,
         effect:
           "Intense Fire for (Incendiary Device Handling Skill Level x 15) sec.",
+        contents: ["Consumable:209", "MiscItem:204", "MiscItem:205"],
+      },
+      {
+        id: 207,
+        name: "Crowd Blast Potion",
+        effect: "Imitates the Crowd Blast skill",
+      },
+      {
+        id: 208,
+        name: "Rock Buffalo Potion",
+        effect: "A required component of Dolores Doesn't Splat Potion",
+      },
+      {
+        id: 209,
+        name: "Goblin Oil",
+        effect: "Has many uses",
       },
     ],
     miscItems: [
       {
         id: 201,
         name: "Scrap Metal",
-        type: "Misc",
       },
       {
         id: 202,
         name: "Scrap Metal Pole",
-        type: "Misc",
       },
       {
         id: 203,
         name: "Metal Bearing",
-        type: "Misc",
+      },
+      {
+        id: 204,
+        name: "Low-Grade Moonshine Jug",
+      },
+      {
+        id: 205,
+        name: "Torch",
+      },
+      {
+        id: 206,
+        name: "Fireball or Custard? Scratchcard",
       },
     ],
   };
