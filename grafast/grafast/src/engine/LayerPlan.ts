@@ -969,8 +969,10 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       if (!parentBucket) continue;
       flagUnion |= parentBucket.flagUnion;
       totalSize += parentBucket.size;
+      const map = mapByParentLayerPlanId[plp.id]!;
       for (let i = 0, l = parentBucket.size; i < l; i++) {
         const sourcePolyPath = parentBucket.polymorphicPathList[i];
+        map.set(i, polymorphicPathList.length);
         polymorphicPathList.push(sourcePolyPath);
       }
     }
@@ -1033,7 +1035,6 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         sourceIndex++
       ) {
         const { stepId, layerPlanId } = sources[sourceIndex];
-        const map = mapByParentLayerPlanId[layerPlanId]!;
         const parentBucket = sharedState._retainedBuckets.get(layerPlanId);
         if (parentBucket != null) {
           const sourceStore = parentBucket.store.get(stepId);
@@ -1057,7 +1058,6 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
 
             // Now set the polymorphic path for this new entry
             ev._copyResult(newIndex, sourceStore, originalIndex);
-            map.set(originalIndex, newIndex);
 
             iterators[newIndex] = parentBucket.iterators[originalIndex];
           }
