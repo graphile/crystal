@@ -1,0 +1,30 @@
+{
+  crawler(id: 103) {
+    id
+    name
+    ... on ActiveCrawler {
+      items {
+        __typename
+        id
+        name
+      }
+      favouriteItem {
+        __typename
+        id
+        name
+        ... on Created {
+          creator {
+            id
+            name
+            ... on ActiveCrawler {
+              bestFriend {
+                id
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

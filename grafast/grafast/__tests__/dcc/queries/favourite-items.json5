@@ -1,0 +1,38 @@
+{
+  crawler: {
+    id: 103,
+    name: 'Katia',
+    items: [
+      {
+        __typename: 'Equipment',
+        id: 207,
+        name: 'Enchanted Repeating Crossbow',
+      },
+      {
+        __typename: 'Consumable',
+        id: 203,
+        name: 'Mana Potion',
+      },
+      {
+        __typename: 'Consumable',
+        id: 204,
+        name: 'Healing Potion',
+      },
+      {
+        __typename: 'Equipment',
+        id: 210,
+        name: 'Ugly Backpack With a Completely Useless Design',
+      },
+    ],
+    favouriteItem: {
+      __typename: 'Equipment',
+      id: 210,
+      name: 'Ugly Backpack With a Completely Useless Design',
+      creator: {
+        id: 101,
+        name: 'Carl',
+        bestFriend: null,
+      },
+    },
+  },
+}

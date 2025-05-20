@@ -16,7 +16,13 @@ import {
   loadOne,
   makeGrafastSchema,
 } from "../../dist/index.js";
-import type { CrawlerData, Database, ItemSpec, NpcData } from "./dcc-data.js";
+import type {
+  CrawlerData,
+  Database,
+  EquipmentData,
+  ItemSpec,
+  NpcData,
+} from "./dcc-data.js";
 import {
   batchGetConsumableById,
   batchGetCrawlerById,
@@ -117,15 +123,23 @@ export const makeBaseArgs = () => {
         name: String
         contents: [Item]
       }
-      type Equipment implements Item {
-        id: Int!
-        name: String
-        contents: [Item]
+      interface Created {
+        creator: Crawler
       }
-      type Consumable implements Item {
+      type Equipment implements Item & Created {
         id: Int!
         name: String
         contents: [Item]
+        creator: Crawler
+        currentDurability: Int
+        maxDurability: Int
+      }
+      type Consumable implements Item & Created {
+        id: Int!
+        name: String
+        contents: [Item]
+        creator: Crawler
+        effect: String
       }
       type MiscItem implements Item {
         id: Int!
@@ -249,6 +263,13 @@ export const makeBaseArgs = () => {
           };
         },
       },
+      Equipment: {
+        creator: getCreator,
+      },
+      Consumable: {
+        creator: getCreator,
+      },
+      MiscItem: {},
     },
   });
   const data = makeData();
@@ -260,6 +281,12 @@ export const makeBaseArgs = () => {
     contextValue: { data },
   };
 };
+
+function getCreator($source: Step<{ creator?: number }>) {
+  const $data = context().get("data");
+  const $id = inhibitOnNull(get($source, "creator"));
+  return loadOne($id, $data, null, batchGetCrawlerById);
+}
 
 function crawlerToTypeName(crawler: CrawlerData): string | null {
   if (crawler.deleted) return "DeletedCrawler";
