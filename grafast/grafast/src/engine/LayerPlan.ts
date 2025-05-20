@@ -969,6 +969,10 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       if (!parentBucket) continue;
       flagUnion |= parentBucket.flagUnion;
       totalSize += parentBucket.size;
+      for (let i = 0, l = parentBucket.size; i < l; i++) {
+        const sourcePolyPath = parentBucket.polymorphicPathList[i];
+        polymorphicPathList.push(sourcePolyPath);
+      }
     }
     for (const stepId of copyStepIds) {
       let newEv: ExecutionValue | undefined;
@@ -1014,8 +1018,6 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       );
     }
 
-    let size = 0;
-
     ////////////////////////////////////////////////////////////////////////////
     //
     // Code that would be in the switch statement if we were normal...
@@ -1052,25 +1054,16 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
               continue;
             }
             const newIndex = values.length;
-            const sourcePolyPath =
-              parentBucket.polymorphicPathList[originalIndex];
 
             // Now set the polymorphic path for this new entry
             ev._copyResult(newIndex, sourceStore, originalIndex);
             map.set(originalIndex, newIndex);
-            polymorphicPathList[newIndex] = sourcePolyPath;
 
             iterators[newIndex] = parentBucket.iterators[originalIndex];
           }
         }
       }
-      if (size === 0) {
-        size = values.length;
-        if (size === 0) {
-          // No data; skip
-          break;
-        }
-      } else if (size !== values.length) {
+      if (values.length !== totalSize) {
         throw new Error(
           `GrafastInternalError<9d205bd8-2d00-4d9a-8471-4e24d4720806>: inconsistency! Different lengths in store sizes found`,
         );
@@ -1082,13 +1075,13 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     //
     ////////////////////////////////////////////////////////////////////////////
 
-    if (size > 0) {
+    if (totalSize > 0) {
       // Reference
       const childBucket = newBucket(
         { metaByMetaKey: undefined /* use defaults */, sharedState },
         {
           layerPlan: this,
-          size,
+          size: totalSize,
           store,
           // PERF: not necessarily, if we don't copy the errors, we don't have the errors.
           flagUnion,
