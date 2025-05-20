@@ -1796,7 +1796,16 @@ export class OperationPlan {
           commonStep = $combined;
         } else {
           $original = [...steps][0];
-          commonLayerPlan = firstArgsTuple.layerPlan;
+          const layerPlans = new Set<LayerPlan>();
+          for (const tuple of argsTupleList) {
+            layerPlans.add(tuple.layerPlan);
+          }
+          if (layerPlans.size === 1) {
+            commonLayerPlan = [...layerPlans][0];
+          } else {
+            commonLayerPlan =
+              this.getCombinedLayerPlanForLayerPlans(layerPlans);
+          }
 
           commonStep = graphqlType.extensions?.grafast?.toSpecifier
             ? withGlobalLayerPlan(
@@ -1818,13 +1827,7 @@ export class OperationPlan {
               : $original;
 
           for (const argsTuple of argsTupleList) {
-            if (isDev) {
-              if (argsTuple.layerPlan !== commonLayerPlan) {
-                throw new Error(
-                  `GrafastInternalError<6ebb715a-4a3c-40be-83ea-b03ca02cd221>: expected ${argsTuple.layerPlan} to be ${commonLayerPlan} since ${argsTuple.parentStep} matched ${commonStep}`,
-                );
-              }
-            }
+            argsTuple.layerPlan = commonLayerPlan;
             const polymorphicPaths = argsTuple.polymorphicPaths;
             if (polymorphicPaths) {
               for (const path of polymorphicPaths) {
@@ -3005,7 +3008,7 @@ export class OperationPlan {
         if (
           possiblyPeer !== step &&
           !possiblyPeer.hasSideEffects &&
-          possiblyPeer.layerPlan === layerPlan &&
+          isPeerLayerPlan(possiblyPeer.layerPlan, layerPlan) &&
           possiblyPeer._stepOptions.stream == null &&
           possiblyPeer.peerKey === peerKey
           // && possiblyPeer._stepOptions.stream?.initialCount === streamInitialCount
@@ -3060,7 +3063,7 @@ export class OperationPlan {
         if (
           peerLayerPlan.depth >= minDepth &&
           possiblyPeer.dependencies.length === dependencyCount &&
-          peerLayerPlan === ancestry[peerLayerPlan.depth] &&
+          isPeerLayerPlan(peerLayerPlan, ancestry[peerLayerPlan.depth]) &&
           peerFlags[dependencyIndex] === flags[dependencyIndex] &&
           peerOnReject[dependencyIndex] === onReject[dependencyIndex]
         ) {
@@ -3126,7 +3129,7 @@ export class OperationPlan {
             } = possiblyPeer;
             if (
               peerDependencies.length === dependencyCount &&
-              peerLayerPlan === ancestry[peerLayerPlan.depth] &&
+              isPeerLayerPlan(peerLayerPlan, ancestry[peerLayerPlan.depth]) &&
               peerFlags[dependencyIndex] === flags[dependencyIndex] &&
               peerOnReject[dependencyIndex] === onReject[dependencyIndex]
             ) {
@@ -3628,25 +3631,45 @@ export class OperationPlan {
 
     if (winner.polymorphicPaths !== null) {
       const polymorphicPaths = new Set<string>();
-      const layerPolymorphicPaths = polymorphicPathsForLayer(winner.layerPlan)!;
-      // PERF: this is hideous
-      for (const s of [step, ...equivalentSteps]) {
-        for (const p of s.polymorphicPaths!) {
-          let trimmed = p;
-          let i;
-          while (
-            !layerPolymorphicPaths.has(trimmed) &&
-            (i = trimmed.lastIndexOf(">")) >= 0
-          ) {
-            if (i === 0) {
-              throw new Error(
-                `GrafastInternalError<93da1006-3af9-44dd-a54b-5bf6fe3e791c>: ${s} has polymorphic paths ${[...(s.polymorphicPaths ?? [])]}; but ${p} is not in ${[...layerPolymorphicPaths]}.`,
-              );
+
+      // If the paths don't match up we must be in a polymorphicPartition and
+      // need to move the winner out of it
+      tryAgain: for (let attempts = 0; attempts < 2; attempts++) {
+        const layerPolymorphicPaths = polymorphicPathsForLayer(
+          winner.layerPlan,
+        )!;
+        // PERF: this string trimming is hideous
+        for (const s of [step, ...equivalentSteps]) {
+          for (const p of s.polymorphicPaths!) {
+            let trimmed = p;
+            let i;
+            while (
+              !layerPolymorphicPaths.has(trimmed) &&
+              (i = trimmed.lastIndexOf(">")) >= 0
+            ) {
+              if (i === 0) {
+                const reason = winner.layerPlan.reason;
+                if (reason.type === "polymorphicPartition") {
+                  // Hoist winner into the polymorphic layer plan, and restart
+                  // the loop
+                  this.stepTracker.moveStepToLayerPlan(
+                    winner,
+                    reason.parentLayerPlan,
+                  );
+                  polymorphicPaths.clear();
+                  continue tryAgain;
+                } else {
+                  throw new Error(
+                    `GrafastInternalError<93da1006-3af9-44dd-a54b-5bf6fe3e791c>: ${s} has polymorphic paths ${[...(s.polymorphicPaths ?? [])]}; but ${p} is not in ${[...layerPolymorphicPaths]}.`,
+                  );
+                }
+              }
+              trimmed = trimmed.slice(0, i);
             }
-            trimmed = trimmed.slice(0, i);
+            polymorphicPaths.add(trimmed);
           }
-          polymorphicPaths.add(trimmed);
         }
+        break;
       }
       winner.polymorphicPaths = polymorphicPaths;
     }
@@ -5264,5 +5287,17 @@ function stepIsValidInPolyPath($step: Step, polyPath: string): boolean {
     const i = trimmed.lastIndexOf(">");
     trimmed = trimmed.slice(0, i);
   } while (trimmed.length > 0 && trimmed[0] === ">");
+  return false;
+}
+
+function isPeerLayerPlan(lp1: LayerPlan, lp2: LayerPlan) {
+  if (lp1 === lp2) return true;
+  if (
+    lp1.reason.type === "polymorphicPartition" &&
+    lp2.reason.type === "polymorphicPartition" &&
+    lp1.reason.parentLayerPlan === lp2.reason.parentLayerPlan
+  ) {
+    return true;
+  }
   return false;
 }
