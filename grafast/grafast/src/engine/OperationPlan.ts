@@ -4300,6 +4300,34 @@ export class OperationPlan {
           break;
         }
         case "combined": {
+          // Resolve redundant combinations now plans have been deduped/optimized
+          for (const combo of layerPlan.combinations) {
+            const { sources } = combo;
+            let newSources: Array<(typeof sources)[number]> | null = null;
+            const l = sources.length;
+            // Deliberately miss the first (index=0) item
+            for (let i = l - 1; i > 0; i--) {
+              const source = sources[i];
+              const { layerPlanId, stepId } = source;
+              for (let j = i - 1; j >= 0; j--) {
+                const otherSource = sources[j];
+                if (
+                  otherSource.layerPlanId === layerPlanId &&
+                  otherSource.stepId === stepId
+                ) {
+                  if (!newSources) newSources = [...sources];
+                  // Duplicate! Remove it!
+                  newSources.splice(i, 1);
+                  break;
+                }
+              }
+            }
+            if (newSources) {
+              combo.sources = newSources;
+            }
+          }
+
+          // Populate our final polyPaths
           const newPolyPaths = new Set<string>();
           for (const lp of reason.parentLayerPlans) {
             const paths = processPolymorphicPathsInLayerPlan(lp);
