@@ -299,7 +299,7 @@ type StepAccessKey<
   : TStep extends Step<infer UData>
     ? UData extends Record<string, any>
       ? Step<UData[TAttr]>
-      : string
+      : Step<any>
     : never;
 
 /**
