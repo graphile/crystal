@@ -50,6 +50,25 @@ export interface ConsumableData extends ItemData {
 
 export interface MiscItemData extends ItemData {}
 
+export interface Location {
+  id: number;
+  name: string;
+  type: number;
+  floors: number[];
+}
+
+export interface SafeRoom {
+  id: number;
+  hasPersonalSpace: boolean;
+  hasStaff?: true;
+}
+
+export interface Club {
+  id: number;
+  manager: number;
+  security?: number[];
+}
+
 export interface Database {
   crawlers: readonly CrawlerData[];
   npcs: readonly NpcData[];

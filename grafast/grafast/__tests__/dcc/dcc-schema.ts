@@ -147,8 +147,36 @@ export const makeBaseArgs = () => {
         name: String
         contents: [Item]
       }
+      interface Location {
+        id: Int!
+        name: String!
+        floors: [Int!]!
+      }
+
+      type SafeRoom implements Location {
+        id: Int!
+        name: String!
+        floors: [Int!]!
+        hasPersonalSpace: Boolean!
+        hasStaff: Boolean
+      }
+
+      type Club implements Location {
+        id: Int!
+        name: String!
+        floors: [Int!]!
+        manager: NPC!
+        security: [Security!]
+      }
+
+      type Floor {
+        number: Int!
+        locations: [Location!]!
+      }
+
       type Query {
         crawler(id: Int!): Crawler
+        floor(number: Int!): Floor
       }
     `,
     plans: {
@@ -165,6 +193,9 @@ export const makeBaseArgs = () => {
         crawler(_: any, { $id }: FieldArgs) {
           const $data = context().get("data");
           return loadOne($id as Step<number>, $data, null, batchGetCrawlerById);
+        },
+        floor(_: any, { $number }: FieldArgs) {
+          return lambda($number, getFloor);
         },
       },
       ActiveCrawler: {
@@ -319,4 +350,11 @@ function decodeItemSpec(itemSpec: ItemSpec): {
   const [__typename, rawID] = itemSpec.split(":");
   const id = parseInt(rawID, 10);
   return { __typename, id };
+}
+
+function getFloor(number: number) {
+  if (number >= 1 && number <= 18) {
+    return { number };
+  }
+  return null;
 }
