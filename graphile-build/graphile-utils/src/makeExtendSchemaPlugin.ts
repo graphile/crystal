@@ -83,6 +83,8 @@ export type ObjectPlan<TSource = any, TContext = any> = {
   __assertStep?:
     | ((step: ExecutableStep) => asserts step is ExecutableStep)
     | { new (...args: any[]): ExecutableStep };
+  __isTypeOf?: GraphQLIsTypeOfFn<any, any>;
+  __planType?($specifier: Step): Step;
   __scope?: GraphileBuild.ScopeObject;
 } & {
   [key: string]:
@@ -425,11 +427,12 @@ export function makeExtendSchemaPlugin(
               const name = getName(definition.name);
               const description = getDescription(definition.description);
               const directives = getDirectives(definition.directives);
+              const p = (plans[name] ?? {}) as ObjectPlan;
               const scope = {
                 __origin: `makeExtendSchemaPlugin`,
                 directives,
                 ...scopeFromDirectives(directives),
-                ...plans[name]?.__scope,
+                ...p.__scope,
               };
               build.registerObjectType(
                 name,
@@ -450,11 +453,17 @@ export function makeExtendSchemaPlugin(
                         description,
                       }
                     : null),
-                  ...(plans?.[name]?.__assertStep
+                  ...(p.__isTypeOf
+                    ? {
+                        isTypeOf: p.__isTypeOf,
+                      }
+                    : null),
+                  ...(p.__assertStep || p.__planType
                     ? {
                         extensions: {
                           grafast: {
-                            assertStep: plans[name].__assertStep as any,
+                            assertStep: p.__assertStep as any,
+                            planType: p.__planType as any,
                           },
                         } as GraphQLObjectTypeExtensions<any, any>,
                       }
