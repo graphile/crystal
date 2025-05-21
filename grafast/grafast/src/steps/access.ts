@@ -284,13 +284,31 @@ export function access<TData>(
   return new AccessStep<TData>(parentPlan, path, fallback);
 }
 
+type StepGetKeys<TStep extends Step> = TStep extends { get(attr: infer U): any }
+  ? U
+  : TStep extends Step<infer UData>
+    ? UData extends Record<string, any>
+      ? keyof UData
+      : string
+    : never;
+type StepAccessKey<
+  TStep extends Step,
+  TAttr extends StepGetKeys<TStep> & string,
+> = TStep extends { get(attr: any): infer U }
+  ? U
+  : TStep extends Step<infer UData>
+    ? UData extends Record<string, any>
+      ? UData[TAttr]
+      : string
+    : never;
+
 /**
  * Call `$step.get(attr)` if possible, falling back to `access($step, attr)`.
  */
-export function get<TData, TAttr extends string>(
-  $step: Step<TData>,
-  attr: TAttr,
-): Step<TData extends Record<string, any> ? TData[TAttr] : any> {
+export function get<
+  TStep extends Step,
+  TAttr extends StepGetKeys<TStep> & string,
+>($step: TStep, attr: TAttr): Step<StepAccessKey<TStep, TAttr>> {
   return "get" in $step && typeof $step.get === "function"
     ? $step.get(attr)
     : access($step, attr);

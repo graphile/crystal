@@ -1084,7 +1084,8 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 const typeAttrName = polymorphism.typeAttributes[0];
                 const typeNameFromType = EXPORTABLE(
                   (interfaceTypeName, polymorphism) => {
-                    function typeNameFromType(typeVal: string) {
+                    function typeNameFromType(typeVal: unknown) {
+                      if (typeof typeVal !== "string") return null;
                       return polymorphism.types[typeVal]?.name ?? null;
                     }
                     typeNameFromType.displayName = `${interfaceTypeName}_typeNameFromType`;

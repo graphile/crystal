@@ -3057,7 +3057,7 @@ export function makeExampleSchema(
                   : singleTableItemsResource.get({
                       id: get($inStep, "id"),
                     });
-              const $type = get($record, "type");
+              const $type = get($record, "type") as Step<string>;
               const $__typename = lambda(
                 $type,
                 singleTableTypeNameCallback,
@@ -3284,7 +3284,7 @@ export function makeExampleSchema(
                   : relationalItemsResource.get({
                       id: get($inStep, "id"),
                     });
-              const $type = get($base, "type");
+              const $type = get($base, "type") as Step<string>;
               const $__typename = lambda(
                 $type,
                 relationalItemTypeNameFromType,
