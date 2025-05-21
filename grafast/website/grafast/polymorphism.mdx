@@ -119,7 +119,7 @@ of its `planType` method, which the schema author supplies.
 ### `planType`
 
 If you use `makeGrafastSchema()` then you can specify `__planType` on the
-interface type:
+interface or union type:
 
 ```ts
 const schema = makeGrafastSchema({
@@ -128,9 +128,16 @@ const schema = makeGrafastSchema({
       id: ID!
       #...
     }
+    union Entity = Animal | Alien
   `,
   plans: {
     Animal: {
+      __planType($specifier) {
+        /* ... */
+      },
+      // Also: __toSpecifier($step)
+    },
+    Entity: {
       __planType($specifier) {
         /* ... */
       },
@@ -158,6 +165,18 @@ const Animal = new GraphQLInterfaceType({
     },
   },
 });
+const Entity = new GraphQLUnionType({
+  name: "Entity",
+  types: [Animal /* , ... */],
+  extensions: {
+    grafast: {
+      planType($specifier) {
+        /* ... */
+      },
+      // Also: toSpecifier($step)
+    },
+  },
+});
 ```
 
 However you add it, `planType` accepts two parameters: the specifier step, and
@@ -169,7 +188,7 @@ entries:
   concrete object object type.
 - `planForType(t)` (optional): a function that is called for each possible
   concrete object type, `t`, and must return the step to use for that type (or
-`null` if creating such a step is not possible). If
+  `null` if creating such a step is not possible). If
   unspecified, the `$specifier` step will be used for all object types.
 
 In our "fetch-to-type" example from before, `planType` might look like this:
@@ -339,7 +358,47 @@ consistent data whether there's one step or many. However, if there was just one
 step then we also make available the original step via the `info` argument
 (`info.$original`); you may use this if you want to be extra efficient somehow.
 
-<!-- TODO: give an example. -->
+As shown in the [planType](#plantype) examples above, `toSpecifier` also goes in
+the union or interface type's extensions (`extensions.grafast.toSpecifier`); how
+you would populate this depends on the framework you're using; here's an example
+using `makeGrafastSchema`:
+
+```ts
+const schema = makeGrafastSchema({
+  typeDefs: /* GraphQL */ `
+    interface Animal {
+      id: ID!
+      #...
+    }
+  `,
+  plans: {
+    Animal: {
+      __toSpecifier($step) {
+        // A simple data object with just the ID, perfect for accumulating
+        return object({ id: get($step, "id") });
+      },
+      __planType($obj) {
+        // Extract the ID
+        const $id = get($obj, "id");
+        // Fetch the record (same for all types)
+        const $record = loadOne($id, batchGetAnimalById);
+        // Determine the GraphQL type name for the record
+        const $__typename = $record.get("typename");
+        // Return our polymorphic planner
+        return {
+          $__typename,
+          planForType() {
+            // We've already fetched the record, which is polymorphic, and we've
+            // already determined the type; all types can thus share this same
+            // step.
+            return $record;
+          },
+        };
+      },
+    },
+  },
+});
+```
 
 ## Caveats
 
