@@ -17,6 +17,8 @@ import { arrayOfLength, arraysMatch, setsMatch } from "../utils.js";
 import { batchExecutionValue, newBucket } from "./executeBucket.js";
 import type { OperationPlan } from "./OperationPlan";
 
+const SKIP_FLAGS = FLAG_STOPPED | FLAG_POLY_SKIPPED;
+
 /*
  * Branching: e.g. polymorphic, conditional, etc - means that different
  * directions can be chosen - the plan "branches" at that point based on a
@@ -526,7 +528,23 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     return this.operationPlan._addStep(step);
   }
 
-  public finalize(): void {}
+  public finalize(): void {
+    this.finalCombinations = this.combinations.map((c) => {
+      const { targetStepId, sources } = c;
+      const sourceStepsByLayerPlanId = Object.create(null) as Record<
+        LayerPlan["id"],
+        Step["id"][]
+      >;
+      for (const { layerPlanId, stepId } of sources) {
+        sourceStepsByLayerPlanId[layerPlanId] ??= [];
+        sourceStepsByLayerPlanId[layerPlanId].push(stepId);
+      }
+      return {
+        targetStepId,
+        sourceStepsByLayerPlanId,
+      };
+    });
+  }
 
   public newBucket(parentBucket: Bucket): Bucket | null {
     if (this.reason.type === "combined") {
@@ -948,8 +966,10 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         `GrafastInternalError<59c54cd0-ee32-478a-9e0e-4123eec2f8f5>: newCombinedBucket must only be called on combined layer plans`,
       );
     }
+
     const { sharedState } = finalParentBucket;
     const { copyStepIds } = this;
+
     const store: Bucket["store"] = new Map();
     const polymorphicPathList: (string | null)[] = [];
     const iterators: Array<Set<AsyncIterator<any> | Iterator<any>>> = [];
@@ -959,6 +979,8 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     > = Object.create(null);
     let flagUnion = NO_FLAGS;
     let totalSize = 0;
+    const batchStepIdsToCopy = new Set<number>();
+
     for (const plp of this.reason.parentLayerPlans) {
       mapByParentLayerPlanId[plp.id] = new Map();
       const parentBucket = sharedState._retainedBuckets.get(plp.id);
@@ -971,41 +993,42 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         map.set(i, polymorphicPathList.length);
         polymorphicPathList.push(sourcePolyPath);
       }
+      for (const copyStepId of copyStepIds) {
+        if (store.has(copyStepId)) continue;
+        const ev = parentBucket.store.get(copyStepId);
+        if (ev == null) {
+          // No action
+          // TODO: do we need a placeholder for not found evs? I don't think so -
+          // it implies that the dependency bucket doesn't exist and thus nothing
+          // will use it?
+        } else if (ev.isBatch) {
+          batchStepIdsToCopy.add(copyStepId);
+        } else {
+          store.set(copyStepId, ev);
+        }
+      }
     }
-    for (const stepId of copyStepIds) {
-      let newEv: ExecutionValue | undefined;
+
+    for (const stepId of batchStepIdsToCopy) {
+      const newEv = batchExecutionValue(
+        arrayOfLength(totalSize, null),
+        arrayOfLength(totalSize, FLAG_NULL & FLAG_STOPPED),
+      );
+      store.set(stepId, newEv);
       let offset = 0;
       for (const plp of this.reason.parentLayerPlans) {
         const parentBucket = sharedState._retainedBuckets.get(plp.id);
         if (!parentBucket) continue;
-        const ev = parentBucket.store.get(stepId);
-        if (ev == null) {
-          // No action
-        } else if (ev.isBatch) {
-          // Create a batch execution value if one doesn't already exist
-          if (!newEv) {
-            // By default, these values aren't used
-            newEv = batchExecutionValue(
-              arrayOfLength(totalSize, null),
-              arrayOfLength(totalSize, FLAG_NULL & FLAG_STOPPED),
-            );
-          }
+
+        const sourceEv = parentBucket.store.get(stepId);
+        if (sourceEv != null) {
           // Populate it with the values we care about
           for (let i = 0, l = parentBucket.size; i < l; i++) {
-            newEv._copyResult(i + offset, ev, i);
+            newEv._copyResult(i + offset, sourceEv, i);
           }
-        } else {
-          newEv = ev;
         }
 
         offset += parentBucket.size;
-      }
-      if (newEv != null) {
-        store.set(stepId, newEv);
-      } else {
-        // TODO: do we need a placeholder for not found evs? I don't think so -
-        // it implies that the dependency bucket doesn't exist and thus nothing
-        // will use it?
       }
     }
 
@@ -1021,43 +1044,44 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     // Code that would be in the switch statement if we were normal...
     //
 
-    for (const { targetStepId, sources } of this.combinations) {
-      const values: any[] = [];
-      const ev = batchExecutionValue(values);
+    for (const { targetStepId, sourceStepsByLayerPlanId } of this
+      .finalCombinations) {
+      const ev = batchExecutionValue(
+        arrayOfLength(totalSize, null),
+        arrayOfLength(totalSize, FLAG_NULL & FLAG_STOPPED),
+      );
       store.set(targetStepId, ev);
-      for (
-        let sourceIndex = 0, sourceCount = sources.length;
-        sourceIndex < sourceCount;
-        sourceIndex++
-      ) {
-        const { stepId, layerPlanId } = sources[sourceIndex];
-        const parentBucket = sharedState._retainedBuckets.get(layerPlanId);
-        if (parentBucket != null) {
-          const sourceStore = parentBucket.store.get(stepId);
-          if (!sourceStore) {
-            const step = this.operationPlan.stepTracker.getStepById(stepId);
-            throw new Error(
-              `GrafastInternalError<a48ca88c-e4b9-4a4f-9a38-846fa067f143>: missing source store for ${step} (${stepId}) in ${this}`,
-            );
-          }
-          for (
-            let originalIndex = 0;
-            originalIndex < parentBucket.size;
-            originalIndex++
-          ) {
-            const newIndex = values.length;
+      let offset = 0;
+      for (const plp of this.reason.parentLayerPlans) {
+        const parentBucket = sharedState._retainedBuckets.get(plp.id);
+        if (parentBucket == null) continue;
 
-            // Now set the polymorphic path for this new entry
-            ev._copyResult(newIndex, sourceStore, originalIndex);
+        for (
+          let originalIndex = 0;
+          originalIndex < parentBucket.size;
+          originalIndex++
+        ) {
+          const newIndex = originalIndex + offset;
 
-            iterators[newIndex] = parentBucket.iterators[originalIndex];
+          if (sourceStepsByLayerPlanId[plp.id]) {
+            for (const stepId of sourceStepsByLayerPlanId[plp.id]) {
+              const sourceStore = parentBucket.store.get(stepId);
+              if (!sourceStore) {
+                const step = this.operationPlan.stepTracker.getStepById(stepId);
+                throw new Error(
+                  `GrafastInternalError<a48ca88c-e4b9-4a4f-9a38-846fa067f143>: missing source store for ${step} (${stepId}) in ${this}`,
+                );
+              }
+              if ((sourceStore._flagsAt(originalIndex) & SKIP_FLAGS) == 0) {
+                ev._copyResult(newIndex, sourceStore, originalIndex);
+                break;
+              }
+            }
           }
+
+          iterators[newIndex] = parentBucket.iterators[originalIndex];
         }
-      }
-      if (values.length !== totalSize) {
-        throw new Error(
-          `GrafastInternalError<9d205bd8-2d00-4d9a-8471-4e24d4720806>: inconsistency! Different lengths in store sizes found; ${values.length} !== ${totalSize}`,
-        );
+        offset += parentBucket.size;
       }
     }
 
@@ -1104,6 +1128,13 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       layerPlanId: LayerPlan["id"];
       stepId: Step["id"];
     }[];
+    targetStepId: number;
+  }> = [];
+  /** @internal */
+  public finalCombinations: Array<{
+    sourceStepsByLayerPlanId: {
+      [layerPlanId: LayerPlan["id"]]: ReadonlyArray<Step["id"]>;
+    };
     targetStepId: number;
   }> = [];
   public addCombo(
