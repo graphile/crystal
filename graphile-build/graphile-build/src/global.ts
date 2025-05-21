@@ -1,4 +1,5 @@
 import type {
+  AbstractTypePlanner,
   BaseGraphQLArguments,
   GrafastArgumentConfig,
   GrafastFieldConfig,
@@ -7,7 +8,6 @@ import type {
   GrafastInputFieldConfigMap,
   OutputPlanForType,
   PlanTypeInfo,
-  PolymorphicTypePlanner,
   Step,
 } from "grafast";
 import type {
@@ -282,14 +282,15 @@ declare global {
       toSpecifier?($step: Step): Step;
 
       /**
-       * Plantime. `$specifier` is either a step returned from a polymorphic field
-       * or list position, or a `__ValueStep` that represents the combined values
-       * of such steps (to prevent unbounded plan branching). `__planType` must
-       * then construct a step that represents the `__typename` related to this
-       * given specifier (or `null` if no match can be found) and a `planForType`
-       * method which, when called, should return the step for the given type.
+       * Plantime. `$specifier` is either a step returned from a field or list
+       * position with an abstract type, or a `__ValueStep` that represents the
+       * combined values of such steps (to prevent unbounded plan branching).
+       * `__planType` must then construct a step that represents the
+       * `__typename` related to this given specifier (or `null` if no match
+       * can be found) and a `planForType` method which, when called, should
+       * return the step for the given type.
        */
-      planType?($specifier: Step, info: PlanTypeInfo): PolymorphicTypePlanner;
+      planType?($specifier: Step, info: PlanTypeInfo): AbstractTypePlanner;
     }
 
     /** Our take on GraphQLInterfaceTypeConfig that allows for plans */
@@ -316,14 +317,15 @@ declare global {
       toSpecifier?($step: Step): Step;
 
       /**
-       * Plantime. `$specifier` is either a step returned from a polymorphic field
-       * or list position, or a `__ValueStep` that represents the combined values
-       * of such steps (to prevent unbounded plan branching). `__planType` must
-       * then construct a step that represents the `__typename` related to this
-       * given specifier (or `null` if no match can be found) and a `planForType`
-       * method which, when called, should return the step for the given type.
+       * Plantime. `$specifier` is either a step returned from a field or list
+       * position with an abstract type, or a `__ValueStep` that
+       * represents the combined values of such steps (to prevent unbounded
+       * plan branching). `__planType` must then construct a step that
+       * represents the `__typename` related to this given specifier (or `null`
+       * if no match can be found) and a `planForType` method which, when
+       * called, should return the step for the given type.
        */
-      planType?($specifier: Step, info: PlanTypeInfo): PolymorphicTypePlanner;
+      planType?($specifier: Step, info: PlanTypeInfo): AbstractTypePlanner;
     }
 
     interface BuildVersions {

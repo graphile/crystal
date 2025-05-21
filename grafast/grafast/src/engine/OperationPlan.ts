@@ -60,7 +60,7 @@ import type {
   LocationDetails,
   Maybe,
   PlanTypeInfo,
-  PolymorphicTypePlanner,
+  AbstractTypePlanner,
   TrackedArguments,
 } from "../interfaces.js";
 import type { ApplyAfterModeArg } from "../operationPlan-input.js";
@@ -5244,7 +5244,7 @@ function isSafeForUnbatched(step: UnbatchedExecutableStep): boolean {
 function defaultPlanType(
   $stepOrSpecifier: Step,
   info: PlanTypeInfo,
-): PolymorphicTypePlanner {
+): AbstractTypePlanner {
   const $__typename =
     $stepOrSpecifier.toTypename?.() ??
     (info.resolverEmulation

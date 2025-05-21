@@ -9,12 +9,12 @@ import { GraphQLSchema } from "graphql";
 import * as graphql from "graphql";
 
 import type {
+  AbstractTypePlanner,
   ArgumentApplyPlanResolver,
   EnumValueApplyResolver,
   FieldPlanResolver,
   InputObjectFieldApplyResolver,
   InputObjectTypeBakedResolver,
-  PolymorphicTypePlanner,
   ScalarPlanResolver,
 } from "./interfaces.js";
 import type { Step } from "./step.js";
@@ -104,14 +104,15 @@ export type InterfaceOrUnionPlans = {
   __toSpecifier?($step: Step): Step;
 
   /**
-   * Plantime. `$specifier` is either a step returned from a polymorphic field
-   * or list position, or a `__ValueStep` that represents the combined values
-   * of such steps (to prevent unbounded plan branching). `__planType` must
-   * then construct a step that represents the `__typename` related to this
-   * given specifier (or `null` if no match can be found) and a `planForType`
-   * method which, when called, should return the step for the given type.
+   * Plantime. `$specifier` is either a step returned from a field or list
+   * position with an abstract type, or a `__ValueStep` that represents the
+   * combined values of such steps (to prevent unbounded plan branching).
+   * `__planType` must then construct a step that represents the `__typename`
+   * related to this given specifier (or `null` if no match can be found) and a
+   * `planForType` method which, when called, should return the step for the
+   * given type.
    */
-  __planType?: ($specifier: Step) => PolymorphicTypePlanner;
+  __planType?: ($specifier: Step) => AbstractTypePlanner;
 };
 
 /**

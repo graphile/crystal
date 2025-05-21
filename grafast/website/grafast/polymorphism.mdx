@@ -181,7 +181,7 @@ const Entity = new GraphQLUnionType({
 
 However you add it, `planType` accepts two parameters: the specifier step, and
 an `info` object you can find out more about in "Advanced" below. The function
-must return a `PolymorphicTypePlanner` object, which is an object with two
+must return a `AbstractTypePlanner` object, which is an object with two
 entries:
 
 - `$__typename` (required): a step representing the name of the resolved
@@ -194,7 +194,7 @@ entries:
 In our "fetch-to-type" example from before, `planType` might look like this:
 
 ```ts
-function planType($specifier: Step<number>): PolymorphicTypePlanner {
+function planType($specifier: Step<number>): AbstractTypePlanner {
   // Fetch the database record for this $specifier
   const $record = animals.get({ id: $specifier });
   // Extract the type from the relevant column
@@ -223,7 +223,7 @@ However, in our "type-to-fetch" example, `planType` would perform more logic
 inside the `planForType` method, and needs less work to find the type name:
 
 ```ts
-function planType($specifier: Step<string>): PolymorphicTypePlanner {
+function planType($specifier: Step<string>): AbstractTypePlanner {
   // Parse the NodeID into a typename and identifier
   const $parsed = lambda($specifier, parseNodeId, true);
   // Extract the type name:

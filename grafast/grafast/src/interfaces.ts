@@ -829,18 +829,18 @@ export interface PlanTypeInfo {
 }
 
 /**
- * When planning a polymorphic type, the interface or union should have a
+ * When planning an abstract type, an interface or union, it should have a
  * `extensions.grafast.planType` method which accepts an incoming step
  * representing the polymorphic data (we call this the `$specifier`) and will
- * return a PolymorphicTypePlanner object. This object has a key `$__typename`
+ * return a AbstractTypePlanner object. This object has a key `$__typename`
  * whose value must be a step that represents the GraphQL type name to use for
  * the given $specifier, and a method `planForType` that should return the step
  * to use for a specific object type within the interface/union.
  */
-export interface PolymorphicTypePlanner {
+export interface AbstractTypePlanner {
   /**
    * Must be a step representing the name of the object type associated with
-   * the given `$speicifer`, or `null` if no such type could be determined.
+   * the given `$specifier`, or `null` if no such type could be determined.
    */
   $__typename: Step<string | null>;
   /**
