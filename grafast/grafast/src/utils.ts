@@ -1163,25 +1163,35 @@ export function layerPlanHeirarchyContains(
  * need it.
  */
 export function stepsAreInSamePhase(ancestor: Step, descendent: Step) {
-  for (let i = descendent.layerPlan.depth; i >= 0; i--) {
-    const currentLayerPlan = descendent.layerPlan.ancestry[i];
-    if (currentLayerPlan === ancestor.layerPlan) {
-      return true;
+  const ancestorDepth = ancestor.layerPlan.depth;
+  const descendentDepth = descendent.layerPlan.depth;
+  if (descendentDepth < ancestorDepth) {
+    throw new Error(
+      `descendent is deeper than ancestor; did you pass ancestor/descendent the wrong way around?`,
+    );
+  }
+  if (
+    ancestor.layerPlan.deferBoundaryDepth !==
+    descendent.layerPlan.deferBoundaryDepth
+  ) {
+    return false;
+  }
+  for (let i = 0; i < ancestorDepth; i++) {
+    if (ancestor.layerPlan.ancestry[i] !== descendent.layerPlan.ancestry[i]) {
+      return false;
     }
+  }
+  for (let i = ancestorDepth; i < descendentDepth; i++) {
+    const currentLayerPlan = descendent.layerPlan.ancestry[i];
     const t = currentLayerPlan.reason.type;
     switch (t) {
       case "combined": {
-        // Unsafe to browse up through a combined
-        return false;
+        continue;
       }
       case "subscription":
       case "defer": {
         // These indicate boundaries over which plans shouldn't be optimized
         // together (generally).
-        return false;
-      }
-      case "polymorphicPartition": {
-        // TODO: think about this.
         return false;
       }
       case "listItem": {
@@ -1196,7 +1206,8 @@ export function stepsAreInSamePhase(ancestor: Step, descendent: Step) {
       case "root":
       case "nullableBoundary":
       case "subroutine":
-      case "polymorphic": // TODO: CHECK ME!
+      case "polymorphic":
+      case "polymorphicPartition":
       case "mutationField": {
         continue;
       }
@@ -1206,9 +1217,7 @@ export function stepsAreInSamePhase(ancestor: Step, descendent: Step) {
       }
     }
   }
-  throw new Error(
-    `${descendent} is not dependent on ${ancestor}, perhaps you passed the arguments in the wrong order?`,
-  );
+  return true;
 }
 
 export function isPhaseTransitionLayerPlan(layerPlan: LayerPlan): boolean {
