@@ -284,6 +284,14 @@ export function access<TData>(
   return new AccessStep<TData>(parentPlan, path, fallback);
 }
 
+type StepGetReturn<TStep, TAttr extends string> = TStep extends {
+  get: (attr: TAttr) => infer U;
+}
+  ? U
+  : TStep extends { get: (attr: string) => infer U }
+    ? U
+    : never;
+
 type StepGetKeys<TStep extends Step> = TStep extends { get(attr: infer U): any }
   ? U
   : TStep extends Step<infer UData>
@@ -294,8 +302,8 @@ type StepGetKeys<TStep extends Step> = TStep extends { get(attr: infer U): any }
 type StepAccessKey<
   TStep extends Step,
   TAttr extends StepGetKeys<TStep> & string,
-> = TStep extends { get(attr: any): infer U }
-  ? U
+> = TStep extends { get(attr: any): any }
+  ? StepGetReturn<TStep, TAttr>
   : TStep extends Step<infer UData>
     ? UData extends Record<string, any>
       ? Step<UData[TAttr]>
