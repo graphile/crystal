@@ -1034,6 +1034,10 @@ export function stepADependsOnStepB(stepA: Step, stepB: Step): boolean {
   return false;
 }
 
+function stepAIsOrDependsOnStepB(stepA: Step, stepB: Step): boolean {
+  return stepA === stepB || stepADependsOnStepB(stepA, stepB);
+}
+
 /**
  * Returns true if stepA is allowed to depend on stepB, false otherwise. (This
  * mostly relates to heirarchy.)
@@ -1175,10 +1179,27 @@ export function stepsAreInSamePhase(ancestor: Step, descendent: Step) {
       `descendent is deeper than ancestor; did you pass ancestor/descendent the wrong way around?`,
     );
   }
+  const descDeferBoundary =
+    descendent.layerPlan.ancestry[descendent.layerPlan.deferBoundaryDepth];
   if (
-    ancestor.layerPlan.deferBoundaryDepth !==
-    descendent.layerPlan.deferBoundaryDepth
+    ancestor.layerPlan.ancestry[ancestor.layerPlan.deferBoundaryDepth] !==
+    descDeferBoundary
   ) {
+    // Still possible to be okay if ancestor is the source of a streamed list item or deferred step
+    if (
+      descDeferBoundary.reason.type === "listItem" &&
+      descDeferBoundary.reason.stream != null &&
+      descendent.layerPlan.ancestry[
+        descendent.layerPlan.deferBoundaryDepth - 1
+      ] === ancestor.layerPlan
+    ) {
+      if (
+        stepAIsOrDependsOnStepB(descDeferBoundary.reason.parentStep, ancestor)
+      ) {
+        return true;
+      }
+    }
+    // Nope, don't allow
     return false;
   }
   for (let i = 0; i < ancestorDepth; i++) {
@@ -1186,7 +1207,7 @@ export function stepsAreInSamePhase(ancestor: Step, descendent: Step) {
       return false;
     }
   }
-  for (let i = ancestorDepth; i < descendentDepth; i++) {
+  for (let i = ancestorDepth + 1; i < descendentDepth; i++) {
     const currentLayerPlan = descendent.layerPlan.ancestry[i];
     const t = currentLayerPlan.reason.type;
     switch (t) {
