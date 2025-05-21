@@ -4,7 +4,7 @@ title: Polymorphism
 
 # Polymorphism in @dataplan/pg
 
-Polymorphism in PostgreSQL schemas can take many forms, and each haev their own
+Polymorphism in PostgreSQL schemas can take many forms, and each have their own
 trade-offs. `@dataplan/pg` has two
 main ways of querying polymorphic data: `pgSelect` (for querying either a single
 table for all types or a single table left-joined to tables with additional data
@@ -395,9 +395,9 @@ const plans = {
   },
   Entity: {
     planType($specifier) {
-      const $personId = $item.get("person_id");
-      const $postId = $item.get("post_id");
-      const $commentId = $item.get("comment_id");
+      const $personId = $specifier.get("person_id");
+      const $postId = $specifier.get("post_id");
+      const $commentId = $specifier.get("comment_id");
       const $__typename = lambda(
         [$personId, $postId, $commentId],
         ([personId, postId, commentId]) => {
@@ -488,9 +488,9 @@ const plans = {
   Entity: {
     // The same __planType as the previous example
     __planType($specifier) {
-      const $personId = $item.get("person_id");
-      const $postId = $item.get("post_id");
-      const $commentId = $item.get("comment_id");
+      const $personId = $specifier.get("person_id");
+      const $postId = $specifier.get("post_id");
+      const $commentId = $specifier.get("comment_id");
       const $__typename = lambda(
         [$personId, $postId, $commentId],
         ([personId, postId, commentId]) => {
