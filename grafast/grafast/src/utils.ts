@@ -1058,31 +1058,31 @@ export function stepAShouldTryAndInlineIntoStepB($a: Step, $b: Step): boolean {
     );
   }
   if (!stepsAreInSamePhase($b, $a)) return false;
+
+  // TODO: add some rules about polymorphism here; e.g. "only if most of the
+  // polymorphic paths are covered" or something. We don't want the parent to
+  // do lots of work for lots of polymorphic paths that won't be covered, but
+  // equally we don't want to necessarily require 100% of the polymorphic
+  // branches to be matched.
+  /*
   const paths = pathsFromAncestorToTargetLayerPlan($b.layerPlan, $a.layerPlan);
-  if (paths.length > 1) return false;
-  if ($a.polymorphicPaths != null) {
-    if (
-      $b.polymorphicPaths != null &&
-      ![...$b.polymorphicPaths].every((p) =>
-        [...$a.polymorphicPaths!].some((p2) => p2.startsWith(p)),
-      )
-    ) {
-      return false;
-    }
-    const polyLps = paths[0].filter(
-      (lp): lp is LayerPlan<LayerPlanReasonPolymorphic> =>
-        lp.reason.type === "polymorphic",
-    );
-    if (polyLps.length > 0) {
-      if (
-        ![...polyLps[polyLps.length - 1].reason.polymorphicPaths].every((p) =>
-          [...$a.polymorphicPaths!].some((p2) => p2 === p),
-        )
-      ) {
-        return false;
+  let path: readonly LayerPlan[];
+  if (paths.length === 0) {
+    throw new Error(`No path from ${$a} back to ${$b}?`);
+  } else if (paths.length > 1) {
+    const commonPath: LayerPlan[] = [];
+    const firstPath = paths[0];
+    for (const lp of firstPath) {
+      if (paths.every((p) => p.includes(lp))) {
+        commonPath.push(lp);
       }
     }
+    path = commonPath;
+  } else {
+    path = paths[0];
   }
+  */
+
   return true;
 }
 
@@ -1163,6 +1163,11 @@ export function layerPlanHeirarchyContains(
  * need it.
  */
 export function stepsAreInSamePhase(ancestor: Step, descendent: Step) {
+  if (isDev && !stepADependsOnStepB(descendent, ancestor)) {
+    throw new Error(
+      `Shouldn't try and inline into something you're not dependent on!`,
+    );
+  }
   const ancestorDepth = ancestor.layerPlan.depth;
   const descendentDepth = descendent.layerPlan.depth;
   if (descendentDepth < ancestorDepth) {
