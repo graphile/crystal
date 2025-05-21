@@ -1,5 +1,30 @@
 {
-  floor(number: 4) {
+  floor(number: 3) {
     number
+    locations {
+      ...l
+      floors {
+        number
+        locations {
+          ...l
+        }
+      }
+    }
+  }
+}
+
+fragment l on Location {
+  __typename
+  name
+  ... on SafeRoom {
+    hasPersonalSpace
+    hasStaff
+  }
+  ... on Club {
+    tagline
+    manager {
+      id
+    }
+    # security {          id        }
   }
 }

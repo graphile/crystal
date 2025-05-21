@@ -13,6 +13,7 @@ import {
   get,
   inhibitOnNull,
   lambda,
+  loadMany,
   loadOne,
   makeGrafastSchema,
 } from "../../dist/index.js";
@@ -21,16 +22,22 @@ import type {
   Database,
   EquipmentData,
   ItemSpec,
+  LocationData,
   NpcData,
 } from "./dcc-data.js";
 import {
+  batchGetClubById,
   batchGetConsumableById,
   batchGetCrawlerById,
   batchGetEquipmentById,
+  batchGetLocationById,
+  batchGetLocationsByFloorNumber,
   batchGetMiscItemById,
   batchGetNpcById,
+  batchGetSafeRoomById,
   makeData,
 } from "./dcc-data.js";
+import { delegate } from "./delegate.js";
 
 const resolvedPreset = resolvePreset({
   grafast: {
@@ -150,13 +157,13 @@ export const makeBaseArgs = () => {
       interface Location {
         id: Int!
         name: String!
-        floors: [Int!]!
+        floors: [Floor!]!
       }
 
       type SafeRoom implements Location {
         id: Int!
         name: String!
-        floors: [Int!]!
+        floors: [Floor!]!
         hasPersonalSpace: Boolean!
         hasStaff: Boolean
       }
@@ -164,14 +171,15 @@ export const makeBaseArgs = () => {
       type Club implements Location {
         id: Int!
         name: String!
-        floors: [Int!]!
-        manager: NPC!
+        floors: [Floor!]!
+        manager: NPC
         security: [Security!]
+        tagline: String!
       }
 
       type Floor {
         number: Int!
-        locations: [Location!]!
+        locations: [Location]
       }
 
       type Query {
@@ -302,6 +310,62 @@ export const makeBaseArgs = () => {
         creator: getCreator,
       },
       MiscItem: {},
+      Floor: {
+        locations($floor: Step<FloorData>) {
+          const $number = get($floor, "number");
+          const $data = context().get("data");
+          return loadMany($number, $data, null, batchGetLocationsByFloorNumber);
+        },
+      },
+      Location: {
+        __planType($location: Step<LocationData>): PolymorphicTypePlanner {
+          const $data = context().get("data");
+          const $__typename = get($location, "type");
+          return {
+            $__typename,
+            planForType(t) {
+              console.log("plan type", t.name);
+              const $id = get($location, "id");
+
+              if (t.name === "SafeRoom") {
+                const $saferoom = loadOne(
+                  $id,
+                  $data,
+                  null,
+                  batchGetSafeRoomById,
+                );
+                return delegate(
+                  $saferoom,
+                  ["type", "name", "floors", "id"],
+                  $location,
+                );
+              }
+              if (t.name === "Club") {
+                const $club = loadOne($id, $data, null, batchGetClubById);
+                return delegate(
+                  $club,
+                  ["type", "name", "floors", "id"],
+                  $location,
+                );
+              }
+              console.log("unexpected type", t.name);
+              return null;
+            },
+          };
+        },
+      },
+      SafeRoom: {
+        floors($saferoom) {
+          const $floors = get($saferoom, "floors") as Step<number[]>;
+          return each($floors, ($floor) => lambda($floor, getFloor));
+        },
+      },
+      Club: {
+        floors($club) {
+          const $floors = get($club, "floors") as Step<number[]>;
+          return each($floors, ($floor) => lambda($floor, getFloor));
+        },
+      },
     },
   });
   const data = makeData();
@@ -352,7 +416,11 @@ function decodeItemSpec(itemSpec: ItemSpec): {
   return { __typename, id };
 }
 
-function getFloor(number: number) {
+interface FloorData {
+  number: number;
+}
+
+function getFloor(number: number): FloorData | null {
   if (number >= 1 && number <= 18) {
     return { number };
   }

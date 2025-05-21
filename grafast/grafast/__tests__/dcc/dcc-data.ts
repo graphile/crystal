@@ -3,6 +3,7 @@
 import type { LoadManyCallback, LoadOneCallback } from "../../dist";
 
 export type ItemSpec = `${"Equipment" | "Consumable" | "MiscItem"}:${number}`;
+export type LocationType = "SafeRoom" | "Club";
 
 export interface CrawlerData {
   id: number;
@@ -18,8 +19,8 @@ export interface CrawlerData {
 
 export interface NpcData {
   id: number;
-  type: "Manager" | "Security" | "Guide";
-  species: "Changeling" | "Rock Monster" | "Half Elf";
+  type: "Manager" | "Security" | "Guide" | "ClubStaff";
+  species: "Changeling" | "Rock Monster" | "Half Elf" | "Gondii";
   name: string;
   exCrawler?: boolean;
   client?: number;
@@ -50,23 +51,24 @@ export interface ConsumableData extends ItemData {
 
 export interface MiscItemData extends ItemData {}
 
-export interface Location {
+export interface LocationData {
   id: number;
   name: string;
-  type: number;
+  type: LocationType;
   floors: number[];
 }
 
-export interface SafeRoom {
+export interface SafeRoomData {
   id: number;
   hasPersonalSpace: boolean;
   hasStaff?: true;
 }
 
-export interface Club {
+export interface ClubData {
   id: number;
-  manager: number;
+  manager?: number;
   security?: number[];
+  tagline: String;
 }
 
 export interface Database {
@@ -75,6 +77,9 @@ export interface Database {
   equipment: readonly EquipmentData[];
   consumables: readonly ConsumableData[];
   miscItems: readonly MiscItemData[];
+  locations: readonly LocationData[];
+  saferooms: readonly SafeRoomData[];
+  clubs: readonly ClubData[];
 }
 
 export function makeData(): Database {
@@ -198,6 +203,12 @@ export function makeData(): Database {
         name: "Tiatha",
         exCrawler: true,
         client: 105,
+      },
+      {
+        id: 305,
+        type: "ClubStaff",
+        species: "Gondii",
+        name: "Orren",
       },
     ],
     equipment: [
@@ -346,6 +357,52 @@ export function makeData(): Database {
         name: "Fireball or Custard? Scratchcard",
       },
     ],
+    locations: [
+      { id: 101, type: "SafeRoom", name: "Peruvian Taco Bell", floors: [1, 2] },
+      { id: 102, type: "SafeRoom", name: "DMV waiting room", floors: [1, 2] },
+      { id: 103, type: "Club", name: "Tutorial Guild", floors: [1, 2] },
+      {
+        id: 201,
+        type: "SafeRoom",
+        name: "French storm shelter",
+        floors: [2, 3],
+      },
+      { id: 301, type: "Club", name: "Desperado Club", floors: [3, 4, 5] },
+      { id: 302, type: "Club", name: "Club Vanquisher", floors: [3, 4, 5] },
+    ],
+    saferooms: [
+      {
+        id: 101,
+        hasPersonalSpace: true,
+        hasStaff: true,
+      },
+      {
+        id: 102,
+        hasPersonalSpace: false,
+        hasStaff: true,
+      },
+      {
+        id: 201,
+        hasPersonalSpace: false,
+      },
+    ],
+    clubs: [
+      {
+        id: 103,
+        manager: 301,
+        tagline: "Crawlers are recommended to join, but not required",
+      },
+      {
+        id: 301,
+        manager: 305,
+        security: [302, 303],
+        tagline: "So fun it hurts",
+      },
+      {
+        id: 302,
+        tagline: "Heathens will find no solace here",
+      },
+    ],
   };
 }
 
@@ -416,4 +473,43 @@ export const batchGetMiscItemById: LoadOneCallback<
   Database
 > = (ids, { unary: data }) => {
   return ids.map((id) => data.miscItems.find((c) => c.id === id));
+};
+
+export const batchGetLocationsByFloorNumber: LoadManyCallback<
+  number,
+  LocationData,
+  never,
+  Database
+> = (floorNumberList, { unary: data }) => {
+  return floorNumberList.map((floorNumber) =>
+    data.locations.filter((c) => c.floors.includes(floorNumber)),
+  );
+};
+
+export const batchGetLocationById: LoadOneCallback<
+  number,
+  LocationData,
+  never,
+  Database
+> = (ids, { unary: data }) => {
+  return ids.map((id) => data.locations.find((c) => c.id === id));
+};
+
+export const batchGetSafeRoomById: LoadOneCallback<
+  number,
+  SafeRoomData,
+  never,
+  Database
+> = (ids, { unary: data }) => {
+  console.log(ids);
+  return ids.map((id) => data.saferooms.find((c) => c.id === id));
+};
+
+export const batchGetClubById: LoadOneCallback<
+  number,
+  ClubData,
+  never,
+  Database
+> = (ids, { unary: data }) => {
+  return ids.map((id) => data.clubs.find((c) => c.id === id));
 };

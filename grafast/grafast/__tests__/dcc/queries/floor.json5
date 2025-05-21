@@ -1,3 +1,197 @@
 {
-  floor: null,
+  floor: {
+    number: 3,
+    locations: [
+      {
+        __typename: 'SafeRoom',
+        name: 'French storm shelter',
+        hasPersonalSpace: false,
+        hasStaff: null,
+        floors: [
+          {
+            number: 2,
+            locations: [
+              {
+                __typename: 'SafeRoom',
+                name: 'Peruvian Taco Bell',
+                hasPersonalSpace: true,
+                hasStaff: true,
+              },
+              {
+                __typename: 'SafeRoom',
+                name: 'DMV waiting room',
+                hasPersonalSpace: false,
+                hasStaff: true,
+              },
+              {
+                __typename: 'Club',
+                name: 'Tutorial Guild',
+                tagline: 'Crawlers are recommended to join, but not required',
+                manager: null,
+              },
+              {
+                __typename: 'SafeRoom',
+                name: 'French storm shelter',
+                hasPersonalSpace: false,
+                hasStaff: null,
+              },
+            ],
+          },
+          {
+            number: 3,
+            locations: [
+              {
+                __typename: 'SafeRoom',
+                name: 'French storm shelter',
+                hasPersonalSpace: false,
+                hasStaff: null,
+              },
+              {
+                __typename: 'Club',
+                name: 'Desperado Club',
+                tagline: 'So fun it hurts',
+                manager: null,
+              },
+              {
+                __typename: 'Club',
+                name: 'Club Vanquisher',
+                tagline: 'Heathens will find no solace here',
+                manager: null,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        __typename: 'Club',
+        name: 'Desperado Club',
+        tagline: 'So fun it hurts',
+        manager: null,
+        floors: [
+          {
+            number: 3,
+            locations: [
+              {
+                __typename: 'SafeRoom',
+                name: 'French storm shelter',
+                hasPersonalSpace: false,
+                hasStaff: null,
+              },
+              {
+                __typename: 'Club',
+                name: 'Desperado Club',
+                tagline: 'So fun it hurts',
+                manager: null,
+              },
+              {
+                __typename: 'Club',
+                name: 'Club Vanquisher',
+                tagline: 'Heathens will find no solace here',
+                manager: null,
+              },
+            ],
+          },
+          {
+            number: 4,
+            locations: [
+              {
+                __typename: 'Club',
+                name: 'Desperado Club',
+                tagline: 'So fun it hurts',
+                manager: null,
+              },
+              {
+                __typename: 'Club',
+                name: 'Club Vanquisher',
+                tagline: 'Heathens will find no solace here',
+                manager: null,
+              },
+            ],
+          },
+          {
+            number: 5,
+            locations: [
+              {
+                __typename: 'Club',
+                name: 'Desperado Club',
+                tagline: 'So fun it hurts',
+                manager: null,
+              },
+              {
+                __typename: 'Club',
+                name: 'Club Vanquisher',
+                tagline: 'Heathens will find no solace here',
+                manager: null,
+              },
+            ],
+          },
+        ],
+      },
+      {
+        __typename: 'Club',
+        name: 'Club Vanquisher',
+        tagline: 'Heathens will find no solace here',
+        manager: null,
+        floors: [
+          {
+            number: 3,
+            locations: [
+              {
+                __typename: 'SafeRoom',
+                name: 'French storm shelter',
+                hasPersonalSpace: false,
+                hasStaff: null,
+              },
+              {
+                __typename: 'Club',
+                name: 'Desperado Club',
+                tagline: 'So fun it hurts',
+                manager: null,
+              },
+              {
+                __typename: 'Club',
+                name: 'Club Vanquisher',
+                tagline: 'Heathens will find no solace here',
+                manager: null,
+              },
+            ],
+          },
+          {
+            number: 4,
+            locations: [
+              {
+                __typename: 'Club',
+                name: 'Desperado Club',
+                tagline: 'So fun it hurts',
+                manager: null,
+              },
+              {
+                __typename: 'Club',
+                name: 'Club Vanquisher',
+                tagline: 'Heathens will find no solace here',
+                manager: null,
+              },
+            ],
+          },
+          {
+            number: 5,
+            locations: [
+              {
+                __typename: 'Club',
+                name: 'Desperado Club',
+                tagline: 'So fun it hurts',
+                manager: null,
+              },
+              {
+                __typename: 'Club',
+                name: 'Club Vanquisher',
+                tagline: 'Heathens will find no solace here',
+                manager: null,
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 }
