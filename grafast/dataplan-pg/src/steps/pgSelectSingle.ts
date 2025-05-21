@@ -494,26 +494,6 @@ export class PgSelectSingleStep<
     });
   }
 
-  planForType(type: GraphQLObjectType): Step {
-    const poly = (this.resource.codec as PgCodec).polymorphism;
-    if (poly?.mode === "single") {
-      return this;
-    } else if (poly?.mode === "relational") {
-      for (const spec of Object.values(poly.types)) {
-        if (spec.name === type.name) {
-          return this.singleRelation(spec.relationName as any);
-        }
-      }
-      throw new Error(
-        `${this} Could not find matching name for relational polymorphic '${type.name}'`,
-      );
-    } else {
-      throw new Error(
-        `${this}: Don't know how to plan this as polymorphic for ${type}`,
-      );
-    }
-  }
-
   private nonNullAttribute: {
     attribute: PgCodecAttribute;
     attr: string;
