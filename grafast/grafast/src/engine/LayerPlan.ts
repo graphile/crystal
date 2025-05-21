@@ -1014,7 +1014,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     for (const stepId of batchStepIdsToCopy) {
       const newEv = batchExecutionValue(
         arrayOfLength(totalSize, null),
-        arrayOfLength(totalSize, FLAG_NULL & FLAG_STOPPED),
+        arrayOfLength(totalSize, FLAG_NULL | FLAG_STOPPED),
       );
       store.set(stepId, newEv);
       let offset = 0;
@@ -1050,7 +1050,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       .finalCombinations) {
       const ev = batchExecutionValue(
         arrayOfLength(totalSize, null),
-        arrayOfLength(totalSize, FLAG_NULL & FLAG_STOPPED),
+        arrayOfLength(totalSize, FLAG_NULL | FLAG_STOPPED),
       );
       store.set(targetStepId, ev);
       let offset = 0;
