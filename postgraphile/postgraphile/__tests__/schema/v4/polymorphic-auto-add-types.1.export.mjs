@@ -4599,6 +4599,7 @@ const otherSource_single_table_item_relationsPgResource = registry.pgResources["
 const otherSource_single_table_item_relation_composite_pksPgResource = registry.pgResources["single_table_item_relation_composite_pks"];
 const SingleTableItem_typeNameFromType = ((interfaceTypeName, polymorphism) => {
   function typeNameFromType(typeVal) {
+    if (typeof typeVal !== "string") return null;
     return polymorphism.types[typeVal]?.name ?? null;
   }
   typeNameFromType.displayName = `${interfaceTypeName}_typeNameFromType`;
@@ -4701,6 +4702,7 @@ const resourceByTypeName3 = {
 };
 const RelationalItem_typeNameFromType = ((interfaceTypeName, polymorphism) => {
   function typeNameFromType(typeVal) {
+    if (typeof typeVal !== "string") return null;
     return polymorphism.types[typeVal]?.name ?? null;
   }
   typeNameFromType.displayName = `${interfaceTypeName}_typeNameFromType`;

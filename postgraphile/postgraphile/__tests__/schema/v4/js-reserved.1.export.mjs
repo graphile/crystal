@@ -1939,6 +1939,7 @@ function findTypeNameMatch(specifier) {
 }
 const RelationalItem_typeNameFromType = ((interfaceTypeName, polymorphism) => {
   function typeNameFromType(typeVal) {
+    if (typeof typeVal !== "string") return null;
     return polymorphism.types[typeVal]?.name ?? null;
   }
   typeNameFromType.displayName = `${interfaceTypeName}_typeNameFromType`;
