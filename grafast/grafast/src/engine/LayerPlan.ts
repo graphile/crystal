@@ -17,7 +17,8 @@ import { arrayOfLength, arraysMatch, setsMatch } from "../utils.js";
 import { batchExecutionValue, newBucket } from "./executeBucket.js";
 import type { OperationPlan } from "./OperationPlan";
 
-const SKIP_FLAGS = FLAG_STOPPED | FLAG_POLY_SKIPPED;
+const SKIP_FLAGS =
+  FLAG_ERROR | FLAG_STOPPED | FLAG_POLY_SKIPPED | FLAG_INHIBITED;
 
 /*
  * Branching: e.g. polymorphic, conditional, etc - means that different
@@ -1009,6 +1010,8 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       }
     }
 
+    if (totalSize === 0) return null;
+
     for (const stepId of batchStepIdsToCopy) {
       const newEv = batchExecutionValue(
         arrayOfLength(totalSize, null),
@@ -1090,36 +1093,32 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     //
     ////////////////////////////////////////////////////////////////////////////
 
-    if (totalSize > 0) {
-      // Reference
-      const childBucket = newBucket(
-        { metaByMetaKey: undefined /* use defaults */, sharedState },
-        {
-          layerPlan: this,
-          size: totalSize,
-          store,
-          // PERF: not necessarily, if we don't copy the errors, we don't have the errors.
-          flagUnion,
-          polymorphicPathList,
-          polymorphicType: null,
-          iterators,
-        },
-      );
-      for (const plp of this.reason.parentLayerPlans) {
-        const parentBucket = sharedState._retainedBuckets.get(plp.id);
-        if (parentBucket != null) {
-          const map = mapByParentLayerPlanId[plp.id]!;
-          parentBucket.children[this.id] = {
-            bucket: childBucket,
-            map,
-          };
-        }
+    // Reference
+    const childBucket = newBucket(
+      { metaByMetaKey: undefined /* use defaults */, sharedState },
+      {
+        layerPlan: this,
+        size: totalSize,
+        store,
+        // PERF: not necessarily, if we don't copy the errors, we don't have the errors.
+        flagUnion,
+        polymorphicPathList,
+        polymorphicType: null,
+        iterators,
+      },
+    );
+    for (const plp of this.reason.parentLayerPlans) {
+      const parentBucket = sharedState._retainedBuckets.get(plp.id);
+      if (parentBucket != null) {
+        const map = mapByParentLayerPlanId[plp.id]!;
+        parentBucket.children[this.id] = {
+          bucket: childBucket,
+          map,
+        };
       }
-
-      return childBucket;
-    } else {
-      return null;
     }
+
+    return childBucket;
   }
 
   /** @internal */
