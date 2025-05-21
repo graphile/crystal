@@ -5290,7 +5290,13 @@ function stepIsValidInPolyPath($step: Step, polyPath: string): boolean {
   return false;
 }
 
-function isPeerLayerPlan(lp1: LayerPlan, lp2: LayerPlan) {
+function isPeerLayerPlan(
+  lp1: LayerPlan | undefined,
+  lp2: LayerPlan | undefined,
+) {
+  if (lp1 == null || lp2 == null) {
+    return false;
+  }
   if (lp1 === lp2) return true;
   if (
     lp1.reason.type === "polymorphicPartition" &&
