@@ -1063,12 +1063,11 @@ export function stepAShouldTryAndInlineIntoStepB($a: Step, $b: Step): boolean {
   }
   if (!stepsAreInSamePhase($b, $a)) return false;
 
-  // TODO: add some rules about polymorphism here; e.g. "only if most of the
+  // TODO: review the rules about polymorphism here; e.g. "only if most of the
   // polymorphic paths are covered" or something. We don't want the parent to
   // do lots of work for lots of polymorphic paths that won't be covered, but
   // equally we don't want to necessarily require 100% of the polymorphic
   // branches to be matched.
-  /*
   const paths = pathsFromAncestorToTargetLayerPlan($b.layerPlan, $a.layerPlan);
   let path: readonly LayerPlan[];
   if (paths.length === 0) {
@@ -1085,7 +1084,11 @@ export function stepAShouldTryAndInlineIntoStepB($a: Step, $b: Step): boolean {
   } else {
     path = paths[0];
   }
-  */
+  for (const lp of path) {
+    if (lp.reason.type === "polymorphicPartition") {
+      return false;
+    }
+  }
 
   return true;
 }
