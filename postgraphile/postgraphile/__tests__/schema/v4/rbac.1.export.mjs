@@ -1,5 +1,5 @@
 import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectStep, TYPES, assertPgClassSingleStep, domainOfCodec, enumCodec, listOfCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, rangeOfCodec, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId } from "grafast";
 import { GraphQLError, GraphQLString, Kind } from "graphql";
 import { sql } from "pg-sql2";
 const nodeIdHandler_Query = {
@@ -3938,22 +3938,23 @@ const registryConfig_pgResources_foreign_key_foreign_key = {
   }
 };
 const list_bde_mutationFunctionIdentifer = sql.identifier("b", "list_bde_mutation");
+const compound_keyUniques = [{
+  isPrimary: true,
+  attributes: ["person_id_1", "person_id_2"],
+  description: undefined,
+  extensions: {
+    tags: {
+      __proto__: null
+    }
+  }
+}];
 const registryConfig_pgResources_compound_key_compound_key = {
   executor: executor,
   name: "compound_key",
   identifier: "main.c.compound_key",
   from: compoundKeyIdentifier,
   codec: compoundKeyCodec,
-  uniques: [{
-    isPrimary: true,
-    attributes: ["person_id_1", "person_id_2"],
-    description: undefined,
-    extensions: {
-      tags: {
-        __proto__: null
-      }
-    }
-  }],
+  uniques: compound_keyUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -10010,6 +10011,7 @@ function InternetAddressSerialize(value) {
   return "" + value;
 }
 const pgFieldSource_post_computed_with_optional_argPgResource = registry.pgResources["post_computed_with_optional_arg"];
+const resource_compound_keyPgResource = registry.pgResources["compound_key"];
 const pgFieldSource_person_computed_outPgResource = registry.pgResources["person_computed_out"];
 const pgFieldSource_person_first_namePgResource = registry.pgResources["person_first_name"];
 const argDetailsSimple_left_arm_identity = [{
@@ -11559,6 +11561,13 @@ export const plans = {
   },
   PersonSecret: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of person_secretUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_person_secretPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandler_PersonSecret.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_PersonSecret.codec.name].encode);
@@ -11577,6 +11586,13 @@ export const plans = {
   },
   Person: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of personUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_personPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandler_Person.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_Person.codec.name].encode);
@@ -11726,6 +11742,13 @@ export const plans = {
   },
   Post: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of postUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_postPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandler_Post.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_Post.codec.name].encode);
@@ -11919,6 +11942,13 @@ export const plans = {
   },
   LeftArm: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of left_armUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_left_armPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandler_LeftArm.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_LeftArm.codec.name].encode);
@@ -11937,6 +11967,13 @@ export const plans = {
   },
   CompoundKey: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of compound_keyUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_compound_keyPgResource.get(spec);
+    },
     personId2($record) {
       return $record.get("person_id_2");
     },

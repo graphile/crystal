@@ -1,5 +1,5 @@
 import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, PgSelectStep, TYPES, assertPgClassSingleStep, domainOfCodec, enumCodec, listOfCodec, makeRegistry, pgClassExpression, pgFromExpression, pgSelectFromRecord, pgSelectFromRecords, pgSelectSingleFromRecord, rangeOfCodec, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, stepAMayDependOnStepB } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, stepAMayDependOnStepB } from "grafast";
 import { GraphQLError, GraphQLInt, GraphQLString, Kind, valueFromASTUntyped } from "graphql";
 import { sql } from "pg-sql2";
 const nodeIdHandler_Query = {
@@ -10184,6 +10184,13 @@ export const plans = {
   },
   MyTable: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of my_tableUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_my_tablePgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandler_MyTable.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_MyTable.codec.name].encode);
@@ -10209,6 +10216,13 @@ export const plans = {
   },
   PersonSecret: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of person_secretUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_person_secretPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandler_PersonSecret.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_PersonSecret.codec.name].encode);
@@ -10227,6 +10241,13 @@ export const plans = {
   },
   Person: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of personUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_personPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandler_Person.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_Person.codec.name].encode);
@@ -11229,6 +11250,13 @@ export const plans = {
   },
   LeftArm: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of left_armUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_left_armPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandler_LeftArm.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_LeftArm.codec.name].encode);
@@ -11253,6 +11281,13 @@ export const plans = {
   },
   CompoundKey: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of compound_keyUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_compound_keyPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandler_CompoundKey.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_CompoundKey.codec.name].encode);
@@ -11372,6 +11407,13 @@ export const plans = {
   },
   NullTestRecord: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of null_test_recordUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_null_test_recordPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandler_NullTestRecord.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_NullTestRecord.codec.name].encode);
@@ -11388,6 +11430,13 @@ export const plans = {
   },
   Issue756: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of issue756Uniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_issue756PgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandler_Issue756.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_Issue756.codec.name].encode);

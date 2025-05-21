@@ -2,23 +2,7 @@ import { PgDeleteSingleStep, PgExecutor, PgSelectSingleStep, TYPES, assertPgClas
 import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId, stepAMayDependOnStepB } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
-const nodeIdHandler_RelationalTopic_codec_base64JSON = {
-  name: "base64JSON",
-  encode: (() => {
-    function base64JSONEncode(value) {
-      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-    }
-    base64JSONEncode.isSyncAndSafe = true; // Optimization
-    return base64JSONEncode;
-  })(),
-  decode: (() => {
-    function base64JSONDecode(value) {
-      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-    }
-    base64JSONDecode.isSyncAndSafe = true; // Optimization
-    return base64JSONDecode;
-  })()
-};
+const pkCols = ["id"];
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -737,23 +721,22 @@ const awaitFunctionIdentifer = sql.identifier("js_reserved", "await");
 const caseFunctionIdentifer = sql.identifier("js_reserved", "case");
 const valueOfFunctionIdentifer = sql.identifier("js_reserved", "valueOf");
 const null_yieldFunctionIdentifer = sql.identifier("js_reserved", "null_yield");
-const relational_topicsUniques = [{
-  isPrimary: true,
-  attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
-}];
 const registryConfig_pgResources_relational_topics_relational_topics = {
   executor: executor,
   name: "relational_topics",
   identifier: "main.js_reserved.relational_topics",
   from: relationalTopicsIdentifier,
   codec: relationalTopicsCodec,
-  uniques: relational_topicsUniques,
+  uniques: [{
+    isPrimary: true,
+    attributes: pkCols,
+    description: undefined,
+    extensions: {
+      tags: {
+        __proto__: null
+      }
+    }
+  }],
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -1594,7 +1577,24 @@ const registryConfig = {
   }
 };
 const registry = makeRegistry(registryConfig);
-const pgResource_relational_topicsPgResource = registry.pgResources["relational_topics"];
+const resource_relational_topicsPgResource = registry.pgResources["relational_topics"];
+const nodeIdHandler_RelationalTopic_codec_base64JSON = {
+  name: "base64JSON",
+  encode: (() => {
+    function base64JSONEncode(value) {
+      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+    }
+    base64JSONEncode.isSyncAndSafe = true; // Optimization
+    return base64JSONEncode;
+  })(),
+  decode: (() => {
+    function base64JSONDecode(value) {
+      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+    }
+    base64JSONDecode.isSyncAndSafe = true; // Optimization
+    return base64JSONDecode;
+  })()
+};
 const nodeIdHandler_RelationalTopic = {
   typeName: "RelationalTopic",
   codec: nodeIdHandler_RelationalTopic_codec_base64JSON,
@@ -1611,7 +1611,7 @@ const nodeIdHandler_RelationalTopic = {
     return value.slice(1);
   },
   get(spec) {
-    return pgResource_relational_topicsPgResource.get(spec);
+    return resource_relational_topicsPgResource.get(spec);
   },
   match(obj) {
     return obj[0] === "relational_topics";
@@ -6705,6 +6705,13 @@ input DeleteReservedByNullInput {
 export const plans = {
   RelationalTopic: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of pkCols) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_relational_topicsPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandler_RelationalTopic.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_RelationalTopic.codec.name].encode);
@@ -6806,6 +6813,13 @@ export const plans = {
   },
   Building: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of buildingUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return building_buildingPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.Building.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Building.codec.name].encode);
@@ -6917,6 +6931,13 @@ export const plans = {
   },
   Machine: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of machineUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_machinePgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.Machine.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Machine.codec.name].encode);
@@ -7150,6 +7171,13 @@ export const plans = {
   },
   RelationalStatus: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of relational_statusUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_relational_statusPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.RelationalStatus.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.RelationalStatus.codec.name].encode);
@@ -7186,7 +7214,7 @@ export const plans = {
     relationalTopicById(_$root, {
       $id
     }) {
-      return pgResource_relational_topicsPgResource.get({
+      return resource_relational_topicsPgResource.get({
         id: $id
       });
     },
@@ -7427,7 +7455,7 @@ export const plans = {
     },
     allRelationalTopicsList: {
       plan() {
-        return pgResource_relational_topicsPgResource.find();
+        return resource_relational_topicsPgResource.find();
       },
       args: {
         first(_, $connection, arg) {
@@ -7446,7 +7474,7 @@ export const plans = {
     },
     allRelationalTopics: {
       plan() {
-        return connection(pgResource_relational_topicsPgResource.find());
+        return connection(resource_relational_topicsPgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -8065,6 +8093,13 @@ export const plans = {
   },
   _Proto__: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of __proto__Uniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource___proto__PgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName._Proto__.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName._Proto__.codec.name].encode);
@@ -8072,6 +8107,13 @@ export const plans = {
   },
   Constructor: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of constructorUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_constructorPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.Constructor.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Constructor.codec.name].encode);
@@ -8079,6 +8121,13 @@ export const plans = {
   },
   Crop: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of cropUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_cropPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.Crop.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Crop.codec.name].encode);
@@ -8086,6 +8135,13 @@ export const plans = {
   },
   Material: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of materialUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_materialPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.Material.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Material.codec.name].encode);
@@ -8093,6 +8149,13 @@ export const plans = {
   },
   Null: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of nullUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_nullPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.Null.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Null.codec.name].encode);
@@ -8108,6 +8171,13 @@ export const plans = {
   },
   Project: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of projectUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_projectPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.Project.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Project.codec.name].encode);
@@ -8118,6 +8188,13 @@ export const plans = {
   },
   Yield: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of yieldUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_yieldPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.Yield.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Yield.codec.name].encode);
@@ -8125,6 +8202,13 @@ export const plans = {
   },
   Reserved: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of reservedUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_reservedPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.Reserved.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Reserved.codec.name].encode);
@@ -8170,7 +8254,7 @@ export const plans = {
   },
   RelationalTopicsOrderBy: {
     PRIMARY_KEY_ASC(queryBuilder) {
-      relational_topicsUniques[0].attributes.forEach(attributeName => {
+      pkCols.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
           direction: "ASC"
@@ -8179,7 +8263,7 @@ export const plans = {
       queryBuilder.setOrderIsUnique();
     },
     PRIMARY_KEY_DESC(queryBuilder) {
-      relational_topicsUniques[0].attributes.forEach(attributeName => {
+      pkCols.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
           direction: "DESC"

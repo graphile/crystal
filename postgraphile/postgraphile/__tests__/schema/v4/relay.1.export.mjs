@@ -1,5 +1,5 @@
 import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, PgSelectStep, TYPES, assertPgClassSingleStep, makeRegistry, pgClassExpression, pgDeleteSingle, pgFromExpression, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeDecodeNodeIdRuntime, makeGrafastSchema, object, rootValue, specFromNodeId, stepAMayDependOnStepB } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeDecodeNodeIdRuntime, makeGrafastSchema, object, rootValue, specFromNodeId, stepAMayDependOnStepB } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 const nodeIdHandler_Query = {
@@ -3729,6 +3729,13 @@ export const plans = {
   },
   Post: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of postUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_postPgResource.get(spec);
+    },
     id($parent) {
       const specifier = nodeIdHandler_Post.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_Post.codec.name].encode);
@@ -3741,6 +3748,13 @@ export const plans = {
   },
   Person: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of personUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return codecResource_personPgResource.get(spec);
+    },
     id($parent) {
       const specifier = nodeIdHandler_Person.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_Person.codec.name].encode);
@@ -3936,6 +3950,13 @@ export const plans = {
   },
   Film: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of filmsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_filmsPgResource.get(spec);
+    },
     id($parent) {
       const specifier = nodeIdHandler_Film.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_Film.codec.name].encode);
@@ -3943,6 +3964,13 @@ export const plans = {
   },
   Studio: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of studiosUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_studiosPgResource.get(spec);
+    },
     id($parent) {
       const specifier = nodeIdHandler_Studio.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_Studio.codec.name].encode);
@@ -3989,6 +4017,13 @@ export const plans = {
   },
   TvShow: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of tv_showsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_tv_showsPgResource.get(spec);
+    },
     id($parent) {
       const specifier = nodeIdHandler_TvShow.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_TvShow.codec.name].encode);
@@ -4040,6 +4075,13 @@ export const plans = {
   },
   TvEpisode: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of tv_episodesUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_tv_episodesPgResource.get(spec);
+    },
     id($parent) {
       const specifier = nodeIdHandler_TvEpisode.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_TvEpisode.codec.name].encode);

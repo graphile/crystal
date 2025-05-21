@@ -1,5 +1,5 @@
 import { PgDeleteSingleStep, PgExecutor, TYPES, assertPgClassSingleStep, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 const nodeIdHandler_Query = {
@@ -1627,6 +1627,13 @@ export const plans = {
   },
   File: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of fileUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_filePgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandler_File.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_File.codec.name].encode);
@@ -1634,6 +1641,13 @@ export const plans = {
   },
   User: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of userUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_userPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandler_User.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_User.codec.name].encode);
@@ -1680,6 +1694,13 @@ export const plans = {
   },
   UserFile: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of user_fileUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_user_filePgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandler_UserFile.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_UserFile.codec.name].encode);

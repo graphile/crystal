@@ -1,5 +1,5 @@
 import { PgDeleteSingleStep, PgExecutor, TYPES, assertPgClassSingleStep, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 const nodeIdHandler_Query = {
@@ -559,23 +559,24 @@ const registryConfig_pgResources_post_table_post_table = {
     }
   }
 };
+const postsUniques = [{
+  isPrimary: false,
+  attributes: ["id"],
+  description: undefined,
+  extensions: {
+    tags: {
+      __proto__: null,
+      behavior: "-single -update -delete"
+    }
+  }
+}];
 const registryConfig_pgResources_posts_posts = {
   executor: executor,
   name: "posts",
   identifier: "main.smart_comment_relations.post_view",
   from: postsIdentifier,
   codec: postsCodec,
-  uniques: [{
-    isPrimary: false,
-    attributes: ["id"],
-    description: undefined,
-    extensions: {
-      tags: {
-        __proto__: null,
-        behavior: "-single -update -delete"
-      }
-    }
-  }],
+  uniques: postsUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -3993,6 +3994,13 @@ export const plans = {
   },
   Offer: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of offersUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_offersPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandler_Offer.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_Offer.codec.name].encode);
@@ -4008,6 +4016,13 @@ export const plans = {
   },
   Post: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of postsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_postsPgResource.get(spec);
+    },
     offersByPostId: {
       plan($record) {
         const $records = resource_offersPgResource.find({
@@ -4150,6 +4165,13 @@ export const plans = {
   },
   Street: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of streetsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_streetsPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandler_Street.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_Street.codec.name].encode);
@@ -4295,6 +4317,13 @@ export const plans = {
   },
   Property: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of propertiesUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_propertiesPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandler_Property.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_Property.codec.name].encode);
@@ -4418,6 +4447,13 @@ export const plans = {
   },
   StreetProperty: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of street_propertyUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_street_propertyPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandler_StreetProperty.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_StreetProperty.codec.name].encode);
@@ -4450,6 +4486,13 @@ export const plans = {
   },
   House: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of housesUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_housesPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandler_House.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_House.codec.name].encode);
@@ -4496,6 +4539,13 @@ export const plans = {
   },
   Building: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of buildingsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_buildingsPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandler_Building.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_Building.codec.name].encode);

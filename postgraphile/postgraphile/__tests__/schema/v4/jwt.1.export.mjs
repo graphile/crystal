@@ -1,5 +1,5 @@
 import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectStep, TYPES, assertPgClassSingleStep, domainOfCodec, enumCodec, listOfCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectFromRecords, pgSelectSingleFromRecord, pgUpdateSingle, rangeOfCodec, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId } from "grafast";
 import { GraphQLError, GraphQLInt, GraphQLString, Kind, valueFromASTUntyped } from "graphql";
 import jsonwebtoken from "jsonwebtoken";
 import { sql } from "pg-sql2";
@@ -1334,6 +1334,17 @@ const mult_2FunctionIdentifer = sql.identifier("b", "mult_2");
 const mult_3FunctionIdentifer = sql.identifier("b", "mult_3");
 const mult_4FunctionIdentifer = sql.identifier("b", "mult_4");
 const guid_fnFunctionIdentifer = sql.identifier("b", "guid_fn");
+const updatable_viewUniques = [{
+  isPrimary: false,
+  attributes: ["x"],
+  description: undefined,
+  extensions: {
+    tags: {
+      __proto__: null,
+      behavior: "-single -update -delete"
+    }
+  }
+}];
 const authenticate_failFunctionIdentifer = sql.identifier("b", "authenticate_fail");
 const resourceConfig_jwt_token = {
   executor: executor,
@@ -1713,17 +1724,7 @@ const registry = makeRegistry({
       identifier: "main.b.updatable_view",
       from: updatableViewIdentifier,
       codec: updatableViewCodec,
-      uniques: [{
-        isPrimary: false,
-        attributes: ["x"],
-        description: undefined,
-        extensions: {
-          tags: {
-            __proto__: null,
-            behavior: "-single -update -delete"
-          }
-        }
-      }],
+      uniques: updatable_viewUniques,
       isVirtual: false,
       description: "YOYOYO!!",
       extensions: {
@@ -4845,6 +4846,13 @@ export const plans = {
   },
   List: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of listsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_listsPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandler_List.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_List.codec.name].encode);
@@ -4986,6 +4994,13 @@ export const plans = {
   },
   Type: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of typesUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_typesPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandler_Type.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_Type.codec.name].encode);
@@ -5314,7 +5329,14 @@ export const plans = {
     }
   },
   UpdatableView: {
-    __assertStep: assertPgClassSingleStep
+    __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of updatable_viewUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_updatable_viewPgResource.get(spec);
+    }
   },
   UpdatableViewsEdge: {
     __assertStep: assertEdgeCapableStep,

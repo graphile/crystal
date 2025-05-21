@@ -2606,22 +2606,23 @@ const registryConfig_pgResources_people_people = {
     }
   }
 };
+const prioritiesUniques = [{
+  isPrimary: true,
+  attributes: ["id"],
+  description: undefined,
+  extensions: {
+    tags: {
+      __proto__: null
+    }
+  }
+}];
 const registryConfig_pgResources_priorities_priorities = {
   executor: executor,
   name: "priorities",
   identifier: "main.polymorphic.priorities",
   from: prioritiesIdentifier,
   codec: prioritiesCodec,
-  uniques: [{
-    isPrimary: true,
-    attributes: ["id"],
-    description: undefined,
-    extensions: {
-      tags: {
-        __proto__: null
-      }
-    }
-  }],
+  uniques: prioritiesUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -14507,6 +14508,13 @@ export const plans = {
   },
   Person: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of peopleUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return otherSource_peoplePgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.Person.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Person.codec.name].encode);
@@ -14745,6 +14753,13 @@ export const plans = {
   },
   LogEntry: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of log_entriesUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_log_entriesPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.LogEntry.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.LogEntry.codec.name].encode);
@@ -14789,6 +14804,13 @@ export const plans = {
   },
   Organization: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of organizationsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_organizationsPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.Organization.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Organization.codec.name].encode);
@@ -15022,6 +15044,13 @@ export const plans = {
   },
   AwsApplication: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of aws_applicationsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_aws_applicationsPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.AwsApplication.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.AwsApplication.codec.name].encode);
@@ -15492,6 +15521,13 @@ export const plans = {
   },
   GcpApplication: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of gcp_applicationsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_gcp_applicationsPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.GcpApplication.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.GcpApplication.codec.name].encode);
@@ -16091,6 +16127,13 @@ export const plans = {
   },
   RelationalItemRelation: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of relational_item_relationsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_relational_item_relationsPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.RelationalItemRelation.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.RelationalItemRelation.codec.name].encode);
@@ -16129,6 +16172,13 @@ export const plans = {
   },
   RelationalItemRelationCompositePk: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of relational_item_relation_composite_pksUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_relational_item_relation_composite_pksPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.RelationalItemRelationCompositePk.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.RelationalItemRelationCompositePk.codec.name].encode);
@@ -16477,6 +16527,13 @@ export const plans = {
   },
   SingleTableItemRelation: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of single_table_item_relationsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return otherSource_single_table_item_relationsPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.SingleTableItemRelation.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.SingleTableItemRelation.codec.name].encode);
@@ -16515,6 +16572,13 @@ export const plans = {
   },
   SingleTableItemRelationCompositePk: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of single_table_item_relation_composite_pksUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return otherSource_single_table_item_relation_composite_pksPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.SingleTableItemRelationCompositePk.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.SingleTableItemRelationCompositePk.codec.name].encode);
@@ -16929,6 +16993,13 @@ export const plans = {
   },
   Priority: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of prioritiesUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_prioritiesPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.Priority.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Priority.codec.name].encode);
@@ -17630,6 +17701,13 @@ export const plans = {
   },
   RelationalTopic: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of relational_topicsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_relational_topicsPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.RelationalTopic.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.RelationalTopic.codec.name].encode);
@@ -18093,6 +18171,13 @@ export const plans = {
   },
   RelationalPost: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of relational_postsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_relational_postsPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.RelationalPost.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.RelationalPost.codec.name].encode);
@@ -18368,6 +18453,13 @@ export const plans = {
   },
   RelationalDivider: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of relational_dividersUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_relational_dividersPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.RelationalDivider.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.RelationalDivider.codec.name].encode);
@@ -18643,6 +18735,13 @@ export const plans = {
   },
   RelationalChecklist: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of relational_checklistsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_relational_checklistsPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.RelationalChecklist.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.RelationalChecklist.codec.name].encode);
@@ -18918,6 +19017,13 @@ export const plans = {
   },
   RelationalChecklistItem: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of relational_checklist_itemsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_relational_checklist_itemsPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.RelationalChecklistItem.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.RelationalChecklistItem.codec.name].encode);
@@ -20170,6 +20276,13 @@ export const plans = {
   },
   FirstPartyVulnerability: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of first_party_vulnerabilitiesUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_first_party_vulnerabilitiesPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.FirstPartyVulnerability.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.FirstPartyVulnerability.codec.name].encode);
@@ -20269,6 +20382,13 @@ export const plans = {
   },
   ThirdPartyVulnerability: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of third_party_vulnerabilitiesUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_third_party_vulnerabilitiesPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.ThirdPartyVulnerability.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.ThirdPartyVulnerability.codec.name].encode);

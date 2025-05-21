@@ -1,5 +1,5 @@
 import { PgDeleteSingleStep, PgExecutor, TYPES, assertPgClassSingleStep, domainOfCodec, enumCodec, listOfCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, recordCodec, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 const nodeIdHandler_Query = {
@@ -2422,6 +2422,13 @@ export const plans = {
   },
   AlwaysAsIdentity: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of always_as_identityUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_always_as_identityPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandler_AlwaysAsIdentity.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_AlwaysAsIdentity.codec.name].encode);
@@ -2429,6 +2436,13 @@ export const plans = {
   },
   ByDefaultAsIdentity: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of by_default_as_identityUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_by_default_as_identityPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandler_ByDefaultAsIdentity.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_ByDefaultAsIdentity.codec.name].encode);
@@ -2436,6 +2450,13 @@ export const plans = {
   },
   Network: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of networkUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_networkPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandler_Network.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_Network.codec.name].encode);
@@ -2453,6 +2474,13 @@ export const plans = {
   },
   Type: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of typesUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_typesPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandler_Type.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandler_Type.codec.name].encode);
