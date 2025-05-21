@@ -17,10 +17,6 @@ import { arrayOfLength, arraysMatch, setsMatch } from "../utils.js";
 import { batchExecutionValue, newBucket } from "./executeBucket.js";
 import type { OperationPlan } from "./OperationPlan";
 
-/** If any of these flags are set on a value, its type should not be resolved and it should be treated as null */
-const SKIP_RESOLVE_TYPE_FLAGS =
-  FLAG_NULL | FLAG_ERROR | FLAG_STOPPED | FLAG_POLY_SKIPPED | FLAG_INHIBITED;
-
 /*
  * Branching: e.g. polymorphic, conditional, etc - means that different
  * directions can be chosen - the plan "branches" at that point based on a
@@ -1049,11 +1045,6 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             originalIndex < parentBucket.size;
             originalIndex++
           ) {
-            const flags = sourceStore._flagsAt(originalIndex);
-            if ((flags & SKIP_RESOLVE_TYPE_FLAGS) !== 0) {
-              // No need to process this value
-              continue;
-            }
             const newIndex = values.length;
 
             // Now set the polymorphic path for this new entry
@@ -1065,7 +1056,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       }
       if (values.length !== totalSize) {
         throw new Error(
-          `GrafastInternalError<9d205bd8-2d00-4d9a-8471-4e24d4720806>: inconsistency! Different lengths in store sizes found`,
+          `GrafastInternalError<9d205bd8-2d00-4d9a-8471-4e24d4720806>: inconsistency! Different lengths in store sizes found; ${values.length} !== ${totalSize}`,
         );
       }
     }
