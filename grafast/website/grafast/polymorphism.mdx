@@ -1,27 +1,31 @@
 ---
-title: "Abstract types"
+title: "Abstract types & polymorphism"
 sidebar_position: 11
 ---
 
-# Abstract types (polymorphism)
+# Abstract types and polymorphism
 
 GraphQL supports two abstract types suitable for usage in output: interfaces and
 unions. An interface defines a list of fields; all objects that implement the
 interface must implement fields compatible with these. A union is a simple list
 of possible object types. At runtime, positions that return one of these
-abstract types must resolve to a concrete object type.
+abstract types must resolve to a concrete object type; thus abstract types allow
+GraphQL to describe positions where data polymorphism can occur.
 
-Gra*fast* supports both of these forms of GraphQL polymorphism, both through
-traditional GraphQL.js resolvers and through plan resolvers. Resolvers work the
-same (basically) as they do in GraphQL.js so we won't dig into them here, but
-let's look into how Gra*fast* supports polymorphism via plan resolvers (which
+Gra*fast* supports GraphQL interfaces and unions, both through traditional
+GraphQL.js resolvers and through plan resolvers. Resolvers work the same
+(basically) as they do in GraphQL.js so we won't dig into them here, but let's
+look into how Gra*fast* supports abstract types via plan resolvers (which
 enables greater efficiency!).
 
 ## Polymorphic positions
 
-Let's define the term "polymorphic position" to make it easier to talk about
-planning our polymorphic GraphQL query. Imagine you have a GraphQL schema such
-as:
+To make it easier to talk about planning a polymorphic GraphQL query, let's
+define the term "polymorphic position" to refer to a position in our GraphQL
+operation whose return type is an abstract type (an interface or union).
+
+Imagine you have a GraphQL schema such as:
+
 
 ```graphql {13,14}
 interface Animal {
@@ -87,9 +91,8 @@ Operations may have any number (0 or higher) of polymorphic positions.
 ## Planning polymorphism
 
 Planning a polymorphic position is a collaboration between the field's plan
-resolver and the abstract type's `planType` method.
-
-### Specifier and planType
+resolver and the abstract type's `planType` method, which describes how to
+resolve abstract values into their concrete type and associated data.
 
 The plan returned by a field plan resolver representing the value to use
 for a polymorphic position is called a "specifier". It's called a specifier
@@ -269,15 +272,16 @@ continue planning for each type from there.
 
 Walking all possible object types is a simple approach, but it can inflate the
 time spent planning an operation, especially for highly polymorphic operations.
-We minimize this cost by fanning in before fanning out (see the below infobox), but
-there's space for more optimization: at some point, Gra*fast* might add support for on-demand polymorphic planning.
+We minimize this cost by fanning in before fanning out (see the below infobox),
+but there's space for more optimization: at some point, Gra*fast* might add
+support for on-demand polymorphic planning.
 
-With on-demand polymorphic planning, each "polymorphic branch" of the plan will only be planned
-the first time that an object of that type is met at runtime. This on-demand
-polymorphic planning strategy should significantly decrease initial planning
-time for highly polymorphic operations, and may result in many of the paths
-never needing to be planned at all! If this is something your deployment of
-Gra*fast* needs, please get in touch!
+With on-demand polymorphic planning, each "polymorphic branch" of the plan will
+only be planned the first time that an object of that type is met at runtime.
+This on-demand polymorphic planning strategy should significantly decrease
+initial planning time for highly polymorphic operations, and may result in many
+of the paths never needing to be planned at all. If this is something your
+deployment of Gra*fast* needs, please get in touch.
 
 :::
 
@@ -402,11 +406,11 @@ const schema = makeGrafastSchema({
 
 ## Caveats
 
-Though we limit the impact of polymorphism, it's still quite expensive compared
-to regular fields (you can think of it as more akin to the number of fields that
-there are types that polymorphic position represents). As such, to protect your
-servers from malicious queries we recommend that you implement trusted documents
-if you can, and if not that you apply a polymorphic depth limit to avoid
-polymorphisms branching becoming an attack vector for your schema. We also make
-available planning timeouts, but these should be your fallback defence rather
-than your primary defence.
+Though we limit the impact of abstract types, they are still quite expensive
+compared to regular types (a field returning an abstract type that could be N
+different concrete types can be similarly complex to having N fields that return
+concrete types). As such, to protect your servers from malicious queries we
+recommend that you implement trusted documents if you can, and if not that you
+apply an abstract type depth limit to avoid polymorphism's branching becoming an
+attack vector for your schema. We also make available planning timeouts, but
+these should be your fallback defence rather than your primary defence.
