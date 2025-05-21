@@ -88,7 +88,6 @@ export class PgSelectSingleStep<
   private nullCheckId: number | null = null;
   public readonly resource: TResource;
   private _coalesceToEmptyObject = false;
-  private typeStepIndexList: number[] | null = null;
   private fromRelation: { refId: number | null; relationName: string } | null =
     null;
 
