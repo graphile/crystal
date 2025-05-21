@@ -14,9 +14,9 @@ graph TD
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 18, 12, 31, 29, 30, 78, 40<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[18]<br />1: <br />ᐳ: 19, 20<br />2: PgUnionAll[32]<br />ᐳ: Access[76]"):::bucket
     Bucket4("Bucket 4 (listItem)<br />Deps: 32, 40, 12<br /><br />ROOT __Item{4}ᐸ76ᐳ[34]"):::bucket
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 34, 36, 40, 12<br /><br />ROOT __Item{4}ᐸ76ᐳ[34]"):::bucket
-    Bucket6("Bucket 6 (polymorphic)<br />__typename: Access[43]<br />Deps: 12, 44, 43<br /><br />1: PgSelect[46], PgSelect[60]<br />2: PgSelectRows[55], PgSelectRows[69]<br />ᐳ: 54, 57, 68, 71, 72, 73, 74, 75"):::bucket
-    Bucket7("Bucket 7 (polymorphicPartition)<br />|AwsApplication<br />Deps: 72, 73<br />ᐳAwsApplication"):::bucket
-    Bucket8("Bucket 8 (polymorphicPartition)<br />|GcpApplication<br />Deps: 74, 75<br />ᐳGcpApplication"):::bucket
+    Bucket6("Bucket 6 (polymorphic)<br />__typename: Access[43]<br />Deps: 43, 12, 44"):::bucket
+    Bucket7("Bucket 7 (polymorphicPartition)<br />|AwsApplication<br />Deps: 12, 44<br />ᐳAwsApplication<br /><br />1: PgSelect[46]<br />2: PgSelectRows[55]<br />ᐳ: 54, 57, 72, 73"):::bucket
+    Bucket8("Bucket 8 (polymorphicPartition)<br />|GcpApplication<br />Deps: 12, 44<br />ᐳGcpApplication<br /><br />1: PgSelect[60]<br />2: PgSelectRows[69]<br />ᐳ: 68, 71, 74, 75"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
@@ -84,29 +84,29 @@ graph TD
     Lambda42 --> Access43
     Access44{{"Access[44∈5]<br />ᐸ42.idᐳ"}}:::plan
     Lambda42 --> Access44
-    PgSelect46[["PgSelect[46∈6]<br />ᐸaws_applicationsᐳ<br />ᐳAwsApplication"]]:::plan
+    PgSelect46[["PgSelect[46∈7]<br />ᐸaws_applicationsᐳ<br />ᐳAwsApplication"]]:::plan
     Object12 & Access44 --> PgSelect46
-    PgSelect60[["PgSelect[60∈6]<br />ᐸgcp_applicationsᐳ<br />ᐳGcpApplication"]]:::plan
-    Object12 & Access44 --> PgSelect60
-    First54{{"First[54∈6]^"}}:::plan
-    PgSelectRows55[["PgSelectRows[55∈6]^"]]:::plan
+    First54{{"First[54∈7]^"}}:::plan
+    PgSelectRows55[["PgSelectRows[55∈7]^"]]:::plan
     PgSelectRows55 --> First54
     PgSelect46 --> PgSelectRows55
-    PgSelectSingle57{{"PgSelectSingle[57∈6]^<br />ᐸaws_applicationsᐳ"}}:::plan
+    PgSelectSingle57{{"PgSelectSingle[57∈7]^<br />ᐸaws_applicationsᐳ"}}:::plan
     First54 --> PgSelectSingle57
-    First68{{"First[68∈6]^"}}:::plan
-    PgSelectRows69[["PgSelectRows[69∈6]^"]]:::plan
+    PgClassExpression72{{"PgClassExpression[72∈7]^<br />ᐸ__aws_appl...ons__.”id”ᐳ"}}:::plan
+    PgSelectSingle57 --> PgClassExpression72
+    PgClassExpression73{{"PgClassExpression[73∈7]^<br />ᐸ__aws_appl...s__.”name”ᐳ"}}:::plan
+    PgSelectSingle57 --> PgClassExpression73
+    PgSelect60[["PgSelect[60∈8]<br />ᐸgcp_applicationsᐳ<br />ᐳGcpApplication"]]:::plan
+    Object12 & Access44 --> PgSelect60
+    First68{{"First[68∈8]^"}}:::plan
+    PgSelectRows69[["PgSelectRows[69∈8]^"]]:::plan
     PgSelectRows69 --> First68
     PgSelect60 --> PgSelectRows69
-    PgSelectSingle71{{"PgSelectSingle[71∈6]^<br />ᐸgcp_applicationsᐳ"}}:::plan
+    PgSelectSingle71{{"PgSelectSingle[71∈8]^<br />ᐸgcp_applicationsᐳ"}}:::plan
     First68 --> PgSelectSingle71
-    PgClassExpression72{{"PgClassExpression[72∈6]^<br />ᐸ__aws_appl...ons__.”id”ᐳ"}}:::plan
-    PgSelectSingle57 --> PgClassExpression72
-    PgClassExpression73{{"PgClassExpression[73∈6]^<br />ᐸ__aws_appl...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle57 --> PgClassExpression73
-    PgClassExpression74{{"PgClassExpression[74∈6]^<br />ᐸ__gcp_appl...ons__.”id”ᐳ"}}:::plan
+    PgClassExpression74{{"PgClassExpression[74∈8]^<br />ᐸ__gcp_appl...ons__.”id”ᐳ"}}:::plan
     PgSelectSingle71 --> PgClassExpression74
-    PgClassExpression75{{"PgClassExpression[75∈6]^<br />ᐸ__gcp_appl...s__.”name”ᐳ"}}:::plan
+    PgClassExpression75{{"PgClassExpression[75∈8]^<br />ᐸ__gcp_appl...s__.”name”ᐳ"}}:::plan
     PgSelectSingle71 --> PgClassExpression75
 
     %% define steps
@@ -123,9 +123,9 @@ graph TD
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgCursor37,Access38,Access39,List41,Lambda42,Access43,Access44 bucket5
     classDef bucket6 stroke:#ff1493
-    class Bucket6,PgSelect46,First54,PgSelectRows55,PgSelectSingle57,PgSelect60,First68,PgSelectRows69,PgSelectSingle71,PgClassExpression72,PgClassExpression73,PgClassExpression74,PgClassExpression75 bucket6
+    class Bucket6 bucket6
     classDef bucket7 stroke:#808000
-    class Bucket7 bucket7
+    class Bucket7,PgSelect46,First54,PgSelectRows55,PgSelectSingle57,PgClassExpression72,PgClassExpression73 bucket7
     classDef bucket8 stroke:#dda0dd
-    class Bucket8 bucket8
+    class Bucket8,PgSelect60,First68,PgSelectRows69,PgSelectSingle71,PgClassExpression74,PgClassExpression75 bucket8
 
