@@ -19,12 +19,17 @@ fragment l on Location {
   ... on SafeRoom {
     hasPersonalSpace
     hasStaff
+    stock {
+      id
+    }
   }
   ... on Club {
     tagline
     manager {
       id
     }
-    # security {          id        }
+    security {
+      id
+    }
   }
 }

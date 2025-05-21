@@ -4,7 +4,7 @@
     name: 'Carl',
     items: [
       {
-        __typename: 'MiscItem',
+        __typename: 'UtilityItem',
         id: 206,
         name: 'Fireball or Custard? Scratchcard',
       },
@@ -41,12 +41,9 @@
         contents: null,
       },
       {
-        __typename: 'Consumable',
+        __typename: 'UtilityItem',
         id: 202,
         name: 'Bandage',
-        creator: null,
-        effect: null,
-        contents: null,
       },
       {
         __typename: 'Consumable',

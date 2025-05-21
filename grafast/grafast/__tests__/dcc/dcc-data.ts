@@ -2,7 +2,8 @@
 
 import type { LoadManyCallback, LoadOneCallback } from "../../dist";
 
-export type ItemSpec = `${"Equipment" | "Consumable" | "MiscItem"}:${number}`;
+export type ItemSpec =
+  `${"Equipment" | "Consumable" | "UtilityItem" | "MiscItem"}:${number}`;
 export type LocationType = "SafeRoom" | "Club";
 
 export interface CrawlerData {
@@ -49,6 +50,10 @@ export interface ConsumableData extends ItemData {
   contents?: ItemSpec[];
 }
 
+export interface UtilityItemData extends ItemData {
+  contents?: ItemSpec[];
+}
+
 export interface MiscItemData extends ItemData {}
 
 export interface LocationData {
@@ -62,6 +67,7 @@ export interface SafeRoomData {
   id: number;
   hasPersonalSpace: boolean;
   hasStaff?: true;
+  stock?: ItemSpec[];
 }
 
 export interface ClubData {
@@ -76,6 +82,7 @@ export interface Database {
   npcs: readonly NpcData[];
   equipment: readonly EquipmentData[];
   consumables: readonly ConsumableData[];
+  utilityItems: readonly UtilityItemData[];
   miscItems: readonly MiscItemData[];
   locations: readonly LocationData[];
   saferooms: readonly SafeRoomData[];
@@ -90,12 +97,12 @@ export function makeData(): Database {
         species: "Human",
         name: "Carl",
         items: [
-          "MiscItem:206",
+          "UtilityItem:206",
           "Equipment:201",
           "Equipment:202",
           "Equipment:203",
           "Consumable:201",
-          "Consumable:202",
+          "UtilityItem:202",
           "Consumable:203",
           "Consumable:204",
           "Consumable:205",
@@ -115,7 +122,7 @@ export function makeData(): Database {
           "Equipment:204",
           "Equipment:206",
           "Consumable:201",
-          "Consumable:202",
+          "UtilityItem:202",
           "Consumable:203",
           "Consumable:204",
           "Consumable:205",
@@ -148,7 +155,7 @@ export function makeData(): Database {
           "Equipment:208",
           "Equipment:209",
           "Consumable:204",
-          "Consumable:202",
+          "UtilityItem:202",
           "Consumable:203",
         ],
         friends: [101, 102, 105],
@@ -157,7 +164,7 @@ export function makeData(): Database {
         id: 105,
         species: "Human",
         name: "Elle",
-        items: ["Consumable:202", "Consumable:203"],
+        items: ["UtilityItem:202", "Consumable:203"],
         friends: [101, 102, 104],
       },
       {
@@ -289,7 +296,6 @@ export function makeData(): Database {
         effect:
           "Temporary immunity to all health-seeping conditions and debuffs",
       },
-      { id: 202, name: "Bandage", type: "Consumable" },
       {
         id: 203,
         name: "Mana Potion",
@@ -331,6 +337,13 @@ export function makeData(): Database {
         effect: "Has many uses",
       },
     ],
+    utilityItems: [
+      { id: 202, name: "Bandage" },
+      {
+        id: 206,
+        name: "Fireball or Custard? Scratchcard",
+      },
+    ],
     miscItems: [
       {
         id: 201,
@@ -352,10 +365,6 @@ export function makeData(): Database {
         id: 205,
         name: "Torch",
       },
-      {
-        id: 206,
-        name: "Fireball or Custard? Scratchcard",
-      },
     ],
     locations: [
       { id: 101, type: "SafeRoom", name: "Peruvian Taco Bell", floors: [1, 2] },
@@ -375,6 +384,7 @@ export function makeData(): Database {
         id: 101,
         hasPersonalSpace: true,
         hasStaff: true,
+        stock: ["Consumable:203", "Consumable:204", "Consumable:209"],
       },
       {
         id: 102,
@@ -384,6 +394,13 @@ export function makeData(): Database {
       {
         id: 201,
         hasPersonalSpace: false,
+      },
+      {
+        /* An orphaned saferoom sharing the id of a club */
+        id: 301,
+        hasPersonalSpace: true,
+        hasStaff: true,
+        stock: ["Consumable:203", "Consumable:204"],
       },
     ],
     clubs: [
@@ -421,7 +438,6 @@ export const batchGetCrawlersByIds: LoadManyCallback<
   never,
   Database
 > = (idsList, { unary: data }) => {
-  console.dir(idsList);
   return idsList.map((ids) =>
     ids.map((id) => data.crawlers.find((c) => c.id === id)),
   );
@@ -442,7 +458,6 @@ export const batchGetNpcsByIds: LoadManyCallback<
   never,
   Database
 > = (idsList, { unary: data }) => {
-  console.dir(idsList);
   return idsList.map((ids) =>
     ids.map((id) => data.npcs.find((c) => c.id === id)),
   );
@@ -464,6 +479,15 @@ export const batchGetConsumableById: LoadOneCallback<
   Database
 > = (ids, { unary: data }) => {
   return ids.map((id) => data.consumables.find((c) => c.id === id));
+};
+
+export const batchGetUtilityItemById: LoadOneCallback<
+  number,
+  UtilityItemData,
+  never,
+  Database
+> = (ids, { unary: data }) => {
+  return ids.map((id) => data.utilityItems.find((c) => c.id === id));
 };
 
 export const batchGetMiscItemById: LoadOneCallback<
@@ -501,7 +525,6 @@ export const batchGetSafeRoomById: LoadOneCallback<
   never,
   Database
 > = (ids, { unary: data }) => {
-  console.log(ids);
   return ids.map((id) => data.saferooms.find((c) => c.id === id));
 };
 

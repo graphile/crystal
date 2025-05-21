@@ -8,6 +8,7 @@ import type {
 } from "../../dist/index.js";
 import {
   coalesce,
+  constant,
   context,
   each,
   get,
@@ -18,9 +19,9 @@ import {
   makeGrafastSchema,
 } from "../../dist/index.js";
 import type {
+  ClubData,
   CrawlerData,
   Database,
-  EquipmentData,
   ItemSpec,
   LocationData,
   NpcData,
@@ -30,11 +31,11 @@ import {
   batchGetConsumableById,
   batchGetCrawlerById,
   batchGetEquipmentById,
-  batchGetLocationById,
   batchGetLocationsByFloorNumber,
   batchGetMiscItemById,
   batchGetNpcById,
   batchGetSafeRoomById,
+  batchGetUtilityItemById,
   makeData,
 } from "./dcc-data.js";
 import { delegate } from "./delegate.js";
@@ -64,6 +65,7 @@ export const makeBaseArgs = () => {
         CHANGELING
         ROCK_MONSTER
         HALF_ELF
+        GONDII
       }
       interface HasInventory {
         items: [Item]
@@ -93,6 +95,13 @@ export const makeBaseArgs = () => {
         exCrawler: Boolean
         friends: [Character]
         clients: [ActiveCrawler!]
+      }
+      type ClubStaff implements NPC & Character {
+        id: Int!
+        name: String!
+        species: Species
+        exCrawler: Boolean
+        friends: [Character]
       }
       interface NPC implements Character {
         id: Int!
@@ -154,11 +163,19 @@ export const makeBaseArgs = () => {
         name: String
         contents: [Item]
       }
+      type UtilityItem implements Item {
+        id: Int!
+        name: String
+        contents: [Item]
+      }
       interface Location {
         id: Int!
         name: String!
         floors: [Floor!]!
       }
+
+      union SafeRoomStock = Consumable | MiscItem | Equipment
+      union ClubStock = Consumable | MiscItem | UtilityItem
 
       type SafeRoom implements Location {
         id: Int!
@@ -166,6 +183,8 @@ export const makeBaseArgs = () => {
         floors: [Floor!]!
         hasPersonalSpace: Boolean!
         hasStaff: Boolean
+        #stock: [Item]
+        stock: [SafeRoomStock]
       }
 
       type Club implements Location {
@@ -175,6 +194,7 @@ export const makeBaseArgs = () => {
         manager: NPC
         security: [Security!]
         tagline: String!
+        stock: [ClubStock]
       }
 
       type Floor {
@@ -185,6 +205,7 @@ export const makeBaseArgs = () => {
       type Query {
         crawler(id: Int!): Crawler
         floor(number: Int!): Floor
+        brokenItem: Item
       }
     `,
     plans: {
@@ -195,6 +216,7 @@ export const makeBaseArgs = () => {
         CHANGELING: { value: "Changeling" },
         ROCK_MONSTER: { value: "Rock Monster" },
         HALF_ELF: { value: "Half Elf" },
+        GONDII: { value: "Gondii" },
       },
 
       Query: {
@@ -204,6 +226,9 @@ export const makeBaseArgs = () => {
         },
         floor(_: any, { $number }: FieldArgs) {
           return lambda($number, getFloor);
+        },
+        brokenItem() {
+          return constant("Utility:999");
         },
       },
       ActiveCrawler: {
@@ -279,6 +304,21 @@ export const makeBaseArgs = () => {
           } as PolymorphicTypePlanner;
         },
       },
+      NPC: {
+        __planType($npcId: Step<number>) {
+          const $data = context().get("data");
+          const $npc = loadOne($npcId, $data, null, batchGetNpcById);
+          const $__typename = lambda($npc, npcToTypeName);
+
+          return {
+            $__typename,
+            planForType(t) {
+              return $npc;
+            },
+          } as PolymorphicTypePlanner;
+        },
+      },
+
       Item: {
         __planType($itemSpec: Step<ItemSpec>): PolymorphicTypePlanner {
           const $decoded = lambda($itemSpec, decodeItemSpec);
@@ -295,6 +335,9 @@ export const makeBaseArgs = () => {
               if (t.name === "Consumable") {
                 return loadOne($id, $data, null, batchGetConsumableById);
               }
+              if (t.name === "UtilityItem") {
+                return loadOne($id, $data, null, batchGetUtilityItemById);
+              }
               if (t.name === "MiscItem") {
                 return loadOne($id, $data, null, batchGetMiscItemById);
               }
@@ -309,6 +352,7 @@ export const makeBaseArgs = () => {
       Consumable: {
         creator: getCreator,
       },
+      UtilityItem: {},
       MiscItem: {},
       Floor: {
         locations($floor: Step<FloorData>) {
@@ -324,7 +368,6 @@ export const makeBaseArgs = () => {
           return {
             $__typename,
             planForType(t) {
-              console.log("plan type", t.name);
               const $id = get($location, "id");
 
               if (t.name === "SafeRoom") {
@@ -348,7 +391,6 @@ export const makeBaseArgs = () => {
                   $location,
                 );
               }
-              console.log("unexpected type", t.name);
               return null;
             },
           };
@@ -364,6 +406,13 @@ export const makeBaseArgs = () => {
         floors($club) {
           const $floors = get($club, "floors") as Step<number[]>;
           return each($floors, ($floor) => lambda($floor, getFloor));
+        },
+        security($club: Step<ClubData & LocationData>) {
+          const $ids = inhibitOnNull(get($club, "security"));
+          return each($ids, ($id) => {
+            const $data = context().get("data");
+            return loadOne($id, $data, null, batchGetNpcById);
+          });
         },
       },
     },
@@ -390,7 +439,7 @@ function crawlerToTypeName(crawler: CrawlerData): string | null {
 }
 
 function npcToTypeName(npc: NpcData): string | null {
-  if (["Manager", "Security", "Guide"].includes(npc.type)) {
+  if (["Manager", "Security", "Guide", "ClubStaff"].includes(npc.type)) {
     return npc.type;
   } else {
     console.warn(`${npc.type} is not yet a supported type of NPC in GraphQL`);

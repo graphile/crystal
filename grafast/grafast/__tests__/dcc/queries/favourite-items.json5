@@ -53,10 +53,9 @@
                   effect: 'Temporary immunity to all health-seeping conditions and debuffs',
                 },
                 {
-                  __typename: 'Consumable',
+                  __typename: 'UtilityItem',
                   id: 202,
                   name: 'Bandage',
-                  effect: null,
                 },
                 {
                   __typename: 'Consumable',
@@ -133,10 +132,9 @@
                   effect: 'Heal 50%+ total health',
                 },
                 {
-                  __typename: 'Consumable',
+                  __typename: 'UtilityItem',
                   id: 202,
                   name: 'Bandage',
-                  effect: null,
                 },
                 {
                   __typename: 'Consumable',
@@ -152,10 +150,9 @@
               name: 'Elle',
               items: [
                 {
-                  __typename: 'Consumable',
+                  __typename: 'UtilityItem',
                   id: 202,
                   name: 'Bandage',
-                  effect: null,
                 },
                 {
                   __typename: 'Consumable',
@@ -233,7 +230,7 @@
                 name: 'Rev-Up Immunity Smoothie',
               },
               {
-                __typename: 'Consumable',
+                __typename: 'UtilityItem',
                 id: 202,
                 name: 'Bandage',
               },
@@ -304,7 +301,7 @@
                 name: 'Healing Potion',
               },
               {
-                __typename: 'Consumable',
+                __typename: 'UtilityItem',
                 id: 202,
                 name: 'Bandage',
               },
@@ -322,7 +319,7 @@
             crawlerNumber: null,
             items: [
               {
-                __typename: 'Consumable',
+                __typename: 'UtilityItem',
                 id: 202,
                 name: 'Bandage',
               },
