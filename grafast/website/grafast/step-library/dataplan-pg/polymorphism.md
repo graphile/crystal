@@ -4,23 +4,22 @@ title: Polymorphism
 
 # Polymorphism in @dataplan/pg
 
-Polymorphism in PostgreSQL schemas can take many forms. `@dataplan/pg` has two
-main ways of dealing with this polymorphism: `pgSelect` (which is polymorphic
-capable so long as all the data either comes from a single table, or a single
-table left-joined to additional tables), and `pgUnionAll` (which allows you to
-pull data from multiple different (independent) database tables via the SQL
-`UNION ALL` construct). These two step classes are similar in many ways, but
-`pgUnionAll` is much more limited in order to maintain performance even when
-dealing with complex setups.
-
-Read on for examples of these.
+Polymorphism in PostgreSQL schemas can take many forms, and each haev their own
+trade-offs. `@dataplan/pg` has two
+main ways of querying polymorphic data: `pgSelect` (for querying either a single
+table for all types or a single table left-joined to tables with additional data
+for each type), and `pgUnionAll` (for querying multiple different (independent)
+database tables via the SQL `UNION ALL` construct). These two step classes are
+similar in many ways, but `pgUnionAll` is much more limited in order to maintain
+performance even when dealing with complex setups.
 
 ## Types of polymorphism supported
 
-There are many ways of modelling polymorphism in the database, and they each
-have various trade-offs. `@dataplan/pg` currently supports the following
-approaches, but if you use a different method for modelling polymorphism in
-your database please get in touch - maybe we can add support for that too!
+Gra*fast* leaves the planning of abstract types to the user (via the `planType`
+method - see [Grafast polymorphism](/grafast/polymorphism)), so `@dataplan/pg`
+does not specifically need polymorphism support. That said; we want to make
+your life easier when dealing with polymorphism, so here's how to handle some
+common forms of polymorphism in PostgreSQL:
 
 ### Single table
 
@@ -49,12 +48,7 @@ create table items (
 
   -- Shared attributes:
   parent_id int references items on delete cascade,
-  author_id int not null references people on delete cascade,
-  position bigint not null default 0,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now(),
-  is_explicitly_archived bool not null default false,
-  archived_at timestamptz,
+  position int not null default 0,
 
   -- Attributes that may be used by one or more item subtypes.
   title text,
@@ -68,7 +62,108 @@ The `items` table contains all the information that we need for our GraphQL
 types `Topic`, `Post`, `Divider`, `Checklist` and `ChecklistItem`.
 
 This style of polymorphism can use `pgSelect` in the same way as you would with
-regular row selection, however the codec on the source your `pgSelect` uses
+regular row selection; and might have types and plans such as these:
+
+<details>
+  <summary>Click to expand typeDefs and itemTypeNameFromType definition</summary>
+
+```ts
+const typeDefs = /* GraphQL */ `
+  type Query {
+    item(id: Int!): Item
+  }
+
+  interface Item {
+    id: Int!
+    parent: Item
+    position: Int
+  }
+
+  type Topic implements Item {
+    id: Int!
+    parent: Item
+    position: Int
+
+    title: String
+  }
+  type Post implements Item {
+    id: Int!
+    parent: Item
+    position: Int
+
+    title: String
+    description: String
+    note: String
+  }
+  type Divider implements Item {
+    id: Int!
+    parent: Item
+    position: Int
+
+    title: String
+    color: String
+  }
+  type Checklist implements Item {
+    id: Int!
+    parent: Item
+    position: Int
+
+    title: String
+  }
+  type ChecklistItem implements Item {
+    id: Int!
+    parent: Item
+    position: Int
+
+    description: String
+    note: String
+  }
+`;
+
+const itemTypeNameFromType = (type: string) =>
+  ({
+    TOPIC: "Topic",
+    POST: "Post",
+    DIVIDER: "Divider",
+    CHECKLIST: "Checklist",
+    CHECKLIST_ITEM: "ChecklistItem",
+  })[type];
+```
+
+</details>
+
+```ts
+// TODO: test this!
+
+const singleTableSchema = makeGrafastSchema({
+  typeDefs,
+  plans: {
+    Query: {
+      item(_, { $id }) {
+        // The `Item` type expects the specifier to simply be the item ID
+        return $id;
+      },
+    },
+    // Our abstract (interface) type
+    Item: {
+      __planType($id: Step<number>) {
+        // Load the item
+        const $item = singleTableItems.get({ id: $id });
+        // Get its type (e.g. CHECKLIST_ITEM)
+        const $type = get($item, "type");
+        // Convert that to a GraphQL type (e.g. ChecklistItem)
+        const $__typename = lambda($type, itemTypeNameFromType);
+        // Return the abstract type planner, use $item for every type
+        return { $__typename, planForType: () => $item };
+      },
+    },
+  },
+});
+```
+
+<!-- TODO: move this to the PostGraphile documentation?
+
+, however the codec on the source your `pgSelect` uses
 must have the `polymorphic` configuration option set to `mode: "single"` for it
 to work. Something like:
 
@@ -96,6 +191,8 @@ itemResource.codec.polymorphism = {
 };
 ```
 
+-->
+
 ### Relational table
 
 Similar to the single table example above, the relational table has a central
@@ -120,12 +217,7 @@ create table items (
 
   -- Shared attributes:
   parent_id int references items on delete cascade,
-  author_id int not null references people on delete cascade,
-  position bigint not null default 0,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now(),
-  is_explicitly_archived bool not null default false,
-  archived_at timestamptz
+  position int not null default 0
 );
 
 -- Tables for each of the subtypes
@@ -175,7 +267,61 @@ in your GraphQL data-modelling and that what you actually want is an interface.
 :::
 
 This style of polymorphism can use `pgSelect` in the same way as you would with
-regular row selection, however the codec on the source your `pgSelect` uses
+regular row selection, but the `planType` is a tiny bit more complex:
+
+```ts
+// TODO: test this!
+
+// Note: we're using the same `typeDefs` and `itemTypeNameFromType` as above
+
+const relationalSchema = makeGrafastSchema({
+  typeDefs,
+  plans: {
+    Query: {
+      item(_, { $id }) {
+        // The `Item` type expects the specifier to simply be the item ID
+        return $id;
+      },
+    },
+    Item: {
+      __planType($id: Step<number>) {
+        // Load the base item
+        const $item = relationalItems.get({ id: $id });
+        // Get its type (e.g. CHECKLIST_ITEM)
+        const $type = get($item, "type");
+        // Convert that to a GraphQL type (e.g. ChecklistItem)
+        const $__typename = lambda($type, itemTypeNameFromType);
+        // Return the abstract type planner
+        return {
+          $__typename,
+          planForType(t) {
+            // This time, each GraphQL object type needs to select from its own
+            // subtable via a relational join.
+            switch (t.name) {
+              case "Topic":
+                return $item.singleRelation("topic");
+              case "Post":
+                return $item.singleRelation("post");
+              case "Divider":
+                return $item.singleRelation("divider");
+              case "Checklist":
+                return $item.singleRelation("checklist");
+              case "ChecklistItem":
+                return $item.singleRelation("checklistItem");
+              default:
+                throw new Error(`Don't know how to plan type ${t}`);
+            }
+          },
+        };
+      },
+    },
+  },
+});
+```
+
+<!-- TODO: move these to PostGraphile docs?
+
+, however the codec on the source your `pgSelect` uses
 must have the `polymorphic` configuration option set to `mode: "relational"`
 for it to work. Something like:
 
@@ -215,6 +361,9 @@ your central source has which links to the relevant table that contains
 additional data for this type.
 
 :::
+
+
+-->
 
 ### Composite type union
 
@@ -289,15 +438,10 @@ Consider the following GraphQL schema, where a person may have a number
 of favourite entities of various types:
 
 ```graphql
-union PersonFavouriteEntity = Person | Post | Comment
-type PersonFavourite {
-  id: ID!
-  person: Person!
-  entity: PersonFavouriteEntity!
-}
+union Entity = Person | Post | Comment
 type Person {
   # ...
-  favourites: [PersonFavourite!]!
+  favourites: [Entity!]!
 }
 type Query {
   person: Person
@@ -318,8 +462,8 @@ create table person_favourites (
 
 Here we might set the rule that exactly one of `liked_person_id`,
 `liked_post_id` and `liked_comment_id` must be non-null at a time, and the one
-which is non-null would indicate which concrete type the
-`PersonFavouriteEntity` represents.
+which is non-null would indicate which concrete type the `Entity`
+represents. Planning this would be very similar to the above:
 
 We can plan this using a `pgUnionAll`:
 
@@ -330,40 +474,48 @@ const plans = {
       const $favourites = personFavouritesResource.find({
         person_id: $person.get("id"),
       });
-      return each($favourites, ($favourite) => {
-        const $list = pgUnionAll({
-          attributes: {},
-          resourceByTypeName: {
-            Person: personResource,
-            Post: postResource,
-            Comment: pommentResource,
-          },
-          members: [
-            {
-              typeName: "Person",
-              resource: personResource,
-              match: {
-                id: $favourite.get("liked_person_id"),
-              },
-            },
-            {
-              typeName: "Post",
-              resource: postResource,
-              match: {
-                id: $favourite.get("liked_post_id"),
-              },
-            },
-            {
-              typeName: "Comment",
-              resource: commentResource,
-              match: {
-                id: $favourite.get("liked_comment_id"),
-              },
-            },
-          ],
-        });
-        return $list.single();
-      });
+      // Convert the $favourites collection into a set of specifiers for our
+      // Entity polymorphic type.
+      return each($favourites, ($favourite) =>
+        object({
+          person_id: $favourite.get("liked_person_id"),
+          post_id: $favourite.get("liked_post_id"),
+          comment_id: $favourite.get("liked_comment_id"),
+        }),
+      );
+    },
+  },
+  Entity: {
+    // The same __planType as the previous example
+    __planType($specifier) {
+      const $personId = $item.get("person_id");
+      const $postId = $item.get("post_id");
+      const $commentId = $item.get("comment_id");
+      const $__typename = lambda(
+        [$personId, $postId, $commentId],
+        ([personId, postId, commentId]) => {
+          if (personId != null) return "Person";
+          if (postId != null) return "Post";
+          if (commentId != null) return "Comment";
+          return null;
+        },
+        true,
+      );
+      return {
+        $__typename,
+        planForType(t) {
+          switch (t.name) {
+            case "Person":
+              return personResource.get({ person_id: $personId });
+            case "Post":
+              return postResource.get({ post_id: $postId });
+            case "Comment":
+              return commentResource.get({ comment_id: $commentId });
+            default:
+              throw new Error(`Don't know how to plan type ${t}`);
+          }
+        },
+      };
     },
   },
 };
@@ -379,13 +531,32 @@ you could use [pgUnionAll](./pgUnionAll.md) to plan them.
 const plans = {
   Query: {
     allPeopleAndOrganizations() {
-      const $list = pgUnionAll({
+      return pgUnionAll({
         resourceByTypeName: {
           Person: personResource,
           Organization: organizationResource,
         },
       });
-      return $list;
+    },
+  },
+  PersonOrOrganization: {
+    __planType($spec) {
+      // PgUnionAllSingleStep has a `toSpecifier` method, so we know the object
+      // will already have the right shape.
+      const $__typename = get($spec, "__typename");
+      return {
+        $__typename,
+        planForType(t) {
+          switch (t.name) {
+            case "Person":
+              return personResource.get({ id: get($spec, "id") });
+            case "Organization":
+              return organizationResource.get({ id: get($spec, "id") });
+            default:
+              throw new Error(`Don't know how to plan type ${t}`);
+          }
+        },
+      };
     },
   },
 };
