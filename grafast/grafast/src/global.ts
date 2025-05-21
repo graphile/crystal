@@ -14,9 +14,7 @@ export function operationPlan(): OperationPlan {
   return currentLayerPlan().operationPlan;
 }
 
-export function context<
-  TContext extends Grafast.Context = Grafast.Context,
->(): __ValueStep<TContext> {
+export function context(): __ValueStep<Grafast.Context> {
   return operationPlan().contextStep as __ValueStep<any>;
 }
 
