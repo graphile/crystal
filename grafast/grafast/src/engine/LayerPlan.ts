@@ -406,7 +406,6 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       // TODO: is this calculated correctly?
       let deferBoundaryDepth = 0;
 
-      const commonAncestryDepth = -1;
       this.ancestry = [];
       /** Unskipped because it comes from the raw layer plans, we skip over those that don't match */
       let prevUnskippedDeferBoundaryDepth = 0;
