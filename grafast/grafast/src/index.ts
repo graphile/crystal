@@ -51,14 +51,7 @@ import { isUnaryStep } from "./engine/lib/withGlobalLayerPlan.js";
 import { OperationPlan } from "./engine/OperationPlan.js";
 import { $$inhibit, flagError, isSafeError, SafeError } from "./error.js";
 import { execute } from "./execute.js";
-import {
-  context,
-  debugPlans,
-  operationPlan,
-  rootValue,
-  trackedContext,
-  trackedRootValue,
-} from "./global.js";
+import { context, debugPlans, operationPlan, rootValue } from "./global.js";
 import { grafast, grafastSync } from "./grafastGraphql.js";
 import { inspect } from "./inspect.js";
 import type {
@@ -499,8 +492,6 @@ export {
   stringifyPayload,
   stripAnsi,
   subscribe,
-  trackedContext,
-  trackedRootValue,
   trap,
   TRAP_ERROR,
   TRAP_ERROR_OR_INHIBITED,
@@ -564,8 +555,6 @@ exportAsMany("grafast", {
   ConstantStep,
   context,
   rootValue,
-  trackedContext,
-  trackedRootValue,
   inhibitOnNull,
   assertNotNull,
   trap,
