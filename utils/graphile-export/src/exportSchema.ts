@@ -1597,6 +1597,33 @@ function exportSchemaTypeDefs({
           ),
         );
       }
+      if (type.isTypeOf) {
+        typeProperties.push(
+          t.objectProperty(
+            t.identifier("__isTypeOf"),
+            convertToIdentifierViaAST(
+              file,
+              type.isTypeOf,
+              `${type.name}IsTypeOf`,
+              `${type.name}.extensions.isTypeOf`,
+            ),
+          ),
+        );
+      }
+
+      if (type.extensions.grafast?.planType) {
+        typeProperties.push(
+          t.objectProperty(
+            t.identifier("__planType"),
+            convertToIdentifierViaAST(
+              file,
+              type.extensions.grafast.planType,
+              `${type.name}PlanType`,
+              `${type.name}.extensions.planType`,
+            ),
+          ),
+        );
+      }
 
       for (const [fieldName, field] of Object.entries(type.toConfig().fields)) {
         // Use shorthand if there's only a `plan` and nothing else

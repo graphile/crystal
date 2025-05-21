@@ -236,16 +236,25 @@ export function makeGrafastSchema(details: {
             ...rawConfig.extensions,
           },
         };
+        const ext = config.extensions as graphql.GraphQLObjectTypeExtensions<
+          any,
+          any
+        >;
         if (objectPlans) {
           for (const [fieldName, rawFieldSpec] of Object.entries(objectPlans)) {
             if (fieldName === "__assertStep") {
               exportNameHint(rawFieldSpec, `${typeName}_assertStep`);
-              (
-                config.extensions as graphql.GraphQLObjectTypeExtensions<
-                  any,
-                  any
-                >
-              ).grafast = { assertStep: rawFieldSpec as any };
+              ext.grafast ??= {};
+              config.extensions!.grafast!.assertStep = rawFieldSpec as any;
+              continue;
+            } else if (fieldName === "__planType") {
+              exportNameHint(rawFieldSpec, `${typeName}_planType`);
+              ext.grafast ??= {};
+              config.extensions!.grafast!.planType = rawFieldSpec as any;
+              continue;
+            } else if (fieldName === "__isTypeOf") {
+              exportNameHint(rawFieldSpec, `${typeName}_isTypeOf`);
+              config.isTypeOf = rawFieldSpec as any;
               continue;
             } else if (fieldName.startsWith("__")) {
               throw new Error(
