@@ -298,7 +298,7 @@ type StepAccessKey<
   ? U
   : TStep extends Step<infer UData>
     ? UData extends Record<string, any>
-      ? UData[TAttr]
+      ? Step<UData[TAttr]>
       : string
     : never;
 
@@ -308,8 +308,8 @@ type StepAccessKey<
 export function get<
   TStep extends Step,
   TAttr extends StepGetKeys<TStep> & string,
->($step: TStep, attr: TAttr): Step<StepAccessKey<TStep, TAttr>> {
+>($step: TStep, attr: TAttr): StepAccessKey<TStep, TAttr> {
   return "get" in $step && typeof $step.get === "function"
     ? $step.get(attr)
-    : access($step, attr);
+    : (access($step, attr) as any);
 }
