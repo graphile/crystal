@@ -1,6 +1,5 @@
 import type { EdgeCapableStep, Step, UnbatchedExecutionExtra } from "grafast";
 import { exportAs, UnbatchedStep } from "grafast";
-import type { GraphQLObjectType } from "grafast/graphql";
 import type { SQL, SQLable } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 

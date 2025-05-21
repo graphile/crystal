@@ -1,8 +1,8 @@
 import type {
+  AbstractTypePlanner,
   ExecutableStep,
   FieldPlanResolver,
   PlanTypeInfo,
-  AbstractTypePlanner,
   Step,
 } from "grafast";
 import type {

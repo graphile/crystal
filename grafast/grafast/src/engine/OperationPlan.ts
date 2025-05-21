@@ -49,6 +49,7 @@ import {
 import { inputStep } from "../input.js";
 import { inspect } from "../inspect.js";
 import type {
+  AbstractTypePlanner,
   AddDependencyOptions,
   AnyInputStep,
   FieldPlanResolver,
@@ -60,7 +61,6 @@ import type {
   LocationDetails,
   Maybe,
   PlanTypeInfo,
-  AbstractTypePlanner,
   TrackedArguments,
 } from "../interfaces.js";
 import type { ApplyAfterModeArg } from "../operationPlan-input.js";
