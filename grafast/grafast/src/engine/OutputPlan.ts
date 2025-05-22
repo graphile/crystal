@@ -1218,6 +1218,11 @@ function makePolymorphicExecutor<TAsString extends boolean>(
           `GrafastInternalError<a46999ef-41ff-4a22-bae9-fa37ff6e5f7f>: Could not determine the OutputPlan to use for '${typeName}' from '${bucket.layerPlan}'`,
         );
       }
+      if (!childOutputPlan) {
+        throw new GraphQLError(
+          "Could not determine concrete output for abstract type",
+        );
+      }
 
       const directChild = bucket.children[childOutputPlan.layerPlan.id];
       if (directChild !== undefined) {
