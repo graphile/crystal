@@ -1207,21 +1207,23 @@ function makePolymorphicExecutor<TAsString extends boolean>(
   return makeExecutor({
     inner(bucketRootValue, root, mutablePath, bucket, bucketIndex) {
       const typeName = bucketRootValue;
-      const childOutputPlan = this.childByTypeName![typeName];
       if (isDev) {
         assert.ok(
           typeName,
           "GrafastInternalError<fd3f3cf0-0789-4c74-a6cd-839c808896ed>: Could not determine concreteType for object",
         );
-        assert.ok(
-          childOutputPlan,
-          `GrafastInternalError<a46999ef-41ff-4a22-bae9-fa37ff6e5f7f>: Could not determine the OutputPlan to use for '${typeName}' from '${bucket.layerPlan}'`,
-        );
       }
+      const childOutputPlan = this.childByTypeName![typeName];
       if (!childOutputPlan) {
-        throw new GraphQLError(
-          "Could not determine concrete output for abstract type",
+        // Search: InvalidConcreteTypeName
+        console.warn(
+          // TODO: add "at ${this.path}"
+          `Invalid object type name for this abstract position; saw %o, but expected one of ${(
+            this.type as OutputPlanTypePolymorphicObject
+          ).typeNames.join(", ")}`,
+          typeName,
         );
+        return asString ? "null" : null;
       }
 
       const directChild = bucket.children[childOutputPlan.layerPlan.id];

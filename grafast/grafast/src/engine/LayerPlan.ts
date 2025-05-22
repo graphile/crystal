@@ -837,7 +837,9 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             parentBucket.polymorphicPathList.at(originalIndex);
           const typeName = typenameEV.at(originalIndex);
           if (!this.reason.typeNames.includes(typeName)) {
-            // TODO: should we error?
+            // Search: InvalidConcreteTypeName
+            // TODO: should we throw an error?
+
             // Skip
             continue;
           }
