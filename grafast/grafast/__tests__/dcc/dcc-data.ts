@@ -4,7 +4,7 @@ import type { LoadManyCallback, LoadOneCallback } from "../../dist";
 
 export type ItemSpec =
   `${"Equipment" | "Consumable" | "UtilityItem" | "MiscItem"}:${number}`;
-export type LocationType = "SafeRoom" | "Club" | "Stairwell";
+export type LocationType = "BetaLocation" | "SafeRoom" | "Club" | "Stairwell";
 
 export interface CrawlerData {
   id: number;
@@ -613,5 +613,5 @@ export const batchGetBetaLocationById: LoadOneCallback<
   never,
   Database
 > = (ids, { unary: data }) => {
-  return ids.map((id) => data.betaLocation.find((c) => c.id === id));
+  return ids.map((id) => data.betaLocations.find((c) => c.id === id));
 };
