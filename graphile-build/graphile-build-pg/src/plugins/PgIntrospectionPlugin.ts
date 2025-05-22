@@ -368,7 +368,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
             new PgExecutor({
               name: serviceName,
               context: () => {
-                const ctx = context<Grafast.Context>();
+                const ctx = context();
                 return object({
                   pgSettings:
                     pgSettingsKey != null

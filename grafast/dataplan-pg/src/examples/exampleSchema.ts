@@ -150,13 +150,6 @@ export function EXPORTABLE<T, TScope extends any[]>(
 
 // These are what the generics extend from
 
-// This is the actual runtime context; we should not use a global for this.
-export interface OurGraphQLContext extends Grafast.Context {
-  pgSettings: Record<string, string | undefined>;
-  withPgClient: WithPgClient<NodePostgresPgClient>;
-  pgSubscriber: PgSubscriber;
-}
-
 /*+--------------------------------------------------------------------------+
   |                               DATA SOURCES                               |
   +--------------------------------------------------------------------------+*/
@@ -169,10 +162,8 @@ export function makeExampleSchema(
       new PgExecutor({
         name: "main",
         context: () => {
-          const $context = context<OurGraphQLContext>();
-          return object<
-            PgExecutorContextPlans<OurGraphQLContext["pgSettings"]>
-          >({
+          const $context = context();
+          return object<PgExecutorContextPlans<Grafast.Context["pgSettings"]>>({
             pgSettings: $context.get("pgSettings"),
             withPgClient: $context.get("withPgClient"),
           });
@@ -2438,7 +2429,7 @@ export function makeExampleSchema(
     },
   });
 
-  type GQLObj = GraphQLObjectType<any, OurGraphQLContext>;
+  type GQLObj = GraphQLObjectType<any, any>;
   const Forum: GQLObj = newObjectTypeBuilder<ForumStep>(PgSelectSingleStep)({
     name: "Forum",
     planType: EXPORTABLE(
@@ -2886,7 +2877,7 @@ export function makeExampleSchema(
     [lambda],
   );
 
-  const PersonBookmark: GraphQLObjectType<any, OurGraphQLContext> =
+  const PersonBookmark: GraphQLObjectType<any, any> =
     newObjectTypeBuilder<PersonBookmarkStep>(PgSelectSingleStep)({
       name: "PersonBookmark",
       planType: EXPORTABLE(
@@ -2914,72 +2905,72 @@ export function makeExampleSchema(
       }),
     });
 
-  const Person: GraphQLObjectType<any, OurGraphQLContext> =
-    newObjectTypeBuilder<PersonStep>(PgSelectSingleStep)({
-      name: "Person",
-      planType: EXPORTABLE(
-        (get, personResource) =>
-          function planType($specifier) {
-            const $personId = get($specifier, "person_id") as Step<number>;
-            return personResource.get({ person_id: $personId });
-          },
-        [get, personResource],
-      ),
-      fields: () => ({
-        personId: attrField("person_id", GraphQLInt),
-        username: attrField("username", GraphQLString),
-        singleTableItemsList: {
-          type: new GraphQLList(SingleTableItem),
-          args: { first: { type: GraphQLInt }, offset: { type: GraphQLInt } },
-          plan: EXPORTABLE(
-            (deoptimizeIfAppropriate, singleTableItemsResource) =>
-              function plan($person, { $first, $offset }) {
-                const $personId = $person.get("person_id");
-                const $items: SingleTableItemsStep =
-                  singleTableItemsResource.find({
-                    author_id: $personId,
-                  });
-                $items.setFirst($first);
-                $items.setOffset($offset);
-                deoptimizeIfAppropriate($items);
-                return $items;
-              },
-            [deoptimizeIfAppropriate, singleTableItemsResource],
-          ),
+  const Person: GraphQLObjectType<any, any> = newObjectTypeBuilder<PersonStep>(
+    PgSelectSingleStep,
+  )({
+    name: "Person",
+    planType: EXPORTABLE(
+      (get, personResource) =>
+        function planType($specifier) {
+          const $personId = get($specifier, "person_id") as Step<number>;
+          return personResource.get({ person_id: $personId });
         },
+      [get, personResource],
+    ),
+    fields: () => ({
+      personId: attrField("person_id", GraphQLInt),
+      username: attrField("username", GraphQLString),
+      singleTableItemsList: {
+        type: new GraphQLList(SingleTableItem),
+        args: { first: { type: GraphQLInt }, offset: { type: GraphQLInt } },
+        plan: EXPORTABLE(
+          (deoptimizeIfAppropriate, singleTableItemsResource) =>
+            function plan($person, { $first, $offset }) {
+              const $personId = $person.get("person_id");
+              const $items: SingleTableItemsStep =
+                singleTableItemsResource.find({
+                  author_id: $personId,
+                });
+              $items.setFirst($first);
+              $items.setOffset($offset);
+              deoptimizeIfAppropriate($items);
+              return $items;
+            },
+          [deoptimizeIfAppropriate, singleTableItemsResource],
+        ),
+      },
 
-        relationalItemsList: {
-          type: new GraphQLList(RelationalItem),
-          args: { first: { type: GraphQLInt }, offset: { type: GraphQLInt } },
-          plan: EXPORTABLE(
-            (deoptimizeIfAppropriate, relationalItemsResource) =>
-              function plan($person, { $first, $offset }) {
-                const $personId = $person.get("person_id");
-                const $items: RelationalItemsStep =
-                  relationalItemsResource.find({
-                    author_id: $personId,
-                  });
-                $items.setFirst($first);
-                $items.setOffset($offset);
-                deoptimizeIfAppropriate($items);
-                return $items;
-              },
-            [deoptimizeIfAppropriate, relationalItemsResource],
-          ),
-        },
+      relationalItemsList: {
+        type: new GraphQLList(RelationalItem),
+        args: { first: { type: GraphQLInt }, offset: { type: GraphQLInt } },
+        plan: EXPORTABLE(
+          (deoptimizeIfAppropriate, relationalItemsResource) =>
+            function plan($person, { $first, $offset }) {
+              const $personId = $person.get("person_id");
+              const $items: RelationalItemsStep = relationalItemsResource.find({
+                author_id: $personId,
+              });
+              $items.setFirst($first);
+              $items.setOffset($offset);
+              deoptimizeIfAppropriate($items);
+              return $items;
+            },
+          [deoptimizeIfAppropriate, relationalItemsResource],
+        ),
+      },
 
-        personBookmarksList: {
-          type: new GraphQLList(PersonBookmark),
-          plan: EXPORTABLE(
-            () =>
-              function plan($person) {
-                return $person.manyRelation("personBookmarks");
-              },
-            [],
-          ),
-        },
-      }),
-    });
+      personBookmarksList: {
+        type: new GraphQLList(PersonBookmark),
+        plan: EXPORTABLE(
+          () =>
+            function plan($person) {
+              return $person.manyRelation("personBookmarks");
+            },
+          [],
+        ),
+      },
+    }),
+  });
 
   const Post: GQLObj = newObjectTypeBuilder<PostStep>(PgSelectSingleStep)({
     name: "Post",
@@ -2998,7 +2989,7 @@ export function makeExampleSchema(
     }),
   });
 
-  const Comment: GraphQLObjectType<any, OurGraphQLContext> =
+  const Comment: GraphQLObjectType<any, any> =
     newObjectTypeBuilder<CommentStep>(PgSelectSingleStep)({
       name: "Comment",
       planType: EXPORTABLE(
@@ -5328,7 +5319,7 @@ export function makeExampleSchema(
                 (id) => `forum:${id}:message`,
                 true,
               );
-              const $pgSubscriber = context<OurGraphQLContext>().get(
+              const $pgSubscriber = context().get(
                 "pgSubscriber",
               ) as unknown as AccessStep<GrafastSubscriber>;
 
