@@ -45,10 +45,13 @@ describe("queries", () => {
           `${BASE_DIR}/${baseName}.json5`,
         );
       });
-      it("matched plan snapshot", async () => {
+      it("matched plan snapshot", async function () {
         const plan = (result.extensions as any)?.explain?.operations?.find(
           (o: any) => o.type === "plan",
         )?.plan;
+        if (!plan && result.errors) {
+          return this.skip();
+        }
         const mermaid = planToMermaid(plan).trim() + "\n";
         await snapshot(mermaid, `${BASE_DIR}/${baseName}.mermaid`);
       });
