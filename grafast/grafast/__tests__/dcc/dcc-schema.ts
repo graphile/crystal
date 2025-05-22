@@ -35,6 +35,7 @@ import {
   batchGetMiscItemById,
   batchGetNpcById,
   batchGetSafeRoomById,
+  batchGetStairwellById,
   batchGetUtilityItemById,
   makeData,
 } from "./dcc-data.js";
@@ -199,6 +200,12 @@ export const makeBaseArgs = () => {
       }
 
       type Stairwell implements Location {
+        id: Int!
+        name: String!
+        floors: [Floor!]!
+      }
+
+      type BetaLocation implements Location {
         id: Int!
         name: String!
         floors: [Floor!]!
@@ -382,7 +389,19 @@ export const makeBaseArgs = () => {
                   $location,
                 );
               }
-
+              if (t.name === "Stairwell") {
+                const $stairwell = loadOne(
+                  $id,
+                  $data,
+                  null,
+                  batchGetStairwellById,
+                );
+                return delegate(
+                  $stairwell,
+                  ["type", "name", "floors", "id"],
+                  $location,
+                );
+              }
               if (t.name === "BetaLocation") {
                 // This is to check that explicitly returning null here works as expected
                 return null;
@@ -393,16 +412,10 @@ export const makeBaseArgs = () => {
         },
       },
       SafeRoom: {
-        floors($saferoom) {
-          const $floors = get($saferoom, "floors") as Step<number[]>;
-          return each($floors, ($floor) => lambda($floor, getFloor));
-        },
+        ...SharedLocationResolvers,
       },
       Club: {
-        floors($club) {
-          const $floors = get($club, "floors") as Step<number[]>;
-          return each($floors, ($floor) => lambda($floor, getFloor));
-        },
+        ...SharedLocationResolvers,
         security($club: Step<ClubData & LocationData>) {
           const $ids = inhibitOnNull(get($club, "security"));
           return each($ids, ($id) => {
@@ -410,6 +423,9 @@ export const makeBaseArgs = () => {
             return loadOne($id, $data, null, batchGetNpcById);
           });
         },
+      },
+      Stairwell: {
+        ...SharedLocationResolvers,
       },
     },
   });
@@ -421,6 +437,13 @@ export const makeBaseArgs = () => {
     variableValues: {},
     contextValue: { data },
   };
+};
+
+const SharedLocationResolvers = {
+  floors($place) {
+    const $floors = get($place, "floors") as Step<number[]>;
+    return each($floors, ($floor) => lambda($floor, getFloor));
+  },
 };
 
 const ItemResolver = {

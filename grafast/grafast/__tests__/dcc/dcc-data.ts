@@ -87,6 +87,10 @@ export interface StairwellData {
   id: number;
 }
 
+export interface BetaLocationData {
+  id: number;
+}
+
 export interface Database {
   crawlers: readonly CrawlerData[];
   npcs: readonly NpcData[];
@@ -97,6 +101,7 @@ export interface Database {
   locations: readonly LocationData[];
   saferooms: readonly SafeRoomData[];
   stairwells: readonly StairwellData[];
+  betaLocations: readonly BetaLocationData[];
   clubs: readonly ClubData[];
 }
 
@@ -393,6 +398,7 @@ export function makeData(): Database {
       },
     ],
     locations: [
+      { id: 100, type: "BetaLocation", name: "Alleyway", floors: [1] },
       { id: 101, type: "SafeRoom", name: "Peruvian Taco Bell", floors: [1, 2] },
       { id: 102, type: "SafeRoom", name: "DMV waiting room", floors: [1, 2] },
       { id: 103, type: "Club", name: "Tutorial Guild", floors: [1, 2] },
@@ -473,6 +479,8 @@ export function makeData(): Database {
       { id: 402 },
       { id: 501 },
     ],
+    /* A Location type without a field plan, which should return null */
+    betaLocations: [{ id: 100 }],
   };
 }
 
@@ -597,4 +605,13 @@ export const batchGetStairwellById: LoadOneCallback<
   Database
 > = (ids, { unary: data }) => {
   return ids.map((id) => data.stairwells.find((c) => c.id === id));
+};
+
+export const batchGetBetaLocationById: LoadOneCallback<
+  number,
+  BetaLocationData,
+  never,
+  Database
+> = (ids, { unary: data }) => {
+  return ids.map((id) => data.betaLocation.find((c) => c.id === id));
 };
