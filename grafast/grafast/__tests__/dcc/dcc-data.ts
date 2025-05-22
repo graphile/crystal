@@ -75,6 +75,7 @@ export interface ClubData {
   manager?: number;
   security?: number[];
   tagline: String;
+  stock?: ItemSpec[];
 }
 
 export interface Database {
@@ -384,7 +385,7 @@ export function makeData(): Database {
         id: 101,
         hasPersonalSpace: true,
         hasStaff: true,
-        stock: ["Consumable:203", "Consumable:204", "Consumable:209"],
+        stock: ["Consumable:203", "Consumable:204", "MiscItem:205"],
       },
       {
         id: 102,
@@ -408,12 +409,19 @@ export function makeData(): Database {
         id: 103,
         manager: 301,
         tagline: "Crawlers are recommended to join, but not required",
+        stock: ["Consumable:203", "Consumable:204", "UtilityItem:202"],
       },
       {
         id: 301,
         manager: 305,
         security: [302, 303],
         tagline: "So fun it hurts",
+        stock: [
+          "Consumable:203",
+          "Consumable:204",
+          "Consumable:209",
+          "UtilityItem:206",
+        ],
       },
       {
         id: 302,

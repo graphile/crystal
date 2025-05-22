@@ -1,3 +1,4 @@
+# Tests what happens when an non-existent typename is returned from planType
 {
   brokenItem {
     __typename

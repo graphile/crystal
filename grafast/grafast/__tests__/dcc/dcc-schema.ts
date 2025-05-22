@@ -307,7 +307,13 @@ export const makeBaseArgs = () => {
       NPC: {
         __planType($npcId: Step<number>) {
           const $data = context().get("data");
-          const $npc = loadOne($npcId, $data, null, batchGetNpcById);
+          // TODO: Inhibit on null shouldn't be needed here
+          const $npc = loadOne(
+            inhibitOnNull($npcId),
+            $data,
+            null,
+            batchGetNpcById,
+          );
           const $__typename = lambda($npc, npcToTypeName);
 
           return {
@@ -319,33 +325,10 @@ export const makeBaseArgs = () => {
         },
       },
 
-      Item: {
-        __planType($itemSpec: Step<ItemSpec>): PolymorphicTypePlanner {
-          const $decoded = lambda($itemSpec, decodeItemSpec);
-          const $__typename = get($decoded, "__typename");
-          return {
-            $__typename,
-            planForType(t) {
-              const $id = get($decoded, "id");
-              const $data = context().get("data");
+      Item: ItemResolver,
+      SafeRoomStock: ItemResolver,
+      ClubStock: ItemResolver,
 
-              if (t.name === "Equipment") {
-                return loadOne($id, $data, null, batchGetEquipmentById);
-              }
-              if (t.name === "Consumable") {
-                return loadOne($id, $data, null, batchGetConsumableById);
-              }
-              if (t.name === "UtilityItem") {
-                return loadOne($id, $data, null, batchGetUtilityItemById);
-              }
-              if (t.name === "MiscItem") {
-                return loadOne($id, $data, null, batchGetMiscItemById);
-              }
-              return null;
-            },
-          };
-        },
-      },
       Equipment: {
         creator: getCreator,
       },
@@ -425,6 +408,34 @@ export const makeBaseArgs = () => {
     variableValues: {},
     contextValue: { data },
   };
+};
+
+const ItemResolver = {
+  __planType($itemSpec: Step<ItemSpec>): PolymorphicTypePlanner {
+    const $decoded = lambda($itemSpec, decodeItemSpec);
+    const $__typename = get($decoded, "__typename");
+    return {
+      $__typename,
+      planForType(t) {
+        const $id = get($decoded, "id");
+        const $data = context().get("data");
+
+        if (t.name === "Equipment") {
+          return loadOne($id, $data, null, batchGetEquipmentById);
+        }
+        if (t.name === "Consumable") {
+          return loadOne($id, $data, null, batchGetConsumableById);
+        }
+        if (t.name === "UtilityItem") {
+          return loadOne($id, $data, null, batchGetUtilityItemById);
+        }
+        if (t.name === "MiscItem") {
+          return loadOne($id, $data, null, batchGetMiscItemById);
+        }
+        return null;
+      },
+    };
+  },
 };
 
 function getCreator($source: Step<{ creator?: number }>) {
