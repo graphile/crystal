@@ -66,6 +66,7 @@ export const makeBaseArgs = () => {
         ROCK_MONSTER
         HALF_ELF
         GONDII
+        BOPCA
       }
       interface HasInventory {
         items: [Item]
@@ -96,12 +97,13 @@ export const makeBaseArgs = () => {
         friends: [Character]
         clients: [ActiveCrawler!]
       }
-      type ClubStaff implements NPC & Character {
+      type Staff implements NPC & Character & HasInventory {
         id: Int!
         name: String!
         species: Species
         exCrawler: Boolean
         friends: [Character]
+        items: [Item]
       }
       interface NPC implements Character {
         id: Int!
@@ -181,9 +183,8 @@ export const makeBaseArgs = () => {
         id: Int!
         name: String!
         floors: [Floor!]!
-        hasPersonalSpace: Boolean!
-        hasStaff: Boolean
-        #stock: [Item]
+        hasPersonalSpace: Boolean
+        manager: NPC
         stock: [SafeRoomStock]
       }
 
@@ -195,6 +196,12 @@ export const makeBaseArgs = () => {
         security: [Security!]
         tagline: String!
         stock: [ClubStock]
+      }
+
+      type Stairwell implements Location {
+        id: Int!
+        name: String!
+        floors: [Floor!]!
       }
 
       type Floor {
@@ -217,6 +224,7 @@ export const makeBaseArgs = () => {
         ROCK_MONSTER: { value: "Rock Monster" },
         HALF_ELF: { value: "Half Elf" },
         GONDII: { value: "Gondii" },
+        BOPCA: { value: "Bopca Protector" },
       },
 
       Query: {
@@ -374,6 +382,11 @@ export const makeBaseArgs = () => {
                   $location,
                 );
               }
+
+              if (t.name === "BetaLocation") {
+                // This is to check that explicitly returning null here works as expected
+                return null;
+              }
               return null;
             },
           };
@@ -450,7 +463,7 @@ function crawlerToTypeName(crawler: CrawlerData): string | null {
 }
 
 function npcToTypeName(npc: NpcData): string | null {
-  if (["Manager", "Security", "Guide", "ClubStaff"].includes(npc.type)) {
+  if (["Manager", "Security", "Guide", "Staff"].includes(npc.type)) {
     return npc.type;
   } else {
     console.warn(`${npc.type} is not yet a supported type of NPC in GraphQL`);

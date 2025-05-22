@@ -7,6 +7,12 @@
         number
         locations {
           ...l
+          floors {
+            number
+            locations {
+              ...l
+            }
+          }
         }
       }
     }
@@ -18,29 +24,53 @@ fragment l on Location {
   name
   ... on SafeRoom {
     hasPersonalSpace
-    hasStaff
-    stock {
-      ... on Item {
+    manager {
+      id
+      name
+      friends {
         id
-        __typename
         name
+      }
+      ... on HasInventory {
+        items {
+          id
+          name
+        }
       }
     }
   }
+
   ... on Club {
     tagline
     manager {
       id
+      name
+      friends {
+        id
+        name
+      }
+      ... on HasInventory {
+        items {
+          id
+          name
+        }
+      }
     }
     security {
       id
-    }
-    stock {
-      ... on Item {
+      name
+      clients {
         id
-        __typename
         name
       }
     }
   }
 }
+
+# TODO Add back stock to Club and SafeRoom
+#    stock {
+#      ... on Item {
+#        id
+#        __typename
+#        name
+#      }

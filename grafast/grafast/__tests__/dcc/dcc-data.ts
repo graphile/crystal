@@ -4,7 +4,7 @@ import type { LoadManyCallback, LoadOneCallback } from "../../dist";
 
 export type ItemSpec =
   `${"Equipment" | "Consumable" | "UtilityItem" | "MiscItem"}:${number}`;
-export type LocationType = "SafeRoom" | "Club";
+export type LocationType = "SafeRoom" | "Club" | "Stairwell";
 
 export interface CrawlerData {
   id: number;
@@ -20,8 +20,13 @@ export interface CrawlerData {
 
 export interface NpcData {
   id: number;
-  type: "Manager" | "Security" | "Guide" | "ClubStaff";
-  species: "Changeling" | "Rock Monster" | "Half Elf" | "Gondii";
+  type: "Manager" | "Security" | "Guide" | "Staff";
+  species:
+    | "Changeling"
+    | "Rock Monster"
+    | "Half Elf"
+    | "Gondii"
+    | "Bopca Protector";
   name: string;
   exCrawler?: boolean;
   client?: number;
@@ -65,8 +70,8 @@ export interface LocationData {
 
 export interface SafeRoomData {
   id: number;
-  hasPersonalSpace: boolean;
-  hasStaff?: true;
+  hasPersonalSpace?: true;
+  manager?: number;
   stock?: ItemSpec[];
 }
 
@@ -78,6 +83,10 @@ export interface ClubData {
   stock?: ItemSpec[];
 }
 
+export interface StairwellData {
+  id: number;
+}
+
 export interface Database {
   crawlers: readonly CrawlerData[];
   npcs: readonly NpcData[];
@@ -87,6 +96,7 @@ export interface Database {
   miscItems: readonly MiscItemData[];
   locations: readonly LocationData[];
   saferooms: readonly SafeRoomData[];
+  stairwells: readonly StairwellData[];
   clubs: readonly ClubData[];
 }
 
@@ -185,7 +195,7 @@ export function makeData(): Database {
         exCrawler: true,
         client: 102,
         items: ["Consumable:203", "Consumable:203", "Consumable:203"],
-        friends: [101, 102, 103],
+        friends: [101, 102, 103, 306],
       },
       {
         id: 302,
@@ -203,7 +213,6 @@ export function makeData(): Database {
         friends: [102, 302],
         clients: [101, 102, 103],
       },
-
       {
         id: 304,
         type: "Manager",
@@ -214,9 +223,25 @@ export function makeData(): Database {
       },
       {
         id: 305,
-        type: "ClubStaff",
+        type: "Staff",
         species: "Gondii",
         name: "Orren",
+      },
+      {
+        /* Has an item of Equipment type, which isn't allowed in SaferoomStock type */
+        id: 306,
+        type: "Staff",
+        species: "Bopca Protector",
+        name: "Tally",
+        friends: [102, 301],
+        items: ["UtilityItem:202", "Equipment:208"],
+      },
+      {
+        id: 307,
+        type: "Security",
+        species: "Rock Monster",
+        name: "Clay-ton",
+        clients: [105],
       },
     ],
     equipment: [
@@ -371,36 +396,42 @@ export function makeData(): Database {
       { id: 101, type: "SafeRoom", name: "Peruvian Taco Bell", floors: [1, 2] },
       { id: 102, type: "SafeRoom", name: "DMV waiting room", floors: [1, 2] },
       { id: 103, type: "Club", name: "Tutorial Guild", floors: [1, 2] },
+      { id: 104, type: "Stairwell", name: "Stairwell 1-1", floors: [1] },
+      { id: 105, type: "Stairwell", name: "Stairwell 1-2", floors: [1] },
       {
         id: 201,
         type: "SafeRoom",
         name: "French storm shelter",
         floors: [2, 3],
       },
+      { id: 204, type: "Stairwell", name: "Stairwell 2-1", floors: [2] },
+      { id: 205, type: "Stairwell", name: "Stairwell 2-2", floors: [2] },
+      { id: 206, type: "Stairwell", name: "Stairwell 2-3", floors: [2] },
       { id: 301, type: "Club", name: "Desperado Club", floors: [3, 4, 5] },
       { id: 302, type: "Club", name: "Club Vanquisher", floors: [3, 4, 5] },
+      { id: 303, type: "Stairwell", name: "Stairwell 3-1", floors: [3] },
+      { id: 304, type: "Stairwell", name: "Stairwell 3-2", floors: [3] },
+      { id: 401, type: "Stairwell", name: "Stairwell 4-1", floors: [4] },
+      { id: 402, type: "Stairwell", name: "Stairwell 4-2", floors: [4] },
+      { id: 501, type: "Stairwell", name: "Stairwell 5-1", floors: [5] },
     ],
     saferooms: [
       {
         id: 101,
         hasPersonalSpace: true,
-        hasStaff: true,
         stock: ["Consumable:203", "Consumable:204", "MiscItem:205"],
+        manager: 306,
       },
       {
         id: 102,
-        hasPersonalSpace: false,
-        hasStaff: true,
       },
       {
         id: 201,
-        hasPersonalSpace: false,
       },
       {
         /* An orphaned saferoom sharing the id of a club */
         id: 301,
         hasPersonalSpace: true,
-        hasStaff: true,
         stock: ["Consumable:203", "Consumable:204"],
       },
     ],
@@ -426,7 +457,21 @@ export function makeData(): Database {
       {
         id: 302,
         tagline: "Heathens will find no solace here",
+        stock: ["UtilityItem:202"],
+        security: [307],
       },
+    ],
+    stairwells: [
+      { id: 104 },
+      { id: 105 },
+      { id: 204 },
+      { id: 205 },
+      { id: 206 },
+      { id: 303 },
+      { id: 304 },
+      { id: 401 },
+      { id: 402 },
+      { id: 501 },
     ],
   };
 }
@@ -543,4 +588,13 @@ export const batchGetClubById: LoadOneCallback<
   Database
 > = (ids, { unary: data }) => {
   return ids.map((id) => data.clubs.find((c) => c.id === id));
+};
+
+export const batchGetStairwellById: LoadOneCallback<
+  number,
+  StairwellData,
+  never,
+  Database
+> = (ids, { unary: data }) => {
+  return ids.map((id) => data.stairwells.find((c) => c.id === id));
 };
