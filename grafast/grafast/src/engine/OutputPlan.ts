@@ -1223,7 +1223,7 @@ function makePolymorphicExecutor<TAsString extends boolean>(
           ).typeNames.join(", ")}`,
           typeName,
         );
-        return asString ? "null" : null;
+        return (asString ? "null" : null) as any;
       }
 
       const directChild = bucket.children[childOutputPlan.layerPlan.id];
