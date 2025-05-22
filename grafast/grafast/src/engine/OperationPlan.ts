@@ -302,8 +302,10 @@ export class OperationPlan {
   /**
    * @internal
    */
-  public readonly itemStepIdByListStepId: {
-    [listStepId: number]: number | undefined;
+  public readonly itemStepIdByListStepIdByParentLayerPlanId: {
+    [parentLayerPlanId: number]:
+      | { [listStepId: number]: number | undefined }
+      | undefined;
   } = Object.create(null);
 
   /**
@@ -1035,7 +1037,10 @@ export class OperationPlan {
     depth: number,
     stream: LayerPlanReasonListItemStream | undefined,
   ): __ItemStep<TData> {
-    const itemStepId = this.itemStepIdByListStepId[listStep.id];
+    const itemStepIdByListStepId =
+      (this.itemStepIdByListStepIdByParentLayerPlanId[parentLayerPlan.id] ??=
+        Object.create(null));
+    const itemStepId = itemStepIdByListStepId[listStep.id];
     if (itemStepId !== undefined) {
       const itemStep = this.stepTracker.getStepById(
         itemStepId,
@@ -1064,7 +1069,7 @@ export class OperationPlan {
       () => new __ItemStep(listStep, depth),
     );
     layerPlan.setRootStep(itemStep);
-    this.itemStepIdByListStepId[listStep.id] = itemStep.id;
+    itemStepIdByListStepId[listStep.id] = itemStep.id;
     return itemStep;
   }
 
