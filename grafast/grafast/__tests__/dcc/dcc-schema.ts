@@ -1,11 +1,7 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import { resolvePreset } from "graphile-config";
 
-import type {
-  FieldArgs,
-  PolymorphicTypePlanner,
-  Step,
-} from "../../dist/index.js";
+import type { AbstractTypePlanner, FieldArgs, Step } from "../../dist/index.js";
 import {
   coalesce,
   constant,
@@ -316,7 +312,7 @@ export const makeBaseArgs = () => {
                 return null;
               }
             },
-          } as PolymorphicTypePlanner;
+          } as AbstractTypePlanner;
         },
       },
       NPC: {
@@ -336,7 +332,7 @@ export const makeBaseArgs = () => {
             planForType(t) {
               return $npc;
             },
-          } as PolymorphicTypePlanner;
+          } as AbstractTypePlanner;
         },
       },
 
@@ -360,7 +356,7 @@ export const makeBaseArgs = () => {
         },
       },
       Location: {
-        __planType($location: Step<LocationData>): PolymorphicTypePlanner {
+        __planType($location: Step<LocationData>): AbstractTypePlanner {
           const $data = context().get("data");
           const $__typename = get($location, "type");
           return {
@@ -440,14 +436,14 @@ export const makeBaseArgs = () => {
 };
 
 const SharedLocationResolvers = {
-  floors($place) {
+  floors($place: Step<LocationData>) {
     const $floors = get($place, "floors") as Step<number[]>;
     return each($floors, ($floor) => lambda($floor, getFloor));
   },
 };
 
 const ItemResolver = {
-  __planType($itemSpec: Step<ItemSpec>): PolymorphicTypePlanner {
+  __planType($itemSpec: Step<ItemSpec>): AbstractTypePlanner {
     const $decoded = lambda($itemSpec, decodeItemSpec);
     const $__typename = get($decoded, "__typename");
     return {
