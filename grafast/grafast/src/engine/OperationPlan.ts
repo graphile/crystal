@@ -855,20 +855,20 @@ export class OperationPlan {
 
     if (subscriptionPlanResolver !== undefined) {
       // PERF: optimize this
-      const { haltTree, step: subscribeStep } = this.batchPlanField(
-        rootType.name,
+      const { haltTree, step: subscribeStep } = this.batchPlanField({
+        typeName: rootType.name,
         fieldName,
-        this.rootLayerPlan,
+        layerPlan: this.rootLayerPlan,
         path,
-        POLYMORPHIC_ROOT_PATHS,
+        polymorphicPaths: POLYMORPHIC_ROOT_PATHS,
         planningPath,
-        subscriptionPlanResolver,
-        "subscribePlan",
-        this.trackedRootValueStep,
-        fieldSpec,
+        planResolver: subscriptionPlanResolver,
+        applyAfterMode: "subscribePlan",
+        rawParentStep: this.trackedRootValueStep,
+        field: fieldSpec,
         trackedArguments,
-        true,
-      )();
+        streamDetails: true,
+      })();
       if (haltTree) {
         throw new SafeError("Failed to setup subscription");
       }
@@ -1340,20 +1340,20 @@ export class OperationPlan {
           }
         }
         if (typeof planResolver === "function") {
-          ({ step, haltTree } = yield this.batchPlanField(
-            objectType.name,
+          ({ step, haltTree } = yield this.batchPlanField({
+            typeName: objectType.name,
             fieldName,
-            fieldLayerPlan,
-            fieldPath,
+            layerPlan: fieldLayerPlan,
+            path: fieldPath,
             polymorphicPaths,
-            fieldPlanningPath,
+            planningPath: fieldPlanningPath,
             planResolver,
-            "plan",
-            parentStep,
-            objectField,
+            applyAfterMode: "plan",
+            rawParentStep: parentStep,
+            field: objectField,
             trackedArguments,
-            isList ? (streamDetails ?? false) : null,
-          ));
+            streamDetails: isList ? (streamDetails ?? false) : null,
+          }));
         } else {
           // No plan resolver (or plan resolver fallback) so there must be a
           // `resolve` method, so we'll feed the full parent step into the
@@ -2625,25 +2625,47 @@ export class OperationPlan {
     });
   }
 
+  planFieldBatch: {
+    complete: boolean;
+    batch: Array<BatchPlanFieldDetails>;
+    results: Array<{ haltTree: boolean; step: Step }>;
+  } | null = null;
   private batchPlanField(
-    typeName: string,
-    fieldName: string,
-    layerPlan: LayerPlan,
-    path: readonly string[],
-    polymorphicPaths: ReadonlySet<string> | null,
-    planningPath: string,
-    planResolver: FieldPlanResolver,
-    applyAfterMode: ApplyAfterModeArg,
-    rawParentStep: Step,
-    field: GraphQLField<any, any>,
-    trackedArguments: TrackedArguments,
-    // If 'true' this is a subscription rather than a stream
-    // If 'false' this is a list but it will never stream
-    // If 'null' this is neither subscribe field nor list field
-    // Otherwise, it's a list field that has the `@stream` directive applied
-    streamDetails: StreamDetails | true | false | null,
+    batchPlanFieldDetails: BatchPlanFieldDetails,
   ): () => { haltTree: boolean; step: Step } {
+    let b: typeof this.planFieldBatch;
+    if (this.planFieldBatch) {
+      b = this.planFieldBatch;
+    } else {
+      b = this.planFieldBatch = {
+        complete: false,
+        batch: [],
+        results: [],
+      };
+    }
+    const myIndex = b.batch.length;
+    b.batch.push(batchPlanFieldDetails);
     return () => {
+      if (!b.complete) {
+        // PROCESS BATCH HERE!
+        b.complete = true;
+        this.planFieldBatch = null;
+      }
+      const batchPlanFieldDetails = b.batch[myIndex];
+      const {
+        typeName,
+        fieldName,
+        layerPlan,
+        path,
+        polymorphicPaths,
+        planningPath,
+        planResolver,
+        applyAfterMode,
+        rawParentStep,
+        field,
+        trackedArguments,
+        streamDetails,
+      } = batchPlanFieldDetails;
       const coordinate = `${typeName}.${fieldName}`;
 
       // The step may have been de-duped whilst sibling steps were planned
@@ -5170,4 +5192,23 @@ function isPeerLayerPlan(
     return true;
   }
   return false;
+}
+
+interface BatchPlanFieldDetails {
+  typeName: string;
+  fieldName: string;
+  layerPlan: LayerPlan;
+  path: readonly string[];
+  polymorphicPaths: ReadonlySet<string> | null;
+  planningPath: string;
+  planResolver: FieldPlanResolver;
+  applyAfterMode: ApplyAfterModeArg;
+  rawParentStep: Step;
+  field: GraphQLField<any, any>;
+  trackedArguments: TrackedArguments;
+  // If 'true' this is a subscription rather than a stream
+  // If 'false' this is a list but it will never stream
+  // If 'null' this is neither subscribe field nor list field
+  // Otherwise, it's a list field that has the `@stream` directive applied
+  streamDetails: StreamDetails | true | false | null;
 }
