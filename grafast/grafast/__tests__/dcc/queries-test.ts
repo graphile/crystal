@@ -4,7 +4,7 @@ import { readFile } from "node:fs/promises";
 
 import { expect } from "chai";
 import type { ExecutionResult } from "graphql";
-import * as JSON5 from "json5";
+import JSON5 from "json5";
 import { it } from "mocha";
 
 import { grafast } from "../../dist/index.js";

@@ -41,7 +41,6 @@ export interface ItemData {
   name: string;
   creator?: number;
   contents?: ItemSpec[];
-  /** @deprecated */
   type?: string;
 }
 
@@ -80,7 +79,7 @@ export interface ClubData {
   id: number;
   manager?: number;
   security?: number[];
-  tagline: String;
+  tagline: string;
   stock?: ItemSpec[];
 }
 
