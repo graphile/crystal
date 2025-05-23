@@ -855,7 +855,7 @@ export class OperationPlan {
 
     if (subscriptionPlanResolver !== undefined) {
       // PERF: optimize this
-      const { haltTree, step: subscribeStep } = this.planField(
+      const { haltTree, step: subscribeStep } = this.batchPlanField(
         rootType.name,
         fieldName,
         this.rootLayerPlan,
@@ -868,7 +868,7 @@ export class OperationPlan {
         fieldSpec,
         trackedArguments,
         true,
-      );
+      )();
       if (haltTree) {
         throw new SafeError("Failed to setup subscription");
       }
@@ -1072,7 +1072,7 @@ export class OperationPlan {
     return itemStep;
   }
 
-  processGroupedFieldSet(details: ProcessGroupedFieldSetDetails) {
+  *processGroupedFieldSet(details: ProcessGroupedFieldSetDetails) {
     const {
       outputPlan,
       path,
@@ -1340,7 +1340,7 @@ export class OperationPlan {
           }
         }
         if (typeof planResolver === "function") {
-          ({ step, haltTree } = this.planField(
+          ({ step, haltTree } = yield this.batchPlanField(
             objectType.name,
             fieldName,
             fieldLayerPlan,
@@ -1535,10 +1535,10 @@ export class OperationPlan {
       isMutation,
     );
     const objectTypeFields = objectType.getFields();
-    this.processGroupedFieldSet({
+    this.queueNextLayer(this.processGroupedFieldSet, {
       outputPlan,
       path,
-      planningPath,
+      planningPath: planningPath + ">",
       polymorphicPaths,
       parentStep,
       positionType: objectType,
@@ -1562,7 +1562,7 @@ export class OperationPlan {
   >();
 
   private queueNextLayer<TDetails extends CommonPlanningDetails<any>>(
-    method: (details: TDetails) => void,
+    method: (details: TDetails) => void | Generator<() => any, void, any>,
     details: TDetails,
   ): void {
     const { planningPath } = details;
@@ -1634,29 +1634,94 @@ export class OperationPlan {
       // polymorphism)
       this.mutateTodos(todo);
 
+      const DONE = Symbol("done");
+      /** Our generators, for batching */
+      interface GennySpec {
+        genny: Generator<() => any, void, any>;
+        loc: string[] | null;
+        layerPlan: LayerPlan;
+        layerPlanLatestSideEffect: Step | null;
+        result: any;
+      }
+      const gennies: Array<GennySpec> = [];
+
       // Finally plan this layer
       for (const [
         fn,
-        details,
+        rawDetails,
         loc,
         originalLayerPlan,
         layerPlanLatestSideEffect,
       ] of batch) {
-        const $sideEffect = originalLayerPlan.latestSideEffectStep;
-        originalLayerPlan.latestSideEffectStep = layerPlanLatestSideEffect;
-        try {
-          const prevLoc = this.loc;
-          this.loc = loc;
-          fn.call(this, details);
-          this.loc = prevLoc;
-        } finally {
-          originalLayerPlan.latestSideEffectStep = $sideEffect;
+        const details = rawDetails as CommonPlanningDetails;
+        this.withLocLpSE(
+          loc,
+          originalLayerPlan,
+          layerPlanLatestSideEffect,
+          () => {
+            /** Still just genny from the block */
+            const genny = fn.call(this, details);
+            if (genny != null) {
+              gennies.push({
+                genny,
+                loc,
+                layerPlan: details.layerPlan,
+                layerPlanLatestSideEffect:
+                  details.layerPlan.latestSideEffectStep,
+                result: undefined,
+              });
+            }
+          },
+        );
+      }
+
+      // And go through all the generators
+      while (gennies.length > 0) {
+        const cbs: Array<{ spec: GennySpec; cb: () => any }> = [];
+        for (const spec of gennies) {
+          const { genny, loc, layerPlan, layerPlanLatestSideEffect, result } =
+            spec;
+          this.withLocLpSE(loc, layerPlan, layerPlanLatestSideEffect, () => {
+            const r = genny.next(result);
+            if (r.done) {
+              spec.result = DONE;
+            } else {
+              cbs.push({ spec, cb: r.value });
+            }
+          });
+        }
+        for (const { spec, cb } of cbs) {
+          spec.result = cb();
+        }
+        // Remove the generators that are done.
+        for (let i = gennies.length - 1; i >= 0; i--) {
+          if (gennies[i].result === DONE) {
+            gennies.splice(i, 1);
+          }
         }
       }
     }
 
     // A final deduplicate
     this.deduplicateSteps();
+  }
+
+  withLocLpSE(
+    loc: string[] | null,
+    layerPlan: LayerPlan,
+    layerPlanLatestSideEffect: Step | null,
+    cb: () => void,
+  ) {
+    const $sideEffect = layerPlan.latestSideEffectStep;
+    layerPlan.latestSideEffectStep = layerPlanLatestSideEffect;
+    try {
+      const prevLoc = this.loc;
+      this.loc = loc;
+      cb();
+      this.loc = prevLoc;
+    } finally {
+      layerPlan.latestSideEffectStep = $sideEffect;
+    }
   }
 
   private mutateTodos(todo: Todo) {
@@ -2560,7 +2625,7 @@ export class OperationPlan {
     });
   }
 
-  private planField(
+  private batchPlanField(
     typeName: string,
     fieldName: string,
     layerPlan: LayerPlan,
@@ -2577,109 +2642,111 @@ export class OperationPlan {
     // If 'null' this is neither subscribe field nor list field
     // Otherwise, it's a list field that has the `@stream` directive applied
     streamDetails: StreamDetails | true | false | null,
-  ): { haltTree: boolean; step: Step } {
-    const coordinate = `${typeName}.${fieldName}`;
+  ): () => { haltTree: boolean; step: Step } {
+    return () => {
+      const coordinate = `${typeName}.${fieldName}`;
 
-    // The step may have been de-duped whilst sibling steps were planned
-    // PERF: this should be handled in the parent?
-    const parentStep = this.stepTracker.getStepById(rawParentStep.id);
+      // The step may have been de-duped whilst sibling steps were planned
+      // PERF: this should be handled in the parent?
+      const parentStep = this.stepTracker.getStepById(rawParentStep.id);
 
-    const previousStepCount = this.stepTracker.stepCount;
-    const previousSideEffectStep = layerPlan.latestSideEffectStep;
+      const previousStepCount = this.stepTracker.stepCount;
+      const previousSideEffectStep = layerPlan.latestSideEffectStep;
 
-    if (this.loc !== null) this.loc.push(`planField(${path.join(".")})`);
-    try {
-      let step = withGlobalLayerPlan(
-        layerPlan,
-        polymorphicPaths,
-        planningPath,
-        withFieldArgsForArguments,
-        null,
-        this,
-        trackedArguments,
-        field,
-        parentStep,
-        applyAfterMode,
-        coordinate,
-        (fieldArgs) =>
-          planResolver(parentStep, fieldArgs, {
-            fieldName,
-            field,
-            schema: this.schema,
-          }),
-      );
-      let haltTree = false;
-      if (step === null || (step instanceof ConstantStep && step.isNull())) {
-        // Constantly null; do not step any further in this tree.
-        step =
-          step ||
-          // `withGlobalLayerPlan(layerPlan, polymorphicPaths, () => constant(null))` but with reduced memory allocation
-          withGlobalLayerPlan(
-            layerPlan,
-            polymorphicPaths,
-            planningPath,
-            constant,
-            null,
-            null,
-          );
-        haltTree = true;
-      }
-      assertExecutableStep(step);
+      if (this.loc !== null) this.loc.push(`planField(${path.join(".")})`);
+      try {
+        let step = withGlobalLayerPlan(
+          layerPlan,
+          polymorphicPaths,
+          planningPath,
+          withFieldArgsForArguments,
+          null,
+          this,
+          trackedArguments,
+          field,
+          parentStep,
+          applyAfterMode,
+          coordinate,
+          (fieldArgs) =>
+            planResolver(parentStep, fieldArgs, {
+              fieldName,
+              field,
+              schema: this.schema,
+            }),
+        );
+        let haltTree = false;
+        if (step === null || (step instanceof ConstantStep && step.isNull())) {
+          // Constantly null; do not step any further in this tree.
+          step =
+            step ||
+            // `withGlobalLayerPlan(layerPlan, polymorphicPaths, () => constant(null))` but with reduced memory allocation
+            withGlobalLayerPlan(
+              layerPlan,
+              polymorphicPaths,
+              planningPath,
+              constant,
+              null,
+              null,
+            );
+          haltTree = true;
+        }
+        assertExecutableStep(step);
 
-      if (streamDetails === true) {
-        // subscription
-        step._stepOptions.stream = {};
-        step._stepOptions.walkIterable = true;
-      } else if (streamDetails === false) {
-        step._stepOptions.walkIterable = true;
-      } else if (streamDetails != null) {
-        step._stepOptions.stream = {
-          initialCountStepId: streamDetails.initialCount.id,
-          ifStepId: streamDetails.if.id,
-          labelStepId: streamDetails.label.id,
-        };
-        step._stepOptions.walkIterable = true;
-      }
-      return { step, haltTree };
-    } catch (e) {
-      if (ALWAYS_THROW_PLANNING_ERRORS) {
-        throw e;
-      }
+        if (streamDetails === true) {
+          // subscription
+          step._stepOptions.stream = {};
+          step._stepOptions.walkIterable = true;
+        } else if (streamDetails === false) {
+          step._stepOptions.walkIterable = true;
+        } else if (streamDetails != null) {
+          step._stepOptions.stream = {
+            initialCountStepId: streamDetails.initialCount.id,
+            ifStepId: streamDetails.if.id,
+            labelStepId: streamDetails.label.id,
+          };
+          step._stepOptions.walkIterable = true;
+        }
+        return { step, haltTree };
+      } catch (e) {
+        if (ALWAYS_THROW_PLANNING_ERRORS) {
+          throw e;
+        }
 
-      if (THROW_PLANNING_ERRORS_ON_SIDE_EFFECTS) {
-        for (let i = previousStepCount; i < this.stepTracker.stepCount; i++) {
-          const step = this.stepTracker.stepById[i];
-          if (step && step.hasSideEffects) {
-            throw e;
+        if (THROW_PLANNING_ERRORS_ON_SIDE_EFFECTS) {
+          for (let i = previousStepCount; i < this.stepTracker.stepCount; i++) {
+            const step = this.stepTracker.stepById[i];
+            if (step && step.hasSideEffects) {
+              throw e;
+            }
           }
         }
-      }
 
-      try {
-        this.stepTracker.purgeBackTo(previousStepCount);
-        layerPlan.latestSideEffectStep = previousSideEffectStep;
-      } catch (e2) {
-        console.error(
-          `Cleanup error occurred whilst trying to recover from field planning error: ${e2.stack}`,
+        try {
+          this.stepTracker.purgeBackTo(previousStepCount);
+          layerPlan.latestSideEffectStep = previousSideEffectStep;
+        } catch (e2) {
+          console.error(
+            `Cleanup error occurred whilst trying to recover from field planning error: ${e2.stack}`,
+          );
+          throw e;
+        }
+
+        const step = withGlobalLayerPlan(
+          layerPlan,
+          polymorphicPaths,
+          planningPath,
+          error,
+          null,
+          e,
         );
-        throw e;
+        const haltTree = true;
+        // PERF: consider deleting all steps that were allocated during this. For
+        // now we'll just rely on tree-shaking.
+        return { step, haltTree };
+      } finally {
+        if (this.loc !== null) this.loc.pop();
       }
-
-      const step = withGlobalLayerPlan(
-        layerPlan,
-        polymorphicPaths,
-        planningPath,
-        error,
-        null,
-        e,
-      );
-      const haltTree = true;
-      // PERF: consider deleting all steps that were allocated during this. For
-      // now we'll just rely on tree-shaking.
-      return { step, haltTree };
-    } finally {
-      if (this.loc !== null) this.loc.pop();
-    }
+    };
   }
 
   /**
@@ -5020,7 +5087,7 @@ function throwNoNewStepsError(
 }
 
 type QueueTuple<T extends CommonPlanningDetails> = [
-  method: (details: T) => void,
+  method: (details: T) => void | Generator<() => any, void, any>,
   details: T,
   loc: string[] | null,
   originalLayerPlan: LayerPlan,
