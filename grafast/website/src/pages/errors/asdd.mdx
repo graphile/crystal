@@ -45,6 +45,9 @@ function plan($source) {
 }
 ```
 
+Now the closure doesn't reference any extant `$steps` from outside of the
+closure, it is passed or constructs the steps it needs.
+
 :::tip Use our lint rules to avoid issues like this
 
 TODO: make these lint rules ;)
