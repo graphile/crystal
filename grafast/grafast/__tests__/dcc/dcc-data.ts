@@ -33,6 +33,7 @@ export interface NpcData {
   clients?: number[];
   items?: ItemSpec[];
   friends?: number[];
+  bestFriend?: number;
 }
 
 export interface ItemData {

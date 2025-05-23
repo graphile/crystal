@@ -75,6 +75,7 @@ export const makeBaseArgs = () => {
         species: Species
         exCrawler: Boolean
         friends: [Character]
+        bestFriend: Character
         saferoomLocation: String
       }
       type Manager implements NPC & Character & HasInventory {
@@ -84,6 +85,7 @@ export const makeBaseArgs = () => {
         items: [Item]
         exCrawler: Boolean
         friends: [Character]
+        bestFriend: Character
         client: ActiveCrawler
       }
       type Security implements NPC & Character {
@@ -92,6 +94,7 @@ export const makeBaseArgs = () => {
         species: Species
         exCrawler: Boolean
         friends: [Character]
+        bestFriend: Character
         clients: [ActiveCrawler!]
       }
       type Staff implements NPC & Character & HasInventory {
@@ -99,6 +102,7 @@ export const makeBaseArgs = () => {
         name: String!
         species: Species
         exCrawler: Boolean
+        bestFriend: Character
         friends: [Character]
         items: [Item]
       }
@@ -107,6 +111,7 @@ export const makeBaseArgs = () => {
         name: String!
         species: Species
         exCrawler: Boolean
+        bestFriend: Character
         friends: [Character]
       }
       interface Character {
@@ -130,7 +135,7 @@ export const makeBaseArgs = () => {
         items: [Item]
         favouriteItem: Item
         friends: [Character]
-        bestFriend: Character
+        bestFriend: ActiveCrawler
         crawlerNumber: Int
       }
       interface Item {
@@ -343,6 +348,10 @@ export const makeBaseArgs = () => {
               return $npc;
             },
           } as AbstractTypePlanner;
+        },
+        bestFriend($npc: Step<NpcData>) {
+          const $id = get($npc, "bestFriend");
+          return $id;
         },
       },
 
