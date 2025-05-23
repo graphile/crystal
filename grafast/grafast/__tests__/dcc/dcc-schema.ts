@@ -277,8 +277,8 @@ export const makeBaseArgs = () => {
       Security: {
         clients($security: Step<NpcData>) {
           const $ids = inhibitOnNull(get($security, "clients"));
-          const $data = context().get("data");
           return each($ids, ($id) => {
+            const $data = context().get("data");
             return loadOne($id, $data, null, batchGetCrawlerById);
           });
         },
