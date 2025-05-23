@@ -171,6 +171,20 @@ export const makeBaseArgs = () => {
         id: Int!
         name: String
       }
+
+      type LootBox {
+        id: Int!
+        tier: LootTier!;
+        category: LootCategory!;
+      }
+      type LootData {
+        id: Int!
+        itemType: String!
+        itemId: Int!
+        lootBoxId: Int!
+        percentageChance: Int
+      }
+
       interface Location {
         id: Int!
         name: String!

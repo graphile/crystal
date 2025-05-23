@@ -5,6 +5,8 @@ import type { LoadManyCallback, LoadOneCallback } from "../../dist";
 export type ItemSpec =
   `${"Equipment" | "Consumable" | "UtilityItem" | "MiscItem"}:${number}`;
 export type LocationType = "BetaLocation" | "SafeRoom" | "Club" | "Stairwell";
+export type LootTier = "Bronze" | "Silver" | "Gold";
+export type LootCategory = "Adventurer" | "Boss" | "Fan" | "Quest";
 
 export interface CrawlerData {
   id: number;
@@ -61,6 +63,20 @@ export interface UtilityItemData extends ItemData {
 
 export interface MiscItemData extends ItemData {}
 
+export interface LootBoxData {
+  id: number;
+  tier: LootTier;
+  category: LootCategory;
+}
+
+export interface LootData {
+  id: number;
+  itemType: String;
+  itemId: number;
+  lootBoxId: number;
+  percentageChance: number;
+}
+
 export interface LocationData {
   id: number;
   name: string;
@@ -98,6 +114,8 @@ export interface Database {
   consumables: readonly ConsumableData[];
   utilityItems: readonly UtilityItemData[];
   miscItems: readonly MiscItemData[];
+  lootBoxes: readonly LootBoxData[];
+  lootData: readonly LootData[];
   locations: readonly LocationData[];
   saferooms: readonly SafeRoomData[];
   stairwells: readonly StairwellData[];
@@ -397,6 +415,79 @@ export function makeData(): Database {
       {
         id: 205,
         name: "Torch",
+      },
+    ],
+    lootBoxes: [
+      { id: 501, tier: "Bronze", category: "Adventurer" },
+      { id: 502, tier: "Bronze", category: "Quest" },
+      { id: 503, tier: "Silver", category: "Adventurer" },
+      { id: 504, tier: "Silver", category: "Boss" },
+      { id: 505, tier: "Gold", category: "Fan" },
+      { id: 506, tier: "Gold", category: "Quest" },
+    ],
+    lootData: [
+      {
+        id: 101,
+        itemType: "Equipment",
+        itemId: 201,
+        lootBoxId: 501,
+        percentageChance: 50,
+      },
+      {
+        id: 102,
+        itemType: "Equipment",
+        itemId: 202,
+        lootBoxId: 503,
+        percentageChance: 10,
+      },
+      {
+        id: 103,
+        itemType: "Equipment",
+        itemId: 203,
+        lootBoxId: 503,
+        percentageChance: 10,
+      },
+      {
+        id: 104,
+        itemType: "Equipment",
+        itemId: 204,
+        lootBoxId: 505,
+        percentageChance: 50,
+      },
+      {
+        id: 105,
+        itemType: "Equipment",
+        itemId: 205,
+        lootBoxId: 505,
+        percentageChance: 50,
+      },
+      {
+        id: 201,
+        itemType: "Consumable",
+        itemId: 203,
+        lootBoxId: 501,
+        percentageChance: 100,
+      },
+      {
+        id: 202,
+        itemType: "Consumable",
+        itemId: 203,
+        lootBoxId: 502,
+        percentageChance: 100,
+      },
+      {
+        id: 203,
+        itemType: "Consumable",
+        itemId: 203,
+        lootBoxId: 503,
+        percentageChance: 100,
+      },
+      {
+        id: 204,
+        itemType: "Consumable",
+        itemId: 203,
+        lootBoxId: 504,
+        percentageChance: 100,
       },
     ],
     locations: [
