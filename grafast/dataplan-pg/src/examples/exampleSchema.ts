@@ -78,7 +78,9 @@ import type {
   PgExecutorContextPlans,
   PgInsertSingleStep,
   PgSelectStep,
+  WithPgClient,
 } from "../";
+import type { NodePostgresPgClient, PgSubscriber } from "../adaptors/pg";
 import { listOfCodec, sqlValueWithCodec } from "../codecs.js";
 import {
   makePgResourceOptions,
@@ -147,6 +149,16 @@ export function EXPORTABLE<T, TScope extends any[]>(
 }
 
 // These are what the generics extend from
+
+declare global {
+  namespace Grafast {
+    interface Context {
+      pgSettings: Record<string, string | undefined> | null;
+      withPgClient: WithPgClient<NodePostgresPgClient>;
+      pgSubscriber: PgSubscriber | null;
+    }
+  }
+}
 
 /*+--------------------------------------------------------------------------+
   |                               DATA SOURCES                               |
