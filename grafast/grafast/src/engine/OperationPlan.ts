@@ -1708,20 +1708,20 @@ export class OperationPlan {
       // layer plan / `planType` shuffle.
       for (const [
         graphqlType,
-        // Its `args[]` where args itself is a tuple of the arguments. `args` was
-        // confusing, `argses` even moreso... So `argsTupleList` it is.
-        argsTupleList,
+        // A list of all the `details` argument objects capture for this type
+        detailsRecordList,
       ] of polymorphicResolveTypeEntriesByPolyType) {
-        const firstArgsTuple = argsTupleList[0];
+        const firstDetailsRecord = detailsRecordList[0];
 
         // All of these properties should be in common
-        // const path = firstArgsTuple.path;
-        const planningPath = firstArgsTuple.planningPath;
-        const allPossibleObjectTypes = firstArgsTuple.allPossibleObjectTypes;
+        // const path = firstDetailsRecord.path;
+        const planningPath = firstDetailsRecord.planningPath;
+        const allPossibleObjectTypes =
+          firstDetailsRecord.allPossibleObjectTypes;
 
         // The existence of this is common (i.e. either all have it set, or all
         // have it null, but the actual contents may differ)
-        const polymorphicPaths = firstArgsTuple.polymorphicPaths;
+        const polymorphicPaths = firstDetailsRecord.polymorphicPaths;
 
         const combinedPolymorphicPaths = polymorphicPaths
           ? new Set<string>(/* Populated below */)
@@ -1730,19 +1730,19 @@ export class OperationPlan {
         let commonLayerPlan: LayerPlan;
         let $original: Step | null;
         let commonStep: Step;
-        const steps = new Set(argsTupleList.map((t) => t.parentStep));
+        const steps = new Set(detailsRecordList.map((t) => t.parentStep));
         if (steps.size > 1) {
           $original = null;
           // Make combined
-          const layerPlans = new Set(argsTupleList.map((t) => t.layerPlan));
+          const layerPlans = new Set(detailsRecordList.map((t) => t.layerPlan));
           const combinedLayerPlan =
             this.getCombinedLayerPlanForLayerPlans(layerPlans);
           const toCombine: { step: Step; layerPlan: LayerPlan }[] = [];
           let isUnary = true;
-          for (const argsTuple of argsTupleList) {
-            const parentStep = argsTuple.parentStep;
-            const polymorphicPaths = argsTuple.polymorphicPaths;
-            const layerPlan = argsTuple.layerPlan;
+          for (const detailsRecord of detailsRecordList) {
+            const parentStep = detailsRecord.parentStep;
+            const polymorphicPaths = detailsRecord.polymorphicPaths;
+            const layerPlan = detailsRecord.layerPlan;
             if (!parentStep._isUnary) {
               isUnary = false;
             }
@@ -1801,7 +1801,7 @@ export class OperationPlan {
         } else {
           $original = [...steps][0];
           const layerPlans = new Set<LayerPlan>();
-          for (const tuple of argsTupleList) {
+          for (const tuple of detailsRecordList) {
             layerPlans.add(tuple.layerPlan);
           }
           if (layerPlans.size === 1) {
@@ -1830,9 +1830,9 @@ export class OperationPlan {
                 )
               : $original;
 
-          for (const argsTuple of argsTupleList) {
-            argsTuple.layerPlan = commonLayerPlan;
-            const polymorphicPaths = argsTuple.polymorphicPaths;
+          for (const detailsRecord of detailsRecordList) {
+            detailsRecord.layerPlan = commonLayerPlan;
+            const polymorphicPaths = detailsRecord.polymorphicPaths;
             if (polymorphicPaths) {
               for (const path of polymorphicPaths) {
                 combinedPolymorphicPaths!.add(path);
@@ -1846,7 +1846,7 @@ export class OperationPlan {
           graphqlType.extensions?.grafast?.planType ?? defaultPlanType;
         // TODO: revisit this. If planType exists then no need? If resolver emulation then always?
         const resolverEmulation =
-          // argsTupleList.some((a) => a.resolverEmulation) && (
+          // detailsRecordList.some((a) => a.resolverEmulation) && (
           graphqlType.resolveType != null ||
           allPossibleObjectTypes.some((t) => t.isTypeOf != null);
         const info: PlanTypeInfo = {
@@ -1935,12 +1935,12 @@ export class OperationPlan {
         }
 
         // Now replace references to layer plan and step
-        for (const argsTuple of argsTupleList) {
-          argsTuple.parentStep = commonStep;
-          argsTuple.layerPlan = polymorphicLayerPlan;
+        for (const detailsRecord of detailsRecordList) {
+          detailsRecord.parentStep = commonStep;
+          detailsRecord.layerPlan = polymorphicLayerPlan;
 
           // TODO: do we want to set the polymorphic paths here or not?
-          // argsTuple.polymorphicPaths = combinedPolymorphicPaths;
+          // detailsRecord.polymorphicPaths = combinedPolymorphicPaths;
 
           const {
             locationDetails,
@@ -1948,7 +1948,7 @@ export class OperationPlan {
             responseKey,
             isNonNull,
             outputPlan: parentOutputPlan,
-          } = argsTuple;
+          } = detailsRecord;
           const polymorphicOutputPlan = new OutputPlan(
             commonLayerPlan,
             polymorphicTypePlanner.$__typename,
@@ -1959,14 +1959,14 @@ export class OperationPlan {
             },
             locationDetails,
           );
-          argsTuple.outputPlan = polymorphicOutputPlan;
+          detailsRecord.outputPlan = polymorphicOutputPlan;
           parentOutputPlan.addChild(parentObjectType, responseKey, {
             type: "outputPlan",
             outputPlan: polymorphicOutputPlan,
             isNonNull,
             locationDetails,
           });
-          argsTuple.stepForType = stepForType;
+          detailsRecord.stepForType = stepForType;
         }
       }
 
