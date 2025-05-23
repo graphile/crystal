@@ -11,9 +11,9 @@ graph TD
     Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 6, 8, 9, 10<br />2: PgSelect[7]<br />3: PgSelectRows[11]"):::bucket
     Bucket1("Bucket 1 (listItem)<br />Deps: 10, 6<br /><br />ROOT __Item{1}ᐸ11ᐳ[12]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 13, 10, 6<br /><br />ROOT PgSelectSingle{1}ᐸpeopleᐳ[13]<br />1: <br />ᐳ: 14, 15<br />2: PgSelect[16]<br />3: PgSelectRows[20]"):::bucket
-    Bucket3("Bucket 3 (listItem)<br />Deps: 10<br /><br />ROOT __Item{3}ᐸ20ᐳ[21]<br />1: <br />ᐳ: 22, 23, 25, 26, 27, 42<br />2: PgSelect[28]<br />3: PgSelectRows[37]<br />ᐳ: 36, 39, 108, 109, 113"):::bucket
-    Bucket4("Bucket 4 (polymorphic)<br />__typename: Lambda[26]<br />Deps: 26, 109, 22, 23, 25, 42, 39, 27, 108, 113"):::bucket
-    Bucket5("Bucket 5 (polymorphic)<br />__typename: Lambda[109]<br />Deps: 109, 39, 27, 108, 113"):::bucket
+    Bucket3("Bucket 3 (listItem)<br />Deps: 10<br /><br />ROOT __Item{3}ᐸ20ᐳ[21]<br />1: <br />ᐳ: 22, 23, 25, 26, 27, 37<br />2: PgSelect[28]<br />3: PgSelectRows[33]<br />ᐳ: 32, 34, 83, 84, 87"):::bucket
+    Bucket4("Bucket 4 (polymorphic)<br />__typename: Lambda[26]<br />Deps: 26, 84, 22, 23, 25, 37, 34, 27, 83, 87"):::bucket
+    Bucket5("Bucket 5 (polymorphic)<br />__typename: Lambda[84]<br />Deps: 84, 34, 27, 83, 87"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
@@ -60,20 +60,20 @@ graph TD
     Lambda26{{"Lambda[26∈3]"}}:::plan
     PgClassExpression25 --> Lambda26
     PgSelectSingle22 --> PgClassExpression27
-    First36{{"First[36∈3]"}}:::plan
-    PgSelectRows37[["PgSelectRows[37∈3]"]]:::plan
-    PgSelectRows37 --> First36
-    PgSelect28 --> PgSelectRows37
-    PgSelectSingle39{{"PgSelectSingle[39∈3]<br />ᐸsingle_table_itemsᐳ"}}:::plan
-    First36 --> PgSelectSingle39
-    PgClassExpression42{{"PgClassExpression[42∈3]<br />ᐸ__single_t...__.”type2”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression42
-    PgClassExpression108{{"PgClassExpression[108∈3]<br />ᐸ__single_t...s__.”type”ᐳ"}}:::plan
-    PgSelectSingle39 --> PgClassExpression108
-    Lambda109{{"Lambda[109∈3]"}}:::plan
-    PgClassExpression108 --> Lambda109
-    PgClassExpression113{{"PgClassExpression[113∈3]<br />ᐸ__single_t...__.”type2”ᐳ"}}:::plan
-    PgSelectSingle39 --> PgClassExpression113
+    First32{{"First[32∈3]"}}:::plan
+    PgSelectRows33[["PgSelectRows[33∈3]"]]:::plan
+    PgSelectRows33 --> First32
+    PgSelect28 --> PgSelectRows33
+    PgSelectSingle34{{"PgSelectSingle[34∈3]<br />ᐸsingle_table_itemsᐳ"}}:::plan
+    First32 --> PgSelectSingle34
+    PgClassExpression37{{"PgClassExpression[37∈3]<br />ᐸ__single_t...__.”type2”ᐳ"}}:::plan
+    PgSelectSingle22 --> PgClassExpression37
+    PgClassExpression83{{"PgClassExpression[83∈3]<br />ᐸ__single_t...s__.”type”ᐳ"}}:::plan
+    PgSelectSingle34 --> PgClassExpression83
+    Lambda84{{"Lambda[84∈3]"}}:::plan
+    PgClassExpression83 --> Lambda84
+    PgClassExpression87{{"PgClassExpression[87∈3]<br />ᐸ__single_t...__.”type2”ᐳ"}}:::plan
+    PgSelectSingle34 --> PgClassExpression87
 
     %% define steps
     classDef bucket0 stroke:#696969
@@ -83,7 +83,7 @@ graph TD
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression14,PgClassExpression15,PgSelect16,PgSelectRows20 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,__Item21,PgSelectSingle22,PgClassExpression23,PgClassExpression25,Lambda26,PgClassExpression27,PgSelect28,First36,PgSelectRows37,PgSelectSingle39,PgClassExpression42,PgClassExpression108,Lambda109,PgClassExpression113 bucket3
+    class Bucket3,__Item21,PgSelectSingle22,PgClassExpression23,PgClassExpression25,Lambda26,PgClassExpression27,PgSelect28,First32,PgSelectRows33,PgSelectSingle34,PgClassExpression37,PgClassExpression83,Lambda84,PgClassExpression87 bucket3
     classDef bucket4 stroke:#0000ff
     class Bucket4 bucket4
     classDef bucket5 stroke:#7fff00
