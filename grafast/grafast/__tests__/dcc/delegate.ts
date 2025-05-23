@@ -1,5 +1,3 @@
-import { EXPORTABLE } from "graphile-export";
-
 import { get, Step } from "../../dist/index.js";
 
 export function delegate(
@@ -10,29 +8,26 @@ export function delegate(
   return new DelegateStep($primary, delegatedAttributes, $secondary);
 }
 
-const DelegateStep = EXPORTABLE(
-  (Step, get) =>
-    class DelegateStep extends Step {
-      constructor(
-        $primary: Step,
-        private delegatedAttributes: string[],
-        $secondary: Step,
-      ) {
-        super();
-        this.addDataDependency($primary);
-        this.addDataDependency($secondary);
-      }
-      get(attr: string) {
-        if (this.delegatedAttributes.includes(attr)) {
-          return get(this.getDep(1), attr);
-        } else {
-          return get(this.getDep(0), attr);
-        }
-      }
-      optimize() {
-        return this.getDep(0);
-      }
-    },
-  [Step, get],
-);
-type DelegateStep = InstanceType<typeof DelegateStep>;
+class DelegateStep extends Step {
+  // Don't export
+  static $$export = null;
+  constructor(
+    $primary: Step,
+    private delegatedAttributes: string[],
+    $secondary: Step,
+  ) {
+    super();
+    this.addDataDependency($primary);
+    this.addDataDependency($secondary);
+  }
+  get(attr: string) {
+    if (this.delegatedAttributes.includes(attr)) {
+      return get(this.getDep(1), attr);
+    } else {
+      return get(this.getDep(0), attr);
+    }
+  }
+  optimize() {
+    return this.getDep(0);
+  }
+}
