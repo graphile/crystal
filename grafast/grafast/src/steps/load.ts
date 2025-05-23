@@ -8,7 +8,13 @@ import type {
 import type { Multistep, UnwrapMultistep } from "../multistep.js";
 import { isMultistep, multistep } from "../multistep.js";
 import { isListLikeStep, isObjectLikeStep, Step } from "../step.js";
-import { arrayOfLength, canonicalJSONStringify, isTuple } from "../utils.js";
+import {
+  arrayOfLength,
+  arraysMatch,
+  canonicalJSONStringify,
+  isTuple,
+  recordsMatch,
+} from "../utils.js";
 import { access } from "./access.js";
 
 export interface LoadOptions<
@@ -147,6 +153,20 @@ export class LoadedRecordStep<
     }
     this.params[paramKey] = value;
   }
+  deduplicate(peers: LoadedRecordStep<any, any>[]) {
+    return peers.filter(
+      (p) =>
+        p.isSingle === this.isSingle &&
+        p.sourceDescription === this.sourceDescription &&
+        recordsMatch(p.ioEquivalence, this.ioEquivalence) &&
+        recordsMatch(p.params, this.params),
+    );
+  }
+  public deduplicatedWith(replacement: LoadedRecordStep<any, any>): void {
+    for (const attr of this.attributes) {
+      replacement.attributes.add(attr);
+    }
+  }
   optimize() {
     const $source = this.getDepDeep(0);
     if ($source instanceof LoadStep) {
@@ -279,6 +299,21 @@ export class LoadStep<
   addAttributes(attributes: Set<keyof TItem>): void {
     for (const attribute of attributes) {
       this.attributes.add(attribute);
+    }
+  }
+  public deduplicate(peers: readonly LoadStep<any, any, any, any, any>[]) {
+    return peers.filter(
+      (p) =>
+        p.load === this.load &&
+        ioEquivalenceMatches(p.ioEquivalence, this.ioEquivalence) &&
+        recordsMatch(p.params, this.params),
+    );
+  }
+  public deduplicatedWith(
+    replacement: LoadStep<any, any, any, any, any>,
+  ): void {
+    for (const attr of this.attributes) {
+      replacement.attributes.add(attr);
     }
   }
   finalize() {
@@ -813,5 +848,26 @@ export function loadOne<
         UnwrapMultistep<TUnaryMultistep>
       >,
     ).single();
+  }
+}
+
+function ioEquivalenceMatches(
+  io1: IOEquivalence<Multistep>,
+  io2: IOEquivalence<Multistep>,
+): boolean {
+  if (io1 === io2) return true;
+
+  if (io1 == null) return false;
+  if (io2 == null) return false;
+
+  if (typeof io1 === "string") return false;
+  if (typeof io2 === "string") return false;
+
+  if (Array.isArray(io1)) {
+    if (!Array.isArray(io2)) return false;
+    return arraysMatch(io1, io2);
+  } else {
+    if (Array.isArray(io2)) return false;
+    return recordsMatch(io1, io2);
   }
 }
