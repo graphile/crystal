@@ -46,6 +46,9 @@ import {
 import type { LayerPlan } from "./LayerPlan.js";
 import type { MetaByMetaKey } from "./OperationPlan.js";
 
+/** Default recoverable/trappable flags (excluding NULL) */
+const INHIBIT_OR_ERROR_FLAGS = FLAG_INHIBITED | FLAG_ERROR;
+
 const timeoutError = Object.freeze(
   new SafeError(
     "Execution timeout exceeded, please simplify or add limits to your request.",
@@ -598,13 +601,12 @@ export function executeBucket(
                   // If dep is not inhibited, but we're disallowed, use our onReject.
                   if (
                     onReject !== undefined &&
-                    (disallowedFlags & (FLAG_INHIBITED | FLAG_ERROR)) ===
-                      NO_FLAGS
+                    (disallowedFlags & INHIBIT_OR_ERROR_FLAGS) === NO_FLAGS
                   ) {
                     rejectValue ||= onReject;
                   }
                   if (forceIndexValue == null) {
-                    if ((flags & FLAG_ERROR) !== 0) {
+                    if ((flags & FLAG_ERROR) !== NO_FLAGS) {
                       const v = depExecutionVal.at(dataIndex);
                       forceIndexValue = v;
                     } else {
