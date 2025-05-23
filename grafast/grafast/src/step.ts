@@ -39,7 +39,6 @@ import type {
   StepOptions,
   UnbatchedExecutionExtra,
 } from "./interfaces.js";
-import type { __DataOnlyStep } from "./steps/__dataOnly.js";
 import type { __FlagStep, __ItemStep } from "./steps/index.js";
 import { stepADependsOnStepB, stepAMayDependOnStepB } from "./utils.js";
 
@@ -274,10 +273,11 @@ export /* abstract */ class Step<TData = any> {
   public hasSideEffects: boolean;
 
   /**
-   * This exists specifically so that __DataOnlyStep can override it.
-   * NOTHING ELSE SHOULD TOUCH IT!
+   * DO NOT USE! (Specifically exists so that very VERY special steps could
+   * override it if they so wished.)
    *
    * @internal
+   * @experimental
    */
   public __trappableFlags: number;
 

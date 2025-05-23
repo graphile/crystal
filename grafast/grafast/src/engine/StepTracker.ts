@@ -7,7 +7,6 @@ import type {
   AddUnaryDependencyOptions,
 } from "../interfaces.js";
 import { Step } from "../step.js";
-import { __dataOnly, __DataOnlyStep } from "../steps/__dataOnly.js";
 import { __FlagStep } from "../steps/__flag.js";
 import { sudo, writeableArray } from "../utils.js";
 import type {
@@ -328,9 +327,7 @@ export class StepTracker {
     options: AddDependencyOptions,
   ): number {
     const $dependent = sudo(raw$dependent);
-    const $dependency = options.dataOnly
-      ? sudo(__dataOnly(options.step))
-      : sudo(options.step);
+    const $dependency = sudo(options.step);
     if (!this.activeSteps.has($dependent)) {
       throw new Error(
         `Cannot add ${$dependency} as a dependency of ${$dependent}; the latter is deleted!`,
@@ -375,7 +372,6 @@ export class StepTracker {
       skipDeduplication,
       acceptFlags = ALL_FLAGS & ~$dependent.defaultForbiddenFlags,
       onReject,
-      dataOnly = false,
     } = options;
     // When copying dependencies between classes, we might not want to
     // deduplicate because we might refer to the dependency by its index. As
@@ -386,17 +382,6 @@ export class StepTracker {
       const existingIndex = dependentDependencies.indexOf($searchForMe);
       if (existingIndex >= 0) {
         return existingIndex;
-      }
-      if (dataOnly) {
-        for (let i = 0, l = dependentDependencies.length; i < l; i++) {
-          const dep = dependentDependencies[i];
-          if (
-            dep instanceof __DataOnlyStep &&
-            sudo(dep).dependencies[0] === $searchForMe
-          ) {
-            return i;
-          }
-        }
       }
     }
 
