@@ -209,6 +209,7 @@ export function makeData(): Database {
         name: "Bomo",
         friends: [102, 303],
         clients: [101, 102, 103],
+        bestFriend: 303,
       },
       {
         id: 303,
@@ -217,6 +218,7 @@ export function makeData(): Database {
         name: "Sledge",
         friends: [102, 302],
         clients: [101, 102, 103],
+        bestFriend: 302,
       },
       {
         id: 304,

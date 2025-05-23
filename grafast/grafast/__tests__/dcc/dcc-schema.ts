@@ -116,7 +116,7 @@ export const makeBaseArgs = () => {
       }
       interface Character {
         id: Int!
-        name: String
+        name: String!
       }
       interface Crawler implements Character {
         id: Int!
@@ -225,6 +225,8 @@ export const makeBaseArgs = () => {
 
       type Query {
         crawler(id: Int!): Crawler
+        character(id: Int!): Character
+
         floor(number: Int!): Floor
         brokenItem: Item
         item(type: ItemType!, id: Int!): Item
@@ -246,6 +248,9 @@ export const makeBaseArgs = () => {
         crawler(_: any, { $id }: FieldArgs) {
           const $data = context().get("data");
           return loadOne($id as Step<number>, $data, null, batchGetCrawlerById);
+        },
+        character(_: any, { $id }: FieldArgs) {
+          return $id;
         },
         floor(_: any, { $number }: FieldArgs) {
           return lambda($number, getFloor);
@@ -269,6 +274,7 @@ export const makeBaseArgs = () => {
         },
       },
       Manager: {
+        ...SharedNpcResolvers,
         client($manager: Step<NpcData>) {
           const $id = inhibitOnNull(get($manager, "client"));
           const $data = context().get("data");
@@ -276,6 +282,8 @@ export const makeBaseArgs = () => {
         },
       },
       Security: {
+        ...SharedNpcResolvers,
+
         clients($security: Step<NpcData>) {
           const $ids = inhibitOnNull(get($security, "clients"));
           return each($ids, ($id) => {
@@ -283,6 +291,12 @@ export const makeBaseArgs = () => {
             return loadOne($id, $data, null, batchGetCrawlerById);
           });
         },
+      },
+      Guide: {
+        ...SharedNpcResolvers,
+      },
+      Staff: {
+        ...SharedNpcResolvers,
       },
       Crawler: {
         __planType($crawler: Step<CrawlerData>) {
@@ -349,10 +363,6 @@ export const makeBaseArgs = () => {
               return $npc;
             },
           } as AbstractTypePlanner;
-        },
-        bestFriend($npc: Step<NpcData>) {
-          const $id = get($npc, "bestFriend");
-          return $id;
         },
       },
 
@@ -459,6 +469,13 @@ const SharedLocationResolvers = {
   floors($place: Step<LocationData>) {
     const $floors = get($place, "floors") as Step<number[]>;
     return each($floors, ($floor) => lambda($floor, getFloor));
+  },
+};
+
+const SharedNpcResolvers = {
+  bestFriend($npc: Step<NpcData>) {
+    const $id = get($npc, "bestFriend");
+    return $id;
   },
 };
 
