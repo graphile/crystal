@@ -78,9 +78,7 @@ import type {
   PgExecutorContextPlans,
   PgInsertSingleStep,
   PgSelectStep,
-  WithPgClient,
 } from "../";
-import type { NodePostgresPgClient, PgSubscriber } from "../adaptors/pg.js";
 import { listOfCodec, sqlValueWithCodec } from "../codecs.js";
 import {
   makePgResourceOptions,
