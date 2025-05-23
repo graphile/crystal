@@ -1,8 +1,8 @@
-import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, PgSelectStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgFromExpression, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUnionAll, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, ConstantStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, inhibitOnNull, lambda, list, makeDecodeNodeId, makeGrafastSchema, node, object, rootValue, specFromNodeId, stepAMayDependOnStepB } from "grafast";
+import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, PgSelectStep, PgUnionAllSingleStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgFromExpression, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUnionAll, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
+import { ConnectionStep, ConstantStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId, stepAMayDependOnStepB } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
-const handler_codec_base64JSON = {
+const nodeIdHandler_SingleTableTopic_codec_base64JSON = {
   name: "base64JSON",
   encode: (() => {
     function base64JSONEncode(value) {
@@ -2606,22 +2606,23 @@ const registryConfig_pgResources_people_people = {
     }
   }
 };
+const prioritiesUniques = [{
+  isPrimary: true,
+  attributes: ["id"],
+  description: undefined,
+  extensions: {
+    tags: {
+      __proto__: null
+    }
+  }
+}];
 const registryConfig_pgResources_priorities_priorities = {
   executor: executor,
   name: "priorities",
   identifier: "main.polymorphic.priorities",
   from: prioritiesIdentifier,
   codec: prioritiesCodec,
-  uniques: [{
-    isPrimary: true,
-    attributes: ["id"],
-    description: undefined,
-    extensions: {
-      tags: {
-        __proto__: null
-      }
-    }
-  }],
+  uniques: prioritiesUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -4561,9 +4562,9 @@ const registryConfig = {
 };
 const registry = makeRegistry(registryConfig);
 const resource_single_table_itemsPgResource = registry.pgResources["single_table_items"];
-const handler = {
+const nodeIdHandler_SingleTableTopic = {
   typeName: "SingleTableTopic",
-  codec: handler_codec_base64JSON,
+  codec: nodeIdHandler_SingleTableTopic_codec_base64JSON,
   deprecationReason: undefined,
   plan($record) {
     return list([constant("SingleTableTopic", false), $record.get("id")]);
@@ -4598,7 +4599,7 @@ const nodeIdCodecs = {
       isSyncAndSafe: true
     })
   },
-  base64JSON: handler_codec_base64JSON,
+  base64JSON: nodeIdHandler_SingleTableTopic_codec_base64JSON,
   pipeString: {
     name: "pipeString",
     encode: Object.assign(function pipeStringEncode(value) {
@@ -4670,71 +4671,566 @@ function qbWhereBuilder(qb) {
 }
 const otherSource_single_table_item_relationsPgResource = registry.pgResources["single_table_item_relations"];
 const otherSource_single_table_item_relation_composite_pksPgResource = registry.pgResources["single_table_item_relation_composite_pks"];
+const SingleTableItem_typeNameFromType = ((interfaceTypeName, polymorphism) => {
+  function typeNameFromType(typeVal) {
+    if (typeof typeVal !== "string") return null;
+    return polymorphism.types[typeVal]?.name ?? null;
+  }
+  typeNameFromType.displayName = `${interfaceTypeName}_typeNameFromType`;
+  return typeNameFromType;
+})("SingleTableItem", spec_singleTableItems.polymorphism);
+const pgResource_organizationsPgResource = registry.pgResources["organizations"];
+const pgResource_prioritiesPgResource = registry.pgResources["priorities"];
+const pgResource_relational_checklistsPgResource = registry.pgResources["relational_checklists"];
+const pgResource_relational_item_relation_composite_pksPgResource = registry.pgResources["relational_item_relation_composite_pks"];
+const pgResource_relational_topicsPgResource = registry.pgResources["relational_topics"];
+const pgResource_relational_checklist_itemsPgResource = registry.pgResources["relational_checklist_items"];
+const pgResource_relational_dividersPgResource = registry.pgResources["relational_dividers"];
+const pgResource_relational_item_relationsPgResource = registry.pgResources["relational_item_relations"];
+const pgResource_log_entriesPgResource = registry.pgResources["log_entries"];
+const pgResource_relational_postsPgResource = registry.pgResources["relational_posts"];
+const pgResource_first_party_vulnerabilitiesPgResource = registry.pgResources["first_party_vulnerabilities"];
+const pgResource_third_party_vulnerabilitiesPgResource = registry.pgResources["third_party_vulnerabilities"];
+const pgResource_aws_applicationsPgResource = registry.pgResources["aws_applications"];
+const pgResource_gcp_applicationsPgResource = registry.pgResources["gcp_applications"];
+const nodeIdHandlerByTypeName = {
+  __proto__: null,
+  Query: {
+    typeName: "Query",
+    codec: nodeIdCodecs.raw,
+    match(specifier) {
+      return specifier === "query";
+    },
+    getIdentifiers(_value) {
+      return [];
+    },
+    getSpec() {
+      return "irrelevant";
+    },
+    get() {
+      return rootValue();
+    },
+    plan() {
+      return constant`query`;
+    }
+  },
+  SingleTableTopic: nodeIdHandler_SingleTableTopic,
+  SingleTablePost: {
+    typeName: "SingleTablePost",
+    codec: nodeIdHandler_SingleTableTopic_codec_base64JSON,
+    deprecationReason: undefined,
+    plan($record) {
+      return list([constant("SingleTablePost", false), $record.get("id")]);
+    },
+    getSpec($list) {
+      return {
+        id: inhibitOnNull(access($list, [1]))
+      };
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return resource_single_table_itemsPgResource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === "SingleTablePost";
+    }
+  },
+  SingleTableDivider: {
+    typeName: "SingleTableDivider",
+    codec: nodeIdHandler_SingleTableTopic_codec_base64JSON,
+    deprecationReason: undefined,
+    plan($record) {
+      return list([constant("SingleTableDivider", false), $record.get("id")]);
+    },
+    getSpec($list) {
+      return {
+        id: inhibitOnNull(access($list, [1]))
+      };
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return resource_single_table_itemsPgResource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === "SingleTableDivider";
+    }
+  },
+  SingleTableChecklist: {
+    typeName: "SingleTableChecklist",
+    codec: nodeIdHandler_SingleTableTopic_codec_base64JSON,
+    deprecationReason: undefined,
+    plan($record) {
+      return list([constant("SingleTableChecklist", false), $record.get("id")]);
+    },
+    getSpec($list) {
+      return {
+        id: inhibitOnNull(access($list, [1]))
+      };
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return resource_single_table_itemsPgResource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === "SingleTableChecklist";
+    }
+  },
+  SingleTableChecklistItem: {
+    typeName: "SingleTableChecklistItem",
+    codec: nodeIdHandler_SingleTableTopic_codec_base64JSON,
+    deprecationReason: undefined,
+    plan($record) {
+      return list([constant("SingleTableChecklistItem", false), $record.get("id")]);
+    },
+    getSpec($list) {
+      return {
+        id: inhibitOnNull(access($list, [1]))
+      };
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return resource_single_table_itemsPgResource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === "SingleTableChecklistItem";
+    }
+  },
+  Organization: {
+    typeName: "Organization",
+    codec: nodeIdHandler_SingleTableTopic_codec_base64JSON,
+    deprecationReason: undefined,
+    plan($record) {
+      return list([constant("organizations", false), $record.get("organization_id")]);
+    },
+    getSpec($list) {
+      return {
+        organization_id: inhibitOnNull(access($list, [1]))
+      };
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return pgResource_organizationsPgResource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === "organizations";
+    }
+  },
+  Person: {
+    typeName: "Person",
+    codec: nodeIdHandler_SingleTableTopic_codec_base64JSON,
+    deprecationReason: undefined,
+    plan($record) {
+      return list([constant("people", false), $record.get("person_id")]);
+    },
+    getSpec($list) {
+      return {
+        person_id: inhibitOnNull(access($list, [1]))
+      };
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return otherSource_peoplePgResource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === "people";
+    }
+  },
+  Priority: {
+    typeName: "Priority",
+    codec: nodeIdHandler_SingleTableTopic_codec_base64JSON,
+    deprecationReason: undefined,
+    plan($record) {
+      return list([constant("priorities", false), $record.get("id")]);
+    },
+    getSpec($list) {
+      return {
+        id: inhibitOnNull(access($list, [1]))
+      };
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return pgResource_prioritiesPgResource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === "priorities";
+    }
+  },
+  RelationalChecklist: {
+    typeName: "RelationalChecklist",
+    codec: nodeIdHandler_SingleTableTopic_codec_base64JSON,
+    deprecationReason: undefined,
+    plan($record) {
+      return list([constant("relational_checklists", false), $record.get("checklist_item_id")]);
+    },
+    getSpec($list) {
+      return {
+        checklist_item_id: inhibitOnNull(access($list, [1]))
+      };
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return pgResource_relational_checklistsPgResource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === "relational_checklists";
+    }
+  },
+  RelationalItemRelationCompositePk: {
+    typeName: "RelationalItemRelationCompositePk",
+    codec: nodeIdHandler_SingleTableTopic_codec_base64JSON,
+    deprecationReason: undefined,
+    plan($record) {
+      return list([constant("relational_item_relation_composite_pks", false), $record.get("parent_id"), $record.get("child_id")]);
+    },
+    getSpec($list) {
+      return {
+        parent_id: inhibitOnNull(access($list, [1])),
+        child_id: inhibitOnNull(access($list, [2]))
+      };
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return pgResource_relational_item_relation_composite_pksPgResource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === "relational_item_relation_composite_pks";
+    }
+  },
+  RelationalTopic: {
+    typeName: "RelationalTopic",
+    codec: nodeIdHandler_SingleTableTopic_codec_base64JSON,
+    deprecationReason: undefined,
+    plan($record) {
+      return list([constant("relational_topics", false), $record.get("topic_item_id")]);
+    },
+    getSpec($list) {
+      return {
+        topic_item_id: inhibitOnNull(access($list, [1]))
+      };
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return pgResource_relational_topicsPgResource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === "relational_topics";
+    }
+  },
+  SingleTableItemRelationCompositePk: {
+    typeName: "SingleTableItemRelationCompositePk",
+    codec: nodeIdHandler_SingleTableTopic_codec_base64JSON,
+    deprecationReason: undefined,
+    plan($record) {
+      return list([constant("single_table_item_relation_composite_pks", false), $record.get("parent_id"), $record.get("child_id")]);
+    },
+    getSpec($list) {
+      return {
+        parent_id: inhibitOnNull(access($list, [1])),
+        child_id: inhibitOnNull(access($list, [2]))
+      };
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return otherSource_single_table_item_relation_composite_pksPgResource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === "single_table_item_relation_composite_pks";
+    }
+  },
+  RelationalChecklistItem: {
+    typeName: "RelationalChecklistItem",
+    codec: nodeIdHandler_SingleTableTopic_codec_base64JSON,
+    deprecationReason: undefined,
+    plan($record) {
+      return list([constant("relational_checklist_items", false), $record.get("checklist_item_item_id")]);
+    },
+    getSpec($list) {
+      return {
+        checklist_item_item_id: inhibitOnNull(access($list, [1]))
+      };
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return pgResource_relational_checklist_itemsPgResource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === "relational_checklist_items";
+    }
+  },
+  RelationalDivider: {
+    typeName: "RelationalDivider",
+    codec: nodeIdHandler_SingleTableTopic_codec_base64JSON,
+    deprecationReason: undefined,
+    plan($record) {
+      return list([constant("relational_dividers", false), $record.get("divider_item_id")]);
+    },
+    getSpec($list) {
+      return {
+        divider_item_id: inhibitOnNull(access($list, [1]))
+      };
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return pgResource_relational_dividersPgResource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === "relational_dividers";
+    }
+  },
+  RelationalItemRelation: {
+    typeName: "RelationalItemRelation",
+    codec: nodeIdHandler_SingleTableTopic_codec_base64JSON,
+    deprecationReason: undefined,
+    plan($record) {
+      return list([constant("relational_item_relations", false), $record.get("id")]);
+    },
+    getSpec($list) {
+      return {
+        id: inhibitOnNull(access($list, [1]))
+      };
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return pgResource_relational_item_relationsPgResource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === "relational_item_relations";
+    }
+  },
+  SingleTableItemRelation: {
+    typeName: "SingleTableItemRelation",
+    codec: nodeIdHandler_SingleTableTopic_codec_base64JSON,
+    deprecationReason: undefined,
+    plan($record) {
+      return list([constant("single_table_item_relations", false), $record.get("id")]);
+    },
+    getSpec($list) {
+      return {
+        id: inhibitOnNull(access($list, [1]))
+      };
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return otherSource_single_table_item_relationsPgResource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === "single_table_item_relations";
+    }
+  },
+  LogEntry: {
+    typeName: "LogEntry",
+    codec: nodeIdHandler_SingleTableTopic_codec_base64JSON,
+    deprecationReason: undefined,
+    plan($record) {
+      return list([constant("log_entries", false), $record.get("id")]);
+    },
+    getSpec($list) {
+      return {
+        id: inhibitOnNull(access($list, [1]))
+      };
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return pgResource_log_entriesPgResource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === "log_entries";
+    }
+  },
+  RelationalPost: {
+    typeName: "RelationalPost",
+    codec: nodeIdHandler_SingleTableTopic_codec_base64JSON,
+    deprecationReason: undefined,
+    plan($record) {
+      return list([constant("relational_posts", false), $record.get("post_item_id")]);
+    },
+    getSpec($list) {
+      return {
+        post_item_id: inhibitOnNull(access($list, [1]))
+      };
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return pgResource_relational_postsPgResource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === "relational_posts";
+    }
+  },
+  FirstPartyVulnerability: {
+    typeName: "FirstPartyVulnerability",
+    codec: nodeIdHandler_SingleTableTopic_codec_base64JSON,
+    deprecationReason: undefined,
+    plan($record) {
+      return list([constant("first_party_vulnerabilities", false), $record.get("id")]);
+    },
+    getSpec($list) {
+      return {
+        id: inhibitOnNull(access($list, [1]))
+      };
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return pgResource_first_party_vulnerabilitiesPgResource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === "first_party_vulnerabilities";
+    }
+  },
+  ThirdPartyVulnerability: {
+    typeName: "ThirdPartyVulnerability",
+    codec: nodeIdHandler_SingleTableTopic_codec_base64JSON,
+    deprecationReason: undefined,
+    plan($record) {
+      return list([constant("third_party_vulnerabilities", false), $record.get("id")]);
+    },
+    getSpec($list) {
+      return {
+        id: inhibitOnNull(access($list, [1]))
+      };
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return pgResource_third_party_vulnerabilitiesPgResource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === "third_party_vulnerabilities";
+    }
+  },
+  AwsApplication: {
+    typeName: "AwsApplication",
+    codec: nodeIdHandler_SingleTableTopic_codec_base64JSON,
+    deprecationReason: undefined,
+    plan($record) {
+      return list([constant("aws_applications", false), $record.get("id")]);
+    },
+    getSpec($list) {
+      return {
+        id: inhibitOnNull(access($list, [1]))
+      };
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return pgResource_aws_applicationsPgResource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === "aws_applications";
+    }
+  },
+  GcpApplication: {
+    typeName: "GcpApplication",
+    codec: nodeIdHandler_SingleTableTopic_codec_base64JSON,
+    deprecationReason: undefined,
+    plan($record) {
+      return list([constant("gcp_applications", false), $record.get("id")]);
+    },
+    getSpec($list) {
+      return {
+        id: inhibitOnNull(access($list, [1]))
+      };
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return pgResource_gcp_applicationsPgResource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === "gcp_applications";
+    }
+  }
+};
+const decodeNodeId = makeDecodeNodeId(Object.values(nodeIdHandlerByTypeName));
+function findTypeNameMatch(specifier) {
+  if (!specifier) return null;
+  for (const [typeName, typeSpec] of Object.entries(nodeIdHandlerByTypeName)) {
+    const value = specifier[typeSpec.codec.name];
+    if (value != null && typeSpec.match(value)) {
+      return typeName;
+    }
+  }
+  return null;
+}
 function BigIntSerialize(value) {
   return "" + value;
 }
-const handler2 = {
-  typeName: "Person",
-  codec: handler_codec_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("people", false), $record.get("person_id")]);
-  },
-  getSpec($list) {
-    return {
-      person_id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return otherSource_peoplePgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "people";
-  }
-};
-const otherSource_log_entriesPgResource = registry.pgResources["log_entries"];
 const otherSource_relational_itemsPgResource = registry.pgResources["relational_items"];
-const otherSource_aws_applicationsPgResource = registry.pgResources["aws_applications"];
-const otherSource_gcp_applicationsPgResource = registry.pgResources["gcp_applications"];
 const members = [{
-  resource: otherSource_aws_applicationsPgResource,
+  resource: pgResource_aws_applicationsPgResource,
   typeName: "AwsApplication",
   path: []
 }, {
-  resource: otherSource_gcp_applicationsPgResource,
+  resource: pgResource_gcp_applicationsPgResource,
   typeName: "GcpApplication",
   path: []
 }];
 const paths = [{
-  resource: otherSource_aws_applicationsPgResource,
+  resource: pgResource_aws_applicationsPgResource,
   hasReferencee: true,
   isUnique: false,
   layers: [{
     relationName: "awsApplicationsByTheirPersonId",
     localAttributes: registryConfig.pgRelations.people.awsApplicationsByTheirPersonId.localAttributes,
     remoteAttributes: registryConfig.pgRelations.people.awsApplicationsByTheirPersonId.remoteAttributes,
-    resource: otherSource_aws_applicationsPgResource,
+    resource: pgResource_aws_applicationsPgResource,
     isUnique: false
   }]
 }, {
-  resource: otherSource_gcp_applicationsPgResource,
+  resource: pgResource_gcp_applicationsPgResource,
   hasReferencee: true,
   isUnique: false,
   layers: [{
     relationName: "gcpApplicationsByTheirPersonId",
     localAttributes: registryConfig.pgRelations.people.gcpApplicationsByTheirPersonId.localAttributes,
     remoteAttributes: registryConfig.pgRelations.people.gcpApplicationsByTheirPersonId.remoteAttributes,
-    resource: otherSource_gcp_applicationsPgResource,
+    resource: pgResource_gcp_applicationsPgResource,
     isUnique: false
   }]
 }];
 const resourceByTypeName = {
   __proto__: null,
-  AwsApplication: otherSource_aws_applicationsPgResource,
-  GcpApplication: otherSource_gcp_applicationsPgResource
+  AwsApplication: pgResource_aws_applicationsPgResource,
+  GcpApplication: pgResource_gcp_applicationsPgResource
 };
 function limitToTypes(ltt) {
   if (ltt) {
@@ -4743,36 +5239,13 @@ function limitToTypes(ltt) {
     return () => {};
   }
 }
-const handler3 = {
-  typeName: "LogEntry",
-  codec: handler_codec_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("log_entries", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return otherSource_log_entriesPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "log_entries";
-  }
-};
-const otherSource_organizationsPgResource = registry.pgResources["organizations"];
 const attributes = {};
 const members2 = [{
   resource: otherSource_peoplePgResource,
   typeName: "Person",
   path: []
 }, {
-  resource: otherSource_organizationsPgResource,
+  resource: pgResource_organizationsPgResource,
   typeName: "Organization",
   path: []
 }];
@@ -4788,65 +5261,21 @@ const paths2 = [{
     isUnique: true
   }]
 }, {
-  resource: otherSource_organizationsPgResource,
+  resource: pgResource_organizationsPgResource,
   hasReferencee: false,
   isUnique: true,
   layers: [{
     relationName: "organizationsByMyOrganizationId",
     localAttributes: registryConfig.pgRelations.logEntries.organizationsByMyOrganizationId.localAttributes,
     remoteAttributes: registryConfig.pgRelations.logEntries.organizationsByMyOrganizationId.remoteAttributes,
-    resource: otherSource_organizationsPgResource,
+    resource: pgResource_organizationsPgResource,
     isUnique: true
   }]
 }];
 const resourceByTypeName2 = {
   __proto__: null,
   Person: otherSource_peoplePgResource,
-  Organization: otherSource_organizationsPgResource
-};
-const handler4 = {
-  typeName: "Organization",
-  codec: handler_codec_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("organizations", false), $record.get("organization_id")]);
-  },
-  getSpec($list) {
-    return {
-      organization_id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return otherSource_organizationsPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "organizations";
-  }
-};
-const handler5 = {
-  typeName: "AwsApplication",
-  codec: handler_codec_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("aws_applications", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return otherSource_aws_applicationsPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "aws_applications";
-  }
+  Organization: pgResource_organizationsPgResource
 };
 const members_0_resource_aws_application_first_party_vulnerabilitiesPgResource = registry.pgResources["aws_application_first_party_vulnerabilities"];
 const members_1_resource_aws_application_third_party_vulnerabilitiesPgResource = registry.pgResources["aws_application_third_party_vulnerabilities"];
@@ -4863,10 +5292,8 @@ const members3 = [{
     relationName: "thirdPartyVulnerabilitiesByMyThirdPartyVulnerabilityId"
   }]
 }];
-const paths_0_resource_first_party_vulnerabilitiesPgResource = registry.pgResources["first_party_vulnerabilities"];
-const paths_1_resource_third_party_vulnerabilitiesPgResource = registry.pgResources["third_party_vulnerabilities"];
 const paths3 = [{
-  resource: paths_0_resource_first_party_vulnerabilitiesPgResource,
+  resource: pgResource_first_party_vulnerabilitiesPgResource,
   hasReferencee: true,
   isUnique: false,
   layers: [{
@@ -4879,11 +5306,11 @@ const paths3 = [{
     relationName: "firstPartyVulnerabilitiesByMyFirstPartyVulnerabilityId",
     localAttributes: registryConfig.pgRelations.awsApplicationFirstPartyVulnerabilities.firstPartyVulnerabilitiesByMyFirstPartyVulnerabilityId.localAttributes,
     remoteAttributes: registryConfig.pgRelations.awsApplicationFirstPartyVulnerabilities.firstPartyVulnerabilitiesByMyFirstPartyVulnerabilityId.remoteAttributes,
-    resource: paths_0_resource_first_party_vulnerabilitiesPgResource,
+    resource: pgResource_first_party_vulnerabilitiesPgResource,
     isUnique: true
   }]
 }, {
-  resource: paths_1_resource_third_party_vulnerabilitiesPgResource,
+  resource: pgResource_third_party_vulnerabilitiesPgResource,
   hasReferencee: true,
   isUnique: false,
   layers: [{
@@ -4896,14 +5323,14 @@ const paths3 = [{
     relationName: "thirdPartyVulnerabilitiesByMyThirdPartyVulnerabilityId",
     localAttributes: registryConfig.pgRelations.awsApplicationThirdPartyVulnerabilities.thirdPartyVulnerabilitiesByMyThirdPartyVulnerabilityId.localAttributes,
     remoteAttributes: registryConfig.pgRelations.awsApplicationThirdPartyVulnerabilities.thirdPartyVulnerabilitiesByMyThirdPartyVulnerabilityId.remoteAttributes,
-    resource: paths_1_resource_third_party_vulnerabilitiesPgResource,
+    resource: pgResource_third_party_vulnerabilitiesPgResource,
     isUnique: true
   }]
 }];
 const resourceByTypeName3 = {
   __proto__: null,
-  FirstPartyVulnerability: paths_0_resource_first_party_vulnerabilitiesPgResource,
-  ThirdPartyVulnerability: paths_1_resource_third_party_vulnerabilitiesPgResource
+  FirstPartyVulnerability: pgResource_first_party_vulnerabilitiesPgResource,
+  ThirdPartyVulnerability: pgResource_third_party_vulnerabilitiesPgResource
 };
 const attributes2 = {};
 const members4 = [{
@@ -4911,7 +5338,7 @@ const members4 = [{
   typeName: "Person",
   path: []
 }, {
-  resource: otherSource_organizationsPgResource,
+  resource: pgResource_organizationsPgResource,
   typeName: "Organization",
   path: []
 }];
@@ -4927,43 +5354,36 @@ const paths4 = [{
     isUnique: true
   }]
 }, {
-  resource: otherSource_organizationsPgResource,
+  resource: pgResource_organizationsPgResource,
   hasReferencee: false,
   isUnique: true,
   layers: [{
     relationName: "organizationsByMyOrganizationId",
     localAttributes: registryConfig.pgRelations.awsApplications.organizationsByMyOrganizationId.localAttributes,
     remoteAttributes: registryConfig.pgRelations.awsApplications.organizationsByMyOrganizationId.remoteAttributes,
-    resource: otherSource_organizationsPgResource,
+    resource: pgResource_organizationsPgResource,
     isUnique: true
   }]
 }];
 const resourceByTypeName4 = {
   __proto__: null,
   Person: otherSource_peoplePgResource,
-  Organization: otherSource_organizationsPgResource
+  Organization: pgResource_organizationsPgResource
 };
-const handler6 = {
-  typeName: "GcpApplication",
-  codec: handler_codec_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("gcp_applications", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return otherSource_gcp_applicationsPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "gcp_applications";
-  }
+const resourceByTypeName5 = {
+  __proto__: null,
+  AwsApplication: pgResource_aws_applicationsPgResource,
+  GcpApplication: pgResource_gcp_applicationsPgResource
+};
+const resourceByTypeName6 = {
+  __proto__: null,
+  FirstPartyVulnerability: pgResource_first_party_vulnerabilitiesPgResource,
+  ThirdPartyVulnerability: pgResource_third_party_vulnerabilitiesPgResource
+};
+const resourceByTypeName7 = {
+  __proto__: null,
+  Organization: pgResource_organizationsPgResource,
+  Person: otherSource_peoplePgResource
 };
 const members_0_resource_gcp_application_first_party_vulnerabilitiesPgResource = registry.pgResources["gcp_application_first_party_vulnerabilities"];
 const members_1_resource_gcp_application_third_party_vulnerabilitiesPgResource = registry.pgResources["gcp_application_third_party_vulnerabilities"];
@@ -4981,7 +5401,7 @@ const members5 = [{
   }]
 }];
 const paths5 = [{
-  resource: paths_0_resource_first_party_vulnerabilitiesPgResource,
+  resource: pgResource_first_party_vulnerabilitiesPgResource,
   hasReferencee: true,
   isUnique: false,
   layers: [{
@@ -4994,11 +5414,11 @@ const paths5 = [{
     relationName: "firstPartyVulnerabilitiesByMyFirstPartyVulnerabilityId",
     localAttributes: registryConfig.pgRelations.gcpApplicationFirstPartyVulnerabilities.firstPartyVulnerabilitiesByMyFirstPartyVulnerabilityId.localAttributes,
     remoteAttributes: registryConfig.pgRelations.gcpApplicationFirstPartyVulnerabilities.firstPartyVulnerabilitiesByMyFirstPartyVulnerabilityId.remoteAttributes,
-    resource: paths_0_resource_first_party_vulnerabilitiesPgResource,
+    resource: pgResource_first_party_vulnerabilitiesPgResource,
     isUnique: true
   }]
 }, {
-  resource: paths_1_resource_third_party_vulnerabilitiesPgResource,
+  resource: pgResource_third_party_vulnerabilitiesPgResource,
   hasReferencee: true,
   isUnique: false,
   layers: [{
@@ -5011,14 +5431,14 @@ const paths5 = [{
     relationName: "thirdPartyVulnerabilitiesByMyThirdPartyVulnerabilityId",
     localAttributes: registryConfig.pgRelations.gcpApplicationThirdPartyVulnerabilities.thirdPartyVulnerabilitiesByMyThirdPartyVulnerabilityId.localAttributes,
     remoteAttributes: registryConfig.pgRelations.gcpApplicationThirdPartyVulnerabilities.thirdPartyVulnerabilitiesByMyThirdPartyVulnerabilityId.remoteAttributes,
-    resource: paths_1_resource_third_party_vulnerabilitiesPgResource,
+    resource: pgResource_third_party_vulnerabilitiesPgResource,
     isUnique: true
   }]
 }];
-const resourceByTypeName5 = {
+const resourceByTypeName8 = {
   __proto__: null,
-  FirstPartyVulnerability: paths_0_resource_first_party_vulnerabilitiesPgResource,
-  ThirdPartyVulnerability: paths_1_resource_third_party_vulnerabilitiesPgResource
+  FirstPartyVulnerability: pgResource_first_party_vulnerabilitiesPgResource,
+  ThirdPartyVulnerability: pgResource_third_party_vulnerabilitiesPgResource
 };
 const attributes3 = {};
 const members6 = [{
@@ -5026,7 +5446,7 @@ const members6 = [{
   typeName: "Person",
   path: []
 }, {
-  resource: otherSource_organizationsPgResource,
+  resource: pgResource_organizationsPgResource,
   typeName: "Organization",
   path: []
 }];
@@ -5042,427 +5462,30 @@ const paths6 = [{
     isUnique: true
   }]
 }, {
-  resource: otherSource_organizationsPgResource,
+  resource: pgResource_organizationsPgResource,
   hasReferencee: false,
   isUnique: true,
   layers: [{
     relationName: "organizationsByMyOrganizationId",
     localAttributes: registryConfig.pgRelations.gcpApplications.organizationsByMyOrganizationId.localAttributes,
     remoteAttributes: registryConfig.pgRelations.gcpApplications.organizationsByMyOrganizationId.remoteAttributes,
-    resource: otherSource_organizationsPgResource,
+    resource: pgResource_organizationsPgResource,
     isUnique: true
   }]
 }];
-const resourceByTypeName6 = {
+const resourceByTypeName9 = {
   __proto__: null,
   Person: otherSource_peoplePgResource,
-  Organization: otherSource_organizationsPgResource
+  Organization: pgResource_organizationsPgResource
 };
-const pgResource_relational_item_relationsPgResource = registry.pgResources["relational_item_relations"];
-const handler7 = {
-  typeName: "RelationalItemRelation",
-  codec: handler_codec_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("relational_item_relations", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return pgResource_relational_item_relationsPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "relational_item_relations";
+const RelationalItem_typeNameFromType = ((interfaceTypeName, polymorphism) => {
+  function typeNameFromType(typeVal) {
+    if (typeof typeVal !== "string") return null;
+    return polymorphism.types[typeVal]?.name ?? null;
   }
-};
-const pgResource_relational_item_relation_composite_pksPgResource = registry.pgResources["relational_item_relation_composite_pks"];
-const handler8 = {
-  typeName: "RelationalItemRelationCompositePk",
-  codec: handler_codec_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("relational_item_relation_composite_pks", false), $record.get("parent_id"), $record.get("child_id")]);
-  },
-  getSpec($list) {
-    return {
-      parent_id: inhibitOnNull(access($list, [1])),
-      child_id: inhibitOnNull(access($list, [2]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return pgResource_relational_item_relation_composite_pksPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "relational_item_relation_composite_pks";
-  }
-};
-const handler9 = {
-  typeName: "SingleTableItemRelation",
-  codec: handler_codec_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("single_table_item_relations", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return otherSource_single_table_item_relationsPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "single_table_item_relations";
-  }
-};
-const handler10 = {
-  typeName: "SingleTableItemRelationCompositePk",
-  codec: handler_codec_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("single_table_item_relation_composite_pks", false), $record.get("parent_id"), $record.get("child_id")]);
-  },
-  getSpec($list) {
-    return {
-      parent_id: inhibitOnNull(access($list, [1])),
-      child_id: inhibitOnNull(access($list, [2]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return otherSource_single_table_item_relation_composite_pksPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "single_table_item_relation_composite_pks";
-  }
-};
-const handler11 = {
-  typeName: "SingleTablePost",
-  codec: handler_codec_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("SingleTablePost", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_single_table_itemsPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "SingleTablePost";
-  }
-};
-const otherSource_prioritiesPgResource = registry.pgResources["priorities"];
-const handler12 = {
-  typeName: "Priority",
-  codec: handler_codec_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("priorities", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return otherSource_prioritiesPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "priorities";
-  }
-};
-const handler13 = {
-  typeName: "SingleTableDivider",
-  codec: handler_codec_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("SingleTableDivider", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_single_table_itemsPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "SingleTableDivider";
-  }
-};
-const handler14 = {
-  typeName: "SingleTableChecklist",
-  codec: handler_codec_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("SingleTableChecklist", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_single_table_itemsPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "SingleTableChecklist";
-  }
-};
-const handler15 = {
-  typeName: "SingleTableChecklistItem",
-  codec: handler_codec_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("SingleTableChecklistItem", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return resource_single_table_itemsPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "SingleTableChecklistItem";
-  }
-};
-const pgResource_relational_topicsPgResource = registry.pgResources["relational_topics"];
-const handler16 = {
-  typeName: "RelationalTopic",
-  codec: handler_codec_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("relational_topics", false), $record.get("topic_item_id")]);
-  },
-  getSpec($list) {
-    return {
-      topic_item_id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return pgResource_relational_topicsPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "relational_topics";
-  }
-};
-const pgResource_relational_postsPgResource = registry.pgResources["relational_posts"];
-const handler17 = {
-  typeName: "RelationalPost",
-  codec: handler_codec_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("relational_posts", false), $record.get("post_item_id")]);
-  },
-  getSpec($list) {
-    return {
-      post_item_id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return pgResource_relational_postsPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "relational_posts";
-  }
-};
-const pgResource_relational_dividersPgResource = registry.pgResources["relational_dividers"];
-const handler18 = {
-  typeName: "RelationalDivider",
-  codec: handler_codec_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("relational_dividers", false), $record.get("divider_item_id")]);
-  },
-  getSpec($list) {
-    return {
-      divider_item_id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return pgResource_relational_dividersPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "relational_dividers";
-  }
-};
-const pgResource_relational_checklistsPgResource = registry.pgResources["relational_checklists"];
-const handler19 = {
-  typeName: "RelationalChecklist",
-  codec: handler_codec_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("relational_checklists", false), $record.get("checklist_item_id")]);
-  },
-  getSpec($list) {
-    return {
-      checklist_item_id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return pgResource_relational_checklistsPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "relational_checklists";
-  }
-};
-const pgResource_relational_checklist_itemsPgResource = registry.pgResources["relational_checklist_items"];
-const handler20 = {
-  typeName: "RelationalChecklistItem",
-  codec: handler_codec_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("relational_checklist_items", false), $record.get("checklist_item_item_id")]);
-  },
-  getSpec($list) {
-    return {
-      checklist_item_item_id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return pgResource_relational_checklist_itemsPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "relational_checklist_items";
-  }
-};
-const handler21 = {
-  typeName: "Query",
-  codec: nodeIdCodecs.raw,
-  match(specifier) {
-    return specifier === "query";
-  },
-  getIdentifiers(_value) {
-    return [];
-  },
-  getSpec() {
-    return "irrelevant";
-  },
-  get() {
-    return rootValue();
-  },
-  plan() {
-    return constant`query`;
-  }
-};
-const nodeIdHandlerByTypeName = {
-  __proto__: null,
-  Query: handler21,
-  SingleTableTopic: handler,
-  SingleTablePost: handler11,
-  SingleTableDivider: handler13,
-  SingleTableChecklist: handler14,
-  SingleTableChecklistItem: handler15,
-  Organization: handler4,
-  Person: handler2,
-  Priority: handler12,
-  RelationalChecklist: handler19,
-  RelationalItemRelationCompositePk: handler8,
-  RelationalTopic: handler16,
-  SingleTableItemRelationCompositePk: handler10,
-  RelationalChecklistItem: handler20,
-  RelationalDivider: handler18,
-  RelationalItemRelation: handler7,
-  SingleTableItemRelation: handler9,
-  LogEntry: handler3,
-  RelationalPost: handler17,
-  FirstPartyVulnerability: {
-    typeName: "FirstPartyVulnerability",
-    codec: handler_codec_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("first_party_vulnerabilities", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return paths_0_resource_first_party_vulnerabilitiesPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "first_party_vulnerabilities";
-    }
-  },
-  ThirdPartyVulnerability: {
-    typeName: "ThirdPartyVulnerability",
-    codec: handler_codec_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("third_party_vulnerabilities", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return paths_1_resource_third_party_vulnerabilitiesPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "third_party_vulnerabilities";
-    }
-  },
-  AwsApplication: handler5,
-  GcpApplication: handler6
-};
+  typeNameFromType.displayName = `${interfaceTypeName}_typeNameFromType`;
+  return typeNameFromType;
+})("RelationalItem", spec_relationalItems.polymorphism);
 const resource_all_single_tablesPgResource = registry.pgResources["all_single_tables"];
 const getSelectPlanFromParentAndArgs = ($root, args, _info) => {
   const selectArgs = makeArgs_first_party_vulnerabilities_cvss_score_int(args);
@@ -5513,76 +5536,76 @@ function specForHandler(handler) {
   return spec;
 }
 const nodeFetcher_SingleTableTopic = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(handler));
-  return handler.get(handler.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_SingleTableTopic));
+  return nodeIdHandler_SingleTableTopic.get(nodeIdHandler_SingleTableTopic.getSpec($decoded));
 };
 const nodeFetcher_SingleTablePost = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(handler11));
-  return handler11.get(handler11.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.SingleTablePost));
+  return nodeIdHandlerByTypeName.SingleTablePost.get(nodeIdHandlerByTypeName.SingleTablePost.getSpec($decoded));
 };
 const nodeFetcher_SingleTableDivider = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(handler13));
-  return handler13.get(handler13.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.SingleTableDivider));
+  return nodeIdHandlerByTypeName.SingleTableDivider.get(nodeIdHandlerByTypeName.SingleTableDivider.getSpec($decoded));
 };
 const nodeFetcher_SingleTableChecklist = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(handler14));
-  return handler14.get(handler14.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.SingleTableChecklist));
+  return nodeIdHandlerByTypeName.SingleTableChecklist.get(nodeIdHandlerByTypeName.SingleTableChecklist.getSpec($decoded));
 };
 const nodeFetcher_SingleTableChecklistItem = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(handler15));
-  return handler15.get(handler15.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.SingleTableChecklistItem));
+  return nodeIdHandlerByTypeName.SingleTableChecklistItem.get(nodeIdHandlerByTypeName.SingleTableChecklistItem.getSpec($decoded));
 };
 const nodeFetcher_Organization = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(handler4));
-  return handler4.get(handler4.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Organization));
+  return nodeIdHandlerByTypeName.Organization.get(nodeIdHandlerByTypeName.Organization.getSpec($decoded));
 };
 const nodeFetcher_Person = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(handler2));
-  return handler2.get(handler2.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Person));
+  return nodeIdHandlerByTypeName.Person.get(nodeIdHandlerByTypeName.Person.getSpec($decoded));
 };
 const nodeFetcher_Priority = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(handler12));
-  return handler12.get(handler12.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Priority));
+  return nodeIdHandlerByTypeName.Priority.get(nodeIdHandlerByTypeName.Priority.getSpec($decoded));
 };
 const nodeFetcher_RelationalChecklist = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(handler19));
-  return handler19.get(handler19.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.RelationalChecklist));
+  return nodeIdHandlerByTypeName.RelationalChecklist.get(nodeIdHandlerByTypeName.RelationalChecklist.getSpec($decoded));
 };
 const nodeFetcher_RelationalItemRelationCompositePk = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(handler8));
-  return handler8.get(handler8.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.RelationalItemRelationCompositePk));
+  return nodeIdHandlerByTypeName.RelationalItemRelationCompositePk.get(nodeIdHandlerByTypeName.RelationalItemRelationCompositePk.getSpec($decoded));
 };
 const nodeFetcher_RelationalTopic = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(handler16));
-  return handler16.get(handler16.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.RelationalTopic));
+  return nodeIdHandlerByTypeName.RelationalTopic.get(nodeIdHandlerByTypeName.RelationalTopic.getSpec($decoded));
 };
 const nodeFetcher_SingleTableItemRelationCompositePk = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(handler10));
-  return handler10.get(handler10.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.SingleTableItemRelationCompositePk));
+  return nodeIdHandlerByTypeName.SingleTableItemRelationCompositePk.get(nodeIdHandlerByTypeName.SingleTableItemRelationCompositePk.getSpec($decoded));
 };
 const nodeFetcher_RelationalChecklistItem = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(handler20));
-  return handler20.get(handler20.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.RelationalChecklistItem));
+  return nodeIdHandlerByTypeName.RelationalChecklistItem.get(nodeIdHandlerByTypeName.RelationalChecklistItem.getSpec($decoded));
 };
 const nodeFetcher_RelationalDivider = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(handler18));
-  return handler18.get(handler18.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.RelationalDivider));
+  return nodeIdHandlerByTypeName.RelationalDivider.get(nodeIdHandlerByTypeName.RelationalDivider.getSpec($decoded));
 };
 const nodeFetcher_RelationalItemRelation = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(handler7));
-  return handler7.get(handler7.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.RelationalItemRelation));
+  return nodeIdHandlerByTypeName.RelationalItemRelation.get(nodeIdHandlerByTypeName.RelationalItemRelation.getSpec($decoded));
 };
 const nodeFetcher_SingleTableItemRelation = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(handler9));
-  return handler9.get(handler9.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.SingleTableItemRelation));
+  return nodeIdHandlerByTypeName.SingleTableItemRelation.get(nodeIdHandlerByTypeName.SingleTableItemRelation.getSpec($decoded));
 };
 const nodeFetcher_LogEntry = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(handler3));
-  return handler3.get(handler3.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.LogEntry));
+  return nodeIdHandlerByTypeName.LogEntry.get(nodeIdHandlerByTypeName.LogEntry.getSpec($decoded));
 };
 const nodeFetcher_RelationalPost = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(handler17));
-  return handler17.get(handler17.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.RelationalPost));
+  return nodeIdHandlerByTypeName.RelationalPost.get(nodeIdHandlerByTypeName.RelationalPost.getSpec($decoded));
 };
 const nodeFetcher_FirstPartyVulnerability = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.FirstPartyVulnerability));
@@ -5593,39 +5616,39 @@ const nodeFetcher_ThirdPartyVulnerability = $nodeId => {
   return nodeIdHandlerByTypeName.ThirdPartyVulnerability.get(nodeIdHandlerByTypeName.ThirdPartyVulnerability.getSpec($decoded));
 };
 const nodeFetcher_AwsApplication = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(handler5));
-  return handler5.get(handler5.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.AwsApplication));
+  return nodeIdHandlerByTypeName.AwsApplication.get(nodeIdHandlerByTypeName.AwsApplication.getSpec($decoded));
 };
 const nodeFetcher_GcpApplication = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(handler6));
-  return handler6.get(handler6.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.GcpApplication));
+  return nodeIdHandlerByTypeName.GcpApplication.get(nodeIdHandlerByTypeName.GcpApplication.getSpec($decoded));
 };
 const members7 = [{
-  resource: paths_0_resource_first_party_vulnerabilitiesPgResource,
+  resource: pgResource_first_party_vulnerabilitiesPgResource,
   typeName: "FirstPartyVulnerability"
 }, {
-  resource: paths_1_resource_third_party_vulnerabilitiesPgResource,
+  resource: pgResource_third_party_vulnerabilitiesPgResource,
   typeName: "ThirdPartyVulnerability"
 }];
-const resourceByTypeName7 = {
+const resourceByTypeName10 = {
   __proto__: null,
-  FirstPartyVulnerability: paths_0_resource_first_party_vulnerabilitiesPgResource,
-  ThirdPartyVulnerability: paths_1_resource_third_party_vulnerabilitiesPgResource
+  FirstPartyVulnerability: pgResource_first_party_vulnerabilitiesPgResource,
+  ThirdPartyVulnerability: pgResource_third_party_vulnerabilitiesPgResource
 };
 const members8 = [{
-  resource: otherSource_aws_applicationsPgResource,
+  resource: pgResource_aws_applicationsPgResource,
   typeName: "AwsApplication"
 }, {
-  resource: otherSource_gcp_applicationsPgResource,
+  resource: pgResource_gcp_applicationsPgResource,
   typeName: "GcpApplication"
 }];
-const resourceByTypeName8 = {
+const resourceByTypeName11 = {
   __proto__: null,
-  AwsApplication: otherSource_aws_applicationsPgResource,
-  GcpApplication: otherSource_gcp_applicationsPgResource
+  AwsApplication: pgResource_aws_applicationsPgResource,
+  GcpApplication: pgResource_gcp_applicationsPgResource
 };
 const members9 = [];
-const resourceByTypeName9 = {
+const resourceByTypeName12 = {
   __proto__: null
 };
 const resource_first_party_vulnerabilities_cvss_score_intPgResource = registry.pgResources["first_party_vulnerabilities_cvss_score_int"];
@@ -5643,7 +5666,7 @@ const members10 = [{
   }]
 }];
 const paths7 = [{
-  resource: otherSource_aws_applicationsPgResource,
+  resource: pgResource_aws_applicationsPgResource,
   hasReferencee: true,
   isUnique: false,
   layers: [{
@@ -5656,11 +5679,11 @@ const paths7 = [{
     relationName: "awsApplicationsByMyAwsApplicationId",
     localAttributes: registryConfig.pgRelations.awsApplicationFirstPartyVulnerabilities.awsApplicationsByMyAwsApplicationId.localAttributes,
     remoteAttributes: registryConfig.pgRelations.awsApplicationFirstPartyVulnerabilities.awsApplicationsByMyAwsApplicationId.remoteAttributes,
-    resource: otherSource_aws_applicationsPgResource,
+    resource: pgResource_aws_applicationsPgResource,
     isUnique: true
   }]
 }, {
-  resource: otherSource_gcp_applicationsPgResource,
+  resource: pgResource_gcp_applicationsPgResource,
   hasReferencee: true,
   isUnique: false,
   layers: [{
@@ -5673,14 +5696,14 @@ const paths7 = [{
     relationName: "gcpApplicationsByMyGcpApplicationId",
     localAttributes: registryConfig.pgRelations.gcpApplicationFirstPartyVulnerabilities.gcpApplicationsByMyGcpApplicationId.localAttributes,
     remoteAttributes: registryConfig.pgRelations.gcpApplicationFirstPartyVulnerabilities.gcpApplicationsByMyGcpApplicationId.remoteAttributes,
-    resource: otherSource_gcp_applicationsPgResource,
+    resource: pgResource_gcp_applicationsPgResource,
     isUnique: true
   }]
 }];
-const resourceByTypeName10 = {
+const resourceByTypeName13 = {
   __proto__: null,
-  AwsApplication: otherSource_aws_applicationsPgResource,
-  GcpApplication: otherSource_gcp_applicationsPgResource
+  AwsApplication: pgResource_aws_applicationsPgResource,
+  GcpApplication: pgResource_gcp_applicationsPgResource
 };
 const attributes4 = {};
 const members11 = [{
@@ -5730,7 +5753,7 @@ const paths8 = [{
     relationName: "awsApplicationsByMyAwsApplicationId",
     localAttributes: registryConfig.pgRelations.awsApplicationFirstPartyVulnerabilities.awsApplicationsByMyAwsApplicationId.localAttributes,
     remoteAttributes: registryConfig.pgRelations.awsApplicationFirstPartyVulnerabilities.awsApplicationsByMyAwsApplicationId.remoteAttributes,
-    resource: otherSource_aws_applicationsPgResource,
+    resource: pgResource_aws_applicationsPgResource,
     isUnique: true
   }, {
     relationName: "peopleByMyPersonId",
@@ -5740,7 +5763,7 @@ const paths8 = [{
     isUnique: true
   }]
 }, {
-  resource: otherSource_organizationsPgResource,
+  resource: pgResource_organizationsPgResource,
   hasReferencee: true,
   isUnique: false,
   layers: [{
@@ -5753,13 +5776,13 @@ const paths8 = [{
     relationName: "awsApplicationsByMyAwsApplicationId",
     localAttributes: registryConfig.pgRelations.awsApplicationFirstPartyVulnerabilities.awsApplicationsByMyAwsApplicationId.localAttributes,
     remoteAttributes: registryConfig.pgRelations.awsApplicationFirstPartyVulnerabilities.awsApplicationsByMyAwsApplicationId.remoteAttributes,
-    resource: otherSource_aws_applicationsPgResource,
+    resource: pgResource_aws_applicationsPgResource,
     isUnique: true
   }, {
     relationName: "organizationsByMyOrganizationId",
     localAttributes: registryConfig.pgRelations.awsApplications.organizationsByMyOrganizationId.localAttributes,
     remoteAttributes: registryConfig.pgRelations.awsApplications.organizationsByMyOrganizationId.remoteAttributes,
-    resource: otherSource_organizationsPgResource,
+    resource: pgResource_organizationsPgResource,
     isUnique: true
   }]
 }, {
@@ -5776,7 +5799,7 @@ const paths8 = [{
     relationName: "gcpApplicationsByMyGcpApplicationId",
     localAttributes: registryConfig.pgRelations.gcpApplicationFirstPartyVulnerabilities.gcpApplicationsByMyGcpApplicationId.localAttributes,
     remoteAttributes: registryConfig.pgRelations.gcpApplicationFirstPartyVulnerabilities.gcpApplicationsByMyGcpApplicationId.remoteAttributes,
-    resource: otherSource_gcp_applicationsPgResource,
+    resource: pgResource_gcp_applicationsPgResource,
     isUnique: true
   }, {
     relationName: "peopleByMyPersonId",
@@ -5786,7 +5809,7 @@ const paths8 = [{
     isUnique: true
   }]
 }, {
-  resource: otherSource_organizationsPgResource,
+  resource: pgResource_organizationsPgResource,
   hasReferencee: true,
   isUnique: false,
   layers: [{
@@ -5799,20 +5822,20 @@ const paths8 = [{
     relationName: "gcpApplicationsByMyGcpApplicationId",
     localAttributes: registryConfig.pgRelations.gcpApplicationFirstPartyVulnerabilities.gcpApplicationsByMyGcpApplicationId.localAttributes,
     remoteAttributes: registryConfig.pgRelations.gcpApplicationFirstPartyVulnerabilities.gcpApplicationsByMyGcpApplicationId.remoteAttributes,
-    resource: otherSource_gcp_applicationsPgResource,
+    resource: pgResource_gcp_applicationsPgResource,
     isUnique: true
   }, {
     relationName: "organizationsByMyOrganizationId",
     localAttributes: registryConfig.pgRelations.gcpApplications.organizationsByMyOrganizationId.localAttributes,
     remoteAttributes: registryConfig.pgRelations.gcpApplications.organizationsByMyOrganizationId.remoteAttributes,
-    resource: otherSource_organizationsPgResource,
+    resource: pgResource_organizationsPgResource,
     isUnique: true
   }]
 }];
-const resourceByTypeName11 = {
+const resourceByTypeName14 = {
   __proto__: null,
   Person: otherSource_peoplePgResource,
-  Organization: otherSource_organizationsPgResource
+  Organization: pgResource_organizationsPgResource
 };
 const resource_third_party_vulnerabilities_cvss_score_intPgResource = registry.pgResources["third_party_vulnerabilities_cvss_score_int"];
 const members12 = [{
@@ -5829,7 +5852,7 @@ const members12 = [{
   }]
 }];
 const paths9 = [{
-  resource: otherSource_aws_applicationsPgResource,
+  resource: pgResource_aws_applicationsPgResource,
   hasReferencee: true,
   isUnique: false,
   layers: [{
@@ -5842,11 +5865,11 @@ const paths9 = [{
     relationName: "awsApplicationsByMyAwsApplicationId",
     localAttributes: registryConfig.pgRelations.awsApplicationThirdPartyVulnerabilities.awsApplicationsByMyAwsApplicationId.localAttributes,
     remoteAttributes: registryConfig.pgRelations.awsApplicationThirdPartyVulnerabilities.awsApplicationsByMyAwsApplicationId.remoteAttributes,
-    resource: otherSource_aws_applicationsPgResource,
+    resource: pgResource_aws_applicationsPgResource,
     isUnique: true
   }]
 }, {
-  resource: otherSource_gcp_applicationsPgResource,
+  resource: pgResource_gcp_applicationsPgResource,
   hasReferencee: true,
   isUnique: false,
   layers: [{
@@ -5859,14 +5882,14 @@ const paths9 = [{
     relationName: "gcpApplicationsByMyGcpApplicationId",
     localAttributes: registryConfig.pgRelations.gcpApplicationThirdPartyVulnerabilities.gcpApplicationsByMyGcpApplicationId.localAttributes,
     remoteAttributes: registryConfig.pgRelations.gcpApplicationThirdPartyVulnerabilities.gcpApplicationsByMyGcpApplicationId.remoteAttributes,
-    resource: otherSource_gcp_applicationsPgResource,
+    resource: pgResource_gcp_applicationsPgResource,
     isUnique: true
   }]
 }];
-const resourceByTypeName12 = {
+const resourceByTypeName15 = {
   __proto__: null,
-  AwsApplication: otherSource_aws_applicationsPgResource,
-  GcpApplication: otherSource_gcp_applicationsPgResource
+  AwsApplication: pgResource_aws_applicationsPgResource,
+  GcpApplication: pgResource_gcp_applicationsPgResource
 };
 const attributes5 = {};
 const members13 = [{
@@ -5916,7 +5939,7 @@ const paths10 = [{
     relationName: "awsApplicationsByMyAwsApplicationId",
     localAttributes: registryConfig.pgRelations.awsApplicationThirdPartyVulnerabilities.awsApplicationsByMyAwsApplicationId.localAttributes,
     remoteAttributes: registryConfig.pgRelations.awsApplicationThirdPartyVulnerabilities.awsApplicationsByMyAwsApplicationId.remoteAttributes,
-    resource: otherSource_aws_applicationsPgResource,
+    resource: pgResource_aws_applicationsPgResource,
     isUnique: true
   }, {
     relationName: "peopleByMyPersonId",
@@ -5926,7 +5949,7 @@ const paths10 = [{
     isUnique: true
   }]
 }, {
-  resource: otherSource_organizationsPgResource,
+  resource: pgResource_organizationsPgResource,
   hasReferencee: true,
   isUnique: false,
   layers: [{
@@ -5939,13 +5962,13 @@ const paths10 = [{
     relationName: "awsApplicationsByMyAwsApplicationId",
     localAttributes: registryConfig.pgRelations.awsApplicationThirdPartyVulnerabilities.awsApplicationsByMyAwsApplicationId.localAttributes,
     remoteAttributes: registryConfig.pgRelations.awsApplicationThirdPartyVulnerabilities.awsApplicationsByMyAwsApplicationId.remoteAttributes,
-    resource: otherSource_aws_applicationsPgResource,
+    resource: pgResource_aws_applicationsPgResource,
     isUnique: true
   }, {
     relationName: "organizationsByMyOrganizationId",
     localAttributes: registryConfig.pgRelations.awsApplications.organizationsByMyOrganizationId.localAttributes,
     remoteAttributes: registryConfig.pgRelations.awsApplications.organizationsByMyOrganizationId.remoteAttributes,
-    resource: otherSource_organizationsPgResource,
+    resource: pgResource_organizationsPgResource,
     isUnique: true
   }]
 }, {
@@ -5962,7 +5985,7 @@ const paths10 = [{
     relationName: "gcpApplicationsByMyGcpApplicationId",
     localAttributes: registryConfig.pgRelations.gcpApplicationThirdPartyVulnerabilities.gcpApplicationsByMyGcpApplicationId.localAttributes,
     remoteAttributes: registryConfig.pgRelations.gcpApplicationThirdPartyVulnerabilities.gcpApplicationsByMyGcpApplicationId.remoteAttributes,
-    resource: otherSource_gcp_applicationsPgResource,
+    resource: pgResource_gcp_applicationsPgResource,
     isUnique: true
   }, {
     relationName: "peopleByMyPersonId",
@@ -5972,7 +5995,7 @@ const paths10 = [{
     isUnique: true
   }]
 }, {
-  resource: otherSource_organizationsPgResource,
+  resource: pgResource_organizationsPgResource,
   hasReferencee: true,
   isUnique: false,
   layers: [{
@@ -5985,40 +6008,43 @@ const paths10 = [{
     relationName: "gcpApplicationsByMyGcpApplicationId",
     localAttributes: registryConfig.pgRelations.gcpApplicationThirdPartyVulnerabilities.gcpApplicationsByMyGcpApplicationId.localAttributes,
     remoteAttributes: registryConfig.pgRelations.gcpApplicationThirdPartyVulnerabilities.gcpApplicationsByMyGcpApplicationId.remoteAttributes,
-    resource: otherSource_gcp_applicationsPgResource,
+    resource: pgResource_gcp_applicationsPgResource,
     isUnique: true
   }, {
     relationName: "organizationsByMyOrganizationId",
     localAttributes: registryConfig.pgRelations.gcpApplications.organizationsByMyOrganizationId.localAttributes,
     remoteAttributes: registryConfig.pgRelations.gcpApplications.organizationsByMyOrganizationId.remoteAttributes,
-    resource: otherSource_organizationsPgResource,
+    resource: pgResource_organizationsPgResource,
     isUnique: true
   }]
 }];
-const resourceByTypeName13 = {
+const resourceByTypeName16 = {
   __proto__: null,
   Person: otherSource_peoplePgResource,
-  Organization: otherSource_organizationsPgResource
+  Organization: pgResource_organizationsPgResource
 };
-const decodeNodeId = makeDecodeNodeId([handler16, handler17, handler18, handler19, handler20]);
+const resourceByTypeName17 = {
+  __proto__: null
+};
+const decodeNodeId2 = makeDecodeNodeId([nodeIdHandlerByTypeName.RelationalTopic, nodeIdHandlerByTypeName.RelationalPost, nodeIdHandlerByTypeName.RelationalDivider, nodeIdHandlerByTypeName.RelationalChecklist, nodeIdHandlerByTypeName.RelationalChecklistItem]);
 const details = [{
   remotePkAttributes: relational_topicsUniques[0].attributes,
-  handler: handler16
+  handler: nodeIdHandlerByTypeName.RelationalTopic
 }, {
   remotePkAttributes: relational_postsUniques[0].attributes,
-  handler: handler17
+  handler: nodeIdHandlerByTypeName.RelationalPost
 }, {
   remotePkAttributes: relational_dividersUniques[0].attributes,
-  handler: handler18
+  handler: nodeIdHandlerByTypeName.RelationalDivider
 }, {
   remotePkAttributes: relational_checklistsUniques[0].attributes,
-  handler: handler19
+  handler: nodeIdHandlerByTypeName.RelationalChecklist
 }, {
   remotePkAttributes: relational_checklist_itemsUniques[0].attributes,
-  handler: handler20
+  handler: nodeIdHandlerByTypeName.RelationalChecklistItem
 }];
 const getSpec = $nodeId => {
-  const $specifier = decodeNodeId($nodeId);
+  const $specifier = decodeNodeId2($nodeId);
   const $handlerMatches = list(details.map(({
     handler,
     remotePkAttributes
@@ -6054,31 +6080,31 @@ const makeArgs_custom_delete_relational_item = (args, path = []) => argDetailsSi
 const resource_custom_delete_relational_itemPgResource = registry.pgResources["custom_delete_relational_item"];
 const specFromArgs_Organization = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(handler4, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.Organization, $nodeId);
 };
 const specFromArgs_Person = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(handler2, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.Person, $nodeId);
 };
 const specFromArgs_RelationalItemRelationCompositePk = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(handler8, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.RelationalItemRelationCompositePk, $nodeId);
 };
 const specFromArgs_SingleTableItemRelationCompositePk = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(handler10, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.SingleTableItemRelationCompositePk, $nodeId);
 };
 const specFromArgs_RelationalItemRelation = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(handler7, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.RelationalItemRelation, $nodeId);
 };
 const specFromArgs_SingleTableItemRelation = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(handler9, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.SingleTableItemRelation, $nodeId);
 };
 const specFromArgs_LogEntry = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(handler3, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.LogEntry, $nodeId);
 };
 const specFromArgs_FirstPartyVulnerability = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
@@ -6090,39 +6116,39 @@ const specFromArgs_ThirdPartyVulnerability = args => {
 };
 const specFromArgs_AwsApplication = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(handler5, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.AwsApplication, $nodeId);
 };
 const specFromArgs_GcpApplication = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(handler6, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.GcpApplication, $nodeId);
 };
 const specFromArgs_Organization2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(handler4, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.Organization, $nodeId);
 };
 const specFromArgs_Person2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(handler2, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.Person, $nodeId);
 };
 const specFromArgs_RelationalItemRelationCompositePk2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(handler8, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.RelationalItemRelationCompositePk, $nodeId);
 };
 const specFromArgs_SingleTableItemRelationCompositePk2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(handler10, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.SingleTableItemRelationCompositePk, $nodeId);
 };
 const specFromArgs_RelationalItemRelation2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(handler7, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.RelationalItemRelation, $nodeId);
 };
 const specFromArgs_SingleTableItemRelation2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(handler9, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.SingleTableItemRelation, $nodeId);
 };
 const specFromArgs_LogEntry2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(handler3, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.LogEntry, $nodeId);
 };
 const specFromArgs_FirstPartyVulnerability2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
@@ -6134,11 +6160,11 @@ const specFromArgs_ThirdPartyVulnerability2 = args => {
 };
 const specFromArgs_AwsApplication2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(handler5, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.AwsApplication, $nodeId);
 };
 const specFromArgs_GcpApplication2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(handler6, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.GcpApplication, $nodeId);
 };
 export const typeDefs = /* GraphQL */`type SingleTableTopic implements SingleTableItem & Node {
   """
@@ -14211,8 +14237,8 @@ export const plans = {
   SingleTableTopic: {
     __assertStep: assertPgClassSingleStep,
     nodeId($parent) {
-      const specifier = handler.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler.codec.name].encode);
+      const specifier = nodeIdHandler_SingleTableTopic.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_SingleTableTopic.codec.name].encode);
     },
     meaningOfLife($in, args, _info) {
       const {
@@ -14424,6 +14450,42 @@ export const plans = {
       });
     }
   },
+  SingleTableItem: {
+    __toSpecifier(step) {
+      return object(Object.fromEntries(single_table_itemsUniques[0].attributes.map(attrName => [attrName, get2(step, attrName)])));
+    },
+    __planType($specifier, {
+      $original
+    }) {
+      const $inStep = $original ?? $specifier;
+      const $record = $inStep instanceof PgSelectSingleStep ? $inStep : resource_single_table_itemsPgResource.get(Object.fromEntries(single_table_itemsUniques[0].attributes.map(attrName => [attrName, get2($inStep, attrName)])));
+      const $typeVal = get2($record, "type");
+      const $__typename = lambda($typeVal, SingleTableItem_typeNameFromType, true);
+      return {
+        $__typename,
+        planForType() {
+          return $record;
+        }
+      };
+    }
+  },
+  Node: {
+    __planType($nodeId) {
+      const $specifier = decodeNodeId($nodeId);
+      const $__typename = lambda($specifier, findTypeNameMatch, true);
+      return {
+        $__typename,
+        planForType(type) {
+          const spec = nodeIdHandlerByTypeName[type.name];
+          if (spec) {
+            return spec.get(spec.getSpec(access($specifier, [spec.codec.name])));
+          } else {
+            throw new Error(`Failed to find handler for ${type.name}`);
+          }
+        }
+      };
+    }
+  },
   BigInt: {
     serialize: BigIntSerialize,
     parseValue: BigIntSerialize,
@@ -14446,16 +14508,23 @@ export const plans = {
   },
   Person: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of peopleUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return otherSource_peoplePgResource.get(spec);
+    },
     nodeId($parent) {
-      const specifier = handler2.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler2.codec.name].encode);
+      const specifier = nodeIdHandlerByTypeName.Person.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Person.codec.name].encode);
     },
     personId($record) {
       return $record.get("person_id");
     },
     logEntriesByPersonId: {
       plan($record) {
-        const $records = otherSource_log_entriesPgResource.find({
+        const $records = pgResource_log_entriesPgResource.find({
           person_id: $record.get("person_id")
         });
         return connection($records);
@@ -14554,7 +14623,7 @@ export const plans = {
     },
     awsApplicationsByPersonId: {
       plan($record) {
-        const $records = otherSource_aws_applicationsPgResource.find({
+        const $records = pgResource_aws_applicationsPgResource.find({
           person_id: $record.get("person_id")
         });
         return connection($records);
@@ -14587,7 +14656,7 @@ export const plans = {
     },
     gcpApplicationsByPersonId: {
       plan($record) {
-        const $records = otherSource_gcp_applicationsPgResource.find({
+        const $records = pgResource_gcp_applicationsPgResource.find({
           person_id: $record.get("person_id")
         });
         return connection($records);
@@ -14684,9 +14753,16 @@ export const plans = {
   },
   LogEntry: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of log_entriesUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_log_entriesPgResource.get(spec);
+    },
     nodeId($parent) {
-      const specifier = handler3.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler3.codec.name].encode);
+      const specifier = nodeIdHandlerByTypeName.LogEntry.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.LogEntry.codec.name].encode);
     },
     personId($record) {
       return $record.get("person_id");
@@ -14695,7 +14771,7 @@ export const plans = {
       return $record.get("organization_id");
     },
     organizationByOrganizationId($record) {
-      return otherSource_organizationsPgResource.get({
+      return pgResource_organizationsPgResource.get({
         organization_id: $record.get("organization_id")
       });
     },
@@ -14728,16 +14804,23 @@ export const plans = {
   },
   Organization: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of organizationsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_organizationsPgResource.get(spec);
+    },
     nodeId($parent) {
-      const specifier = handler4.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler4.codec.name].encode);
+      const specifier = nodeIdHandlerByTypeName.Organization.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Organization.codec.name].encode);
     },
     organizationId($record) {
       return $record.get("organization_id");
     },
     logEntriesByOrganizationId: {
       plan($record) {
-        const $records = otherSource_log_entriesPgResource.find({
+        const $records = pgResource_log_entriesPgResource.find({
           organization_id: $record.get("organization_id")
         });
         return connection($records);
@@ -14770,7 +14853,7 @@ export const plans = {
     },
     awsApplicationsByOrganizationId: {
       plan($record) {
-        const $records = otherSource_aws_applicationsPgResource.find({
+        const $records = pgResource_aws_applicationsPgResource.find({
           organization_id: $record.get("organization_id")
         });
         return connection($records);
@@ -14803,7 +14886,7 @@ export const plans = {
     },
     gcpApplicationsByOrganizationId: {
       plan($record) {
-        const $records = otherSource_gcp_applicationsPgResource.find({
+        const $records = pgResource_gcp_applicationsPgResource.find({
           organization_id: $record.get("organization_id")
         });
         return connection($records);
@@ -14961,9 +15044,16 @@ export const plans = {
   },
   AwsApplication: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of aws_applicationsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_aws_applicationsPgResource.get(spec);
+    },
     nodeId($parent) {
-      const specifier = handler5.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler5.codec.name].encode);
+      const specifier = nodeIdHandlerByTypeName.AwsApplication.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.AwsApplication.codec.name].encode);
     },
     lastDeployed($record) {
       return $record.get("last_deployed");
@@ -14978,7 +15068,7 @@ export const plans = {
       return $record.get("aws_id");
     },
     organizationByOrganizationId($record) {
-      return otherSource_organizationsPgResource.get({
+      return pgResource_organizationsPgResource.get({
         organization_id: $record.get("organization_id")
       });
     },
@@ -15066,10 +15156,64 @@ export const plans = {
       return $list.single();
     }
   },
+  Application: {
+    __toSpecifier($step) {
+      if ($step instanceof PgUnionAllSingleStep) {
+        return $step.toSpecifier();
+      } else {
+        return $step;
+      }
+    },
+    __planType($specifier) {
+      const $__typename = get2($specifier, "__typename");
+      return {
+        $__typename,
+        planForType(t) {
+          const resource = resourceByTypeName5[t.name];
+          if (!resource) {
+            throw new Error(`Type ${t.name} has no associated resource`);
+          }
+          const pk = resource.uniques.find(u => u.isPrimary) ?? resource.uniques[0];
+          const spec = Object.create(null);
+          for (const attrName of pk.attributes) {
+            spec[attrName] = get2($specifier, attrName);
+          }
+          return resource.get(spec);
+        }
+      };
+    }
+  },
   VulnerabilitiesConnection: {
     __assertStep: ConnectionStep,
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+    }
+  },
+  Vulnerability: {
+    __toSpecifier($step) {
+      if ($step instanceof PgUnionAllSingleStep) {
+        return $step.toSpecifier();
+      } else {
+        return $step;
+      }
+    },
+    __planType($specifier) {
+      const $__typename = get2($specifier, "__typename");
+      return {
+        $__typename,
+        planForType(t) {
+          const resource = resourceByTypeName6[t.name];
+          if (!resource) {
+            throw new Error(`Type ${t.name} has no associated resource`);
+          }
+          const pk = resource.uniques.find(u => u.isPrimary) ?? resource.uniques[0];
+          const spec = Object.create(null);
+          for (const attrName of pk.attributes) {
+            spec[attrName] = get2($specifier, attrName);
+          }
+          return resource.get(spec);
+        }
+      };
     }
   },
   ApplicationsConnection: {
@@ -15104,6 +15248,26 @@ export const plans = {
   },
   PersonOrOrganizationConnection: {
     __assertStep: ConnectionStep
+  },
+  PersonOrOrganization: {
+    __planType($specifier) {
+      const $__typename = get2($specifier, "__typename");
+      return {
+        $__typename,
+        planForType(t) {
+          const resource = resourceByTypeName7[t.name];
+          if (!resource) {
+            throw new Error(`Could not determine resource for ${t.name}`);
+          }
+          const pk = resource.uniques.find(u => u.isPrimary) ?? resource.uniques[0];
+          const spec = Object.create(null);
+          for (const attrName of pk.attributes) {
+            spec[attrName] = get2($specifier, attrName);
+          }
+          return resource.get(spec);
+        }
+      };
+    }
   },
   PersonOrOrganizationEdge: {
     __assertStep: assertEdgeCapableStep,
@@ -15357,9 +15521,16 @@ export const plans = {
   },
   GcpApplication: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of gcp_applicationsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_gcp_applicationsPgResource.get(spec);
+    },
     nodeId($parent) {
-      const specifier = handler6.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler6.codec.name].encode);
+      const specifier = nodeIdHandlerByTypeName.GcpApplication.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.GcpApplication.codec.name].encode);
     },
     lastDeployed($record) {
       return $record.get("last_deployed");
@@ -15374,7 +15545,7 @@ export const plans = {
       return $record.get("gcp_id");
     },
     organizationByOrganizationId($record) {
-      return otherSource_organizationsPgResource.get({
+      return pgResource_organizationsPgResource.get({
         organization_id: $record.get("organization_id")
       });
     },
@@ -15399,7 +15570,7 @@ export const plans = {
         }
         const $list = pgUnionAll({
           attributes: spec_Vulnerability.attributes,
-          resourceByTypeName: resourceByTypeName5,
+          resourceByTypeName: resourceByTypeName8,
           members: members5,
           name: "vulnerabilities"
         });
@@ -15455,7 +15626,7 @@ export const plans = {
       }
       const $list = pgUnionAll({
         attributes: attributes3,
-        resourceByTypeName: resourceByTypeName6,
+        resourceByTypeName: resourceByTypeName9,
         members: members6,
         name: "owner"
       });
@@ -15885,6 +16056,69 @@ export const plans = {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
+  RelationalItem: {
+    __toSpecifier(step) {
+      if (step instanceof PgSelectSingleStep && step.resource !== otherSource_relational_itemsPgResource) {
+        // Assume it's a child; return description of base
+        // PERF: ideally we'd use relationship
+        // traversal instead, this would both be
+        // shorter and also cacheable.
+        const stepPk = step.resource.uniques.find(u => u.isPrimary)?.attributes;
+        if (!stepPk) {
+          throw new Error(`Expected a relational record for ${otherSource_relational_itemsPgResource.name}, but found one for ${step.resource.name} which has no primary key!`);
+        }
+        if (stepPk.length !== relational_itemsUniques[0].attributes.length) {
+          throw new Error(`Expected a relational record for ${otherSource_relational_itemsPgResource.name}, but found one for ${step.resource.name} which has a primary key with a different number of columns!`);
+        }
+        return object(Object.fromEntries(relational_itemsUniques[0].attributes.map((attrName, idx) => [attrName, get2(step, stepPk[idx])])));
+      } else {
+        // Assume it is or describes the base:
+        return object(Object.fromEntries(relational_itemsUniques[0].attributes.map(attrName => [attrName, get2(step, attrName)])));
+      }
+    },
+    __planType($specifier, {
+      $original
+    }) {
+      const $inStep = $original ?? $specifier;
+      // A PgSelectSingleStep representing the base relational table
+      const $base = (() => {
+        if ($inStep instanceof PgSelectSingleStep) {
+          if ($inStep.resource.codec === otherSource_relational_itemsPgResource.codec) {
+            // It's the core table; that's what we want!
+            return $inStep;
+          } else {
+            // Assume it's a child; get base record by primary key
+            // PERF: ideally we'd use relationship
+            // traversal instead, this would both be
+            // shorter and also cacheable.
+            const stepPk = $inStep.resource.uniques.find(u => u.isPrimary)?.attributes;
+            if (!stepPk) {
+              throw new Error(`Expected a relational record for ${otherSource_relational_itemsPgResource.name}, but found one for ${$inStep.resource.name} which has no primary key!`);
+            }
+            if (stepPk.length !== relational_itemsUniques[0].attributes.length) {
+              throw new Error(`Expected a relational record for ${otherSource_relational_itemsPgResource.name}, but found one for ${$inStep.resource.name} which has a primary key with a different number of columns!`);
+            }
+            return otherSource_relational_itemsPgResource.get(Object.fromEntries(relational_itemsUniques[0].attributes.map((attrName, idx) => [attrName, get2($inStep, stepPk[idx])])));
+          }
+        } else {
+          // Assume it's an object representing the base table
+          return otherSource_relational_itemsPgResource.get(Object.fromEntries(relational_itemsUniques[0].attributes.map(attrName => [attrName, get2($inStep, attrName)])));
+        }
+      })();
+      const $typeVal = get2($base, "type");
+      const $__typename = lambda($typeVal, RelationalItem_typeNameFromType, true);
+      return {
+        $__typename,
+        planForType(type) {
+          const spec = Object.values(spec_relationalItems.polymorphism.types).find(s => s.name === type.name);
+          if (!spec) {
+            throw new Error(`${this} Could not find matching name for relational polymorphic '${type.name}'`);
+          }
+          return $base.singleRelation(spec.relationName);
+        }
+      };
+    }
+  },
   RelationalItemRelationsConnection: {
     __assertStep: ConnectionStep,
     totalCount($connection) {
@@ -15893,9 +16127,16 @@ export const plans = {
   },
   RelationalItemRelation: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of relational_item_relationsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_relational_item_relationsPgResource.get(spec);
+    },
     nodeId($parent) {
-      const specifier = handler7.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler7.codec.name].encode);
+      const specifier = nodeIdHandlerByTypeName.RelationalItemRelation.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.RelationalItemRelation.codec.name].encode);
     },
     parentId($record) {
       return $record.get("parent_id");
@@ -15931,9 +16172,16 @@ export const plans = {
   },
   RelationalItemRelationCompositePk: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of relational_item_relation_composite_pksUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_relational_item_relation_composite_pksPgResource.get(spec);
+    },
     nodeId($parent) {
-      const specifier = handler8.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler8.codec.name].encode);
+      const specifier = nodeIdHandlerByTypeName.RelationalItemRelationCompositePk.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.RelationalItemRelationCompositePk.codec.name].encode);
     },
     parentId($record) {
       return $record.get("parent_id");
@@ -16279,9 +16527,16 @@ export const plans = {
   },
   SingleTableItemRelation: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of single_table_item_relationsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return otherSource_single_table_item_relationsPgResource.get(spec);
+    },
     nodeId($parent) {
-      const specifier = handler9.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler9.codec.name].encode);
+      const specifier = nodeIdHandlerByTypeName.SingleTableItemRelation.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.SingleTableItemRelation.codec.name].encode);
     },
     parentId($record) {
       return $record.get("parent_id");
@@ -16317,9 +16572,16 @@ export const plans = {
   },
   SingleTableItemRelationCompositePk: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of single_table_item_relation_composite_pksUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return otherSource_single_table_item_relation_composite_pksPgResource.get(spec);
+    },
     nodeId($parent) {
-      const specifier = handler10.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler10.codec.name].encode);
+      const specifier = nodeIdHandlerByTypeName.SingleTableItemRelationCompositePk.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.SingleTableItemRelationCompositePk.codec.name].encode);
     },
     parentId($record) {
       return $record.get("parent_id");
@@ -16505,8 +16767,8 @@ export const plans = {
   SingleTablePost: {
     __assertStep: assertPgClassSingleStep,
     nodeId($parent) {
-      const specifier = handler11.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler11.codec.name].encode);
+      const specifier = nodeIdHandlerByTypeName.SingleTablePost.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.SingleTablePost.codec.name].encode);
     },
     meaningOfLife($in, args, _info) {
       const {
@@ -16554,7 +16816,7 @@ export const plans = {
       });
     },
     priorityByPriorityId($record) {
-      return otherSource_prioritiesPgResource.get({
+      return pgResource_prioritiesPgResource.get({
         id: $record.get("priority_id")
       });
     },
@@ -16731,9 +16993,16 @@ export const plans = {
   },
   Priority: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of prioritiesUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_prioritiesPgResource.get(spec);
+    },
     nodeId($parent) {
-      const specifier = handler12.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler12.codec.name].encode);
+      const specifier = nodeIdHandlerByTypeName.Priority.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Priority.codec.name].encode);
     },
     singleTableItemsByPriorityId: {
       plan($record) {
@@ -16772,8 +17041,8 @@ export const plans = {
   SingleTableDivider: {
     __assertStep: assertPgClassSingleStep,
     nodeId($parent) {
-      const specifier = handler13.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler13.codec.name].encode);
+      const specifier = nodeIdHandlerByTypeName.SingleTableDivider.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.SingleTableDivider.codec.name].encode);
     },
     meaningOfLife($in, args, _info) {
       const {
@@ -16988,8 +17257,8 @@ export const plans = {
   SingleTableChecklist: {
     __assertStep: assertPgClassSingleStep,
     nodeId($parent) {
-      const specifier = handler14.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler14.codec.name].encode);
+      const specifier = nodeIdHandlerByTypeName.SingleTableChecklist.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.SingleTableChecklist.codec.name].encode);
     },
     meaningOfLife($in, args, _info) {
       const {
@@ -17209,8 +17478,8 @@ export const plans = {
   SingleTableChecklistItem: {
     __assertStep: assertPgClassSingleStep,
     nodeId($parent) {
-      const specifier = handler15.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler15.codec.name].encode);
+      const specifier = nodeIdHandlerByTypeName.SingleTableChecklistItem.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.SingleTableChecklistItem.codec.name].encode);
     },
     meaningOfLife($in, args, _info) {
       const {
@@ -17255,7 +17524,7 @@ export const plans = {
       });
     },
     priorityByPriorityId($record) {
-      return otherSource_prioritiesPgResource.get({
+      return pgResource_prioritiesPgResource.get({
         id: $record.get("priority_id")
       });
     },
@@ -17432,9 +17701,16 @@ export const plans = {
   },
   RelationalTopic: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of relational_topicsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_relational_topicsPgResource.get(spec);
+    },
     nodeId($parent) {
-      const specifier = handler16.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler16.codec.name].encode);
+      const specifier = nodeIdHandlerByTypeName.RelationalTopic.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.RelationalTopic.codec.name].encode);
     },
     parentId($record) {
       return $record.get("parent_id");
@@ -17895,9 +18171,16 @@ export const plans = {
   },
   RelationalPost: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of relational_postsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_relational_postsPgResource.get(spec);
+    },
     nodeId($parent) {
-      const specifier = handler17.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler17.codec.name].encode);
+      const specifier = nodeIdHandlerByTypeName.RelationalPost.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.RelationalPost.codec.name].encode);
     },
     parentId($record) {
       return $record.get("parent_id");
@@ -18170,9 +18453,16 @@ export const plans = {
   },
   RelationalDivider: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of relational_dividersUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_relational_dividersPgResource.get(spec);
+    },
     nodeId($parent) {
-      const specifier = handler18.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler18.codec.name].encode);
+      const specifier = nodeIdHandlerByTypeName.RelationalDivider.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.RelationalDivider.codec.name].encode);
     },
     parentId($record) {
       return $record.get("parent_id");
@@ -18445,9 +18735,16 @@ export const plans = {
   },
   RelationalChecklist: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of relational_checklistsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_relational_checklistsPgResource.get(spec);
+    },
     nodeId($parent) {
-      const specifier = handler19.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler19.codec.name].encode);
+      const specifier = nodeIdHandlerByTypeName.RelationalChecklist.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.RelationalChecklist.codec.name].encode);
     },
     parentId($record) {
       return $record.get("parent_id");
@@ -18720,9 +19017,16 @@ export const plans = {
   },
   RelationalChecklistItem: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of relational_checklist_itemsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_relational_checklist_itemsPgResource.get(spec);
+    },
     nodeId($parent) {
-      const specifier = handler20.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler20.codec.name].encode);
+      const specifier = nodeIdHandlerByTypeName.RelationalChecklistItem.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.RelationalChecklistItem.codec.name].encode);
     },
     parentId($record) {
       return $record.get("parent_id");
@@ -19001,23 +19305,23 @@ export const plans = {
       return rootValue();
     },
     nodeId($parent) {
-      const specifier = handler21.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler21.codec.name].encode);
+      const specifier = nodeIdHandlerByTypeName.Query.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Query.codec.name].encode);
     },
-    node(_$root, args) {
-      return node(nodeIdHandlerByTypeName, args.getRaw("nodeId"));
+    node(_$root, fieldArgs) {
+      return fieldArgs.getRaw("nodeId");
     },
     organizationByOrganizationId(_$root, {
       $organizationId
     }) {
-      return otherSource_organizationsPgResource.get({
+      return pgResource_organizationsPgResource.get({
         organization_id: $organizationId
       });
     },
     organizationByName(_$root, {
       $name
     }) {
-      return otherSource_organizationsPgResource.get({
+      return pgResource_organizationsPgResource.get({
         name: $name
       });
     },
@@ -19038,7 +19342,7 @@ export const plans = {
     priorityById(_$root, {
       $id
     }) {
-      return otherSource_prioritiesPgResource.get({
+      return pgResource_prioritiesPgResource.get({
         id: $id
       });
     },
@@ -19123,7 +19427,7 @@ export const plans = {
     logEntryById(_$root, {
       $id
     }) {
-      return otherSource_log_entriesPgResource.get({
+      return pgResource_log_entriesPgResource.get({
         id: $id
       });
     },
@@ -19137,28 +19441,28 @@ export const plans = {
     firstPartyVulnerabilityById(_$root, {
       $id
     }) {
-      return paths_0_resource_first_party_vulnerabilitiesPgResource.get({
+      return pgResource_first_party_vulnerabilitiesPgResource.get({
         id: $id
       });
     },
     thirdPartyVulnerabilityById(_$root, {
       $id
     }) {
-      return paths_1_resource_third_party_vulnerabilitiesPgResource.get({
+      return pgResource_third_party_vulnerabilitiesPgResource.get({
         id: $id
       });
     },
     awsApplicationById(_$root, {
       $id
     }) {
-      return otherSource_aws_applicationsPgResource.get({
+      return pgResource_aws_applicationsPgResource.get({
         id: $id
       });
     },
     gcpApplicationById(_$root, {
       $id
     }) {
-      return otherSource_gcp_applicationsPgResource.get({
+      return pgResource_gcp_applicationsPgResource.get({
         id: $id
       });
     },
@@ -19285,7 +19589,7 @@ export const plans = {
       plan() {
         const $list = pgUnionAll({
           attributes: spec_Vulnerability.attributes,
-          resourceByTypeName: resourceByTypeName7,
+          resourceByTypeName: resourceByTypeName10,
           members: members7,
           name: "Vulnerability"
         });
@@ -19330,7 +19634,7 @@ export const plans = {
       plan() {
         const $list = pgUnionAll({
           attributes: spec_Application.attributes,
-          resourceByTypeName: resourceByTypeName8,
+          resourceByTypeName: resourceByTypeName11,
           members: members8,
           name: "Application"
         });
@@ -19375,7 +19679,7 @@ export const plans = {
       plan() {
         const $list = pgUnionAll({
           attributes: spec_ZeroImplementation.attributes,
-          resourceByTypeName: resourceByTypeName9,
+          resourceByTypeName: resourceByTypeName12,
           members: members9,
           name: "ZeroImplementation"
         });
@@ -19409,7 +19713,7 @@ export const plans = {
     },
     allOrganizations: {
       plan() {
-        return connection(otherSource_organizationsPgResource.find());
+        return connection(pgResource_organizationsPgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -19469,7 +19773,7 @@ export const plans = {
     },
     allPriorities: {
       plan() {
-        return connection(otherSource_prioritiesPgResource.find());
+        return connection(pgResource_prioritiesPgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -19731,7 +20035,7 @@ export const plans = {
     },
     allLogEntries: {
       plan() {
-        return connection(otherSource_log_entriesPgResource.find());
+        return connection(pgResource_log_entriesPgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -19791,7 +20095,7 @@ export const plans = {
     },
     allFirstPartyVulnerabilities: {
       plan() {
-        return connection(paths_0_resource_first_party_vulnerabilitiesPgResource.find());
+        return connection(pgResource_first_party_vulnerabilitiesPgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -19821,7 +20125,7 @@ export const plans = {
     },
     allThirdPartyVulnerabilities: {
       plan() {
-        return connection(paths_1_resource_third_party_vulnerabilitiesPgResource.find());
+        return connection(pgResource_third_party_vulnerabilitiesPgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -19851,7 +20155,7 @@ export const plans = {
     },
     allAwsApplications: {
       plan() {
-        return connection(otherSource_aws_applicationsPgResource.find());
+        return connection(pgResource_aws_applicationsPgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -19881,7 +20185,7 @@ export const plans = {
     },
     allGcpApplications: {
       plan() {
-        return connection(otherSource_gcp_applicationsPgResource.find());
+        return connection(pgResource_gcp_applicationsPgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -19972,6 +20276,13 @@ export const plans = {
   },
   FirstPartyVulnerability: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of first_party_vulnerabilitiesUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_first_party_vulnerabilitiesPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.FirstPartyVulnerability.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.FirstPartyVulnerability.codec.name].encode);
@@ -20006,7 +20317,7 @@ export const plans = {
         }
         const $list = pgUnionAll({
           attributes: spec_Application.attributes,
-          resourceByTypeName: resourceByTypeName10,
+          resourceByTypeName: resourceByTypeName13,
           members: members10,
           name: "applications"
         });
@@ -20062,7 +20373,7 @@ export const plans = {
       }
       const $list = pgUnionAll({
         attributes: attributes4,
-        resourceByTypeName: resourceByTypeName11,
+        resourceByTypeName: resourceByTypeName14,
         members: members11,
         name: "owners"
       });
@@ -20071,6 +20382,13 @@ export const plans = {
   },
   ThirdPartyVulnerability: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of third_party_vulnerabilitiesUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_third_party_vulnerabilitiesPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.ThirdPartyVulnerability.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.ThirdPartyVulnerability.codec.name].encode);
@@ -20105,7 +20423,7 @@ export const plans = {
         }
         const $list = pgUnionAll({
           attributes: spec_Application.attributes,
-          resourceByTypeName: resourceByTypeName12,
+          resourceByTypeName: resourceByTypeName15,
           members: members12,
           name: "applications"
         });
@@ -20161,7 +20479,7 @@ export const plans = {
       }
       const $list = pgUnionAll({
         attributes: attributes5,
-        resourceByTypeName: resourceByTypeName13,
+        resourceByTypeName: resourceByTypeName16,
         members: members13,
         name: "owners"
       });
@@ -20172,6 +20490,33 @@ export const plans = {
     __assertStep: ConnectionStep,
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+    }
+  },
+  ZeroImplementation: {
+    __toSpecifier($step) {
+      if ($step instanceof PgUnionAllSingleStep) {
+        return $step.toSpecifier();
+      } else {
+        return $step;
+      }
+    },
+    __planType($specifier) {
+      const $__typename = get2($specifier, "__typename");
+      return {
+        $__typename,
+        planForType(t) {
+          const resource = resourceByTypeName17[t.name];
+          if (!resource) {
+            throw new Error(`Type ${t.name} has no associated resource`);
+          }
+          const pk = resource.uniques.find(u => u.isPrimary) ?? resource.uniques[0];
+          const spec = Object.create(null);
+          for (const attrName of pk.attributes) {
+            spec[attrName] = get2($specifier, attrName);
+          }
+          return resource.get(spec);
+        }
+      };
     }
   },
   ZeroImplementationsEdge: {
@@ -22108,7 +22453,7 @@ export const plans = {
     },
     createOrganization: {
       plan(_, args) {
-        const $insert = pgInsertSingle(otherSource_organizationsPgResource, Object.create(null));
+        const $insert = pgInsertSingle(pgResource_organizationsPgResource, Object.create(null));
         args.apply($insert);
         const plan = object({
           result: $insert
@@ -22198,7 +22543,7 @@ export const plans = {
     },
     createLogEntry: {
       plan(_, args) {
-        const $insert = pgInsertSingle(otherSource_log_entriesPgResource, Object.create(null));
+        const $insert = pgInsertSingle(pgResource_log_entriesPgResource, Object.create(null));
         args.apply($insert);
         const plan = object({
           result: $insert
@@ -22213,7 +22558,7 @@ export const plans = {
     },
     createFirstPartyVulnerability: {
       plan(_, args) {
-        const $insert = pgInsertSingle(paths_0_resource_first_party_vulnerabilitiesPgResource, Object.create(null));
+        const $insert = pgInsertSingle(pgResource_first_party_vulnerabilitiesPgResource, Object.create(null));
         args.apply($insert);
         const plan = object({
           result: $insert
@@ -22228,7 +22573,7 @@ export const plans = {
     },
     createThirdPartyVulnerability: {
       plan(_, args) {
-        const $insert = pgInsertSingle(paths_1_resource_third_party_vulnerabilitiesPgResource, Object.create(null));
+        const $insert = pgInsertSingle(pgResource_third_party_vulnerabilitiesPgResource, Object.create(null));
         args.apply($insert);
         const plan = object({
           result: $insert
@@ -22243,7 +22588,7 @@ export const plans = {
     },
     createAwsApplication: {
       plan(_, args) {
-        const $insert = pgInsertSingle(otherSource_aws_applicationsPgResource, Object.create(null));
+        const $insert = pgInsertSingle(pgResource_aws_applicationsPgResource, Object.create(null));
         args.apply($insert);
         const plan = object({
           result: $insert
@@ -22258,7 +22603,7 @@ export const plans = {
     },
     createGcpApplication: {
       plan(_, args) {
-        const $insert = pgInsertSingle(otherSource_gcp_applicationsPgResource, Object.create(null));
+        const $insert = pgInsertSingle(pgResource_gcp_applicationsPgResource, Object.create(null));
         args.apply($insert);
         const plan = object({
           result: $insert
@@ -22273,7 +22618,7 @@ export const plans = {
     },
     updateOrganization: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(otherSource_organizationsPgResource, specFromArgs_Organization(args));
+        const $update = pgUpdateSingle(pgResource_organizationsPgResource, specFromArgs_Organization(args));
         args.apply($update);
         return object({
           result: $update
@@ -22287,7 +22632,7 @@ export const plans = {
     },
     updateOrganizationByOrganizationId: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(otherSource_organizationsPgResource, {
+        const $update = pgUpdateSingle(pgResource_organizationsPgResource, {
           organization_id: args.getRaw(['input', "organizationId"])
         });
         args.apply($update);
@@ -22303,7 +22648,7 @@ export const plans = {
     },
     updateOrganizationByName: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(otherSource_organizationsPgResource, {
+        const $update = pgUpdateSingle(pgResource_organizationsPgResource, {
           name: args.getRaw(['input', "name"])
         });
         args.apply($update);
@@ -22521,7 +22866,7 @@ export const plans = {
     },
     updateLogEntry: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(otherSource_log_entriesPgResource, specFromArgs_LogEntry(args));
+        const $update = pgUpdateSingle(pgResource_log_entriesPgResource, specFromArgs_LogEntry(args));
         args.apply($update);
         return object({
           result: $update
@@ -22535,7 +22880,7 @@ export const plans = {
     },
     updateLogEntryById: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(otherSource_log_entriesPgResource, {
+        const $update = pgUpdateSingle(pgResource_log_entriesPgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($update);
@@ -22551,7 +22896,7 @@ export const plans = {
     },
     updateFirstPartyVulnerability: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(paths_0_resource_first_party_vulnerabilitiesPgResource, specFromArgs_FirstPartyVulnerability(args));
+        const $update = pgUpdateSingle(pgResource_first_party_vulnerabilitiesPgResource, specFromArgs_FirstPartyVulnerability(args));
         args.apply($update);
         return object({
           result: $update
@@ -22565,7 +22910,7 @@ export const plans = {
     },
     updateFirstPartyVulnerabilityById: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(paths_0_resource_first_party_vulnerabilitiesPgResource, {
+        const $update = pgUpdateSingle(pgResource_first_party_vulnerabilitiesPgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($update);
@@ -22581,7 +22926,7 @@ export const plans = {
     },
     updateThirdPartyVulnerability: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(paths_1_resource_third_party_vulnerabilitiesPgResource, specFromArgs_ThirdPartyVulnerability(args));
+        const $update = pgUpdateSingle(pgResource_third_party_vulnerabilitiesPgResource, specFromArgs_ThirdPartyVulnerability(args));
         args.apply($update);
         return object({
           result: $update
@@ -22595,7 +22940,7 @@ export const plans = {
     },
     updateThirdPartyVulnerabilityById: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(paths_1_resource_third_party_vulnerabilitiesPgResource, {
+        const $update = pgUpdateSingle(pgResource_third_party_vulnerabilitiesPgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($update);
@@ -22611,7 +22956,7 @@ export const plans = {
     },
     updateAwsApplication: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(otherSource_aws_applicationsPgResource, specFromArgs_AwsApplication(args));
+        const $update = pgUpdateSingle(pgResource_aws_applicationsPgResource, specFromArgs_AwsApplication(args));
         args.apply($update);
         return object({
           result: $update
@@ -22625,7 +22970,7 @@ export const plans = {
     },
     updateAwsApplicationById: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(otherSource_aws_applicationsPgResource, {
+        const $update = pgUpdateSingle(pgResource_aws_applicationsPgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($update);
@@ -22641,7 +22986,7 @@ export const plans = {
     },
     updateGcpApplication: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(otherSource_gcp_applicationsPgResource, specFromArgs_GcpApplication(args));
+        const $update = pgUpdateSingle(pgResource_gcp_applicationsPgResource, specFromArgs_GcpApplication(args));
         args.apply($update);
         return object({
           result: $update
@@ -22655,7 +23000,7 @@ export const plans = {
     },
     updateGcpApplicationById: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(otherSource_gcp_applicationsPgResource, {
+        const $update = pgUpdateSingle(pgResource_gcp_applicationsPgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($update);
@@ -22671,7 +23016,7 @@ export const plans = {
     },
     deleteOrganization: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(otherSource_organizationsPgResource, specFromArgs_Organization2(args));
+        const $delete = pgDeleteSingle(pgResource_organizationsPgResource, specFromArgs_Organization2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -22685,7 +23030,7 @@ export const plans = {
     },
     deleteOrganizationByOrganizationId: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(otherSource_organizationsPgResource, {
+        const $delete = pgDeleteSingle(pgResource_organizationsPgResource, {
           organization_id: args.getRaw(['input', "organizationId"])
         });
         args.apply($delete);
@@ -22701,7 +23046,7 @@ export const plans = {
     },
     deleteOrganizationByName: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(otherSource_organizationsPgResource, {
+        const $delete = pgDeleteSingle(pgResource_organizationsPgResource, {
           name: args.getRaw(['input', "name"])
         });
         args.apply($delete);
@@ -22919,7 +23264,7 @@ export const plans = {
     },
     deleteLogEntry: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(otherSource_log_entriesPgResource, specFromArgs_LogEntry2(args));
+        const $delete = pgDeleteSingle(pgResource_log_entriesPgResource, specFromArgs_LogEntry2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -22933,7 +23278,7 @@ export const plans = {
     },
     deleteLogEntryById: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(otherSource_log_entriesPgResource, {
+        const $delete = pgDeleteSingle(pgResource_log_entriesPgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($delete);
@@ -22949,7 +23294,7 @@ export const plans = {
     },
     deleteFirstPartyVulnerability: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(paths_0_resource_first_party_vulnerabilitiesPgResource, specFromArgs_FirstPartyVulnerability2(args));
+        const $delete = pgDeleteSingle(pgResource_first_party_vulnerabilitiesPgResource, specFromArgs_FirstPartyVulnerability2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -22963,7 +23308,7 @@ export const plans = {
     },
     deleteFirstPartyVulnerabilityById: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(paths_0_resource_first_party_vulnerabilitiesPgResource, {
+        const $delete = pgDeleteSingle(pgResource_first_party_vulnerabilitiesPgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($delete);
@@ -22979,7 +23324,7 @@ export const plans = {
     },
     deleteThirdPartyVulnerability: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(paths_1_resource_third_party_vulnerabilitiesPgResource, specFromArgs_ThirdPartyVulnerability2(args));
+        const $delete = pgDeleteSingle(pgResource_third_party_vulnerabilitiesPgResource, specFromArgs_ThirdPartyVulnerability2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -22993,7 +23338,7 @@ export const plans = {
     },
     deleteThirdPartyVulnerabilityById: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(paths_1_resource_third_party_vulnerabilitiesPgResource, {
+        const $delete = pgDeleteSingle(pgResource_third_party_vulnerabilitiesPgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($delete);
@@ -23009,7 +23354,7 @@ export const plans = {
     },
     deleteAwsApplication: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(otherSource_aws_applicationsPgResource, specFromArgs_AwsApplication2(args));
+        const $delete = pgDeleteSingle(pgResource_aws_applicationsPgResource, specFromArgs_AwsApplication2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -23023,7 +23368,7 @@ export const plans = {
     },
     deleteAwsApplicationById: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(otherSource_aws_applicationsPgResource, {
+        const $delete = pgDeleteSingle(pgResource_aws_applicationsPgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($delete);
@@ -23039,7 +23384,7 @@ export const plans = {
     },
     deleteGcpApplication: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(otherSource_gcp_applicationsPgResource, specFromArgs_GcpApplication2(args));
+        const $delete = pgDeleteSingle(pgResource_gcp_applicationsPgResource, specFromArgs_GcpApplication2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -23053,7 +23398,7 @@ export const plans = {
     },
     deleteGcpApplicationById: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(otherSource_gcp_applicationsPgResource, {
+        const $delete = pgDeleteSingle(pgResource_gcp_applicationsPgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($delete);
@@ -23111,7 +23456,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return otherSource_organizationsPgResource.find(spec);
+          return pgResource_organizationsPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -23535,7 +23880,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return otherSource_log_entriesPgResource.find(spec);
+          return pgResource_log_entriesPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -23547,7 +23892,7 @@ export const plans = {
       return new EdgeStep($connection, $single);
     },
     organizationByOrganizationId($record) {
-      return otherSource_organizationsPgResource.get({
+      return pgResource_organizationsPgResource.get({
         organization_id: $record.get("result").get("organization_id")
       });
     },
@@ -23619,7 +23964,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return paths_0_resource_first_party_vulnerabilitiesPgResource.find(spec);
+          return pgResource_first_party_vulnerabilitiesPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -23693,7 +24038,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return paths_1_resource_third_party_vulnerabilitiesPgResource.find(spec);
+          return pgResource_third_party_vulnerabilitiesPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -23767,7 +24112,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return otherSource_aws_applicationsPgResource.find(spec);
+          return pgResource_aws_applicationsPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -23779,7 +24124,7 @@ export const plans = {
       return new EdgeStep($connection, $single);
     },
     organizationByOrganizationId($record) {
-      return otherSource_organizationsPgResource.get({
+      return pgResource_organizationsPgResource.get({
         organization_id: $record.get("result").get("organization_id")
       });
     },
@@ -23863,7 +24208,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return otherSource_gcp_applicationsPgResource.find(spec);
+          return pgResource_gcp_applicationsPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -23875,7 +24220,7 @@ export const plans = {
       return new EdgeStep($connection, $single);
     },
     organizationByOrganizationId($record) {
-      return otherSource_organizationsPgResource.get({
+      return pgResource_organizationsPgResource.get({
         organization_id: $record.get("result").get("organization_id")
       });
     },
@@ -23959,7 +24304,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return otherSource_organizationsPgResource.find(spec);
+          return pgResource_organizationsPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -24483,7 +24828,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return otherSource_log_entriesPgResource.find(spec);
+          return pgResource_log_entriesPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -24495,7 +24840,7 @@ export const plans = {
       return new EdgeStep($connection, $single);
     },
     organizationByOrganizationId($record) {
-      return otherSource_organizationsPgResource.get({
+      return pgResource_organizationsPgResource.get({
         organization_id: $record.get("result").get("organization_id")
       });
     },
@@ -24577,7 +24922,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return paths_0_resource_first_party_vulnerabilitiesPgResource.find(spec);
+          return pgResource_first_party_vulnerabilitiesPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -24661,7 +25006,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return paths_1_resource_third_party_vulnerabilitiesPgResource.find(spec);
+          return pgResource_third_party_vulnerabilitiesPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -24745,7 +25090,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return otherSource_aws_applicationsPgResource.find(spec);
+          return pgResource_aws_applicationsPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -24757,7 +25102,7 @@ export const plans = {
       return new EdgeStep($connection, $single);
     },
     organizationByOrganizationId($record) {
-      return otherSource_organizationsPgResource.get({
+      return pgResource_organizationsPgResource.get({
         organization_id: $record.get("result").get("organization_id")
       });
     },
@@ -24851,7 +25196,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return otherSource_gcp_applicationsPgResource.find(spec);
+          return pgResource_gcp_applicationsPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -24863,7 +25208,7 @@ export const plans = {
       return new EdgeStep($connection, $single);
     },
     organizationByOrganizationId($record) {
-      return otherSource_organizationsPgResource.get({
+      return pgResource_organizationsPgResource.get({
         organization_id: $record.get("result").get("organization_id")
       });
     },
@@ -24943,8 +25288,8 @@ export const plans = {
     },
     deletedOrganizationId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = handler4.plan($record);
-      return lambda(specifier, handler_codec_base64JSON.encode);
+      const specifier = nodeIdHandlerByTypeName.Organization.plan($record);
+      return lambda(specifier, nodeIdHandler_SingleTableTopic_codec_base64JSON.encode);
     },
     query() {
       return rootValue();
@@ -24962,7 +25307,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return otherSource_organizationsPgResource.find(spec);
+          return pgResource_organizationsPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -25000,8 +25345,8 @@ export const plans = {
     },
     deletedPersonId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = handler2.plan($record);
-      return lambda(specifier, handler_codec_base64JSON.encode);
+      const specifier = nodeIdHandlerByTypeName.Person.plan($record);
+      return lambda(specifier, nodeIdHandler_SingleTableTopic_codec_base64JSON.encode);
     },
     query() {
       return rootValue();
@@ -25057,8 +25402,8 @@ export const plans = {
     },
     deletedRelationalItemRelationCompositePkId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = handler8.plan($record);
-      return lambda(specifier, handler_codec_base64JSON.encode);
+      const specifier = nodeIdHandlerByTypeName.RelationalItemRelationCompositePk.plan($record);
+      return lambda(specifier, nodeIdHandler_SingleTableTopic_codec_base64JSON.encode);
     },
     query() {
       return rootValue();
@@ -25119,8 +25464,8 @@ export const plans = {
     },
     deletedSingleTableItemRelationCompositePkId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = handler10.plan($record);
-      return lambda(specifier, handler_codec_base64JSON.encode);
+      const specifier = nodeIdHandlerByTypeName.SingleTableItemRelationCompositePk.plan($record);
+      return lambda(specifier, nodeIdHandler_SingleTableTopic_codec_base64JSON.encode);
     },
     query() {
       return rootValue();
@@ -25181,8 +25526,8 @@ export const plans = {
     },
     deletedRelationalItemRelationId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = handler7.plan($record);
-      return lambda(specifier, handler_codec_base64JSON.encode);
+      const specifier = nodeIdHandlerByTypeName.RelationalItemRelation.plan($record);
+      return lambda(specifier, nodeIdHandler_SingleTableTopic_codec_base64JSON.encode);
     },
     query() {
       return rootValue();
@@ -25248,8 +25593,8 @@ export const plans = {
     },
     deletedSingleTableItemRelationId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = handler9.plan($record);
-      return lambda(specifier, handler_codec_base64JSON.encode);
+      const specifier = nodeIdHandlerByTypeName.SingleTableItemRelation.plan($record);
+      return lambda(specifier, nodeIdHandler_SingleTableTopic_codec_base64JSON.encode);
     },
     query() {
       return rootValue();
@@ -25315,8 +25660,8 @@ export const plans = {
     },
     deletedLogEntryId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = handler3.plan($record);
-      return lambda(specifier, handler_codec_base64JSON.encode);
+      const specifier = nodeIdHandlerByTypeName.LogEntry.plan($record);
+      return lambda(specifier, nodeIdHandler_SingleTableTopic_codec_base64JSON.encode);
     },
     query() {
       return rootValue();
@@ -25334,7 +25679,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return otherSource_log_entriesPgResource.find(spec);
+          return pgResource_log_entriesPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -25346,7 +25691,7 @@ export const plans = {
       return new EdgeStep($connection, $single);
     },
     organizationByOrganizationId($record) {
-      return otherSource_organizationsPgResource.get({
+      return pgResource_organizationsPgResource.get({
         organization_id: $record.get("result").get("organization_id")
       });
     },
@@ -25378,7 +25723,7 @@ export const plans = {
     deletedFirstPartyVulnerabilityId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.FirstPartyVulnerability.plan($record);
-      return lambda(specifier, handler_codec_base64JSON.encode);
+      return lambda(specifier, nodeIdHandler_SingleTableTopic_codec_base64JSON.encode);
     },
     query() {
       return rootValue();
@@ -25396,7 +25741,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return paths_0_resource_first_party_vulnerabilitiesPgResource.find(spec);
+          return pgResource_first_party_vulnerabilitiesPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -25430,7 +25775,7 @@ export const plans = {
     deletedThirdPartyVulnerabilityId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.ThirdPartyVulnerability.plan($record);
-      return lambda(specifier, handler_codec_base64JSON.encode);
+      return lambda(specifier, nodeIdHandler_SingleTableTopic_codec_base64JSON.encode);
     },
     query() {
       return rootValue();
@@ -25448,7 +25793,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return paths_1_resource_third_party_vulnerabilitiesPgResource.find(spec);
+          return pgResource_third_party_vulnerabilitiesPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -25481,8 +25826,8 @@ export const plans = {
     },
     deletedAwsApplicationId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = handler5.plan($record);
-      return lambda(specifier, handler_codec_base64JSON.encode);
+      const specifier = nodeIdHandlerByTypeName.AwsApplication.plan($record);
+      return lambda(specifier, nodeIdHandler_SingleTableTopic_codec_base64JSON.encode);
     },
     query() {
       return rootValue();
@@ -25500,7 +25845,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return otherSource_aws_applicationsPgResource.find(spec);
+          return pgResource_aws_applicationsPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -25512,7 +25857,7 @@ export const plans = {
       return new EdgeStep($connection, $single);
     },
     organizationByOrganizationId($record) {
-      return otherSource_organizationsPgResource.get({
+      return pgResource_organizationsPgResource.get({
         organization_id: $record.get("result").get("organization_id")
       });
     },
@@ -25543,8 +25888,8 @@ export const plans = {
     },
     deletedGcpApplicationId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = handler6.plan($record);
-      return lambda(specifier, handler_codec_base64JSON.encode);
+      const specifier = nodeIdHandlerByTypeName.GcpApplication.plan($record);
+      return lambda(specifier, nodeIdHandler_SingleTableTopic_codec_base64JSON.encode);
     },
     query() {
       return rootValue();
@@ -25562,7 +25907,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return otherSource_gcp_applicationsPgResource.find(spec);
+          return pgResource_gcp_applicationsPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -25574,7 +25919,7 @@ export const plans = {
       return new EdgeStep($connection, $single);
     },
     organizationByOrganizationId($record) {
-      return otherSource_organizationsPgResource.get({
+      return pgResource_organizationsPgResource.get({
         organization_id: $record.get("result").get("organization_id")
       });
     },

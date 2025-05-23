@@ -407,9 +407,7 @@ ${duration}
             }
           }
 
-          const textAndValues = `${common.text}\n${JSON.stringify(
-            rawSqlValues,
-          )}`;
+          const textAndValues = `${common.text}\n${JSON.stringify(rawSqlValues)}`;
           let cacheForQuery = cacheForContext.get(textAndValues);
           if (!cacheForQuery) {
             cacheForQuery = new Map();

@@ -319,7 +319,9 @@ export function arraysMatch<T>(
   }
   if (comparator !== undefined) {
     for (let i = 0; i < l; i++) {
-      if (!comparator(array1[i], array2[i])) {
+      const a = array1[i]!;
+      const b = array2[i]!;
+      if (a !== b && !comparator(a, b)) {
         return false;
       }
     }
@@ -329,6 +331,100 @@ export function arraysMatch<T>(
         return false;
       }
     }
+  }
+  return true;
+}
+
+/**
+ * Returns true if map1 and map2 have the same keys, and every matching entry
+ * value within them pass the `comparator` check (which defaults to `===`).
+ */
+export function mapsMatch<TKey, TVal>(
+  map1: ReadonlyMap<TKey, TVal>,
+  map2: ReadonlyMap<TKey, TVal>,
+  comparator?: (
+    k: TKey,
+    val1: TVal | undefined,
+    val2: TVal | undefined,
+  ) => boolean,
+): boolean {
+  if (map1 === map2) return true;
+  const l = map1.size;
+  if (l !== map2.size) {
+    return false;
+  }
+  const allKeys = new Set([...map1.keys(), ...map2.keys()]);
+  if (allKeys.size !== l) {
+    return false;
+  }
+  if (comparator !== undefined) {
+    for (const k of allKeys) {
+      const a = map1.get(k);
+      const b = map2.get(k);
+      if (a !== b && !comparator(k, a, b)) {
+        return false;
+      }
+    }
+  } else {
+    for (const k of allKeys) {
+      if (map1.get(k) !== map2.get(k)) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+/**
+ * Returns true if record1 and record2 are equivalent, i.e. every value within
+ * them pass the `comparator` check (which defaults to `===`).
+ *
+ * Currently keys are ignored (`record[key] = undefined` is treated the same as
+ * `record[key]` being unset), but this may not always be the case.
+ */
+export function recordsMatch<
+  TRecord extends { readonly [k: string | symbol | number]: any },
+>(
+  record1: TRecord,
+  record2: TRecord,
+  comparator?: (
+    k: keyof TRecord,
+    val1: TRecord[typeof k],
+    val2: TRecord[typeof k],
+  ) => boolean,
+): boolean {
+  if (record1 === record2) return true;
+  const k1 = Object.keys(record1) as (keyof TRecord)[];
+  const k2 = Object.keys(record2) as (keyof TRecord)[];
+  const allKeys = new Set([...k1, ...k2]);
+  if (comparator !== undefined) {
+    for (const k of allKeys) {
+      const a = record1[k];
+      const b = record2[k];
+      if (a !== b && !comparator(k, a, b)) {
+        return false;
+      }
+    }
+  } else {
+    for (const k of allKeys) {
+      if (record1[k] !== record2[k]) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+export function setsMatch(
+  s1: ReadonlySet<string> | null,
+  s2: ReadonlySet<string> | null,
+) {
+  if (s1 === s2) return true;
+  if (s1 == null) return false;
+  if (s2 == null) return false;
+  if (s1.size !== s2.size) return false;
+  for (const p of s1) {
+    if (!s2.has(p)) return false;
   }
   return true;
 }
@@ -347,6 +443,7 @@ export type ObjectTypeSpec<
         | ((step: Step) => asserts step is TParentStep)
         | { new (...args: any[]): TParentStep }
     : null;
+  planType?: ($specifier: Step) => TParentStep;
 };
 
 /**
@@ -358,15 +455,16 @@ export function objectSpec<
 >(
   spec: ObjectTypeSpec<TParentStep, TFields>,
 ): GraphQLObjectTypeConfig<any, Grafast.Context> {
-  const { assertStep, ...rest } = spec;
+  const { assertStep, planType, ...rest } = spec;
   const modifiedSpec: GraphQLObjectTypeConfig<any, Grafast.Context> = {
     ...rest,
-    ...(assertStep
+    ...(assertStep || planType
       ? {
           extensions: {
             ...spec.extensions,
             grafast: {
-              assertStep,
+              ...(assertStep ? { assertStep } : null),
+              ...(planType ? { planType } : null),
               ...spec.extensions?.grafast,
             },
           },
@@ -882,6 +980,7 @@ export type Sudo<T> =
         dependencyOnReject: ReadonlyArray<Error | null | undefined>;
         defaultForbiddenFlags: ExecutionEntryFlags;
         getDepOptions: Step["getDepOptions"];
+        _refs: Array<number>;
       }
     : T;
 
@@ -932,6 +1031,10 @@ export function stepADependsOnStepB(stepA: Step, stepB: Step): boolean {
   return false;
 }
 
+function stepAIsOrDependsOnStepB(stepA: Step, stepB: Step): boolean {
+  return stepA === stepB || stepADependsOnStepB(stepA, stepB);
+}
+
 /**
  * Returns true if stepA is allowed to depend on stepB, false otherwise. (This
  * mostly relates to heirarchy.)
@@ -947,6 +1050,93 @@ export function stepAMayDependOnStepB($a: Step, $b: Step): boolean {
     return false;
   }
   return !stepADependsOnStepB($b, $a);
+}
+
+export function stepAShouldTryAndInlineIntoStepB($a: Step, $b: Step): boolean {
+  if (isDev && !stepADependsOnStepB($a, $b)) {
+    throw new Error(
+      `Shouldn't try and inline into something you're not dependent on!`,
+    );
+  }
+  if (!stepsAreInSamePhase($b, $a)) return false;
+
+  // TODO: review the rules about polymorphism here; e.g. "only if most of the
+  // polymorphic paths are covered" or something. We don't want the parent to
+  // do lots of work for lots of polymorphic paths that won't be covered, but
+  // equally we don't want to necessarily require 100% of the polymorphic
+  // branches to be matched.
+  const paths = pathsFromAncestorToTargetLayerPlan($b.layerPlan, $a.layerPlan);
+  let path: readonly LayerPlan[];
+  if (paths.length === 0) {
+    throw new Error(`No path from ${$a} back to ${$b}?`);
+  } else if (paths.length > 1) {
+    const commonPath: LayerPlan[] = [];
+    const firstPath = paths[0];
+    for (const lp of firstPath) {
+      if (paths.every((p) => p.includes(lp))) {
+        commonPath.push(lp);
+      }
+    }
+    path = commonPath;
+  } else {
+    path = paths[0];
+  }
+  for (const lp of path) {
+    if (lp.reason.type === "polymorphicPartition") {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+export function pathsFromAncestorToTargetLayerPlan(
+  ancestor: LayerPlan,
+  lp: LayerPlan,
+): readonly LayerPlan[][] {
+  if (lp === ancestor) {
+    // One path, and it's the null path - stay where you are.
+    return [[]];
+  }
+
+  if (lp.reason.type === "root") {
+    // No paths found - lp doesn't inherit from ancestor.
+    return [];
+  } else if (lp.reason.type === "combined") {
+    const childPaths = lp.reason.parentLayerPlans.flatMap((plp) =>
+      pathsFromAncestorToTargetLayerPlan(ancestor, plp),
+    );
+    for (const path of childPaths) {
+      path.push(lp);
+    }
+    return childPaths;
+  } else {
+    const childPaths = pathsFromAncestorToTargetLayerPlan(
+      ancestor,
+      lp.reason.parentLayerPlan,
+    );
+    for (const path of childPaths) {
+      path.push(lp);
+    }
+    return childPaths;
+  }
+}
+
+export function layerPlanHeirarchyContains(
+  lp: LayerPlan,
+  targetLp: LayerPlan,
+): boolean {
+  if (lp === targetLp) return true;
+  if (lp.reason.type === "root") {
+    return false;
+  } else if (lp.reason.type === "combined") {
+    return lp.reason.parentLayerPlans.some((plp) =>
+      layerPlanHeirarchyContains(plp, targetLp),
+    );
+  } else {
+    // PERF: loop would be faster than recursion
+    return layerPlanHeirarchyContains(lp.reason.parentLayerPlan, targetLp);
+  }
 }
 
 /**
@@ -977,22 +1167,57 @@ export function stepAMayDependOnStepB($a: Step, $b: Step): boolean {
  * need it.
  */
 export function stepsAreInSamePhase(ancestor: Step, descendent: Step) {
-  let currentLayerPlan: LayerPlan | null = descendent.layerPlan;
-  do {
-    if (currentLayerPlan === ancestor.layerPlan) {
-      return true;
+  if (isDev && !stepADependsOnStepB(descendent, ancestor)) {
+    throw new Error(
+      `Shouldn't try and inline into something you're not dependent on!`,
+    );
+  }
+  const ancestorDepth = ancestor.layerPlan.depth;
+  const descendentDepth = descendent.layerPlan.depth;
+  if (descendentDepth < ancestorDepth) {
+    throw new Error(
+      `descendent is deeper than ancestor; did you pass ancestor/descendent the wrong way around?`,
+    );
+  }
+  const descDeferBoundary =
+    descendent.layerPlan.ancestry[descendent.layerPlan.deferBoundaryDepth];
+  if (
+    ancestor.layerPlan.ancestry[ancestor.layerPlan.deferBoundaryDepth] !==
+    descDeferBoundary
+  ) {
+    // Still possible to be okay if ancestor is the source of a streamed list item or deferred step
+    if (
+      descDeferBoundary.reason.type === "listItem" &&
+      descDeferBoundary.reason.stream != null &&
+      descendent.layerPlan.ancestry[
+        descendent.layerPlan.deferBoundaryDepth - 1
+      ] === ancestor.layerPlan
+    ) {
+      if (
+        stepAIsOrDependsOnStepB(descDeferBoundary.reason.parentStep, ancestor)
+      ) {
+        return true;
+      }
     }
+    // Nope, don't allow
+    return false;
+  }
+  for (let i = 0; i < ancestorDepth; i++) {
+    if (ancestor.layerPlan.ancestry[i] !== descendent.layerPlan.ancestry[i]) {
+      return false;
+    }
+  }
+  for (let i = ancestorDepth + 1; i < descendentDepth; i++) {
+    const currentLayerPlan = descendent.layerPlan.ancestry[i];
     const t = currentLayerPlan.reason.type;
     switch (t) {
+      case "combined": {
+        continue;
+      }
       case "subscription":
       case "defer": {
         // These indicate boundaries over which plans shouldn't be optimized
         // together (generally).
-        return false;
-      }
-      case "polymorphic": {
-        // OPTIMIZE: can optimize this so that if all polymorphicPaths match then it
-        // passes
         return false;
       }
       case "listItem": {
@@ -1007,6 +1232,8 @@ export function stepsAreInSamePhase(ancestor: Step, descendent: Step) {
       case "root":
       case "nullableBoundary":
       case "subroutine":
+      case "polymorphic":
+      case "polymorphicPartition":
       case "mutationField": {
         continue;
       }
@@ -1015,10 +1242,38 @@ export function stepsAreInSamePhase(ancestor: Step, descendent: Step) {
         throw new Error(`Unhandled layer plan type '${never}'`);
       }
     }
-  } while ((currentLayerPlan = currentLayerPlan.parentLayerPlan));
-  throw new Error(
-    `${descendent} is not dependent on ${ancestor}, perhaps you passed the arguments in the wrong order?`,
-  );
+  }
+  return true;
+}
+
+export function isPhaseTransitionLayerPlan(layerPlan: LayerPlan): boolean {
+  const t = layerPlan.reason.type;
+  switch (t) {
+    case "subscription":
+    case "defer": {
+      return true;
+    }
+    case "listItem": {
+      if (layerPlan.reason.stream) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+    case "polymorphic":
+    case "polymorphicPartition":
+    case "root":
+    case "nullableBoundary":
+    case "subroutine":
+    case "combined": // TODO: CHECK ME!
+    case "mutationField": {
+      return false;
+    }
+    default: {
+      const never: never = t;
+      throw new Error(`Unhandled layer plan type '${never}'`);
+    }
+  }
 }
 
 // ENHANCE: implement this!

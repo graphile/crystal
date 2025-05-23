@@ -1,9 +1,15 @@
 select
-  __single_table_items__."id"::text as "0",
-  __single_table_items__."type"::text as "1",
-  __single_table_items__."parent_id"::text as "2"
-from "polymorphic"."single_table_items" as __single_table_items__
-order by __single_table_items__."id" asc;
+  __single_table_items_2."id"::text as "0",
+  __single_table_items_2."type"::text as "1",
+  __single_table_items__."id"::text as "2",
+  __single_table_items__."type"::text as "3"
+from "polymorphic"."single_table_items" as __single_table_items_2
+left outer join "polymorphic"."single_table_items" as __single_table_items__
+on (
+/* WHERE becoming ON */ (
+  __single_table_items__."id" = __single_table_items_2."parent_id"
+))
+order by __single_table_items_2."id" asc;
 
 select
   __relational_items__."id"::text as "0",
@@ -54,19 +60,6 @@ where (
   __relational_item_relations__."child_id" = $1::"int4"
 )
 order by __relational_item_relations__."id" asc;
-
-select __single_table_items_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __single_table_items_identifiers__,
-lateral (
-  select
-    __single_table_items__."id"::text as "0",
-    __single_table_items__."type"::text as "1",
-    __single_table_items_identifiers__.idx as "2"
-  from "polymorphic"."single_table_items" as __single_table_items__
-  where (
-    __single_table_items__."id" = __single_table_items_identifiers__."id0"
-  )
-) as __single_table_items_result__;
 
 select __relational_topics_result__.*
 from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __relational_topics_identifiers__,
@@ -135,8 +128,7 @@ from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from js
 lateral (
   select
     __relational_items__."id"::text as "0",
-    __relational_items__."type"::text as "1",
-    __relational_items_identifiers__.idx as "2"
+    __relational_items_identifiers__.idx as "1"
   from "polymorphic"."relational_items" as __relational_items__
   inner join "polymorphic"."relational_items" as __relational_items_2
   on (__relational_items__."id" = __relational_items_2."parent_id")
@@ -150,8 +142,7 @@ from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from js
 lateral (
   select
     __relational_items__."id"::text as "0",
-    __relational_items__."type"::text as "1",
-    __relational_items_identifiers__.idx as "2"
+    __relational_items_identifiers__.idx as "1"
   from "polymorphic"."relational_items" as __relational_items__
   inner join "polymorphic"."relational_items" as __relational_items_2
   on (__relational_items__."id" = __relational_items_2."parent_id")
@@ -165,8 +156,7 @@ from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from js
 lateral (
   select
     __relational_items__."id"::text as "0",
-    __relational_items__."type"::text as "1",
-    __relational_items_identifiers__.idx as "2"
+    __relational_items_identifiers__.idx as "1"
   from "polymorphic"."relational_items" as __relational_items__
   inner join "polymorphic"."relational_items" as __relational_items_2
   on (__relational_items__."id" = __relational_items_2."parent_id")
@@ -176,8 +166,7 @@ lateral (
 ) as __relational_items_result__;
 
 select
-  __relational_items__."id"::text as "0",
-  __relational_items__."type"::text as "1"
+  __relational_items__."id"::text as "0"
 from "polymorphic"."relational_items" as __relational_items__
 inner join "polymorphic"."relational_items" as __relational_items_2
 on (__relational_items__."id" = __relational_items_2."parent_id")
@@ -190,13 +179,25 @@ from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from js
 lateral (
   select
     __relational_items__."id"::text as "0",
-    __relational_items__."type"::text as "1",
-    __relational_items_identifiers__.idx as "2"
+    __relational_items_identifiers__.idx as "1"
   from "polymorphic"."relational_items" as __relational_items__
   inner join "polymorphic"."relational_items" as __relational_items_2
   on (__relational_items__."id" = __relational_items_2."parent_id")
   where (
     __relational_items_2."id" = __relational_items_identifiers__."id0"
+  )
+) as __relational_items_result__;
+
+select __relational_items_result__.*
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __relational_items_identifiers__,
+lateral (
+  select
+    __relational_items__."type"::text as "0",
+    __relational_items__."id"::text as "1",
+    __relational_items_identifiers__.idx as "2"
+  from "polymorphic"."relational_items" as __relational_items__
+  where (
+    __relational_items__."id" = __relational_items_identifiers__."id0"
   )
 ) as __relational_items_result__;
 

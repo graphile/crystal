@@ -1,13 +1,3 @@
-import type { FlaggedValue } from "../error.js";
-import { $$inhibit, flagError, SafeError } from "../error.js";
-import { inspect } from "../inspect.js";
-import type {
-  AddDependencyOptions,
-  DataFromStep,
-  ExecutionDetails,
-  ExecutionEntryFlags,
-  GrafastResultsList,
-} from "../interfaces.js";
 import {
   $$deepDepSkip,
   ALL_FLAGS,
@@ -17,6 +7,16 @@ import {
   FLAG_INHIBITED,
   FLAG_NULL,
   TRAPPABLE_FLAGS,
+} from "../constants.js";
+import type { FlaggedValue } from "../error.js";
+import { $$inhibit, flagError, SafeError } from "../error.js";
+import { inspect } from "../inspect.js";
+import type {
+  AddDependencyOptions,
+  DataFromStep,
+  ExecutionDetails,
+  ExecutionEntryFlags,
+  GrafastResultsList,
 } from "../interfaces.js";
 import type { ListCapableStep } from "../step.js";
 import { isListCapableStep, Step } from "../step.js";
@@ -55,6 +55,7 @@ export type ResolvedTrapValue = false | null | undefined | readonly never[];
 export interface FlagStepOptions {
   acceptFlags?: ExecutionEntryFlags;
   onReject?: Error | null;
+  dataOnly?: boolean;
   if?: Step<boolean>;
   // Trapping an error might want to result in a null or an empty list.
   valueForInhibited?: TrapValue;
@@ -108,6 +109,7 @@ export class __FlagStep<TStep extends Step> extends Step<DataFromStep<TStep>> {
     const {
       acceptFlags = DEFAULT_ACCEPT_FLAGS,
       onReject,
+      dataOnly,
       if: $cond,
       valueForInhibited = "PASS_THROUGH",
       valueForError = "PASS_THROUGH",
@@ -131,7 +133,7 @@ export class __FlagStep<TStep extends Step> extends Step<DataFromStep<TStep>> {
         this.ifDep = this.addDependency($cond);
       }
     } else {
-      this.addDependency({ step, acceptFlags, onReject });
+      this.addDependency({ step, acceptFlags, onReject, dataOnly });
     }
     if (isListCapableStep(step)) {
       this.listItem = this._listItem;
@@ -292,7 +294,7 @@ export function inhibitOnNull<TStep extends Step>(
   return new __FlagStep<TStep>($step, {
     ...options,
     acceptFlags: DEFAULT_ACCEPT_FLAGS & ~FLAG_NULL,
-  });
+  }) as Step<TStep extends Step<infer U> ? Exclude<U, null | undefined> : any>;
 }
 
 /**
@@ -333,7 +335,7 @@ export function trap<TStep extends Step>(
   depId: number,
   throwOnFlagged = false,
 ) {
-  const { step, acceptFlags, onReject } = this.getDepOptions(depId);
+  const { step, acceptFlags, onReject, dataOnly } = this.getDepOptions(depId);
   if (acceptFlags === DEFAULT_ACCEPT_FLAGS && onReject == null) {
     return step;
   } else {
@@ -347,6 +349,6 @@ export function trap<TStep extends Step>(
       );
     }
     // Return a __FlagStep around options.step so that all the options are preserved.
-    return new __FlagStep(step, { acceptFlags, onReject });
+    return new __FlagStep(step, { acceptFlags, onReject, dataOnly });
   }
 };

@@ -1,24 +1,8 @@
 import { PgDeleteSingleStep, PgExecutor, PgSelectSingleStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgFromExpression, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId, stepAMayDependOnStepB } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId, stepAMayDependOnStepB } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
-const handler_codec_base64JSON = {
-  name: "base64JSON",
-  encode: (() => {
-    function base64JSONEncode(value) {
-      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-    }
-    base64JSONEncode.isSyncAndSafe = true; // Optimization
-    return base64JSONEncode;
-  })(),
-  decode: (() => {
-    function base64JSONDecode(value) {
-      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-    }
-    base64JSONDecode.isSyncAndSafe = true; // Optimization
-    return base64JSONDecode;
-  })()
-};
+const pkCols = ["id"];
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -737,23 +721,22 @@ const awaitFunctionIdentifer = sql.identifier("js_reserved", "await");
 const caseFunctionIdentifer = sql.identifier("js_reserved", "case");
 const valueOfFunctionIdentifer = sql.identifier("js_reserved", "valueOf");
 const null_yieldFunctionIdentifer = sql.identifier("js_reserved", "null_yield");
-const relational_topicsUniques = [{
-  isPrimary: true,
-  attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
-}];
 const registryConfig_pgResources_relational_topics_relational_topics = {
   executor: executor,
   name: "relational_topics",
   identifier: "main.js_reserved.relational_topics",
   from: relationalTopicsIdentifier,
   codec: relationalTopicsCodec,
-  uniques: relational_topicsUniques,
+  uniques: [{
+    isPrimary: true,
+    attributes: pkCols,
+    description: undefined,
+    extensions: {
+      tags: {
+        __proto__: null
+      }
+    }
+  }],
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -1594,10 +1577,27 @@ const registryConfig = {
   }
 };
 const registry = makeRegistry(registryConfig);
-const pgResource_relational_topicsPgResource = registry.pgResources["relational_topics"];
-const handler = {
+const resource_relational_topicsPgResource = registry.pgResources["relational_topics"];
+const nodeIdHandler_RelationalTopic_codec_base64JSON = {
+  name: "base64JSON",
+  encode: (() => {
+    function base64JSONEncode(value) {
+      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+    }
+    base64JSONEncode.isSyncAndSafe = true; // Optimization
+    return base64JSONEncode;
+  })(),
+  decode: (() => {
+    function base64JSONDecode(value) {
+      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+    }
+    base64JSONDecode.isSyncAndSafe = true; // Optimization
+    return base64JSONDecode;
+  })()
+};
+const nodeIdHandler_RelationalTopic = {
   typeName: "RelationalTopic",
-  codec: handler_codec_base64JSON,
+  codec: nodeIdHandler_RelationalTopic_codec_base64JSON,
   deprecationReason: undefined,
   plan($record) {
     return list([constant("relational_topics", false), $record.get("id")]);
@@ -1611,7 +1611,7 @@ const handler = {
     return value.slice(1);
   },
   get(spec) {
-    return pgResource_relational_topicsPgResource.get(spec);
+    return resource_relational_topicsPgResource.get(spec);
   },
   match(obj) {
     return obj[0] === "relational_topics";
@@ -1632,7 +1632,7 @@ const nodeIdCodecs = {
       isSyncAndSafe: true
     })
   },
-  base64JSON: handler_codec_base64JSON,
+  base64JSON: nodeIdHandler_RelationalTopic_codec_base64JSON,
   pipeString: {
     name: "pipeString",
     encode: Object.assign(function pipeStringEncode(value) {
@@ -1649,132 +1649,41 @@ const nodeIdCodecs = {
 };
 const building_buildingPgResource = registry.pgResources["building"];
 const relational_items_relational_itemsPgResource = registry.pgResources["relational_items"];
-const handler2 = {
-  typeName: "Building",
-  codec: handler_codec_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("buildings", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return building_buildingPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "buildings";
-  }
-};
-const otherSource_machinePgResource = registry.pgResources["machine"];
-const specFromRecord = $record => {
-  return registryConfig.pgRelations.building.machinesByTheirConstructor.remoteAttributes.reduce((memo, remoteAttributeName, i) => {
-    memo[remoteAttributeName] = $record.get(registryConfig.pgRelations.building.machinesByTheirConstructor.localAttributes[i]);
-    return memo;
-  }, Object.create(null));
-};
-function qbWhereBuilder(qb) {
-  return qb.whereBuilder();
-}
-const specFromRecord2 = $record => {
-  return registryConfig.pgRelations.building.relationalItemsByTheirConstructor.remoteAttributes.reduce((memo, remoteAttributeName, i) => {
-    memo[remoteAttributeName] = $record.get(registryConfig.pgRelations.building.relationalItemsByTheirConstructor.localAttributes[i]);
-    return memo;
-  }, Object.create(null));
-};
-const handler3 = {
-  typeName: "Machine",
-  codec: handler_codec_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("machines", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return otherSource_machinePgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "machines";
-  }
-};
-const specFromRecord3 = $record => {
-  return registryConfig.pgRelations.machine.buildingByMyConstructor.remoteAttributes.reduce((memo, remoteAttributeName, i) => {
-    memo[remoteAttributeName] = $record.get(registryConfig.pgRelations.machine.buildingByMyConstructor.localAttributes[i]);
-    return memo;
-  }, Object.create(null));
-};
-function CursorSerialize(value) {
-  return "" + value;
-}
-const pgResource_relational_statusPgResource = registry.pgResources["relational_status"];
-const handler4 = {
-  typeName: "RelationalStatus",
-  codec: handler_codec_base64JSON,
-  deprecationReason: undefined,
-  plan($record) {
-    return list([constant("relational_statuses", false), $record.get("id")]);
-  },
-  getSpec($list) {
-    return {
-      id: inhibitOnNull(access($list, [1]))
-    };
-  },
-  getIdentifiers(value) {
-    return value.slice(1);
-  },
-  get(spec) {
-    return pgResource_relational_statusPgResource.get(spec);
-  },
-  match(obj) {
-    return obj[0] === "relational_statuses";
-  }
-};
-const handler5 = {
-  typeName: "Query",
-  codec: nodeIdCodecs.raw,
-  match(specifier) {
-    return specifier === "query";
-  },
-  getIdentifiers(_value) {
-    return [];
-  },
-  getSpec() {
-    return "irrelevant";
-  },
-  get() {
-    return rootValue();
-  },
-  plan() {
-    return constant`query`;
-  }
-};
 const pgResource___proto__PgResource = registry.pgResources["__proto__"];
 const pgResource_constructorPgResource = registry.pgResources["constructor"];
 const pgResource_cropPgResource = registry.pgResources["crop"];
+const pgResource_machinePgResource = registry.pgResources["machine"];
 const pgResource_materialPgResource = registry.pgResources["material"];
 const pgResource_nullPgResource = registry.pgResources["null"];
 const pgResource_projectPgResource = registry.pgResources["project"];
+const pgResource_relational_statusPgResource = registry.pgResources["relational_status"];
 const pgResource_yieldPgResource = registry.pgResources["yield"];
 const pgResource_reservedPgResource = registry.pgResources["reserved"];
 const nodeIdHandlerByTypeName = {
   __proto__: null,
-  Query: handler5,
-  RelationalTopic: handler,
+  Query: {
+    typeName: "Query",
+    codec: nodeIdCodecs.raw,
+    match(specifier) {
+      return specifier === "query";
+    },
+    getIdentifiers(_value) {
+      return [];
+    },
+    getSpec() {
+      return "irrelevant";
+    },
+    get() {
+      return rootValue();
+    },
+    plan() {
+      return constant`query`;
+    }
+  },
+  RelationalTopic: nodeIdHandler_RelationalTopic,
   _Proto__: {
     typeName: "_Proto__",
-    codec: handler_codec_base64JSON,
+    codec: nodeIdHandler_RelationalTopic_codec_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("__proto__S", false), ...__proto__Uniques[0].attributes.map(attribute => $record.get(attribute))]);
@@ -1796,10 +1705,31 @@ const nodeIdHandlerByTypeName = {
       return obj[0] === "__proto__S";
     }
   },
-  Building: handler2,
+  Building: {
+    typeName: "Building",
+    codec: nodeIdHandler_RelationalTopic_codec_base64JSON,
+    deprecationReason: undefined,
+    plan($record) {
+      return list([constant("buildings", false), $record.get("id")]);
+    },
+    getSpec($list) {
+      return {
+        id: inhibitOnNull(access($list, [1]))
+      };
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return building_buildingPgResource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === "buildings";
+    }
+  },
   Constructor: {
     typeName: "Constructor",
-    codec: handler_codec_base64JSON,
+    codec: nodeIdHandler_RelationalTopic_codec_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("constructors", false), $record.get("id")]);
@@ -1821,7 +1751,7 @@ const nodeIdHandlerByTypeName = {
   },
   Crop: {
     typeName: "Crop",
-    codec: handler_codec_base64JSON,
+    codec: nodeIdHandler_RelationalTopic_codec_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("crops", false), $record.get("id")]);
@@ -1841,10 +1771,31 @@ const nodeIdHandlerByTypeName = {
       return obj[0] === "crops";
     }
   },
-  Machine: handler3,
+  Machine: {
+    typeName: "Machine",
+    codec: nodeIdHandler_RelationalTopic_codec_base64JSON,
+    deprecationReason: undefined,
+    plan($record) {
+      return list([constant("machines", false), $record.get("id")]);
+    },
+    getSpec($list) {
+      return {
+        id: inhibitOnNull(access($list, [1]))
+      };
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return pgResource_machinePgResource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === "machines";
+    }
+  },
   Material: {
     typeName: "Material",
-    codec: handler_codec_base64JSON,
+    codec: nodeIdHandler_RelationalTopic_codec_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("materials", false), $record.get("id")]);
@@ -1866,7 +1817,7 @@ const nodeIdHandlerByTypeName = {
   },
   Null: {
     typeName: "Null",
-    codec: handler_codec_base64JSON,
+    codec: nodeIdHandler_RelationalTopic_codec_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("nulls", false), $record.get("id")]);
@@ -1888,7 +1839,7 @@ const nodeIdHandlerByTypeName = {
   },
   Project: {
     typeName: "Project",
-    codec: handler_codec_base64JSON,
+    codec: nodeIdHandler_RelationalTopic_codec_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("projects", false), $record.get("id")]);
@@ -1908,10 +1859,31 @@ const nodeIdHandlerByTypeName = {
       return obj[0] === "projects";
     }
   },
-  RelationalStatus: handler4,
+  RelationalStatus: {
+    typeName: "RelationalStatus",
+    codec: nodeIdHandler_RelationalTopic_codec_base64JSON,
+    deprecationReason: undefined,
+    plan($record) {
+      return list([constant("relational_statuses", false), $record.get("id")]);
+    },
+    getSpec($list) {
+      return {
+        id: inhibitOnNull(access($list, [1]))
+      };
+    },
+    getIdentifiers(value) {
+      return value.slice(1);
+    },
+    get(spec) {
+      return pgResource_relational_statusPgResource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === "relational_statuses";
+    }
+  },
   Yield: {
     typeName: "Yield",
-    codec: handler_codec_base64JSON,
+    codec: nodeIdHandler_RelationalTopic_codec_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("yields", false), $record.get("id")]);
@@ -1933,7 +1905,7 @@ const nodeIdHandlerByTypeName = {
   },
   Reserved: {
     typeName: "Reserved",
-    codec: handler_codec_base64JSON,
+    codec: nodeIdHandler_RelationalTopic_codec_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("reserveds", false), $record.get("id")]);
@@ -1954,6 +1926,49 @@ const nodeIdHandlerByTypeName = {
     }
   }
 };
+const decodeNodeId = makeDecodeNodeId(Object.values(nodeIdHandlerByTypeName));
+function findTypeNameMatch(specifier) {
+  if (!specifier) return null;
+  for (const [typeName, typeSpec] of Object.entries(nodeIdHandlerByTypeName)) {
+    const value = specifier[typeSpec.codec.name];
+    if (value != null && typeSpec.match(value)) {
+      return typeName;
+    }
+  }
+  return null;
+}
+const RelationalItem_typeNameFromType = ((interfaceTypeName, polymorphism) => {
+  function typeNameFromType(typeVal) {
+    if (typeof typeVal !== "string") return null;
+    return polymorphism.types[typeVal]?.name ?? null;
+  }
+  typeNameFromType.displayName = `${interfaceTypeName}_typeNameFromType`;
+  return typeNameFromType;
+})("RelationalItem", spec_relationalItems.polymorphism);
+const specFromRecord = $record => {
+  return registryConfig.pgRelations.building.machinesByTheirConstructor.remoteAttributes.reduce((memo, remoteAttributeName, i) => {
+    memo[remoteAttributeName] = $record.get(registryConfig.pgRelations.building.machinesByTheirConstructor.localAttributes[i]);
+    return memo;
+  }, Object.create(null));
+};
+function qbWhereBuilder(qb) {
+  return qb.whereBuilder();
+}
+const specFromRecord2 = $record => {
+  return registryConfig.pgRelations.building.relationalItemsByTheirConstructor.remoteAttributes.reduce((memo, remoteAttributeName, i) => {
+    memo[remoteAttributeName] = $record.get(registryConfig.pgRelations.building.relationalItemsByTheirConstructor.localAttributes[i]);
+    return memo;
+  }, Object.create(null));
+};
+const specFromRecord3 = $record => {
+  return registryConfig.pgRelations.machine.buildingByMyConstructor.remoteAttributes.reduce((memo, remoteAttributeName, i) => {
+    memo[remoteAttributeName] = $record.get(registryConfig.pgRelations.machine.buildingByMyConstructor.localAttributes[i]);
+    return memo;
+  }, Object.create(null));
+};
+function CursorSerialize(value) {
+  return "" + value;
+}
 const detailsByAttributeName = {
   __proto__: null,
   constructor: {
@@ -2096,16 +2111,16 @@ function specForHandler(handler) {
   return spec;
 }
 const nodeFetcher_RelationalTopic = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(handler));
-  return handler.get(handler.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_RelationalTopic));
+  return nodeIdHandler_RelationalTopic.get(nodeIdHandler_RelationalTopic.getSpec($decoded));
 };
 const nodeFetcher__Proto__ = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName._Proto__));
   return nodeIdHandlerByTypeName._Proto__.get(nodeIdHandlerByTypeName._Proto__.getSpec($decoded));
 };
 const nodeFetcher_Building = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(handler2));
-  return handler2.get(handler2.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Building));
+  return nodeIdHandlerByTypeName.Building.get(nodeIdHandlerByTypeName.Building.getSpec($decoded));
 };
 const nodeFetcher_Constructor = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Constructor));
@@ -2116,8 +2131,8 @@ const nodeFetcher_Crop = $nodeId => {
   return nodeIdHandlerByTypeName.Crop.get(nodeIdHandlerByTypeName.Crop.getSpec($decoded));
 };
 const nodeFetcher_Machine = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(handler3));
-  return handler3.get(handler3.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Machine));
+  return nodeIdHandlerByTypeName.Machine.get(nodeIdHandlerByTypeName.Machine.getSpec($decoded));
 };
 const nodeFetcher_Material = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Material));
@@ -2132,8 +2147,8 @@ const nodeFetcher_Project = $nodeId => {
   return nodeIdHandlerByTypeName.Project.get(nodeIdHandlerByTypeName.Project.getSpec($decoded));
 };
 const nodeFetcher_RelationalStatus = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(handler4));
-  return handler4.get(handler4.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.RelationalStatus));
+  return nodeIdHandlerByTypeName.RelationalStatus.get(nodeIdHandlerByTypeName.RelationalStatus.getSpec($decoded));
 };
 const nodeFetcher_Yield = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Yield));
@@ -2224,7 +2239,7 @@ const specFromArgs__Proto__ = args => {
 };
 const specFromArgs_Building = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(handler2, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.Building, $nodeId);
 };
 const uniqueAttributes = [["constructor", "constructor"]];
 const specFromArgs_Building2 = args => {
@@ -2243,7 +2258,7 @@ const specFromArgs_Crop = args => {
 };
 const specFromArgs_Machine = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(handler3, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.Machine, $nodeId);
 };
 const specFromArgs_Material = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
@@ -2292,7 +2307,7 @@ const specFromArgs__Proto__2 = args => {
 };
 const specFromArgs_Building3 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(handler2, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.Building, $nodeId);
 };
 const uniqueAttributes5 = [["constructor", "constructor"]];
 const specFromArgs_Building4 = args => {
@@ -2311,7 +2326,7 @@ const specFromArgs_Crop2 = args => {
 };
 const specFromArgs_Machine2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(handler3, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.Machine, $nodeId);
 };
 const specFromArgs_Material3 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
@@ -6690,9 +6705,16 @@ input DeleteReservedByNullInput {
 export const plans = {
   RelationalTopic: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of pkCols) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_relational_topicsPgResource.get(spec);
+    },
     nodeId($parent) {
-      const specifier = handler.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler.codec.name].encode);
+      const specifier = nodeIdHandler_RelationalTopic.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_RelationalTopic.codec.name].encode);
     },
     buildingByConstructor($record) {
       const $buildings = building_buildingPgResource.find();
@@ -6709,15 +6731,102 @@ export const plans = {
       return $buildings.single();
     }
   },
+  Node: {
+    __planType($nodeId) {
+      const $specifier = decodeNodeId($nodeId);
+      const $__typename = lambda($specifier, findTypeNameMatch, true);
+      return {
+        $__typename,
+        planForType(type) {
+          const spec = nodeIdHandlerByTypeName[type.name];
+          if (spec) {
+            return spec.get(spec.getSpec(access($specifier, [spec.codec.name])));
+          } else {
+            throw new Error(`Failed to find handler for ${type.name}`);
+          }
+        }
+      };
+    }
+  },
+  RelationalItem: {
+    __toSpecifier(step) {
+      if (step instanceof PgSelectSingleStep && step.resource !== relational_items_relational_itemsPgResource) {
+        // Assume it's a child; return description of base
+        // PERF: ideally we'd use relationship
+        // traversal instead, this would both be
+        // shorter and also cacheable.
+        const stepPk = step.resource.uniques.find(u => u.isPrimary)?.attributes;
+        if (!stepPk) {
+          throw new Error(`Expected a relational record for ${relational_items_relational_itemsPgResource.name}, but found one for ${step.resource.name} which has no primary key!`);
+        }
+        if (stepPk.length !== relational_itemsUniques[0].attributes.length) {
+          throw new Error(`Expected a relational record for ${relational_items_relational_itemsPgResource.name}, but found one for ${step.resource.name} which has a primary key with a different number of columns!`);
+        }
+        return object(Object.fromEntries(relational_itemsUniques[0].attributes.map((attrName, idx) => [attrName, get2(step, stepPk[idx])])));
+      } else {
+        // Assume it is or describes the base:
+        return object(Object.fromEntries(relational_itemsUniques[0].attributes.map(attrName => [attrName, get2(step, attrName)])));
+      }
+    },
+    __planType($specifier, {
+      $original
+    }) {
+      const $inStep = $original ?? $specifier;
+      // A PgSelectSingleStep representing the base relational table
+      const $base = (() => {
+        if ($inStep instanceof PgSelectSingleStep) {
+          if ($inStep.resource.codec === relational_items_relational_itemsPgResource.codec) {
+            // It's the core table; that's what we want!
+            return $inStep;
+          } else {
+            // Assume it's a child; get base record by primary key
+            // PERF: ideally we'd use relationship
+            // traversal instead, this would both be
+            // shorter and also cacheable.
+            const stepPk = $inStep.resource.uniques.find(u => u.isPrimary)?.attributes;
+            if (!stepPk) {
+              throw new Error(`Expected a relational record for ${relational_items_relational_itemsPgResource.name}, but found one for ${$inStep.resource.name} which has no primary key!`);
+            }
+            if (stepPk.length !== relational_itemsUniques[0].attributes.length) {
+              throw new Error(`Expected a relational record for ${relational_items_relational_itemsPgResource.name}, but found one for ${$inStep.resource.name} which has a primary key with a different number of columns!`);
+            }
+            return relational_items_relational_itemsPgResource.get(Object.fromEntries(relational_itemsUniques[0].attributes.map((attrName, idx) => [attrName, get2($inStep, stepPk[idx])])));
+          }
+        } else {
+          // Assume it's an object representing the base table
+          return relational_items_relational_itemsPgResource.get(Object.fromEntries(relational_itemsUniques[0].attributes.map(attrName => [attrName, get2($inStep, attrName)])));
+        }
+      })();
+      const $typeVal = get2($base, "type");
+      const $__typename = lambda($typeVal, RelationalItem_typeNameFromType, true);
+      return {
+        $__typename,
+        planForType(type) {
+          const spec = Object.values(spec_relationalItems.polymorphism.types).find(s => s.name === type.name);
+          if (!spec) {
+            throw new Error(`${this} Could not find matching name for relational polymorphic '${type.name}'`);
+          }
+          return $base.singleRelation(spec.relationName);
+        }
+      };
+    }
+  },
   Building: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of buildingUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return building_buildingPgResource.get(spec);
+    },
     nodeId($parent) {
-      const specifier = handler2.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler2.codec.name].encode);
+      const specifier = nodeIdHandlerByTypeName.Building.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Building.codec.name].encode);
     },
     machinesByConstructor: {
       plan($record) {
-        return connection(otherSource_machinePgResource.find(specFromRecord($record)));
+        return connection(pgResource_machinePgResource.find(specFromRecord($record)));
       },
       args: {
         first(_, $connection, arg) {
@@ -6747,7 +6856,7 @@ export const plans = {
     },
     machinesByConstructorList: {
       plan($record) {
-        return otherSource_machinePgResource.find(specFromRecord($record));
+        return pgResource_machinePgResource.find(specFromRecord($record));
       },
       args: {
         first(_, $connection, arg) {
@@ -6822,9 +6931,16 @@ export const plans = {
   },
   Machine: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of machineUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_machinePgResource.get(spec);
+    },
     nodeId($parent) {
-      const specifier = handler3.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler3.codec.name].encode);
+      const specifier = nodeIdHandlerByTypeName.Machine.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Machine.codec.name].encode);
     },
     buildingByConstructor($record) {
       return building_buildingPgResource.get(specFromRecord3($record));
@@ -7055,9 +7171,16 @@ export const plans = {
   },
   RelationalStatus: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of relational_statusUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_relational_statusPgResource.get(spec);
+    },
     nodeId($parent) {
-      const specifier = handler4.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler4.codec.name].encode);
+      const specifier = nodeIdHandlerByTypeName.RelationalStatus.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.RelationalStatus.codec.name].encode);
     },
     buildingByConstructor($record) {
       const $buildings = building_buildingPgResource.find();
@@ -7082,16 +7205,16 @@ export const plans = {
       return rootValue();
     },
     nodeId($parent) {
-      const specifier = handler5.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler5.codec.name].encode);
+      const specifier = nodeIdHandlerByTypeName.Query.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Query.codec.name].encode);
     },
-    node(_$root, args) {
-      return node(nodeIdHandlerByTypeName, args.getRaw("nodeId"));
+    node(_$root, fieldArgs) {
+      return fieldArgs.getRaw("nodeId");
     },
     relationalTopicById(_$root, {
       $id
     }) {
-      return pgResource_relational_topicsPgResource.get({
+      return resource_relational_topicsPgResource.get({
         id: $id
       });
     },
@@ -7161,7 +7284,7 @@ export const plans = {
     machineById(_$root, {
       $id
     }) {
-      return otherSource_machinePgResource.get({
+      return pgResource_machinePgResource.get({
         id: $id
       });
     },
@@ -7332,7 +7455,7 @@ export const plans = {
     },
     allRelationalTopicsList: {
       plan() {
-        return pgResource_relational_topicsPgResource.find();
+        return resource_relational_topicsPgResource.find();
       },
       args: {
         first(_, $connection, arg) {
@@ -7351,7 +7474,7 @@ export const plans = {
     },
     allRelationalTopics: {
       plan() {
-        return connection(pgResource_relational_topicsPgResource.find());
+        return connection(resource_relational_topicsPgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -7577,7 +7700,7 @@ export const plans = {
     },
     allMachinesList: {
       plan() {
-        return otherSource_machinePgResource.find();
+        return pgResource_machinePgResource.find();
       },
       args: {
         first(_, $connection, arg) {
@@ -7596,7 +7719,7 @@ export const plans = {
     },
     allMachines: {
       plan() {
-        return connection(otherSource_machinePgResource.find());
+        return connection(pgResource_machinePgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -7970,6 +8093,13 @@ export const plans = {
   },
   _Proto__: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of __proto__Uniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource___proto__PgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName._Proto__.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName._Proto__.codec.name].encode);
@@ -7977,6 +8107,13 @@ export const plans = {
   },
   Constructor: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of constructorUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_constructorPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.Constructor.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Constructor.codec.name].encode);
@@ -7984,6 +8121,13 @@ export const plans = {
   },
   Crop: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of cropUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_cropPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.Crop.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Crop.codec.name].encode);
@@ -7991,6 +8135,13 @@ export const plans = {
   },
   Material: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of materialUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_materialPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.Material.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Material.codec.name].encode);
@@ -7998,6 +8149,13 @@ export const plans = {
   },
   Null: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of nullUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_nullPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.Null.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Null.codec.name].encode);
@@ -8013,6 +8171,13 @@ export const plans = {
   },
   Project: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of projectUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_projectPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.Project.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Project.codec.name].encode);
@@ -8023,6 +8188,13 @@ export const plans = {
   },
   Yield: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of yieldUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_yieldPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.Yield.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Yield.codec.name].encode);
@@ -8030,6 +8202,13 @@ export const plans = {
   },
   Reserved: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of reservedUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return pgResource_reservedPgResource.get(spec);
+    },
     nodeId($parent) {
       const specifier = nodeIdHandlerByTypeName.Reserved.plan($parent);
       return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Reserved.codec.name].encode);
@@ -8075,7 +8254,7 @@ export const plans = {
   },
   RelationalTopicsOrderBy: {
     PRIMARY_KEY_ASC(queryBuilder) {
-      relational_topicsUniques[0].attributes.forEach(attributeName => {
+      pkCols.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
           direction: "ASC"
@@ -8084,7 +8263,7 @@ export const plans = {
       queryBuilder.setOrderIsUnique();
     },
     PRIMARY_KEY_DESC(queryBuilder) {
-      relational_topicsUniques[0].attributes.forEach(attributeName => {
+      pkCols.forEach(attributeName => {
         queryBuilder.orderBy({
           attribute: attributeName,
           direction: "DESC"
@@ -9333,7 +9512,7 @@ export const plans = {
     },
     createMachine: {
       plan(_, args) {
-        const $insert = pgInsertSingle(otherSource_machinePgResource, Object.create(null));
+        const $insert = pgInsertSingle(pgResource_machinePgResource, Object.create(null));
         args.apply($insert);
         const plan = object({
           result: $insert
@@ -9621,7 +9800,7 @@ export const plans = {
     },
     updateMachine: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(otherSource_machinePgResource, specFromArgs_Machine(args));
+        const $update = pgUpdateSingle(pgResource_machinePgResource, specFromArgs_Machine(args));
         args.apply($update);
         return object({
           result: $update
@@ -9635,7 +9814,7 @@ export const plans = {
     },
     updateMachineById: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(otherSource_machinePgResource, {
+        const $update = pgUpdateSingle(pgResource_machinePgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($update);
@@ -10137,7 +10316,7 @@ export const plans = {
     },
     deleteMachine: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(otherSource_machinePgResource, specFromArgs_Machine2(args));
+        const $delete = pgDeleteSingle(pgResource_machinePgResource, specFromArgs_Machine2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -10151,7 +10330,7 @@ export const plans = {
     },
     deleteMachineById: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(otherSource_machinePgResource, {
+        const $delete = pgDeleteSingle(pgResource_machinePgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($delete);
@@ -10751,7 +10930,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return otherSource_machinePgResource.find(spec);
+          return pgResource_machinePgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -11531,7 +11710,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return otherSource_machinePgResource.find(spec);
+          return pgResource_machinePgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -12086,7 +12265,7 @@ export const plans = {
     deletedProtoId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName._Proto__.plan($record);
-      return lambda(specifier, handler_codec_base64JSON.encode);
+      return lambda(specifier, nodeIdHandler_RelationalTopic_codec_base64JSON.encode);
     },
     query() {
       return rootValue();
@@ -12142,8 +12321,8 @@ export const plans = {
     },
     deletedBuildingId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = handler2.plan($record);
-      return lambda(specifier, handler_codec_base64JSON.encode);
+      const specifier = nodeIdHandlerByTypeName.Building.plan($record);
+      return lambda(specifier, nodeIdHandler_RelationalTopic_codec_base64JSON.encode);
     },
     query() {
       return rootValue();
@@ -12200,7 +12379,7 @@ export const plans = {
     deletedConstructorId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Constructor.plan($record);
-      return lambda(specifier, handler_codec_base64JSON.encode);
+      return lambda(specifier, nodeIdHandler_RelationalTopic_codec_base64JSON.encode);
     },
     query() {
       return rootValue();
@@ -12262,7 +12441,7 @@ export const plans = {
     deletedCropId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Crop.plan($record);
-      return lambda(specifier, handler_codec_base64JSON.encode);
+      return lambda(specifier, nodeIdHandler_RelationalTopic_codec_base64JSON.encode);
     },
     query() {
       return rootValue();
@@ -12318,8 +12497,8 @@ export const plans = {
     },
     deletedMachineId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = handler3.plan($record);
-      return lambda(specifier, handler_codec_base64JSON.encode);
+      const specifier = nodeIdHandlerByTypeName.Machine.plan($record);
+      return lambda(specifier, nodeIdHandler_RelationalTopic_codec_base64JSON.encode);
     },
     query() {
       return rootValue();
@@ -12337,7 +12516,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return otherSource_machinePgResource.find(spec);
+          return pgResource_machinePgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -12375,7 +12554,7 @@ export const plans = {
     deletedMaterialId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Material.plan($record);
-      return lambda(specifier, handler_codec_base64JSON.encode);
+      return lambda(specifier, nodeIdHandler_RelationalTopic_codec_base64JSON.encode);
     },
     query() {
       return rootValue();
@@ -12437,7 +12616,7 @@ export const plans = {
     deletedNullId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Null.plan($record);
-      return lambda(specifier, handler_codec_base64JSON.encode);
+      return lambda(specifier, nodeIdHandler_RelationalTopic_codec_base64JSON.encode);
     },
     query() {
       return rootValue();
@@ -12499,7 +12678,7 @@ export const plans = {
     deletedProjectId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Project.plan($record);
-      return lambda(specifier, handler_codec_base64JSON.encode);
+      return lambda(specifier, nodeIdHandler_RelationalTopic_codec_base64JSON.encode);
     },
     query() {
       return rootValue();
@@ -12556,7 +12735,7 @@ export const plans = {
     deletedYieldId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Yield.plan($record);
-      return lambda(specifier, handler_codec_base64JSON.encode);
+      return lambda(specifier, nodeIdHandler_RelationalTopic_codec_base64JSON.encode);
     },
     query() {
       return rootValue();
@@ -12613,7 +12792,7 @@ export const plans = {
     deletedReservedId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Reserved.plan($record);
-      return lambda(specifier, handler_codec_base64JSON.encode);
+      return lambda(specifier, nodeIdHandler_RelationalTopic_codec_base64JSON.encode);
     },
     query() {
       return rootValue();

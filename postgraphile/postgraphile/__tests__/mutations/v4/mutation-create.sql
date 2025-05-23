@@ -90,14 +90,6 @@ insert into "c"."person" as __person__ ("id", "person_full_name", "about", "emai
   case when (__person__) is not distinct from null then null::text else json_build_array((((__person__)."id"))::text, ((__person__)."person_full_name"), (((__person__)."aliases"))::text, ((__person__)."about"), ((__person__)."email"), case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(((((__person__)."site"))."url"))::text end, (((__person__)."config"))::text, (((__person__)."last_login_from_ip"))::text, (((__person__)."last_login_from_subnet"))::text, (((__person__)."user_mac"))::text, to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text))::text end as "8";
 
 select
-  ("c"."person_exists"(
-    __person__,
-    $1::"b"."email"
-  ))::text as "0",
-  __person__."id"::text as "1"
-from (select ($2::"c"."person").*) as __person__;
-
-select
   __person__."id"::text as "0",
   __person__."person_full_name" as "1"
 from "c"."person" as __person__
@@ -153,6 +145,14 @@ where (
   __person__."id" = $1::"int4"
 )
 order by __person__."email" desc, __person__."id" desc;
+
+select
+  ("c"."person_exists"(
+    __person__,
+    $1::"b"."email"
+  ))::text as "0",
+  __person__."id"::text as "1"
+from (select ($2::"c"."person").*) as __person__;
 
 insert into "c"."person" as __person__ ("id", "person_full_name", "about", "email", "config", "last_login_from_ip", "last_login_from_subnet", "user_mac") values ($1::"int4", $2::"varchar", $3::"text", $4::"b"."email", $5::"hstore", $6::"inet", $7::"cidr", $8::"macaddr") returning
   __person__."id"::text as "0",
@@ -166,14 +166,6 @@ insert into "c"."person" as __person__ ("id", "person_full_name", "about", "emai
   case when (__person__) is not distinct from null then null::text else json_build_array((((__person__)."id"))::text, ((__person__)."person_full_name"), (((__person__)."aliases"))::text, ((__person__)."about"), ((__person__)."email"), case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(((((__person__)."site"))."url"))::text end, (((__person__)."config"))::text, (((__person__)."last_login_from_ip"))::text, (((__person__)."last_login_from_subnet"))::text, (((__person__)."user_mac"))::text, to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text))::text end as "8";
 
 select
-  ("c"."person_exists"(
-    __person__,
-    $1::"b"."email"
-  ))::text as "0",
-  __person__."id"::text as "1"
-from (select ($2::"c"."person").*) as __person__;
-
-select
   __person__."id"::text as "0",
   __person__."person_full_name" as "1"
 from "c"."person" as __person__
@@ -229,6 +221,14 @@ where (
   __person__."id" = $1::"int4"
 )
 order by __person__."email" desc, __person__."id" desc;
+
+select
+  ("c"."person_exists"(
+    __person__,
+    $1::"b"."email"
+  ))::text as "0",
+  __person__."id"::text as "1"
+from (select ($2::"c"."person").*) as __person__;
 
 insert into "c"."compound_key" as __compound_key__ ("person_id_2", "person_id_1", "extra") values ($1::"int4", $2::"int4", $3::"bool") returning
   __compound_key__."person_id_1"::text as "0",
@@ -269,14 +269,6 @@ insert into "c"."person" as __person__ ("id", "person_full_name", "about", "emai
   case when (__person__) is not distinct from null then null::text else json_build_array((((__person__)."id"))::text, ((__person__)."person_full_name"), (((__person__)."aliases"))::text, ((__person__)."about"), ((__person__)."email"), case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(((((__person__)."site"))."url"))::text end, (((__person__)."config"))::text, (((__person__)."last_login_from_ip"))::text, (((__person__)."last_login_from_subnet"))::text, (((__person__)."user_mac"))::text, to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text))::text end as "8";
 
 select
-  ("c"."person_exists"(
-    __person__,
-    $1::"b"."email"
-  ))::text as "0",
-  __person__."id"::text as "1"
-from (select ($2::"c"."person").*) as __person__;
-
-select
   __person__."id"::text as "0",
   __person__."person_full_name" as "1"
 from "c"."person" as __person__
@@ -333,6 +325,14 @@ where (
 )
 order by __person__."email" desc, __person__."id" desc;
 
+select
+  ("c"."person_exists"(
+    __person__,
+    $1::"b"."email"
+  ))::text as "0",
+  __person__."id"::text as "1"
+from (select ($2::"c"."person").*) as __person__;
+
 insert into "c"."person" as __person__ ("id", "person_full_name", "about", "email") values ($1::"int4", $2::"varchar", $3::"text", $4::"b"."email") returning
   case when (__person__) is not distinct from null then null::text else json_build_array((((__person__)."id"))::text, ((__person__)."person_full_name"), (((__person__)."aliases"))::text, ((__person__)."about"), ((__person__)."email"), case when (((__person__)."site")) is not distinct from null then null::text else json_build_array(((((__person__)."site"))."url"))::text end, (((__person__)."config"))::text, (((__person__)."last_login_from_ip"))::text, (((__person__)."last_login_from_subnet"))::text, (((__person__)."user_mac"))::text, to_char(((__person__)."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text))::text end as "0";
 
@@ -364,27 +364,12 @@ from unnest($1::"a"."comptype"[]) as __frmcdc_comptype__;
 
 insert into "a"."post" as __post__ ("headline", "author_id", "comptypes") values ($1::"text", $2::"int4", $3::"a"."comptype"[]) returning
   __post__."id"::text as "0",
-  __post__."headline" as "1",
+  __post__."author_id"::text as "1",
+  __post__."headline" as "2",
   (case when (__post__."comptypes") is not distinct from null then null::text else array(
     select case when (__comptype__) is not distinct from null then null::text else json_build_array(to_char(((__comptype__)."schedule"), 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text), (((__comptype__)."is_optimised"))::text)::text end
     from unnest(__post__."comptypes") __comptype__
-  )::text end) as "2",
-  __post__."author_id"::text as "3";
-
-select
-  to_char(__frmcdc_comptype__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "0",
-  __frmcdc_comptype__."is_optimised"::text as "1",
-  (not (__frmcdc_comptype__ is null))::text as "2"
-from unnest($1::"a"."comptype"[]) as __frmcdc_comptype__;
-
-select
-  __person__."id"::text as "0",
-  __person__."email" as "1",
-  to_char(__person__."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "2"
-from "c"."person" as __person__
-where (
-  __person__."id" = $1::"int4"
-);
+  )::text end) as "3";
 
 select
   __post__."id"::text as "0",
@@ -408,3 +393,18 @@ where (
   __post__."id" = $1::"int4"
 )
 order by __post__."id" asc;
+
+select
+  to_char(__person__."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "0",
+  __person__."id"::text as "1",
+  __person__."email" as "2"
+from "c"."person" as __person__
+where (
+  __person__."id" = $1::"int4"
+);
+
+select
+  to_char(__frmcdc_comptype__."schedule", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "0",
+  __frmcdc_comptype__."is_optimised"::text as "1",
+  (not (__frmcdc_comptype__ is null))::text as "2"
+from unnest($1::"a"."comptype"[]) as __frmcdc_comptype__;

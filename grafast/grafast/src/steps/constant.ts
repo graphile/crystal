@@ -1,3 +1,4 @@
+import { operationPlan } from "../global.js";
 import { inspect } from "../inspect.js";
 import type {
   ExecutionDetails,
@@ -6,7 +7,6 @@ import type {
 } from "../interfaces.js";
 import { Step, UnbatchedStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
-import { operationPlan } from "./index.js";
 
 /**
  * Converts a constant value (e.g. a string/number/etc) into a plan

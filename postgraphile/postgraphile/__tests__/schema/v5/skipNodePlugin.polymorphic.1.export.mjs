@@ -1,5 +1,5 @@
-import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgFromExpression, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUnionAll, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, ConstantStep, EdgeStep, ObjectStep, __ValueStep, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, lambda, makeGrafastSchema, object, rootValue, stepAMayDependOnStepB } from "grafast";
+import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, PgUnionAllSingleStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgFromExpression, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUnionAll, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
+import { ConnectionStep, ConstantStep, EdgeStep, ObjectStep, __ValueStep, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, lambda, makeGrafastSchema, object, rootValue, stepAMayDependOnStepB } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 const EMPTY_ARRAY = [];
@@ -4591,6 +4591,14 @@ function qbWhereBuilder(qb) {
 }
 const otherSource_single_table_item_relationsPgResource = registry.pgResources["single_table_item_relations"];
 const otherSource_single_table_item_relation_composite_pksPgResource = registry.pgResources["single_table_item_relation_composite_pks"];
+const SingleTableItem_typeNameFromType = ((interfaceTypeName, polymorphism) => {
+  function typeNameFromType(typeVal) {
+    if (typeof typeVal !== "string") return null;
+    return polymorphism.types[typeVal]?.name ?? null;
+  }
+  typeNameFromType.displayName = `${interfaceTypeName}_typeNameFromType`;
+  return typeNameFromType;
+})("SingleTableItem", spec_singleTableItems.polymorphism);
 function BigIntSerialize(value) {
   return "" + value;
 }
@@ -4776,6 +4784,21 @@ const resourceByTypeName4 = {
   Person: otherSource_peoplePgResource,
   Organization: otherSource_organizationsPgResource
 };
+const resourceByTypeName5 = {
+  __proto__: null,
+  AwsApplication: otherSource_aws_applicationsPgResource,
+  GcpApplication: otherSource_gcp_applicationsPgResource
+};
+const resourceByTypeName6 = {
+  __proto__: null,
+  FirstPartyVulnerability: paths_0_resource_first_party_vulnerabilitiesPgResource,
+  ThirdPartyVulnerability: paths_1_resource_third_party_vulnerabilitiesPgResource
+};
+const resourceByTypeName7 = {
+  __proto__: null,
+  Organization: otherSource_organizationsPgResource,
+  Person: otherSource_peoplePgResource
+};
 const resource_first_party_vulnerabilities_cvss_score_intPgResource = registry.pgResources["first_party_vulnerabilities_cvss_score_int"];
 const otherSource_gcp_application_first_party_vulnerabilitiesPgResource = registry.pgResources["gcp_application_first_party_vulnerabilities"];
 const members5 = [{
@@ -4826,7 +4849,7 @@ const paths5 = [{
     isUnique: true
   }]
 }];
-const resourceByTypeName5 = {
+const resourceByTypeName8 = {
   __proto__: null,
   AwsApplication: otherSource_aws_applicationsPgResource,
   GcpApplication: otherSource_gcp_applicationsPgResource
@@ -4958,7 +4981,7 @@ const paths6 = [{
     isUnique: true
   }]
 }];
-const resourceByTypeName6 = {
+const resourceByTypeName9 = {
   __proto__: null,
   Person: otherSource_peoplePgResource,
   Organization: otherSource_organizationsPgResource
@@ -5012,7 +5035,7 @@ const paths7 = [{
     isUnique: true
   }]
 }];
-const resourceByTypeName7 = {
+const resourceByTypeName10 = {
   __proto__: null,
   FirstPartyVulnerability: paths_0_resource_first_party_vulnerabilitiesPgResource,
   ThirdPartyVulnerability: paths_1_resource_third_party_vulnerabilitiesPgResource
@@ -5050,7 +5073,7 @@ const paths8 = [{
     isUnique: true
   }]
 }];
-const resourceByTypeName8 = {
+const resourceByTypeName11 = {
   __proto__: null,
   Person: otherSource_peoplePgResource,
   Organization: otherSource_organizationsPgResource
@@ -5104,7 +5127,7 @@ const paths9 = [{
     isUnique: true
   }]
 }];
-const resourceByTypeName9 = {
+const resourceByTypeName12 = {
   __proto__: null,
   AwsApplication: otherSource_aws_applicationsPgResource,
   GcpApplication: otherSource_gcp_applicationsPgResource
@@ -5236,19 +5259,27 @@ const paths10 = [{
     isUnique: true
   }]
 }];
-const resourceByTypeName10 = {
+const resourceByTypeName13 = {
   __proto__: null,
   Person: otherSource_peoplePgResource,
   Organization: otherSource_organizationsPgResource
 };
+const RelationalItem_typeNameFromType = ((interfaceTypeName, polymorphism) => {
+  function typeNameFromType(typeVal) {
+    if (typeof typeVal !== "string") return null;
+    return polymorphism.types[typeVal]?.name ?? null;
+  }
+  typeNameFromType.displayName = `${interfaceTypeName}_typeNameFromType`;
+  return typeNameFromType;
+})("RelationalItem", spec_relationalItems.polymorphism);
+const resource_relational_item_relationsPgResource = registry.pgResources["relational_item_relations"];
+const resource_relational_item_relation_composite_pksPgResource = registry.pgResources["relational_item_relation_composite_pks"];
 const otherSource_prioritiesPgResource = registry.pgResources["priorities"];
-const relational_topics_relational_topicsPgResource = registry.pgResources["relational_topics"];
-const relational_item_relations_relational_item_relationsPgResource = registry.pgResources["relational_item_relations"];
-const relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource = registry.pgResources["relational_item_relation_composite_pks"];
+const resource_relational_topicsPgResource = registry.pgResources["relational_topics"];
+const resource_relational_postsPgResource = registry.pgResources["relational_posts"];
+const resource_relational_dividersPgResource = registry.pgResources["relational_dividers"];
 const resource_relational_checklistsPgResource = registry.pgResources["relational_checklists"];
 const resource_relational_checklist_itemsPgResource = registry.pgResources["relational_checklist_items"];
-const resource_relational_dividersPgResource = registry.pgResources["relational_dividers"];
-const resource_relational_postsPgResource = registry.pgResources["relational_posts"];
 const resource_all_single_tablesPgResource = registry.pgResources["all_single_tables"];
 const getSelectPlanFromParentAndArgs = ($root, args, _info) => {
   const selectArgs = makeArgs_first_party_vulnerabilities_cvss_score_int(args);
@@ -5286,7 +5317,7 @@ const members11 = [{
   resource: paths_1_resource_third_party_vulnerabilitiesPgResource,
   typeName: "ThirdPartyVulnerability"
 }];
-const resourceByTypeName11 = {
+const resourceByTypeName14 = {
   __proto__: null,
   FirstPartyVulnerability: paths_0_resource_first_party_vulnerabilitiesPgResource,
   ThirdPartyVulnerability: paths_1_resource_third_party_vulnerabilitiesPgResource
@@ -5298,13 +5329,16 @@ const members12 = [{
   resource: otherSource_gcp_applicationsPgResource,
   typeName: "GcpApplication"
 }];
-const resourceByTypeName12 = {
+const resourceByTypeName15 = {
   __proto__: null,
   AwsApplication: otherSource_aws_applicationsPgResource,
   GcpApplication: otherSource_gcp_applicationsPgResource
 };
 const members13 = [];
-const resourceByTypeName13 = {
+const resourceByTypeName16 = {
+  __proto__: null
+};
+const resourceByTypeName17 = {
   __proto__: null
 };
 export const typeDefs = /* GraphQL */`type SingleTableTopic implements SingleTableItem {
@@ -14072,6 +14106,25 @@ export const plans = {
       });
     }
   },
+  SingleTableItem: {
+    __toSpecifier(step) {
+      return object(Object.fromEntries(single_table_itemsUniques[0].attributes.map(attrName => [attrName, get2(step, attrName)])));
+    },
+    __planType($specifier, {
+      $original
+    }) {
+      const $inStep = $original ?? $specifier;
+      const $record = $inStep instanceof PgSelectSingleStep ? $inStep : otherSource_single_table_itemsPgResource.get(Object.fromEntries(single_table_itemsUniques[0].attributes.map(attrName => [attrName, get2($inStep, attrName)])));
+      const $typeVal = get2($record, "type");
+      const $__typename = lambda($typeVal, SingleTableItem_typeNameFromType, true);
+      return {
+        $__typename,
+        planForType() {
+          return $record;
+        }
+      };
+    }
+  },
   BigInt: {
     serialize: BigIntSerialize,
     parseValue: BigIntSerialize,
@@ -14094,6 +14147,13 @@ export const plans = {
   },
   Person: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of peopleUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return otherSource_peoplePgResource.get(spec);
+    },
     personId($record) {
       return $record.get("person_id");
     },
@@ -14328,6 +14388,13 @@ export const plans = {
   },
   LogEntry: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of log_entriesUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return otherSource_log_entriesPgResource.get(spec);
+    },
     rowId($record) {
       return $record.get("id");
     },
@@ -14371,6 +14438,13 @@ export const plans = {
   },
   Organization: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of organizationsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return otherSource_organizationsPgResource.get(spec);
+    },
     organizationId($record) {
       return $record.get("organization_id");
     },
@@ -14600,6 +14674,13 @@ export const plans = {
   },
   AwsApplication: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of aws_applicationsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return otherSource_aws_applicationsPgResource.get(spec);
+    },
     rowId($record) {
       return $record.get("id");
     },
@@ -14770,10 +14851,64 @@ export const plans = {
       return $list.single();
     }
   },
+  Application: {
+    __toSpecifier($step) {
+      if ($step instanceof PgUnionAllSingleStep) {
+        return $step.toSpecifier();
+      } else {
+        return $step;
+      }
+    },
+    __planType($specifier) {
+      const $__typename = get2($specifier, "__typename");
+      return {
+        $__typename,
+        planForType(t) {
+          const resource = resourceByTypeName5[t.name];
+          if (!resource) {
+            throw new Error(`Type ${t.name} has no associated resource`);
+          }
+          const pk = resource.uniques.find(u => u.isPrimary) ?? resource.uniques[0];
+          const spec = Object.create(null);
+          for (const attrName of pk.attributes) {
+            spec[attrName] = get2($specifier, attrName);
+          }
+          return resource.get(spec);
+        }
+      };
+    }
+  },
   VulnerabilityConnection: {
     __assertStep: ConnectionStep,
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+    }
+  },
+  Vulnerability: {
+    __toSpecifier($step) {
+      if ($step instanceof PgUnionAllSingleStep) {
+        return $step.toSpecifier();
+      } else {
+        return $step;
+      }
+    },
+    __planType($specifier) {
+      const $__typename = get2($specifier, "__typename");
+      return {
+        $__typename,
+        planForType(t) {
+          const resource = resourceByTypeName6[t.name];
+          if (!resource) {
+            throw new Error(`Type ${t.name} has no associated resource`);
+          }
+          const pk = resource.uniques.find(u => u.isPrimary) ?? resource.uniques[0];
+          const spec = Object.create(null);
+          for (const attrName of pk.attributes) {
+            spec[attrName] = get2($specifier, attrName);
+          }
+          return resource.get(spec);
+        }
+      };
     }
   },
   ApplicationConnection: {
@@ -14809,6 +14944,26 @@ export const plans = {
   PersonOrOrganizationConnection: {
     __assertStep: ConnectionStep
   },
+  PersonOrOrganization: {
+    __planType($specifier) {
+      const $__typename = get2($specifier, "__typename");
+      return {
+        $__typename,
+        planForType(t) {
+          const resource = resourceByTypeName7[t.name];
+          if (!resource) {
+            throw new Error(`Could not determine resource for ${t.name}`);
+          }
+          const pk = resource.uniques.find(u => u.isPrimary) ?? resource.uniques[0];
+          const spec = Object.create(null);
+          for (const attrName of pk.attributes) {
+            spec[attrName] = get2($specifier, attrName);
+          }
+          return resource.get(spec);
+        }
+      };
+    }
+  },
   PersonOrOrganizationEdge: {
     __assertStep: assertEdgeCapableStep,
     cursor($edge) {
@@ -14835,6 +14990,13 @@ export const plans = {
   },
   AwsApplicationFirstPartyVulnerability: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of aws_application_first_party_vulnerabilitiesUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return otherSource_aws_application_first_party_vulnerabilitiesPgResource.get(spec);
+    },
     awsApplicationId($record) {
       return $record.get("aws_application_id");
     },
@@ -14854,6 +15016,13 @@ export const plans = {
   },
   FirstPartyVulnerability: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of first_party_vulnerabilitiesUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return paths_0_resource_first_party_vulnerabilitiesPgResource.get(spec);
+    },
     cvssScoreInt($in, args, _info) {
       const {
         $row,
@@ -14953,7 +15122,7 @@ export const plans = {
         }
         const $list = pgUnionAll({
           attributes: spec_Application.attributes,
-          resourceByTypeName: resourceByTypeName5,
+          resourceByTypeName: resourceByTypeName8,
           members: members5,
           name: "applications"
         });
@@ -15009,7 +15178,7 @@ export const plans = {
       }
       const $list = pgUnionAll({
         attributes: attributes3,
-        resourceByTypeName: resourceByTypeName6,
+        resourceByTypeName: resourceByTypeName9,
         members: members6,
         name: "owners"
       });
@@ -15090,6 +15259,13 @@ export const plans = {
   },
   GcpApplicationFirstPartyVulnerability: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of gcp_application_first_party_vulnerabilitiesUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return otherSource_gcp_application_first_party_vulnerabilitiesPgResource.get(spec);
+    },
     gcpApplicationId($record) {
       return $record.get("gcp_application_id");
     },
@@ -15109,6 +15285,13 @@ export const plans = {
   },
   GcpApplication: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of gcp_applicationsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return otherSource_gcp_applicationsPgResource.get(spec);
+    },
     rowId($record) {
       return $record.get("id");
     },
@@ -15216,7 +15399,7 @@ export const plans = {
         }
         const $list = pgUnionAll({
           attributes: spec_Vulnerability.attributes,
-          resourceByTypeName: resourceByTypeName7,
+          resourceByTypeName: resourceByTypeName10,
           members: members7,
           name: "vulnerabilities"
         });
@@ -15272,7 +15455,7 @@ export const plans = {
       }
       const $list = pgUnionAll({
         attributes: attributes4,
-        resourceByTypeName: resourceByTypeName8,
+        resourceByTypeName: resourceByTypeName11,
         members: members8,
         name: "owner"
       });
@@ -15353,6 +15536,13 @@ export const plans = {
   },
   GcpApplicationThirdPartyVulnerability: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of gcp_application_third_party_vulnerabilitiesUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return otherSource_gcp_application_third_party_vulnerabilitiesPgResource.get(spec);
+    },
     gcpApplicationId($record) {
       return $record.get("gcp_application_id");
     },
@@ -15372,6 +15562,13 @@ export const plans = {
   },
   ThirdPartyVulnerability: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of third_party_vulnerabilitiesUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return paths_1_resource_third_party_vulnerabilitiesPgResource.get(spec);
+    },
     cvssScoreInt($in, args, _info) {
       const {
         $row,
@@ -15471,7 +15668,7 @@ export const plans = {
         }
         const $list = pgUnionAll({
           attributes: spec_Application.attributes,
-          resourceByTypeName: resourceByTypeName9,
+          resourceByTypeName: resourceByTypeName12,
           members: members9,
           name: "applications"
         });
@@ -15527,7 +15724,7 @@ export const plans = {
       }
       const $list = pgUnionAll({
         attributes: attributes5,
-        resourceByTypeName: resourceByTypeName10,
+        resourceByTypeName: resourceByTypeName13,
         members: members10,
         name: "owners"
       });
@@ -15542,6 +15739,13 @@ export const plans = {
   },
   AwsApplicationThirdPartyVulnerability: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of aws_application_third_party_vulnerabilitiesUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return otherSource_aws_application_third_party_vulnerabilitiesPgResource.get(spec);
+    },
     awsApplicationId($record) {
       return $record.get("aws_application_id");
     },
@@ -16449,6 +16653,69 @@ export const plans = {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
+  RelationalItem: {
+    __toSpecifier(step) {
+      if (step instanceof PgSelectSingleStep && step.resource !== otherSource_relational_itemsPgResource) {
+        // Assume it's a child; return description of base
+        // PERF: ideally we'd use relationship
+        // traversal instead, this would both be
+        // shorter and also cacheable.
+        const stepPk = step.resource.uniques.find(u => u.isPrimary)?.attributes;
+        if (!stepPk) {
+          throw new Error(`Expected a relational record for ${otherSource_relational_itemsPgResource.name}, but found one for ${step.resource.name} which has no primary key!`);
+        }
+        if (stepPk.length !== relational_itemsUniques[0].attributes.length) {
+          throw new Error(`Expected a relational record for ${otherSource_relational_itemsPgResource.name}, but found one for ${step.resource.name} which has a primary key with a different number of columns!`);
+        }
+        return object(Object.fromEntries(relational_itemsUniques[0].attributes.map((attrName, idx) => [attrName, get2(step, stepPk[idx])])));
+      } else {
+        // Assume it is or describes the base:
+        return object(Object.fromEntries(relational_itemsUniques[0].attributes.map(attrName => [attrName, get2(step, attrName)])));
+      }
+    },
+    __planType($specifier, {
+      $original
+    }) {
+      const $inStep = $original ?? $specifier;
+      // A PgSelectSingleStep representing the base relational table
+      const $base = (() => {
+        if ($inStep instanceof PgSelectSingleStep) {
+          if ($inStep.resource.codec === otherSource_relational_itemsPgResource.codec) {
+            // It's the core table; that's what we want!
+            return $inStep;
+          } else {
+            // Assume it's a child; get base record by primary key
+            // PERF: ideally we'd use relationship
+            // traversal instead, this would both be
+            // shorter and also cacheable.
+            const stepPk = $inStep.resource.uniques.find(u => u.isPrimary)?.attributes;
+            if (!stepPk) {
+              throw new Error(`Expected a relational record for ${otherSource_relational_itemsPgResource.name}, but found one for ${$inStep.resource.name} which has no primary key!`);
+            }
+            if (stepPk.length !== relational_itemsUniques[0].attributes.length) {
+              throw new Error(`Expected a relational record for ${otherSource_relational_itemsPgResource.name}, but found one for ${$inStep.resource.name} which has a primary key with a different number of columns!`);
+            }
+            return otherSource_relational_itemsPgResource.get(Object.fromEntries(relational_itemsUniques[0].attributes.map((attrName, idx) => [attrName, get2($inStep, stepPk[idx])])));
+          }
+        } else {
+          // Assume it's an object representing the base table
+          return otherSource_relational_itemsPgResource.get(Object.fromEntries(relational_itemsUniques[0].attributes.map(attrName => [attrName, get2($inStep, attrName)])));
+        }
+      })();
+      const $typeVal = get2($base, "type");
+      const $__typename = lambda($typeVal, RelationalItem_typeNameFromType, true);
+      return {
+        $__typename,
+        planForType(type) {
+          const spec = Object.values(spec_relationalItems.polymorphism.types).find(s => s.name === type.name);
+          if (!spec) {
+            throw new Error(`${this} Could not find matching name for relational polymorphic '${type.name}'`);
+          }
+          return $base.singleRelation(spec.relationName);
+        }
+      };
+    }
+  },
   RelationalItemRelationConnection: {
     __assertStep: ConnectionStep,
     totalCount($connection) {
@@ -16457,6 +16724,13 @@ export const plans = {
   },
   RelationalItemRelation: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of relational_item_relationsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_relational_item_relationsPgResource.get(spec);
+    },
     rowId($record) {
       return $record.get("id");
     },
@@ -16494,6 +16768,13 @@ export const plans = {
   },
   RelationalItemRelationCompositePk: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of relational_item_relation_composite_pksUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_relational_item_relation_composite_pksPgResource.get(spec);
+    },
     parentId($record) {
       return $record.get("parent_id");
     },
@@ -16771,6 +17052,13 @@ export const plans = {
   },
   SingleTableItemRelation: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of single_table_item_relationsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return otherSource_single_table_item_relationsPgResource.get(spec);
+    },
     rowId($record) {
       return $record.get("id");
     },
@@ -16808,6 +17096,13 @@ export const plans = {
   },
   SingleTableItemRelationCompositePk: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of single_table_item_relation_composite_pksUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return otherSource_single_table_item_relation_composite_pksPgResource.get(spec);
+    },
     parentId($record) {
       return $record.get("parent_id");
     },
@@ -17217,6 +17512,13 @@ export const plans = {
   },
   Priority: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of prioritiesUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return otherSource_prioritiesPgResource.get(spec);
+    },
     rowId($record) {
       return $record.get("id");
     },
@@ -17914,6 +18216,13 @@ export const plans = {
   },
   RelationalTopic: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of relational_topicsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_relational_topicsPgResource.get(spec);
+    },
     rowId($record) {
       return $record.get("id");
     },
@@ -18000,7 +18309,7 @@ export const plans = {
       return $relational_items.single();
     },
     relationalTopicByRootTopicId($record) {
-      const $relational_topics = relational_topics_relational_topicsPgResource.find();
+      const $relational_topics = resource_relational_topicsPgResource.find();
       let previousAlias = $relational_topics.alias;
       const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
       $relational_topics.join({
@@ -18056,7 +18365,7 @@ export const plans = {
     },
     relationalItemRelationsByChildId: {
       plan($record) {
-        const $relational_item_relations = relational_item_relations_relational_item_relationsPgResource.find();
+        const $relational_item_relations = resource_relational_item_relationsPgResource.find();
         let previousAlias = $relational_item_relations.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relations.join({
@@ -18097,7 +18406,7 @@ export const plans = {
     },
     relationalItemRelationsByParentId: {
       plan($record) {
-        const $relational_item_relations = relational_item_relations_relational_item_relationsPgResource.find();
+        const $relational_item_relations = resource_relational_item_relationsPgResource.find();
         let previousAlias = $relational_item_relations.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relations.join({
@@ -18138,7 +18447,7 @@ export const plans = {
     },
     relationalItemRelationCompositePksByChildId: {
       plan($record) {
-        const $relational_item_relation_composite_pks = relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource.find();
+        const $relational_item_relation_composite_pks = resource_relational_item_relation_composite_pksPgResource.find();
         let previousAlias = $relational_item_relation_composite_pks.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relation_composite_pks.join({
@@ -18179,7 +18488,7 @@ export const plans = {
     },
     relationalItemRelationCompositePksByParentId: {
       plan($record) {
-        const $relational_item_relation_composite_pks = relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource.find();
+        const $relational_item_relation_composite_pks = resource_relational_item_relation_composite_pksPgResource.find();
         let previousAlias = $relational_item_relation_composite_pks.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relation_composite_pks.join({
@@ -18376,6 +18685,13 @@ export const plans = {
   },
   RelationalPost: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of relational_postsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_relational_postsPgResource.get(spec);
+    },
     rowId($record) {
       return $record.get("id");
     },
@@ -18429,7 +18745,7 @@ export const plans = {
       return $relational_items.single();
     },
     relationalTopicByRootTopicId($record) {
-      const $relational_topics = relational_topics_relational_topicsPgResource.find();
+      const $relational_topics = resource_relational_topicsPgResource.find();
       let previousAlias = $relational_topics.alias;
       const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
       $relational_topics.join({
@@ -18485,7 +18801,7 @@ export const plans = {
     },
     relationalItemRelationsByChildId: {
       plan($record) {
-        const $relational_item_relations = relational_item_relations_relational_item_relationsPgResource.find();
+        const $relational_item_relations = resource_relational_item_relationsPgResource.find();
         let previousAlias = $relational_item_relations.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relations.join({
@@ -18526,7 +18842,7 @@ export const plans = {
     },
     relationalItemRelationsByParentId: {
       plan($record) {
-        const $relational_item_relations = relational_item_relations_relational_item_relationsPgResource.find();
+        const $relational_item_relations = resource_relational_item_relationsPgResource.find();
         let previousAlias = $relational_item_relations.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relations.join({
@@ -18567,7 +18883,7 @@ export const plans = {
     },
     relationalItemRelationCompositePksByChildId: {
       plan($record) {
-        const $relational_item_relation_composite_pks = relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource.find();
+        const $relational_item_relation_composite_pks = resource_relational_item_relation_composite_pksPgResource.find();
         let previousAlias = $relational_item_relation_composite_pks.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relation_composite_pks.join({
@@ -18608,7 +18924,7 @@ export const plans = {
     },
     relationalItemRelationCompositePksByParentId: {
       plan($record) {
-        const $relational_item_relation_composite_pks = relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource.find();
+        const $relational_item_relation_composite_pks = resource_relational_item_relation_composite_pksPgResource.find();
         let previousAlias = $relational_item_relation_composite_pks.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relation_composite_pks.join({
@@ -18650,6 +18966,13 @@ export const plans = {
   },
   RelationalDivider: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of relational_dividersUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_relational_dividersPgResource.get(spec);
+    },
     rowId($record) {
       return $record.get("id");
     },
@@ -18703,7 +19026,7 @@ export const plans = {
       return $relational_items.single();
     },
     relationalTopicByRootTopicId($record) {
-      const $relational_topics = relational_topics_relational_topicsPgResource.find();
+      const $relational_topics = resource_relational_topicsPgResource.find();
       let previousAlias = $relational_topics.alias;
       const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
       $relational_topics.join({
@@ -18759,7 +19082,7 @@ export const plans = {
     },
     relationalItemRelationsByChildId: {
       plan($record) {
-        const $relational_item_relations = relational_item_relations_relational_item_relationsPgResource.find();
+        const $relational_item_relations = resource_relational_item_relationsPgResource.find();
         let previousAlias = $relational_item_relations.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relations.join({
@@ -18800,7 +19123,7 @@ export const plans = {
     },
     relationalItemRelationsByParentId: {
       plan($record) {
-        const $relational_item_relations = relational_item_relations_relational_item_relationsPgResource.find();
+        const $relational_item_relations = resource_relational_item_relationsPgResource.find();
         let previousAlias = $relational_item_relations.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relations.join({
@@ -18841,7 +19164,7 @@ export const plans = {
     },
     relationalItemRelationCompositePksByChildId: {
       plan($record) {
-        const $relational_item_relation_composite_pks = relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource.find();
+        const $relational_item_relation_composite_pks = resource_relational_item_relation_composite_pksPgResource.find();
         let previousAlias = $relational_item_relation_composite_pks.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relation_composite_pks.join({
@@ -18882,7 +19205,7 @@ export const plans = {
     },
     relationalItemRelationCompositePksByParentId: {
       plan($record) {
-        const $relational_item_relation_composite_pks = relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource.find();
+        const $relational_item_relation_composite_pks = resource_relational_item_relation_composite_pksPgResource.find();
         let previousAlias = $relational_item_relation_composite_pks.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relation_composite_pks.join({
@@ -18924,6 +19247,13 @@ export const plans = {
   },
   RelationalChecklist: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of relational_checklistsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_relational_checklistsPgResource.get(spec);
+    },
     rowId($record) {
       return $record.get("id");
     },
@@ -18977,7 +19307,7 @@ export const plans = {
       return $relational_items.single();
     },
     relationalTopicByRootTopicId($record) {
-      const $relational_topics = relational_topics_relational_topicsPgResource.find();
+      const $relational_topics = resource_relational_topicsPgResource.find();
       let previousAlias = $relational_topics.alias;
       const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
       $relational_topics.join({
@@ -19033,7 +19363,7 @@ export const plans = {
     },
     relationalItemRelationsByChildId: {
       plan($record) {
-        const $relational_item_relations = relational_item_relations_relational_item_relationsPgResource.find();
+        const $relational_item_relations = resource_relational_item_relationsPgResource.find();
         let previousAlias = $relational_item_relations.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relations.join({
@@ -19074,7 +19404,7 @@ export const plans = {
     },
     relationalItemRelationsByParentId: {
       plan($record) {
-        const $relational_item_relations = relational_item_relations_relational_item_relationsPgResource.find();
+        const $relational_item_relations = resource_relational_item_relationsPgResource.find();
         let previousAlias = $relational_item_relations.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relations.join({
@@ -19115,7 +19445,7 @@ export const plans = {
     },
     relationalItemRelationCompositePksByChildId: {
       plan($record) {
-        const $relational_item_relation_composite_pks = relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource.find();
+        const $relational_item_relation_composite_pks = resource_relational_item_relation_composite_pksPgResource.find();
         let previousAlias = $relational_item_relation_composite_pks.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relation_composite_pks.join({
@@ -19156,7 +19486,7 @@ export const plans = {
     },
     relationalItemRelationCompositePksByParentId: {
       plan($record) {
-        const $relational_item_relation_composite_pks = relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource.find();
+        const $relational_item_relation_composite_pks = resource_relational_item_relation_composite_pksPgResource.find();
         let previousAlias = $relational_item_relation_composite_pks.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relation_composite_pks.join({
@@ -19198,6 +19528,13 @@ export const plans = {
   },
   RelationalChecklistItem: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of relational_checklist_itemsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_relational_checklist_itemsPgResource.get(spec);
+    },
     rowId($record) {
       return $record.get("id");
     },
@@ -19251,7 +19588,7 @@ export const plans = {
       return $relational_items.single();
     },
     relationalTopicByRootTopicId($record) {
-      const $relational_topics = relational_topics_relational_topicsPgResource.find();
+      const $relational_topics = resource_relational_topicsPgResource.find();
       let previousAlias = $relational_topics.alias;
       const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
       $relational_topics.join({
@@ -19307,7 +19644,7 @@ export const plans = {
     },
     relationalItemRelationsByChildId: {
       plan($record) {
-        const $relational_item_relations = relational_item_relations_relational_item_relationsPgResource.find();
+        const $relational_item_relations = resource_relational_item_relationsPgResource.find();
         let previousAlias = $relational_item_relations.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relations.join({
@@ -19348,7 +19685,7 @@ export const plans = {
     },
     relationalItemRelationsByParentId: {
       plan($record) {
-        const $relational_item_relations = relational_item_relations_relational_item_relationsPgResource.find();
+        const $relational_item_relations = resource_relational_item_relationsPgResource.find();
         let previousAlias = $relational_item_relations.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relations.join({
@@ -19389,7 +19726,7 @@ export const plans = {
     },
     relationalItemRelationCompositePksByChildId: {
       plan($record) {
-        const $relational_item_relation_composite_pks = relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource.find();
+        const $relational_item_relation_composite_pks = resource_relational_item_relation_composite_pksPgResource.find();
         let previousAlias = $relational_item_relation_composite_pks.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relation_composite_pks.join({
@@ -19430,7 +19767,7 @@ export const plans = {
     },
     relationalItemRelationCompositePksByParentId: {
       plan($record) {
-        const $relational_item_relation_composite_pks = relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource.find();
+        const $relational_item_relation_composite_pks = resource_relational_item_relation_composite_pksPgResource.find();
         let previousAlias = $relational_item_relation_composite_pks.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relation_composite_pks.join({
@@ -19559,7 +19896,7 @@ export const plans = {
       $parentId,
       $childId
     }) {
-      return relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource.get({
+      return resource_relational_item_relation_composite_pksPgResource.get({
         parent_id: $parentId,
         child_id: $childId
       });
@@ -19567,7 +19904,7 @@ export const plans = {
     relationalTopicByTopicItemId(_$root, {
       $topicItemId
     }) {
-      return relational_topics_relational_topicsPgResource.get({
+      return resource_relational_topicsPgResource.get({
         topic_item_id: $topicItemId
       });
     },
@@ -19597,7 +19934,7 @@ export const plans = {
     relationalItemRelationByRowId(_$root, {
       $rowId
     }) {
-      return relational_item_relations_relational_item_relationsPgResource.get({
+      return resource_relational_item_relationsPgResource.get({
         id: $rowId
       });
     },
@@ -19605,7 +19942,7 @@ export const plans = {
       $parentId,
       $childId
     }) {
-      return relational_item_relations_relational_item_relationsPgResource.get({
+      return resource_relational_item_relationsPgResource.get({
         parent_id: $parentId,
         child_id: $childId
       });
@@ -19697,7 +20034,7 @@ export const plans = {
       plan() {
         const $list = pgUnionAll({
           attributes: spec_Vulnerability.attributes,
-          resourceByTypeName: resourceByTypeName11,
+          resourceByTypeName: resourceByTypeName14,
           members: members11,
           name: "Vulnerability"
         });
@@ -19742,7 +20079,7 @@ export const plans = {
       plan() {
         const $list = pgUnionAll({
           attributes: spec_Application.attributes,
-          resourceByTypeName: resourceByTypeName12,
+          resourceByTypeName: resourceByTypeName15,
           members: members12,
           name: "Application"
         });
@@ -19787,7 +20124,7 @@ export const plans = {
       plan() {
         const $list = pgUnionAll({
           attributes: spec_ZeroImplementation.attributes,
-          resourceByTypeName: resourceByTypeName13,
+          resourceByTypeName: resourceByTypeName16,
           members: members13,
           name: "ZeroImplementation"
         });
@@ -20061,7 +20398,7 @@ export const plans = {
     },
     allRelationalItemRelationCompositePks: {
       plan() {
-        return connection(relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource.find());
+        return connection(resource_relational_item_relation_composite_pksPgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -20091,7 +20428,7 @@ export const plans = {
     },
     allRelationalTopics: {
       plan() {
-        return connection(relational_topics_relational_topicsPgResource.find());
+        return connection(resource_relational_topicsPgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -20211,7 +20548,7 @@ export const plans = {
     },
     allRelationalItemRelations: {
       plan() {
-        return connection(relational_item_relations_relational_item_relationsPgResource.find());
+        return connection(resource_relational_item_relationsPgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -20514,6 +20851,33 @@ export const plans = {
     __assertStep: ConnectionStep,
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+    }
+  },
+  ZeroImplementation: {
+    __toSpecifier($step) {
+      if ($step instanceof PgUnionAllSingleStep) {
+        return $step.toSpecifier();
+      } else {
+        return $step;
+      }
+    },
+    __planType($specifier) {
+      const $__typename = get2($specifier, "__typename");
+      return {
+        $__typename,
+        planForType(t) {
+          const resource = resourceByTypeName17[t.name];
+          if (!resource) {
+            throw new Error(`Type ${t.name} has no associated resource`);
+          }
+          const pk = resource.uniques.find(u => u.isPrimary) ?? resource.uniques[0];
+          const spec = Object.create(null);
+          for (const attrName of pk.attributes) {
+            spec[attrName] = get2($specifier, attrName);
+          }
+          return resource.get(spec);
+        }
+      };
     }
   },
   ZeroImplementationEdge: {
@@ -22597,7 +22961,7 @@ export const plans = {
     },
     createRelationalItemRelationCompositePk: {
       plan(_, args) {
-        const $insert = pgInsertSingle(relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource, Object.create(null));
+        const $insert = pgInsertSingle(resource_relational_item_relation_composite_pksPgResource, Object.create(null));
         args.apply($insert);
         const plan = object({
           result: $insert
@@ -22627,7 +22991,7 @@ export const plans = {
     },
     createRelationalItemRelation: {
       plan(_, args) {
-        const $insert = pgInsertSingle(relational_item_relations_relational_item_relationsPgResource, Object.create(null));
+        const $insert = pgInsertSingle(resource_relational_item_relationsPgResource, Object.create(null));
         args.apply($insert);
         const plan = object({
           result: $insert
@@ -22880,7 +23244,7 @@ export const plans = {
     },
     updateRelationalItemRelationCompositePkByParentIdAndChildId: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource, {
+        const $update = pgUpdateSingle(resource_relational_item_relation_composite_pksPgResource, {
           parent_id: args.getRaw(['input', "parentId"]),
           child_id: args.getRaw(['input', "childId"])
         });
@@ -22914,7 +23278,7 @@ export const plans = {
     },
     updateRelationalItemRelationByRowId: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(relational_item_relations_relational_item_relationsPgResource, {
+        const $update = pgUpdateSingle(resource_relational_item_relationsPgResource, {
           id: args.getRaw(['input', "rowId"])
         });
         args.apply($update);
@@ -22930,7 +23294,7 @@ export const plans = {
     },
     updateRelationalItemRelationByParentIdAndChildId: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(relational_item_relations_relational_item_relationsPgResource, {
+        const $update = pgUpdateSingle(resource_relational_item_relationsPgResource, {
           parent_id: args.getRaw(['input', "parentId"]),
           child_id: args.getRaw(['input', "childId"])
         });
@@ -23208,7 +23572,7 @@ export const plans = {
     },
     deleteRelationalItemRelationCompositePkByParentIdAndChildId: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource, {
+        const $delete = pgDeleteSingle(resource_relational_item_relation_composite_pksPgResource, {
           parent_id: args.getRaw(['input', "parentId"]),
           child_id: args.getRaw(['input', "childId"])
         });
@@ -23242,7 +23606,7 @@ export const plans = {
     },
     deleteRelationalItemRelationByRowId: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(relational_item_relations_relational_item_relationsPgResource, {
+        const $delete = pgDeleteSingle(resource_relational_item_relationsPgResource, {
           id: args.getRaw(['input', "rowId"])
         });
         args.apply($delete);
@@ -23258,7 +23622,7 @@ export const plans = {
     },
     deleteRelationalItemRelationByParentIdAndChildId: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(relational_item_relations_relational_item_relationsPgResource, {
+        const $delete = pgDeleteSingle(resource_relational_item_relationsPgResource, {
           parent_id: args.getRaw(['input', "parentId"]),
           child_id: args.getRaw(['input', "childId"])
         });
@@ -23846,7 +24210,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource.find(spec);
+          return resource_relational_item_relation_composite_pksPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -23970,7 +24334,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return relational_item_relations_relational_item_relationsPgResource.find(spec);
+          return resource_relational_item_relationsPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -24954,7 +25318,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource.find(spec);
+          return resource_relational_item_relation_composite_pksPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -25078,7 +25442,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return relational_item_relations_relational_item_relationsPgResource.find(spec);
+          return resource_relational_item_relationsPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -25932,7 +26296,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource.find(spec);
+          return resource_relational_item_relation_composite_pksPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -26016,7 +26380,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return relational_item_relations_relational_item_relationsPgResource.find(spec);
+          return resource_relational_item_relationsPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");

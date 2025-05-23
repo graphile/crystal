@@ -54,7 +54,9 @@ import {
  * comma separated list of snapshot types to update.
  */
 const { UPDATE_SNAPSHOTS } = process.env;
-const updateSnapshotExtensions = UPDATE_SNAPSHOTS?.split(",");
+const updateSnapshotExtensions = UPDATE_SNAPSHOTS?.split(",")
+  .map((s) => s.trim())
+  .filter((s) => s.length > 0);
 function shouldUpdateSnapshot(filePath: string) {
   // Never update snapshots in CI
   if (process.env.CI) return false;
@@ -149,6 +151,7 @@ export async function runTestQuery(
      * to ensure the plan reuse doesn't break the query.
      */
     runTimes?: number;
+    dontLogErrors?: boolean;
   },
   options: {
     callback?: (

@@ -1194,6 +1194,15 @@ function objectToObjectProperties(o: {
     .map(([key, value]) => t.objectProperty(identifierOrLiteral(key), value!));
 }
 
+/** Only use when you're sure the keys are safe to use as identifiers */
+function dangerousObjectToObjectPropertiesWithIdentifierKeys(o: {
+  [key: string]: t.Expression | null;
+}): t.ObjectProperty[] {
+  return Object.entries(o)
+    .filter(([, value]) => value != null)
+    .map(([key, value]) => t.objectProperty(t.identifier(key), value!));
+}
+
 function extensions(
   file: CodegenFile,
   extensions: object | null | undefined,
@@ -1588,6 +1597,33 @@ function exportSchemaTypeDefs({
           ),
         );
       }
+      if (type.isTypeOf) {
+        typeProperties.push(
+          t.objectProperty(
+            t.identifier("__isTypeOf"),
+            convertToIdentifierViaAST(
+              file,
+              type.isTypeOf,
+              `${type.name}IsTypeOf`,
+              `${type.name}.extensions.isTypeOf`,
+            ),
+          ),
+        );
+      }
+
+      if (type.extensions.grafast?.planType) {
+        typeProperties.push(
+          t.objectProperty(
+            t.identifier("__planType"),
+            convertToIdentifierViaAST(
+              file,
+              type.extensions.grafast.planType,
+              `${type.name}PlanType`,
+              `${type.name}.extensions.planType`,
+            ),
+          ),
+        );
+      }
 
       for (const [fieldName, field] of Object.entries(type.toConfig().fields)) {
         // Use shorthand if there's only a `plan` and nothing else
@@ -1812,18 +1848,40 @@ function exportSchemaTypeDefs({
       type instanceof GraphQLUnionType
     ) {
       const config = type.toConfig();
-      if (config.resolveType) {
+      if (
+        config.resolveType ||
+        config.extensions.grafast?.toSpecifier ||
+        config.extensions.grafast?.planType
+      ) {
         plansProperties.push(
           t.objectProperty(
             identifierOrLiteral(type.name),
             t.objectExpression(
-              objectToObjectProperties({
-                __resolveType: convertToIdentifierViaAST(
-                  file,
-                  type.resolveType,
-                  `${type.name}ResolveType`,
-                  `${type.name}.resolveType`,
-                ),
+              dangerousObjectToObjectPropertiesWithIdentifierKeys({
+                __resolveType: type.resolveType
+                  ? convertToIdentifierViaAST(
+                      file,
+                      type.resolveType,
+                      `${type.name}ResolveType`,
+                      `${type.name}.resolveType`,
+                    )
+                  : null,
+                __toSpecifier: type.extensions?.grafast?.toSpecifier
+                  ? convertToIdentifierViaAST(
+                      file,
+                      type.extensions?.grafast?.toSpecifier,
+                      `${type.name}ToSpecifier`,
+                      `${type.name}.toSpecifier`,
+                    )
+                  : null,
+                __planType: type.extensions?.grafast?.planType
+                  ? convertToIdentifierViaAST(
+                      file,
+                      type.extensions?.grafast?.planType,
+                      `${type.name}PlanType`,
+                      `${type.name}.planType`,
+                    )
+                  : null,
               }),
             ),
           ),

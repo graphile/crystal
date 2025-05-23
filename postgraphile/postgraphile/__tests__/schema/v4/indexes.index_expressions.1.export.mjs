@@ -1,8 +1,8 @@
 import { PgExecutor, TYPES, assertPgClassSingleStep, makeRegistry, recordCodec, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, access, assertEdgeCapableStep, assertPageInfoCapableStep, connection, constant, context, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue } from "grafast";
+import { ConnectionStep, access, assertEdgeCapableStep, assertPageInfoCapableStep, connection, constant, context, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
-const handler = {
+const nodeIdHandler_Query = {
   typeName: "Query",
   codec: {
     name: "raw",
@@ -52,7 +52,7 @@ const nodeIdCodecs_base64JSON_base64JSON = {
 };
 const nodeIdCodecs = {
   __proto__: null,
-  raw: handler.codec,
+  raw: nodeIdHandler_Query.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
@@ -136,7 +136,7 @@ const employeeUniques = [{
     }
   }
 }];
-const pgResource_employeePgResource = makeRegistry({
+const resource_employeePgResource = makeRegistry({
   pgExecutors: {
     __proto__: null,
     main: executor
@@ -178,30 +178,26 @@ const pgResource_employeePgResource = makeRegistry({
     __proto__: null
   }
 }).pgResources["employee"];
-const nodeIdHandlerByTypeName = {
-  __proto__: null,
-  Query: handler,
-  Employee: {
-    typeName: "Employee",
-    codec: nodeIdCodecs_base64JSON_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("employees", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return pgResource_employeePgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "employees";
-    }
+const nodeIdHandler_Employee = {
+  typeName: "Employee",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("employees", false), $record.get("id")]);
+  },
+  getSpec($list) {
+    return {
+      id: inhibitOnNull(access($list, [1]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_employeePgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "employees";
   }
 };
 function specForHandler(handler) {
@@ -224,11 +220,27 @@ function specForHandler(handler) {
   return spec;
 }
 const nodeFetcher_Employee = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Employee));
-  return nodeIdHandlerByTypeName.Employee.get(nodeIdHandlerByTypeName.Employee.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Employee));
+  return nodeIdHandler_Employee.get(nodeIdHandler_Employee.getSpec($decoded));
 };
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
+}
+const nodeIdHandlerByTypeName = {
+  __proto__: null,
+  Query: nodeIdHandler_Query,
+  Employee: nodeIdHandler_Employee
+};
+const decodeNodeId = makeDecodeNodeId(Object.values(nodeIdHandlerByTypeName));
+function findTypeNameMatch(specifier) {
+  if (!specifier) return null;
+  for (const [typeName, typeSpec] of Object.entries(nodeIdHandlerByTypeName)) {
+    const value = specifier[typeSpec.codec.name];
+    if (value != null && typeSpec.match(value)) {
+      return typeName;
+    }
+  }
+  return null;
 }
 function CursorSerialize(value) {
   return "" + value;
@@ -389,16 +401,16 @@ export const plans = {
       return rootValue();
     },
     nodeId($parent) {
-      const specifier = handler.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler.codec.name].encode);
+      const specifier = nodeIdHandler_Query.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Query.codec.name].encode);
     },
-    node(_$root, args) {
-      return node(nodeIdHandlerByTypeName, args.getRaw("nodeId"));
+    node(_$root, fieldArgs) {
+      return fieldArgs.getRaw("nodeId");
     },
     employeeById(_$root, {
       $id
     }) {
-      return pgResource_employeePgResource.get({
+      return resource_employeePgResource.get({
         id: $id
       });
     },
@@ -408,7 +420,7 @@ export const plans = {
     },
     allEmployees: {
       plan() {
-        return connection(pgResource_employeePgResource.find());
+        return connection(resource_employeePgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -437,11 +449,35 @@ export const plans = {
       }
     }
   },
+  Node: {
+    __planType($nodeId) {
+      const $specifier = decodeNodeId($nodeId);
+      const $__typename = lambda($specifier, findTypeNameMatch, true);
+      return {
+        $__typename,
+        planForType(type) {
+          const spec = nodeIdHandlerByTypeName[type.name];
+          if (spec) {
+            return spec.get(spec.getSpec(access($specifier, [spec.codec.name])));
+          } else {
+            throw new Error(`Failed to find handler for ${type.name}`);
+          }
+        }
+      };
+    }
+  },
   Employee: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of employeeUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_employeePgResource.get(spec);
+    },
     nodeId($parent) {
-      const specifier = nodeIdHandlerByTypeName.Employee.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Employee.codec.name].encode);
+      const specifier = nodeIdHandler_Employee.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Employee.codec.name].encode);
     },
     firstName($record) {
       return $record.get("first_name");

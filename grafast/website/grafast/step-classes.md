@@ -539,6 +539,65 @@ class MyQueryStep extends Step {
 }
 ```
 
+### toTypename()
+
+Enables a step to return a step resolving to the typename, used by the
+`defaultPlanType` polymorphic type resolver function when the GraphQL union or
+interface type does not implement the `planType` method. If not implemented,
+this default function will fall back to `get($step, '__typename')`.
+
+### toSpecifier()
+
+This function name is reserved for convenience such that `$step.toSpecifier()`
+should mean the same as `abstractType.toSpecifier($step)`. Grafast does not
+actually use this method (currently), but it can be convenient for users so
+we reserve it for specifically this use case.
+
+Importantly, Gra*fast* does not require that a specifier takes a
+particular form, it's an agreement between the steps you're using and the
+polymorphic types (unions and interfaces) that you've implemented. We strongly
+recommend it's a plain-old JavaScript object (POJO) though!
+
+```ts
+class MyStep extends Step {
+  // ...
+  toSpecifier() {
+    return object({
+      __typename: this.get("type"),
+      id: this.get("id"),
+    });
+  }
+}
+
+const Animal = new GraphQLInterfaceType({
+  name: "Animal",
+  // ... fields ...
+  toSpecifier($step) {
+    // Call .toSpecifier() if it exists, otherwise use the step directly
+    return $step.toSpecifier?.() ?? $step;
+  },
+  planType($specifier) {
+    // Extract the property that indicates the type from above
+    const $__typename = get($specifier, "__typename");
+    return { $__typename };
+  },
+});
+
+const Cat = new GraphQLObjectType({
+  name: "Cat",
+  interfaces: [Animal],
+  // ... fields ...
+  extensions: {
+    grafast: {
+      planType($specifier) {
+        const $id = get($specifier, "id");
+        return cats.get({ id: $id });
+      },
+    },
+  },
+});
+```
+
 ## Built in methods
 
 Your custom step class will have access to all the built-in methods that come

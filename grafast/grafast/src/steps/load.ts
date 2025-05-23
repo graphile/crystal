@@ -38,13 +38,13 @@ type LoadCallback<
 export type LoadOneCallback<
   TSpec,
   TItem,
-  TParams extends Record<string, any>,
+  TParams extends Record<string, any> = Record<string, any>,
   TUnarySpec = never,
 > = LoadCallback<TSpec, TItem, TItem, TParams, TUnarySpec>;
 export type LoadManyCallback<
   TSpec,
   TItem,
-  TParams extends Record<string, any>,
+  TParams extends Record<string, any> = Record<string, any>,
   TUnarySpec = never,
 > = LoadCallback<TSpec, TItem, ReadonlyArray<TItem>, TParams, TUnarySpec>;
 

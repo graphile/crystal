@@ -1,7 +1,17 @@
 import { isAsyncIterable, isIterable } from "iterall";
 
 import * as assert from "../assert.js";
-import type { Bucket, RequestTools } from "../bucket.js";
+import type { Bucket, RequestTools, SharedBucketState } from "../bucket.js";
+import {
+  $$streamMore,
+  $$timeout,
+  FLAG_ERROR,
+  FLAG_INHIBITED,
+  FLAG_NULL,
+  FLAG_POLY_SKIPPED,
+  FLAG_STOPPED,
+  NO_FLAGS,
+} from "../constants.js";
 import { isDev } from "../dev.js";
 import { isFlaggedValue, SafeError } from "../error.js";
 import { inspect } from "../inspect.js";
@@ -23,22 +33,21 @@ import type {
   UnaryExecutionValue,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
-import {
-  $$streamMore,
-  $$timeout,
-  FLAG_ERROR,
-  FLAG_INHIBITED,
-  FLAG_NULL,
-  FLAG_POLY_SKIPPED,
-  FLAG_STOPPED,
-  NO_FLAGS,
-} from "../interfaces.js";
 import type { Step, UnbatchedStep } from "../step.js";
 import { __ItemStep } from "../steps/__item.js";
 import { __ValueStep } from "../steps/__value.js";
 import { timeSource } from "../timeSource.js";
-import { arrayOfLength, isPromiseLike, sudo } from "../utils.js";
+import {
+  arrayOfLength,
+  isPhaseTransitionLayerPlan,
+  isPromiseLike,
+  sudo,
+} from "../utils.js";
+import type { LayerPlan } from "./LayerPlan.js";
 import type { MetaByMetaKey } from "./OperationPlan.js";
+
+/** Default recoverable/trappable flags (excluding NULL) */
+const INHIBIT_OR_ERROR_FLAGS = FLAG_INHIBITED | FLAG_ERROR;
 
 const timeoutError = Object.freeze(
   new SafeError(
@@ -115,7 +124,7 @@ export function executeBucket(
     metaByMetaKey,
     size,
     store,
-    layerPlan: { phases, children: childLayerPlans },
+    layerPlan: { phases },
   } = bucket;
 
   const phaseCount = phases.length;
@@ -551,59 +560,82 @@ export function executeBucket(
             let forceIndexValue: Error | null | undefined = undefined;
             let rejectValue: Error | null | undefined = undefined;
             let indexFlags: ExecutionEntryFlags = NO_FLAGS;
-            for (let i = 0, l = step.dependencies.length; i < l; i++) {
-              const $dep = step.dependencies[i];
-              const forbiddenFlags = step.dependencyForbiddenFlags[i];
-              const onReject = step.dependencyOnReject[i];
-              const depExecutionVal = bucket.store.get($dep.id)!;
 
-              // Search for "f2b3b1b3" for similar block
-              const flags = depExecutionVal._flagsAt(dataIndex);
-              const disallowedFlags = flags & forbiddenFlags;
-              if (disallowedFlags) {
-                indexFlags |= disallowedFlags;
-                // If there's a reject behavior and we're FRESHLY rejected (weren't
-                // already inhibited), use that as a fallback.
-                // TODO: validate this.
-                // If dep is inhibited and we don't allow inhibited, copy through (null or error).
-                // If dep is inhibited and we do allow inhibited, but we're disallowed, use our onReject.
-                // If dep is not inhibited, but we're disallowed, use our onReject.
-                if (
-                  onReject !== undefined &&
-                  (disallowedFlags & (FLAG_INHIBITED | FLAG_ERROR)) === NO_FLAGS
-                ) {
-                  rejectValue ||= onReject;
+            // Check polymorphism matches
+            const stepPolymorphicPaths = step.polymorphicPaths;
+            if (
+              stepPolymorphicPaths !== null &&
+              (step._isUnary
+                ? /*
+                   * already asserted that it matches;
+                   * !! search "f4ce2c83"
+                   */ false
+                : /* batch check */
+                  !stepPolymorphicPaths.has(
+                    bucket.polymorphicPathList[dataIndex] as string,
+                  ))
+            ) {
+              indexFlags |= FLAG_POLY_SKIPPED;
+              forceIndexValue = null;
+            } else {
+              for (let i = 0, l = step.dependencies.length; i < l; i++) {
+                const $dep = step.dependencies[i];
+                const forbiddenFlags = step.dependencyForbiddenFlags[i];
+                const onReject = step.dependencyOnReject[i];
+                const depExecutionVal = bucket.store.get($dep.id);
+                if (depExecutionVal === undefined) {
+                  throw new Error(
+                    `GrafastInternalError<480e7c98-a777-4efb-b826-c339129ccff8>: could not find value in ${bucket} for ${$dep}, dependency ${i} of ${step}`,
+                  );
                 }
-                if (forceIndexValue == null) {
-                  if ((flags & FLAG_ERROR) !== 0) {
-                    const v = depExecutionVal.at(dataIndex);
-                    forceIndexValue = v;
-                  } else {
-                    forceIndexValue = null;
+                // Search for "f2b3b1b3" for similar block
+                const flags = depExecutionVal._flagsAt(dataIndex);
+                const disallowedFlags = flags & forbiddenFlags;
+                if (disallowedFlags) {
+                  indexFlags |= disallowedFlags;
+                  // If there's a reject behavior and we're FRESHLY rejected (weren't
+                  // already inhibited), use that as a fallback.
+                  // TODO: validate this.
+                  // If dep is inhibited and we don't allow inhibited, copy through (null or error).
+                  // If dep is inhibited and we do allow inhibited, but we're disallowed, use our onReject.
+                  // If dep is not inhibited, but we're disallowed, use our onReject.
+                  if (
+                    onReject !== undefined &&
+                    (disallowedFlags & INHIBIT_OR_ERROR_FLAGS) === NO_FLAGS
+                  ) {
+                    rejectValue ||= onReject;
                   }
-                } else {
-                  // First error wins, ignore this second error.
-                }
-                // End "f2b3b1b3" block
-              } else if (forceIndexValue === undefined) {
-                const depVal = depExecutionVal.at(dataIndex);
-                let depFlags;
-                if (
-                  (bucket.flagUnion & FLAG_ERROR) === FLAG_ERROR &&
-                  ((depFlags = depExecutionVal._flagsAt(dataIndex)) &
-                    FLAG_ERROR) ===
-                    FLAG_ERROR
-                ) {
-                  if (step._isUnary) {
-                    // COPY the unary value
-                    bucket.store.set(step.id, depExecutionVal);
-                    bucket.flagUnion |= depFlags;
+                  if (forceIndexValue == null) {
+                    if ((flags & FLAG_ERROR) !== NO_FLAGS) {
+                      const v = depExecutionVal.at(dataIndex);
+                      forceIndexValue = v;
+                    } else {
+                      forceIndexValue = null;
+                    }
                   } else {
-                    bucket.setResult(step, dataIndex, depVal, FLAG_ERROR);
+                    // First error wins, ignore this second error.
                   }
-                  continue stepLoop;
+                  // End "f2b3b1b3" block
+                } else if (forceIndexValue === undefined) {
+                  const depVal = depExecutionVal.at(dataIndex);
+                  let depFlags;
+                  if (
+                    (bucket.flagUnion & FLAG_ERROR) === FLAG_ERROR &&
+                    ((depFlags = depExecutionVal._flagsAt(dataIndex)) &
+                      FLAG_ERROR) ===
+                      FLAG_ERROR
+                  ) {
+                    if (step._isUnary) {
+                      // COPY the unary value
+                      bucket.store.set(step.id, depExecutionVal);
+                      bucket.flagUnion |= depFlags;
+                    } else {
+                      bucket.setResult(step, dataIndex, depVal, FLAG_ERROR);
+                    }
+                    continue stepLoop;
+                  }
+                  deps.push(depVal);
                 }
-                deps.push(depVal);
               }
             }
 
@@ -611,7 +643,9 @@ export function executeBucket(
 
             if (forceIndexValue !== undefined) {
               // Search for "17217999b7a7" for similar block
-              if (forceIndexValue == null && rejectValue != null) {
+              if ((indexFlags & FLAG_POLY_SKIPPED) === FLAG_POLY_SKIPPED) {
+                // Already skipped
+              } else if (forceIndexValue == null && rejectValue != null) {
                 indexFlags |= FLAG_ERROR;
                 forceIndexValue = rejectValue;
               } else {
@@ -699,15 +733,17 @@ export function executeBucket(
     values: ReadonlyArray<ExecutionValue>,
     extra: ExecutionExtra,
   ): ExecutionResults<any> {
-    if (isDev && step._isUnary && count !== 1) {
-      throw new Error(
-        `GrafastInternalError<84a6cdfa-e8fe-4dea-85fe-9426a6a78027>: ${step} is a unary step, but we're attempting to pass it ${count} (!= 1) values`,
-      );
-    }
-    if (step.execute.length > 1) {
-      throw new Error(
-        `${step} is using a legacy form of 'execute' which accepts multiple arguments, please see https://err.red/gev2`,
-      );
+    if (isDev) {
+      if (step._isUnary && count !== 1) {
+        throw new Error(
+          `GrafastInternalError<84a6cdfa-e8fe-4dea-85fe-9426a6a78027>: ${step} is a unary step, but we're attempting to pass it ${count} (!= 1) values`,
+        );
+      }
+      if (step.execute.length > 1) {
+        throw new Error(
+          `${step} is using a legacy form of 'execute' which accepts multiple arguments, please see https://err.red/gev2`,
+        );
+      }
     }
     const executeDetails: ExecutionDetails<readonly any[]> = {
       indexMap: makeIndexMap(count),
@@ -756,6 +792,7 @@ export function executeBucket(
 
     /** If all we see is errors, there's no need to execute! */
     let newSize = 0;
+    const newPolymorphicPathList: (string | null)[] = [];
     let stepPolymorphicPaths = step.polymorphicPaths;
     const legitDepsCount = sudo(step).dependencies.length;
     const dependenciesIncludingSideEffectsCount =
@@ -795,7 +832,7 @@ export function executeBucket(
       ) {
         indexFlags |= FLAG_POLY_SKIPPED;
         forceIndexValue = null;
-      } else if (extra._bucket.flagUnion) {
+      } else if (extra._bucket.flagUnion !== 0) {
         for (let i = 0; i < dependenciesIncludingSideEffectsCount; i++) {
           const depExecutionVal = dependenciesIncludingSideEffects[i];
           const forbiddenFlags = dependencyForbiddenFlags[i];
@@ -863,7 +900,8 @@ export function executeBucket(
         forcedValues.flags[dataIndex] = indexFlags;
         forcedValues.results[dataIndex] = forceIndexValue;
       } else {
-        newSize++;
+        const newIndex = newSize++;
+        newPolymorphicPathList[newIndex] = polymorphicPathList[dataIndex];
         if (needsTransform) {
           // dependenciesWithoutErrors has limited content; add this non-error value
           for (
@@ -989,20 +1027,15 @@ export function executeBucket(
       }
       if (
         isDev &&
-        step.layerPlan.reason.type === "polymorphic" &&
+        (step.layerPlan.reason.type === "polymorphic" ||
+          step.layerPlan.reason.type === "polymorphicPartition") &&
         step.polymorphicPaths === null
       ) {
         throw new Error(
           `GrafastInternalError<c33328fe-6758-4699-8ac6-7be41ce58bfb>: a step without polymorphic paths cannot belong to a polymorphic bucket`,
         );
       }
-      if (!needsFiltering) {
-        const isSelectiveStep =
-          step.layerPlan.reason.type === "polymorphic" &&
-          step.polymorphicPaths!.size !==
-            step.layerPlan.reason.polymorphicPaths.size;
-        needsFiltering ||= isSelectiveStep;
-      }
+      needsFiltering ||= step._isSelectiveStep;
       const result = needsFiltering
         ? reallyExecuteStepWithFiltering(
             step,
@@ -1043,79 +1076,15 @@ export function executeBucket(
   }
 
   function executeSamePhaseChildren(): PromiseOrDirect<void> {
-    // PERF: create a JIT factory for this at planning time
-    const childPromises: PromiseLike<any>[] = [];
+    const result = completeBucketAndExecuteSamePhaseChildren(
+      bucket,
+      requestContext,
+    );
 
-    // This promise should never reject
-    let mutationQueue: PromiseLike<void> | null = null;
-    /**
-     * Ensures that callback is only called once all other enqueued callbacks
-     * are called.
-     */
-    const enqueue = <T>(
-      callback: () => PromiseOrDirect<T>,
-    ): PromiseOrDirect<T> => {
-      const result = mutationQueue ? mutationQueue.then(callback) : callback();
-      if (isPromiseLike(result)) {
-        mutationQueue = result.then(noop, noop);
-      }
-      return result;
-    };
-
-    loop: for (const childLayerPlan of childLayerPlans) {
-      switch (childLayerPlan.reason.type) {
-        case "nullableBoundary":
-        case "listItem":
-        case "polymorphic": {
-          const childBucket = childLayerPlan.newBucket(bucket);
-          if (childBucket !== null) {
-            // Execute
-            const result = executeBucket(childBucket, requestContext);
-            if (isPromiseLike(result)) {
-              childPromises.push(result);
-            }
-          }
-          break;
-        }
-        case "mutationField": {
-          const childBucket = childLayerPlan.newBucket(bucket);
-          if (childBucket !== null) {
-            // Enqueue for execution (mutations must run in order)
-            const promise = enqueue(() =>
-              executeBucket(childBucket, requestContext),
-            );
-            if (isPromiseLike(promise)) {
-              childPromises.push(promise);
-            }
-          }
-
-          break;
-        }
-        case "subroutine":
-        case "subscription":
-        case "defer": {
-          // Ignore; these are handled elsewhere
-          continue loop;
-        }
-        case "root": {
-          throw new Error(
-            // *confused emoji*
-            "GrafastInternalError<05fb7069-81b5-43f7-ae71-f62547d2c2b7>: root cannot be not the root (...)",
-          );
-        }
-        default: {
-          const never: never = childLayerPlan.reason;
-          throw new Error(
-            `GrafastInternalError<c6984a96-050e-4d40-ab18-a8c5dc7e239b>: unhandled reason '${inspect(
-              never,
-            )}'`,
-          );
-        }
-      }
-    }
-
-    if (childPromises.length > 0) {
-      return Promise.all(childPromises).then(() => {
+    if (result != null) {
+      return result.then(() => {
+        // PERF: this seems like a bad idea! We're forcing the bucket to be
+        // retained in this closure? Why?
         bucket.isComplete = true;
         return;
       });
@@ -1126,8 +1095,185 @@ export function executeBucket(
   }
 }
 
+function completeBucketAndExecuteSamePhaseChildren(
+  bucket: Bucket,
+  requestContext: RequestTools,
+) {
+  const { layerPlan, sharedState } = bucket;
+
+  const result = markLayerPlanAsDone(
+    requestContext,
+    sharedState,
+    layerPlan,
+    bucket,
+  );
+
+  bucket.sharedState.release(bucket);
+
+  return result;
+}
+
+function markLayerPlanAsDone(
+  requestContext: RequestTools,
+  sharedState: SharedBucketState,
+  layerPlan: LayerPlan,
+  bucket: Bucket | null,
+): PromiseOrDirect<void> {
+  if (sharedState._doneBucketIds.has(layerPlan.id)) {
+    throw new Error(
+      `${bucket} has already completed, it cannot complete again!`,
+    );
+  }
+  sharedState._doneBucketIds.add(layerPlan.id);
+
+  const childPromises: PromiseLike<any>[] = [];
+
+  // This promise should never reject
+  let mutationQueue: PromiseLike<void> | null = null;
+  /**
+   * Ensures that callback is only called once all other enqueued callbacks
+   * are called.
+   */
+  const enqueue = <T>(
+    callback: () => PromiseOrDirect<T>,
+  ): PromiseOrDirect<T> => {
+    const result = mutationQueue ? mutationQueue.then(callback) : callback();
+    if (isPromiseLike(result)) {
+      mutationQueue = result.then(noop, noop);
+    }
+    return result;
+  };
+  const { children: childLayerPlans } = layerPlan;
+
+  // PERF: create a JIT factory for this at planning time
+  loop: for (const childLayerPlan of childLayerPlans) {
+    switch (childLayerPlan.reason.type) {
+      case "nullableBoundary":
+      case "listItem":
+      case "polymorphic":
+      case "polymorphicPartition": {
+        const childBucket =
+          bucket == null ? null : childLayerPlan.newBucket(bucket);
+        // Execute
+        const result: PromiseOrDirect<void> =
+          childBucket !== null
+            ? executeBucket(childBucket, requestContext)
+            : markLayerPlanAsDone(
+                requestContext,
+                sharedState,
+                childLayerPlan,
+                null,
+              );
+        if (isPromiseLike(result)) {
+          childPromises.push(result);
+        }
+        break;
+      }
+      case "mutationField": {
+        const childBucket =
+          bucket == null ? null : childLayerPlan.newBucket(bucket);
+        // Enqueue for execution (mutations must run in order)
+        const promise: PromiseOrDirect<void> = enqueue(() =>
+          childBucket !== null
+            ? executeBucket(childBucket, requestContext)
+            : markLayerPlanAsDone(
+                requestContext,
+                sharedState,
+                childLayerPlan,
+                null,
+              ),
+        );
+        if (isPromiseLike(promise)) {
+          childPromises.push(promise);
+        }
+
+        break;
+      }
+      case "combined": {
+        // First, see if _all_ parent layer plans are ready
+        let allParentLayerPlansAreReady = true;
+        for (const lp of childLayerPlan.reason.parentLayerPlans) {
+          if (lp === layerPlan) continue;
+          if (!sharedState._doneBucketIds.has(lp.id)) {
+            allParentLayerPlansAreReady = false;
+            break;
+          }
+        }
+        if (!allParentLayerPlansAreReady) {
+          // The last parent layer plan to complete will handle it.
+          // Make sure we're retained so it can use our data!
+          // Will be released inside the "combined" branch in childLayerPlan.newBucket
+          if (bucket != null) {
+            bucket.sharedState.retain(bucket);
+          }
+
+          // TODO: MAKE SURE CANCELLED BUCKETS ARE HANDLED!
+
+          continue loop;
+        }
+        const childBucket = childLayerPlan.newCombinedBucket({ sharedState });
+        if (childBucket !== null) {
+          // Execute
+          const result = executeBucket(childBucket, requestContext);
+          if (isPromiseLike(result)) {
+            childPromises.push(result);
+          }
+        }
+        break;
+      }
+      case "subroutine":
+      case "subscription":
+      case "defer": {
+        // Ignore; these are handled elsewhere
+        continue loop;
+      }
+      case "root": {
+        throw new Error(
+          // *confused emoji*
+          "GrafastInternalError<05fb7069-81b5-43f7-ae71-f62547d2c2b7>: root cannot be not the root (...)",
+        );
+      }
+      default: {
+        const never: never = childLayerPlan.reason;
+        throw new Error(
+          `GrafastInternalError<c6984a96-050e-4d40-ab18-a8c5dc7e239b>: unhandled reason '${inspect(
+            never,
+          )}'`,
+        );
+      }
+    }
+  }
+  if (childPromises.length > 0) {
+    // These should never reject; rejections will bubble up through the promise chain
+    return Promise.all(childPromises).then(noop);
+  } else {
+    return;
+  }
+}
+
+function makeSharedState(): SharedBucketState {
+  return {
+    _doneBucketIds: new Set(),
+    _retainedBuckets: new Map(),
+    retain(bucket) {
+      this._retainedBuckets.set(bucket.layerPlan.id, bucket);
+      bucket.retainCount++;
+    },
+    release(bucket) {
+      bucket.retainCount--;
+      if (bucket.retainCount <= 0) {
+        this._retainedBuckets.delete(bucket.layerPlan.id);
+      }
+    },
+  };
+}
+
 /** @internal */
 export function newBucket(
+  parent: {
+    metaByMetaKey: MetaByMetaKey | undefined;
+    sharedState: SharedBucketState;
+  } | null,
   spec: Pick<
     Bucket,
     | "layerPlan"
@@ -1135,10 +1281,16 @@ export function newBucket(
     | "size"
     | "flagUnion"
     | "polymorphicPathList"
+    | "polymorphicType"
     | "iterators"
   >,
-  parentMetaByMetaKey: MetaByMetaKey | null,
 ): Bucket {
+  const parentMetaByMetaKey = parent?.metaByMetaKey;
+  const sharedState: SharedBucketState =
+    // Do not copy state across phase transitions
+    isPhaseTransitionLayerPlan(spec.layerPlan)
+      ? makeSharedState()
+      : (parent?.sharedState ?? makeSharedState());
   if (isDev) {
     // Some validations
     if (!(spec.size > 0)) {
@@ -1180,7 +1332,7 @@ export function newBucket(
   }
   const type = spec.layerPlan.reason.type;
   const metaByMetaKey =
-    parentMetaByMetaKey === null ||
+    parentMetaByMetaKey == null ||
     type === "root" ||
     type === "mutationField" ||
     type === "subscription"
@@ -1188,16 +1340,26 @@ export function newBucket(
         spec.layerPlan.operationPlan.makeMetaByMetaKey()
       : parentMetaByMetaKey;
   // Copy from spec
-  const { layerPlan, store, size, flagUnion, polymorphicPathList, iterators } =
-    spec;
+  const {
+    layerPlan,
+    store,
+    size,
+    flagUnion,
+    polymorphicPathList,
+    polymorphicType,
+    iterators,
+  } = spec;
   const children = Object.create(null);
-  return {
+  const bucket: Bucket = {
+    sharedState,
+    retainCount: 0,
     toString: bucketToString,
     layerPlan,
     store,
     size,
     flagUnion,
     polymorphicPathList,
+    polymorphicType,
     iterators,
     metaByMetaKey,
     isComplete: false,
@@ -1244,6 +1406,11 @@ export function newBucket(
       }
     },
   };
+
+  // Will be released when setDone is called
+  sharedState.retain(bucket);
+
+  return bucket;
 }
 
 export function bucketToString(this: Bucket) {
@@ -1445,6 +1612,5 @@ function evaluateStream(
     stream.initialCountStepId == null
       ? 0
       : (bucket.store.get(stream.initialCountStepId)?.unaryValue() ?? 0);
-
   return { initialCount };
 }
