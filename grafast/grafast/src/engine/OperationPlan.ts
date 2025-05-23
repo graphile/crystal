@@ -96,6 +96,7 @@ import {
   isTypePlanned,
   layerPlanHeirarchyContains,
   pathsFromAncestorToTargetLayerPlan,
+  recordsMatch,
   setsMatch,
   stepADependsOnStepB,
   sudo,
@@ -2680,6 +2681,7 @@ export class OperationPlan {
         trackedArguments,
         streamDetails,
       } = batchPlanFieldDetails;
+      // TODO: add arguments to signature
       const signature = `${planningPath}|${typeName}|${fieldName}|${layerPlan.id}`;
       let entry = groups.get(signature);
       if (!entry) {
@@ -2717,7 +2719,7 @@ export class OperationPlan {
             `GraphileInternalError<67d2a787-2383-4228-8358-6ea9b3321445>: processPlanField signature failure - mismatch field`,
           );
         }
-        if (trackedArguments !== firstDetails.trackedArguments) {
+        if (!recordsMatch(trackedArguments, firstDetails.trackedArguments)) {
           throw new Error(
             `GraphileInternalError<ec3f1e44-0ab6-445c-a644-a4d276f4b787>: processPlanField signature failure - mismatch trackedArguments`,
           );
