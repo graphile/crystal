@@ -1217,8 +1217,7 @@ function makePolymorphicExecutor<TAsString extends boolean>(
       if (!childOutputPlan) {
         // Search: InvalidConcreteTypeName
         console.warn(
-          // TODO: add "at ${this.path}"
-          `Invalid object type name for this abstract position; saw %o, but expected one of ${(
+          `Invalid object type name for this abstract position${this.locationDetails.parentTypeName && this.locationDetails.fieldName ? ` at ${this.locationDetails.parentTypeName}.${this.locationDetails.fieldName}` : ""}; saw %o, but expected one of ${(
             this.type as OutputPlanTypePolymorphicObject
           ).typeNames.join(", ")}`,
           typeName,
