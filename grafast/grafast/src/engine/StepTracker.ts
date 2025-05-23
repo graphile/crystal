@@ -327,7 +327,7 @@ export class StepTracker {
     options: AddDependencyOptions,
   ): number {
     const $dependent = sudo(raw$dependent);
-    const $dependency = sudo(options.step);
+    const $dependency = sudo(this.getStepById(options.step.id));
     if (!this.activeSteps.has($dependent)) {
       throw new Error(
         `Cannot add ${$dependency} as a dependency of ${$dependent}; the latter is deleted! Explanation: https://err.red/gasdd#phase=${this.operationPlan.phase}&dependency=${encodeURIComponent(String($dependency))}&dependent=${encodeURIComponent(String($dependent))}&deleted=dependent`,
@@ -378,8 +378,7 @@ export class StepTracker {
     // such, we should only dedupe by default but allow opting out.
     // TODO: change this to `!skipDeduplication`
     if (skipDeduplication === false) {
-      const $searchForMe = options.step;
-      const existingIndex = dependentDependencies.indexOf($searchForMe);
+      const existingIndex = dependentDependencies.indexOf($dependency);
       if (existingIndex >= 0) {
         return existingIndex;
       }
@@ -420,13 +419,17 @@ export class StepTracker {
         `${$dependent} attempted to add dataOnly unary dependency; this is not permitted.`,
       );
     }
-    const $dependency = options.step;
+    const $dependency = this.getStepById(options.step.id);
     const { nonUnaryMessage = defaultNonUnaryMessage, ...rest } = options;
     if (!$dependency._isUnary) {
       throw new Error(nonUnaryMessage($dependent, $dependency));
     }
     $dependency._isUnaryLocked = true;
-    return this.addStepDependency($dependent, { ...rest, dataOnly: false });
+    return this.addStepDependency($dependent, {
+      ...rest,
+      step: $dependency,
+      dataOnly: false,
+    });
   }
 
   public setOutputPlanRootStep(outputPlan: OutputPlan, $dependency: Step) {
