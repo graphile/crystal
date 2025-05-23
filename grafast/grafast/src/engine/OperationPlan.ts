@@ -2623,16 +2623,12 @@ export class OperationPlan {
     });
   }
 
-  planFieldBatch: {
-    complete: boolean;
-    batch: Array<BatchPlanFieldDetails>;
-    results: Array<{ haltTree: boolean; step: Step }>;
-  } | null = null;
+  planFieldBatch: PlanFieldBatch | null = null;
   private batchPlanField(
     batchPlanFieldDetails: BatchPlanFieldDetails,
   ): () => { haltTree: boolean; step: Step } {
-    let b: typeof this.planFieldBatch;
-    if (this.planFieldBatch) {
+    let b: PlanFieldBatch;
+    if (this.planFieldBatch != null) {
       b = this.planFieldBatch;
     } else {
       b = this.planFieldBatch = {
@@ -2645,11 +2641,97 @@ export class OperationPlan {
     b.batch.push(batchPlanFieldDetails);
     return () => {
       if (!b.complete) {
-        // PROCESS BATCH HERE!
-        b.complete = true;
-        this.planFieldBatch = null;
+        this.processPlanField(b);
       }
-      const batchPlanFieldDetails = b.batch[myIndex];
+      const result = b.results[myIndex];
+      if (result.error) {
+        throw result.error;
+      }
+      return result;
+    };
+  }
+
+  private processPlanField(b: PlanFieldBatch) {
+    b.complete = true;
+    this.planFieldBatch = null;
+
+    /*
+    const groups = new Map<
+      string,
+      {
+        firstDetails: BatchPlanFieldDetails;
+        extraDetails: { polymorphicPaths: ReadonlySet<string> | null }[];
+        streamDetails: boolean | StreamDetails | null;
+      }
+    >();
+    for (let i = 0, l = b.batch.length; i < l; i++) {
+      const batchPlanFieldDetails = b.batch[i];
+      const {
+        typeName,
+        fieldName,
+        layerPlan,
+        path,
+        polymorphicPaths,
+        planningPath,
+        planResolver,
+        applyAfterMode,
+        rawParentStep,
+        field,
+        trackedArguments,
+        streamDetails,
+      } = batchPlanFieldDetails;
+      const signature = `${planningPath}|${typeName}|${fieldName}|${layerPlan.id}`;
+      let entry = groups.get(signature);
+      if (!entry) {
+        entry = {
+          firstDetails: batchPlanFieldDetails,
+          extraDetails: [{ polymorphicPaths }],
+          streamDetails,
+        };
+        groups.set(signature, entry);
+      } else {
+        const firstDetails = entry.firstDetails;
+        // Check it matches
+        if (planResolver !== firstDetails.planResolver) {
+          throw new Error(
+            `GraphileInternalError<7f14700f-2272-4b6a-a927-7600d934fdf0>: processPlanField signature failure - mismatch planResolver`,
+          );
+        }
+        if (!arraysMatch(path, firstDetails.path)) {
+          throw new Error(
+            `GraphileInternalError<cb84829d-ee4c-40cd-a3a6-f53d1029ad83>: processPlanField signature failure - mismatch path`,
+          );
+        }
+        if (applyAfterMode !== firstDetails.applyAfterMode) {
+          throw new Error(
+            `GraphileInternalError<bbddad4f-68aa-49c7-b82c-09ceebf14a3f>: processPlanField signature failure - mismatch applyAfterMode`,
+          );
+        }
+        if (rawParentStep !== firstDetails.rawParentStep) {
+          throw new Error(
+            `GraphileInternalError<3306994d-7881-4495-89d1-6c9252840369>: processPlanField signature failure - mismatch rawParentStep`,
+          );
+        }
+        if (field !== firstDetails.field) {
+          throw new Error(
+            `GraphileInternalError<67d2a787-2383-4228-8358-6ea9b3321445>: processPlanField signature failure - mismatch field`,
+          );
+        }
+        if (trackedArguments !== firstDetails.trackedArguments) {
+          throw new Error(
+            `GraphileInternalError<ec3f1e44-0ab6-445c-a644-a4d276f4b787>: processPlanField signature failure - mismatch trackedArguments`,
+          );
+        }
+        if (!streamDetails) {
+          entry.streamDetails = null;
+        }
+
+        entry.extraDetails.push({ polymorphicPaths });
+      }
+    }
+    */
+    for (let i = 0, l = b.batch.length; i < l; i++) {
+      const batchPlanFieldDetails = b.batch[i];
       const {
         typeName,
         fieldName,
@@ -2726,47 +2808,55 @@ export class OperationPlan {
           };
           step._stepOptions.walkIterable = true;
         }
-        return { step, haltTree };
+        b.results[i] = { step, haltTree };
       } catch (e) {
-        if (ALWAYS_THROW_PLANNING_ERRORS) {
-          throw e;
-        }
+        try {
+          if (ALWAYS_THROW_PLANNING_ERRORS) {
+            throw e;
+          }
 
-        if (THROW_PLANNING_ERRORS_ON_SIDE_EFFECTS) {
-          for (let i = previousStepCount; i < this.stepTracker.stepCount; i++) {
-            const step = this.stepTracker.stepById[i];
-            if (step && step.hasSideEffects) {
-              throw e;
+          if (THROW_PLANNING_ERRORS_ON_SIDE_EFFECTS) {
+            for (
+              let i = previousStepCount;
+              i < this.stepTracker.stepCount;
+              i++
+            ) {
+              const step = this.stepTracker.stepById[i];
+              if (step && step.hasSideEffects) {
+                throw e;
+              }
             }
           }
-        }
 
-        try {
-          this.stepTracker.purgeBackTo(previousStepCount);
-          layerPlan.latestSideEffectStep = previousSideEffectStep;
-        } catch (e2) {
-          console.error(
-            `Cleanup error occurred whilst trying to recover from field planning error: ${e2.stack}`,
+          try {
+            this.stepTracker.purgeBackTo(previousStepCount);
+            layerPlan.latestSideEffectStep = previousSideEffectStep;
+          } catch (e2) {
+            console.error(
+              `Cleanup error occurred whilst trying to recover from field planning error: ${e2.stack}`,
+            );
+            throw e;
+          }
+
+          const step = withGlobalLayerPlan(
+            layerPlan,
+            polymorphicPaths,
+            planningPath,
+            error,
+            null,
+            e,
           );
-          throw e;
+          const haltTree = true;
+          // PERF: consider deleting all steps that were allocated during this. For
+          // now we'll just rely on tree-shaking.
+          b.results[i] = { step, haltTree };
+        } catch (error) {
+          b.results[i] = { error };
         }
-
-        const step = withGlobalLayerPlan(
-          layerPlan,
-          polymorphicPaths,
-          planningPath,
-          error,
-          null,
-          e,
-        );
-        const haltTree = true;
-        // PERF: consider deleting all steps that were allocated during this. For
-        // now we'll just rely on tree-shaking.
-        return { step, haltTree };
       } finally {
         if (this.loc !== null) this.loc.pop();
       }
-    };
+    }
   }
 
   /**
@@ -5237,4 +5327,12 @@ interface BatchPlanFieldDetails {
   // If 'null' this is neither subscribe field nor list field
   // Otherwise, it's a list field that has the `@stream` directive applied
   streamDetails: StreamDetails | true | false | null;
+}
+
+interface PlanFieldBatch {
+  complete: boolean;
+  batch: Array<BatchPlanFieldDetails>;
+  results: Array<
+    { error: Error } | { error?: never; haltTree: boolean; step: Step }
+  >;
 }
