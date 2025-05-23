@@ -1824,7 +1824,15 @@ export class OperationPlan {
                   $original.toSpecifier,
                   $original,
                 )
-              : $original;
+              : stepHasToRecord($original)
+                ? withGlobalLayerPlan(
+                    commonLayerPlan,
+                    polymorphicPaths,
+                    planningPath,
+                    $original.toRecord,
+                    $original,
+                  )
+                : $original;
 
           for (const detailsRecord of detailsRecordList) {
             detailsRecord.layerPlan = commonLayerPlan;
