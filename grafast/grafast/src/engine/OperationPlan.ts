@@ -1580,6 +1580,8 @@ export class OperationPlan {
       method,
       details,
       this.loc ? [...this.loc] : null,
+      details.layerPlan,
+      details.layerPlan.latestSideEffectStep,
     ];
     this.planningQueue.push(tuple);
     list.push(tuple);
@@ -1633,11 +1635,23 @@ export class OperationPlan {
       this.mutateTodos(todo);
 
       // Finally plan this layer
-      for (const [fn, details, loc] of batch) {
-        const prevLoc = this.loc;
-        this.loc = loc;
-        fn.call(this, details);
-        this.loc = prevLoc;
+      for (const [
+        fn,
+        details,
+        loc,
+        originalLayerPlan,
+        layerPlanLatestSideEffect,
+      ] of batch) {
+        const $sideEffect = originalLayerPlan.latestSideEffectStep;
+        originalLayerPlan.latestSideEffectStep = layerPlanLatestSideEffect;
+        try {
+          const prevLoc = this.loc;
+          this.loc = loc;
+          fn.call(this, details);
+          this.loc = prevLoc;
+        } finally {
+          originalLayerPlan.latestSideEffectStep = $sideEffect;
+        }
       }
     }
 
@@ -5005,9 +5019,11 @@ function throwNoNewStepsError(
 }
 
 type QueueTuple<T extends CommonPlanningDetails> = [
-  (details: T) => void,
-  T,
-  string[] | null,
+  method: (details: T) => void,
+  details: T,
+  loc: string[] | null,
+  originalLayerPlan: LayerPlan,
+  layerPlanLatestSideEffect: Step | null,
 ];
 
 function isSafeForUnbatched(step: UnbatchedExecutableStep): boolean {
