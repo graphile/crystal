@@ -330,12 +330,12 @@ export class StepTracker {
     const $dependency = sudo(options.step);
     if (!this.activeSteps.has($dependent)) {
       throw new Error(
-        `Cannot add ${$dependency} as a dependency of ${$dependent}; the latter is deleted! (phase = ${this.operationPlan.phase})`,
+        `Cannot add ${$dependency} as a dependency of ${$dependent}; the latter is deleted! Explanation: https://err.red/gasdd?phase=${this.operationPlan.phase}&dependency=${encodeURIComponent(String($dependency))}&dependent=${encodeURIComponent(String($dependent))}&deleted=dependent`,
       );
     }
     if (!this.activeSteps.has($dependency)) {
       throw new Error(
-        `Cannot add ${$dependency} as a dependency of ${$dependent}; the former is deleted! (phase = ${this.operationPlan.phase})`,
+        `Cannot add ${$dependency} as a dependency of ${$dependent}; the former is deleted! Explanation: https://err.red/gasdd?phase=${this.operationPlan.phase}&dependency=${encodeURIComponent(String($dependency))}&dependent=${encodeURIComponent(String($dependent))}&deleted=dependency`,
       );
     }
     if ($dependent.isFinalized) {

@@ -1,0 +1,70 @@
+# addStepDependency - Deleted
+
+Examples:
+
+```
+Cannot add [...] as a dependency of [...]; the latter is deleted!
+Cannot add [...] as a dependency of [...]; the former is deleted!
+```
+
+You've received this error because you've attempted to add a dependency between
+two steps, but one (or more) of those steps have been deleted. Typically this
+occurs when you cache a step &mdash; either as a property somewhere or in a
+closure &mdash; and that step is deduplicated, tree shaken, or otherwise
+disposed of before you come to reference it.
+
+It's common to see this issue when using `each()`:
+
+```ts title="Broken code"
+function plan($source) {
+  const $ids = get($source, "relatedIds");
+  // highlight-next-line
+  const $db = context().get("db");
+  return each($ids, ($id) => {
+    return loadOne($id, $db, null, batchGetThingById);
+  });
+}
+```
+
+Here the callback to `each()` references `$db` from the higher closure, but if
+this step were to have deduplicated before the each callback is called, you'd be
+handling a deleted step.
+
+The solution is to ensure that closures you use never capture steps from a
+higher level; typically the solution is to move the fetching of the data into
+the callback:
+
+```ts title="Fixed code"
+function plan($source) {
+  const $ids = get($source, "relatedIds");
+  return each($ids, ($id) => {
+    // highlight-next-line
+    const $db = context().get("db");
+    return loadOne($id, $db, null, batchGetThingById);
+  });
+}
+```
+
+:::tip Use our lint rules to avoid issues like this
+
+TODO: make these lint rules ;)
+
+:::
+
+:::info Why don't we solve this automatically?
+
+Gra*fast* internally tracks which step IDs have been replaced with others; we
+could make it so when you add a dependency on a replaced step, it instead
+references the replacement. This would indeed solve this particular error, but
+it would open a more nefarious can of worms: you might not realise that the step
+that you are handling has been replaced by another, and you might send the
+deleted version instructions such as "load this attribute" or "include a
+cursor". Since the step is no longer in the operation plan, these instructions
+would never go anywhere, meaning that your code would look like it should work
+but you'd get issues in certain operations.
+
+Rather than introducing the potential for subtle errors into your project, we
+decided it would be better to surface this kind of issue more explicitly so you
+can fix the root cause.
+
+:::
