@@ -856,7 +856,7 @@ export function executeBucket(
       ) {
         indexFlags |= FLAG_POLY_SKIPPED;
         forceIndexValue = null;
-      } else if (extra._bucket.flagUnion) {
+      } else if (extra._bucket.flagUnion !== 0) {
         for (let i = 0; i < dependenciesIncludingSideEffectsCount; i++) {
           const depExecutionVal = dependenciesIncludingSideEffects[i];
           const forbiddenFlags = dependencyForbiddenFlags[i];

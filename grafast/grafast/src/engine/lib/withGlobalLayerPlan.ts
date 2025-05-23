@@ -60,6 +60,7 @@ export function currentPolymorphicPaths(): ReadonlySet<string> | null {
 export function currentPlanningPath(): string | undefined {
   const opPlan = operationPlan();
   if (opPlan.phase === "plan" && globalData_planningPath === undefined) {
+    // This might happen during deduplicate for example
     console.warn(
       "GrafastInternalWarning<6a484dc3-a690-493c-b8b3-d6196bf2c290>: currentPlanningPath could not retrieve the current path even in 'plan' phase",
     );
