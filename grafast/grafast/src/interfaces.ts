@@ -441,7 +441,7 @@ export type GrafastInputFieldConfig<
 export type TrackedArguments<
   TArgs extends BaseGraphQLArguments = BaseGraphQLArguments,
 > = {
-  get<TKey extends keyof TArgs>(key: TKey): AnyInputStep;
+  [TKey in keyof TArgs & string]: AnyInputStep;
 };
 
 /**

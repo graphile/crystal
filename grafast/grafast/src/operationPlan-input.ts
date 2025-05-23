@@ -117,17 +117,17 @@ export function withFieldArgsForArguments<T extends Step>(
       if (path === undefined) {
         return object(
           Object.fromEntries(
-            Object.keys(args).map((argName) => [argName, $all.get(argName)]),
+            Object.keys(args).map((argName) => [argName, $all[argName]]),
           ),
         );
       } else if (typeof path === "string") {
-        return $all.get(path);
+        return $all[path];
       } else if (Array.isArray(path)) {
         const [first, ...rest] = path;
         if (!first) {
           throw new Error(`getRaw() must be called with a non-empty path`);
         }
-        let $entry = $all.get(first);
+        let $entry = $all[first];
         for (const pathSegment of rest) {
           if (typeof pathSegment === "number" && "at" in $entry) {
             $entry = $entry.at(pathSegment);
