@@ -19,15 +19,17 @@
           ... on Consumable {
             effect
           }
-          contents {
-            __typename
-            id
-            name
-            ... on Equipment {
-              maxDurability
-            }
-            ... on Consumable {
-              effect
+          ... on HasContents {
+            contents {
+              __typename
+              id
+              name
+              ... on Equipment {
+                maxDurability
+              }
+              ... on Consumable {
+                effect
+              }
             }
           }
         }

@@ -3,51 +3,199 @@
     name: "Carl's Jug O' Boom",
     creator: {
       id: 101,
+      name: 'Carl',
       items: [
         {
+          __typename: 'UtilityItem',
           id: 206,
+          name: 'Fireball or Custard? Scratchcard',
         },
         {
+          __typename: 'Equipment',
           id: 201,
+          name: 'Cloak of Stoutness',
           creator: null,
         },
         {
+          __typename: 'Equipment',
           id: 202,
+          name: 'Toe Ring of the Splatter Skunk',
           creator: null,
         },
         {
+          __typename: 'Equipment',
           id: 203,
+          name: 'Enchanted War Gauntlet',
           creator: null,
         },
         {
+          __typename: 'Consumable',
           id: 201,
+          name: 'Rev-Up Immunity Smoothie',
           creator: null,
         },
         {
+          __typename: 'UtilityItem',
           id: 202,
+          name: 'Bandage',
         },
         {
+          __typename: 'Consumable',
           id: 203,
+          name: 'Mana Potion',
           creator: null,
         },
         {
+          __typename: 'Consumable',
           id: 204,
+          name: 'Healing Potion',
           creator: null,
         },
         {
+          __typename: 'Consumable',
           id: 205,
+          name: "Dolores Doesn't Splat Potion",
           creator: {
             id: 106,
+            name: 'Dolores',
+            items: [
+              {
+                __typename: 'Consumable',
+                id: 205,
+                name: "Dolores Doesn't Splat Potion",
+                contents: [
+                  {
+                    __typename: 'Consumable',
+                    id: 207,
+                    name: 'Crowd Blast Potion',
+                  },
+                  {
+                    __typename: 'Consumable',
+                    id: 208,
+                    name: 'Rock Buffalo Potion',
+                  },
+                ],
+              },
+            ],
           },
         },
         {
+          __typename: 'Consumable',
           id: 206,
+          name: "Carl's Jug O' Boom",
           creator: {
             id: 101,
+            name: 'Carl',
+            items: [
+              {
+                __typename: 'UtilityItem',
+                id: 206,
+                name: 'Fireball or Custard? Scratchcard',
+              },
+              {
+                __typename: 'Equipment',
+                id: 201,
+                name: 'Cloak of Stoutness',
+                contents: null,
+              },
+              {
+                __typename: 'Equipment',
+                id: 202,
+                name: 'Toe Ring of the Splatter Skunk',
+                contents: null,
+              },
+              {
+                __typename: 'Equipment',
+                id: 203,
+                name: 'Enchanted War Gauntlet',
+                contents: null,
+              },
+              {
+                __typename: 'Consumable',
+                id: 201,
+                name: 'Rev-Up Immunity Smoothie',
+                contents: null,
+              },
+              {
+                __typename: 'UtilityItem',
+                id: 202,
+                name: 'Bandage',
+              },
+              {
+                __typename: 'Consumable',
+                id: 203,
+                name: 'Mana Potion',
+                contents: null,
+              },
+              {
+                __typename: 'Consumable',
+                id: 204,
+                name: 'Healing Potion',
+                contents: null,
+              },
+              {
+                __typename: 'Consumable',
+                id: 205,
+                name: "Dolores Doesn't Splat Potion",
+                contents: [
+                  {
+                    __typename: 'Consumable',
+                    id: 207,
+                    name: 'Crowd Blast Potion',
+                  },
+                  {
+                    __typename: 'Consumable',
+                    id: 208,
+                    name: 'Rock Buffalo Potion',
+                  },
+                ],
+              },
+              {
+                __typename: 'Consumable',
+                id: 206,
+                name: "Carl's Jug O' Boom",
+                contents: [
+                  {
+                    __typename: 'Consumable',
+                    id: 209,
+                    name: 'Goblin Oil',
+                  },
+                  {
+                    __typename: 'MiscItem',
+                    id: 204,
+                    name: 'Low-Grade Moonshine Jug',
+                  },
+                  {
+                    __typename: 'MiscItem',
+                    id: 205,
+                    name: 'Torch',
+                  },
+                ],
+              },
+              {
+                __typename: 'Equipment',
+                id: 211,
+                name: "Enchanted Anarchist's Battle Rattle",
+                contents: [
+                  {
+                    __typename: 'Equipment',
+                    id: 212,
+                    name: 'Earth Upgrade Patch',
+                  },
+                  {
+                    __typename: 'Equipment',
+                    id: 213,
+                    name: 'Skyfowl Upgrade Patch',
+                  },
+                ],
+              },
+            ],
           },
         },
         {
+          __typename: 'Equipment',
           id: 211,
+          name: "Enchanted Anarchist's Battle Rattle",
           creator: null,
         },
       ],

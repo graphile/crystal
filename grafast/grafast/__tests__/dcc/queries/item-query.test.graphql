@@ -4,12 +4,30 @@
     ... on Created {
       creator {
         id
+        name
         ... on HasInventory {
           items {
+            __typename
             id
+            name
             ... on Created {
               creator {
                 id
+                name
+                ... on HasInventory {
+                  items {
+                    __typename
+                    id
+                    name
+                    ... on HasContents {
+                      contents {
+                        __typename
+                        id
+                        name
+                      }
+                    }
+                  }
+                }
               }
             }
           }

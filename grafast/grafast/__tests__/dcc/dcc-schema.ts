@@ -136,13 +136,14 @@ export const makeBaseArgs = () => {
       interface Item {
         id: Int!
         name: String
+      }
+      interface HasContents {
         contents: [Item]
       }
       interface Created {
         creator: Crawler
-        contents: [Item]
       }
-      type Equipment implements Item & Created {
+      type Equipment implements Item & Created & HasContents {
         id: Int!
         name: String
         contents: [Item]
@@ -150,7 +151,7 @@ export const makeBaseArgs = () => {
         currentDurability: Int
         maxDurability: Int
       }
-      type Consumable implements Item & Created {
+      type Consumable implements Item & Created & HasContents {
         id: Int!
         name: String
         contents: [Item]
@@ -160,12 +161,10 @@ export const makeBaseArgs = () => {
       type MiscItem implements Item {
         id: Int!
         name: String
-        contents: [Item]
       }
       type UtilityItem implements Item {
         id: Int!
         name: String
-        contents: [Item]
       }
       interface Location {
         id: Int!
