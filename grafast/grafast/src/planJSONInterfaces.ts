@@ -112,12 +112,12 @@ export interface GrafastPlanBucketJSONv1 {
   steps: ReadonlyArray<GrafastPlanStepJSONv1>;
   rootStepId: string | number | null;
   phases: ReadonlyArray<GrafastPlanBucketPhaseJSONv1>;
-  children: ReadonlyArray<GrafastPlanBucketJSONv1>;
+  childIds: ReadonlyArray<number>;
 }
 
 export interface GrafastPlanJSONv1 extends GrafastPlanJSON {
   version: "v1";
-  rootBucket: GrafastPlanBucketJSONv1;
+  buckets: ReadonlyArray<GrafastPlanBucketJSONv1>;
 }
 
 export type JSONValue =

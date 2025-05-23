@@ -110,8 +110,7 @@ export function planToMermaid(
   const sortedSteps: GrafastPlanStepJSONv1[] = [];
   const extractSteps = (bucket: GrafastPlanBucketJSONv1): void => {
     if (layerPlanById[bucket.id]) {
-      // Already processed. Likely either a combo or descendant of a combo
-      return;
+      throw new Error(`Two buckets with the same ID ${bucket.id}?`);
     }
     layerPlanById[bucket.id] = bucket;
     // Shallowest bucket first, then most dependencies
@@ -134,11 +133,8 @@ export function planToMermaid(
         }
       }
     }
-    for (const child of bucket.children) {
-      extractSteps(child);
-    }
   };
-  extractSteps(planJSON.rootBucket);
+  planJSON.buckets.forEach(extractSteps);
 
   const color = (i: number) => {
     return COLORS[i % COLORS.length];
@@ -218,7 +214,7 @@ export function planToMermaid(
   if (!skipBuckets) {
     for (let i = 0, l = layerPlans.length; i < l; i++) {
       const layerPlan = layerPlans[i];
-      const childNodes = layerPlan.children.map((c) => `Bucket${c.id}`);
+      const childNodes = layerPlan.childIds.map((cId) => `Bucket${cId}`);
       if (childNodes.length > 0) {
         graph.push(`    Bucket${layerPlan.id} --> ${childNodes.join(" & ")}`);
       }
