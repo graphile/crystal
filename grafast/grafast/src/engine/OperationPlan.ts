@@ -1649,11 +1649,11 @@ export class OperationPlan {
     for (const [_planningPath, batch] of todo) {
       const polymorphicResolveTypeEntriesByPolyType = new Map<
         GraphQLUnionType | GraphQLInterfaceType,
-        Array<Parameters<typeof this.polymorphicResolveType>[0]>
+        Array<PolymorphicResolveTypeDetails>
       >();
       const planFieldReturnTypeEntriesByStepByLayerPlan = new Map<
         LayerPlan,
-        Map<Step, Array<Parameters<typeof this.polymorphicPlanObjectType>[0]>>
+        Map<Step, Array<PolymorphicPlanObjectTypeDetails>>
       >();
       for (const entry of batch) {
         const [method, rawArgs] = entry;
@@ -1664,9 +1664,7 @@ export class OperationPlan {
         );
 
         if (method === this.polymorphicResolveType) {
-          const args = rawArgs as Parameters<
-            typeof this.polymorphicResolveType
-          >[0];
+          const args = rawArgs as PolymorphicResolveTypeDetails;
           const polyType = args.positionType;
           if (!isUnionType(polyType) && !isInterfaceType(polyType)) {
             throw new Error(
@@ -1680,9 +1678,7 @@ export class OperationPlan {
           }
           list.push(args);
         } else if (method == this.polymorphicPlanObjectType) {
-          const args = rawArgs as Parameters<
-            typeof this.polymorphicPlanObjectType
-          >[0];
+          const args = rawArgs as PolymorphicPlanObjectTypeDetails;
           const lp = args.layerPlan;
           let planFieldReturnTypeEntriesByStep =
             planFieldReturnTypeEntriesByStepByLayerPlan.get(lp);
