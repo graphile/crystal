@@ -217,11 +217,7 @@ const OUTPUT_PLAN_TYPE_ARRAY = Object.freeze({ mode: "array" });
 const newValueStepCallback = (isImmutable: boolean) =>
   new __ValueStep(isImmutable);
 
-const NO_ARGS: TrackedArguments = {
-  get() {
-    throw new Error(`This field doesn't have any arguments`);
-  },
-};
+const NO_ARGS: TrackedArguments = {};
 
 export class OperationPlan {
   /* This only exists to make establishOperationPlan easier for TypeScript */
@@ -922,12 +918,7 @@ export class OperationPlan {
         POLYMORPHIC_ROOT_PATHS,
         planningPath,
         () => {
-          const $args = object(
-            field.arguments?.reduce((memo, arg) => {
-              memo[arg.name.value] = trackedArguments.get(arg.name.value);
-              return memo;
-            }, Object.create(null)) ?? Object.create(null),
-          );
+          const $args = object(trackedArguments);
           const rawResolver = fieldSpec.resolve;
           const rawSubscriber = fieldSpec.subscribe;
           return graphqlResolver(
@@ -1375,11 +1366,7 @@ export class OperationPlan {
             polymorphicPaths,
             fieldPlanningPath,
             () => {
-              const spec = Object.create(null);
-              for (const arg of field.arguments ?? EMPTY_ARRAY) {
-                spec[arg.name.value] = trackedArguments.get(arg.name.value);
-              }
-              const $args = object(spec);
+              const $args = object(trackedArguments);
               return graphqlResolver(resolver, subscriber, step, $args, {
                 ...this.resolveInfoOperationBase,
                 fieldName,
@@ -2896,11 +2883,7 @@ export class OperationPlan {
       );
       trackedArgumentValues[argumentName] = argumentPlan;
     }
-    return {
-      get(name) {
-        return trackedArgumentValues[name];
-      },
-    };
+    return trackedArgumentValues;
   }
 
   /**

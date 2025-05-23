@@ -8,7 +8,11 @@ import * as graphql from "graphql";
 
 import type { __ItemStep, ExecutionDetails, ObjectStep } from "../index.js";
 import { context, flagError } from "../index.js";
-import type { PlanTypeInfo, UnbatchedExecutionExtra } from "../interfaces.js";
+import type {
+  PlanTypeInfo,
+  TrackedArguments,
+  UnbatchedExecutionExtra,
+} from "../interfaces.js";
 import { Step, UnbatchedStep } from "../step.js";
 import { isPromiseLike } from "../utils.js";
 
@@ -45,7 +49,7 @@ export class GraphQLResolverStep extends UnbatchedStep {
       | null
       | undefined,
     $plan: Step,
-    $args: ObjectStep,
+    $args: ObjectStep<TrackedArguments>,
     private resolveInfoBase: ResolveInfoBase,
   ) {
     super();
@@ -219,7 +223,7 @@ export function graphqlResolver(
   resolver: GraphQLFieldResolver<any, any> | null | undefined,
   subscriber: GraphQLFieldResolver<any, any> | null | undefined,
   $step: Step,
-  $args: ObjectStep,
+  $args: ObjectStep<TrackedArguments>,
   resolveInfoBase: ResolveInfoBase,
 ): Step {
   return new GraphQLResolverStep(
