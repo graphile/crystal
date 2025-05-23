@@ -91,14 +91,6 @@ function mergeErrorsBackIn(
   return { flags: finalFlags, results: finalResults };
 }
 
-/**
- * It has already been filtered at this point, unary can exist across
- * many poly paths, so we can't detail the singular poly path it belongs
- * to... so just lie and say it belongs to all of them. It's an internal
- * property and we only use it in __dataOnly step anyway.
- */
-const UNARY_POLYPATH_HACK = [null] as const;
-
 /** @internal */
 export function executeBucket(
   bucket: Bucket,
@@ -112,20 +104,9 @@ export function executeBucket(
     size: number,
     step: Step,
     dependencies: ReadonlyArray<ExecutionValue>,
-    polymorphicPathList: ReadonlyArray<string | null>,
     extra: ExecutionExtra,
   ): PromiseOrDirect<GrafastInternalResultsOrStream<any>> {
-    const results = executeOrStream(
-      size,
-      step,
-      dependencies,
-      step._isUnary
-        ? bucket.size === 1
-          ? bucket.polymorphicPathList
-          : UNARY_POLYPATH_HACK
-        : polymorphicPathList,
-      extra,
-    );
+    const results = executeOrStream(size, step, dependencies, extra);
     const flags = arrayOfLength(size, NO_FLAGS);
     if (isPromiseLike(results)) {
       return results.then((results) => ({ flags, results }));
@@ -748,18 +729,12 @@ export function executeBucket(
     count: number,
     step: Step,
     values: ReadonlyArray<ExecutionValue>,
-    polymorphicPathList: ReadonlyArray<string | null>,
     extra: ExecutionExtra,
   ): ExecutionResults<any> {
     if (isDev) {
       if (step._isUnary && count !== 1) {
         throw new Error(
           `GrafastInternalError<84a6cdfa-e8fe-4dea-85fe-9426a6a78027>: ${step} is a unary step, but we're attempting to pass it ${count} (!= 1) values`,
-        );
-      }
-      if (polymorphicPathList.length !== count) {
-        throw new Error(
-          `GrafastInternalError<1ad4fa5b-211d-4985-b8e9-b34400c78780>: Issue constructing polymorphicPathList for ${step}; expected ${count} entries, but found ${polymorphicPathList.length}`,
         );
       }
       if (step.execute.length > 1) {
@@ -775,7 +750,6 @@ export function executeBucket(
       values,
       extra,
       stream: evaluateStream(bucket, step),
-      polymorphicPathList,
     };
     if (!step.isSyncAndSafe && middleware != null) {
       return middleware.run(
@@ -952,7 +926,6 @@ export function executeBucket(
         newSize,
         step,
         dependencies,
-        newPolymorphicPathList,
         extra,
       );
       if (isPromiseLike(resultWithoutErrors)) {
@@ -977,7 +950,6 @@ export function executeBucket(
         newSize,
         step,
         dependencies,
-        newPolymorphicPathList,
         extra,
       );
     }
@@ -1075,7 +1047,6 @@ export function executeBucket(
             size,
             step,
             $sideEffect ? dependencies.slice(0, depCount) : dependencies,
-            bucket.polymorphicPathList,
             extra,
           );
       if (isPromiseLike(result)) {
