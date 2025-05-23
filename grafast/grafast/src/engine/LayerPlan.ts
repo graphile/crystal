@@ -17,8 +17,19 @@ import { arrayOfLength, arraysMatch, setsMatch } from "../utils.js";
 import { batchExecutionValue, newBucket } from "./executeBucket.js";
 import type { OperationPlan } from "./OperationPlan";
 
+/**
+ * If any of these flags exist on a value then it isn't the value we want to
+ * include for the combo step.
+ */
 const SKIP_FLAGS =
   FLAG_ERROR | FLAG_STOPPED | FLAG_POLY_SKIPPED | FLAG_INHIBITED;
+
+/**
+ * If any of these flags exist on the "$__typename" step, then the value
+ * should resolve to null
+ */
+const NO_TYPENAME_FLAGS =
+  FLAG_ERROR | FLAG_STOPPED | FLAG_POLY_SKIPPED | FLAG_INHIBITED | FLAG_NULL;
 
 /*
  * Branching: e.g. polymorphic, conditional, etc - means that different
@@ -821,10 +832,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           originalIndex++
         ) {
           const flags = typenameEV._flagsAt(originalIndex);
-          if (
-            flags &
-            (FLAG_ERROR | FLAG_INHIBITED | FLAG_NULL | FLAG_POLY_SKIPPED)
-          ) {
+          if ((flags & NO_TYPENAME_FLAGS) !== 0) {
             continue;
           }
           if (
