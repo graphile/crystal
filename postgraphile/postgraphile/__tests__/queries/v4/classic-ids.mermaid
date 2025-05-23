@@ -48,28 +48,28 @@ graph TD
     Object13 & ApplyInput15 & Connection14 --> PgSelect25
     PgSelectRows27[["PgSelectRows[27∈1] ➊"]]:::plan
     PgSelect25 --> PgSelectRows27
+    PgSelect26[["PgSelect[26∈2] ➊<br />ᐸedge_caseᐳ"]]:::plan
+    Object13 & ApplyInput23 & Connection22 --> PgSelect26
+    PgSelectRows28[["PgSelectRows[28∈2] ➊"]]:::plan
+    PgSelect26 --> PgSelectRows28
     __Item29[/"__Item[29∈3]<br />ᐸ27ᐳ"\]:::itemplan
     PgSelectRows27 ==> __Item29
     PgSelectSingle30{{"PgSelectSingle[30∈3]<br />ᐸpostᐳ"}}:::plan
     __Item29 --> PgSelectSingle30
+    __Item31[/"__Item[31∈4]<br />ᐸ28ᐳ"\]:::itemplan
+    PgSelectRows28 ==> __Item31
+    PgSelectSingle32{{"PgSelectSingle[32∈4]<br />ᐸedge_caseᐳ"}}:::plan
+    __Item31 --> PgSelectSingle32
     List35{{"List[35∈5]<br />ᐸ33,34ᐳ"}}:::plan
     PgClassExpression34{{"PgClassExpression[34∈5]<br />ᐸ__post__.”id”ᐳ"}}:::plan
     Constant33 & PgClassExpression34 --> List35
     PgSelectSingle30 --> PgClassExpression34
     Lambda36{{"Lambda[36∈5]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List35 --> Lambda36
-    PgClassExpression37{{"PgClassExpression[37∈5]<br />ᐸ__post__.”headline”ᐳ"}}:::plan
-    PgSelectSingle30 --> PgClassExpression37
-    PgSelect26[["PgSelect[26∈2] ➊<br />ᐸedge_caseᐳ"]]:::plan
-    Object13 & ApplyInput23 & Connection22 --> PgSelect26
-    PgSelectRows28[["PgSelectRows[28∈2] ➊"]]:::plan
-    PgSelect26 --> PgSelectRows28
-    __Item31[/"__Item[31∈4]<br />ᐸ28ᐳ"\]:::itemplan
-    PgSelectRows28 ==> __Item31
-    PgSelectSingle32{{"PgSelectSingle[32∈4]<br />ᐸedge_caseᐳ"}}:::plan
-    __Item31 --> PgSelectSingle32
-    PgClassExpression38{{"PgClassExpression[38∈6]<br />ᐸ__edge_case__.”row_id”ᐳ"}}:::plan
-    PgSelectSingle32 --> PgClassExpression38
+    PgClassExpression38{{"PgClassExpression[38∈5]<br />ᐸ__post__.”headline”ᐳ"}}:::plan
+    PgSelectSingle30 --> PgClassExpression38
+    PgClassExpression37{{"PgClassExpression[37∈6]<br />ᐸ__edge_case__.”row_id”ᐳ"}}:::plan
+    PgSelectSingle32 --> PgClassExpression37
 
     %% define steps
     classDef bucket0 stroke:#696969
@@ -83,7 +83,7 @@ graph TD
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item31,PgSelectSingle32 bucket4
     classDef bucket5 stroke:#7fff00
-    class Bucket5,PgClassExpression34,List35,Lambda36,PgClassExpression37 bucket5
+    class Bucket5,PgClassExpression34,List35,Lambda36,PgClassExpression38 bucket5
     classDef bucket6 stroke:#ff1493
-    class Bucket6,PgClassExpression38 bucket6
+    class Bucket6,PgClassExpression37 bucket6
 

@@ -37,24 +37,24 @@ graph TD
     Object11 & Connection12 --> PgSelect19
     PgSelectRows21[["PgSelectRows[21∈1] ➊"]]:::plan
     PgSelect19 --> PgSelectRows21
-    __Item23[/"__Item[23∈3]<br />ᐸ21ᐳ"\]:::itemplan
-    PgSelectRows21 ==> __Item23
-    PgSelectSingle24{{"PgSelectSingle[24∈3]<br />ᐸpersonᐳ"}}:::plan
-    __Item23 --> PgSelectSingle24
-    PgClassExpression27{{"PgClassExpression[27∈5]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgSelectSingle24 --> PgClassExpression27
-    PgClassExpression28{{"PgClassExpression[28∈5]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle24 --> PgClassExpression28
     PgSelect20[["PgSelect[20∈2] ➊<br />ᐸpersonᐳ"]]:::plan
     Object11 & Connection17 --> PgSelect20
     PgSelectRows22[["PgSelectRows[22∈2] ➊"]]:::plan
     PgSelect20 --> PgSelectRows22
+    __Item23[/"__Item[23∈3]<br />ᐸ21ᐳ"\]:::itemplan
+    PgSelectRows21 ==> __Item23
+    PgSelectSingle24{{"PgSelectSingle[24∈3]<br />ᐸpersonᐳ"}}:::plan
+    __Item23 --> PgSelectSingle24
     __Item25[/"__Item[25∈4]<br />ᐸ22ᐳ"\]:::itemplan
     PgSelectRows22 ==> __Item25
     PgSelectSingle26{{"PgSelectSingle[26∈4]<br />ᐸpersonᐳ"}}:::plan
     __Item25 --> PgSelectSingle26
-    PgClassExpression29{{"PgClassExpression[29∈6]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgSelectSingle26 --> PgClassExpression29
+    PgClassExpression27{{"PgClassExpression[27∈5]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle24 --> PgClassExpression27
+    PgClassExpression29{{"PgClassExpression[29∈5]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgSelectSingle24 --> PgClassExpression29
+    PgClassExpression28{{"PgClassExpression[28∈6]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle26 --> PgClassExpression28
     PgClassExpression30{{"PgClassExpression[30∈6]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle26 --> PgClassExpression30
 
@@ -70,7 +70,7 @@ graph TD
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item25,PgSelectSingle26 bucket4
     classDef bucket5 stroke:#7fff00
-    class Bucket5,PgClassExpression27,PgClassExpression28 bucket5
+    class Bucket5,PgClassExpression27,PgClassExpression29 bucket5
     classDef bucket6 stroke:#ff1493
-    class Bucket6,PgClassExpression29,PgClassExpression30 bucket6
+    class Bucket6,PgClassExpression28,PgClassExpression30 bucket6
 

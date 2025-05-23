@@ -14,7 +14,7 @@ graph TD
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16, 11, 28<br /><br />ROOT Object{1}ᐸ{result}ᐳ[16]"):::bucket
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 27, 22, 25<br /><br />ROOT Object{2}ᐸ{result}ᐳ[27]"):::bucket
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 11, 28<br /><br />ROOT PgInsertSingle{1}ᐸuser()ᐳ[11]"):::bucket
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 22, 25<br /><br />ROOT PgInsertSingle{2}ᐸuser_file()ᐳ[22]<br />1: <br />ᐳ: 36, 35, 37, 38<br />2: PgSelect[39]<br />3: PgSelectRows[44]<br />ᐳ: First[43], PgSelectSingle[45]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 22, 25<br /><br />ROOT PgInsertSingle{2}ᐸuser_file()ᐳ[22]<br />1: <br />ᐳ: 34, 33, 36, 38<br />2: PgSelect[39]<br />3: PgSelectRows[44]<br />ᐳ: First[43], PgSelectSingle[45]"):::bucket
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 45<br /><br />ROOT PgSelectSingle{6}ᐸuserᐳ[45]"):::bucket
     end
     Bucket0 --> Bucket1 & Bucket2
@@ -53,16 +53,6 @@ graph TD
     Object14 & ApplyInput15 --> PgInsertSingle11
     Object16{{"Object[16∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle11 --> Object16
-    List31{{"List[31∈5] ➊<br />ᐸ28,29ᐳ"}}:::plan
-    PgClassExpression29{{"PgClassExpression[29∈5] ➊<br />ᐸ__user__.”id”ᐳ"}}:::plan
-    Constant28 & PgClassExpression29 --> List31
-    Access30{{"Access[30∈5] ➊<br />ᐸ11.tᐳ"}}:::plan
-    Access30 --> PgClassExpression29
-    PgInsertSingle11 --> Access30
-    Lambda32{{"Lambda[32∈5] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List31 --> Lambda32
-    PgClassExpression34{{"PgClassExpression[34∈5] ➊<br />ᐸ__user__.”name”ᐳ"}}:::plan
-    Access30 --> PgClassExpression34
     PgInsertSingle22[["PgInsertSingle[22∈2] ➊<br />ᐸuser_file()ᐳ"]]:::sideeffectplan
     Object25{{"Object[25∈2] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object25 & ApplyInput26 --> PgInsertSingle22
@@ -73,16 +63,26 @@ graph TD
     __Value2 --> Access24
     Object27{{"Object[27∈2] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle22 --> Object27
+    List31{{"List[31∈5] ➊<br />ᐸ28,29ᐳ"}}:::plan
+    PgClassExpression29{{"PgClassExpression[29∈5] ➊<br />ᐸ__user__.”id”ᐳ"}}:::plan
+    Constant28 & PgClassExpression29 --> List31
+    Access30{{"Access[30∈5] ➊<br />ᐸ11.tᐳ"}}:::plan
+    Access30 --> PgClassExpression29
+    PgInsertSingle11 --> Access30
+    Lambda32{{"Lambda[32∈5] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List31 --> Lambda32
+    PgClassExpression37{{"PgClassExpression[37∈5] ➊<br />ᐸ__user__.”name”ᐳ"}}:::plan
+    Access30 --> PgClassExpression37
     PgSelect39[["PgSelect[39∈6] ➊<br />ᐸuserᐳ"]]:::plan
     PgClassExpression38{{"PgClassExpression[38∈6] ➊<br />ᐸ__user_file__.”user_id”ᐳ"}}:::plan
     Object25 & PgClassExpression38 --> PgSelect39
-    PgClassExpression35{{"PgClassExpression[35∈6] ➊<br />ᐸ__user_file__.”id”ᐳ"}}:::plan
-    Access36{{"Access[36∈6] ➊<br />ᐸ22.tᐳ"}}:::plan
-    Access36 --> PgClassExpression35
-    PgInsertSingle22 --> Access36
-    PgClassExpression37{{"PgClassExpression[37∈6] ➊<br />ᐸ__user_fil...”filename”ᐳ"}}:::plan
-    Access36 --> PgClassExpression37
-    Access36 --> PgClassExpression38
+    PgClassExpression33{{"PgClassExpression[33∈6] ➊<br />ᐸ__user_file__.”id”ᐳ"}}:::plan
+    Access34{{"Access[34∈6] ➊<br />ᐸ22.tᐳ"}}:::plan
+    Access34 --> PgClassExpression33
+    PgInsertSingle22 --> Access34
+    PgClassExpression36{{"PgClassExpression[36∈6] ➊<br />ᐸ__user_fil...”filename”ᐳ"}}:::plan
+    Access34 --> PgClassExpression36
+    Access34 --> PgClassExpression38
     First43{{"First[43∈6] ➊"}}:::plan
     PgSelectRows44[["PgSelectRows[44∈6] ➊"]]:::plan
     PgSelectRows44 --> First43
@@ -106,9 +106,9 @@ graph TD
     classDef bucket4 stroke:#0000ff
     class Bucket4 bucket4
     classDef bucket5 stroke:#7fff00
-    class Bucket5,PgClassExpression29,Access30,List31,Lambda32,PgClassExpression34 bucket5
+    class Bucket5,PgClassExpression29,Access30,List31,Lambda32,PgClassExpression37 bucket5
     classDef bucket6 stroke:#ff1493
-    class Bucket6,PgClassExpression35,Access36,PgClassExpression37,PgClassExpression38,PgSelect39,First43,PgSelectRows44,PgSelectSingle45 bucket6
+    class Bucket6,PgClassExpression33,Access34,PgClassExpression36,PgClassExpression38,PgSelect39,First43,PgSelectRows44,PgSelectSingle45 bucket6
     classDef bucket7 stroke:#808000
     class Bucket7,PgClassExpression46,PgClassExpression47 bucket7
 

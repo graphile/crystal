@@ -8,10 +8,10 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/interfaces-single-table/relation"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 316, 10<br />2: PgSelect[7]<br />3: PgSelectRows[12]<br />ᐳ: 11, 13, 14, 16, 17, 18<br />4: PgSelect[19]<br />5: PgSelectRows[24]<br />ᐳ: 23, 25, 64, 65, 67<br />6: PgSelect[68]<br />7: PgSelectRows[73]<br />ᐳ: First[72], PgSelectSingle[74]"):::bucket
-    Bucket1("Bucket 1 (polymorphic)<br />__typename: Lambda[17]<br />Deps: 17, 65, 74, 13, 14, 25, 18"):::bucket
-    Bucket2("Bucket 2 (polymorphic)<br />__typename: Lambda[65]<br />Deps: 65, 74, 25, 18"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 74<br /><br />ROOT PgSelectSingleᐸpeopleᐳ[74]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 316, 10<br />2: PgSelect[7]<br />3: PgSelectRows[12]<br />ᐳ: 11, 13, 14, 16, 17, 18<br />4: PgSelect[19]<br />5: PgSelectRows[24]<br />ᐳ: 23, 25, 64, 65, 91<br />6: PgSelect[92]<br />7: PgSelectRows[97]<br />ᐳ: First[96], PgSelectSingle[98]"):::bucket
+    Bucket1("Bucket 1 (polymorphic)<br />__typename: Lambda[17]<br />Deps: 17, 65, 98, 13, 14, 25, 18"):::bucket
+    Bucket2("Bucket 2 (polymorphic)<br />__typename: Lambda[65]<br />Deps: 65, 98, 25, 18"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 98<br /><br />ROOT PgSelectSingleᐸpeopleᐳ[98]"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
@@ -28,9 +28,9 @@ graph TD
     PgSelect19[["PgSelect[19∈0] ➊<br />ᐸsingle_table_itemsᐳ"]]:::plan
     PgClassExpression18{{"PgClassExpression[18∈0] ➊<br />ᐸ__single_t...parent_id”ᐳ"}}:::plan
     Object10 & PgClassExpression18 --> PgSelect19
-    PgSelect68[["PgSelect[68∈0] ➊<br />ᐸpeopleᐳ"]]:::plan
-    PgClassExpression67{{"PgClassExpression[67∈0] ➊<br />ᐸ__single_t...author_id”ᐳ"}}:::plan
-    Object10 & PgClassExpression67 --> PgSelect68
+    PgSelect92[["PgSelect[92∈0] ➊<br />ᐸpeopleᐳ"]]:::plan
+    PgClassExpression91{{"PgClassExpression[91∈0] ➊<br />ᐸ__single_t...author_id”ᐳ"}}:::plan
+    Object10 & PgClassExpression91 --> PgSelect92
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
@@ -57,20 +57,20 @@ graph TD
     PgSelectSingle25 --> PgClassExpression64
     Lambda65{{"Lambda[65∈0] ➊"}}:::plan
     PgClassExpression64 --> Lambda65
-    PgSelectSingle25 --> PgClassExpression67
-    First72{{"First[72∈0] ➊"}}:::plan
-    PgSelectRows73[["PgSelectRows[73∈0] ➊"]]:::plan
-    PgSelectRows73 --> First72
-    PgSelect68 --> PgSelectRows73
-    PgSelectSingle74{{"PgSelectSingle[74∈0] ➊<br />ᐸpeopleᐳ"}}:::plan
-    First72 --> PgSelectSingle74
+    PgSelectSingle25 --> PgClassExpression91
+    First96{{"First[96∈0] ➊"}}:::plan
+    PgSelectRows97[["PgSelectRows[97∈0] ➊"]]:::plan
+    PgSelectRows97 --> First96
+    PgSelect92 --> PgSelectRows97
+    PgSelectSingle98{{"PgSelectSingle[98∈0] ➊<br />ᐸpeopleᐳ"}}:::plan
+    First96 --> PgSelectSingle98
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgClassExpression291{{"PgClassExpression[291∈3] ➊<br />ᐸ__people__.”username”ᐳ<br />(5) ...ᐳSingleTableTopic<br />(5) ...ᐳSingleTablePost<br />(5) ...ᐳSingleTableDivider<br />(5) ...ᐳSingleTableChecklist<br />(5) ...ᐳSingleTableChecklistItem"}}:::plan
-    PgSelectSingle74 --> PgClassExpression291
+    PgSelectSingle98 --> PgClassExpression291
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,PgClassExpression14,PgClassExpression16,Lambda17,PgClassExpression18,PgSelect19,First23,PgSelectRows24,PgSelectSingle25,PgClassExpression64,Lambda65,PgClassExpression67,PgSelect68,First72,PgSelectRows73,PgSelectSingle74,Constant316 bucket0
+    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,PgClassExpression14,PgClassExpression16,Lambda17,PgClassExpression18,PgSelect19,First23,PgSelectRows24,PgSelectSingle25,PgClassExpression64,Lambda65,PgClassExpression91,PgSelect92,First96,PgSelectRows97,PgSelectSingle98,Constant316 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1 bucket1
     classDef bucket2 stroke:#7f007f
