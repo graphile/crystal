@@ -212,10 +212,18 @@ export const makeBaseArgs = () => {
         locations: [Location]
       }
 
+      enum ItemType {
+        Equipment
+        Consumable
+        UtilityItem
+        MiscItem
+      }
+
       type Query {
         crawler(id: Int!): Crawler
         floor(number: Int!): Floor
         brokenItem: Item
+        item(type: ItemType!, id: Int!): Item
       }
     `,
     plans: {
@@ -240,6 +248,9 @@ export const makeBaseArgs = () => {
         },
         brokenItem() {
           return constant("Utility:999");
+        },
+        item(_: any, { $type, $id }: FieldArgs) {
+          return lambda([$type, $id], ([type, id]) => `${type}:${id}`);
         },
       },
       ActiveCrawler: {
