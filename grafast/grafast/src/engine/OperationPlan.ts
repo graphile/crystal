@@ -2682,7 +2682,11 @@ export class OperationPlan {
         streamDetails,
       } = batchPlanFieldDetails;
       // TODO: add arguments to signature
-      const signature = `${planningPath}|${typeName}|${fieldName}|${layerPlan.id}`;
+      const signature = `${planningPath}@${layerPlan.id}=${typeName}.${fieldName}(${Object.entries(
+        trackedArguments,
+      )
+        .map(([key, step]) => `${key}:${step.id}`)
+        .join(",")})`;
       let entry = groups.get(signature);
       if (!entry) {
         entry = {
