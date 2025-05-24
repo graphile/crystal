@@ -123,7 +123,7 @@ export interface Database {
   clubs: readonly ClubData[];
 }
 
-export function makeData(): Database {
+export function makeDb(): Database {
   return {
     crawlers: [
       {

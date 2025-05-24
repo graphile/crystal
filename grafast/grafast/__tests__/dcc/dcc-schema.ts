@@ -33,7 +33,7 @@ import {
   batchGetSafeRoomById,
   batchGetStairwellById,
   batchGetUtilityItemById,
-  makeData,
+  makeDb,
 } from "./dcc-data.js";
 import { delegate } from "./delegate.js";
 
@@ -47,7 +47,7 @@ const requestContext = {};
 declare global {
   namespace Grafast {
     interface Context {
-      data: Database;
+      db: Database;
     }
   }
 }
@@ -263,8 +263,8 @@ export const makeBaseArgs = () => {
 
       Query: {
         crawler(_: any, { $id }: FieldArgs) {
-          const $data = context().get("data");
-          return loadOne($id as Step<number>, $data, null, batchGetCrawlerById);
+          const $db = context().get("db");
+          return loadOne($id as Step<number>, $db, null, batchGetCrawlerById);
         },
         character(_: any, { $id }: FieldArgs) {
           return $id;
@@ -282,8 +282,8 @@ export const makeBaseArgs = () => {
       ActiveCrawler: {
         bestFriend($activeCrawler: Step<CrawlerData>) {
           const $id = inhibitOnNull(get($activeCrawler, "bestFriend"));
-          const $data = context().get("data");
-          return loadOne($id, $data, null, batchGetCrawlerById);
+          const $db = context().get("db");
+          return loadOne($id, $db, null, batchGetCrawlerById);
         },
         friends($activeCrawler: Step<CrawlerData>) {
           const $ids = get($activeCrawler, "friends");
@@ -294,8 +294,8 @@ export const makeBaseArgs = () => {
         ...SharedNpcResolvers,
         client($manager: Step<NpcData>) {
           const $id = inhibitOnNull(get($manager, "client"));
-          const $data = context().get("data");
-          return loadOne($id, $data, null, batchGetCrawlerById);
+          const $db = context().get("db");
+          return loadOne($id, $db, null, batchGetCrawlerById);
         },
       },
       Security: {
@@ -304,8 +304,8 @@ export const makeBaseArgs = () => {
         clients($security: Step<NpcData>) {
           const $ids = inhibitOnNull(get($security, "clients"));
           return each($ids, ($id) => {
-            const $data = context().get("data");
-            return loadOne($id, $data, null, batchGetCrawlerById);
+            const $db = context().get("db");
+            return loadOne($id, $db, null, batchGetCrawlerById);
           });
         },
       },
@@ -323,17 +323,12 @@ export const makeBaseArgs = () => {
       },
       Character: {
         __planType($specifier: Step<number>) {
-          const $data = context().get("data");
+          const $db = context().get("db");
 
           const $crawlerId = inhibitOnNull(
             lambda($specifier, extractCrawlerId),
           );
-          const $crawler = loadOne(
-            $crawlerId,
-            $data,
-            null,
-            batchGetCrawlerById,
-          );
+          const $crawler = loadOne($crawlerId, $db, null, batchGetCrawlerById);
           const $crawlerTypename = lambda(
             $crawler as Step<CrawlerData>,
             crawlerToTypeName,
@@ -342,7 +337,7 @@ export const makeBaseArgs = () => {
           const $npcId = inhibitOnNull(
             lambda($specifier, extractNpcId),
           ) as Step<number>;
-          const $npc = loadOne($npcId, $data, null, batchGetNpcById);
+          const $npc = loadOne($npcId, $db, null, batchGetNpcById);
           const $npcTypename = lambda($npc, npcToTypeName);
 
           const $__typename = coalesce([$crawlerTypename, $npcTypename]);
@@ -364,11 +359,11 @@ export const makeBaseArgs = () => {
       },
       NPC: {
         __planType($npcId: Step<number>) {
-          const $data = context().get("data");
+          const $db = context().get("db");
           // TODO: Inhibit on null shouldn't be needed here
           const $npc = loadOne(
             inhibitOnNull($npcId),
-            $data,
+            $db,
             null,
             batchGetNpcById,
           );
@@ -398,13 +393,13 @@ export const makeBaseArgs = () => {
       Floor: {
         locations($floor: Step<FloorData>) {
           const $number = get($floor, "number");
-          const $data = context().get("data");
-          return loadMany($number, $data, null, batchGetLocationsByFloorNumber);
+          const $db = context().get("db");
+          return loadMany($number, $db, null, batchGetLocationsByFloorNumber);
         },
       },
       Location: {
         __planType($location: Step<LocationData>): AbstractTypePlanner {
-          const $data = context().get("data");
+          const $db = context().get("db");
           const $__typename = get($location, "type");
           return {
             $__typename,
@@ -412,12 +407,7 @@ export const makeBaseArgs = () => {
               const $id = get($location, "id");
 
               if (t.name === "SafeRoom") {
-                const $saferoom = loadOne(
-                  $id,
-                  $data,
-                  null,
-                  batchGetSafeRoomById,
-                );
+                const $saferoom = loadOne($id, $db, null, batchGetSafeRoomById);
                 return delegate(
                   $saferoom,
                   ["type", "name", "floors", "id"],
@@ -425,7 +415,7 @@ export const makeBaseArgs = () => {
                 );
               }
               if (t.name === "Club") {
-                const $club = loadOne($id, $data, null, batchGetClubById);
+                const $club = loadOne($id, $db, null, batchGetClubById);
                 return delegate(
                   $club,
                   ["type", "name", "floors", "id"],
@@ -435,7 +425,7 @@ export const makeBaseArgs = () => {
               if (t.name === "Stairwell") {
                 const $stairwell = loadOne(
                   $id,
-                  $data,
+                  $db,
                   null,
                   batchGetStairwellById,
                 );
@@ -462,8 +452,8 @@ export const makeBaseArgs = () => {
         security($club: Step<ClubData & LocationData>) {
           const $ids = inhibitOnNull(get($club, "security"));
           return each($ids, ($id) => {
-            const $data = context().get("data");
-            return loadOne($id, $data, null, batchGetNpcById);
+            const $db = context().get("db");
+            return loadOne($id, $db, null, batchGetNpcById);
           });
         },
       },
@@ -472,13 +462,13 @@ export const makeBaseArgs = () => {
       },
     },
   });
-  const data = makeData();
+  const db = makeDb();
   return {
     schema,
     resolvedPreset,
     requestContext,
     variableValues: {},
-    contextValue: { data },
+    contextValue: { db },
   };
 };
 
@@ -504,19 +494,19 @@ const ItemResolver = {
       $__typename,
       planForType(t) {
         const $id = get($decoded, "id");
-        const $data = context().get("data");
+        const $db = context().get("db");
 
         if (t.name === "Equipment") {
-          return loadOne($id, $data, null, batchGetEquipmentById);
+          return loadOne($id, $db, null, batchGetEquipmentById);
         }
         if (t.name === "Consumable") {
-          return loadOne($id, $data, null, batchGetConsumableById);
+          return loadOne($id, $db, null, batchGetConsumableById);
         }
         if (t.name === "UtilityItem") {
-          return loadOne($id, $data, null, batchGetUtilityItemById);
+          return loadOne($id, $db, null, batchGetUtilityItemById);
         }
         if (t.name === "MiscItem") {
-          return loadOne($id, $data, null, batchGetMiscItemById);
+          return loadOne($id, $db, null, batchGetMiscItemById);
         }
         return null;
       },
@@ -525,9 +515,9 @@ const ItemResolver = {
 };
 
 function getCreator($source: Step<{ creator?: number }>) {
-  const $data = context().get("data");
+  const $db = context().get("db");
   const $id = inhibitOnNull(get($source, "creator"));
-  return loadOne($id, $data, null, batchGetCrawlerById);
+  return loadOne($id, $db, null, batchGetCrawlerById);
 }
 
 function crawlerToTypeName(crawler: CrawlerData): string | null {
