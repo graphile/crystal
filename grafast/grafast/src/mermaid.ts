@@ -282,7 +282,8 @@ export function planToMermaid(
         depIdsInSameBucket.every(
           (id) => pp(stepById[id].polymorphicPaths) === polyPaths,
         );
-      const polyPathsIfDifferent = polyPathsAreSame ? "" : `\n${polyPaths}`;
+      const polyPathsIfDifferent =
+        polyPathsAreSame || polyPaths === "" ? "" : `\n${polyPaths}`;
 
       const [lBrace, rBrace, shape = "", planNameText = planName] =
         plan.stepClass === "__ItemStep"
