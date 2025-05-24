@@ -330,12 +330,12 @@ export class StepTracker {
     const $dependency = sudo(options.step);
     if (!this.activeSteps.has($dependent)) {
       throw new Error(
-        `Cannot add ${$dependency} as a dependency of ${$dependent}; the latter is deleted!`,
+        `Cannot add ${$dependency} as a dependency of ${$dependent}; the latter is deleted! Explanation: https://err.red/gasdd#phase=${this.operationPlan.phase}&dependency=${encodeURIComponent(String($dependency))}&dependent=${encodeURIComponent(String($dependent))}&deleted=dependent`,
       );
     }
     if (!this.activeSteps.has($dependency)) {
       throw new Error(
-        `Cannot add ${$dependency} as a dependency of ${$dependent}; the former is deleted!`,
+        `Cannot add ${$dependency} as a dependency of ${$dependent}; the former is deleted! Explanation: https://err.red/gasdd#phase=${this.operationPlan.phase}&dependency=${encodeURIComponent(String($dependency))}&dependent=${encodeURIComponent(String($dependent))}&deleted=dependency`,
       );
     }
     if ($dependent.isFinalized) {
@@ -347,7 +347,7 @@ export class StepTracker {
       throw new Error(
         `Error occurred when adding dependency for '${$dependent}', value passed was not a step, it was '${inspect(
           $dependency,
-        )}'`,
+        )}' (phase = ${this.operationPlan.phase})`,
       );
     }
     if (isDev) {
@@ -356,7 +356,7 @@ export class StepTracker {
         throw new Error(
           //console.error(
           // This is not a GrafastInternalError
-          `Attempted to add '${$dependency}' (${$dependency.layerPlan}) as a dependency of '${$dependent}' (${$dependent.layerPlan}), but we cannot because that LayerPlan isn't an ancestor`,
+          `Attempted to add '${$dependency}' (${$dependency.layerPlan}) as a dependency of '${$dependent}' (${$dependent.layerPlan}), but we cannot because that LayerPlan isn't an ancestor. (phase = ${this.operationPlan.phase})`,
         );
       }
     }
