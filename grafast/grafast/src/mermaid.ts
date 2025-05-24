@@ -140,11 +140,11 @@ export function planToMermaid(
     if (
       step.bucketId === 0 &&
       step.isSyncAndSafe &&
-      step.supportsUnbatched &&
       (dependentsByStepId[step.id]?.length ?? 0) === 0
     ) {
       return true;
     }
+    return false;
   };
   const partitionToPoly = (bucketId: number | string) => {
     const lp = layerPlanById[bucketId];
