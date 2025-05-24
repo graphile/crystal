@@ -2681,12 +2681,10 @@ export class OperationPlan {
         trackedArguments,
         streamDetails,
       } = batchPlanFieldDetails;
-      // TODO: add arguments to signature
-      const signature = `${planningPath}@${layerPlan.id}=${typeName}.${fieldName}(${Object.entries(
-        trackedArguments,
-      )
+      const argsSig = Object.entries(trackedArguments)
         .map(([key, step]) => `${key}:${step.id}`)
-        .join(",")})`;
+        .join(",");
+      const signature = `${planningPath}@${layerPlan.id}=${typeName}.${fieldName}(${argsSig})`;
       let entry = groups.get(signature);
       if (!entry) {
         entry = {
