@@ -92,6 +92,29 @@ export function inputStep(
   inputValue: ValueNode | undefined,
   defaultValue: ConstValueNode | undefined = undefined,
 ): AnyInputStep {
+  let c1 = operationPlan._inputStepCache.get(inputType);
+  if (!c1) {
+    c1 = new Map();
+    operationPlan._inputStepCache.set(inputType, c1);
+  }
+  let c2 = c1.get(inputValue);
+  if (!c2) {
+    c2 = new Map();
+    c1.set(inputValue, c2);
+  }
+  let c3 = c2.get(defaultValue);
+  if (c3) return c3;
+  c3 = _inputStep(operationPlan, inputType, inputValue, defaultValue);
+  c2.set(defaultValue, c3);
+  return c3;
+}
+
+function _inputStep(
+  operationPlan: OperationPlan,
+  inputType: GraphQLInputType,
+  inputValue: ValueNode | undefined,
+  defaultValue: ConstValueNode | undefined,
+): AnyInputStep {
   const { valueNodeToStaticValueCache } = operationPlan;
   if (inputValue === undefined) {
     // Definitely can't be or contain a variable!
