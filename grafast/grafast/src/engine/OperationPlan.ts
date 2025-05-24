@@ -226,6 +226,17 @@ export class OperationPlan {
   public readonly [$$ts]: undefined;
   /** @internal */
   public [$$contextPlanCache]?: GrafastPlanJSON;
+  /**
+   * For use by `inputStep()` only.
+   * @internal
+   */
+  public _inputStepCache = new Map<
+    graphql.GraphQLInputType,
+    Map<
+      graphql.ValueNode | undefined,
+      Map<graphql.ConstValueNode | undefined, AnyInputStep>
+    >
+  >();
 
   public readonly queryType: GraphQLObjectType;
   public readonly mutationType: GraphQLObjectType | null;
