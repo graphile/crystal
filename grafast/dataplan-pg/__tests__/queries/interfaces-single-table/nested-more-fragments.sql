@@ -13,8 +13,8 @@ select
       to_char(__single_table_items_2."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text),
       __single_table_items_2."title",
       __single_table_items_2."description",
-      __single_table_items_2."note",
       __single_table_items_2."color",
+      __single_table_items_2."note",
       __single_table_items__."type"::text,
       __single_table_items__."type2"::text,
       __single_table_items__."position"::text,
@@ -24,8 +24,8 @@ select
       to_char(__single_table_items__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text),
       __single_table_items__."title",
       __single_table_items__."description",
-      __single_table_items__."note",
       __single_table_items__."color",
+      __single_table_items__."note",
       __people__."username",
       __people_2."username"
     ]::text[]

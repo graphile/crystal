@@ -23,8 +23,8 @@ lateral (
     to_char(__single_table_items__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "9",
     __single_table_items__."title" as "10",
     __single_table_items__."description" as "11",
-    __single_table_items__."note" as "12",
-    __single_table_items__."color" as "13",
+    __single_table_items__."color" as "12",
+    __single_table_items__."note" as "13",
     __single_table_items_identifiers__.idx as "14"
   from interfaces_and_unions.single_table_items as __single_table_items__
   where
@@ -50,8 +50,8 @@ lateral (
     to_char(__single_table_items__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "7",
     __single_table_items__."title" as "8",
     __single_table_items__."description" as "9",
-    __single_table_items__."note" as "10",
-    __single_table_items__."color" as "11",
+    __single_table_items__."color" as "10",
+    __single_table_items__."note" as "11",
     __single_table_items_identifiers__.idx as "12"
   from interfaces_and_unions.single_table_items as __single_table_items__
   where
