@@ -2684,7 +2684,14 @@ export class OperationPlan {
       const argsSig = Object.entries(trackedArguments)
         .map(([key, step]) => `${key}:${step.id}`)
         .join(",");
-      const signature = `${planningPath}@${layerPlan.id}=${typeName}.${fieldName}(${argsSig})`;
+
+      /**
+       * Our tests don't come up with anywhere where rawParentStep.id needs
+       * incorporation into the signature, but I'm feeling paranoid.
+       */
+      const benjiesParanoia = `[${rawParentStep.id}]`;
+
+      const signature = `${planningPath}@${layerPlan.id}${benjiesParanoia}=${typeName}.${fieldName}(${argsSig})`;
       let entry = groups.get(signature);
       if (!entry) {
         entry = {
@@ -2695,40 +2702,64 @@ export class OperationPlan {
         };
         groups.set(signature, entry);
       } else {
-        const firstDetails = entry.firstDetails;
-        // Check it matches
-        if (planResolver !== firstDetails.planResolver) {
-          throw new Error(
-            `GraphileInternalError<7f14700f-2272-4b6a-a927-7600d934fdf0>: processPlanField signature failure - mismatch planResolver`,
-          );
-        }
-        if (!arraysMatch(path, firstDetails.path)) {
-          throw new Error(
-            `GraphileInternalError<cb84829d-ee4c-40cd-a3a6-f53d1029ad83>: processPlanField signature failure - mismatch path`,
-          );
-        }
-        if (applyAfterMode !== firstDetails.applyAfterMode) {
-          throw new Error(
-            `GraphileInternalError<bbddad4f-68aa-49c7-b82c-09ceebf14a3f>: processPlanField signature failure - mismatch applyAfterMode`,
-          );
-        }
-        if (rawParentStep !== firstDetails.rawParentStep) {
-          throw new Error(
-            `GraphileInternalError<3306994d-7881-4495-89d1-6c9252840369>: processPlanField signature failure - mismatch rawParentStep`,
-          );
-        }
-        if (field !== firstDetails.field) {
-          throw new Error(
-            `GraphileInternalError<67d2a787-2383-4228-8358-6ea9b3321445>: processPlanField signature failure - mismatch field`,
-          );
-        }
-        if (!recordsMatch(trackedArguments, firstDetails.trackedArguments)) {
-          throw new Error(
-            `GraphileInternalError<ec3f1e44-0ab6-445c-a644-a4d276f4b787>: processPlanField signature failure - mismatch trackedArguments`,
-          );
-        }
-        if (!streamDetails) {
-          entry.streamDetails = null;
+        if (isDev) {
+          const firstDetails = entry.firstDetails;
+          // Check it matches
+          if (typeName !== firstDetails.typeName) {
+            throw new Error(
+              `GraphileInternalError<15e09f3f-1a83-48a8-822c-1158b9740ef7>: processPlanField signature failure - mismatch typeName`,
+            );
+          }
+          if (fieldName !== firstDetails.fieldName) {
+            throw new Error(
+              `GraphileInternalError<2999cbf9-7143-4677-9592-0bfc52e12cb0>: processPlanField signature failure - mismatch fieldName`,
+            );
+          }
+          if (layerPlan !== firstDetails.layerPlan) {
+            throw new Error(
+              `GraphileInternalError<52786d18-cfda-4ed6-a309-9cb31dcd5f34>: processPlanField signature failure - mismatch layerPlan`,
+            );
+          }
+          if (!arraysMatch(path, firstDetails.path)) {
+            throw new Error(
+              `GraphileInternalError<cb84829d-ee4c-40cd-a3a6-f53d1029ad83>: processPlanField signature failure - mismatch path`,
+            );
+          }
+          // Explicitly differences in polymorphicPaths are allowed
+          if (planningPath !== firstDetails.planningPath) {
+            throw new Error(
+              `GraphileInternalError<1b708215-1549-47c3-9cf5-8fd8d7eb9bd0>: processPlanField signature failure - mismatch planningPath`,
+            );
+          }
+          if (planResolver !== firstDetails.planResolver) {
+            throw new Error(
+              `GraphileInternalError<7f14700f-2272-4b6a-a927-7600d934fdf0>: processPlanField signature failure - mismatch planResolver`,
+            );
+          }
+          if (applyAfterMode !== firstDetails.applyAfterMode) {
+            throw new Error(
+              `GraphileInternalError<bbddad4f-68aa-49c7-b82c-09ceebf14a3f>: processPlanField signature failure - mismatch applyAfterMode`,
+            );
+          }
+          if (rawParentStep !== firstDetails.rawParentStep) {
+            throw new Error(
+              `GraphileInternalError<3306994d-7881-4495-89d1-6c9252840369>: processPlanField signature failure - mismatch rawParentStep`,
+            );
+          }
+          if (field !== firstDetails.field) {
+            throw new Error(
+              `GraphileInternalError<67d2a787-2383-4228-8358-6ea9b3321445>: processPlanField signature failure - mismatch field`,
+            );
+          }
+          if (!recordsMatch(trackedArguments, firstDetails.trackedArguments)) {
+            throw new Error(
+              `GraphileInternalError<ec3f1e44-0ab6-445c-a644-a4d276f4b787>: processPlanField signature failure - mismatch trackedArguments`,
+            );
+          }
+          // If any of them don't stream, turn streaming off
+          if (!streamDetails) {
+            entry.streamDetails = null;
+          }
         }
 
         entry.indexes.push(i);
