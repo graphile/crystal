@@ -225,6 +225,17 @@ export class OperationPlan {
   public readonly [$$ts]: undefined;
   /** @internal */
   public [$$contextPlanCache]?: GrafastPlanJSON;
+  /**
+   * For use by `inputStep()` only.
+   * @internal
+   */
+  public _inputStepCache = new Map<
+    graphql.GraphQLInputType,
+    Map<
+      graphql.ValueNode | undefined,
+      Map<graphql.ConstValueNode | undefined, AnyInputStep>
+    >
+  >();
 
   public readonly queryType: GraphQLObjectType;
   public readonly mutationType: GraphQLObjectType | null;
@@ -4766,10 +4777,9 @@ export class OperationPlan {
     return matches;
   }
 
-  private _cacheStepStoreByLayerPlanAndActionKey: Record<
-    string,
-    Map<any, any> | undefined
-  > = Object.create(null);
+  private _cacheStepStoreByActionKeyByLayerPlan: Map<number, StepCache> =
+    new Map();
+  private _immutableCacheStepStoreAndActionKey: StepCache = Object.create(null);
   /**
    * Cache a generated step by a given identifier (cacheKey) such that we don't
    * need to regenerate it on future calls, significantly reducing the load on
@@ -4784,9 +4794,40 @@ export class OperationPlan {
     cb: () => T,
   ): T {
     const layerPlan = currentLayerPlan();
+    let cache = this._cacheStepStoreByActionKeyByLayerPlan.get(layerPlan.id);
+    if (!cache) {
+      cache = Object.create(null) as StepCache;
+      this._cacheStepStoreByActionKeyByLayerPlan.set(layerPlan.id, cache);
+    }
+    return this._cacheStep(cache, ownerStep, actionKey, cacheKey, cb);
+  }
+
+  /** @internal */
+  cacheImmutableStep<T extends Step>(
+    actionKey: string,
+    cacheKey: any /* Anything suitable to be the key in a Map */,
+    cb: () => T,
+  ): T {
+    const cache = this._immutableCacheStepStoreAndActionKey;
+    return this._cacheStep(
+      cache,
+      this.variableValuesStep,
+      actionKey,
+      cacheKey,
+      cb,
+    );
+  }
+
+  _cacheStep<T extends Step>(
+    store: StepCache,
+    ownerStep: Step,
+    actionKey: string,
+    cacheKey: any /* Anything suitable to be the key in a Map */,
+    cb: () => T,
+  ): T {
     const paths = currentPolymorphicPaths();
-    const cache = (this._cacheStepStoreByLayerPlanAndActionKey[
-      `${actionKey}|${layerPlan.id}|${ownerStep.id}|${paths == null ? "" : [...paths].join(",")}`
+    const cache = (store[
+      `${actionKey}|${ownerStep.id}|${paths == null ? "" : [...paths].join(",")}`
     ] ??= new Map());
 
     const cacheIt = () => {
@@ -4820,7 +4861,7 @@ export class OperationPlan {
    * from setting hasSideEffects on an ExecutableStep, among other places.
    */
   public resetCache() {
-    this._cacheStepStoreByLayerPlanAndActionKey = Object.create(null);
+    this._cacheStepStoreByActionKeyByLayerPlan.clear();
   }
 
   public withRootLayerPlan<T>(cb: () => T): T {
@@ -5087,3 +5128,5 @@ function isPeerLayerPlan(
   }
   return false;
 }
+
+type StepCache = Record<string, Map<any, any> | undefined>;
