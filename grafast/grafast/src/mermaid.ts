@@ -159,6 +159,7 @@ export function planToMermaid(
     const step = stepById[stepId];
     if (!step) return true;
     if (step.stepClass === "ConstantStep") return true;
+    if (step.bucketId !== 0) return false;
     const dependents = dependentsByStepId[stepId];
     if (!dependents || dependents.length === 0) return false;
     const firstDependent = dependents[0];
