@@ -33,25 +33,20 @@ graph TD
     Bucket9 --> Bucket11
 
     %% plan dependencies
-    PgSelect8[["PgSelect[8∈0] ➊<br />ᐸforumsᐳ"]]:::plan
-    Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Lambda13{{"Lambda[13∈0] ➊<br />ᐸincludeArchivedConditionᐳ"}}:::plan
-    Object11 & Lambda13 --> PgSelect8
+    PgSelect8[["PgSelect[8∈0] ➊<br />ᐸforumsᐳ<br />More deps:<br />- Object[11]"]]:::plan
+    Lambda13{{"Lambda[13∈0] ➊<br />ᐸincludeArchivedConditionᐳ<br />More deps:<br />- Constantᐸ[ undefined, 'EXCLUSIVELY' ]ᐳ[63]"}}:::plan
+    Lambda13 --> PgSelect8
+    Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 5"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10
-    Constant63{{"Constant[63∈0] ➊<br />ᐸ[ undefined, 'EXCLUSIVELY' ]ᐳ"}}:::plan
-    Constant63 --> Lambda13
     PgSelectRows14[["PgSelectRows[14∈0] ➊"]]:::plan
     PgSelect8 --> PgSelectRows14
-    Lambda28{{"Lambda[28∈0] ➊<br />ᐸincludeArchivedConditionᐳ"}}:::plan
-    Constant64{{"Constant[64∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
-    Constant64 --> Lambda28
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Connection24{{"Connection[24∈0] ➊<br />ᐸ20ᐳ"}}:::plan
+    Lambda28{{"Lambda[28∈0] ➊<br />ᐸincludeArchivedConditionᐳ<br />Dependents: 2<br />More deps:<br />- Constantᐸ[HIDDEN]ᐳ[64]"}}:::plan
+    Connection24{{"Connection[24∈0] ➊<br />ᐸ20ᐳ<br />Dependents: 2"}}:::plan
     __Item15[/"__Item[15∈1]<br />ᐸ14ᐳ"\]:::itemplan
     PgSelectRows14 ==> __Item15
     PgSelectSingle16{{"PgSelectSingle[16∈1]<br />ᐸforumsᐳ"}}:::plan
@@ -62,12 +57,12 @@ graph TD
     PgSelectSingle16 --> PgClassExpression19
     PgClassExpression25{{"PgClassExpression[25∈2]<br />ᐸ__forums__...chived_at”ᐳ"}}:::plan
     PgSelectSingle16 --> PgClassExpression25
-    PgSelect29[["PgSelect[29∈4]<br />ᐸmessagesᐳ"]]:::plan
-    Object11 & PgClassExpression19 & PgClassExpression25 & Lambda28 & Connection24 --> PgSelect29
+    PgSelect29[["PgSelect[29∈4]<br />ᐸmessagesᐳ<br />More deps:<br />- Object[11]<br />- Lambda[28]<br />- Connection[24]"]]:::plan
+    PgClassExpression19 & PgClassExpression25 --> PgSelect29
     PgSelectRows31[["PgSelectRows[31∈4]"]]:::plan
     PgSelect29 --> PgSelectRows31
-    PgSelect30[["PgSelect[30∈5]<br />ᐸmessagesᐳ"]]:::plan
-    Object11 & PgClassExpression19 & PgClassExpression25 & Lambda28 & Connection24 --> PgSelect30
+    PgSelect30[["PgSelect[30∈5]<br />ᐸmessagesᐳ<br />More deps:<br />- Object[11]<br />- Lambda[28]<br />- Connection[24]"]]:::plan
+    PgClassExpression19 & PgClassExpression25 --> PgSelect30
     PgSelectRows32[["PgSelectRows[32∈5]"]]:::plan
     PgSelect30 --> PgSelectRows32
     __Item33[/"__Item[33∈6]<br />ᐸ31ᐳ"\]:::itemplan
@@ -80,9 +75,9 @@ graph TD
     __Item35 --> PgSelectSingle36
     Access38{{"Access[38∈7]<br />ᐸ30.cursorDetailsᐳ"}}:::plan
     PgSelect30 --> Access38
-    PgSelect41[["PgSelect[41∈8]<br />ᐸusersᐳ"]]:::plan
+    PgSelect41[["PgSelect[41∈8]<br />ᐸusersᐳ<br />More deps:<br />- Object[11]"]]:::plan
     PgClassExpression40{{"PgClassExpression[40∈8]<br />ᐸ__messages...author_id”ᐳ"}}:::plan
-    Object11 & PgClassExpression40 --> PgSelect41
+    PgClassExpression40 --> PgSelect41
     PgClassExpression37{{"PgClassExpression[37∈8]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
     PgSelectSingle34 --> PgClassExpression37
     PgSelectSingle34 --> PgClassExpression40
@@ -94,9 +89,9 @@ graph TD
     First45 --> PgSelectSingle47
     PgCursor39{{"PgCursor[39∈9]"}}:::plan
     PgSelectSingle36 & Access38 --> PgCursor39
-    PgSelect52[["PgSelect[52∈9]<br />ᐸusersᐳ"]]:::plan
+    PgSelect52[["PgSelect[52∈9]<br />ᐸusersᐳ<br />More deps:<br />- Object[11]"]]:::plan
     PgClassExpression51{{"PgClassExpression[51∈9]<br />ᐸ__messages...author_id”ᐳ"}}:::plan
-    Object11 & PgClassExpression51 --> PgSelect52
+    PgClassExpression51 --> PgSelect52
     PgClassExpression49{{"PgClassExpression[49∈9]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
     PgSelectSingle36 --> PgClassExpression49
     PgSelectSingle36 --> PgClassExpression51
@@ -117,7 +112,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect8,Access9,Access10,Object11,Lambda13,PgSelectRows14,Connection24,Lambda28,Constant63,Constant64 bucket0
+    class Bucket0,__Value2,PgSelect8,Access9,Access10,Object11,Lambda13,PgSelectRows14,Connection24,Lambda28 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item15,PgSelectSingle16 bucket1
     classDef bucket2 stroke:#7f007f

@@ -35,21 +35,15 @@ graph TD
     Bucket1 --> Bucket2 & Bucket3 & Bucket4 & Bucket5 & Bucket6 & Bucket7 & Bucket8 & Bucket9 & Bucket10 & Bucket11 & Bucket12 & Bucket13 & Bucket14 & Bucket15 & Bucket16 & Bucket17 & Bucket18 & Bucket19 & Bucket20 & Bucket21
 
     %% plan dependencies
-    Lambda7{{"Lambda[7∈0] ➊<br />ᐸdecodeNodeIdWithCodecsᐳ"}}:::plan
-    Constant205{{"Constant[205∈0] ➊<br />ᐸ'WyJ0eXBlcyIsMTFd'ᐳ"}}:::plan
-    Constant205 --> Lambda7
-    Lambda8{{"Lambda[8∈0] ➊<br />ᐸfindTypeNameMatchᐳ"}}:::plan
-    Lambda7 --> Lambda8
+    Lambda7{{"Lambda[7∈0] ➊<br />ᐸdecodeNodeIdWithCodecsᐳ<br />Dependents: 3<br />More deps:<br />- Constantᐸ'WyJ0eXBlcyIsMTFd'ᐳ[205]"}}:::plan
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Object16{{"Object[16∈1] ➊^<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access14{{"Access[14∈1] ➊<br />ᐸ2.pgSettingsᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756<br />ᐳList"}}:::plan
     Access15{{"Access[15∈1] ➊<br />ᐸ2.withPgClientᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756<br />ᐳList"}}:::plan
     Access14 & Access15 --> Object16
     __Value2 --> Access14
     __Value2 --> Access15
-    Access203{{"Access[203∈1] ➊<br />ᐸ7.base64JSON.1ᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756<br />ᐳList"}}:::plan
-    Lambda7 --> Access203
+    Access203{{"Access[203∈1] ➊<br />ᐸ7.base64JSON.1ᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756<br />ᐳList<br />More deps:<br />- Lambda[7]"}}:::plan
     PgSelect13[["PgSelect[13∈3] ➊<br />ᐸinputsᐳ<br />ᐳInput"]]:::plan
     Access203 -->|rejectNull| PgSelect13
     Object16 --> PgSelect13
@@ -105,7 +99,7 @@ graph TD
     PgSelectSingle69{{"PgSelectSingle[69∈8] ➊^<br />ᐸdefault_valueᐳ"}}:::plan
     First67 --> PgSelectSingle69
     PgSelect75[["PgSelect[75∈9] ➊^<br />ᐸcompound_keyᐳ"]]:::plan
-    Access204{{"Access[204∈9] ➊<br />ᐸ7.base64JSON.2ᐳ<br />ᐳCompoundKey"}}:::plan
+    Access204{{"Access[204∈9] ➊<br />ᐸ7.base64JSON.2ᐳ<br />ᐳCompoundKey<br />More deps:<br />- Lambda[7]"}}:::plan
     Access203 -->|rejectNull| PgSelect75
     Access204 -->|rejectNull| PgSelect75
     Object16 --> PgSelect75
@@ -115,7 +109,6 @@ graph TD
     PgSelect75 --> PgSelectRows80
     PgSelectSingle81{{"PgSelectSingle[81∈9] ➊^<br />ᐸcompound_keyᐳ"}}:::plan
     First79 --> PgSelectSingle81
-    Lambda7 --> Access204
     PgSelect85[["PgSelect[85∈10] ➊<br />ᐸpersonᐳ<br />ᐳPerson"]]:::plan
     Access203 -->|rejectNull| PgSelect85
     Object16 --> PgSelect85
@@ -229,7 +222,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Lambda7,Lambda8,Constant205 bucket0
+    class Bucket0,__Value2,Lambda7 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,Access14,Access15,Object16,Access203 bucket1
     classDef bucket2 stroke:#7f007f

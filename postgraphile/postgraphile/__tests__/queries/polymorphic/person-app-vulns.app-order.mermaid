@@ -27,31 +27,26 @@ graph TD
     Bucket6 --> Bucket7 & Bucket8
 
     %% plan dependencies
-    Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 4"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access10 & Access11 --> Object12
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access10
     __Value2 --> Access11
-    Connection13{{"Connection[13∈0] ➊<br />ᐸ9ᐳ"}}:::plan
-    Constant63{{"Constant[63∈0] ➊<br />ᐸ4ᐳ"}}:::plan
-    Constant63 --> Connection13
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection13{{"Connection[13∈0] ➊<br />ᐸ9ᐳ<br />More deps:<br />- Constantᐸ4ᐳ[63]"}}:::plan
     Connection26{{"Connection[26∈0] ➊<br />ᐸ22ᐳ"}}:::plan
-    Constant27{{"Constant[27∈0] ➊<br />ᐸ[Function: applyInputConstant]ᐳ"}}:::plan
-    Constant36{{"Constant[36∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
-    PgSelect15[["PgSelect[15∈1] ➊<br />ᐸpeopleᐳ"]]:::plan
-    Object12 & Connection13 & Constant63 --> PgSelect15
+    PgSelect15[["PgSelect[15∈1] ➊<br />ᐸpeopleᐳ<br />More deps:<br />- Object[12]<br />- Constantᐸ4ᐳ[63]"]]:::plan
+    Connection13 --> PgSelect15
     PgSelectRows16[["PgSelectRows[16∈1] ➊"]]:::plan
     PgSelect15 --> PgSelectRows16
     __Item17[/"__Item[17∈2]<br />ᐸ16ᐳ"\]:::itemplan
     PgSelectRows16 ==> __Item17
     PgSelectSingle18{{"PgSelectSingle[18∈2]<br />ᐸpeopleᐳ"}}:::plan
     __Item17 --> PgSelectSingle18
-    PgUnionAll28[["PgUnionAll[28∈3]<br />ᐸAwsApplication,GcpApplicationᐳ"]]:::plan
+    PgUnionAll28[["PgUnionAll[28∈3]<br />ᐸAwsApplication,GcpApplicationᐳ<br />More deps:<br />- Object[12]<br />- Constantᐸ[Function: applyInputConstant]ᐳ[27]"]]:::plan
     PgClassExpression19{{"PgClassExpression[19∈3]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
-    Object12 & PgClassExpression19 & Constant27 & Connection26 --> PgUnionAll28
+    PgClassExpression19 & Connection26 --> PgUnionAll28
     PgSelectSingle18 --> PgClassExpression19
     PgClassExpression20{{"PgClassExpression[20∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle18 --> PgClassExpression20
@@ -61,10 +56,10 @@ graph TD
     Access62 ==> __Item30
     Access32{{"Access[32∈4]<br />ᐸ28.cursorDetailsᐳ"}}:::plan
     PgUnionAll28 --> Access32
-    List37{{"List[37∈5]<br />ᐸ34,35,36ᐳ"}}:::plan
+    List37{{"List[37∈5]<br />ᐸ34,35,36ᐳ<br />More deps:<br />- Constantᐸ[HIDDEN]ᐳ[36]"}}:::plan
     Access34{{"Access[34∈5]<br />ᐸ30.0ᐳ"}}:::plan
     Access35{{"Access[35∈5]<br />ᐸ30.1ᐳ"}}:::plan
-    Access34 & Access35 & Constant36 --> List37
+    Access34 & Access35 --> List37
     PgCursor33{{"PgCursor[33∈5]"}}:::plan
     __Item30 & Access32 --> PgCursor33
     __Item30 --> Access34
@@ -75,8 +70,8 @@ graph TD
     Lambda38 --> Access39
     Access40{{"Access[40∈5]<br />ᐸ38.idᐳ"}}:::plan
     Lambda38 --> Access40
-    PgSelect41[["PgSelect[41∈7]<br />ᐸaws_applicationsᐳ<br />ᐳAwsApplication"]]:::plan
-    Object12 & Access40 --> PgSelect41
+    PgSelect41[["PgSelect[41∈7]<br />ᐸaws_applicationsᐳ<br />ᐳAwsApplication<br />More deps:<br />- Object[12]"]]:::plan
+    Access40 --> PgSelect41
     First45{{"First[45∈7]^"}}:::plan
     PgSelectRows46[["PgSelectRows[46∈7]^"]]:::plan
     PgSelectRows46 --> First45
@@ -89,8 +84,8 @@ graph TD
     PgSelectSingle47 --> PgClassExpression58
     PgClassExpression60{{"PgClassExpression[60∈7]^<br />ᐸ__aws_appl..._deployed”ᐳ"}}:::plan
     PgSelectSingle47 --> PgClassExpression60
-    PgSelect49[["PgSelect[49∈8]<br />ᐸgcp_applicationsᐳ<br />ᐳGcpApplication"]]:::plan
-    Object12 & Access40 --> PgSelect49
+    PgSelect49[["PgSelect[49∈8]<br />ᐸgcp_applicationsᐳ<br />ᐳGcpApplication<br />More deps:<br />- Object[12]"]]:::plan
+    Access40 --> PgSelect49
     First53{{"First[53∈8]^"}}:::plan
     PgSelectRows54[["PgSelectRows[54∈8]^"]]:::plan
     PgSelectRows54 --> First53
@@ -106,7 +101,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access10,Access11,Object12,Connection13,Connection26,Constant27,Constant36,Constant63 bucket0
+    class Bucket0,__Value2,Access10,Access11,Object12,Connection13,Connection26 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect15,PgSelectRows16 bucket1
     classDef bucket2 stroke:#7f007f

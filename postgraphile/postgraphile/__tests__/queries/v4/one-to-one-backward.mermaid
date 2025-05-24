@@ -38,10 +38,7 @@ graph TD
     PgSelectInlineApply81["PgSelectInlineApply[81∈0] ➊"]:::plan
     PgSelectInlineApply77["PgSelectInlineApply[77∈0] ➊"]:::plan
     PgSelectInlineApply77 --> PgSelectInlineApply81
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection12{{"Connection[12∈0] ➊<br />ᐸ8ᐳ"}}:::plan
-    Constant36{{"Constant[36∈0] ➊<br />ᐸ'left_arms'ᐳ"}}:::plan
-    Constant40{{"Constant[40∈0] ➊<br />ᐸ'person_secrets'ᐳ"}}:::plan
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸpersonᐳ"]]:::plan
     Object11 & Connection12 & PgSelectInlineApply73 & PgSelectInlineApply81 --> PgSelect14
     PgSelectRows15[["PgSelectRows[15∈1] ➊"]]:::plan
@@ -84,9 +81,9 @@ graph TD
     First33 --> PgSelectSingle35
     List75 --> Lambda76
     List83 --> Lambda84
-    List38{{"List[38∈4]<br />ᐸ36,37ᐳ"}}:::plan
+    List38{{"List[38∈4]<br />ᐸ36,37ᐳ<br />More deps:<br />- Constantᐸ'left_arms'ᐳ[36]"}}:::plan
     PgClassExpression37{{"PgClassExpression[37∈4]<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
-    Constant36 & PgClassExpression37 --> List38
+    PgClassExpression37 --> List38
     List71{{"List[71∈4]<br />ᐸ70,30ᐳ"}}:::plan
     Access70{{"Access[70∈4]<br />ᐸ76.m.joinDetailsFor52ᐳ"}}:::plan
     Access70 & PgSelectSingle30 --> List71
@@ -106,9 +103,9 @@ graph TD
     PgSelectSingle30 --> PgClassExpression60
     Lambda76 --> Access70
     List71 --> Lambda72
-    List42{{"List[42∈5]<br />ᐸ40,41ᐳ"}}:::plan
+    List42{{"List[42∈5]<br />ᐸ40,41ᐳ<br />More deps:<br />- Constantᐸ'person_secrets'ᐳ[40]"}}:::plan
     PgClassExpression41{{"PgClassExpression[41∈5]<br />ᐸ__person_s...person_id”ᐳ"}}:::plan
-    Constant40 & PgClassExpression41 --> List42
+    PgClassExpression41 --> List42
     List79{{"List[79∈5]<br />ᐸ78,35ᐳ"}}:::plan
     Access78{{"Access[78∈5]<br />ᐸ84.m.joinDetailsFor45ᐳ"}}:::plan
     Access78 & PgSelectSingle35 --> List79
@@ -141,7 +138,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access9,Access10,Object11,Connection12,Constant36,Constant40,PgSelectInlineApply69,PgSelectInlineApply73,PgSelectInlineApply77,PgSelectInlineApply81 bucket0
+    class Bucket0,__Value2,Access9,Access10,Object11,Connection12,PgSelectInlineApply69,PgSelectInlineApply73,PgSelectInlineApply77,PgSelectInlineApply81 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect14,PgSelectRows15,Access18,Access74,Access82 bucket1
     classDef bucket2 stroke:#7f007f

@@ -27,10 +27,7 @@ graph TD
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
-    __InputObject20{{"__InputObject[20∈0] ➊"}}:::plan
-    Constant33{{"Constant[33∈0] ➊<br />ᐸ'1'ᐳ"}}:::plan
-    Constant34{{"Constant[34∈0] ➊<br />ᐸ'MOBILE'ᐳ"}}:::plan
-    Constant33 & Constant34 --> __InputObject20
+    __InputObject20{{"__InputObject[20∈0] ➊<br />More deps:<br />- Constantᐸ'1'ᐳ[33]<br />- Constantᐸ'MOBILE'ᐳ[34]"}}:::plan
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10
@@ -38,7 +35,6 @@ graph TD
     __InputObject20 --> BakedInput23
     PgFromExpression25{{"PgFromExpression[25∈0] ➊"}}:::plan
     BakedInput23 --> PgFromExpression25
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection12{{"Connection[12∈0] ➊<br />ᐸ8ᐳ"}}:::plan
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸspacecraftᐳ"]]:::plan
     Object11 & Connection12 & PgFromExpression25 --> PgSelect14
@@ -61,7 +57,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access9,Access10,Object11,Connection12,__InputObject20,BakedInput23,PgFromExpression25,Constant33,Constant34 bucket0
+    class Bucket0,__Value2,Access9,Access10,Object11,Connection12,__InputObject20,BakedInput23,PgFromExpression25 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect14,PgSelectRows15 bucket1
     classDef bucket2 stroke:#7f007f

@@ -20,13 +20,12 @@ graph TD
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
-    __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
+    __InputObject6{{"__InputObject[6∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]"}}:::plan
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10
     ApplyInput16{{"ApplyInput[16∈0] ➊"}}:::plan
     __InputObject6 --> ApplyInput16
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgSelect8[["PgSelect[8∈1] ➊<br />ᐸauthenticate_fail(mutation)ᐳ"]]:::sideeffectplan
     Object11 & ApplyInput16 --> PgSelect8
     First12{{"First[12∈1] ➊"}}:::plan
@@ -42,7 +41,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,Access9,Access10,Object11,ApplyInput16 bucket0
+    class Bucket0,__Value2,__InputObject6,Access9,Access10,Object11,ApplyInput16 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect8,First12,PgSelectRows13,PgSelectSingle14,Object15 bucket1
     classDef bucket2 stroke:#7f007f

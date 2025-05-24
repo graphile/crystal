@@ -27,32 +27,24 @@ graph TD
     Bucket6 --> Bucket8
 
     %% plan dependencies
-    Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 3"}}:::plan
+    Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access9 & Access10 --> Object11
-    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
-    __Value2 --> Access9
-    __Value2 --> Access10
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant112{{"Constant[112∈0] ➊<br />ᐸ4ᐳ"}}:::plan
-    Constant113{{"Constant[113∈0] ➊<br />ᐸ3141592ᐳ"}}:::plan
-    PgDeleteSingle8[["PgDeleteSingle[8∈1] ➊<br />ᐸrelational_posts(id)ᐳ"]]:::sideeffectplan
-    Object11 & Constant112 --> PgDeleteSingle8
-    PgDeleteSingle14[["PgDeleteSingle[14∈2] ➊<br />ᐸrelational_posts(id)ᐳ"]]:::sideeffectplan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ<br />Dependents: 4"]:::plan
+    PgDeleteSingle8[["PgDeleteSingle[8∈1] ➊<br />ᐸrelational_posts(id)ᐳ<br />More deps:<br />- Object[11]<br />- Constantᐸ4ᐳ[112]"]]:::sideeffectplan
+    PgDeleteSingle14[["PgDeleteSingle[14∈2] ➊<br />ᐸrelational_posts(id)ᐳ<br />More deps:<br />- Constantᐸ3141592ᐳ[113]"]]:::sideeffectplan
     Object17{{"Object[17∈2] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object17 & Constant113 --> PgDeleteSingle14
-    Access15{{"Access[15∈2] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access16{{"Access[16∈2] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object17 --> PgDeleteSingle14
+    Access15{{"Access[15∈2] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access16{{"Access[16∈2] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access15 & Access16 --> Object17
-    __Value2 --> Access15
-    __Value2 --> Access16
-    PgSelect23[["PgSelect[23∈3] ➊<br />ᐸrelational_postsᐳ"]]:::plan
+    PgSelect23[["PgSelect[23∈3] ➊<br />ᐸrelational_postsᐳ<br />More deps:<br />- Object[11]"]]:::plan
     PgFromExpression27{{"PgFromExpression[27∈3] ➊"}}:::plan
     PgSelectInlineApply94["PgSelectInlineApply[94∈3] ➊"]:::plan
     PgFromExpression98{{"PgFromExpression[98∈3] ➊"}}:::plan
     PgSelectInlineApply99["PgSelectInlineApply[99∈3] ➊"]:::plan
-    Object11 & PgFromExpression27 & PgSelectInlineApply94 & PgFromExpression98 & PgSelectInlineApply99 --> PgSelect23
+    PgFromExpression27 & PgSelectInlineApply94 & PgFromExpression98 & PgSelectInlineApply99 --> PgSelect23
     PgClassExpression18{{"PgClassExpression[18∈3] ➊<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
     Access19{{"Access[19∈3] ➊<br />ᐸ8.tᐳ"}}:::plan
     Access19 --> PgClassExpression18
@@ -93,9 +85,9 @@ graph TD
     PgSelect32 --> Access104
     Access109{{"Access[109∈4] ➊<br />ᐸ32.m.joinDetailsFor59ᐳ"}}:::plan
     PgSelect32 --> Access109
-    PgSelect74[["PgSelect[74∈5] ➊<br />ᐸpeopleᐳ"]]:::plan
+    PgSelect74[["PgSelect[74∈5] ➊<br />ᐸpeopleᐳ<br />More deps:<br />- Object[11]"]]:::plan
     PgClassExpression73{{"PgClassExpression[73∈5] ➊<br />ᐸ__relation...author_id”ᐳ"}}:::plan
-    Object11 & PgClassExpression73 --> PgSelect74
+    PgClassExpression73 --> PgSelect74
     List96{{"List[96∈5] ➊<br />ᐸ95,30ᐳ"}}:::plan
     Access95 & PgSelectSingle30 --> List96
     List101{{"List[101∈5] ➊<br />ᐸ100,30ᐳ"}}:::plan
@@ -184,7 +176,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access9,Access10,Object11,Constant112,Constant113 bucket0
+    class Bucket0,__Value2,Access9,Access10,Object11 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgDeleteSingle8 bucket1
     classDef bucket2 stroke:#7f007f

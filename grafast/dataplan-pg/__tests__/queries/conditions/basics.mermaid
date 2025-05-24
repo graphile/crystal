@@ -22,27 +22,21 @@ graph TD
     %% plan dependencies
     PgSelect8[["PgSelect[8∈0] ➊<br />ᐸforumsᐳ"]]:::plan
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Lambda13{{"Lambda[13∈0] ➊<br />ᐸincludeArchivedConditionᐳ"}}:::plan
-    PgSelectInlineApply33["PgSelectInlineApply[33∈0] ➊"]:::plan
+    Lambda13{{"Lambda[13∈0] ➊<br />ᐸincludeArchivedConditionᐳ<br />More deps:<br />- Constantᐸ[ undefined, 'YES' ]ᐳ[40]"}}:::plan
+    PgSelectInlineApply33["PgSelectInlineApply[33∈0] ➊<br />More deps:<br />- Constantᐸ2ᐳ[38]"]:::plan
     Object11 & Lambda13 & PgSelectInlineApply33 --> PgSelect8
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
-    Constant38{{"Constant[38∈0] ➊<br />ᐸ2ᐳ"}}:::plan
-    Lambda28{{"Lambda[28∈0] ➊<br />ᐸincludeArchivedConditionᐳ"}}:::plan
-    Constant38 & Lambda28 --> PgSelectInlineApply33
+    Lambda28{{"Lambda[28∈0] ➊<br />ᐸincludeArchivedConditionᐳ<br />More deps:<br />- Constantᐸ[HIDDEN]ᐳ[39]"}}:::plan
+    Lambda28 --> PgSelectInlineApply33
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10
-    Constant40{{"Constant[40∈0] ➊<br />ᐸ[ undefined, 'YES' ]ᐳ"}}:::plan
-    Constant40 --> Lambda13
     PgSelectRows14[["PgSelectRows[14∈0] ➊"]]:::plan
     PgSelect8 --> PgSelectRows14
-    Constant39{{"Constant[39∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
-    Constant39 --> Lambda28
     Access34{{"Access[34∈0] ➊<br />ᐸ8.m.subqueryDetailsFor21ᐳ"}}:::plan
     PgSelect8 --> Access34
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item15[/"__Item[15∈1]<br />ᐸ14ᐳ"\]:::itemplan
     PgSelectRows14 ==> __Item15
     PgSelectSingle16{{"PgSelectSingle[16∈1]<br />ᐸforumsᐳ"}}:::plan
@@ -64,7 +58,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect8,Access9,Access10,Object11,Lambda13,PgSelectRows14,Lambda28,PgSelectInlineApply33,Access34,Constant38,Constant39,Constant40 bucket0
+    class Bucket0,__Value2,PgSelect8,Access9,Access10,Object11,Lambda13,PgSelectRows14,Lambda28,PgSelectInlineApply33,Access34 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item15,PgSelectSingle16 bucket1
     classDef bucket2 stroke:#7f007f

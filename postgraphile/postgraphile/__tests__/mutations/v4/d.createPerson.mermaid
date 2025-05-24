@@ -18,13 +18,8 @@ graph TD
     Bucket2 --> Bucket3
 
     %% plan dependencies
-    __InputObject8{{"__InputObject[8∈0] ➊"}}:::plan
-    Constant29{{"Constant[29∈0] ➊<br />ᐸ'Doe'ᐳ"}}:::plan
-    Constant30{{"Constant[30∈0] ➊<br />ᐸ'create2'ᐳ"}}:::plan
-    Constant31{{"Constant[31∈0] ➊<br />ᐸ'create1'ᐳ"}}:::plan
-    Constant32{{"Constant[32∈0] ➊<br />ᐸ'create3'ᐳ"}}:::plan
-    Constant29 & Constant30 & Constant31 & Constant32 --> __InputObject8
-    __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
+    __InputObject8{{"__InputObject[8∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ'Doe'ᐳ[29]<br />- Constantᐸ'create2'ᐳ[30]<br />- Constantᐸ'create1'ᐳ[31]<br />- Constantᐸ'create3'ᐳ[32]"}}:::plan
+    __InputObject6{{"__InputObject[6∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]"}}:::plan
     __InputObject8 --> __InputObject6
     Object16{{"Object[16∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access14{{"Access[14∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
@@ -35,7 +30,6 @@ graph TD
     __Value2 --> Access15
     ApplyInput17{{"ApplyInput[17∈0] ➊"}}:::plan
     __InputObject6 --> ApplyInput17
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgInsertSingle13[["PgInsertSingle[13∈1] ➊<br />ᐸperson()ᐳ"]]:::sideeffectplan
     Object16 & ApplyInput17 --> PgInsertSingle13
     Object18{{"Object[18∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
@@ -63,7 +57,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,__InputObject8,Access14,Access15,Object16,ApplyInput17,Constant29,Constant30,Constant31,Constant32 bucket0
+    class Bucket0,__Value2,__InputObject6,__InputObject8,Access14,Access15,Object16,ApplyInput17 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle13,Object18 bucket1
     classDef bucket2 stroke:#7f007f

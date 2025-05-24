@@ -25,9 +25,8 @@ graph TD
     Bucket6 --> Bucket7
 
     %% plan dependencies
-    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸpeopleᐳ"]]:::plan
-    Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object10 --> PgSelect7
+    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸpeopleᐳ<br />More deps:<br />- Object[10]<br />- Constantᐸundefinedᐳ[6]"]]:::plan
+    Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 5"}}:::plan
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
@@ -36,28 +35,27 @@ graph TD
     __Value2 --> Access9
     PgSelectRows11[["PgSelectRows[11∈0] ➊"]]:::plan
     PgSelect7 --> PgSelectRows11
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item12[/"__Item[12∈1]<br />ᐸ11ᐳ"\]:::itemplan
     PgSelectRows11 ==> __Item12
     PgSelectSingle13{{"PgSelectSingle[13∈1]<br />ᐸpeopleᐳ"}}:::plan
     __Item12 --> PgSelectSingle13
-    PgSelect16[["PgSelect[16∈2]<br />ᐸsingle_table_itemsᐳ"]]:::plan
+    PgSelect16[["PgSelect[16∈2]<br />ᐸsingle_table_itemsᐳ<br />More deps:<br />- Object[10]<br />- Constantᐸundefinedᐳ[6]<br />- Constantᐸundefinedᐳ[6]"]]:::plan
     PgClassExpression15{{"PgClassExpression[15∈2]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
-    Object10 & PgClassExpression15 --> PgSelect16
+    PgClassExpression15 --> PgSelect16
     PgClassExpression14{{"PgClassExpression[14∈2]<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression14
     PgSelectSingle13 --> PgClassExpression15
     PgSelectRows20[["PgSelectRows[20∈2]"]]:::plan
     PgSelect16 --> PgSelectRows20
-    PgSelect28[["PgSelect[28∈3]<br />ᐸsingle_table_itemsᐳ"]]:::plan
+    PgSelect28[["PgSelect[28∈3]<br />ᐸsingle_table_itemsᐳ<br />More deps:<br />- Object[10]"]]:::plan
     PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__single_t...parent_id”ᐳ"}}:::plan
-    Object10 & PgClassExpression27 --> PgSelect28
-    PgSelect83[["PgSelect[83∈3]<br />ᐸpeopleᐳ"]]:::plan
+    PgClassExpression27 --> PgSelect28
+    PgSelect83[["PgSelect[83∈3]<br />ᐸpeopleᐳ<br />More deps:<br />- Object[10]"]]:::plan
     PgClassExpression82{{"PgClassExpression[82∈3]<br />ᐸ__single_t...author_id”ᐳ"}}:::plan
-    Object10 & PgClassExpression82 --> PgSelect83
-    PgSelect157[["PgSelect[157∈3]<br />ᐸpeopleᐳ"]]:::plan
+    PgClassExpression82 --> PgSelect83
+    PgSelect157[["PgSelect[157∈3]<br />ᐸpeopleᐳ<br />More deps:<br />- Object[10]"]]:::plan
     PgClassExpression156{{"PgClassExpression[156∈3]<br />ᐸ__single_t...author_id”ᐳ"}}:::plan
-    Object10 & PgClassExpression156 --> PgSelect157
+    PgClassExpression156 --> PgSelect157
     __Item21[/"__Item[21∈3]<br />ᐸ20ᐳ"\]:::itemplan
     PgSelectRows20 ==> __Item21
     PgSelectSingle22{{"PgSelectSingle[22∈3]<br />ᐸsingle_table_itemsᐳ"}}:::plan
@@ -124,7 +122,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,PgSelectRows11 bucket0
+    class Bucket0,__Value2,PgSelect7,Access8,Access9,Object10,PgSelectRows11 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item12,PgSelectSingle13 bucket1
     classDef bucket2 stroke:#7f007f

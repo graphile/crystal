@@ -21,35 +21,27 @@ graph TD
     Bucket3 --> Bucket4 & Bucket5
 
     %% plan dependencies
-    __InputObject9{{"__InputObject[9∈0] ➊"}}:::plan
-    Constant40{{"Constant[40∈0] ➊<br />ᐸ'Budd Daay'ᐳ"}}:::plan
-    Constant11{{"Constant[11∈0] ➊<br />ᐸ[ 'BD', 'Buddy' ]ᐳ"}}:::plan
-    Constant12{{"Constant[12∈0] ➊<br />ᐸnullᐳ"}}:::plan
-    Constant41{{"Constant[41∈0] ➊<br />ᐸ'buddy@example.com'ᐳ"}}:::plan
-    __InputObject14{{"__InputObject[14∈0] ➊"}}:::plan
-    Constant40 & Constant11 & Constant12 & Constant41 & __InputObject14 --> __InputObject9
-    __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
-    Constant39{{"Constant[39∈0] ➊<br />ᐸ3ᐳ"}}:::plan
-    Constant39 & __InputObject9 --> __InputObject6
-    Object19{{"Object[19∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    __InputObject9{{"__InputObject[9∈0] ➊<br />More deps:<br />- Constantᐸ'Budd Daay'ᐳ[40]<br />- Constantᐸ[ 'BD', 'Buddy' ]ᐳ[11]<br />- Constantᐸnullᐳ[12]<br />- Constantᐸ'buddy@example.com'ᐳ[41]"}}:::plan
+    __InputObject14{{"__InputObject[14∈0] ➊<br />More deps:<br />- Constantᐸ'http://buddy.com'ᐳ[42]"}}:::plan
+    __InputObject14 --> __InputObject9
+    __InputObject6{{"__InputObject[6∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ3ᐳ[39]"}}:::plan
+    __InputObject9 --> __InputObject6
+    Object19{{"Object[19∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 2"}}:::plan
     Access17{{"Access[17∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access18{{"Access[18∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access17 & Access18 --> Object19
-    Constant42{{"Constant[42∈0] ➊<br />ᐸ'http://buddy.com'ᐳ"}}:::plan
-    Constant42 --> __InputObject14
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access17
     __Value2 --> Access18
     ApplyInput20{{"ApplyInput[20∈0] ➊"}}:::plan
     __InputObject6 --> ApplyInput20
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    PgUpdateSingle16[["PgUpdateSingle[16∈1] ➊<br />ᐸperson(id;)ᐳ"]]:::sideeffectplan
-    Object19 & Constant39 & ApplyInput20 --> PgUpdateSingle16
+    PgUpdateSingle16[["PgUpdateSingle[16∈1] ➊<br />ᐸperson(id;)ᐳ<br />More deps:<br />- Object[19]<br />- Constantᐸ3ᐳ[39]"]]:::sideeffectplan
+    ApplyInput20 --> PgUpdateSingle16
     Object21{{"Object[21∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgUpdateSingle16 --> Object21
-    PgSelect29[["PgSelect[29∈3] ➊<br />ᐸfrmcdc_wrappedUrlᐳ"]]:::plan
+    PgSelect29[["PgSelect[29∈3] ➊<br />ᐸfrmcdc_wrappedUrlᐳ<br />More deps:<br />- Object[19]"]]:::plan
     PgFromExpression33{{"PgFromExpression[33∈3] ➊"}}:::plan
-    Object19 & PgFromExpression33 --> PgSelect29
+    PgFromExpression33 --> PgSelect29
     PgClassExpression22{{"PgClassExpression[22∈3] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
     Access23{{"Access[23∈3] ➊<br />ᐸ16.tᐳ"}}:::plan
     Access23 --> PgClassExpression22
@@ -78,7 +70,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,__InputObject9,Constant11,Constant12,__InputObject14,Access17,Access18,Object19,ApplyInput20,Constant39,Constant40,Constant41,Constant42 bucket0
+    class Bucket0,__Value2,__InputObject6,__InputObject9,__InputObject14,Access17,Access18,Object19,ApplyInput20 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUpdateSingle16,Object21 bucket1
     classDef bucket2 stroke:#7f007f

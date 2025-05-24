@@ -29,55 +29,40 @@ graph TD
     Bucket6 --> Bucket8 & Bucket10
 
     %% plan dependencies
-    __InputObject9{{"__InputObject[9∈0] ➊"}}:::plan
-    Constant78{{"Constant[78∈0] ➊<br />ᐸ'postgraphile_test_authenticator'ᐳ"}}:::plan
-    Constant79{{"Constant[79∈0] ➊<br />ᐸ'pg11'ᐳ"}}:::plan
-    Constant12{{"Constant[12∈0] ➊<br />ᐸ[ '2098288669218571759', '2098288669218571760', '20982886692ᐳ"}}:::plan
-    __InputObject13{{"__InputObject[13∈0] ➊"}}:::plan
-    Constant78 & Constant79 & Constant12 & __InputObject13 --> __InputObject9
-    __InputObject22{{"__InputObject[22∈0] ➊"}}:::plan
-    Constant81{{"Constant[81∈0] ➊<br />ᐸ'postgraphile_test_visitor'ᐳ"}}:::plan
-    Constant82{{"Constant[82∈0] ➊<br />ᐸ'c'ᐳ"}}:::plan
-    Constant25{{"Constant[25∈0] ➊<br />ᐸ[ '2098288669218571759', '2098288669218571760', '20982886692ᐳ"}}:::plan
-    __InputObject26{{"__InputObject[26∈0] ➊"}}:::plan
-    Constant81 & Constant82 & Constant25 & __InputObject26 --> __InputObject22
-    __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
-    Constant77{{"Constant[77∈0] ➊<br />ᐸ12ᐳ"}}:::plan
-    Constant77 & __InputObject9 --> __InputObject6
-    Constant80{{"Constant[80∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Constant80 --> __InputObject13
-    Object18{{"Object[18∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access16{{"Access[16∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access17{{"Access[17∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    __InputObject9{{"__InputObject[9∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ'postgraphile_test_authenticator'ᐳ[78]<br />- Constantᐸ'pg11'ᐳ[79]<br />- Constantᐸ[ '2098288669218571759', '2098288669218571760', '20982886692ᐳ[12]"}}:::plan
+    __InputObject13{{"__InputObject[13∈0] ➊<br />More deps:<br />- Constantᐸ1ᐳ[80]<br />- Constantᐸundefinedᐳ[7]"}}:::plan
+    __InputObject13 --> __InputObject9
+    __InputObject22{{"__InputObject[22∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ'postgraphile_test_visitor'ᐳ[81]<br />- Constantᐸ'c'ᐳ[82]<br />- Constantᐸ[ '2098288669218571759', '2098288669218571760', '20982886692ᐳ[25]"}}:::plan
+    __InputObject26{{"__InputObject[26∈0] ➊<br />More deps:<br />- Constantᐸ1ᐳ[80]<br />- Constantᐸundefinedᐳ[7]"}}:::plan
+    __InputObject26 --> __InputObject22
+    __InputObject6{{"__InputObject[6∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ12ᐳ[77]"}}:::plan
+    __InputObject9 --> __InputObject6
+    Object18{{"Object[18∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 2"}}:::plan
+    Access16{{"Access[16∈0] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access17{{"Access[17∈0] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access16 & Access17 --> Object18
-    __InputObject21{{"__InputObject[21∈0] ➊"}}:::plan
+    __InputObject21{{"__InputObject[21∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]"}}:::plan
     __InputObject22 --> __InputObject21
-    Constant80 --> __InputObject26
-    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
-    __Value2 --> Access16
-    __Value2 --> Access17
     ApplyInput19{{"ApplyInput[19∈0] ➊"}}:::plan
     __InputObject6 --> ApplyInput19
     ApplyInput31{{"ApplyInput[31∈0] ➊"}}:::plan
     __InputObject21 --> ApplyInput31
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    PgUpdateSingle15[["PgUpdateSingle[15∈1] ➊<br />ᐸtypes(id;)ᐳ"]]:::sideeffectplan
-    Object18 & Constant77 & ApplyInput19 --> PgUpdateSingle15
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ<br />Dependents: 4"]:::plan
+    PgUpdateSingle15[["PgUpdateSingle[15∈1] ➊<br />ᐸtypes(id;)ᐳ<br />More deps:<br />- Object[18]<br />- Constantᐸ12ᐳ[77]"]]:::sideeffectplan
+    ApplyInput19 --> PgUpdateSingle15
     Object20{{"Object[20∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgUpdateSingle15 --> Object20
     PgInsertSingle27[["PgInsertSingle[27∈2] ➊<br />ᐸtypes()ᐳ"]]:::sideeffectplan
     Object30{{"Object[30∈2] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object30 & ApplyInput31 --> PgInsertSingle27
-    Access28{{"Access[28∈2] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access29{{"Access[29∈2] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access28{{"Access[28∈2] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access29{{"Access[29∈2] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access28 & Access29 --> Object30
-    __Value2 --> Access28
-    __Value2 --> Access29
     Object32{{"Object[32∈2] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle27 --> Object32
-    PgSelect44[["PgSelect[44∈5] ➊<br />ᐸfrmcdc_domainConstrainedCompoundTypeᐳ"]]:::plan
+    PgSelect44[["PgSelect[44∈5] ➊<br />ᐸfrmcdc_domainConstrainedCompoundTypeᐳ<br />More deps:<br />- Object[18]"]]:::plan
     PgFromExpression48{{"PgFromExpression[48∈5] ➊"}}:::plan
-    Object18 & PgFromExpression48 --> PgSelect44
+    PgFromExpression48 --> PgSelect44
     PgClassExpression33{{"PgClassExpression[33∈5] ➊<br />ᐸ__types__.”id”ᐳ"}}:::plan
     Access34{{"Access[34∈5] ➊<br />ᐸ15.tᐳ"}}:::plan
     Access34 --> PgClassExpression33
@@ -154,7 +139,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,__InputObject9,Constant12,__InputObject13,Access16,Access17,Object18,ApplyInput19,__InputObject21,__InputObject22,Constant25,__InputObject26,ApplyInput31,Constant77,Constant78,Constant79,Constant80,Constant81,Constant82 bucket0
+    class Bucket0,__Value2,__InputObject6,__InputObject9,__InputObject13,Access16,Access17,Object18,ApplyInput19,__InputObject21,__InputObject22,__InputObject26,ApplyInput31 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUpdateSingle15,Object20 bucket1
     classDef bucket2 stroke:#7f007f

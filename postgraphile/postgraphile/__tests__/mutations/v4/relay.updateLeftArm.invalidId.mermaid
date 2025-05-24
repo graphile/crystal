@@ -20,19 +20,14 @@ graph TD
     Bucket3 --> Bucket4
 
     %% plan dependencies
-    __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
-    Constant40{{"Constant[40∈0] ➊<br />ᐸ'WyJsZWZ0X2FybXMiLDQyXQ=='ᐳ"}}:::plan
-    __InputObject9{{"__InputObject[9∈0] ➊"}}:::plan
-    Constant40 & __InputObject9 --> __InputObject6
-    Constant41{{"Constant[41∈0] ➊<br />ᐸ0.75ᐳ"}}:::plan
-    Constant42{{"Constant[42∈0] ➊<br />ᐸ'WyJteV90YWJsZXMiLDFd'ᐳ"}}:::plan
-    Constant41 & Constant42 --> __InputObject9
-    Object18{{"Object[18∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    __InputObject6{{"__InputObject[6∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ'WyJsZWZ0X2FybXMiLDQyXQ=='ᐳ[40]"}}:::plan
+    __InputObject9{{"__InputObject[9∈0] ➊<br />More deps:<br />- Constantᐸ0.75ᐳ[41]<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ'WyJteV90YWJsZXMiLDFd'ᐳ[42]"}}:::plan
+    __InputObject9 --> __InputObject6
+    Object18{{"Object[18∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 2"}}:::plan
     Access16{{"Access[16∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access17{{"Access[17∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access16 & Access17 --> Object18
-    Lambda12{{"Lambda[12∈0] ➊<br />ᐸdecode_LeftArm_base64JSONᐳ"}}:::plan
-    Constant40 --> Lambda12
+    Lambda12{{"Lambda[12∈0] ➊<br />ᐸdecode_LeftArm_base64JSONᐳ<br />More deps:<br />- Constantᐸ'WyJsZWZ0X2FybXMiLDQyXQ=='ᐳ[40]"}}:::plan
     Access13{{"Access[13∈0] ➊<br />ᐸ12.1ᐳ"}}:::plan
     Lambda12 --> Access13
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
@@ -40,20 +35,17 @@ graph TD
     __Value2 --> Access17
     ApplyInput19{{"ApplyInput[19∈0] ➊"}}:::plan
     __InputObject6 --> ApplyInput19
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant21{{"Constant[21∈0] ➊<br />ᐸ'left_arms'ᐳ"}}:::plan
-    Constant36{{"Constant[36∈0] ➊<br />ᐸ'people'ᐳ"}}:::plan
-    PgUpdateSingle15[["PgUpdateSingle[15∈1] ➊<br />ᐸleft_arm(id;)ᐳ"]]:::sideeffectplan
+    PgUpdateSingle15[["PgUpdateSingle[15∈1] ➊<br />ᐸleft_arm(id;)ᐳ<br />More deps:<br />- Object[18]"]]:::sideeffectplan
     Access13 -->|rejectNull| PgUpdateSingle15
-    Object18 & ApplyInput19 --> PgUpdateSingle15
+    ApplyInput19 --> PgUpdateSingle15
     Object20{{"Object[20∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgUpdateSingle15 --> Object20
-    List24{{"List[24∈3] ➊<br />ᐸ21,22ᐳ"}}:::plan
+    List24{{"List[24∈3] ➊<br />ᐸ21,22ᐳ<br />More deps:<br />- Constantᐸ'left_arms'ᐳ[21]"}}:::plan
     PgClassExpression22{{"PgClassExpression[22∈3] ➊<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
-    Constant21 & PgClassExpression22 --> List24
-    PgSelect27[["PgSelect[27∈3] ➊<br />ᐸpersonᐳ"]]:::plan
+    PgClassExpression22 --> List24
+    PgSelect27[["PgSelect[27∈3] ➊<br />ᐸpersonᐳ<br />More deps:<br />- Object[18]"]]:::plan
     PgClassExpression26{{"PgClassExpression[26∈3] ➊<br />ᐸ__left_arm...person_id”ᐳ"}}:::plan
-    Object18 & PgClassExpression26 --> PgSelect27
+    PgClassExpression26 --> PgSelect27
     Access23{{"Access[23∈3] ➊<br />ᐸ15.tᐳ"}}:::plan
     Access23 --> PgClassExpression22
     PgUpdateSingle15 --> Access23
@@ -70,16 +62,16 @@ graph TD
     Access23 --> PgClassExpression34
     PgClassExpression35{{"PgClassExpression[35∈3] ➊<br />ᐸ__left_arm__.”mood”ᐳ"}}:::plan
     Access23 --> PgClassExpression35
-    List38{{"List[38∈4] ➊<br />ᐸ36,37ᐳ"}}:::plan
+    List38{{"List[38∈4] ➊<br />ᐸ36,37ᐳ<br />More deps:<br />- Constantᐸ'people'ᐳ[36]"}}:::plan
     PgClassExpression37{{"PgClassExpression[37∈4] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    Constant36 & PgClassExpression37 --> List38
+    PgClassExpression37 --> List38
     PgSelectSingle33 --> PgClassExpression37
     Lambda39{{"Lambda[39∈4] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List38 --> Lambda39
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,__InputObject9,Lambda12,Access13,Access16,Access17,Object18,ApplyInput19,Constant21,Constant36,Constant40,Constant41,Constant42 bucket0
+    class Bucket0,__Value2,__InputObject6,__InputObject9,Lambda12,Access13,Access16,Access17,Object18,ApplyInput19 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUpdateSingle15,Object20 bucket1
     classDef bucket2 stroke:#7f007f

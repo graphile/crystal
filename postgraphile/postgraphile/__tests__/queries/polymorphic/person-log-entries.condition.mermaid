@@ -20,9 +20,7 @@ graph TD
     Bucket3 --> Bucket4
 
     %% plan dependencies
-    __InputObject7{{"__InputObject[7∈0] ➊"}}:::plan
-    Constant38{{"Constant[38∈0] ➊<br />ᐸ'Dave'ᐳ"}}:::plan
-    Constant38 --> __InputObject7
+    __InputObject7{{"__InputObject[7∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[6]<br />- Constantᐸ'Dave'ᐳ[38]"}}:::plan
     Object13{{"Object[13∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -32,7 +30,6 @@ graph TD
     __Value2 --> Access12
     ApplyInput15{{"ApplyInput[15∈0] ➊"}}:::plan
     __InputObject7 --> ApplyInput15
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection14{{"Connection[14∈0] ➊<br />ᐸ10ᐳ"}}:::plan
     PgSelectInlineApply34["PgSelectInlineApply[34∈0] ➊"]:::plan
     PgSelect17[["PgSelect[17∈1] ➊<br />ᐸpeopleᐳ"]]:::plan
@@ -66,7 +63,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject7,Access11,Access12,Object13,Connection14,ApplyInput15,PgSelectInlineApply34,Constant38 bucket0
+    class Bucket0,__Value2,__InputObject7,Access11,Access12,Object13,Connection14,ApplyInput15,PgSelectInlineApply34 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect17,PgSelectRows18,Access35 bucket1
     classDef bucket2 stroke:#7f007f

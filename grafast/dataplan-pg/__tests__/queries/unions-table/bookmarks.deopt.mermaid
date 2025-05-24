@@ -30,11 +30,10 @@ graph TD
     Bucket8 --> Bucket10 & Bucket11
 
     %% plan dependencies
-    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸpeopleᐳ"]]:::plan
-    Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant99{{"Constant[99∈0] ➊<br />ᐸ2ᐳ"}}:::plan
+    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸpeopleᐳ<br />More deps:<br />- Object[10]<br />- Constantᐸ2ᐳ[99]"]]:::plan
     PgSelectInlineApply95["PgSelectInlineApply[95∈0] ➊"]:::plan
-    Object10 & Constant99 & PgSelectInlineApply95 --> PgSelect7
+    PgSelectInlineApply95 --> PgSelect7
+    Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 8"}}:::plan
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
@@ -53,7 +52,6 @@ graph TD
     PgSelect7 --> Access96
     Lambda98{{"Lambda[98∈0] ➊<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List97 --> Lambda98
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgClassExpression14{{"PgClassExpression[14∈1] ➊<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression14
     PgClassExpression15{{"PgClassExpression[15∈1] ➊<br />ᐸ__people__.”username”ᐳ"}}:::plan
@@ -69,9 +67,9 @@ graph TD
     PgClassExpression34{{"PgClassExpression[34∈3]<br />ᐸ(__person_....”post_id”ᐳ"}}:::plan
     PgClassExpression35{{"PgClassExpression[35∈3]<br />ᐸ(__person_...omment_id”ᐳ"}}:::plan
     PgClassExpression33 & PgClassExpression34 & PgClassExpression35 --> List36
-    PgSelect25[["PgSelect[25∈3]<br />ᐸpeopleᐳ"]]:::plan
+    PgSelect25[["PgSelect[25∈3]<br />ᐸpeopleᐳ<br />More deps:<br />- Object[10]"]]:::plan
     PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__person_b...person_id”ᐳ"}}:::plan
-    Object10 & PgClassExpression24 --> PgSelect25
+    PgClassExpression24 --> PgSelect25
     PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__person_b...rks__.”id”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression23
     PgSelectSingle22 --> PgClassExpression24
@@ -90,9 +88,9 @@ graph TD
     Lambda37 --> Access38
     PgClassExpression63{{"PgClassExpression[63∈4]<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle31 --> PgClassExpression63
-    PgSelect40[["PgSelect[40∈6]^<br />ᐸpeopleᐳ"]]:::plan
+    PgSelect40[["PgSelect[40∈6]^<br />ᐸpeopleᐳ<br />More deps:<br />- Object[10]"]]:::plan
     Access39{{"Access[39∈6]<br />ᐸ37.person_idᐳ<br />ᐳPerson"}}:::plan
-    Object10 & Access39 --> PgSelect40
+    Access39 --> PgSelect40
     Lambda37 --> Access39
     First44{{"First[44∈6]^"}}:::plan
     PgSelectRows45[["PgSelectRows[45∈6]^"]]:::plan
@@ -104,12 +102,12 @@ graph TD
     PgSelectSingle46 --> PgClassExpression64
     PgClassExpression67{{"PgClassExpression[67∈6]^<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle46 --> PgClassExpression67
-    PgSelect48[["PgSelect[48∈7]^<br />ᐸpostsᐳ"]]:::plan
+    PgSelect48[["PgSelect[48∈7]^<br />ᐸpostsᐳ<br />More deps:<br />- Object[10]"]]:::plan
     Access47{{"Access[47∈7]<br />ᐸ37.post_idᐳ<br />ᐳPost"}}:::plan
-    Object10 & Access47 --> PgSelect48
-    PgSelect69[["PgSelect[69∈7]^<br />ᐸpeopleᐳ"]]:::plan
+    Access47 --> PgSelect48
+    PgSelect69[["PgSelect[69∈7]^<br />ᐸpeopleᐳ<br />More deps:<br />- Object[10]"]]:::plan
     PgClassExpression68{{"PgClassExpression[68∈7]^<br />ᐸ__posts__.”author_id”ᐳ"}}:::plan
-    Object10 & PgClassExpression68 --> PgSelect69
+    PgClassExpression68 --> PgSelect69
     Lambda37 --> Access47
     First52{{"First[52∈7]^"}}:::plan
     PgSelectRows53[["PgSelectRows[53∈7]^"]]:::plan
@@ -128,15 +126,15 @@ graph TD
     First73 --> PgSelectSingle75
     PgClassExpression84{{"PgClassExpression[84∈7]^<br />ᐸ__posts__.”body”ᐳ"}}:::plan
     PgSelectSingle54 --> PgClassExpression84
-    PgSelect56[["PgSelect[56∈8]^<br />ᐸcommentsᐳ"]]:::plan
+    PgSelect56[["PgSelect[56∈8]^<br />ᐸcommentsᐳ<br />More deps:<br />- Object[10]"]]:::plan
     Access55{{"Access[55∈8]<br />ᐸ37.comment_idᐳ<br />ᐳComment"}}:::plan
-    Object10 & Access55 --> PgSelect56
-    PgSelect77[["PgSelect[77∈8]^<br />ᐸpeopleᐳ"]]:::plan
+    Access55 --> PgSelect56
+    PgSelect77[["PgSelect[77∈8]^<br />ᐸpeopleᐳ<br />More deps:<br />- Object[10]"]]:::plan
     PgClassExpression76{{"PgClassExpression[76∈8]^<br />ᐸ__comments...author_id”ᐳ"}}:::plan
-    Object10 & PgClassExpression76 --> PgSelect77
-    PgSelect86[["PgSelect[86∈8]^<br />ᐸpostsᐳ"]]:::plan
+    PgClassExpression76 --> PgSelect77
+    PgSelect86[["PgSelect[86∈8]^<br />ᐸpostsᐳ<br />More deps:<br />- Object[10]"]]:::plan
     PgClassExpression85{{"PgClassExpression[85∈8]^<br />ᐸ__comments__.”post_id”ᐳ"}}:::plan
-    Object10 & PgClassExpression85 --> PgSelect86
+    PgClassExpression85 --> PgSelect86
     Lambda37 --> Access55
     First60{{"First[60∈8]^"}}:::plan
     PgSelectRows61[["PgSelectRows[61∈8]^"]]:::plan
@@ -171,7 +169,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,PgSelectInlineApply95,Access96,List97,Lambda98,Constant99 bucket0
+    class Bucket0,__Value2,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,PgSelectInlineApply95,Access96,List97,Lambda98 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgClassExpression14,PgClassExpression15,PgSelectRows20 bucket1
     classDef bucket2 stroke:#7f007f

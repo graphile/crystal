@@ -23,32 +23,30 @@ graph TD
     Bucket4 --> Bucket5 & Bucket6
 
     %% plan dependencies
-    Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 4"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection12{{"Connection[12∈0] ➊<br />ᐸ8ᐳ"}}:::plan
-    Constant30{{"Constant[30∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
-    PgSelect14[["PgSelect[14∈1] ➊<br />ᐸlog_entriesᐳ"]]:::plan
-    Object11 & Connection12 --> PgSelect14
+    PgSelect14[["PgSelect[14∈1] ➊<br />ᐸlog_entriesᐳ<br />More deps:<br />- Object[11]"]]:::plan
+    Connection12 --> PgSelect14
     PgSelectRows15[["PgSelectRows[15∈1] ➊"]]:::plan
     PgSelect14 --> PgSelectRows15
     __Item16[/"__Item[16∈2]<br />ᐸ15ᐳ"\]:::itemplan
     PgSelectRows15 ==> __Item16
     PgSelectSingle17{{"PgSelectSingle[17∈2]<br />ᐸlog_entriesᐳ"}}:::plan
     __Item16 --> PgSelectSingle17
-    PgUnionAll21[["PgUnionAll[21∈3]<br />ᐸPerson,Organizationᐳ"]]:::plan
+    PgUnionAll21[["PgUnionAll[21∈3]<br />ᐸPerson,Organizationᐳ<br />More deps:<br />- Object[11]"]]:::plan
     PgClassExpression19{{"PgClassExpression[19∈3]<br />ᐸ__log_entr...person_id”ᐳ"}}:::plan
     PgClassExpression20{{"PgClassExpression[20∈3]<br />ᐸ__log_entr...zation_id”ᐳ"}}:::plan
-    Object11 & PgClassExpression19 & PgClassExpression20 --> PgUnionAll21
-    List31{{"List[31∈3]<br />ᐸ28,29,30ᐳ"}}:::plan
+    PgClassExpression19 & PgClassExpression20 --> PgUnionAll21
+    List31{{"List[31∈3]<br />ᐸ28,29,30ᐳ<br />More deps:<br />- Constantᐸ[HIDDEN]ᐳ[30]"}}:::plan
     Access28{{"Access[28∈3]<br />ᐸ25.0ᐳ"}}:::plan
     Access29{{"Access[29∈3]<br />ᐸ25.1ᐳ"}}:::plan
-    Access28 & Access29 & Constant30 --> List31
+    Access28 & Access29 --> List31
     PgClassExpression18{{"PgClassExpression[18∈3]<br />ᐸ__log_entries__.”id”ᐳ"}}:::plan
     PgSelectSingle17 --> PgClassExpression18
     PgSelectSingle17 --> PgClassExpression19
@@ -63,9 +61,9 @@ graph TD
     Access33{{"Access[33∈3]<br />ᐸ32.__typenameᐳ"}}:::plan
     Lambda32 --> Access33
     PgUnionAll21 --> Access52
-    PgSelect35[["PgSelect[35∈5]^<br />ᐸorganizationsᐳ"]]:::plan
+    PgSelect35[["PgSelect[35∈5]^<br />ᐸorganizationsᐳ<br />More deps:<br />- Object[11]"]]:::plan
     Access34{{"Access[34∈5]<br />ᐸ32.organization_idᐳ<br />ᐳOrganization"}}:::plan
-    Object11 & Access34 --> PgSelect35
+    Access34 --> PgSelect35
     Lambda32 --> Access34
     First39{{"First[39∈5]^"}}:::plan
     PgSelectRows40[["PgSelectRows[40∈5]^"]]:::plan
@@ -75,9 +73,9 @@ graph TD
     First39 --> PgSelectSingle41
     PgClassExpression50{{"PgClassExpression[50∈5]^<br />ᐸ__organiza...s__.”name”ᐳ"}}:::plan
     PgSelectSingle41 --> PgClassExpression50
-    PgSelect43[["PgSelect[43∈6]^<br />ᐸpeopleᐳ"]]:::plan
+    PgSelect43[["PgSelect[43∈6]^<br />ᐸpeopleᐳ<br />More deps:<br />- Object[11]"]]:::plan
     Access42{{"Access[42∈6]<br />ᐸ32.person_idᐳ<br />ᐳPerson"}}:::plan
-    Object11 & Access42 --> PgSelect43
+    Access42 --> PgSelect43
     Lambda32 --> Access42
     First47{{"First[47∈6]^"}}:::plan
     PgSelectRows48[["PgSelectRows[48∈6]^"]]:::plan
@@ -90,7 +88,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access9,Access10,Object11,Connection12,Constant30 bucket0
+    class Bucket0,__Value2,Access9,Access10,Object11,Connection12 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect14,PgSelectRows15 bucket1
     classDef bucket2 stroke:#7f007f

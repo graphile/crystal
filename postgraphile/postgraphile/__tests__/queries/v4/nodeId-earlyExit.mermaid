@@ -25,32 +25,24 @@ graph TD
     Bucket6 --> Bucket8
 
     %% plan dependencies
-    __InputObject11{{"__InputObject[11∈0] ➊"}}:::plan
-    Constant67{{"Constant[67∈0] ➊<br />ᐸ'Twenty Seventwo'ᐳ"}}:::plan
-    Constant67 --> __InputObject11
-    Object17{{"Object[17∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    __InputObject11{{"__InputObject[11∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[10]<br />- Constantᐸ'Twenty Seventwo'ᐳ[67]"}}:::plan
+    Object17{{"Object[17∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 4"}}:::plan
     Access15{{"Access[15∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access16{{"Access[16∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access15 & Access16 --> Object17
-    PgSelect25[["PgSelect[25∈0] ➊<br />ᐸpersonᐳ"]]:::plan
+    PgSelect25[["PgSelect[25∈0] ➊<br />ᐸpersonᐳ<br />More deps:<br />- Object[17]"]]:::plan
     Access23{{"Access[23∈0] ➊<br />ᐸ22.1ᐳ"}}:::plan
     Access23 -->|rejectNull| PgSelect25
-    Object17 --> PgSelect25
-    __InputObject30{{"__InputObject[30∈0] ➊"}}:::plan
-    Constant69{{"Constant[69∈0] ➊<br />ᐸ'Is that a cooking show?'ᐳ"}}:::plan
-    Constant69 --> __InputObject30
-    PgSelect42[["PgSelect[42∈0] ➊<br />ᐸpersonᐳ"]]:::plan
+    __InputObject30{{"__InputObject[30∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[10]<br />- Constantᐸ'Is that a cooking show?'ᐳ[69]"}}:::plan
+    PgSelect42[["PgSelect[42∈0] ➊<br />ᐸpersonᐳ<br />More deps:<br />- Object[17]"]]:::plan
     Access40{{"Access[40∈0] ➊<br />ᐸ39.1ᐳ"}}:::plan
     Access40 -->|rejectNull| PgSelect42
-    Object17 --> PgSelect42
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access15
     __Value2 --> Access16
     ApplyInput19{{"ApplyInput[19∈0] ➊"}}:::plan
     __InputObject11 --> ApplyInput19
-    Lambda22{{"Lambda[22∈0] ➊<br />ᐸspecifier_Person_base64JSONᐳ"}}:::plan
-    Constant68{{"Constant[68∈0] ➊<br />ᐸ'WyJwZW9wbGUiLDZd'ᐳ"}}:::plan
-    Constant68 --> Lambda22
+    Lambda22{{"Lambda[22∈0] ➊<br />ᐸspecifier_Person_base64JSONᐳ<br />More deps:<br />- Constantᐸ'WyJwZW9wbGUiLDZd'ᐳ[68]"}}:::plan
     Lambda22 --> Access23
     First27{{"First[27∈0] ➊"}}:::plan
     PgSelectRows28[["PgSelectRows[28∈0] ➊"]]:::plan
@@ -60,9 +52,7 @@ graph TD
     First27 --> PgSelectSingle29
     ApplyInput36{{"ApplyInput[36∈0] ➊"}}:::plan
     __InputObject30 --> ApplyInput36
-    Lambda39{{"Lambda[39∈0] ➊<br />ᐸspecifier_Person_base64JSONᐳ"}}:::plan
-    Constant70{{"Constant[70∈0] ➊<br />ᐸ'WyJwb3N0cyIsM10='ᐳ"}}:::plan
-    Constant70 --> Lambda39
+    Lambda39{{"Lambda[39∈0] ➊<br />ᐸspecifier_Person_base64JSONᐳ<br />More deps:<br />- Constantᐸ'WyJwb3N0cyIsM10='ᐳ[70]"}}:::plan
     Lambda39 --> Access40
     First44{{"First[44∈0] ➊"}}:::plan
     PgSelectRows45[["PgSelectRows[45∈0] ➊"]]:::plan
@@ -70,19 +60,16 @@ graph TD
     PgSelect42 --> PgSelectRows45
     PgSelectSingle46{{"PgSelectSingle[46∈0] ➊<br />ᐸpersonᐳ"}}:::plan
     First44 --> PgSelectSingle46
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection18{{"Connection[18∈0] ➊<br />ᐸ14ᐳ"}}:::plan
     Connection35{{"Connection[35∈0] ➊<br />ᐸ33ᐳ"}}:::plan
-    Constant57{{"Constant[57∈0] ➊<br />ᐸ'people'ᐳ"}}:::plan
-    Constant61{{"Constant[61∈0] ➊<br />ᐸ'posts'ᐳ"}}:::plan
-    PgSelect47[["PgSelect[47∈1] ➊<br />ᐸpersonᐳ"]]:::plan
-    Object17 & ApplyInput19 & Connection18 --> PgSelect47
+    PgSelect47[["PgSelect[47∈1] ➊<br />ᐸpersonᐳ<br />More deps:<br />- Object[17]"]]:::plan
+    ApplyInput19 & Connection18 --> PgSelect47
     PgSelectRows51[["PgSelectRows[51∈1] ➊"]]:::plan
     PgSelect47 --> PgSelectRows51
     PgClassExpression48{{"PgClassExpression[48∈2] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle29 --> PgClassExpression48
-    PgSelect49[["PgSelect[49∈3] ➊<br />ᐸpostᐳ"]]:::plan
-    Object17 & ApplyInput36 & Connection35 --> PgSelect49
+    PgSelect49[["PgSelect[49∈3] ➊<br />ᐸpostᐳ<br />More deps:<br />- Object[17]"]]:::plan
+    ApplyInput36 & Connection35 --> PgSelect49
     PgSelectRows52[["PgSelectRows[52∈3] ➊"]]:::plan
     PgSelect49 --> PgSelectRows52
     PgClassExpression50{{"PgClassExpression[50∈4] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
@@ -95,17 +82,17 @@ graph TD
     PgSelectRows52 ==> __Item55
     PgSelectSingle56{{"PgSelectSingle[56∈6]<br />ᐸpostᐳ"}}:::plan
     __Item55 --> PgSelectSingle56
-    List59{{"List[59∈7]<br />ᐸ57,58ᐳ"}}:::plan
+    List59{{"List[59∈7]<br />ᐸ57,58ᐳ<br />More deps:<br />- Constantᐸ'people'ᐳ[57]"}}:::plan
     PgClassExpression58{{"PgClassExpression[58∈7]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    Constant57 & PgClassExpression58 --> List59
+    PgClassExpression58 --> List59
     PgSelectSingle54 --> PgClassExpression58
     Lambda60{{"Lambda[60∈7]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List59 --> Lambda60
     PgClassExpression65{{"PgClassExpression[65∈7]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle54 --> PgClassExpression65
-    List63{{"List[63∈8]<br />ᐸ61,62ᐳ"}}:::plan
+    List63{{"List[63∈8]<br />ᐸ61,62ᐳ<br />More deps:<br />- Constantᐸ'posts'ᐳ[61]"}}:::plan
     PgClassExpression62{{"PgClassExpression[62∈8]<br />ᐸ__post__.”id”ᐳ"}}:::plan
-    Constant61 & PgClassExpression62 --> List63
+    PgClassExpression62 --> List63
     PgSelectSingle56 --> PgClassExpression62
     Lambda64{{"Lambda[64∈8]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List63 --> Lambda64
@@ -114,7 +101,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject11,Access15,Access16,Object17,Connection18,ApplyInput19,Lambda22,Access23,PgSelect25,First27,PgSelectRows28,PgSelectSingle29,__InputObject30,Connection35,ApplyInput36,Lambda39,Access40,PgSelect42,First44,PgSelectRows45,PgSelectSingle46,Constant57,Constant61,Constant67,Constant68,Constant69,Constant70 bucket0
+    class Bucket0,__Value2,__InputObject11,Access15,Access16,Object17,Connection18,ApplyInput19,Lambda22,Access23,PgSelect25,First27,PgSelectRows28,PgSelectSingle29,__InputObject30,Connection35,ApplyInput36,Lambda39,Access40,PgSelect42,First44,PgSelectRows45,PgSelectSingle46 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect47,PgSelectRows51 bucket1
     classDef bucket2 stroke:#7f007f

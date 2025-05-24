@@ -24,31 +24,26 @@ graph TD
     Access12{{"Access[12∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access13{{"Access[13∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access12 & Access13 --> Object14
-    Connection15{{"Connection[15∈0] ➊<br />ᐸ11ᐳ"}}:::plan
-    Constant68{{"Constant[68∈0] ➊<br />ᐸ3ᐳ"}}:::plan
-    Lambda18{{"Lambda[18∈0] ➊<br />ᐸparseCursorᐳ"}}:::plan
-    Constant68 & Lambda18 --> Connection15
+    Connection15{{"Connection[15∈0] ➊<br />ᐸ11ᐳ<br />More deps:<br />- Constantᐸ3ᐳ[68]<br />- Lambda[18]"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ0.valueᐳ"}}:::plan
     __Value0["__Value[0∈0] ➊<br />ᐸvariableValuesᐳ"]:::plan
     __Value0 --> Access9
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access12
     __Value2 --> Access13
-    Lambda17{{"Lambda[17∈0] ➊<br />ᐸincludeArchivedConditionᐳ"}}:::plan
-    Constant67{{"Constant[67∈0] ➊<br />ᐸ[ undefined, 'INHERIT' ]ᐳ"}}:::plan
-    Constant67 --> Lambda17
+    Lambda17{{"Lambda[17∈0] ➊<br />ᐸincludeArchivedConditionᐳ<br />More deps:<br />- Constantᐸ[ undefined, 'INHERIT' ]ᐳ[67]"}}:::plan
+    Lambda18{{"Lambda[18∈0] ➊<br />ᐸparseCursorᐳ<br />Dependents: 2"}}:::plan
     Access9 --> Lambda18
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgSelectInlineApply63["PgSelectInlineApply[63∈0] ➊"]:::plan
-    PgSelect19[["PgSelect[19∈1] ➊<br />ᐸmessages+1ᐳ"]]:::plan
-    Object14 & Lambda17 & Connection15 & Lambda18 & Constant68 & PgSelectInlineApply63 --> PgSelect19
-    Object36{{"Object[36∈1] ➊<br />ᐸ{first,last,offset,hasMore}ᐳ"}}:::plan
+    PgSelect19[["PgSelect[19∈1] ➊<br />ᐸmessages+1ᐳ<br />More deps:<br />- Lambda[18]<br />- Constantᐸ3ᐳ[68]"]]:::plan
+    Object14 & Lambda17 & Connection15 & PgSelectInlineApply63 --> PgSelect19
+    Object36{{"Object[36∈1] ➊<br />ᐸ{first,last,offset,hasMore}ᐳ<br />More deps:<br />- Constantᐸ3ᐳ[68]<br />- Constantᐸundefinedᐳ[6]<br />- Constantᐸundefinedᐳ[6]"}}:::plan
     Access31{{"Access[31∈1] ➊<br />ᐸ19.hasMoreᐳ"}}:::plan
-    Constant68 & Access31 --> Object36
+    Access31 --> Object36
     PgSelect22[["PgSelect[22∈1] ➊<br />ᐸmessages(aggregate)ᐳ"]]:::plan
     Object14 & Lambda17 & Connection15 --> PgSelect22
-    Object32{{"Object[32∈1] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
-    Constant68 & Access31 --> Object32
+    Object32{{"Object[32∈1] ➊<br />ᐸ{first,last,hasMore}ᐳ<br />More deps:<br />- Constantᐸ3ᐳ[68]<br />- Constantᐸundefinedᐳ[6]"}}:::plan
+    Access31 --> Object32
     PgCursor43{{"PgCursor[43∈1] ➊"}}:::plan
     PgSelectSingle41{{"PgSelectSingle[41∈1] ➊<br />ᐸmessagesᐳ"}}:::plan
     Access42{{"Access[42∈1] ➊<br />ᐸ19.cursorDetailsᐳ"}}:::plan
@@ -107,7 +102,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value2,__Value4,Access9,Access12,Access13,Object14,Connection15,Lambda17,Lambda18,PgSelectInlineApply63,Constant67,Constant68 bucket0
+    class Bucket0,__Value0,__Value2,Access9,Access12,Access13,Object14,Connection15,Lambda17,Lambda18,PgSelectInlineApply63 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect19,PgPageInfo21,PgSelect22,First23,PgSelectRows24,PgSelectSingle25,PgClassExpression26,PgSelectRows27,Access31,Object32,Lambda33,Object36,Lambda37,First39,PgSelectSingle41,Access42,PgCursor43,Last45,PgSelectSingle47,PgCursor49,Access64 bucket1
     classDef bucket2 stroke:#7f007f

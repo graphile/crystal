@@ -18,7 +18,7 @@ graph TD
     %% plan dependencies
     PgSelect8[["PgSelect[8∈0] ➊<br />ᐸforumsᐳ"]]:::plan
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Lambda13{{"Lambda[13∈0] ➊<br />ᐸincludeArchivedConditionᐳ"}}:::plan
+    Lambda13{{"Lambda[13∈0] ➊<br />ᐸincludeArchivedConditionᐳ<br />More deps:<br />- Constantᐸ[ undefined, 'INHERIT' ]ᐳ[24]"}}:::plan
     Object11 & Lambda13 --> PgSelect8
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -26,11 +26,8 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10
-    Constant24{{"Constant[24∈0] ➊<br />ᐸ[ undefined, 'INHERIT' ]ᐳ"}}:::plan
-    Constant24 --> Lambda13
     PgSelectRows18[["PgSelectRows[18∈0] ➊"]]:::plan
     PgSelect8 --> PgSelectRows18
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item19[/"__Item[19∈1]<br />ᐸ18ᐳ"\]:::itemplan
     PgSelectRows18 ==> __Item19
     PgSelectSingle20{{"PgSelectSingle[20∈1]<br />ᐸforumsᐳ"}}:::plan
@@ -42,7 +39,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect8,Access9,Access10,Object11,Lambda13,PgSelectRows18,Constant24 bucket0
+    class Bucket0,__Value2,PgSelect8,Access9,Access10,Object11,Lambda13,PgSelectRows18 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item19,PgSelectSingle20 bucket1
     classDef bucket2 stroke:#7f007f

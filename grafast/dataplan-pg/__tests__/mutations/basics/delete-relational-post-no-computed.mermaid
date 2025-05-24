@@ -20,25 +20,18 @@ graph TD
 
     %% plan dependencies
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access9 & Access10 --> Object11
-    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
-    __Value2 --> Access9
-    __Value2 --> Access10
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant22{{"Constant[22∈0] ➊<br />ᐸ4ᐳ"}}:::plan
-    Constant23{{"Constant[23∈0] ➊<br />ᐸ3141592ᐳ"}}:::plan
-    PgDeleteSingle8[["PgDeleteSingle[8∈1] ➊<br />ᐸrelational_posts(id)ᐳ"]]:::sideeffectplan
-    Object11 & Constant22 --> PgDeleteSingle8
-    PgDeleteSingle14[["PgDeleteSingle[14∈2] ➊<br />ᐸrelational_posts(id)ᐳ"]]:::sideeffectplan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ<br />Dependents: 4"]:::plan
+    PgDeleteSingle8[["PgDeleteSingle[8∈1] ➊<br />ᐸrelational_posts(id)ᐳ<br />More deps:<br />- Constantᐸ4ᐳ[22]"]]:::sideeffectplan
+    Object11 --> PgDeleteSingle8
+    PgDeleteSingle14[["PgDeleteSingle[14∈2] ➊<br />ᐸrelational_posts(id)ᐳ<br />More deps:<br />- Constantᐸ3141592ᐳ[23]"]]:::sideeffectplan
     Object17{{"Object[17∈2] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object17 & Constant23 --> PgDeleteSingle14
-    Access15{{"Access[15∈2] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access16{{"Access[16∈2] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object17 --> PgDeleteSingle14
+    Access15{{"Access[15∈2] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access16{{"Access[16∈2] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access15 & Access16 --> Object17
-    __Value2 --> Access15
-    __Value2 --> Access16
     PgClassExpression18{{"PgClassExpression[18∈3] ➊<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
     Access19{{"Access[19∈3] ➊<br />ᐸ8.tᐳ"}}:::plan
     Access19 --> PgClassExpression18
@@ -50,7 +43,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access9,Access10,Object11,Constant22,Constant23 bucket0
+    class Bucket0,__Value2,Access9,Access10,Object11 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgDeleteSingle8 bucket1
     classDef bucket2 stroke:#7f007f

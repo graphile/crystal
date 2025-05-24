@@ -16,7 +16,6 @@ graph TD
     Bucket1 --> Bucket2
 
     %% plan dependencies
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection8{{"Connection[8∈0] ➊<br />ᐸ7ᐳ"}}:::plan
     PgUnionAll9[["PgUnionAll[9∈1] ➊"]]:::plan
     Connection8 --> PgUnionAll9
@@ -27,7 +26,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value4,Connection8 bucket0
+    class Bucket0,Connection8 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUnionAll9,Access13 bucket1
     classDef bucket2 stroke:#7f007f

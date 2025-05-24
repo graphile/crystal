@@ -20,16 +20,12 @@ graph TD
     Bucket4 --> Bucket5
 
     %% plan dependencies
-    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸprojectᐳ"]]:::plan
-    Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant37{{"Constant[37∈0] ➊<br />ᐸ'DynaTAC'ᐳ"}}:::plan
-    Object10 & Constant37 --> PgSelect7
+    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸprojectᐳ<br />More deps:<br />- Object[10]<br />- Constantᐸ'DynaTAC'ᐳ[37]"]]:::plan
+    Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 3"}}:::plan
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
-    PgSelect15[["PgSelect[15∈0] ➊<br />ᐸprojectᐳ"]]:::plan
-    Constant38{{"Constant[38∈0] ➊<br />ᐸ2ᐳ"}}:::plan
-    Object10 & Constant38 --> PgSelect15
+    PgSelect15[["PgSelect[15∈0] ➊<br />ᐸprojectᐳ<br />More deps:<br />- Object[10]<br />- Constantᐸ2ᐳ[38]"]]:::plan
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
@@ -45,7 +41,6 @@ graph TD
     PgSelect15 --> PgSelectRows18
     PgSelectSingle19{{"PgSelectSingle[19∈0] ➊<br />ᐸprojectᐳ"}}:::plan
     First17 --> PgSelectSingle19
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection24{{"Connection[24∈0] ➊<br />ᐸ22ᐳ"}}:::plan
     PgClassExpression26{{"PgClassExpression[26∈1] ➊<br />ᐸ__project__.”brand”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression26
@@ -55,8 +50,8 @@ graph TD
     PgSelectSingle19 --> PgClassExpression27
     PgClassExpression30{{"PgClassExpression[30∈2] ➊<br />ᐸ__project__.”__proto__”ᐳ"}}:::plan
     PgSelectSingle19 --> PgClassExpression30
-    PgSelect28[["PgSelect[28∈3] ➊<br />ᐸprojectᐳ"]]:::plan
-    Object10 & Connection24 --> PgSelect28
+    PgSelect28[["PgSelect[28∈3] ➊<br />ᐸprojectᐳ<br />More deps:<br />- Object[10]"]]:::plan
+    Connection24 --> PgSelect28
     PgSelectRows31[["PgSelectRows[31∈3] ➊"]]:::plan
     PgSelect28 --> PgSelectRows31
     __Item32[/"__Item[32∈4]<br />ᐸ31ᐳ"\]:::itemplan
@@ -72,7 +67,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,PgSelect15,First17,PgSelectRows18,PgSelectSingle19,Connection24,Constant37,Constant38 bucket0
+    class Bucket0,__Value2,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,PgSelect15,First17,PgSelectRows18,PgSelectSingle19,Connection24 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgClassExpression26,PgClassExpression29 bucket1
     classDef bucket2 stroke:#7f007f

@@ -20,18 +20,14 @@ graph TD
     Bucket3 --> Bucket4
 
     %% plan dependencies
-    __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
-    Constant39{{"Constant[39∈0] ➊<br />ᐸ'WyJsZWZ0X2FybXMiLDQyXQ=='ᐳ"}}:::plan
-    __InputObject9{{"__InputObject[9∈0] ➊"}}:::plan
-    Constant39 & __InputObject9 --> __InputObject6
-    Constant40{{"Constant[40∈0] ➊<br />ᐸ0.71ᐳ"}}:::plan
-    Constant40 --> __InputObject9
-    Object17{{"Object[17∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    __InputObject6{{"__InputObject[6∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ'WyJsZWZ0X2FybXMiLDQyXQ=='ᐳ[39]"}}:::plan
+    __InputObject9{{"__InputObject[9∈0] ➊<br />More deps:<br />- Constantᐸ0.71ᐳ[40]<br />- Constantᐸundefinedᐳ[7]"}}:::plan
+    __InputObject9 --> __InputObject6
+    Object17{{"Object[17∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 2"}}:::plan
     Access15{{"Access[15∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access16{{"Access[16∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access15 & Access16 --> Object17
-    Lambda11{{"Lambda[11∈0] ➊<br />ᐸdecode_LeftArm_base64JSONᐳ"}}:::plan
-    Constant39 --> Lambda11
+    Lambda11{{"Lambda[11∈0] ➊<br />ᐸdecode_LeftArm_base64JSONᐳ<br />More deps:<br />- Constantᐸ'WyJsZWZ0X2FybXMiLDQyXQ=='ᐳ[39]"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ11.1ᐳ"}}:::plan
     Lambda11 --> Access12
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
@@ -39,20 +35,17 @@ graph TD
     __Value2 --> Access16
     ApplyInput18{{"ApplyInput[18∈0] ➊"}}:::plan
     __InputObject6 --> ApplyInput18
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant20{{"Constant[20∈0] ➊<br />ᐸ'left_arms'ᐳ"}}:::plan
-    Constant35{{"Constant[35∈0] ➊<br />ᐸ'people'ᐳ"}}:::plan
-    PgUpdateSingle14[["PgUpdateSingle[14∈1] ➊<br />ᐸleft_arm(id;)ᐳ"]]:::sideeffectplan
+    PgUpdateSingle14[["PgUpdateSingle[14∈1] ➊<br />ᐸleft_arm(id;)ᐳ<br />More deps:<br />- Object[17]"]]:::sideeffectplan
     Access12 -->|rejectNull| PgUpdateSingle14
-    Object17 & ApplyInput18 --> PgUpdateSingle14
+    ApplyInput18 --> PgUpdateSingle14
     Object19{{"Object[19∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgUpdateSingle14 --> Object19
-    List23{{"List[23∈3] ➊<br />ᐸ20,21ᐳ"}}:::plan
+    List23{{"List[23∈3] ➊<br />ᐸ20,21ᐳ<br />More deps:<br />- Constantᐸ'left_arms'ᐳ[20]"}}:::plan
     PgClassExpression21{{"PgClassExpression[21∈3] ➊<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
-    Constant20 & PgClassExpression21 --> List23
-    PgSelect26[["PgSelect[26∈3] ➊<br />ᐸpersonᐳ"]]:::plan
+    PgClassExpression21 --> List23
+    PgSelect26[["PgSelect[26∈3] ➊<br />ᐸpersonᐳ<br />More deps:<br />- Object[17]"]]:::plan
     PgClassExpression25{{"PgClassExpression[25∈3] ➊<br />ᐸ__left_arm...person_id”ᐳ"}}:::plan
-    Object17 & PgClassExpression25 --> PgSelect26
+    PgClassExpression25 --> PgSelect26
     Access22{{"Access[22∈3] ➊<br />ᐸ14.tᐳ"}}:::plan
     Access22 --> PgClassExpression21
     PgUpdateSingle14 --> Access22
@@ -69,16 +62,16 @@ graph TD
     Access22 --> PgClassExpression33
     PgClassExpression34{{"PgClassExpression[34∈3] ➊<br />ᐸ__left_arm__.”mood”ᐳ"}}:::plan
     Access22 --> PgClassExpression34
-    List37{{"List[37∈4] ➊<br />ᐸ35,36ᐳ"}}:::plan
+    List37{{"List[37∈4] ➊<br />ᐸ35,36ᐳ<br />More deps:<br />- Constantᐸ'people'ᐳ[35]"}}:::plan
     PgClassExpression36{{"PgClassExpression[36∈4] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    Constant35 & PgClassExpression36 --> List37
+    PgClassExpression36 --> List37
     PgSelectSingle32 --> PgClassExpression36
     Lambda38{{"Lambda[38∈4] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List37 --> Lambda38
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,__InputObject9,Lambda11,Access12,Access15,Access16,Object17,ApplyInput18,Constant20,Constant35,Constant39,Constant40 bucket0
+    class Bucket0,__Value2,__InputObject6,__InputObject9,Lambda11,Access12,Access15,Access16,Object17,ApplyInput18 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUpdateSingle14,Object19 bucket1
     classDef bucket2 stroke:#7f007f

@@ -16,7 +16,7 @@ graph TD
     %% plan dependencies
     PgSelect7[["PgSelect[7∈0] ➊<br />ᐸtable_queryᐳ"]]:::plan
     Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgFromExpression11{{"PgFromExpression[11∈0] ➊"}}:::plan
+    PgFromExpression11{{"PgFromExpression[11∈0] ➊<br />More deps:<br />- Constantᐸ13373475ᐳ[17]"}}:::plan
     Object10 & PgFromExpression11 --> PgSelect7
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -24,15 +24,12 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
-    Constant17{{"Constant[17∈0] ➊<br />ᐸ13373475ᐳ"}}:::plan
-    Constant17 --> PgFromExpression11
     First12{{"First[12∈0] ➊"}}:::plan
     PgSelectRows13[["PgSelectRows[13∈0] ➊"]]:::plan
     PgSelectRows13 --> First12
     PgSelect7 --> PgSelectRows13
     PgSelectSingle14{{"PgSelectSingle[14∈0] ➊<br />ᐸtable_queryᐳ"}}:::plan
     First12 --> PgSelectSingle14
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgClassExpression15{{"PgClassExpression[15∈1] ➊<br />ᐸ__table_query__.”id”ᐳ"}}:::plan
     PgSelectSingle14 --> PgClassExpression15
     PgClassExpression16{{"PgClassExpression[16∈1] ➊<br />ᐸ__table_qu...”headline”ᐳ"}}:::plan
@@ -40,7 +37,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,PgFromExpression11,First12,PgSelectRows13,PgSelectSingle14,Constant17 bucket0
+    class Bucket0,__Value2,PgSelect7,Access8,Access9,Object10,PgFromExpression11,First12,PgSelectRows13,PgSelectSingle14 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgClassExpression15,PgClassExpression16 bucket1
 

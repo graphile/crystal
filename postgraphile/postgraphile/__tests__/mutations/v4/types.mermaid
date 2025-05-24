@@ -192,144 +192,72 @@ graph TD
     Bucket77 --> Bucket123
 
     %% plan dependencies
-    __InputObject34{{"__InputObject[34∈0] ➊"}}:::plan
-    Constant1278{{"Constant[1278∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Constant1279{{"Constant[1279∈0] ➊<br />ᐸ'1'ᐳ"}}:::plan
-    Constant1280{{"Constant[1280∈0] ➊<br />ᐸtrueᐳ"}}:::plan
-    Constant1281{{"Constant[1281∈0] ➊<br />ᐸ'red'ᐳ"}}:::plan
-    Constant39{{"Constant[39∈0] ➊<br />ᐸ[ 'red', 'green', 'blue' ]ᐳ"}}:::plan
-    Constant40{{"Constant[40∈0] ➊<br />ᐸ[ 'Hi' ]ᐳ"}}:::plan
-    Constant1282{{"Constant[1282∈0] ➊<br />ᐸ{ json: true }ᐳ"}}:::plan
-    Constant1283{{"Constant[1283∈0] ➊<br />ᐸ{ jsonb: true }ᐳ"}}:::plan
+    __InputObject34{{"__InputObject[34∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ1ᐳ[1278]<br />- Constantᐸ'1'ᐳ[1279]<br />- Constantᐸtrueᐳ[1280]<br />- Constantᐸ'red'ᐳ[1281]<br />- Constantᐸ[ 'red', 'green', 'blue' ]ᐳ[39]<br />- Constantᐸ[ 'Hi' ]ᐳ[40]<br />- Constantᐸ{ json: true }ᐳ[1282]<br />- Constantᐸ{ jsonb: true }ᐳ[1283]<br />- Constantᐸ'2012-01-11'ᐳ[1288]<br />- Constantᐸ'2012-01-01'ᐳ[1289]<br />- Constantᐸ'2010-01-01'ᐳ[1290]<br />- Constantᐸ'19:00:00'ᐳ[1291]<br />- Constantᐸ[ §{ minutes: 27 } ]ᐳ[62]<br />- Constantᐸ27ᐳ[1292]<br />- Constantᐸ'192.168.0.0'ᐳ[1297]<br />- Constantᐸ'192.168.0.0/16'ᐳ[1298]<br />- Constantᐸ'08:00:2b:01:02:03'ᐳ[1299]<br />- Constantᐸ'b.type_function'ᐳ[1300]<br />- Constantᐸ'b.type_function(int)'ᐳ[1301]<br />- Constantᐸ'*ᐸᐳ'ᐳ[1302]<br />- Constantᐸ'+(integer, integer)'ᐳ[1303]<br />- Constantᐸ'c.person'ᐳ[1304]<br />- Constantᐸ'numeric'ᐳ[1305]<br />- Constantᐸ'dutch'ᐳ[1306]<br />- Constantᐸ'dutch_stem'ᐳ[1307]<br />- Constantᐸ[ 'T1', 'T2', 'T3' ]ᐳ[83]<br />- Constantᐸ[ '2098288669218571759', '2098288669218571760', '20982886692ᐳ[84]<br />- ConstantᐸᐸBuffer 5a 53 ea 5a 7f eaᐳᐳ[1308]<br />- Constantᐸ[ ᐸBuffer 01 a0 5b 09 c0 ddᐳ, ᐸBuffer 01 a0 5bᐳ ]ᐳ[86]<br />- Constantᐸ'Foo.Bar.Baz'ᐳ[1309]<br />- Constantᐸ[ 'Bar.Baz.Qux', 'Bar.Foo.Fah' ]ᐳ[88]"}}:::plan
     __InputObject43{{"__InputObject[43∈0] ➊"}}:::plan
     __InputObject47{{"__InputObject[47∈0] ➊"}}:::plan
     __InputObject52{{"__InputObject[52∈0] ➊"}}:::plan
-    Constant1288{{"Constant[1288∈0] ➊<br />ᐸ'2012-01-11'ᐳ"}}:::plan
-    Constant1289{{"Constant[1289∈0] ➊<br />ᐸ'2012-01-01'ᐳ"}}:::plan
-    Constant1290{{"Constant[1290∈0] ➊<br />ᐸ'2010-01-01'ᐳ"}}:::plan
-    Constant1291{{"Constant[1291∈0] ➊<br />ᐸ'19:00:00'ᐳ"}}:::plan
-    __InputObject60{{"__InputObject[60∈0] ➊"}}:::plan
-    Constant62{{"Constant[62∈0] ➊<br />ᐸ[ §{ minutes: 27 } ]ᐳ"}}:::plan
-    Constant1292{{"Constant[1292∈0] ➊<br />ᐸ27ᐳ"}}:::plan
-    __InputObject63{{"__InputObject[63∈0] ➊"}}:::plan
-    __InputObject64{{"__InputObject[64∈0] ➊"}}:::plan
-    __InputObject66{{"__InputObject[66∈0] ➊"}}:::plan
-    __InputObject69{{"__InputObject[69∈0] ➊"}}:::plan
-    Constant1297{{"Constant[1297∈0] ➊<br />ᐸ'192.168.0.0'ᐳ"}}:::plan
-    Constant1298{{"Constant[1298∈0] ➊<br />ᐸ'192.168.0.0/16'ᐳ"}}:::plan
-    Constant1299{{"Constant[1299∈0] ➊<br />ᐸ'08:00:2b:01:02:03'ᐳ"}}:::plan
-    Constant1300{{"Constant[1300∈0] ➊<br />ᐸ'b.type_function'ᐳ"}}:::plan
-    Constant1301{{"Constant[1301∈0] ➊<br />ᐸ'b.type_function(int)'ᐳ"}}:::plan
-    Constant1302{{"Constant[1302∈0] ➊<br />ᐸ'*ᐸᐳ'ᐳ"}}:::plan
-    Constant1303{{"Constant[1303∈0] ➊<br />ᐸ'+(integer, integer)'ᐳ"}}:::plan
-    Constant1304{{"Constant[1304∈0] ➊<br />ᐸ'c.person'ᐳ"}}:::plan
-    Constant1305{{"Constant[1305∈0] ➊<br />ᐸ'numeric'ᐳ"}}:::plan
-    Constant1306{{"Constant[1306∈0] ➊<br />ᐸ'dutch'ᐳ"}}:::plan
-    Constant1307{{"Constant[1307∈0] ➊<br />ᐸ'dutch_stem'ᐳ"}}:::plan
-    Constant83{{"Constant[83∈0] ➊<br />ᐸ[ 'T1', 'T2', 'T3' ]ᐳ"}}:::plan
-    Constant84{{"Constant[84∈0] ➊<br />ᐸ[ '2098288669218571759', '2098288669218571760', '20982886692ᐳ"}}:::plan
-    Constant1308{{"Constant[1308∈0] ➊<br />ᐸᐸBuffer 5a 53 ea 5a 7f eaᐳᐳ"}}:::plan
-    Constant86{{"Constant[86∈0] ➊<br />ᐸ[ ᐸBuffer 01 a0 5b 09 c0 ddᐳ, ᐸBuffer 01 a0 5bᐳ ]ᐳ"}}:::plan
-    Constant1309{{"Constant[1309∈0] ➊<br />ᐸ'Foo.Bar.Baz'ᐳ"}}:::plan
-    Constant88{{"Constant[88∈0] ➊<br />ᐸ[ 'Bar.Baz.Qux', 'Bar.Foo.Fah' ]ᐳ"}}:::plan
-    Constant1278 & Constant1279 & Constant1280 & Constant1281 & Constant39 & Constant40 & Constant1282 & Constant1283 & __InputObject43 & __InputObject47 & __InputObject52 & Constant1288 & Constant1289 & Constant1290 & Constant1291 & __InputObject60 & Constant62 & Constant1292 & __InputObject63 & __InputObject64 & __InputObject66 & __InputObject69 & Constant1297 & Constant1298 & Constant1299 & Constant1300 & Constant1301 & Constant1302 & Constant1303 & Constant1304 & Constant1305 & Constant1306 & Constant1307 & Constant83 & Constant84 & Constant1308 & Constant86 & Constant1309 & Constant88 --> __InputObject34
-    __InputObject96{{"__InputObject[96∈0] ➊"}}:::plan
-    Constant97{{"Constant[97∈0] ➊<br />ᐸ[ 'red', 'green', 'blue' ]ᐳ"}}:::plan
-    Constant98{{"Constant[98∈0] ➊<br />ᐸ[ 'Hi' ]ᐳ"}}:::plan
-    Constant1310{{"Constant[1310∈0] ➊<br />ᐸ{ json: true }ᐳ"}}:::plan
-    Constant1311{{"Constant[1311∈0] ➊<br />ᐸ{ jsonb: true }ᐳ"}}:::plan
+    __InputObject60{{"__InputObject[60∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ27ᐳ[1292]"}}:::plan
+    __InputObject63{{"__InputObject[63∈0] ➊<br />More deps:<br />- Constantᐸ1ᐳ[1278]<br />- Constantᐸundefinedᐳ[7]"}}:::plan
+    __InputObject64{{"__InputObject[64∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]"}}:::plan
+    __InputObject66{{"__InputObject[66∈0] ➊<br />More deps:<br />- Constantᐸ99ᐳ[1293]<br />- Constantᐸ77ᐳ[1294]"}}:::plan
+    __InputObject69{{"__InputObject[69∈0] ➊<br />More deps:<br />- Constantᐸ0ᐳ[1295]<br />- Constantᐸ42ᐳ[1296]"}}:::plan
+    __InputObject43 & __InputObject47 & __InputObject52 & __InputObject60 & __InputObject63 & __InputObject64 & __InputObject66 & __InputObject69 --> __InputObject34
+    __InputObject96{{"__InputObject[96∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ1ᐳ[1278]<br />- Constantᐸ'1'ᐳ[1279]<br />- Constantᐸtrueᐳ[1280]<br />- Constantᐸ'red'ᐳ[1281]<br />- Constantᐸ[ 'red', 'green', 'blue' ]ᐳ[97]<br />- Constantᐸ[ 'Hi' ]ᐳ[98]<br />- Constantᐸ{ json: true }ᐳ[1310]<br />- Constantᐸ{ jsonb: true }ᐳ[1311]<br />- Constantᐸ'2012-01-11'ᐳ[1288]<br />- Constantᐸ'2012-01-01'ᐳ[1289]<br />- Constantᐸ'2010-01-01'ᐳ[1290]<br />- Constantᐸ'19:00:00'ᐳ[1291]<br />- Constantᐸ[ §{ minutes: 27 } ]ᐳ[111]<br />- Constantᐸ27ᐳ[1292]<br />- Constantᐸ'b.type_function'ᐳ[1300]<br />- Constantᐸ'b.type_function(int)'ᐳ[1301]<br />- Constantᐸ'*ᐸᐳ'ᐳ[1302]<br />- Constantᐸ'+(integer, integer)'ᐳ[1303]<br />- Constantᐸ'c.person'ᐳ[1304]<br />- Constantᐸ'numeric'ᐳ[1305]<br />- Constantᐸ'dutch'ᐳ[1306]<br />- Constantᐸ'dutch_stem'ᐳ[1307]<br />- Constantᐸ'Foo.Bar.Baz'ᐳ[1309]<br />- Constantᐸ[ 'Bar.Baz.Qux', 'Bar.Foo.Fah' ]ᐳ[116]"}}:::plan
     __InputObject101{{"__InputObject[101∈0] ➊"}}:::plan
     __InputObject104{{"__InputObject[104∈0] ➊"}}:::plan
     __InputObject107{{"__InputObject[107∈0] ➊"}}:::plan
-    __InputObject110{{"__InputObject[110∈0] ➊"}}:::plan
-    Constant111{{"Constant[111∈0] ➊<br />ᐸ[ §{ minutes: 27 } ]ᐳ"}}:::plan
-    __InputObject112{{"__InputObject[112∈0] ➊"}}:::plan
-    __InputObject113{{"__InputObject[113∈0] ➊"}}:::plan
-    __InputObject115{{"__InputObject[115∈0] ➊"}}:::plan
-    Constant116{{"Constant[116∈0] ➊<br />ᐸ[ 'Bar.Baz.Qux', 'Bar.Foo.Fah' ]ᐳ"}}:::plan
-    Constant1278 & Constant1279 & Constant1280 & Constant1281 & Constant97 & Constant98 & Constant1310 & Constant1311 & __InputObject101 & __InputObject104 & __InputObject107 & Constant1288 & Constant1289 & Constant1290 & Constant1291 & __InputObject110 & Constant111 & Constant1292 & __InputObject112 & __InputObject113 & __InputObject115 & Constant1300 & Constant1301 & Constant1302 & Constant1303 & Constant1304 & Constant1305 & Constant1306 & Constant1307 & Constant1309 & Constant116 --> __InputObject96
-    __InputObject33{{"__InputObject[33∈0] ➊"}}:::plan
-    Constant1277{{"Constant[1277∈0] ➊<br />ᐸ11ᐳ"}}:::plan
-    Constant1277 & __InputObject34 --> __InputObject33
-    __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
-    Constant1277 --> __InputObject6
-    Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    __InputObject110{{"__InputObject[110∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ27ᐳ[1292]"}}:::plan
+    __InputObject112{{"__InputObject[112∈0] ➊<br />More deps:<br />- Constantᐸ1ᐳ[1278]<br />- Constantᐸundefinedᐳ[7]"}}:::plan
+    __InputObject113{{"__InputObject[113∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]"}}:::plan
+    __InputObject115{{"__InputObject[115∈0] ➊<br />More deps:<br />- Constantᐸ99ᐳ[1293]<br />- Constantᐸ77ᐳ[1294]"}}:::plan
+    __InputObject101 & __InputObject104 & __InputObject107 & __InputObject110 & __InputObject112 & __InputObject113 & __InputObject115 --> __InputObject96
+    __InputObject33{{"__InputObject[33∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ11ᐳ[1277]"}}:::plan
+    __InputObject34 --> __InputObject33
+    __InputObject6{{"__InputObject[6∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ11ᐳ[1277]"}}:::plan
+    Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 7"}}:::plan
+    Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access10 & Access11 --> Object12
-    __InputObject44{{"__InputObject[44∈0] ➊"}}:::plan
-    __InputObject45{{"__InputObject[45∈0] ➊"}}:::plan
+    __InputObject44{{"__InputObject[44∈0] ➊<br />More deps:<br />- Constantᐸ'1'ᐳ[1279]<br />- Constantᐸtrueᐳ[1280]"}}:::plan
+    __InputObject45{{"__InputObject[45∈0] ➊<br />More deps:<br />- Constantᐸ'7'ᐳ[1284]<br />- Constantᐸtrueᐳ[1280]"}}:::plan
     __InputObject44 & __InputObject45 --> __InputObject43
-    Constant1279 & Constant1280 --> __InputObject44
-    Constant1284{{"Constant[1284∈0] ➊<br />ᐸ'7'ᐳ"}}:::plan
-    Constant1284 & Constant1280 --> __InputObject45
-    __InputObject48{{"__InputObject[48∈0] ➊"}}:::plan
-    __InputObject50{{"__InputObject[50∈0] ➊"}}:::plan
+    __InputObject48{{"__InputObject[48∈0] ➊<br />More deps:<br />- Constantᐸ'1985-01-01'ᐳ[1285]<br />- Constantᐸtrueᐳ[1280]"}}:::plan
+    __InputObject50{{"__InputObject[50∈0] ➊<br />More deps:<br />- Constantᐸ'2020-01-01'ᐳ[1286]<br />- Constantᐸtrueᐳ[1280]"}}:::plan
     __InputObject48 & __InputObject50 --> __InputObject47
-    Constant1285{{"Constant[1285∈0] ➊<br />ᐸ'1985-01-01'ᐳ"}}:::plan
-    Constant1285 & Constant1280 --> __InputObject48
-    Constant1286{{"Constant[1286∈0] ➊<br />ᐸ'2020-01-01'ᐳ"}}:::plan
-    Constant1286 & Constant1280 --> __InputObject50
-    __InputObject53{{"__InputObject[53∈0] ➊"}}:::plan
-    __InputObject54{{"__InputObject[54∈0] ➊"}}:::plan
+    __InputObject53{{"__InputObject[53∈0] ➊<br />More deps:<br />- Constantᐸ1ᐳ[1278]<br />- Constantᐸtrueᐳ[1280]"}}:::plan
+    __InputObject54{{"__InputObject[54∈0] ➊<br />More deps:<br />- Constantᐸ2ᐳ[1287]<br />- Constantᐸtrueᐳ[1280]"}}:::plan
     __InputObject53 & __InputObject54 --> __InputObject52
-    Constant1278 & Constant1280 --> __InputObject53
-    Constant1287{{"Constant[1287∈0] ➊<br />ᐸ2ᐳ"}}:::plan
-    Constant1287 & Constant1280 --> __InputObject54
-    Constant1292 --> __InputObject60
-    Constant1278 --> __InputObject63
-    __InputObject65{{"__InputObject[65∈0] ➊"}}:::plan
+    __InputObject65{{"__InputObject[65∈0] ➊<br />More deps:<br />- Constantᐸ1ᐳ[1278]<br />- Constantᐸundefinedᐳ[7]"}}:::plan
     __InputObject65 --> __InputObject64
-    Constant1278 --> __InputObject65
-    Constant1293{{"Constant[1293∈0] ➊<br />ᐸ99ᐳ"}}:::plan
-    Constant1294{{"Constant[1294∈0] ➊<br />ᐸ77ᐳ"}}:::plan
-    Constant1293 & Constant1294 --> __InputObject66
-    Constant1295{{"Constant[1295∈0] ➊<br />ᐸ0ᐳ"}}:::plan
-    Constant1296{{"Constant[1296∈0] ➊<br />ᐸ42ᐳ"}}:::plan
-    Constant1295 & Constant1296 --> __InputObject69
-    __InputObject95{{"__InputObject[95∈0] ➊"}}:::plan
+    __InputObject95{{"__InputObject[95∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]"}}:::plan
     __InputObject96 --> __InputObject95
-    __InputObject102{{"__InputObject[102∈0] ➊"}}:::plan
-    __InputObject103{{"__InputObject[103∈0] ➊"}}:::plan
+    __InputObject102{{"__InputObject[102∈0] ➊<br />More deps:<br />- Constantᐸ'1'ᐳ[1279]<br />- Constantᐸtrueᐳ[1280]"}}:::plan
+    __InputObject103{{"__InputObject[103∈0] ➊<br />More deps:<br />- Constantᐸ'7'ᐳ[1284]<br />- Constantᐸtrueᐳ[1280]"}}:::plan
     __InputObject102 & __InputObject103 --> __InputObject101
-    Constant1279 & Constant1280 --> __InputObject102
-    Constant1284 & Constant1280 --> __InputObject103
-    __InputObject105{{"__InputObject[105∈0] ➊"}}:::plan
-    __InputObject106{{"__InputObject[106∈0] ➊"}}:::plan
+    __InputObject105{{"__InputObject[105∈0] ➊<br />More deps:<br />- Constantᐸ'1985-01-01'ᐳ[1285]<br />- Constantᐸtrueᐳ[1280]"}}:::plan
+    __InputObject106{{"__InputObject[106∈0] ➊<br />More deps:<br />- Constantᐸ'2020-01-01'ᐳ[1286]<br />- Constantᐸtrueᐳ[1280]"}}:::plan
     __InputObject105 & __InputObject106 --> __InputObject104
-    Constant1285 & Constant1280 --> __InputObject105
-    Constant1286 & Constant1280 --> __InputObject106
-    __InputObject108{{"__InputObject[108∈0] ➊"}}:::plan
-    __InputObject109{{"__InputObject[109∈0] ➊"}}:::plan
+    __InputObject108{{"__InputObject[108∈0] ➊<br />More deps:<br />- Constantᐸ1ᐳ[1278]<br />- Constantᐸtrueᐳ[1280]"}}:::plan
+    __InputObject109{{"__InputObject[109∈0] ➊<br />More deps:<br />- Constantᐸ2ᐳ[1287]<br />- Constantᐸtrueᐳ[1280]"}}:::plan
     __InputObject108 & __InputObject109 --> __InputObject107
-    Constant1278 & Constant1280 --> __InputObject108
-    Constant1287 & Constant1280 --> __InputObject109
-    Constant1292 --> __InputObject110
-    Constant1278 --> __InputObject112
-    __InputObject114{{"__InputObject[114∈0] ➊"}}:::plan
+    __InputObject114{{"__InputObject[114∈0] ➊<br />More deps:<br />- Constantᐸ1ᐳ[1278]<br />- Constantᐸundefinedᐳ[7]"}}:::plan
     __InputObject114 --> __InputObject113
-    Constant1278 --> __InputObject114
-    Constant1293 & Constant1294 --> __InputObject115
-    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
-    __Value2 --> Access10
-    __Value2 --> Access11
-    PgFromExpression13{{"PgFromExpression[13∈0] ➊"}}:::plan
-    Constant1277 --> PgFromExpression13
+    PgFromExpression13{{"PgFromExpression[13∈0] ➊<br />More deps:<br />- Constantᐸ11ᐳ[1277]"}}:::plan
     ApplyInput18{{"ApplyInput[18∈0] ➊"}}:::plan
     __InputObject6 --> ApplyInput18
-    __InputObject19{{"__InputObject[19∈0] ➊"}}:::plan
+    __InputObject19{{"__InputObject[19∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]"}}:::plan
     ApplyInput25{{"ApplyInput[25∈0] ➊"}}:::plan
     __InputObject19 --> ApplyInput25
-    __InputObject26{{"__InputObject[26∈0] ➊"}}:::plan
+    __InputObject26{{"__InputObject[26∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]"}}:::plan
     ApplyInput32{{"ApplyInput[32∈0] ➊"}}:::plan
     __InputObject26 --> ApplyInput32
     ApplyInput93{{"ApplyInput[93∈0] ➊"}}:::plan
     __InputObject33 --> ApplyInput93
     ApplyInput121{{"ApplyInput[121∈0] ➊"}}:::plan
     __InputObject95 --> ApplyInput121
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    PgSelect9[["PgSelect[9∈1] ➊<br />ᐸtype_function_mutation(mutation)ᐳ"]]:::sideeffectplan
-    Object12 & PgFromExpression13 & ApplyInput18 --> PgSelect9
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ<br />Dependents: 10"]:::plan
+    PgSelect9[["PgSelect[9∈1] ➊<br />ᐸtype_function_mutation(mutation)ᐳ<br />More deps:<br />- Object[12]"]]:::sideeffectplan
+    PgFromExpression13 & ApplyInput18 --> PgSelect9
     First14{{"First[14∈1] ➊"}}:::plan
     PgSelectRows15[["PgSelectRows[15∈1] ➊"]]:::plan
     PgSelectRows15 --> First14
@@ -341,41 +269,33 @@ graph TD
     PgSelect20[["PgSelect[20∈2] ➊<br />ᐸtype_function_list_mutation(mutation)ᐳ"]]:::sideeffectplan
     Object23{{"Object[23∈2] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object23 & ApplyInput25 --> PgSelect20
-    Access21{{"Access[21∈2] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access22{{"Access[22∈2] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access21{{"Access[21∈2] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access22{{"Access[22∈2] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access21 & Access22 --> Object23
-    __Value2 --> Access21
-    __Value2 --> Access22
     Object24{{"Object[24∈2] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgSelect20 --> Object24
     PgSelect27[["PgSelect[27∈3] ➊<br />ᐸtype_function_connection_mutation(mutation)ᐳ"]]:::sideeffectplan
     Object30{{"Object[30∈3] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object30 & ApplyInput32 --> PgSelect27
-    Access28{{"Access[28∈3] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access29{{"Access[29∈3] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access28{{"Access[28∈3] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access29{{"Access[29∈3] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access28 & Access29 --> Object30
-    __Value2 --> Access28
-    __Value2 --> Access29
     Object31{{"Object[31∈3] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgSelect27 --> Object31
-    PgUpdateSingle89[["PgUpdateSingle[89∈4] ➊<br />ᐸtypes(id;)ᐳ"]]:::sideeffectplan
+    PgUpdateSingle89[["PgUpdateSingle[89∈4] ➊<br />ᐸtypes(id;)ᐳ<br />More deps:<br />- Constantᐸ11ᐳ[1277]"]]:::sideeffectplan
     Object92{{"Object[92∈4] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object92 & Constant1277 & ApplyInput93 --> PgUpdateSingle89
-    Access90{{"Access[90∈4] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access91{{"Access[91∈4] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object92 & ApplyInput93 --> PgUpdateSingle89
+    Access90{{"Access[90∈4] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access91{{"Access[91∈4] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access90 & Access91 --> Object92
-    __Value2 --> Access90
-    __Value2 --> Access91
     Object94{{"Object[94∈4] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgUpdateSingle89 --> Object94
     PgInsertSingle117[["PgInsertSingle[117∈5] ➊<br />ᐸtypes()ᐳ"]]:::sideeffectplan
     Object120{{"Object[120∈5] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object120 & ApplyInput121 --> PgInsertSingle117
-    Access118{{"Access[118∈5] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access119{{"Access[119∈5] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access118{{"Access[118∈5] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access119{{"Access[119∈5] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access118 & Access119 --> Object120
-    __Value2 --> Access118
-    __Value2 --> Access119
     Object122{{"Object[122∈5] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle117 --> Object122
     PgFromExpression1185{{"PgFromExpression[1185∈6] ➊"}}:::plan
@@ -430,24 +350,24 @@ graph TD
     PgSelectInlineApply1268["PgSelectInlineApply[1268∈10] ➊"]:::plan
     PgFromExpression1272{{"PgFromExpression[1272∈10] ➊"}}:::plan
     PgSelectInlineApply1273["PgSelectInlineApply[1273∈10] ➊"]:::plan
-    PgSelect237[["PgSelect[237∈11] ➊<br />ᐸfrmcdc_nestedCompoundTypeᐳ"]]:::plan
+    PgSelect237[["PgSelect[237∈11] ➊<br />ᐸfrmcdc_nestedCompoundTypeᐳ<br />More deps:<br />- Object[12]"]]:::plan
     PgFromExpression239{{"PgFromExpression[239∈11] ➊"}}:::plan
-    Object12 & PgFromExpression239 & PgFromExpression1185 & PgSelectInlineApply1186 & PgFromExpression1190 & PgSelectInlineApply1191 --> PgSelect237
-    PgSelect279[["PgSelect[279∈11] ➊<br />ᐸfrmcdc_nestedCompoundTypeᐳ"]]:::plan
+    PgFromExpression239 & PgFromExpression1185 & PgSelectInlineApply1186 & PgFromExpression1190 & PgSelectInlineApply1191 --> PgSelect237
+    PgSelect279[["PgSelect[279∈11] ➊<br />ᐸfrmcdc_nestedCompoundTypeᐳ<br />More deps:<br />- Object[12]"]]:::plan
     PgFromExpression281{{"PgFromExpression[281∈11] ➊"}}:::plan
-    Object12 & PgFromExpression281 & PgFromExpression1195 & PgSelectInlineApply1196 & PgFromExpression1200 & PgSelectInlineApply1201 --> PgSelect279
-    PgSelect210[["PgSelect[210∈11] ➊<br />ᐸfrmcdc_compoundTypeᐳ"]]:::plan
+    PgFromExpression281 & PgFromExpression1195 & PgSelectInlineApply1196 & PgFromExpression1200 & PgSelectInlineApply1201 --> PgSelect279
+    PgSelect210[["PgSelect[210∈11] ➊<br />ᐸfrmcdc_compoundTypeᐳ<br />More deps:<br />- Object[12]"]]:::plan
     PgFromExpression214{{"PgFromExpression[214∈11] ➊"}}:::plan
-    Object12 & PgFromExpression214 --> PgSelect210
-    PgSelect258[["PgSelect[258∈11] ➊<br />ᐸfrmcdc_compoundTypeᐳ"]]:::plan
+    PgFromExpression214 --> PgSelect210
+    PgSelect258[["PgSelect[258∈11] ➊<br />ᐸfrmcdc_compoundTypeᐳ<br />More deps:<br />- Object[12]"]]:::plan
     PgFromExpression260{{"PgFromExpression[260∈11] ➊"}}:::plan
-    Object12 & PgFromExpression260 --> PgSelect258
-    PgSelect350[["PgSelect[350∈11] ➊<br />ᐸpostᐳ"]]:::plan
+    PgFromExpression260 --> PgSelect258
+    PgSelect350[["PgSelect[350∈11] ➊<br />ᐸpostᐳ<br />More deps:<br />- Object[12]"]]:::plan
     PgClassExpression134{{"PgClassExpression[134∈11] ➊<br />ᐸ__type_fun...”smallint”ᐳ"}}:::plan
-    Object12 & PgClassExpression134 --> PgSelect350
-    PgSelect367[["PgSelect[367∈11] ➊<br />ᐸpostᐳ"]]:::plan
+    PgClassExpression134 --> PgSelect350
+    PgSelect367[["PgSelect[367∈11] ➊<br />ᐸpostᐳ<br />More deps:<br />- Object[12]"]]:::plan
     PgClassExpression129{{"PgClassExpression[129∈11] ➊<br />ᐸ__type_fun...ion__.”id”ᐳ"}}:::plan
-    Object12 & PgClassExpression129 --> PgSelect367
+    PgClassExpression129 --> PgSelect367
     List1188{{"List[1188∈11] ➊<br />ᐸ1187,242ᐳ"}}:::plan
     Access1187{{"Access[1187∈11] ➊<br />ᐸ237.m.joinDetailsFor600ᐳ"}}:::plan
     PgSelectSingle242{{"PgSelectSingle[242∈11] ➊<br />ᐸfrmcdc_nestedCompoundTypeᐳ"}}:::plan
@@ -2069,7 +1989,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,Access10,Access11,Object12,PgFromExpression13,ApplyInput18,__InputObject19,ApplyInput25,__InputObject26,ApplyInput32,__InputObject33,__InputObject34,Constant39,Constant40,__InputObject43,__InputObject44,__InputObject45,__InputObject47,__InputObject48,__InputObject50,__InputObject52,__InputObject53,__InputObject54,__InputObject60,Constant62,__InputObject63,__InputObject64,__InputObject65,__InputObject66,__InputObject69,Constant83,Constant84,Constant86,Constant88,ApplyInput93,__InputObject95,__InputObject96,Constant97,Constant98,__InputObject101,__InputObject102,__InputObject103,__InputObject104,__InputObject105,__InputObject106,__InputObject107,__InputObject108,__InputObject109,__InputObject110,Constant111,__InputObject112,__InputObject113,__InputObject114,__InputObject115,Constant116,ApplyInput121,Constant1277,Constant1278,Constant1279,Constant1280,Constant1281,Constant1282,Constant1283,Constant1284,Constant1285,Constant1286,Constant1287,Constant1288,Constant1289,Constant1290,Constant1291,Constant1292,Constant1293,Constant1294,Constant1295,Constant1296,Constant1297,Constant1298,Constant1299,Constant1300,Constant1301,Constant1302,Constant1303,Constant1304,Constant1305,Constant1306,Constant1307,Constant1308,Constant1309,Constant1310,Constant1311 bucket0
+    class Bucket0,__Value2,__InputObject6,Access10,Access11,Object12,PgFromExpression13,ApplyInput18,__InputObject19,ApplyInput25,__InputObject26,ApplyInput32,__InputObject33,__InputObject34,__InputObject43,__InputObject44,__InputObject45,__InputObject47,__InputObject48,__InputObject50,__InputObject52,__InputObject53,__InputObject54,__InputObject60,__InputObject63,__InputObject64,__InputObject65,__InputObject66,__InputObject69,ApplyInput93,__InputObject95,__InputObject96,__InputObject101,__InputObject102,__InputObject103,__InputObject104,__InputObject105,__InputObject106,__InputObject107,__InputObject108,__InputObject109,__InputObject110,__InputObject112,__InputObject113,__InputObject114,__InputObject115,ApplyInput121 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect9,First14,PgSelectRows15,PgSelectSingle16,Object17 bucket1
     classDef bucket2 stroke:#7f007f

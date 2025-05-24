@@ -18,29 +18,25 @@ graph TD
     Bucket2 --> Bucket3
 
     %% plan dependencies
-    __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
-    __InputObject8{{"__InputObject[8∈0] ➊"}}:::plan
+    __InputObject6{{"__InputObject[6∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]"}}:::plan
+    __InputObject8{{"__InputObject[8∈0] ➊<br />More deps:<br />- Constantᐸ0.66ᐳ[25]"}}:::plan
     __InputObject8 --> __InputObject6
     Object13{{"Object[13∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access11 & Access12 --> Object13
-    Constant25{{"Constant[25∈0] ➊<br />ᐸ0.66ᐳ"}}:::plan
-    Constant25 --> __InputObject8
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access11
     __Value2 --> Access12
     ApplyInput14{{"ApplyInput[14∈0] ➊"}}:::plan
     __InputObject6 --> ApplyInput14
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant16{{"Constant[16∈0] ➊<br />ᐸ'left_arms'ᐳ"}}:::plan
     PgInsertSingle10[["PgInsertSingle[10∈1] ➊<br />ᐸleft_arm()ᐳ"]]:::sideeffectplan
     Object13 & ApplyInput14 --> PgInsertSingle10
     Object15{{"Object[15∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle10 --> Object15
-    List19{{"List[19∈3] ➊<br />ᐸ16,17ᐳ"}}:::plan
+    List19{{"List[19∈3] ➊<br />ᐸ16,17ᐳ<br />More deps:<br />- Constantᐸ'left_arms'ᐳ[16]"}}:::plan
     PgClassExpression17{{"PgClassExpression[17∈3] ➊<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
-    Constant16 & PgClassExpression17 --> List19
+    PgClassExpression17 --> List19
     Access18{{"Access[18∈3] ➊<br />ᐸ10.tᐳ"}}:::plan
     Access18 --> PgClassExpression17
     PgInsertSingle10 --> Access18
@@ -55,7 +51,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,__InputObject8,Access11,Access12,Object13,ApplyInput14,Constant16,Constant25 bucket0
+    class Bucket0,__Value2,__InputObject6,__InputObject8,Access11,Access12,Object13,ApplyInput14 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle10,Object15 bucket1
     classDef bucket2 stroke:#7f007f

@@ -41,51 +41,36 @@ graph TD
     Bucket12 --> Bucket16
 
     %% plan dependencies
-    Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access12{{"Access[12∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access13{{"Access[13∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 3"}}:::plan
+    Access12{{"Access[12∈0] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access13{{"Access[13∈0] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access12 & Access13 --> Object14
-    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
-    __Value2 --> Access12
-    __Value2 --> Access13
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant24{{"Constant[24∈0] ➊<br />ᐸnullᐳ"}}:::plan
-    Constant244{{"Constant[244∈0] ➊<br />ᐸ4ᐳ"}}:::plan
-    Constant245{{"Constant[245∈0] ➊<br />ᐸ'A description'ᐳ"}}:::plan
-    Constant246{{"Constant[246∈0] ➊<br />ᐸ'A note'ᐳ"}}:::plan
-    Constant247{{"Constant[247∈0] ➊<br />ᐸ3141592ᐳ"}}:::plan
-    PgUpdateSingle11[["PgUpdateSingle[11∈1] ➊<br />ᐸrelational_posts(id;title,description,note)ᐳ"]]:::sideeffectplan
-    Object14 & Constant244 & Constant245 --> PgUpdateSingle11
-    PgUpdateSingle18[["PgUpdateSingle[18∈2] ➊<br />ᐸrelational_posts(id;title,description,note)ᐳ"]]:::sideeffectplan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ<br />Dependents: 8"]:::plan
+    PgUpdateSingle11[["PgUpdateSingle[11∈1] ➊<br />ᐸrelational_posts(id;title,description,note)ᐳ<br />More deps:<br />- Object[14]<br />- Constantᐸ4ᐳ[244]<br />- Constantᐸundefinedᐳ[9]<br />- Constantᐸ'A description'ᐳ[245]"]]:::sideeffectplan
+    PgUpdateSingle18[["PgUpdateSingle[18∈2] ➊<br />ᐸrelational_posts(id;title,description,note)ᐳ<br />More deps:<br />- Constantᐸ4ᐳ[244]<br />- Constantᐸundefinedᐳ[9]<br />- Constantᐸ'A note'ᐳ[246]"]]:::sideeffectplan
     Object21{{"Object[21∈2] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object21 & Constant244 & Constant246 --> PgUpdateSingle18
-    Access19{{"Access[19∈2] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access20{{"Access[20∈2] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object21 --> PgUpdateSingle18
+    Access19{{"Access[19∈2] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access20{{"Access[20∈2] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access19 & Access20 --> Object21
-    __Value2 --> Access19
-    __Value2 --> Access20
-    PgUpdateSingle25[["PgUpdateSingle[25∈3] ➊<br />ᐸrelational_posts(id;title,description,note)ᐳ"]]:::sideeffectplan
+    PgUpdateSingle25[["PgUpdateSingle[25∈3] ➊<br />ᐸrelational_posts(id;title,description,note)ᐳ<br />More deps:<br />- Constantᐸ4ᐳ[244]<br />- Constantᐸundefinedᐳ[9]<br />- Constantᐸnullᐳ[24]"]]:::sideeffectplan
     Object28{{"Object[28∈3] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object28 & Constant244 & Constant24 --> PgUpdateSingle25
-    Access26{{"Access[26∈3] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access27{{"Access[27∈3] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object28 --> PgUpdateSingle25
+    Access26{{"Access[26∈3] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access27{{"Access[27∈3] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access26 & Access27 --> Object28
-    __Value2 --> Access26
-    __Value2 --> Access27
-    PgUpdateSingle32[["PgUpdateSingle[32∈4] ➊<br />ᐸrelational_posts(id;title,description,note)ᐳ"]]:::sideeffectplan
+    PgUpdateSingle32[["PgUpdateSingle[32∈4] ➊<br />ᐸrelational_posts(id;title,description,note)ᐳ<br />More deps:<br />- Constantᐸ3141592ᐳ[247]<br />- Constantᐸundefinedᐳ[9]<br />- Constantᐸnullᐳ[24]"]]:::sideeffectplan
     Object35{{"Object[35∈4] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object35 & Constant247 & Constant24 --> PgUpdateSingle32
-    Access33{{"Access[33∈4] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access34{{"Access[34∈4] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object35 --> PgUpdateSingle32
+    Access33{{"Access[33∈4] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access34{{"Access[34∈4] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access33 & Access34 --> Object35
-    __Value2 --> Access33
-    __Value2 --> Access34
-    PgSelect45[["PgSelect[45∈5] ➊<br />ᐸrelational_postsᐳ"]]:::plan
+    PgSelect45[["PgSelect[45∈5] ➊<br />ᐸrelational_postsᐳ<br />More deps:<br />- Object[14]"]]:::plan
     PgClassExpression36{{"PgClassExpression[36∈5] ➊<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
     PgSelectInlineApply208["PgSelectInlineApply[208∈5] ➊"]:::plan
     PgFromExpression212{{"PgFromExpression[212∈5] ➊"}}:::plan
     PgSelectInlineApply213["PgSelectInlineApply[213∈5] ➊"]:::plan
-    Object14 & PgClassExpression36 & PgSelectInlineApply208 & PgFromExpression212 & PgSelectInlineApply213 --> PgSelect45
+    PgClassExpression36 & PgSelectInlineApply208 & PgFromExpression212 & PgSelectInlineApply213 --> PgSelect45
     Access37{{"Access[37∈5] ➊<br />ᐸ11.tᐳ"}}:::plan
     Access37 --> PgClassExpression36
     PgUpdateSingle11 --> Access37
@@ -156,9 +141,9 @@ graph TD
     PgSelect69 --> Access236
     Access241{{"Access[241∈8] ➊<br />ᐸ69.m.joinDetailsFor123ᐳ"}}:::plan
     PgSelect69 --> Access241
-    PgSelect162[["PgSelect[162∈9] ➊<br />ᐸpeopleᐳ"]]:::plan
+    PgSelect162[["PgSelect[162∈9] ➊<br />ᐸpeopleᐳ<br />More deps:<br />- Object[14]"]]:::plan
     PgClassExpression161{{"PgClassExpression[161∈9] ➊<br />ᐸ__relation...author_id”ᐳ"}}:::plan
-    Object14 & PgClassExpression161 --> PgSelect162
+    PgClassExpression161 --> PgSelect162
     List210{{"List[210∈9] ➊<br />ᐸ209,51ᐳ"}}:::plan
     Access209 & PgSelectSingle51 --> List210
     List215{{"List[215∈9] ➊<br />ᐸ214,51ᐳ"}}:::plan
@@ -343,7 +328,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access12,Access13,Object14,Constant24,Constant244,Constant245,Constant246,Constant247 bucket0
+    class Bucket0,__Value2,Access12,Access13,Object14 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUpdateSingle11 bucket1
     classDef bucket2 stroke:#7f007f

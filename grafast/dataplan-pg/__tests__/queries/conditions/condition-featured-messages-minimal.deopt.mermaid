@@ -18,45 +18,36 @@ graph TD
     Bucket2 --> Bucket3
 
     %% plan dependencies
-    PgSelect8[["PgSelect[8∈0] ➊<br />ᐸforumsᐳ"]]:::plan
-    Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Lambda13{{"Lambda[13∈0] ➊<br />ᐸincludeArchivedConditionᐳ"}}:::plan
-    Object11 & Lambda13 --> PgSelect8
+    PgSelect8[["PgSelect[8∈0] ➊<br />ᐸforumsᐳ<br />More deps:<br />- Object[11]"]]:::plan
+    Lambda13{{"Lambda[13∈0] ➊<br />ᐸincludeArchivedConditionᐳ<br />More deps:<br />- Constantᐸ[ undefined, 'INHERIT' ]ᐳ[42]"}}:::plan
+    Lambda13 --> PgSelect8
+    Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 3"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10
-    Constant42{{"Constant[42∈0] ➊<br />ᐸ[ undefined, 'INHERIT' ]ᐳ"}}:::plan
-    Constant42 --> Lambda13
     PgSelectRows14[["PgSelectRows[14∈0] ➊"]]:::plan
     PgSelect8 --> PgSelectRows14
-    __InputObject18{{"__InputObject[18∈0] ➊"}}:::plan
-    Constant45{{"Constant[45∈0] ➊<br />ᐸtrueᐳ"}}:::plan
-    Constant45 --> __InputObject18
-    Connection25{{"Connection[25∈0] ➊<br />ᐸ21ᐳ"}}:::plan
-    Constant44{{"Constant[44∈0] ➊<br />ᐸ5ᐳ"}}:::plan
-    Constant44 --> Connection25
+    __InputObject18{{"__InputObject[18∈0] ➊<br />More deps:<br />- Constantᐸtrueᐳ[45]"}}:::plan
+    Connection25{{"Connection[25∈0] ➊<br />ᐸ21ᐳ<br />More deps:<br />- Constantᐸ5ᐳ[44]"}}:::plan
     ApplyInput26{{"ApplyInput[26∈0] ➊"}}:::plan
     __InputObject18 --> ApplyInput26
-    Lambda30{{"Lambda[30∈0] ➊<br />ᐸincludeArchivedConditionᐳ"}}:::plan
-    Constant43{{"Constant[43∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
-    Constant43 --> Lambda30
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Lambda30{{"Lambda[30∈0] ➊<br />ᐸincludeArchivedConditionᐳ<br />More deps:<br />- Constantᐸ[HIDDEN]ᐳ[43]"}}:::plan
     __Item15[/"__Item[15∈1]<br />ᐸ14ᐳ"\]:::itemplan
     PgSelectRows14 ==> __Item15
     PgSelectSingle16{{"PgSelectSingle[16∈1]<br />ᐸforumsᐳ"}}:::plan
     __Item15 --> PgSelectSingle16
-    PgSelect31[["PgSelect[31∈3]<br />ᐸmessages+1ᐳ"]]:::plan
+    PgSelect31[["PgSelect[31∈3]<br />ᐸmessages+1ᐳ<br />More deps:<br />- Object[11]<br />- Constantᐸ5ᐳ[44]"]]:::plan
     PgClassExpression20{{"PgClassExpression[20∈3]<br />ᐸ__forums__.”id”ᐳ"}}:::plan
     PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__forums__...chived_at”ᐳ"}}:::plan
-    Object11 & PgClassExpression20 & ApplyInput26 & PgClassExpression27 & Lambda30 & Connection25 & Constant44 --> PgSelect31
-    PgSelect33[["PgSelect[33∈3]<br />ᐸmessages(aggregate)ᐳ"]]:::plan
-    Object11 & PgClassExpression20 & ApplyInput26 & PgClassExpression27 & Lambda30 & Connection25 --> PgSelect33
-    Object40{{"Object[40∈3]<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
+    PgClassExpression20 & ApplyInput26 & PgClassExpression27 & Lambda30 & Connection25 --> PgSelect31
+    PgSelect33[["PgSelect[33∈3]<br />ᐸmessages(aggregate)ᐳ<br />More deps:<br />- Object[11]"]]:::plan
+    PgClassExpression20 & ApplyInput26 & PgClassExpression27 & Lambda30 & Connection25 --> PgSelect33
+    Object40{{"Object[40∈3]<br />ᐸ{first,last,hasMore}ᐳ<br />More deps:<br />- Constantᐸ5ᐳ[44]<br />- Constantᐸundefinedᐳ[6]"}}:::plan
     Access39{{"Access[39∈3]<br />ᐸ31.hasMoreᐳ"}}:::plan
-    Constant44 & Access39 --> Object40
+    Access39 --> Object40
     PgSelectSingle16 --> PgClassExpression20
     PgSelectSingle16 --> PgClassExpression27
     PgPageInfo32{{"PgPageInfo[32∈3] ➊"}}:::plan
@@ -75,7 +66,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect8,Access9,Access10,Object11,Lambda13,PgSelectRows14,__InputObject18,Connection25,ApplyInput26,Lambda30,Constant42,Constant43,Constant44,Constant45 bucket0
+    class Bucket0,__Value2,PgSelect8,Access9,Access10,Object11,Lambda13,PgSelectRows14,__InputObject18,Connection25,ApplyInput26,Lambda30 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item15,PgSelectSingle16 bucket1
     classDef bucket2 stroke:#7f007f

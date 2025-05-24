@@ -19,12 +19,8 @@ graph TD
     Bucket2 --> Bucket3 & Bucket4
 
     %% plan dependencies
-    PgUnionAll8[["PgUnionAll[8∈0] ➊<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ"]]:::plan
-    Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant12{{"Constant[12∈0] ➊<br />ᐸ6ᐳ"}}:::plan
-    Constant47{{"Constant[47∈0] ➊<br />ᐸ3ᐳ"}}:::plan
-    Constant48{{"Constant[48∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Object11 & Constant12 & Constant47 & Constant48 --> PgUnionAll8
+    PgUnionAll8[["PgUnionAll[8∈0] ➊<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ<br />More deps:<br />- Object[11]<br />- Constantᐸ6ᐳ[12]<br />- Constantᐸ3ᐳ[47]<br />- Constantᐸ1ᐳ[48]"]]:::plan
+    Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 3"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
@@ -33,12 +29,10 @@ graph TD
     __Value2 --> Access10
     Access46{{"Access[46∈0] ➊<br />ᐸ8.itemsᐳ"}}:::plan
     PgUnionAll8 --> Access46
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant18{{"Constant[18∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
-    List19{{"List[19∈1]<br />ᐸ16,17,18ᐳ"}}:::plan
+    List19{{"List[19∈1]<br />ᐸ16,17,18ᐳ<br />More deps:<br />- Constantᐸ[HIDDEN]ᐳ[18]"}}:::plan
     Access16{{"Access[16∈1]<br />ᐸ14.0ᐳ"}}:::plan
     Access17{{"Access[17∈1]<br />ᐸ14.1ᐳ"}}:::plan
-    Access16 & Access17 & Constant18 --> List19
+    Access16 & Access17 --> List19
     __Item14[/"__Item[14∈1]<br />ᐸ46ᐳ"\]:::itemplan
     Access46 ==> __Item14
     __Item14 --> Access16
@@ -49,8 +43,8 @@ graph TD
     Lambda20 --> Access21
     Access22{{"Access[22∈1]<br />ᐸ20.idᐳ"}}:::plan
     Lambda20 --> Access22
-    PgSelect23[["PgSelect[23∈3]<br />ᐸfirst_party_vulnerabilitiesᐳ<br />ᐳFirstPartyVulnerability"]]:::plan
-    Object11 & Access22 --> PgSelect23
+    PgSelect23[["PgSelect[23∈3]<br />ᐸfirst_party_vulnerabilitiesᐳ<br />ᐳFirstPartyVulnerability<br />More deps:<br />- Object[11]"]]:::plan
+    Access22 --> PgSelect23
     First27{{"First[27∈3]^"}}:::plan
     PgSelectRows28[["PgSelectRows[28∈3]^"]]:::plan
     PgSelectRows28 --> First27
@@ -65,8 +59,8 @@ graph TD
     PgSelectSingle29 --> PgClassExpression42
     PgClassExpression44{{"PgClassExpression[44∈3]^<br />ᐸ__first_pa...team_name”ᐳ"}}:::plan
     PgSelectSingle29 --> PgClassExpression44
-    PgSelect31[["PgSelect[31∈4]<br />ᐸthird_party_vulnerabilitiesᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
-    Object11 & Access22 --> PgSelect31
+    PgSelect31[["PgSelect[31∈4]<br />ᐸthird_party_vulnerabilitiesᐳ<br />ᐳThirdPartyVulnerability<br />More deps:<br />- Object[11]"]]:::plan
+    Access22 --> PgSelect31
     First35{{"First[35∈4]^"}}:::plan
     PgSelectRows36[["PgSelectRows[36∈4]^"]]:::plan
     PgSelectRows36 --> First35
@@ -84,7 +78,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgUnionAll8,Access9,Access10,Object11,Constant12,Constant18,Access46,Constant47,Constant48 bucket0
+    class Bucket0,__Value2,PgUnionAll8,Access9,Access10,Object11,Access46 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item14,Access16,Access17,List19,Lambda20,Access21,Access22 bucket1
     classDef bucket2 stroke:#7f007f

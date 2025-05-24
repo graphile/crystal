@@ -24,36 +24,29 @@ graph TD
     Bucket5 --> Bucket6
 
     %% plan dependencies
-    PgSelect9[["PgSelect[9∈0] ➊<br />ᐸforumsᐳ"]]:::plan
+    PgSelect9[["PgSelect[9∈0] ➊<br />ᐸforumsᐳ<br />More deps:<br />- Constantᐸ2ᐳ[93]"]]:::plan
     Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant93{{"Constant[93∈0] ➊<br />ᐸ2ᐳ"}}:::plan
-    Lambda14{{"Lambda[14∈0] ➊<br />ᐸincludeArchivedConditionᐳ"}}:::plan
-    PgSelectInlineApply85["PgSelectInlineApply[85∈0] ➊"]:::plan
+    Lambda14{{"Lambda[14∈0] ➊<br />ᐸincludeArchivedConditionᐳ<br />More deps:<br />- Constantᐸ[ undefined, 'YES' ]ᐳ[96]"}}:::plan
+    PgSelectInlineApply85["PgSelectInlineApply[85∈0] ➊<br />More deps:<br />- Constantᐸ2ᐳ[93]"]:::plan
     PgSelectInlineApply89["PgSelectInlineApply[89∈0] ➊"]:::plan
-    Object12 & Constant93 & Lambda14 & PgSelectInlineApply85 & PgSelectInlineApply89 --> PgSelect9
-    Lambda29{{"Lambda[29∈0] ➊<br />ᐸincludeArchivedConditionᐳ"}}:::plan
+    Object12 & Lambda14 & PgSelectInlineApply85 & PgSelectInlineApply89 --> PgSelect9
+    Lambda29{{"Lambda[29∈0] ➊<br />ᐸincludeArchivedConditionᐳ<br />More deps:<br />- Constantᐸ[HIDDEN]ᐳ[97]"}}:::plan
     PgSelectInlineApply81["PgSelectInlineApply[81∈0] ➊"]:::plan
-    Constant93 & Lambda29 & PgSelectInlineApply81 --> PgSelectInlineApply85
+    Lambda29 & PgSelectInlineApply81 --> PgSelectInlineApply85
     Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access10 & Access11 --> Object12
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access10
     __Value2 --> Access11
-    Constant96{{"Constant[96∈0] ➊<br />ᐸ[ undefined, 'YES' ]ᐳ"}}:::plan
-    Constant96 --> Lambda14
     PgSelectRows15[["PgSelectRows[15∈0] ➊"]]:::plan
     PgSelect9 --> PgSelectRows15
-    Connection25{{"Connection[25∈0] ➊<br />ᐸ21ᐳ"}}:::plan
-    Constant93 --> Connection25
-    Constant97{{"Constant[97∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
-    Constant97 --> Lambda29
+    Connection25{{"Connection[25∈0] ➊<br />ᐸ21ᐳ<br />More deps:<br />- Constantᐸ2ᐳ[93]"}}:::plan
     Access86{{"Access[86∈0] ➊<br />ᐸ9.m.subqueryDetailsFor30ᐳ"}}:::plan
     PgSelect9 --> Access86
     Lambda29 --> PgSelectInlineApply89
     Access90{{"Access[90∈0] ➊<br />ᐸ9.m.subqueryDetailsFor34ᐳ"}}:::plan
     PgSelect9 --> Access90
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item16[/"__Item[16∈1]<br />ᐸ15ᐳ"\]:::itemplan
     PgSelectRows15 ==> __Item16
     PgSelectSingle17{{"PgSelectSingle[17∈1]<br />ᐸforumsᐳ"}}:::plan
@@ -68,11 +61,11 @@ graph TD
     List87 --> Lambda88
     Lambda92{{"Lambda[92∈2]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List91 --> Lambda92
-    Object49{{"Object[49∈3]<br />ᐸ{first,last,offset,hasMore}ᐳ"}}:::plan
+    Object49{{"Object[49∈3]<br />ᐸ{first,last,offset,hasMore}ᐳ<br />More deps:<br />- Constantᐸ2ᐳ[93]<br />- Constantᐸundefinedᐳ[8]<br />- Constantᐸundefinedᐳ[8]"}}:::plan
     Access44{{"Access[44∈3]<br />ᐸ88.hasMoreᐳ"}}:::plan
-    Constant93 & Access44 --> Object49
-    Object45{{"Object[45∈3]<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
-    Constant93 & Access44 --> Object45
+    Access44 --> Object49
+    Object45{{"Object[45∈3]<br />ᐸ{first,last,hasMore}ᐳ<br />More deps:<br />- Constantᐸ2ᐳ[93]<br />- Constantᐸundefinedᐳ[8]"}}:::plan
+    Access44 --> Object45
     PgCursor56{{"PgCursor[56∈3]"}}:::plan
     PgSelectSingle54{{"PgSelectSingle[54∈3]<br />ᐸmessagesᐳ"}}:::plan
     Access55{{"Access[55∈3]<br />ᐸ88.cursorDetailsᐳ"}}:::plan
@@ -131,7 +124,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect9,Access10,Access11,Object12,Lambda14,PgSelectRows15,Connection25,Lambda29,PgSelectInlineApply81,PgSelectInlineApply85,Access86,PgSelectInlineApply89,Access90,Constant93,Constant96,Constant97 bucket0
+    class Bucket0,__Value2,PgSelect9,Access10,Access11,Object12,Lambda14,PgSelectRows15,Connection25,Lambda29,PgSelectInlineApply81,PgSelectInlineApply85,Access86,PgSelectInlineApply89,Access90 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item16,PgSelectSingle17 bucket1
     classDef bucket2 stroke:#7f007f

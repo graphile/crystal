@@ -33,71 +33,38 @@ graph TD
     Bucket10 --> Bucket12
 
     %% plan dependencies
-    __InputObject8{{"__InputObject[8∈0] ➊"}}:::plan
-    __InputObject9{{"__InputObject[9∈0] ➊"}}:::plan
+    __InputObject8{{"__InputObject[8∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]"}}:::plan
+    __InputObject9{{"__InputObject[9∈0] ➊<br />More deps:<br />- Constantᐸ99ᐳ[99]<br />- Constantᐸ1234ᐳ[100]"}}:::plan
     __InputObject12{{"__InputObject[12∈0] ➊"}}:::plan
     __InputObject19{{"__InputObject[19∈0] ➊"}}:::plan
     __InputObject25{{"__InputObject[25∈0] ➊"}}:::plan
-    __InputObject32{{"__InputObject[32∈0] ➊"}}:::plan
-    __InputObject35{{"__InputObject[35∈0] ➊"}}:::plan
-    __InputObject38{{"__InputObject[38∈0] ➊"}}:::plan
-    __InputObject40{{"__InputObject[40∈0] ➊"}}:::plan
+    __InputObject32{{"__InputObject[32∈0] ➊<br />More deps:<br />- Constantᐸ[ §{ x: 0, y: 0 }, §{ x: 0, y: 10 }, §{ x: 10, y: 10 }, §{ xᐳ[33]<br />- Constantᐸtrueᐳ[112]"}}:::plan
+    __InputObject35{{"__InputObject[35∈0] ➊<br />More deps:<br />- Constantᐸ[ §{ x: 0, y: 0 }, §{ x: 0, y: 10 }, §{ x: 10, y: 10 }, §{ xᐳ[36]<br />- Constantᐸfalseᐳ[113]"}}:::plan
+    __InputObject38{{"__InputObject[38∈0] ➊<br />More deps:<br />- Constantᐸ[ §{ x: 0, y: 0 }, §{ x: 0, y: 10 }, §{ x: 10, y: 10 }, §{ xᐳ[39]"}}:::plan
+    __InputObject40{{"__InputObject[40∈0] ➊<br />More deps:<br />- Constantᐸ3ᐳ[116]"}}:::plan
     __InputObject9 & __InputObject12 & __InputObject19 & __InputObject25 & __InputObject32 & __InputObject35 & __InputObject38 & __InputObject40 --> __InputObject8
-    __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
+    __InputObject6{{"__InputObject[6∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]"}}:::plan
     __InputObject8 --> __InputObject6
-    Constant99{{"Constant[99∈0] ➊<br />ᐸ99ᐳ"}}:::plan
-    Constant100{{"Constant[100∈0] ➊<br />ᐸ1234ᐳ"}}:::plan
-    Constant99 & Constant100 --> __InputObject9
-    __InputObject13{{"__InputObject[13∈0] ➊"}}:::plan
-    __InputObject16{{"__InputObject[16∈0] ➊"}}:::plan
+    __InputObject13{{"__InputObject[13∈0] ➊<br />More deps:<br />- Constantᐸ25ᐳ[101]<br />- Constantᐸ200ᐳ[102]"}}:::plan
+    __InputObject16{{"__InputObject[16∈0] ➊<br />More deps:<br />- Constantᐸ0ᐳ[103]<br />- Constantᐸ100ᐳ[104]"}}:::plan
     __InputObject13 & __InputObject16 --> __InputObject12
-    Constant101{{"Constant[101∈0] ➊<br />ᐸ25ᐳ"}}:::plan
-    Constant102{{"Constant[102∈0] ➊<br />ᐸ200ᐳ"}}:::plan
-    Constant101 & Constant102 --> __InputObject13
-    Constant103{{"Constant[103∈0] ➊<br />ᐸ0ᐳ"}}:::plan
-    Constant104{{"Constant[104∈0] ➊<br />ᐸ100ᐳ"}}:::plan
-    Constant103 & Constant104 --> __InputObject16
-    __InputObject20{{"__InputObject[20∈0] ➊"}}:::plan
-    __InputObject22{{"__InputObject[22∈0] ➊"}}:::plan
+    __InputObject20{{"__InputObject[20∈0] ➊<br />More deps:<br />- Constantᐸ99ᐳ[99]<br />- Constantᐸ111ᐳ[105]"}}:::plan
+    __InputObject22{{"__InputObject[22∈0] ➊<br />More deps:<br />- Constantᐸ2935ᐳ[106]<br />- Constantᐸ3548ᐳ[107]"}}:::plan
     __InputObject20 & __InputObject22 --> __InputObject19
-    Constant105{{"Constant[105∈0] ➊<br />ᐸ111ᐳ"}}:::plan
-    Constant99 & Constant105 --> __InputObject20
-    Constant106{{"Constant[106∈0] ➊<br />ᐸ2935ᐳ"}}:::plan
-    Constant107{{"Constant[107∈0] ➊<br />ᐸ3548ᐳ"}}:::plan
-    Constant106 & Constant107 --> __InputObject22
-    __InputObject26{{"__InputObject[26∈0] ➊"}}:::plan
-    __InputObject29{{"__InputObject[29∈0] ➊"}}:::plan
+    __InputObject26{{"__InputObject[26∈0] ➊<br />More deps:<br />- Constantᐸ123ᐳ[108]<br />- Constantᐸ52635ᐳ[109]"}}:::plan
+    __InputObject29{{"__InputObject[29∈0] ➊<br />More deps:<br />- Constantᐸ2342ᐳ[110]<br />- Constantᐸ12445ᐳ[111]"}}:::plan
     __InputObject26 & __InputObject29 --> __InputObject25
-    Constant108{{"Constant[108∈0] ➊<br />ᐸ123ᐳ"}}:::plan
-    Constant109{{"Constant[109∈0] ➊<br />ᐸ52635ᐳ"}}:::plan
-    Constant108 & Constant109 --> __InputObject26
-    Constant110{{"Constant[110∈0] ➊<br />ᐸ2342ᐳ"}}:::plan
-    Constant111{{"Constant[111∈0] ➊<br />ᐸ12445ᐳ"}}:::plan
-    Constant110 & Constant111 --> __InputObject29
-    Constant33{{"Constant[33∈0] ➊<br />ᐸ[ §{ x: 0, y: 0 }, §{ x: 0, y: 10 }, §{ x: 10, y: 10 }, §{ xᐳ"}}:::plan
-    Constant112{{"Constant[112∈0] ➊<br />ᐸtrueᐳ"}}:::plan
-    Constant33 & Constant112 --> __InputObject32
-    Constant36{{"Constant[36∈0] ➊<br />ᐸ[ §{ x: 0, y: 0 }, §{ x: 0, y: 10 }, §{ x: 10, y: 10 }, §{ xᐳ"}}:::plan
-    Constant113{{"Constant[113∈0] ➊<br />ᐸfalseᐳ"}}:::plan
-    Constant36 & Constant113 --> __InputObject35
-    __InputObject41{{"__InputObject[41∈0] ➊"}}:::plan
-    Constant116{{"Constant[116∈0] ➊<br />ᐸ3ᐳ"}}:::plan
-    __InputObject41 & Constant116 --> __InputObject40
-    Constant114{{"Constant[114∈0] ➊<br />ᐸ7ᐳ"}}:::plan
-    Constant115{{"Constant[115∈0] ➊<br />ᐸ11ᐳ"}}:::plan
-    Constant114 & Constant115 --> __InputObject41
+    __InputObject41{{"__InputObject[41∈0] ➊<br />More deps:<br />- Constantᐸ7ᐳ[114]<br />- Constantᐸ11ᐳ[115]"}}:::plan
+    __InputObject41 --> __InputObject40
     Object48{{"Object[48∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access46{{"Access[46∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access47{{"Access[47∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access46 & Access47 --> Object48
-    Constant39{{"Constant[39∈0] ➊<br />ᐸ[ §{ x: 0, y: 0 }, §{ x: 0, y: 10 }, §{ x: 10, y: 10 }, §{ xᐳ"}}:::plan
-    Constant39 --> __InputObject38
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access46
     __Value2 --> Access47
     ApplyInput49{{"ApplyInput[49∈0] ➊"}}:::plan
     __InputObject6 --> ApplyInput49
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgInsertSingle45[["PgInsertSingle[45∈1] ➊<br />ᐸgeom()ᐳ"]]:::sideeffectplan
     Object48 & ApplyInput49 --> PgInsertSingle45
     Object50{{"Object[50∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
@@ -137,7 +104,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,__InputObject8,__InputObject9,__InputObject12,__InputObject13,__InputObject16,__InputObject19,__InputObject20,__InputObject22,__InputObject25,__InputObject26,__InputObject29,__InputObject32,Constant33,__InputObject35,Constant36,__InputObject38,Constant39,__InputObject40,__InputObject41,Access46,Access47,Object48,ApplyInput49,Constant99,Constant100,Constant101,Constant102,Constant103,Constant104,Constant105,Constant106,Constant107,Constant108,Constant109,Constant110,Constant111,Constant112,Constant113,Constant114,Constant115,Constant116 bucket0
+    class Bucket0,__Value2,__InputObject6,__InputObject8,__InputObject9,__InputObject12,__InputObject13,__InputObject16,__InputObject19,__InputObject20,__InputObject22,__InputObject25,__InputObject26,__InputObject29,__InputObject32,__InputObject35,__InputObject38,__InputObject40,__InputObject41,Access46,Access47,Object48,ApplyInput49 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle45,Object50 bucket1
     classDef bucket2 stroke:#7f007f

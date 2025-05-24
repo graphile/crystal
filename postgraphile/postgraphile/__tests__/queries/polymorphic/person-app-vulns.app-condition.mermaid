@@ -27,40 +27,30 @@ graph TD
     Bucket6 --> Bucket7 & Bucket8
 
     %% plan dependencies
-    Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 4"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access10 & Access11 --> Object12
-    __InputObject23{{"__InputObject[23∈0] ➊"}}:::plan
-    Constant68{{"Constant[68∈0] ➊<br />ᐸ'AWfulS'ᐳ"}}:::plan
-    Constant68 --> __InputObject23
-    Connection29{{"Connection[29∈0] ➊<br />ᐸ25ᐳ"}}:::plan
-    Constant66{{"Constant[66∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Lambda30{{"Lambda[30∈0] ➊<br />ᐸparseCursorᐳ"}}:::plan
-    Constant66 & Lambda30 --> Connection29
+    __InputObject23{{"__InputObject[23∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ'AWfulS'ᐳ[68]"}}:::plan
+    Connection29{{"Connection[29∈0] ➊<br />ᐸ25ᐳ<br />More deps:<br />- Constantᐸ1ᐳ[66]<br />- Lambda[30]"}}:::plan
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access10
     __Value2 --> Access11
-    Connection13{{"Connection[13∈0] ➊<br />ᐸ9ᐳ"}}:::plan
-    Constant65{{"Constant[65∈0] ➊<br />ᐸ4ᐳ"}}:::plan
-    Constant65 --> Connection13
-    Constant67{{"Constant[67∈0] ➊<br />ᐸ'WyI0OTgwM2MxZTJiIiwiQXdzQXBwbGljYXRpb24iLCJbXCI0XCJdIl0='ᐳ"}}:::plan
-    Constant67 --> Lambda30
+    Connection13{{"Connection[13∈0] ➊<br />ᐸ9ᐳ<br />More deps:<br />- Constantᐸ4ᐳ[65]"}}:::plan
+    Lambda30{{"Lambda[30∈0] ➊<br />ᐸparseCursorᐳ<br />Dependents: 2<br />More deps:<br />- Constantᐸ'WyI0OTgwM2MxZTJiIiwiQXdzQXBwbGljYXRpb24iLCJbXCI0XCJdIl0='ᐳ[67]"}}:::plan
     ApplyInput31{{"ApplyInput[31∈0] ➊"}}:::plan
     __InputObject23 --> ApplyInput31
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant40{{"Constant[40∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
-    PgSelect15[["PgSelect[15∈1] ➊<br />ᐸpeopleᐳ"]]:::plan
-    Object12 & Connection13 & Constant65 --> PgSelect15
+    PgSelect15[["PgSelect[15∈1] ➊<br />ᐸpeopleᐳ<br />More deps:<br />- Object[12]<br />- Constantᐸ4ᐳ[65]"]]:::plan
+    Connection13 --> PgSelect15
     PgSelectRows16[["PgSelectRows[16∈1] ➊"]]:::plan
     PgSelect15 --> PgSelectRows16
     __Item17[/"__Item[17∈2]<br />ᐸ16ᐳ"\]:::itemplan
     PgSelectRows16 ==> __Item17
     PgSelectSingle18{{"PgSelectSingle[18∈2]<br />ᐸpeopleᐳ"}}:::plan
     __Item17 --> PgSelectSingle18
-    PgUnionAll32[["PgUnionAll[32∈3]<br />ᐸAwsApplication,GcpApplicationᐳ"]]:::plan
+    PgUnionAll32[["PgUnionAll[32∈3]<br />ᐸAwsApplication,GcpApplicationᐳ<br />More deps:<br />- Object[12]<br />- Lambda[30]<br />- Constantᐸ1ᐳ[66]"]]:::plan
     PgClassExpression19{{"PgClassExpression[19∈3]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
-    Object12 & PgClassExpression19 & ApplyInput31 & Connection29 & Lambda30 & Constant66 --> PgUnionAll32
+    PgClassExpression19 & ApplyInput31 & Connection29 --> PgUnionAll32
     PgSelectSingle18 --> PgClassExpression19
     PgClassExpression20{{"PgClassExpression[20∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle18 --> PgClassExpression20
@@ -70,10 +60,10 @@ graph TD
     Access64 ==> __Item34
     Access36{{"Access[36∈4]<br />ᐸ32.cursorDetailsᐳ"}}:::plan
     PgUnionAll32 --> Access36
-    List41{{"List[41∈5]<br />ᐸ38,39,40ᐳ"}}:::plan
+    List41{{"List[41∈5]<br />ᐸ38,39,40ᐳ<br />More deps:<br />- Constantᐸ[HIDDEN]ᐳ[40]"}}:::plan
     Access38{{"Access[38∈5]<br />ᐸ34.0ᐳ"}}:::plan
     Access39{{"Access[39∈5]<br />ᐸ34.1ᐳ"}}:::plan
-    Access38 & Access39 & Constant40 --> List41
+    Access38 & Access39 --> List41
     PgCursor37{{"PgCursor[37∈5]"}}:::plan
     __Item34 & Access36 --> PgCursor37
     __Item34 --> Access38
@@ -84,8 +74,8 @@ graph TD
     Lambda42 --> Access43
     Access44{{"Access[44∈5]<br />ᐸ42.idᐳ"}}:::plan
     Lambda42 --> Access44
-    PgSelect45[["PgSelect[45∈7]<br />ᐸaws_applicationsᐳ<br />ᐳAwsApplication"]]:::plan
-    Object12 & Access44 --> PgSelect45
+    PgSelect45[["PgSelect[45∈7]<br />ᐸaws_applicationsᐳ<br />ᐳAwsApplication<br />More deps:<br />- Object[12]"]]:::plan
+    Access44 --> PgSelect45
     First49{{"First[49∈7]^"}}:::plan
     PgSelectRows50[["PgSelectRows[50∈7]^"]]:::plan
     PgSelectRows50 --> First49
@@ -96,8 +86,8 @@ graph TD
     PgSelectSingle51 --> PgClassExpression60
     PgClassExpression62{{"PgClassExpression[62∈7]^<br />ᐸ__aws_appl...s__.”name”ᐳ"}}:::plan
     PgSelectSingle51 --> PgClassExpression62
-    PgSelect53[["PgSelect[53∈8]<br />ᐸgcp_applicationsᐳ<br />ᐳGcpApplication"]]:::plan
-    Object12 & Access44 --> PgSelect53
+    PgSelect53[["PgSelect[53∈8]<br />ᐸgcp_applicationsᐳ<br />ᐳGcpApplication<br />More deps:<br />- Object[12]"]]:::plan
+    Access44 --> PgSelect53
     First57{{"First[57∈8]^"}}:::plan
     PgSelectRows58[["PgSelectRows[58∈8]^"]]:::plan
     PgSelectRows58 --> First57
@@ -111,7 +101,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access10,Access11,Object12,Connection13,__InputObject23,Connection29,Lambda30,ApplyInput31,Constant40,Constant65,Constant66,Constant67,Constant68 bucket0
+    class Bucket0,__Value2,Access10,Access11,Object12,Connection13,__InputObject23,Connection29,Lambda30,ApplyInput31 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect15,PgSelectRows16 bucket1
     classDef bucket2 stroke:#7f007f

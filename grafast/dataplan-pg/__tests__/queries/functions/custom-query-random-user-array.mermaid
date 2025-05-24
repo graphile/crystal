@@ -27,7 +27,6 @@ graph TD
     __Value2 --> Access8
     PgSelectRows10[["PgSelectRows[10∈0] ➊"]]:::plan
     PgSelect6 --> PgSelectRows10
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item11[/"__Item[11∈1]<br />ᐸ10ᐳ"\]:::itemplan
     PgSelectRows10 ==> __Item11
     PgSelectSingle12{{"PgSelectSingle[12∈1]<br />ᐸrandom_user_arrayᐳ"}}:::plan
@@ -39,7 +38,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect6,Access7,Access8,Object9,PgSelectRows10 bucket0
+    class Bucket0,__Value2,PgSelect6,Access7,Access8,Object9,PgSelectRows10 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item11,PgSelectSingle12 bucket1
     classDef bucket2 stroke:#7f007f

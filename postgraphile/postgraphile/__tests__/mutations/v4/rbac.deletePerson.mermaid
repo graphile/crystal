@@ -16,9 +16,7 @@ graph TD
     Bucket1 --> Bucket2
 
     %% plan dependencies
-    __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
-    Constant20{{"Constant[20∈0] ➊<br />ᐸ3ᐳ"}}:::plan
-    Constant20 --> __InputObject6
+    __InputObject6{{"__InputObject[6∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ3ᐳ[20]"}}:::plan
     Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -28,15 +26,13 @@ graph TD
     __Value2 --> Access11
     ApplyInput13{{"ApplyInput[13∈0] ➊"}}:::plan
     __InputObject6 --> ApplyInput13
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant15{{"Constant[15∈0] ➊<br />ᐸ'people'ᐳ"}}:::plan
-    PgDeleteSingle9[["PgDeleteSingle[9∈1] ➊<br />ᐸperson(id)ᐳ"]]:::sideeffectplan
-    Object12 & Constant20 & ApplyInput13 --> PgDeleteSingle9
+    PgDeleteSingle9[["PgDeleteSingle[9∈1] ➊<br />ᐸperson(id)ᐳ<br />More deps:<br />- Constantᐸ3ᐳ[20]"]]:::sideeffectplan
+    Object12 & ApplyInput13 --> PgDeleteSingle9
     Object14{{"Object[14∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgDeleteSingle9 --> Object14
-    List18{{"List[18∈2] ➊<br />ᐸ15,16ᐳ"}}:::plan
+    List18{{"List[18∈2] ➊<br />ᐸ15,16ᐳ<br />More deps:<br />- Constantᐸ'people'ᐳ[15]"}}:::plan
     PgClassExpression16{{"PgClassExpression[16∈2] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    Constant15 & PgClassExpression16 --> List18
+    PgClassExpression16 --> List18
     Access17{{"Access[17∈2] ➊<br />ᐸ9.tᐳ"}}:::plan
     Access17 --> PgClassExpression16
     PgDeleteSingle9 --> Access17
@@ -45,7 +41,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,Access10,Access11,Object12,ApplyInput13,Constant15,Constant20 bucket0
+    class Bucket0,__Value2,__InputObject6,Access10,Access11,Object12,ApplyInput13 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgDeleteSingle9,Object14 bucket1
     classDef bucket2 stroke:#7f007f

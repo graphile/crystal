@@ -25,11 +25,11 @@ graph TD
     Bucket6 --> Bucket7
 
     %% plan dependencies
-    PgSelectInlineApply252["PgSelectInlineApply[252∈0] ➊"]:::plan
+    PgSelectInlineApply252["PgSelectInlineApply[252∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[6]<br />- Constantᐸundefinedᐳ[6]"]:::plan
     PgSelectInlineApply244["PgSelectInlineApply[244∈0] ➊"]:::plan
     PgSelectInlineApply248["PgSelectInlineApply[248∈0] ➊"]:::plan
     PgSelectInlineApply244 & PgSelectInlineApply248 --> PgSelectInlineApply252
-    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸpeopleᐳ"]]:::plan
+    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸpeopleᐳ<br />More deps:<br />- Constantᐸundefinedᐳ[6]"]]:::plan
     Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object10 & PgSelectInlineApply252 --> PgSelect7
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
@@ -44,7 +44,6 @@ graph TD
     PgSelectInlineApply240 --> PgSelectInlineApply244
     Access253{{"Access[253∈0] ➊<br />ᐸ7.m.subqueryDetailsFor16ᐳ"}}:::plan
     PgSelect7 --> Access253
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item12[/"__Item[12∈1]<br />ᐸ11ᐳ"\]:::itemplan
     PgSelectRows11 ==> __Item12
     PgSelectSingle13{{"PgSelectSingle[13∈1]<br />ᐸpeopleᐳ"}}:::plan
@@ -156,7 +155,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,PgSelectRows11,PgSelectInlineApply240,PgSelectInlineApply244,PgSelectInlineApply248,PgSelectInlineApply252,Access253 bucket0
+    class Bucket0,__Value2,PgSelect7,Access8,Access9,Object10,PgSelectRows11,PgSelectInlineApply240,PgSelectInlineApply244,PgSelectInlineApply248,PgSelectInlineApply252,Access253 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item12,PgSelectSingle13 bucket1
     classDef bucket2 stroke:#7f007f

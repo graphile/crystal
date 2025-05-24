@@ -20,22 +20,20 @@ graph TD
     Bucket4 --> Bucket5
 
     %% plan dependencies
-    Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 3"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection12{{"Connection[12∈0] ➊<br />ᐸ8ᐳ"}}:::plan
     Connection17{{"Connection[17∈0] ➊<br />ᐸ15ᐳ"}}:::plan
     Connection21{{"Connection[21∈0] ➊<br />ᐸ19ᐳ"}}:::plan
     PgFromExpression41{{"PgFromExpression[41∈0] ➊"}}:::plan
-    Connection42{{"Connection[42∈0] ➊<br />ᐸ37ᐳ"}}:::plan
     PgSelectInlineApply48["PgSelectInlineApply[48∈0] ➊"]:::plan
-    PgSelect22[["PgSelect[22∈1] ➊<br />ᐸperson(aggregate)ᐳ"]]:::plan
-    Object11 & Connection12 --> PgSelect22
+    PgSelect22[["PgSelect[22∈1] ➊<br />ᐸperson(aggregate)ᐳ<br />More deps:<br />- Object[11]"]]:::plan
+    Connection12 --> PgSelect22
     First23{{"First[23∈1] ➊"}}:::plan
     PgSelectRows24[["PgSelectRows[24∈1] ➊"]]:::plan
     PgSelectRows24 --> First23
@@ -44,14 +42,14 @@ graph TD
     First23 --> PgSelectSingle25
     PgClassExpression26{{"PgClassExpression[26∈1] ➊<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle25 --> PgClassExpression26
-    PgSelect27[["PgSelect[27∈2] ➊<br />ᐸpersonᐳ"]]:::plan
-    Object11 & Connection17 & PgFromExpression41 & PgSelectInlineApply48 --> PgSelect27
+    PgSelect27[["PgSelect[27∈2] ➊<br />ᐸpersonᐳ<br />More deps:<br />- Object[11]"]]:::plan
+    Connection17 & PgFromExpression41 & PgSelectInlineApply48 --> PgSelect27
     PgSelectRows33[["PgSelectRows[33∈2] ➊"]]:::plan
     PgSelect27 --> PgSelectRows33
     Access49{{"Access[49∈2] ➊<br />ᐸ27.m.subqueryDetailsFor43ᐳ"}}:::plan
     PgSelect27 --> Access49
-    PgSelect28[["PgSelect[28∈3] ➊<br />ᐸtable_set_query(aggregate)ᐳ"]]:::plan
-    Object11 & Connection21 --> PgSelect28
+    PgSelect28[["PgSelect[28∈3] ➊<br />ᐸtable_set_query(aggregate)ᐳ<br />More deps:<br />- Object[11]"]]:::plan
+    Connection21 --> PgSelect28
     First29{{"First[29∈3] ➊"}}:::plan
     PgSelectRows30[["PgSelectRows[30∈3] ➊"]]:::plan
     PgSelectRows30 --> First29
@@ -79,7 +77,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access9,Access10,Object11,Connection12,Connection17,Connection21,PgFromExpression41,Connection42,PgSelectInlineApply48 bucket0
+    class Bucket0,__Value2,Access9,Access10,Object11,Connection12,Connection17,Connection21,PgFromExpression41,PgSelectInlineApply48 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect22,First23,PgSelectRows24,PgSelectSingle25,PgClassExpression26 bucket1
     classDef bucket2 stroke:#7f007f

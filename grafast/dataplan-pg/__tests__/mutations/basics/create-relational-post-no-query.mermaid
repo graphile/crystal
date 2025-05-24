@@ -71,32 +71,15 @@ graph TD
 
     %% plan dependencies
     Object15{{"Object[15∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access13{{"Access[13∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access14{{"Access[14∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access13{{"Access[13∈0] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access14{{"Access[14∈0] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access13 & Access14 --> Object15
-    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
-    __Value2 --> Access13
-    __Value2 --> Access14
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant10{{"Constant[10∈0] ➊<br />ᐸ'POST'ᐳ"}}:::plan
-    Constant11{{"Constant[11∈0] ➊<br />ᐸ2ᐳ"}}:::plan
-    Constant405{{"Constant[405∈0] ➊<br />ᐸ'My Relational Post 1'ᐳ"}}:::plan
-    Constant406{{"Constant[406∈0] ➊<br />ᐸ'A post, innit? 1'ᐳ"}}:::plan
-    Constant407{{"Constant[407∈0] ➊<br />ᐸ'Such a great post. 1'ᐳ"}}:::plan
-    Constant408{{"Constant[408∈0] ➊<br />ᐸ'My Relational Post 2'ᐳ"}}:::plan
-    Constant409{{"Constant[409∈0] ➊<br />ᐸ'A post, innit? 2'ᐳ"}}:::plan
-    Constant410{{"Constant[410∈0] ➊<br />ᐸ'Such a great post. 2'ᐳ"}}:::plan
-    Constant411{{"Constant[411∈0] ➊<br />ᐸ'My Relational Post 3'ᐳ"}}:::plan
-    Constant412{{"Constant[412∈0] ➊<br />ᐸ'A post, innit? 3'ᐳ"}}:::plan
-    Constant413{{"Constant[413∈0] ➊<br />ᐸ'Such a great post. 3'ᐳ"}}:::plan
-    Constant414{{"Constant[414∈0] ➊<br />ᐸ1000000ᐳ"}}:::plan
-    Constant415{{"Constant[415∈0] ➊<br />ᐸ1000001ᐳ"}}:::plan
-    Constant416{{"Constant[416∈0] ➊<br />ᐸ1000002ᐳ"}}:::plan
-    PgInsertSingle18[["PgInsertSingle[18∈1] ➊<br />ᐸrelational_posts(id,title,description,note)ᐳ"]]:::sideeffectplan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ<br />Dependents: 6"]:::plan
+    PgInsertSingle18[["PgInsertSingle[18∈1] ➊<br />ᐸrelational_posts(id,title,description,note)ᐳ<br />More deps:<br />- Constantᐸ'My Relational Post 1'ᐳ[405]<br />- Constantᐸ'A post, innit? 1'ᐳ[406]<br />- Constantᐸ'Such a great post. 1'ᐳ[407]"]]:::sideeffectplan
     PgClassExpression16{{"PgClassExpression[16∈1] ➊<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
-    Object15 & PgClassExpression16 & Constant405 & Constant406 & Constant407 --> PgInsertSingle18
-    PgInsertSingle12[["PgInsertSingle[12∈1] ➊<br />ᐸrelational_items(type,author_id)ᐳ"]]:::sideeffectplan
-    Object15 & Constant10 & Constant11 --> PgInsertSingle12
+    Object15 & PgClassExpression16 --> PgInsertSingle18
+    PgInsertSingle12[["PgInsertSingle[12∈1] ➊<br />ᐸrelational_items(type,author_id)ᐳ<br />More deps:<br />- Constantᐸ'POST'ᐳ[10]<br />- Constantᐸ2ᐳ[11]"]]:::sideeffectplan
+    Object15 --> PgInsertSingle12
     Access17{{"Access[17∈1] ➊<br />ᐸ12.tᐳ"}}:::plan
     Access17 --> PgClassExpression16
     PgInsertSingle12 --> Access17
@@ -104,17 +87,15 @@ graph TD
     Access23{{"Access[23∈1] ➊<br />ᐸ18.tᐳ"}}:::plan
     Access23 --> PgClassExpression22
     PgInsertSingle18 --> Access23
-    PgInsertSingle34[["PgInsertSingle[34∈2] ➊<br />ᐸrelational_posts(id,title,description,note)ᐳ"]]:::sideeffectplan
+    PgInsertSingle34[["PgInsertSingle[34∈2] ➊<br />ᐸrelational_posts(id,title,description,note)ᐳ<br />More deps:<br />- Constantᐸ'My Relational Post 2'ᐳ[408]<br />- Constantᐸ'A post, innit? 2'ᐳ[409]<br />- Constantᐸ'Such a great post. 2'ᐳ[410]"]]:::sideeffectplan
     Object31{{"Object[31∈2] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     PgClassExpression32{{"PgClassExpression[32∈2] ➊<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
-    Object31 & PgClassExpression32 & Constant408 & Constant409 & Constant410 --> PgInsertSingle34
-    PgInsertSingle28[["PgInsertSingle[28∈2] ➊<br />ᐸrelational_items(type,author_id)ᐳ"]]:::sideeffectplan
-    Object31 & Constant10 & Constant11 --> PgInsertSingle28
-    Access29{{"Access[29∈2] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access30{{"Access[30∈2] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object31 & PgClassExpression32 --> PgInsertSingle34
+    PgInsertSingle28[["PgInsertSingle[28∈2] ➊<br />ᐸrelational_items(type,author_id)ᐳ<br />More deps:<br />- Constantᐸ'POST'ᐳ[10]<br />- Constantᐸ2ᐳ[11]"]]:::sideeffectplan
+    Object31 --> PgInsertSingle28
+    Access29{{"Access[29∈2] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access30{{"Access[30∈2] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access29 & Access30 --> Object31
-    __Value2 --> Access29
-    __Value2 --> Access30
     Access33{{"Access[33∈2] ➊<br />ᐸ28.tᐳ"}}:::plan
     Access33 --> PgClassExpression32
     PgInsertSingle28 --> Access33
@@ -122,17 +103,15 @@ graph TD
     Access39{{"Access[39∈2] ➊<br />ᐸ34.tᐳ"}}:::plan
     Access39 --> PgClassExpression38
     PgInsertSingle34 --> Access39
-    PgInsertSingle50[["PgInsertSingle[50∈3] ➊<br />ᐸrelational_posts(id,title,description,note)ᐳ"]]:::sideeffectplan
+    PgInsertSingle50[["PgInsertSingle[50∈3] ➊<br />ᐸrelational_posts(id,title,description,note)ᐳ<br />More deps:<br />- Constantᐸ'My Relational Post 3'ᐳ[411]<br />- Constantᐸ'A post, innit? 3'ᐳ[412]<br />- Constantᐸ'Such a great post. 3'ᐳ[413]"]]:::sideeffectplan
     Object47{{"Object[47∈3] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     PgClassExpression48{{"PgClassExpression[48∈3] ➊<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
-    Object47 & PgClassExpression48 & Constant411 & Constant412 & Constant413 --> PgInsertSingle50
-    PgInsertSingle44[["PgInsertSingle[44∈3] ➊<br />ᐸrelational_items(type,author_id)ᐳ"]]:::sideeffectplan
-    Object47 & Constant10 & Constant11 --> PgInsertSingle44
-    Access45{{"Access[45∈3] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access46{{"Access[46∈3] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object47 & PgClassExpression48 --> PgInsertSingle50
+    PgInsertSingle44[["PgInsertSingle[44∈3] ➊<br />ᐸrelational_items(type,author_id)ᐳ<br />More deps:<br />- Constantᐸ'POST'ᐳ[10]<br />- Constantᐸ2ᐳ[11]"]]:::sideeffectplan
+    Object47 --> PgInsertSingle44
+    Access45{{"Access[45∈3] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access46{{"Access[46∈3] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access45 & Access46 --> Object47
-    __Value2 --> Access45
-    __Value2 --> Access46
     Access49{{"Access[49∈3] ➊<br />ᐸ44.tᐳ"}}:::plan
     Access49 --> PgClassExpression48
     PgInsertSingle44 --> Access49
@@ -140,12 +119,12 @@ graph TD
     Access55{{"Access[55∈3] ➊<br />ᐸ50.tᐳ"}}:::plan
     Access55 --> PgClassExpression54
     PgInsertSingle50 --> Access55
-    PgSelect57[["PgSelect[57∈5] ➊<br />ᐸrelational_itemsᐳ"]]:::plan
-    Object31 & Constant414 --> PgSelect57
-    PgSelect72[["PgSelect[72∈5] ➊<br />ᐸrelational_itemsᐳ"]]:::plan
-    Object31 & Constant415 --> PgSelect72
-    PgSelect83[["PgSelect[83∈5] ➊<br />ᐸrelational_itemsᐳ"]]:::plan
-    Object31 & Constant416 --> PgSelect83
+    PgSelect57[["PgSelect[57∈5] ➊<br />ᐸrelational_itemsᐳ<br />More deps:<br />- Constantᐸ1000000ᐳ[414]"]]:::plan
+    Object31 --> PgSelect57
+    PgSelect72[["PgSelect[72∈5] ➊<br />ᐸrelational_itemsᐳ<br />More deps:<br />- Constantᐸ1000001ᐳ[415]"]]:::plan
+    Object31 --> PgSelect72
+    PgSelect83[["PgSelect[83∈5] ➊<br />ᐸrelational_itemsᐳ<br />More deps:<br />- Constantᐸ1000002ᐳ[416]"]]:::plan
+    Object31 --> PgSelect83
     First61{{"First[61∈5] ➊"}}:::plan
     PgSelectRows62[["PgSelectRows[62∈5] ➊"]]:::plan
     PgSelectRows62 --> First61
@@ -182,12 +161,12 @@ graph TD
     PgSelectSingle87 --> PgClassExpression271
     Lambda272{{"Lambda[272∈5] ➊<br />ᐸrelationalItemTypeNameFromTypeᐳ"}}:::plan
     PgClassExpression271 --> Lambda272
-    PgSelect64[["PgSelect[64∈6] ➊<br />ᐸrelational_itemsᐳ"]]:::plan
-    Object47 & Constant414 --> PgSelect64
-    PgSelect77[["PgSelect[77∈6] ➊<br />ᐸrelational_itemsᐳ"]]:::plan
-    Object47 & Constant415 --> PgSelect77
-    PgSelect88[["PgSelect[88∈6] ➊<br />ᐸrelational_itemsᐳ"]]:::plan
-    Object47 & Constant416 --> PgSelect88
+    PgSelect64[["PgSelect[64∈6] ➊<br />ᐸrelational_itemsᐳ<br />More deps:<br />- Constantᐸ1000000ᐳ[414]"]]:::plan
+    Object47 --> PgSelect64
+    PgSelect77[["PgSelect[77∈6] ➊<br />ᐸrelational_itemsᐳ<br />More deps:<br />- Constantᐸ1000001ᐳ[415]"]]:::plan
+    Object47 --> PgSelect77
+    PgSelect88[["PgSelect[88∈6] ➊<br />ᐸrelational_itemsᐳ<br />More deps:<br />- Constantᐸ1000002ᐳ[416]"]]:::plan
+    Object47 --> PgSelect88
     First68{{"First[68∈6] ➊"}}:::plan
     PgSelectRows69[["PgSelectRows[69∈6] ➊"]]:::plan
     PgSelectRows69 --> First68
@@ -503,7 +482,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant10,Constant11,Access13,Access14,Object15,Constant405,Constant406,Constant407,Constant408,Constant409,Constant410,Constant411,Constant412,Constant413,Constant414,Constant415,Constant416 bucket0
+    class Bucket0,__Value2,Access13,Access14,Object15 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle12,PgClassExpression16,Access17,PgInsertSingle18,PgClassExpression22,Access23 bucket1
     classDef bucket2 stroke:#7f007f

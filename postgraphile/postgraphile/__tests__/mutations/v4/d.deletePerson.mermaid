@@ -18,9 +18,7 @@ graph TD
     Bucket2 --> Bucket3
 
     %% plan dependencies
-    __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
-    Constant25{{"Constant[25∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Constant25 --> __InputObject6
+    __InputObject6{{"__InputObject[6∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ1ᐳ[25]"}}:::plan
     Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -30,9 +28,8 @@ graph TD
     __Value2 --> Access11
     ApplyInput13{{"ApplyInput[13∈0] ➊"}}:::plan
     __InputObject6 --> ApplyInput13
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    PgDeleteSingle9[["PgDeleteSingle[9∈1] ➊<br />ᐸperson(id)ᐳ"]]:::sideeffectplan
-    Object12 & Constant25 & ApplyInput13 --> PgDeleteSingle9
+    PgDeleteSingle9[["PgDeleteSingle[9∈1] ➊<br />ᐸperson(id)ᐳ<br />More deps:<br />- Constantᐸ1ᐳ[25]"]]:::sideeffectplan
+    Object12 & ApplyInput13 --> PgDeleteSingle9
     Object14{{"Object[14∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgDeleteSingle9 --> Object14
     PgClassExpression15{{"PgClassExpression[15∈3] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
@@ -58,7 +55,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,Access10,Access11,Object12,ApplyInput13,Constant25 bucket0
+    class Bucket0,__Value2,__InputObject6,Access10,Access11,Object12,ApplyInput13 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgDeleteSingle9,Object14 bucket1
     classDef bucket2 stroke:#7f007f

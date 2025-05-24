@@ -40,37 +40,26 @@ graph TD
     Bucket11 --> Bucket16
 
     %% plan dependencies
-    Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 2"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
-    __InputObject46{{"__InputObject[46∈0] ➊"}}:::plan
-    Constant116{{"Constant[116∈0] ➊<br />ᐸ'Large bet on myself in round one.'ᐳ"}}:::plan
-    Constant116 --> __InputObject46
+    __InputObject46{{"__InputObject[46∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[6]<br />- Constantᐸ'Large bet on myself in round one.'ᐳ[116]"}}:::plan
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10
-    Connection38{{"Connection[38∈0] ➊<br />ᐸ34ᐳ"}}:::plan
-    Constant115{{"Constant[115∈0] ➊<br />ᐸ2ᐳ"}}:::plan
-    Constant115 --> Connection38
     ApplyInput52{{"ApplyInput[52∈0] ➊"}}:::plan
     __InputObject46 --> ApplyInput52
-    PgSelectInlineApply95["PgSelectInlineApply[95∈0] ➊"]:::plan
-    Constant115 --> PgSelectInlineApply95
+    PgSelectInlineApply95["PgSelectInlineApply[95∈0] ➊<br />More deps:<br />- Constantᐸ2ᐳ[115]"]:::plan
     PgSelectInlineApply99["PgSelectInlineApply[99∈0] ➊"]:::plan
     ApplyInput52 --> PgSelectInlineApply99
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection12{{"Connection[12∈0] ➊<br />ᐸ8ᐳ"}}:::plan
     Connection17{{"Connection[17∈0] ➊<br />ᐸ15ᐳ"}}:::plan
-    Connection44{{"Connection[44∈0] ➊<br />ᐸ40ᐳ"}}:::plan
-    Connection51{{"Connection[51∈0] ➊<br />ᐸ49ᐳ"}}:::plan
-    Connection57{{"Connection[57∈0] ➊<br />ᐸ55ᐳ"}}:::plan
-    Connection62{{"Connection[62∈0] ➊<br />ᐸ60ᐳ"}}:::plan
     PgSelectInlineApply103["PgSelectInlineApply[103∈0] ➊"]:::plan
     PgSelectInlineApply107["PgSelectInlineApply[107∈0] ➊"]:::plan
     PgSelectInlineApply111["PgSelectInlineApply[111∈0] ➊"]:::plan
-    PgSelect19[["PgSelect[19∈1] ➊<br />ᐸpersonᐳ"]]:::plan
-    Object11 & Connection12 & PgSelectInlineApply95 & PgSelectInlineApply99 & PgSelectInlineApply103 & PgSelectInlineApply107 --> PgSelect19
+    PgSelect19[["PgSelect[19∈1] ➊<br />ᐸpersonᐳ<br />More deps:<br />- Object[11]"]]:::plan
+    Connection12 & PgSelectInlineApply95 & PgSelectInlineApply99 & PgSelectInlineApply103 & PgSelectInlineApply107 --> PgSelect19
     PgSelectRows21[["PgSelectRows[21∈1] ➊"]]:::plan
     PgSelect19 --> PgSelectRows21
     Access96{{"Access[96∈1] ➊<br />ᐸ19.m.subqueryDetailsFor64ᐳ"}}:::plan
@@ -81,8 +70,8 @@ graph TD
     PgSelect19 --> Access104
     Access108{{"Access[108∈1] ➊<br />ᐸ19.m.subqueryDetailsFor68ᐳ"}}:::plan
     PgSelect19 --> Access108
-    PgSelect20[["PgSelect[20∈2] ➊<br />ᐸcompound_keyᐳ"]]:::plan
-    Object11 & Connection17 & PgSelectInlineApply111 --> PgSelect20
+    PgSelect20[["PgSelect[20∈2] ➊<br />ᐸcompound_keyᐳ<br />More deps:<br />- Object[11]"]]:::plan
+    Connection17 & PgSelectInlineApply111 --> PgSelect20
     PgSelectRows22[["PgSelectRows[22∈2] ➊"]]:::plan
     PgSelect20 --> PgSelectRows22
     Access112{{"Access[112∈2] ➊<br />ᐸ20.m.subqueryDetailsFor65ᐳ"}}:::plan
@@ -178,7 +167,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access9,Access10,Object11,Connection12,Connection17,Connection38,Connection44,__InputObject46,Connection51,ApplyInput52,Connection57,Connection62,PgSelectInlineApply95,PgSelectInlineApply99,PgSelectInlineApply103,PgSelectInlineApply107,PgSelectInlineApply111,Constant115,Constant116 bucket0
+    class Bucket0,__Value2,Access9,Access10,Object11,Connection12,Connection17,__InputObject46,ApplyInput52,PgSelectInlineApply95,PgSelectInlineApply99,PgSelectInlineApply103,PgSelectInlineApply107,PgSelectInlineApply111 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect19,PgSelectRows21,Access96,Access100,Access104,Access108 bucket1
     classDef bucket2 stroke:#7f007f

@@ -31,35 +31,26 @@ graph TD
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
-    PgSelect12[["PgSelect[12∈0] ➊<br />ᐸconstructorᐳ"]]:::plan
-    Constant120{{"Constant[120∈0] ➊<br />ᐸ'Copper Wire'ᐳ"}}:::plan
-    Object10 & Constant120 --> PgSelect12
-    PgSelect18[["PgSelect[18∈0] ➊<br />ᐸconstructorᐳ"]]:::plan
-    Constant121{{"Constant[121∈0] ➊<br />ᐸ2ᐳ"}}:::plan
-    Object10 & Constant121 --> PgSelect18
-    PgSelect24[["PgSelect[24∈0] ➊<br />ᐸconstructorᐳ"]]:::plan
-    Constant122{{"Constant[122∈0] ➊<br />ᐸ'Iron Mine'ᐳ"}}:::plan
-    Object10 & Constant122 --> PgSelect24
-    PgSelect32[["PgSelect[32∈0] ➊<br />ᐸyieldᐳ"]]:::plan
-    Constant123{{"Constant[123∈0] ➊<br />ᐸ'UK'ᐳ"}}:::plan
-    Object10 & Constant123 --> PgSelect32
-    PgSelect37[["PgSelect[37∈0] ➊<br />ᐸyieldᐳ"]]:::plan
-    Object10 & Constant121 --> PgSelect37
-    PgSelect45[["PgSelect[45∈0] ➊<br />ᐸ__proto__ᐳ"]]:::plan
-    Constant124{{"Constant[124∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Object10 & Constant124 --> PgSelect45
-    PgSelect51[["PgSelect[51∈0] ➊<br />ᐸ__proto__ᐳ"]]:::plan
-    Constant125{{"Constant[125∈0] ➊<br />ᐸ'VCS'ᐳ"}}:::plan
-    Object10 & Constant125 --> PgSelect51
-    PgSelect59[["PgSelect[59∈0] ➊<br />ᐸnullᐳ"]]:::plan
-    Constant126{{"Constant[126∈0] ➊<br />ᐸ'10 am'ᐳ"}}:::plan
-    Object10 & Constant126 --> PgSelect59
-    PgSelect65[["PgSelect[65∈0] ➊<br />ᐸnullᐳ"]]:::plan
-    Constant127{{"Constant[127∈0] ➊<br />ᐸ'flat'ᐳ"}}:::plan
-    Object10 & Constant127 --> PgSelect65
-    PgSelect71[["PgSelect[71∈0] ➊<br />ᐸnullᐳ"]]:::plan
-    Constant128{{"Constant[128∈0] ➊<br />ᐸ3ᐳ"}}:::plan
-    Object10 & Constant128 --> PgSelect71
+    PgSelect12[["PgSelect[12∈0] ➊<br />ᐸconstructorᐳ<br />More deps:<br />- Constantᐸ'Copper Wire'ᐳ[120]"]]:::plan
+    Object10 --> PgSelect12
+    PgSelect18[["PgSelect[18∈0] ➊<br />ᐸconstructorᐳ<br />More deps:<br />- Constantᐸ2ᐳ[121]"]]:::plan
+    Object10 --> PgSelect18
+    PgSelect24[["PgSelect[24∈0] ➊<br />ᐸconstructorᐳ<br />More deps:<br />- Constantᐸ'Iron Mine'ᐳ[122]"]]:::plan
+    Object10 --> PgSelect24
+    PgSelect32[["PgSelect[32∈0] ➊<br />ᐸyieldᐳ<br />More deps:<br />- Constantᐸ'UK'ᐳ[123]"]]:::plan
+    Object10 --> PgSelect32
+    PgSelect37[["PgSelect[37∈0] ➊<br />ᐸyieldᐳ<br />More deps:<br />- Constantᐸ2ᐳ[121]"]]:::plan
+    Object10 --> PgSelect37
+    PgSelect45[["PgSelect[45∈0] ➊<br />ᐸ__proto__ᐳ<br />More deps:<br />- Constantᐸ1ᐳ[124]"]]:::plan
+    Object10 --> PgSelect45
+    PgSelect51[["PgSelect[51∈0] ➊<br />ᐸ__proto__ᐳ<br />More deps:<br />- Constantᐸ'VCS'ᐳ[125]"]]:::plan
+    Object10 --> PgSelect51
+    PgSelect59[["PgSelect[59∈0] ➊<br />ᐸnullᐳ<br />More deps:<br />- Constantᐸ'10 am'ᐳ[126]"]]:::plan
+    Object10 --> PgSelect59
+    PgSelect65[["PgSelect[65∈0] ➊<br />ᐸnullᐳ<br />More deps:<br />- Constantᐸ'flat'ᐳ[127]"]]:::plan
+    Object10 --> PgSelect65
+    PgSelect71[["PgSelect[71∈0] ➊<br />ᐸnullᐳ<br />More deps:<br />- Constantᐸ3ᐳ[128]"]]:::plan
+    Object10 --> PgSelect71
     PgSelect7[["PgSelect[7∈0] ➊<br />ᐸconstructorᐳ"]]:::plan
     Object10 --> PgSelect7
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
@@ -139,7 +130,6 @@ graph TD
     PgSelect42 --> PgSelectRows78
     PgSelectRows79[["PgSelectRows[79∈0] ➊"]]:::plan
     PgSelect56 --> PgSelectRows79
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgClassExpression88{{"PgClassExpression[88∈1] ➊<br />ᐸ__constructor__.”name”ᐳ"}}:::plan
     PgSelectSingle16 --> PgClassExpression88
     PgClassExpression98{{"PgClassExpression[98∈1] ➊<br />ᐸ__constructor__.”id”ᐳ"}}:::plan
@@ -223,7 +213,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,PgSelect12,First14,PgSelectRows15,PgSelectSingle16,PgSelect18,First20,PgSelectRows21,PgSelectSingle22,PgSelect24,First26,PgSelectRows27,PgSelectSingle28,PgSelect29,PgSelect32,First34,PgSelectRows35,PgSelectSingle36,PgSelect37,First39,PgSelectRows40,PgSelectSingle41,PgSelect42,PgSelect45,First47,PgSelectRows48,PgSelectSingle49,PgSelect51,First53,PgSelectRows54,PgSelectSingle55,PgSelect56,PgSelect59,First61,PgSelectRows62,PgSelectSingle63,PgSelect65,First67,PgSelectRows68,PgSelectSingle69,PgSelect71,First73,PgSelectRows74,PgSelectSingle75,PgSelectRows76,PgSelectRows77,PgSelectRows78,PgSelectRows79,Constant120,Constant121,Constant122,Constant123,Constant124,Constant125,Constant126,Constant127,Constant128 bucket0
+    class Bucket0,__Value2,PgSelect7,Access8,Access9,Object10,PgSelect12,First14,PgSelectRows15,PgSelectSingle16,PgSelect18,First20,PgSelectRows21,PgSelectSingle22,PgSelect24,First26,PgSelectRows27,PgSelectSingle28,PgSelect29,PgSelect32,First34,PgSelectRows35,PgSelectSingle36,PgSelect37,First39,PgSelectRows40,PgSelectSingle41,PgSelect42,PgSelect45,First47,PgSelectRows48,PgSelectSingle49,PgSelect51,First53,PgSelectRows54,PgSelectSingle55,PgSelect56,PgSelect59,First61,PgSelectRows62,PgSelectSingle63,PgSelect65,First67,PgSelectRows68,PgSelectSingle69,PgSelect71,First73,PgSelectRows74,PgSelectSingle75,PgSelectRows76,PgSelectRows77,PgSelectRows78,PgSelectRows79 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgClassExpression88,PgClassExpression98 bucket1
     classDef bucket2 stroke:#7f007f
