@@ -56,16 +56,16 @@ graph TD
     PgSelectSingle24 --> PgClassExpression28
     Lambda30{{"Lambda[30∈5]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List29 --> Lambda30
-    PgClassExpression35{{"PgClassExpression[35∈5]<br />ᐸ__similar_...1__.”col2”ᐳ"}}:::plan
-    PgSelectSingle24 --> PgClassExpression35
-    List33{{"List[33∈6]<br />ᐸ27,32ᐳ"}}:::plan
-    PgClassExpression32{{"PgClassExpression[32∈6]<br />ᐸ__similar_...e_1__.”id”ᐳ"}}:::plan
-    Constant27 & PgClassExpression32 --> List33
-    PgSelectSingle26 --> PgClassExpression32
-    Lambda34{{"Lambda[34∈6]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List33 --> Lambda34
-    PgClassExpression36{{"PgClassExpression[36∈6]<br />ᐸ__similar_...1__.”col2”ᐳ"}}:::plan
-    PgSelectSingle26 --> PgClassExpression36
+    PgClassExpression34{{"PgClassExpression[34∈5]<br />ᐸ__similar_...1__.”col2”ᐳ"}}:::plan
+    PgSelectSingle24 --> PgClassExpression34
+    List32{{"List[32∈6]<br />ᐸ27,31ᐳ"}}:::plan
+    PgClassExpression31{{"PgClassExpression[31∈6]<br />ᐸ__similar_...e_1__.”id”ᐳ"}}:::plan
+    Constant27 & PgClassExpression31 --> List32
+    PgSelectSingle26 --> PgClassExpression31
+    Lambda33{{"Lambda[33∈6]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List32 --> Lambda33
+    PgClassExpression35{{"PgClassExpression[35∈6]<br />ᐸ__similar_...1__.”col2”ᐳ"}}:::plan
+    PgSelectSingle26 --> PgClassExpression35
 
     %% define steps
     classDef bucket0 stroke:#696969
@@ -79,7 +79,7 @@ graph TD
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item25,PgSelectSingle26 bucket4
     classDef bucket5 stroke:#7fff00
-    class Bucket5,PgClassExpression28,List29,Lambda30,PgClassExpression35 bucket5
+    class Bucket5,PgClassExpression28,List29,Lambda30,PgClassExpression34 bucket5
     classDef bucket6 stroke:#ff1493
-    class Bucket6,PgClassExpression32,List33,Lambda34,PgClassExpression36 bucket6
+    class Bucket6,PgClassExpression31,List32,Lambda33,PgClassExpression35 bucket6
 
