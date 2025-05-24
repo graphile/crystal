@@ -16,6 +16,7 @@ import { __InputDefaultStep } from "./steps/__inputDefault.js";
 import { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import type { __InputObjectStepWithDollars } from "./steps/__inputObject.js";
 import { __InputObjectStep } from "./steps/__inputObject.js";
+import { __inputStaticLeaf } from "./steps/__inputStaticLeaf.js";
 import { __TrackedValueStepWithDollars } from "./steps/__trackedValue.js";
 import {
   __InputListStep,
@@ -172,7 +173,7 @@ export function inputStep(
     } else {
       // Variable is already ruled out, so it must be one of: Kind.INT | Kind.FLOAT | Kind.STRING | Kind.BOOLEAN | Kind.NULL | Kind.ENUM
       // none of which can contain a variable:
-      return new __InputStaticLeafStep(inputType, inputValue);
+      return __inputStaticLeaf(inputType, inputValue);
     }
   } else if (isObj) {
     return new __InputObjectStep(

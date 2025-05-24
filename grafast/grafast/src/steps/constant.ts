@@ -183,7 +183,6 @@ export function constant<TData>(
       t === "symbol"
     ) {
       return opPlan.cacheImmutableStep(
-        opPlan.variableValuesStep,
         isSecret ? `constant-secret` : `constant`,
         data as null | undefined | boolean | string | number | symbol,
         makeConst,

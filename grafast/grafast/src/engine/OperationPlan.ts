@@ -4990,20 +4990,25 @@ export class OperationPlan {
 
   /** @internal */
   cacheImmutableStep<T extends Step>(
-    ownerStep: Step,
     actionKey: string,
-    cacheKey: symbol | string | number | boolean | null | undefined,
+    cacheKey: any /* Anything suitable to be the key in a Map */,
     cb: () => T,
   ): T {
     const cache = this._immutableCacheStepStoreAndActionKey;
-    return this._cacheStep(cache, ownerStep, actionKey, cacheKey, cb);
+    return this._cacheStep(
+      cache,
+      this.variableValuesStep,
+      actionKey,
+      cacheKey,
+      cb,
+    );
   }
 
   _cacheStep<T extends Step>(
     store: StepCache,
     ownerStep: Step,
     actionKey: string,
-    cacheKey: symbol | string | number | boolean | null | undefined,
+    cacheKey: any /* Anything suitable to be the key in a Map */,
     cb: () => T,
   ): T {
     const paths = currentPolymorphicPaths();
