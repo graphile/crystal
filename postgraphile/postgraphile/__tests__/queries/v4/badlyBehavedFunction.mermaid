@@ -50,14 +50,6 @@ graph TD
     PgSelectRows15 ==> __Item19
     PgSelectSingle20{{"PgSelectSingle[20∈3]<br />ᐸbadly_behaved_functionᐳ"}}:::plan
     __Item19 --> PgSelectSingle20
-    List28{{"List[28∈5]<br />ᐸ26,27ᐳ"}}:::plan
-    PgClassExpression27{{"PgClassExpression[27∈5]<br />ᐸ__badly_be...ion__.”id”ᐳ"}}:::plan
-    Constant26 & PgClassExpression27 --> List28
-    PgSelectSingle20 --> PgClassExpression27
-    Lambda29{{"Lambda[29∈5]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List28 --> Lambda29
-    PgClassExpression31{{"PgClassExpression[31∈5]<br />ᐸ”c”.”perso...unction__)ᐳ"}}:::plan
-    PgSelectSingle20 --> PgClassExpression31
     Edge23{{"Edge[23∈4]"}}:::plan
     PgSelectSingle22{{"PgSelectSingle[22∈4]<br />ᐸbadly_behaved_functionᐳ"}}:::plan
     PgCursor25{{"PgCursor[25∈4]"}}:::plan
@@ -66,6 +58,14 @@ graph TD
     __Item21[/"__Item[21∈4]<br />ᐸ14ᐳ"\]:::itemplan
     __ListTransform14 ==> __Item21
     __Item21 --> PgSelectSingle22
+    List28{{"List[28∈5]<br />ᐸ26,27ᐳ"}}:::plan
+    PgClassExpression27{{"PgClassExpression[27∈5]<br />ᐸ__badly_be...ion__.”id”ᐳ"}}:::plan
+    Constant26 & PgClassExpression27 --> List28
+    PgSelectSingle20 --> PgClassExpression27
+    Lambda29{{"Lambda[29∈5]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List28 --> Lambda29
+    PgClassExpression31{{"PgClassExpression[31∈5]<br />ᐸ”c”.”perso...unction__)ᐳ"}}:::plan
+    PgSelectSingle20 --> PgClassExpression31
     List34{{"List[34∈7]<br />ᐸ26,33ᐳ"}}:::plan
     PgClassExpression33{{"PgClassExpression[33∈7]<br />ᐸ__badly_be...ion__.”id”ᐳ"}}:::plan
     Constant26 & PgClassExpression33 --> List34

@@ -31,10 +31,6 @@ graph TD
     Constant23{{"Constant[23∈0] ➊<br />ᐸ3141592ᐳ"}}:::plan
     PgDeleteSingle8[["PgDeleteSingle[8∈1] ➊<br />ᐸrelational_posts(id)ᐳ"]]:::sideeffectplan
     Object11 & Constant22 --> PgDeleteSingle8
-    PgClassExpression18{{"PgClassExpression[18∈3] ➊<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
-    Access19{{"Access[19∈3] ➊<br />ᐸ8.tᐳ"}}:::plan
-    Access19 --> PgClassExpression18
-    PgDeleteSingle8 --> Access19
     PgDeleteSingle14[["PgDeleteSingle[14∈2] ➊<br />ᐸrelational_posts(id)ᐳ"]]:::sideeffectplan
     Object17{{"Object[17∈2] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object17 & Constant23 --> PgDeleteSingle14
@@ -43,6 +39,10 @@ graph TD
     Access15 & Access16 --> Object17
     __Value2 --> Access15
     __Value2 --> Access16
+    PgClassExpression18{{"PgClassExpression[18∈3] ➊<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
+    Access19{{"Access[19∈3] ➊<br />ᐸ8.tᐳ"}}:::plan
+    Access19 --> PgClassExpression18
+    PgDeleteSingle8 --> Access19
     PgClassExpression20{{"PgClassExpression[20∈4] ➊<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
     Access21{{"Access[21∈4] ➊<br />ᐸ14.tᐳ"}}:::plan
     Access21 --> PgClassExpression20

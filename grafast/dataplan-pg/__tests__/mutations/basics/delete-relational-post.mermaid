@@ -39,6 +39,14 @@ graph TD
     Constant121{{"Constant[121∈0] ➊<br />ᐸ3141592ᐳ"}}:::plan
     PgDeleteSingle8[["PgDeleteSingle[8∈1] ➊<br />ᐸrelational_posts(id)ᐳ"]]:::sideeffectplan
     Object11 & Constant120 --> PgDeleteSingle8
+    PgDeleteSingle14[["PgDeleteSingle[14∈2] ➊<br />ᐸrelational_posts(id)ᐳ"]]:::sideeffectplan
+    Object17{{"Object[17∈2] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object17 & Constant121 --> PgDeleteSingle14
+    Access15{{"Access[15∈2] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access16{{"Access[16∈2] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access15 & Access16 --> Object17
+    __Value2 --> Access15
+    __Value2 --> Access16
     PgSelect21[["PgSelect[21∈3] ➊<br />ᐸrelational_postsᐳ"]]:::plan
     PgFromExpression25{{"PgFromExpression[25∈3] ➊"}}:::plan
     PgSelectInlineApply98["PgSelectInlineApply[98∈3] ➊"]:::plan
@@ -64,6 +72,31 @@ graph TD
     PgSelect21 --> Access99
     Access104{{"Access[104∈3] ➊<br />ᐸ21.m.joinDetailsFor45ᐳ"}}:::plan
     PgSelect21 --> Access104
+    PgSelect32[["PgSelect[32∈4] ➊<br />ᐸrelational_postsᐳ"]]:::plan
+    PgFromExpression36{{"PgFromExpression[36∈4] ➊"}}:::plan
+    PgSelectInlineApply111["PgSelectInlineApply[111∈4] ➊"]:::plan
+    PgFromExpression115{{"PgFromExpression[115∈4] ➊"}}:::plan
+    PgSelectInlineApply116["PgSelectInlineApply[116∈4] ➊"]:::plan
+    Object17 & PgFromExpression36 & PgSelectInlineApply111 & PgFromExpression115 & PgSelectInlineApply116 --> PgSelect32
+    PgClassExpression29{{"PgClassExpression[29∈4] ➊<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
+    Access30{{"Access[30∈4] ➊<br />ᐸ14.tᐳ"}}:::plan
+    Access30 --> PgClassExpression29
+    PgDeleteSingle14 --> Access30
+    PgClassExpression31{{"PgClassExpression[31∈4] ➊<br />ᐸ__relational_posts__ᐳ"}}:::plan
+    Access30 --> PgClassExpression31
+    PgClassExpression31 --> PgFromExpression36
+    First37{{"First[37∈4] ➊"}}:::plan
+    PgSelectRows38[["PgSelectRows[38∈4] ➊"]]:::plan
+    PgSelectRows38 --> First37
+    PgSelect32 --> PgSelectRows38
+    PgSelectSingle39{{"PgSelectSingle[39∈4] ➊<br />ᐸrelational_postsᐳ"}}:::plan
+    First37 --> PgSelectSingle39
+    PgSelectInlineApply107["PgSelectInlineApply[107∈4] ➊"]:::plan
+    PgSelectInlineApply107 --> PgSelectInlineApply111
+    Access112{{"Access[112∈4] ➊<br />ᐸ32.m.joinDetailsFor79ᐳ"}}:::plan
+    PgSelect32 --> Access112
+    Access117{{"Access[117∈4] ➊<br />ᐸ32.m.joinDetailsFor70ᐳ"}}:::plan
+    PgSelect32 --> Access117
     List96{{"List[96∈5] ➊<br />ᐸ95,58ᐳ"}}:::plan
     Access95{{"Access[95∈5] ➊<br />ᐸ101.m.joinDetailsFor60ᐳ"}}:::plan
     PgSelectSingle58{{"PgSelectSingle[58∈5] ➊<br />ᐸrelational_itemsᐳ"}}:::plan
@@ -106,43 +139,6 @@ graph TD
     List96 --> Lambda97
     List100 --> Lambda101
     List105 --> Lambda106
-    PgClassExpression90{{"PgClassExpression[90∈7] ➊<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
-    PgSelectSingle64 --> PgClassExpression90
-    PgClassExpression91{{"PgClassExpression[91∈7] ➊<br />ᐸ__people__.”username”ᐳ"}}:::plan
-    PgSelectSingle64 --> PgClassExpression91
-    PgDeleteSingle14[["PgDeleteSingle[14∈2] ➊<br />ᐸrelational_posts(id)ᐳ"]]:::sideeffectplan
-    Object17{{"Object[17∈2] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object17 & Constant121 --> PgDeleteSingle14
-    Access15{{"Access[15∈2] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access16{{"Access[16∈2] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
-    Access15 & Access16 --> Object17
-    __Value2 --> Access15
-    __Value2 --> Access16
-    PgSelect32[["PgSelect[32∈4] ➊<br />ᐸrelational_postsᐳ"]]:::plan
-    PgFromExpression36{{"PgFromExpression[36∈4] ➊"}}:::plan
-    PgSelectInlineApply111["PgSelectInlineApply[111∈4] ➊"]:::plan
-    PgFromExpression115{{"PgFromExpression[115∈4] ➊"}}:::plan
-    PgSelectInlineApply116["PgSelectInlineApply[116∈4] ➊"]:::plan
-    Object17 & PgFromExpression36 & PgSelectInlineApply111 & PgFromExpression115 & PgSelectInlineApply116 --> PgSelect32
-    PgClassExpression29{{"PgClassExpression[29∈4] ➊<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
-    Access30{{"Access[30∈4] ➊<br />ᐸ14.tᐳ"}}:::plan
-    Access30 --> PgClassExpression29
-    PgDeleteSingle14 --> Access30
-    PgClassExpression31{{"PgClassExpression[31∈4] ➊<br />ᐸ__relational_posts__ᐳ"}}:::plan
-    Access30 --> PgClassExpression31
-    PgClassExpression31 --> PgFromExpression36
-    First37{{"First[37∈4] ➊"}}:::plan
-    PgSelectRows38[["PgSelectRows[38∈4] ➊"]]:::plan
-    PgSelectRows38 --> First37
-    PgSelect32 --> PgSelectRows38
-    PgSelectSingle39{{"PgSelectSingle[39∈4] ➊<br />ᐸrelational_postsᐳ"}}:::plan
-    First37 --> PgSelectSingle39
-    PgSelectInlineApply107["PgSelectInlineApply[107∈4] ➊"]:::plan
-    PgSelectInlineApply107 --> PgSelectInlineApply111
-    Access112{{"Access[112∈4] ➊<br />ᐸ32.m.joinDetailsFor79ᐳ"}}:::plan
-    PgSelect32 --> Access112
-    Access117{{"Access[117∈4] ➊<br />ᐸ32.m.joinDetailsFor70ᐳ"}}:::plan
-    PgSelect32 --> Access117
     List109{{"List[109∈6] ➊<br />ᐸ108,83ᐳ"}}:::plan
     Access108{{"Access[108∈6] ➊<br />ᐸ114.m.joinDetailsFor85ᐳ"}}:::plan
     PgSelectSingle83{{"PgSelectSingle[83∈6] ➊<br />ᐸrelational_itemsᐳ"}}:::plan
@@ -185,6 +181,10 @@ graph TD
     List109 --> Lambda110
     List113 --> Lambda114
     List118 --> Lambda119
+    PgClassExpression90{{"PgClassExpression[90∈7] ➊<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
+    PgSelectSingle64 --> PgClassExpression90
+    PgClassExpression91{{"PgClassExpression[91∈7] ➊<br />ᐸ__people__.”username”ᐳ"}}:::plan
+    PgSelectSingle64 --> PgClassExpression91
     PgClassExpression92{{"PgClassExpression[92∈8] ➊<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
     PgSelectSingle89 --> PgClassExpression92
     PgClassExpression93{{"PgClassExpression[93∈8] ➊<br />ᐸ__people__.”username”ᐳ"}}:::plan

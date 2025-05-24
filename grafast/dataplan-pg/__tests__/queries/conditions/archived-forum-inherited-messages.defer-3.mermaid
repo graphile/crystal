@@ -68,12 +68,24 @@ graph TD
     Object11 & PgClassExpression19 & PgClassExpression25 & Lambda28 & Connection24 & PgSelectInlineApply61 --> PgSelect29
     PgSelectRows31[["PgSelectRows[31∈4]"]]:::plan
     PgSelect29 --> PgSelectRows31
+    PgSelect30[["PgSelect[30∈5]<br />ᐸmessagesᐳ"]]:::plan
+    Object11 & PgClassExpression19 & PgClassExpression25 & Lambda28 & Connection24 & PgSelectInlineApply65 --> PgSelect30
+    PgSelectRows32[["PgSelectRows[32∈5]"]]:::plan
+    PgSelect30 --> PgSelectRows32
     __Item33[/"__Item[33∈6]<br />ᐸ31ᐳ"\]:::itemplan
     PgSelectRows31 ==> __Item33
     PgSelectSingle34{{"PgSelectSingle[34∈6]<br />ᐸmessagesᐳ"}}:::plan
     __Item33 --> PgSelectSingle34
     Access62{{"Access[62∈6]<br />ᐸ29.m.joinDetailsFor39ᐳ"}}:::plan
     PgSelect29 --> Access62
+    __Item35[/"__Item[35∈7]<br />ᐸ32ᐳ"\]:::itemplan
+    PgSelectRows32 ==> __Item35
+    PgSelectSingle36{{"PgSelectSingle[36∈7]<br />ᐸmessagesᐳ"}}:::plan
+    __Item35 --> PgSelectSingle36
+    Access46{{"Access[46∈7]<br />ᐸ30.cursorDetailsᐳ"}}:::plan
+    PgSelect30 --> Access46
+    Access66{{"Access[66∈7]<br />ᐸ30.m.joinDetailsFor52ᐳ"}}:::plan
+    PgSelect30 --> Access66
     List63{{"List[63∈8]<br />ᐸ62,34ᐳ"}}:::plan
     Access62 & PgSelectSingle34 --> List63
     PgClassExpression37{{"PgClassExpression[37∈8]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
@@ -86,22 +98,6 @@ graph TD
     PgSelectSingle45{{"PgSelectSingle[45∈8]<br />ᐸusersᐳ"}}:::plan
     First43 --> PgSelectSingle45
     List63 --> Lambda64
-    PgClassExpression48{{"PgClassExpression[48∈10]<br />ᐸ__users__.”username”ᐳ"}}:::plan
-    PgSelectSingle45 --> PgClassExpression48
-    PgClassExpression49{{"PgClassExpression[49∈10]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
-    PgSelectSingle45 --> PgClassExpression49
-    PgSelect30[["PgSelect[30∈5]<br />ᐸmessagesᐳ"]]:::plan
-    Object11 & PgClassExpression19 & PgClassExpression25 & Lambda28 & Connection24 & PgSelectInlineApply65 --> PgSelect30
-    PgSelectRows32[["PgSelectRows[32∈5]"]]:::plan
-    PgSelect30 --> PgSelectRows32
-    __Item35[/"__Item[35∈7]<br />ᐸ32ᐳ"\]:::itemplan
-    PgSelectRows32 ==> __Item35
-    PgSelectSingle36{{"PgSelectSingle[36∈7]<br />ᐸmessagesᐳ"}}:::plan
-    __Item35 --> PgSelectSingle36
-    Access46{{"Access[46∈7]<br />ᐸ30.cursorDetailsᐳ"}}:::plan
-    PgSelect30 --> Access46
-    Access66{{"Access[66∈7]<br />ᐸ30.m.joinDetailsFor52ᐳ"}}:::plan
-    PgSelect30 --> Access66
     PgCursor47{{"PgCursor[47∈9]"}}:::plan
     PgSelectSingle36 & Access46 --> PgCursor47
     List67{{"List[67∈9]<br />ᐸ66,36ᐳ"}}:::plan
@@ -116,6 +112,10 @@ graph TD
     PgSelectSingle58{{"PgSelectSingle[58∈9]<br />ᐸusersᐳ"}}:::plan
     First56 --> PgSelectSingle58
     List67 --> Lambda68
+    PgClassExpression48{{"PgClassExpression[48∈10]<br />ᐸ__users__.”username”ᐳ"}}:::plan
+    PgSelectSingle45 --> PgClassExpression48
+    PgClassExpression49{{"PgClassExpression[49∈10]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
+    PgSelectSingle45 --> PgClassExpression49
     PgClassExpression59{{"PgClassExpression[59∈11]<br />ᐸ__users__.”username”ᐳ"}}:::plan
     PgSelectSingle58 --> PgClassExpression59
     PgClassExpression60{{"PgClassExpression[60∈11]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan

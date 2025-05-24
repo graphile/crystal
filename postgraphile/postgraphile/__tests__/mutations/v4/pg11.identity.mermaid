@@ -60,12 +60,6 @@ graph TD
     Object13 & ApplyInput14 --> PgInsertSingle10
     Object15{{"Object[15∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle10 --> Object15
-    PgClassExpression37{{"PgClassExpression[37∈7] ➊<br />ᐸ__always_a...ity__.”id”ᐳ"}}:::plan
-    Access38{{"Access[38∈7] ➊<br />ᐸ10.tᐳ"}}:::plan
-    Access38 --> PgClassExpression37
-    PgInsertSingle10 --> Access38
-    PgClassExpression39{{"PgClassExpression[39∈7] ➊<br />ᐸ__always_a...tity__.”t”ᐳ"}}:::plan
-    Access38 --> PgClassExpression39
     PgInsertSingle20[["PgInsertSingle[20∈2] ➊<br />ᐸby_default_as_identity()ᐳ"]]:::sideeffectplan
     Object23{{"Object[23∈2] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object23 & ApplyInput24 --> PgInsertSingle20
@@ -76,12 +70,6 @@ graph TD
     __Value2 --> Access22
     Object25{{"Object[25∈2] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle20 --> Object25
-    PgClassExpression40{{"PgClassExpression[40∈8] ➊<br />ᐸ__by_defau...ity__.”id”ᐳ"}}:::plan
-    Access41{{"Access[41∈8] ➊<br />ᐸ20.tᐳ"}}:::plan
-    Access41 --> PgClassExpression40
-    PgInsertSingle20 --> Access41
-    PgClassExpression42{{"PgClassExpression[42∈8] ➊<br />ᐸ__by_defau...tity__.”t”ᐳ"}}:::plan
-    Access41 --> PgClassExpression42
     PgInsertSingle31[["PgInsertSingle[31∈3] ➊<br />ᐸby_default_as_identity()ᐳ"]]:::sideeffectplan
     Object34{{"Object[34∈3] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object34 & ApplyInput35 --> PgInsertSingle31
@@ -92,6 +80,18 @@ graph TD
     __Value2 --> Access33
     Object36{{"Object[36∈3] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle31 --> Object36
+    PgClassExpression37{{"PgClassExpression[37∈7] ➊<br />ᐸ__always_a...ity__.”id”ᐳ"}}:::plan
+    Access38{{"Access[38∈7] ➊<br />ᐸ10.tᐳ"}}:::plan
+    Access38 --> PgClassExpression37
+    PgInsertSingle10 --> Access38
+    PgClassExpression39{{"PgClassExpression[39∈7] ➊<br />ᐸ__always_a...tity__.”t”ᐳ"}}:::plan
+    Access38 --> PgClassExpression39
+    PgClassExpression40{{"PgClassExpression[40∈8] ➊<br />ᐸ__by_defau...ity__.”id”ᐳ"}}:::plan
+    Access41{{"Access[41∈8] ➊<br />ᐸ20.tᐳ"}}:::plan
+    Access41 --> PgClassExpression40
+    PgInsertSingle20 --> Access41
+    PgClassExpression42{{"PgClassExpression[42∈8] ➊<br />ᐸ__by_defau...tity__.”t”ᐳ"}}:::plan
+    Access41 --> PgClassExpression42
     PgClassExpression43{{"PgClassExpression[43∈9] ➊<br />ᐸ__by_defau...ity__.”id”ᐳ"}}:::plan
     Access44{{"Access[44∈9] ➊<br />ᐸ31.tᐳ"}}:::plan
     Access44 --> PgClassExpression43

@@ -113,10 +113,30 @@ graph TD
     Constant119 --> Connection63
     Access115{{"Access[115∈7]^<br />ᐸ71.itemsᐳ"}}:::plan
     PgUnionAll71 --> Access115
+    PgUnionAll72[["PgUnionAll[72∈8]^<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ"]]:::plan
+    PgClassExpression64{{"PgClassExpression[64∈8]^<br />ᐸ__gcp_appl...ons__.”id”ᐳ"}}:::plan
+    Connection70{{"Connection[70∈8] ➊<br />ᐸ66ᐳ<br />ᐳGcpApplication"}}:::plan
+    Object12 & PgClassExpression64 & Connection70 & Constant119 --> PgUnionAll72
+    PgSelect50[["PgSelect[50∈8]<br />ᐸgcp_applicationsᐳ<br />ᐳGcpApplication"]]:::plan
+    Object12 & Access41 --> PgSelect50
+    First54{{"First[54∈8]^"}}:::plan
+    PgSelectRows55[["PgSelectRows[55∈8]^"]]:::plan
+    PgSelectRows55 --> First54
+    PgSelect50 --> PgSelectRows55
+    PgSelectSingle56{{"PgSelectSingle[56∈8]^<br />ᐸgcp_applicationsᐳ"}}:::plan
+    First54 --> PgSelectSingle56
+    PgSelectSingle56 --> PgClassExpression64
+    Constant119 --> Connection70
+    Access116{{"Access[116∈8]^<br />ᐸ72.itemsᐳ"}}:::plan
+    PgUnionAll72 --> Access116
     __Item75[/"__Item[75∈9]<br />ᐸ115ᐳ<br />ᐳAwsApplication"\]:::itemplan
     Access115 ==> __Item75
     Access79{{"Access[79∈9]<br />ᐸ71.cursorDetailsᐳ<br />ᐳAwsApplication"}}:::plan
     PgUnionAll71 --> Access79
+    __Item77[/"__Item[77∈10]<br />ᐸ116ᐳ<br />ᐳGcpApplication"\]:::itemplan
+    Access116 ==> __Item77
+    Access81{{"Access[81∈10]<br />ᐸ72.cursorDetailsᐳ<br />ᐳGcpApplication"}}:::plan
+    PgUnionAll72 --> Access81
     List86{{"List[86∈11]^<br />ᐸ83,84,85ᐳ"}}:::plan
     Access83{{"Access[83∈11]<br />ᐸ75.0ᐳ<br />ᐳAwsApplication"}}:::plan
     Access84{{"Access[84∈11]<br />ᐸ75.1ᐳ<br />ᐳAwsApplication"}}:::plan
@@ -127,6 +147,16 @@ graph TD
     __Item75 --> Access84
     Lambda87{{"Lambda[87∈11]^<br />ᐸtoSpecifierᐳ"}}:::plan
     List86 --> Lambda87
+    List91{{"List[91∈12]^<br />ᐸ88,89,90ᐳ"}}:::plan
+    Access88{{"Access[88∈12]<br />ᐸ77.0ᐳ<br />ᐳGcpApplication"}}:::plan
+    Access89{{"Access[89∈12]<br />ᐸ77.1ᐳ<br />ᐳGcpApplication"}}:::plan
+    Access88 & Access89 & Constant90 --> List91
+    PgCursor82{{"PgCursor[82∈12]<br />ᐳGcpApplication"}}:::plan
+    __Item77 & Access81 --> PgCursor82
+    __Item77 --> Access88
+    __Item77 --> Access89
+    Lambda92{{"Lambda[92∈12]^<br />ᐸtoSpecifierᐳ"}}:::plan
+    List91 --> Lambda92
     Access94{{"Access[94∈13]^<br />ᐸ93.__typenameᐳ"}}:::plan
     __Value93:::plan@{shape: docs, label: "__Combined[93∈13]<br />ᐳAwsApplication<br />ᐳGcpApplication"}
     __Value93 --> Access94
@@ -152,36 +182,6 @@ graph TD
     First108 --> PgSelectSingle110
     PgClassExpression112{{"PgClassExpression[112∈16]^<br />ᐸ__third_pa...ies__.”id”ᐳ"}}:::plan
     PgSelectSingle110 --> PgClassExpression112
-    PgUnionAll72[["PgUnionAll[72∈8]^<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ"]]:::plan
-    PgClassExpression64{{"PgClassExpression[64∈8]^<br />ᐸ__gcp_appl...ons__.”id”ᐳ"}}:::plan
-    Connection70{{"Connection[70∈8] ➊<br />ᐸ66ᐳ<br />ᐳGcpApplication"}}:::plan
-    Object12 & PgClassExpression64 & Connection70 & Constant119 --> PgUnionAll72
-    PgSelect50[["PgSelect[50∈8]<br />ᐸgcp_applicationsᐳ<br />ᐳGcpApplication"]]:::plan
-    Object12 & Access41 --> PgSelect50
-    First54{{"First[54∈8]^"}}:::plan
-    PgSelectRows55[["PgSelectRows[55∈8]^"]]:::plan
-    PgSelectRows55 --> First54
-    PgSelect50 --> PgSelectRows55
-    PgSelectSingle56{{"PgSelectSingle[56∈8]^<br />ᐸgcp_applicationsᐳ"}}:::plan
-    First54 --> PgSelectSingle56
-    PgSelectSingle56 --> PgClassExpression64
-    Constant119 --> Connection70
-    Access116{{"Access[116∈8]^<br />ᐸ72.itemsᐳ"}}:::plan
-    PgUnionAll72 --> Access116
-    __Item77[/"__Item[77∈10]<br />ᐸ116ᐳ<br />ᐳGcpApplication"\]:::itemplan
-    Access116 ==> __Item77
-    Access81{{"Access[81∈10]<br />ᐸ72.cursorDetailsᐳ<br />ᐳGcpApplication"}}:::plan
-    PgUnionAll72 --> Access81
-    List91{{"List[91∈12]^<br />ᐸ88,89,90ᐳ"}}:::plan
-    Access88{{"Access[88∈12]<br />ᐸ77.0ᐳ<br />ᐳGcpApplication"}}:::plan
-    Access89{{"Access[89∈12]<br />ᐸ77.1ᐳ<br />ᐳGcpApplication"}}:::plan
-    Access88 & Access89 & Constant90 --> List91
-    PgCursor82{{"PgCursor[82∈12]<br />ᐳGcpApplication"}}:::plan
-    __Item77 & Access81 --> PgCursor82
-    __Item77 --> Access88
-    __Item77 --> Access89
-    Lambda92{{"Lambda[92∈12]^<br />ᐸtoSpecifierᐳ"}}:::plan
-    List91 --> Lambda92
 
     %% define steps
     classDef bucket0 stroke:#696969

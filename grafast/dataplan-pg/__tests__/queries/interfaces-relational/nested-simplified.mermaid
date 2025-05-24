@@ -91,6 +91,38 @@ graph TD
     PgSelect30 --> PgSelectRows35
     PgSelectSingle36{{"PgSelectSingle[36∈5]^<br />ᐸrelational_topicsᐳ"}}:::plan
     First34 --> PgSelectSingle36
+    PgSelect38[["PgSelect[38∈6]<br />ᐸrelational_postsᐳ<br />ᐳRelationalPost"]]:::plan
+    Object10 & PgClassExpression25 --> PgSelect38
+    First42{{"First[42∈6]^"}}:::plan
+    PgSelectRows43[["PgSelectRows[43∈6]^"]]:::plan
+    PgSelectRows43 --> First42
+    PgSelect38 --> PgSelectRows43
+    PgSelectSingle44{{"PgSelectSingle[44∈6]^<br />ᐸrelational_postsᐳ"}}:::plan
+    First42 --> PgSelectSingle44
+    PgSelect46[["PgSelect[46∈7]<br />ᐸrelational_dividersᐳ<br />ᐳRelationalDivider"]]:::plan
+    Object10 & PgClassExpression25 --> PgSelect46
+    First50{{"First[50∈7]^"}}:::plan
+    PgSelectRows51[["PgSelectRows[51∈7]^"]]:::plan
+    PgSelectRows51 --> First50
+    PgSelect46 --> PgSelectRows51
+    PgSelectSingle52{{"PgSelectSingle[52∈7]^<br />ᐸrelational_dividersᐳ"}}:::plan
+    First50 --> PgSelectSingle52
+    PgSelect54[["PgSelect[54∈8]<br />ᐸrelational_checklistsᐳ<br />ᐳRelationalChecklist"]]:::plan
+    Object10 & PgClassExpression25 --> PgSelect54
+    First58{{"First[58∈8]^"}}:::plan
+    PgSelectRows59[["PgSelectRows[59∈8]^"]]:::plan
+    PgSelectRows59 --> First58
+    PgSelect54 --> PgSelectRows59
+    PgSelectSingle60{{"PgSelectSingle[60∈8]^<br />ᐸrelational_checklistsᐳ"}}:::plan
+    First58 --> PgSelectSingle60
+    PgSelect62[["PgSelect[62∈9]<br />ᐸrelational_checklist_itemsᐳ<br />ᐳRelationalChecklistItem"]]:::plan
+    Object10 & PgClassExpression25 --> PgSelect62
+    First66{{"First[66∈9]^"}}:::plan
+    PgSelectRows67[["PgSelectRows[67∈9]^"]]:::plan
+    PgSelectRows67 --> First66
+    PgSelect62 --> PgSelectRows67
+    PgSelectSingle68{{"PgSelectSingle[68∈9]^<br />ᐸrelational_checklist_itemsᐳ"}}:::plan
+    First66 --> PgSelectSingle68
     List245{{"List[245∈10]<br />ᐸ244,24ᐳ"}}:::plan
     Access244{{"Access[244∈10]<br />ᐸ250.m.joinDetailsFor73ᐳ"}}:::plan
     Access244 & PgSelectSingle24 --> List245
@@ -151,38 +183,6 @@ graph TD
     PgSelect161 --> PgSelectRows166
     PgSelectSingle167{{"PgSelectSingle[167∈16]^<br />ᐸrelational_checklist_itemsᐳ"}}:::plan
     First165 --> PgSelectSingle167
-    PgSelect38[["PgSelect[38∈6]<br />ᐸrelational_postsᐳ<br />ᐳRelationalPost"]]:::plan
-    Object10 & PgClassExpression25 --> PgSelect38
-    First42{{"First[42∈6]^"}}:::plan
-    PgSelectRows43[["PgSelectRows[43∈6]^"]]:::plan
-    PgSelectRows43 --> First42
-    PgSelect38 --> PgSelectRows43
-    PgSelectSingle44{{"PgSelectSingle[44∈6]^<br />ᐸrelational_postsᐳ"}}:::plan
-    First42 --> PgSelectSingle44
-    PgSelect46[["PgSelect[46∈7]<br />ᐸrelational_dividersᐳ<br />ᐳRelationalDivider"]]:::plan
-    Object10 & PgClassExpression25 --> PgSelect46
-    First50{{"First[50∈7]^"}}:::plan
-    PgSelectRows51[["PgSelectRows[51∈7]^"]]:::plan
-    PgSelectRows51 --> First50
-    PgSelect46 --> PgSelectRows51
-    PgSelectSingle52{{"PgSelectSingle[52∈7]^<br />ᐸrelational_dividersᐳ"}}:::plan
-    First50 --> PgSelectSingle52
-    PgSelect54[["PgSelect[54∈8]<br />ᐸrelational_checklistsᐳ<br />ᐳRelationalChecklist"]]:::plan
-    Object10 & PgClassExpression25 --> PgSelect54
-    First58{{"First[58∈8]^"}}:::plan
-    PgSelectRows59[["PgSelectRows[59∈8]^"]]:::plan
-    PgSelectRows59 --> First58
-    PgSelect54 --> PgSelectRows59
-    PgSelectSingle60{{"PgSelectSingle[60∈8]^<br />ᐸrelational_checklistsᐳ"}}:::plan
-    First58 --> PgSelectSingle60
-    PgSelect62[["PgSelect[62∈9]<br />ᐸrelational_checklist_itemsᐳ<br />ᐳRelationalChecklistItem"]]:::plan
-    Object10 & PgClassExpression25 --> PgSelect62
-    First66{{"First[66∈9]^"}}:::plan
-    PgSelectRows67[["PgSelectRows[67∈9]^"]]:::plan
-    PgSelectRows67 --> First66
-    PgSelect62 --> PgSelectRows67
-    PgSelectSingle68{{"PgSelectSingle[68∈9]^<br />ᐸrelational_checklist_itemsᐳ"}}:::plan
-    First66 --> PgSelectSingle68
 
     %% define steps
     classDef bucket0 stroke:#696969

@@ -112,6 +112,14 @@ graph TD
     __Item42 --> PgSelectSingle43
     Access80{{"Access[80∈4]<br />ᐸ31.m.joinDetailsFor57ᐳ"}}:::plan
     PgSelect31 --> Access80
+    __Item44[/"__Item[44∈5]<br />ᐸ41ᐳ"\]:::itemplan
+    PgSelectRows41 ==> __Item44
+    PgSelectSingle45{{"PgSelectSingle[45∈5]<br />ᐸmessagesᐳ"}}:::plan
+    __Item44 --> PgSelectSingle45
+    Access64{{"Access[64∈5]<br />ᐸ32.cursorDetailsᐳ"}}:::plan
+    PgSelect32 --> Access64
+    Access84{{"Access[84∈5]<br />ᐸ32.m.joinDetailsFor70ᐳ"}}:::plan
+    PgSelect32 --> Access84
     List81{{"List[81∈6]<br />ᐸ80,43ᐳ"}}:::plan
     Access80 & PgSelectSingle43 --> List81
     PgClassExpression55{{"PgClassExpression[55∈6]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
@@ -124,18 +132,6 @@ graph TD
     PgSelectSingle63{{"PgSelectSingle[63∈6]<br />ᐸusersᐳ"}}:::plan
     First61 --> PgSelectSingle63
     List81 --> Lambda82
-    PgClassExpression66{{"PgClassExpression[66∈8]<br />ᐸ__users__.”username”ᐳ"}}:::plan
-    PgSelectSingle63 --> PgClassExpression66
-    PgClassExpression67{{"PgClassExpression[67∈8]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
-    PgSelectSingle63 --> PgClassExpression67
-    __Item44[/"__Item[44∈5]<br />ᐸ41ᐳ"\]:::itemplan
-    PgSelectRows41 ==> __Item44
-    PgSelectSingle45{{"PgSelectSingle[45∈5]<br />ᐸmessagesᐳ"}}:::plan
-    __Item44 --> PgSelectSingle45
-    Access64{{"Access[64∈5]<br />ᐸ32.cursorDetailsᐳ"}}:::plan
-    PgSelect32 --> Access64
-    Access84{{"Access[84∈5]<br />ᐸ32.m.joinDetailsFor70ᐳ"}}:::plan
-    PgSelect32 --> Access84
     PgCursor65{{"PgCursor[65∈7]"}}:::plan
     PgSelectSingle45 & Access64 --> PgCursor65
     List85{{"List[85∈7]<br />ᐸ84,45ᐳ"}}:::plan
@@ -150,6 +146,10 @@ graph TD
     PgSelectSingle76{{"PgSelectSingle[76∈7]<br />ᐸusersᐳ"}}:::plan
     First74 --> PgSelectSingle76
     List85 --> Lambda86
+    PgClassExpression66{{"PgClassExpression[66∈8]<br />ᐸ__users__.”username”ᐳ"}}:::plan
+    PgSelectSingle63 --> PgClassExpression66
+    PgClassExpression67{{"PgClassExpression[67∈8]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
+    PgSelectSingle63 --> PgClassExpression67
     PgClassExpression77{{"PgClassExpression[77∈9]<br />ᐸ__users__.”username”ᐳ"}}:::plan
     PgSelectSingle76 --> PgClassExpression77
     PgClassExpression78{{"PgClassExpression[78∈9]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan

@@ -39,10 +39,20 @@ graph TD
     PgSelect19 --> PgSelectRows21
     Access27{{"Access[27∈1] ➊<br />ᐸ19.cursorDetailsᐳ"}}:::plan
     PgSelect19 --> Access27
+    PgSelect20[["PgSelect[20∈2] ➊<br />ᐸtestviewᐳ"]]:::plan
+    Object11 & Connection17 --> PgSelect20
+    PgSelectRows22[["PgSelectRows[22∈2] ➊"]]:::plan
+    PgSelect20 --> PgSelectRows22
+    Access29{{"Access[29∈2] ➊<br />ᐸ20.cursorDetailsᐳ"}}:::plan
+    PgSelect20 --> Access29
     __Item23[/"__Item[23∈3]<br />ᐸ21ᐳ"\]:::itemplan
     PgSelectRows21 ==> __Item23
     PgSelectSingle24{{"PgSelectSingle[24∈3]<br />ᐸtestviewᐳ"}}:::plan
     __Item23 --> PgSelectSingle24
+    __Item25[/"__Item[25∈4]<br />ᐸ22ᐳ"\]:::itemplan
+    PgSelectRows22 ==> __Item25
+    PgSelectSingle26{{"PgSelectSingle[26∈4]<br />ᐸtestviewᐳ"}}:::plan
+    __Item25 --> PgSelectSingle26
     PgCursor28{{"PgCursor[28∈5]"}}:::plan
     PgSelectSingle24 & Access27 --> PgCursor28
     PgClassExpression31{{"PgClassExpression[31∈5]<br />ᐸ__testview...estviewid”ᐳ"}}:::plan
@@ -51,16 +61,6 @@ graph TD
     PgSelectSingle24 --> PgClassExpression32
     PgClassExpression33{{"PgClassExpression[33∈5]<br />ᐸ__testview__.”col2”ᐳ"}}:::plan
     PgSelectSingle24 --> PgClassExpression33
-    PgSelect20[["PgSelect[20∈2] ➊<br />ᐸtestviewᐳ"]]:::plan
-    Object11 & Connection17 --> PgSelect20
-    PgSelectRows22[["PgSelectRows[22∈2] ➊"]]:::plan
-    PgSelect20 --> PgSelectRows22
-    Access29{{"Access[29∈2] ➊<br />ᐸ20.cursorDetailsᐳ"}}:::plan
-    PgSelect20 --> Access29
-    __Item25[/"__Item[25∈4]<br />ᐸ22ᐳ"\]:::itemplan
-    PgSelectRows22 ==> __Item25
-    PgSelectSingle26{{"PgSelectSingle[26∈4]<br />ᐸtestviewᐳ"}}:::plan
-    __Item25 --> PgSelectSingle26
     PgCursor30{{"PgCursor[30∈6]"}}:::plan
     PgSelectSingle26 & Access29 --> PgCursor30
     PgClassExpression34{{"PgClassExpression[34∈6]<br />ᐸ__testview...estviewid”ᐳ"}}:::plan

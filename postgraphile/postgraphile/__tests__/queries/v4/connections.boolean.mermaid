@@ -79,18 +79,6 @@ graph TD
     Object56 --> Lambda57
     Lambda61{{"Lambda[61∈1] ➊<br />ᐸhasPreviousPageCbᐳ"}}:::plan
     Object60 --> Lambda61
-    __Item62[/"__Item[62∈3]<br />ᐸ39ᐳ"\]:::itemplan
-    PgSelectRows39 ==> __Item62
-    PgSelectSingle63{{"PgSelectSingle[63∈3]<br />ᐸcompound_keyᐳ"}}:::plan
-    __Item62 --> PgSelectSingle63
-    PgCursor88{{"PgCursor[88∈5]"}}:::plan
-    PgSelectSingle63 & Access45 --> PgCursor88
-    PgClassExpression91{{"PgClassExpression[91∈5]<br />ᐸ__compound...__.”extra”ᐳ"}}:::plan
-    PgSelectSingle63 --> PgClassExpression91
-    PgClassExpression92{{"PgClassExpression[92∈5]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
-    PgSelectSingle63 --> PgClassExpression92
-    PgClassExpression93{{"PgClassExpression[93∈5]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
-    PgSelectSingle63 --> PgClassExpression93
     PgSelect31[["PgSelect[31∈2] ➊<br />ᐸcompound_key+1ᐳ"]]:::plan
     Object12 & Connection20 & Lambda21 & Constant97 --> PgSelect31
     Object83{{"Object[83∈2] ➊<br />ᐸ{first,last,offset,hasMore}ᐳ"}}:::plan
@@ -131,10 +119,22 @@ graph TD
     Object79 --> Lambda80
     Lambda84{{"Lambda[84∈2] ➊<br />ᐸhasPreviousPageCbᐳ"}}:::plan
     Object83 --> Lambda84
+    __Item62[/"__Item[62∈3]<br />ᐸ39ᐳ"\]:::itemplan
+    PgSelectRows39 ==> __Item62
+    PgSelectSingle63{{"PgSelectSingle[63∈3]<br />ᐸcompound_keyᐳ"}}:::plan
+    __Item62 --> PgSelectSingle63
     __Item85[/"__Item[85∈4]<br />ᐸ40ᐳ"\]:::itemplan
     PgSelectRows40 ==> __Item85
     PgSelectSingle86{{"PgSelectSingle[86∈4]<br />ᐸcompound_keyᐳ"}}:::plan
     __Item85 --> PgSelectSingle86
+    PgCursor88{{"PgCursor[88∈5]"}}:::plan
+    PgSelectSingle63 & Access45 --> PgCursor88
+    PgClassExpression91{{"PgClassExpression[91∈5]<br />ᐸ__compound...__.”extra”ᐳ"}}:::plan
+    PgSelectSingle63 --> PgClassExpression91
+    PgClassExpression92{{"PgClassExpression[92∈5]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
+    PgSelectSingle63 --> PgClassExpression92
+    PgClassExpression93{{"PgClassExpression[93∈5]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
+    PgSelectSingle63 --> PgClassExpression93
     PgCursor90{{"PgCursor[90∈6]"}}:::plan
     PgSelectSingle86 & Access68 --> PgCursor90
     PgClassExpression94{{"PgClassExpression[94∈6]<br />ᐸ__compound...__.”extra”ᐳ"}}:::plan

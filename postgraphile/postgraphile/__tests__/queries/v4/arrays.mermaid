@@ -109,6 +109,14 @@ graph TD
     PgSelectRows35 ==> __Item45
     PgSelectSingle46{{"PgSelectSingle[46∈10]<br />ᐸfrmcdc_compoundTypeᐳ"}}:::plan
     __Item45 --> PgSelectSingle46
+    __Item47[/"__Item[47∈11]<br />ᐸ36ᐳ"\]:::itemplan
+    PgSelectRows36 ==> __Item47
+    PgSelectSingle48{{"PgSelectSingle[48∈11]<br />ᐸfrmcdc_compoundTypeᐳ"}}:::plan
+    __Item47 --> PgSelectSingle48
+    __Item49[/"__Item[49∈12]<br />ᐸ33ᐳ"\]:::itemplan
+    PgClassExpression33 ==> __Item49
+    __Item50[/"__Item[50∈13]<br />ᐸ34ᐳ"\]:::itemplan
+    PgClassExpression34 ==> __Item50
     PgClassExpression51{{"PgClassExpression[51∈14]<br />ᐸ__frmcdc_c...type__.”a”ᐳ"}}:::plan
     PgSelectSingle46 --> PgClassExpression51
     PgClassExpression52{{"PgClassExpression[52∈14]<br />ᐸ__frmcdc_c...type__.”b”ᐳ"}}:::plan
@@ -123,10 +131,6 @@ graph TD
     PgSelectSingle46 --> PgClassExpression56
     PgClassExpression57{{"PgClassExpression[57∈14]<br />ᐸ__frmcdc_c....”foo_bar”ᐳ"}}:::plan
     PgSelectSingle46 --> PgClassExpression57
-    __Item47[/"__Item[47∈11]<br />ᐸ36ᐳ"\]:::itemplan
-    PgSelectRows36 ==> __Item47
-    PgSelectSingle48{{"PgSelectSingle[48∈11]<br />ᐸfrmcdc_compoundTypeᐳ"}}:::plan
-    __Item47 --> PgSelectSingle48
     PgClassExpression58{{"PgClassExpression[58∈15]<br />ᐸ__frmcdc_c...type__.”a”ᐳ"}}:::plan
     PgSelectSingle48 --> PgClassExpression58
     PgClassExpression59{{"PgClassExpression[59∈15]<br />ᐸ__frmcdc_c...type__.”b”ᐳ"}}:::plan
@@ -141,10 +145,6 @@ graph TD
     PgSelectSingle48 --> PgClassExpression63
     PgClassExpression64{{"PgClassExpression[64∈15]<br />ᐸ__frmcdc_c....”foo_bar”ᐳ"}}:::plan
     PgSelectSingle48 --> PgClassExpression64
-    __Item49[/"__Item[49∈12]<br />ᐸ33ᐳ"\]:::itemplan
-    PgClassExpression33 ==> __Item49
-    __Item50[/"__Item[50∈13]<br />ᐸ34ᐳ"\]:::itemplan
-    PgClassExpression34 ==> __Item50
 
     %% define steps
     classDef bucket0 stroke:#696969

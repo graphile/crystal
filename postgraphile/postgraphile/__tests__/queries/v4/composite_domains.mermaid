@@ -88,20 +88,6 @@ graph TD
     PgSelectSingle40 --> PgClassExpression47
     PgClassExpression48{{"PgClassExpression[48∈5]<br />ᐸ__frmcdc_u...__.”lines”ᐳ"}}:::plan
     PgSelectSingle40 --> PgClassExpression48
-    PgSelect55[["PgSelect[55∈9]<br />ᐸfrmcdc_userUpdateContentLineNodeᐳ"]]:::plan
-    __Item54[/"__Item[54∈9]<br />ᐸ48ᐳ"\]:::itemplan
-    Object11 & __Item54 & PgFromExpression59 --> PgSelect55
-    PgClassExpression48 ==> __Item54
-    PgSelectRows60[["PgSelectRows[60∈9]"]]:::plan
-    PgSelect55 --> PgSelectRows60
-    __Item63[/"__Item[63∈10]<br />ᐸ60ᐳ"\]:::itemplan
-    PgSelectRows60 ==> __Item63
-    PgSelectSingle64{{"PgSelectSingle[64∈10]<br />ᐸfrmcdc_userUpdateContentLineNodeᐳ"}}:::plan
-    __Item63 --> PgSelectSingle64
-    PgClassExpression65{{"PgClassExpression[65∈10]<br />ᐸ__frmcdc_u...node_type”ᐳ"}}:::plan
-    PgSelectSingle64 --> PgClassExpression65
-    PgClassExpression66{{"PgClassExpression[66∈10]<br />ᐸ__frmcdc_u...node_text”ᐳ"}}:::plan
-    PgSelectSingle64 --> PgClassExpression66
     PgSelect42[["PgSelect[42∈6]<br />ᐸfrmcdc_userUpdateContentLineNodeᐳ"]]:::plan
     __Item41[/"__Item[41∈6]<br />ᐸ36ᐳ"\]:::itemplan
     Object11 & __Item41 & PgFromExpression46 --> PgSelect42
@@ -116,6 +102,20 @@ graph TD
     PgSelectSingle53 --> PgClassExpression61
     PgClassExpression62{{"PgClassExpression[62∈8]<br />ᐸ__frmcdc_u...node_text”ᐳ"}}:::plan
     PgSelectSingle53 --> PgClassExpression62
+    PgSelect55[["PgSelect[55∈9]<br />ᐸfrmcdc_userUpdateContentLineNodeᐳ"]]:::plan
+    __Item54[/"__Item[54∈9]<br />ᐸ48ᐳ"\]:::itemplan
+    Object11 & __Item54 & PgFromExpression59 --> PgSelect55
+    PgClassExpression48 ==> __Item54
+    PgSelectRows60[["PgSelectRows[60∈9]"]]:::plan
+    PgSelect55 --> PgSelectRows60
+    __Item63[/"__Item[63∈10]<br />ᐸ60ᐳ"\]:::itemplan
+    PgSelectRows60 ==> __Item63
+    PgSelectSingle64{{"PgSelectSingle[64∈10]<br />ᐸfrmcdc_userUpdateContentLineNodeᐳ"}}:::plan
+    __Item63 --> PgSelectSingle64
+    PgClassExpression65{{"PgClassExpression[65∈10]<br />ᐸ__frmcdc_u...node_type”ᐳ"}}:::plan
+    PgSelectSingle64 --> PgClassExpression65
+    PgClassExpression66{{"PgClassExpression[66∈10]<br />ᐸ__frmcdc_u...node_text”ᐳ"}}:::plan
+    PgSelectSingle64 --> PgClassExpression66
 
     %% define steps
     classDef bucket0 stroke:#696969

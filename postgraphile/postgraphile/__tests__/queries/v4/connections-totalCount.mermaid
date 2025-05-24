@@ -50,6 +50,16 @@ graph TD
     PgSelect27 --> PgSelectRows33
     Access49{{"Access[49∈2] ➊<br />ᐸ27.m.subqueryDetailsFor43ᐳ"}}:::plan
     PgSelect27 --> Access49
+    PgSelect28[["PgSelect[28∈3] ➊<br />ᐸtable_set_query(aggregate)ᐳ"]]:::plan
+    Object11 & Connection21 --> PgSelect28
+    First29{{"First[29∈3] ➊"}}:::plan
+    PgSelectRows30[["PgSelectRows[30∈3] ➊"]]:::plan
+    PgSelectRows30 --> First29
+    PgSelect28 --> PgSelectRows30
+    PgSelectSingle31{{"PgSelectSingle[31∈3] ➊<br />ᐸtable_set_queryᐳ"}}:::plan
+    First29 --> PgSelectSingle31
+    PgClassExpression32{{"PgClassExpression[32∈3] ➊<br />ᐸcount(*)ᐳ"}}:::plan
+    PgSelectSingle31 --> PgClassExpression32
     __Item34[/"__Item[34∈4]<br />ᐸ33ᐳ"\]:::itemplan
     PgSelectRows33 ==> __Item34
     PgSelectSingle35{{"PgSelectSingle[35∈4]<br />ᐸpersonᐳ"}}:::plan
@@ -66,16 +76,6 @@ graph TD
     PgClassExpression47{{"PgClassExpression[47∈5]<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle46 --> PgClassExpression47
     List50 --> Lambda51
-    PgSelect28[["PgSelect[28∈3] ➊<br />ᐸtable_set_query(aggregate)ᐳ"]]:::plan
-    Object11 & Connection21 --> PgSelect28
-    First29{{"First[29∈3] ➊"}}:::plan
-    PgSelectRows30[["PgSelectRows[30∈3] ➊"]]:::plan
-    PgSelectRows30 --> First29
-    PgSelect28 --> PgSelectRows30
-    PgSelectSingle31{{"PgSelectSingle[31∈3] ➊<br />ᐸtable_set_queryᐳ"}}:::plan
-    First29 --> PgSelectSingle31
-    PgClassExpression32{{"PgClassExpression[32∈3] ➊<br />ᐸcount(*)ᐳ"}}:::plan
-    PgSelectSingle31 --> PgClassExpression32
 
     %% define steps
     classDef bucket0 stroke:#696969

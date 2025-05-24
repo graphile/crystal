@@ -128,8 +128,6 @@ graph TD
     First72 --> PgSelectSingle74
     PgClassExpression75{{"PgClassExpression[75∈7]^<br />ᐸ__posts__.”body”ᐳ"}}:::plan
     PgSelectSingle54 --> PgClassExpression75
-    PgClassExpression92{{"PgClassExpression[92∈9]<br />ᐸ__people__.”username”ᐳ<br />ᐳPost"}}:::plan
-    PgSelectSingle74 --> PgClassExpression92
     PgSelect56[["PgSelect[56∈8]^<br />ᐸcommentsᐳ"]]:::plan
     Access55{{"Access[55∈8]<br />ᐸ37.comment_idᐳ<br />ᐳComment"}}:::plan
     Object10 & Access55 --> PgSelect56
@@ -164,6 +162,8 @@ graph TD
     First88 --> PgSelectSingle90
     PgClassExpression91{{"PgClassExpression[91∈8]^<br />ᐸ__comments__.”body”ᐳ"}}:::plan
     PgSelectSingle62 --> PgClassExpression91
+    PgClassExpression92{{"PgClassExpression[92∈9]<br />ᐸ__people__.”username”ᐳ<br />ᐳPost"}}:::plan
+    PgSelectSingle74 --> PgClassExpression92
     PgClassExpression93{{"PgClassExpression[93∈10]<br />ᐸ__people__.”username”ᐳ<br />ᐳComment"}}:::plan
     PgSelectSingle84 --> PgClassExpression93
     PgClassExpression94{{"PgClassExpression[94∈11]<br />ᐸ__posts__.”body”ᐳ<br />ᐳComment"}}:::plan

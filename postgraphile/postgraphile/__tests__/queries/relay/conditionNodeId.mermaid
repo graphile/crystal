@@ -88,10 +88,40 @@ graph TD
     PgSelect44 --> PgSelectRows48
     Access113{{"Access[113∈1] ➊<br />ᐸ44.m.joinDetailsFor61ᐳ"}}:::plan
     PgSelect44 --> Access113
+    PgSelect45[["PgSelect[45∈2] ➊<br />ᐸpostᐳ"]]:::plan
+    Object14 & ApplyInput25 & Connection24 & PgSelectInlineApply116 --> PgSelect45
+    PgSelectRows49[["PgSelectRows[49∈2] ➊"]]:::plan
+    PgSelect45 --> PgSelectRows49
+    Access117{{"Access[117∈2] ➊<br />ᐸ45.m.joinDetailsFor70ᐳ"}}:::plan
+    PgSelect45 --> Access117
+    PgSelect46[["PgSelect[46∈3] ➊<br />ᐸpostᐳ"]]:::plan
+    Object14 & ApplyInput33 & Connection32 & PgSelectInlineApply124 --> PgSelect46
+    PgSelectRows50[["PgSelectRows[50∈3] ➊"]]:::plan
+    PgSelect46 --> PgSelectRows50
+    Access125{{"Access[125∈3] ➊<br />ᐸ46.m.joinDetailsFor79ᐳ"}}:::plan
+    PgSelect46 --> Access125
+    PgSelect47[["PgSelect[47∈4] ➊<br />ᐸpostᐳ"]]:::plan
+    Object14 & ApplyInput42 & Connection41 & PgSelectInlineApply120 --> PgSelect47
+    PgSelectRows51[["PgSelectRows[51∈4] ➊"]]:::plan
+    PgSelect47 --> PgSelectRows51
+    Access121{{"Access[121∈4] ➊<br />ᐸ47.m.joinDetailsFor88ᐳ"}}:::plan
+    PgSelect47 --> Access121
     __Item52[/"__Item[52∈5]<br />ᐸ48ᐳ"\]:::itemplan
     PgSelectRows48 ==> __Item52
     PgSelectSingle53{{"PgSelectSingle[53∈5]<br />ᐸpostᐳ"}}:::plan
     __Item52 --> PgSelectSingle53
+    __Item54[/"__Item[54∈6]<br />ᐸ49ᐳ"\]:::itemplan
+    PgSelectRows49 ==> __Item54
+    PgSelectSingle55{{"PgSelectSingle[55∈6]<br />ᐸpostᐳ"}}:::plan
+    __Item54 --> PgSelectSingle55
+    __Item56[/"__Item[56∈7]<br />ᐸ50ᐳ"\]:::itemplan
+    PgSelectRows50 ==> __Item56
+    PgSelectSingle57{{"PgSelectSingle[57∈7]<br />ᐸpostᐳ"}}:::plan
+    __Item56 --> PgSelectSingle57
+    __Item58[/"__Item[58∈8]<br />ᐸ51ᐳ"\]:::itemplan
+    PgSelectRows51 ==> __Item58
+    PgSelectSingle59{{"PgSelectSingle[59∈8]<br />ᐸpostᐳ"}}:::plan
+    __Item58 --> PgSelectSingle59
     List114{{"List[114∈9]<br />ᐸ113,53ᐳ"}}:::plan
     Access113 & PgSelectSingle53 --> List114
     First65{{"First[65∈9]"}}:::plan
@@ -104,22 +134,6 @@ graph TD
     PgClassExpression68{{"PgClassExpression[68∈9]<br />ᐸ__post__.”body”ᐳ"}}:::plan
     PgSelectSingle53 --> PgClassExpression68
     List114 --> Lambda115
-    List98{{"List[98∈13]<br />ᐸ96,97ᐳ"}}:::plan
-    PgClassExpression97{{"PgClassExpression[97∈13]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    Constant96 & PgClassExpression97 --> List98
-    PgSelectSingle67 --> PgClassExpression97
-    Lambda99{{"Lambda[99∈13]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List98 --> Lambda99
-    PgSelect45[["PgSelect[45∈2] ➊<br />ᐸpostᐳ"]]:::plan
-    Object14 & ApplyInput25 & Connection24 & PgSelectInlineApply116 --> PgSelect45
-    PgSelectRows49[["PgSelectRows[49∈2] ➊"]]:::plan
-    PgSelect45 --> PgSelectRows49
-    Access117{{"Access[117∈2] ➊<br />ᐸ45.m.joinDetailsFor70ᐳ"}}:::plan
-    PgSelect45 --> Access117
-    __Item54[/"__Item[54∈6]<br />ᐸ49ᐳ"\]:::itemplan
-    PgSelectRows49 ==> __Item54
-    PgSelectSingle55{{"PgSelectSingle[55∈6]<br />ᐸpostᐳ"}}:::plan
-    __Item54 --> PgSelectSingle55
     List118{{"List[118∈10]<br />ᐸ117,55ᐳ"}}:::plan
     Access117 & PgSelectSingle55 --> List118
     First74{{"First[74∈10]"}}:::plan
@@ -132,22 +146,6 @@ graph TD
     PgClassExpression77{{"PgClassExpression[77∈10]<br />ᐸ__post__.”body”ᐳ"}}:::plan
     PgSelectSingle55 --> PgClassExpression77
     List118 --> Lambda119
-    List102{{"List[102∈14]<br />ᐸ96,101ᐳ"}}:::plan
-    PgClassExpression101{{"PgClassExpression[101∈14]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    Constant96 & PgClassExpression101 --> List102
-    PgSelectSingle76 --> PgClassExpression101
-    Lambda103{{"Lambda[103∈14]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List102 --> Lambda103
-    PgSelect46[["PgSelect[46∈3] ➊<br />ᐸpostᐳ"]]:::plan
-    Object14 & ApplyInput33 & Connection32 & PgSelectInlineApply124 --> PgSelect46
-    PgSelectRows50[["PgSelectRows[50∈3] ➊"]]:::plan
-    PgSelect46 --> PgSelectRows50
-    Access125{{"Access[125∈3] ➊<br />ᐸ46.m.joinDetailsFor79ᐳ"}}:::plan
-    PgSelect46 --> Access125
-    __Item56[/"__Item[56∈7]<br />ᐸ50ᐳ"\]:::itemplan
-    PgSelectRows50 ==> __Item56
-    PgSelectSingle57{{"PgSelectSingle[57∈7]<br />ᐸpostᐳ"}}:::plan
-    __Item56 --> PgSelectSingle57
     List126{{"List[126∈11]<br />ᐸ125,57ᐳ"}}:::plan
     Access125 & PgSelectSingle57 --> List126
     First83{{"First[83∈11]"}}:::plan
@@ -160,22 +158,6 @@ graph TD
     PgClassExpression86{{"PgClassExpression[86∈11]<br />ᐸ__post__.”body”ᐳ"}}:::plan
     PgSelectSingle57 --> PgClassExpression86
     List126 --> Lambda127
-    List106{{"List[106∈15]<br />ᐸ96,105ᐳ"}}:::plan
-    PgClassExpression105{{"PgClassExpression[105∈15]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    Constant96 & PgClassExpression105 --> List106
-    PgSelectSingle85 --> PgClassExpression105
-    Lambda107{{"Lambda[107∈15]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List106 --> Lambda107
-    PgSelect47[["PgSelect[47∈4] ➊<br />ᐸpostᐳ"]]:::plan
-    Object14 & ApplyInput42 & Connection41 & PgSelectInlineApply120 --> PgSelect47
-    PgSelectRows51[["PgSelectRows[51∈4] ➊"]]:::plan
-    PgSelect47 --> PgSelectRows51
-    Access121{{"Access[121∈4] ➊<br />ᐸ47.m.joinDetailsFor88ᐳ"}}:::plan
-    PgSelect47 --> Access121
-    __Item58[/"__Item[58∈8]<br />ᐸ51ᐳ"\]:::itemplan
-    PgSelectRows51 ==> __Item58
-    PgSelectSingle59{{"PgSelectSingle[59∈8]<br />ᐸpostᐳ"}}:::plan
-    __Item58 --> PgSelectSingle59
     List122{{"List[122∈12]<br />ᐸ121,59ᐳ"}}:::plan
     Access121 & PgSelectSingle59 --> List122
     First92{{"First[92∈12]"}}:::plan
@@ -188,6 +170,24 @@ graph TD
     PgClassExpression95{{"PgClassExpression[95∈12]<br />ᐸ__post__.”body”ᐳ"}}:::plan
     PgSelectSingle59 --> PgClassExpression95
     List122 --> Lambda123
+    List98{{"List[98∈13]<br />ᐸ96,97ᐳ"}}:::plan
+    PgClassExpression97{{"PgClassExpression[97∈13]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    Constant96 & PgClassExpression97 --> List98
+    PgSelectSingle67 --> PgClassExpression97
+    Lambda99{{"Lambda[99∈13]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List98 --> Lambda99
+    List102{{"List[102∈14]<br />ᐸ96,101ᐳ"}}:::plan
+    PgClassExpression101{{"PgClassExpression[101∈14]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    Constant96 & PgClassExpression101 --> List102
+    PgSelectSingle76 --> PgClassExpression101
+    Lambda103{{"Lambda[103∈14]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List102 --> Lambda103
+    List106{{"List[106∈15]<br />ᐸ96,105ᐳ"}}:::plan
+    PgClassExpression105{{"PgClassExpression[105∈15]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    Constant96 & PgClassExpression105 --> List106
+    PgSelectSingle85 --> PgClassExpression105
+    Lambda107{{"Lambda[107∈15]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List106 --> Lambda107
     List110{{"List[110∈16]<br />ᐸ96,109ᐳ"}}:::plan
     PgClassExpression109{{"PgClassExpression[109∈16]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     Constant96 & PgClassExpression109 --> List110
