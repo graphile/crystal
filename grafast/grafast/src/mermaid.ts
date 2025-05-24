@@ -296,7 +296,7 @@ export function planToMermaid(
                 : ["[", "]"]
               : ["[[", "]]"];
       const depCount = isExcessivelyReferenced(plan.id)
-        ? `\nDependency count: ${dependentsByStepId[plan.id]?.length}`
+        ? `\nDependents: ${dependentsByStepId[plan.id]?.length}`
         : ``;
       const extraDeps = plan.dependencyIds.filter(isExcessivelyReferenced);
       const extraDependencies =
