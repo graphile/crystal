@@ -39,7 +39,7 @@ function assertNotRuntime(operationPlan: OperationPlan, description: string) {
 
 export function withFieldArgsForArguments<T extends Step>(
   operationPlan: OperationPlan,
-  $all: TrackedArguments,
+  trackedArguments: TrackedArguments,
   field: GraphQLField<any, any, any>,
   $parent: Step,
   applyAfterMode: ApplyAfterModeArg,
@@ -115,19 +115,15 @@ export function withFieldArgsForArguments<T extends Step>(
     getRaw(path) {
       assertNotRuntime(operationPlan, `fieldArgs.getRaw()`);
       if (path === undefined) {
-        return object(
-          Object.fromEntries(
-            Object.keys(args).map((argName) => [argName, $all.get(argName)]),
-          ),
-        );
+        return object(trackedArguments);
       } else if (typeof path === "string") {
-        return $all.get(path);
+        return trackedArguments[path];
       } else if (Array.isArray(path)) {
         const [first, ...rest] = path;
         if (!first) {
           throw new Error(`getRaw() must be called with a non-empty path`);
         }
-        let $entry = $all.get(first);
+        let $entry = trackedArguments[first];
         for (const pathSegment of rest) {
           if (typeof pathSegment === "number" && "at" in $entry) {
             $entry = $entry.at(pathSegment);
