@@ -1,6 +1,6 @@
 /* ALL OF THIS IS TYPESCRIPT, NOT GRAPHQL */
 
-import type { LoadManyCallback, LoadOneCallback } from "../../dist";
+import type { LoadManyCallback, LoadOneCallback } from "../../dist/index.js";
 
 export type ItemSpec =
   `${"Equipment" | "Consumable" | "UtilityItem" | "MiscItem"}:${number}`;

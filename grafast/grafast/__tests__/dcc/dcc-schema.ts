@@ -47,7 +47,7 @@ const requestContext = {};
 declare global {
   namespace Grafast {
     interface Context {
-      db: Database;
+      dccDb: Database;
     }
   }
 }
@@ -263,7 +263,7 @@ export const makeBaseArgs = () => {
 
       Query: {
         crawler(_: any, { $id }: FieldArgs) {
-          const $db = context().get("db");
+          const $db = context().get("dccDb");
           return loadOne($id as Step<number>, $db, null, batchGetCrawlerById);
         },
         character(_: any, { $id }: FieldArgs) {
@@ -282,7 +282,7 @@ export const makeBaseArgs = () => {
       ActiveCrawler: {
         bestFriend($activeCrawler: Step<CrawlerData>) {
           const $id = inhibitOnNull(get($activeCrawler, "bestFriend"));
-          const $db = context().get("db");
+          const $db = context().get("dccDb");
           return loadOne($id, $db, null, batchGetCrawlerById);
         },
         friends($activeCrawler: Step<CrawlerData>) {
@@ -294,7 +294,7 @@ export const makeBaseArgs = () => {
         ...SharedNpcResolvers,
         client($manager: Step<NpcData>) {
           const $id = inhibitOnNull(get($manager, "client"));
-          const $db = context().get("db");
+          const $db = context().get("dccDb");
           return loadOne($id, $db, null, batchGetCrawlerById);
         },
       },
@@ -304,7 +304,7 @@ export const makeBaseArgs = () => {
         clients($security: Step<NpcData>) {
           const $ids = inhibitOnNull(get($security, "clients"));
           return each($ids, ($id) => {
-            const $db = context().get("db");
+            const $db = context().get("dccDb");
             return loadOne($id, $db, null, batchGetCrawlerById);
           });
         },
@@ -323,7 +323,7 @@ export const makeBaseArgs = () => {
       },
       Character: {
         __planType($specifier: Step<number>) {
-          const $db = context().get("db");
+          const $db = context().get("dccDb");
 
           const $crawlerId = inhibitOnNull(
             lambda($specifier, extractCrawlerId),
@@ -359,7 +359,7 @@ export const makeBaseArgs = () => {
       },
       NPC: {
         __planType($npcId: Step<number>) {
-          const $db = context().get("db");
+          const $db = context().get("dccDb");
           // TODO: Inhibit on null shouldn't be needed here
           const $npc = loadOne(
             inhibitOnNull($npcId),
@@ -393,13 +393,13 @@ export const makeBaseArgs = () => {
       Floor: {
         locations($floor: Step<FloorData>) {
           const $number = get($floor, "number");
-          const $db = context().get("db");
+          const $db = context().get("dccDb");
           return loadMany($number, $db, null, batchGetLocationsByFloorNumber);
         },
       },
       Location: {
         __planType($location: Step<LocationData>): AbstractTypePlanner {
-          const $db = context().get("db");
+          const $db = context().get("dccDb");
           const $__typename = get($location, "type");
           return {
             $__typename,
@@ -452,7 +452,7 @@ export const makeBaseArgs = () => {
         security($club: Step<ClubData & LocationData>) {
           const $ids = inhibitOnNull(get($club, "security"));
           return each($ids, ($id) => {
-            const $db = context().get("db");
+            const $db = context().get("dccDb");
             return loadOne($id, $db, null, batchGetNpcById);
           });
         },
@@ -462,13 +462,13 @@ export const makeBaseArgs = () => {
       },
     },
   });
-  const db = makeDb();
+  const dccDb = makeDb();
   return {
     schema,
     resolvedPreset,
     requestContext,
     variableValues: {},
-    contextValue: { db },
+    contextValue: { dccDb },
   };
 };
 
@@ -494,7 +494,7 @@ const ItemResolver = {
       $__typename,
       planForType(t) {
         const $id = get($decoded, "id");
-        const $db = context().get("db");
+        const $db = context().get("dccDb");
 
         if (t.name === "Equipment") {
           return loadOne($id, $db, null, batchGetEquipmentById);
@@ -515,7 +515,7 @@ const ItemResolver = {
 };
 
 function getCreator($source: Step<{ creator?: number }>) {
-  const $db = context().get("db");
+  const $db = context().get("dccDb");
   const $id = inhibitOnNull(get($source, "creator"));
   return loadOne($id, $db, null, batchGetCrawlerById);
 }
