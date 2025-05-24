@@ -238,10 +238,15 @@ export const makeBaseArgs = () => {
       type Query {
         crawler(id: Int!): Crawler
         character(id: Int!): Character
-
         floor(number: Int!): Floor
-        brokenItem: Item
         item(type: ItemType!, id: Int!): Item
+
+        """
+        Returns the value "Utility:999" which indicates a typeName of
+        "Utility", which does not exist. The correct typeName is "UtilityItem",
+        but we want to test when the value is wrong.
+        """
+        brokenItem: Item
       }
     `,
     plans: {
