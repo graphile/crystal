@@ -57,16 +57,16 @@ graph TD
     PgSelectSingle24 & Access27 --> PgCursor28
     PgClassExpression31{{"PgClassExpression[31∈5]<br />ᐸ__testview...estviewid”ᐳ"}}:::plan
     PgSelectSingle24 --> PgClassExpression31
-    PgClassExpression32{{"PgClassExpression[32∈5]<br />ᐸ__testview__.”col1”ᐳ"}}:::plan
-    PgSelectSingle24 --> PgClassExpression32
-    PgClassExpression33{{"PgClassExpression[33∈5]<br />ᐸ__testview__.”col2”ᐳ"}}:::plan
+    PgClassExpression33{{"PgClassExpression[33∈5]<br />ᐸ__testview__.”col1”ᐳ"}}:::plan
     PgSelectSingle24 --> PgClassExpression33
+    PgClassExpression35{{"PgClassExpression[35∈5]<br />ᐸ__testview__.”col2”ᐳ"}}:::plan
+    PgSelectSingle24 --> PgClassExpression35
     PgCursor30{{"PgCursor[30∈6]"}}:::plan
     PgSelectSingle26 & Access29 --> PgCursor30
-    PgClassExpression34{{"PgClassExpression[34∈6]<br />ᐸ__testview...estviewid”ᐳ"}}:::plan
+    PgClassExpression32{{"PgClassExpression[32∈6]<br />ᐸ__testview...estviewid”ᐳ"}}:::plan
+    PgSelectSingle26 --> PgClassExpression32
+    PgClassExpression34{{"PgClassExpression[34∈6]<br />ᐸ__testview__.”col1”ᐳ"}}:::plan
     PgSelectSingle26 --> PgClassExpression34
-    PgClassExpression35{{"PgClassExpression[35∈6]<br />ᐸ__testview__.”col1”ᐳ"}}:::plan
-    PgSelectSingle26 --> PgClassExpression35
     PgClassExpression36{{"PgClassExpression[36∈6]<br />ᐸ__testview__.”col2”ᐳ"}}:::plan
     PgSelectSingle26 --> PgClassExpression36
 
@@ -82,7 +82,7 @@ graph TD
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item25,PgSelectSingle26 bucket4
     classDef bucket5 stroke:#7fff00
-    class Bucket5,PgCursor28,PgClassExpression31,PgClassExpression32,PgClassExpression33 bucket5
+    class Bucket5,PgCursor28,PgClassExpression31,PgClassExpression33,PgClassExpression35 bucket5
     classDef bucket6 stroke:#ff1493
-    class Bucket6,PgCursor30,PgClassExpression34,PgClassExpression35,PgClassExpression36 bucket6
+    class Bucket6,PgCursor30,PgClassExpression32,PgClassExpression34,PgClassExpression36 bucket6
 

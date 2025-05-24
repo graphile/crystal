@@ -96,6 +96,7 @@ import {
   isTypePlanned,
   layerPlanHeirarchyContains,
   pathsFromAncestorToTargetLayerPlan,
+  recordsMatch,
   setsMatch,
   stepADependsOnStepB,
   sudo,
@@ -862,20 +863,20 @@ export class OperationPlan {
 
     if (subscriptionPlanResolver !== undefined) {
       // PERF: optimize this
-      const { haltTree, step: subscribeStep } = this.planField(
-        rootType.name,
+      const { haltTree, step: subscribeStep } = this.batchPlanField({
+        typeName: rootType.name,
         fieldName,
-        this.rootLayerPlan,
+        layerPlan: this.rootLayerPlan,
         path,
-        POLYMORPHIC_ROOT_PATHS,
+        polymorphicPaths: POLYMORPHIC_ROOT_PATHS,
         planningPath,
-        subscriptionPlanResolver,
-        "subscribePlan",
-        this.trackedRootValueStep,
-        fieldSpec,
+        planResolver: subscriptionPlanResolver,
+        applyAfterMode: "subscribePlan",
+        rawParentStep: this.trackedRootValueStep,
+        field: fieldSpec,
         trackedArguments,
-        true,
-      );
+        streamDetails: true,
+      })();
       if (haltTree) {
         throw new SafeError("Failed to setup subscription");
       }
@@ -1074,7 +1075,7 @@ export class OperationPlan {
     return itemStep;
   }
 
-  processGroupedFieldSet(details: ProcessGroupedFieldSetDetails) {
+  *processGroupedFieldSet(details: ProcessGroupedFieldSetDetails) {
     const {
       outputPlan,
       path,
@@ -1342,20 +1343,20 @@ export class OperationPlan {
           }
         }
         if (typeof planResolver === "function") {
-          ({ step, haltTree } = this.planField(
-            objectType.name,
+          ({ step, haltTree } = yield this.batchPlanField({
+            typeName: objectType.name,
             fieldName,
-            fieldLayerPlan,
-            fieldPath,
+            layerPlan: fieldLayerPlan,
+            path: fieldPath,
             polymorphicPaths,
-            fieldPlanningPath,
+            planningPath: fieldPlanningPath,
             planResolver,
-            "plan",
-            parentStep,
-            objectField,
+            applyAfterMode: "plan",
+            rawParentStep: parentStep,
+            field: objectField,
             trackedArguments,
-            isList ? (streamDetails ?? false) : null,
-          ));
+            streamDetails: isList ? (streamDetails ?? false) : null,
+          }));
         } else {
           // No plan resolver (or plan resolver fallback) so there must be a
           // `resolve` method, so we'll feed the full parent step into the
@@ -1533,10 +1534,10 @@ export class OperationPlan {
       isMutation,
     );
     const objectTypeFields = objectType.getFields();
-    this.processGroupedFieldSet({
+    this.queueNextLayer(this.processGroupedFieldSet, {
       outputPlan,
       path,
-      planningPath,
+      planningPath: planningPath + ">",
       polymorphicPaths,
       parentStep,
       positionType: objectType,
@@ -1560,7 +1561,7 @@ export class OperationPlan {
   >();
 
   private queueNextLayer<TDetails extends CommonPlanningDetails<any>>(
-    method: (details: TDetails) => void,
+    method: (details: TDetails) => void | Generator<() => any, void, any>,
     details: TDetails,
   ): void {
     const { planningPath } = details;
@@ -1632,29 +1633,94 @@ export class OperationPlan {
       // polymorphism)
       this.mutateTodos(todo);
 
+      const DONE = Symbol("done");
+      /** Our generators, for batching */
+      interface GennySpec {
+        genny: Generator<() => any, void, any>;
+        loc: string[] | null;
+        layerPlan: LayerPlan;
+        layerPlanLatestSideEffect: Step | null;
+        result: any;
+      }
+      const gennies: Array<GennySpec> = [];
+
       // Finally plan this layer
       for (const [
         fn,
-        details,
+        rawDetails,
         loc,
         originalLayerPlan,
         layerPlanLatestSideEffect,
       ] of batch) {
-        const $sideEffect = originalLayerPlan.latestSideEffectStep;
-        originalLayerPlan.latestSideEffectStep = layerPlanLatestSideEffect;
-        try {
-          const prevLoc = this.loc;
-          this.loc = loc;
-          fn.call(this, details);
-          this.loc = prevLoc;
-        } finally {
-          originalLayerPlan.latestSideEffectStep = $sideEffect;
+        const details = rawDetails as CommonPlanningDetails;
+        this.withLocLpSE(
+          loc,
+          originalLayerPlan,
+          layerPlanLatestSideEffect,
+          () => {
+            /** Still just genny from the block */
+            const genny = fn.call(this, details);
+            if (genny != null) {
+              gennies.push({
+                genny,
+                loc,
+                layerPlan: details.layerPlan,
+                layerPlanLatestSideEffect:
+                  details.layerPlan.latestSideEffectStep,
+                result: undefined,
+              });
+            }
+          },
+        );
+      }
+
+      // And go through all the generators
+      while (gennies.length > 0) {
+        const cbs: Array<{ spec: GennySpec; cb: () => any }> = [];
+        for (const spec of gennies) {
+          const { genny, loc, layerPlan, layerPlanLatestSideEffect, result } =
+            spec;
+          this.withLocLpSE(loc, layerPlan, layerPlanLatestSideEffect, () => {
+            const r = genny.next(result);
+            if (r.done) {
+              spec.result = DONE;
+            } else {
+              cbs.push({ spec, cb: r.value });
+            }
+          });
+        }
+        for (const { spec, cb } of cbs) {
+          spec.result = cb();
+        }
+        // Remove the generators that are done.
+        for (let i = gennies.length - 1; i >= 0; i--) {
+          if (gennies[i].result === DONE) {
+            gennies.splice(i, 1);
+          }
         }
       }
     }
 
     // A final deduplicate
     this.deduplicateSteps();
+  }
+
+  withLocLpSE(
+    loc: string[] | null,
+    layerPlan: LayerPlan,
+    layerPlanLatestSideEffect: Step | null,
+    cb: () => void,
+  ) {
+    const $sideEffect = layerPlan.latestSideEffectStep;
+    layerPlan.latestSideEffectStep = layerPlanLatestSideEffect;
+    try {
+      const prevLoc = this.loc;
+      this.loc = loc;
+      cb();
+      this.loc = prevLoc;
+    } finally {
+      layerPlan.latestSideEffectStep = $sideEffect;
+    }
   }
 
   private mutateTodos(todo: Todo) {
@@ -2558,24 +2624,212 @@ export class OperationPlan {
     });
   }
 
-  private planField(
-    typeName: string,
-    fieldName: string,
-    layerPlan: LayerPlan,
-    path: readonly string[],
-    polymorphicPaths: ReadonlySet<string> | null,
-    planningPath: string,
-    planResolver: FieldPlanResolver,
-    applyAfterMode: ApplyAfterModeArg,
-    rawParentStep: Step,
-    field: GraphQLField<any, any>,
-    trackedArguments: TrackedArguments,
-    // If 'true' this is a subscription rather than a stream
-    // If 'false' this is a list but it will never stream
-    // If 'null' this is neither subscribe field nor list field
-    // Otherwise, it's a list field that has the `@stream` directive applied
-    streamDetails: StreamDetails | true | false | null,
-  ): { haltTree: boolean; step: Step } {
+  planFieldBatch: PlanFieldBatch | null = null;
+  private batchPlanField(
+    batchPlanFieldDetails: PlanFieldDetails,
+  ): () => { haltTree: boolean; step: Step } {
+    let b: PlanFieldBatch;
+    if (this.planFieldBatch != null) {
+      b = this.planFieldBatch;
+    } else {
+      b = this.planFieldBatch = {
+        complete: false,
+        batch: [],
+        results: [],
+      };
+    }
+    const myIndex = b.batch.length;
+    b.batch.push(batchPlanFieldDetails);
+    return () => {
+      if (!b.complete) {
+        this.processPlanField(b);
+      }
+      const result = b.results[myIndex];
+      if (result.error) {
+        throw result.error;
+      }
+      return result;
+    };
+  }
+
+  private processPlanField(b: PlanFieldBatch) {
+    b.complete = true;
+    this.planFieldBatch = null;
+
+    const groups = new Map<
+      string,
+      {
+        firstDetails: PlanFieldDetails;
+        extraDetails: { polymorphicPaths: ReadonlySet<string> | null }[];
+        streamDetails: boolean | StreamDetails | null;
+        indexes: number[];
+      }
+    >();
+    for (let i = 0, l = b.batch.length; i < l; i++) {
+      const batchPlanFieldDetails = b.batch[i];
+      const {
+        typeName,
+        fieldName,
+        layerPlan,
+        // path,
+        polymorphicPaths,
+        planningPath,
+        // planResolver,
+        // applyAfterMode,
+        rawParentStep,
+        // field,
+        trackedArguments,
+        streamDetails,
+      } = batchPlanFieldDetails;
+      const argsSig = Object.entries(trackedArguments)
+        .map(([key, step]) => `${key}:${step.id}`)
+        .join(",");
+
+      /**
+       * Our tests don't come up with anywhere where rawParentStep.id needs
+       * incorporation into the signature, but I'm feeling paranoid.
+       */
+      const benjiesParanoia = `[${rawParentStep.id}]`;
+
+      const signature = `${planningPath}@${layerPlan.id}${benjiesParanoia}=${typeName}.${fieldName}(${argsSig})`;
+      let entry = groups.get(signature);
+      if (!entry) {
+        entry = {
+          firstDetails: batchPlanFieldDetails,
+          extraDetails: [{ polymorphicPaths }],
+          streamDetails,
+          indexes: [i],
+        };
+        groups.set(signature, entry);
+      } else {
+        if (isDev) {
+          // Check everything lines up as we would expect
+          for (const key of Object.keys(
+            batchPlanFieldDetails,
+          ) as (keyof typeof batchPlanFieldDetails)[]) {
+            const myVal = batchPlanFieldDetails[key];
+            const first = entry.firstDetails[key];
+            if (myVal === first) continue;
+            switch (key) {
+              case "typeName":
+                throw new Error(
+                  `GraphileInternalError<15e09f3f-1a83-48a8-822c-1158b9740ef7>: processPlanField signature failure - mismatch typeName`,
+                );
+              case "fieldName":
+                throw new Error(
+                  `GraphileInternalError<2999cbf9-7143-4677-9592-0bfc52e12cb0>: processPlanField signature failure - mismatch fieldName`,
+                );
+              case "layerPlan":
+                throw new Error(
+                  `GraphileInternalError<52786d18-cfda-4ed6-a309-9cb31dcd5f34>: processPlanField signature failure - mismatch layerPlan`,
+                );
+              case "path":
+                if (
+                  !arraysMatch(
+                    batchPlanFieldDetails.path,
+                    entry.firstDetails.path,
+                  )
+                ) {
+                  throw new Error(
+                    `GraphileInternalError<cb84829d-ee4c-40cd-a3a6-f53d1029ad83>: processPlanField signature failure - mismatch path`,
+                  );
+                }
+                break;
+              case "polymorphicPaths":
+                // Explicitly differences in polymorphicPaths are allowed
+                break;
+              case "planningPath":
+                throw new Error(
+                  `GraphileInternalError<1b708215-1549-47c3-9cf5-8fd8d7eb9bd0>: processPlanField signature failure - mismatch planningPath`,
+                );
+              case "planResolver":
+                throw new Error(
+                  `GraphileInternalError<7f14700f-2272-4b6a-a927-7600d934fdf0>: processPlanField signature failure - mismatch planResolver`,
+                );
+              case "applyAfterMode":
+                throw new Error(
+                  `GraphileInternalError<bbddad4f-68aa-49c7-b82c-09ceebf14a3f>: processPlanField signature failure - mismatch applyAfterMode`,
+                );
+              case "rawParentStep":
+                throw new Error(
+                  `GraphileInternalError<3306994d-7881-4495-89d1-6c9252840369>: processPlanField signature failure - mismatch rawParentStep`,
+                );
+              case "field":
+                throw new Error(
+                  `GraphileInternalError<67d2a787-2383-4228-8358-6ea9b3321445>: processPlanField signature failure - mismatch field`,
+                );
+              case "trackedArguments":
+                if (
+                  !recordsMatch(
+                    batchPlanFieldDetails.trackedArguments,
+                    entry.firstDetails.trackedArguments,
+                  )
+                ) {
+                  throw new Error(
+                    `GraphileInternalError<ec3f1e44-0ab6-445c-a644-a4d276f4b787>: processPlanField signature failure - mismatch trackedArguments`,
+                  );
+                }
+                break;
+              case "streamDetails":
+                // If any of them don't stream, turn streaming off
+                if (!streamDetails) {
+                  entry.streamDetails = null;
+                }
+                break;
+              default: {
+                const never: never = key;
+                throw new Error(
+                  `GraphileInternalError<3f039c33-0b43-47d8-8da8-57873186cd60>: unexpected key '${never}'`,
+                );
+              }
+            }
+          }
+        }
+
+        entry.indexes.push(i);
+        entry.extraDetails.push({ polymorphicPaths });
+      }
+    }
+
+    // Loop through the groups and resolve the plan ONCE per group.
+    // We don't care about the signature here; that was just for grouping
+    for (const entry of groups.values()) {
+      const planFieldDetails: PlanFieldDetails = {
+        ...entry.firstDetails,
+        polymorphicPaths: entry.firstDetails.polymorphicPaths
+          ? new Set([
+              ...entry.firstDetails.polymorphicPaths,
+              ...entry.extraDetails.flatMap((d) => [...d.polymorphicPaths!]),
+            ])
+          : null,
+      };
+      let result: PlanFieldBatchResult;
+      try {
+        result = this._realPlanField(planFieldDetails);
+      } catch (error) {
+        result = { error };
+      }
+      for (const i of entry.indexes) {
+        b.results[i] = result;
+      }
+    }
+  }
+
+  _realPlanField(planFieldDetails: PlanFieldDetails) {
+    const {
+      typeName,
+      fieldName,
+      layerPlan,
+      path,
+      polymorphicPaths,
+      planningPath,
+      planResolver,
+      applyAfterMode,
+      rawParentStep,
+      field,
+      trackedArguments,
+      streamDetails,
+    } = planFieldDetails;
     const coordinate = `${typeName}.${fieldName}`;
 
     // The step may have been de-duped whilst sibling steps were planned
@@ -5044,7 +5298,7 @@ function throwNoNewStepsError(
 }
 
 type QueueTuple<T extends CommonPlanningDetails> = [
-  method: (details: T) => void,
+  method: (details: T) => void | Generator<() => any, void, any>,
   details: T,
   loc: string[] | null,
   originalLayerPlan: LayerPlan,
@@ -5130,3 +5384,32 @@ function isPeerLayerPlan(
 }
 
 type StepCache = Record<string, Map<any, any> | undefined>;
+
+interface PlanFieldDetails {
+  typeName: string;
+  fieldName: string;
+  layerPlan: LayerPlan;
+  path: readonly string[];
+  polymorphicPaths: ReadonlySet<string> | null;
+  planningPath: string;
+  planResolver: FieldPlanResolver;
+  applyAfterMode: ApplyAfterModeArg;
+  rawParentStep: Step;
+  field: GraphQLField<any, any>;
+  trackedArguments: TrackedArguments;
+  // If 'true' this is a subscription rather than a stream
+  // If 'false' this is a list but it will never stream
+  // If 'null' this is neither subscribe field nor list field
+  // Otherwise, it's a list field that has the `@stream` directive applied
+  streamDetails: StreamDetails | true | false | null;
+}
+
+type PlanFieldBatchResult =
+  | { error: Error }
+  | { error?: never; haltTree: boolean; step: Step };
+
+interface PlanFieldBatch {
+  complete: boolean;
+  batch: Array<PlanFieldDetails>;
+  results: Array<PlanFieldBatchResult>;
+}

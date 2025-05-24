@@ -90,14 +90,14 @@ graph TD
     List51 --> Lambda52
     PgClassExpression26{{"PgClassExpression[26∈4]<br />ᐸ__messages__.”forum_id”ᐳ"}}:::plan
     PgSelectSingle21 --> PgClassExpression26
-    PgClassExpression41{{"PgClassExpression[41∈4]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
-    PgSelectSingle33 --> PgClassExpression41
-    PgClassExpression42{{"PgClassExpression[42∈4]<br />ᐸ(__forums_... not null)ᐳ"}}:::plan
+    PgClassExpression42{{"PgClassExpression[42∈4]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
     PgSelectSingle33 --> PgClassExpression42
-    PgClassExpression43{{"PgClassExpression[43∈5]<br />ᐸ__users__.”username”ᐳ"}}:::plan
+    PgClassExpression44{{"PgClassExpression[44∈4]<br />ᐸ(__forums_... not null)ᐳ"}}:::plan
+    PgSelectSingle33 --> PgClassExpression44
+    PgClassExpression41{{"PgClassExpression[41∈5]<br />ᐸ__users__.”username”ᐳ"}}:::plan
+    PgSelectSingle39 --> PgClassExpression41
+    PgClassExpression43{{"PgClassExpression[43∈5]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
     PgSelectSingle39 --> PgClassExpression43
-    PgClassExpression44{{"PgClassExpression[44∈5]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
-    PgSelectSingle39 --> PgClassExpression44
 
     %% define steps
     classDef bucket0 stroke:#696969
@@ -109,7 +109,7 @@ graph TD
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression22,PgClassExpression23,PgClassExpression24,PgClassExpression25,First31,PgSelectRows32,PgSelectSingle33,First37,PgSelectRows38,PgSelectSingle39,Access46,List47,Lambda48,Access50,List51,Lambda52 bucket3
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgClassExpression26,PgClassExpression41,PgClassExpression42 bucket4
+    class Bucket4,PgClassExpression26,PgClassExpression42,PgClassExpression44 bucket4
     classDef bucket5 stroke:#7fff00
-    class Bucket5,PgClassExpression43,PgClassExpression44 bucket5
+    class Bucket5,PgClassExpression41,PgClassExpression43 bucket5
 

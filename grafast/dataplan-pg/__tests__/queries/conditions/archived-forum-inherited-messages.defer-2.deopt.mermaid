@@ -14,8 +14,8 @@ graph TD
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16, 24, 11, 28<br /><br />ROOT Connectionᐸ20ᐳ[24]"):::bucket
     Bucket4("Bucket 4 (defer)<br />Deps: 11, 19, 25, 28, 24<br /><br />1: PgSelect[29]<br />2: PgSelectRows[31]"):::bucket
     Bucket5("Bucket 5 (listItem)<br />Deps: 29, 11<br /><br />ROOT __Item{5}ᐸ31ᐳ[32]"):::bucket
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 33, 11, 44<br /><br />ROOT PgSelectSingle{5}ᐸmessagesᐳ[33]<br />1: <br />ᐳ: 35, 36, 45<br />2: PgSelect[37]<br />3: PgSelectRows[42]<br />ᐳ: First[41], PgSelectSingle[43]"):::bucket
-    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 43<br /><br />ROOT PgSelectSingle{6}ᐸusersᐳ[43]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 33, 36, 11<br /><br />ROOT PgSelectSingle{5}ᐸmessagesᐳ[33]<br />1: <br />ᐳ: 35, 37, 38<br />2: PgSelect[39]<br />3: PgSelectRows[44]<br />ᐳ: First[43], PgSelectSingle[45]"):::bucket
+    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 45<br /><br />ROOT PgSelectSingle{6}ᐸusersᐳ[45]"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
@@ -63,26 +63,26 @@ graph TD
     PgSelectRows31 ==> __Item32
     PgSelectSingle33{{"PgSelectSingle[33∈5]<br />ᐸmessagesᐳ"}}:::plan
     __Item32 --> PgSelectSingle33
-    Access44{{"Access[44∈5]<br />ᐸ29.cursorDetailsᐳ"}}:::plan
-    PgSelect29 --> Access44
-    PgSelect37[["PgSelect[37∈6]<br />ᐸusersᐳ"]]:::plan
-    PgClassExpression36{{"PgClassExpression[36∈6]<br />ᐸ__messages...author_id”ᐳ"}}:::plan
-    Object11 & PgClassExpression36 --> PgSelect37
-    PgCursor45{{"PgCursor[45∈6]"}}:::plan
-    PgSelectSingle33 & Access44 --> PgCursor45
+    Access36{{"Access[36∈5]<br />ᐸ29.cursorDetailsᐳ"}}:::plan
+    PgSelect29 --> Access36
+    PgCursor37{{"PgCursor[37∈6]"}}:::plan
+    PgSelectSingle33 & Access36 --> PgCursor37
+    PgSelect39[["PgSelect[39∈6]<br />ᐸusersᐳ"]]:::plan
+    PgClassExpression38{{"PgClassExpression[38∈6]<br />ᐸ__messages...author_id”ᐳ"}}:::plan
+    Object11 & PgClassExpression38 --> PgSelect39
     PgClassExpression35{{"PgClassExpression[35∈6]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
     PgSelectSingle33 --> PgClassExpression35
-    PgSelectSingle33 --> PgClassExpression36
-    First41{{"First[41∈6]"}}:::plan
-    PgSelectRows42[["PgSelectRows[42∈6]"]]:::plan
-    PgSelectRows42 --> First41
-    PgSelect37 --> PgSelectRows42
-    PgSelectSingle43{{"PgSelectSingle[43∈6]<br />ᐸusersᐳ"}}:::plan
-    First41 --> PgSelectSingle43
+    PgSelectSingle33 --> PgClassExpression38
+    First43{{"First[43∈6]"}}:::plan
+    PgSelectRows44[["PgSelectRows[44∈6]"]]:::plan
+    PgSelectRows44 --> First43
+    PgSelect39 --> PgSelectRows44
+    PgSelectSingle45{{"PgSelectSingle[45∈6]<br />ᐸusersᐳ"}}:::plan
+    First43 --> PgSelectSingle45
     PgClassExpression46{{"PgClassExpression[46∈7]<br />ᐸ__users__.”username”ᐳ"}}:::plan
-    PgSelectSingle43 --> PgClassExpression46
+    PgSelectSingle45 --> PgClassExpression46
     PgClassExpression47{{"PgClassExpression[47∈7]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
-    PgSelectSingle43 --> PgClassExpression47
+    PgSelectSingle45 --> PgClassExpression47
 
     %% define steps
     classDef bucket0 stroke:#696969
@@ -96,9 +96,9 @@ graph TD
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgSelect29,PgSelectRows31 bucket4
     classDef bucket5 stroke:#7fff00
-    class Bucket5,__Item32,PgSelectSingle33,Access44 bucket5
+    class Bucket5,__Item32,PgSelectSingle33,Access36 bucket5
     classDef bucket6 stroke:#ff1493
-    class Bucket6,PgClassExpression35,PgClassExpression36,PgSelect37,First41,PgSelectRows42,PgSelectSingle43,PgCursor45 bucket6
+    class Bucket6,PgClassExpression35,PgCursor37,PgClassExpression38,PgSelect39,First43,PgSelectRows44,PgSelectSingle45 bucket6
     classDef bucket7 stroke:#808000
     class Bucket7,PgClassExpression46,PgClassExpression47 bucket7
 

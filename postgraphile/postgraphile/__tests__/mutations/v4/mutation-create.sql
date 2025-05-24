@@ -396,8 +396,8 @@ order by __post__."id" asc;
 
 select
   to_char(__person__."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.US'::text) as "0",
-  __person__."id"::text as "1",
-  __person__."email" as "2"
+  __person__."email" as "1",
+  __person__."id"::text as "2"
 from "c"."person" as __person__
 where (
   __person__."id" = $1::"int4"
