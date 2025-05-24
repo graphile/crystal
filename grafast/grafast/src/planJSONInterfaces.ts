@@ -105,14 +105,14 @@ export interface GrafastPlanBucketReasonCombinedJSONv1 {
 }
 
 export interface GrafastPlanBucketJSONv1 {
-  id: number;
+  id: number | string;
   reason: GrafastPlanBucketReasonJSONv1;
   parentSideEffectStepId: string | number | null;
   copyStepIds: ReadonlyArray<string | number>;
   steps: ReadonlyArray<GrafastPlanStepJSONv1>;
   rootStepId: string | number | null;
   phases: ReadonlyArray<GrafastPlanBucketPhaseJSONv1>;
-  childIds: ReadonlyArray<number>;
+  childIds: ReadonlyArray<number | string>;
 }
 
 export interface GrafastPlanJSONv1 extends GrafastPlanJSON {

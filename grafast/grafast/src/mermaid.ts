@@ -83,10 +83,6 @@ function isGrafastPlanJSONv1(json: GrafastPlanJSON): json is GrafastPlanJSONv1 {
   return json.version === "v1";
 }
 
-function shouldHideStep(step: GrafastPlanStepJSONv1) {
-  return (step.extra?.constant as any)?.type === "undefined";
-}
-
 export function planToMermaid(
   planJSON: GrafastPlanJSON,
   {
@@ -135,6 +131,43 @@ export function planToMermaid(
     }
   };
   planJSON.buckets.forEach(extractSteps);
+
+  const shouldHideStep = (step: GrafastPlanStepJSONv1) => {
+    if ((step.extra?.constant as any)?.type === "undefined") {
+      return true;
+    }
+    if (
+      step.bucketId === 0 &&
+      step.isSyncAndSafe &&
+      step.supportsUnbatched &&
+      (dependentsByStepId[step.id]?.length ?? 0) === 0
+    ) {
+      return true;
+    }
+  };
+  const partitionToPoly = (bucketId: number | string) => {
+    const lp = layerPlanById[bucketId];
+    if (lp.reason.type === "polymorphicPartition") {
+      return layerPlans.find((lp) => lp.childIds.includes(bucketId));
+    } else {
+      return bucketId;
+    }
+  };
+
+  const isExcessivelyReferenced = (stepId: string | number) => {
+    const step = stepById[stepId];
+    if (!step) return true;
+    const dependents = dependentsByStepId[stepId];
+    if (!dependents || dependents.length === 0) return false;
+    const firstDependent = dependents[0];
+
+    // If it's referenced by more than one layer plan, it's excessive
+    return dependents.some(
+      (d) =>
+        partitionToPoly(d.bucketId) !==
+        partitionToPoly(firstDependent.bucketId),
+    );
+  };
 
   const color = (i: number) => {
     return COLORS[i % COLORS.length];
@@ -259,11 +292,24 @@ export function planToMermaid(
                 ? ["{{", "}}"]
                 : ["[", "]"]
               : ["[[", "]]"];
+      const depCount = isExcessivelyReferenced(plan.id)
+        ? `\nDependency count: ${dependentsByStepId[plan.id]?.length}`
+        : ``;
+      const extraDeps = plan.dependencyIds.filter(isExcessivelyReferenced);
+      const extraDependencies =
+        extraDeps.length > 0
+          ? `\nMore deps:\n${extraDeps
+              .map((depId) => {
+                const step = stepById[depId];
+                return `- ${shortStep(step)}`;
+              })
+              .join("\n")}`
+          : ``;
       const planString = `${planNameText}[${plan.id}${`∈${plan.bucketId}`}${
         plan.stream ? "@s" : ""
       }]${plan.isUnary ? " ➊" : ""}${polyPathsAreSame && polyPaths !== "" ? "^" : ""}${
         meta ? `\n<${meta}>` : ""
-      }${polyPathsIfDifferent}`;
+      }${polyPathsIfDifferent}${depCount}${extraDependencies}`;
       const planClass = plan.hasSideEffects
         ? "sideeffectplan"
         : plan.stepClass === "__ItemStep"
@@ -324,7 +370,7 @@ export function planToMermaid(
       const planNode = planId(plan);
       const depNodes = plan.dependencyIds.map((depId) => {
         const step = stepById[depId];
-        if (shouldHideStep(step)) {
+        if (shouldHideStep(step) || isExcessivelyReferenced(depId)) {
           return null;
         } else {
           return planId(step);
@@ -412,7 +458,7 @@ export function planToMermaid(
     const layerPlan = layerPlans[i];
     const steps = layerPlan.steps;
     graph.push(
-      `    classDef bucket${layerPlan.id} stroke:${color(layerPlan.id)}`,
+      `    classDef bucket${layerPlan.id} stroke:${color(typeof layerPlan.id === "number" ? layerPlan.id : Object.values(layerPlanById).indexOf(layerPlan))}`,
     );
     graph.push(
       `    class ${[
