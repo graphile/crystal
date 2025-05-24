@@ -259,8 +259,9 @@ export const makeBaseArgs = () => {
       },
       ActiveCrawler: {
         bestFriend($activeCrawler: Step<CrawlerData>) {
-          const $id = get($activeCrawler, "bestFriend");
-          return $id;
+          const $id = inhibitOnNull(get($activeCrawler, "bestFriend"));
+          const $data = context().get("data");
+          return loadOne($id, $data, null, batchGetCrawlerById);
         },
         friends($activeCrawler: Step<CrawlerData>) {
           const $ids = get($activeCrawler, "friends");
