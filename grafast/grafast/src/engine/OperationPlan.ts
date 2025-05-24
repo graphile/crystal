@@ -2615,7 +2615,7 @@ export class OperationPlan {
 
   planFieldBatch: PlanFieldBatch | null = null;
   private batchPlanField(
-    batchPlanFieldDetails: BatchPlanFieldDetails,
+    batchPlanFieldDetails: PlanFieldDetails,
   ): () => { haltTree: boolean; step: Step } {
     let b: PlanFieldBatch;
     if (this.planFieldBatch != null) {
@@ -2649,7 +2649,7 @@ export class OperationPlan {
     const groups = new Map<
       string,
       {
-        firstDetails: BatchPlanFieldDetails;
+        firstDetails: PlanFieldDetails;
         extraDetails: { polymorphicPaths: ReadonlySet<string> | null }[];
         streamDetails: boolean | StreamDetails | null;
       }
@@ -2723,130 +2723,130 @@ export class OperationPlan {
     */
     for (let i = 0, l = b.batch.length; i < l; i++) {
       const batchPlanFieldDetails = b.batch[i];
-      const {
-        typeName,
-        fieldName,
+      try {
+        b.results[i] = this._realPlanField(batchPlanFieldDetails);
+      } catch (error) {
+        b.results[i] = { error };
+      }
+    }
+  }
+
+  _realPlanField(planFieldDetails: PlanFieldDetails) {
+    const {
+      typeName,
+      fieldName,
+      layerPlan,
+      path,
+      polymorphicPaths,
+      planningPath,
+      planResolver,
+      applyAfterMode,
+      rawParentStep,
+      field,
+      trackedArguments,
+      streamDetails,
+    } = planFieldDetails;
+    const coordinate = `${typeName}.${fieldName}`;
+
+    // The step may have been de-duped whilst sibling steps were planned
+    // PERF: this should be handled in the parent?
+    const parentStep = this.stepTracker.getStepById(rawParentStep.id);
+
+    const previousStepCount = this.stepTracker.stepCount;
+    const previousSideEffectStep = layerPlan.latestSideEffectStep;
+
+    if (this.loc !== null) this.loc.push(`planField(${path.join(".")})`);
+    try {
+      let step = withGlobalLayerPlan(
         layerPlan,
-        path,
         polymorphicPaths,
         planningPath,
-        planResolver,
-        applyAfterMode,
-        rawParentStep,
-        field,
+        withFieldArgsForArguments,
+        null,
+        this,
         trackedArguments,
-        streamDetails,
-      } = batchPlanFieldDetails;
-      const coordinate = `${typeName}.${fieldName}`;
-
-      // The step may have been de-duped whilst sibling steps were planned
-      // PERF: this should be handled in the parent?
-      const parentStep = this.stepTracker.getStepById(rawParentStep.id);
-
-      const previousStepCount = this.stepTracker.stepCount;
-      const previousSideEffectStep = layerPlan.latestSideEffectStep;
-
-      if (this.loc !== null) this.loc.push(`planField(${path.join(".")})`);
-      try {
-        let step = withGlobalLayerPlan(
-          layerPlan,
-          polymorphicPaths,
-          planningPath,
-          withFieldArgsForArguments,
-          null,
-          this,
-          trackedArguments,
-          field,
-          parentStep,
-          applyAfterMode,
-          coordinate,
-          (fieldArgs) =>
-            planResolver(parentStep, fieldArgs, {
-              fieldName,
-              field,
-              schema: this.schema,
-            }),
-        );
-        let haltTree = false;
-        if (step === null || (step instanceof ConstantStep && step.isNull())) {
-          // Constantly null; do not step any further in this tree.
-          step =
-            step ||
-            // `withGlobalLayerPlan(layerPlan, polymorphicPaths, () => constant(null))` but with reduced memory allocation
-            withGlobalLayerPlan(
-              layerPlan,
-              polymorphicPaths,
-              planningPath,
-              constant,
-              null,
-              null,
-            );
-          haltTree = true;
-        }
-        assertExecutableStep(step);
-
-        if (streamDetails === true) {
-          // subscription
-          step._stepOptions.stream = {};
-          step._stepOptions.walkIterable = true;
-        } else if (streamDetails === false) {
-          step._stepOptions.walkIterable = true;
-        } else if (streamDetails != null) {
-          step._stepOptions.stream = {
-            initialCountStepId: streamDetails.initialCount.id,
-            ifStepId: streamDetails.if.id,
-            labelStepId: streamDetails.label.id,
-          };
-          step._stepOptions.walkIterable = true;
-        }
-        b.results[i] = { step, haltTree };
-      } catch (e) {
-        try {
-          if (ALWAYS_THROW_PLANNING_ERRORS) {
-            throw e;
-          }
-
-          if (THROW_PLANNING_ERRORS_ON_SIDE_EFFECTS) {
-            for (
-              let i = previousStepCount;
-              i < this.stepTracker.stepCount;
-              i++
-            ) {
-              const step = this.stepTracker.stepById[i];
-              if (step && step.hasSideEffects) {
-                throw e;
-              }
-            }
-          }
-
-          try {
-            this.stepTracker.purgeBackTo(previousStepCount);
-            layerPlan.latestSideEffectStep = previousSideEffectStep;
-          } catch (e2) {
-            console.error(
-              `Cleanup error occurred whilst trying to recover from field planning error: ${e2.stack}`,
-            );
-            throw e;
-          }
-
-          const step = withGlobalLayerPlan(
+        field,
+        parentStep,
+        applyAfterMode,
+        coordinate,
+        (fieldArgs) =>
+          planResolver(parentStep, fieldArgs, {
+            fieldName,
+            field,
+            schema: this.schema,
+          }),
+      );
+      let haltTree = false;
+      if (step === null || (step instanceof ConstantStep && step.isNull())) {
+        // Constantly null; do not step any further in this tree.
+        step =
+          step ||
+          // `withGlobalLayerPlan(layerPlan, polymorphicPaths, () => constant(null))` but with reduced memory allocation
+          withGlobalLayerPlan(
             layerPlan,
             polymorphicPaths,
             planningPath,
-            error,
+            constant,
             null,
-            e,
+            null,
           );
-          const haltTree = true;
-          // PERF: consider deleting all steps that were allocated during this. For
-          // now we'll just rely on tree-shaking.
-          b.results[i] = { step, haltTree };
-        } catch (error) {
-          b.results[i] = { error };
-        }
-      } finally {
-        if (this.loc !== null) this.loc.pop();
+        haltTree = true;
       }
+      assertExecutableStep(step);
+
+      if (streamDetails === true) {
+        // subscription
+        step._stepOptions.stream = {};
+        step._stepOptions.walkIterable = true;
+      } else if (streamDetails === false) {
+        step._stepOptions.walkIterable = true;
+      } else if (streamDetails != null) {
+        step._stepOptions.stream = {
+          initialCountStepId: streamDetails.initialCount.id,
+          ifStepId: streamDetails.if.id,
+          labelStepId: streamDetails.label.id,
+        };
+        step._stepOptions.walkIterable = true;
+      }
+      return { step, haltTree };
+    } catch (e) {
+      if (ALWAYS_THROW_PLANNING_ERRORS) {
+        throw e;
+      }
+
+      if (THROW_PLANNING_ERRORS_ON_SIDE_EFFECTS) {
+        for (let i = previousStepCount; i < this.stepTracker.stepCount; i++) {
+          const step = this.stepTracker.stepById[i];
+          if (step && step.hasSideEffects) {
+            throw e;
+          }
+        }
+      }
+
+      try {
+        this.stepTracker.purgeBackTo(previousStepCount);
+        layerPlan.latestSideEffectStep = previousSideEffectStep;
+      } catch (e2) {
+        console.error(
+          `Cleanup error occurred whilst trying to recover from field planning error: ${e2.stack}`,
+        );
+        throw e;
+      }
+
+      const step = withGlobalLayerPlan(
+        layerPlan,
+        polymorphicPaths,
+        planningPath,
+        error,
+        null,
+        e,
+      );
+      const haltTree = true;
+      // PERF: consider deleting all steps that were allocated during this. For
+      // now we'll just rely on tree-shaking.
+      return { step, haltTree };
+    } finally {
+      if (this.loc !== null) this.loc.pop();
     }
   }
 
@@ -5269,7 +5269,7 @@ function isPeerLayerPlan(
   return false;
 }
 
-interface BatchPlanFieldDetails {
+interface PlanFieldDetails {
   typeName: string;
   fieldName: string;
   layerPlan: LayerPlan;
@@ -5290,7 +5290,7 @@ interface BatchPlanFieldDetails {
 
 interface PlanFieldBatch {
   complete: boolean;
-  batch: Array<BatchPlanFieldDetails>;
+  batch: Array<PlanFieldDetails>;
   results: Array<
     { error: Error } | { error?: never; haltTree: boolean; step: Step }
   >;
