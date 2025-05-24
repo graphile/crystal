@@ -71,7 +71,7 @@ export interface LootBoxData {
 
 export interface LootData {
   id: number;
-  itemType: String;
+  itemType: string;
   itemId: number;
   lootBoxId: number;
   percentageChance: number;
