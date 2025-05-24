@@ -1,0 +1,20 @@
+{
+  item(type: Consumable, id: 206) {
+    name
+    ... on Created {
+      creator {
+        id
+        ... on HasInventory {
+          items {
+            id
+            ... on Created {
+              creator {
+                id
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

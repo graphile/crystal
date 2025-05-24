@@ -1,0 +1,139 @@
+{
+  crawler: {
+    id: 101,
+    name: 'Carl',
+    items: [
+      {
+        __typename: 'UtilityItem',
+        id: 206,
+        name: 'Fireball or Custard? Scratchcard',
+      },
+      {
+        __typename: 'Equipment',
+        id: 201,
+        name: 'Cloak of Stoutness',
+        creator: null,
+        maxDurability: 300,
+        contents: null,
+      },
+      {
+        __typename: 'Equipment',
+        id: 202,
+        name: 'Toe Ring of the Splatter Skunk',
+        creator: null,
+        maxDurability: 1000,
+        contents: null,
+      },
+      {
+        __typename: 'Equipment',
+        id: 203,
+        name: 'Enchanted War Gauntlet',
+        creator: null,
+        maxDurability: 1800,
+        contents: null,
+      },
+      {
+        __typename: 'Consumable',
+        id: 201,
+        name: 'Rev-Up Immunity Smoothie',
+        creator: null,
+        effect: 'Temporary immunity to all health-seeping conditions and debuffs',
+        contents: null,
+      },
+      {
+        __typename: 'UtilityItem',
+        id: 202,
+        name: 'Bandage',
+      },
+      {
+        __typename: 'Consumable',
+        id: 203,
+        name: 'Mana Potion',
+        creator: null,
+        effect: 'Fully restores MP',
+        contents: null,
+      },
+      {
+        __typename: 'Consumable',
+        id: 204,
+        name: 'Healing Potion',
+        creator: null,
+        effect: 'Heal 50%+ total health',
+        contents: null,
+      },
+      {
+        __typename: 'Consumable',
+        id: 205,
+        name: "Dolores Doesn't Splat Potion",
+        creator: {
+          id: 106,
+          name: 'Dolores',
+        },
+        effect: 'Soften impact surface. Impact x 5',
+        contents: [
+          {
+            __typename: 'Consumable',
+            id: 207,
+            name: 'Crowd Blast Potion',
+            effect: 'Imitates the Crowd Blast skill',
+          },
+          {
+            __typename: 'Consumable',
+            id: 208,
+            name: 'Rock Buffalo Potion',
+            effect: "A required component of Dolores Doesn't Splat Potion",
+          },
+        ],
+      },
+      {
+        __typename: 'Consumable',
+        id: 206,
+        name: "Carl's Jug O' Boom",
+        creator: {
+          id: 101,
+          name: 'Carl',
+        },
+        effect: 'Intense Fire for (Incendiary Device Handling Skill Level x 15) sec.',
+        contents: [
+          {
+            __typename: 'Consumable',
+            id: 209,
+            name: 'Goblin Oil',
+            effect: 'Has many uses',
+          },
+          {
+            __typename: 'MiscItem',
+            id: 204,
+            name: 'Low-Grade Moonshine Jug',
+          },
+          {
+            __typename: 'MiscItem',
+            id: 205,
+            name: 'Torch',
+          },
+        ],
+      },
+      {
+        __typename: 'Equipment',
+        id: 211,
+        name: "Enchanted Anarchist's Battle Rattle",
+        creator: null,
+        maxDurability: 10000,
+        contents: [
+          {
+            __typename: 'Equipment',
+            id: 212,
+            name: 'Earth Upgrade Patch',
+            maxDurability: 10000,
+          },
+          {
+            __typename: 'Equipment',
+            id: 213,
+            name: 'Skyfowl Upgrade Patch',
+            maxDurability: 10000,
+          },
+        ],
+      },
+    ],
+  },
+}

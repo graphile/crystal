@@ -1,0 +1,181 @@
+{
+  crawler: {
+    id: 102,
+    name: 'Princess Donut',
+    species: 'CAT',
+    friends: [
+      {
+        __typename: 'ActiveCrawler',
+        id: 101,
+        name: 'Carl',
+        crawlerNumber: 4122,
+        friends: [
+          {
+            id: 102,
+            name: 'Princess Donut',
+          },
+          {
+            id: 103,
+            name: 'Katia',
+          },
+          {
+            id: 104,
+            name: 'Imani',
+          },
+          {
+            id: 105,
+            name: 'Elle',
+          },
+          {
+            id: 301,
+            name: 'Mordecai',
+          },
+        ],
+      },
+      {
+        __typename: 'ActiveCrawler',
+        id: 103,
+        name: 'Katia',
+        crawlerNumber: 9077265,
+        friends: [
+          {
+            id: 101,
+            name: 'Carl',
+          },
+          {
+            id: 102,
+            name: 'Princess Donut',
+          },
+        ],
+      },
+      {
+        __typename: 'ActiveCrawler',
+        id: 104,
+        name: 'Imani',
+        crawlerNumber: null,
+        friends: [
+          {
+            id: 101,
+            name: 'Carl',
+          },
+          {
+            id: 102,
+            name: 'Princess Donut',
+          },
+          {
+            id: 105,
+            name: 'Elle',
+          },
+        ],
+      },
+      {
+        __typename: 'ActiveCrawler',
+        id: 105,
+        name: 'Elle',
+        crawlerNumber: null,
+        friends: [
+          {
+            id: 101,
+            name: 'Carl',
+          },
+          {
+            id: 102,
+            name: 'Princess Donut',
+          },
+          {
+            id: 104,
+            name: 'Imani',
+          },
+        ],
+      },
+      {
+        __typename: 'Manager',
+        id: 301,
+        name: 'Mordecai',
+        exCrawler: true,
+        friends: [
+          {
+            id: 101,
+            name: 'Carl',
+          },
+          {
+            id: 102,
+            name: 'Princess Donut',
+          },
+          {
+            id: 103,
+            name: 'Katia',
+          },
+          {
+            id: 306,
+            name: 'Tally',
+          },
+        ],
+        client: {
+          id: 102,
+          name: 'Princess Donut',
+        },
+      },
+      {
+        __typename: 'Security',
+        id: 302,
+        name: 'Bomo',
+        exCrawler: null,
+        friends: [
+          {
+            id: 102,
+            name: 'Princess Donut',
+          },
+          {
+            id: 303,
+            name: 'Sledge',
+          },
+        ],
+        clients: [
+          {
+            id: 101,
+            name: 'Carl',
+          },
+          {
+            id: 102,
+            name: 'Princess Donut',
+          },
+          {
+            id: 103,
+            name: 'Katia',
+          },
+        ],
+      },
+      {
+        __typename: 'Security',
+        id: 303,
+        name: 'Sledge',
+        exCrawler: null,
+        friends: [
+          {
+            id: 102,
+            name: 'Princess Donut',
+          },
+          {
+            id: 302,
+            name: 'Bomo',
+          },
+        ],
+        clients: [
+          {
+            id: 101,
+            name: 'Carl',
+          },
+          {
+            id: 102,
+            name: 'Princess Donut',
+          },
+          {
+            id: 103,
+            name: 'Katia',
+          },
+        ],
+      },
+    ],
+  },
+}

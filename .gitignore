@@ -18,6 +18,9 @@ _LOCAL
 # mermaid pngs
 grafast/dataplan-pg/__tests__/**/*.mermaid.png
 
+# mermaid plans
+grafast/grafast/__tests__/dcc/**/*.mermaid
+
 # yarn2 stuff
 .yarn/*
 !.yarn/releases

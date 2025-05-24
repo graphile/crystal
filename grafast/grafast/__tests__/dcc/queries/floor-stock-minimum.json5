@@ -1,0 +1,47 @@
+{
+  floor: {
+    number: 3,
+    locations: [
+      {
+        id: 201,
+        stock: null,
+      },
+      {
+        id: 301,
+        stock: [
+          {
+            __typename: 'Consumable',
+            id: 203,
+          },
+          {
+            __typename: 'Consumable',
+            id: 204,
+          },
+          {
+            __typename: 'Consumable',
+            id: 209,
+          },
+          {
+            __typename: 'UtilityItem',
+            id: 206,
+          },
+        ],
+      },
+      {
+        id: 302,
+        stock: [
+          {
+            __typename: 'UtilityItem',
+            id: 202,
+          },
+        ],
+      },
+      {
+        id: 303,
+      },
+      {
+        id: 304,
+      },
+    ],
+  },
+}
