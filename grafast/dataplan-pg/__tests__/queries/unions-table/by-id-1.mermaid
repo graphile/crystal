@@ -20,10 +20,8 @@ graph TD
     Bucket1 --> Bucket2 & Bucket3 & Bucket4 & Bucket5 & Bucket6
 
     %% plan dependencies
-    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸunion_itemsᐳ"]]:::plan
-    Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant68{{"Constant[68∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Object10 & Constant68 --> PgSelect7
+    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸunion_itemsᐳ<br />More deps:<br />- Object[10]<br />- Constantᐸ1ᐳ[68]"]]:::plan
+    Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 6"}}:::plan
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
@@ -38,13 +36,10 @@ graph TD
     First11 --> PgSelectSingle13
     PgClassExpression14{{"PgClassExpression[14∈0] ➊<br />ᐸ__union_items__.”type”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression14
-    Lambda16{{"Lambda[16∈0] ➊<br />ᐸunionItemTypeNameFromTypeᐳ"}}:::plan
-    PgClassExpression14 -->|rejectNull| Lambda16
     PgClassExpression17{{"PgClassExpression[17∈0] ➊<br />ᐸ__union_items__.”id”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression17
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    PgSelect19[["PgSelect[19∈2] ➊<br />ᐸunion_topicsᐳ<br />ᐳUnionTopic"]]:::plan
-    Object10 & PgClassExpression17 --> PgSelect19
+    PgSelect19[["PgSelect[19∈2] ➊<br />ᐸunion_topicsᐳ<br />ᐳUnionTopic<br />More deps:<br />- Object[10]"]]:::plan
+    PgClassExpression17 --> PgSelect19
     First23{{"First[23∈2] ➊^"}}:::plan
     PgSelectRows24[["PgSelectRows[24∈2] ➊^"]]:::plan
     PgSelectRows24 --> First23
@@ -55,8 +50,8 @@ graph TD
     PgSelectSingle25 --> PgClassExpression54
     PgClassExpression59{{"PgClassExpression[59∈2] ➊^<br />ᐸ__union_to...__.”title”ᐳ"}}:::plan
     PgSelectSingle25 --> PgClassExpression59
-    PgSelect26[["PgSelect[26∈3] ➊<br />ᐸunion_postsᐳ<br />ᐳUnionPost"]]:::plan
-    Object10 & PgClassExpression17 --> PgSelect26
+    PgSelect26[["PgSelect[26∈3] ➊<br />ᐸunion_postsᐳ<br />ᐳUnionPost<br />More deps:<br />- Object[10]"]]:::plan
+    PgClassExpression17 --> PgSelect26
     First30{{"First[30∈3] ➊^"}}:::plan
     PgSelectRows31[["PgSelectRows[31∈3] ➊^"]]:::plan
     PgSelectRows31 --> First30
@@ -71,8 +66,8 @@ graph TD
     PgSelectSingle32 --> PgClassExpression64
     PgClassExpression67{{"PgClassExpression[67∈3] ➊^<br />ᐸ__union_posts__.”note”ᐳ"}}:::plan
     PgSelectSingle32 --> PgClassExpression67
-    PgSelect33[["PgSelect[33∈4] ➊<br />ᐸunion_dividersᐳ<br />ᐳUnionDivider"]]:::plan
-    Object10 & PgClassExpression17 --> PgSelect33
+    PgSelect33[["PgSelect[33∈4] ➊<br />ᐸunion_dividersᐳ<br />ᐳUnionDivider<br />More deps:<br />- Object[10]"]]:::plan
+    PgClassExpression17 --> PgSelect33
     First37{{"First[37∈4] ➊^"}}:::plan
     PgSelectRows38[["PgSelectRows[38∈4] ➊^"]]:::plan
     PgSelectRows38 --> First37
@@ -85,8 +80,8 @@ graph TD
     PgSelectSingle39 --> PgClassExpression61
     PgClassExpression65{{"PgClassExpression[65∈4] ➊^<br />ᐸ__union_di...__.”color”ᐳ"}}:::plan
     PgSelectSingle39 --> PgClassExpression65
-    PgSelect40[["PgSelect[40∈5] ➊<br />ᐸunion_checklistsᐳ<br />ᐳUnionChecklist"]]:::plan
-    Object10 & PgClassExpression17 --> PgSelect40
+    PgSelect40[["PgSelect[40∈5] ➊<br />ᐸunion_checklistsᐳ<br />ᐳUnionChecklist<br />More deps:<br />- Object[10]"]]:::plan
+    PgClassExpression17 --> PgSelect40
     First44{{"First[44∈5] ➊^"}}:::plan
     PgSelectRows45[["PgSelectRows[45∈5] ➊^"]]:::plan
     PgSelectRows45 --> First44
@@ -97,8 +92,8 @@ graph TD
     PgSelectSingle46 --> PgClassExpression57
     PgClassExpression62{{"PgClassExpression[62∈5] ➊^<br />ᐸ__union_ch...__.”title”ᐳ"}}:::plan
     PgSelectSingle46 --> PgClassExpression62
-    PgSelect47[["PgSelect[47∈6] ➊<br />ᐸunion_checklist_itemsᐳ<br />ᐳUnionChecklistItem"]]:::plan
-    Object10 & PgClassExpression17 --> PgSelect47
+    PgSelect47[["PgSelect[47∈6] ➊<br />ᐸunion_checklist_itemsᐳ<br />ᐳUnionChecklistItem<br />More deps:<br />- Object[10]"]]:::plan
+    PgClassExpression17 --> PgSelect47
     First51{{"First[51∈6] ➊^"}}:::plan
     PgSelectRows52[["PgSelectRows[52∈6] ➊^"]]:::plan
     PgSelectRows52 --> First51
@@ -114,7 +109,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,PgClassExpression14,Lambda16,PgClassExpression17,Constant68 bucket0
+    class Bucket0,__Value2,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,PgClassExpression14,PgClassExpression17 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1 bucket1
     classDef bucket2 stroke:#7f007f

@@ -18,12 +18,11 @@ graph TD
     Bucket2 --> Bucket3
 
     %% plan dependencies
-    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸforumsᐳ"]]:::plan
+    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸforumsᐳ<br />More deps:<br />- Constantᐸ'f1700000-0000-0000-0000-000000000f17'ᐳ[29]"]]:::plan
     Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant29{{"Constant[29∈0] ➊<br />ᐸ'f1700000-0000-0000-0000-000000000f17'ᐳ"}}:::plan
     PgFromExpression24{{"PgFromExpression[24∈0] ➊"}}:::plan
     PgSelectInlineApply25["PgSelectInlineApply[25∈0] ➊"]:::plan
-    Object10 & Constant29 & PgFromExpression24 & PgSelectInlineApply25 --> PgSelect7
+    Object10 & PgFromExpression24 & PgSelectInlineApply25 --> PgSelect7
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
@@ -37,12 +36,9 @@ graph TD
     PgSelectRows12[["PgSelectRows[12∈0] ➊"]]:::plan
     PgSelectRows12 --> First11
     PgSelect7 --> PgSelectRows12
-    PgSelectSingle13{{"PgSelectSingle[13∈0] ➊<br />ᐸforumsᐳ"}}:::plan
-    First11 --> PgSelectSingle13
     PgSelect7 --> Access26
     Lambda28{{"Lambda[28∈0] ➊<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List27 --> Lambda28
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgSelectRows20[["PgSelectRows[20∈1] ➊"]]:::plan
     Lambda28 --> PgSelectRows20
     __Item21[/"__Item[21∈2]<br />ᐸ20ᐳ"\]:::itemplan
@@ -54,7 +50,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,PgFromExpression24,PgSelectInlineApply25,Access26,List27,Lambda28,Constant29 bucket0
+    class Bucket0,__Value2,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgFromExpression24,PgSelectInlineApply25,Access26,List27,Lambda28 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelectRows20 bucket1
     classDef bucket2 stroke:#7f007f

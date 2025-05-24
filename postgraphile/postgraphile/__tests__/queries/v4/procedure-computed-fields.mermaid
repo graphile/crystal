@@ -70,52 +70,27 @@ graph TD
     Bucket35 --> Bucket36
 
     %% plan dependencies
-    PgSelect30[["PgSelect[30∈0] ➊<br />ᐸpersonᐳ"]]:::plan
-    Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant351{{"Constant[351∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    PgFromExpression41{{"PgFromExpression[41∈0] ➊"}}:::plan
-    PgFromExpression45{{"PgFromExpression[45∈0] ➊"}}:::plan
-    PgFromExpression48{{"PgFromExpression[48∈0] ➊"}}:::plan
-    PgFromExpression51{{"PgFromExpression[51∈0] ➊"}}:::plan
-    PgFromExpression54{{"PgFromExpression[54∈0] ➊"}}:::plan
-    PgFromExpression57{{"PgFromExpression[57∈0] ➊"}}:::plan
-    Object11 & Constant351 & PgFromExpression41 & PgFromExpression45 & PgFromExpression48 & PgFromExpression51 & PgFromExpression54 & PgFromExpression57 --> PgSelect30
-    __InputObject150{{"__InputObject[150∈0] ➊"}}:::plan
-    Constant357{{"Constant[357∈0] ➊<br />ᐸ419ᐳ"}}:::plan
-    Constant358{{"Constant[358∈0] ➊<br />ᐸ'easy cheesy baked potatoes'ᐳ"}}:::plan
-    Constant359{{"Constant[359∈0] ➊<br />ᐸ'red'ᐳ"}}:::plan
-    Constant360{{"Constant[360∈0] ➊<br />ᐸ'BAR_FOO'ᐳ"}}:::plan
-    Constant361{{"Constant[361∈0] ➊<br />ᐸ''ᐳ"}}:::plan
-    __InputObject156{{"__InputObject[156∈0] ➊"}}:::plan
-    Constant353{{"Constant[353∈0] ➊<br />ᐸ8ᐳ"}}:::plan
-    Constant357 & Constant358 & Constant359 & Constant360 & Constant361 & __InputObject156 & Constant353 --> __InputObject150
-    Constant352{{"Constant[352∈0] ➊<br />ᐸ7ᐳ"}}:::plan
-    Constant351 & Constant352 --> PgFromExpression41
-    Constant351 & Constant353 & Constant352 --> PgFromExpression45
-    Constant351 & Constant352 --> PgFromExpression48
-    Constant351 & Constant352 --> PgFromExpression51
-    Constant351 & Constant352 --> PgFromExpression54
-    Constant351 & Constant352 --> PgFromExpression57
+    PgSelect30[["PgSelect[30∈0] ➊<br />ᐸpersonᐳ<br />More deps:<br />- Object[11]<br />- Constantᐸ1ᐳ[351]"]]:::plan
+    PgFromExpression41{{"PgFromExpression[41∈0] ➊<br />More deps:<br />- Constantᐸ1ᐳ[351]<br />- Constantᐸundefinedᐳ[6]<br />- Constantᐸ7ᐳ[352]"}}:::plan
+    PgFromExpression45{{"PgFromExpression[45∈0] ➊<br />More deps:<br />- Constantᐸ1ᐳ[351]<br />- Constantᐸ8ᐳ[353]<br />- Constantᐸ7ᐳ[352]"}}:::plan
+    PgFromExpression48{{"PgFromExpression[48∈0] ➊<br />More deps:<br />- Constantᐸ1ᐳ[351]<br />- Constantᐸundefinedᐳ[6]<br />- Constantᐸ7ᐳ[352]"}}:::plan
+    PgFromExpression51{{"PgFromExpression[51∈0] ➊<br />More deps:<br />- Constantᐸ1ᐳ[351]<br />- Constantᐸundefinedᐳ[6]<br />- Constantᐸ7ᐳ[352]"}}:::plan
+    PgFromExpression54{{"PgFromExpression[54∈0] ➊<br />More deps:<br />- Constantᐸ1ᐳ[351]<br />- Constantᐸundefinedᐳ[6]<br />- Constantᐸ7ᐳ[352]"}}:::plan
+    PgFromExpression57{{"PgFromExpression[57∈0] ➊<br />More deps:<br />- Constantᐸ1ᐳ[351]<br />- Constantᐸundefinedᐳ[6]<br />- Constantᐸ7ᐳ[352]"}}:::plan
+    PgFromExpression41 & PgFromExpression45 & PgFromExpression48 & PgFromExpression51 & PgFromExpression54 & PgFromExpression57 --> PgSelect30
+    __InputObject150{{"__InputObject[150∈0] ➊<br />More deps:<br />- Constantᐸ419ᐳ[357]<br />- Constantᐸ'easy cheesy baked potatoes'ᐳ[358]<br />- Constantᐸ'red'ᐳ[359]<br />- Constantᐸundefinedᐳ[6]<br />- Constantᐸ'BAR_FOO'ᐳ[360]<br />- Constantᐸ''ᐳ[361]<br />- Constantᐸ8ᐳ[353]"}}:::plan
+    __InputObject156{{"__InputObject[156∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[6]<br />- Constantᐸ5ᐳ[362]"}}:::plan
+    __InputObject156 --> __InputObject150
+    Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 5"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
-    PgFromExpression105{{"PgFromExpression[105∈0] ➊"}}:::plan
-    Constant354{{"Constant[354∈0] ➊<br />ᐸ15ᐳ"}}:::plan
-    Constant354 --> PgFromExpression105
-    PgFromExpression126{{"PgFromExpression[126∈0] ➊"}}:::plan
-    Constant355{{"Constant[355∈0] ➊<br />ᐸ20ᐳ"}}:::plan
-    Constant356{{"Constant[356∈0] ➊<br />ᐸ'[...]'ᐳ"}}:::plan
-    Constant355 & Constant356 --> PgFromExpression126
-    PgFromExpression139{{"PgFromExpression[139∈0] ➊"}}:::plan
-    Constant354 --> PgFromExpression139
-    PgFromExpression142{{"PgFromExpression[142∈0] ➊"}}:::plan
-    Constant355 & Constant356 --> PgFromExpression142
-    PgFromExpression145{{"PgFromExpression[145∈0] ➊"}}:::plan
-    Constant354 --> PgFromExpression145
-    PgFromExpression148{{"PgFromExpression[148∈0] ➊"}}:::plan
-    Constant355 & Constant356 --> PgFromExpression148
-    Constant362{{"Constant[362∈0] ➊<br />ᐸ5ᐳ"}}:::plan
-    Constant362 --> __InputObject156
+    PgFromExpression105{{"PgFromExpression[105∈0] ➊<br />More deps:<br />- Constantᐸ15ᐳ[354]<br />- Constantᐸundefinedᐳ[6]"}}:::plan
+    PgFromExpression126{{"PgFromExpression[126∈0] ➊<br />More deps:<br />- Constantᐸ20ᐳ[355]<br />- Constantᐸ'[...]'ᐳ[356]"}}:::plan
+    PgFromExpression139{{"PgFromExpression[139∈0] ➊<br />More deps:<br />- Constantᐸ15ᐳ[354]<br />- Constantᐸundefinedᐳ[6]"}}:::plan
+    PgFromExpression142{{"PgFromExpression[142∈0] ➊<br />More deps:<br />- Constantᐸ20ᐳ[355]<br />- Constantᐸ'[...]'ᐳ[356]"}}:::plan
+    PgFromExpression145{{"PgFromExpression[145∈0] ➊<br />More deps:<br />- Constantᐸ15ᐳ[354]<br />- Constantᐸundefinedᐳ[6]"}}:::plan
+    PgFromExpression148{{"PgFromExpression[148∈0] ➊<br />More deps:<br />- Constantᐸ20ᐳ[355]<br />- Constantᐸ'[...]'ᐳ[356]"}}:::plan
     PgSelectInlineApply311["PgSelectInlineApply[311∈0] ➊"]:::plan
     PgSelectInlineApply303["PgSelectInlineApply[303∈0] ➊"]:::plan
     PgSelectInlineApply307["PgSelectInlineApply[307∈0] ➊"]:::plan
@@ -133,19 +108,15 @@ graph TD
     PgSelect30 --> PgSelectRows33
     PgSelectSingle34{{"PgSelectSingle[34∈0] ➊<br />ᐸpersonᐳ"}}:::plan
     First32 --> PgSelectSingle34
-    PgFromExpression91{{"PgFromExpression[91∈0] ➊"}}:::plan
-    PgFromExpression136{{"PgFromExpression[136∈0] ➊"}}:::plan
+    PgFromExpression91{{"PgFromExpression[91∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[6]"}}:::plan
+    PgFromExpression136{{"PgFromExpression[136∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[6]"}}:::plan
     BakedInput158{{"BakedInput[158∈0] ➊"}}:::plan
     __InputObject150 --> BakedInput158
     PgFromExpression164{{"PgFromExpression[164∈0] ➊"}}:::plan
     BakedInput158 --> PgFromExpression164
-    Connection283{{"Connection[283∈0] ➊<br />ᐸ278ᐳ"}}:::plan
-    Constant351 --> Connection283
-    PgSelectInlineApply343["PgSelectInlineApply[343∈0] ➊"]:::plan
-    Constant351 --> PgSelectInlineApply343
+    PgSelectInlineApply343["PgSelectInlineApply[343∈0] ➊<br />More deps:<br />- Constantᐸ1ᐳ[351]"]:::plan
     PgSelectInlineApply347["PgSelectInlineApply[347∈0] ➊"]:::plan
     PgSelectInlineApply343 --> PgSelectInlineApply347
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection12{{"Connection[12∈0] ➊<br />ᐸ8ᐳ"}}:::plan
     Connection17{{"Connection[17∈0] ➊<br />ᐸ15ᐳ"}}:::plan
     Connection22{{"Connection[22∈0] ➊<br />ᐸ20ᐳ"}}:::plan
@@ -154,7 +125,6 @@ graph TD
     PgFromExpression86{{"PgFromExpression[86∈0] ➊"}}:::plan
     PgFromExpression100{{"PgFromExpression[100∈0] ➊"}}:::plan
     PgFromExpression112{{"PgFromExpression[112∈0] ➊"}}:::plan
-    Connection113{{"Connection[113∈0] ➊<br />ᐸ108ᐳ"}}:::plan
     PgFromExpression121{{"PgFromExpression[121∈0] ➊"}}:::plan
     PgFromExpression131{{"PgFromExpression[131∈0] ➊"}}:::plan
     PgFromExpression172{{"PgFromExpression[172∈0] ➊"}}:::plan
@@ -169,8 +139,8 @@ graph TD
     PgSelectInlineApply331["PgSelectInlineApply[331∈0] ➊"]:::plan
     PgSelectInlineApply335["PgSelectInlineApply[335∈0] ➊"]:::plan
     PgSelectInlineApply339["PgSelectInlineApply[339∈0] ➊"]:::plan
-    PgSelect36[["PgSelect[36∈1] ➊<br />ᐸtypesᐳ"]]:::plan
-    Object11 & Connection12 & PgFromExpression76 & PgSelectInlineApply299 & PgFromExpression86 & PgFromExpression183 & PgFromExpression204 & PgSelectInlineApply311 & PgFromExpression100 & PgSelectInlineApply315 & PgFromExpression121 & PgFromExpression194 & PgFromExpression212 & PgSelectInlineApply327 --> PgSelect36
+    PgSelect36[["PgSelect[36∈1] ➊<br />ᐸtypesᐳ<br />More deps:<br />- Object[11]"]]:::plan
+    Connection12 & PgFromExpression76 & PgSelectInlineApply299 & PgFromExpression86 & PgFromExpression183 & PgFromExpression204 & PgSelectInlineApply311 & PgFromExpression100 & PgSelectInlineApply315 & PgFromExpression121 & PgFromExpression194 & PgFromExpression212 & PgSelectInlineApply327 --> PgSelect36
     PgSelectRows59[["PgSelectRows[59∈1] ➊"]]:::plan
     PgSelect36 --> PgSelectRows59
     Access300{{"Access[300∈1] ➊<br />ᐸ36.m.joinDetailsFor72ᐳ"}}:::plan
@@ -181,24 +151,24 @@ graph TD
     PgSelect36 --> Access316
     Access328{{"Access[328∈1] ➊<br />ᐸ36.m.joinDetailsFor119ᐳ"}}:::plan
     PgSelect36 --> Access328
-    PgSelect37[["PgSelect[37∈2] ➊<br />ᐸpostᐳ"]]:::plan
-    Object11 & Connection17 & PgFromExpression91 & PgFromExpression105 & PgFromExpression126 & PgFromExpression136 & PgFromExpression139 & PgFromExpression142 & PgFromExpression145 & PgFromExpression148 & PgFromExpression164 & PgSelectInlineApply331 & PgFromExpression172 & PgSelectInlineApply335 --> PgSelect37
+    PgSelect37[["PgSelect[37∈2] ➊<br />ᐸpostᐳ<br />More deps:<br />- Object[11]"]]:::plan
+    Connection17 & PgFromExpression91 & PgFromExpression105 & PgFromExpression126 & PgFromExpression136 & PgFromExpression139 & PgFromExpression142 & PgFromExpression145 & PgFromExpression148 & PgFromExpression164 & PgSelectInlineApply331 & PgFromExpression172 & PgSelectInlineApply335 --> PgSelect37
     PgSelectRows60[["PgSelectRows[60∈2] ➊"]]:::plan
     PgSelect37 --> PgSelectRows60
     Access332{{"Access[332∈2] ➊<br />ᐸ37.m.subqueryDetailsFor160ᐳ"}}:::plan
     PgSelect37 --> Access332
     Access336{{"Access[336∈2] ➊<br />ᐸ37.m.subqueryDetailsFor199ᐳ"}}:::plan
     PgSelect37 --> Access336
-    PgSelect38[["PgSelect[38∈3] ➊<br />ᐸpersonᐳ"]]:::plan
-    Object11 & Connection22 & PgFromExpression131 & PgSelectInlineApply339 & PgFromExpression112 & PgFromExpression282 & PgSelectInlineApply347 --> PgSelect38
+    PgSelect38[["PgSelect[38∈3] ➊<br />ᐸpersonᐳ<br />More deps:<br />- Object[11]"]]:::plan
+    Connection22 & PgFromExpression131 & PgSelectInlineApply339 & PgFromExpression112 & PgFromExpression282 & PgSelectInlineApply347 --> PgSelect38
     PgSelectRows61[["PgSelectRows[61∈3] ➊"]]:::plan
     PgSelect38 --> PgSelectRows61
     Access340{{"Access[340∈3] ➊<br />ᐸ38.m.joinDetailsFor129ᐳ"}}:::plan
     PgSelect38 --> Access340
     Access348{{"Access[348∈3] ➊<br />ᐸ38.m.subqueryDetailsFor188ᐳ"}}:::plan
     PgSelect38 --> Access348
-    PgSelect39[["PgSelect[39∈4] ➊<br />ᐸedge_caseᐳ"]]:::plan
-    Object11 & Connection27 --> PgSelect39
+    PgSelect39[["PgSelect[39∈4] ➊<br />ᐸedge_caseᐳ<br />More deps:<br />- Object[11]"]]:::plan
+    Connection27 --> PgSelect39
     PgSelectRows62[["PgSelectRows[62∈4] ➊"]]:::plan
     PgSelect39 --> PgSelectRows62
     PgClassExpression42{{"PgClassExpression[42∈5] ➊<br />ᐸ(1/0) /* E...ferred! */ᐳ"}}:::plan
@@ -494,7 +464,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access9,Access10,Object11,Connection12,Connection17,Connection22,Connection27,PgSelect30,First32,PgSelectRows33,PgSelectSingle34,PgFromExpression41,PgFromExpression45,PgFromExpression48,PgFromExpression51,PgFromExpression54,PgFromExpression57,PgFromExpression76,PgFromExpression86,PgFromExpression91,PgFromExpression100,PgFromExpression105,PgFromExpression112,Connection113,PgFromExpression121,PgFromExpression126,PgFromExpression131,PgFromExpression136,PgFromExpression139,PgFromExpression142,PgFromExpression145,PgFromExpression148,__InputObject150,__InputObject156,BakedInput158,PgFromExpression164,PgFromExpression172,Connection173,PgFromExpression183,PgFromExpression194,PgFromExpression204,PgFromExpression212,PgFromExpression282,Connection283,PgSelectInlineApply299,PgSelectInlineApply303,PgSelectInlineApply307,PgSelectInlineApply311,PgSelectInlineApply315,PgSelectInlineApply319,PgSelectInlineApply323,PgSelectInlineApply327,PgSelectInlineApply331,PgSelectInlineApply335,PgSelectInlineApply339,PgSelectInlineApply343,PgSelectInlineApply347,Constant351,Constant352,Constant353,Constant354,Constant355,Constant356,Constant357,Constant358,Constant359,Constant360,Constant361,Constant362 bucket0
+    class Bucket0,__Value2,Access9,Access10,Object11,Connection12,Connection17,Connection22,Connection27,PgSelect30,First32,PgSelectRows33,PgSelectSingle34,PgFromExpression41,PgFromExpression45,PgFromExpression48,PgFromExpression51,PgFromExpression54,PgFromExpression57,PgFromExpression76,PgFromExpression86,PgFromExpression91,PgFromExpression100,PgFromExpression105,PgFromExpression112,PgFromExpression121,PgFromExpression126,PgFromExpression131,PgFromExpression136,PgFromExpression139,PgFromExpression142,PgFromExpression145,PgFromExpression148,__InputObject150,__InputObject156,BakedInput158,PgFromExpression164,PgFromExpression172,Connection173,PgFromExpression183,PgFromExpression194,PgFromExpression204,PgFromExpression212,PgFromExpression282,PgSelectInlineApply299,PgSelectInlineApply303,PgSelectInlineApply307,PgSelectInlineApply311,PgSelectInlineApply315,PgSelectInlineApply319,PgSelectInlineApply323,PgSelectInlineApply327,PgSelectInlineApply331,PgSelectInlineApply335,PgSelectInlineApply339,PgSelectInlineApply343,PgSelectInlineApply347 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect36,PgSelectRows59,Access300,Access312,Access316,Access328 bucket1
     classDef bucket2 stroke:#7f007f

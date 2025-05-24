@@ -41,20 +41,18 @@ graph TD
     Bucket12 --> Bucket16
 
     %% plan dependencies
-    __InputObject7{{"__InputObject[7∈0] ➊"}}:::plan
+    __InputObject7{{"__InputObject[7∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[6]"}}:::plan
     Access8{{"Access[8∈0] ➊<br />ᐸ0.undefinedᐳ"}}:::plan
     Access8 --> __InputObject7
-    Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 4"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access13{{"Access[13∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access12 & Access13 --> Object14
-    __InputObject18{{"__InputObject[18∈0] ➊"}}:::plan
+    __InputObject18{{"__InputObject[18∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[6]"}}:::plan
     Access19{{"Access[19∈0] ➊<br />ᐸ0.aliceᐳ"}}:::plan
     Access19 --> __InputObject18
-    __InputObject27{{"__InputObject[27∈0] ➊"}}:::plan
-    Constant28{{"Constant[28∈0] ➊<br />ᐸnullᐳ"}}:::plan
-    Constant28 --> __InputObject27
-    __InputObject35{{"__InputObject[35∈0] ➊"}}:::plan
+    __InputObject27{{"__InputObject[27∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[6]<br />- Constantᐸnullᐳ[28]"}}:::plan
+    __InputObject35{{"__InputObject[35∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[6]"}}:::plan
     Access36{{"Access[36∈0] ➊<br />ᐸ0.post3ᐳ"}}:::plan
     Access36 --> __InputObject35
     __Value0["__Value[0∈0] ➊<br />ᐸvariableValuesᐳ"]:::plan
@@ -72,36 +70,34 @@ graph TD
     __Value0 --> Access36
     ApplyInput42{{"ApplyInput[42∈0] ➊"}}:::plan
     __InputObject35 --> ApplyInput42
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection15{{"Connection[15∈0] ➊<br />ᐸ11ᐳ"}}:::plan
     Connection24{{"Connection[24∈0] ➊<br />ᐸ22ᐳ"}}:::plan
     Connection32{{"Connection[32∈0] ➊<br />ᐸ30ᐳ"}}:::plan
     Connection41{{"Connection[41∈0] ➊<br />ᐸ39ᐳ"}}:::plan
-    Constant96{{"Constant[96∈0] ➊<br />ᐸ'people'ᐳ"}}:::plan
     PgSelectInlineApply109["PgSelectInlineApply[109∈0] ➊"]:::plan
     PgSelectInlineApply113["PgSelectInlineApply[113∈0] ➊"]:::plan
     PgSelectInlineApply117["PgSelectInlineApply[117∈0] ➊"]:::plan
     PgSelectInlineApply121["PgSelectInlineApply[121∈0] ➊"]:::plan
-    PgSelect44[["PgSelect[44∈1] ➊<br />ᐸpostᐳ"]]:::plan
-    Object14 & ApplyInput16 & Connection15 & PgSelectInlineApply109 --> PgSelect44
+    PgSelect44[["PgSelect[44∈1] ➊<br />ᐸpostᐳ<br />More deps:<br />- Object[14]"]]:::plan
+    ApplyInput16 & Connection15 & PgSelectInlineApply109 --> PgSelect44
     PgSelectRows48[["PgSelectRows[48∈1] ➊"]]:::plan
     PgSelect44 --> PgSelectRows48
     Access110{{"Access[110∈1] ➊<br />ᐸ44.m.joinDetailsFor61ᐳ"}}:::plan
     PgSelect44 --> Access110
-    PgSelect45[["PgSelect[45∈2] ➊<br />ᐸpostᐳ"]]:::plan
-    Object14 & ApplyInput25 & Connection24 & PgSelectInlineApply113 --> PgSelect45
+    PgSelect45[["PgSelect[45∈2] ➊<br />ᐸpostᐳ<br />More deps:<br />- Object[14]"]]:::plan
+    ApplyInput25 & Connection24 & PgSelectInlineApply113 --> PgSelect45
     PgSelectRows49[["PgSelectRows[49∈2] ➊"]]:::plan
     PgSelect45 --> PgSelectRows49
     Access114{{"Access[114∈2] ➊<br />ᐸ45.m.joinDetailsFor69ᐳ"}}:::plan
     PgSelect45 --> Access114
-    PgSelect46[["PgSelect[46∈3] ➊<br />ᐸpostᐳ"]]:::plan
-    Object14 & ApplyInput33 & Connection32 & PgSelectInlineApply121 --> PgSelect46
+    PgSelect46[["PgSelect[46∈3] ➊<br />ᐸpostᐳ<br />More deps:<br />- Object[14]"]]:::plan
+    ApplyInput33 & Connection32 & PgSelectInlineApply121 --> PgSelect46
     PgSelectRows50[["PgSelectRows[50∈3] ➊"]]:::plan
     PgSelect46 --> PgSelectRows50
     Access122{{"Access[122∈3] ➊<br />ᐸ46.m.joinDetailsFor77ᐳ"}}:::plan
     PgSelect46 --> Access122
-    PgSelect47[["PgSelect[47∈4] ➊<br />ᐸpostᐳ"]]:::plan
-    Object14 & ApplyInput42 & Connection41 & PgSelectInlineApply117 --> PgSelect47
+    PgSelect47[["PgSelect[47∈4] ➊<br />ᐸpostᐳ<br />More deps:<br />- Object[14]"]]:::plan
+    ApplyInput42 & Connection41 & PgSelectInlineApply117 --> PgSelect47
     PgSelectRows51[["PgSelectRows[51∈4] ➊"]]:::plan
     PgSelect47 --> PgSelectRows51
     Access118{{"Access[118∈4] ➊<br />ᐸ47.m.joinDetailsFor85ᐳ"}}:::plan
@@ -170,34 +166,34 @@ graph TD
     PgClassExpression95{{"PgClassExpression[95∈12]<br />ᐸ__post__.”body”ᐳ"}}:::plan
     PgSelectSingle59 --> PgClassExpression95
     List119 --> Lambda120
-    List98{{"List[98∈13]<br />ᐸ96,97ᐳ"}}:::plan
+    List98{{"List[98∈13]<br />ᐸ96,97ᐳ<br />More deps:<br />- Constantᐸ'people'ᐳ[96]"}}:::plan
     PgClassExpression97{{"PgClassExpression[97∈13]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    Constant96 & PgClassExpression97 --> List98
+    PgClassExpression97 --> List98
     PgSelectSingle67 --> PgClassExpression97
     Lambda99{{"Lambda[99∈13]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List98 --> Lambda99
-    List101{{"List[101∈14]<br />ᐸ96,100ᐳ"}}:::plan
+    List101{{"List[101∈14]<br />ᐸ96,100ᐳ<br />More deps:<br />- Constantᐸ'people'ᐳ[96]"}}:::plan
     PgClassExpression100{{"PgClassExpression[100∈14]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    Constant96 & PgClassExpression100 --> List101
+    PgClassExpression100 --> List101
     PgSelectSingle75 --> PgClassExpression100
     Lambda102{{"Lambda[102∈14]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List101 --> Lambda102
-    List104{{"List[104∈15]<br />ᐸ96,103ᐳ"}}:::plan
+    List104{{"List[104∈15]<br />ᐸ96,103ᐳ<br />More deps:<br />- Constantᐸ'people'ᐳ[96]"}}:::plan
     PgClassExpression103{{"PgClassExpression[103∈15]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    Constant96 & PgClassExpression103 --> List104
+    PgClassExpression103 --> List104
     PgSelectSingle83 --> PgClassExpression103
     Lambda105{{"Lambda[105∈15]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List104 --> Lambda105
-    List107{{"List[107∈16]<br />ᐸ96,106ᐳ"}}:::plan
+    List107{{"List[107∈16]<br />ᐸ96,106ᐳ<br />More deps:<br />- Constantᐸ'people'ᐳ[96]"}}:::plan
     PgClassExpression106{{"PgClassExpression[106∈16]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    Constant96 & PgClassExpression106 --> List107
+    PgClassExpression106 --> List107
     PgSelectSingle91 --> PgClassExpression106
     Lambda108{{"Lambda[108∈16]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List107 --> Lambda108
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value2,__Value4,__InputObject7,Access8,Access12,Access13,Object14,Connection15,ApplyInput16,__InputObject18,Access19,Connection24,ApplyInput25,__InputObject27,Constant28,Connection32,ApplyInput33,__InputObject35,Access36,Connection41,ApplyInput42,Constant96,PgSelectInlineApply109,PgSelectInlineApply113,PgSelectInlineApply117,PgSelectInlineApply121 bucket0
+    class Bucket0,__Value0,__Value2,__InputObject7,Access8,Access12,Access13,Object14,Connection15,ApplyInput16,__InputObject18,Access19,Connection24,ApplyInput25,__InputObject27,Connection32,ApplyInput33,__InputObject35,Access36,Connection41,ApplyInput42,PgSelectInlineApply109,PgSelectInlineApply113,PgSelectInlineApply117,PgSelectInlineApply121 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect44,PgSelectRows48,Access110 bucket1
     classDef bucket2 stroke:#7f007f

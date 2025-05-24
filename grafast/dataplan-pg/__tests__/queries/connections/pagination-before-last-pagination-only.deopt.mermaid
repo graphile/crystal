@@ -18,28 +18,21 @@ graph TD
     Access11{{"Access[11∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access11 & Access12 --> Object13
-    Connection14{{"Connection[14∈0] ➊<br />ᐸ10ᐳ"}}:::plan
-    Constant34{{"Constant[34∈0] ➊<br />ᐸ3ᐳ"}}:::plan
-    Lambda17{{"Lambda[17∈0] ➊<br />ᐸparseCursorᐳ"}}:::plan
-    Constant34 & Lambda17 --> Connection14
+    Connection14{{"Connection[14∈0] ➊<br />ᐸ10ᐳ<br />More deps:<br />- Constantᐸ3ᐳ[34]<br />- Lambda[17]"}}:::plan
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access11
     __Value2 --> Access12
-    Lambda16{{"Lambda[16∈0] ➊<br />ᐸincludeArchivedConditionᐳ"}}:::plan
-    Constant33{{"Constant[33∈0] ➊<br />ᐸ[ undefined, 'INHERIT' ]ᐳ"}}:::plan
-    Constant33 --> Lambda16
-    Constant35{{"Constant[35∈0] ➊<br />ᐸ'WyJmMGIyOGM5NGMxIiwiZjE3MGYxNzAtMDAwMC0wMDAwLTAwMDAtYjBiMDAᐳ"}}:::plan
-    Constant35 --> Lambda17
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    PgSelect18[["PgSelect[18∈1] ➊<br />ᐸmessages+1ᐳ"]]:::plan
-    Object13 & Lambda16 & Connection14 & Lambda17 & Constant34 --> PgSelect18
-    Object31{{"Object[31∈1] ➊<br />ᐸ{first,last,offset,hasMore}ᐳ"}}:::plan
+    Lambda16{{"Lambda[16∈0] ➊<br />ᐸincludeArchivedConditionᐳ<br />More deps:<br />- Constantᐸ[ undefined, 'INHERIT' ]ᐳ[33]"}}:::plan
+    Lambda17{{"Lambda[17∈0] ➊<br />ᐸparseCursorᐳ<br />Dependents: 2<br />More deps:<br />- Constantᐸ'WyJmMGIyOGM5NGMxIiwiZjE3MGYxNzAtMDAwMC0wMDAwLTAwMDAtYjBiMDAᐳ[35]"}}:::plan
+    PgSelect18[["PgSelect[18∈1] ➊<br />ᐸmessages+1ᐳ<br />More deps:<br />- Lambda[17]<br />- Constantᐸ3ᐳ[34]"]]:::plan
+    Object13 & Lambda16 & Connection14 --> PgSelect18
+    Object31{{"Object[31∈1] ➊<br />ᐸ{first,last,offset,hasMore}ᐳ<br />More deps:<br />- Constantᐸundefinedᐳ[6]<br />- Constantᐸ3ᐳ[34]<br />- Constantᐸundefinedᐳ[6]"}}:::plan
     Access26{{"Access[26∈1] ➊<br />ᐸ18.hasMoreᐳ"}}:::plan
-    Constant34 & Access26 --> Object31
+    Access26 --> Object31
     PgSelect20[["PgSelect[20∈1] ➊<br />ᐸmessages(aggregate)ᐳ"]]:::plan
     Object13 & Lambda16 & Connection14 --> PgSelect20
-    Object27{{"Object[27∈1] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
-    Constant34 & Access26 --> Object27
+    Object27{{"Object[27∈1] ➊<br />ᐸ{first,last,hasMore}ᐳ<br />More deps:<br />- Constantᐸundefinedᐳ[6]<br />- Constantᐸ3ᐳ[34]"}}:::plan
+    Access26 --> Object27
     PgPageInfo19{{"PgPageInfo[19∈1] ➊"}}:::plan
     Connection14 --> PgPageInfo19
     First21{{"First[21∈1] ➊"}}:::plan
@@ -58,7 +51,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access11,Access12,Object13,Connection14,Lambda16,Lambda17,Constant33,Constant34,Constant35 bucket0
+    class Bucket0,__Value2,Access11,Access12,Object13,Connection14,Lambda16,Lambda17 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect18,PgPageInfo19,PgSelect20,First21,PgSelectRows22,PgSelectSingle23,PgClassExpression24,Access26,Object27,Lambda28,Object31,Lambda32 bucket1
 

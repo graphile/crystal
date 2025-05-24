@@ -23,34 +23,26 @@ graph TD
     Bucket4 --> Bucket6
 
     %% plan dependencies
-    Object13{{"Object[13∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object13{{"Object[13∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 4"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access11 & Access12 --> Object13
-    Connection14{{"Connection[14∈0] ➊<br />ᐸ10ᐳ"}}:::plan
-    Constant100{{"Constant[100∈0] ➊<br />ᐸ2ᐳ"}}:::plan
-    Lambda15{{"Lambda[15∈0] ➊<br />ᐸparseCursorᐳ"}}:::plan
-    Constant100 & Lambda15 --> Connection14
-    Connection21{{"Connection[21∈0] ➊<br />ᐸ19ᐳ"}}:::plan
-    Lambda22{{"Lambda[22∈0] ➊<br />ᐸparseCursorᐳ"}}:::plan
-    Constant100 & Lambda22 --> Connection21
+    Connection14{{"Connection[14∈0] ➊<br />ᐸ10ᐳ<br />More deps:<br />- Constantᐸ2ᐳ[100]<br />- Lambda[15]"}}:::plan
+    Connection21{{"Connection[21∈0] ➊<br />ᐸ19ᐳ<br />More deps:<br />- Constantᐸ2ᐳ[100]<br />- Lambda[22]"}}:::plan
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access11
     __Value2 --> Access12
-    Constant101{{"Constant[101∈0] ➊<br />ᐸ''ᐳ"}}:::plan
-    Constant101 --> Lambda15
-    Constant102{{"Constant[102∈0] ➊<br />ᐸ'27'ᐳ"}}:::plan
-    Constant102 --> Lambda22
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    PgSelect24[["PgSelect[24∈1] ➊<br />ᐸperson+1ᐳ"]]:::plan
-    Object13 & Connection14 & Lambda15 & Constant100 --> PgSelect24
-    Object80{{"Object[80∈1] ➊<br />ᐸ{first,last,offset,hasMore}ᐳ"}}:::plan
+    Lambda15{{"Lambda[15∈0] ➊<br />ᐸparseCursorᐳ<br />Dependents: 2<br />More deps:<br />- Constantᐸ''ᐳ[101]"}}:::plan
+    Lambda22{{"Lambda[22∈0] ➊<br />ᐸparseCursorᐳ<br />Dependents: 2<br />More deps:<br />- Constantᐸ'27'ᐳ[102]"}}:::plan
+    PgSelect24[["PgSelect[24∈1] ➊<br />ᐸperson+1ᐳ<br />More deps:<br />- Object[13]<br />- Lambda[15]<br />- Constantᐸ2ᐳ[100]"]]:::plan
+    Connection14 --> PgSelect24
+    Object80{{"Object[80∈1] ➊<br />ᐸ{first,last,offset,hasMore}ᐳ<br />More deps:<br />- Constantᐸ2ᐳ[100]<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸundefinedᐳ[7]"}}:::plan
     Access71{{"Access[71∈1] ➊<br />ᐸ24.hasMoreᐳ"}}:::plan
-    Constant100 & Access71 --> Object80
-    Object72{{"Object[72∈1] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
-    Constant100 & Access71 --> Object72
-    PgSelect28[["PgSelect[28∈1] ➊<br />ᐸperson(aggregate)ᐳ"]]:::plan
-    Object13 & Connection14 --> PgSelect28
+    Access71 --> Object80
+    Object72{{"Object[72∈1] ➊<br />ᐸ{first,last,hasMore}ᐳ<br />More deps:<br />- Constantᐸ2ᐳ[100]<br />- Constantᐸundefinedᐳ[7]"}}:::plan
+    Access71 --> Object72
+    PgSelect28[["PgSelect[28∈1] ➊<br />ᐸperson(aggregate)ᐳ<br />More deps:<br />- Object[13]"]]:::plan
+    Connection14 --> PgSelect28
     PgCursor51{{"PgCursor[51∈1] ➊"}}:::plan
     PgSelectSingle49{{"PgSelectSingle[49∈1] ➊<br />ᐸpersonᐳ"}}:::plan
     Access50{{"Access[50∈1] ➊<br />ᐸ24.cursorDetailsᐳ"}}:::plan
@@ -82,15 +74,15 @@ graph TD
     Object72 --> Lambda73
     Lambda81{{"Lambda[81∈1] ➊<br />ᐸhasPreviousPageCbᐳ"}}:::plan
     Object80 --> Lambda81
-    PgSelect26[["PgSelect[26∈2] ➊<br />ᐸperson+1ᐳ"]]:::plan
-    Object13 & Connection21 & Lambda22 & Constant100 --> PgSelect26
-    Object84{{"Object[84∈2] ➊<br />ᐸ{first,last,offset,hasMore}ᐳ"}}:::plan
+    PgSelect26[["PgSelect[26∈2] ➊<br />ᐸperson+1ᐳ<br />More deps:<br />- Object[13]<br />- Lambda[22]<br />- Constantᐸ2ᐳ[100]"]]:::plan
+    Connection21 --> PgSelect26
+    Object84{{"Object[84∈2] ➊<br />ᐸ{first,last,offset,hasMore}ᐳ<br />More deps:<br />- Constantᐸ2ᐳ[100]<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸundefinedᐳ[7]"}}:::plan
     Access75{{"Access[75∈2] ➊<br />ᐸ26.hasMoreᐳ"}}:::plan
-    Constant100 & Access75 --> Object84
-    Object76{{"Object[76∈2] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
-    Constant100 & Access75 --> Object76
-    PgSelect33[["PgSelect[33∈2] ➊<br />ᐸperson(aggregate)ᐳ"]]:::plan
-    Object13 & Connection21 --> PgSelect33
+    Access75 --> Object84
+    Object76{{"Object[76∈2] ➊<br />ᐸ{first,last,hasMore}ᐳ<br />More deps:<br />- Constantᐸ2ᐳ[100]<br />- Constantᐸundefinedᐳ[7]"}}:::plan
+    Access75 --> Object76
+    PgSelect33[["PgSelect[33∈2] ➊<br />ᐸperson(aggregate)ᐳ<br />More deps:<br />- Object[13]"]]:::plan
+    Connection21 --> PgSelect33
     PgCursor57{{"PgCursor[57∈2] ➊"}}:::plan
     PgSelectSingle55{{"PgSelectSingle[55∈2] ➊<br />ᐸpersonᐳ"}}:::plan
     Access56{{"Access[56∈2] ➊<br />ᐸ26.cursorDetailsᐳ"}}:::plan
@@ -157,7 +149,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access11,Access12,Object13,Connection14,Lambda15,Connection21,Lambda22,Constant100,Constant101,Constant102 bucket0
+    class Bucket0,__Value2,Access11,Access12,Object13,Connection14,Lambda15,Connection21,Lambda22 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect24,PgPageInfo25,PgSelect28,First29,PgSelectRows30,PgSelectSingle31,PgClassExpression32,PgSelectRows40,First47,PgSelectSingle49,Access50,PgCursor51,Last59,PgSelectSingle61,PgCursor63,Access71,Object72,Lambda73,Object80,Lambda81 bucket1
     classDef bucket2 stroke:#7f007f

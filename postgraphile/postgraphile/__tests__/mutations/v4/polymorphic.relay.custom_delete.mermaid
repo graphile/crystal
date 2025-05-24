@@ -30,31 +30,20 @@ graph TD
     Bucket6 --> Bucket7 & Bucket8 & Bucket9 & Bucket10 & Bucket11
 
     %% plan dependencies
-    __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
-    Constant136{{"Constant[136∈0] ➊<br />ᐸ'WyJyZWxhdGlvbmFsX3RvcGljcyIsMV0='ᐳ"}}:::plan
-    Constant136 --> __InputObject6
-    Object38{{"Object[38∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    __InputObject6{{"__InputObject[6∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ'WyJyZWxhdGlvbmFsX3RvcGljcyIsMV0='ᐳ[136]"}}:::plan
+    Object38{{"Object[38∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 8"}}:::plan
     Access36{{"Access[36∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access37{{"Access[37∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access36 & Access37 --> Object38
-    Lambda9{{"Lambda[9∈0] ➊<br />ᐸdecodeNodeIdWithCodecsᐳ"}}:::plan
-    Constant136 --> Lambda9
+    Lambda9{{"Lambda[9∈0] ➊<br />ᐸdecodeNodeIdWithCodecsᐳ<br />Dependents: 6<br />More deps:<br />- Constantᐸ'WyJyZWxhdGlvbmFsX3RvcGljcyIsMV0='ᐳ[136]"}}:::plan
     List14{{"List[14∈0] ➊<br />ᐸ135ᐳ"}}:::plan
-    Access135{{"Access[135∈0] ➊<br />ᐸ9.base64JSON.1ᐳ"}}:::plan
+    Access135{{"Access[135∈0] ➊<br />ᐸ9.base64JSON.1ᐳ<br />More deps:<br />- Lambda[9]"}}:::plan
     Access135 -->|rejectNull| List14
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access36
     __Value2 --> Access37
     ApplyInput53{{"ApplyInput[53∈0] ➊"}}:::plan
     __InputObject6 --> ApplyInput53
-    Lambda9 --> Access135
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant110{{"Constant[110∈0] ➊<br />ᐸ'relational_topics'ᐳ"}}:::plan
-    Constant114{{"Constant[114∈0] ➊<br />ᐸ'relational_posts'ᐳ"}}:::plan
-    Constant118{{"Constant[118∈0] ➊<br />ᐸ'relational_dividers'ᐳ"}}:::plan
-    Constant122{{"Constant[122∈0] ➊<br />ᐸ'relational_checklists'ᐳ"}}:::plan
-    Constant126{{"Constant[126∈0] ➊<br />ᐸ'relational_checklist_items'ᐳ"}}:::plan
-    Constant137{{"Constant[137∈0] ➊<br />ᐸ1ᐳ"}}:::plan
     List32{{"List[32∈1] ➊<br />ᐸ15,19,23,27,31ᐳ"}}:::plan
     Object15{{"Object[15∈1] ➊<br />ᐸ{match,pks}ᐳ"}}:::plan
     Object19{{"Object[19∈1] ➊<br />ᐸ{match,pks}ᐳ"}}:::plan
@@ -62,27 +51,22 @@ graph TD
     Object27{{"Object[27∈1] ➊<br />ᐸ{match,pks}ᐳ"}}:::plan
     Object31{{"Object[31∈1] ➊<br />ᐸ{match,pks}ᐳ"}}:::plan
     Object15 & Object19 & Object23 & Object27 & Object31 --> List32
-    PgSelect43[["PgSelect[43∈1] ➊<br />ᐸcustom_delete_relational_item(mutation)ᐳ"]]:::sideeffectplan
+    PgSelect43[["PgSelect[43∈1] ➊<br />ᐸcustom_delete_relational_item(mutation)ᐳ<br />More deps:<br />- Object[38]"]]:::sideeffectplan
     PgFromExpression47{{"PgFromExpression[47∈1] ➊"}}:::plan
-    Object38 & PgFromExpression47 & ApplyInput53 --> PgSelect43
-    Lambda13[["Lambda[13∈1] ➊"]]:::unbatchedplan
+    PgFromExpression47 & ApplyInput53 --> PgSelect43
+    Lambda13[["Lambda[13∈1] ➊<br />More deps:<br />- Lambda[9]"]]:::unbatchedplan
     Lambda13 & List14 --> Object15
-    Lambda17[["Lambda[17∈1] ➊"]]:::unbatchedplan
+    Lambda17[["Lambda[17∈1] ➊<br />More deps:<br />- Lambda[9]"]]:::unbatchedplan
     Lambda17 & List14 --> Object19
-    Lambda21[["Lambda[21∈1] ➊"]]:::unbatchedplan
+    Lambda21[["Lambda[21∈1] ➊<br />More deps:<br />- Lambda[9]"]]:::unbatchedplan
     Lambda21 & List14 --> Object23
-    Lambda25[["Lambda[25∈1] ➊"]]:::unbatchedplan
+    Lambda25[["Lambda[25∈1] ➊<br />More deps:<br />- Lambda[9]"]]:::unbatchedplan
     Lambda25 & List14 --> Object27
-    Lambda29[["Lambda[29∈1] ➊"]]:::unbatchedplan
+    Lambda29[["Lambda[29∈1] ➊<br />More deps:<br />- Lambda[9]"]]:::unbatchedplan
     Lambda29 & List14 --> Object31
-    PgSelect35[["PgSelect[35∈1] ➊<br />ᐸrelational_itemsᐳ"]]:::plan
+    PgSelect35[["PgSelect[35∈1] ➊<br />ᐸrelational_itemsᐳ<br />More deps:<br />- Object[38]"]]:::plan
     Access34{{"Access[34∈1] ➊<br />ᐸ33.0ᐳ"}}:::plan
-    Object38 & Access34 --> PgSelect35
-    Lambda9 --> Lambda13
-    Lambda9 --> Lambda17
-    Lambda9 --> Lambda21
-    Lambda9 --> Lambda25
-    Lambda9 --> Lambda29
+    Access34 --> PgSelect35
     Lambda33{{"Lambda[33∈1] ➊"}}:::plan
     List32 --> Lambda33
     Lambda33 --> Access34
@@ -105,10 +89,9 @@ graph TD
     PgSelectSingle50 --> PgClassExpression51
     Object52{{"Object[52∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgClassExpression51 --> Object52
-    Connection60{{"Connection[60∈2] ➊<br />ᐸ56ᐳ"}}:::plan
-    Constant137 --> Connection60
-    PgSelect62[["PgSelect[62∈4] ➊<br />ᐸrelational_itemsᐳ"]]:::plan
-    Object38 & Connection60 & Constant137 --> PgSelect62
+    Connection60{{"Connection[60∈2] ➊<br />ᐸ56ᐳ<br />More deps:<br />- Constantᐸ1ᐳ[137]"}}:::plan
+    PgSelect62[["PgSelect[62∈4] ➊<br />ᐸrelational_itemsᐳ<br />More deps:<br />- Object[38]<br />- Constantᐸ1ᐳ[137]"]]:::plan
+    Connection60 --> PgSelect62
     PgSelectRows63[["PgSelectRows[63∈4] ➊"]]:::plan
     PgSelect62 --> PgSelectRows63
     __Item64[/"__Item[64∈5]<br />ᐸ63ᐳ"\]:::itemplan
@@ -121,11 +104,11 @@ graph TD
     PgSelectSingle65 --> PgClassExpression68
     Lambda69{{"Lambda[69∈5]<br />ᐸRelationalItem_typeNameFromTypeᐳ"}}:::plan
     PgClassExpression68 --> Lambda69
-    PgSelect71[["PgSelect[71∈7]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic"]]:::plan
-    Object38 & PgClassExpression66 --> PgSelect71
-    List112{{"List[112∈7]^<br />ᐸ110,111ᐳ"}}:::plan
+    PgSelect71[["PgSelect[71∈7]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic<br />More deps:<br />- Object[38]"]]:::plan
+    PgClassExpression66 --> PgSelect71
+    List112{{"List[112∈7]^<br />ᐸ110,111ᐳ<br />More deps:<br />- Constantᐸ'relational_topics'ᐳ[110]"}}:::plan
     PgClassExpression111{{"PgClassExpression[111∈7]^<br />ᐸ__relation...c_item_id”ᐳ"}}:::plan
-    Constant110 & PgClassExpression111 --> List112
+    PgClassExpression111 --> List112
     First75{{"First[75∈7]^"}}:::plan
     PgSelectRows76[["PgSelectRows[76∈7]^"]]:::plan
     PgSelectRows76 --> First75
@@ -135,11 +118,11 @@ graph TD
     PgSelectSingle77 --> PgClassExpression111
     Lambda113{{"Lambda[113∈7]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List112 --> Lambda113
-    PgSelect79[["PgSelect[79∈8]<br />ᐸrelational_postsᐳ<br />ᐳRelationalPost"]]:::plan
-    Object38 & PgClassExpression66 --> PgSelect79
-    List116{{"List[116∈8]^<br />ᐸ114,115ᐳ"}}:::plan
+    PgSelect79[["PgSelect[79∈8]<br />ᐸrelational_postsᐳ<br />ᐳRelationalPost<br />More deps:<br />- Object[38]"]]:::plan
+    PgClassExpression66 --> PgSelect79
+    List116{{"List[116∈8]^<br />ᐸ114,115ᐳ<br />More deps:<br />- Constantᐸ'relational_posts'ᐳ[114]"}}:::plan
     PgClassExpression115{{"PgClassExpression[115∈8]^<br />ᐸ__relation...t_item_id”ᐳ"}}:::plan
-    Constant114 & PgClassExpression115 --> List116
+    PgClassExpression115 --> List116
     First83{{"First[83∈8]^"}}:::plan
     PgSelectRows84[["PgSelectRows[84∈8]^"]]:::plan
     PgSelectRows84 --> First83
@@ -149,11 +132,11 @@ graph TD
     PgSelectSingle85 --> PgClassExpression115
     Lambda117{{"Lambda[117∈8]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List116 --> Lambda117
-    PgSelect87[["PgSelect[87∈9]<br />ᐸrelational_dividersᐳ<br />ᐳRelationalDivider"]]:::plan
-    Object38 & PgClassExpression66 --> PgSelect87
-    List120{{"List[120∈9]^<br />ᐸ118,119ᐳ"}}:::plan
+    PgSelect87[["PgSelect[87∈9]<br />ᐸrelational_dividersᐳ<br />ᐳRelationalDivider<br />More deps:<br />- Object[38]"]]:::plan
+    PgClassExpression66 --> PgSelect87
+    List120{{"List[120∈9]^<br />ᐸ118,119ᐳ<br />More deps:<br />- Constantᐸ'relational_dividers'ᐳ[118]"}}:::plan
     PgClassExpression119{{"PgClassExpression[119∈9]^<br />ᐸ__relation...r_item_id”ᐳ"}}:::plan
-    Constant118 & PgClassExpression119 --> List120
+    PgClassExpression119 --> List120
     First91{{"First[91∈9]^"}}:::plan
     PgSelectRows92[["PgSelectRows[92∈9]^"]]:::plan
     PgSelectRows92 --> First91
@@ -163,11 +146,11 @@ graph TD
     PgSelectSingle93 --> PgClassExpression119
     Lambda121{{"Lambda[121∈9]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List120 --> Lambda121
-    PgSelect95[["PgSelect[95∈10]<br />ᐸrelational_checklistsᐳ<br />ᐳRelationalChecklist"]]:::plan
-    Object38 & PgClassExpression66 --> PgSelect95
-    List124{{"List[124∈10]^<br />ᐸ122,123ᐳ"}}:::plan
+    PgSelect95[["PgSelect[95∈10]<br />ᐸrelational_checklistsᐳ<br />ᐳRelationalChecklist<br />More deps:<br />- Object[38]"]]:::plan
+    PgClassExpression66 --> PgSelect95
+    List124{{"List[124∈10]^<br />ᐸ122,123ᐳ<br />More deps:<br />- Constantᐸ'relational_checklists'ᐳ[122]"}}:::plan
     PgClassExpression123{{"PgClassExpression[123∈10]^<br />ᐸ__relation...t_item_id”ᐳ"}}:::plan
-    Constant122 & PgClassExpression123 --> List124
+    PgClassExpression123 --> List124
     First99{{"First[99∈10]^"}}:::plan
     PgSelectRows100[["PgSelectRows[100∈10]^"]]:::plan
     PgSelectRows100 --> First99
@@ -177,11 +160,11 @@ graph TD
     PgSelectSingle101 --> PgClassExpression123
     Lambda125{{"Lambda[125∈10]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List124 --> Lambda125
-    PgSelect103[["PgSelect[103∈11]<br />ᐸrelational_checklist_itemsᐳ<br />ᐳRelationalChecklistItem"]]:::plan
-    Object38 & PgClassExpression66 --> PgSelect103
-    List128{{"List[128∈11]^<br />ᐸ126,127ᐳ"}}:::plan
+    PgSelect103[["PgSelect[103∈11]<br />ᐸrelational_checklist_itemsᐳ<br />ᐳRelationalChecklistItem<br />More deps:<br />- Object[38]"]]:::plan
+    PgClassExpression66 --> PgSelect103
+    List128{{"List[128∈11]^<br />ᐸ126,127ᐳ<br />More deps:<br />- Constantᐸ'relational_checklist_items'ᐳ[126]"}}:::plan
     PgClassExpression127{{"PgClassExpression[127∈11]^<br />ᐸ__relation...m_item_id”ᐳ"}}:::plan
-    Constant126 & PgClassExpression127 --> List128
+    PgClassExpression127 --> List128
     First107{{"First[107∈11]^"}}:::plan
     PgSelectRows108[["PgSelectRows[108∈11]^"]]:::plan
     PgSelectRows108 --> First107
@@ -194,7 +177,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,Lambda9,List14,Access36,Access37,Object38,ApplyInput53,Constant110,Constant114,Constant118,Constant122,Constant126,Access135,Constant136,Constant137 bucket0
+    class Bucket0,__Value2,__InputObject6,Lambda9,List14,Access36,Access37,Object38,ApplyInput53,Access135 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,Lambda13,Object15,Lambda17,Object19,Lambda21,Object23,Lambda25,Object27,Lambda29,Object31,List32,Lambda33,Access34,PgSelect35,First39,PgSelectRows40,PgSelectSingle41,PgClassExpression42,PgSelect43,PgFromExpression47,First48,PgSelectRows49,PgSelectSingle50,PgClassExpression51,Object52 bucket1
     classDef bucket2 stroke:#7f007f

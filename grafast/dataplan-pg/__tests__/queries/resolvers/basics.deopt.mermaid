@@ -15,14 +15,11 @@ graph TD
 
     %% plan dependencies
     Object9{{"Object[9∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access7{{"Access[7∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access8{{"Access[8∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access7{{"Access[7∈0] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access8{{"Access[8∈0] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access7 & Access8 --> Object9
     PgSelect6[["PgSelect[6∈0] ➊<br />ᐸrandom_userᐳ"]]:::plan
     Object9 --> PgSelect6
-    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
-    __Value2 --> Access7
-    __Value2 --> Access8
     First10{{"First[10∈0] ➊"}}:::plan
     PgSelectRows11[["PgSelectRows[11∈0] ➊"]]:::plan
     PgSelectRows11 --> First10
@@ -30,18 +27,18 @@ graph TD
     PgSelectSingle12{{"PgSelectSingle[12∈0] ➊<br />ᐸusersᐳ"}}:::plan
     First10 --> PgSelectSingle12
     __Value0["__Value[0∈0] ➊<br />ᐸvariableValuesᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ<br />Dependents: 3"]:::plan
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant19{{"Constant[19∈0] ➊<br />ᐸ§{ hashType: 'sha1' }ᐳ"}}:::plan
-    GraphQLResolver17[["GraphQLResolver[17∈1] ➊<br />ᐸUser.usernameHashᐳ"]]:::unbatchedplan
+    GraphQLResolver17[["GraphQLResolver[17∈1] ➊<br />ᐸUser.usernameHashᐳ<br />More deps:<br />- Constantᐸ§{ hashType: 'sha1' }ᐳ[19]<br />- __Value[2]"]]:::unbatchedplan
     Object15{{"Object[15∈1] ➊<br />ᐸ{username}ᐳ"}}:::plan
-    Object15 & Constant19 & __Value2 & __Value0 & __Value4 --> GraphQLResolver17
+    Object15 & __Value0 & __Value4 --> GraphQLResolver17
     PgClassExpression13{{"PgClassExpression[13∈1] ➊<br />ᐸ__random_u...”username”ᐳ"}}:::plan
     PgSelectSingle12 --> PgClassExpression13
     PgClassExpression13 --> Object15
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value2,__Value4,PgSelect6,Access7,Access8,Object9,First10,PgSelectRows11,PgSelectSingle12,Constant19 bucket0
+    class Bucket0,__Value0,__Value2,__Value4,PgSelect6,Access7,Access8,Object9,First10,PgSelectRows11,PgSelectSingle12 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgClassExpression13,Object15,GraphQLResolver17 bucket1
 

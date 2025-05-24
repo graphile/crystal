@@ -22,30 +22,24 @@ graph TD
     Bucket4 --> Bucket5
 
     %% plan dependencies
-    PgSelect9[["PgSelect[9∈0] ➊<br />ᐸforumsᐳ"]]:::plan
+    PgSelect9[["PgSelect[9∈0] ➊<br />ᐸforumsᐳ<br />More deps:<br />- Constantᐸ2ᐳ[50]"]]:::plan
     Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant50{{"Constant[50∈0] ➊<br />ᐸ2ᐳ"}}:::plan
-    Lambda14{{"Lambda[14∈0] ➊<br />ᐸincludeArchivedConditionᐳ"}}:::plan
-    PgSelectInlineApply46["PgSelectInlineApply[46∈0] ➊"]:::plan
-    Object12 & Constant50 & Lambda14 & PgSelectInlineApply46 --> PgSelect9
-    Lambda27{{"Lambda[27∈0] ➊<br />ᐸincludeArchivedConditionᐳ"}}:::plan
+    Lambda14{{"Lambda[14∈0] ➊<br />ᐸincludeArchivedConditionᐳ<br />More deps:<br />- Constantᐸ[ undefined, 'YES' ]ᐳ[52]"}}:::plan
+    PgSelectInlineApply46["PgSelectInlineApply[46∈0] ➊<br />More deps:<br />- Constantᐸ2ᐳ[50]"]:::plan
+    Object12 & Lambda14 & PgSelectInlineApply46 --> PgSelect9
+    Lambda27{{"Lambda[27∈0] ➊<br />ᐸincludeArchivedConditionᐳ<br />More deps:<br />- Constantᐸ[HIDDEN]ᐳ[53]"}}:::plan
     PgSelectInlineApply42["PgSelectInlineApply[42∈0] ➊"]:::plan
-    Constant50 & Lambda27 & PgSelectInlineApply42 --> PgSelectInlineApply46
+    Lambda27 & PgSelectInlineApply42 --> PgSelectInlineApply46
     Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access10 & Access11 --> Object12
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access10
     __Value2 --> Access11
-    Constant52{{"Constant[52∈0] ➊<br />ᐸ[ undefined, 'YES' ]ᐳ"}}:::plan
-    Constant52 --> Lambda14
     PgSelectRows15[["PgSelectRows[15∈0] ➊"]]:::plan
     PgSelect9 --> PgSelectRows15
-    Constant53{{"Constant[53∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
-    Constant53 --> Lambda27
     Access47{{"Access[47∈0] ➊<br />ᐸ9.m.subqueryDetailsFor20ᐳ"}}:::plan
     PgSelect9 --> Access47
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item16[/"__Item[16∈1]<br />ᐸ15ᐳ"\]:::itemplan
     PgSelectRows15 ==> __Item16
     PgSelectSingle17{{"PgSelectSingle[17∈1]<br />ᐸforumsᐳ"}}:::plan
@@ -83,7 +77,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect9,Access10,Access11,Object12,Lambda14,PgSelectRows15,Lambda27,PgSelectInlineApply42,PgSelectInlineApply46,Access47,Constant50,Constant52,Constant53 bucket0
+    class Bucket0,__Value2,PgSelect9,Access10,Access11,Object12,Lambda14,PgSelectRows15,Lambda27,PgSelectInlineApply42,PgSelectInlineApply46,Access47 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item16,PgSelectSingle17 bucket1
     classDef bucket2 stroke:#7f007f

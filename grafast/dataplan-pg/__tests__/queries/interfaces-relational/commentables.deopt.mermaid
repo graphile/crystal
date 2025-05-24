@@ -21,22 +21,18 @@ graph TD
     Bucket3 --> Bucket4 & Bucket5 & Bucket6
 
     %% plan dependencies
-    Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 4"}}:::plan
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
-    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸrelational_commentablesᐳ"]]:::plan
-    Object10 --> PgSelect7
+    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸrelational_commentablesᐳ<br />More deps:<br />- Object[10]"]]:::plan
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
-    __ListTransform11[["__ListTransform[11∈0] ➊<br />ᐸeach:7ᐳ"]]:::plan
-    PgSelectRows12[["PgSelectRows[12∈0] ➊"]]:::plan
-    PgSelectRows12 --> __ListTransform11
+    __ListTransform11[["__ListTransform[11∈0] ➊<br />ᐸeach:7ᐳ<br />More deps:<br />- PgSelectRows[12]"]]:::plan
+    PgSelectRows12[["PgSelectRows[12∈0] ➊<br />Dependents: 2"]]:::plan
     PgSelect7 --> PgSelectRows12
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    __Item13[/"__Item[13∈1]<br />ᐸ12ᐳ"\]:::itemplan
-    PgSelectRows12 -.-> __Item13
+    __Item13[/"__Item[13∈1]<br />ᐸ12ᐳ<br />More deps:<br />- PgSelectRows[12]"\]:::itemplan
     PgSelectSingle14{{"PgSelectSingle[14∈1]<br />ᐸrelational_commentablesᐳ"}}:::plan
     __Item13 --> PgSelectSingle14
     __Item15[/"__Item[15∈2]<br />ᐸ11ᐳ"\]:::itemplan
@@ -49,10 +45,10 @@ graph TD
     PgSelectSingle16 --> PgClassExpression19
     Lambda21{{"Lambda[21∈2]<br />ᐸrelationalItemTypeNameFromTypeᐳ"}}:::plan
     PgClassExpression19 -->|rejectNull| Lambda21
-    PgSelect23[["PgSelect[23∈4]^<br />ᐸrelational_postsᐳ"]]:::plan
+    PgSelect23[["PgSelect[23∈4]^<br />ᐸrelational_postsᐳ<br />More deps:<br />- Object[10]"]]:::plan
     PgSelectInlineApply113["PgSelectInlineApply[113∈4] ➊<br />ᐳRelationalPost"]:::plan
     PgClassExpression17 -->|rejectNull| PgSelect23
-    Object10 & PgSelectInlineApply113 --> PgSelect23
+    PgSelectInlineApply113 --> PgSelect23
     List115{{"List[115∈4]^<br />ᐸ114,29ᐳ"}}:::plan
     Access114{{"Access[114∈4]^<br />ᐸ23.m.joinDetailsFor47ᐳ"}}:::plan
     PgSelectSingle29{{"PgSelectSingle[29∈4]^<br />ᐸrelational_postsᐳ"}}:::plan
@@ -85,10 +81,10 @@ graph TD
     PgSelectSingle29 --> PgClassExpression112
     PgSelect23 --> Access114
     List115 --> Lambda116
-    PgSelect30[["PgSelect[30∈5]^<br />ᐸrelational_checklistsᐳ"]]:::plan
+    PgSelect30[["PgSelect[30∈5]^<br />ᐸrelational_checklistsᐳ<br />More deps:<br />- Object[10]"]]:::plan
     PgSelectInlineApply117["PgSelectInlineApply[117∈5] ➊<br />ᐳRelationalChecklist"]:::plan
     PgClassExpression17 -->|rejectNull| PgSelect30
-    Object10 & PgSelectInlineApply117 --> PgSelect30
+    PgSelectInlineApply117 --> PgSelect30
     List119{{"List[119∈5]^<br />ᐸ118,36ᐳ"}}:::plan
     Access118{{"Access[118∈5]^<br />ᐸ30.m.joinDetailsFor55ᐳ"}}:::plan
     PgSelectSingle36{{"PgSelectSingle[36∈5]^<br />ᐸrelational_checklistsᐳ"}}:::plan
@@ -117,10 +113,10 @@ graph TD
     PgSelectSingle36 --> PgClassExpression108
     PgSelect30 --> Access118
     List119 --> Lambda120
-    PgSelect37[["PgSelect[37∈6]^<br />ᐸrelational_checklist_itemsᐳ"]]:::plan
+    PgSelect37[["PgSelect[37∈6]^<br />ᐸrelational_checklist_itemsᐳ<br />More deps:<br />- Object[10]"]]:::plan
     PgSelectInlineApply121["PgSelectInlineApply[121∈6] ➊<br />ᐳRelationalChecklistItem"]:::plan
     PgClassExpression17 -->|rejectNull| PgSelect37
-    Object10 & PgSelectInlineApply121 --> PgSelect37
+    PgSelectInlineApply121 --> PgSelect37
     List123{{"List[123∈6]^<br />ᐸ122,43ᐳ"}}:::plan
     Access122{{"Access[122∈6]^<br />ᐸ37.m.joinDetailsFor63ᐳ"}}:::plan
     PgSelectSingle43{{"PgSelectSingle[43∈6]^<br />ᐸrelational_checklist_itemsᐳ"}}:::plan
@@ -154,7 +150,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,__ListTransform11,PgSelectRows12 bucket0
+    class Bucket0,__Value2,PgSelect7,Access8,Access9,Object10,__ListTransform11,PgSelectRows12 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item13,PgSelectSingle14 bucket1
     classDef bucket2 stroke:#7f007f

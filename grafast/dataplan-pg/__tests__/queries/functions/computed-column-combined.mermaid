@@ -22,15 +22,14 @@ graph TD
     Bucket4 --> Bucket5
 
     %% plan dependencies
-    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸforumsᐳ"]]:::plan
+    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸforumsᐳ<br />More deps:<br />- Constantᐸ'f1700000-0000-0000-0000-000000000f17'ᐳ[73]"]]:::plan
     Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant73{{"Constant[73∈0] ➊<br />ᐸ'f1700000-0000-0000-0000-000000000f17'ᐳ"}}:::plan
     PgFromExpression68{{"PgFromExpression[68∈0] ➊"}}:::plan
     PgFromExpression63{{"PgFromExpression[63∈0] ➊"}}:::plan
-    PgFromExpression53{{"PgFromExpression[53∈0] ➊"}}:::plan
+    PgFromExpression53{{"PgFromExpression[53∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[34]"}}:::plan
     PgFromExpression58{{"PgFromExpression[58∈0] ➊"}}:::plan
     PgSelectInlineApply69["PgSelectInlineApply[69∈0] ➊"]:::plan
-    Object10 & Constant73 & PgFromExpression68 & PgFromExpression63 & PgFromExpression53 & PgFromExpression58 & PgSelectInlineApply69 --> PgSelect7
+    Object10 & PgFromExpression68 & PgFromExpression63 & PgFromExpression53 & PgFromExpression58 & PgSelectInlineApply69 --> PgSelect7
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
@@ -50,7 +49,6 @@ graph TD
     PgSelectInlineApply64 --> PgSelectInlineApply69
     Access70{{"Access[70∈0] ➊<br />ᐸ7.m.joinDetailsFor15ᐳ"}}:::plan
     PgSelect7 --> Access70
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     List71{{"List[71∈1] ➊<br />ᐸ70,13ᐳ"}}:::plan
     Access70 & PgSelectSingle13 --> List71
     First20{{"First[20∈1] ➊"}}:::plan
@@ -108,7 +106,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,PgFromExpression53,PgSelectInlineApply54,PgFromExpression58,PgSelectInlineApply59,PgFromExpression63,PgSelectInlineApply64,PgFromExpression68,PgSelectInlineApply69,Access70,Constant73 bucket0
+    class Bucket0,__Value2,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,PgFromExpression53,PgSelectInlineApply54,PgFromExpression58,PgSelectInlineApply59,PgFromExpression63,PgSelectInlineApply64,PgFromExpression68,PgSelectInlineApply69,Access70 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,First20,PgSelectRows21,PgSelectSingle22,Access65,List71,Lambda72 bucket1
     classDef bucket2 stroke:#7f007f

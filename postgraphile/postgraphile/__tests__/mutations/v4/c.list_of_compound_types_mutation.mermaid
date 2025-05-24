@@ -40,7 +40,6 @@ graph TD
     BakedInput10 --> PgFromExpression15
     ApplyInput17{{"ApplyInput[17∈0] ➊"}}:::plan
     Access6 --> ApplyInput17
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgSelect11[["PgSelect[11∈1] ➊<br />ᐸlist_of_compound_types_mutation(mutation)ᐳ"]]:::sideeffectplan
     Object14 & PgFromExpression15 & ApplyInput17 --> PgSelect11
     Object16{{"Object[16∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
@@ -70,7 +69,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value2,__Value4,Access6,Access8,BakedInput10,Access12,Access13,Object14,PgFromExpression15,ApplyInput17 bucket0
+    class Bucket0,__Value0,__Value2,Access6,Access8,BakedInput10,Access12,Access13,Object14,PgFromExpression15,ApplyInput17 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect11,Object16 bucket1
     classDef bucket2 stroke:#7f007f

@@ -18,13 +18,8 @@ graph TD
     Bucket2 --> Bucket3
 
     %% plan dependencies
-    __InputObject8{{"__InputObject[8∈0] ➊"}}:::plan
-    Constant29{{"Constant[29∈0] ➊<br />ᐸ'10.0.0.0'ᐳ"}}:::plan
-    Constant30{{"Constant[30∈0] ➊<br />ᐸ'10.0.0.0/8'ᐳ"}}:::plan
-    Constant31{{"Constant[31∈0] ➊<br />ᐸ'000000000000'ᐳ"}}:::plan
-    Constant32{{"Constant[32∈0] ➊<br />ᐸ'0000000000000000'ᐳ"}}:::plan
-    Constant29 & Constant30 & Constant31 & Constant32 --> __InputObject8
-    __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
+    __InputObject8{{"__InputObject[8∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ'10.0.0.0'ᐳ[29]<br />- Constantᐸ'10.0.0.0/8'ᐳ[30]<br />- Constantᐸ'000000000000'ᐳ[31]<br />- Constantᐸ'0000000000000000'ᐳ[32]"}}:::plan
+    __InputObject6{{"__InputObject[6∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]"}}:::plan
     __InputObject8 --> __InputObject6
     Object16{{"Object[16∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access14{{"Access[14∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
@@ -35,15 +30,13 @@ graph TD
     __Value2 --> Access15
     ApplyInput17{{"ApplyInput[17∈0] ➊"}}:::plan
     __InputObject6 --> ApplyInput17
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant19{{"Constant[19∈0] ➊<br />ᐸ'networks'ᐳ"}}:::plan
     PgInsertSingle13[["PgInsertSingle[13∈1] ➊<br />ᐸnetwork()ᐳ"]]:::sideeffectplan
     Object16 & ApplyInput17 --> PgInsertSingle13
     Object18{{"Object[18∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle13 --> Object18
-    List22{{"List[22∈3] ➊<br />ᐸ19,20ᐳ"}}:::plan
+    List22{{"List[22∈3] ➊<br />ᐸ19,20ᐳ<br />More deps:<br />- Constantᐸ'networks'ᐳ[19]"}}:::plan
     PgClassExpression20{{"PgClassExpression[20∈3] ➊<br />ᐸ__network__.”id”ᐳ"}}:::plan
-    Constant19 & PgClassExpression20 --> List22
+    PgClassExpression20 --> List22
     Access21{{"Access[21∈3] ➊<br />ᐸ13.tᐳ"}}:::plan
     Access21 --> PgClassExpression20
     PgInsertSingle13 --> Access21
@@ -60,7 +53,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,__InputObject8,Access14,Access15,Object16,ApplyInput17,Constant19,Constant29,Constant30,Constant31,Constant32 bucket0
+    class Bucket0,__Value2,__InputObject6,__InputObject8,Access14,Access15,Object16,ApplyInput17 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle13,Object18 bucket1
     classDef bucket2 stroke:#7f007f

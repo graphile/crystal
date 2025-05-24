@@ -22,7 +22,7 @@ graph TD
     %% plan dependencies
     PgSelect12[["PgSelect[12∈0] ➊<br />ᐸforumsᐳ"]]:::plan
     Object15{{"Object[15∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Lambda17{{"Lambda[17∈0] ➊<br />ᐸincludeArchivedConditionᐳ"}}:::plan
+    Lambda17{{"Lambda[17∈0] ➊<br />ᐸincludeArchivedConditionᐳ<br />More deps:<br />- Constantᐸ[ undefined, 'INHERIT' ]ᐳ[47]"}}:::plan
     ApplyInput18{{"ApplyInput[18∈0] ➊"}}:::plan
     PgSelectInlineApply43["PgSelectInlineApply[43∈0] ➊"]:::plan
     Object15 & Lambda17 & ApplyInput18 & PgSelectInlineApply43 --> PgSelect12
@@ -34,7 +34,7 @@ graph TD
     Access26{{"Access[26∈0] ➊<br />ᐸ0.isArchivedᐳ"}}:::plan
     Access24 & Access26 --> __InputObject23
     ApplyInput33{{"ApplyInput[33∈0] ➊"}}:::plan
-    Lambda37{{"Lambda[37∈0] ➊<br />ᐸincludeArchivedConditionᐳ"}}:::plan
+    Lambda37{{"Lambda[37∈0] ➊<br />ᐸincludeArchivedConditionᐳ<br />More deps:<br />- Constantᐸ[HIDDEN]ᐳ[48]"}}:::plan
     ApplyInput33 & Lambda37 --> PgSelectInlineApply43
     __InputObject8{{"__InputObject[8∈0] ➊"}}:::plan
     __InputObject9{{"__InputObject[9∈0] ➊"}}:::plan
@@ -46,19 +46,14 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access13
     __Value2 --> Access14
-    Constant47{{"Constant[47∈0] ➊<br />ᐸ[ undefined, 'INHERIT' ]ᐳ"}}:::plan
-    Constant47 --> Lambda17
     __InputObject8 --> ApplyInput18
     PgSelectRows19[["PgSelectRows[19∈0] ➊"]]:::plan
     PgSelect12 --> PgSelectRows19
     __Value0 --> Access24
     __Value0 --> Access26
     __InputObject23 --> ApplyInput33
-    Constant48{{"Constant[48∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
-    Constant48 --> Lambda37
     Access44{{"Access[44∈0] ➊<br />ᐸ12.m.subqueryDetailsFor29ᐳ"}}:::plan
     PgSelect12 --> Access44
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item20[/"__Item[20∈1]<br />ᐸ19ᐳ"\]:::itemplan
     PgSelectRows19 ==> __Item20
     PgSelectSingle21{{"PgSelectSingle[21∈1]<br />ᐸforumsᐳ"}}:::plan
@@ -82,7 +77,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value2,__Value4,__InputObject8,__InputObject9,Access10,PgSelect12,Access13,Access14,Object15,Lambda17,ApplyInput18,PgSelectRows19,__InputObject23,Access24,Access26,ApplyInput33,Lambda37,PgSelectInlineApply43,Access44,Constant47,Constant48 bucket0
+    class Bucket0,__Value0,__Value2,__InputObject8,__InputObject9,Access10,PgSelect12,Access13,Access14,Object15,Lambda17,ApplyInput18,PgSelectRows19,__InputObject23,Access24,Access26,ApplyInput33,Lambda37,PgSelectInlineApply43,Access44 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item20,PgSelectSingle21 bucket1
     classDef bucket2 stroke:#7f007f

@@ -22,10 +22,8 @@ graph TD
     Bucket4 --> Bucket5
 
     %% plan dependencies
-    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸforumsᐳ"]]:::plan
-    Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant58{{"Constant[58∈0] ➊<br />ᐸ'f1700000-0000-0000-0000-000000000f17'ᐳ"}}:::plan
-    Object10 & Constant58 --> PgSelect7
+    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸforumsᐳ<br />More deps:<br />- Object[10]<br />- Constantᐸ'f1700000-0000-0000-0000-000000000f17'ᐳ[58]"]]:::plan
+    Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 4"}}:::plan
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
@@ -38,12 +36,11 @@ graph TD
     PgSelect7 --> PgSelectRows12
     PgSelectSingle13{{"PgSelectSingle[13∈0] ➊<br />ᐸforumsᐳ"}}:::plan
     First11 --> PgSelectSingle13
-    PgFromExpression53{{"PgFromExpression[53∈0] ➊"}}:::plan
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    PgFromExpression53{{"PgFromExpression[53∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[34]"}}:::plan
     PgSelectInlineApply54["PgSelectInlineApply[54∈0] ➊"]:::plan
-    PgSelect15[["PgSelect[15∈1] ➊<br />ᐸforums_random_userᐳ"]]:::plan
+    PgSelect15[["PgSelect[15∈1] ➊<br />ᐸforums_random_userᐳ<br />More deps:<br />- Object[10]"]]:::plan
     PgFromExpression19{{"PgFromExpression[19∈1] ➊"}}:::plan
-    Object10 & PgFromExpression19 --> PgSelect15
+    PgFromExpression19 --> PgSelect15
     PgClassExpression14{{"PgClassExpression[14∈1] ➊<br />ᐸ__forums__ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression14
     PgClassExpression14 --> PgFromExpression19
@@ -53,9 +50,9 @@ graph TD
     PgSelect15 --> PgSelectRows21
     PgSelectSingle22{{"PgSelectSingle[22∈1] ➊<br />ᐸusersᐳ"}}:::plan
     First20 --> PgSelectSingle22
-    PgSelect26[["PgSelect[26∈2] ➊<br />ᐸusers_most_recent_forumᐳ"]]:::plan
+    PgSelect26[["PgSelect[26∈2] ➊<br />ᐸusers_most_recent_forumᐳ<br />More deps:<br />- Object[10]"]]:::plan
     PgFromExpression30{{"PgFromExpression[30∈2] ➊"}}:::plan
-    Object10 & PgFromExpression30 & PgFromExpression53 & PgSelectInlineApply54 --> PgSelect26
+    PgFromExpression30 & PgFromExpression53 & PgSelectInlineApply54 --> PgSelect26
     PgClassExpression23{{"PgClassExpression[23∈2] ➊<br />ᐸ__forums_r...”username”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression23
     PgClassExpression24{{"PgClassExpression[24∈2] ➊<br />ᐸ__forums_r...vatar_url”ᐳ"}}:::plan
@@ -71,9 +68,9 @@ graph TD
     First31 --> PgSelectSingle33
     Access55{{"Access[55∈2] ➊<br />ᐸ26.m.joinDetailsFor36ᐳ"}}:::plan
     PgSelect26 --> Access55
-    PgSelect46[["PgSelect[46∈3] ➊<br />ᐸforums_featured_messagesᐳ"]]:::plan
+    PgSelect46[["PgSelect[46∈3] ➊<br />ᐸforums_featured_messagesᐳ<br />More deps:<br />- Object[10]"]]:::plan
     PgFromExpression48{{"PgFromExpression[48∈3] ➊"}}:::plan
-    Object10 & PgFromExpression48 --> PgSelect46
+    PgFromExpression48 --> PgSelect46
     List56{{"List[56∈3] ➊<br />ᐸ55,33ᐳ"}}:::plan
     Access55 & PgSelectSingle33 --> List56
     PgClassExpression35{{"PgClassExpression[35∈3] ➊<br />ᐸ__users_mo...nt_forum__ᐳ"}}:::plan
@@ -100,7 +97,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,PgFromExpression53,PgSelectInlineApply54,Constant58 bucket0
+    class Bucket0,__Value2,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,PgFromExpression53,PgSelectInlineApply54 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgClassExpression14,PgSelect15,PgFromExpression19,First20,PgSelectRows21,PgSelectSingle22 bucket1
     classDef bucket2 stroke:#7f007f

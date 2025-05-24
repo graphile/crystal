@@ -24,38 +24,30 @@ graph TD
     Bucket0 --> Bucket1 & Bucket2 & Bucket3 & Bucket4 & Bucket5 & Bucket6 & Bucket7 & Bucket8 & Bucket9 & Bucket10 & Bucket11
 
     %% plan dependencies
-    PgSelect27[["PgSelect[27∈0] ➊<br />ᐸpostᐳ"]]:::plan
+    PgSelect27[["PgSelect[27∈0] ➊<br />ᐸpostᐳ<br />More deps:<br />- Constantᐸ2ᐳ[113]"]]:::plan
     Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant113{{"Constant[113∈0] ➊<br />ᐸ2ᐳ"}}:::plan
     ApplyInput29{{"ApplyInput[29∈0] ➊"}}:::plan
-    Object10 & Constant113 & ApplyInput29 --> PgSelect27
-    PgSelect32[["PgSelect[32∈0] ➊<br />ᐸpersonᐳ"]]:::plan
-    Constant114{{"Constant[114∈0] ➊<br />ᐸ3ᐳ"}}:::plan
-    Constant115{{"Constant[115∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Object10 & Constant114 & Constant115 --> PgSelect32
+    Object10 & ApplyInput29 --> PgSelect27
+    PgSelect32[["PgSelect[32∈0] ➊<br />ᐸpersonᐳ<br />More deps:<br />- Constantᐸ3ᐳ[114]<br />- Constantᐸ1ᐳ[115]"]]:::plan
+    Object10 --> PgSelect32
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
-    PgSelect12[["PgSelect[12∈0] ➊<br />ᐸpersonᐳ"]]:::plan
-    Object10 & Constant113 --> PgSelect12
-    __InputObject22{{"__InputObject[22∈0] ➊"}}:::plan
-    Constant113 --> __InputObject22
+    PgSelect12[["PgSelect[12∈0] ➊<br />ᐸpersonᐳ<br />More deps:<br />- Constantᐸ2ᐳ[113]"]]:::plan
+    Object10 --> PgSelect12
+    __InputObject22{{"__InputObject[22∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[6]<br />- Constantᐸ2ᐳ[113]"}}:::plan
     PgSelect23[["PgSelect[23∈0] ➊<br />ᐸpostᐳ"]]:::plan
     ApplyInput25{{"ApplyInput[25∈0] ➊"}}:::plan
     Object10 & ApplyInput25 --> PgSelect23
-    __InputObject26{{"__InputObject[26∈0] ➊"}}:::plan
-    Constant113 --> __InputObject26
-    PgSelect35[["PgSelect[35∈0] ➊<br />ᐸpersonᐳ"]]:::plan
-    Constant116{{"Constant[116∈0] ➊<br />ᐸ0ᐳ"}}:::plan
-    Object10 & Constant116 --> PgSelect35
-    __InputObject41{{"__InputObject[41∈0] ➊"}}:::plan
-    Constant42{{"Constant[42∈0] ➊<br />ᐸnullᐳ"}}:::plan
-    Constant42 --> __InputObject41
+    __InputObject26{{"__InputObject[26∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[6]<br />- Constantᐸ2ᐳ[113]"}}:::plan
+    PgSelect35[["PgSelect[35∈0] ➊<br />ᐸpersonᐳ<br />More deps:<br />- Constantᐸ0ᐳ[116]"]]:::plan
+    Object10 --> PgSelect35
+    __InputObject41{{"__InputObject[41∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[6]<br />- Constantᐸnullᐳ[42]"}}:::plan
     PgSelect43[["PgSelect[43∈0] ➊<br />ᐸpersonᐳ"]]:::plan
     ApplyInput45{{"ApplyInput[45∈0] ➊"}}:::plan
     Object10 & ApplyInput45 --> PgSelect43
-    PgSelect47[["PgSelect[47∈0] ➊<br />ᐸpostᐳ"]]:::plan
-    Object10 & Constant114 --> PgSelect47
+    PgSelect47[["PgSelect[47∈0] ➊<br />ᐸpostᐳ<br />More deps:<br />- Constantᐸ3ᐳ[114]"]]:::plan
+    Object10 --> PgSelect47
     PgSelect7[["PgSelect[7∈0] ➊<br />ᐸpersonᐳ"]]:::plan
     Object10 --> PgSelect7
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
@@ -92,7 +84,6 @@ graph TD
     PgSelect43 --> PgSelectRows59
     PgSelectRows60[["PgSelectRows[60∈0] ➊"]]:::plan
     PgSelect47 --> PgSelectRows60
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item61[/"__Item[61∈1]<br />ᐸ50ᐳ"\]:::itemplan
     PgSelectRows50 ==> __Item61
     PgSelectSingle62{{"PgSelectSingle[62∈1]<br />ᐸpersonᐳ"}}:::plan
@@ -200,7 +191,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,PgSelect12,PgSelect15,PgSelect19,__InputObject22,PgSelect23,ApplyInput25,__InputObject26,PgSelect27,ApplyInput29,PgSelect32,PgSelect35,PgSelect38,__InputObject41,Constant42,PgSelect43,ApplyInput45,PgSelect47,PgSelectRows50,PgSelectRows51,PgSelectRows52,PgSelectRows53,PgSelectRows54,PgSelectRows55,PgSelectRows56,PgSelectRows57,PgSelectRows58,PgSelectRows59,PgSelectRows60,Constant113,Constant114,Constant115,Constant116 bucket0
+    class Bucket0,__Value2,PgSelect7,Access8,Access9,Object10,PgSelect12,PgSelect15,PgSelect19,__InputObject22,PgSelect23,ApplyInput25,__InputObject26,PgSelect27,ApplyInput29,PgSelect32,PgSelect35,PgSelect38,__InputObject41,PgSelect43,ApplyInput45,PgSelect47,PgSelectRows50,PgSelectRows51,PgSelectRows52,PgSelectRows53,PgSelectRows54,PgSelectRows55,PgSelectRows56,PgSelectRows57,PgSelectRows58,PgSelectRows59,PgSelectRows60 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item61,PgSelectSingle62,PgClassExpression83,PgClassExpression94,PgClassExpression105 bucket1
     classDef bucket2 stroke:#7f007f

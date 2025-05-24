@@ -14,11 +14,10 @@ graph TD
     Bucket0 --> Bucket1
 
     %% plan dependencies
-    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸrelational_topicsᐳ"]]:::plan
+    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸrelational_topicsᐳ<br />More deps:<br />- Constantᐸ12ᐳ[64]"]]:::plan
     Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant64{{"Constant[64∈0] ➊<br />ᐸ12ᐳ"}}:::plan
     PgSelectInlineApply60["PgSelectInlineApply[60∈0] ➊"]:::plan
-    Object10 & Constant64 & PgSelectInlineApply60 --> PgSelect7
+    Object10 & PgSelectInlineApply60 --> PgSelect7
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
@@ -33,7 +32,6 @@ graph TD
     First11 --> PgSelectSingle13
     Access61{{"Access[61∈0] ➊<br />ᐸ7.m.joinDetailsFor15ᐳ"}}:::plan
     PgSelect7 --> Access61
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     List62{{"List[62∈1] ➊<br />ᐸ61,13ᐳ"}}:::plan
     Access61 & PgSelectSingle13 --> List62
     PgClassExpression14{{"PgClassExpression[14∈1] ➊<br />ᐸ__relation...ics__.”id”ᐳ"}}:::plan
@@ -65,7 +63,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,PgSelectInlineApply60,Access61,Constant64 bucket0
+    class Bucket0,__Value2,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,PgSelectInlineApply60,Access61 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgClassExpression14,First19,PgSelectRows20,PgSelectSingle21,PgClassExpression22,PgClassExpression28,PgClassExpression34,PgClassExpression40,PgClassExpression46,PgClassExpression52,PgClassExpression58,PgClassExpression59,List62,Lambda63 bucket1
 

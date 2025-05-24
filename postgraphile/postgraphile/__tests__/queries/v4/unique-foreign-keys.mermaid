@@ -36,7 +36,6 @@ graph TD
     PgSelectInlineApply47 --> PgSelectInlineApply51
     PgSelectInlineApply55["PgSelectInlineApply[55∈0] ➊"]:::plan
     PgSelectInlineApply51 --> PgSelectInlineApply55
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection12{{"Connection[12∈0] ➊<br />ᐸ8ᐳ"}}:::plan
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸcompound_keyᐳ"]]:::plan
     Object11 & Connection12 & PgSelectInlineApply55 --> PgSelect14
@@ -101,7 +100,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access9,Access10,Object11,Connection12,PgSelectInlineApply47,PgSelectInlineApply51,PgSelectInlineApply55 bucket0
+    class Bucket0,__Value2,Access9,Access10,Object11,Connection12,PgSelectInlineApply47,PgSelectInlineApply51,PgSelectInlineApply55 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect14,PgSelectRows15,Access56 bucket1
     classDef bucket2 stroke:#7f007f

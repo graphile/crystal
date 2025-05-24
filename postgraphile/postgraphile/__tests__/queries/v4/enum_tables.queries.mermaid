@@ -40,20 +40,14 @@ graph TD
     Bucket12 --> Bucket17
 
     %% plan dependencies
-    Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 7"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
-    PgSelect25[["PgSelect[25∈0] ➊<br />ᐸletter_descriptionsᐳ"]]:::plan
-    Constant98{{"Constant[98∈0] ➊<br />ᐸ'B'ᐳ"}}:::plan
-    Object11 & Constant98 --> PgSelect25
-    PgSelect30[["PgSelect[30∈0] ➊<br />ᐸletter_descriptionsᐳ"]]:::plan
-    Object11 & Constant98 --> PgSelect30
-    __InputObject35{{"__InputObject[35∈0] ➊"}}:::plan
-    Constant99{{"Constant[99∈0] ➊<br />ᐸ'C'ᐳ"}}:::plan
-    Constant99 --> __InputObject35
-    __InputObject43{{"__InputObject[43∈0] ➊"}}:::plan
-    Constant99 --> __InputObject43
+    PgSelect25[["PgSelect[25∈0] ➊<br />ᐸletter_descriptionsᐳ<br />More deps:<br />- Object[11]<br />- Constantᐸ'B'ᐳ[98]"]]:::plan
+    PgSelect30[["PgSelect[30∈0] ➊<br />ᐸletter_descriptionsᐳ<br />More deps:<br />- Object[11]<br />- Constantᐸ'B'ᐳ[98]"]]:::plan
+    __InputObject35{{"__InputObject[35∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[6]<br />- Constantᐸ'C'ᐳ[99]"}}:::plan
+    __InputObject43{{"__InputObject[43∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[6]<br />- Constantᐸ'C'ᐳ[99]"}}:::plan
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10
@@ -73,22 +67,21 @@ graph TD
     __InputObject35 --> ApplyInput41
     ApplyInput48{{"ApplyInput[48∈0] ➊"}}:::plan
     __InputObject43 --> ApplyInput48
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection12{{"Connection[12∈0] ➊<br />ᐸ8ᐳ"}}:::plan
     Connection17{{"Connection[17∈0] ➊<br />ᐸ15ᐳ"}}:::plan
     Connection22{{"Connection[22∈0] ➊<br />ᐸ20ᐳ"}}:::plan
     Connection40{{"Connection[40∈0] ➊<br />ᐸ38ᐳ"}}:::plan
     Connection47{{"Connection[47∈0] ➊<br />ᐸ45ᐳ"}}:::plan
-    PgSelect50[["PgSelect[50∈1] ➊<br />ᐸletter_descriptionsᐳ"]]:::plan
-    Object11 & Connection12 --> PgSelect50
+    PgSelect50[["PgSelect[50∈1] ➊<br />ᐸletter_descriptionsᐳ<br />More deps:<br />- Object[11]"]]:::plan
+    Connection12 --> PgSelect50
     PgSelectRows63[["PgSelectRows[63∈1] ➊"]]:::plan
     PgSelect50 --> PgSelectRows63
-    PgSelect51[["PgSelect[51∈2] ➊<br />ᐸletter_descriptionsᐳ"]]:::plan
-    Object11 & Connection17 --> PgSelect51
+    PgSelect51[["PgSelect[51∈2] ➊<br />ᐸletter_descriptionsᐳ<br />More deps:<br />- Object[11]"]]:::plan
+    Connection17 --> PgSelect51
     PgSelectRows64[["PgSelectRows[64∈2] ➊"]]:::plan
     PgSelect51 --> PgSelectRows64
-    PgSelect52[["PgSelect[52∈3] ➊<br />ᐸletter_descriptionsᐳ"]]:::plan
-    Object11 & Connection22 --> PgSelect52
+    PgSelect52[["PgSelect[52∈3] ➊<br />ᐸletter_descriptionsᐳ<br />More deps:<br />- Object[11]"]]:::plan
+    Connection22 --> PgSelect52
     PgSelectRows65[["PgSelectRows[65∈3] ➊"]]:::plan
     PgSelect52 --> PgSelectRows65
     PgClassExpression53{{"PgClassExpression[53∈4] ➊<br />ᐸ__letter_d...ons__.”id”ᐳ"}}:::plan
@@ -107,12 +100,12 @@ graph TD
     PgSelectSingle34 --> PgClassExpression60
     PgClassExpression62{{"PgClassExpression[62∈5] ➊<br />ᐸ__letter_d...scription”ᐳ"}}:::plan
     PgSelectSingle34 --> PgClassExpression62
-    PgSelect55[["PgSelect[55∈6] ➊<br />ᐸletter_descriptionsᐳ"]]:::plan
-    Object11 & ApplyInput41 & Connection40 --> PgSelect55
+    PgSelect55[["PgSelect[55∈6] ➊<br />ᐸletter_descriptionsᐳ<br />More deps:<br />- Object[11]"]]:::plan
+    ApplyInput41 & Connection40 --> PgSelect55
     PgSelectRows66[["PgSelectRows[66∈6] ➊"]]:::plan
     PgSelect55 --> PgSelectRows66
-    PgSelect56[["PgSelect[56∈7] ➊<br />ᐸletter_descriptionsᐳ"]]:::plan
-    Object11 & ApplyInput48 & Connection47 --> PgSelect56
+    PgSelect56[["PgSelect[56∈7] ➊<br />ᐸletter_descriptionsᐳ<br />More deps:<br />- Object[11]"]]:::plan
+    ApplyInput48 & Connection47 --> PgSelect56
     PgSelectRows67[["PgSelectRows[67∈7] ➊"]]:::plan
     PgSelect56 --> PgSelectRows67
     __Item68[/"__Item[68∈8]<br />ᐸ63ᐳ"\]:::itemplan
@@ -178,7 +171,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access9,Access10,Object11,Connection12,Connection17,Connection22,PgSelect25,First27,PgSelectRows28,PgSelectSingle29,PgSelect30,First32,PgSelectRows33,PgSelectSingle34,__InputObject35,Connection40,ApplyInput41,__InputObject43,Connection47,ApplyInput48,Constant98,Constant99 bucket0
+    class Bucket0,__Value2,Access9,Access10,Object11,Connection12,Connection17,Connection22,PgSelect25,First27,PgSelectRows28,PgSelectSingle29,PgSelect30,First32,PgSelectRows33,PgSelectSingle34,__InputObject35,Connection40,ApplyInput41,__InputObject43,Connection47,ApplyInput48 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect50,PgSelectRows63 bucket1
     classDef bucket2 stroke:#7f007f

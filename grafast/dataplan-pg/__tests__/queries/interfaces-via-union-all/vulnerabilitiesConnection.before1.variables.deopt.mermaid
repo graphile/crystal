@@ -23,36 +23,31 @@ graph TD
     Bucket4 --> Bucket5 & Bucket6
 
     %% plan dependencies
-    Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 3"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access13{{"Access[13∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access12 & Access13 --> Object14
-    Connection16{{"Connection[16∈0] ➊<br />ᐸ11ᐳ"}}:::plan
-    Constant55{{"Constant[55∈0] ➊<br />ᐸ2ᐳ"}}:::plan
-    Lambda17{{"Lambda[17∈0] ➊<br />ᐸparseCursorᐳ"}}:::plan
-    Constant55 & Lambda17 --> Connection16
+    Connection16{{"Connection[16∈0] ➊<br />ᐸ11ᐳ<br />More deps:<br />- Constantᐸ2ᐳ[55]<br />- Lambda[17]"}}:::plan
     Access8{{"Access[8∈0] ➊<br />ᐸ0.valueᐳ"}}:::plan
     __Value0["__Value[0∈0] ➊<br />ᐸvariableValuesᐳ"]:::plan
     __Value0 --> Access8
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access12
     __Value2 --> Access13
+    Lambda17{{"Lambda[17∈0] ➊<br />ᐸparseCursorᐳ<br />Dependents: 2"}}:::plan
     Access8 --> Lambda17
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant15{{"Constant[15∈0] ➊<br />ᐸ[Function: applyInputConstant]ᐳ"}}:::plan
-    Constant26{{"Constant[26∈0] ➊<br />ᐸ[HIDDEN]ᐳ"}}:::plan
-    PgUnionAll18[["PgUnionAll[18∈1] ➊<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ"]]:::plan
-    Object14 & Constant15 & Connection16 & Lambda17 & Constant55 --> PgUnionAll18
+    PgUnionAll18[["PgUnionAll[18∈1] ➊<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ<br />More deps:<br />- Object[14]<br />- Constantᐸ[Function: applyInputConstant]ᐳ[15]<br />- Lambda[17]<br />- Constantᐸ2ᐳ[55]"]]:::plan
+    Connection16 --> PgUnionAll18
     Access22{{"Access[22∈1] ➊<br />ᐸ18.cursorDetailsᐳ"}}:::plan
     PgUnionAll18 --> Access22
     Access54{{"Access[54∈1] ➊<br />ᐸ18.itemsᐳ"}}:::plan
     PgUnionAll18 --> Access54
     __Item20[/"__Item[20∈2]<br />ᐸ54ᐳ"\]:::itemplan
     Access54 ==> __Item20
-    List27{{"List[27∈3]<br />ᐸ24,25,26ᐳ"}}:::plan
+    List27{{"List[27∈3]<br />ᐸ24,25,26ᐳ<br />More deps:<br />- Constantᐸ[HIDDEN]ᐳ[26]"}}:::plan
     Access24{{"Access[24∈3]<br />ᐸ20.0ᐳ"}}:::plan
     Access25{{"Access[25∈3]<br />ᐸ20.1ᐳ"}}:::plan
-    Access24 & Access25 & Constant26 --> List27
+    Access24 & Access25 --> List27
     PgCursor23{{"PgCursor[23∈3]"}}:::plan
     __Item20 & Access22 --> PgCursor23
     __Item20 --> Access24
@@ -63,8 +58,8 @@ graph TD
     Lambda28 --> Access29
     Access30{{"Access[30∈3]<br />ᐸ28.idᐳ"}}:::plan
     Lambda28 --> Access30
-    PgSelect31[["PgSelect[31∈5]<br />ᐸfirst_party_vulnerabilitiesᐳ<br />ᐳFirstPartyVulnerability"]]:::plan
-    Object14 & Access30 --> PgSelect31
+    PgSelect31[["PgSelect[31∈5]<br />ᐸfirst_party_vulnerabilitiesᐳ<br />ᐳFirstPartyVulnerability<br />More deps:<br />- Object[14]"]]:::plan
+    Access30 --> PgSelect31
     First35{{"First[35∈5]^"}}:::plan
     PgSelectRows36[["PgSelectRows[36∈5]^"]]:::plan
     PgSelectRows36 --> First35
@@ -79,8 +74,8 @@ graph TD
     PgSelectSingle37 --> PgClassExpression50
     PgClassExpression52{{"PgClassExpression[52∈5]^<br />ᐸ__first_pa...team_name”ᐳ"}}:::plan
     PgSelectSingle37 --> PgClassExpression52
-    PgSelect39[["PgSelect[39∈6]<br />ᐸthird_party_vulnerabilitiesᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
-    Object14 & Access30 --> PgSelect39
+    PgSelect39[["PgSelect[39∈6]<br />ᐸthird_party_vulnerabilitiesᐳ<br />ᐳThirdPartyVulnerability<br />More deps:<br />- Object[14]"]]:::plan
+    Access30 --> PgSelect39
     First43{{"First[43∈6]^"}}:::plan
     PgSelectRows44[["PgSelectRows[44∈6]^"]]:::plan
     PgSelectRows44 --> First43
@@ -98,7 +93,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value2,__Value4,Access8,Access12,Access13,Object14,Constant15,Connection16,Lambda17,Constant26,Constant55 bucket0
+    class Bucket0,__Value0,__Value2,Access8,Access12,Access13,Object14,Connection16,Lambda17 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUnionAll18,Access22,Access54 bucket1
     classDef bucket2 stroke:#7f007f

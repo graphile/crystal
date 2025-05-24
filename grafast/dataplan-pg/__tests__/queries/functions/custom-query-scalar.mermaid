@@ -14,16 +14,16 @@ graph TD
     %% plan dependencies
     PgSelect7[["PgSelect[7∈0] ➊<br />ᐸunique_author_countᐳ"]]:::plan
     Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgFromExpression11{{"PgFromExpression[11∈0] ➊"}}:::plan
+    PgFromExpression11{{"PgFromExpression[11∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[6]"}}:::plan
     Object10 & PgFromExpression11 --> PgSelect7
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
     PgSelect17[["PgSelect[17∈0] ➊<br />ᐸunique_author_countᐳ"]]:::plan
-    PgFromExpression19{{"PgFromExpression[19∈0] ➊"}}:::plan
+    PgFromExpression19{{"PgFromExpression[19∈0] ➊<br />More deps:<br />- Constantᐸtrueᐳ[32]"}}:::plan
     Object10 & PgFromExpression19 --> PgSelect17
     PgSelect25[["PgSelect[25∈0] ➊<br />ᐸunique_author_countᐳ"]]:::plan
-    PgFromExpression27{{"PgFromExpression[27∈0] ➊"}}:::plan
+    PgFromExpression27{{"PgFromExpression[27∈0] ➊<br />More deps:<br />- Constantᐸfalseᐳ[33]"}}:::plan
     Object10 & PgFromExpression27 --> PgSelect25
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
@@ -34,31 +34,20 @@ graph TD
     PgSelect7 --> PgSelectRows13
     PgSelectSingle14{{"PgSelectSingle[14∈0] ➊<br />ᐸunique_author_countᐳ"}}:::plan
     First12 --> PgSelectSingle14
-    PgClassExpression15{{"PgClassExpression[15∈0] ➊<br />ᐸ__unique_a..._count__.vᐳ"}}:::plan
-    PgSelectSingle14 --> PgClassExpression15
-    Constant32{{"Constant[32∈0] ➊<br />ᐸtrueᐳ"}}:::plan
-    Constant32 --> PgFromExpression19
     First20{{"First[20∈0] ➊"}}:::plan
     PgSelectRows21[["PgSelectRows[21∈0] ➊"]]:::plan
     PgSelectRows21 --> First20
     PgSelect17 --> PgSelectRows21
     PgSelectSingle22{{"PgSelectSingle[22∈0] ➊<br />ᐸunique_author_countᐳ"}}:::plan
     First20 --> PgSelectSingle22
-    PgClassExpression23{{"PgClassExpression[23∈0] ➊<br />ᐸ__unique_a..._count__.vᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression23
-    Constant33{{"Constant[33∈0] ➊<br />ᐸfalseᐳ"}}:::plan
-    Constant33 --> PgFromExpression27
     First28{{"First[28∈0] ➊"}}:::plan
     PgSelectRows29[["PgSelectRows[29∈0] ➊"]]:::plan
     PgSelectRows29 --> First28
     PgSelect25 --> PgSelectRows29
     PgSelectSingle30{{"PgSelectSingle[30∈0] ➊<br />ᐸunique_author_countᐳ"}}:::plan
     First28 --> PgSelectSingle30
-    PgClassExpression31{{"PgClassExpression[31∈0] ➊<br />ᐸ__unique_a..._count__.vᐳ"}}:::plan
-    PgSelectSingle30 --> PgClassExpression31
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,PgFromExpression11,First12,PgSelectRows13,PgSelectSingle14,PgClassExpression15,PgSelect17,PgFromExpression19,First20,PgSelectRows21,PgSelectSingle22,PgClassExpression23,PgSelect25,PgFromExpression27,First28,PgSelectRows29,PgSelectSingle30,PgClassExpression31,Constant32,Constant33 bucket0
+    class Bucket0,__Value2,PgSelect7,Access8,Access9,Object10,PgFromExpression11,First12,PgSelectRows13,PgSelectSingle14,PgSelect17,PgFromExpression19,First20,PgSelectRows21,PgSelectSingle22,PgSelect25,PgFromExpression27,First28,PgSelectRows29,PgSelectSingle30 bucket0
 

@@ -29,7 +29,6 @@ graph TD
     PgSelect6 --> PgSelectRows11
     PgSelectSingle12{{"PgSelectSingle[12∈0] ➊<br />ᐸusersᐳ"}}:::plan
     First10 --> PgSelectSingle12
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgClassExpression13{{"PgClassExpression[13∈1] ➊<br />ᐸ__random_u...”username”ᐳ"}}:::plan
     PgSelectSingle12 --> PgClassExpression13
     PgClassExpression14{{"PgClassExpression[14∈1] ➊<br />ᐸ__random_u...vatar_url”ᐳ"}}:::plan
@@ -37,7 +36,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect6,Access7,Access8,Object9,First10,PgSelectRows11,PgSelectSingle12 bucket0
+    class Bucket0,__Value2,PgSelect6,Access7,Access8,Object9,First10,PgSelectRows11,PgSelectSingle12 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgClassExpression13,PgClassExpression14 bucket1
 

@@ -28,17 +28,17 @@ graph TD
     Bucket6 --> Bucket9
 
     %% plan dependencies
-    __InputObject7{{"__InputObject[7∈0] ➊"}}:::plan
+    __InputObject7{{"__InputObject[7∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[6]"}}:::plan
     __InputDynamicScalar8{{"__InputDynamicScalar[8∈0] ➊"}}:::plan
     __InputDynamicScalar8 --> __InputObject7
-    Object15{{"Object[15∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object15{{"Object[15∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 3"}}:::plan
     Access13{{"Access[13∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access14{{"Access[14∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access13 & Access14 --> Object15
-    __InputObject19{{"__InputObject[19∈0] ➊"}}:::plan
+    __InputObject19{{"__InputObject[19∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[6]"}}:::plan
     __InputDynamicScalar20{{"__InputDynamicScalar[20∈0] ➊"}}:::plan
     __InputDynamicScalar20 --> __InputObject19
-    __InputObject27{{"__InputObject[27∈0] ➊"}}:::plan
+    __InputObject27{{"__InputObject[27∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[6]"}}:::plan
     Access28{{"Access[28∈0] ➊<br />ᐸ0.myVal2ᐳ"}}:::plan
     Access28 --> __InputObject27
     Access9{{"Access[9∈0] ➊<br />ᐸ0.myValᐳ"}}:::plan
@@ -55,20 +55,19 @@ graph TD
     __Value0 --> Access28
     ApplyInput34{{"ApplyInput[34∈0] ➊"}}:::plan
     __InputObject27 --> ApplyInput34
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection16{{"Connection[16∈0] ➊<br />ᐸ12ᐳ"}}:::plan
     Connection24{{"Connection[24∈0] ➊<br />ᐸ22ᐳ"}}:::plan
     Connection33{{"Connection[33∈0] ➊<br />ᐸ31ᐳ"}}:::plan
-    PgSelect36[["PgSelect[36∈1] ➊<br />ᐸmy_tableᐳ"]]:::plan
-    Object15 & ApplyInput17 & Connection16 --> PgSelect36
+    PgSelect36[["PgSelect[36∈1] ➊<br />ᐸmy_tableᐳ<br />More deps:<br />- Object[15]"]]:::plan
+    ApplyInput17 & Connection16 --> PgSelect36
     PgSelectRows39[["PgSelectRows[39∈1] ➊"]]:::plan
     PgSelect36 --> PgSelectRows39
-    PgSelect37[["PgSelect[37∈2] ➊<br />ᐸmy_tableᐳ"]]:::plan
-    Object15 & ApplyInput25 & Connection24 --> PgSelect37
+    PgSelect37[["PgSelect[37∈2] ➊<br />ᐸmy_tableᐳ<br />More deps:<br />- Object[15]"]]:::plan
+    ApplyInput25 & Connection24 --> PgSelect37
     PgSelectRows40[["PgSelectRows[40∈2] ➊"]]:::plan
     PgSelect37 --> PgSelectRows40
-    PgSelect38[["PgSelect[38∈3] ➊<br />ᐸmy_tableᐳ"]]:::plan
-    Object15 & ApplyInput34 & Connection33 --> PgSelect38
+    PgSelect38[["PgSelect[38∈3] ➊<br />ᐸmy_tableᐳ<br />More deps:<br />- Object[15]"]]:::plan
+    ApplyInput34 & Connection33 --> PgSelect38
     PgSelectRows41[["PgSelectRows[41∈3] ➊"]]:::plan
     PgSelect38 --> PgSelectRows41
     __Item42[/"__Item[42∈4]<br />ᐸ39ᐳ"\]:::itemplan
@@ -98,7 +97,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value2,__Value4,__InputObject7,__InputDynamicScalar8,Access9,Access13,Access14,Object15,Connection16,ApplyInput17,__InputObject19,__InputDynamicScalar20,Connection24,ApplyInput25,__InputObject27,Access28,Connection33,ApplyInput34 bucket0
+    class Bucket0,__Value0,__Value2,__InputObject7,__InputDynamicScalar8,Access9,Access13,Access14,Object15,Connection16,ApplyInput17,__InputObject19,__InputDynamicScalar20,Connection24,ApplyInput25,__InputObject27,Access28,Connection33,ApplyInput34 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect36,PgSelectRows39 bucket1
     classDef bucket2 stroke:#7f007f

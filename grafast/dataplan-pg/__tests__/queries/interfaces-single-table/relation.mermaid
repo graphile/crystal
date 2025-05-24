@@ -18,11 +18,10 @@ graph TD
     Bucket2 --> Bucket3
 
     %% plan dependencies
-    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸsingle_table_itemsᐳ"]]:::plan
+    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸsingle_table_itemsᐳ<br />More deps:<br />- Constantᐸ15ᐳ[120]"]]:::plan
     Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant120{{"Constant[120∈0] ➊<br />ᐸ15ᐳ"}}:::plan
     PgSelectInlineApply116["PgSelectInlineApply[116∈0] ➊"]:::plan
-    Object10 & Constant120 & PgSelectInlineApply116 --> PgSelect7
+    Object10 & PgSelectInlineApply116 --> PgSelect7
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
@@ -42,14 +41,8 @@ graph TD
     PgSelectRows12 --> First11
     PgSelect7 --> PgSelectRows12
     First11 --> PgSelectSingle13
-    PgClassExpression14{{"PgClassExpression[14∈0] ➊<br />ᐸ__single_t...ems__.”id”ᐳ"}}:::plan
-    PgSelectSingle13 --> PgClassExpression14
     PgClassExpression16{{"PgClassExpression[16∈0] ➊<br />ᐸ__single_t...s__.”type”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression16
-    Lambda17{{"Lambda[17∈0] ➊"}}:::plan
-    PgClassExpression16 --> Lambda17
-    PgClassExpression18{{"PgClassExpression[18∈0] ➊<br />ᐸ__single_t...parent_id”ᐳ"}}:::plan
-    PgSelectSingle13 --> PgClassExpression18
     First23{{"First[23∈0] ➊"}}:::plan
     PgSelectRows24[["PgSelectRows[24∈0] ➊"]]:::plan
     PgSelectRows24 --> First23
@@ -58,8 +51,6 @@ graph TD
     First23 --> PgSelectSingle25
     PgClassExpression64{{"PgClassExpression[64∈0] ➊<br />ᐸ__single_t...s__.”type”ᐳ"}}:::plan
     PgSelectSingle25 --> PgClassExpression64
-    Lambda65{{"Lambda[65∈0] ➊"}}:::plan
-    PgClassExpression64 --> Lambda65
     First76{{"First[76∈0] ➊"}}:::plan
     PgSelectRows77[["PgSelectRows[77∈0] ➊"]]:::plan
     PgSelectRows77 --> First76
@@ -73,13 +64,12 @@ graph TD
     PgSelectInlineApply112 --> PgSelectInlineApply116
     PgSelect7 --> Access117
     List118 --> Lambda119
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgClassExpression111{{"PgClassExpression[111∈3] ➊<br />ᐸ__people__.”username”ᐳ<br />(5) ...ᐳSingleTableTopic<br />(5) ...ᐳSingleTablePost<br />(5) ...ᐳSingleTableDivider<br />(5) ...ᐳSingleTableChecklist<br />(5) ...ᐳSingleTableChecklistItem"}}:::plan
     PgSelectSingle78 --> PgClassExpression111
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,PgClassExpression14,PgClassExpression16,Lambda17,PgClassExpression18,First23,PgSelectRows24,PgSelectSingle25,PgClassExpression64,Lambda65,First76,PgSelectRows77,PgSelectSingle78,PgSelectInlineApply112,Access113,List114,Lambda115,PgSelectInlineApply116,Access117,List118,Lambda119,Constant120 bucket0
+    class Bucket0,__Value2,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,PgClassExpression16,First23,PgSelectRows24,PgSelectSingle25,PgClassExpression64,First76,PgSelectRows77,PgSelectSingle78,PgSelectInlineApply112,Access113,List114,Lambda115,PgSelectInlineApply116,Access117,List118,Lambda119 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1 bucket1
     classDef bucket2 stroke:#7f007f

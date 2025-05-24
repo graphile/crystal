@@ -18,10 +18,9 @@ graph TD
     Bucket2 --> Bucket3
 
     %% plan dependencies
-    __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
-    Constant25{{"Constant[25∈0] ➊<br />ᐸ3ᐳ"}}:::plan
-    __InputObject9{{"__InputObject[9∈0] ➊"}}:::plan
-    Constant25 & __InputObject9 --> __InputObject6
+    __InputObject6{{"__InputObject[6∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ3ᐳ[25]"}}:::plan
+    __InputObject9{{"__InputObject[9∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]"}}:::plan
+    __InputObject9 --> __InputObject6
     Access10{{"Access[10∈0] ➊<br />ᐸ0.nnValueᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ0.nullValueᐳ"}}:::plan
     Access10 & Access12 --> __InputObject9
@@ -37,9 +36,8 @@ graph TD
     __Value2 --> Access16
     ApplyInput18{{"ApplyInput[18∈0] ➊"}}:::plan
     __InputObject6 --> ApplyInput18
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    PgUpdateSingle14[["PgUpdateSingle[14∈1] ➊<br />ᐸsimilar_table_1(id;)ᐳ"]]:::sideeffectplan
-    Object17 & Constant25 & ApplyInput18 --> PgUpdateSingle14
+    PgUpdateSingle14[["PgUpdateSingle[14∈1] ➊<br />ᐸsimilar_table_1(id;)ᐳ<br />More deps:<br />- Constantᐸ3ᐳ[25]"]]:::sideeffectplan
+    Object17 & ApplyInput18 --> PgUpdateSingle14
     Object19{{"Object[19∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgUpdateSingle14 --> Object19
     PgClassExpression20{{"PgClassExpression[20∈3] ➊<br />ᐸ__similar_...e_1__.”id”ᐳ"}}:::plan
@@ -55,7 +53,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value2,__Value4,__InputObject6,__InputObject9,Access10,Access12,Access15,Access16,Object17,ApplyInput18,Constant25 bucket0
+    class Bucket0,__Value0,__Value2,__InputObject6,__InputObject9,Access10,Access12,Access15,Access16,Object17,ApplyInput18 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUpdateSingle14,Object19 bucket1
     classDef bucket2 stroke:#7f007f

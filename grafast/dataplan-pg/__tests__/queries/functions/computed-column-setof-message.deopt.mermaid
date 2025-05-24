@@ -18,10 +18,8 @@ graph TD
     Bucket2 --> Bucket3
 
     %% plan dependencies
-    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸforumsᐳ"]]:::plan
-    Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant24{{"Constant[24∈0] ➊<br />ᐸ'f1700000-0000-0000-0000-000000000f17'ᐳ"}}:::plan
-    Object10 & Constant24 --> PgSelect7
+    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸforumsᐳ<br />More deps:<br />- Object[10]<br />- Constantᐸ'f1700000-0000-0000-0000-000000000f17'ᐳ[24]"]]:::plan
+    Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 2"}}:::plan
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
@@ -34,10 +32,9 @@ graph TD
     PgSelect7 --> PgSelectRows12
     PgSelectSingle13{{"PgSelectSingle[13∈0] ➊<br />ᐸforumsᐳ"}}:::plan
     First11 --> PgSelectSingle13
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    PgSelect15[["PgSelect[15∈1] ➊<br />ᐸforums_featured_messagesᐳ"]]:::plan
+    PgSelect15[["PgSelect[15∈1] ➊<br />ᐸforums_featured_messagesᐳ<br />More deps:<br />- Object[10]"]]:::plan
     PgFromExpression19{{"PgFromExpression[19∈1] ➊"}}:::plan
-    Object10 & PgFromExpression19 --> PgSelect15
+    PgFromExpression19 --> PgSelect15
     PgClassExpression14{{"PgClassExpression[14∈1] ➊<br />ᐸ__forums__ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression14
     PgClassExpression14 --> PgFromExpression19
@@ -52,7 +49,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,Constant24 bucket0
+    class Bucket0,__Value2,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgClassExpression14,PgSelect15,PgFromExpression19,PgSelectRows20 bucket1
     classDef bucket2 stroke:#7f007f

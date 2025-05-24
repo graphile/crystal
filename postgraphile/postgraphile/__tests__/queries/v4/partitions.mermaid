@@ -27,15 +27,14 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection12{{"Connection[12∈0] ➊<br />ᐸ8ᐳ"}}:::plan
     PgSelectInlineApply60["PgSelectInlineApply[60∈0] ➊"]:::plan
-    Object43{{"Object[43∈1] ➊<br />ᐸ{first,last,offset,hasMore}ᐳ"}}:::plan
+    Object43{{"Object[43∈1] ➊<br />ᐸ{first,last,offset,hasMore}ᐳ<br />More deps:<br />- Constantᐸundefinedᐳ[6]<br />- Constantᐸundefinedᐳ[6]<br />- Constantᐸundefinedᐳ[6]"}}:::plan
     Access38{{"Access[38∈1] ➊<br />ᐸ14.hasMoreᐳ"}}:::plan
     Access38 --> Object43
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸmeasurements+1ᐳ"]]:::plan
     Object11 & Connection12 & PgSelectInlineApply60 --> PgSelect14
-    Object39{{"Object[39∈1] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
+    Object39{{"Object[39∈1] ➊<br />ᐸ{first,last,hasMore}ᐳ<br />More deps:<br />- Constantᐸundefinedᐳ[6]<br />- Constantᐸundefinedᐳ[6]"}}:::plan
     Access38 --> Object39
     PgSelect15[["PgSelect[15∈1] ➊<br />ᐸmeasurements(aggregate)ᐳ"]]:::plan
     Object11 & Connection12 --> PgSelect15
@@ -101,7 +100,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access9,Access10,Object11,Connection12,PgSelectInlineApply60 bucket0
+    class Bucket0,__Value2,Access9,Access10,Object11,Connection12,PgSelectInlineApply60 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect14,PgSelect15,First16,PgSelectRows17,PgSelectSingle18,PgClassExpression19,PgPageInfo21,PgSelectRows22,First26,PgSelectSingle28,Access29,PgCursor30,Last32,PgSelectSingle34,PgCursor36,Access38,Object39,Lambda40,Object43,Lambda44,Access61 bucket1
     classDef bucket2 stroke:#7f007f

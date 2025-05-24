@@ -25,16 +25,14 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access10
     __Value2 --> Access11
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant15{{"Constant[15∈0] ➊<br />ᐸ§{ a: 3 }ᐳ"}}:::plan
-    WithPgClient9[["WithPgClient[9∈1] ➊"]]:::sideeffectplan
-    Object12 & Constant15 --> WithPgClient9
+    WithPgClient9[["WithPgClient[9∈1] ➊<br />More deps:<br />- Constantᐸ§{ a: 3 }ᐳ[15]"]]:::sideeffectplan
+    Object12 --> WithPgClient9
     __Item13[/"__Item[13∈3]<br />ᐸ9ᐳ"\]:::itemplan
     WithPgClient9 ==> __Item13
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access10,Access11,Object12,Constant15 bucket0
+    class Bucket0,__Value2,Access10,Access11,Object12 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,WithPgClient9 bucket1
     classDef bucket2 stroke:#7f007f

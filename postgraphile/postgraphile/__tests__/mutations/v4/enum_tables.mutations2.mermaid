@@ -18,11 +18,8 @@ graph TD
     Bucket2 --> Bucket3
 
     %% plan dependencies
-    __InputObject8{{"__InputObject[8∈0] ➊"}}:::plan
-    Constant22{{"Constant[22∈0] ➊<br />ᐸ'a3'ᐳ"}}:::plan
-    Constant23{{"Constant[23∈0] ➊<br />ᐸ'b4'ᐳ"}}:::plan
-    Constant22 & Constant23 --> __InputObject8
-    __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
+    __InputObject8{{"__InputObject[8∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ'a3'ᐳ[22]<br />- Constantᐸ'b4'ᐳ[23]"}}:::plan
+    __InputObject6{{"__InputObject[6∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]"}}:::plan
     __InputObject8 --> __InputObject6
     Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
@@ -33,7 +30,6 @@ graph TD
     __Value2 --> Access13
     ApplyInput15{{"ApplyInput[15∈0] ➊"}}:::plan
     __InputObject6 --> ApplyInput15
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgInsertSingle11[["PgInsertSingle[11∈1] ➊<br />ᐸreferencing_table()ᐳ"]]:::sideeffectplan
     Object14 & ApplyInput15 --> PgInsertSingle11
     Object16{{"Object[16∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
@@ -51,7 +47,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,__InputObject8,Access12,Access13,Object14,ApplyInput15,Constant22,Constant23 bucket0
+    class Bucket0,__Value2,__InputObject6,__InputObject8,Access12,Access13,Object14,ApplyInput15 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle11,Object16 bucket1
     classDef bucket2 stroke:#7f007f

@@ -31,13 +31,12 @@ graph TD
     First10 --> PgSelectSingle12
     PgClassExpression13{{"PgClassExpression[13∈0] ➊<br />ᐸ__forum_names_array__.vᐳ"}}:::plan
     PgSelectSingle12 --> PgClassExpression13
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item14[/"__Item[14∈1]<br />ᐸ13ᐳ"\]:::itemplan
     PgClassExpression13 ==> __Item14
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect6,Access7,Access8,Object9,First10,PgSelectRows11,PgSelectSingle12,PgClassExpression13 bucket0
+    class Bucket0,__Value2,PgSelect6,Access7,Access8,Object9,First10,PgSelectRows11,PgSelectSingle12,PgClassExpression13 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item14 bucket1
 

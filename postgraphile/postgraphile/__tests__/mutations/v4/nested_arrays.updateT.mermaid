@@ -22,7 +22,7 @@ graph TD
     Bucket5 --> Bucket6
 
     %% plan dependencies
-    Object13{{"Object[13∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object13{{"Object[13∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 2"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access11 & Access12 --> Object13
@@ -36,9 +36,8 @@ graph TD
     __Value2 --> Access12
     ApplyInput14{{"ApplyInput[14∈0] ➊"}}:::plan
     Access6 --> ApplyInput14
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    PgUpdateSingle10[["PgUpdateSingle[10∈1] ➊<br />ᐸt(k;)ᐳ"]]:::sideeffectplan
-    Object13 & Access8 & ApplyInput14 --> PgUpdateSingle10
+    PgUpdateSingle10[["PgUpdateSingle[10∈1] ➊<br />ᐸt(k;)ᐳ<br />More deps:<br />- Object[13]"]]:::sideeffectplan
+    Access8 & ApplyInput14 --> PgUpdateSingle10
     Object15{{"Object[15∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgUpdateSingle10 --> Object15
     PgFromExpression26{{"PgFromExpression[26∈2] ➊"}}:::plan
@@ -48,9 +47,9 @@ graph TD
     PgUpdateSingle10 --> Access17
     PgClassExpression18{{"PgClassExpression[18∈3] ➊<br />ᐸ__t__.”v”ᐳ"}}:::plan
     Access17 --> PgClassExpression18
-    PgSelect22[["PgSelect[22∈5]<br />ᐸfrmcdc_workHourᐳ"]]:::plan
+    PgSelect22[["PgSelect[22∈5]<br />ᐸfrmcdc_workHourᐳ<br />More deps:<br />- Object[13]"]]:::plan
     __Item21[/"__Item[21∈5]<br />ᐸ18ᐳ"\]:::itemplan
-    Object13 & __Item21 & PgFromExpression26 --> PgSelect22
+    __Item21 & PgFromExpression26 --> PgSelect22
     PgClassExpression18 ==> __Item21
     PgSelectRows27[["PgSelectRows[27∈5]"]]:::plan
     PgSelect22 --> PgSelectRows27
@@ -69,7 +68,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value2,__Value4,Access6,Access8,Access11,Access12,Object13,ApplyInput14 bucket0
+    class Bucket0,__Value0,__Value2,Access6,Access8,Access11,Access12,Object13,ApplyInput14 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUpdateSingle10,Object15 bucket1
     classDef bucket2 stroke:#7f007f

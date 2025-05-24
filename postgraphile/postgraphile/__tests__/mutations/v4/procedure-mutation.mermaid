@@ -187,127 +187,60 @@ graph TD
     Bucket106 --> Bucket107
 
     %% plan dependencies
-    __InputObject234{{"__InputObject[234∈0] ➊"}}:::plan
-    Constant632{{"Constant[632∈0] ➊<br />ᐸ419ᐳ"}}:::plan
-    Constant633{{"Constant[633∈0] ➊<br />ᐸ'easy cheesy baked potatoes'ᐳ"}}:::plan
-    Constant634{{"Constant[634∈0] ➊<br />ᐸ'red'ᐳ"}}:::plan
-    Constant635{{"Constant[635∈0] ➊<br />ᐸ'FOO_BAR'ᐳ"}}:::plan
-    Constant636{{"Constant[636∈0] ➊<br />ᐸ''ᐳ"}}:::plan
-    __InputObject240{{"__InputObject[240∈0] ➊"}}:::plan
-    Constant637{{"Constant[637∈0] ➊<br />ᐸ8ᐳ"}}:::plan
-    Constant632 & Constant633 & Constant634 & Constant635 & Constant636 & __InputObject240 & Constant637 --> __InputObject234
-    __InputObject254{{"__InputObject[254∈0] ➊"}}:::plan
-    __InputObject255{{"__InputObject[255∈0] ➊"}}:::plan
-    Constant632 & Constant633 & Constant634 & Constant635 & Constant636 & __InputObject255 & Constant637 --> __InputObject254
-    __InputObject265{{"__InputObject[265∈0] ➊"}}:::plan
-    __InputObject266{{"__InputObject[266∈0] ➊"}}:::plan
-    Constant632 & Constant633 & Constant634 & Constant635 & Constant636 & __InputObject266 & Constant637 --> __InputObject265
-    __InputObject408{{"__InputObject[408∈0] ➊"}}:::plan
-    Constant646{{"Constant[646∈0] ➊<br />ᐸ'BAR_FOO'ᐳ"}}:::plan
-    __InputObject410{{"__InputObject[410∈0] ➊"}}:::plan
-    Constant632 & Constant633 & Constant634 & Constant646 & Constant636 & __InputObject410 & Constant637 --> __InputObject408
-    __InputObject212{{"__InputObject[212∈0] ➊"}}:::plan
-    Constant628{{"Constant[628∈0] ➊<br />ᐸ'50'ᐳ"}}:::plan
-    Constant629{{"Constant[629∈0] ➊<br />ᐸfalseᐳ"}}:::plan
-    Constant630{{"Constant[630∈0] ➊<br />ᐸ'xyz'ᐳ"}}:::plan
-    Constant216{{"Constant[216∈0] ➊<br />ᐸ[ 1, 2, 3 ]ᐳ"}}:::plan
-    Constant631{{"Constant[631∈0] ➊<br />ᐸ{ a: 1, b: 2, c: 3 }ᐳ"}}:::plan
-    __InputObject218{{"__InputObject[218∈0] ➊"}}:::plan
-    Constant628 & Constant629 & Constant630 & Constant216 & Constant631 & __InputObject218 --> __InputObject212
-    __InputObject374{{"__InputObject[374∈0] ➊"}}:::plan
-    Constant642{{"Constant[642∈0] ➊<br />ᐸ15ᐳ"}}:::plan
-    Constant643{{"Constant[643∈0] ➊<br />ᐸ'headline_'ᐳ"}}:::plan
-    Constant644{{"Constant[644∈0] ➊<br />ᐸ'body'ᐳ"}}:::plan
-    Constant642 & Constant643 & Constant644 --> __InputObject374
-    __InputObject97{{"__InputObject[97∈0] ➊"}}:::plan
-    Constant621{{"Constant[621∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Constant622{{"Constant[622∈0] ➊<br />ᐸ2ᐳ"}}:::plan
-    Constant621 & Constant622 --> __InputObject97
-    __InputObject124{{"__InputObject[124∈0] ➊"}}:::plan
-    Constant624{{"Constant[624∈0] ➊<br />ᐸ'world'ᐳ"}}:::plan
-    Constant625{{"Constant[625∈0] ➊<br />ᐸ5ᐳ"}}:::plan
-    Constant624 & Constant625 --> __InputObject124
-    __InputObject138{{"__InputObject[138∈0] ➊"}}:::plan
-    Constant626{{"Constant[626∈0] ➊<br />ᐸ3ᐳ"}}:::plan
-    Constant621 & Constant626 --> __InputObject138
-    __InputObject151{{"__InputObject[151∈0] ➊"}}:::plan
-    Constant621 & Constant626 --> __InputObject151
-    __InputObject163{{"__InputObject[163∈0] ➊"}}:::plan
-    Constant627{{"Constant[627∈0] ➊<br />ᐸ0ᐳ"}}:::plan
-    Constant627 & Constant621 --> __InputObject163
-    __InputObject188{{"__InputObject[188∈0] ➊"}}:::plan
-    Constant621 & Constant622 --> __InputObject188
-    __InputObject200{{"__InputObject[200∈0] ➊"}}:::plan
-    Constant625 & Constant622 --> __InputObject200
-    __InputObject305{{"__InputObject[305∈0] ➊"}}:::plan
-    Constant639{{"Constant[639∈0] ➊<br />ᐸ6ᐳ"}}:::plan
-    Constant625 & Constant639 --> __InputObject305
-    __InputObject373{{"__InputObject[373∈0] ➊"}}:::plan
-    Constant645{{"Constant[645∈0] ➊<br />ᐸ'test'ᐳ"}}:::plan
-    __InputObject374 & Constant645 --> __InputObject373
-    __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
-    Constant615{{"Constant[615∈0] ➊<br />ᐸ{ a: 1, b: 2, c: 3 }ᐳ"}}:::plan
-    Constant615 --> __InputObject6
+    __InputObject234{{"__InputObject[234∈0] ➊<br />More deps:<br />- Constantᐸ419ᐳ[632]<br />- Constantᐸ'easy cheesy baked potatoes'ᐳ[633]<br />- Constantᐸ'red'ᐳ[634]<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ'FOO_BAR'ᐳ[635]<br />- Constantᐸ''ᐳ[636]<br />- Constantᐸ8ᐳ[637]"}}:::plan
+    __InputObject240{{"__InputObject[240∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ5ᐳ[625]"}}:::plan
+    __InputObject240 --> __InputObject234
+    __InputObject254{{"__InputObject[254∈0] ➊<br />More deps:<br />- Constantᐸ419ᐳ[632]<br />- Constantᐸ'easy cheesy baked potatoes'ᐳ[633]<br />- Constantᐸ'red'ᐳ[634]<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ'FOO_BAR'ᐳ[635]<br />- Constantᐸ''ᐳ[636]<br />- Constantᐸ8ᐳ[637]"}}:::plan
+    __InputObject255{{"__InputObject[255∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ5ᐳ[625]"}}:::plan
+    __InputObject255 --> __InputObject254
+    __InputObject265{{"__InputObject[265∈0] ➊<br />More deps:<br />- Constantᐸ419ᐳ[632]<br />- Constantᐸ'easy cheesy baked potatoes'ᐳ[633]<br />- Constantᐸ'red'ᐳ[634]<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ'FOO_BAR'ᐳ[635]<br />- Constantᐸ''ᐳ[636]<br />- Constantᐸ8ᐳ[637]"}}:::plan
+    __InputObject266{{"__InputObject[266∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ5ᐳ[625]"}}:::plan
+    __InputObject266 --> __InputObject265
+    __InputObject408{{"__InputObject[408∈0] ➊<br />More deps:<br />- Constantᐸ419ᐳ[632]<br />- Constantᐸ'easy cheesy baked potatoes'ᐳ[633]<br />- Constantᐸ'red'ᐳ[634]<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ'BAR_FOO'ᐳ[646]<br />- Constantᐸ''ᐳ[636]<br />- Constantᐸ8ᐳ[637]"}}:::plan
+    __InputObject410{{"__InputObject[410∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ5ᐳ[625]"}}:::plan
+    __InputObject410 --> __InputObject408
+    __InputObject212{{"__InputObject[212∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ'50'ᐳ[628]<br />- Constantᐸfalseᐳ[629]<br />- Constantᐸ'xyz'ᐳ[630]<br />- Constantᐸ[ 1, 2, 3 ]ᐳ[216]<br />- Constantᐸ{ a: 1, b: 2, c: 3 }ᐳ[631]<br />- __InputObject[218]"}}:::plan
+    __InputObject374{{"__InputObject[374∈0] ➊<br />More deps:<br />- Constantᐸ15ᐳ[642]<br />- Constantᐸ'headline_'ᐳ[643]<br />- Constantᐸ'body'ᐳ[644]<br />- Constantᐸundefinedᐳ[7]"}}:::plan
+    __InputObject97{{"__InputObject[97∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ1ᐳ[621]<br />- Constantᐸ2ᐳ[622]"}}:::plan
+    __InputObject124{{"__InputObject[124∈0] ➊<br />More deps:<br />- Constantᐸ'world'ᐳ[624]<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ5ᐳ[625]"}}:::plan
+    __InputObject138{{"__InputObject[138∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ1ᐳ[621]<br />- Constantᐸ3ᐳ[626]"}}:::plan
+    __InputObject151{{"__InputObject[151∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ1ᐳ[621]<br />- Constantᐸ3ᐳ[626]"}}:::plan
+    __InputObject163{{"__InputObject[163∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ0ᐳ[627]<br />- Constantᐸ1ᐳ[621]"}}:::plan
+    __InputObject188{{"__InputObject[188∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ1ᐳ[621]<br />- Constantᐸ2ᐳ[622]"}}:::plan
+    __InputObject200{{"__InputObject[200∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ5ᐳ[625]<br />- Constantᐸ2ᐳ[622]"}}:::plan
+    __InputObject305{{"__InputObject[305∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ5ᐳ[625]<br />- Constantᐸ6ᐳ[639]"}}:::plan
+    __InputObject373{{"__InputObject[373∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ'test'ᐳ[645]"}}:::plan
+    __InputObject374 --> __InputObject373
+    __InputObject6{{"__InputObject[6∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ{ a: 1, b: 2, c: 3 }ᐳ[615]"}}:::plan
     Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access10 & Access11 --> Object12
-    __InputObject20{{"__InputObject[20∈0] ➊"}}:::plan
-    Constant616{{"Constant[616∈0] ➊<br />ᐸ{ a: 1, b: 2, c: 3 }ᐳ"}}:::plan
-    Constant616 --> __InputObject20
-    __InputObject33{{"__InputObject[33∈0] ➊"}}:::plan
-    Constant617{{"Constant[617∈0] ➊<br />ᐸ[ { amount: '44' }, { amount: null } ]ᐳ"}}:::plan
-    Constant617 --> __InputObject33
-    __InputObject46{{"__InputObject[46∈0] ➊"}}:::plan
-    Constant618{{"Constant[618∈0] ➊<br />ᐸ[ { amount: '44' }, { amount: null } ]ᐳ"}}:::plan
-    Constant618 --> __InputObject46
-    __InputObject59{{"__InputObject[59∈0] ➊"}}:::plan
-    Constant619{{"Constant[619∈0] ➊<br />ᐸ[ { amount: '44' }, { amount: null } ]ᐳ"}}:::plan
-    Constant619 --> __InputObject59
-    __InputObject84{{"__InputObject[84∈0] ➊"}}:::plan
-    Constant620{{"Constant[620∈0] ➊<br />ᐸ[ { amount: '44' }, { amount: null } ]ᐳ"}}:::plan
-    Constant620 --> __InputObject84
-    __InputObject111{{"__InputObject[111∈0] ➊"}}:::plan
-    Constant623{{"Constant[623∈0] ➊<br />ᐸ'hello'ᐳ"}}:::plan
-    Constant623 & Constant622 --> __InputObject111
-    __InputObject176{{"__InputObject[176∈0] ➊"}}:::plan
-    Constant621 --> __InputObject176
-    __InputObject219{{"__InputObject[219∈0] ➊"}}:::plan
-    __InputObject220{{"__InputObject[220∈0] ➊"}}:::plan
+    __InputObject20{{"__InputObject[20∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ{ a: 1, b: 2, c: 3 }ᐳ[616]"}}:::plan
+    __InputObject33{{"__InputObject[33∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ[ { amount: '44' }, { amount: null } ]ᐳ[617]"}}:::plan
+    __InputObject46{{"__InputObject[46∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ[ { amount: '44' }, { amount: null } ]ᐳ[618]"}}:::plan
+    __InputObject59{{"__InputObject[59∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ[ { amount: '44' }, { amount: null } ]ᐳ[619]"}}:::plan
+    __InputObject84{{"__InputObject[84∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ[ { amount: '44' }, { amount: null } ]ᐳ[620]"}}:::plan
+    __InputObject111{{"__InputObject[111∈0] ➊<br />More deps:<br />- Constantᐸ'hello'ᐳ[623]<br />- Constantᐸ2ᐳ[622]"}}:::plan
+    __InputObject176{{"__InputObject[176∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ1ᐳ[621]"}}:::plan
+    __InputObject218{{"__InputObject[218∈0] ➊<br />Dependents: 2"}}:::plan
+    __InputObject219{{"__InputObject[219∈0] ➊<br />More deps:<br />- Constantᐸ1ᐳ[621]<br />- Constantᐸfalseᐳ[629]"}}:::plan
+    __InputObject220{{"__InputObject[220∈0] ➊<br />More deps:<br />- Constantᐸ5ᐳ[625]<br />- Constantᐸfalseᐳ[629]"}}:::plan
     __InputObject219 & __InputObject220 --> __InputObject218
-    Constant621 & Constant629 --> __InputObject219
-    Constant625 & Constant629 --> __InputObject220
-    __InputObject233{{"__InputObject[233∈0] ➊"}}:::plan
+    __InputObject233{{"__InputObject[233∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]"}}:::plan
     __InputObject234 --> __InputObject233
-    Constant625 --> __InputObject240
-    __InputObject253{{"__InputObject[253∈0] ➊"}}:::plan
+    __InputObject253{{"__InputObject[253∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]"}}:::plan
     __InputObject254 --> __InputObject253
-    Constant625 --> __InputObject255
-    __InputObject264{{"__InputObject[264∈0] ➊"}}:::plan
+    __InputObject264{{"__InputObject[264∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]"}}:::plan
     __InputObject265 --> __InputObject264
-    Constant625 --> __InputObject266
-    __InputObject275{{"__InputObject[275∈0] ➊"}}:::plan
-    Constant625 --> __InputObject275
-    __InputObject286{{"__InputObject[286∈0] ➊"}}:::plan
-    Constant638{{"Constant[638∈0] ➊<br />ᐸ-1ᐳ"}}:::plan
-    Constant638 --> __InputObject286
-    __InputObject337{{"__InputObject[337∈0] ➊"}}:::plan
-    Constant338{{"Constant[338∈0] ➊<br />ᐸnullᐳ"}}:::plan
-    Constant338 --> __InputObject337
-    __InputObject350{{"__InputObject[350∈0] ➊"}}:::plan
-    Constant641{{"Constant[641∈0] ➊<br />ᐸ'0123456789abcde'ᐳ"}}:::plan
-    Constant641 --> __InputObject350
-    __InputObject363{{"__InputObject[363∈0] ➊"}}:::plan
-    Constant364{{"Constant[364∈0] ➊<br />ᐸ[ §{ id: 7, headline: 'headline', body: 'body', authorId: 90ᐳ"}}:::plan
-    Constant364 --> __InputObject363
-    __InputObject407{{"__InputObject[407∈0] ➊"}}:::plan
+    __InputObject275{{"__InputObject[275∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ5ᐳ[625]"}}:::plan
+    __InputObject286{{"__InputObject[286∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ-1ᐳ[638]"}}:::plan
+    __InputObject337{{"__InputObject[337∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸnullᐳ[338]"}}:::plan
+    __InputObject350{{"__InputObject[350∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ'0123456789abcde'ᐳ[641]"}}:::plan
+    __InputObject363{{"__InputObject[363∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ[ §{ id: 7, headline: 'headline', body: 'body', authorId: 90ᐳ[364]"}}:::plan
+    __InputObject407{{"__InputObject[407∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]"}}:::plan
     __InputObject408 --> __InputObject407
-    Constant625 --> __InputObject410
-    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
-    __Value2 --> Access10
-    __Value2 --> Access11
-    PgFromExpression13{{"PgFromExpression[13∈0] ➊"}}:::plan
-    Constant615 --> PgFromExpression13
+    PgFromExpression13{{"PgFromExpression[13∈0] ➊<br />More deps:<br />- Constantᐸ{ a: 1, b: 2, c: 3 }ᐳ[615]"}}:::plan
     ApplyInput19{{"ApplyInput[19∈0] ➊"}}:::plan
     __InputObject6 --> ApplyInput19
     ApplyInput32{{"ApplyInput[32∈0] ➊"}}:::plan
@@ -318,7 +251,7 @@ graph TD
     __InputObject46 --> ApplyInput58
     ApplyInput71{{"ApplyInput[71∈0] ➊"}}:::plan
     __InputObject59 --> ApplyInput71
-    __InputObject72{{"__InputObject[72∈0] ➊"}}:::plan
+    __InputObject72{{"__InputObject[72∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]"}}:::plan
     ApplyInput83{{"ApplyInput[83∈0] ➊"}}:::plan
     __InputObject72 --> ApplyInput83
     ApplyInput96{{"ApplyInput[96∈0] ➊"}}:::plan
@@ -341,8 +274,7 @@ graph TD
     __InputObject188 --> ApplyInput199
     ApplyInput211{{"ApplyInput[211∈0] ➊"}}:::plan
     __InputObject200 --> ApplyInput211
-    BakedInput221{{"BakedInput[221∈0] ➊"}}:::plan
-    Constant216 --> BakedInput221
+    BakedInput221{{"BakedInput[221∈0] ➊<br />More deps:<br />- Constantᐸ[ 1, 2, 3 ]ᐳ[216]"}}:::plan
     ApplyInput232{{"ApplyInput[232∈0] ➊"}}:::plan
     __InputObject212 --> ApplyInput232
     BakedInput242{{"BakedInput[242∈0] ➊"}}:::plan
@@ -361,52 +293,48 @@ graph TD
     __InputObject275 --> ApplyInput285
     ApplyInput297{{"ApplyInput[297∈0] ➊"}}:::plan
     __InputObject286 --> ApplyInput297
-    __InputObject298{{"__InputObject[298∈0] ➊"}}:::plan
+    __InputObject298{{"__InputObject[298∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]"}}:::plan
     ApplyInput304{{"ApplyInput[304∈0] ➊"}}:::plan
     __InputObject298 --> ApplyInput304
     ApplyInput313{{"ApplyInput[313∈0] ➊"}}:::plan
     __InputObject305 --> ApplyInput313
-    __InputObject314{{"__InputObject[314∈0] ➊"}}:::plan
-    Constant640{{"Constant[640∈0] ➊<br />ᐸ'x'ᐳ"}}:::plan
-    Constant640 --> __InputObject314
+    __InputObject314{{"__InputObject[314∈0] ➊<br />More deps:<br />- Constantᐸ'x'ᐳ[640]"}}:::plan
     ApplyInput325{{"ApplyInput[325∈0] ➊"}}:::plan
     __InputObject314 --> ApplyInput325
-    __InputObject326{{"__InputObject[326∈0] ➊"}}:::plan
+    __InputObject326{{"__InputObject[326∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]"}}:::plan
     ApplyInput336{{"ApplyInput[336∈0] ➊"}}:::plan
     __InputObject326 --> ApplyInput336
     ApplyInput349{{"ApplyInput[349∈0] ➊"}}:::plan
     __InputObject337 --> ApplyInput349
     ApplyInput362{{"ApplyInput[362∈0] ➊"}}:::plan
     __InputObject350 --> ApplyInput362
-    BakedInput365{{"BakedInput[365∈0] ➊"}}:::plan
-    Constant364 --> BakedInput365
+    BakedInput365{{"BakedInput[365∈0] ➊<br />More deps:<br />- Constantᐸ[ §{ id: 7, headline: 'headline', body: 'body', authorId: 90ᐳ[364]"}}:::plan
     ApplyInput372{{"ApplyInput[372∈0] ➊"}}:::plan
     __InputObject363 --> ApplyInput372
     BakedInput379{{"BakedInput[379∈0] ➊"}}:::plan
     __InputObject374 --> BakedInput379
     ApplyInput389{{"ApplyInput[389∈0] ➊"}}:::plan
     __InputObject373 --> ApplyInput389
-    __InputObject390{{"__InputObject[390∈0] ➊"}}:::plan
+    __InputObject390{{"__InputObject[390∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]"}}:::plan
     ApplyInput399{{"ApplyInput[399∈0] ➊"}}:::plan
     __InputObject390 --> ApplyInput399
-    __InputObject400{{"__InputObject[400∈0] ➊"}}:::plan
+    __InputObject400{{"__InputObject[400∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]"}}:::plan
     ApplyInput406{{"ApplyInput[406∈0] ➊"}}:::plan
     __InputObject400 --> ApplyInput406
     BakedInput411{{"BakedInput[411∈0] ➊"}}:::plan
     __InputObject408 --> BakedInput411
     ApplyInput418{{"ApplyInput[418∈0] ➊"}}:::plan
     __InputObject407 --> ApplyInput418
-    __InputObject419{{"__InputObject[419∈0] ➊"}}:::plan
+    __InputObject419{{"__InputObject[419∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]"}}:::plan
     ApplyInput429{{"ApplyInput[429∈0] ➊"}}:::plan
     __InputObject419 --> ApplyInput429
-    __InputObject430{{"__InputObject[430∈0] ➊"}}:::plan
+    __InputObject430{{"__InputObject[430∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]"}}:::plan
     ApplyInput440{{"ApplyInput[440∈0] ➊"}}:::plan
     __InputObject430 --> ApplyInput440
-    __InputObject441{{"__InputObject[441∈0] ➊"}}:::plan
+    __InputObject441{{"__InputObject[441∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]"}}:::plan
     ApplyInput447{{"ApplyInput[447∈0] ➊"}}:::plan
     __InputObject441 --> ApplyInput447
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant521{{"Constant[521∈0] ➊<br />ᐸ'posts'ᐳ"}}:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ<br />Dependents: 72"]:::plan
     PgSelect9[["PgSelect[9∈1] ➊<br />ᐸjson_identity_mutation(mutation)ᐳ"]]:::sideeffectplan
     Object12 & PgFromExpression13 & ApplyInput19 --> PgSelect9
     First14{{"First[14∈1] ➊"}}:::plan
@@ -421,14 +349,11 @@ graph TD
     PgClassExpression17 --> Object18
     PgSelect22[["PgSelect[22∈2] ➊<br />ᐸjsonb_identity_mutation(mutation)ᐳ"]]:::sideeffectplan
     Object25{{"Object[25∈2] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgFromExpression26{{"PgFromExpression[26∈2] ➊"}}:::plan
+    PgFromExpression26{{"PgFromExpression[26∈2] ➊<br />More deps:<br />- Constantᐸ{ a: 1, b: 2, c: 3 }ᐳ[616]"}}:::plan
     Object25 & PgFromExpression26 & ApplyInput32 --> PgSelect22
-    Access23{{"Access[23∈2] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access24{{"Access[24∈2] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access23{{"Access[23∈2] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access24{{"Access[24∈2] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access23 & Access24 --> Object25
-    __Value2 --> Access23
-    __Value2 --> Access24
-    Constant616 --> PgFromExpression26
     First27{{"First[27∈2] ➊"}}:::plan
     PgSelectRows28[["PgSelectRows[28∈2] ➊"]]:::plan
     PgSelectRows28 --> First27
@@ -441,14 +366,11 @@ graph TD
     PgClassExpression30 --> Object31
     PgSelect35[["PgSelect[35∈3] ➊<br />ᐸjson_identity_mutation(mutation)ᐳ"]]:::sideeffectplan
     Object38{{"Object[38∈3] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgFromExpression39{{"PgFromExpression[39∈3] ➊"}}:::plan
+    PgFromExpression39{{"PgFromExpression[39∈3] ➊<br />More deps:<br />- Constantᐸ[ { amount: '44' }, { amount: null } ]ᐳ[617]"}}:::plan
     Object38 & PgFromExpression39 & ApplyInput45 --> PgSelect35
-    Access36{{"Access[36∈3] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access37{{"Access[37∈3] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access36{{"Access[36∈3] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access37{{"Access[37∈3] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access36 & Access37 --> Object38
-    __Value2 --> Access36
-    __Value2 --> Access37
-    Constant617 --> PgFromExpression39
     First40{{"First[40∈3] ➊"}}:::plan
     PgSelectRows41[["PgSelectRows[41∈3] ➊"]]:::plan
     PgSelectRows41 --> First40
@@ -461,14 +383,11 @@ graph TD
     PgClassExpression43 --> Object44
     PgSelect48[["PgSelect[48∈4] ➊<br />ᐸjsonb_identity_mutation(mutation)ᐳ"]]:::sideeffectplan
     Object51{{"Object[51∈4] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgFromExpression52{{"PgFromExpression[52∈4] ➊"}}:::plan
+    PgFromExpression52{{"PgFromExpression[52∈4] ➊<br />More deps:<br />- Constantᐸ[ { amount: '44' }, { amount: null } ]ᐳ[618]"}}:::plan
     Object51 & PgFromExpression52 & ApplyInput58 --> PgSelect48
-    Access49{{"Access[49∈4] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access50{{"Access[50∈4] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access49{{"Access[49∈4] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access50{{"Access[50∈4] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access49 & Access50 --> Object51
-    __Value2 --> Access49
-    __Value2 --> Access50
-    Constant618 --> PgFromExpression52
     First53{{"First[53∈4] ➊"}}:::plan
     PgSelectRows54[["PgSelectRows[54∈4] ➊"]]:::plan
     PgSelectRows54 --> First53
@@ -481,14 +400,11 @@ graph TD
     PgClassExpression56 --> Object57
     PgSelect61[["PgSelect[61∈5] ➊<br />ᐸjsonb_identity_mutation_plpgsql(mutation)ᐳ"]]:::sideeffectplan
     Object64{{"Object[64∈5] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgFromExpression65{{"PgFromExpression[65∈5] ➊"}}:::plan
+    PgFromExpression65{{"PgFromExpression[65∈5] ➊<br />More deps:<br />- Constantᐸ[ { amount: '44' }, { amount: null } ]ᐳ[619]"}}:::plan
     Object64 & PgFromExpression65 & ApplyInput71 --> PgSelect61
-    Access62{{"Access[62∈5] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access63{{"Access[63∈5] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access62{{"Access[62∈5] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access63{{"Access[63∈5] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access62 & Access63 --> Object64
-    __Value2 --> Access62
-    __Value2 --> Access63
-    Constant619 --> PgFromExpression65
     First66{{"First[66∈5] ➊"}}:::plan
     PgSelectRows67[["PgSelectRows[67∈5] ➊"]]:::plan
     PgSelectRows67 --> First66
@@ -501,13 +417,11 @@ graph TD
     PgClassExpression69 --> Object70
     PgSelect73[["PgSelect[73∈6] ➊<br />ᐸjsonb_identity_mutation_plpgsql_with_default(mutation)ᐳ"]]:::sideeffectplan
     Object76{{"Object[76∈6] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgFromExpression77{{"PgFromExpression[77∈6] ➊"}}:::plan
+    PgFromExpression77{{"PgFromExpression[77∈6] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]"}}:::plan
     Object76 & PgFromExpression77 & ApplyInput83 --> PgSelect73
-    Access74{{"Access[74∈6] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access75{{"Access[75∈6] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access74{{"Access[74∈6] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access75{{"Access[75∈6] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access74 & Access75 --> Object76
-    __Value2 --> Access74
-    __Value2 --> Access75
     First78{{"First[78∈6] ➊"}}:::plan
     PgSelectRows79[["PgSelectRows[79∈6] ➊"]]:::plan
     PgSelectRows79 --> First78
@@ -520,14 +434,11 @@ graph TD
     PgClassExpression81 --> Object82
     PgSelect86[["PgSelect[86∈7] ➊<br />ᐸjsonb_identity_mutation_plpgsql_with_default(mutation)ᐳ"]]:::sideeffectplan
     Object89{{"Object[89∈7] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgFromExpression90{{"PgFromExpression[90∈7] ➊"}}:::plan
+    PgFromExpression90{{"PgFromExpression[90∈7] ➊<br />More deps:<br />- Constantᐸ[ { amount: '44' }, { amount: null } ]ᐳ[620]"}}:::plan
     Object89 & PgFromExpression90 & ApplyInput96 --> PgSelect86
-    Access87{{"Access[87∈7] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access88{{"Access[88∈7] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access87{{"Access[87∈7] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access88{{"Access[88∈7] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access87 & Access88 --> Object89
-    __Value2 --> Access87
-    __Value2 --> Access88
-    Constant620 --> PgFromExpression90
     First91{{"First[91∈7] ➊"}}:::plan
     PgSelectRows92[["PgSelectRows[92∈7] ➊"]]:::plan
     PgSelectRows92 --> First91
@@ -540,14 +451,11 @@ graph TD
     PgClassExpression94 --> Object95
     PgSelect100[["PgSelect[100∈8] ➊<br />ᐸadd_1_mutation(mutation)ᐳ"]]:::sideeffectplan
     Object103{{"Object[103∈8] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgFromExpression104{{"PgFromExpression[104∈8] ➊"}}:::plan
+    PgFromExpression104{{"PgFromExpression[104∈8] ➊<br />More deps:<br />- Constantᐸ1ᐳ[621]<br />- Constantᐸ2ᐳ[622]"}}:::plan
     Object103 & PgFromExpression104 & ApplyInput110 --> PgSelect100
-    Access101{{"Access[101∈8] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access102{{"Access[102∈8] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access101{{"Access[101∈8] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access102{{"Access[102∈8] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access101 & Access102 --> Object103
-    Constant621 & Constant622 --> PgFromExpression104
-    __Value2 --> Access101
-    __Value2 --> Access102
     First105{{"First[105∈8] ➊"}}:::plan
     PgSelectRows106[["PgSelectRows[106∈8] ➊"]]:::plan
     PgSelectRows106 --> First105
@@ -560,14 +468,11 @@ graph TD
     PgClassExpression108 --> Object109
     PgSelect113[["PgSelect[113∈9] ➊<br />ᐸadd_2_mutation(mutation)ᐳ"]]:::sideeffectplan
     Object116{{"Object[116∈9] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgFromExpression117{{"PgFromExpression[117∈9] ➊"}}:::plan
+    PgFromExpression117{{"PgFromExpression[117∈9] ➊<br />More deps:<br />- Constantᐸ2ᐳ[622]"}}:::plan
     Object116 & PgFromExpression117 & ApplyInput123 --> PgSelect113
-    Access114{{"Access[114∈9] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access115{{"Access[115∈9] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access114{{"Access[114∈9] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access115{{"Access[115∈9] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access114 & Access115 --> Object116
-    __Value2 --> Access114
-    __Value2 --> Access115
-    Constant622 --> PgFromExpression117
     First118{{"First[118∈9] ➊"}}:::plan
     PgSelectRows119[["PgSelectRows[119∈9] ➊"]]:::plan
     PgSelectRows119 --> First118
@@ -580,14 +485,11 @@ graph TD
     PgClassExpression121 --> Object122
     PgSelect127[["PgSelect[127∈10] ➊<br />ᐸadd_3_mutation(mutation)ᐳ"]]:::sideeffectplan
     Object130{{"Object[130∈10] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgFromExpression131{{"PgFromExpression[131∈10] ➊"}}:::plan
+    PgFromExpression131{{"PgFromExpression[131∈10] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ5ᐳ[625]"}}:::plan
     Object130 & PgFromExpression131 & ApplyInput137 --> PgSelect127
-    Access128{{"Access[128∈10] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access129{{"Access[129∈10] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access128{{"Access[128∈10] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access129{{"Access[129∈10] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access128 & Access129 --> Object130
-    Constant625 --> PgFromExpression131
-    __Value2 --> Access128
-    __Value2 --> Access129
     First132{{"First[132∈10] ➊"}}:::plan
     PgSelectRows133[["PgSelectRows[133∈10] ➊"]]:::plan
     PgSelectRows133 --> First132
@@ -600,14 +502,11 @@ graph TD
     PgClassExpression135 --> Object136
     PgSelect140[["PgSelect[140∈11] ➊<br />ᐸadd_4_mutation(mutation)ᐳ"]]:::sideeffectplan
     Object143{{"Object[143∈11] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgFromExpression144{{"PgFromExpression[144∈11] ➊"}}:::plan
+    PgFromExpression144{{"PgFromExpression[144∈11] ➊<br />More deps:<br />- Constantᐸ1ᐳ[621]<br />- Constantᐸ3ᐳ[626]"}}:::plan
     Object143 & PgFromExpression144 & ApplyInput150 --> PgSelect140
-    Access141{{"Access[141∈11] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access142{{"Access[142∈11] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access141{{"Access[141∈11] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access142{{"Access[142∈11] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access141 & Access142 --> Object143
-    Constant621 & Constant626 --> PgFromExpression144
-    __Value2 --> Access141
-    __Value2 --> Access142
     First145{{"First[145∈11] ➊"}}:::plan
     PgSelectRows146[["PgSelectRows[146∈11] ➊"]]:::plan
     PgSelectRows146 --> First145
@@ -620,14 +519,11 @@ graph TD
     PgClassExpression148 --> Object149
     PgSelect152[["PgSelect[152∈12] ➊<br />ᐸadd_4_mutation_error(mutation)ᐳ"]]:::sideeffectplan
     Object155{{"Object[155∈12] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgFromExpression156{{"PgFromExpression[156∈12] ➊"}}:::plan
+    PgFromExpression156{{"PgFromExpression[156∈12] ➊<br />More deps:<br />- Constantᐸ1ᐳ[621]<br />- Constantᐸ3ᐳ[626]"}}:::plan
     Object155 & PgFromExpression156 & ApplyInput162 --> PgSelect152
-    Access153{{"Access[153∈12] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access154{{"Access[154∈12] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access153{{"Access[153∈12] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access154{{"Access[154∈12] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access153 & Access154 --> Object155
-    Constant621 & Constant626 --> PgFromExpression156
-    __Value2 --> Access153
-    __Value2 --> Access154
     First157{{"First[157∈12] ➊"}}:::plan
     PgSelectRows158[["PgSelectRows[158∈12] ➊"]]:::plan
     PgSelectRows158 --> First157
@@ -640,14 +536,11 @@ graph TD
     PgClassExpression160 --> Object161
     PgSelect165[["PgSelect[165∈13] ➊<br />ᐸmult_1(mutation)ᐳ"]]:::sideeffectplan
     Object168{{"Object[168∈13] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgFromExpression169{{"PgFromExpression[169∈13] ➊"}}:::plan
+    PgFromExpression169{{"PgFromExpression[169∈13] ➊<br />More deps:<br />- Constantᐸ0ᐳ[627]<br />- Constantᐸ1ᐳ[621]"}}:::plan
     Object168 & PgFromExpression169 & ApplyInput175 --> PgSelect165
-    Access166{{"Access[166∈13] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access167{{"Access[167∈13] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access166{{"Access[166∈13] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access167{{"Access[167∈13] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access166 & Access167 --> Object168
-    Constant627 & Constant621 --> PgFromExpression169
-    __Value2 --> Access166
-    __Value2 --> Access167
     First170{{"First[170∈13] ➊"}}:::plan
     PgSelectRows171[["PgSelectRows[171∈13] ➊"]]:::plan
     PgSelectRows171 --> First170
@@ -660,14 +553,11 @@ graph TD
     PgClassExpression173 --> Object174
     PgSelect177[["PgSelect[177∈14] ➊<br />ᐸmult_2(mutation)ᐳ"]]:::sideeffectplan
     Object180{{"Object[180∈14] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgFromExpression181{{"PgFromExpression[181∈14] ➊"}}:::plan
+    PgFromExpression181{{"PgFromExpression[181∈14] ➊<br />More deps:<br />- Constantᐸ1ᐳ[621]"}}:::plan
     Object180 & PgFromExpression181 & ApplyInput187 --> PgSelect177
-    Access178{{"Access[178∈14] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access179{{"Access[179∈14] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access178{{"Access[178∈14] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access179{{"Access[179∈14] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access178 & Access179 --> Object180
-    __Value2 --> Access178
-    __Value2 --> Access179
-    Constant621 --> PgFromExpression181
     First182{{"First[182∈14] ➊"}}:::plan
     PgSelectRows183[["PgSelectRows[183∈14] ➊"]]:::plan
     PgSelectRows183 --> First182
@@ -680,14 +570,11 @@ graph TD
     PgClassExpression185 --> Object186
     PgSelect189[["PgSelect[189∈15] ➊<br />ᐸmult_3(mutation)ᐳ"]]:::sideeffectplan
     Object192{{"Object[192∈15] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgFromExpression193{{"PgFromExpression[193∈15] ➊"}}:::plan
+    PgFromExpression193{{"PgFromExpression[193∈15] ➊<br />More deps:<br />- Constantᐸ1ᐳ[621]<br />- Constantᐸ2ᐳ[622]"}}:::plan
     Object192 & PgFromExpression193 & ApplyInput199 --> PgSelect189
-    Access190{{"Access[190∈15] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access191{{"Access[191∈15] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access190{{"Access[190∈15] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access191{{"Access[191∈15] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access190 & Access191 --> Object192
-    Constant621 & Constant622 --> PgFromExpression193
-    __Value2 --> Access190
-    __Value2 --> Access191
     First194{{"First[194∈15] ➊"}}:::plan
     PgSelectRows195[["PgSelectRows[195∈15] ➊"]]:::plan
     PgSelectRows195 --> First194
@@ -700,14 +587,11 @@ graph TD
     PgClassExpression197 --> Object198
     PgSelect201[["PgSelect[201∈16] ➊<br />ᐸmult_4(mutation)ᐳ"]]:::sideeffectplan
     Object204{{"Object[204∈16] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgFromExpression205{{"PgFromExpression[205∈16] ➊"}}:::plan
+    PgFromExpression205{{"PgFromExpression[205∈16] ➊<br />More deps:<br />- Constantᐸ5ᐳ[625]<br />- Constantᐸ2ᐳ[622]"}}:::plan
     Object204 & PgFromExpression205 & ApplyInput211 --> PgSelect201
-    Access202{{"Access[202∈16] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access203{{"Access[203∈16] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access202{{"Access[202∈16] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access203{{"Access[203∈16] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access202 & Access203 --> Object204
-    Constant625 & Constant622 --> PgFromExpression205
-    __Value2 --> Access202
-    __Value2 --> Access203
     First206{{"First[206∈16] ➊"}}:::plan
     PgSelectRows207[["PgSelectRows[207∈16] ➊"]]:::plan
     PgSelectRows207 --> First206
@@ -718,16 +602,14 @@ graph TD
     PgSelectSingle208 --> PgClassExpression209
     Object210{{"Object[210∈16] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgClassExpression209 --> Object210
-    PgFromExpression226{{"PgFromExpression[226∈17] ➊"}}:::plan
-    Constant628 & Constant629 & Constant630 & BakedInput221 & Constant631 & __InputObject218 --> PgFromExpression226
+    PgFromExpression226{{"PgFromExpression[226∈17] ➊<br />More deps:<br />- Constantᐸ'50'ᐳ[628]<br />- Constantᐸfalseᐳ[629]<br />- Constantᐸ'xyz'ᐳ[630]<br />- Constantᐸ{ a: 1, b: 2, c: 3 }ᐳ[631]<br />- __InputObject[218]"}}:::plan
+    BakedInput221 --> PgFromExpression226
     PgSelect222[["PgSelect[222∈17] ➊<br />ᐸtypes_mutation(mutation)ᐳ"]]:::sideeffectplan
     Object225{{"Object[225∈17] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object225 & PgFromExpression226 & ApplyInput232 --> PgSelect222
-    Access223{{"Access[223∈17] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access224{{"Access[224∈17] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access223{{"Access[223∈17] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access224{{"Access[224∈17] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access223 & Access224 --> Object225
-    __Value2 --> Access223
-    __Value2 --> Access224
     First227{{"First[227∈17] ➊"}}:::plan
     PgSelectRows228[["PgSelectRows[228∈17] ➊"]]:::plan
     PgSelectRows228 --> First227
@@ -742,11 +624,9 @@ graph TD
     Object246{{"Object[246∈18] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     PgFromExpression247{{"PgFromExpression[247∈18] ➊"}}:::plan
     Object246 & PgFromExpression247 & ApplyInput252 --> PgSelect243
-    Access244{{"Access[244∈18] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access245{{"Access[245∈18] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access244{{"Access[244∈18] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access245{{"Access[245∈18] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access244 & Access245 --> Object246
-    __Value2 --> Access244
-    __Value2 --> Access245
     BakedInput242 --> PgFromExpression247
     First248{{"First[248∈18] ➊"}}:::plan
     PgSelectRows249[["PgSelectRows[249∈18] ➊"]]:::plan
@@ -760,11 +640,9 @@ graph TD
     Object260{{"Object[260∈19] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     PgFromExpression261{{"PgFromExpression[261∈19] ➊"}}:::plan
     Object260 & PgFromExpression261 & ApplyInput263 --> PgSelect257
-    Access258{{"Access[258∈19] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access259{{"Access[259∈19] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access258{{"Access[258∈19] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access259{{"Access[259∈19] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access258 & Access259 --> Object260
-    __Value2 --> Access258
-    __Value2 --> Access259
     BakedInput256 --> PgFromExpression261
     Object262{{"Object[262∈19] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgSelect257 --> Object262
@@ -772,24 +650,19 @@ graph TD
     Object271{{"Object[271∈20] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     PgFromExpression272{{"PgFromExpression[272∈20] ➊"}}:::plan
     Object271 & PgFromExpression272 & ApplyInput274 --> PgSelect268
-    Access269{{"Access[269∈20] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access270{{"Access[270∈20] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access269{{"Access[269∈20] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access270{{"Access[270∈20] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access269 & Access270 --> Object271
-    __Value2 --> Access269
-    __Value2 --> Access270
     BakedInput267 --> PgFromExpression272
     Object273{{"Object[273∈20] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgSelect268 --> Object273
     PgSelect276[["PgSelect[276∈21] ➊<br />ᐸtable_mutation(mutation)ᐳ"]]:::sideeffectplan
     Object279{{"Object[279∈21] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgFromExpression280{{"PgFromExpression[280∈21] ➊"}}:::plan
+    PgFromExpression280{{"PgFromExpression[280∈21] ➊<br />More deps:<br />- Constantᐸ5ᐳ[625]"}}:::plan
     Object279 & PgFromExpression280 & ApplyInput285 --> PgSelect276
-    Access277{{"Access[277∈21] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access278{{"Access[278∈21] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access277{{"Access[277∈21] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access278{{"Access[278∈21] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access277 & Access278 --> Object279
-    __Value2 --> Access277
-    __Value2 --> Access278
-    Constant625 --> PgFromExpression280
     First281{{"First[281∈21] ➊"}}:::plan
     PgSelectRows282[["PgSelectRows[282∈21] ➊"]]:::plan
     PgSelectRows282 --> First281
@@ -800,14 +673,11 @@ graph TD
     PgSelectSingle283 --> Object284
     PgSelect288[["PgSelect[288∈22] ➊<br />ᐸtable_mutation(mutation)ᐳ"]]:::sideeffectplan
     Object291{{"Object[291∈22] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgFromExpression292{{"PgFromExpression[292∈22] ➊"}}:::plan
+    PgFromExpression292{{"PgFromExpression[292∈22] ➊<br />More deps:<br />- Constantᐸ-1ᐳ[638]"}}:::plan
     Object291 & PgFromExpression292 & ApplyInput297 --> PgSelect288
-    Access289{{"Access[289∈22] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access290{{"Access[290∈22] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access289{{"Access[289∈22] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access290{{"Access[290∈22] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access289 & Access290 --> Object291
-    __Value2 --> Access289
-    __Value2 --> Access290
-    Constant638 --> PgFromExpression292
     First293{{"First[293∈22] ➊"}}:::plan
     PgSelectRows294[["PgSelectRows[294∈22] ➊"]]:::plan
     PgSelectRows294 --> First293
@@ -819,33 +689,26 @@ graph TD
     PgSelect299[["PgSelect[299∈23] ➊<br />ᐸtable_set_mutation(mutation)ᐳ"]]:::sideeffectplan
     Object302{{"Object[302∈23] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object302 & ApplyInput304 --> PgSelect299
-    Access300{{"Access[300∈23] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access301{{"Access[301∈23] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access300{{"Access[300∈23] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access301{{"Access[301∈23] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access300 & Access301 --> Object302
-    __Value2 --> Access300
-    __Value2 --> Access301
     Object303{{"Object[303∈23] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgSelect299 --> Object303
     PgSelect307[["PgSelect[307∈24] ➊<br />ᐸint_set_mutation(mutation)ᐳ"]]:::sideeffectplan
     Object310{{"Object[310∈24] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgFromExpression311{{"PgFromExpression[311∈24] ➊"}}:::plan
+    PgFromExpression311{{"PgFromExpression[311∈24] ➊<br />More deps:<br />- Constantᐸ5ᐳ[625]<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ6ᐳ[639]"}}:::plan
     Object310 & PgFromExpression311 & ApplyInput313 --> PgSelect307
-    Constant625 & Constant639 --> PgFromExpression311
-    Access308{{"Access[308∈24] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access309{{"Access[309∈24] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access308{{"Access[308∈24] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access309{{"Access[309∈24] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access308 & Access309 --> Object310
-    __Value2 --> Access308
-    __Value2 --> Access309
     Object312{{"Object[312∈24] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgSelect307 --> Object312
     PgSelect316[["PgSelect[316∈25] ➊<br />ᐸno_args_mutation(mutation)ᐳ"]]:::sideeffectplan
     Object319{{"Object[319∈25] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object319 & ApplyInput325 --> PgSelect316
-    Access317{{"Access[317∈25] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access318{{"Access[318∈25] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access317{{"Access[317∈25] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access318{{"Access[318∈25] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access317 & Access318 --> Object319
-    __Value2 --> Access317
-    __Value2 --> Access318
     First320{{"First[320∈25] ➊"}}:::plan
     PgSelectRows321[["PgSelectRows[321∈25] ➊"]]:::plan
     PgSelectRows321 --> First320
@@ -859,11 +722,9 @@ graph TD
     PgSelect327[["PgSelect[327∈26] ➊<br />ᐸreturn_void_mutation(mutation)ᐳ"]]:::sideeffectplan
     Object330{{"Object[330∈26] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object330 & ApplyInput336 --> PgSelect327
-    Access328{{"Access[328∈26] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access329{{"Access[329∈26] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access328{{"Access[328∈26] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access329{{"Access[329∈26] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access328 & Access329 --> Object330
-    __Value2 --> Access328
-    __Value2 --> Access329
     First331{{"First[331∈26] ➊"}}:::plan
     PgSelectRows332[["PgSelectRows[332∈26] ➊"]]:::plan
     PgSelectRows332 --> First331
@@ -876,14 +737,11 @@ graph TD
     PgClassExpression334 --> Object335
     PgSelect339[["PgSelect[339∈27] ➊<br />ᐸguid_fn(mutation)ᐳ"]]:::sideeffectplan
     Object342{{"Object[342∈27] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgFromExpression343{{"PgFromExpression[343∈27] ➊"}}:::plan
+    PgFromExpression343{{"PgFromExpression[343∈27] ➊<br />More deps:<br />- Constantᐸnullᐳ[338]"}}:::plan
     Object342 & PgFromExpression343 & ApplyInput349 --> PgSelect339
-    Access340{{"Access[340∈27] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access341{{"Access[341∈27] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access340{{"Access[340∈27] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access341{{"Access[341∈27] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access340 & Access341 --> Object342
-    __Value2 --> Access340
-    __Value2 --> Access341
-    Constant338 --> PgFromExpression343
     First344{{"First[344∈27] ➊"}}:::plan
     PgSelectRows345[["PgSelectRows[345∈27] ➊"]]:::plan
     PgSelectRows345 --> First344
@@ -896,14 +754,11 @@ graph TD
     PgClassExpression347 --> Object348
     PgSelect352[["PgSelect[352∈28] ➊<br />ᐸguid_fn(mutation)ᐳ"]]:::sideeffectplan
     Object355{{"Object[355∈28] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgFromExpression356{{"PgFromExpression[356∈28] ➊"}}:::plan
+    PgFromExpression356{{"PgFromExpression[356∈28] ➊<br />More deps:<br />- Constantᐸ'0123456789abcde'ᐳ[641]"}}:::plan
     Object355 & PgFromExpression356 & ApplyInput362 --> PgSelect352
-    Access353{{"Access[353∈28] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access354{{"Access[354∈28] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access353{{"Access[353∈28] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access354{{"Access[354∈28] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access353 & Access354 --> Object355
-    __Value2 --> Access353
-    __Value2 --> Access354
-    Constant641 --> PgFromExpression356
     First357{{"First[357∈28] ➊"}}:::plan
     PgSelectRows358[["PgSelectRows[358∈28] ➊"]]:::plan
     PgSelectRows358 --> First357
@@ -918,24 +773,20 @@ graph TD
     Object369{{"Object[369∈29] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     PgFromExpression370{{"PgFromExpression[370∈29] ➊"}}:::plan
     Object369 & PgFromExpression370 & ApplyInput372 --> PgSelect366
-    Access367{{"Access[367∈29] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access368{{"Access[368∈29] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access367{{"Access[367∈29] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access368{{"Access[368∈29] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access367 & Access368 --> Object369
-    __Value2 --> Access367
-    __Value2 --> Access368
     BakedInput365 --> PgFromExpression370
     Object371{{"Object[371∈29] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgSelect366 --> Object371
     PgSelect380[["PgSelect[380∈30] ➊<br />ᐸpost_with_suffix(mutation)ᐳ"]]:::sideeffectplan
     Object383{{"Object[383∈30] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgFromExpression384{{"PgFromExpression[384∈30] ➊"}}:::plan
+    PgFromExpression384{{"PgFromExpression[384∈30] ➊<br />More deps:<br />- Constantᐸ'test'ᐳ[645]"}}:::plan
     Object383 & PgFromExpression384 & ApplyInput389 --> PgSelect380
-    Access381{{"Access[381∈30] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access382{{"Access[382∈30] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access381{{"Access[381∈30] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access382{{"Access[382∈30] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access381 & Access382 --> Object383
-    BakedInput379 & Constant645 --> PgFromExpression384
-    __Value2 --> Access381
-    __Value2 --> Access382
+    BakedInput379 --> PgFromExpression384
     First385{{"First[385∈30] ➊"}}:::plan
     PgSelectRows386[["PgSelectRows[386∈30] ➊"]]:::plan
     PgSelectRows386 --> First385
@@ -947,11 +798,9 @@ graph TD
     PgSelect391[["PgSelect[391∈31] ➊<br />ᐸissue756_mutation(mutation)ᐳ"]]:::sideeffectplan
     Object394{{"Object[394∈31] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object394 & ApplyInput399 --> PgSelect391
-    Access392{{"Access[392∈31] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access393{{"Access[393∈31] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access392{{"Access[392∈31] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access393{{"Access[393∈31] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access392 & Access393 --> Object394
-    __Value2 --> Access392
-    __Value2 --> Access393
     First395{{"First[395∈31] ➊"}}:::plan
     PgSelectRows396[["PgSelectRows[396∈31] ➊"]]:::plan
     PgSelectRows396 --> First395
@@ -963,33 +812,27 @@ graph TD
     PgSelect401[["PgSelect[401∈32] ➊<br />ᐸissue756_set_mutation(mutation)ᐳ"]]:::sideeffectplan
     Object404{{"Object[404∈32] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object404 & ApplyInput406 --> PgSelect401
-    Access402{{"Access[402∈32] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access403{{"Access[403∈32] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access402{{"Access[402∈32] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access403{{"Access[403∈32] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access402 & Access403 --> Object404
-    __Value2 --> Access402
-    __Value2 --> Access403
     Object405{{"Object[405∈32] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgSelect401 --> Object405
     PgSelect412[["PgSelect[412∈33] ➊<br />ᐸmutation_compound_type_array(mutation)ᐳ"]]:::sideeffectplan
     Object415{{"Object[415∈33] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     PgFromExpression416{{"PgFromExpression[416∈33] ➊"}}:::plan
     Object415 & PgFromExpression416 & ApplyInput418 --> PgSelect412
-    Access413{{"Access[413∈33] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access414{{"Access[414∈33] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access413{{"Access[413∈33] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access414{{"Access[414∈33] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access413 & Access414 --> Object415
-    __Value2 --> Access413
-    __Value2 --> Access414
     BakedInput411 --> PgFromExpression416
     Object417{{"Object[417∈33] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgSelect412 --> Object417
     PgSelect420[["PgSelect[420∈34] ➊<br />ᐸmutation_text_array(mutation)ᐳ"]]:::sideeffectplan
     Object423{{"Object[423∈34] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object423 & ApplyInput429 --> PgSelect420
-    Access421{{"Access[421∈34] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access422{{"Access[422∈34] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access421{{"Access[421∈34] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access422{{"Access[422∈34] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access421 & Access422 --> Object423
-    __Value2 --> Access421
-    __Value2 --> Access422
     First424{{"First[424∈34] ➊"}}:::plan
     PgSelectRows425[["PgSelectRows[425∈34] ➊"]]:::plan
     PgSelectRows425 --> First424
@@ -1003,11 +846,9 @@ graph TD
     PgSelect431[["PgSelect[431∈35] ➊<br />ᐸmutation_interval_array(mutation)ᐳ"]]:::sideeffectplan
     Object434{{"Object[434∈35] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object434 & ApplyInput440 --> PgSelect431
-    Access432{{"Access[432∈35] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access433{{"Access[433∈35] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access432{{"Access[432∈35] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access433{{"Access[433∈35] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access432 & Access433 --> Object434
-    __Value2 --> Access432
-    __Value2 --> Access433
     First435{{"First[435∈35] ➊"}}:::plan
     PgSelectRows436[["PgSelectRows[436∈35] ➊"]]:::plan
     PgSelectRows436 --> First435
@@ -1021,11 +862,9 @@ graph TD
     PgSelect442[["PgSelect[442∈36] ➊<br />ᐸmutation_interval_set(mutation)ᐳ"]]:::sideeffectplan
     Object445{{"Object[445∈36] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object445 & ApplyInput447 --> PgSelect442
-    Access443{{"Access[443∈36] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access444{{"Access[444∈36] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access443{{"Access[443∈36] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access444{{"Access[444∈36] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access443 & Access444 --> Object445
-    __Value2 --> Access443
-    __Value2 --> Access444
     Object446{{"Object[446∈36] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgSelect442 --> Object446
     PgSelectRows492[["PgSelectRows[492∈55] ➊"]]:::plan
@@ -1045,8 +884,8 @@ graph TD
     Object279 & PgClassExpression470 --> PgSelect471
     Access479{{"Access[479∈57] ➊<br />ᐸ471.cursorDetailsᐳ"}}:::plan
     PgSelectSingle477 & Access479 --> PgCursor480
-    List523{{"List[523∈57] ➊<br />ᐸ521,470ᐳ"}}:::plan
-    Constant521 & PgClassExpression470 --> List523
+    List523{{"List[523∈57] ➊<br />ᐸ521,470ᐳ<br />More deps:<br />- Constantᐸ'posts'ᐳ[521]"}}:::plan
+    PgClassExpression470 --> List523
     PgSelectSingle283 --> PgClassExpression452
     First457{{"First[457∈57] ➊"}}:::plan
     PgSelectRows458[["PgSelectRows[458∈57] ➊"]]:::plan
@@ -1076,8 +915,8 @@ graph TD
     Object291 & PgClassExpression481 --> PgSelect482
     Access490{{"Access[490∈58] ➊<br />ᐸ482.cursorDetailsᐳ"}}:::plan
     PgSelectSingle488 & Access490 --> PgCursor491
-    List526{{"List[526∈58] ➊<br />ᐸ521,481ᐳ"}}:::plan
-    Constant521 & PgClassExpression481 --> List526
+    List526{{"List[526∈58] ➊<br />ᐸ521,481ᐳ<br />More deps:<br />- Constantᐸ'posts'ᐳ[521]"}}:::plan
+    PgClassExpression481 --> List526
     PgSelectSingle295 --> PgClassExpression460
     First465{{"First[465∈58] ➊"}}:::plan
     PgSelectRows466[["PgSelectRows[466∈58] ➊"]]:::plan
@@ -1266,7 +1105,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,Access10,Access11,Object12,PgFromExpression13,ApplyInput19,__InputObject20,ApplyInput32,__InputObject33,ApplyInput45,__InputObject46,ApplyInput58,__InputObject59,ApplyInput71,__InputObject72,ApplyInput83,__InputObject84,ApplyInput96,__InputObject97,ApplyInput110,__InputObject111,ApplyInput123,__InputObject124,ApplyInput137,__InputObject138,ApplyInput150,__InputObject151,ApplyInput162,__InputObject163,ApplyInput175,__InputObject176,ApplyInput187,__InputObject188,ApplyInput199,__InputObject200,ApplyInput211,__InputObject212,Constant216,__InputObject218,__InputObject219,__InputObject220,BakedInput221,ApplyInput232,__InputObject233,__InputObject234,__InputObject240,BakedInput242,ApplyInput252,__InputObject253,__InputObject254,__InputObject255,BakedInput256,ApplyInput263,__InputObject264,__InputObject265,__InputObject266,BakedInput267,ApplyInput274,__InputObject275,ApplyInput285,__InputObject286,ApplyInput297,__InputObject298,ApplyInput304,__InputObject305,ApplyInput313,__InputObject314,ApplyInput325,__InputObject326,ApplyInput336,__InputObject337,Constant338,ApplyInput349,__InputObject350,ApplyInput362,__InputObject363,Constant364,BakedInput365,ApplyInput372,__InputObject373,__InputObject374,BakedInput379,ApplyInput389,__InputObject390,ApplyInput399,__InputObject400,ApplyInput406,__InputObject407,__InputObject408,__InputObject410,BakedInput411,ApplyInput418,__InputObject419,ApplyInput429,__InputObject430,ApplyInput440,__InputObject441,ApplyInput447,Constant521,Constant615,Constant616,Constant617,Constant618,Constant619,Constant620,Constant621,Constant622,Constant623,Constant624,Constant625,Constant626,Constant627,Constant628,Constant629,Constant630,Constant631,Constant632,Constant633,Constant634,Constant635,Constant636,Constant637,Constant638,Constant639,Constant640,Constant641,Constant642,Constant643,Constant644,Constant645,Constant646 bucket0
+    class Bucket0,__Value2,__InputObject6,Access10,Access11,Object12,PgFromExpression13,ApplyInput19,__InputObject20,ApplyInput32,__InputObject33,ApplyInput45,__InputObject46,ApplyInput58,__InputObject59,ApplyInput71,__InputObject72,ApplyInput83,__InputObject84,ApplyInput96,__InputObject97,ApplyInput110,__InputObject111,ApplyInput123,__InputObject124,ApplyInput137,__InputObject138,ApplyInput150,__InputObject151,ApplyInput162,__InputObject163,ApplyInput175,__InputObject176,ApplyInput187,__InputObject188,ApplyInput199,__InputObject200,ApplyInput211,__InputObject212,__InputObject218,__InputObject219,__InputObject220,BakedInput221,ApplyInput232,__InputObject233,__InputObject234,__InputObject240,BakedInput242,ApplyInput252,__InputObject253,__InputObject254,__InputObject255,BakedInput256,ApplyInput263,__InputObject264,__InputObject265,__InputObject266,BakedInput267,ApplyInput274,__InputObject275,ApplyInput285,__InputObject286,ApplyInput297,__InputObject298,ApplyInput304,__InputObject305,ApplyInput313,__InputObject314,ApplyInput325,__InputObject326,ApplyInput336,__InputObject337,ApplyInput349,__InputObject350,ApplyInput362,__InputObject363,BakedInput365,ApplyInput372,__InputObject373,__InputObject374,BakedInput379,ApplyInput389,__InputObject390,ApplyInput399,__InputObject400,ApplyInput406,__InputObject407,__InputObject408,__InputObject410,BakedInput411,ApplyInput418,__InputObject419,ApplyInput429,__InputObject430,ApplyInput440,__InputObject441,ApplyInput447 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect9,First14,PgSelectRows15,PgSelectSingle16,PgClassExpression17,Object18 bucket1
     classDef bucket2 stroke:#7f007f

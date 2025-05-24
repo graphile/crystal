@@ -29,15 +29,13 @@ graph TD
     Bucket9 --> Bucket10
 
     %% plan dependencies
-    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸmachineᐳ"]]:::plan
-    Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant93{{"Constant[93∈0] ➊<br />ᐸ1ᐳ"}}:::plan
+    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸmachineᐳ<br />More deps:<br />- Object[10]<br />- Constantᐸ1ᐳ[93]"]]:::plan
     PgSelectInlineApply85["PgSelectInlineApply[85∈0] ➊"]:::plan
-    Object10 & Constant93 & PgSelectInlineApply85 --> PgSelect7
-    PgSelect15[["PgSelect[15∈0] ➊<br />ᐸbuildingᐳ"]]:::plan
-    Constant94{{"Constant[94∈0] ➊<br />ᐸ2ᐳ"}}:::plan
+    PgSelectInlineApply85 --> PgSelect7
+    PgSelect15[["PgSelect[15∈0] ➊<br />ᐸbuildingᐳ<br />More deps:<br />- Object[10]<br />- Constantᐸ2ᐳ[94]"]]:::plan
     PgSelectInlineApply89["PgSelectInlineApply[89∈0] ➊"]:::plan
-    Object10 & Constant94 & PgSelectInlineApply89 --> PgSelect15
+    PgSelectInlineApply89 --> PgSelect15
+    Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 5"}}:::plan
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
@@ -64,9 +62,7 @@ graph TD
     PgSelect15 --> Access90
     Lambda92{{"Lambda[92∈0] ➊<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List91 --> Lambda92
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     Connection24{{"Connection[24∈0] ➊<br />ᐸ22ᐳ"}}:::plan
-    Connection40{{"Connection[40∈0] ➊<br />ᐸ36ᐳ"}}:::plan
     List87{{"List[87∈1] ➊<br />ᐸ86,13ᐳ"}}:::plan
     Access86 & PgSelectSingle13 --> List87
     PgClassExpression27{{"PgClassExpression[27∈1] ➊<br />ᐸ__machine_...nstructor”ᐳ"}}:::plan
@@ -85,8 +81,8 @@ graph TD
     PgSelectSingle19 --> PgClassExpression43
     PgSelectRows71[["PgSelectRows[71∈2] ➊"]]:::plan
     Lambda92 --> PgSelectRows71
-    PgSelect42[["PgSelect[42∈3] ➊<br />ᐸrelational_itemsᐳ"]]:::plan
-    Object10 & Connection24 --> PgSelect42
+    PgSelect42[["PgSelect[42∈3] ➊<br />ᐸrelational_itemsᐳ<br />More deps:<br />- Object[10]"]]:::plan
+    Connection24 --> PgSelect42
     PgSelectRows45[["PgSelectRows[45∈3] ➊"]]:::plan
     PgSelect42 --> PgSelectRows45
     PgClassExpression48{{"PgClassExpression[48∈4] ➊<br />ᐸ__building__.”id”ᐳ"}}:::plan
@@ -105,8 +101,8 @@ graph TD
     PgClassExpression53 --> Lambda54
     PgClassExpression76{{"PgClassExpression[76∈5]<br />ᐸ__relation...nstructor”ᐳ"}}:::plan
     PgSelectSingle47 --> PgClassExpression76
-    PgSelect56[["PgSelect[56∈7]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic"]]:::plan
-    Object10 & PgClassExpression51 --> PgSelect56
+    PgSelect56[["PgSelect[56∈7]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic<br />More deps:<br />- Object[10]"]]:::plan
+    PgClassExpression51 --> PgSelect56
     First60{{"First[60∈7]^"}}:::plan
     PgSelectRows61[["PgSelectRows[61∈7]^"]]:::plan
     PgSelectRows61 --> First60
@@ -115,8 +111,8 @@ graph TD
     First60 --> PgSelectSingle62
     PgClassExpression80{{"PgClassExpression[80∈7]^<br />ᐸ__relation...__.”title”ᐳ"}}:::plan
     PgSelectSingle62 --> PgClassExpression80
-    PgSelect64[["PgSelect[64∈8]<br />ᐸrelational_statusᐳ<br />ᐳRelationalStatus"]]:::plan
-    Object10 & PgClassExpression51 --> PgSelect64
+    PgSelect64[["PgSelect[64∈8]<br />ᐸrelational_statusᐳ<br />ᐳRelationalStatus<br />More deps:<br />- Object[10]"]]:::plan
+    PgClassExpression51 --> PgSelect64
     First68{{"First[68∈8]^"}}:::plan
     PgSelectRows69[["PgSelectRows[69∈8]^"]]:::plan
     PgSelectRows69 --> First68
@@ -138,7 +134,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,PgSelect15,First17,PgSelectRows18,PgSelectSingle19,Connection24,Connection40,PgSelectInlineApply85,Access86,PgSelectInlineApply89,Access90,List91,Lambda92,Constant93,Constant94 bucket0
+    class Bucket0,__Value2,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,PgSelect15,First17,PgSelectRows18,PgSelectSingle19,Connection24,PgSelectInlineApply85,Access86,PgSelectInlineApply89,Access90,List91,Lambda92 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgClassExpression27,First32,PgSelectRows33,PgSelectSingle34,PgClassExpression44,List87,Lambda88 bucket1
     classDef bucket2 stroke:#7f007f

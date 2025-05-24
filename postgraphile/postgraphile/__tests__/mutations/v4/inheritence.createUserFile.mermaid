@@ -25,30 +25,21 @@ graph TD
     Bucket6 --> Bucket7
 
     %% plan dependencies
-    __InputObject18{{"__InputObject[18∈0] ➊"}}:::plan
-    Constant48{{"Constant[48∈0] ➊<br />ᐸ'foo.txt'ᐳ"}}:::plan
-    Constant46{{"Constant[46∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Constant48 & Constant46 --> __InputObject18
-    __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
-    __InputObject8{{"__InputObject[8∈0] ➊"}}:::plan
+    __InputObject18{{"__InputObject[18∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ'foo.txt'ᐳ[48]<br />- Constantᐸ1ᐳ[46]"}}:::plan
+    __InputObject6{{"__InputObject[6∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]"}}:::plan
+    __InputObject8{{"__InputObject[8∈0] ➊<br />More deps:<br />- Constantᐸ1ᐳ[46]<br />- Constantᐸ'Bobby Tables'ᐳ[47]"}}:::plan
     __InputObject8 --> __InputObject6
-    Constant47{{"Constant[47∈0] ➊<br />ᐸ'Bobby Tables'ᐳ"}}:::plan
-    Constant46 & Constant47 --> __InputObject8
     Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access12{{"Access[12∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access13{{"Access[13∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access12{{"Access[12∈0] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access13{{"Access[13∈0] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access12 & Access13 --> Object14
-    __InputObject17{{"__InputObject[17∈0] ➊"}}:::plan
+    __InputObject17{{"__InputObject[17∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]"}}:::plan
     __InputObject18 --> __InputObject17
-    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
-    __Value2 --> Access12
-    __Value2 --> Access13
     ApplyInput15{{"ApplyInput[15∈0] ➊"}}:::plan
     __InputObject6 --> ApplyInput15
     ApplyInput24{{"ApplyInput[24∈0] ➊"}}:::plan
     __InputObject17 --> ApplyInput24
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant26{{"Constant[26∈0] ➊<br />ᐸ'users'ᐳ"}}:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ<br />Dependents: 4"]:::plan
     PgInsertSingle11[["PgInsertSingle[11∈1] ➊<br />ᐸuser()ᐳ"]]:::sideeffectplan
     Object14 & ApplyInput15 --> PgInsertSingle11
     Object16{{"Object[16∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
@@ -56,16 +47,14 @@ graph TD
     PgInsertSingle20[["PgInsertSingle[20∈2] ➊<br />ᐸuser_file()ᐳ"]]:::sideeffectplan
     Object23{{"Object[23∈2] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object23 & ApplyInput24 --> PgInsertSingle20
-    Access21{{"Access[21∈2] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access22{{"Access[22∈2] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access21{{"Access[21∈2] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access22{{"Access[22∈2] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access21 & Access22 --> Object23
-    __Value2 --> Access21
-    __Value2 --> Access22
     Object25{{"Object[25∈2] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle20 --> Object25
-    List29{{"List[29∈5] ➊<br />ᐸ26,27ᐳ"}}:::plan
+    List29{{"List[29∈5] ➊<br />ᐸ26,27ᐳ<br />More deps:<br />- Constantᐸ'users'ᐳ[26]"}}:::plan
     PgClassExpression27{{"PgClassExpression[27∈5] ➊<br />ᐸ__user__.”id”ᐳ"}}:::plan
-    Constant26 & PgClassExpression27 --> List29
+    PgClassExpression27 --> List29
     Access28{{"Access[28∈5] ➊<br />ᐸ11.tᐳ"}}:::plan
     Access28 --> PgClassExpression27
     PgInsertSingle11 --> Access28
@@ -96,7 +85,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,__InputObject8,Access12,Access13,Object14,ApplyInput15,__InputObject17,__InputObject18,ApplyInput24,Constant26,Constant46,Constant47,Constant48 bucket0
+    class Bucket0,__Value2,__InputObject6,__InputObject8,Access12,Access13,Object14,ApplyInput15,__InputObject17,__InputObject18,ApplyInput24 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle11,Object16 bucket1
     classDef bucket2 stroke:#7f007f

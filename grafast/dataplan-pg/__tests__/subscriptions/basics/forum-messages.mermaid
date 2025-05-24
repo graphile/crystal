@@ -23,19 +23,16 @@ graph TD
     %% plan dependencies
     Listen9["Listen[9∈0@s] ➊"]:::plan
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSubscriberᐳ"}}:::plan
-    Lambda7{{"Lambda[7∈0] ➊"}}:::plan
+    Lambda7{{"Lambda[7∈0] ➊<br />More deps:<br />- Constantᐸ'ca700000-0000-0000-0000-000000000ca7'ᐳ[53]"}}:::plan
     Access8 & Lambda7 --> Listen9
     Object18{{"Object[18∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access16{{"Access[16∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access17{{"Access[17∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access16 & Access17 --> Object18
-    Constant53{{"Constant[53∈0] ➊<br />ᐸ'ca700000-0000-0000-0000-000000000ca7'ᐳ"}}:::plan
-    Constant53 --> Lambda7
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access16
     __Value2 --> Access17
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgSelectInlineApply45["PgSelectInlineApply[45∈0] ➊"]:::plan
     PgSelectInlineApply49["PgSelectInlineApply[49∈0] ➊"]:::plan
     __Item10[/"__Item[10∈1]<br />ᐸ9ᐳ"\]:::itemplan
@@ -101,7 +98,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Lambda7,Access8,Listen9,Access16,Access17,Object18,PgSelectInlineApply45,PgSelectInlineApply49,Constant53 bucket0
+    class Bucket0,__Value2,Lambda7,Access8,Listen9,Access16,Access17,Object18,PgSelectInlineApply45,PgSelectInlineApply49 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item10,JSONParse11 bucket1
     classDef bucket2 stroke:#7f007f
