@@ -63,14 +63,6 @@ graph TD
     Object12 & Constant55 & ApplyInput13 --> PgDeleteSingle9
     Object14{{"Object[14∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgDeleteSingle9 --> Object14
-    PgClassExpression46{{"PgClassExpression[46∈7] ➊<br />ᐸ__letter_d...ons__.”id”ᐳ"}}:::plan
-    Access47{{"Access[47∈7] ➊<br />ᐸ9.tᐳ"}}:::plan
-    Access47 --> PgClassExpression46
-    PgDeleteSingle9 --> Access47
-    PgClassExpression48{{"PgClassExpression[48∈7] ➊<br />ᐸ__letter_d..._.”letter”ᐳ"}}:::plan
-    Access47 --> PgClassExpression48
-    PgClassExpression49{{"PgClassExpression[49∈7] ➊<br />ᐸ__letter_d..._via_view”ᐳ"}}:::plan
-    Access47 --> PgClassExpression49
     PgInsertSingle21[["PgInsertSingle[21∈2] ➊<br />ᐸletter_descriptions()ᐳ"]]:::sideeffectplan
     Object24{{"Object[24∈2] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object24 & ApplyInput25 --> PgInsertSingle21
@@ -81,16 +73,6 @@ graph TD
     __Value2 --> Access23
     Object26{{"Object[26∈2] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle21 --> Object26
-    PgClassExpression50{{"PgClassExpression[50∈8] ➊<br />ᐸ__letter_d...ons__.”id”ᐳ"}}:::plan
-    Access51{{"Access[51∈8] ➊<br />ᐸ21.tᐳ"}}:::plan
-    Access51 --> PgClassExpression50
-    PgInsertSingle21 --> Access51
-    PgClassExpression52{{"PgClassExpression[52∈8] ➊<br />ᐸ__letter_d..._.”letter”ᐳ"}}:::plan
-    Access51 --> PgClassExpression52
-    PgClassExpression53{{"PgClassExpression[53∈8] ➊<br />ᐸ__letter_d..._via_view”ᐳ"}}:::plan
-    Access51 --> PgClassExpression53
-    PgClassExpression54{{"PgClassExpression[54∈8] ➊<br />ᐸ__letter_d...scription”ᐳ"}}:::plan
-    Access51 --> PgClassExpression54
     PgSelect35[["PgSelect[35∈3] ➊<br />ᐸreferencing_table_mutation(mutation)ᐳ"]]:::sideeffectplan
     Object38{{"Object[38∈3] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     PgFromExpression39{{"PgFromExpression[39∈3] ➊"}}:::plan
@@ -111,6 +93,24 @@ graph TD
     PgSelectSingle42 --> PgClassExpression43
     Object44{{"Object[44∈3] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgClassExpression43 --> Object44
+    PgClassExpression46{{"PgClassExpression[46∈7] ➊<br />ᐸ__letter_d...ons__.”id”ᐳ"}}:::plan
+    Access47{{"Access[47∈7] ➊<br />ᐸ9.tᐳ"}}:::plan
+    Access47 --> PgClassExpression46
+    PgDeleteSingle9 --> Access47
+    PgClassExpression48{{"PgClassExpression[48∈7] ➊<br />ᐸ__letter_d..._.”letter”ᐳ"}}:::plan
+    Access47 --> PgClassExpression48
+    PgClassExpression49{{"PgClassExpression[49∈7] ➊<br />ᐸ__letter_d..._via_view”ᐳ"}}:::plan
+    Access47 --> PgClassExpression49
+    PgClassExpression50{{"PgClassExpression[50∈8] ➊<br />ᐸ__letter_d...ons__.”id”ᐳ"}}:::plan
+    Access51{{"Access[51∈8] ➊<br />ᐸ21.tᐳ"}}:::plan
+    Access51 --> PgClassExpression50
+    PgInsertSingle21 --> Access51
+    PgClassExpression52{{"PgClassExpression[52∈8] ➊<br />ᐸ__letter_d..._.”letter”ᐳ"}}:::plan
+    Access51 --> PgClassExpression52
+    PgClassExpression53{{"PgClassExpression[53∈8] ➊<br />ᐸ__letter_d..._via_view”ᐳ"}}:::plan
+    Access51 --> PgClassExpression53
+    PgClassExpression54{{"PgClassExpression[54∈8] ➊<br />ᐸ__letter_d...scription”ᐳ"}}:::plan
+    Access51 --> PgClassExpression54
 
     %% define steps
     classDef bucket0 stroke:#696969

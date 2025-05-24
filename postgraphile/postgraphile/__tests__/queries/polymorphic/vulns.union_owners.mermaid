@@ -159,6 +159,40 @@ graph TD
     PgUnionAll77 --> Access523
     Access524{{"Access[524∈4]^<br />ᐸ80.itemsᐳ"}}:::plan
     PgUnionAll80 --> Access524
+    PgUnionAll83[["PgUnionAll[83∈5]^<br />ᐸAwsApplication,GcpApplicationᐳ"]]:::plan
+    PgClassExpression57{{"PgClassExpression[57∈5]^<br />ᐸ__third_pa...ies__.”id”ᐳ"}}:::plan
+    Connection65{{"Connection[65∈5] ➊<br />ᐸ61ᐳ<br />ᐳThirdPartyVulnerability"}}:::plan
+    Object11 & PgClassExpression57 & Connection65 --> PgUnionAll83
+    PgUnionAll86[["PgUnionAll[86∈5]^<br />ᐸPerson,Organization,Person,Organizationᐳ"]]:::plan
+    Connection70{{"Connection[70∈5] ➊<br />ᐸ68ᐳ<br />ᐳThirdPartyVulnerability"}}:::plan
+    Object11 & PgClassExpression57 & Connection70 --> PgUnionAll86
+    PgSelect32[["PgSelect[32∈5]<br />ᐸthird_party_vulnerabilitiesᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
+    Object11 & Access23 --> PgSelect32
+    List58{{"List[58∈5]^<br />ᐸ56,57ᐳ"}}:::plan
+    Constant56 & PgClassExpression57 --> List58
+    PgUnionAll66[["PgUnionAll[66∈5]^<br />ᐸAwsApplication,GcpApplicationᐳ"]]:::plan
+    Object11 & PgClassExpression57 --> PgUnionAll66
+    PgUnionAll71[["PgUnionAll[71∈5]^<br />ᐸPerson,Organization,Person,Organizationᐳ"]]:::plan
+    Object11 & PgClassExpression57 --> PgUnionAll71
+    First36{{"First[36∈5]^"}}:::plan
+    PgSelectRows37[["PgSelectRows[37∈5]^"]]:::plan
+    PgSelectRows37 --> First36
+    PgSelect32 --> PgSelectRows37
+    PgSelectSingle38{{"PgSelectSingle[38∈5]^<br />ᐸthird_party_vulnerabilitiesᐳ"}}:::plan
+    First36 --> PgSelectSingle38
+    PgSelectSingle38 --> PgClassExpression57
+    Lambda59{{"Lambda[59∈5]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List58 --> Lambda59
+    PgClassExpression60{{"PgClassExpression[60∈5]^<br />ᐸ__third_pa...s__.”name”ᐳ"}}:::plan
+    PgSelectSingle38 --> PgClassExpression60
+    Access525{{"Access[525∈5]^<br />ᐸ66.itemsᐳ"}}:::plan
+    PgUnionAll66 --> Access525
+    Access526{{"Access[526∈5]^<br />ᐸ71.itemsᐳ"}}:::plan
+    PgUnionAll71 --> Access526
+    Access527{{"Access[527∈5]^<br />ᐸ83.itemsᐳ"}}:::plan
+    PgUnionAll83 --> Access527
+    Access528{{"Access[528∈5]^<br />ᐸ86.itemsᐳ"}}:::plan
+    PgUnionAll86 --> Access528
     List96{{"List[96∈6]^<br />ᐸ93,94,95ᐳ"}}:::plan
     Access93{{"Access[93∈6]^<br />ᐸ78.0ᐳ"}}:::plan
     Access94{{"Access[94∈6]^<br />ᐸ78.1ᐳ"}}:::plan
@@ -169,11 +203,84 @@ graph TD
     __Item78 --> Access94
     Lambda97{{"Lambda[97∈6]^<br />ᐸtoSpecifierᐳ"}}:::plan
     List96 --> Lambda97
+    List124{{"List[124∈7]^<br />ᐸ121,122,123ᐳ"}}:::plan
+    Access121{{"Access[121∈7]^<br />ᐸ81.0ᐳ"}}:::plan
+    Access122{{"Access[122∈7]^<br />ᐸ81.1ᐳ"}}:::plan
+    Access121 & Access122 & Constant123 --> List124
+    __Item81[/"__Item[81∈7]<br />ᐸ522ᐳ<br />ᐳFirstPartyVulnerability"\]:::itemplan
+    Access522 ==> __Item81
+    __Item81 --> Access121
+    __Item81 --> Access122
+    Lambda125{{"Lambda[125∈7]^<br />ᐸtoSpecifierᐳ"}}:::plan
+    List124 --> Lambda125
+    List101{{"List[101∈8]^<br />ᐸ98,99,100ᐳ"}}:::plan
+    Access98{{"Access[98∈8]^<br />ᐸ84.0ᐳ"}}:::plan
+    Access99{{"Access[99∈8]^<br />ᐸ84.1ᐳ"}}:::plan
+    Access98 & Access99 & Constant100 --> List101
+    __Item84[/"__Item[84∈8]<br />ᐸ525ᐳ<br />ᐳThirdPartyVulnerability"\]:::itemplan
+    Access525 ==> __Item84
+    __Item84 --> Access98
+    __Item84 --> Access99
+    Lambda102{{"Lambda[102∈8]^<br />ᐸtoSpecifierᐳ"}}:::plan
+    List101 --> Lambda102
+    List129{{"List[129∈9]^<br />ᐸ126,127,128ᐳ"}}:::plan
+    Access126{{"Access[126∈9]^<br />ᐸ87.0ᐳ"}}:::plan
+    Access127{{"Access[127∈9]^<br />ᐸ87.1ᐳ"}}:::plan
+    Access126 & Access127 & Constant128 --> List129
+    __Item87[/"__Item[87∈9]<br />ᐸ526ᐳ<br />ᐳThirdPartyVulnerability"\]:::itemplan
+    Access526 ==> __Item87
+    __Item87 --> Access126
+    __Item87 --> Access127
+    Lambda130{{"Lambda[130∈9]^<br />ᐸtoSpecifierᐳ"}}:::plan
+    List129 --> Lambda130
     Access104{{"Access[104∈10]^<br />ᐸ103.__typenameᐳ"}}:::plan
     __Value103:::plan@{shape: docs, label: "__Combined[103∈10]<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability"}
     __Value103 --> Access104
     Access105{{"Access[105∈10]^<br />ᐸ103.idᐳ"}}:::plan
     __Value103 --> Access105
+    Access132{{"Access[132∈12]^<br />ᐸ131.__typenameᐳ"}}:::plan
+    __Value131:::plan@{shape: docs, label: "__Combined[131∈12]<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability"}
+    __Value131 --> Access132
+    List236{{"List[236∈14]^<br />ᐸ233,234,235ᐳ"}}:::plan
+    Access233{{"Access[233∈14]^<br />ᐸ149.0ᐳ"}}:::plan
+    Access234{{"Access[234∈14]^<br />ᐸ149.1ᐳ"}}:::plan
+    Access233 & Access234 & Constant235 --> List236
+    __Item149[/"__Item[149∈14]<br />ᐸ523ᐳ<br />ᐳFirstPartyVulnerability"\]:::itemplan
+    Access523 ==> __Item149
+    __Item149 --> Access233
+    __Item149 --> Access234
+    Lambda237{{"Lambda[237∈14]^<br />ᐸtoSpecifierᐳ"}}:::plan
+    List236 --> Lambda237
+    List264{{"List[264∈15]^<br />ᐸ261,262,263ᐳ"}}:::plan
+    Access261{{"Access[261∈15]^<br />ᐸ151.0ᐳ"}}:::plan
+    Access262{{"Access[262∈15]^<br />ᐸ151.1ᐳ"}}:::plan
+    Access261 & Access262 & Constant263 --> List264
+    __Item151[/"__Item[151∈15]<br />ᐸ524ᐳ<br />ᐳFirstPartyVulnerability"\]:::itemplan
+    Access524 ==> __Item151
+    __Item151 --> Access261
+    __Item151 --> Access262
+    Lambda265{{"Lambda[265∈15]^<br />ᐸtoSpecifierᐳ"}}:::plan
+    List264 --> Lambda265
+    List241{{"List[241∈16]^<br />ᐸ238,239,240ᐳ"}}:::plan
+    Access238{{"Access[238∈16]^<br />ᐸ153.0ᐳ"}}:::plan
+    Access239{{"Access[239∈16]^<br />ᐸ153.1ᐳ"}}:::plan
+    Access238 & Access239 & Constant240 --> List241
+    __Item153[/"__Item[153∈16]<br />ᐸ527ᐳ<br />ᐳThirdPartyVulnerability"\]:::itemplan
+    Access527 ==> __Item153
+    __Item153 --> Access238
+    __Item153 --> Access239
+    Lambda242{{"Lambda[242∈16]^<br />ᐸtoSpecifierᐳ"}}:::plan
+    List241 --> Lambda242
+    List269{{"List[269∈17]^<br />ᐸ266,267,268ᐳ"}}:::plan
+    Access266{{"Access[266∈17]^<br />ᐸ155.0ᐳ"}}:::plan
+    Access267{{"Access[267∈17]^<br />ᐸ155.1ᐳ"}}:::plan
+    Access266 & Access267 & Constant268 --> List269
+    __Item155[/"__Item[155∈17]<br />ᐸ528ᐳ<br />ᐳThirdPartyVulnerability"\]:::itemplan
+    Access528 ==> __Item155
+    __Item155 --> Access266
+    __Item155 --> Access267
+    Lambda270{{"Lambda[270∈17]^<br />ᐸtoSpecifierᐳ"}}:::plan
+    List269 --> Lambda270
     PgUnionAll164[["PgUnionAll[164∈18]<br />ᐸPerson,Organizationᐳ<br />ᐳFirstPartyVulnerabilityᐳAwsApplication"]]:::plan
     PgClassExpression162{{"PgClassExpression[162∈18]^<br />ᐸ__aws_appl...person_id”ᐳ"}}:::plan
     PgClassExpression163{{"PgClassExpression[163∈18]^<br />ᐸ__aws_appl...zation_id”ᐳ"}}:::plan
@@ -222,45 +329,6 @@ graph TD
     List302 --> Lambda303
     PgUnionAll164 --> Access530
     PgUnionAll202 --> Access531
-    Access310{{"Access[310∈28]^<br />ᐸ309.__typenameᐳ"}}:::plan
-    __Value309:::plan@{shape: docs, label: "__Combined[309∈28]<br />(2) ...ᐳAwsApplication<br />(2) ...ᐳGcpApplication"}
-    __Value309 --> Access310
-    PgSelect312[["PgSelect[312∈32]^<br />ᐸorganizationsᐳ"]]:::plan
-    Access311{{"Access[311∈32]<br />ᐸ309.organization_idᐳ<br />(4) ...ᐳOrganization"}}:::plan
-    Object11 & Access311 --> PgSelect312
-    List405{{"List[405∈32]^<br />ᐸ185,404ᐳ"}}:::plan
-    PgClassExpression404{{"PgClassExpression[404∈32]^<br />ᐸ__organiza...zation_id”ᐳ"}}:::plan
-    Constant185 & PgClassExpression404 --> List405
-    __Value309 --> Access311
-    First316{{"First[316∈32]^"}}:::plan
-    PgSelectRows317[["PgSelectRows[317∈32]^"]]:::plan
-    PgSelectRows317 --> First316
-    PgSelect312 --> PgSelectRows317
-    PgSelectSingle318{{"PgSelectSingle[318∈32]^<br />ᐸorganizationsᐳ"}}:::plan
-    First316 --> PgSelectSingle318
-    PgSelectSingle318 --> PgClassExpression404
-    Lambda406{{"Lambda[406∈32]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List405 --> Lambda406
-    PgClassExpression407{{"PgClassExpression[407∈32]^<br />ᐸ__organiza...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle318 --> PgClassExpression407
-    PgSelect320[["PgSelect[320∈33]^<br />ᐸpeopleᐳ"]]:::plan
-    Access319{{"Access[319∈33]<br />ᐸ309.person_idᐳ<br />(4) ...ᐳPerson"}}:::plan
-    Object11 & Access319 --> PgSelect320
-    List410{{"List[410∈33]^<br />ᐸ190,409ᐳ"}}:::plan
-    PgClassExpression409{{"PgClassExpression[409∈33]^<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
-    Constant190 & PgClassExpression409 --> List410
-    __Value309 --> Access319
-    First324{{"First[324∈33]^"}}:::plan
-    PgSelectRows325[["PgSelectRows[325∈33]^"]]:::plan
-    PgSelectRows325 --> First324
-    PgSelect320 --> PgSelectRows325
-    PgSelectSingle326{{"PgSelectSingle[326∈33]^<br />ᐸpeopleᐳ"}}:::plan
-    First324 --> PgSelectSingle326
-    PgSelectSingle326 --> PgClassExpression409
-    Lambda411{{"Lambda[411∈33]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List410 --> Lambda411
-    PgClassExpression412{{"PgClassExpression[412∈33]^<br />ᐸ__people__.”username”ᐳ"}}:::plan
-    PgSelectSingle326 --> PgClassExpression412
     PgUnionAll178[["PgUnionAll[178∈19]<br />ᐸPerson,Organizationᐳ<br />ᐳFirstPartyVulnerabilityᐳGcpApplication"]]:::plan
     PgClassExpression176{{"PgClassExpression[176∈19]^<br />ᐸ__gcp_appl...person_id”ᐳ"}}:::plan
     PgClassExpression177{{"PgClassExpression[177∈19]^<br />ᐸ__gcp_appl...zation_id”ᐳ"}}:::plan
@@ -309,19 +377,6 @@ graph TD
     List307 --> Lambda308
     PgUnionAll178 --> Access532
     PgUnionAll216 --> Access533
-    List124{{"List[124∈7]^<br />ᐸ121,122,123ᐳ"}}:::plan
-    Access121{{"Access[121∈7]^<br />ᐸ81.0ᐳ"}}:::plan
-    Access122{{"Access[122∈7]^<br />ᐸ81.1ᐳ"}}:::plan
-    Access121 & Access122 & Constant123 --> List124
-    __Item81[/"__Item[81∈7]<br />ᐸ522ᐳ<br />ᐳFirstPartyVulnerability"\]:::itemplan
-    Access522 ==> __Item81
-    __Item81 --> Access121
-    __Item81 --> Access122
-    Lambda125{{"Lambda[125∈7]^<br />ᐸtoSpecifierᐳ"}}:::plan
-    List124 --> Lambda125
-    Access132{{"Access[132∈12]^<br />ᐸ131.__typenameᐳ"}}:::plan
-    __Value131:::plan@{shape: docs, label: "__Combined[131∈12]<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability"}
-    __Value131 --> Access132
     PgSelect134[["PgSelect[134∈20]^<br />ᐸorganizationsᐳ"]]:::plan
     Access133{{"Access[133∈20]<br />ᐸ131.organization_idᐳ<br />(2) ...ᐳOrganization"}}:::plan
     Object11 & Access133 --> PgSelect134
@@ -358,21 +413,14 @@ graph TD
     List192 --> Lambda193
     PgClassExpression194{{"PgClassExpression[194∈21]^<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle148 --> PgClassExpression194
-    List236{{"List[236∈14]^<br />ᐸ233,234,235ᐳ"}}:::plan
-    Access233{{"Access[233∈14]^<br />ᐸ149.0ᐳ"}}:::plan
-    Access234{{"Access[234∈14]^<br />ᐸ149.1ᐳ"}}:::plan
-    Access233 & Access234 & Constant235 --> List236
-    __Item149[/"__Item[149∈14]<br />ᐸ523ᐳ<br />ᐳFirstPartyVulnerability"\]:::itemplan
-    Access523 ==> __Item149
-    __Item149 --> Access233
-    __Item149 --> Access234
-    Lambda237{{"Lambda[237∈14]^<br />ᐸtoSpecifierᐳ"}}:::plan
-    List236 --> Lambda237
     Access244{{"Access[244∈22]^<br />ᐸ243.__typenameᐳ"}}:::plan
     __Value243:::plan@{shape: docs, label: "__Combined[243∈22]<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability"}
     __Value243 --> Access244
     Access245{{"Access[245∈22]^<br />ᐸ243.idᐳ"}}:::plan
     __Value243 --> Access245
+    Access272{{"Access[272∈24]^<br />ᐸ271.__typenameᐳ"}}:::plan
+    __Value271:::plan@{shape: docs, label: "__Combined[271∈24]<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability"}
+    __Value271 --> Access272
     PgUnionAll334[["PgUnionAll[334∈26]<br />ᐸPerson,Organizationᐳ<br />ᐳFirstPartyVulnerabilityᐳAwsApplication"]]:::plan
     PgClassExpression332{{"PgClassExpression[332∈26]^<br />ᐸ__aws_appl...person_id”ᐳ"}}:::plan
     PgClassExpression333{{"PgClassExpression[333∈26]^<br />ᐸ__aws_appl...zation_id”ᐳ"}}:::plan
@@ -421,45 +469,6 @@ graph TD
     List456 --> Lambda457
     PgUnionAll334 --> Access534
     PgUnionAll372 --> Access535
-    Access464{{"Access[464∈34]^<br />ᐸ463.__typenameᐳ"}}:::plan
-    __Value463:::plan@{shape: docs, label: "__Combined[463∈34]<br />(2) ...ᐳAwsApplication<br />(2) ...ᐳGcpApplication"}
-    __Value463 --> Access464
-    PgSelect466[["PgSelect[466∈36]^<br />ᐸorganizationsᐳ"]]:::plan
-    Access465{{"Access[465∈36]<br />ᐸ463.organization_idᐳ<br />(4) ...ᐳOrganization"}}:::plan
-    Object11 & Access465 --> PgSelect466
-    List483{{"List[483∈36]^<br />ᐸ185,482ᐳ"}}:::plan
-    PgClassExpression482{{"PgClassExpression[482∈36]^<br />ᐸ__organiza...zation_id”ᐳ"}}:::plan
-    Constant185 & PgClassExpression482 --> List483
-    __Value463 --> Access465
-    First470{{"First[470∈36]^"}}:::plan
-    PgSelectRows471[["PgSelectRows[471∈36]^"]]:::plan
-    PgSelectRows471 --> First470
-    PgSelect466 --> PgSelectRows471
-    PgSelectSingle472{{"PgSelectSingle[472∈36]^<br />ᐸorganizationsᐳ"}}:::plan
-    First470 --> PgSelectSingle472
-    PgSelectSingle472 --> PgClassExpression482
-    Lambda484{{"Lambda[484∈36]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List483 --> Lambda484
-    PgClassExpression485{{"PgClassExpression[485∈36]^<br />ᐸ__organiza...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle472 --> PgClassExpression485
-    PgSelect474[["PgSelect[474∈37]^<br />ᐸpeopleᐳ"]]:::plan
-    Access473{{"Access[473∈37]<br />ᐸ463.person_idᐳ<br />(4) ...ᐳPerson"}}:::plan
-    Object11 & Access473 --> PgSelect474
-    List488{{"List[488∈37]^<br />ᐸ190,487ᐳ"}}:::plan
-    PgClassExpression487{{"PgClassExpression[487∈37]^<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
-    Constant190 & PgClassExpression487 --> List488
-    __Value463 --> Access473
-    First478{{"First[478∈37]^"}}:::plan
-    PgSelectRows479[["PgSelectRows[479∈37]^"]]:::plan
-    PgSelectRows479 --> First478
-    PgSelect474 --> PgSelectRows479
-    PgSelectSingle480{{"PgSelectSingle[480∈37]^<br />ᐸpeopleᐳ"}}:::plan
-    First478 --> PgSelectSingle480
-    PgSelectSingle480 --> PgClassExpression487
-    Lambda489{{"Lambda[489∈37]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List488 --> Lambda489
-    PgClassExpression490{{"PgClassExpression[490∈37]^<br />ᐸ__people__.”username”ᐳ"}}:::plan
-    PgSelectSingle480 --> PgClassExpression490
     PgUnionAll348[["PgUnionAll[348∈27]<br />ᐸPerson,Organizationᐳ<br />ᐳFirstPartyVulnerabilityᐳGcpApplication"]]:::plan
     PgClassExpression346{{"PgClassExpression[346∈27]^<br />ᐸ__gcp_appl...person_id”ᐳ"}}:::plan
     PgClassExpression347{{"PgClassExpression[347∈27]^<br />ᐸ__gcp_appl...zation_id”ᐳ"}}:::plan
@@ -508,19 +517,9 @@ graph TD
     List461 --> Lambda462
     PgUnionAll348 --> Access536
     PgUnionAll386 --> Access537
-    List264{{"List[264∈15]^<br />ᐸ261,262,263ᐳ"}}:::plan
-    Access261{{"Access[261∈15]^<br />ᐸ151.0ᐳ"}}:::plan
-    Access262{{"Access[262∈15]^<br />ᐸ151.1ᐳ"}}:::plan
-    Access261 & Access262 & Constant263 --> List264
-    __Item151[/"__Item[151∈15]<br />ᐸ524ᐳ<br />ᐳFirstPartyVulnerability"\]:::itemplan
-    Access524 ==> __Item151
-    __Item151 --> Access261
-    __Item151 --> Access262
-    Lambda265{{"Lambda[265∈15]^<br />ᐸtoSpecifierᐳ"}}:::plan
-    List264 --> Lambda265
-    Access272{{"Access[272∈24]^<br />ᐸ271.__typenameᐳ"}}:::plan
-    __Value271:::plan@{shape: docs, label: "__Combined[271∈24]<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability"}
-    __Value271 --> Access272
+    Access310{{"Access[310∈28]^<br />ᐸ309.__typenameᐳ"}}:::plan
+    __Value309:::plan@{shape: docs, label: "__Combined[309∈28]<br />(2) ...ᐳAwsApplication<br />(2) ...ᐳGcpApplication"}
+    __Value309 --> Access310
     PgSelect274[["PgSelect[274∈30]^<br />ᐸorganizationsᐳ"]]:::plan
     Access273{{"Access[273∈30]<br />ᐸ271.organization_idᐳ<br />(2) ...ᐳOrganization"}}:::plan
     Object11 & Access273 --> PgSelect274
@@ -557,80 +556,81 @@ graph TD
     List362 --> Lambda363
     PgClassExpression364{{"PgClassExpression[364∈31]^<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle288 --> PgClassExpression364
-    PgUnionAll83[["PgUnionAll[83∈5]^<br />ᐸAwsApplication,GcpApplicationᐳ"]]:::plan
-    PgClassExpression57{{"PgClassExpression[57∈5]^<br />ᐸ__third_pa...ies__.”id”ᐳ"}}:::plan
-    Connection65{{"Connection[65∈5] ➊<br />ᐸ61ᐳ<br />ᐳThirdPartyVulnerability"}}:::plan
-    Object11 & PgClassExpression57 & Connection65 --> PgUnionAll83
-    PgUnionAll86[["PgUnionAll[86∈5]^<br />ᐸPerson,Organization,Person,Organizationᐳ"]]:::plan
-    Connection70{{"Connection[70∈5] ➊<br />ᐸ68ᐳ<br />ᐳThirdPartyVulnerability"}}:::plan
-    Object11 & PgClassExpression57 & Connection70 --> PgUnionAll86
-    PgSelect32[["PgSelect[32∈5]<br />ᐸthird_party_vulnerabilitiesᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
-    Object11 & Access23 --> PgSelect32
-    List58{{"List[58∈5]^<br />ᐸ56,57ᐳ"}}:::plan
-    Constant56 & PgClassExpression57 --> List58
-    PgUnionAll66[["PgUnionAll[66∈5]^<br />ᐸAwsApplication,GcpApplicationᐳ"]]:::plan
-    Object11 & PgClassExpression57 --> PgUnionAll66
-    PgUnionAll71[["PgUnionAll[71∈5]^<br />ᐸPerson,Organization,Person,Organizationᐳ"]]:::plan
-    Object11 & PgClassExpression57 --> PgUnionAll71
-    First36{{"First[36∈5]^"}}:::plan
-    PgSelectRows37[["PgSelectRows[37∈5]^"]]:::plan
-    PgSelectRows37 --> First36
-    PgSelect32 --> PgSelectRows37
-    PgSelectSingle38{{"PgSelectSingle[38∈5]^<br />ᐸthird_party_vulnerabilitiesᐳ"}}:::plan
-    First36 --> PgSelectSingle38
-    PgSelectSingle38 --> PgClassExpression57
-    Lambda59{{"Lambda[59∈5]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List58 --> Lambda59
-    PgClassExpression60{{"PgClassExpression[60∈5]^<br />ᐸ__third_pa...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle38 --> PgClassExpression60
-    Access525{{"Access[525∈5]^<br />ᐸ66.itemsᐳ"}}:::plan
-    PgUnionAll66 --> Access525
-    Access526{{"Access[526∈5]^<br />ᐸ71.itemsᐳ"}}:::plan
-    PgUnionAll71 --> Access526
-    Access527{{"Access[527∈5]^<br />ᐸ83.itemsᐳ"}}:::plan
-    PgUnionAll83 --> Access527
-    Access528{{"Access[528∈5]^<br />ᐸ86.itemsᐳ"}}:::plan
-    PgUnionAll86 --> Access528
-    List101{{"List[101∈8]^<br />ᐸ98,99,100ᐳ"}}:::plan
-    Access98{{"Access[98∈8]^<br />ᐸ84.0ᐳ"}}:::plan
-    Access99{{"Access[99∈8]^<br />ᐸ84.1ᐳ"}}:::plan
-    Access98 & Access99 & Constant100 --> List101
-    __Item84[/"__Item[84∈8]<br />ᐸ525ᐳ<br />ᐳThirdPartyVulnerability"\]:::itemplan
-    Access525 ==> __Item84
-    __Item84 --> Access98
-    __Item84 --> Access99
-    Lambda102{{"Lambda[102∈8]^<br />ᐸtoSpecifierᐳ"}}:::plan
-    List101 --> Lambda102
-    List129{{"List[129∈9]^<br />ᐸ126,127,128ᐳ"}}:::plan
-    Access126{{"Access[126∈9]^<br />ᐸ87.0ᐳ"}}:::plan
-    Access127{{"Access[127∈9]^<br />ᐸ87.1ᐳ"}}:::plan
-    Access126 & Access127 & Constant128 --> List129
-    __Item87[/"__Item[87∈9]<br />ᐸ526ᐳ<br />ᐳThirdPartyVulnerability"\]:::itemplan
-    Access526 ==> __Item87
-    __Item87 --> Access126
-    __Item87 --> Access127
-    Lambda130{{"Lambda[130∈9]^<br />ᐸtoSpecifierᐳ"}}:::plan
-    List129 --> Lambda130
-    List241{{"List[241∈16]^<br />ᐸ238,239,240ᐳ"}}:::plan
-    Access238{{"Access[238∈16]^<br />ᐸ153.0ᐳ"}}:::plan
-    Access239{{"Access[239∈16]^<br />ᐸ153.1ᐳ"}}:::plan
-    Access238 & Access239 & Constant240 --> List241
-    __Item153[/"__Item[153∈16]<br />ᐸ527ᐳ<br />ᐳThirdPartyVulnerability"\]:::itemplan
-    Access527 ==> __Item153
-    __Item153 --> Access238
-    __Item153 --> Access239
-    Lambda242{{"Lambda[242∈16]^<br />ᐸtoSpecifierᐳ"}}:::plan
-    List241 --> Lambda242
-    List269{{"List[269∈17]^<br />ᐸ266,267,268ᐳ"}}:::plan
-    Access266{{"Access[266∈17]^<br />ᐸ155.0ᐳ"}}:::plan
-    Access267{{"Access[267∈17]^<br />ᐸ155.1ᐳ"}}:::plan
-    Access266 & Access267 & Constant268 --> List269
-    __Item155[/"__Item[155∈17]<br />ᐸ528ᐳ<br />ᐳThirdPartyVulnerability"\]:::itemplan
-    Access528 ==> __Item155
-    __Item155 --> Access266
-    __Item155 --> Access267
-    Lambda270{{"Lambda[270∈17]^<br />ᐸtoSpecifierᐳ"}}:::plan
-    List269 --> Lambda270
+    PgSelect312[["PgSelect[312∈32]^<br />ᐸorganizationsᐳ"]]:::plan
+    Access311{{"Access[311∈32]<br />ᐸ309.organization_idᐳ<br />(4) ...ᐳOrganization"}}:::plan
+    Object11 & Access311 --> PgSelect312
+    List405{{"List[405∈32]^<br />ᐸ185,404ᐳ"}}:::plan
+    PgClassExpression404{{"PgClassExpression[404∈32]^<br />ᐸ__organiza...zation_id”ᐳ"}}:::plan
+    Constant185 & PgClassExpression404 --> List405
+    __Value309 --> Access311
+    First316{{"First[316∈32]^"}}:::plan
+    PgSelectRows317[["PgSelectRows[317∈32]^"]]:::plan
+    PgSelectRows317 --> First316
+    PgSelect312 --> PgSelectRows317
+    PgSelectSingle318{{"PgSelectSingle[318∈32]^<br />ᐸorganizationsᐳ"}}:::plan
+    First316 --> PgSelectSingle318
+    PgSelectSingle318 --> PgClassExpression404
+    Lambda406{{"Lambda[406∈32]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List405 --> Lambda406
+    PgClassExpression407{{"PgClassExpression[407∈32]^<br />ᐸ__organiza...s__.”name”ᐳ"}}:::plan
+    PgSelectSingle318 --> PgClassExpression407
+    PgSelect320[["PgSelect[320∈33]^<br />ᐸpeopleᐳ"]]:::plan
+    Access319{{"Access[319∈33]<br />ᐸ309.person_idᐳ<br />(4) ...ᐳPerson"}}:::plan
+    Object11 & Access319 --> PgSelect320
+    List410{{"List[410∈33]^<br />ᐸ190,409ᐳ"}}:::plan
+    PgClassExpression409{{"PgClassExpression[409∈33]^<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
+    Constant190 & PgClassExpression409 --> List410
+    __Value309 --> Access319
+    First324{{"First[324∈33]^"}}:::plan
+    PgSelectRows325[["PgSelectRows[325∈33]^"]]:::plan
+    PgSelectRows325 --> First324
+    PgSelect320 --> PgSelectRows325
+    PgSelectSingle326{{"PgSelectSingle[326∈33]^<br />ᐸpeopleᐳ"}}:::plan
+    First324 --> PgSelectSingle326
+    PgSelectSingle326 --> PgClassExpression409
+    Lambda411{{"Lambda[411∈33]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List410 --> Lambda411
+    PgClassExpression412{{"PgClassExpression[412∈33]^<br />ᐸ__people__.”username”ᐳ"}}:::plan
+    PgSelectSingle326 --> PgClassExpression412
+    Access464{{"Access[464∈34]^<br />ᐸ463.__typenameᐳ"}}:::plan
+    __Value463:::plan@{shape: docs, label: "__Combined[463∈34]<br />(2) ...ᐳAwsApplication<br />(2) ...ᐳGcpApplication"}
+    __Value463 --> Access464
+    PgSelect466[["PgSelect[466∈36]^<br />ᐸorganizationsᐳ"]]:::plan
+    Access465{{"Access[465∈36]<br />ᐸ463.organization_idᐳ<br />(4) ...ᐳOrganization"}}:::plan
+    Object11 & Access465 --> PgSelect466
+    List483{{"List[483∈36]^<br />ᐸ185,482ᐳ"}}:::plan
+    PgClassExpression482{{"PgClassExpression[482∈36]^<br />ᐸ__organiza...zation_id”ᐳ"}}:::plan
+    Constant185 & PgClassExpression482 --> List483
+    __Value463 --> Access465
+    First470{{"First[470∈36]^"}}:::plan
+    PgSelectRows471[["PgSelectRows[471∈36]^"]]:::plan
+    PgSelectRows471 --> First470
+    PgSelect466 --> PgSelectRows471
+    PgSelectSingle472{{"PgSelectSingle[472∈36]^<br />ᐸorganizationsᐳ"}}:::plan
+    First470 --> PgSelectSingle472
+    PgSelectSingle472 --> PgClassExpression482
+    Lambda484{{"Lambda[484∈36]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List483 --> Lambda484
+    PgClassExpression485{{"PgClassExpression[485∈36]^<br />ᐸ__organiza...s__.”name”ᐳ"}}:::plan
+    PgSelectSingle472 --> PgClassExpression485
+    PgSelect474[["PgSelect[474∈37]^<br />ᐸpeopleᐳ"]]:::plan
+    Access473{{"Access[473∈37]<br />ᐸ463.person_idᐳ<br />(4) ...ᐳPerson"}}:::plan
+    Object11 & Access473 --> PgSelect474
+    List488{{"List[488∈37]^<br />ᐸ190,487ᐳ"}}:::plan
+    PgClassExpression487{{"PgClassExpression[487∈37]^<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
+    Constant190 & PgClassExpression487 --> List488
+    __Value463 --> Access473
+    First478{{"First[478∈37]^"}}:::plan
+    PgSelectRows479[["PgSelectRows[479∈37]^"]]:::plan
+    PgSelectRows479 --> First478
+    PgSelect474 --> PgSelectRows479
+    PgSelectSingle480{{"PgSelectSingle[480∈37]^<br />ᐸpeopleᐳ"}}:::plan
+    First478 --> PgSelectSingle480
+    PgSelectSingle480 --> PgClassExpression487
+    Lambda489{{"Lambda[489∈37]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List488 --> Lambda489
+    PgClassExpression490{{"PgClassExpression[490∈37]^<br />ᐸ__people__.”username”ᐳ"}}:::plan
+    PgSelectSingle480 --> PgClassExpression490
 
     %% define steps
     classDef bucket0 stroke:#696969

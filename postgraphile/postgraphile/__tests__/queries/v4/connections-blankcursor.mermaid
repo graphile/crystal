@@ -82,22 +82,6 @@ graph TD
     Object58 --> Lambda59
     Lambda63{{"Lambda[63∈1] ➊<br />ᐸhasPreviousPageCbᐳ"}}:::plan
     Object62 --> Lambda63
-    __Item64[/"__Item[64∈3]<br />ᐸ41ᐳ"\]:::itemplan
-    PgSelectRows41 ==> __Item64
-    PgSelectSingle65{{"PgSelectSingle[65∈3]<br />ᐸpersonᐳ"}}:::plan
-    __Item64 --> PgSelectSingle65
-    PgCursor90{{"PgCursor[90∈5]"}}:::plan
-    PgSelectSingle65 & Access47 --> PgCursor90
-    PgClassExpression93{{"PgClassExpression[93∈5]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgSelectSingle65 --> PgClassExpression93
-    PgClassExpression94{{"PgClassExpression[94∈5]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle65 --> PgClassExpression94
-    PgClassExpression95{{"PgClassExpression[95∈5]<br />ᐸ__person__.”email”ᐳ"}}:::plan
-    PgSelectSingle65 --> PgClassExpression95
-    PgClassExpression96{{"PgClassExpression[96∈5]<br />ᐸ__person__.”config”ᐳ"}}:::plan
-    PgSelectSingle65 --> PgClassExpression96
-    PgClassExpression97{{"PgClassExpression[97∈5]<br />ᐸ__person__...n_from_ip”ᐳ"}}:::plan
-    PgSelectSingle65 --> PgClassExpression97
     PgSelect33[["PgSelect[33∈2] ➊<br />ᐸperson+1ᐳ"]]:::plan
     Object13 & Connection22 & Lambda23 & Constant103 --> PgSelect33
     Object85{{"Object[85∈2] ➊<br />ᐸ{first,last,offset,hasMore}ᐳ"}}:::plan
@@ -138,10 +122,26 @@ graph TD
     Object81 --> Lambda82
     Lambda86{{"Lambda[86∈2] ➊<br />ᐸhasPreviousPageCbᐳ"}}:::plan
     Object85 --> Lambda86
+    __Item64[/"__Item[64∈3]<br />ᐸ41ᐳ"\]:::itemplan
+    PgSelectRows41 ==> __Item64
+    PgSelectSingle65{{"PgSelectSingle[65∈3]<br />ᐸpersonᐳ"}}:::plan
+    __Item64 --> PgSelectSingle65
     __Item87[/"__Item[87∈4]<br />ᐸ42ᐳ"\]:::itemplan
     PgSelectRows42 ==> __Item87
     PgSelectSingle88{{"PgSelectSingle[88∈4]<br />ᐸpersonᐳ"}}:::plan
     __Item87 --> PgSelectSingle88
+    PgCursor90{{"PgCursor[90∈5]"}}:::plan
+    PgSelectSingle65 & Access47 --> PgCursor90
+    PgClassExpression93{{"PgClassExpression[93∈5]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle65 --> PgClassExpression93
+    PgClassExpression94{{"PgClassExpression[94∈5]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgSelectSingle65 --> PgClassExpression94
+    PgClassExpression95{{"PgClassExpression[95∈5]<br />ᐸ__person__.”email”ᐳ"}}:::plan
+    PgSelectSingle65 --> PgClassExpression95
+    PgClassExpression96{{"PgClassExpression[96∈5]<br />ᐸ__person__.”config”ᐳ"}}:::plan
+    PgSelectSingle65 --> PgClassExpression96
+    PgClassExpression97{{"PgClassExpression[97∈5]<br />ᐸ__person__...n_from_ip”ᐳ"}}:::plan
+    PgSelectSingle65 --> PgClassExpression97
     PgCursor92{{"PgCursor[92∈6]"}}:::plan
     PgSelectSingle88 & Access70 --> PgCursor92
     PgClassExpression98{{"PgClassExpression[98∈6]<br />ᐸ__person__.”id”ᐳ"}}:::plan

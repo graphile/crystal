@@ -4716,14 +4716,15 @@ export class OperationPlan {
         copyStepIds: lp.copyStepIds,
         phases: lp.phases.map(printPhase),
         steps: lp.steps.map(printStep),
-        // BUG: this is unsafe since combo layer plans will be included multiple times. We should reference by id, perhaps?
-        children: lp.children.map(printBucket),
+        childIds: lp.children.map((c) => c.id),
         rootStepId: lp.rootStep ? lp.rootStep.id : null,
       };
     }
     return {
       version: "v1",
-      rootBucket: printBucket(this.rootLayerPlan),
+      buckets: this.stepTracker.layerPlans
+        .filter((b) => b != null)
+        .map(printBucket),
     } as GrafastPlanJSONv1;
   }
 

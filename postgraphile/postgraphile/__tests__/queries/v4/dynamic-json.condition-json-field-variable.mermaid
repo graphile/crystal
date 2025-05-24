@@ -63,34 +63,34 @@ graph TD
     Object15 & ApplyInput17 & Connection16 --> PgSelect36
     PgSelectRows39[["PgSelectRows[39∈1] ➊"]]:::plan
     PgSelect36 --> PgSelectRows39
-    __Item42[/"__Item[42∈4]<br />ᐸ39ᐳ"\]:::itemplan
-    PgSelectRows39 ==> __Item42
-    PgSelectSingle43{{"PgSelectSingle[43∈4]<br />ᐸmy_tableᐳ"}}:::plan
-    __Item42 --> PgSelectSingle43
-    PgClassExpression48{{"PgClassExpression[48∈7]<br />ᐸ__my_table__.”id”ᐳ"}}:::plan
-    PgSelectSingle43 --> PgClassExpression48
-    PgClassExpression49{{"PgClassExpression[49∈7]<br />ᐸ__my_table...json_data”ᐳ"}}:::plan
-    PgSelectSingle43 --> PgClassExpression49
     PgSelect37[["PgSelect[37∈2] ➊<br />ᐸmy_tableᐳ"]]:::plan
     Object15 & ApplyInput25 & Connection24 --> PgSelect37
     PgSelectRows40[["PgSelectRows[40∈2] ➊"]]:::plan
     PgSelect37 --> PgSelectRows40
-    __Item44[/"__Item[44∈5]<br />ᐸ40ᐳ"\]:::itemplan
-    PgSelectRows40 ==> __Item44
-    PgSelectSingle45{{"PgSelectSingle[45∈5]<br />ᐸmy_tableᐳ"}}:::plan
-    __Item44 --> PgSelectSingle45
-    PgClassExpression50{{"PgClassExpression[50∈8]<br />ᐸ__my_table__.”id”ᐳ"}}:::plan
-    PgSelectSingle45 --> PgClassExpression50
-    PgClassExpression51{{"PgClassExpression[51∈8]<br />ᐸ__my_table...json_data”ᐳ"}}:::plan
-    PgSelectSingle45 --> PgClassExpression51
     PgSelect38[["PgSelect[38∈3] ➊<br />ᐸmy_tableᐳ"]]:::plan
     Object15 & ApplyInput34 & Connection33 --> PgSelect38
     PgSelectRows41[["PgSelectRows[41∈3] ➊"]]:::plan
     PgSelect38 --> PgSelectRows41
+    __Item42[/"__Item[42∈4]<br />ᐸ39ᐳ"\]:::itemplan
+    PgSelectRows39 ==> __Item42
+    PgSelectSingle43{{"PgSelectSingle[43∈4]<br />ᐸmy_tableᐳ"}}:::plan
+    __Item42 --> PgSelectSingle43
+    __Item44[/"__Item[44∈5]<br />ᐸ40ᐳ"\]:::itemplan
+    PgSelectRows40 ==> __Item44
+    PgSelectSingle45{{"PgSelectSingle[45∈5]<br />ᐸmy_tableᐳ"}}:::plan
+    __Item44 --> PgSelectSingle45
     __Item46[/"__Item[46∈6]<br />ᐸ41ᐳ"\]:::itemplan
     PgSelectRows41 ==> __Item46
     PgSelectSingle47{{"PgSelectSingle[47∈6]<br />ᐸmy_tableᐳ"}}:::plan
     __Item46 --> PgSelectSingle47
+    PgClassExpression48{{"PgClassExpression[48∈7]<br />ᐸ__my_table__.”id”ᐳ"}}:::plan
+    PgSelectSingle43 --> PgClassExpression48
+    PgClassExpression49{{"PgClassExpression[49∈7]<br />ᐸ__my_table...json_data”ᐳ"}}:::plan
+    PgSelectSingle43 --> PgClassExpression49
+    PgClassExpression50{{"PgClassExpression[50∈8]<br />ᐸ__my_table__.”id”ᐳ"}}:::plan
+    PgSelectSingle45 --> PgClassExpression50
+    PgClassExpression51{{"PgClassExpression[51∈8]<br />ᐸ__my_table...json_data”ᐳ"}}:::plan
+    PgSelectSingle45 --> PgClassExpression51
     PgClassExpression52{{"PgClassExpression[52∈9]<br />ᐸ__my_table__.”id”ᐳ"}}:::plan
     PgSelectSingle47 --> PgClassExpression52
     PgClassExpression53{{"PgClassExpression[53∈9]<br />ᐸ__my_table...json_data”ᐳ"}}:::plan

@@ -123,6 +123,36 @@ graph TD
     Object14 & ApplyInput15 --> PgInsertSingle11
     Object16{{"Object[16∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle11 --> Object16
+    PgInsertSingle22[["PgInsertSingle[22∈2] ➊<br />ᐸrelational_item_relation_composite_pks()ᐳ"]]:::sideeffectplan
+    Object25{{"Object[25∈2] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object25 & ApplyInput26 --> PgInsertSingle22
+    Access23{{"Access[23∈2] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access24{{"Access[24∈2] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access23 & Access24 --> Object25
+    __Value2 --> Access23
+    __Value2 --> Access24
+    Object27{{"Object[27∈2] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgInsertSingle22 --> Object27
+    PgInsertSingle33[["PgInsertSingle[33∈3] ➊<br />ᐸsingle_table_item_relations()ᐳ"]]:::sideeffectplan
+    Object36{{"Object[36∈3] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object36 & ApplyInput37 --> PgInsertSingle33
+    Access34{{"Access[34∈3] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access35{{"Access[35∈3] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access34 & Access35 --> Object36
+    __Value2 --> Access34
+    __Value2 --> Access35
+    Object38{{"Object[38∈3] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgInsertSingle33 --> Object38
+    PgInsertSingle44[["PgInsertSingle[44∈4] ➊<br />ᐸsingle_table_item_relation_composite_pks()ᐳ"]]:::sideeffectplan
+    Object47{{"Object[47∈4] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object47 & ApplyInput48 --> PgInsertSingle44
+    Access45{{"Access[45∈4] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access46{{"Access[46∈4] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access45 & Access46 --> Object47
+    __Value2 --> Access45
+    __Value2 --> Access46
+    Object49{{"Object[49∈4] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgInsertSingle44 --> Object49
     List53{{"List[53∈9] ➊<br />ᐸ50,51ᐳ"}}:::plan
     PgClassExpression51{{"PgClassExpression[51∈9] ➊<br />ᐸ__relation...ons__.”id”ᐳ"}}:::plan
     Constant50 & PgClassExpression51 --> List53
@@ -163,6 +193,202 @@ graph TD
     PgSelectSingle68 --> PgClassExpression174
     Lambda175{{"Lambda[175∈9] ➊<br />ᐸRelationalItem_typeNameFromTypeᐳ"}}:::plan
     PgClassExpression174 --> Lambda175
+    List73{{"List[73∈10] ➊<br />ᐸ69,70,72ᐳ"}}:::plan
+    PgClassExpression70{{"PgClassExpression[70∈10] ➊<br />ᐸ__relation...parent_id”ᐳ"}}:::plan
+    PgClassExpression72{{"PgClassExpression[72∈10] ➊<br />ᐸ__relation...”child_id”ᐳ"}}:::plan
+    Constant69 & PgClassExpression70 & PgClassExpression72 --> List73
+    PgSelect76[["PgSelect[76∈10] ➊<br />ᐸrelational_itemsᐳ"]]:::plan
+    Object25 & PgClassExpression72 --> PgSelect76
+    PgSelect84[["PgSelect[84∈10] ➊<br />ᐸrelational_itemsᐳ"]]:::plan
+    Object25 & PgClassExpression70 --> PgSelect84
+    Access71{{"Access[71∈10] ➊<br />ᐸ22.tᐳ"}}:::plan
+    Access71 --> PgClassExpression70
+    PgInsertSingle22 --> Access71
+    Access71 --> PgClassExpression72
+    Lambda74{{"Lambda[74∈10] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List73 --> Lambda74
+    First80{{"First[80∈10] ➊"}}:::plan
+    PgSelectRows81[["PgSelectRows[81∈10] ➊"]]:::plan
+    PgSelectRows81 --> First80
+    PgSelect76 --> PgSelectRows81
+    PgSelectSingle82{{"PgSelectSingle[82∈10] ➊<br />ᐸrelational_itemsᐳ"}}:::plan
+    First80 --> PgSelectSingle82
+    First86{{"First[86∈10] ➊"}}:::plan
+    PgSelectRows87[["PgSelectRows[87∈10] ➊"]]:::plan
+    PgSelectRows87 --> First86
+    PgSelect84 --> PgSelectRows87
+    PgSelectSingle88{{"PgSelectSingle[88∈10] ➊<br />ᐸrelational_itemsᐳ"}}:::plan
+    First86 --> PgSelectSingle88
+    PgClassExpression216{{"PgClassExpression[216∈10] ➊<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
+    PgSelectSingle82 --> PgClassExpression216
+    PgClassExpression218{{"PgClassExpression[218∈10] ➊<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
+    PgSelectSingle82 --> PgClassExpression218
+    Lambda219{{"Lambda[219∈10] ➊<br />ᐸRelationalItem_typeNameFromTypeᐳ"}}:::plan
+    PgClassExpression218 --> Lambda219
+    PgClassExpression260{{"PgClassExpression[260∈10] ➊<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
+    PgSelectSingle88 --> PgClassExpression260
+    PgClassExpression262{{"PgClassExpression[262∈10] ➊<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
+    PgSelectSingle88 --> PgClassExpression262
+    Lambda263{{"Lambda[263∈10] ➊<br />ᐸRelationalItem_typeNameFromTypeᐳ"}}:::plan
+    PgClassExpression262 --> Lambda263
+    List92{{"List[92∈11] ➊<br />ᐸ89,90ᐳ"}}:::plan
+    PgClassExpression90{{"PgClassExpression[90∈11] ➊<br />ᐸ__single_t...ons__.”id”ᐳ"}}:::plan
+    Constant89 & PgClassExpression90 --> List92
+    PgSelect95[["PgSelect[95∈11] ➊<br />ᐸsingle_table_itemsᐳ"]]:::plan
+    PgClassExpression94{{"PgClassExpression[94∈11] ➊<br />ᐸ__single_t...”child_id”ᐳ"}}:::plan
+    Object36 & PgClassExpression94 --> PgSelect95
+    PgSelect103[["PgSelect[103∈11] ➊<br />ᐸsingle_table_itemsᐳ"]]:::plan
+    PgClassExpression102{{"PgClassExpression[102∈11] ➊<br />ᐸ__single_t...parent_id”ᐳ"}}:::plan
+    Object36 & PgClassExpression102 --> PgSelect103
+    Access91{{"Access[91∈11] ➊<br />ᐸ33.tᐳ"}}:::plan
+    Access91 --> PgClassExpression90
+    PgInsertSingle33 --> Access91
+    Lambda93{{"Lambda[93∈11] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List92 --> Lambda93
+    Access91 --> PgClassExpression94
+    First99{{"First[99∈11] ➊"}}:::plan
+    PgSelectRows100[["PgSelectRows[100∈11] ➊"]]:::plan
+    PgSelectRows100 --> First99
+    PgSelect95 --> PgSelectRows100
+    PgSelectSingle101{{"PgSelectSingle[101∈11] ➊<br />ᐸsingle_table_itemsᐳ"}}:::plan
+    First99 --> PgSelectSingle101
+    Access91 --> PgClassExpression102
+    First105{{"First[105∈11] ➊"}}:::plan
+    PgSelectRows106[["PgSelectRows[106∈11] ➊"]]:::plan
+    PgSelectRows106 --> First105
+    PgSelect103 --> PgSelectRows106
+    PgSelectSingle107{{"PgSelectSingle[107∈11] ➊<br />ᐸsingle_table_itemsᐳ"}}:::plan
+    First105 --> PgSelectSingle107
+    PgClassExpression304{{"PgClassExpression[304∈11] ➊<br />ᐸ__single_t...ems__.”id”ᐳ"}}:::plan
+    PgSelectSingle101 --> PgClassExpression304
+    PgClassExpression306{{"PgClassExpression[306∈11] ➊<br />ᐸ__single_t...s__.”type”ᐳ"}}:::plan
+    PgSelectSingle101 --> PgClassExpression306
+    Lambda307{{"Lambda[307∈11] ➊<br />ᐸSingleTableItem_typeNameFromTypeᐳ"}}:::plan
+    PgClassExpression306 --> Lambda307
+    PgClassExpression308{{"PgClassExpression[308∈11] ➊<br />ᐸ__single_t...ems__.”id”ᐳ"}}:::plan
+    PgSelectSingle107 --> PgClassExpression308
+    PgClassExpression310{{"PgClassExpression[310∈11] ➊<br />ᐸ__single_t...s__.”type”ᐳ"}}:::plan
+    PgSelectSingle107 --> PgClassExpression310
+    Lambda311{{"Lambda[311∈11] ➊<br />ᐸSingleTableItem_typeNameFromTypeᐳ"}}:::plan
+    PgClassExpression310 --> Lambda311
+    List112{{"List[112∈12] ➊<br />ᐸ108,109,111ᐳ"}}:::plan
+    PgClassExpression109{{"PgClassExpression[109∈12] ➊<br />ᐸ__single_t...parent_id”ᐳ"}}:::plan
+    PgClassExpression111{{"PgClassExpression[111∈12] ➊<br />ᐸ__single_t...”child_id”ᐳ"}}:::plan
+    Constant108 & PgClassExpression109 & PgClassExpression111 --> List112
+    PgSelect115[["PgSelect[115∈12] ➊<br />ᐸsingle_table_itemsᐳ"]]:::plan
+    Object47 & PgClassExpression111 --> PgSelect115
+    PgSelect123[["PgSelect[123∈12] ➊<br />ᐸsingle_table_itemsᐳ"]]:::plan
+    Object47 & PgClassExpression109 --> PgSelect123
+    Access110{{"Access[110∈12] ➊<br />ᐸ44.tᐳ"}}:::plan
+    Access110 --> PgClassExpression109
+    PgInsertSingle44 --> Access110
+    Access110 --> PgClassExpression111
+    Lambda113{{"Lambda[113∈12] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List112 --> Lambda113
+    First119{{"First[119∈12] ➊"}}:::plan
+    PgSelectRows120[["PgSelectRows[120∈12] ➊"]]:::plan
+    PgSelectRows120 --> First119
+    PgSelect115 --> PgSelectRows120
+    PgSelectSingle121{{"PgSelectSingle[121∈12] ➊<br />ᐸsingle_table_itemsᐳ"}}:::plan
+    First119 --> PgSelectSingle121
+    First125{{"First[125∈12] ➊"}}:::plan
+    PgSelectRows126[["PgSelectRows[126∈12] ➊"]]:::plan
+    PgSelectRows126 --> First125
+    PgSelect123 --> PgSelectRows126
+    PgSelectSingle127{{"PgSelectSingle[127∈12] ➊<br />ᐸsingle_table_itemsᐳ"}}:::plan
+    First125 --> PgSelectSingle127
+    PgClassExpression312{{"PgClassExpression[312∈12] ➊<br />ᐸ__single_t...ems__.”id”ᐳ"}}:::plan
+    PgSelectSingle121 --> PgClassExpression312
+    PgClassExpression314{{"PgClassExpression[314∈12] ➊<br />ᐸ__single_t...s__.”type”ᐳ"}}:::plan
+    PgSelectSingle121 --> PgClassExpression314
+    Lambda315{{"Lambda[315∈12] ➊<br />ᐸSingleTableItem_typeNameFromTypeᐳ"}}:::plan
+    PgClassExpression314 --> Lambda315
+    PgClassExpression316{{"PgClassExpression[316∈12] ➊<br />ᐸ__single_t...ems__.”id”ᐳ"}}:::plan
+    PgSelectSingle127 --> PgClassExpression316
+    PgClassExpression318{{"PgClassExpression[318∈12] ➊<br />ᐸ__single_t...s__.”type”ᐳ"}}:::plan
+    PgSelectSingle127 --> PgClassExpression318
+    Lambda319{{"Lambda[319∈12] ➊<br />ᐸSingleTableItem_typeNameFromTypeᐳ"}}:::plan
+    PgClassExpression318 --> Lambda319
+    List422{{"List[422∈17] ➊<br />ᐸ420,304ᐳ<br />ᐳSingleTableTopic"}}:::plan
+    Constant420 & PgClassExpression304 --> List422
+    List427{{"List[427∈17] ➊<br />ᐸ425,304ᐳ<br />ᐳSingleTablePost"}}:::plan
+    Constant425 & PgClassExpression304 --> List427
+    List432{{"List[432∈17] ➊<br />ᐸ430,304ᐳ<br />ᐳSingleTableDivider"}}:::plan
+    Constant430 & PgClassExpression304 --> List432
+    List437{{"List[437∈17] ➊<br />ᐸ435,304ᐳ<br />ᐳSingleTableChecklist"}}:::plan
+    Constant435 & PgClassExpression304 --> List437
+    List442{{"List[442∈17] ➊<br />ᐸ440,304ᐳ<br />ᐳSingleTableChecklistItem"}}:::plan
+    Constant440 & PgClassExpression304 --> List442
+    Lambda423{{"Lambda[423∈17] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List422 --> Lambda423
+    Lambda428{{"Lambda[428∈17] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List427 --> Lambda428
+    Lambda433{{"Lambda[433∈17] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List432 --> Lambda433
+    Lambda438{{"Lambda[438∈17] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List437 --> Lambda438
+    Lambda443{{"Lambda[443∈17] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List442 --> Lambda443
+    List447{{"List[447∈18] ➊<br />ᐸ420,308ᐳ<br />ᐳSingleTableTopic"}}:::plan
+    Constant420 & PgClassExpression308 --> List447
+    List452{{"List[452∈18] ➊<br />ᐸ425,308ᐳ<br />ᐳSingleTablePost"}}:::plan
+    Constant425 & PgClassExpression308 --> List452
+    List457{{"List[457∈18] ➊<br />ᐸ430,308ᐳ<br />ᐳSingleTableDivider"}}:::plan
+    Constant430 & PgClassExpression308 --> List457
+    List462{{"List[462∈18] ➊<br />ᐸ435,308ᐳ<br />ᐳSingleTableChecklist"}}:::plan
+    Constant435 & PgClassExpression308 --> List462
+    List467{{"List[467∈18] ➊<br />ᐸ440,308ᐳ<br />ᐳSingleTableChecklistItem"}}:::plan
+    Constant440 & PgClassExpression308 --> List467
+    Lambda448{{"Lambda[448∈18] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List447 --> Lambda448
+    Lambda453{{"Lambda[453∈18] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List452 --> Lambda453
+    Lambda458{{"Lambda[458∈18] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List457 --> Lambda458
+    Lambda463{{"Lambda[463∈18] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List462 --> Lambda463
+    Lambda468{{"Lambda[468∈18] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List467 --> Lambda468
+    List472{{"List[472∈19] ➊<br />ᐸ420,312ᐳ<br />ᐳSingleTableTopic"}}:::plan
+    Constant420 & PgClassExpression312 --> List472
+    List477{{"List[477∈19] ➊<br />ᐸ425,312ᐳ<br />ᐳSingleTablePost"}}:::plan
+    Constant425 & PgClassExpression312 --> List477
+    List482{{"List[482∈19] ➊<br />ᐸ430,312ᐳ<br />ᐳSingleTableDivider"}}:::plan
+    Constant430 & PgClassExpression312 --> List482
+    List487{{"List[487∈19] ➊<br />ᐸ435,312ᐳ<br />ᐳSingleTableChecklist"}}:::plan
+    Constant435 & PgClassExpression312 --> List487
+    List492{{"List[492∈19] ➊<br />ᐸ440,312ᐳ<br />ᐳSingleTableChecklistItem"}}:::plan
+    Constant440 & PgClassExpression312 --> List492
+    Lambda473{{"Lambda[473∈19] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List472 --> Lambda473
+    Lambda478{{"Lambda[478∈19] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List477 --> Lambda478
+    Lambda483{{"Lambda[483∈19] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List482 --> Lambda483
+    Lambda488{{"Lambda[488∈19] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List487 --> Lambda488
+    Lambda493{{"Lambda[493∈19] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List492 --> Lambda493
+    List497{{"List[497∈20] ➊<br />ᐸ420,316ᐳ<br />ᐳSingleTableTopic"}}:::plan
+    Constant420 & PgClassExpression316 --> List497
+    List502{{"List[502∈20] ➊<br />ᐸ425,316ᐳ<br />ᐳSingleTablePost"}}:::plan
+    Constant425 & PgClassExpression316 --> List502
+    List507{{"List[507∈20] ➊<br />ᐸ430,316ᐳ<br />ᐳSingleTableDivider"}}:::plan
+    Constant430 & PgClassExpression316 --> List507
+    List512{{"List[512∈20] ➊<br />ᐸ435,316ᐳ<br />ᐳSingleTableChecklist"}}:::plan
+    Constant435 & PgClassExpression316 --> List512
+    List517{{"List[517∈20] ➊<br />ᐸ440,316ᐳ<br />ᐳSingleTableChecklistItem"}}:::plan
+    Constant440 & PgClassExpression316 --> List517
+    Lambda498{{"Lambda[498∈20] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List497 --> Lambda498
+    Lambda503{{"Lambda[503∈20] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List502 --> Lambda503
+    Lambda508{{"Lambda[508∈20] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List507 --> Lambda508
+    Lambda513{{"Lambda[513∈20] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List512 --> Lambda513
+    Lambda518{{"Lambda[518∈20] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List517 --> Lambda518
     PgSelect133[["PgSelect[133∈21] ➊<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic"]]:::plan
     Object14 & PgClassExpression128 --> PgSelect133
     List322{{"List[322∈21] ➊^<br />ᐸ320,321ᐳ"}}:::plan
@@ -303,54 +529,6 @@ graph TD
     PgSelectSingle215 --> PgClassExpression366
     Lambda368{{"Lambda[368∈30] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List367 --> Lambda368
-    PgInsertSingle22[["PgInsertSingle[22∈2] ➊<br />ᐸrelational_item_relation_composite_pks()ᐳ"]]:::sideeffectplan
-    Object25{{"Object[25∈2] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object25 & ApplyInput26 --> PgInsertSingle22
-    Access23{{"Access[23∈2] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access24{{"Access[24∈2] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
-    Access23 & Access24 --> Object25
-    __Value2 --> Access23
-    __Value2 --> Access24
-    Object27{{"Object[27∈2] ➊<br />ᐸ{result}ᐳ"}}:::plan
-    PgInsertSingle22 --> Object27
-    List73{{"List[73∈10] ➊<br />ᐸ69,70,72ᐳ"}}:::plan
-    PgClassExpression70{{"PgClassExpression[70∈10] ➊<br />ᐸ__relation...parent_id”ᐳ"}}:::plan
-    PgClassExpression72{{"PgClassExpression[72∈10] ➊<br />ᐸ__relation...”child_id”ᐳ"}}:::plan
-    Constant69 & PgClassExpression70 & PgClassExpression72 --> List73
-    PgSelect76[["PgSelect[76∈10] ➊<br />ᐸrelational_itemsᐳ"]]:::plan
-    Object25 & PgClassExpression72 --> PgSelect76
-    PgSelect84[["PgSelect[84∈10] ➊<br />ᐸrelational_itemsᐳ"]]:::plan
-    Object25 & PgClassExpression70 --> PgSelect84
-    Access71{{"Access[71∈10] ➊<br />ᐸ22.tᐳ"}}:::plan
-    Access71 --> PgClassExpression70
-    PgInsertSingle22 --> Access71
-    Access71 --> PgClassExpression72
-    Lambda74{{"Lambda[74∈10] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List73 --> Lambda74
-    First80{{"First[80∈10] ➊"}}:::plan
-    PgSelectRows81[["PgSelectRows[81∈10] ➊"]]:::plan
-    PgSelectRows81 --> First80
-    PgSelect76 --> PgSelectRows81
-    PgSelectSingle82{{"PgSelectSingle[82∈10] ➊<br />ᐸrelational_itemsᐳ"}}:::plan
-    First80 --> PgSelectSingle82
-    First86{{"First[86∈10] ➊"}}:::plan
-    PgSelectRows87[["PgSelectRows[87∈10] ➊"]]:::plan
-    PgSelectRows87 --> First86
-    PgSelect84 --> PgSelectRows87
-    PgSelectSingle88{{"PgSelectSingle[88∈10] ➊<br />ᐸrelational_itemsᐳ"}}:::plan
-    First86 --> PgSelectSingle88
-    PgClassExpression216{{"PgClassExpression[216∈10] ➊<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
-    PgSelectSingle82 --> PgClassExpression216
-    PgClassExpression218{{"PgClassExpression[218∈10] ➊<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
-    PgSelectSingle82 --> PgClassExpression218
-    Lambda219{{"Lambda[219∈10] ➊<br />ᐸRelationalItem_typeNameFromTypeᐳ"}}:::plan
-    PgClassExpression218 --> Lambda219
-    PgClassExpression260{{"PgClassExpression[260∈10] ➊<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
-    PgSelectSingle88 --> PgClassExpression260
-    PgClassExpression262{{"PgClassExpression[262∈10] ➊<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
-    PgSelectSingle88 --> PgClassExpression262
-    Lambda263{{"Lambda[263∈10] ➊<br />ᐸRelationalItem_typeNameFromTypeᐳ"}}:::plan
-    PgClassExpression262 --> Lambda263
     PgSelect221[["PgSelect[221∈31] ➊<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic"]]:::plan
     Object25 & PgClassExpression216 --> PgSelect221
     List372{{"List[372∈31] ➊^<br />ᐸ320,371ᐳ"}}:::plan
@@ -491,184 +669,6 @@ graph TD
     PgSelectSingle303 --> PgClassExpression416
     Lambda418{{"Lambda[418∈40] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List417 --> Lambda418
-    PgInsertSingle33[["PgInsertSingle[33∈3] ➊<br />ᐸsingle_table_item_relations()ᐳ"]]:::sideeffectplan
-    Object36{{"Object[36∈3] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object36 & ApplyInput37 --> PgInsertSingle33
-    Access34{{"Access[34∈3] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access35{{"Access[35∈3] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
-    Access34 & Access35 --> Object36
-    __Value2 --> Access34
-    __Value2 --> Access35
-    Object38{{"Object[38∈3] ➊<br />ᐸ{result}ᐳ"}}:::plan
-    PgInsertSingle33 --> Object38
-    List92{{"List[92∈11] ➊<br />ᐸ89,90ᐳ"}}:::plan
-    PgClassExpression90{{"PgClassExpression[90∈11] ➊<br />ᐸ__single_t...ons__.”id”ᐳ"}}:::plan
-    Constant89 & PgClassExpression90 --> List92
-    PgSelect95[["PgSelect[95∈11] ➊<br />ᐸsingle_table_itemsᐳ"]]:::plan
-    PgClassExpression94{{"PgClassExpression[94∈11] ➊<br />ᐸ__single_t...”child_id”ᐳ"}}:::plan
-    Object36 & PgClassExpression94 --> PgSelect95
-    PgSelect103[["PgSelect[103∈11] ➊<br />ᐸsingle_table_itemsᐳ"]]:::plan
-    PgClassExpression102{{"PgClassExpression[102∈11] ➊<br />ᐸ__single_t...parent_id”ᐳ"}}:::plan
-    Object36 & PgClassExpression102 --> PgSelect103
-    Access91{{"Access[91∈11] ➊<br />ᐸ33.tᐳ"}}:::plan
-    Access91 --> PgClassExpression90
-    PgInsertSingle33 --> Access91
-    Lambda93{{"Lambda[93∈11] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List92 --> Lambda93
-    Access91 --> PgClassExpression94
-    First99{{"First[99∈11] ➊"}}:::plan
-    PgSelectRows100[["PgSelectRows[100∈11] ➊"]]:::plan
-    PgSelectRows100 --> First99
-    PgSelect95 --> PgSelectRows100
-    PgSelectSingle101{{"PgSelectSingle[101∈11] ➊<br />ᐸsingle_table_itemsᐳ"}}:::plan
-    First99 --> PgSelectSingle101
-    Access91 --> PgClassExpression102
-    First105{{"First[105∈11] ➊"}}:::plan
-    PgSelectRows106[["PgSelectRows[106∈11] ➊"]]:::plan
-    PgSelectRows106 --> First105
-    PgSelect103 --> PgSelectRows106
-    PgSelectSingle107{{"PgSelectSingle[107∈11] ➊<br />ᐸsingle_table_itemsᐳ"}}:::plan
-    First105 --> PgSelectSingle107
-    PgClassExpression304{{"PgClassExpression[304∈11] ➊<br />ᐸ__single_t...ems__.”id”ᐳ"}}:::plan
-    PgSelectSingle101 --> PgClassExpression304
-    PgClassExpression306{{"PgClassExpression[306∈11] ➊<br />ᐸ__single_t...s__.”type”ᐳ"}}:::plan
-    PgSelectSingle101 --> PgClassExpression306
-    Lambda307{{"Lambda[307∈11] ➊<br />ᐸSingleTableItem_typeNameFromTypeᐳ"}}:::plan
-    PgClassExpression306 --> Lambda307
-    PgClassExpression308{{"PgClassExpression[308∈11] ➊<br />ᐸ__single_t...ems__.”id”ᐳ"}}:::plan
-    PgSelectSingle107 --> PgClassExpression308
-    PgClassExpression310{{"PgClassExpression[310∈11] ➊<br />ᐸ__single_t...s__.”type”ᐳ"}}:::plan
-    PgSelectSingle107 --> PgClassExpression310
-    Lambda311{{"Lambda[311∈11] ➊<br />ᐸSingleTableItem_typeNameFromTypeᐳ"}}:::plan
-    PgClassExpression310 --> Lambda311
-    List422{{"List[422∈17] ➊<br />ᐸ420,304ᐳ<br />ᐳSingleTableTopic"}}:::plan
-    Constant420 & PgClassExpression304 --> List422
-    List427{{"List[427∈17] ➊<br />ᐸ425,304ᐳ<br />ᐳSingleTablePost"}}:::plan
-    Constant425 & PgClassExpression304 --> List427
-    List432{{"List[432∈17] ➊<br />ᐸ430,304ᐳ<br />ᐳSingleTableDivider"}}:::plan
-    Constant430 & PgClassExpression304 --> List432
-    List437{{"List[437∈17] ➊<br />ᐸ435,304ᐳ<br />ᐳSingleTableChecklist"}}:::plan
-    Constant435 & PgClassExpression304 --> List437
-    List442{{"List[442∈17] ➊<br />ᐸ440,304ᐳ<br />ᐳSingleTableChecklistItem"}}:::plan
-    Constant440 & PgClassExpression304 --> List442
-    Lambda423{{"Lambda[423∈17] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List422 --> Lambda423
-    Lambda428{{"Lambda[428∈17] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List427 --> Lambda428
-    Lambda433{{"Lambda[433∈17] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List432 --> Lambda433
-    Lambda438{{"Lambda[438∈17] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List437 --> Lambda438
-    Lambda443{{"Lambda[443∈17] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List442 --> Lambda443
-    List447{{"List[447∈18] ➊<br />ᐸ420,308ᐳ<br />ᐳSingleTableTopic"}}:::plan
-    Constant420 & PgClassExpression308 --> List447
-    List452{{"List[452∈18] ➊<br />ᐸ425,308ᐳ<br />ᐳSingleTablePost"}}:::plan
-    Constant425 & PgClassExpression308 --> List452
-    List457{{"List[457∈18] ➊<br />ᐸ430,308ᐳ<br />ᐳSingleTableDivider"}}:::plan
-    Constant430 & PgClassExpression308 --> List457
-    List462{{"List[462∈18] ➊<br />ᐸ435,308ᐳ<br />ᐳSingleTableChecklist"}}:::plan
-    Constant435 & PgClassExpression308 --> List462
-    List467{{"List[467∈18] ➊<br />ᐸ440,308ᐳ<br />ᐳSingleTableChecklistItem"}}:::plan
-    Constant440 & PgClassExpression308 --> List467
-    Lambda448{{"Lambda[448∈18] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List447 --> Lambda448
-    Lambda453{{"Lambda[453∈18] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List452 --> Lambda453
-    Lambda458{{"Lambda[458∈18] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List457 --> Lambda458
-    Lambda463{{"Lambda[463∈18] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List462 --> Lambda463
-    Lambda468{{"Lambda[468∈18] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List467 --> Lambda468
-    PgInsertSingle44[["PgInsertSingle[44∈4] ➊<br />ᐸsingle_table_item_relation_composite_pks()ᐳ"]]:::sideeffectplan
-    Object47{{"Object[47∈4] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object47 & ApplyInput48 --> PgInsertSingle44
-    Access45{{"Access[45∈4] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access46{{"Access[46∈4] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
-    Access45 & Access46 --> Object47
-    __Value2 --> Access45
-    __Value2 --> Access46
-    Object49{{"Object[49∈4] ➊<br />ᐸ{result}ᐳ"}}:::plan
-    PgInsertSingle44 --> Object49
-    List112{{"List[112∈12] ➊<br />ᐸ108,109,111ᐳ"}}:::plan
-    PgClassExpression109{{"PgClassExpression[109∈12] ➊<br />ᐸ__single_t...parent_id”ᐳ"}}:::plan
-    PgClassExpression111{{"PgClassExpression[111∈12] ➊<br />ᐸ__single_t...”child_id”ᐳ"}}:::plan
-    Constant108 & PgClassExpression109 & PgClassExpression111 --> List112
-    PgSelect115[["PgSelect[115∈12] ➊<br />ᐸsingle_table_itemsᐳ"]]:::plan
-    Object47 & PgClassExpression111 --> PgSelect115
-    PgSelect123[["PgSelect[123∈12] ➊<br />ᐸsingle_table_itemsᐳ"]]:::plan
-    Object47 & PgClassExpression109 --> PgSelect123
-    Access110{{"Access[110∈12] ➊<br />ᐸ44.tᐳ"}}:::plan
-    Access110 --> PgClassExpression109
-    PgInsertSingle44 --> Access110
-    Access110 --> PgClassExpression111
-    Lambda113{{"Lambda[113∈12] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List112 --> Lambda113
-    First119{{"First[119∈12] ➊"}}:::plan
-    PgSelectRows120[["PgSelectRows[120∈12] ➊"]]:::plan
-    PgSelectRows120 --> First119
-    PgSelect115 --> PgSelectRows120
-    PgSelectSingle121{{"PgSelectSingle[121∈12] ➊<br />ᐸsingle_table_itemsᐳ"}}:::plan
-    First119 --> PgSelectSingle121
-    First125{{"First[125∈12] ➊"}}:::plan
-    PgSelectRows126[["PgSelectRows[126∈12] ➊"]]:::plan
-    PgSelectRows126 --> First125
-    PgSelect123 --> PgSelectRows126
-    PgSelectSingle127{{"PgSelectSingle[127∈12] ➊<br />ᐸsingle_table_itemsᐳ"}}:::plan
-    First125 --> PgSelectSingle127
-    PgClassExpression312{{"PgClassExpression[312∈12] ➊<br />ᐸ__single_t...ems__.”id”ᐳ"}}:::plan
-    PgSelectSingle121 --> PgClassExpression312
-    PgClassExpression314{{"PgClassExpression[314∈12] ➊<br />ᐸ__single_t...s__.”type”ᐳ"}}:::plan
-    PgSelectSingle121 --> PgClassExpression314
-    Lambda315{{"Lambda[315∈12] ➊<br />ᐸSingleTableItem_typeNameFromTypeᐳ"}}:::plan
-    PgClassExpression314 --> Lambda315
-    PgClassExpression316{{"PgClassExpression[316∈12] ➊<br />ᐸ__single_t...ems__.”id”ᐳ"}}:::plan
-    PgSelectSingle127 --> PgClassExpression316
-    PgClassExpression318{{"PgClassExpression[318∈12] ➊<br />ᐸ__single_t...s__.”type”ᐳ"}}:::plan
-    PgSelectSingle127 --> PgClassExpression318
-    Lambda319{{"Lambda[319∈12] ➊<br />ᐸSingleTableItem_typeNameFromTypeᐳ"}}:::plan
-    PgClassExpression318 --> Lambda319
-    List472{{"List[472∈19] ➊<br />ᐸ420,312ᐳ<br />ᐳSingleTableTopic"}}:::plan
-    Constant420 & PgClassExpression312 --> List472
-    List477{{"List[477∈19] ➊<br />ᐸ425,312ᐳ<br />ᐳSingleTablePost"}}:::plan
-    Constant425 & PgClassExpression312 --> List477
-    List482{{"List[482∈19] ➊<br />ᐸ430,312ᐳ<br />ᐳSingleTableDivider"}}:::plan
-    Constant430 & PgClassExpression312 --> List482
-    List487{{"List[487∈19] ➊<br />ᐸ435,312ᐳ<br />ᐳSingleTableChecklist"}}:::plan
-    Constant435 & PgClassExpression312 --> List487
-    List492{{"List[492∈19] ➊<br />ᐸ440,312ᐳ<br />ᐳSingleTableChecklistItem"}}:::plan
-    Constant440 & PgClassExpression312 --> List492
-    Lambda473{{"Lambda[473∈19] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List472 --> Lambda473
-    Lambda478{{"Lambda[478∈19] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List477 --> Lambda478
-    Lambda483{{"Lambda[483∈19] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List482 --> Lambda483
-    Lambda488{{"Lambda[488∈19] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List487 --> Lambda488
-    Lambda493{{"Lambda[493∈19] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List492 --> Lambda493
-    List497{{"List[497∈20] ➊<br />ᐸ420,316ᐳ<br />ᐳSingleTableTopic"}}:::plan
-    Constant420 & PgClassExpression316 --> List497
-    List502{{"List[502∈20] ➊<br />ᐸ425,316ᐳ<br />ᐳSingleTablePost"}}:::plan
-    Constant425 & PgClassExpression316 --> List502
-    List507{{"List[507∈20] ➊<br />ᐸ430,316ᐳ<br />ᐳSingleTableDivider"}}:::plan
-    Constant430 & PgClassExpression316 --> List507
-    List512{{"List[512∈20] ➊<br />ᐸ435,316ᐳ<br />ᐳSingleTableChecklist"}}:::plan
-    Constant435 & PgClassExpression316 --> List512
-    List517{{"List[517∈20] ➊<br />ᐸ440,316ᐳ<br />ᐳSingleTableChecklistItem"}}:::plan
-    Constant440 & PgClassExpression316 --> List517
-    Lambda498{{"Lambda[498∈20] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List497 --> Lambda498
-    Lambda503{{"Lambda[503∈20] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List502 --> Lambda503
-    Lambda508{{"Lambda[508∈20] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List507 --> Lambda508
-    Lambda513{{"Lambda[513∈20] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List512 --> Lambda513
-    Lambda518{{"Lambda[518∈20] ➊^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List517 --> Lambda518
 
     %% define steps
     classDef bucket0 stroke:#696969

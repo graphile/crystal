@@ -122,6 +122,24 @@ graph TD
     Access41{{"Access[41∈2] ➊<br />ᐸ36.tᐳ"}}:::plan
     Access41 --> PgClassExpression40
     PgInsertSingle36 --> Access41
+    PgInsertSingle54[["PgInsertSingle[54∈3] ➊<br />ᐸrelational_posts(id,title,description,note)ᐳ"]]:::sideeffectplan
+    Object51{{"Object[51∈3] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    PgClassExpression52{{"PgClassExpression[52∈3] ➊<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
+    Object51 & PgClassExpression52 & Constant418 & Constant419 & Constant420 --> PgInsertSingle54
+    PgInsertSingle48[["PgInsertSingle[48∈3] ➊<br />ᐸrelational_items(type,author_id)ᐳ"]]:::sideeffectplan
+    Object51 & Constant10 & Constant11 --> PgInsertSingle48
+    Access49{{"Access[49∈3] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access50{{"Access[50∈3] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access49 & Access50 --> Object51
+    __Value2 --> Access49
+    __Value2 --> Access50
+    Access53{{"Access[53∈3] ➊<br />ᐸ48.tᐳ"}}:::plan
+    Access53 --> PgClassExpression52
+    PgInsertSingle48 --> Access53
+    PgClassExpression58{{"PgClassExpression[58∈3] ➊<br />ᐸ__relational_posts__ᐳ"}}:::plan
+    Access59{{"Access[59∈3] ➊<br />ᐸ54.tᐳ"}}:::plan
+    Access59 --> PgClassExpression58
+    PgInsertSingle54 --> Access59
     PgSelect61[["PgSelect[61∈5] ➊<br />ᐸrelational_itemsᐳ"]]:::plan
     Object33 & Constant421 --> PgSelect61
     PgSelect69[["PgSelect[69∈5] ➊<br />ᐸrelational_itemsᐳ"]]:::plan
@@ -164,6 +182,48 @@ graph TD
     PgSelectSingle79 --> PgClassExpression190
     Lambda191{{"Lambda[191∈5] ➊<br />ᐸrelationalItemTypeNameFromTypeᐳ"}}:::plan
     PgClassExpression190 --> Lambda191
+    PgSelect81[["PgSelect[81∈6] ➊<br />ᐸrelational_itemsᐳ"]]:::plan
+    Object51 & Constant421 --> PgSelect81
+    PgSelect89[["PgSelect[89∈6] ➊<br />ᐸrelational_itemsᐳ"]]:::plan
+    Object51 & Constant422 --> PgSelect89
+    PgSelect95[["PgSelect[95∈6] ➊<br />ᐸrelational_itemsᐳ"]]:::plan
+    Object51 & Constant423 --> PgSelect95
+    First85{{"First[85∈6] ➊"}}:::plan
+    PgSelectRows86[["PgSelectRows[86∈6] ➊"]]:::plan
+    PgSelectRows86 --> First85
+    PgSelect81 --> PgSelectRows86
+    PgSelectSingle87{{"PgSelectSingle[87∈6] ➊<br />ᐸrelational_itemsᐳ"}}:::plan
+    First85 --> PgSelectSingle87
+    First91{{"First[91∈6] ➊"}}:::plan
+    PgSelectRows92[["PgSelectRows[92∈6] ➊"]]:::plan
+    PgSelectRows92 --> First91
+    PgSelect89 --> PgSelectRows92
+    PgSelectSingle93{{"PgSelectSingle[93∈6] ➊<br />ᐸrelational_itemsᐳ"}}:::plan
+    First91 --> PgSelectSingle93
+    First97{{"First[97∈6] ➊"}}:::plan
+    PgSelectRows98[["PgSelectRows[98∈6] ➊"]]:::plan
+    PgSelectRows98 --> First97
+    PgSelect95 --> PgSelectRows98
+    PgSelectSingle99{{"PgSelectSingle[99∈6] ➊<br />ᐸrelational_itemsᐳ"}}:::plan
+    First97 --> PgSelectSingle99
+    PgClassExpression232{{"PgClassExpression[232∈6] ➊<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
+    PgSelectSingle87 --> PgClassExpression232
+    PgClassExpression234{{"PgClassExpression[234∈6] ➊<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
+    PgSelectSingle87 --> PgClassExpression234
+    Lambda235{{"Lambda[235∈6] ➊<br />ᐸrelationalItemTypeNameFromTypeᐳ"}}:::plan
+    PgClassExpression234 --> Lambda235
+    PgClassExpression276{{"PgClassExpression[276∈6] ➊<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
+    PgSelectSingle93 --> PgClassExpression276
+    PgClassExpression278{{"PgClassExpression[278∈6] ➊<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
+    PgSelectSingle93 --> PgClassExpression278
+    Lambda279{{"Lambda[279∈6] ➊<br />ᐸrelationalItemTypeNameFromTypeᐳ"}}:::plan
+    PgClassExpression278 --> Lambda279
+    PgClassExpression320{{"PgClassExpression[320∈6] ➊<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
+    PgSelectSingle99 --> PgClassExpression320
+    PgClassExpression322{{"PgClassExpression[322∈6] ➊<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
+    PgSelectSingle99 --> PgClassExpression322
+    Lambda323{{"Lambda[323∈6] ➊<br />ᐸrelationalItemTypeNameFromTypeᐳ"}}:::plan
+    PgClassExpression322 --> Lambda323
     PgSelect105[["PgSelect[105∈15] ➊<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic"]]:::plan
     Object33 & PgClassExpression100 --> PgSelect105
     First109{{"First[109∈15] ➊^"}}:::plan
@@ -302,66 +362,6 @@ graph TD
     PgSelect225 --> PgSelectRows230
     PgSelectSingle231{{"PgSelectSingle[231∈29] ➊^<br />ᐸrelational_checklist_itemsᐳ"}}:::plan
     First229 --> PgSelectSingle231
-    PgInsertSingle54[["PgInsertSingle[54∈3] ➊<br />ᐸrelational_posts(id,title,description,note)ᐳ"]]:::sideeffectplan
-    Object51{{"Object[51∈3] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    PgClassExpression52{{"PgClassExpression[52∈3] ➊<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
-    Object51 & PgClassExpression52 & Constant418 & Constant419 & Constant420 --> PgInsertSingle54
-    PgInsertSingle48[["PgInsertSingle[48∈3] ➊<br />ᐸrelational_items(type,author_id)ᐳ"]]:::sideeffectplan
-    Object51 & Constant10 & Constant11 --> PgInsertSingle48
-    Access49{{"Access[49∈3] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access50{{"Access[50∈3] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
-    Access49 & Access50 --> Object51
-    __Value2 --> Access49
-    __Value2 --> Access50
-    Access53{{"Access[53∈3] ➊<br />ᐸ48.tᐳ"}}:::plan
-    Access53 --> PgClassExpression52
-    PgInsertSingle48 --> Access53
-    PgClassExpression58{{"PgClassExpression[58∈3] ➊<br />ᐸ__relational_posts__ᐳ"}}:::plan
-    Access59{{"Access[59∈3] ➊<br />ᐸ54.tᐳ"}}:::plan
-    Access59 --> PgClassExpression58
-    PgInsertSingle54 --> Access59
-    PgSelect81[["PgSelect[81∈6] ➊<br />ᐸrelational_itemsᐳ"]]:::plan
-    Object51 & Constant421 --> PgSelect81
-    PgSelect89[["PgSelect[89∈6] ➊<br />ᐸrelational_itemsᐳ"]]:::plan
-    Object51 & Constant422 --> PgSelect89
-    PgSelect95[["PgSelect[95∈6] ➊<br />ᐸrelational_itemsᐳ"]]:::plan
-    Object51 & Constant423 --> PgSelect95
-    First85{{"First[85∈6] ➊"}}:::plan
-    PgSelectRows86[["PgSelectRows[86∈6] ➊"]]:::plan
-    PgSelectRows86 --> First85
-    PgSelect81 --> PgSelectRows86
-    PgSelectSingle87{{"PgSelectSingle[87∈6] ➊<br />ᐸrelational_itemsᐳ"}}:::plan
-    First85 --> PgSelectSingle87
-    First91{{"First[91∈6] ➊"}}:::plan
-    PgSelectRows92[["PgSelectRows[92∈6] ➊"]]:::plan
-    PgSelectRows92 --> First91
-    PgSelect89 --> PgSelectRows92
-    PgSelectSingle93{{"PgSelectSingle[93∈6] ➊<br />ᐸrelational_itemsᐳ"}}:::plan
-    First91 --> PgSelectSingle93
-    First97{{"First[97∈6] ➊"}}:::plan
-    PgSelectRows98[["PgSelectRows[98∈6] ➊"]]:::plan
-    PgSelectRows98 --> First97
-    PgSelect95 --> PgSelectRows98
-    PgSelectSingle99{{"PgSelectSingle[99∈6] ➊<br />ᐸrelational_itemsᐳ"}}:::plan
-    First97 --> PgSelectSingle99
-    PgClassExpression232{{"PgClassExpression[232∈6] ➊<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
-    PgSelectSingle87 --> PgClassExpression232
-    PgClassExpression234{{"PgClassExpression[234∈6] ➊<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
-    PgSelectSingle87 --> PgClassExpression234
-    Lambda235{{"Lambda[235∈6] ➊<br />ᐸrelationalItemTypeNameFromTypeᐳ"}}:::plan
-    PgClassExpression234 --> Lambda235
-    PgClassExpression276{{"PgClassExpression[276∈6] ➊<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
-    PgSelectSingle93 --> PgClassExpression276
-    PgClassExpression278{{"PgClassExpression[278∈6] ➊<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
-    PgSelectSingle93 --> PgClassExpression278
-    Lambda279{{"Lambda[279∈6] ➊<br />ᐸrelationalItemTypeNameFromTypeᐳ"}}:::plan
-    PgClassExpression278 --> Lambda279
-    PgClassExpression320{{"PgClassExpression[320∈6] ➊<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
-    PgSelectSingle99 --> PgClassExpression320
-    PgClassExpression322{{"PgClassExpression[322∈6] ➊<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
-    PgSelectSingle99 --> PgClassExpression322
-    Lambda323{{"Lambda[323∈6] ➊<br />ᐸrelationalItemTypeNameFromTypeᐳ"}}:::plan
-    PgClassExpression322 --> Lambda323
     PgSelect237[["PgSelect[237∈30] ➊<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic"]]:::plan
     Object51 & PgClassExpression232 --> PgSelect237
     First241{{"First[241∈30] ➊^"}}:::plan

@@ -88,6 +88,14 @@ graph TD
     List63 --> Lambda64
     List67 --> Lambda68
     List71 --> Lambda72
+    __Item17[/"__Item[17∈2]<br />ᐸ14ᐳ"\]:::itemplan
+    PgSelectRows14 ==> __Item17
+    PgSelectSingle18{{"PgSelectSingle[18∈2]<br />ᐸcompound_keyᐳ"}}:::plan
+    __Item17 --> PgSelectSingle18
+    PgClassExpression35{{"PgClassExpression[35∈2]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
+    PgSelectSingle18 --> PgClassExpression35
+    PgClassExpression36{{"PgClassExpression[36∈2]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
+    PgSelectSingle18 --> PgClassExpression36
     __Item41[/"__Item[41∈3]<br />ᐸ37ᐳ"\]:::itemplan
     PgSelectRows37 ==> __Item41
     PgSelectSingle42{{"PgSelectSingle[42∈3]<br />ᐸpostᐳ"}}:::plan
@@ -120,14 +128,6 @@ graph TD
     PgSelectSingle48 --> PgClassExpression55
     PgClassExpression56{{"PgClassExpression[56∈6]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
     PgSelectSingle48 --> PgClassExpression56
-    __Item17[/"__Item[17∈2]<br />ᐸ14ᐳ"\]:::itemplan
-    PgSelectRows14 ==> __Item17
-    PgSelectSingle18{{"PgSelectSingle[18∈2]<br />ᐸcompound_keyᐳ"}}:::plan
-    __Item17 --> PgSelectSingle18
-    PgClassExpression35{{"PgClassExpression[35∈2]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
-    PgSelectSingle18 --> PgClassExpression35
-    PgClassExpression36{{"PgClassExpression[36∈2]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
-    PgSelectSingle18 --> PgClassExpression36
 
     %% define steps
     classDef bucket0 stroke:#696969

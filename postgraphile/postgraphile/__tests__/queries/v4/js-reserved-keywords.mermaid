@@ -81,28 +81,18 @@ graph TD
     PgClassExpression34{{"PgClassExpression[34∈1] ➊<br />ᐸ__machine__.”input”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression34
     List87 --> Lambda88
-    PgClassExpression46{{"PgClassExpression[46∈4] ➊<br />ᐸ__building__.”id”ᐳ"}}:::plan
-    PgSelectSingle33 --> PgClassExpression46
-    PgClassExpression47{{"PgClassExpression[47∈4] ➊<br />ᐸ__building...nstructor”ᐳ"}}:::plan
-    PgSelectSingle33 --> PgClassExpression47
     PgClassExpression43{{"PgClassExpression[43∈2] ➊<br />ᐸ__building__.”name”ᐳ"}}:::plan
     PgSelectSingle19 --> PgClassExpression43
     PgSelectRows51[["PgSelectRows[51∈2] ➊"]]:::plan
     Lambda92 --> PgSelectRows51
-    __Item72[/"__Item[72∈7]<br />ᐸ51ᐳ"\]:::itemplan
-    PgSelectRows51 ==> __Item72
-    PgSelectSingle73{{"PgSelectSingle[73∈7]<br />ᐸmachineᐳ"}}:::plan
-    __Item72 --> PgSelectSingle73
-    PgClassExpression82{{"PgClassExpression[82∈10]<br />ᐸ__machine__.”id”ᐳ"}}:::plan
-    PgSelectSingle73 --> PgClassExpression82
-    PgClassExpression83{{"PgClassExpression[83∈10]<br />ᐸ__machine_...nstructor”ᐳ"}}:::plan
-    PgSelectSingle73 --> PgClassExpression83
-    PgClassExpression84{{"PgClassExpression[84∈10]<br />ᐸ__machine__.”input”ᐳ"}}:::plan
-    PgSelectSingle73 --> PgClassExpression84
     PgSelect44[["PgSelect[44∈3] ➊<br />ᐸrelational_itemsᐳ"]]:::plan
     Object10 & Connection24 --> PgSelect44
     PgSelectRows45[["PgSelectRows[45∈3] ➊"]]:::plan
     PgSelect44 --> PgSelectRows45
+    PgClassExpression46{{"PgClassExpression[46∈4] ➊<br />ᐸ__building__.”id”ᐳ"}}:::plan
+    PgSelectSingle33 --> PgClassExpression46
+    PgClassExpression47{{"PgClassExpression[47∈4] ➊<br />ᐸ__building...nstructor”ᐳ"}}:::plan
+    PgSelectSingle33 --> PgClassExpression47
     __Item49[/"__Item[49∈5]<br />ᐸ45ᐳ"\]:::itemplan
     PgSelectRows45 ==> __Item49
     PgSelectSingle50{{"PgSelectSingle[50∈5]<br />ᐸrelational_itemsᐳ"}}:::plan
@@ -115,6 +105,10 @@ graph TD
     PgClassExpression54 --> Lambda55
     PgClassExpression75{{"PgClassExpression[75∈5]<br />ᐸ__relation...nstructor”ᐳ"}}:::plan
     PgSelectSingle50 --> PgClassExpression75
+    __Item72[/"__Item[72∈7]<br />ᐸ51ᐳ"\]:::itemplan
+    PgSelectRows51 ==> __Item72
+    PgSelectSingle73{{"PgSelectSingle[73∈7]<br />ᐸmachineᐳ"}}:::plan
+    __Item72 --> PgSelectSingle73
     PgSelect57[["PgSelect[57∈8]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic"]]:::plan
     Object10 & PgClassExpression52 --> PgSelect57
     First61{{"First[61∈8]^"}}:::plan
@@ -135,6 +129,12 @@ graph TD
     First69 --> PgSelectSingle71
     PgClassExpression81{{"PgClassExpression[81∈9]^<br />ᐸ__relation...s__.”note”ᐳ"}}:::plan
     PgSelectSingle71 --> PgClassExpression81
+    PgClassExpression82{{"PgClassExpression[82∈10]<br />ᐸ__machine__.”id”ᐳ"}}:::plan
+    PgSelectSingle73 --> PgClassExpression82
+    PgClassExpression83{{"PgClassExpression[83∈10]<br />ᐸ__machine_...nstructor”ᐳ"}}:::plan
+    PgSelectSingle73 --> PgClassExpression83
+    PgClassExpression84{{"PgClassExpression[84∈10]<br />ᐸ__machine__.”input”ᐳ"}}:::plan
+    PgSelectSingle73 --> PgClassExpression84
 
     %% define steps
     classDef bucket0 stroke:#696969

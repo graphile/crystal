@@ -62,18 +62,6 @@ graph TD
     Object11 & Connection12 --> PgSelect32
     PgSelectRows43[["PgSelectRows[43∈1] ➊"]]:::plan
     PgSelect32 --> PgSelectRows43
-    __Item44[/"__Item[44∈4]<br />ᐸ43ᐳ"\]:::itemplan
-    PgSelectRows43 ==> __Item44
-    PgSelectSingle45{{"PgSelectSingle[45∈4]<br />ᐸlarge_node_idᐳ"}}:::plan
-    __Item44 --> PgSelectSingle45
-    List48{{"List[48∈5]<br />ᐸ33,47ᐳ"}}:::plan
-    PgClassExpression47{{"PgClassExpression[47∈5]<br />ᐸ__large_node_id__.”id”ᐳ"}}:::plan
-    Constant33 & PgClassExpression47 --> List48
-    PgSelectSingle45 --> PgClassExpression47
-    Lambda49{{"Lambda[49∈5]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List48 --> Lambda49
-    PgClassExpression50{{"PgClassExpression[50∈5]<br />ᐸ__large_no...d__.”text”ᐳ"}}:::plan
-    PgSelectSingle45 --> PgClassExpression50
     List35{{"List[35∈2] ➊<br />ᐸ33,34ᐳ"}}:::plan
     PgClassExpression34{{"PgClassExpression[34∈2] ➊<br />ᐸ__large_node_id__.”id”ᐳ"}}:::plan
     Constant33 & PgClassExpression34 --> List35
@@ -90,6 +78,18 @@ graph TD
     List40 --> Lambda41
     PgClassExpression42{{"PgClassExpression[42∈3] ➊<br />ᐸ__large_no...d__.”text”ᐳ"}}:::plan
     PgSelectSingle31 --> PgClassExpression42
+    __Item44[/"__Item[44∈4]<br />ᐸ43ᐳ"\]:::itemplan
+    PgSelectRows43 ==> __Item44
+    PgSelectSingle45{{"PgSelectSingle[45∈4]<br />ᐸlarge_node_idᐳ"}}:::plan
+    __Item44 --> PgSelectSingle45
+    List48{{"List[48∈5]<br />ᐸ33,47ᐳ"}}:::plan
+    PgClassExpression47{{"PgClassExpression[47∈5]<br />ᐸ__large_node_id__.”id”ᐳ"}}:::plan
+    Constant33 & PgClassExpression47 --> List48
+    PgSelectSingle45 --> PgClassExpression47
+    Lambda49{{"Lambda[49∈5]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List48 --> Lambda49
+    PgClassExpression50{{"PgClassExpression[50∈5]<br />ᐸ__large_no...d__.”text”ᐳ"}}:::plan
+    PgSelectSingle45 --> PgClassExpression50
 
     %% define steps
     classDef bucket0 stroke:#696969

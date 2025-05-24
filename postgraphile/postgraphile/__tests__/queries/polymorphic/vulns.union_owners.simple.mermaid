@@ -90,6 +90,27 @@ graph TD
     PgSelectSingle30 --> PgClassExpression43
     Access115{{"Access[115∈4]^<br />ᐸ59.itemsᐳ"}}:::plan
     PgUnionAll59 --> Access115
+    PgUnionAll60[["PgUnionAll[60∈5]^<br />ᐸPerson,Organization,Person,Organizationᐳ"]]:::plan
+    PgClassExpression50{{"PgClassExpression[50∈5]^<br />ᐸ__third_pa...ies__.”id”ᐳ"}}:::plan
+    Connection58{{"Connection[58∈5] ➊<br />ᐸ54ᐳ<br />ᐳThirdPartyVulnerability"}}:::plan
+    Object11 & PgClassExpression50 & Connection58 --> PgUnionAll60
+    PgSelect32[["PgSelect[32∈5]<br />ᐸthird_party_vulnerabilitiesᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
+    Object11 & Access23 --> PgSelect32
+    List51{{"List[51∈5]^<br />ᐸ49,50ᐳ"}}:::plan
+    Constant49 & PgClassExpression50 --> List51
+    First36{{"First[36∈5]^"}}:::plan
+    PgSelectRows37[["PgSelectRows[37∈5]^"]]:::plan
+    PgSelectRows37 --> First36
+    PgSelect32 --> PgSelectRows37
+    PgSelectSingle38{{"PgSelectSingle[38∈5]^<br />ᐸthird_party_vulnerabilitiesᐳ"}}:::plan
+    First36 --> PgSelectSingle38
+    PgSelectSingle38 --> PgClassExpression50
+    Lambda52{{"Lambda[52∈5]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List51 --> Lambda52
+    PgClassExpression53{{"PgClassExpression[53∈5]^<br />ᐸ__third_pa...s__.”name”ᐳ"}}:::plan
+    PgSelectSingle38 --> PgClassExpression53
+    Access116{{"Access[116∈5]^<br />ᐸ60.itemsᐳ"}}:::plan
+    PgUnionAll60 --> Access116
     List70{{"List[70∈6]^<br />ᐸ67,68,69ᐳ"}}:::plan
     Access67{{"Access[67∈6]^<br />ᐸ63.0ᐳ"}}:::plan
     Access68{{"Access[68∈6]^<br />ᐸ63.1ᐳ"}}:::plan
@@ -100,6 +121,16 @@ graph TD
     __Item63 --> Access68
     Lambda71{{"Lambda[71∈6]^<br />ᐸtoSpecifierᐳ"}}:::plan
     List70 --> Lambda71
+    List75{{"List[75∈7]^<br />ᐸ72,73,74ᐳ"}}:::plan
+    Access72{{"Access[72∈7]^<br />ᐸ65.0ᐳ"}}:::plan
+    Access73{{"Access[73∈7]^<br />ᐸ65.1ᐳ"}}:::plan
+    Access72 & Access73 & Constant74 --> List75
+    __Item65[/"__Item[65∈7]<br />ᐸ116ᐳ<br />ᐳThirdPartyVulnerability"\]:::itemplan
+    Access116 ==> __Item65
+    __Item65 --> Access72
+    __Item65 --> Access73
+    Lambda76{{"Lambda[76∈7]^<br />ᐸtoSpecifierᐳ"}}:::plan
+    List75 --> Lambda76
     Access78{{"Access[78∈8]^<br />ᐸ77.__typenameᐳ"}}:::plan
     __Value77:::plan@{shape: docs, label: "__Combined[77∈8]<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability"}
     __Value77 --> Access78
@@ -139,37 +170,6 @@ graph TD
     List102 --> Lambda103
     PgClassExpression104{{"PgClassExpression[104∈11]^<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle94 --> PgClassExpression104
-    PgUnionAll60[["PgUnionAll[60∈5]^<br />ᐸPerson,Organization,Person,Organizationᐳ"]]:::plan
-    PgClassExpression50{{"PgClassExpression[50∈5]^<br />ᐸ__third_pa...ies__.”id”ᐳ"}}:::plan
-    Connection58{{"Connection[58∈5] ➊<br />ᐸ54ᐳ<br />ᐳThirdPartyVulnerability"}}:::plan
-    Object11 & PgClassExpression50 & Connection58 --> PgUnionAll60
-    PgSelect32[["PgSelect[32∈5]<br />ᐸthird_party_vulnerabilitiesᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
-    Object11 & Access23 --> PgSelect32
-    List51{{"List[51∈5]^<br />ᐸ49,50ᐳ"}}:::plan
-    Constant49 & PgClassExpression50 --> List51
-    First36{{"First[36∈5]^"}}:::plan
-    PgSelectRows37[["PgSelectRows[37∈5]^"]]:::plan
-    PgSelectRows37 --> First36
-    PgSelect32 --> PgSelectRows37
-    PgSelectSingle38{{"PgSelectSingle[38∈5]^<br />ᐸthird_party_vulnerabilitiesᐳ"}}:::plan
-    First36 --> PgSelectSingle38
-    PgSelectSingle38 --> PgClassExpression50
-    Lambda52{{"Lambda[52∈5]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List51 --> Lambda52
-    PgClassExpression53{{"PgClassExpression[53∈5]^<br />ᐸ__third_pa...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle38 --> PgClassExpression53
-    Access116{{"Access[116∈5]^<br />ᐸ60.itemsᐳ"}}:::plan
-    PgUnionAll60 --> Access116
-    List75{{"List[75∈7]^<br />ᐸ72,73,74ᐳ"}}:::plan
-    Access72{{"Access[72∈7]^<br />ᐸ65.0ᐳ"}}:::plan
-    Access73{{"Access[73∈7]^<br />ᐸ65.1ᐳ"}}:::plan
-    Access72 & Access73 & Constant74 --> List75
-    __Item65[/"__Item[65∈7]<br />ᐸ116ᐳ<br />ᐳThirdPartyVulnerability"\]:::itemplan
-    Access116 ==> __Item65
-    __Item65 --> Access72
-    __Item65 --> Access73
-    Lambda76{{"Lambda[76∈7]^<br />ᐸtoSpecifierᐳ"}}:::plan
-    List75 --> Lambda76
 
     %% define steps
     classDef bucket0 stroke:#696969

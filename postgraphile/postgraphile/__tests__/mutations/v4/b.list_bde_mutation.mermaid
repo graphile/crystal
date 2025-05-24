@@ -90,8 +90,6 @@ graph TD
     PgSelectSingle19 --> PgClassExpression20
     Object21{{"Object[21∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgClassExpression20 --> Object21
-    __Item74[/"__Item[74∈9]<br />ᐸ20ᐳ"\]:::itemplan
-    PgClassExpression20 ==> __Item74
     PgSelect29[["PgSelect[29∈2] ➊<br />ᐸlist_bde_mutation(mutation)ᐳ"]]:::sideeffectplan
     Object32{{"Object[32∈2] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     PgFromExpression33{{"PgFromExpression[33∈2] ➊"}}:::plan
@@ -112,8 +110,6 @@ graph TD
     PgSelectSingle36 --> PgClassExpression37
     Object38{{"Object[38∈2] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgClassExpression37 --> Object38
-    __Item75[/"__Item[75∈10]<br />ᐸ37ᐳ"\]:::itemplan
-    PgClassExpression37 ==> __Item75
     PgSelect46[["PgSelect[46∈3] ➊<br />ᐸlist_bde_mutation(mutation)ᐳ"]]:::sideeffectplan
     Object49{{"Object[49∈3] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     PgFromExpression50{{"PgFromExpression[50∈3] ➊"}}:::plan
@@ -134,8 +130,6 @@ graph TD
     PgSelectSingle53 --> PgClassExpression54
     Object55{{"Object[55∈3] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgClassExpression54 --> Object55
-    __Item76[/"__Item[76∈11]<br />ᐸ54ᐳ"\]:::itemplan
-    PgClassExpression54 ==> __Item76
     PgSelect63[["PgSelect[63∈4] ➊<br />ᐸlist_bde_mutation(mutation)ᐳ"]]:::sideeffectplan
     Object66{{"Object[66∈4] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     PgFromExpression67{{"PgFromExpression[67∈4] ➊"}}:::plan
@@ -156,6 +150,12 @@ graph TD
     PgSelectSingle70 --> PgClassExpression71
     Object72{{"Object[72∈4] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgClassExpression71 --> Object72
+    __Item74[/"__Item[74∈9]<br />ᐸ20ᐳ"\]:::itemplan
+    PgClassExpression20 ==> __Item74
+    __Item75[/"__Item[75∈10]<br />ᐸ37ᐳ"\]:::itemplan
+    PgClassExpression37 ==> __Item75
+    __Item76[/"__Item[76∈11]<br />ᐸ54ᐳ"\]:::itemplan
+    PgClassExpression54 ==> __Item76
     __Item77[/"__Item[77∈12]<br />ᐸ71ᐳ"\]:::itemplan
     PgClassExpression71 ==> __Item77
 

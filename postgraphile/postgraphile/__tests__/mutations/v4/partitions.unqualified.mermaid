@@ -56,6 +56,16 @@ graph TD
     Object16 & ApplyInput17 --> PgInsertSingle13
     Object18{{"Object[18∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle13 --> Object18
+    PgUpdateSingle25[["PgUpdateSingle[25∈2] ➊<br />ᐸmeasurements(timestamp,key;)ᐳ"]]:::sideeffectplan
+    Object28{{"Object[28∈2] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object28 & Constant59 & Constant60 & ApplyInput29 --> PgUpdateSingle25
+    Access26{{"Access[26∈2] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access27{{"Access[27∈2] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access26 & Access27 --> Object28
+    __Value2 --> Access26
+    __Value2 --> Access27
+    Object30{{"Object[30∈2] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgUpdateSingle25 --> Object30
     PgSelect36[["PgSelect[36∈5] ➊<br />ᐸusersᐳ"]]:::plan
     PgClassExpression35{{"PgClassExpression[35∈5] ➊<br />ᐸ__measurem....”user_id”ᐳ"}}:::plan
     Object16 & PgClassExpression35 --> PgSelect36
@@ -74,20 +84,6 @@ graph TD
     PgSelect36 --> PgSelectRows41
     PgSelectSingle42{{"PgSelectSingle[42∈5] ➊<br />ᐸusersᐳ"}}:::plan
     First40 --> PgSelectSingle42
-    PgClassExpression55{{"PgClassExpression[55∈7] ➊<br />ᐸ__users__.”id”ᐳ"}}:::plan
-    PgSelectSingle42 --> PgClassExpression55
-    PgClassExpression56{{"PgClassExpression[56∈7] ➊<br />ᐸ__users__.”name”ᐳ"}}:::plan
-    PgSelectSingle42 --> PgClassExpression56
-    PgUpdateSingle25[["PgUpdateSingle[25∈2] ➊<br />ᐸmeasurements(timestamp,key;)ᐳ"]]:::sideeffectplan
-    Object28{{"Object[28∈2] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object28 & Constant59 & Constant60 & ApplyInput29 --> PgUpdateSingle25
-    Access26{{"Access[26∈2] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access27{{"Access[27∈2] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
-    Access26 & Access27 --> Object28
-    __Value2 --> Access26
-    __Value2 --> Access27
-    Object30{{"Object[30∈2] ➊<br />ᐸ{result}ᐳ"}}:::plan
-    PgUpdateSingle25 --> Object30
     PgSelect48[["PgSelect[48∈6] ➊<br />ᐸusersᐳ"]]:::plan
     PgClassExpression47{{"PgClassExpression[47∈6] ➊<br />ᐸ__measurem....”user_id”ᐳ"}}:::plan
     Object28 & PgClassExpression47 --> PgSelect48
@@ -106,6 +102,10 @@ graph TD
     PgSelect48 --> PgSelectRows53
     PgSelectSingle54{{"PgSelectSingle[54∈6] ➊<br />ᐸusersᐳ"}}:::plan
     First52 --> PgSelectSingle54
+    PgClassExpression55{{"PgClassExpression[55∈7] ➊<br />ᐸ__users__.”id”ᐳ"}}:::plan
+    PgSelectSingle42 --> PgClassExpression55
+    PgClassExpression56{{"PgClassExpression[56∈7] ➊<br />ᐸ__users__.”name”ᐳ"}}:::plan
+    PgSelectSingle42 --> PgClassExpression56
     PgClassExpression57{{"PgClassExpression[57∈8] ➊<br />ᐸ__users__.”id”ᐳ"}}:::plan
     PgSelectSingle54 --> PgClassExpression57
     PgClassExpression58{{"PgClassExpression[58∈8] ➊<br />ᐸ__users__.”name”ᐳ"}}:::plan

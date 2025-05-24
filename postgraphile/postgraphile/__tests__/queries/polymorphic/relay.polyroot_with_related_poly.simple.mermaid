@@ -92,93 +92,6 @@ graph TD
     PgSelectSingle73 --> PgClassExpression122
     Object123{{"Object[123∈4]^<br />ᐸ{id}ᐳ"}}:::plan
     PgClassExpression122 --> Object123
-    PgSelect134[["PgSelect[134∈9]^<br />ᐸrelational_itemsᐳ"]]:::plan
-    Access133{{"Access[133∈9]^<br />ᐸ132.idᐳ"}}:::plan
-    Object11 & Access133 --> PgSelect134
-    __Value132:::plan@{shape: docs, label: "__Combined[132∈9]<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem"}
-    __Value132 --> Access133
-    First138{{"First[138∈9]^"}}:::plan
-    PgSelectRows139[["PgSelectRows[139∈9]^"]]:::plan
-    PgSelectRows139 --> First138
-    PgSelect134 --> PgSelectRows139
-    PgSelectSingle140{{"PgSelectSingle[140∈9]^<br />ᐸrelational_itemsᐳ"}}:::plan
-    First138 --> PgSelectSingle140
-    PgClassExpression141{{"PgClassExpression[141∈9]^<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
-    PgSelectSingle140 --> PgClassExpression141
-    Lambda142{{"Lambda[142∈9]^<br />ᐸRelationalItem_typeNameFromTypeᐳ"}}:::plan
-    PgClassExpression141 --> Lambda142
-    PgClassExpression143{{"PgClassExpression[143∈9]^<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
-    PgSelectSingle140 --> PgClassExpression143
-    PgSelect144[["PgSelect[144∈11]<br />ᐸrelational_topicsᐳ<br />(5) ...ᐳRelationalTopic"]]:::plan
-    Object11 & PgClassExpression143 --> PgSelect144
-    List185{{"List[185∈11]^<br />ᐸ62,184ᐳ"}}:::plan
-    PgClassExpression184{{"PgClassExpression[184∈11]^<br />ᐸ__relation...c_item_id”ᐳ"}}:::plan
-    Constant62 & PgClassExpression184 --> List185
-    First148{{"First[148∈11]^"}}:::plan
-    PgSelectRows149[["PgSelectRows[149∈11]^"]]:::plan
-    PgSelectRows149 --> First148
-    PgSelect144 --> PgSelectRows149
-    PgSelectSingle150{{"PgSelectSingle[150∈11]^<br />ᐸrelational_topicsᐳ"}}:::plan
-    First148 --> PgSelectSingle150
-    PgSelectSingle150 --> PgClassExpression184
-    Lambda186{{"Lambda[186∈11]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List185 --> Lambda186
-    PgSelect152[["PgSelect[152∈12]<br />ᐸrelational_postsᐳ<br />(5) ...ᐳRelationalPost"]]:::plan
-    Object11 & PgClassExpression143 --> PgSelect152
-    List190{{"List[190∈12]^<br />ᐸ74,189ᐳ"}}:::plan
-    PgClassExpression189{{"PgClassExpression[189∈12]^<br />ᐸ__relation...t_item_id”ᐳ"}}:::plan
-    Constant74 & PgClassExpression189 --> List190
-    First156{{"First[156∈12]^"}}:::plan
-    PgSelectRows157[["PgSelectRows[157∈12]^"]]:::plan
-    PgSelectRows157 --> First156
-    PgSelect152 --> PgSelectRows157
-    PgSelectSingle158{{"PgSelectSingle[158∈12]^<br />ᐸrelational_postsᐳ"}}:::plan
-    First156 --> PgSelectSingle158
-    PgSelectSingle158 --> PgClassExpression189
-    Lambda191{{"Lambda[191∈12]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List190 --> Lambda191
-    PgSelect160[["PgSelect[160∈13]<br />ᐸrelational_dividersᐳ<br />(5) ...ᐳRelationalDivider"]]:::plan
-    Object11 & PgClassExpression143 --> PgSelect160
-    List195{{"List[195∈13]^<br />ᐸ86,194ᐳ"}}:::plan
-    PgClassExpression194{{"PgClassExpression[194∈13]^<br />ᐸ__relation...r_item_id”ᐳ"}}:::plan
-    Constant86 & PgClassExpression194 --> List195
-    First164{{"First[164∈13]^"}}:::plan
-    PgSelectRows165[["PgSelectRows[165∈13]^"]]:::plan
-    PgSelectRows165 --> First164
-    PgSelect160 --> PgSelectRows165
-    PgSelectSingle166{{"PgSelectSingle[166∈13]^<br />ᐸrelational_dividersᐳ"}}:::plan
-    First164 --> PgSelectSingle166
-    PgSelectSingle166 --> PgClassExpression194
-    Lambda196{{"Lambda[196∈13]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List195 --> Lambda196
-    PgSelect168[["PgSelect[168∈14]<br />ᐸrelational_checklistsᐳ<br />(5) ...ᐳRelationalChecklist"]]:::plan
-    Object11 & PgClassExpression143 --> PgSelect168
-    List200{{"List[200∈14]^<br />ᐸ98,199ᐳ"}}:::plan
-    PgClassExpression199{{"PgClassExpression[199∈14]^<br />ᐸ__relation...t_item_id”ᐳ"}}:::plan
-    Constant98 & PgClassExpression199 --> List200
-    First172{{"First[172∈14]^"}}:::plan
-    PgSelectRows173[["PgSelectRows[173∈14]^"]]:::plan
-    PgSelectRows173 --> First172
-    PgSelect168 --> PgSelectRows173
-    PgSelectSingle174{{"PgSelectSingle[174∈14]^<br />ᐸrelational_checklistsᐳ"}}:::plan
-    First172 --> PgSelectSingle174
-    PgSelectSingle174 --> PgClassExpression199
-    Lambda201{{"Lambda[201∈14]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List200 --> Lambda201
-    PgSelect176[["PgSelect[176∈15]<br />ᐸrelational_checklist_itemsᐳ<br />(5) ...ᐳRelationalChecklistItem"]]:::plan
-    Object11 & PgClassExpression143 --> PgSelect176
-    List205{{"List[205∈15]^<br />ᐸ110,204ᐳ"}}:::plan
-    PgClassExpression204{{"PgClassExpression[204∈15]^<br />ᐸ__relation...m_item_id”ᐳ"}}:::plan
-    Constant110 & PgClassExpression204 --> List205
-    First180{{"First[180∈15]^"}}:::plan
-    PgSelectRows181[["PgSelectRows[181∈15]^"]]:::plan
-    PgSelectRows181 --> First180
-    PgSelect176 --> PgSelectRows181
-    PgSelectSingle182{{"PgSelectSingle[182∈15]^<br />ᐸrelational_checklist_itemsᐳ"}}:::plan
-    First180 --> PgSelectSingle182
-    PgSelectSingle182 --> PgClassExpression204
-    Lambda206{{"Lambda[206∈15]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List205 --> Lambda206
     PgSelect31[["PgSelect[31∈5]<br />ᐸrelational_postsᐳ<br />ᐳRelationalPost"]]:::plan
     Object11 & PgClassExpression18 --> PgSelect31
     List76{{"List[76∈5]^<br />ᐸ74,75ᐳ"}}:::plan
@@ -283,6 +196,93 @@ graph TD
     PgSelectSingle121 --> PgClassExpression130
     Object131{{"Object[131∈8]^<br />ᐸ{id}ᐳ"}}:::plan
     PgClassExpression130 --> Object131
+    PgSelect134[["PgSelect[134∈9]^<br />ᐸrelational_itemsᐳ"]]:::plan
+    Access133{{"Access[133∈9]^<br />ᐸ132.idᐳ"}}:::plan
+    Object11 & Access133 --> PgSelect134
+    __Value132:::plan@{shape: docs, label: "__Combined[132∈9]<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem"}
+    __Value132 --> Access133
+    First138{{"First[138∈9]^"}}:::plan
+    PgSelectRows139[["PgSelectRows[139∈9]^"]]:::plan
+    PgSelectRows139 --> First138
+    PgSelect134 --> PgSelectRows139
+    PgSelectSingle140{{"PgSelectSingle[140∈9]^<br />ᐸrelational_itemsᐳ"}}:::plan
+    First138 --> PgSelectSingle140
+    PgClassExpression141{{"PgClassExpression[141∈9]^<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
+    PgSelectSingle140 --> PgClassExpression141
+    Lambda142{{"Lambda[142∈9]^<br />ᐸRelationalItem_typeNameFromTypeᐳ"}}:::plan
+    PgClassExpression141 --> Lambda142
+    PgClassExpression143{{"PgClassExpression[143∈9]^<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
+    PgSelectSingle140 --> PgClassExpression143
+    PgSelect144[["PgSelect[144∈11]<br />ᐸrelational_topicsᐳ<br />(5) ...ᐳRelationalTopic"]]:::plan
+    Object11 & PgClassExpression143 --> PgSelect144
+    List185{{"List[185∈11]^<br />ᐸ62,184ᐳ"}}:::plan
+    PgClassExpression184{{"PgClassExpression[184∈11]^<br />ᐸ__relation...c_item_id”ᐳ"}}:::plan
+    Constant62 & PgClassExpression184 --> List185
+    First148{{"First[148∈11]^"}}:::plan
+    PgSelectRows149[["PgSelectRows[149∈11]^"]]:::plan
+    PgSelectRows149 --> First148
+    PgSelect144 --> PgSelectRows149
+    PgSelectSingle150{{"PgSelectSingle[150∈11]^<br />ᐸrelational_topicsᐳ"}}:::plan
+    First148 --> PgSelectSingle150
+    PgSelectSingle150 --> PgClassExpression184
+    Lambda186{{"Lambda[186∈11]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List185 --> Lambda186
+    PgSelect152[["PgSelect[152∈12]<br />ᐸrelational_postsᐳ<br />(5) ...ᐳRelationalPost"]]:::plan
+    Object11 & PgClassExpression143 --> PgSelect152
+    List190{{"List[190∈12]^<br />ᐸ74,189ᐳ"}}:::plan
+    PgClassExpression189{{"PgClassExpression[189∈12]^<br />ᐸ__relation...t_item_id”ᐳ"}}:::plan
+    Constant74 & PgClassExpression189 --> List190
+    First156{{"First[156∈12]^"}}:::plan
+    PgSelectRows157[["PgSelectRows[157∈12]^"]]:::plan
+    PgSelectRows157 --> First156
+    PgSelect152 --> PgSelectRows157
+    PgSelectSingle158{{"PgSelectSingle[158∈12]^<br />ᐸrelational_postsᐳ"}}:::plan
+    First156 --> PgSelectSingle158
+    PgSelectSingle158 --> PgClassExpression189
+    Lambda191{{"Lambda[191∈12]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List190 --> Lambda191
+    PgSelect160[["PgSelect[160∈13]<br />ᐸrelational_dividersᐳ<br />(5) ...ᐳRelationalDivider"]]:::plan
+    Object11 & PgClassExpression143 --> PgSelect160
+    List195{{"List[195∈13]^<br />ᐸ86,194ᐳ"}}:::plan
+    PgClassExpression194{{"PgClassExpression[194∈13]^<br />ᐸ__relation...r_item_id”ᐳ"}}:::plan
+    Constant86 & PgClassExpression194 --> List195
+    First164{{"First[164∈13]^"}}:::plan
+    PgSelectRows165[["PgSelectRows[165∈13]^"]]:::plan
+    PgSelectRows165 --> First164
+    PgSelect160 --> PgSelectRows165
+    PgSelectSingle166{{"PgSelectSingle[166∈13]^<br />ᐸrelational_dividersᐳ"}}:::plan
+    First164 --> PgSelectSingle166
+    PgSelectSingle166 --> PgClassExpression194
+    Lambda196{{"Lambda[196∈13]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List195 --> Lambda196
+    PgSelect168[["PgSelect[168∈14]<br />ᐸrelational_checklistsᐳ<br />(5) ...ᐳRelationalChecklist"]]:::plan
+    Object11 & PgClassExpression143 --> PgSelect168
+    List200{{"List[200∈14]^<br />ᐸ98,199ᐳ"}}:::plan
+    PgClassExpression199{{"PgClassExpression[199∈14]^<br />ᐸ__relation...t_item_id”ᐳ"}}:::plan
+    Constant98 & PgClassExpression199 --> List200
+    First172{{"First[172∈14]^"}}:::plan
+    PgSelectRows173[["PgSelectRows[173∈14]^"]]:::plan
+    PgSelectRows173 --> First172
+    PgSelect168 --> PgSelectRows173
+    PgSelectSingle174{{"PgSelectSingle[174∈14]^<br />ᐸrelational_checklistsᐳ"}}:::plan
+    First172 --> PgSelectSingle174
+    PgSelectSingle174 --> PgClassExpression199
+    Lambda201{{"Lambda[201∈14]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List200 --> Lambda201
+    PgSelect176[["PgSelect[176∈15]<br />ᐸrelational_checklist_itemsᐳ<br />(5) ...ᐳRelationalChecklistItem"]]:::plan
+    Object11 & PgClassExpression143 --> PgSelect176
+    List205{{"List[205∈15]^<br />ᐸ110,204ᐳ"}}:::plan
+    PgClassExpression204{{"PgClassExpression[204∈15]^<br />ᐸ__relation...m_item_id”ᐳ"}}:::plan
+    Constant110 & PgClassExpression204 --> List205
+    First180{{"First[180∈15]^"}}:::plan
+    PgSelectRows181[["PgSelectRows[181∈15]^"]]:::plan
+    PgSelectRows181 --> First180
+    PgSelect176 --> PgSelectRows181
+    PgSelectSingle182{{"PgSelectSingle[182∈15]^<br />ᐸrelational_checklist_itemsᐳ"}}:::plan
+    First180 --> PgSelectSingle182
+    PgSelectSingle182 --> PgClassExpression204
+    Lambda206{{"Lambda[206∈15]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List205 --> Lambda206
 
     %% define steps
     classDef bucket0 stroke:#696969

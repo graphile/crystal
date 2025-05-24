@@ -65,6 +65,16 @@ graph TD
     Object18 & Constant79 & ApplyInput19 --> PgUpdateSingle15
     Object20{{"Object[20∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgUpdateSingle15 --> Object20
+    PgInsertSingle29[["PgInsertSingle[29∈2] ➊<br />ᐸtypes()ᐳ"]]:::sideeffectplan
+    Object32{{"Object[32∈2] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object32 & ApplyInput33 --> PgInsertSingle29
+    Access30{{"Access[30∈2] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access31{{"Access[31∈2] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access30 & Access31 --> Object32
+    __Value2 --> Access30
+    __Value2 --> Access31
+    Object34{{"Object[34∈2] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgInsertSingle29 --> Object34
     PgSelect41[["PgSelect[41∈5] ➊<br />ᐸfrmcdc_domainConstrainedCompoundTypeᐳ"]]:::plan
     PgFromExpression45{{"PgFromExpression[45∈5] ➊"}}:::plan
     Object18 & PgFromExpression45 --> PgSelect41
@@ -87,32 +97,6 @@ graph TD
     PgSelect41 --> PgSelectRows47
     PgSelectSingle48{{"PgSelectSingle[48∈5] ➊<br />ᐸfrmcdc_domainConstrainedCompoundTypeᐳ"}}:::plan
     First46 --> PgSelectSingle48
-    PgClassExpression64{{"PgClassExpression[64∈7] ➊<br />ᐸ__frmcdc_d...type__.”a”ᐳ"}}:::plan
-    PgSelectSingle48 --> PgClassExpression64
-    PgClassExpression65{{"PgClassExpression[65∈7] ➊<br />ᐸ__frmcdc_d...type__.”b”ᐳ"}}:::plan
-    PgSelectSingle48 --> PgClassExpression65
-    PgClassExpression66{{"PgClassExpression[66∈7] ➊<br />ᐸ__frmcdc_d...type__.”c”ᐳ"}}:::plan
-    PgSelectSingle48 --> PgClassExpression66
-    PgClassExpression67{{"PgClassExpression[67∈7] ➊<br />ᐸ__frmcdc_d...type__.”d”ᐳ"}}:::plan
-    PgSelectSingle48 --> PgClassExpression67
-    PgClassExpression68{{"PgClassExpression[68∈7] ➊<br />ᐸ__frmcdc_d...type__.”e”ᐳ"}}:::plan
-    PgSelectSingle48 --> PgClassExpression68
-    PgClassExpression69{{"PgClassExpression[69∈7] ➊<br />ᐸ__frmcdc_d...type__.”f”ᐳ"}}:::plan
-    PgSelectSingle48 --> PgClassExpression69
-    PgClassExpression70{{"PgClassExpression[70∈7] ➊<br />ᐸ__frmcdc_d....”foo_bar”ᐳ"}}:::plan
-    PgSelectSingle48 --> PgClassExpression70
-    __Item63[/"__Item[63∈9]<br />ᐸ39ᐳ"\]:::itemplan
-    PgClassExpression39 ==> __Item63
-    PgInsertSingle29[["PgInsertSingle[29∈2] ➊<br />ᐸtypes()ᐳ"]]:::sideeffectplan
-    Object32{{"Object[32∈2] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object32 & ApplyInput33 --> PgInsertSingle29
-    Access30{{"Access[30∈2] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access31{{"Access[31∈2] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
-    Access30 & Access31 --> Object32
-    __Value2 --> Access30
-    __Value2 --> Access31
-    Object34{{"Object[34∈2] ➊<br />ᐸ{result}ᐳ"}}:::plan
-    PgInsertSingle29 --> Object34
     PgSelect55[["PgSelect[55∈6] ➊<br />ᐸfrmcdc_domainConstrainedCompoundTypeᐳ"]]:::plan
     PgFromExpression59{{"PgFromExpression[59∈6] ➊"}}:::plan
     Object32 & PgFromExpression59 --> PgSelect55
@@ -135,6 +119,20 @@ graph TD
     PgSelect55 --> PgSelectRows61
     PgSelectSingle62{{"PgSelectSingle[62∈6] ➊<br />ᐸfrmcdc_domainConstrainedCompoundTypeᐳ"}}:::plan
     First60 --> PgSelectSingle62
+    PgClassExpression64{{"PgClassExpression[64∈7] ➊<br />ᐸ__frmcdc_d...type__.”a”ᐳ"}}:::plan
+    PgSelectSingle48 --> PgClassExpression64
+    PgClassExpression65{{"PgClassExpression[65∈7] ➊<br />ᐸ__frmcdc_d...type__.”b”ᐳ"}}:::plan
+    PgSelectSingle48 --> PgClassExpression65
+    PgClassExpression66{{"PgClassExpression[66∈7] ➊<br />ᐸ__frmcdc_d...type__.”c”ᐳ"}}:::plan
+    PgSelectSingle48 --> PgClassExpression66
+    PgClassExpression67{{"PgClassExpression[67∈7] ➊<br />ᐸ__frmcdc_d...type__.”d”ᐳ"}}:::plan
+    PgSelectSingle48 --> PgClassExpression67
+    PgClassExpression68{{"PgClassExpression[68∈7] ➊<br />ᐸ__frmcdc_d...type__.”e”ᐳ"}}:::plan
+    PgSelectSingle48 --> PgClassExpression68
+    PgClassExpression69{{"PgClassExpression[69∈7] ➊<br />ᐸ__frmcdc_d...type__.”f”ᐳ"}}:::plan
+    PgSelectSingle48 --> PgClassExpression69
+    PgClassExpression70{{"PgClassExpression[70∈7] ➊<br />ᐸ__frmcdc_d....”foo_bar”ᐳ"}}:::plan
+    PgSelectSingle48 --> PgClassExpression70
     PgClassExpression72{{"PgClassExpression[72∈8] ➊<br />ᐸ__frmcdc_d...type__.”a”ᐳ"}}:::plan
     PgSelectSingle62 --> PgClassExpression72
     PgClassExpression73{{"PgClassExpression[73∈8] ➊<br />ᐸ__frmcdc_d...type__.”b”ᐳ"}}:::plan
@@ -149,6 +147,8 @@ graph TD
     PgSelectSingle62 --> PgClassExpression77
     PgClassExpression78{{"PgClassExpression[78∈8] ➊<br />ᐸ__frmcdc_d....”foo_bar”ᐳ"}}:::plan
     PgSelectSingle62 --> PgClassExpression78
+    __Item63[/"__Item[63∈9]<br />ᐸ39ᐳ"\]:::itemplan
+    PgClassExpression39 ==> __Item63
     __Item71[/"__Item[71∈10]<br />ᐸ53ᐳ"\]:::itemplan
     PgClassExpression53 ==> __Item71
 
