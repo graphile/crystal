@@ -133,6 +133,7 @@ export function planToMermaid(
   planJSON.buckets.forEach(extractSteps);
 
   const shouldHideStep = (step: GrafastPlanStepJSONv1) => {
+    if (step.stepClass === "ConstantStep") return true;
     if ((step.extra?.constant as any)?.type === "undefined") {
       return true;
     }
@@ -157,6 +158,7 @@ export function planToMermaid(
   const isExcessivelyReferenced = (stepId: string | number) => {
     const step = stepById[stepId];
     if (!step) return true;
+    if (step.stepClass === "ConstantStep") return true;
     const dependents = dependentsByStepId[stepId];
     if (!dependents || dependents.length === 0) return false;
     const firstDependent = dependents[0];
@@ -520,6 +522,9 @@ export function planToMermaid(
 }
 
 function shortStep(step: GrafastPlanStepJSONv1) {
+  if (step.stepClass === "ConstantStep") {
+    return `Constant${step.metaString ? `<${step.metaString}>` : ""}[${step.id}]`;
+  }
   return `${step.stepClass.replace(/Step$/, "") ?? ""}[${step.id}]`;
 }
 
