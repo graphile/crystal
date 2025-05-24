@@ -9,7 +9,7 @@ graph TD
 
     subgraph "Buckets for queries/connections/pagination-before-last-pagination-only"
     Bucket0("Bucket 0 (root)"):::bucket
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 16, 14, 17, 35, 6<br /><br />ROOT Connectionᐸ10ᐳ[14]<br />1: PgSelect[18], PgSelect[20]<br />ᐳ: 19, 27, 28, 29, 32, 33<br />2: PgSelectRows[22]<br />ᐳ: 21, 23, 24"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 16, 14, 17, 34, 6<br /><br />ROOT Connectionᐸ10ᐳ[14]<br />1: PgSelect[18], PgSelect[20]<br />ᐳ: 19, 26, 27, 28, 31, 32<br />2: PgSelectRows[22]<br />ᐳ: 21, 23, 24"):::bucket
     end
     Bucket0 --> Bucket1
 
@@ -19,27 +19,27 @@ graph TD
     Access12{{"Access[12∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access11 & Access12 --> Object13
     Connection14{{"Connection[14∈0] ➊<br />ᐸ10ᐳ"}}:::plan
-    Constant35{{"Constant[35∈0] ➊<br />ᐸ3ᐳ"}}:::plan
+    Constant34{{"Constant[34∈0] ➊<br />ᐸ3ᐳ"}}:::plan
     Lambda17{{"Lambda[17∈0] ➊<br />ᐸparseCursorᐳ"}}:::plan
-    Constant35 & Lambda17 --> Connection14
+    Constant34 & Lambda17 --> Connection14
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access11
     __Value2 --> Access12
     Lambda16{{"Lambda[16∈0] ➊<br />ᐸincludeArchivedConditionᐳ"}}:::plan
-    Constant34{{"Constant[34∈0] ➊<br />ᐸ[ undefined, 'INHERIT' ]ᐳ"}}:::plan
-    Constant34 --> Lambda16
-    Constant36{{"Constant[36∈0] ➊<br />ᐸ'WyJmMGIyOGM5NGMxIiwiZjE3MGYxNzAtMDAwMC0wMDAwLTAwMDAtYjBiMDAᐳ"}}:::plan
-    Constant36 --> Lambda17
+    Constant33{{"Constant[33∈0] ➊<br />ᐸ[ undefined, 'INHERIT' ]ᐳ"}}:::plan
+    Constant33 --> Lambda16
+    Constant35{{"Constant[35∈0] ➊<br />ᐸ'WyJmMGIyOGM5NGMxIiwiZjE3MGYxNzAtMDAwMC0wMDAwLTAwMDAtYjBiMDAᐳ"}}:::plan
+    Constant35 --> Lambda17
     __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgSelect18[["PgSelect[18∈1] ➊<br />ᐸmessages+1ᐳ"]]:::plan
-    Object13 & Lambda16 & Connection14 & Lambda17 & Constant35 --> PgSelect18
-    Object32{{"Object[32∈1] ➊<br />ᐸ{first,last,offset,hasMore}ᐳ"}}:::plan
-    Access27{{"Access[27∈1] ➊<br />ᐸ18.hasMoreᐳ"}}:::plan
-    Constant35 & Access27 --> Object32
+    Object13 & Lambda16 & Connection14 & Lambda17 & Constant34 --> PgSelect18
+    Object31{{"Object[31∈1] ➊<br />ᐸ{first,last,offset,hasMore}ᐳ"}}:::plan
+    Access26{{"Access[26∈1] ➊<br />ᐸ18.hasMoreᐳ"}}:::plan
+    Constant34 & Access26 --> Object31
     PgSelect20[["PgSelect[20∈1] ➊<br />ᐸmessages(aggregate)ᐳ"]]:::plan
     Object13 & Lambda16 & Connection14 --> PgSelect20
-    Object28{{"Object[28∈1] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
-    Constant35 & Access27 --> Object28
+    Object27{{"Object[27∈1] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
+    Constant34 & Access26 --> Object27
     PgPageInfo19{{"PgPageInfo[19∈1] ➊"}}:::plan
     Connection14 --> PgPageInfo19
     First21{{"First[21∈1] ➊"}}:::plan
@@ -50,15 +50,15 @@ graph TD
     First21 --> PgSelectSingle23
     PgClassExpression24{{"PgClassExpression[24∈1] ➊<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle23 --> PgClassExpression24
-    PgSelect18 --> Access27
-    Lambda29{{"Lambda[29∈1] ➊<br />ᐸhasNextPageCbᐳ"}}:::plan
-    Object28 --> Lambda29
-    Lambda33{{"Lambda[33∈1] ➊<br />ᐸhasPreviousPageCbᐳ"}}:::plan
-    Object32 --> Lambda33
+    PgSelect18 --> Access26
+    Lambda28{{"Lambda[28∈1] ➊<br />ᐸhasNextPageCbᐳ"}}:::plan
+    Object27 --> Lambda28
+    Lambda32{{"Lambda[32∈1] ➊<br />ᐸhasPreviousPageCbᐳ"}}:::plan
+    Object31 --> Lambda32
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Access11,Access12,Object13,Connection14,Lambda16,Lambda17,Constant34,Constant35,Constant36 bucket0
+    class Bucket0,__Value2,__Value4,Access11,Access12,Object13,Connection14,Lambda16,Lambda17,Constant33,Constant34,Constant35 bucket0
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect18,PgPageInfo19,PgSelect20,First21,PgSelectRows22,PgSelectSingle23,PgClassExpression24,Access27,Object28,Lambda29,Object32,Lambda33 bucket1
+    class Bucket1,PgSelect18,PgPageInfo19,PgSelect20,First21,PgSelectRows22,PgSelectSingle23,PgClassExpression24,Access26,Object27,Lambda28,Object31,Lambda32 bucket1
 
