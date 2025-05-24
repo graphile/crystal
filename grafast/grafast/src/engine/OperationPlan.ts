@@ -217,7 +217,7 @@ const OUTPUT_PLAN_TYPE_ARRAY = Object.freeze({ mode: "array" });
 const newValueStepCallback = (isImmutable: boolean) =>
   new __ValueStep(isImmutable);
 
-const NO_ARGS: TrackedArguments = {};
+const NO_ARGS: TrackedArguments = Object.create(null);
 
 export class OperationPlan {
   /* This only exists to make establishOperationPlan easier for TypeScript */
