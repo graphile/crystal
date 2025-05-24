@@ -9,9 +9,9 @@ import type {
 } from "graphql";
 import * as graphql from "graphql";
 
+import { operationPlan } from "../global.js";
 import { UnbatchedStep } from "../step.js";
 import { constant } from "./constant.js";
-import { operationPlan } from "../global.js";
 
 const { valueFromAST } = graphql;
 
