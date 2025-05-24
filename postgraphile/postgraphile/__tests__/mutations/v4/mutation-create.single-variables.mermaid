@@ -103,14 +103,14 @@ graph TD
     PgSelectSingle36 --> PgClassExpression56
     Lambda58{{"Lambda[58∈6] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List57 --> Lambda58
-    PgClassExpression59{{"PgClassExpression[59∈6] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle36 --> PgClassExpression59
-    List61{{"List[61∈7] ➊<br />ᐸ55,60ᐳ"}}:::plan
-    PgClassExpression60{{"PgClassExpression[60∈7] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    Constant55 & PgClassExpression60 --> List61
-    PgSelectSingle49 --> PgClassExpression60
-    Lambda62{{"Lambda[62∈7] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List61 --> Lambda62
+    PgClassExpression62{{"PgClassExpression[62∈6] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgSelectSingle36 --> PgClassExpression62
+    List60{{"List[60∈7] ➊<br />ᐸ55,59ᐳ"}}:::plan
+    PgClassExpression59{{"PgClassExpression[59∈7] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    Constant55 & PgClassExpression59 --> List60
+    PgSelectSingle49 --> PgClassExpression59
+    Lambda61{{"Lambda[61∈7] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List60 --> Lambda61
     PgClassExpression63{{"PgClassExpression[63∈7] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle49 --> PgClassExpression63
 
@@ -128,7 +128,7 @@ graph TD
     classDef bucket5 stroke:#7fff00
     class Bucket5 bucket5
     classDef bucket6 stroke:#ff1493
-    class Bucket6,PgClassExpression56,List57,Lambda58,PgClassExpression59 bucket6
+    class Bucket6,PgClassExpression56,List57,Lambda58,PgClassExpression62 bucket6
     classDef bucket7 stroke:#808000
-    class Bucket7,PgClassExpression60,List61,Lambda62,PgClassExpression63 bucket7
+    class Bucket7,PgClassExpression59,List60,Lambda61,PgClassExpression63 bucket7
 

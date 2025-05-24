@@ -68,14 +68,14 @@ graph TD
     PgSelectSingle22 --> PgClassExpression34
     Lambda36{{"Lambda[36∈2] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List35 --> Lambda36
-    PgClassExpression37{{"PgClassExpression[37∈2] ➊<br />ᐸ__large_no...d__.”text”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression37
-    List39{{"List[39∈3] ➊<br />ᐸ33,38ᐳ"}}:::plan
-    PgClassExpression38{{"PgClassExpression[38∈3] ➊<br />ᐸ__large_node_id__.”id”ᐳ"}}:::plan
-    Constant33 & PgClassExpression38 --> List39
-    PgSelectSingle31 --> PgClassExpression38
-    Lambda40{{"Lambda[40∈3] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List39 --> Lambda40
+    PgClassExpression40{{"PgClassExpression[40∈2] ➊<br />ᐸ__large_no...d__.”text”ᐳ"}}:::plan
+    PgSelectSingle22 --> PgClassExpression40
+    List38{{"List[38∈3] ➊<br />ᐸ33,37ᐳ"}}:::plan
+    PgClassExpression37{{"PgClassExpression[37∈3] ➊<br />ᐸ__large_node_id__.”id”ᐳ"}}:::plan
+    Constant33 & PgClassExpression37 --> List38
+    PgSelectSingle31 --> PgClassExpression37
+    Lambda39{{"Lambda[39∈3] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List38 --> Lambda39
     PgClassExpression41{{"PgClassExpression[41∈3] ➊<br />ᐸ__large_no...d__.”text”ᐳ"}}:::plan
     PgSelectSingle31 --> PgClassExpression41
     __Item43[/"__Item[43∈4]<br />ᐸ42ᐳ"\]:::itemplan
@@ -97,9 +97,9 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect32,PgSelectRows42 bucket1
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgClassExpression34,List35,Lambda36,PgClassExpression37 bucket2
+    class Bucket2,PgClassExpression34,List35,Lambda36,PgClassExpression40 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression38,List39,Lambda40,PgClassExpression41 bucket3
+    class Bucket3,PgClassExpression37,List38,Lambda39,PgClassExpression41 bucket3
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item43,PgSelectSingle44 bucket4
     classDef bucket5 stroke:#7fff00

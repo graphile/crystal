@@ -12,12 +12,12 @@ graph TD
     Bucket1("Bucket 1 (listItem)<br />Deps: 108, 10<br /><br />ROOT __Item{1}ᐸ11ᐳ[12]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 13, 108, 12, 10<br /><br />ROOT PgSelectSingle{1}ᐸpeopleᐳ[13]<br />1: <br />ᐳ: 14, 109, 110<br />2: PgSelectRows[20]"):::bucket
     Bucket3("Bucket 3 (listItem)<br />Deps: 10<br /><br />ROOT __Item{3}ᐸ20ᐳ[21]"):::bucket
-    Bucket4("Bucket 4 (polymorphic)<br />__typename: Lambda[26]<br />Deps: 26, 10, 23, 25, 69, 70, 71, 72, 73, 74"):::bucket
-    Bucket5("Bucket 5 (polymorphicPartition)<br />|RelationalTopic<br />Deps: 10, 23, 25, 69, 70, 71, 72, 73, 74<br />ᐳRelationalTopic<br /><br />1: PgSelect[28]<br />2: PgSelectRows[33]<br />ᐳ: First[32], PgSelectSingle[34]"):::bucket
-    Bucket6("Bucket 6 (polymorphicPartition)<br />|RelationalPost<br />Deps: 10, 23, 25, 69, 70, 71, 72, 73, 74<br />ᐳRelationalPost<br /><br />1: PgSelect[36]<br />2: PgSelectRows[41]<br />ᐳ: First[40], PgSelectSingle[42]"):::bucket
-    Bucket7("Bucket 7 (polymorphicPartition)<br />|RelationalDivider<br />Deps: 10, 23, 25, 69, 70, 71, 72, 73, 74<br />ᐳRelationalDivider<br /><br />1: PgSelect[44]<br />2: PgSelectRows[49]<br />ᐳ: First[48], PgSelectSingle[50]"):::bucket
-    Bucket8("Bucket 8 (polymorphicPartition)<br />|RelationalChecklist<br />Deps: 10, 23, 25, 69, 70, 71, 72, 73, 74<br />ᐳRelationalChecklist<br /><br />1: PgSelect[52]<br />2: PgSelectRows[57]<br />ᐳ: First[56], PgSelectSingle[58]"):::bucket
-    Bucket9("Bucket 9 (polymorphicPartition)<br />|RelationalChecklistItem<br />Deps: 10, 23, 25, 69, 70, 71, 72, 73, 74<br />ᐳRelationalChecklistItem<br /><br />1: PgSelect[60]<br />2: PgSelectRows[65]<br />ᐳ: First[64], PgSelectSingle[66]"):::bucket
+    Bucket4("Bucket 4 (polymorphic)<br />__typename: Lambda[26]<br />Deps: 26, 10, 23, 25, 77, 82, 87, 92, 97, 102"):::bucket
+    Bucket5("Bucket 5 (polymorphicPartition)<br />|RelationalTopic<br />Deps: 10, 23, 25, 77, 82, 87, 92, 97, 102<br />ᐳRelationalTopic<br /><br />1: PgSelect[28]<br />2: PgSelectRows[33]<br />ᐳ: First[32], PgSelectSingle[34]"):::bucket
+    Bucket6("Bucket 6 (polymorphicPartition)<br />|RelationalPost<br />Deps: 10, 23, 25, 77, 82, 87, 92, 97, 102<br />ᐳRelationalPost<br /><br />1: PgSelect[36]<br />2: PgSelectRows[41]<br />ᐳ: First[40], PgSelectSingle[42]"):::bucket
+    Bucket7("Bucket 7 (polymorphicPartition)<br />|RelationalDivider<br />Deps: 10, 23, 25, 77, 82, 87, 92, 97, 102<br />ᐳRelationalDivider<br /><br />1: PgSelect[44]<br />2: PgSelectRows[49]<br />ᐳ: First[48], PgSelectSingle[50]"):::bucket
+    Bucket8("Bucket 8 (polymorphicPartition)<br />|RelationalChecklist<br />Deps: 10, 23, 25, 77, 82, 87, 92, 97, 102<br />ᐳRelationalChecklist<br /><br />1: PgSelect[52]<br />2: PgSelectRows[57]<br />ᐳ: First[56], PgSelectSingle[58]"):::bucket
+    Bucket9("Bucket 9 (polymorphicPartition)<br />|RelationalChecklistItem<br />Deps: 10, 23, 25, 77, 82, 87, 92, 97, 102<br />ᐳRelationalChecklistItem<br /><br />1: PgSelect[60]<br />2: PgSelectRows[65]<br />ᐳ: First[64], PgSelectSingle[66]"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
@@ -63,18 +63,18 @@ graph TD
     PgSelectSingle22 --> PgClassExpression25
     Lambda26{{"Lambda[26∈3]<br />ᐸrelationalItemTypeNameFromTypeᐳ"}}:::plan
     PgClassExpression25 --> Lambda26
-    PgClassExpression69{{"PgClassExpression[69∈3]<br />ᐸ__relation...__.”type2”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression69
-    PgClassExpression70{{"PgClassExpression[70∈3]<br />ᐸ__relation...”position”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression70
-    PgClassExpression71{{"PgClassExpression[71∈3]<br />ᐸ__relation...reated_at”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression71
-    PgClassExpression72{{"PgClassExpression[72∈3]<br />ᐸ__relation...pdated_at”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression72
-    PgClassExpression73{{"PgClassExpression[73∈3]<br />ᐸ__relation..._archived”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression73
-    PgClassExpression74{{"PgClassExpression[74∈3]<br />ᐸ__relation...chived_at”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression74
+    PgClassExpression77{{"PgClassExpression[77∈3]<br />ᐸ__relation...__.”type2”ᐳ"}}:::plan
+    PgSelectSingle22 --> PgClassExpression77
+    PgClassExpression82{{"PgClassExpression[82∈3]<br />ᐸ__relation...”position”ᐳ"}}:::plan
+    PgSelectSingle22 --> PgClassExpression82
+    PgClassExpression87{{"PgClassExpression[87∈3]<br />ᐸ__relation...reated_at”ᐳ"}}:::plan
+    PgSelectSingle22 --> PgClassExpression87
+    PgClassExpression92{{"PgClassExpression[92∈3]<br />ᐸ__relation...pdated_at”ᐳ"}}:::plan
+    PgSelectSingle22 --> PgClassExpression92
+    PgClassExpression97{{"PgClassExpression[97∈3]<br />ᐸ__relation..._archived”ᐳ"}}:::plan
+    PgSelectSingle22 --> PgClassExpression97
+    PgClassExpression102{{"PgClassExpression[102∈3]<br />ᐸ__relation...chived_at”ᐳ"}}:::plan
+    PgSelectSingle22 --> PgClassExpression102
     PgSelect28[["PgSelect[28∈5]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic"]]:::plan
     Object10 & PgClassExpression23 --> PgSelect28
     First32{{"First[32∈5]^"}}:::plan
@@ -124,7 +124,7 @@ graph TD
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression14,PgSelectRows20,List109,Lambda110 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,__Item21,PgSelectSingle22,PgClassExpression23,PgClassExpression25,Lambda26,PgClassExpression69,PgClassExpression70,PgClassExpression71,PgClassExpression72,PgClassExpression73,PgClassExpression74 bucket3
+    class Bucket3,__Item21,PgSelectSingle22,PgClassExpression23,PgClassExpression25,Lambda26,PgClassExpression77,PgClassExpression82,PgClassExpression87,PgClassExpression92,PgClassExpression97,PgClassExpression102 bucket3
     classDef bucket4 stroke:#0000ff
     class Bucket4 bucket4
     classDef bucket5 stroke:#7fff00
