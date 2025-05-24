@@ -174,8 +174,6 @@ export const makeBaseArgs = () => {
 
       type LootBox {
         id: Int!
-        tier: LootTier!;
-        category: LootCategory!;
       }
       type LootData {
         id: Int!
