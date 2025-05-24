@@ -2656,13 +2656,13 @@ export class OperationPlan {
     b.complete = true;
     this.planFieldBatch = null;
 
-    /*
     const groups = new Map<
       string,
       {
         firstDetails: PlanFieldDetails;
         extraDetails: { polymorphicPaths: ReadonlySet<string> | null }[];
         streamDetails: boolean | StreamDetails | null;
+        indexes: number[];
       }
     >();
     for (let i = 0, l = b.batch.length; i < l; i++) {
@@ -2689,6 +2689,7 @@ export class OperationPlan {
           firstDetails: batchPlanFieldDetails,
           extraDetails: [{ polymorphicPaths }],
           streamDetails,
+          indexes: [i],
         };
         groups.set(signature, entry);
       } else {
@@ -2728,16 +2729,31 @@ export class OperationPlan {
           entry.streamDetails = null;
         }
 
+        entry.indexes.push(i);
         entry.extraDetails.push({ polymorphicPaths });
       }
     }
-    */
-    for (let i = 0, l = b.batch.length; i < l; i++) {
-      const batchPlanFieldDetails = b.batch[i];
+
+    // Loop through the groups and resolve the plan ONCE per group.
+    // We don't care about the signature here; that was just for grouping
+    for (const entry of groups.values()) {
+      const planFieldDetails: PlanFieldDetails = {
+        ...entry.firstDetails,
+        polymorphicPaths: entry.firstDetails.polymorphicPaths
+          ? new Set([
+              ...entry.firstDetails.polymorphicPaths,
+              ...entry.extraDetails.flatMap((d) => [...d.polymorphicPaths!]),
+            ])
+          : null,
+      };
+      let result: PlanFieldBatchResult;
       try {
-        b.results[i] = this._realPlanField(batchPlanFieldDetails);
+        result = this._realPlanField(planFieldDetails);
       } catch (error) {
-        b.results[i] = { error };
+        result = { error };
+      }
+      for (const i of entry.indexes) {
+        b.results[i] = result;
       }
     }
   }
@@ -5331,10 +5347,12 @@ interface PlanFieldDetails {
   streamDetails: StreamDetails | true | false | null;
 }
 
+type PlanFieldBatchResult =
+  | { error: Error }
+  | { error?: never; haltTree: boolean; step: Step };
+
 interface PlanFieldBatch {
   complete: boolean;
   batch: Array<PlanFieldDetails>;
-  results: Array<
-    { error: Error } | { error?: never; haltTree: boolean; step: Step }
-  >;
+  results: Array<PlanFieldBatchResult>;
 }
