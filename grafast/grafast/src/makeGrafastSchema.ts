@@ -215,7 +215,90 @@ export interface GrafastSchemaSpec {
  * syntax and configs for the types in it and returns a GraphQL schema.
  */
 export function makeGrafastSchema(details: GrafastSchemaSpec): GraphQLSchema {
-  const { typeDefs, plans = {}, enableDeferStream = false } = details;
+  const {
+    typeDefs,
+    plans: rawPlans,
+    objectPlans,
+    unionPlans,
+    interfacePlans,
+    inputObjectPlans,
+    scalarPlans,
+    enumPlans,
+    enableDeferStream = false,
+  } = details;
+
+  let plans: GrafastPlans;
+  if (rawPlans) {
+    if (
+      objectPlans ||
+      unionPlans ||
+      interfacePlans ||
+      inputObjectPlans ||
+      scalarPlans ||
+      enumPlans
+    ) {
+      throw new Error(
+        `plans is deprecated and may not be specified alongside newer approaches`,
+      );
+    }
+    plans = rawPlans;
+  } else {
+    // Hackily convert the new format into the old format. We'll do away with
+    // this in future, but for now it's the easiest way to ensure compatibility
+    plans = {};
+
+    for (const [typeName, spec] of Object.entries(objectPlans ?? {})) {
+      const o = {} as Record<string, any>;
+      plans[typeName] = o as any;
+
+      const { fields = {}, ...rest } = spec;
+      for (const [key, val] of Object.entries(rest)) {
+        o[`__${key}`] = val;
+      }
+      for (const [key, val] of Object.entries(fields)) {
+        o[key] = val;
+      }
+    }
+
+    for (const [typeName, spec] of Object.entries(inputObjectPlans ?? {})) {
+      const o = {} as Record<string, any>;
+      plans[typeName] = o as any;
+
+      const { fields = {}, ...rest } = spec;
+      for (const [key, val] of Object.entries(rest)) {
+        o[`__${key}`] = val;
+      }
+      for (const [key, val] of Object.entries(fields)) {
+        o[key] = val;
+      }
+    }
+
+    for (const [typeName, spec] of Object.entries(unionPlans ?? {})) {
+      const o = {} as Record<string, any>;
+      plans[typeName] = o as any;
+
+      for (const [key, val] of Object.entries(spec)) {
+        o[`__${key}`] = val;
+      }
+    }
+
+    for (const [typeName, spec] of Object.entries(interfacePlans ?? {})) {
+      const o = {} as Record<string, any>;
+      plans[typeName] = o as any;
+
+      for (const [key, val] of Object.entries(spec)) {
+        o[`__${key}`] = val;
+      }
+    }
+
+    for (const [typeName, spec] of Object.entries(scalarPlans ?? {})) {
+      plans[typeName] = spec;
+    }
+
+    for (const [typeName, spec] of Object.entries(enumPlans ?? {})) {
+      plans[typeName] = spec;
+    }
+  }
 
   const document: graphql.DocumentNode =
     typeof typeDefs === "string"

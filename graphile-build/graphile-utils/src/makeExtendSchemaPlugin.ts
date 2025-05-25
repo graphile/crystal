@@ -7,56 +7,55 @@ import type {
   PlanTypeInfo,
   Step,
 } from "grafast";
-import {
-  type DefinitionNode,
-  type DirectiveDefinitionNode,
-  type DirectiveLocation,
+import type {
+  DefinitionNode,
+  DirectiveDefinitionNode,
+  DirectiveLocation,
   // Nodes:
-  type DirectiveNode,
-  type DocumentNode,
-  type EnumTypeDefinitionNode,
-  type EnumValueDefinitionNode,
-  type FieldDefinitionNode,
-  type GraphQLArgumentConfig,
-  type GraphQLDirective,
-  type GraphQLEnumType,
+  DirectiveNode,
+  DocumentNode,
+  EnumTypeDefinitionNode,
+  EnumValueDefinitionNode,
+  FieldDefinitionNode,
+  GraphQLArgumentConfig,
+  GraphQLDirective,
+  GraphQLEnumType,
   // Config:
-  type GraphQLEnumValueConfigMap,
-  type GraphQLFieldConfigMap,
+  GraphQLEnumValueConfigMap,
+  GraphQLFieldConfigMap,
   // Resolvers:
-  type GraphQLFieldResolver,
-  type GraphQLInputFieldConfigMap,
-  type GraphQLInputObjectType,
-  type GraphQLInterfaceType,
+  GraphQLFieldResolver,
+  GraphQLInputFieldConfigMap,
+  GraphQLInputObjectType,
+  GraphQLInterfaceType,
   // ONLY import types here, not values
   // Misc:
-  type GraphQLIsTypeOfFn,
-  type GraphQLNamedOutputType,
-  type GraphQLNamedType,
-  type GraphQLObjectType,
-  type GraphQLObjectTypeExtensions,
-  type GraphQLOutputType,
-  type GraphQLScalarType,
-  type GraphQLScalarTypeConfig,
+  GraphQLIsTypeOfFn,
+  GraphQLNamedOutputType,
+  GraphQLNamedType,
+  GraphQLObjectType,
+  GraphQLObjectTypeExtensions,
+  GraphQLOutputType,
+  GraphQLScalarType,
+  GraphQLScalarTypeConfig,
   // Union types:
-  type GraphQLType,
-  type GraphQLTypeResolver,
-  type GraphQLUnionType,
-  type InputObjectTypeDefinitionNode,
-  type InputObjectTypeExtensionNode,
-  type InputValueDefinitionNode,
-  type InterfaceTypeDefinitionNode,
-  type InterfaceTypeExtensionNode,
-  type NamedTypeNode,
-  type NameNode,
-  type ObjectTypeDefinitionNode,
-  type ObjectTypeExtensionNode,
-  parse,
-  type ScalarTypeDefinitionNode,
-  type StringValueNode,
-  type TypeNode,
-  type UnionTypeDefinitionNode,
-  type ValueNode,
+  GraphQLType,
+  GraphQLTypeResolver,
+  GraphQLUnionType,
+  InputObjectTypeDefinitionNode,
+  InputObjectTypeExtensionNode,
+  InputValueDefinitionNode,
+  InterfaceTypeDefinitionNode,
+  InterfaceTypeExtensionNode,
+  NamedTypeNode,
+  NameNode,
+  ObjectTypeDefinitionNode,
+  ObjectTypeExtensionNode,
+  ScalarTypeDefinitionNode,
+  StringValueNode,
+  TypeNode,
+  UnionTypeDefinitionNode,
+  ValueNode,
 } from "grafast/graphql";
 import type { GraphileBuild } from "graphile-build";
 
@@ -109,10 +108,12 @@ export interface Resolvers {
 /** @deprecated Use objectPlans/scalarPlans/etc instead */
 export interface Plans {
   [typeName: string]:
-    | DeprecatedObjectPlan
-    | EnumResolver
-    | GraphQLScalarType
-    | GraphQLScalarTypeConfig<any, any>;
+    | (DeprecatedObjectPlan & { __scope?: GraphileBuild.ScopeObject })
+    | (EnumResolver & { __scope?: GraphileBuild.ScopeEnum })
+    | (GraphQLScalarType & { __scope?: GraphileBuild.ScopeScalar })
+    | (GraphQLScalarTypeConfig<any, any> & {
+        __scope?: GraphileBuild.ScopeScalar;
+      });
 }
 
 export interface ExtensionDefinition
@@ -234,12 +235,19 @@ export function makeExtendSchemaPlugin(
             GraphQLScalarType,
             GraphQLUnionType,
             Kind,
+            parse,
           } = graphql;
 
           const {
             typeDefs,
             resolvers = Object.create(null),
-            plans = Object.create(null),
+            plans: rawPlans,
+            enumPlans,
+            scalarPlans,
+            inputObjectPlans,
+            interfacePlans,
+            unionPlans,
+            objectPlans,
           } = typeof generator === "function"
             ? generator.length === 1
               ? generator(build)
@@ -249,6 +257,83 @@ export function makeExtendSchemaPlugin(
                   build.options,
                 ) as ExtensionDefinition)
             : generator;
+
+          let plans: Plans;
+          if (rawPlans) {
+            if (
+              objectPlans ||
+              unionPlans ||
+              interfacePlans ||
+              inputObjectPlans ||
+              scalarPlans ||
+              enumPlans
+            ) {
+              throw new Error(
+                `plans is deprecated and may not be specified alongside newer approaches`,
+              );
+            }
+            plans = rawPlans;
+          } else {
+            // Hackily convert the new format into the old format. We'll do away with
+            // this in future, but for now it's the easiest way to ensure compatibility
+            plans = {};
+
+            for (const [typeName, spec] of Object.entries(objectPlans ?? {})) {
+              const o = {} as Record<string, any>;
+              plans[typeName] = o as any;
+
+              const { fields = {}, ...rest } = spec;
+              for (const [key, val] of Object.entries(rest)) {
+                o[`__${key}`] = val;
+              }
+              for (const [key, val] of Object.entries(fields)) {
+                o[key] = val;
+              }
+            }
+
+            for (const [typeName, spec] of Object.entries(
+              inputObjectPlans ?? {},
+            )) {
+              const o = {} as Record<string, any>;
+              plans[typeName] = o as any;
+
+              const { fields = {}, ...rest } = spec;
+              for (const [key, val] of Object.entries(rest)) {
+                o[`__${key}`] = val;
+              }
+              for (const [key, val] of Object.entries(fields)) {
+                o[key] = val;
+              }
+            }
+
+            for (const [typeName, spec] of Object.entries(unionPlans ?? {})) {
+              const o = {} as Record<string, any>;
+              plans[typeName] = o as any;
+
+              for (const [key, val] of Object.entries(spec)) {
+                o[`__${key}`] = val;
+              }
+            }
+
+            for (const [typeName, spec] of Object.entries(
+              interfacePlans ?? {},
+            )) {
+              const o = {} as Record<string, any>;
+              plans[typeName] = o as any;
+
+              for (const [key, val] of Object.entries(spec)) {
+                o[`__${key}`] = val;
+              }
+            }
+
+            for (const [typeName, spec] of Object.entries(scalarPlans ?? {})) {
+              plans[typeName] = spec;
+            }
+
+            for (const [typeName, spec] of Object.entries(enumPlans ?? {})) {
+              plans[typeName] = spec;
+            }
+          }
 
           if (typeDefs == null) {
             throw new Error(
