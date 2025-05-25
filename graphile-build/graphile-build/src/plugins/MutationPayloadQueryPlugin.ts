@@ -4,6 +4,7 @@ import { rootValue } from "grafast";
 
 import { EXPORTABLE } from "../utils.js";
 import { version } from "../version.js";
+import { GraphQLOutputType } from "graphql";
 
 declare global {
   namespace GraphileConfig {
@@ -41,7 +42,10 @@ export const MutationPayloadQueryPlugin: GraphileConfig.Plugin = {
             return fields;
           }
 
-          const Query = getTypeByName(inflection.builtin("Query"));
+          const Query = getTypeByName(
+            inflection.builtin("Query"),
+          ) as GraphQLOutputType;
+          if (Query == null) return fields;
           return extend<typeof fields, typeof fields>(
             fields,
             {

@@ -1,9 +1,4 @@
-import type {
-  BaseGraphQLArguments,
-  GrafastFieldConfig,
-  OutputPlanForType,
-  Step,
-} from "grafast";
+import type { BaseGraphQLArguments, GrafastFieldConfig, Step } from "grafast";
 import { inputObjectFieldSpec, objectSpec } from "grafast";
 import type {
   GraphQLEnumTypeConfig,
@@ -204,26 +199,19 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
               );
             },
             fields: () => {
-              const processedFields: GrafastFieldConfig<any, any, any, any>[] =
-                [];
+              const processedFields: GrafastFieldConfig<any, any, any>[] = [];
               const fieldWithHooks: GraphileBuild.FieldWithHooksFunction = <
-                TType extends GraphQLOutputType,
                 TParentStep extends Step,
-                TFieldStep extends OutputPlanForType<TType>,
                 TArgs extends BaseGraphQLArguments,
+                TFieldStep extends Step,
               >(
                 fieldScope: GraphileBuild.ScopeObjectFieldsField,
                 fieldSpec:
-                  | GrafastFieldConfig<TType, TParentStep, TFieldStep, TArgs>
+                  | GrafastFieldConfig<TParentStep, TArgs, TFieldStep>
                   | ((
                       context: GraphileBuild.ContextObjectFieldsField,
-                    ) => GrafastFieldConfig<
-                      TType,
-                      TParentStep,
-                      TFieldStep,
-                      TArgs
-                    >),
-              ): GrafastFieldConfig<TType, TParentStep, TFieldStep, TArgs> => {
+                    ) => GrafastFieldConfig<TParentStep, TArgs, TFieldStep>),
+              ): GrafastFieldConfig<TParentStep, TArgs, TFieldStep> => {
                 if (!isString(fieldScope.fieldName)) {
                   throw new Error(
                     "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is currently necessary.",

@@ -1,59 +1,62 @@
 import type {
   AbstractTypePlanner,
-  ExecutableStep,
-  FieldPlanResolver,
+  DeprecatedObjectPlan,
+  GrafastSchemaSpec,
+  ObjectFieldConfig,
+  ObjectPlan as GrafastObjectPlan,
   PlanTypeInfo,
   Step,
 } from "grafast";
-import type {
-  DefinitionNode,
-  DirectiveDefinitionNode,
-  DirectiveLocation,
+import {
+  type DefinitionNode,
+  type DirectiveDefinitionNode,
+  type DirectiveLocation,
   // Nodes:
-  DirectiveNode,
-  DocumentNode,
-  EnumTypeDefinitionNode,
-  EnumValueDefinitionNode,
-  FieldDefinitionNode,
-  GraphQLArgumentConfig,
-  GraphQLDirective,
-  GraphQLEnumType,
+  type DirectiveNode,
+  type DocumentNode,
+  type EnumTypeDefinitionNode,
+  type EnumValueDefinitionNode,
+  type FieldDefinitionNode,
+  type GraphQLArgumentConfig,
+  type GraphQLDirective,
+  type GraphQLEnumType,
   // Config:
-  GraphQLEnumValueConfigMap,
-  GraphQLFieldConfigMap,
+  type GraphQLEnumValueConfigMap,
+  type GraphQLFieldConfigMap,
   // Resolvers:
-  GraphQLFieldResolver,
-  GraphQLInputFieldConfigMap,
-  GraphQLInputObjectType,
-  GraphQLInterfaceType,
+  type GraphQLFieldResolver,
+  type GraphQLInputFieldConfigMap,
+  type GraphQLInputObjectType,
+  type GraphQLInterfaceType,
   // ONLY import types here, not values
   // Misc:
-  GraphQLIsTypeOfFn,
-  GraphQLNamedOutputType,
-  GraphQLNamedType,
-  GraphQLObjectType,
-  GraphQLObjectTypeExtensions,
-  GraphQLOutputType,
-  GraphQLScalarType,
-  GraphQLScalarTypeConfig,
+  type GraphQLIsTypeOfFn,
+  type GraphQLNamedOutputType,
+  type GraphQLNamedType,
+  type GraphQLObjectType,
+  type GraphQLObjectTypeExtensions,
+  type GraphQLOutputType,
+  type GraphQLScalarType,
+  type GraphQLScalarTypeConfig,
   // Union types:
-  GraphQLType,
-  GraphQLTypeResolver,
-  GraphQLUnionType,
-  InputObjectTypeDefinitionNode,
-  InputObjectTypeExtensionNode,
-  InputValueDefinitionNode,
-  InterfaceTypeDefinitionNode,
-  InterfaceTypeExtensionNode,
-  NamedTypeNode,
-  NameNode,
-  ObjectTypeDefinitionNode,
-  ObjectTypeExtensionNode,
-  ScalarTypeDefinitionNode,
-  StringValueNode,
-  TypeNode,
-  UnionTypeDefinitionNode,
-  ValueNode,
+  type GraphQLType,
+  type GraphQLTypeResolver,
+  type GraphQLUnionType,
+  type InputObjectTypeDefinitionNode,
+  type InputObjectTypeExtensionNode,
+  type InputValueDefinitionNode,
+  type InterfaceTypeDefinitionNode,
+  type InterfaceTypeExtensionNode,
+  type NamedTypeNode,
+  type NameNode,
+  type ObjectTypeDefinitionNode,
+  type ObjectTypeExtensionNode,
+  parse,
+  type ScalarTypeDefinitionNode,
+  type StringValueNode,
+  type TypeNode,
+  type UnionTypeDefinitionNode,
+  type ValueNode,
 } from "grafast/graphql";
 import type { GraphileBuild } from "graphile-build";
 
@@ -61,36 +64,17 @@ import { EXPORTABLE } from "./exportable.js";
 
 type Maybe<T> = T | null | undefined;
 
-export interface ObjectFieldConfig<TSource = any, TContext = any> {
-  scope?: GraphileBuild.ScopeObjectFieldsField;
-  plan?: FieldPlanResolver<any, any, any>;
-  subscribePlan?: FieldPlanResolver<any, any, any>;
-  /** @deprecated Use 'plan' */
-  resolve?: GraphQLFieldResolver<TSource, TContext>;
-  /** @deprecated Use 'subscribePlan' */
-  subscribe?: GraphQLFieldResolver<TSource, TContext>;
+export type ObjectResolver<TSource = any, TContext = any> = {
+  [key: string]: GraphQLFieldResolver<TSource, TContext> | ObjectFieldConfig;
+} & {
   __resolveType?: GraphQLTypeResolver<TSource, TContext>;
   __isTypeOf?: GraphQLIsTypeOfFn<TSource, TContext>;
-}
-
-export interface ObjectResolver<TSource = any, TContext = any> {
-  [key: string]:
-    | GraphQLFieldResolver<TSource, TContext>
-    | ObjectFieldConfig<TSource, TContext>;
-}
-
-export type ObjectPlan<TSource = any, TContext = any> = {
-  __assertStep?:
-    | ((step: ExecutableStep) => asserts step is ExecutableStep)
-    | { new (...args: any[]): ExecutableStep };
-  __isTypeOf?: GraphQLIsTypeOfFn<any, any>;
-  __planType?($specifier: Step): Step;
-  __scope?: GraphileBuild.ScopeObject;
-} & {
-  [key: string]:
-    | FieldPlanResolver<any, any, any>
-    | ObjectFieldConfig<TSource, TContext>;
 };
+
+export interface ObjectPlan<TSource extends Step = Step>
+  extends GrafastObjectPlan<TSource> {
+  __scope?: GraphileBuild.ScopeObject;
+}
 
 export type EnumResolver = {
   __scope?: GraphileBuild.ScopeEnum;
@@ -109,10 +93,10 @@ export interface InputObjectResolver {
   __scope?: GraphileBuild.ScopeInputObject;
 }
 
-/** @deprecated Use Plans instead */
-export interface Resolvers<TSource = any, TContext = any> {
-  [key: string]:
-    | ObjectResolver<TSource, TContext>
+/** @deprecated Use objectPlans/scalarPlans/etc instead */
+export interface Resolvers {
+  [typeName: string]:
+    | ObjectResolver
     | EnumResolver
     | TypeResolver
     | InputObjectResolver
@@ -122,19 +106,29 @@ export interface Resolvers<TSource = any, TContext = any> {
       });
 }
 
-export interface Plans<TSource = any, TContext = any> {
-  [key: string]:
-    | ObjectPlan<TSource, TContext>
+/** @deprecated Use objectPlans/scalarPlans/etc instead */
+export interface Plans {
+  [typeName: string]:
+    | DeprecatedObjectPlan
     | EnumResolver
     | GraphQLScalarType
     | GraphQLScalarTypeConfig<any, any>;
 }
 
-export interface ExtensionDefinition {
-  typeDefs: DocumentNode | DocumentNode[];
+export interface ExtensionDefinition
+  extends Pick<
+    GrafastSchemaSpec,
+    | "typeDefs"
+    | "plans"
+    | "scalarPlans"
+    | "enumPlans"
+    | "objectPlans"
+    | "unionPlans"
+    | "interfacePlans"
+    | "inputObjectPlans"
+  > {
   /** @deprecated Use 'plans' instead */
   resolvers?: Resolvers;
-  plans?: Plans;
 }
 
 type ParentConstructors<T> = { new (...args: any[]): T };
@@ -261,19 +255,27 @@ export function makeExtendSchemaPlugin(
               "The first argument to makeExtendSchemaPlugin must be an object containing a `typeDefs` field.",
             );
           }
-          const typeDefsArr = Array.isArray(typeDefs) ? typeDefs : [typeDefs];
-          const mergedTypeDefinitions = typeDefsArr.reduce(
-            (definitions, typeDef) => {
-              if (!(typeDef as any) || (typeDef as any).kind !== "Document") {
-                throw new Error(
-                  'The first argument to makeExtendSchemaPlugin must be an object containing a `typeDefs` field; the value for this field must be generated by the `gql` helper (`import { gql, makeExtendSchemaPlugin } from "postgraphile/utils"`), or be an array of the same.',
-                );
-              }
-              definitions.push(...typeDef.definitions);
-              return definitions;
-            },
-            [] as DefinitionNode[],
-          );
+          const document: DocumentNode =
+            typeof typeDefs === "string"
+              ? parse(typeDefs)
+              : Array.isArray(typeDefs)
+                ? {
+                    kind: graphql.Kind.DOCUMENT,
+                    definitions: typeDefs.flatMap((t) => {
+                      if (!t || t.kind !== "Document") {
+                        throw new Error(
+                          'The first argument to makeExtendSchemaPlugin must be an object containing a `typeDefs` field; the value for this field must be generated by the `gql` helper (`import { gql, makeExtendSchemaPlugin } from "postgraphile/utils"`), or be an array of the same.',
+                        );
+                      }
+                      return t.definitions;
+                    }),
+                  }
+                : typeDefs;
+          if (!document || document.kind !== "Document") {
+            throw new Error(
+              'The first argument to makeExtendSchemaPlugin must be an object containing a `typeDefs` field; the value for this field must be generated by the `gql` helper (`import { gql, makeExtendSchemaPlugin } from "postgraphile/utils"`), or be an array of the same.',
+            );
+          }
 
           const typeExtensions: TypeExtensions = {
             GraphQLSchema: {
@@ -285,7 +287,7 @@ export function makeExtendSchemaPlugin(
             GraphQLInterfaceType: {},
           };
           const newTypes: Array<NewTypeDef> = [];
-          mergedTypeDefinitions.forEach((definition) => {
+          document.definitions.forEach((definition) => {
             if (definition.kind === "EnumTypeDefinition") {
               newTypes.push({
                 type: GraphQLEnumType,
@@ -427,7 +429,7 @@ export function makeExtendSchemaPlugin(
               const name = getName(definition.name);
               const description = getDescription(definition.description);
               const directives = getDirectives(definition.directives);
-              const p = (plans[name] ?? {}) as ObjectPlan;
+              const p = (plans[name] ?? {}) as DeprecatedObjectPlan;
               const scope = {
                 __origin: `makeExtendSchemaPlugin`,
                 directives,
@@ -1107,12 +1109,14 @@ export function makeExtendSchemaPlugin(
            * other relevant methods.
            */
           const possiblePlan = (
-            plans[Self.name] as Maybe<ObjectPlan<any, any>>
+            plans[Self.name] as Maybe<DeprecatedObjectPlan>
           )?.[fieldName];
           build.exportNameHint(possiblePlan, `${Self.name}_${fieldName}_plan`);
           const possibleResolver = (
             resolvers[Self.name] as Maybe<ObjectResolver>
-          )?.[fieldName];
+          )?.[fieldName] as
+            | GraphQLFieldResolver<TSource, any>
+            | ObjectFieldConfig;
           build.exportNameHint(
             possibleResolver,
             `${Self.name}_${fieldName}_resolver`,

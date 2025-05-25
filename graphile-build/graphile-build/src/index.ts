@@ -1013,7 +1013,7 @@ declare global {
           >;
           GraphQLObjectType_fields_field?: PluginHook<
             GraphileBuild.Hook<
-              GrafastFieldConfig<any, any, any, any>,
+              GrafastFieldConfig<any, any, any>,
               GraphileBuild.ContextObjectFieldsField,
               GraphileBuild.Build
             >

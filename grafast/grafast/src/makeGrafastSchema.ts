@@ -11,6 +11,7 @@ import * as graphql from "graphql";
 import type {
   AbstractTypePlanner,
   ArgumentApplyPlanResolver,
+  BaseGraphQLArguments,
   EnumValueApplyResolver,
   FieldPlanResolver,
   InputObjectFieldApplyResolver,
@@ -31,45 +32,67 @@ const {
   parse,
 } = graphql;
 
+export interface ObjectFieldConfig<
+  TSource extends Step = Step,
+  TArgs extends BaseGraphQLArguments = any,
+  TResultStep extends Step = Step,
+> {
+  plan?: FieldPlanResolver<TSource, TArgs, TResultStep>;
+  subscribePlan?: FieldPlanResolver<TSource, TArgs, TResultStep>;
+  resolve?: GraphQLFieldResolver<any, any>;
+  subscribe?: GraphQLFieldResolver<any, any>;
+  args?: {
+    [argName: string]:
+      | ArgumentApplyPlanResolver
+      | {
+          applyPlan?: ArgumentApplyPlanResolver;
+          applySubscribePlan?: ArgumentApplyPlanResolver;
+          extensions?: graphql.GraphQLArgumentExtensions;
+        };
+  };
+}
+
 // TYPES: improve the types here!
 /**
- * When defining a field with `typeDefs/plans` you can declare the field plan
+ * When defining a field with `typeDefs/objectPlans` you can declare the field plan
  * directly, or you can define a configuration object that accepts the plan and
  * more.
  */
-export type FieldPlans =
-  | FieldPlanResolver<any, any, any>
-  | {
-      plan?: FieldPlanResolver<any, any, any>;
-      subscribePlan?: FieldPlanResolver<any, any, any>;
-      resolve?: GraphQLFieldResolver<any, any>;
-      subscribe?: GraphQLFieldResolver<any, any>;
-      args?: {
-        [argName: string]:
-          | ArgumentApplyPlanResolver
-          | {
-              applyPlan?: ArgumentApplyPlanResolver;
-              applySubscribePlan?: ArgumentApplyPlanResolver;
-              extensions?: graphql.GraphQLArgumentExtensions;
-            };
-      };
-    };
+export type FieldPlan<
+  TSource extends Step = Step,
+  TArgs extends BaseGraphQLArguments = BaseGraphQLArguments,
+  TResultStep extends Step = Step,
+> =
+  | FieldPlanResolver<TSource, TArgs, TResultStep>
+  | ObjectFieldConfig<TSource, TArgs, TResultStep>;
 
+export type DeprecatedObjectPlan<TSource extends Step = Step> = {
+  __assertStep?:
+    | ((step: Step) => asserts step is TSource)
+    | { new (...args: any[]): TSource };
+  __isTypeOf?: graphql.GraphQLIsTypeOfFn<any, any>;
+  __planType?($specifier: Step): TSource;
+} & {
+  [key: string]: FieldPlan<TSource, any, any>;
+};
 /**
  * The plans/config for each field of a GraphQL object type.
  */
-export type ObjectPlans = {
-  __assertStep?:
-    | ((step: Step) => asserts step is Step)
-    | { new (...args: any[]): Step };
-} & {
-  [fieldName: string]: FieldPlans;
+export type ObjectPlan<TSource extends Step = Step> = {
+  assertStep?:
+    | ((step: Step) => asserts step is TSource)
+    | { new (...args: any[]): TSource };
+  isTypeOf?: graphql.GraphQLIsTypeOfFn<any, any>;
+  planType?($specifier: Step): TSource;
+  fields?: {
+    [key: string]: FieldPlan<TSource, any, any>;
+  };
 };
 
 /**
  * The plans for each field of a GraphQL input object type.
  */
-export type InputObjectPlans = {
+export type DeprecatedInputObjectPlan = {
   __baked?: InputObjectTypeBakedResolver;
 } & {
   [fieldName: string]:
@@ -80,10 +103,22 @@ export type InputObjectPlans = {
       };
 };
 
+export type InputObjectPlan = {
+  __baked?: InputObjectTypeBakedResolver;
+  fields?: {
+    [fieldName: string]:
+      | InputObjectFieldApplyResolver<any>
+      | {
+          apply?: InputObjectFieldApplyResolver<any>;
+          extensions?: graphql.GraphQLInputFieldExtensions;
+        };
+  };
+};
+
 /**
  * The plan config for an interface or union type.
  */
-export type InterfaceOrUnionPlans = {
+export interface AbstractTypePlan {
   /**
    * Runtime. If the polymorphic data just needs resolving to a type name, this
    * method can be used to return said type name. If planning of polymorphism
@@ -113,12 +148,14 @@ export type InterfaceOrUnionPlans = {
    * given type.
    */
   __planType?: ($specifier: Step) => AbstractTypePlanner;
-};
+}
+export interface InterfacePlan extends AbstractTypePlan {}
+export interface UnionPlan extends AbstractTypePlan {}
 
 /**
  * The config for a GraphQL scalar type.
  */
-export type ScalarPlans = {
+export type ScalarPlan = {
   serialize?: GraphQLScalarSerializer<any>;
   parseValue?: GraphQLScalarValueParser<any>;
   parseLiteral?: GraphQLScalarLiteralParser<any>;
@@ -128,7 +165,7 @@ export type ScalarPlans = {
 /**
  * The values/configs for the entries in a GraphQL enum type.
  */
-export type EnumPlans = {
+export type EnumPlan = {
   // The internal value for the enum
   [enumValueName: string]:
     | EnumValueApplyResolver
@@ -144,28 +181,54 @@ export type EnumPlans = {
 
 /**
  * A map from GraphQL named type to the config for that type.
+ *
+ * @deprecated Please use the different plan types instead
  */
 export interface GrafastPlans {
   [typeName: string]:
-    | ObjectPlans
-    | InputObjectPlans
-    | InterfaceOrUnionPlans
-    | ScalarPlans
-    | EnumPlans;
+    | DeprecatedObjectPlan
+    | DeprecatedInputObjectPlan
+    | AbstractTypePlan
+    | ScalarPlan
+    | EnumPlan;
+}
+
+export interface GrafastSchemaSpec {
+  typeDefs: string | graphql.DocumentNode | graphql.DocumentNode[];
+  /** @deprecated Please use objectPlans, unionPlans, interfacePlans, inputObjectPlans, scalarPlans or enumPlans as appropriate */
+  plans?: GrafastPlans;
+  scalarPlans?: { [typeName: string]: ScalarPlan };
+  enumPlans?: { [typeName: string]: EnumPlan };
+  objectPlans?: { [typeName: string]: ObjectPlan };
+  unionPlans?: { [typeName: string]: UnionPlan };
+  interfacePlans?: { [typeName: string]: InterfacePlan };
+  inputObjectPlans?: { [typeName: string]: InputObjectPlan };
+  enableDeferStream?: boolean;
 }
 
 /**
  * Takes a GraphQL schema definition in Interface Definition Language (IDL/SDL)
  * syntax and configs for the types in it and returns a GraphQL schema.
  */
-export function makeGrafastSchema(details: {
-  typeDefs: string;
-  plans: GrafastPlans;
-  enableDeferStream?: boolean;
-}): GraphQLSchema {
-  const { typeDefs, plans, enableDeferStream = false } = details;
+export function makeGrafastSchema(details: GrafastSchemaSpec): GraphQLSchema {
+  const { typeDefs, plans = {}, enableDeferStream = false } = details;
 
-  const astSchema = buildASTSchema(parse(typeDefs), {
+  const document: graphql.DocumentNode =
+    typeof typeDefs === "string"
+      ? parse(typeDefs)
+      : Array.isArray(typeDefs)
+        ? {
+            kind: graphql.Kind.DOCUMENT,
+            definitions: typeDefs.flatMap((t) => t.definitions),
+          }
+        : typeDefs;
+  if (!document || document.kind !== "Document") {
+    throw new Error(
+      "The first argument to makeGrafastSchema must be an object containing a `typeDefs` field; the value for this field should be a parsed GraphQL document, array of these, or a string.",
+    );
+  }
+
+  const astSchema = buildASTSchema(document, {
     enableDeferStream,
   });
   const schemaConfig = astSchema.toConfig() as graphql.GraphQLSchemaConfig & {
@@ -226,7 +289,9 @@ export function makeGrafastSchema(details: {
       }
       if (isObjectType(astType)) {
         const rawConfig = astType.toConfig();
-        const objectPlans = plans[astType.name] as ObjectPlans | undefined;
+        const objectPlans = plans[astType.name] as
+          | DeprecatedObjectPlan
+          | undefined;
 
         const rawFields = rawConfig.fields;
         const rawInterfaces = rawConfig.interfaces;
@@ -261,7 +326,7 @@ export function makeGrafastSchema(details: {
                 `Unsupported field name '${fieldName}'; perhaps you meant '__assertStep'?`,
               );
             }
-            const fieldSpec = rawFieldSpec as FieldPlans;
+            const fieldSpec = rawFieldSpec as FieldPlan;
 
             const field = rawFields[fieldName];
             if (!field) {
@@ -417,7 +482,7 @@ export function makeGrafastSchema(details: {
           },
         };
         const inputObjectPlans = plans[astType.name] as
-          | InputObjectPlans
+          | DeprecatedInputObjectPlan
           | undefined;
 
         if (inputObjectPlans) {
@@ -512,9 +577,7 @@ export function makeGrafastSchema(details: {
         config.interfaces = function () {
           return rawInterfaces.map((t) => mapType(t));
         };
-        const polyPlans = plans[astType.name] as
-          | InterfaceOrUnionPlans
-          | undefined;
+        const polyPlans = plans[astType.name] as AbstractTypePlan | undefined;
         if (polyPlans?.__resolveType) {
           exportNameHint(polyPlans.__resolveType, `${typeName}_resolveType`);
           config.resolveType = polyPlans.__resolveType;
@@ -541,9 +604,7 @@ export function makeGrafastSchema(details: {
         config.types = function () {
           return rawTypes.map((t) => mapType(t));
         };
-        const polyPlans = plans[astType.name] as
-          | InterfaceOrUnionPlans
-          | undefined;
+        const polyPlans = plans[astType.name] as AbstractTypePlan | undefined;
         if (polyPlans?.__resolveType) {
           exportNameHint(polyPlans.__resolveType, `${typeName}_resolveType`);
           config.resolveType = polyPlans.__resolveType;
@@ -569,7 +630,7 @@ export function makeGrafastSchema(details: {
             ...rawConfig.extensions,
           },
         };
-        const scalarPlans = plans[astType.name] as ScalarPlans | undefined;
+        const scalarPlans = plans[astType.name] as ScalarPlan | undefined;
         if (typeof scalarPlans?.serialize === "function") {
           exportNameHint(scalarPlans.serialize, `${typeName}_serialize`);
           config.serialize = scalarPlans.serialize;
@@ -600,7 +661,7 @@ export function makeGrafastSchema(details: {
             }
           >;
         };
-        const enumPlans = plans[astType.name] as EnumPlans | undefined;
+        const enumPlans = plans[astType.name] as EnumPlan | undefined;
         const enumValues = config.values;
         if (enumPlans) {
           for (const [enumValueName, enumValueSpec] of Object.entries(

@@ -808,10 +808,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                               [],
                             ),
                           },
-                        }) as Record<
-                          string,
-                          GrafastFieldConfig<any, any, any, any>
-                        >;
+                        }) as Record<string, GrafastFieldConfig<any, any, any>>;
                         if (isVoid) {
                           return fields;
                         }
@@ -1074,8 +1071,8 @@ function modFields(
         );
 
         const getSelectPlanFromParentAndArgs: FieldPlanResolver<
-          any,
           Step,
+          any,
           any
         > = isRootQuery
           ? // Not computed

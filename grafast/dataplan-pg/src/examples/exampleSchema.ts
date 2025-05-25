@@ -3107,7 +3107,6 @@ export function makeExampleSchema(
     archivedAt: attrField("archived_at", GraphQLString),
   } satisfies {
     [fieldName: string]: GrafastFieldConfig<
-      any,
       PgSelectSingleStep<
         PgResource<any, typeof singleTableItemsResource.codec, any, any, any>
       >,
@@ -3356,7 +3355,7 @@ export function makeExampleSchema(
       isExplicitlyArchived: attrField("is_explicitly_archived", GraphQLBoolean),
       archivedAt: attrField("archived_at", GraphQLString),
     }) satisfies {
-      [fieldName: string]: GrafastFieldConfig<any, TStep, any, any>;
+      [fieldName: string]: GrafastFieldConfig<TStep>;
     };
 
   const RelationalTopic = newObjectTypeBuilder<RelationalTopicStep>(

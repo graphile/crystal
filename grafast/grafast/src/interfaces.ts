@@ -14,13 +14,10 @@ import type {
   GraphQLInputObjectType,
   GraphQLInputType,
   GraphQLInterfaceType,
-  GraphQLList,
-  GraphQLNonNull,
   GraphQLObjectType,
   GraphQLOutputType,
   GraphQLScalarType,
   GraphQLSchema,
-  GraphQLType,
   GraphQLUnionType,
   OperationDefinitionNode,
   Source,
@@ -41,7 +38,7 @@ import type { LayerPlanReasonListItemStream } from "./engine/LayerPlan.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import type { FlaggedValue, SafeError } from "./error.js";
 import type { GrafastOperationOptions } from "./prepare.js";
-import type { ListCapableStep, Step } from "./step.js";
+import type { Step } from "./step.js";
 import type { __InputDefaultStep } from "./steps/__inputDefault.js";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import type { ApplyableExecutableStep } from "./steps/applyInput.js";
@@ -55,7 +52,6 @@ import type {
   ConstantStep,
   ObjectStep,
 } from "./steps/index.js";
-import type { GrafastObjectType } from "./utils.js";
 
 export type { ExecutionEntryFlags };
 
@@ -192,21 +188,27 @@ export interface BaseGraphQLVariables {
   [key: string]: unknown;
 }
 export interface BaseGraphQLArguments {
-  [key: string]: any;
+  [key: string]: unknown;
 }
-export type BaseGraphQLInputObject = BaseGraphQLArguments;
 
-export type FieldArgs = {
+export type FieldArgs<TObj extends BaseGraphQLArguments = any> = {
   /** @deprecated Use bakedInput() step instead. */
   get?: never;
+  getRaw<TKey extends keyof TObj & string>(path: TKey): Step<TObj[TKey]>;
   getRaw(
-    path?: string | ReadonlyArray<string | number>,
+    path?: ReadonlyArray<string | number>,
   ): AnyInputStep | ObjectStep<{ [argName: string]: AnyInputStep }>;
-  typeAt(path: string | ReadonlyArray<string | number>): GraphQLInputType;
+  typeAt(path: keyof TObj & string): GraphQLInputType;
+  typeAt(path: ReadonlyArray<string | number>): GraphQLInputType;
   /** This also works (without path) to apply each list entry against $target */
   apply<TArg extends object>(
     $target: ApplyableExecutableStep<TArg>,
-    path?: string | ReadonlyArray<string | number>,
+    path: keyof TObj & string,
+    getTargetFromParent?: (parent: TArg, inputValue: any) => object | undefined,
+  ): void;
+  apply<TArg extends object>(
+    $target: ApplyableExecutableStep<TArg>,
+    path?: ReadonlyArray<string | number>,
     getTargetFromParent?: (parent: TArg, inputValue: any) => object | undefined,
   ): void;
   apply<TArg extends object>(
@@ -215,16 +217,22 @@ export type FieldArgs = {
     // TYPES: Really not sure why TypeScript requires this here?
     justTargetFromParent?: never,
   ): void;
-} & AnyInputStepDollars;
-export type FieldArg = {
+} & {
+  [key in keyof TObj & string as `$${key}`]: Step<TObj[key]> &
+    (TObj[key] extends Record<string, any>
+      ? { [subkey in string as `$${subkey}`]: Step<TObj[key][subkey]> }
+      : never);
+};
+export type FieldArg<TData extends any = any> = {
   /** @deprecated Use bakedInput() step instead. */
   get?: never;
+  getRaw<TKey extends keyof TData & string>(path: TKey): Step<TData[TKey]>;
   getRaw(path?: string | ReadonlyArray<string | number>): AnyInputStep;
   typeAt(path: string | ReadonlyArray<string | number>): GraphQLInputType;
   /** This also works (without path) to apply each list entry against $target */
   apply<TArg extends object>(
     $target: ApplyableExecutableStep<TArg>,
-    path?: string | ReadonlyArray<string | number>,
+    path?: ReadonlyArray<string | number>,
     getTargetFromParent?: (parent: TArg, inputValue: any) => object | undefined,
   ): void;
   apply<TArg extends object>(
@@ -280,14 +288,21 @@ export interface FieldInfo {
  * executions.
  */
 export type FieldPlanResolver<
-  _TArgs extends BaseGraphQLArguments = BaseGraphQLArguments,
   TParentStep extends Step = Step,
-  TResultStep extends Step | null = Step | null,
-> = ($parentPlan: TParentStep, args: FieldArgs, info: FieldInfo) => TResultStep;
+  TArgs extends BaseGraphQLArguments = any,
+  TResultStep extends Step = Step,
+> = (
+  $parentPlan: TParentStep,
+  args: FieldArgs<TArgs>,
+  info: FieldInfo,
+) => TResultStep | null;
 
-export type InputObjectFieldApplyResolver<TParent> = (
+export type InputObjectFieldApplyResolver<
+  TParent extends any = any,
+  TData extends any = any,
+> = (
   target: TParent,
-  input: any, // Don't use unknown here, otherwise users can't easily cast it
+  input: TData, // Don't use unknown here, otherwise users can't easily cast it
   info: {
     schema: GraphQLSchema;
     fieldName: string;
@@ -306,12 +321,13 @@ export type InputObjectTypeBakedResolver = (
 ) => any;
 
 export type ArgumentApplyPlanResolver<
-  TParentStep extends Step = Step,
-  TFieldStep extends Step = Step,
+  TSource extends Step = any,
+  TFieldStep extends Step = any,
+  TData extends any = any,
 > = (
-  $parentPlan: TParentStep,
+  $parentPlan: TSource,
   $fieldPlan: TFieldStep,
-  input: FieldArg,
+  input: FieldArg<TData>,
   info: {
     schema: GraphQLSchema;
     arg: GraphQLArgument;
@@ -354,42 +370,17 @@ export type ScalarInputPlanResolver<TResultStep extends Step = Step> = (
  */
 export type EnumValueApplyResolver<TParent = any> = (parent: TParent) => void;
 
-// TypeScript gets upset if we go too deep, so we try and cover the most common
-// use cases and fall back to `any`
-type OutputPlanForNamedType<TType extends GraphQLType> =
-  TType extends GrafastObjectType<infer TStep, any> ? TStep : Step;
-
-export type OutputPlanForType<TType extends GraphQLOutputType> =
-  TType extends GraphQLNonNull<GraphQLList<GraphQLNonNull<infer U>>>
-    ? ListCapableStep<any, OutputPlanForNamedType<U>> | Step<ReadonlyArray<any>>
-    : TType extends GraphQLNonNull<GraphQLList<infer U>>
-      ?
-          | ListCapableStep<any, OutputPlanForNamedType<U>>
-          | Step<ReadonlyArray<any>>
-      : TType extends GraphQLList<GraphQLNonNull<infer U>>
-        ?
-            | ListCapableStep<any, OutputPlanForNamedType<U>>
-            | Step<ReadonlyArray<any>>
-        : TType extends GraphQLList<infer U>
-          ?
-              | ListCapableStep<any, OutputPlanForNamedType<U>>
-              | Step<ReadonlyArray<any>>
-          : TType extends GraphQLNonNull<infer U>
-            ? OutputPlanForNamedType<U>
-            : OutputPlanForNamedType<TType>;
-
 /**
  * Basically GraphQLFieldConfig but with an easy to access `plan` method.
  */
 export type GrafastFieldConfig<
-  TType extends GraphQLOutputType,
   TParentStep extends Step,
-  TFieldStep extends Step, // TODO: should be OutputPlanForType<TType>, but that results in everything thinking it should be a ListStep
-  TArgs extends BaseGraphQLArguments,
+  TArgs extends BaseGraphQLArguments = any,
+  TFieldStep extends Step = any,
 > = Omit<GraphQLFieldConfig<any, any>, "args" | "type"> & {
-  type: TType;
-  plan?: FieldPlanResolver<TArgs, TParentStep, TFieldStep>;
-  subscribePlan?: FieldPlanResolver<TArgs, TParentStep, TFieldStep>;
+  type: GraphQLOutputType;
+  plan?: FieldPlanResolver<TParentStep, TArgs, TFieldStep>;
+  subscribePlan?: FieldPlanResolver<TParentStep, TArgs, TFieldStep>;
   args?: GrafastFieldConfigArgumentMap;
 };
 
@@ -404,13 +395,13 @@ export type GrafastFieldConfigArgumentMap = {
  * Basically GraphQLArgumentConfig but allowing for a plan.
  */
 export type GrafastArgumentConfig<
-  TInputType extends GraphQLInputType = GraphQLInputType,
-  _TContext extends Grafast.Context = Grafast.Context,
-  _TParentStep extends Step | null = Step | null,
+  TSource extends Step = any,
+  TFieldStep extends Step = any,
+  TData extends any = any,
 > = Omit<GraphQLArgumentConfig, "type"> & {
-  type: TInputType;
-  applyPlan?: ArgumentApplyPlanResolver<any, any>;
-  applySubscribePlan?: ArgumentApplyPlanResolver<any, any>;
+  type: GraphQLInputType;
+  applyPlan?: ArgumentApplyPlanResolver<TSource, TFieldStep, TData>;
+  applySubscribePlan?: ArgumentApplyPlanResolver<TSource, TFieldStep, TData>;
 
   // No longer supported properties
   inputPlan?: never;
@@ -421,12 +412,12 @@ export type GrafastArgumentConfig<
 /**
  * Basically GraphQLInputFieldConfig but allowing for the field to have a plan.
  */
-export type GrafastInputFieldConfig<
-  TParent = any,
-  TInputType extends GraphQLInputType = GraphQLInputType,
-> = Omit<GraphQLInputFieldConfig, "type"> & {
-  type: TInputType;
-  apply?: InputObjectFieldApplyResolver<TParent>;
+export type GrafastInputFieldConfig<TParent = any, TData = any> = Omit<
+  GraphQLInputFieldConfig,
+  "type"
+> & {
+  type: GraphQLInputType;
+  apply?: InputObjectFieldApplyResolver<TParent, TData>;
 
   // No longer supported properties
   inputPlan?: never;

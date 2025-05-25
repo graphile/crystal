@@ -1,3 +1,5 @@
+import type { BaseGraphQLArguments, Step } from "grafast";
+
 export { EXPORTABLE } from "./exportable.js";
 export { gql } from "./gql.js";
 export { makeAddInflectorsPlugin } from "./makeAddInflectorsPlugin.js";
@@ -20,7 +22,6 @@ export {
   EnumResolver,
   ExtensionDefinition,
   makeExtendSchemaPlugin,
-  ObjectFieldConfig,
   ObjectPlan,
   ObjectResolver,
   Plans,
@@ -42,3 +43,13 @@ export {
   PlanWrapperRules,
   PlanWrapperRulesGenerator,
 } from "./makeWrapPlansPlugin.js";
+
+declare module "grafast" {
+  interface ObjectFieldConfig<
+    TSource extends Step = Step,
+    TArgs extends BaseGraphQLArguments = any,
+    TResultStep extends Step = Step,
+  > {
+    scope?: GraphileBuild.ScopeObjectFieldsField;
+  }
+}
