@@ -104,7 +104,7 @@ export type DeprecatedInputObjectPlan = {
 };
 
 export type InputObjectPlan = {
-  __baked?: InputObjectTypeBakedResolver;
+  baked?: InputObjectTypeBakedResolver;
   fields?: {
     [fieldName: string]:
       | InputObjectFieldApplyResolver<any>
@@ -123,34 +123,38 @@ export interface AbstractTypePlan {
    * Runtime. If the polymorphic data just needs resolving to a type name, this
    * method can be used to return said type name. If planning of polymorphism
    * is more complex for this polymorphic type (for example, if it includes
-   * fetching of data) then the `__planType` method should be used instead.
+   * fetching of data) then the `planType` method should be used instead.
    *
-   * Warning: this method is more expensive than __planType because it requires
+   * Warning: this method is more expensive than planType because it requires
    * the implementation of GraphQL.js emulation.
    */
-  __resolveType?: graphql.GraphQLTypeResolver<any, Grafast.Context>;
+  resolveType?: graphql.GraphQLTypeResolver<any, Grafast.Context>;
 
   /**
    * Takes a step representing this polymorphic position, and returns a
-   * "specifier" step that will be input to __planType. If not specified, the
+   * "specifier" step that will be input to planType. If not specified, the
    * step's own `.toSpecifier()` will be used, if present, otherwise the
    * step's own `.toRecord()`, and failing that the step itself.
    */
-  __toSpecifier?($step: Step): Step;
+  toSpecifier?($step: Step): Step;
 
   /**
    * Plantime. `$specifier` is either a step returned from a field or list
    * position with an abstract type, or a `__ValueStep` that represents the
    * combined values of such steps (to prevent unbounded plan branching).
-   * `__planType` must then construct a step that represents the `__typename`
+   * `planType` must then construct a step that represents the `__typename`
    * related to this given specifier (or `null` if no match can be found) and a
    * `planForType` method which, when called, should return the step for the
    * given type.
    */
-  __planType?: ($specifier: Step) => AbstractTypePlanner;
+  planType?: ($specifier: Step) => AbstractTypePlanner;
 }
 export interface InterfacePlan extends AbstractTypePlan {}
 export interface UnionPlan extends AbstractTypePlan {}
+
+export type DeprecatedUnionOrInterfacePlan = {
+  [TKey in keyof AbstractTypePlan as `__${TKey}`]: AbstractTypePlan[TKey];
+};
 
 /**
  * The config for a GraphQL scalar type.
@@ -188,7 +192,7 @@ export interface GrafastPlans {
   [typeName: string]:
     | DeprecatedObjectPlan
     | DeprecatedInputObjectPlan
-    | AbstractTypePlan
+    | DeprecatedUnionOrInterfacePlan
     | ScalarPlan
     | EnumPlan;
 }
@@ -577,7 +581,9 @@ export function makeGrafastSchema(details: GrafastSchemaSpec): GraphQLSchema {
         config.interfaces = function () {
           return rawInterfaces.map((t) => mapType(t));
         };
-        const polyPlans = plans[astType.name] as AbstractTypePlan | undefined;
+        const polyPlans = plans[astType.name] as
+          | DeprecatedUnionOrInterfacePlan
+          | undefined;
         if (polyPlans?.__resolveType) {
           exportNameHint(polyPlans.__resolveType, `${typeName}_resolveType`);
           config.resolveType = polyPlans.__resolveType;
@@ -604,7 +610,9 @@ export function makeGrafastSchema(details: GrafastSchemaSpec): GraphQLSchema {
         config.types = function () {
           return rawTypes.map((t) => mapType(t));
         };
-        const polyPlans = plans[astType.name] as AbstractTypePlan | undefined;
+        const polyPlans = plans[astType.name] as
+          | DeprecatedUnionOrInterfacePlan
+          | undefined;
         if (polyPlans?.__resolveType) {
           exportNameHint(polyPlans.__resolveType, `${typeName}_resolveType`);
           config.resolveType = polyPlans.__resolveType;
