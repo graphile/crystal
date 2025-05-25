@@ -2,8 +2,8 @@
 
 import type { LoadManyCallback, LoadOneCallback } from "../../dist/index.js";
 
-export type ItemSpec =
-  `${"Equipment" | "Consumable" | "UtilityItem" | "MiscItem"}:${number}`;
+export type ItemType = "Equipment" | "Consumable" | "UtilityItem" | "MiscItem";
+export type ItemSpec = `${ItemType}:${number}`;
 export type LocationType = "BetaLocation" | "SafeRoom" | "Club" | "Stairwell";
 export type LootTier = "Bronze" | "Silver" | "Gold";
 export type LootCategory = "Adventurer" | "Boss" | "Fan" | "Quest";

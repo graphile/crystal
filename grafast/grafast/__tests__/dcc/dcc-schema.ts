@@ -1,7 +1,13 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import { resolvePreset } from "graphile-config";
 
-import type { AbstractTypePlanner, FieldArgs, Step } from "../../dist/index.js";
+import type {
+  AbstractTypePlanner,
+  FieldArgs,
+  InterfacePlan,
+  ObjectPlan,
+  Step,
+} from "../../dist/index.js";
 import {
   coalesce,
   constant,
@@ -16,11 +22,15 @@ import {
 } from "../../dist/index.js";
 import type {
   ClubData,
+  ConsumableData,
   CrawlerData,
   Database,
+  EquipmentData,
   ItemSpec,
+  ItemType,
   LocationData,
   NpcData,
+  StairwellData,
 } from "./dcc-data.js";
 import {
   batchGetClubById,
@@ -264,52 +274,55 @@ export const makeBaseArgs = () => {
     objectPlans: {
       Query: {
         fields: {
-          crawler(_: any, { $id }: FieldArgs) {
+          crawler(_: Step, { $id }: FieldArgs<{ id: number }>) {
             const $db = context().get("dccDb");
-            return loadOne($id as Step<number>, $db, null, batchGetCrawlerById);
+            return loadOne($id, $db, null, batchGetCrawlerById);
           },
-          character(_: any, { $id }: FieldArgs) {
+          character(_: Step, { $id }: FieldArgs<{ id: number }>) {
             return $id;
           },
-          floor(_: any, { $number }: FieldArgs) {
+          floor(_: Step, { $number }: FieldArgs<{ number: number }>) {
             return lambda($number, getFloor);
           },
           brokenItem() {
             return constant("Utility:999");
           },
-          item(_: any, { $type, $id }: FieldArgs) {
+          item(
+            _: Step,
+            { $type, $id }: FieldArgs<{ type: ItemType; id: number }>,
+          ) {
             return lambda([$type, $id], ([type, id]) => `${type}:${id}`);
           },
         },
-      },
+      } as ObjectPlan<Step>,
       ActiveCrawler: {
         fields: {
-          bestFriend($activeCrawler: Step<CrawlerData>) {
+          bestFriend($activeCrawler) {
             const $id = inhibitOnNull(get($activeCrawler, "bestFriend"));
             const $db = context().get("dccDb");
             return loadOne($id, $db, null, batchGetCrawlerById);
           },
-          friends($activeCrawler: Step<CrawlerData>) {
+          friends($activeCrawler) {
             const $ids = get($activeCrawler, "friends");
             return $ids;
           },
         },
-      },
+      } as ObjectPlan<Step<CrawlerData>>,
       Manager: {
         fields: {
           ...SharedNpcResolvers,
-          client($manager: Step<NpcData>) {
+          client($manager) {
             const $id = inhibitOnNull(get($manager, "client"));
             const $db = context().get("dccDb");
             return loadOne($id, $db, null, batchGetCrawlerById);
           },
         },
-      },
+      } as ObjectPlan<Step<NpcData>>,
       Security: {
         fields: {
           ...SharedNpcResolvers,
 
-          clients($security: Step<NpcData>) {
+          clients($security) {
             const $ids = inhibitOnNull(get($security, "clients"));
             return each($ids, ($id) => {
               const $db = context().get("dccDb");
@@ -317,39 +330,39 @@ export const makeBaseArgs = () => {
             });
           },
         },
-      },
+      } as ObjectPlan<Step<NpcData>>,
       Guide: {
         fields: {
           ...SharedNpcResolvers,
         },
-      },
+      } as ObjectPlan<Step<NpcData>>,
       Staff: {
         fields: {
           ...SharedNpcResolvers,
         },
-      },
+      } as ObjectPlan<Step<NpcData>>,
 
       Equipment: {
         fields: {
           creator: getCreator,
         },
-      },
+      } as ObjectPlan<Step<EquipmentData>>,
       Consumable: {
         fields: {
           creator: getCreator,
         },
-      },
+      } as ObjectPlan<Step<ConsumableData>>,
       UtilityItem: {},
       MiscItem: {},
       Floor: {
         fields: {
-          locations($floor: Step<FloorData>) {
+          locations($floor) {
             const $number = get($floor, "number");
             const $db = context().get("dccDb");
             return loadMany($number, $db, null, batchGetLocationsByFloorNumber);
           },
         },
-      },
+      } as ObjectPlan<Step<FloorData>>,
       SafeRoom: {
         fields: {
           ...SharedLocationResolvers,
@@ -358,7 +371,7 @@ export const makeBaseArgs = () => {
       Club: {
         fields: {
           ...SharedLocationResolvers,
-          security($club: Step<ClubData & LocationData>) {
+          security($club) {
             const $ids = inhibitOnNull(get($club, "security"));
             return each($ids, ($id) => {
               const $db = context().get("dccDb");
@@ -366,12 +379,12 @@ export const makeBaseArgs = () => {
             });
           },
         },
-      },
+      } as ObjectPlan<Step<ClubData & LocationData>>,
       Stairwell: {
         fields: {
           ...SharedLocationResolvers,
         },
-      },
+      } as ObjectPlan<Step<StairwellData & LocationData>>,
     },
     unionPlans: {
       SafeRoomStock: ItemResolver,
@@ -379,13 +392,13 @@ export const makeBaseArgs = () => {
     },
     interfacePlans: {
       Crawler: {
-        planType($crawler: Step<CrawlerData>) {
+        planType($crawler) {
           const $__typename = lambda($crawler, crawlerToTypeName);
           return { $__typename };
         },
-      },
+      } as InterfacePlan<Step<CrawlerData>>,
       Character: {
-        planType($specifier: Step<number>) {
+        planType($specifier) {
           const $db = context().get("dccDb");
 
           const $crawlerId = inhibitOnNull(
@@ -417,11 +430,11 @@ export const makeBaseArgs = () => {
                 return null;
               }
             },
-          } as AbstractTypePlanner;
+          };
         },
-      },
+      } as InterfacePlan<Step<number>>,
       NPC: {
-        planType($npcId: Step<number>) {
+        planType($npcId) {
           const $db = context().get("dccDb");
           // TODO: Inhibit on null shouldn't be needed here
           const $npc = loadOne(
@@ -437,13 +450,13 @@ export const makeBaseArgs = () => {
             planForType(t) {
               return $npc;
             },
-          } as AbstractTypePlanner;
+          };
         },
-      },
+      } as InterfacePlan<Step<number>>,
       Item: ItemResolver,
 
       Location: {
-        planType($location: Step<LocationData>): AbstractTypePlanner {
+        planType($location) {
           const $db = context().get("dccDb");
           const $__typename = get($location, "type");
           return {
@@ -488,7 +501,7 @@ export const makeBaseArgs = () => {
             },
           };
         },
-      },
+      } as InterfacePlan<Step<LocationData>>,
     },
   });
   const dccDb = makeDb();
@@ -516,7 +529,7 @@ const SharedNpcResolvers = {
 };
 
 const ItemResolver = {
-  planType($itemSpec: Step<ItemSpec>): AbstractTypePlanner {
+  planType($itemSpec) {
     const $decoded = lambda($itemSpec, decodeItemSpec);
     const $__typename = get($decoded, "__typename");
     return {
@@ -541,7 +554,7 @@ const ItemResolver = {
       },
     };
   },
-};
+} as InterfacePlan<Step<ItemSpec>>;
 
 function getCreator($source: Step<{ creator?: number }>) {
   const $db = context().get("dccDb");
