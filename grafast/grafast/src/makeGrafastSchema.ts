@@ -118,7 +118,10 @@ export type InputObjectPlan = {
 /**
  * The plan config for an interface or union type.
  */
-export interface AbstractTypePlan {
+export interface AbstractTypePlan<
+  TSource extends Step = any,
+  TSpecifier extends Step = TSource,
+> {
   /**
    * Runtime. If the polymorphic data just needs resolving to a type name, this
    * method can be used to return said type name. If planning of polymorphism
@@ -136,7 +139,7 @@ export interface AbstractTypePlan {
    * step's own `.toSpecifier()` will be used, if present, otherwise the
    * step's own `.toRecord()`, and failing that the step itself.
    */
-  toSpecifier?($step: Step): Step;
+  toSpecifier?($step: TSource): TSpecifier;
 
   /**
    * Plantime. `$specifier` is either a step returned from a field or list
@@ -147,10 +150,16 @@ export interface AbstractTypePlan {
    * `planForType` method which, when called, should return the step for the
    * given type.
    */
-  planType?: ($specifier: Step) => AbstractTypePlanner;
+  planType?: ($specifier: TSpecifier) => AbstractTypePlanner;
 }
-export interface InterfacePlan extends AbstractTypePlan {}
-export interface UnionPlan extends AbstractTypePlan {}
+export interface InterfacePlan<
+  TSource extends Step = any,
+  TSpecifier extends Step = TSource,
+> extends AbstractTypePlan<TSource, TSpecifier> {}
+export interface UnionPlan<
+  TSource extends Step = any,
+  TSpecifier extends Step = TSource,
+> extends AbstractTypePlan<TSource, TSpecifier> {}
 
 export type DeprecatedUnionOrInterfacePlan = {
   [TKey in keyof AbstractTypePlan as `__${TKey}`]: AbstractTypePlan[TKey];
