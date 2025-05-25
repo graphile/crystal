@@ -405,14 +405,9 @@ export const makeBaseArgs = () => {
             lambda($specifier, extractCrawlerId),
           );
           const $crawler = loadOne($crawlerId, $db, null, batchGetCrawlerById);
-          const $crawlerTypename = lambda(
-            $crawler as Step<CrawlerData>,
-            crawlerToTypeName,
-          );
+          const $crawlerTypename = lambda($crawler, crawlerToTypeName);
 
-          const $npcId = inhibitOnNull(
-            lambda($specifier, extractNpcId),
-          ) as Step<number>;
+          const $npcId = inhibitOnNull(lambda($specifier, extractNpcId));
           const $npc = loadOne($npcId, $db, null, batchGetNpcById);
           const $npcTypename = lambda($npc, npcToTypeName);
 
@@ -516,7 +511,7 @@ export const makeBaseArgs = () => {
 
 const SharedLocationResolvers = {
   floors($place: Step<LocationData>) {
-    const $floors = get($place, "floors") as Step<number[]>;
+    const $floors = get($place, "floors");
     return each($floors, ($floor) => lambda($floor, getFloor));
   },
 };
