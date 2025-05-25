@@ -1,12 +1,18 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import { resolvePreset } from "graphile-config";
+import type { DocumentNode } from "graphql";
 
 import type {
   AbstractTypePlanner,
+  EnumPlan,
   FieldArgs,
+  GrafastSchemaSpec,
+  InputObjectPlan,
   InterfacePlan,
   ObjectPlan,
+  ScalarPlan,
   Step,
+  UnionPlan,
 } from "../../dist/index.js";
 import {
   coalesce,
@@ -62,8 +68,64 @@ declare global {
   }
 }
 
+type Overrides = {
+  SafeRoomStock: {
+    source: Step<ItemSpec>;
+  };
+  ClubStock: {
+    source: Step<ItemSpec>;
+  };
+};
+
+type Get<
+  TOverrides extends { [typeName: string]: { source?: Step } },
+  TTypeName extends string,
+  TProp extends string,
+  TFallback = any,
+> = TTypeName extends keyof TOverrides
+  ? TProp extends keyof TOverrides[TTypeName]
+    ? NonNullable<TOverrides[TTypeName][TProp]>
+    : TFallback
+  : TFallback;
+
+// TODO: generate this with codegen
+type TypedGrafastSchemaSpec = {
+  typeDefs: string | DocumentNode | DocumentNode[];
+  objectPlans?: { [typeName: string]: ObjectPlan };
+  interfacePlans?: { [typeName: string]: InterfacePlan };
+  unionPlans?: {
+    SafeRoomStock?: UnionPlan<
+      Get<Overrides, "SafeRoomStock", "source", Step>,
+      Get<
+        Overrides,
+        "SafeRoomStock",
+        "specifier",
+        // Fallback to source
+        Get<Overrides, "SafeRoomStock", "source", Step>
+      >
+    >;
+    ClubStock?: UnionPlan<
+      Get<Overrides, "ClubStock", "source", Step>,
+      Get<
+        Overrides,
+        "ClubStock",
+        "specifier",
+        // Fallback to source
+        Get<Overrides, "ClubStock", "source", Step>
+      >
+    >;
+  };
+  inputObjectPlans?: { [typeName: string]: InputObjectPlan };
+  scalarPlans?: { [typeName: string]: ScalarPlan };
+  enumPlans?: { [typeName: string]: EnumPlan };
+};
+
+function typedMakeGrafastSchema(spec: TypedGrafastSchemaSpec) {
+  return makeGrafastSchema(spec);
+}
+
 export const makeBaseArgs = () => {
-  const schema = makeGrafastSchema({
+  const schema = typedMakeGrafastSchema({
     typeDefs: /* GraphQL */ `
       enum Species {
         HUMAN
