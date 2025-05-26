@@ -3,30 +3,31 @@ friend. A friend can be an ActiveCrawler or an NPC - and NPC is a polymorphic
 type which can lead to the nodes in the plan combining when appropriate.
 
 ```mermaid
-graph TD
-Id --> IsCrawler
-Id --> IsNPC
+  graph TD
 
-subgraph Crawler
-IsCrawler --> LoadCrawler
-LoadCrawler --> GetTypeNameFromCrawler
-LoadCrawler --> ActiveCrawler
-LoadCrawler --> DeletedCrawler
-end
+  Id --> IsCrawler
+  Id --> IsNPC
 
-subgraph NPC
-IsNPC --> LoadNPC
-LoadNPC --> GetTypeNameFromNPC
-LoadNPC --> Manager & Security & Staff & Guide
-end
+  subgraph Crawler
+  IsCrawler --> LoadCrawler
+  LoadCrawler --> GetTypeNameFromCrawler
+  LoadCrawler --> ActiveCrawler
+  LoadCrawler --> DeletedCrawler
+  end
 
-GetTypeNameFromCrawler & GetTypeNameFromNPC --> Coalesce
-Coalesce --> $__typename
+  subgraph NPC
+  IsNPC --> LoadNPC
+  LoadNPC --> GetTypeNameFromNPC
+  LoadNPC --> Manager & Security & Staff & Guide
+  end
 
-ActiveCrawler & Manager & Security & Staff & Guide --> Combine
-Combine --> GetCrawlerById & GetNpcById
+  GetTypeNameFromCrawler & GetTypeNameFromNPC --> Coalesce
+  Coalesce --> $__typename
 
-GetCrawlerById --> ExtractCrawlerTypeName
-GetNpcById --> ExtractNpcTypeName
-ExtractCrawlerTypeName & ExtractNpcTypeName --> $typename_2
+  ActiveCrawler & Manager & Security & Staff & Guide --> Combine
+
+  Combine --> ExtractNpcById & ExtractCrawlerTypeName
+
+  ExtractNpcById & ExtractCrawlerTypeName --> Coalesce_2
+  Coalesce_2 --> $__typename_2
 ```
