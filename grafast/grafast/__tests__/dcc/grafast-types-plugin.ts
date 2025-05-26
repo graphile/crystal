@@ -12,7 +12,7 @@ import {
 
 export interface GrafastTypesPluginConfig {
   grafastModule?: string;
-  overridesFile: string;
+  overridesFile?: string;
 }
 
 class GrafastGenerator {
@@ -88,7 +88,16 @@ class GrafastGenerator {
     const lines: string[] = [];
     for (const type of this.types) {
       if (!isObjectType(type)) continue;
-      lines.push(`    ${type.name}?: ObjectPlan<${this.get(type, "source")}>;`);
+      lines.push(`    ${type.name}?: Omit<ObjectPlan<${this.get(type, "source")}>, 'fields'> & {
+      fields?: {
+${Object.entries(type.getFields())
+  .map(
+    ([fieldName, val]) =>
+      `        ${fieldName}?: FieldPlan<${this.get(type, "source")}, ${val.args.length > 0 ? `${type.name}${fieldName[0].toUpperCase() + fieldName.substring(1)}Args` : `NoArguments`}, any>;`,
+  )
+  .join("\n")}
+      }
+    };`);
     }
     return lines;
   }
@@ -100,7 +109,7 @@ class GrafastGenerator {
       lines.push(`    ${type.name}?: Omit<InputObjectPlan, 'fields'> & {
       fields?: {
 ${Object.entries(type.getFields())
-  .map(([key, val]) => `        ${key}?: InputFieldPlan<any, any>;`)
+  .map(([fieldName, val]) => `        ${fieldName}?: InputFieldPlan<any, any>;`)
   .join("\n")}
       }
 };`);
@@ -113,7 +122,7 @@ ${Object.entries(type.getFields())
       [
         "// Generated GraphQL SDK (auto-generated – do not edit)",
         "",
-        `import type { AbstractTypePlanner, EnumPlan, FieldArgs, FieldPlan, InputFieldPlan, GrafastSchemaSpec, InputObjectPlan, InterfacePlan, ObjectPlan, ScalarPlan, Step, UnionPlan } from '${this.config.grafastModule ?? "grafast"}';`,
+        `import type { EnumPlan, FieldPlan, InputFieldPlan, GrafastSchemaSpec, InputObjectPlan, InterfacePlan, ObjectPlan, ScalarPlan, Step, UnionPlan } from '${this.config.grafastModule ?? "grafast"}';`,
         `import { makeGrafastSchema } from '${this.config.grafastModule ?? "grafast"}';`,
         this.config.overridesFile
           ? `import type { Overrides } from '${this.config.overridesFile ?? "./grafastTypeOverrides.ts"}';`
@@ -121,6 +130,8 @@ ${Object.entries(type.getFields())
 type Overrides = {}`,
         "",
         `\
+type NoArguments = Record<string, never>;
+
 type Get<
   TTypeName extends string,
   TProp extends string,

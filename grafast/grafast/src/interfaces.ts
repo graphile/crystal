@@ -221,7 +221,7 @@ export type FieldArgs<TObj extends BaseGraphQLArguments = any> = {
   [key in keyof TObj & string as `$${key}`]: Step<TObj[key]> &
     (TObj[key] extends Record<string, any>
       ? { [subkey in string as `$${subkey}`]: Step<TObj[key][subkey]> }
-      : never);
+      : unknown);
 };
 export type FieldArg<TData extends any = any> = {
   /** @deprecated Use bakedInput() step instead. */

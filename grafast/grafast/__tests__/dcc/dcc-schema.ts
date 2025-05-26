@@ -270,21 +270,20 @@ export const makeBaseArgs = () => {
     objectPlans: {
       Query: {
         fields: {
-          france() {},
-          crawler(_, { $id }: FieldArgs<{ id: number }>) {
+          crawler(_, { $id }) {
             const $db = context().get("dccDb");
             return loadOne($id, $db, null, batchGetCrawlerById);
           },
-          character(_, { $id }: FieldArgs<{ id: number }>) {
+          character(_, { $id }) {
             return $id;
           },
-          floor(_, { $number }: FieldArgs<{ number: number }>) {
+          floor(_, { $number }) {
             return lambda($number, getFloor);
           },
           brokenItem() {
             return constant("Utility:999");
           },
-          item(_, { $type, $id }: FieldArgs<{ type: ItemType; id: number }>) {
+          item(_, { $type, $id }) {
             return lambda([$type, $id], ([type, id]) => `${type}:${id}`);
           },
         },
