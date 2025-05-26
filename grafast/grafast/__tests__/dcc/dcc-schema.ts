@@ -20,6 +20,7 @@ import type {
   ItemSpec,
   LocationData,
   NpcData,
+  ItemType,
 } from "./dcc-data.js";
 import {
   batchGetClubById,
@@ -27,6 +28,9 @@ import {
   batchGetCrawlerById,
   batchGetEquipmentById,
   batchGetLocationsByFloorNumber,
+  batchGetLootBoxById,
+  batchGetLootDataByItemTypeAndId,
+  batchGetLootDataByLootBoxId,
   batchGetMiscItemById,
   batchGetNpcById,
   batchGetSafeRoomById,
@@ -141,6 +145,7 @@ export const makeBaseArgs = () => {
       interface Item {
         id: Int!
         name: String
+        canBeFoundIn: [LootBox]
       }
       interface HasContents {
         contents: [Item]
@@ -151,6 +156,7 @@ export const makeBaseArgs = () => {
       type Equipment implements Item & Created & HasContents {
         id: Int!
         name: String
+        canBeFoundIn: [LootBox]
         contents: [Item]
         creator: Crawler
         currentDurability: Int
@@ -159,6 +165,7 @@ export const makeBaseArgs = () => {
       type Consumable implements Item & Created & HasContents {
         id: Int!
         name: String
+        canBeFoundIn: [LootBox]
         contents: [Item]
         creator: Crawler
         effect: String
@@ -166,14 +173,19 @@ export const makeBaseArgs = () => {
       type MiscItem implements Item {
         id: Int!
         name: String
+        canBeFoundIn: [LootBox]
       }
       type UtilityItem implements Item {
         id: Int!
         name: String
+        canBeFoundIn: [LootBox]
       }
 
       type LootBox {
         id: Int!
+        tier: String
+        category: String
+        possibleItems: [Item]
       }
       type LootData {
         id: Int!
@@ -335,15 +347,41 @@ export const makeBaseArgs = () => {
       Equipment: {
         plans: {
           creator: getCreator,
+          canBeFoundIn($item) {
+            const $id = get($item, "id");
+            const $type = constant("Equipment");
+            return lootBoxesForItem($type, $id);
+          },
         },
       },
       Consumable: {
         plans: {
           creator: getCreator,
+          canBeFoundIn($item) {
+            const $id = get($item, "id");
+            const $type = constant("Consumable");
+            return lootBoxesForItem($type, $id);
+          },
         },
       },
-      UtilityItem: {},
-      MiscItem: {},
+      UtilityItem: {
+        fields: {
+          canBeFoundIn($item) {
+            const $id = get($item, "id");
+            const $type = constant("UtilityItem");
+            return lootBoxesForItem($type, $id);
+          },
+        },
+      },
+      MiscItem: {
+        fields: {
+          canBeFoundIn($item) {
+            const $id = get($item, "id");
+            const $type = constant("MiscItem");
+            return lootBoxesForItem($type, $id);
+          },
+        },
+      },
       Floor: {
         plans: {
           locations($floor) {
@@ -373,6 +411,23 @@ export const makeBaseArgs = () => {
       Stairwell: {
         plans: {
           ...SharedLocationResolvers,
+        },
+      },
+      LootBox: {
+        fields: {
+          possibleItems($lootBox) {
+            const $id = get($lootBox, "id");
+            const $db = context().get("dccDb");
+
+            const $lootData = inhibitOnNull(
+              loadMany($id, $db, null, batchGetLootDataByLootBoxId),
+            );
+            return each($lootData, ($lootDatum) => {
+              const $id = get($lootDatum, "itemId");
+              const $type = get($lootDatum, "itemType");
+              return lambda([$type, $id], encodeItemSpec);
+            });
+          },
         },
       },
     },
@@ -499,6 +554,24 @@ export const makeBaseArgs = () => {
   };
 };
 
+function lootBoxesForItem($type: Step<string>, $id: Step<number>) {
+  const $db = context().get("dccDb");
+
+  const $lootData = inhibitOnNull(
+    loadMany([$type, $id], $db, null, batchGetLootDataByItemTypeAndId),
+  );
+  return each($lootData, ($lootDatum) => {
+    const $db = context().get("dccDb");
+
+    return loadOne(
+      get($lootDatum, "lootBoxId"),
+      $db,
+      null,
+      batchGetLootBoxById,
+    );
+  });
+}
+
 const SharedLocationResolvers = {
   floors($place: Step<LocationData>) {
     const $floors = get($place, "floors");
@@ -577,6 +650,17 @@ function decodeItemSpec(itemSpec: ItemSpec): {
   const [__typename, rawID] = itemSpec.split(":");
   const id = parseInt(rawID, 10);
   return { __typename, id };
+}
+
+function encodeItemSpec([type, id]: readonly [
+  type: ItemType,
+  id: number,
+]): ItemSpec {
+  return `${type}:${id}`;
+}
+
+interface FloorData {
+  number: number;
 }
 
 function getFloor(number: number): FloorData | null {
