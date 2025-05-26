@@ -32,14 +32,22 @@ class GrafastGenerator {
       .types.filter((t) => !t.name.startsWith("__"));
   }
 
+  private get(
+    type: GraphQLNamedType,
+    property: "source" | "specifier",
+    fallback: string = "Step",
+  ) {
+    return `Get<${JSON.stringify(type.name)}, ${JSON.stringify(property)}, ${fallback}>`;
+  }
+
   private getInterfacePlans(): string[] {
     const lines: string[] = [];
     for (const type of this.types) {
       if (!isInterfaceType(type)) continue;
       lines.push(`\
     ${type.name}?: InterfacePlan<
-      Get<Overrides, ${JSON.stringify(type.name)}, "source", Step>,
-      Get<Overrides, ${JSON.stringify(type.name)}, "specifier", Get<Overrides, ${JSON.stringify(type.name)}, "source", Step>>
+      ${this.get(type, "source")},
+      ${this.get(type, "specifier", this.get(type, "source"))}
     >;`);
     }
     return lines;
@@ -51,8 +59,8 @@ class GrafastGenerator {
       if (!isUnionType(type)) continue;
       lines.push(`\
     ${type.name}?: UnionPlan<
-      Get<Overrides, ${JSON.stringify(type.name)}, "source", Step>,
-      Get<Overrides, ${JSON.stringify(type.name)}, "specifier", Get<Overrides, ${JSON.stringify(type.name)}, "source", Step>>
+      ${this.get(type, "source")},
+      ${this.get(type, "specifier", this.get(type, "source"))}
     >;`);
     }
     return lines;
@@ -80,7 +88,7 @@ class GrafastGenerator {
     const lines: string[] = [];
     for (const type of this.types) {
       if (!isObjectType(type)) continue;
-      lines.push(`    ${type.name}?: ObjectPlan;`);
+      lines.push(`    ${type.name}?: ObjectPlan<${this.get(type, "source")}>;`);
     }
     return lines;
   }
@@ -108,13 +116,12 @@ type Overrides = {}`,
         "",
         `\
 type Get<
-  TOverrides extends { [typeName: string]: { source?: Step } },
   TTypeName extends string,
   TProp extends string,
   TFallback = any,
-> = TTypeName extends keyof TOverrides
-  ? TProp extends keyof TOverrides[TTypeName]
-    ? NonNullable<TOverrides[TTypeName][TProp]>
+> = TTypeName extends keyof Overrides
+  ? TProp extends keyof Overrides[TTypeName]
+    ? NonNullable<Overrides[TTypeName][TProp]>
     : TFallback
   : TFallback;`,
         "",

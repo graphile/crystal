@@ -19,16 +19,13 @@ import {
   loadOne,
 } from "../../dist/index.js";
 import type {
-  ClubData,
-  ConsumableData,
   CrawlerData,
   Database,
-  EquipmentData,
+  FloorData,
   ItemSpec,
   ItemType,
   LocationData,
   NpcData,
-  StairwellData,
 } from "./dcc-data.js";
 import {
   batchGetClubById,
@@ -273,27 +270,25 @@ export const makeBaseArgs = () => {
     objectPlans: {
       Query: {
         fields: {
-          crawler(_: Step, { $id }: FieldArgs<{ id: number }>) {
+          france() {},
+          crawler(_, { $id }: FieldArgs<{ id: number }>) {
             const $db = context().get("dccDb");
             return loadOne($id, $db, null, batchGetCrawlerById);
           },
-          character(_: Step, { $id }: FieldArgs<{ id: number }>) {
+          character(_, { $id }: FieldArgs<{ id: number }>) {
             return $id;
           },
-          floor(_: Step, { $number }: FieldArgs<{ number: number }>) {
+          floor(_, { $number }: FieldArgs<{ number: number }>) {
             return lambda($number, getFloor);
           },
           brokenItem() {
             return constant("Utility:999");
           },
-          item(
-            _: Step,
-            { $type, $id }: FieldArgs<{ type: ItemType; id: number }>,
-          ) {
+          item(_, { $type, $id }: FieldArgs<{ type: ItemType; id: number }>) {
             return lambda([$type, $id], ([type, id]) => `${type}:${id}`);
           },
         },
-      } as ObjectPlan<Step>,
+      },
       ActiveCrawler: {
         fields: {
           bestFriend($activeCrawler) {
@@ -306,7 +301,7 @@ export const makeBaseArgs = () => {
             return $ids;
           },
         },
-      } as ObjectPlan<Step<CrawlerData>>,
+      },
       Manager: {
         fields: {
           ...SharedNpcResolvers,
@@ -316,7 +311,7 @@ export const makeBaseArgs = () => {
             return loadOne($id, $db, null, batchGetCrawlerById);
           },
         },
-      } as ObjectPlan<Step<NpcData>>,
+      },
       Security: {
         fields: {
           ...SharedNpcResolvers,
@@ -329,28 +324,28 @@ export const makeBaseArgs = () => {
             });
           },
         },
-      } as ObjectPlan<Step<NpcData>>,
+      },
       Guide: {
         fields: {
           ...SharedNpcResolvers,
         },
-      } as ObjectPlan<Step<NpcData>>,
+      },
       Staff: {
         fields: {
           ...SharedNpcResolvers,
         },
-      } as ObjectPlan<Step<NpcData>>,
+      },
 
       Equipment: {
         fields: {
           creator: getCreator,
         },
-      } as ObjectPlan<Step<EquipmentData>>,
+      },
       Consumable: {
         fields: {
           creator: getCreator,
         },
-      } as ObjectPlan<Step<ConsumableData>>,
+      },
       UtilityItem: {},
       MiscItem: {},
       Floor: {
@@ -361,7 +356,7 @@ export const makeBaseArgs = () => {
             return loadMany($number, $db, null, batchGetLocationsByFloorNumber);
           },
         },
-      } as ObjectPlan<Step<FloorData>>,
+      },
       SafeRoom: {
         fields: {
           ...SharedLocationResolvers,
@@ -378,12 +373,12 @@ export const makeBaseArgs = () => {
             });
           },
         },
-      } as ObjectPlan<Step<ClubData & LocationData>>,
+      },
       Stairwell: {
         fields: {
           ...SharedLocationResolvers,
         },
-      } as ObjectPlan<Step<StairwellData & LocationData>>,
+      },
     },
     unionPlans: {
       SafeRoomStock: ItemResolver,
@@ -395,7 +390,7 @@ export const makeBaseArgs = () => {
           const $__typename = lambda($crawler, crawlerToTypeName);
           return { $__typename };
         },
-      } as InterfacePlan<Step<CrawlerData>>,
+      },
       Character: {
         planType($specifier) {
           const $db = context().get("dccDb");
@@ -426,7 +421,7 @@ export const makeBaseArgs = () => {
             },
           };
         },
-      } as InterfacePlan<Step<number>>,
+      },
       NPC: {
         planType($npcId) {
           const $db = context().get("dccDb");
@@ -446,7 +441,7 @@ export const makeBaseArgs = () => {
             },
           };
         },
-      } as InterfacePlan<Step<number>>,
+      },
       Item: ItemResolver,
 
       Location: {
@@ -495,7 +490,7 @@ export const makeBaseArgs = () => {
             },
           };
         },
-      } as InterfacePlan<Step<LocationData>>,
+      },
     },
   });
   const dccDb = makeDb();
@@ -586,10 +581,6 @@ function decodeItemSpec(itemSpec: ItemSpec): {
   const [__typename, rawID] = itemSpec.split(":");
   const id = parseInt(rawID, 10);
   return { __typename, id };
-}
-
-interface FloorData {
-  number: number;
 }
 
 function getFloor(number: number): FloorData | null {

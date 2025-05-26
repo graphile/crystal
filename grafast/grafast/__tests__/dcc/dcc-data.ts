@@ -708,3 +708,7 @@ export const batchGetBetaLocationById: LoadOneCallback<
 > = (ids, { unary: data }) => {
   return ids.map((id) => data.betaLocations.find((c) => c.id === id));
 };
+
+export interface FloorData {
+  number: number;
+}
