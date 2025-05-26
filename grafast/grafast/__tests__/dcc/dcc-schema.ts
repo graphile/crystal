@@ -1,12 +1,7 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import { resolvePreset } from "graphile-config";
 
-import type {
-  FieldArgs,
-  InterfacePlan,
-  ObjectPlan,
-  Step,
-} from "../../dist/index.js";
+import type { InterfacePlan, Step } from "../../dist/index.js";
 import {
   coalesce,
   constant,
@@ -23,7 +18,6 @@ import type {
   Database,
   FloorData,
   ItemSpec,
-  ItemType,
   LocationData,
   NpcData,
 } from "./dcc-data.js";
@@ -427,13 +421,7 @@ export const makeBaseArgs = () => {
       NPC: {
         planType($npcId) {
           const $db = context().get("dccDb");
-          // TODO: Inhibit on null shouldn't be needed here
-          const $npc = loadOne(
-            inhibitOnNull($npcId),
-            $db,
-            null,
-            batchGetNpcById,
-          );
+          const $npc = loadOne($npcId, $db, null, batchGetNpcById);
           const $__typename = lambda($npc, npcToTypeName);
 
           return {
