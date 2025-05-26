@@ -88,6 +88,8 @@
     "browser"
   ],
   "devDependencies": {
+    "@graphql-codegen/cli": "^5.0.6",
+    "@graphql-codegen/plugin-helpers": "^5.1.0",
     "@types/chai": "^4.3.5",
     "@types/jest": "^29.5.4",
     "@types/lodash": "^4.14.197",
