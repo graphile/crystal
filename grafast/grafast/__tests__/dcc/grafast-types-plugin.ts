@@ -38,12 +38,26 @@ class GrafastGenerator {
       .types.filter((t) => !t.name.startsWith("__"));
   }
 
-  private get(
+  private _get(
     type: GraphQLNamedType,
-    property: "source" | "specifier",
+    property: "nullable" | "source" | "specifier",
     fallback: string = "Step",
   ) {
     return `Get<${JSON.stringify(type.name)}, ${JSON.stringify(property)}, ${fallback}>`;
+  }
+
+  private nullable(type: GraphQLNamedType) {
+    return this._get(type, "nullable");
+  }
+  private source(type: GraphQLNamedType) {
+    return this._get(
+      type,
+      "source",
+      `NonNullStep<${this._get(type, "nullable")}>`,
+    );
+  }
+  private specifier(type: GraphQLNamedType) {
+    return this._get(type, "specifier", this.source(type));
   }
 
   private expect(type: GraphQLOutputType) {
@@ -52,7 +66,7 @@ class GrafastGenerator {
     } else if (isListType(type)) {
       return `ListOfStep<${this.expect(type.ofType)}>`;
     } else {
-      return `NullableStep<${this.get(type, "source")}>`;
+      return this.nullable(type);
     }
   }
 
@@ -62,8 +76,8 @@ class GrafastGenerator {
       if (!isInterfaceType(type)) continue;
       lines.push(`\
     ${type.name}?: InterfacePlan<
-      ${this.get(type, "source")},
-      ${this.get(type, "specifier", this.get(type, "source"))}
+      ${this.source(type)},
+      ${this.specifier(type)}
     >;`);
     }
     return lines;
@@ -75,8 +89,8 @@ class GrafastGenerator {
       if (!isUnionType(type)) continue;
       lines.push(`\
     ${type.name}?: UnionPlan<
-      ${this.get(type, "source")},
-      ${this.get(type, "specifier", this.get(type, "source"))}
+      ${this.source(type)},
+      ${this.specifier(type)}
     >;`);
     }
     return lines;
@@ -104,12 +118,12 @@ class GrafastGenerator {
     const lines: string[] = [];
     for (const type of this.types) {
       if (!isObjectType(type)) continue;
-      lines.push(`    ${type.name}?: Omit<ObjectPlan<${this.get(type, "source")}>, 'fields'> & {
+      lines.push(`    ${type.name}?: Omit<ObjectPlan<${this.source(type)}>, 'fields'> & {
       fields?: {
 ${Object.entries(type.getFields())
   .map(
     ([fieldName, fieldSpec]) =>
-      `        ${fieldName}?: FieldPlan<${this.get(type, "source")}, ${fieldSpec.args.length > 0 ? `${type.name}${fieldName[0].toUpperCase() + fieldName.substring(1)}Args` : `NoArguments`}, ${this.expect(fieldSpec.type)}>;`,
+      `        ${fieldName}?: FieldPlan<${this.source(type)}, ${fieldSpec.args.length > 0 ? `${type.name}${fieldName[0].toUpperCase() + fieldName.substring(1)}Args` : `NoArguments`}, ${this.expect(fieldSpec.type)}>;`,
   )
   .join("\n")}
       }
@@ -148,7 +162,6 @@ type Overrides = {}`,
         `\
 type NoArguments = Record<string, never>;
 type NonNullStep<TStep extends Step> = TStep & Step<TStep extends Step<infer U> ? NonNullable<U> : any>;
-type NullableStep<TStep extends Step> = TStep extends Step<infer U> ? Step<U | null | undefined> : TStep;
 type ListOfStep<TStep extends Step> = TStep extends Step<infer U> ? Step<ReadonlyArray<U> | null | undefined> : TStep;
 
 type Get<

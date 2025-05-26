@@ -1,4 +1,4 @@
-import { Step } from "../../dist";
+import { Maybe, Step } from "../../dist";
 import {
   ClubData,
   ConsumableData,
@@ -13,70 +13,74 @@ import {
   UtilityItemData,
 } from "./dcc-data";
 
+// IMPORTANT: Steps must represent the nullable version (suitable for returning
+// from a plan resolver). Should you wish to specify a different (non-nullable)
+// version that's suitable as a field plan resolver's first argument, use the
+// `source:` key in addition to specifying `nullable:`.
 export type Overrides = {
   // Unions
   SafeRoomStock: {
-    source: Step<ItemSpec>;
+    nullable: Step<Maybe<ItemSpec>>;
   };
   ClubStock: {
-    source: Step<ItemSpec>;
+    nullable: Step<Maybe<ItemSpec>>;
   };
 
   // Interfaces
   Crawler: {
-    source: Step<CrawlerData>;
+    nullable: Step<Maybe<CrawlerData>>;
   };
   Character: {
-    source: Step<number>;
+    nullable: Step<Maybe<number>>;
   };
   NPC: {
-    source: Step<number>;
+    nullable: Step<Maybe<number>>;
   };
   Item: {
-    source: Step<ItemSpec>;
+    nullable: Step<Maybe<ItemSpec>>;
   };
   Location: {
-    source: Step<LocationData>;
+    nullable: Step<Maybe<LocationData>>;
   };
 
   // Objects
   Query: {
-    source: Step;
+    nullable: Step<Maybe<Record<string, any>>>;
   };
   ActiveCrawler: {
-    source: Step<CrawlerData>;
+    nullable: Step<Maybe<CrawlerData>>;
   };
   Manager: {
-    source: Step<NpcData>;
+    nullable: Step<Maybe<NpcData>>;
   };
   Security: {
-    source: Step<NpcData>;
+    nullable: Step<Maybe<NpcData>>;
   };
   Guide: {
-    source: Step<NpcData>;
+    nullable: Step<Maybe<NpcData>>;
   };
   Staff: {
-    source: Step<NpcData>;
+    nullable: Step<Maybe<NpcData>>;
   };
   Equipment: {
-    source: Step<EquipmentData>;
+    nullable: Step<Maybe<EquipmentData>>;
   };
   Consumable: {
-    source: Step<ConsumableData>;
+    nullable: Step<Maybe<ConsumableData>>;
   };
   UtilityItem: {
-    source: Step<UtilityItemData>;
+    nullable: Step<Maybe<UtilityItemData>>;
   };
   MiscItem: {
-    source: Step<MiscItemData>;
+    nullable: Step<Maybe<MiscItemData>>;
   };
   Floor: {
-    source: Step<FloorData>;
+    nullable: Step<Maybe<FloorData>>;
   };
   SafeRoom: {
-    source: Step<LocationData & SafeRoomData>;
+    nullable: Step<Maybe<LocationData> & SafeRoomData>;
   };
   Club: {
-    source: Step<LocationData & ClubData>;
+    nullable: Step<Maybe<LocationData> & ClubData>;
   };
 };
