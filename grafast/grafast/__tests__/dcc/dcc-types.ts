@@ -1,6 +1,6 @@
 // Generated GraphQL SDK (auto-generated – do not edit)
 
-import type { AbstractTypePlanner, EnumPlan, FieldArgs, GrafastSchemaSpec, InputObjectPlan, InterfacePlan, ObjectPlan, ScalarPlan, Step, UnionPlan } from '../../dist';
+import type { AbstractTypePlanner, EnumPlan, FieldArgs, FieldPlan, InputFieldPlan, GrafastSchemaSpec, InputObjectPlan, InterfacePlan, ObjectPlan, ScalarPlan, Step, UnionPlan } from '../../dist';
 import { makeGrafastSchema } from '../../dist';
 import type { Overrides } from './dcc-type-overrides.ts';
 

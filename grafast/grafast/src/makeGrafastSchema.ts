@@ -103,15 +103,17 @@ export type DeprecatedInputObjectPlan = {
       };
 };
 
+export type InputFieldPlan<TParent = any, TData = any> =
+  | InputObjectFieldApplyResolver<TParent, TData>
+  | {
+      apply?: InputObjectFieldApplyResolver<TParent, TData>;
+      extensions?: graphql.GraphQLInputFieldExtensions;
+    };
+
 export type InputObjectPlan = {
   baked?: InputObjectTypeBakedResolver;
   fields?: {
-    [fieldName: string]:
-      | InputObjectFieldApplyResolver<any>
-      | {
-          apply?: InputObjectFieldApplyResolver<any>;
-          extensions?: graphql.GraphQLInputFieldExtensions;
-        };
+    [fieldName: string]: InputFieldPlan;
   };
 };
 

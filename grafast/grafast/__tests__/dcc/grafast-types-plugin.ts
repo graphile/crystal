@@ -97,7 +97,13 @@ class GrafastGenerator {
     const lines: string[] = [];
     for (const type of this.types) {
       if (!isInputObjectType(type)) continue;
-      lines.push(`    ${type.name}?: InputObjectPlan;`);
+      lines.push(`    ${type.name}?: Omit<InputObjectPlan, 'fields'> & {
+      fields?: {
+${Object.entries(type.getFields())
+  .map(([key, val]) => `        ${key}?: InputFieldPlan<any, any>;`)
+  .join("\n")}
+      }
+};`);
     }
     return lines;
   }
@@ -107,7 +113,7 @@ class GrafastGenerator {
       [
         "// Generated GraphQL SDK (auto-generated – do not edit)",
         "",
-        `import type { AbstractTypePlanner, EnumPlan, FieldArgs, GrafastSchemaSpec, InputObjectPlan, InterfacePlan, ObjectPlan, ScalarPlan, Step, UnionPlan } from '${this.config.grafastModule ?? "grafast"}';`,
+        `import type { AbstractTypePlanner, EnumPlan, FieldArgs, FieldPlan, InputFieldPlan, GrafastSchemaSpec, InputObjectPlan, InterfacePlan, ObjectPlan, ScalarPlan, Step, UnionPlan } from '${this.config.grafastModule ?? "grafast"}';`,
         `import { makeGrafastSchema } from '${this.config.grafastModule ?? "grafast"}';`,
         this.config.overridesFile
           ? `import type { Overrides } from '${this.config.overridesFile ?? "./grafastTypeOverrides.ts"}';`
