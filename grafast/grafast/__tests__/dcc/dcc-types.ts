@@ -271,6 +271,9 @@ import { makeGrafastSchema } from '../../dist';
 import type { Overrides } from './dcc-type-overrides.ts';
 
 type NoArguments = Record<string, never>;
+type NonNullStep<TStep extends Step> = TStep & Step<TStep extends Step<infer U> ? NonNullable<U> : any>;
+type NullableStep<TStep extends Step> = TStep extends Step<infer U> ? Step<U | null | undefined> : TStep;
+type ListOfStep<TStep extends Step> = TStep extends Step<infer U> ? Step<ReadonlyArray<U> | null | undefined> : TStep;
 
 type Get<
   TTypeName extends string,
@@ -286,161 +289,161 @@ export interface TypedGrafastSchemaSpec extends Omit<GrafastSchemaSpec, 'objectP
   objectPlans?: {
     ActiveCrawler?: Omit<ObjectPlan<Get<"ActiveCrawler", "source", Step>>, 'fields'> & {
       fields?: {
-        bestFriend?: FieldPlan<Get<"ActiveCrawler", "source", Step>, NoArguments, any>;
-        crawlerNumber?: FieldPlan<Get<"ActiveCrawler", "source", Step>, NoArguments, any>;
-        favouriteItem?: FieldPlan<Get<"ActiveCrawler", "source", Step>, NoArguments, any>;
-        friends?: FieldPlan<Get<"ActiveCrawler", "source", Step>, NoArguments, any>;
-        id?: FieldPlan<Get<"ActiveCrawler", "source", Step>, NoArguments, any>;
-        items?: FieldPlan<Get<"ActiveCrawler", "source", Step>, NoArguments, any>;
-        name?: FieldPlan<Get<"ActiveCrawler", "source", Step>, NoArguments, any>;
-        species?: FieldPlan<Get<"ActiveCrawler", "source", Step>, NoArguments, any>;
+        bestFriend?: FieldPlan<Get<"ActiveCrawler", "source", Step>, NoArguments, NullableStep<Get<"ActiveCrawler", "source", Step>>>;
+        crawlerNumber?: FieldPlan<Get<"ActiveCrawler", "source", Step>, NoArguments, NullableStep<Get<"Int", "source", Step>>>;
+        favouriteItem?: FieldPlan<Get<"ActiveCrawler", "source", Step>, NoArguments, NullableStep<Get<"Item", "source", Step>>>;
+        friends?: FieldPlan<Get<"ActiveCrawler", "source", Step>, NoArguments, ListOfStep<NullableStep<Get<"Character", "source", Step>>>>;
+        id?: FieldPlan<Get<"ActiveCrawler", "source", Step>, NoArguments, NonNullStep<NullableStep<Get<"Int", "source", Step>>>>;
+        items?: FieldPlan<Get<"ActiveCrawler", "source", Step>, NoArguments, ListOfStep<NullableStep<Get<"Item", "source", Step>>>>;
+        name?: FieldPlan<Get<"ActiveCrawler", "source", Step>, NoArguments, NonNullStep<NullableStep<Get<"String", "source", Step>>>>;
+        species?: FieldPlan<Get<"ActiveCrawler", "source", Step>, NoArguments, NullableStep<Get<"Species", "source", Step>>>;
       }
     };
     BetaLocation?: Omit<ObjectPlan<Get<"BetaLocation", "source", Step>>, 'fields'> & {
       fields?: {
-        floors?: FieldPlan<Get<"BetaLocation", "source", Step>, NoArguments, any>;
-        id?: FieldPlan<Get<"BetaLocation", "source", Step>, NoArguments, any>;
-        name?: FieldPlan<Get<"BetaLocation", "source", Step>, NoArguments, any>;
+        floors?: FieldPlan<Get<"BetaLocation", "source", Step>, NoArguments, NonNullStep<ListOfStep<NonNullStep<NullableStep<Get<"Floor", "source", Step>>>>>>;
+        id?: FieldPlan<Get<"BetaLocation", "source", Step>, NoArguments, NonNullStep<NullableStep<Get<"Int", "source", Step>>>>;
+        name?: FieldPlan<Get<"BetaLocation", "source", Step>, NoArguments, NonNullStep<NullableStep<Get<"String", "source", Step>>>>;
       }
     };
     Club?: Omit<ObjectPlan<Get<"Club", "source", Step>>, 'fields'> & {
       fields?: {
-        floors?: FieldPlan<Get<"Club", "source", Step>, NoArguments, any>;
-        id?: FieldPlan<Get<"Club", "source", Step>, NoArguments, any>;
-        manager?: FieldPlan<Get<"Club", "source", Step>, NoArguments, any>;
-        name?: FieldPlan<Get<"Club", "source", Step>, NoArguments, any>;
-        security?: FieldPlan<Get<"Club", "source", Step>, NoArguments, any>;
-        stock?: FieldPlan<Get<"Club", "source", Step>, NoArguments, any>;
-        tagline?: FieldPlan<Get<"Club", "source", Step>, NoArguments, any>;
+        floors?: FieldPlan<Get<"Club", "source", Step>, NoArguments, NonNullStep<ListOfStep<NonNullStep<NullableStep<Get<"Floor", "source", Step>>>>>>;
+        id?: FieldPlan<Get<"Club", "source", Step>, NoArguments, NonNullStep<NullableStep<Get<"Int", "source", Step>>>>;
+        manager?: FieldPlan<Get<"Club", "source", Step>, NoArguments, NullableStep<Get<"NPC", "source", Step>>>;
+        name?: FieldPlan<Get<"Club", "source", Step>, NoArguments, NonNullStep<NullableStep<Get<"String", "source", Step>>>>;
+        security?: FieldPlan<Get<"Club", "source", Step>, NoArguments, ListOfStep<NonNullStep<NullableStep<Get<"Security", "source", Step>>>>>;
+        stock?: FieldPlan<Get<"Club", "source", Step>, NoArguments, ListOfStep<NullableStep<Get<"ClubStock", "source", Step>>>>;
+        tagline?: FieldPlan<Get<"Club", "source", Step>, NoArguments, NonNullStep<NullableStep<Get<"String", "source", Step>>>>;
       }
     };
     Consumable?: Omit<ObjectPlan<Get<"Consumable", "source", Step>>, 'fields'> & {
       fields?: {
-        contents?: FieldPlan<Get<"Consumable", "source", Step>, NoArguments, any>;
-        creator?: FieldPlan<Get<"Consumable", "source", Step>, NoArguments, any>;
-        effect?: FieldPlan<Get<"Consumable", "source", Step>, NoArguments, any>;
-        id?: FieldPlan<Get<"Consumable", "source", Step>, NoArguments, any>;
-        name?: FieldPlan<Get<"Consumable", "source", Step>, NoArguments, any>;
+        contents?: FieldPlan<Get<"Consumable", "source", Step>, NoArguments, ListOfStep<NullableStep<Get<"Item", "source", Step>>>>;
+        creator?: FieldPlan<Get<"Consumable", "source", Step>, NoArguments, NullableStep<Get<"Crawler", "source", Step>>>;
+        effect?: FieldPlan<Get<"Consumable", "source", Step>, NoArguments, NullableStep<Get<"String", "source", Step>>>;
+        id?: FieldPlan<Get<"Consumable", "source", Step>, NoArguments, NonNullStep<NullableStep<Get<"Int", "source", Step>>>>;
+        name?: FieldPlan<Get<"Consumable", "source", Step>, NoArguments, NullableStep<Get<"String", "source", Step>>>;
       }
     };
     DeletedCrawler?: Omit<ObjectPlan<Get<"DeletedCrawler", "source", Step>>, 'fields'> & {
       fields?: {
-        crawlerNumber?: FieldPlan<Get<"DeletedCrawler", "source", Step>, NoArguments, any>;
-        id?: FieldPlan<Get<"DeletedCrawler", "source", Step>, NoArguments, any>;
-        name?: FieldPlan<Get<"DeletedCrawler", "source", Step>, NoArguments, any>;
+        crawlerNumber?: FieldPlan<Get<"DeletedCrawler", "source", Step>, NoArguments, NullableStep<Get<"Int", "source", Step>>>;
+        id?: FieldPlan<Get<"DeletedCrawler", "source", Step>, NoArguments, NonNullStep<NullableStep<Get<"Int", "source", Step>>>>;
+        name?: FieldPlan<Get<"DeletedCrawler", "source", Step>, NoArguments, NonNullStep<NullableStep<Get<"String", "source", Step>>>>;
       }
     };
     Equipment?: Omit<ObjectPlan<Get<"Equipment", "source", Step>>, 'fields'> & {
       fields?: {
-        contents?: FieldPlan<Get<"Equipment", "source", Step>, NoArguments, any>;
-        creator?: FieldPlan<Get<"Equipment", "source", Step>, NoArguments, any>;
-        currentDurability?: FieldPlan<Get<"Equipment", "source", Step>, NoArguments, any>;
-        id?: FieldPlan<Get<"Equipment", "source", Step>, NoArguments, any>;
-        maxDurability?: FieldPlan<Get<"Equipment", "source", Step>, NoArguments, any>;
-        name?: FieldPlan<Get<"Equipment", "source", Step>, NoArguments, any>;
+        contents?: FieldPlan<Get<"Equipment", "source", Step>, NoArguments, ListOfStep<NullableStep<Get<"Item", "source", Step>>>>;
+        creator?: FieldPlan<Get<"Equipment", "source", Step>, NoArguments, NullableStep<Get<"Crawler", "source", Step>>>;
+        currentDurability?: FieldPlan<Get<"Equipment", "source", Step>, NoArguments, NullableStep<Get<"Int", "source", Step>>>;
+        id?: FieldPlan<Get<"Equipment", "source", Step>, NoArguments, NonNullStep<NullableStep<Get<"Int", "source", Step>>>>;
+        maxDurability?: FieldPlan<Get<"Equipment", "source", Step>, NoArguments, NullableStep<Get<"Int", "source", Step>>>;
+        name?: FieldPlan<Get<"Equipment", "source", Step>, NoArguments, NullableStep<Get<"String", "source", Step>>>;
       }
     };
     Floor?: Omit<ObjectPlan<Get<"Floor", "source", Step>>, 'fields'> & {
       fields?: {
-        locations?: FieldPlan<Get<"Floor", "source", Step>, NoArguments, any>;
-        number?: FieldPlan<Get<"Floor", "source", Step>, NoArguments, any>;
+        locations?: FieldPlan<Get<"Floor", "source", Step>, NoArguments, ListOfStep<NullableStep<Get<"Location", "source", Step>>>>;
+        number?: FieldPlan<Get<"Floor", "source", Step>, NoArguments, NonNullStep<NullableStep<Get<"Int", "source", Step>>>>;
       }
     };
     Guide?: Omit<ObjectPlan<Get<"Guide", "source", Step>>, 'fields'> & {
       fields?: {
-        bestFriend?: FieldPlan<Get<"Guide", "source", Step>, NoArguments, any>;
-        exCrawler?: FieldPlan<Get<"Guide", "source", Step>, NoArguments, any>;
-        friends?: FieldPlan<Get<"Guide", "source", Step>, NoArguments, any>;
-        id?: FieldPlan<Get<"Guide", "source", Step>, NoArguments, any>;
-        name?: FieldPlan<Get<"Guide", "source", Step>, NoArguments, any>;
-        saferoomLocation?: FieldPlan<Get<"Guide", "source", Step>, NoArguments, any>;
-        species?: FieldPlan<Get<"Guide", "source", Step>, NoArguments, any>;
+        bestFriend?: FieldPlan<Get<"Guide", "source", Step>, NoArguments, NullableStep<Get<"Character", "source", Step>>>;
+        exCrawler?: FieldPlan<Get<"Guide", "source", Step>, NoArguments, NullableStep<Get<"Boolean", "source", Step>>>;
+        friends?: FieldPlan<Get<"Guide", "source", Step>, NoArguments, ListOfStep<NullableStep<Get<"Character", "source", Step>>>>;
+        id?: FieldPlan<Get<"Guide", "source", Step>, NoArguments, NonNullStep<NullableStep<Get<"Int", "source", Step>>>>;
+        name?: FieldPlan<Get<"Guide", "source", Step>, NoArguments, NonNullStep<NullableStep<Get<"String", "source", Step>>>>;
+        saferoomLocation?: FieldPlan<Get<"Guide", "source", Step>, NoArguments, NullableStep<Get<"String", "source", Step>>>;
+        species?: FieldPlan<Get<"Guide", "source", Step>, NoArguments, NullableStep<Get<"Species", "source", Step>>>;
       }
     };
     LootBox?: Omit<ObjectPlan<Get<"LootBox", "source", Step>>, 'fields'> & {
       fields?: {
-        id?: FieldPlan<Get<"LootBox", "source", Step>, NoArguments, any>;
+        id?: FieldPlan<Get<"LootBox", "source", Step>, NoArguments, NonNullStep<NullableStep<Get<"Int", "source", Step>>>>;
       }
     };
     LootData?: Omit<ObjectPlan<Get<"LootData", "source", Step>>, 'fields'> & {
       fields?: {
-        id?: FieldPlan<Get<"LootData", "source", Step>, NoArguments, any>;
-        itemId?: FieldPlan<Get<"LootData", "source", Step>, NoArguments, any>;
-        itemType?: FieldPlan<Get<"LootData", "source", Step>, NoArguments, any>;
-        lootBoxId?: FieldPlan<Get<"LootData", "source", Step>, NoArguments, any>;
-        percentageChance?: FieldPlan<Get<"LootData", "source", Step>, NoArguments, any>;
+        id?: FieldPlan<Get<"LootData", "source", Step>, NoArguments, NonNullStep<NullableStep<Get<"Int", "source", Step>>>>;
+        itemId?: FieldPlan<Get<"LootData", "source", Step>, NoArguments, NonNullStep<NullableStep<Get<"Int", "source", Step>>>>;
+        itemType?: FieldPlan<Get<"LootData", "source", Step>, NoArguments, NonNullStep<NullableStep<Get<"String", "source", Step>>>>;
+        lootBoxId?: FieldPlan<Get<"LootData", "source", Step>, NoArguments, NonNullStep<NullableStep<Get<"Int", "source", Step>>>>;
+        percentageChance?: FieldPlan<Get<"LootData", "source", Step>, NoArguments, NullableStep<Get<"Int", "source", Step>>>;
       }
     };
     Manager?: Omit<ObjectPlan<Get<"Manager", "source", Step>>, 'fields'> & {
       fields?: {
-        bestFriend?: FieldPlan<Get<"Manager", "source", Step>, NoArguments, any>;
-        client?: FieldPlan<Get<"Manager", "source", Step>, NoArguments, any>;
-        exCrawler?: FieldPlan<Get<"Manager", "source", Step>, NoArguments, any>;
-        friends?: FieldPlan<Get<"Manager", "source", Step>, NoArguments, any>;
-        id?: FieldPlan<Get<"Manager", "source", Step>, NoArguments, any>;
-        items?: FieldPlan<Get<"Manager", "source", Step>, NoArguments, any>;
-        name?: FieldPlan<Get<"Manager", "source", Step>, NoArguments, any>;
-        species?: FieldPlan<Get<"Manager", "source", Step>, NoArguments, any>;
+        bestFriend?: FieldPlan<Get<"Manager", "source", Step>, NoArguments, NullableStep<Get<"Character", "source", Step>>>;
+        client?: FieldPlan<Get<"Manager", "source", Step>, NoArguments, NullableStep<Get<"ActiveCrawler", "source", Step>>>;
+        exCrawler?: FieldPlan<Get<"Manager", "source", Step>, NoArguments, NullableStep<Get<"Boolean", "source", Step>>>;
+        friends?: FieldPlan<Get<"Manager", "source", Step>, NoArguments, ListOfStep<NullableStep<Get<"Character", "source", Step>>>>;
+        id?: FieldPlan<Get<"Manager", "source", Step>, NoArguments, NonNullStep<NullableStep<Get<"Int", "source", Step>>>>;
+        items?: FieldPlan<Get<"Manager", "source", Step>, NoArguments, ListOfStep<NullableStep<Get<"Item", "source", Step>>>>;
+        name?: FieldPlan<Get<"Manager", "source", Step>, NoArguments, NonNullStep<NullableStep<Get<"String", "source", Step>>>>;
+        species?: FieldPlan<Get<"Manager", "source", Step>, NoArguments, NullableStep<Get<"Species", "source", Step>>>;
       }
     };
     MiscItem?: Omit<ObjectPlan<Get<"MiscItem", "source", Step>>, 'fields'> & {
       fields?: {
-        id?: FieldPlan<Get<"MiscItem", "source", Step>, NoArguments, any>;
-        name?: FieldPlan<Get<"MiscItem", "source", Step>, NoArguments, any>;
+        id?: FieldPlan<Get<"MiscItem", "source", Step>, NoArguments, NonNullStep<NullableStep<Get<"Int", "source", Step>>>>;
+        name?: FieldPlan<Get<"MiscItem", "source", Step>, NoArguments, NullableStep<Get<"String", "source", Step>>>;
       }
     };
     Query?: Omit<ObjectPlan<Get<"Query", "source", Step>>, 'fields'> & {
       fields?: {
-        brokenItem?: FieldPlan<Get<"Query", "source", Step>, NoArguments, any>;
-        character?: FieldPlan<Get<"Query", "source", Step>, QueryCharacterArgs, any>;
-        crawler?: FieldPlan<Get<"Query", "source", Step>, QueryCrawlerArgs, any>;
-        floor?: FieldPlan<Get<"Query", "source", Step>, QueryFloorArgs, any>;
-        item?: FieldPlan<Get<"Query", "source", Step>, QueryItemArgs, any>;
+        brokenItem?: FieldPlan<Get<"Query", "source", Step>, NoArguments, NullableStep<Get<"Item", "source", Step>>>;
+        character?: FieldPlan<Get<"Query", "source", Step>, QueryCharacterArgs, NullableStep<Get<"Character", "source", Step>>>;
+        crawler?: FieldPlan<Get<"Query", "source", Step>, QueryCrawlerArgs, NullableStep<Get<"Crawler", "source", Step>>>;
+        floor?: FieldPlan<Get<"Query", "source", Step>, QueryFloorArgs, NullableStep<Get<"Floor", "source", Step>>>;
+        item?: FieldPlan<Get<"Query", "source", Step>, QueryItemArgs, NullableStep<Get<"Item", "source", Step>>>;
       }
     };
     SafeRoom?: Omit<ObjectPlan<Get<"SafeRoom", "source", Step>>, 'fields'> & {
       fields?: {
-        floors?: FieldPlan<Get<"SafeRoom", "source", Step>, NoArguments, any>;
-        hasPersonalSpace?: FieldPlan<Get<"SafeRoom", "source", Step>, NoArguments, any>;
-        id?: FieldPlan<Get<"SafeRoom", "source", Step>, NoArguments, any>;
-        manager?: FieldPlan<Get<"SafeRoom", "source", Step>, NoArguments, any>;
-        name?: FieldPlan<Get<"SafeRoom", "source", Step>, NoArguments, any>;
-        stock?: FieldPlan<Get<"SafeRoom", "source", Step>, NoArguments, any>;
+        floors?: FieldPlan<Get<"SafeRoom", "source", Step>, NoArguments, NonNullStep<ListOfStep<NonNullStep<NullableStep<Get<"Floor", "source", Step>>>>>>;
+        hasPersonalSpace?: FieldPlan<Get<"SafeRoom", "source", Step>, NoArguments, NullableStep<Get<"Boolean", "source", Step>>>;
+        id?: FieldPlan<Get<"SafeRoom", "source", Step>, NoArguments, NonNullStep<NullableStep<Get<"Int", "source", Step>>>>;
+        manager?: FieldPlan<Get<"SafeRoom", "source", Step>, NoArguments, NullableStep<Get<"NPC", "source", Step>>>;
+        name?: FieldPlan<Get<"SafeRoom", "source", Step>, NoArguments, NonNullStep<NullableStep<Get<"String", "source", Step>>>>;
+        stock?: FieldPlan<Get<"SafeRoom", "source", Step>, NoArguments, ListOfStep<NullableStep<Get<"SafeRoomStock", "source", Step>>>>;
       }
     };
     Security?: Omit<ObjectPlan<Get<"Security", "source", Step>>, 'fields'> & {
       fields?: {
-        bestFriend?: FieldPlan<Get<"Security", "source", Step>, NoArguments, any>;
-        clients?: FieldPlan<Get<"Security", "source", Step>, NoArguments, any>;
-        exCrawler?: FieldPlan<Get<"Security", "source", Step>, NoArguments, any>;
-        friends?: FieldPlan<Get<"Security", "source", Step>, NoArguments, any>;
-        id?: FieldPlan<Get<"Security", "source", Step>, NoArguments, any>;
-        name?: FieldPlan<Get<"Security", "source", Step>, NoArguments, any>;
-        species?: FieldPlan<Get<"Security", "source", Step>, NoArguments, any>;
+        bestFriend?: FieldPlan<Get<"Security", "source", Step>, NoArguments, NullableStep<Get<"Character", "source", Step>>>;
+        clients?: FieldPlan<Get<"Security", "source", Step>, NoArguments, ListOfStep<NonNullStep<NullableStep<Get<"ActiveCrawler", "source", Step>>>>>;
+        exCrawler?: FieldPlan<Get<"Security", "source", Step>, NoArguments, NullableStep<Get<"Boolean", "source", Step>>>;
+        friends?: FieldPlan<Get<"Security", "source", Step>, NoArguments, ListOfStep<NullableStep<Get<"Character", "source", Step>>>>;
+        id?: FieldPlan<Get<"Security", "source", Step>, NoArguments, NonNullStep<NullableStep<Get<"Int", "source", Step>>>>;
+        name?: FieldPlan<Get<"Security", "source", Step>, NoArguments, NonNullStep<NullableStep<Get<"String", "source", Step>>>>;
+        species?: FieldPlan<Get<"Security", "source", Step>, NoArguments, NullableStep<Get<"Species", "source", Step>>>;
       }
     };
     Staff?: Omit<ObjectPlan<Get<"Staff", "source", Step>>, 'fields'> & {
       fields?: {
-        bestFriend?: FieldPlan<Get<"Staff", "source", Step>, NoArguments, any>;
-        exCrawler?: FieldPlan<Get<"Staff", "source", Step>, NoArguments, any>;
-        friends?: FieldPlan<Get<"Staff", "source", Step>, NoArguments, any>;
-        id?: FieldPlan<Get<"Staff", "source", Step>, NoArguments, any>;
-        items?: FieldPlan<Get<"Staff", "source", Step>, NoArguments, any>;
-        name?: FieldPlan<Get<"Staff", "source", Step>, NoArguments, any>;
-        species?: FieldPlan<Get<"Staff", "source", Step>, NoArguments, any>;
+        bestFriend?: FieldPlan<Get<"Staff", "source", Step>, NoArguments, NullableStep<Get<"Character", "source", Step>>>;
+        exCrawler?: FieldPlan<Get<"Staff", "source", Step>, NoArguments, NullableStep<Get<"Boolean", "source", Step>>>;
+        friends?: FieldPlan<Get<"Staff", "source", Step>, NoArguments, ListOfStep<NullableStep<Get<"Character", "source", Step>>>>;
+        id?: FieldPlan<Get<"Staff", "source", Step>, NoArguments, NonNullStep<NullableStep<Get<"Int", "source", Step>>>>;
+        items?: FieldPlan<Get<"Staff", "source", Step>, NoArguments, ListOfStep<NullableStep<Get<"Item", "source", Step>>>>;
+        name?: FieldPlan<Get<"Staff", "source", Step>, NoArguments, NonNullStep<NullableStep<Get<"String", "source", Step>>>>;
+        species?: FieldPlan<Get<"Staff", "source", Step>, NoArguments, NullableStep<Get<"Species", "source", Step>>>;
       }
     };
     Stairwell?: Omit<ObjectPlan<Get<"Stairwell", "source", Step>>, 'fields'> & {
       fields?: {
-        floors?: FieldPlan<Get<"Stairwell", "source", Step>, NoArguments, any>;
-        id?: FieldPlan<Get<"Stairwell", "source", Step>, NoArguments, any>;
-        name?: FieldPlan<Get<"Stairwell", "source", Step>, NoArguments, any>;
+        floors?: FieldPlan<Get<"Stairwell", "source", Step>, NoArguments, NonNullStep<ListOfStep<NonNullStep<NullableStep<Get<"Floor", "source", Step>>>>>>;
+        id?: FieldPlan<Get<"Stairwell", "source", Step>, NoArguments, NonNullStep<NullableStep<Get<"Int", "source", Step>>>>;
+        name?: FieldPlan<Get<"Stairwell", "source", Step>, NoArguments, NonNullStep<NullableStep<Get<"String", "source", Step>>>>;
       }
     };
     UtilityItem?: Omit<ObjectPlan<Get<"UtilityItem", "source", Step>>, 'fields'> & {
       fields?: {
-        id?: FieldPlan<Get<"UtilityItem", "source", Step>, NoArguments, any>;
-        name?: FieldPlan<Get<"UtilityItem", "source", Step>, NoArguments, any>;
+        id?: FieldPlan<Get<"UtilityItem", "source", Step>, NoArguments, NonNullStep<NullableStep<Get<"Int", "source", Step>>>>;
+        name?: FieldPlan<Get<"UtilityItem", "source", Step>, NoArguments, NullableStep<Get<"String", "source", Step>>>;
       }
     };
   }

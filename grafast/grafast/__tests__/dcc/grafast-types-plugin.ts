@@ -1,9 +1,15 @@
 import type { PluginFunction, Types } from "@graphql-codegen/plugin-helpers";
-import type { GraphQLNamedType, GraphQLSchema } from "graphql";
+import type {
+  GraphQLNamedType,
+  GraphQLOutputType,
+  GraphQLSchema,
+} from "graphql";
 import {
   isEnumType,
   isInputObjectType,
   isInterfaceType,
+  isListType,
+  isNonNullType,
   isObjectType,
   isScalarType,
   isSpecifiedScalarType,
@@ -38,6 +44,16 @@ class GrafastGenerator {
     fallback: string = "Step",
   ) {
     return `Get<${JSON.stringify(type.name)}, ${JSON.stringify(property)}, ${fallback}>`;
+  }
+
+  private expect(type: GraphQLOutputType) {
+    if (isNonNullType(type)) {
+      return `NonNullStep<${this.expect(type.ofType)}>`;
+    } else if (isListType(type)) {
+      return `ListOfStep<${this.expect(type.ofType)}>`;
+    } else {
+      return `NullableStep<${this.get(type, "source")}>`;
+    }
   }
 
   private getInterfacePlans(): string[] {
@@ -92,8 +108,8 @@ class GrafastGenerator {
       fields?: {
 ${Object.entries(type.getFields())
   .map(
-    ([fieldName, val]) =>
-      `        ${fieldName}?: FieldPlan<${this.get(type, "source")}, ${val.args.length > 0 ? `${type.name}${fieldName[0].toUpperCase() + fieldName.substring(1)}Args` : `NoArguments`}, any>;`,
+    ([fieldName, fieldSpec]) =>
+      `        ${fieldName}?: FieldPlan<${this.get(type, "source")}, ${fieldSpec.args.length > 0 ? `${type.name}${fieldName[0].toUpperCase() + fieldName.substring(1)}Args` : `NoArguments`}, ${this.expect(fieldSpec.type)}>;`,
   )
   .join("\n")}
       }
@@ -131,6 +147,9 @@ type Overrides = {}`,
         "",
         `\
 type NoArguments = Record<string, never>;
+type NonNullStep<TStep extends Step> = TStep & Step<TStep extends Step<infer U> ? NonNullable<U> : any>;
+type NullableStep<TStep extends Step> = TStep extends Step<infer U> ? Step<U | null | undefined> : TStep;
+type ListOfStep<TStep extends Step> = TStep extends Step<infer U> ? Step<ReadonlyArray<U> | null | undefined> : TStep;
 
 type Get<
   TTypeName extends string,

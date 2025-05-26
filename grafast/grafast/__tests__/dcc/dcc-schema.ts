@@ -281,10 +281,13 @@ export const makeBaseArgs = () => {
             return lambda($number, getFloor);
           },
           brokenItem() {
-            return constant("Utility:999");
+            return constant("Utility:999" as ItemSpec);
           },
           item(_, { $type, $id }) {
-            return lambda([$type, $id], ([type, id]) => `${type}:${id}`);
+            return lambda(
+              [$type, $id],
+              ([type, id]) => `${type}:${id}` as const,
+            );
           },
         },
       },
