@@ -1,5 +1,6 @@
 import chalk from "chalk";
 
+import type { Maybe } from "../index.js";
 import type { ListCapableStep, Step } from "../step.js";
 import { isListCapableStep } from "../step.js";
 import { __ItemStep } from "./__item.js";
@@ -50,7 +51,7 @@ export function each<
   mapper: (
     itemPlan: ItemsStep<TListStep> extends ListCapableStep<any, any>
       ? ReturnType<ItemsStep<TListStep>["listItem"]>
-      : __ItemStep<any>,
+      : Step<TListStep extends Step<Maybe<ReadonlyArray<infer U>>> ? U : any>,
   ) => TResultItemStep,
 ): __ListTransformStep<any, any, any, any> {
   return listTransform<any, any, any, any>({
