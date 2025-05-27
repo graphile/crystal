@@ -14,7 +14,7 @@ query BaseBrokenItem {
   }
 }
 
-query BrokenItemDefer1 {
+query BrokenItemDefer1 @incremental {
   ... @defer {
     brokenItem {
       __typename
@@ -48,7 +48,7 @@ query BrokenItemDefer2 {
   }
 }
 
-query BrokenItemDefer3 {
+query BrokenItemDefer3 @incremental {
   ... @defer {
     brokenItem {
       ... @defer {
