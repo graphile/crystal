@@ -35,6 +35,16 @@ async function resolveStreamDefer(r: Awaited<ReturnType<typeof grafast>>) {
   }
 }
 
+function tidyAsyncResult(p: AsyncExecutionResult) {
+  if (p.extensions !== undefined) {
+    const copy = { ...p };
+    delete copy.extensions;
+    return copy;
+  } else {
+    return p;
+  }
+}
+
 describe("queries", () => {
   const files = readdirSync(BASE_DIR).filter(
     (n) => !n.startsWith(".") && n.endsWith(SUFFIX),
@@ -73,7 +83,7 @@ describe("queries", () => {
           it("matched data snapshot", async () => {
             if (Array.isArray(result)) {
               await snapshot(
-                JSON5.stringify(result, null, 2) + "\n",
+                JSON5.stringify(result.map(tidyAsyncResult), null, 2) + "\n",
                 `${BASE_DIR}/${baseName}${suffix}.json5`,
               );
             } else {
