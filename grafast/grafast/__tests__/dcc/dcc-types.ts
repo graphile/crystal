@@ -53,6 +53,7 @@ export type ClubStock = Consumable | MiscItem | UtilityItem;
 
 export type Consumable = Created & HasContents & Item & {
   __typename?: 'Consumable';
+  canBeFoundIn?: Maybe<Array<Maybe<LootBox>>>;
   contents?: Maybe<Array<Maybe<Item>>>;
   creator?: Maybe<Crawler>;
   effect?: Maybe<Scalars['String']['output']>;
@@ -79,6 +80,7 @@ export type DeletedCrawler = Character & Crawler & {
 
 export type Equipment = Created & HasContents & Item & {
   __typename?: 'Equipment';
+  canBeFoundIn?: Maybe<Array<Maybe<LootBox>>>;
   contents?: Maybe<Array<Maybe<Item>>>;
   creator?: Maybe<Crawler>;
   currentDurability?: Maybe<Scalars['Int']['output']>;
@@ -113,6 +115,7 @@ export type HasInventory = {
 };
 
 export type Item = {
+  canBeFoundIn?: Maybe<Array<Maybe<LootBox>>>;
   id: Scalars['Int']['output'];
   name?: Maybe<Scalars['String']['output']>;
 };
@@ -132,7 +135,10 @@ export type Location = {
 
 export type LootBox = {
   __typename?: 'LootBox';
+  category?: Maybe<Scalars['String']['output']>;
   id: Scalars['Int']['output'];
+  possibleItems?: Maybe<Array<Maybe<Item>>>;
+  tier?: Maybe<Scalars['String']['output']>;
 };
 
 export type LootData = {
@@ -158,6 +164,7 @@ export type Manager = Character & HasInventory & Npc & {
 
 export type MiscItem = Item & {
   __typename?: 'MiscItem';
+  canBeFoundIn?: Maybe<Array<Maybe<LootBox>>>;
   id: Scalars['Int']['output'];
   name?: Maybe<Scalars['String']['output']>;
 };
@@ -260,6 +267,7 @@ export type Stairwell = Location & {
 
 export type UtilityItem = Item & {
   __typename?: 'UtilityItem';
+  canBeFoundIn?: Maybe<Array<Maybe<LootBox>>>;
   id: Scalars['Int']['output'];
   name?: Maybe<Scalars['String']['output']>;
 };
@@ -318,6 +326,7 @@ export interface TypedGrafastSchemaSpec extends Omit<GrafastSchemaConfig, 'objec
     };
     Consumable?: Omit<ObjectPlan<Get<"Consumable", "source", NonNullStep<Get<"Consumable", "nullable", Step>>>>, 'plans'> & {
       plans?: {
+        canBeFoundIn?: FieldPlan<Get<"Consumable", "source", NonNullStep<Get<"Consumable", "nullable", Step>>>, NoArguments, ListOfStep<Get<"LootBox", "nullable", Step>>>;
         contents?: FieldPlan<Get<"Consumable", "source", NonNullStep<Get<"Consumable", "nullable", Step>>>, NoArguments, ListOfStep<Get<"Item", "nullable", Step>>>;
         creator?: FieldPlan<Get<"Consumable", "source", NonNullStep<Get<"Consumable", "nullable", Step>>>, NoArguments, Get<"Crawler", "nullable", Step>>;
         effect?: FieldPlan<Get<"Consumable", "source", NonNullStep<Get<"Consumable", "nullable", Step>>>, NoArguments, Get<"String", "nullable", Step>>;
@@ -334,6 +343,7 @@ export interface TypedGrafastSchemaSpec extends Omit<GrafastSchemaConfig, 'objec
     };
     Equipment?: Omit<ObjectPlan<Get<"Equipment", "source", NonNullStep<Get<"Equipment", "nullable", Step>>>>, 'plans'> & {
       plans?: {
+        canBeFoundIn?: FieldPlan<Get<"Equipment", "source", NonNullStep<Get<"Equipment", "nullable", Step>>>, NoArguments, ListOfStep<Get<"LootBox", "nullable", Step>>>;
         contents?: FieldPlan<Get<"Equipment", "source", NonNullStep<Get<"Equipment", "nullable", Step>>>, NoArguments, ListOfStep<Get<"Item", "nullable", Step>>>;
         creator?: FieldPlan<Get<"Equipment", "source", NonNullStep<Get<"Equipment", "nullable", Step>>>, NoArguments, Get<"Crawler", "nullable", Step>>;
         currentDurability?: FieldPlan<Get<"Equipment", "source", NonNullStep<Get<"Equipment", "nullable", Step>>>, NoArguments, Get<"Int", "nullable", Step>>;
@@ -361,7 +371,10 @@ export interface TypedGrafastSchemaSpec extends Omit<GrafastSchemaConfig, 'objec
     };
     LootBox?: Omit<ObjectPlan<Get<"LootBox", "source", NonNullStep<Get<"LootBox", "nullable", Step>>>>, 'plans'> & {
       plans?: {
+        category?: FieldPlan<Get<"LootBox", "source", NonNullStep<Get<"LootBox", "nullable", Step>>>, NoArguments, Get<"String", "nullable", Step>>;
         id?: FieldPlan<Get<"LootBox", "source", NonNullStep<Get<"LootBox", "nullable", Step>>>, NoArguments, NonNullStep<Get<"Int", "nullable", Step>>>;
+        possibleItems?: FieldPlan<Get<"LootBox", "source", NonNullStep<Get<"LootBox", "nullable", Step>>>, NoArguments, ListOfStep<Get<"Item", "nullable", Step>>>;
+        tier?: FieldPlan<Get<"LootBox", "source", NonNullStep<Get<"LootBox", "nullable", Step>>>, NoArguments, Get<"String", "nullable", Step>>;
       }
     };
     LootData?: Omit<ObjectPlan<Get<"LootData", "source", NonNullStep<Get<"LootData", "nullable", Step>>>>, 'plans'> & {
@@ -387,6 +400,7 @@ export interface TypedGrafastSchemaSpec extends Omit<GrafastSchemaConfig, 'objec
     };
     MiscItem?: Omit<ObjectPlan<Get<"MiscItem", "source", NonNullStep<Get<"MiscItem", "nullable", Step>>>>, 'plans'> & {
       plans?: {
+        canBeFoundIn?: FieldPlan<Get<"MiscItem", "source", NonNullStep<Get<"MiscItem", "nullable", Step>>>, NoArguments, ListOfStep<Get<"LootBox", "nullable", Step>>>;
         id?: FieldPlan<Get<"MiscItem", "source", NonNullStep<Get<"MiscItem", "nullable", Step>>>, NoArguments, NonNullStep<Get<"Int", "nullable", Step>>>;
         name?: FieldPlan<Get<"MiscItem", "source", NonNullStep<Get<"MiscItem", "nullable", Step>>>, NoArguments, Get<"String", "nullable", Step>>;
       }
@@ -441,6 +455,7 @@ export interface TypedGrafastSchemaSpec extends Omit<GrafastSchemaConfig, 'objec
     };
     UtilityItem?: Omit<ObjectPlan<Get<"UtilityItem", "source", NonNullStep<Get<"UtilityItem", "nullable", Step>>>>, 'plans'> & {
       plans?: {
+        canBeFoundIn?: FieldPlan<Get<"UtilityItem", "source", NonNullStep<Get<"UtilityItem", "nullable", Step>>>, NoArguments, ListOfStep<Get<"LootBox", "nullable", Step>>>;
         id?: FieldPlan<Get<"UtilityItem", "source", NonNullStep<Get<"UtilityItem", "nullable", Step>>>, NoArguments, NonNullStep<Get<"Int", "nullable", Step>>>;
         name?: FieldPlan<Get<"UtilityItem", "source", NonNullStep<Get<"UtilityItem", "nullable", Step>>>, NoArguments, Get<"String", "nullable", Step>>;
       }
