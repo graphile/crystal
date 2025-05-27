@@ -198,8 +198,8 @@ describe("queries", () => {
             });
           } else {
             it("was not incremental", () => {
-              if (Array.isArray(result)) {
-                console.dir(result);
+              if (Array.isArray(rawResult)) {
+                console.dir(rawResult);
                 throw new Error(
                   `Did not expect ${operationName} to be incremental; add the \`@incremental\` directive to the operation if this is expected.`,
                 );
