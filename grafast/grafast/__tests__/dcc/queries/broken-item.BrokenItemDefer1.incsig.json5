@@ -4,9 +4,7 @@
     hasNext: true,
   },
   {
-    data: {
-      brokenItem: null,
-    },
+    data: '{brokenItem:...}',
     hasNext: true,
     path: [],
   },
