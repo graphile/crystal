@@ -626,6 +626,7 @@ function crawlerToTypeName(crawler: CrawlerData): string | null {
 }
 
 function npcToTypeName(npc: NpcData): string | null {
+  if (!npc) return null;
   if (["Manager", "Security", "Guide", "Staff"].includes(npc.type)) {
     return npc.type;
   } else {
