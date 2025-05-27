@@ -239,45 +239,49 @@ const LeftArmPlugin = makeExtendSchemaPlugin((build) => {
         isTheirs: Boolean
       }
     `,
-    plans: {
+    objectPlans: {
       Person: {
-        allArms: EXPORTABLE(
-          (connection, left_arm, object) => ($person) => {
-            const $arms = left_arm.find();
+        fields: {
+          allArms: EXPORTABLE(
+            (connection, left_arm, object) => ($person) => {
+              const $arms = left_arm.find();
 
-            return connection($arms, {
-              edgeDataPlan($arm) {
-                return object({ arm: $arm, person: $person });
-              },
-            });
-          },
-          [connection, left_arm, object],
-        ),
+              return connection($arms, {
+                edgeDataPlan($arm) {
+                  return object({ arm: $arm, person: $person });
+                },
+              });
+            },
+            [connection, left_arm, object],
+          ),
+        },
       },
       PersonRelatedArmEdge: {
-        isTheirs: EXPORTABLE(
-          (aEqualsB, lambda) =>
-            (
-              $edge: EdgeStep<
-                any,
-                any,
-                any,
-                ObjectStep<{
-                  arm: PgSelectSingleStep;
-                  person: PgSelectSingleStep;
-                }>,
-                any
-              >,
-            ) => {
-              const $obj = $edge.data();
-              const $arm = $obj.get("arm");
-              const $armPersonId = $arm.get("person_id");
-              const $person = $obj.get("person");
-              const $personId = $person.get("id");
-              return lambda([$personId, $armPersonId], aEqualsB);
-            },
-          [aEqualsB, lambda],
-        ),
+        fields: {
+          isTheirs: EXPORTABLE(
+            (aEqualsB, lambda) =>
+              (
+                $edge: EdgeStep<
+                  any,
+                  any,
+                  any,
+                  ObjectStep<{
+                    arm: PgSelectSingleStep;
+                    person: PgSelectSingleStep;
+                  }>,
+                  any
+                >,
+              ) => {
+                const $obj = $edge.data();
+                const $arm = $obj.get("arm");
+                const $armPersonId = $arm.get("person_id");
+                const $person = $obj.get("person");
+                const $personId = $person.get("id");
+                return lambda([$personId, $armPersonId], aEqualsB);
+              },
+            [aEqualsB, lambda],
+          ),
+        },
       },
     },
   };
@@ -356,47 +360,51 @@ const preset: GraphileConfig.Preset = {
             wrapMe: Int
           }
         `,
-        plans: {
+        objectPlans: {
           Query: {
-            wrapMe: EXPORTABLE((constant) => () => constant(42), [constant]),
-            throw: EXPORTABLE(
-              (error) => () => {
-                return error(
-                  Object.assign(
-                    new Error(
-                      "You've requested the 'throw' field... which throws!",
+            fields: {
+              wrapMe: EXPORTABLE((constant) => () => constant(42), [constant]),
+              throw: EXPORTABLE(
+                (error) => () => {
+                  return error(
+                    Object.assign(
+                      new Error(
+                        "You've requested the 'throw' field... which throws!",
+                      ),
+                      {
+                        metadata: true,
+                        mol: 42,
+                      },
                     ),
-                    {
-                      metadata: true,
-                      mol: 42,
-                    },
-                  ),
-                );
-              },
-              [error],
-            ),
-          },
-          Person: {
-            greet: EXPORTABLE(
-              (TYPES, sql) =>
-                ($user: PgSelectSingleStep, { $greeting }) => {
-                  const placeholderSql = $user.placeholder(
-                    $greeting,
-                    TYPES.text,
-                  );
-                  return $user.select(
-                    sql`${placeholderSql} || ', ' || ${$user}.name`,
-                    TYPES.text,
                   );
                 },
-              [TYPES, sql],
-            ),
-            query: EXPORTABLE(
-              (constant) => () => {
-                return constant(true);
-              },
-              [constant],
-            ),
+                [error],
+              ),
+            },
+          },
+          Person: {
+            fields: {
+              greet: EXPORTABLE(
+                (TYPES, sql) =>
+                  ($user: PgSelectSingleStep, { $greeting }) => {
+                    const placeholderSql = $user.placeholder(
+                      $greeting,
+                      TYPES.text,
+                    );
+                    return $user.select(
+                      sql`${placeholderSql} || ', ' || ${$user}.name`,
+                      TYPES.text,
+                    );
+                  },
+                [TYPES, sql],
+              ),
+              query: EXPORTABLE(
+                (constant) => () => {
+                  return constant(true);
+                },
+                [constant],
+              ),
+            },
           },
         },
       };
@@ -423,45 +431,49 @@ const preset: GraphileConfig.Preset = {
           gql: Int
         }
       `,
-      plans: {
+      objectPlans: {
         Query: {
-          mol: EXPORTABLE(
-            (context) => () => {
-              return context().get("mol");
-            },
-            [context],
-          ),
+          fields: {
+            mol: EXPORTABLE(
+              (context) => () => {
+                return context().get("mol");
+              },
+              [context],
+            ),
+          },
         },
         Subscription: {
-          // Test via SQL: `NOTIFY test, '{"a":40}';`
-          sub: EXPORTABLE(
-            (context, jsonParse, listen, object) => (_$root, args) => {
-              const $topic = args.getRaw("topic");
-              const $pgSubscriber = context().get("pgSubscriber");
-              return listen($pgSubscriber, $topic, ($payload) =>
-                object({ sub: jsonParse($payload).get("a" as never) }),
-              );
+          fields: {
+            // Test via SQL: `NOTIFY test, '{"a":40}';`
+            sub: EXPORTABLE(
+              (context, jsonParse, listen, object) => (_$root, args) => {
+                const $topic = args.getRaw("topic");
+                const $pgSubscriber = context().get("pgSubscriber");
+                return listen($pgSubscriber, $topic, ($payload) =>
+                  object({ sub: jsonParse($payload).get("a" as never) }),
+                );
+              },
+              [context, jsonParse, listen, object],
+            ),
+            gql: {
+              resolve: EXPORTABLE(
+                () =>
+                  function resolve(e) {
+                    return e;
+                  },
+                [],
+              ),
+              subscribe: EXPORTABLE(
+                (sleep) =>
+                  async function* subscribe() {
+                    for (let i = 0; i < 10; i++) {
+                      yield i;
+                      await sleep(300);
+                    }
+                  },
+                [sleep],
+              ),
             },
-            [context, jsonParse, listen, object],
-          ),
-          gql: {
-            resolve: EXPORTABLE(
-              () =>
-                function resolve(e) {
-                  return e;
-                },
-              [],
-            ),
-            subscribe: EXPORTABLE(
-              (sleep) =>
-                async function* subscribe() {
-                  for (let i = 0; i < 10; i++) {
-                    yield i;
-                    await sleep(300);
-                  }
-                },
-              [sleep],
-            ),
           },
         },
       },
@@ -472,18 +484,20 @@ const preset: GraphileConfig.Preset = {
           error: Int
         }
       `,
-      plans: {
+      objectPlans: {
         Subscription: {
-          error: {
-            subscribePlan: EXPORTABLE(
-              (constant, lambda) =>
-                function subscribePlan() {
-                  return lambda(constant(3), () => {
-                    throw new Error("Testing error");
-                  });
-                },
-              [constant, lambda],
-            ),
+          fields: {
+            error: {
+              subscribePlan: EXPORTABLE(
+                (constant, lambda) =>
+                  function subscribePlan() {
+                    return lambda(constant(3), () => {
+                      throw new Error("Testing error");
+                    });
+                  },
+                [constant, lambda],
+              ),
+            },
           },
         },
       },
