@@ -1,7 +1,12 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import { resolvePreset } from "graphile-config";
 
-import type { FieldArgs, InterfacePlan, Step } from "../../dist/index.js";
+import type {
+  FieldArgs,
+  InterfacePlan,
+  Maybe,
+  Step,
+} from "../../dist/index.js";
 import {
   coalesce,
   constant,
@@ -38,7 +43,7 @@ import {
   batchGetUtilityItemById,
   makeDb,
 } from "./dcc-data.js";
-import { Maybe, typedMakeGrafastSchema } from "./dcc-types.js";
+import { typedMakeGrafastSchema } from "./dcc-types.js";
 import { delegate } from "./delegate.js";
 
 const resolvedPreset = resolvePreset({
@@ -76,7 +81,7 @@ export const makeBaseArgs = () => {
         BOPCA
       }
       interface HasInventory {
-        items: [Item]
+        items(first: Int): [Item]
       }
 
       type Guide implements NPC & Character {
@@ -92,7 +97,7 @@ export const makeBaseArgs = () => {
         id: Int!
         name: String!
         species: Species
-        items: [Item]
+        items(first: Int): [Item]
         exCrawler: Boolean
         friends(first: Int): [Character]
         bestFriend: Character
@@ -114,7 +119,7 @@ export const makeBaseArgs = () => {
         exCrawler: Boolean
         bestFriend: Character
         friends(first: Int): [Character]
-        items: [Item]
+        items(first: Int): [Item]
       }
       interface NPC implements Character {
         id: Int!
@@ -142,7 +147,7 @@ export const makeBaseArgs = () => {
         id: Int!
         name: String!
         species: Species
-        items: [Item]
+        items(first: Int): [Item]
         favouriteItem: Item
         friends: [Character]
         bestFriend: ActiveCrawler
@@ -318,6 +323,10 @@ export const makeBaseArgs = () => {
             const $ids = get($activeCrawler, "friends");
             return $ids;
           },
+          items($crawler, { $first }) {
+            const $items = get($crawler, "items");
+            return lambda([$items, $first], applyLimit);
+          },
         },
       },
       Manager: {
@@ -327,6 +336,10 @@ export const makeBaseArgs = () => {
             const $id = inhibitOnNull(get($manager, "client"));
             const $db = context().get("dccDb");
             return loadOne($id, $db, null, batchGetCrawlerById);
+          },
+          items($npc, { $first }) {
+            const $items = get($npc, "items");
+            return lambda([$items, $first], applyLimit);
           },
         },
       },
@@ -351,6 +364,10 @@ export const makeBaseArgs = () => {
       Staff: {
         plans: {
           ...SharedNpcResolvers,
+          items($npc, { $first }) {
+            const $items = get($npc, "items");
+            return lambda([$items, $first], applyLimit);
+          },
         },
       },
 
