@@ -46,14 +46,16 @@ type LoadCallback<
 export type LoadOneCallback<
   TSpec,
   TItem,
-  TData extends Maybe<TItem>,
+  TData extends Maybe<TItem> = Maybe<TItem>,
   TParams extends Record<string, any> = Record<string, any>,
   TUnarySpec = never,
 > = LoadCallback<TSpec, TItem, TData, TParams, TUnarySpec>;
 export type LoadManyCallback<
   TSpec,
   TItem,
-  TData extends Maybe<ReadonlyArray<Maybe<TItem>>>,
+  TData extends Maybe<ReadonlyArray<Maybe<TItem>>> = Maybe<
+    ReadonlyArray<Maybe<TItem>>
+  >,
   TParams extends Record<string, any> = Record<string, any>,
   TUnarySpec = never,
 > = LoadCallback<TSpec, TItem, TData, TParams, TUnarySpec>;
@@ -65,8 +67,8 @@ export type LoadManyCallback<
 export function loadOneCallback<
   TSpec,
   TItem,
-  TData extends Maybe<TItem>,
-  TParams extends Record<string, any>,
+  TData extends Maybe<TItem> = Maybe<TItem>,
+  TParams extends Record<string, any> = Record<string, any>,
   TUnarySpec = never,
 >(
   callback: LoadOneCallback<TSpec, TItem, TData, TParams, TUnarySpec>,
@@ -80,8 +82,10 @@ export function loadOneCallback<
 export function loadManyCallback<
   TSpec,
   TItem,
-  TData extends Maybe<ReadonlyArray<Maybe<TItem>>>,
-  TParams extends Record<string, any>,
+  TData extends Maybe<ReadonlyArray<Maybe<TItem>>> = Maybe<
+    ReadonlyArray<Maybe<TItem>>
+  >,
+  TParams extends Record<string, any> = Record<string, any>,
   TUnarySpec = never,
 >(
   callback: LoadManyCallback<TSpec, TItem, TData, TParams, TUnarySpec>,
@@ -109,7 +113,7 @@ let loadCounter = 0;
  */
 export class LoadedRecordStep<
   TItem,
-  TData extends Maybe<TItem>,
+  TData extends Maybe<TItem> = Maybe<TItem>,
   TParams extends Record<string, any> = Record<string, any>,
 > extends Step<TData> {
   static $$export = {
@@ -508,7 +512,9 @@ function load<
 export function loadMany<
   const TMultistep extends Multistep,
   TItem,
-  TData extends Maybe<ReadonlyArray<Maybe<TItem>>>,
+  TData extends Maybe<ReadonlyArray<Maybe<TItem>>> = Maybe<
+    ReadonlyArray<Maybe<TItem>>
+  >,
   TParams extends Record<string, any> = Record<string, any>,
   const TUnaryMultistep extends Multistep = never,
 >(
@@ -530,7 +536,9 @@ export function loadMany<
 export function loadMany<
   const TMultistep extends Multistep,
   TItem,
-  TData extends Maybe<ReadonlyArray<Maybe<TItem>>>,
+  TData extends Maybe<ReadonlyArray<Maybe<TItem>>> = Maybe<
+    ReadonlyArray<Maybe<TItem>>
+  >,
   TParams extends Record<string, any> = Record<string, any>,
   const TUnaryMultistep extends Multistep = never,
 >(
@@ -553,7 +561,9 @@ export function loadMany<
 export function loadMany<
   const TMultistep extends Multistep,
   TItem,
-  TData extends Maybe<ReadonlyArray<Maybe<TItem>>>,
+  TData extends Maybe<ReadonlyArray<Maybe<TItem>>> = Maybe<
+    ReadonlyArray<Maybe<TItem>>
+  >,
   TParams extends Record<string, any> = Record<string, any>,
   const TUnaryMultistep extends Multistep = never,
 >(
@@ -576,7 +586,9 @@ export function loadMany<
 export function loadMany<
   const TMultistep extends Multistep,
   TItem,
-  TData extends Maybe<ReadonlyArray<Maybe<TItem>>>,
+  TData extends Maybe<ReadonlyArray<Maybe<TItem>>> = Maybe<
+    ReadonlyArray<Maybe<TItem>>
+  >,
   TParams extends Record<string, any> = Record<string, any>,
   const TUnaryMultistep extends Multistep = never,
 >(
@@ -600,7 +612,9 @@ export function loadMany<
 export function loadMany<
   const TMultistep extends Multistep,
   TItem,
-  TData extends Maybe<ReadonlyArray<Maybe<TItem>>>,
+  TData extends Maybe<ReadonlyArray<Maybe<TItem>>> = Maybe<
+    ReadonlyArray<Maybe<TItem>>
+  >,
   TParams extends Record<string, any> = Record<string, any>,
   const TUnaryMultistep extends Multistep = never,
 >(
