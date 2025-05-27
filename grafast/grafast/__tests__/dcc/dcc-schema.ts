@@ -60,6 +60,11 @@ export const makeBaseArgs = () => {
   const schema = typedMakeGrafastSchema({
     enableDeferStream: true,
     typeDefs: /* GraphQL */ `
+      # For the tests
+      directive @incremental on QUERY | MUTATION | SUBSCRIPTION
+      scalar _RawJSON
+      directive @variables(values: _RawJSON!) on QUERY | MUTATION | SUBSCRIPTION
+
       enum Species {
         HUMAN
         CAT
