@@ -210,13 +210,20 @@ export interface GrafastPlans {
 
 export interface GrafastSchemaSpec {
   typeDefs: string | graphql.DocumentNode | graphql.DocumentNode[];
-  /** @deprecated Please use objectPlans, unionPlans, interfacePlans, inputObjectPlans, scalarPlans or enumPlans as appropriate */
+
+  /**
+   * All the different types of plans smooshed together to simulate the old
+   * typeDefs/resolvers pattern. Avoid.
+   *
+   * @deprecated Please use objectPlans, unionPlans, interfacePlans, inputObjectPlans, scalarPlans or enumPlans as appropriate.
+   */
   plans?: GrafastPlans;
+
   scalarPlans?: { [typeName: string]: ScalarPlan };
   enumPlans?: { [typeName: string]: EnumPlan };
-  objectPlans?: { [typeName: string]: ObjectPlan };
-  unionPlans?: { [typeName: string]: UnionPlan };
-  interfacePlans?: { [typeName: string]: InterfacePlan };
+  objectPlans?: { [typeName: string]: ObjectPlan<any> };
+  unionPlans?: { [typeName: string]: UnionPlan<any> };
+  interfacePlans?: { [typeName: string]: InterfacePlan<any> };
   inputObjectPlans?: { [typeName: string]: InputObjectPlan };
   enableDeferStream?: boolean;
 }
