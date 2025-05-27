@@ -1,6 +1,11 @@
 /* ALL OF THIS IS TYPESCRIPT, NOT GRAPHQL */
 
-import type { LoadManyCallback, LoadOneCallback } from "../../dist/index.js";
+import {
+  loadOneCallback,
+  Maybe,
+  type LoadManyCallback,
+  type LoadOneCallback,
+} from "../../dist/index.js";
 
 export type ItemType = "Equipment" | "Consumable" | "UtilityItem" | "MiscItem";
 export type ItemSpec = `${ItemType}:${number}`;
@@ -580,6 +585,7 @@ export function makeDb(): Database {
 export const batchGetCrawlerById: LoadOneCallback<
   number,
   CrawlerData,
+  Maybe<CrawlerData>,
   never,
   Database
 > = (ids, { unary: data }) => {
@@ -588,7 +594,8 @@ export const batchGetCrawlerById: LoadOneCallback<
 
 export const batchGetCrawlersByIds: LoadManyCallback<
   number[],
-  CrawlerData | undefined,
+  CrawlerData,
+  Maybe<ReadonlyArray<Maybe<CrawlerData>>>,
   never,
   Database
 > = (idsList, { unary: data }) => {
@@ -600,6 +607,7 @@ export const batchGetCrawlersByIds: LoadManyCallback<
 export const batchGetNpcById: LoadOneCallback<
   number,
   NpcData,
+  Maybe<NpcData>,
   never,
   Database
 > = (ids, { unary: data }) => {
@@ -608,7 +616,8 @@ export const batchGetNpcById: LoadOneCallback<
 
 export const batchGetNpcsByIds: LoadManyCallback<
   number[],
-  NpcData | undefined,
+  NpcData,
+  Maybe<ReadonlyArray<Maybe<NpcData>>>,
   never,
   Database
 > = (idsList, { unary: data }) => {
@@ -620,6 +629,7 @@ export const batchGetNpcsByIds: LoadManyCallback<
 export const batchGetEquipmentById: LoadOneCallback<
   number,
   EquipmentData,
+  Maybe<EquipmentData>,
   never,
   Database
 > = (ids, { unary: data }) => {
@@ -629,6 +639,7 @@ export const batchGetEquipmentById: LoadOneCallback<
 export const batchGetConsumableById: LoadOneCallback<
   number,
   ConsumableData,
+  Maybe<ConsumableData>,
   never,
   Database
 > = (ids, { unary: data }) => {
@@ -638,6 +649,7 @@ export const batchGetConsumableById: LoadOneCallback<
 export const batchGetUtilityItemById: LoadOneCallback<
   number,
   UtilityItemData,
+  Maybe<UtilityItemData>,
   never,
   Database
 > = (ids, { unary: data }) => {
@@ -647,6 +659,7 @@ export const batchGetUtilityItemById: LoadOneCallback<
 export const batchGetMiscItemById: LoadOneCallback<
   number,
   MiscItemData,
+  Maybe<MiscItemData>,
   never,
   Database
 > = (ids, { unary: data }) => {
@@ -656,6 +669,7 @@ export const batchGetMiscItemById: LoadOneCallback<
 export const batchGetLocationsByFloorNumber: LoadManyCallback<
   number,
   LocationData,
+  Maybe<ReadonlyArray<Maybe<LocationData>>>,
   never,
   Database
 > = (floorNumberList, { unary: data }) => {
@@ -667,6 +681,7 @@ export const batchGetLocationsByFloorNumber: LoadManyCallback<
 export const batchGetLocationById: LoadOneCallback<
   number,
   LocationData,
+  Maybe<LocationData>,
   never,
   Database
 > = (ids, { unary: data }) => {
@@ -676,6 +691,7 @@ export const batchGetLocationById: LoadOneCallback<
 export const batchGetSafeRoomById: LoadOneCallback<
   number,
   SafeRoomData,
+  Maybe<SafeRoomData>,
   never,
   Database
 > = (ids, { unary: data }) => {
@@ -685,6 +701,7 @@ export const batchGetSafeRoomById: LoadOneCallback<
 export const batchGetClubById: LoadOneCallback<
   number,
   ClubData,
+  Maybe<ClubData>,
   never,
   Database
 > = (ids, { unary: data }) => {
@@ -694,6 +711,7 @@ export const batchGetClubById: LoadOneCallback<
 export const batchGetStairwellById: LoadOneCallback<
   number,
   StairwellData,
+  Maybe<StairwellData>,
   never,
   Database
 > = (ids, { unary: data }) => {
@@ -703,6 +721,7 @@ export const batchGetStairwellById: LoadOneCallback<
 export const batchGetBetaLocationById: LoadOneCallback<
   number,
   BetaLocationData,
+  Maybe<BetaLocationData>,
   never,
   Database
 > = (ids, { unary: data }) => {

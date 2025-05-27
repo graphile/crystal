@@ -394,11 +394,15 @@ export const makeBaseArgs = () => {
           const $crawlerId = inhibitOnNull(
             lambda($specifier, extractCrawlerId),
           );
-          const $crawler = loadOne($crawlerId, $db, null, batchGetCrawlerById);
+          const $crawler = inhibitOnNull(
+            loadOne($crawlerId, $db, null, batchGetCrawlerById),
+          );
           const $crawlerTypename = lambda($crawler, crawlerToTypeName);
 
           const $npcId = inhibitOnNull(lambda($specifier, extractNpcId));
-          const $npc = loadOne($npcId, $db, null, batchGetNpcById);
+          const $npc = inhibitOnNull(
+            loadOne($npcId, $db, null, batchGetNpcById),
+          );
           const $npcTypename = lambda($npc, npcToTypeName);
 
           const $__typename = coalesce([$crawlerTypename, $npcTypename]);
@@ -421,7 +425,9 @@ export const makeBaseArgs = () => {
       NPC: {
         planType($npcId) {
           const $db = context().get("dccDb");
-          const $npc = loadOne($npcId, $db, null, batchGetNpcById);
+          const $npc = inhibitOnNull(
+            loadOne($npcId, $db, null, batchGetNpcById),
+          );
           const $__typename = lambda($npc, npcToTypeName);
 
           return {
