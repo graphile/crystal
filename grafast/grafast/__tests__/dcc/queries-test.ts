@@ -5,8 +5,11 @@ import { readFile } from "node:fs/promises";
 import { expect } from "chai";
 import {
   AsyncExecutionResult,
+  coerceInputValue,
   Kind,
   parse,
+  valueFromAST,
+  valueFromASTUntyped,
   type ExecutionResult,
 } from "graphql";
 import JSON5 from "json5";
@@ -60,6 +63,18 @@ describe("queries", () => {
       );
       operations.forEach((op, i) => {
         const operationName = op.name?.value;
+        let expectIncremental = false;
+        let variableValues = {};
+        for (const dir of op.directives ?? []) {
+          if (dir.name.value === "incremental") {
+            expectIncremental = true;
+          }
+          if (dir.name.value === "variables") {
+            for (const arg of dir.arguments ?? []) {
+              variableValues[arg.name.value] = valueFromASTUntyped(arg.value);
+            }
+          }
+        }
         const suffix = i === 0 ? "" : `.${operationName}`;
         describe(operationName ?? "unnamed", () => {
           before(async () => {
@@ -69,48 +84,81 @@ describe("queries", () => {
                 ...baseArgs,
                 source,
                 operationName,
+                variableValues,
               }),
             );
           });
-          it("did not error", () => {
-            if (Array.isArray(result)) {
+
+          if (expectIncremental) {
+            it("was incremental", () => {
+              if (!Array.isArray(result)) {
+                console.dir(result);
+                throw new Error(`Expected operation to be incremental`);
+              }
+            });
+            it("did not error", function () {
+              if (!Array.isArray(result)) return this.skip();
               const errors = result.map((r) => r.errors).filter(Boolean);
               expect(errors).to.have.length(0);
-            } else {
-              expect(result.errors).not.to.exist;
-            }
-          });
-          it("matched data snapshot", async () => {
-            if (Array.isArray(result)) {
+            });
+            it("matched data snapshot", async function () {
+              if (!Array.isArray(result)) return this.skip();
               await snapshot(
                 JSON5.stringify(result.map(tidyAsyncResult), null, 2) + "\n",
                 `${BASE_DIR}/${baseName}${suffix}.json5`,
               );
-            } else {
+            });
+            it("matched plan snapshot", async function () {
+              if (!Array.isArray(result)) return this.skip();
+              const ext = result[0].extensions;
+              const plan = (ext as any)?.explain?.operations?.find(
+                (o: any) => o.type === "plan",
+              )?.plan;
+              if (!plan && result.some((r) => r.errors)) {
+                return this.skip();
+              }
+              const mermaid = planToMermaid(plan).trim() + "\n";
+              await snapshot(
+                mermaid,
+                `${BASE_DIR}/${baseName}${suffix}.mermaid`,
+              );
+            });
+          } else {
+            it("was not incremental", () => {
+              if (Array.isArray(result)) {
+                console.dir(result);
+                throw new Error(
+                  `Did not expect ${operationName} to be incremental; add the \`@incremental\` directive to the operation if this is expected.`,
+                );
+              }
+            });
+            it("did not error", function () {
+              if (Array.isArray(result)) return this.skip();
+              expect(result.errors).not.to.exist;
+            });
+            it("matched data snapshot", async function () {
+              if (Array.isArray(result)) return this.skip();
               await snapshot(
                 JSON5.stringify(result.data, null, 2) + "\n",
                 `${BASE_DIR}/${baseName}${suffix}.json5`,
               );
-            }
-          });
-          it("matched plan snapshot", async function () {
-            const ext = Array.isArray(result)
-              ? result[0].extensions
-              : result.extensions;
-            const plan = (ext as any)?.explain?.operations?.find(
-              (o: any) => o.type === "plan",
-            )?.plan;
-            if (
-              !plan &&
-              (Array.isArray(result)
-                ? result.some((r) => r.errors)
-                : result.errors)
-            ) {
-              return this.skip();
-            }
-            const mermaid = planToMermaid(plan).trim() + "\n";
-            await snapshot(mermaid, `${BASE_DIR}/${baseName}${suffix}.mermaid`);
-          });
+            });
+            it("matched plan snapshot", async function () {
+              if (Array.isArray(result)) return this.skip();
+              const ext = result.extensions;
+              const plan = (ext as any)?.explain?.operations?.find(
+                (o: any) => o.type === "plan",
+              )?.plan;
+              if (!plan && result.errors) {
+                return this.skip();
+              }
+              const mermaid = planToMermaid(plan).trim() + "\n";
+              await snapshot(
+                mermaid,
+                `${BASE_DIR}/${baseName}${suffix}.mermaid`,
+              );
+            });
+          }
         });
       });
     });
