@@ -1,4 +1,4 @@
-{
+query BestFriend {
   character(id: 102) {
     id
     name
@@ -8,7 +8,7 @@
         id
         name
         ... on HasInventory {
-          items {
+          items(first: 3) {
             __typename
             id
             name
@@ -22,7 +22,42 @@
         id
         name
         ... on HasInventory {
-          items {
+          items(first: 3) {
+            __typename
+            id
+            name
+          }
+        }
+      }
+    }
+  }
+}
+
+query BestFriendWithVariables($first: Int) @variables(values: { first: 3 }) {
+  character(id: 102) {
+    id
+    name
+    ... on ActiveCrawler {
+      bestFriend {
+        __typename
+        id
+        name
+        ... on HasInventory {
+          items(first: $first) {
+            __typename
+            id
+            name
+          }
+        }
+      }
+    }
+    ... on NPC {
+      bestFriend {
+        __typename
+        id
+        name
+        ... on HasInventory {
+          items(first: $first) {
             __typename
             id
             name

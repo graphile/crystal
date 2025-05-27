@@ -19,3 +19,25 @@ query NpcFriends {
     }
   }
 }
+
+query NpcFriendsWithVariables($first: Int) @variables(values: { first: 2 }) {
+  npc(id: 301) {
+    __typename
+    id
+    name
+
+    exCrawler
+    ... on Manager {
+      friends(first: $first) {
+        id
+        name
+      }
+    }
+    ... on Staff {
+      friends(first: $first) {
+        id
+        name
+      }
+    }
+  }
+}

@@ -27,6 +27,11 @@ export type ActiveCrawler = Character & Crawler & HasInventory & {
   species?: Maybe<Species>;
 };
 
+
+export type ActiveCrawlerItemsArgs = {
+  first?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type BetaLocation = Location & {
   __typename?: 'BetaLocation';
   floors: Array<Floor>;
@@ -120,6 +125,11 @@ export type HasInventory = {
   items?: Maybe<Array<Maybe<Item>>>;
 };
 
+
+export type HasInventoryItemsArgs = {
+  first?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type Item = {
   canBeFoundIn?: Maybe<Array<Maybe<LootBox>>>;
   id: Scalars['Int']['output'];
@@ -170,6 +180,11 @@ export type Manager = Character & HasInventory & Npc & {
 
 
 export type ManagerFriendsArgs = {
+  first?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type ManagerItemsArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
 };
 
@@ -290,6 +305,11 @@ export type StaffFriendsArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
 };
 
+
+export type StaffItemsArgs = {
+  first?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type Stairwell = Location & {
   __typename?: 'Stairwell';
   floors: Array<Floor>;
@@ -333,7 +353,7 @@ export interface TypedGrafastSchemaSpec extends Omit<GrafastSchemaConfig, 'objec
         favouriteItem?: FieldPlan<Get<"ActiveCrawler", "source", NonNullStep<Get<"ActiveCrawler", "nullable", Step>>>, NoArguments, Get<"Item", "nullable", Step>>;
         friends?: FieldPlan<Get<"ActiveCrawler", "source", NonNullStep<Get<"ActiveCrawler", "nullable", Step>>>, NoArguments, ListOfStep<Get<"Character", "nullable", Step>>>;
         id?: FieldPlan<Get<"ActiveCrawler", "source", NonNullStep<Get<"ActiveCrawler", "nullable", Step>>>, NoArguments, NonNullStep<Get<"Int", "nullable", Step>>>;
-        items?: FieldPlan<Get<"ActiveCrawler", "source", NonNullStep<Get<"ActiveCrawler", "nullable", Step>>>, NoArguments, ListOfStep<Get<"Item", "nullable", Step>>>;
+        items?: FieldPlan<Get<"ActiveCrawler", "source", NonNullStep<Get<"ActiveCrawler", "nullable", Step>>>, ActiveCrawlerItemsArgs, ListOfStep<Get<"Item", "nullable", Step>>>;
         name?: FieldPlan<Get<"ActiveCrawler", "source", NonNullStep<Get<"ActiveCrawler", "nullable", Step>>>, NoArguments, NonNullStep<Get<"String", "nullable", Step>>>;
         species?: FieldPlan<Get<"ActiveCrawler", "source", NonNullStep<Get<"ActiveCrawler", "nullable", Step>>>, NoArguments, Get<"Species", "nullable", Step>>;
       }
@@ -425,7 +445,7 @@ export interface TypedGrafastSchemaSpec extends Omit<GrafastSchemaConfig, 'objec
         exCrawler?: FieldPlan<Get<"Manager", "source", NonNullStep<Get<"Manager", "nullable", Step>>>, NoArguments, Get<"Boolean", "nullable", Step>>;
         friends?: FieldPlan<Get<"Manager", "source", NonNullStep<Get<"Manager", "nullable", Step>>>, ManagerFriendsArgs, ListOfStep<Get<"Character", "nullable", Step>>>;
         id?: FieldPlan<Get<"Manager", "source", NonNullStep<Get<"Manager", "nullable", Step>>>, NoArguments, NonNullStep<Get<"Int", "nullable", Step>>>;
-        items?: FieldPlan<Get<"Manager", "source", NonNullStep<Get<"Manager", "nullable", Step>>>, NoArguments, ListOfStep<Get<"Item", "nullable", Step>>>;
+        items?: FieldPlan<Get<"Manager", "source", NonNullStep<Get<"Manager", "nullable", Step>>>, ManagerItemsArgs, ListOfStep<Get<"Item", "nullable", Step>>>;
         name?: FieldPlan<Get<"Manager", "source", NonNullStep<Get<"Manager", "nullable", Step>>>, NoArguments, NonNullStep<Get<"String", "nullable", Step>>>;
         species?: FieldPlan<Get<"Manager", "source", NonNullStep<Get<"Manager", "nullable", Step>>>, NoArguments, Get<"Species", "nullable", Step>>;
       }
@@ -474,7 +494,7 @@ export interface TypedGrafastSchemaSpec extends Omit<GrafastSchemaConfig, 'objec
         exCrawler?: FieldPlan<Get<"Staff", "source", NonNullStep<Get<"Staff", "nullable", Step>>>, NoArguments, Get<"Boolean", "nullable", Step>>;
         friends?: FieldPlan<Get<"Staff", "source", NonNullStep<Get<"Staff", "nullable", Step>>>, StaffFriendsArgs, ListOfStep<Get<"Character", "nullable", Step>>>;
         id?: FieldPlan<Get<"Staff", "source", NonNullStep<Get<"Staff", "nullable", Step>>>, NoArguments, NonNullStep<Get<"Int", "nullable", Step>>>;
-        items?: FieldPlan<Get<"Staff", "source", NonNullStep<Get<"Staff", "nullable", Step>>>, NoArguments, ListOfStep<Get<"Item", "nullable", Step>>>;
+        items?: FieldPlan<Get<"Staff", "source", NonNullStep<Get<"Staff", "nullable", Step>>>, StaffItemsArgs, ListOfStep<Get<"Item", "nullable", Step>>>;
         name?: FieldPlan<Get<"Staff", "source", NonNullStep<Get<"Staff", "nullable", Step>>>, NoArguments, NonNullStep<Get<"String", "nullable", Step>>>;
         species?: FieldPlan<Get<"Staff", "source", NonNullStep<Get<"Staff", "nullable", Step>>>, NoArguments, Get<"Species", "nullable", Step>>;
       }
