@@ -1,0 +1,22 @@
+{
+  npc: {
+    __typename: 'Manager',
+    id: 301,
+    name: 'Mordecai',
+    exCrawler: true,
+    friends: [
+      {
+        id: 101,
+        name: 'Carl',
+      },
+      {
+        id: 102,
+        name: 'Princess Donut',
+      },
+      {
+        id: 103,
+        name: 'Katia',
+      },
+    ],
+  },
+}

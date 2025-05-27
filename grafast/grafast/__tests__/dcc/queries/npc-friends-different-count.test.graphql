@@ -1,0 +1,21 @@
+query NpcFriendsDifferentCounts {
+  npc(id: 301) {
+    __typename
+    id
+    name
+
+    exCrawler
+    ... on Manager {
+      friends(first: 3) {
+        id
+        name
+      }
+    }
+    ... on Staff {
+      friends(first: 2) {
+        id
+        name
+      }
+    }
+  }
+}
