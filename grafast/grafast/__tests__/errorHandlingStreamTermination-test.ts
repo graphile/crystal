@@ -79,30 +79,36 @@ const makeSchema = (setStreaming: (isStreaming: boolean) => void) =>
         list: [Thing]
       }
     `,
-    plans: {
+    objectPlans: {
       Query: {
-        list() {
-          return constant([1, 2]);
+        fields: {
+          list() {
+            return constant([1, 2]);
+          },
         },
       },
       Thing: {
-        id($i: Step<number>) {
-          return $i;
-        },
-        anotherList($i: Step<number>) {
-          return new SyncListCallbackStep(
-            $i,
-            (i) => [i + 0, i + 1, i + 2],
-            setStreaming,
-          );
-        },
-        throw() {
-          return lambda(null, () => Promise.reject(new Error("ERROR")));
+        fields: {
+          id($i: Step<number>) {
+            return $i;
+          },
+          anotherList($i: Step<number>) {
+            return new SyncListCallbackStep(
+              $i,
+              (i) => [i + 0, i + 1, i + 2],
+              setStreaming,
+            );
+          },
+          throw() {
+            return lambda(null, () => Promise.reject(new Error("ERROR")));
+          },
         },
       },
       OtherThing: {
-        id($i: Step<number>) {
-          return $i;
+        fields: {
+          id($i: Step<number>) {
+            return $i;
+          },
         },
       },
     },

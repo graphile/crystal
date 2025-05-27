@@ -62,19 +62,21 @@ class BadFinalizeStep extends Step {
 }
 
 const schema = makeGrafastSchema({
-  typeDefs: `
-type Query {
-badOptimize: Int
-badFinalize: Int
-}
+  typeDefs: /* GraphQL */ `
+    type Query {
+      badOptimize: Int
+      badFinalize: Int
+    }
   `,
-  plans: {
+  objectPlans: {
     Query: {
-      badOptimize() {
-        return new BadOptimizeStep(new SomeStep());
-      },
-      badFinalize() {
-        return new BadFinalizeStep(new SomeStep());
+      fields: {
+        badOptimize() {
+          return new BadOptimizeStep(new SomeStep());
+        },
+        badFinalize() {
+          return new BadFinalizeStep(new SomeStep());
+        },
       },
     },
   },

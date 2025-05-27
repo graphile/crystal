@@ -17,13 +17,15 @@ const schema = makeGrafastSchema({
       interfacesSansPlan: [ZeroImplementations!]
     }
   `,
-  plans: {
+  objectPlans: {
     Query: {
-      interface() {
-        return constant(null);
-      },
-      interfaces() {
-        return constant([]);
+      fields: {
+        interface() {
+          return constant(null);
+        },
+        interfaces() {
+          return constant([]);
+        },
       },
     },
   },

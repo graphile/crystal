@@ -4,7 +4,6 @@ import type { ExecutionResult, GraphQLObjectType } from "graphql";
 import { GraphQLInterfaceType } from "graphql";
 import { it } from "mocha";
 
-import type { Step } from "../dist/index.js";
 import { constant, grafast, makeGrafastSchema } from "../dist/index.js";
 
 const makeSchema = () =>
@@ -28,20 +27,24 @@ const makeSchema = () =>
         notifications: [UserNotification!]!
       }
     `,
-    plans: {
+    interfacePlans: {
       UserNotification: {
-        __resolveType(obj: any) {
+        resolveType(obj: any) {
           if (obj.type === "ready") return "UserNotificationReady";
           if (obj.type === "logout") return "UserNotificationLogout";
         },
       },
+    },
+    objectPlans: {
       Query: {
-        notifications() {
-          return constant([
-            { type: "ready", isReady: true, id: "1" },
-            { type: "ready", isReady: false, id: "2" },
-            { type: "logout", username: "benjie", id: "3" },
-          ]);
+        fields: {
+          notifications() {
+            return constant([
+              { type: "ready", isReady: true, id: "1" },
+              { type: "ready", isReady: false, id: "2" },
+              { type: "logout", username: "benjie", id: "3" },
+            ]);
+          },
         },
       },
     },
