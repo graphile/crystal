@@ -4,7 +4,6 @@ import { resolvePreset } from "graphile-config";
 import type { ExecutionResult } from "graphql";
 import { it } from "mocha";
 
-import type { ObjectPlans } from "../dist/index.js";
 import {
   assertNotNull,
   grafast,
@@ -39,50 +38,54 @@ const makeSchema = () => {
         detail: String!
       }
     `,
-    plans: {
+    objectPlans: {
       Query: {
-        unhandledError(_, { $setNullToError }) {
-          const $a = assertNotNull($setNullToError, "Null!");
-          return $a;
-        },
-        errorToNull(_, { $setNullToError }) {
-          const $a = assertNotNull($setNullToError, "Null!");
-          return trap($a, TRAP_ERROR, { valueForError: "NULL" });
-        },
-        errorToEmptyList(_, { $setNullToError }) {
-          const $a = assertNotNull($setNullToError, "Null!");
-          const $list = list([$a]);
-          return trap($list, TRAP_ERROR, { valueForError: "EMPTY_LIST" });
-        },
-        errorToError(_, { $setNullToError }) {
-          const $a = assertNotNull($setNullToError, "Null!");
-          const $derived = lambda($a, () => null, true);
-          return trap($derived, TRAP_ERROR, { valueForError: "PASS_THROUGH" });
-        },
-        mySideEffect() {
-          const $sideEffect = sideEffect(null, () => {
-            throw new Error("Test");
-          });
-          const $trap = trap($sideEffect, TRAP_ERROR, {
-            valueForError: "PASS_THROUGH",
-          });
-          return lambda($trap, () => {
-            return 1;
-          });
-        },
-        mySideEffectError() {
-          const $sideEffect = sideEffect(null, () => {
-            throw Object.assign(new Error("Test 2"), {
-              errcode: 42,
-              detail: "Goodbye, and thanks for all the fish!",
+        fields: {
+          unhandledError(_, { $setNullToError }) {
+            const $a = assertNotNull($setNullToError, "Null!");
+            return $a;
+          },
+          errorToNull(_, { $setNullToError }) {
+            const $a = assertNotNull($setNullToError, "Null!");
+            return trap($a, TRAP_ERROR, { valueForError: "NULL" });
+          },
+          errorToEmptyList(_, { $setNullToError }) {
+            const $a = assertNotNull($setNullToError, "Null!");
+            const $list = list([$a]);
+            return trap($list, TRAP_ERROR, { valueForError: "EMPTY_LIST" });
+          },
+          errorToError(_, { $setNullToError }) {
+            const $a = assertNotNull($setNullToError, "Null!");
+            const $derived = lambda($a, () => null, true);
+            return trap($derived, TRAP_ERROR, {
+              valueForError: "PASS_THROUGH",
             });
-          });
-          const $errorValue = trap($sideEffect, TRAP_ERROR, {
-            valueForError: "PASS_THROUGH",
-          });
-          return $errorValue;
+          },
+          mySideEffect() {
+            const $sideEffect = sideEffect(null, () => {
+              throw new Error("Test");
+            });
+            const $trap = trap($sideEffect, TRAP_ERROR, {
+              valueForError: "PASS_THROUGH",
+            });
+            return lambda($trap, () => {
+              return 1;
+            });
+          },
+          mySideEffectError() {
+            const $sideEffect = sideEffect(null, () => {
+              throw Object.assign(new Error("Test 2"), {
+                errcode: 42,
+                detail: "Goodbye, and thanks for all the fish!",
+              });
+            });
+            const $errorValue = trap($sideEffect, TRAP_ERROR, {
+              valueForError: "PASS_THROUGH",
+            });
+            return $errorValue;
+          },
         },
-      } as ObjectPlans,
+      },
     },
     enableDeferStream: false,
   });

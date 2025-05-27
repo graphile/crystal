@@ -5,11 +5,7 @@ import type { ExecutionResult } from "graphql";
 import { it } from "mocha";
 import sqlite3 from "sqlite3";
 
-import type {
-  ExecutionDetails,
-  GrafastResultsList,
-  ObjectPlans,
-} from "../dist/index.js";
+import type { ExecutionDetails, GrafastResultsList } from "../dist/index.js";
 import {
   access,
   context,
@@ -175,20 +171,24 @@ const makeSchema = () => {
         name: String
       }
     `,
-    plans: {
+    objectPlans: {
       Query: {
-        allPeople(_: Step) {
-          return getRecords("people");
+        fields: {
+          allPeople(_: Step) {
+            return getRecords("people");
+          },
         },
       },
       Person: {
-        pets($owner, { $first }) {
-          const $ownerId = $owner.get("id");
-          const $pets = getRecords("pets", { owner_id: $ownerId });
-          $pets.setFirst($first);
-          return $pets;
+        fields: {
+          pets($owner, { $first }) {
+            const $ownerId = $owner.get("id");
+            const $pets = getRecords("pets", { owner_id: $ownerId });
+            $pets.setFirst($first);
+            return $pets;
+          },
         },
-      } as ObjectPlans,
+      },
     },
     enableDeferStream: false,
   });

@@ -16,30 +16,34 @@ const schema = makeGrafastSchema({
       delayed: Delayed
     }
   `,
-  plans: {
+  objectPlans: {
     Query: {
-      delayed() {
-        return lambda(
-          null,
-          () =>
-            new Promise((resolve) =>
-              setTimeout(() => resolve({ name: "Query.delayed" }), 2),
-            ),
-        );
+      fields: {
+        delayed() {
+          return lambda(
+            null,
+            () =>
+              new Promise((resolve) =>
+                setTimeout(() => resolve({ name: "Query.delayed" }), 2),
+              ),
+          );
+        },
       },
     },
     Delayed: {
-      meaningOfLife() {
-        return constant(42);
-      },
-      delayed($o: ExecutableStep) {
-        return lambda(
-          $o,
-          () =>
-            new Promise((resolve) =>
-              setTimeout(() => resolve({ name: "Delayed.delayed" }), 2),
-            ),
-        );
+      fields: {
+        meaningOfLife() {
+          return constant(42);
+        },
+        delayed($o: ExecutableStep) {
+          return lambda(
+            $o,
+            () =>
+              new Promise((resolve) =>
+                setTimeout(() => resolve({ name: "Delayed.delayed" }), 2),
+              ),
+          );
+        },
       },
     },
   },
