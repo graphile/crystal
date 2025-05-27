@@ -38,6 +38,13 @@ fragment l on Location {
         }
       }
     }
+    stock {
+      ... on Item {
+        id
+        __typename
+        name
+      }
+    }
   }
 
   ... on Club {
@@ -61,6 +68,13 @@ fragment l on Location {
       name
       clients {
         id
+        name
+      }
+    }
+    stock {
+      ... on Item {
+        id
+        __typename
         name
       }
     }
