@@ -1,0 +1,21 @@
+query NpcFriends {
+  npc(id: 301) {
+    __typename
+    id
+    name
+
+    exCrawler
+    ... on Manager {
+      friends(first: 2) {
+        id
+        name
+      }
+    }
+    ... on Staff {
+      friends(first: 2) {
+        id
+        name
+      }
+    }
+  }
+}

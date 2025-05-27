@@ -1,7 +1,7 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import { resolvePreset } from "graphile-config";
 
-import type { InterfacePlan, Step } from "../../dist/index.js";
+import type { FieldArgs, InterfacePlan, Step } from "../../dist/index.js";
 import {
   coalesce,
   constant,
@@ -38,7 +38,7 @@ import {
   batchGetUtilityItemById,
   makeDb,
 } from "./dcc-data.js";
-import { typedMakeGrafastSchema } from "./dcc-types.js";
+import { Maybe, typedMakeGrafastSchema } from "./dcc-types.js";
 import { delegate } from "./delegate.js";
 
 const resolvedPreset = resolvePreset({
@@ -84,7 +84,7 @@ export const makeBaseArgs = () => {
         name: String!
         species: Species
         exCrawler: Boolean
-        friends: [Character]
+        friends(first: Int): [Character]
         bestFriend: Character
         saferoomLocation: String
       }
@@ -94,7 +94,7 @@ export const makeBaseArgs = () => {
         species: Species
         items: [Item]
         exCrawler: Boolean
-        friends: [Character]
+        friends(first: Int): [Character]
         bestFriend: Character
         client: ActiveCrawler
       }
@@ -103,7 +103,7 @@ export const makeBaseArgs = () => {
         name: String!
         species: Species
         exCrawler: Boolean
-        friends: [Character]
+        friends(first: Int): [Character]
         bestFriend: Character
         clients: [ActiveCrawler!]
       }
@@ -113,7 +113,7 @@ export const makeBaseArgs = () => {
         species: Species
         exCrawler: Boolean
         bestFriend: Character
-        friends: [Character]
+        friends(first: Int): [Character]
         items: [Item]
       }
       interface NPC implements Character {
@@ -122,7 +122,7 @@ export const makeBaseArgs = () => {
         species: Species
         exCrawler: Boolean
         bestFriend: Character
-        friends: [Character]
+        friends(first: Int): [Character]
       }
       interface Character {
         id: Int!
@@ -256,6 +256,7 @@ export const makeBaseArgs = () => {
       type Query {
         crawler(id: Int!): Crawler
         character(id: Int!): Character
+        npc(id: Int!): NPC
         floor(number: Int!): Floor
         item(type: ItemType!, id: Int!): Item
 
@@ -291,6 +292,9 @@ export const makeBaseArgs = () => {
           },
           floor(_, { $number }) {
             return lambda($number, getFloor);
+          },
+          npc(_, { $id }) {
+            return $id;
           },
           brokenItem() {
             return constant("Utility:999" as ItemSpec);
@@ -586,11 +590,27 @@ const SharedLocationResolvers = {
 };
 
 const SharedNpcResolvers = {
+  friends(
+    $npc: Step<NpcData>,
+    { $first }: FieldArgs<{ first: Maybe<number> }>,
+  ) {
+    const $friends = get($npc, "friends");
+    return lambda([$friends, $first], applyLimit);
+  },
   bestFriend($npc: Step<NpcData>) {
     const $id = get($npc, "bestFriend");
     return $id;
   },
 };
+
+function applyLimit<T>([list, count]: readonly [
+  list: ReadonlyArray<T> | null | undefined,
+  count: Maybe<number>,
+]) {
+  if (list == null) return list;
+  if (count != null) return list.slice(0, count);
+  return list;
+}
 
 const ItemResolver = {
   planType($itemSpec) {
