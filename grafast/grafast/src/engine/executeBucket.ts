@@ -289,14 +289,14 @@ export function executeBucket(
         flags: ExecutionEntryFlags,
       ) => {
         // Fast lanes
-        if (typeof value !== "object") {
+        if (value == null) {
+          // null / undefined
+          const finalFlags = flags | FLAG_NULL;
+          bucket.setResult(finishedStep, resultIndex, value, finalFlags);
+          return;
+        } else if (typeof value !== "object") {
           // non-objects
           bucket.setResult(finishedStep, resultIndex, value, flags);
-          return;
-        } else if (value === null) {
-          // nulls
-          const finalFlags = flags | FLAG_NULL;
-          bucket.setResult(finishedStep, resultIndex, null, finalFlags);
           return;
         } else if (isFlaggedValue(value)) {
           // flagged values
