@@ -10,6 +10,7 @@ import type {
 } from "./connection.js";
 import type { __ListTransformStep } from "./listTransform.js";
 import { listTransform } from "./listTransform.js";
+import { Maybe } from "../index.js";
 
 const eachReduceCallback = (memo: any[], item: any) => {
   memo.push(item);
@@ -50,7 +51,7 @@ export function each<
   mapper: (
     itemPlan: ItemsStep<TListStep> extends ListCapableStep<any, any>
       ? ReturnType<ItemsStep<TListStep>["listItem"]>
-      : __ItemStep<any>,
+      : Step<TListStep extends Step<Maybe<ReadonlyArray<infer U>>> ? U : any>,
   ) => TResultItemStep,
 ): __ListTransformStep<any, any, any, any> {
   return listTransform<any, any, any, any>({
