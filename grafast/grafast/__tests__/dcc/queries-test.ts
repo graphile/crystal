@@ -115,7 +115,16 @@ function pruneAsyncResult(p: AsyncExecutionResult) {
   const copy = { ...p };
   delete copy.extensions;
   if (copy.data != null && Object.keys(copy.data).length > 0) {
-    copy.data = "{...}";
+    const keys = Object.keys(copy.data);
+    const MAX = 5;
+    if (keys.length > MAX) {
+      copy.data = `{${keys
+        .slice(0, MAX)
+        .map((k) => `${k}:...`)
+        .join(",")},...}`;
+    } else {
+      copy.data = `{${keys.map((k) => `${k}:...`).join(",")}}`;
+    }
   }
   return copy;
 }
