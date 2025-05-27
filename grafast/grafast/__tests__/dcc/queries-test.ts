@@ -1,9 +1,9 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
-import { readdirSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 
 import { expect } from "chai";
-import type { ExecutionResult } from "graphql";
+import { Kind, parse, type ExecutionResult } from "graphql";
 import JSON5 from "json5";
 import { it } from "mocha";
 
@@ -25,35 +25,46 @@ describe("queries", () => {
     const baseName = file.substring(0, file.length - SUFFIX.length);
     describe(file, () => {
       let result: ExecutionResult;
-      before(async () => {
-        const baseArgs = makeBaseArgs();
-        const source = await readFile(BASE_DIR + "/" + file, "utf8");
-        result = (await grafast({
-          ...baseArgs,
-          source,
-        })) as ExecutionResult;
-      });
-      it("did not error", () => {
-        if (result.errors) {
-          console.dir(result.errors);
-        }
-        expect(result.errors).not.to.exist;
-      });
-      it("matched data snapshot", async () => {
-        await snapshot(
-          JSON5.stringify(result.data, null, 2) + "\n",
-          `${BASE_DIR}/${baseName}.json5`,
-        );
-      });
-      it("matched plan snapshot", async function () {
-        const plan = (result.extensions as any)?.explain?.operations?.find(
-          (o: any) => o.type === "plan",
-        )?.plan;
-        if (!plan && result.errors) {
-          return this.skip();
-        }
-        const mermaid = planToMermaid(plan).trim() + "\n";
-        await snapshot(mermaid, `${BASE_DIR}/${baseName}.mermaid`);
+      const source = readFileSync(BASE_DIR + "/" + file, "utf8");
+      const document = parse(source);
+      const operations = document.definitions.filter(
+        (d) => d.kind === Kind.OPERATION_DEFINITION,
+      );
+      operations.forEach((op, i) => {
+        const operationName = op.name?.value;
+        const suffix = i === 0 ? "" : `.${operationName}`;
+        describe(operationName ?? "unnamed", () => {
+          before(async () => {
+            const baseArgs = makeBaseArgs();
+            result = (await grafast({
+              ...baseArgs,
+              source,
+              operationName,
+            })) as ExecutionResult;
+          });
+          it("did not error", () => {
+            if (result.errors) {
+              console.dir(result.errors);
+            }
+            expect(result.errors).not.to.exist;
+          });
+          it("matched data snapshot", async () => {
+            await snapshot(
+              JSON5.stringify(result.data, null, 2) + "\n",
+              `${BASE_DIR}/${baseName}${suffix}.json5`,
+            );
+          });
+          it("matched plan snapshot", async function () {
+            const plan = (result.extensions as any)?.explain?.operations?.find(
+              (o: any) => o.type === "plan",
+            )?.plan;
+            if (!plan && result.errors) {
+              return this.skip();
+            }
+            const mermaid = planToMermaid(plan).trim() + "\n";
+            await snapshot(mermaid, `${BASE_DIR}/${baseName}${suffix}.mermaid`);
+          });
+        });
       });
     });
   }
