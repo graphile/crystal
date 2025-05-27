@@ -58,6 +58,7 @@ declare global {
 
 export const makeBaseArgs = () => {
   const schema = typedMakeGrafastSchema({
+    enableDeferStream: true,
     typeDefs: /* GraphQL */ `
       enum Species {
         HUMAN
