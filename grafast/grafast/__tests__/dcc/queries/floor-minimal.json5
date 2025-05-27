@@ -1,0 +1,18 @@
+{
+  floor: {
+    number: 3,
+    locations: [
+      {},
+      {
+        manager: {
+          __typename: 'Staff',
+        },
+      },
+      {
+        manager: null,
+      },
+      {},
+      {},
+    ],
+  },
+}
