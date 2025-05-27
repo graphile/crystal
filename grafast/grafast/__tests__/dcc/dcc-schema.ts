@@ -659,10 +659,6 @@ function encodeItemSpec([type, id]: readonly [
   return `${type}:${id}`;
 }
 
-interface FloorData {
-  number: number;
-}
-
 function getFloor(number: number): FloorData | null {
   if (number >= 1 && number <= 18) {
     return { number };
