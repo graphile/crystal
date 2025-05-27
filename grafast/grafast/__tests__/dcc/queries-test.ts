@@ -164,7 +164,7 @@ describe("queries", () => {
           }
         }
         const suffix = i === 0 ? "" : `.${operationName}`;
-        describe(operationName ?? "unnamed", () => {
+        describe(operationName ?? "<anonymous>", () => {
           before(async () => {
             const baseArgs = makeBaseArgs();
             rawResult = await streamToArray(
