@@ -1,0 +1,16 @@
+[
+  {
+    data: {},
+    hasNext: true,
+  },
+  {
+    data: {
+      brokenItem: null,
+    },
+    hasNext: true,
+    path: [],
+  },
+  {
+    hasNext: false,
+  },
+]
