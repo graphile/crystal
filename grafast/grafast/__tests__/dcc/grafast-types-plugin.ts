@@ -60,7 +60,7 @@ class GrafastGenerator {
     return this._get(type, "specifier", this.source(type));
   }
 
-  private expect(type: GraphQLOutputType) {
+  private expect(type: GraphQLOutputType): string {
     if (isNonNullType(type)) {
       return `NonNullStep<${this.expect(type.ofType)}>`;
     } else if (isListType(type)) {
