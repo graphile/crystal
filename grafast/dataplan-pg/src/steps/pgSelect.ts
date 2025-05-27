@@ -2147,7 +2147,7 @@ export function pgSelectFromRecords<
         >,
         TResource
       >
-    | Step<any[]>,
+    | Step<readonly any[]>,
 ): PgSelectStep<TResource> {
   return new PgSelectStep<TResource>({
     resource,

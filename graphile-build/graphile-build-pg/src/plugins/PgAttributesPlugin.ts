@@ -17,7 +17,7 @@ import {
   pgSelectSingleFromRecord,
   sqlValueWithCodec,
 } from "@dataplan/pg";
-import type { GrafastFieldConfig, Setter } from "grafast";
+import type { GrafastFieldConfig, Setter, Step } from "grafast";
 import { bakedInputRuntime, each } from "grafast";
 import type { GraphQLFieldConfigMap, GraphQLOutputType } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
@@ -228,7 +228,10 @@ function processAttribute(
                   attributeName,
                 ) as PgClassExpressionStep<PgCodecList<PgCodecList>, any>;
                 return each($val, ($list) => {
-                  const $select = pgSelectFromRecords(resource, $list);
+                  const $select = pgSelectFromRecords(
+                    resource,
+                    $list as Step<readonly unknown[]>,
+                  );
                   $select.setTrusted();
                   return $select;
                 });
