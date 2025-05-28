@@ -49,7 +49,7 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
     hooks: {
       build(build) {
         const {
-          grafast: { inhibitOnNull, trap, TRAP_INHIBITED },
+          grafast: { inhibitOnNull },
         } = build;
         const nodeFetcherByTypeNameCache = new Map<
           string,
@@ -91,14 +91,7 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
               if (!handler) return null;
               const fetcher = handler.deprecationReason
                 ? EXPORTABLE(
-                    (
-                      TRAP_INHIBITED,
-                      handler,
-                      inhibitOnNull,
-                      lambda,
-                      specForHandler,
-                      trap,
-                    ) => {
+                    (handler, inhibitOnNull, lambda, specForHandler) => {
                       const fn: GraphileBuild.NodeFetcher = (
                         $nodeId: ExecutableStep<Maybe<string>>,
                       ) => {
@@ -106,54 +99,27 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
                           $nodeId,
                           specForHandler(handler),
                         );
-                        const $record = handler.get(
+                        return handler.get(
                           handler.getSpec(inhibitOnNull($decoded)),
                         );
-                        return trap($record, TRAP_INHIBITED, {
-                          valueForInhibited: "NULL",
-                        });
                       };
                       fn.deprecationReason = handler.deprecationReason;
                       return fn;
                     },
-                    [
-                      TRAP_INHIBITED,
-                      handler,
-                      inhibitOnNull,
-                      lambda,
-                      specForHandler,
-                      trap,
-                    ],
+                    [handler, inhibitOnNull, lambda, specForHandler],
                   )
                 : EXPORTABLE(
-                    (
-                      TRAP_INHIBITED,
-                      handler,
-                      inhibitOnNull,
-                      lambda,
-                      specForHandler,
-                      trap,
-                    ) =>
+                    (handler, inhibitOnNull, lambda, specForHandler) =>
                       ($nodeId: ExecutableStep<Maybe<string>>) => {
                         const $decoded = lambda(
                           $nodeId,
                           specForHandler(handler),
                         );
-                        const $record = handler.get(
+                        return handler.get(
                           handler.getSpec(inhibitOnNull($decoded)),
                         );
-                        return trap($record, TRAP_INHIBITED, {
-                          valueForInhibited: "NULL",
-                        });
                       },
-                    [
-                      TRAP_INHIBITED,
-                      handler,
-                      inhibitOnNull,
-                      lambda,
-                      specForHandler,
-                      trap,
-                    ],
+                    [handler, inhibitOnNull, lambda, specForHandler],
                   );
               exportNameHint(fetcher, `nodeFetcher_${typeName}`);
               nodeFetcherByTypeNameCache.set(typeName, fetcher);
