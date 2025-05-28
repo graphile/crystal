@@ -484,27 +484,27 @@ function CursorSerialize(value) {
 }
 const specFromArgs_File = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_File, $nodeId);
+  return specFromNodeId(nodeIdHandler_File, inhibitOnNull($nodeId));
 };
 const specFromArgs_User = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_User, $nodeId);
+  return specFromNodeId(nodeIdHandler_User, inhibitOnNull($nodeId));
 };
 const specFromArgs_UserFile = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_UserFile, $nodeId);
+  return specFromNodeId(nodeIdHandler_UserFile, inhibitOnNull($nodeId));
 };
 const specFromArgs_File2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_File, $nodeId);
+  return specFromNodeId(nodeIdHandler_File, inhibitOnNull($nodeId));
 };
 const specFromArgs_User2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_User, $nodeId);
+  return specFromNodeId(nodeIdHandler_User, inhibitOnNull($nodeId));
 };
 const specFromArgs_UserFile2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_UserFile, $nodeId);
+  return specFromNodeId(nodeIdHandler_UserFile, inhibitOnNull($nodeId));
 };
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {

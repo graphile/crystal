@@ -11145,155 +11145,155 @@ const resource_type_function_mutationPgResource = registry.pgResources["type_fun
 const resource_type_function_list_mutationPgResource = registry.pgResources["type_function_list_mutation"];
 const specFromArgs_Input = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Input, $nodeId);
+  return specFromNodeId(nodeIdHandler_Input, inhibitOnNull($nodeId));
 };
 const specFromArgs_Patch = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Patch, $nodeId);
+  return specFromNodeId(nodeIdHandler_Patch, inhibitOnNull($nodeId));
 };
 const specFromArgs_Reserved = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Reserved, $nodeId);
+  return specFromNodeId(nodeIdHandler_Reserved, inhibitOnNull($nodeId));
 };
 const specFromArgs_ReservedPatchRecord = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_ReservedPatchRecord, $nodeId);
+  return specFromNodeId(nodeIdHandler_ReservedPatchRecord, inhibitOnNull($nodeId));
 };
 const specFromArgs_ReservedInputRecord = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_ReservedInputRecord, $nodeId);
+  return specFromNodeId(nodeIdHandler_ReservedInputRecord, inhibitOnNull($nodeId));
 };
 const specFromArgs_DefaultValue = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_DefaultValue, $nodeId);
+  return specFromNodeId(nodeIdHandler_DefaultValue, inhibitOnNull($nodeId));
 };
 const specFromArgs_MyTable = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_MyTable, $nodeId);
+  return specFromNodeId(nodeIdHandler_MyTable, inhibitOnNull($nodeId));
 };
 const specFromArgs_PersonSecret = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_PersonSecret, $nodeId);
+  return specFromNodeId(nodeIdHandler_PersonSecret, inhibitOnNull($nodeId));
 };
 const specFromArgs_ViewTable = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_ViewTable, $nodeId);
+  return specFromNodeId(nodeIdHandler_ViewTable, inhibitOnNull($nodeId));
 };
 const specFromArgs_CompoundKey = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_CompoundKey, $nodeId);
+  return specFromNodeId(nodeIdHandler_CompoundKey, inhibitOnNull($nodeId));
 };
 const specFromArgs_SimilarTable1 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_SimilarTable1, $nodeId);
+  return specFromNodeId(nodeIdHandler_SimilarTable1, inhibitOnNull($nodeId));
 };
 const specFromArgs_SimilarTable2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_SimilarTable2, $nodeId);
+  return specFromNodeId(nodeIdHandler_SimilarTable2, inhibitOnNull($nodeId));
 };
 const specFromArgs_NullTestRecord = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_NullTestRecord, $nodeId);
+  return specFromNodeId(nodeIdHandler_NullTestRecord, inhibitOnNull($nodeId));
 };
 const specFromArgs_LeftArm = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_LeftArm, $nodeId);
+  return specFromNodeId(nodeIdHandler_LeftArm, inhibitOnNull($nodeId));
 };
 const specFromArgs_Issue756 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Issue756, $nodeId);
+  return specFromNodeId(nodeIdHandler_Issue756, inhibitOnNull($nodeId));
 };
 const specFromArgs_Post = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Post, $nodeId);
+  return specFromNodeId(nodeIdHandler_Post, inhibitOnNull($nodeId));
 };
 const specFromArgs_Person = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Person, $nodeId);
+  return specFromNodeId(nodeIdHandler_Person, inhibitOnNull($nodeId));
 };
 const specFromArgs_List = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_List, $nodeId);
+  return specFromNodeId(nodeIdHandler_List, inhibitOnNull($nodeId));
 };
 const specFromArgs_Type = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Type, $nodeId);
+  return specFromNodeId(nodeIdHandler_Type, inhibitOnNull($nodeId));
 };
 const specFromArgs_Input2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Input, $nodeId);
+  return specFromNodeId(nodeIdHandler_Input, inhibitOnNull($nodeId));
 };
 const specFromArgs_Patch2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Patch, $nodeId);
+  return specFromNodeId(nodeIdHandler_Patch, inhibitOnNull($nodeId));
 };
 const specFromArgs_Reserved2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Reserved, $nodeId);
+  return specFromNodeId(nodeIdHandler_Reserved, inhibitOnNull($nodeId));
 };
 const specFromArgs_ReservedPatchRecord2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_ReservedPatchRecord, $nodeId);
+  return specFromNodeId(nodeIdHandler_ReservedPatchRecord, inhibitOnNull($nodeId));
 };
 const specFromArgs_ReservedInputRecord2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_ReservedInputRecord, $nodeId);
+  return specFromNodeId(nodeIdHandler_ReservedInputRecord, inhibitOnNull($nodeId));
 };
 const specFromArgs_DefaultValue2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_DefaultValue, $nodeId);
+  return specFromNodeId(nodeIdHandler_DefaultValue, inhibitOnNull($nodeId));
 };
 const specFromArgs_MyTable2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_MyTable, $nodeId);
+  return specFromNodeId(nodeIdHandler_MyTable, inhibitOnNull($nodeId));
 };
 const specFromArgs_PersonSecret2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_PersonSecret, $nodeId);
+  return specFromNodeId(nodeIdHandler_PersonSecret, inhibitOnNull($nodeId));
 };
 const specFromArgs_ViewTable2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_ViewTable, $nodeId);
+  return specFromNodeId(nodeIdHandler_ViewTable, inhibitOnNull($nodeId));
 };
 const specFromArgs_CompoundKey2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_CompoundKey, $nodeId);
+  return specFromNodeId(nodeIdHandler_CompoundKey, inhibitOnNull($nodeId));
 };
 const specFromArgs_SimilarTable12 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_SimilarTable1, $nodeId);
+  return specFromNodeId(nodeIdHandler_SimilarTable1, inhibitOnNull($nodeId));
 };
 const specFromArgs_SimilarTable22 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_SimilarTable2, $nodeId);
+  return specFromNodeId(nodeIdHandler_SimilarTable2, inhibitOnNull($nodeId));
 };
 const specFromArgs_NullTestRecord2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_NullTestRecord, $nodeId);
+  return specFromNodeId(nodeIdHandler_NullTestRecord, inhibitOnNull($nodeId));
 };
 const specFromArgs_LeftArm2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_LeftArm, $nodeId);
+  return specFromNodeId(nodeIdHandler_LeftArm, inhibitOnNull($nodeId));
 };
 const specFromArgs_Issue7562 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Issue756, $nodeId);
+  return specFromNodeId(nodeIdHandler_Issue756, inhibitOnNull($nodeId));
 };
 const specFromArgs_Post2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Post, $nodeId);
+  return specFromNodeId(nodeIdHandler_Post, inhibitOnNull($nodeId));
 };
 const specFromArgs_Person2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Person, $nodeId);
+  return specFromNodeId(nodeIdHandler_Person, inhibitOnNull($nodeId));
 };
 const specFromArgs_List2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_List, $nodeId);
+  return specFromNodeId(nodeIdHandler_List, inhibitOnNull($nodeId));
 };
 const specFromArgs_Type2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Type, $nodeId);
+  return specFromNodeId(nodeIdHandler_Type, inhibitOnNull($nodeId));
 };
 const resource_frmcdc_jwtTokenPgResource = registry.pgResources["frmcdc_jwtToken"];
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""

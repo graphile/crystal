@@ -308,11 +308,11 @@ function CursorSerialize(value) {
 }
 const specFromArgs_Geom = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Geom, $nodeId);
+  return specFromNodeId(nodeIdHandler_Geom, inhibitOnNull($nodeId));
 };
 const specFromArgs_Geom2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Geom, $nodeId);
+  return specFromNodeId(nodeIdHandler_Geom, inhibitOnNull($nodeId));
 };
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {

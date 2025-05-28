@@ -1477,51 +1477,51 @@ function CursorSerialize(value) {
 }
 const specFromArgs_Post = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Post, $nodeId);
+  return specFromNodeId(nodeIdHandler_Post, inhibitOnNull($nodeId));
 };
 const specFromArgs_Offer = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Offer, $nodeId);
+  return specFromNodeId(nodeIdHandler_Offer, inhibitOnNull($nodeId));
 };
 const specFromArgs_Street = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Street, $nodeId);
+  return specFromNodeId(nodeIdHandler_Street, inhibitOnNull($nodeId));
 };
 const specFromArgs_Property = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Property, $nodeId);
+  return specFromNodeId(nodeIdHandler_Property, inhibitOnNull($nodeId));
 };
 const specFromArgs_StreetProperty = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_StreetProperty, $nodeId);
+  return specFromNodeId(nodeIdHandler_StreetProperty, inhibitOnNull($nodeId));
 };
 const specFromArgs_Building = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Building, $nodeId);
+  return specFromNodeId(nodeIdHandler_Building, inhibitOnNull($nodeId));
 };
 const specFromArgs_Post2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Post, $nodeId);
+  return specFromNodeId(nodeIdHandler_Post, inhibitOnNull($nodeId));
 };
 const specFromArgs_Offer2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Offer, $nodeId);
+  return specFromNodeId(nodeIdHandler_Offer, inhibitOnNull($nodeId));
 };
 const specFromArgs_Street2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Street, $nodeId);
+  return specFromNodeId(nodeIdHandler_Street, inhibitOnNull($nodeId));
 };
 const specFromArgs_Property2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Property, $nodeId);
+  return specFromNodeId(nodeIdHandler_Property, inhibitOnNull($nodeId));
 };
 const specFromArgs_StreetProperty2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_StreetProperty, $nodeId);
+  return specFromNodeId(nodeIdHandler_StreetProperty, inhibitOnNull($nodeId));
 };
 const specFromArgs_Building2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Building, $nodeId);
+  return specFromNodeId(nodeIdHandler_Building, inhibitOnNull($nodeId));
 };
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {

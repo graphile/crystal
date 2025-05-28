@@ -6080,91 +6080,91 @@ const makeArgs_custom_delete_relational_item = (args, path = []) => argDetailsSi
 const resource_custom_delete_relational_itemPgResource = registry.pgResources["custom_delete_relational_item"];
 const specFromArgs_Organization = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Organization, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.Organization, inhibitOnNull($nodeId));
 };
 const specFromArgs_Person = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Person, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.Person, inhibitOnNull($nodeId));
 };
 const specFromArgs_RelationalItemRelationCompositePk = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.RelationalItemRelationCompositePk, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.RelationalItemRelationCompositePk, inhibitOnNull($nodeId));
 };
 const specFromArgs_SingleTableItemRelationCompositePk = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.SingleTableItemRelationCompositePk, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.SingleTableItemRelationCompositePk, inhibitOnNull($nodeId));
 };
 const specFromArgs_RelationalItemRelation = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.RelationalItemRelation, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.RelationalItemRelation, inhibitOnNull($nodeId));
 };
 const specFromArgs_SingleTableItemRelation = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.SingleTableItemRelation, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.SingleTableItemRelation, inhibitOnNull($nodeId));
 };
 const specFromArgs_LogEntry = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.LogEntry, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.LogEntry, inhibitOnNull($nodeId));
 };
 const specFromArgs_FirstPartyVulnerability = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.FirstPartyVulnerability, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.FirstPartyVulnerability, inhibitOnNull($nodeId));
 };
 const specFromArgs_ThirdPartyVulnerability = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.ThirdPartyVulnerability, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.ThirdPartyVulnerability, inhibitOnNull($nodeId));
 };
 const specFromArgs_AwsApplication = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.AwsApplication, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.AwsApplication, inhibitOnNull($nodeId));
 };
 const specFromArgs_GcpApplication = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.GcpApplication, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.GcpApplication, inhibitOnNull($nodeId));
 };
 const specFromArgs_Organization2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Organization, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.Organization, inhibitOnNull($nodeId));
 };
 const specFromArgs_Person2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Person, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.Person, inhibitOnNull($nodeId));
 };
 const specFromArgs_RelationalItemRelationCompositePk2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.RelationalItemRelationCompositePk, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.RelationalItemRelationCompositePk, inhibitOnNull($nodeId));
 };
 const specFromArgs_SingleTableItemRelationCompositePk2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.SingleTableItemRelationCompositePk, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.SingleTableItemRelationCompositePk, inhibitOnNull($nodeId));
 };
 const specFromArgs_RelationalItemRelation2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.RelationalItemRelation, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.RelationalItemRelation, inhibitOnNull($nodeId));
 };
 const specFromArgs_SingleTableItemRelation2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.SingleTableItemRelation, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.SingleTableItemRelation, inhibitOnNull($nodeId));
 };
 const specFromArgs_LogEntry2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.LogEntry, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.LogEntry, inhibitOnNull($nodeId));
 };
 const specFromArgs_FirstPartyVulnerability2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.FirstPartyVulnerability, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.FirstPartyVulnerability, inhibitOnNull($nodeId));
 };
 const specFromArgs_ThirdPartyVulnerability2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.ThirdPartyVulnerability, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.ThirdPartyVulnerability, inhibitOnNull($nodeId));
 };
 const specFromArgs_AwsApplication2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.AwsApplication, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.AwsApplication, inhibitOnNull($nodeId));
 };
 const specFromArgs_GcpApplication2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.GcpApplication, $nodeId);
+  return specFromNodeId(nodeIdHandlerByTypeName.GcpApplication, inhibitOnNull($nodeId));
 };
 export const typeDefs = /* GraphQL */`type SingleTableTopic implements SingleTableItem & Node {
   """

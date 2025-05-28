@@ -6453,59 +6453,59 @@ const resource_mutation_out_table_setofPgResource = registry.pgResources["mutati
 const resource_table_set_mutationPgResource = registry.pgResources["table_set_mutation"];
 const specFromArgs_MyTable = args => {
   const $nodeId = args.getRaw(["input", "id"]);
-  return specFromNodeId(nodeIdHandler_MyTable, $nodeId);
+  return specFromNodeId(nodeIdHandler_MyTable, inhibitOnNull($nodeId));
 };
 const specFromArgs_PersonSecret = args => {
   const $nodeId = args.getRaw(["input", "id"]);
-  return specFromNodeId(nodeIdHandler_PersonSecret, $nodeId);
+  return specFromNodeId(nodeIdHandler_PersonSecret, inhibitOnNull($nodeId));
 };
 const specFromArgs_CompoundKey = args => {
   const $nodeId = args.getRaw(["input", "id"]);
-  return specFromNodeId(nodeIdHandler_CompoundKey, $nodeId);
+  return specFromNodeId(nodeIdHandler_CompoundKey, inhibitOnNull($nodeId));
 };
 const specFromArgs_NullTestRecord = args => {
   const $nodeId = args.getRaw(["input", "id"]);
-  return specFromNodeId(nodeIdHandler_NullTestRecord, $nodeId);
+  return specFromNodeId(nodeIdHandler_NullTestRecord, inhibitOnNull($nodeId));
 };
 const specFromArgs_LeftArm = args => {
   const $nodeId = args.getRaw(["input", "id"]);
-  return specFromNodeId(nodeIdHandler_LeftArm, $nodeId);
+  return specFromNodeId(nodeIdHandler_LeftArm, inhibitOnNull($nodeId));
 };
 const specFromArgs_Issue756 = args => {
   const $nodeId = args.getRaw(["input", "id"]);
-  return specFromNodeId(nodeIdHandler_Issue756, $nodeId);
+  return specFromNodeId(nodeIdHandler_Issue756, inhibitOnNull($nodeId));
 };
 const specFromArgs_Person = args => {
   const $nodeId = args.getRaw(["input", "id"]);
-  return specFromNodeId(nodeIdHandler_Person, $nodeId);
+  return specFromNodeId(nodeIdHandler_Person, inhibitOnNull($nodeId));
 };
 const specFromArgs_MyTable2 = args => {
   const $nodeId = args.getRaw(["input", "id"]);
-  return specFromNodeId(nodeIdHandler_MyTable, $nodeId);
+  return specFromNodeId(nodeIdHandler_MyTable, inhibitOnNull($nodeId));
 };
 const specFromArgs_PersonSecret2 = args => {
   const $nodeId = args.getRaw(["input", "id"]);
-  return specFromNodeId(nodeIdHandler_PersonSecret, $nodeId);
+  return specFromNodeId(nodeIdHandler_PersonSecret, inhibitOnNull($nodeId));
 };
 const specFromArgs_CompoundKey2 = args => {
   const $nodeId = args.getRaw(["input", "id"]);
-  return specFromNodeId(nodeIdHandler_CompoundKey, $nodeId);
+  return specFromNodeId(nodeIdHandler_CompoundKey, inhibitOnNull($nodeId));
 };
 const specFromArgs_NullTestRecord2 = args => {
   const $nodeId = args.getRaw(["input", "id"]);
-  return specFromNodeId(nodeIdHandler_NullTestRecord, $nodeId);
+  return specFromNodeId(nodeIdHandler_NullTestRecord, inhibitOnNull($nodeId));
 };
 const specFromArgs_LeftArm2 = args => {
   const $nodeId = args.getRaw(["input", "id"]);
-  return specFromNodeId(nodeIdHandler_LeftArm, $nodeId);
+  return specFromNodeId(nodeIdHandler_LeftArm, inhibitOnNull($nodeId));
 };
 const specFromArgs_Issue7562 = args => {
   const $nodeId = args.getRaw(["input", "id"]);
-  return specFromNodeId(nodeIdHandler_Issue756, $nodeId);
+  return specFromNodeId(nodeIdHandler_Issue756, inhibitOnNull($nodeId));
 };
 const specFromArgs_Person2 = args => {
   const $nodeId = args.getRaw(["input", "id"]);
-  return specFromNodeId(nodeIdHandler_Person, $nodeId);
+  return specFromNodeId(nodeIdHandler_Person, inhibitOnNull($nodeId));
 };
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {

@@ -2595,19 +2595,19 @@ const resource_type_function_mutationPgResource = registry.pgResources["type_fun
 const resource_type_function_list_mutationPgResource = registry.pgResources["type_function_list_mutation"];
 const specFromArgs_List = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_List, $nodeId);
+  return specFromNodeId(nodeIdHandler_List, inhibitOnNull($nodeId));
 };
 const specFromArgs_Type = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Type, $nodeId);
+  return specFromNodeId(nodeIdHandler_Type, inhibitOnNull($nodeId));
 };
 const specFromArgs_List2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_List, $nodeId);
+  return specFromNodeId(nodeIdHandler_List, inhibitOnNull($nodeId));
 };
 const specFromArgs_Type2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Type, $nodeId);
+  return specFromNodeId(nodeIdHandler_Type, inhibitOnNull($nodeId));
 };
 const attributeNames = ["role", "exp", "a", "b", "c"];
 const resource_frmcdc_jwtTokenPgResource = registry.pgResources["frmcdc_jwtToken"];

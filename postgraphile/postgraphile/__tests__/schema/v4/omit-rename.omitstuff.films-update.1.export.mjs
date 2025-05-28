@@ -1414,47 +1414,47 @@ const makeArgs_login = (args, path = []) => argDetailsSimple_login.map(details =
 const resource_loginPgResource = registry.pgResources["login"];
 const specFromArgs_Studio = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Studio, $nodeId);
+  return specFromNodeId(nodeIdHandler_Studio, inhibitOnNull($nodeId));
 };
 const specFromArgs_Post = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Post, $nodeId);
+  return specFromNodeId(nodeIdHandler_Post, inhibitOnNull($nodeId));
 };
 const specFromArgs_TvEpisode = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_TvEpisode, $nodeId);
+  return specFromNodeId(nodeIdHandler_TvEpisode, inhibitOnNull($nodeId));
 };
 const specFromArgs_TvShow = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_TvShow, $nodeId);
+  return specFromNodeId(nodeIdHandler_TvShow, inhibitOnNull($nodeId));
 };
 const specFromArgs_Person = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Person, $nodeId);
+  return specFromNodeId(nodeIdHandler_Person, inhibitOnNull($nodeId));
 };
 const specFromArgs_Film = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Film, $nodeId);
+  return specFromNodeId(nodeIdHandler_Film, inhibitOnNull($nodeId));
 };
 const specFromArgs_Studio2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Studio, $nodeId);
+  return specFromNodeId(nodeIdHandler_Studio, inhibitOnNull($nodeId));
 };
 const specFromArgs_Post2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Post, $nodeId);
+  return specFromNodeId(nodeIdHandler_Post, inhibitOnNull($nodeId));
 };
 const specFromArgs_TvEpisode2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_TvEpisode, $nodeId);
+  return specFromNodeId(nodeIdHandler_TvEpisode, inhibitOnNull($nodeId));
 };
 const specFromArgs_TvShow2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_TvShow, $nodeId);
+  return specFromNodeId(nodeIdHandler_TvShow, inhibitOnNull($nodeId));
 };
 const specFromArgs_Person2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Person, $nodeId);
+  return specFromNodeId(nodeIdHandler_Person, inhibitOnNull($nodeId));
 };
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {

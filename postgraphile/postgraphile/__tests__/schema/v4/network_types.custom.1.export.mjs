@@ -259,11 +259,11 @@ function InternetAddressSerialize(value) {
 }
 const specFromArgs_Network = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Network, $nodeId);
+  return specFromNodeId(nodeIdHandler_Network, inhibitOnNull($nodeId));
 };
 const specFromArgs_Network2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Network, $nodeId);
+  return specFromNodeId(nodeIdHandler_Network, inhibitOnNull($nodeId));
 };
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {

@@ -816,35 +816,35 @@ const coerce = string => {
 };
 const specFromArgs_AlwaysAsIdentity = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_AlwaysAsIdentity, $nodeId);
+  return specFromNodeId(nodeIdHandler_AlwaysAsIdentity, inhibitOnNull($nodeId));
 };
 const specFromArgs_ByDefaultAsIdentity = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_ByDefaultAsIdentity, $nodeId);
+  return specFromNodeId(nodeIdHandler_ByDefaultAsIdentity, inhibitOnNull($nodeId));
 };
 const specFromArgs_Network = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Network, $nodeId);
+  return specFromNodeId(nodeIdHandler_Network, inhibitOnNull($nodeId));
 };
 const specFromArgs_Type = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Type, $nodeId);
+  return specFromNodeId(nodeIdHandler_Type, inhibitOnNull($nodeId));
 };
 const specFromArgs_AlwaysAsIdentity2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_AlwaysAsIdentity, $nodeId);
+  return specFromNodeId(nodeIdHandler_AlwaysAsIdentity, inhibitOnNull($nodeId));
 };
 const specFromArgs_ByDefaultAsIdentity2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_ByDefaultAsIdentity, $nodeId);
+  return specFromNodeId(nodeIdHandler_ByDefaultAsIdentity, inhibitOnNull($nodeId));
 };
 const specFromArgs_Network2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Network, $nodeId);
+  return specFromNodeId(nodeIdHandler_Network, inhibitOnNull($nodeId));
 };
 const specFromArgs_Type2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Type, $nodeId);
+  return specFromNodeId(nodeIdHandler_Type, inhibitOnNull($nodeId));
 };
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {

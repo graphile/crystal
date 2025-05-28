@@ -398,19 +398,19 @@ function DatetimeSerialize(value) {
 }
 const specFromArgs_User = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_User, $nodeId);
+  return specFromNodeId(nodeIdHandler_User, inhibitOnNull($nodeId));
 };
 const specFromArgs_Measurement = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Measurement, $nodeId);
+  return specFromNodeId(nodeIdHandler_Measurement, inhibitOnNull($nodeId));
 };
 const specFromArgs_User2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_User, $nodeId);
+  return specFromNodeId(nodeIdHandler_User, inhibitOnNull($nodeId));
 };
 const specFromArgs_Measurement2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Measurement, $nodeId);
+  return specFromNodeId(nodeIdHandler_Measurement, inhibitOnNull($nodeId));
 };
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {

@@ -1192,19 +1192,19 @@ const makeArgs_referencing_table_mutation = (args, path = []) => argDetailsSimpl
 const resource_referencing_table_mutationPgResource = registry.pgResources["referencing_table_mutation"];
 const specFromArgs_LetterDescription = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_LetterDescription, $nodeId);
+  return specFromNodeId(nodeIdHandler_LetterDescription, inhibitOnNull($nodeId));
 };
 const specFromArgs_ReferencingTable = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_ReferencingTable, $nodeId);
+  return specFromNodeId(nodeIdHandler_ReferencingTable, inhibitOnNull($nodeId));
 };
 const specFromArgs_LetterDescription2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_LetterDescription, $nodeId);
+  return specFromNodeId(nodeIdHandler_LetterDescription, inhibitOnNull($nodeId));
 };
 const specFromArgs_ReferencingTable2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_ReferencingTable, $nodeId);
+  return specFromNodeId(nodeIdHandler_ReferencingTable, inhibitOnNull($nodeId));
 };
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
