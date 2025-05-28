@@ -653,6 +653,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
         const {
           inflection,
           graphql: { GraphQLNonNull },
+          grafast: { inhibitOnNull },
         } = build;
         const {
           scope: { isRootMutation },
@@ -796,15 +797,28 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                         `specFromArgs_${tableTypeName}`,
                       )
                     : EXPORTABLE(
-                        (handler, nodeIdFieldName, specFromNodeId) =>
+                        (
+                          handler,
+                          inhibitOnNull,
+                          nodeIdFieldName,
+                          specFromNodeId,
+                        ) =>
                           (args: FieldArgs) => {
                             const $nodeId = args.getRaw([
                               "input",
                               nodeIdFieldName,
                             ]) as ExecutableStep<Maybe<string>>;
-                            return specFromNodeId(handler!, $nodeId);
+                            return specFromNodeId(
+                              handler!,
+                              inhibitOnNull($nodeId),
+                            );
                           },
-                        [handler, nodeIdFieldName, specFromNodeId],
+                        [
+                          handler,
+                          inhibitOnNull,
+                          nodeIdFieldName,
+                          specFromNodeId,
+                        ],
                         `specFromArgs_${handler!.typeName}`,
                       );
 
