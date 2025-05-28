@@ -35,7 +35,9 @@ class GrafastGenerator {
     this.config = config;
     this.types = this.schema
       .toConfig()
-      .types.filter((t) => !t.name.startsWith("__"));
+      .types.filter(
+        (t) => !t.name.startsWith("__") && !isSpecifiedScalarType(t),
+      );
   }
 
   private _get(

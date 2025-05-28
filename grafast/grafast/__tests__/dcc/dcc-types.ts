@@ -493,9 +493,6 @@ export interface TypedGrafastSchemaSpec extends Omit<GrafastSchemaSpec, 'objectP
   inputObjectPlans?: {
   }
   scalarPlans?: {
-    Boolean?: ScalarPlan;
-    Int?: ScalarPlan;
-    String?: ScalarPlan;
   }
   enumPlans?: {
     ItemType?: EnumPlan;
