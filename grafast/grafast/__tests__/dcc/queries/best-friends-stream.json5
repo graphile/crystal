@@ -8,6 +8,21 @@
       name: 'Carl',
       items: [
         {
+          __typename: 'Consumable',
+          id: 205,
+          name: "Dolores Doesn't Splat Potion",
+        },
+        {
+          __typename: 'Equipment',
+          id: 211,
+          name: "Enchanted Anarchist's Battle Rattle",
+        },
+        {
+          __typename: 'Consumable',
+          id: 206,
+          name: "Carl's Jug O' Boom",
+        },
+        {
           __typename: 'UtilityItem',
           id: 206,
           name: 'Fireball or Custard? Scratchcard',
@@ -46,21 +61,6 @@
           __typename: 'Consumable',
           id: 204,
           name: 'Healing Potion',
-        },
-        {
-          __typename: 'Consumable',
-          id: 205,
-          name: "Dolores Doesn't Splat Potion",
-        },
-        {
-          __typename: 'Consumable',
-          id: 206,
-          name: "Carl's Jug O' Boom",
-        },
-        {
-          __typename: 'Equipment',
-          id: 211,
-          name: "Enchanted Anarchist's Battle Rattle",
         },
       ],
     },
