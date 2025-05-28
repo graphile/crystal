@@ -1,11 +1,11 @@
 # Ref consumable-items.md
 
-{
+query ConsumableItems {
   crawler(id: 101) {
     id
     name
     ... on HasInventory {
-      items {
+      items(first: 3) {
         __typename
         id
         name
@@ -22,7 +22,7 @@
             effect
           }
           ... on HasContents {
-            contents {
+            contents(first: 3) {
               __typename
               id
               name
@@ -31,6 +31,179 @@
               }
               ... on Consumable {
                 effect
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+query ConsumableItemsWithVariables($first: Int)
+@variables(values: { first: 3 }) {
+  crawler(id: 101) {
+    id
+    name
+    ... on HasInventory {
+      items(first: $first) {
+        __typename
+        id
+        name
+        ... on Created {
+          __typename
+          creator {
+            id
+            name
+          }
+          ... on Equipment {
+            maxDurability
+          }
+          ... on Consumable {
+            effect
+          }
+          ... on HasContents {
+            contents(first: $first) {
+              __typename
+              id
+              name
+              ... on Equipment {
+                maxDurability
+              }
+              ... on Consumable {
+                effect
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+query ConsumableItemsDefer1 @incremental {
+  ... @defer {
+    crawler(id: 101) {
+      id
+      name
+      ... on HasInventory {
+        items(first: 3) {
+          __typename
+          id
+          name
+          ... on Created {
+            __typename
+            creator {
+              id
+              name
+            }
+            ... on Equipment {
+              maxDurability
+            }
+            ... on Consumable {
+              effect
+            }
+            ... on HasContents {
+              contents(first: 3) {
+                __typename
+                id
+                name
+                ... on Equipment {
+                  maxDurability
+                }
+                ... on Consumable {
+                  effect
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+query ConsumableItemsDefer3 {
+  crawler(id: 101) {
+    id
+    name
+    ... on HasInventory {
+      ... @defer {
+        items(first: 3) {
+          __typename
+          id
+          name
+          ... on Created {
+            __typename
+            creator {
+              id
+              name
+            }
+            ... on Equipment {
+              maxDurability
+            }
+            ... on Consumable {
+              effect
+            }
+            ... @defer {
+              ... on HasContents {
+                contents(first: 3) {
+                  __typename
+                  id
+                  name
+                  ... on Equipment {
+                    maxDurability
+                  }
+                  ... on Consumable {
+                    effect
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+query ConsumableItemsDefer4 @incremental {
+  ... @defer {
+    crawler(id: 101) {
+      id
+      name
+      ... on HasInventory {
+        ... @defer {
+          items(first: 3) {
+            __typename
+            id
+            name
+            ... on Created {
+              __typename
+              creator {
+                id
+                name
+              }
+              ... on Equipment {
+                maxDurability
+              }
+              ... on Consumable {
+                effect
+              }
+              ... @defer {
+                ... on HasContents {
+                  contents(first: 3) {
+                    __typename
+                    id
+                    name
+                    ... on Equipment {
+                      maxDurability
+                    }
+                    ... on Consumable {
+                      effect
+                    }
+                  }
+                }
               }
             }
           }

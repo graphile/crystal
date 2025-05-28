@@ -1,0 +1,12 @@
+{
+  initialData: '{}',
+  patches: {
+    '': {
+      '{crawler}': {
+        indicies: [
+          '',
+        ],
+      },
+    },
+  },
+}

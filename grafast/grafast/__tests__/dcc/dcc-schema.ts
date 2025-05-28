@@ -159,7 +159,7 @@ export const makeBaseArgs = () => {
         canBeFoundIn: [LootBox]
       }
       interface HasContents {
-        contents: [Item]
+        contents(first: Int): [Item]
       }
       interface Created {
         creator: Crawler
@@ -168,7 +168,7 @@ export const makeBaseArgs = () => {
         id: Int!
         name: String
         canBeFoundIn: [LootBox]
-        contents: [Item]
+        contents(first: Int): [Item]
         creator: Crawler
         currentDurability: Int
         maxDurability: Int
@@ -177,7 +177,7 @@ export const makeBaseArgs = () => {
         id: Int!
         name: String
         canBeFoundIn: [LootBox]
-        contents: [Item]
+        contents(first: Int): [Item]
         creator: Crawler
         effect: String
       }
