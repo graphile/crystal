@@ -164,7 +164,24 @@ function incsig(p: readonly AsyncExecutionResult[]) {
     const indicies = payload.path!.filter((n) => typeof n === "number");
     result.patches[pathSig][payloadSig].indicies.push(indicies.join("/"));
   }
+  for (const k in result.patches) {
+    result.patches[k] = canonicalSort(result.patches[k]);
+  }
+  result.patches = canonicalSort(result.patches);
   return result;
+}
+
+function canonicalSort(obj: Record<string, any>) {
+  return Object.fromEntries(
+    Object.entries(obj).sort((a, z) =>
+      a[0].localeCompare(
+        z[0],
+        // Language independent sorting (Unicode binary?)
+        // BCP 47 primary language tag "und"
+        "und",
+      ),
+    ),
+  );
 }
 
 //.map(pruneAsyncResult)
