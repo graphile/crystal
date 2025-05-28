@@ -5373,14 +5373,19 @@ function isPeerLayerPlan(
     return false;
   }
   if (lp1 === lp2) return true;
-  if (
-    lp1.reason.type === "polymorphicPartition" &&
-    lp2.reason.type === "polymorphicPartition" &&
-    lp1.reason.parentLayerPlan === lp2.reason.parentLayerPlan
-  ) {
-    return true;
+  const pr1 = getPeerRoot(lp1);
+  const pr2 = getPeerRoot(lp2);
+  return pr1 === pr2;
+}
+
+function getPeerRoot(lp: LayerPlan): LayerPlan {
+  if (lp.reason.type === "polymorphicPartition") {
+    return lp.reason.parentLayerPlan;
   }
-  return false;
+  if (lp.reason.type === "nullableBoundary") {
+    return lp.reason.parentLayerPlan;
+  }
+  return lp;
 }
 
 type StepCache = Record<string, Map<any, any> | undefined>;
