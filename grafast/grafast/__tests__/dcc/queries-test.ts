@@ -1,14 +1,14 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import { readdirSync, readFileSync } from "node:fs";
 
+import { isAsyncIterable } from "@envelop/core";
 import { expect } from "chai";
-import {
+import type {
   AsyncExecutionResult,
-  Kind,
-  parse,
-  valueFromASTUntyped,
-  type ExecutionResult,
+  ExecutionResult,
+  GraphQLError,
 } from "graphql";
+import { Kind, parse, valueFromASTUntyped } from "graphql";
 import JSON5 from "json5";
 import { it } from "mocha";
 
@@ -16,8 +16,6 @@ import { grafast } from "../../dist/index.js";
 import { planToMermaid } from "../../dist/mermaid.js";
 import { snapshot } from "../snapshots.js";
 import { makeBaseArgs } from "./dcc-schema.js";
-import { isAsyncIterable } from "@envelop/core";
-import { GraphQLError, print } from "graphql";
 
 // The text the file must end with
 const SUFFIX = ".test.graphql";
@@ -36,7 +34,10 @@ async function streamToArray(r: Awaited<ReturnType<typeof grafast>>) {
   }
 }
 
-function getObj(base: object, path: ReadonlyArray<string | number>) {
+function getObj(
+  base: Record<string | number, any>,
+  path: ReadonlyArray<string | number>,
+) {
   let current = base;
   for (const part of path) {
     current = current[part];
@@ -47,7 +48,7 @@ function getObj(base: object, path: ReadonlyArray<string | number>) {
   return current;
 }
 
-function deepMerge(target: object, source: object) {
+function deepMerge(target: Record<string | number, any>, source: object) {
   for (const [key, val] of Object.entries(source)) {
     if (!target[key]) {
       target[key] = val;

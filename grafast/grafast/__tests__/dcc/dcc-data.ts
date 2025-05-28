@@ -734,6 +734,7 @@ export const batchGetBetaLocationById: LoadOneCallback<
 export const batchGetLootDataByItemTypeAndId: LoadManyCallback<
   readonly [string, number],
   LootDataData,
+  Maybe<ReadonlyArray<Maybe<LootDataData>>>,
   never,
   Database
 > = (identifiersList, { unary: data }) => {
@@ -745,6 +746,7 @@ export const batchGetLootDataByItemTypeAndId: LoadManyCallback<
 export const batchGetLootDataByLootBoxId: LoadManyCallback<
   number,
   LootDataData,
+  Maybe<ReadonlyArray<Maybe<LootDataData>>>,
   never,
   Database
 > = (identifiersList, { unary: data }) => {
@@ -756,6 +758,7 @@ export const batchGetLootDataByLootBoxId: LoadManyCallback<
 export const batchGetLootBoxById: LoadOneCallback<
   number,
   LootBoxData,
+  Maybe<LootBoxData>,
   never,
   Database
 > = (ids, { unary: data }) => {
