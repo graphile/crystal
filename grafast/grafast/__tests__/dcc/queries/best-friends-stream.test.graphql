@@ -26,9 +26,7 @@ query BestFriend2 {
   }
 }
 
-# TODO: In future this should stream
-
-query BestFriendStream {
+query BestFriendStream @incremental {
   character(id: 102) {
     id
     name
