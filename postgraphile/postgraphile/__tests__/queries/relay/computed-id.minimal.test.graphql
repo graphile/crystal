@@ -1,0 +1,11 @@
+## expect(errors).toBeFalsy()
+#> schema: ["relay"]
+#> extends: ["postgraphile/presets/relay:PgRelayPreset"]
+query Q {
+  a: user(id: "WyJ1c2VycyIsMV0=") {
+    username # Alice
+    base: maxReadingDistance
+    model1: maxReadingDistance(withSpectacles: "WyJzcGVjdGFjbGVzIiwxXQ==")
+    nonsense2: maxReadingDistance(withSpectacles: "query")
+  }
+}

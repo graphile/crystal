@@ -2081,5 +2081,5 @@ create function relay.users_max_reading_distance(u relay.users, with_spectacles 
   and spectacle_id is not distinct from with_spectacles.id;
 $$ language sql stable;
 
-comment on function relay.users_reading_distance is
+comment on function relay.users_max_reading_distance is
   E'Reading distance in metres with the given pair of spectacles (or specify null for no spectacles). If null then that combination hasn''t been measured.';
