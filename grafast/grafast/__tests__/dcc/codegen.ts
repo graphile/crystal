@@ -7,7 +7,7 @@ const config: CodegenConfig = {
     "./dcc-types.ts": {
       plugins: ["typescript", "./grafast-types-plugin.ts"],
       config: {
-        grafastModule: "../../dist",
+        grafastModule: "../../dist/index.js",
         overridesFile: "./dcc-type-overrides.ts",
       },
     },

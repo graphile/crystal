@@ -266,8 +266,8 @@ export type UtilityItem = Item & {
 
 // Generated GraphQL SDK (auto-generated – do not edit)
 
-import type { EnumPlan, FieldPlan, InputFieldPlan, GrafastSchemaSpec, InputObjectPlan, InterfacePlan, ObjectPlan, ScalarPlan, Step, UnionPlan } from '../../dist';
-import { makeGrafastSchema } from '../../dist';
+import type { EnumPlan, FieldPlan, InputFieldPlan, GrafastSchemaSpec, InputObjectPlan, InterfacePlan, ObjectPlan, ScalarPlan, Step, UnionPlan } from '../../dist/index.js';
+import { makeGrafastSchema } from '../../dist/index.js';
 import type { Overrides } from './dcc-type-overrides.ts';
 
 type NoArguments = Record<string, never>;
