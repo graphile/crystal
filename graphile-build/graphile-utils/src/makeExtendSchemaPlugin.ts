@@ -1,7 +1,7 @@
 import type {
   AbstractTypePlanner,
   DeprecatedObjectPlan,
-  GrafastSchemaSpec,
+  GrafastSchemaConfig,
   ObjectFieldConfig,
   ObjectPlan as GrafastObjectPlan,
   PlanTypeInfo,
@@ -110,14 +110,14 @@ export interface Plans {
     | (DeprecatedObjectPlan & { __scope?: GraphileBuild.ScopeObject })
     | (EnumResolver & { __scope?: GraphileBuild.ScopeEnum })
     | (GraphQLScalarType & { __scope?: GraphileBuild.ScopeScalar })
-    | (GraphQLScalarTypeConfig<any, any> & {
+    | (Omit<GraphQLScalarTypeConfig<any, any>, "name"> & {
         __scope?: GraphileBuild.ScopeScalar;
       });
 }
 
 export interface ExtensionDefinition
   extends Pick<
-    GrafastSchemaSpec,
+    GrafastSchemaConfig,
     | "typeDefs"
     | "plans"
     | "scalarPlans"

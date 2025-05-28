@@ -78,7 +78,7 @@ export type DeprecatedObjectPlan<TSource extends Step = Step> = {
 /**
  * The plans/config for each field of a GraphQL object type.
  */
-export type ObjectPlan<TSource extends Step = Step> = {
+export interface ObjectPlan<TSource extends Step = Step> {
   assertStep?:
     | ((step: Step) => asserts step is TSource)
     | { new (...args: any[]): TSource };
@@ -87,7 +87,7 @@ export type ObjectPlan<TSource extends Step = Step> = {
   fields?: {
     [key: string]: FieldPlan<TSource, any, any>;
   };
-};
+}
 
 /**
  * The plans for each field of a GraphQL input object type.
@@ -103,19 +103,20 @@ export type DeprecatedInputObjectPlan = {
       };
 };
 
+export interface InputObjectFieldConfig<TParent = any, TData = any> {
+  apply?: InputObjectFieldApplyResolver<TParent, TData>;
+  extensions?: graphql.GraphQLInputFieldExtensions;
+}
 export type InputFieldPlan<TParent = any, TData = any> =
   | InputObjectFieldApplyResolver<TParent, TData>
-  | {
-      apply?: InputObjectFieldApplyResolver<TParent, TData>;
-      extensions?: graphql.GraphQLInputFieldExtensions;
-    };
+  | InputObjectFieldConfig<TParent, TData>;
 
-export type InputObjectPlan = {
+export interface InputObjectPlan {
   baked?: InputObjectTypeBakedResolver;
   fields?: {
     [fieldName: string]: InputFieldPlan;
   };
-};
+}
 
 /**
  * The plan config for an interface or union type.
@@ -170,12 +171,21 @@ export type DeprecatedUnionOrInterfacePlan = {
 /**
  * The config for a GraphQL scalar type.
  */
-export type ScalarPlan = {
-  serialize?: GraphQLScalarSerializer<any>;
-  parseValue?: GraphQLScalarValueParser<any>;
-  parseLiteral?: GraphQLScalarLiteralParser<any>;
+export interface ScalarPlan<TInternal = any, TExternal = any>
+  extends Omit<
+    graphql.GraphQLScalarTypeConfig<TInternal, TExternal>,
+    "name" | "description" | "specifiedByURL" | "astNode" | "extensionASTNodes"
+  > {
   plan?: ScalarPlanResolver<any, any>;
-};
+}
+
+export interface EnumValueConfig
+  extends Omit<
+    graphql.GraphQLEnumValueConfig,
+    "description" | "deprecationReason" | "astNode"
+  > {
+  apply?: EnumValueApplyResolver;
+}
 
 /**
  * The values/configs for the entries in a GraphQL enum type.
@@ -184,14 +194,10 @@ export type EnumPlan = {
   // The internal value for the enum
   [enumValueName: string]:
     | EnumValueApplyResolver
+    | EnumValueConfig
     | string
     | number
-    | boolean
-    | {
-        value?: unknown;
-        extensions?: graphql.GraphQLEnumValueExtensions;
-        apply?: EnumValueApplyResolver;
-      };
+    | boolean;
 };
 
 /**
@@ -208,7 +214,7 @@ export interface GrafastPlans {
     | EnumPlan;
 }
 
-export interface GrafastSchemaSpec {
+export interface GrafastSchemaConfig {
   typeDefs: string | graphql.DocumentNode | graphql.DocumentNode[];
 
   /**
@@ -232,7 +238,7 @@ export interface GrafastSchemaSpec {
  * Takes a GraphQL schema definition in Interface Definition Language (IDL/SDL)
  * syntax and configs for the types in it and returns a GraphQL schema.
  */
-export function makeGrafastSchema(details: GrafastSchemaSpec): GraphQLSchema {
+export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
   const {
     typeDefs,
     plans: rawPlans,

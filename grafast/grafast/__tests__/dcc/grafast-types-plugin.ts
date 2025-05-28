@@ -154,7 +154,7 @@ ${Object.entries(type.getFields())
       [
         "// Generated GraphQL SDK (auto-generated – do not edit)",
         "",
-        `import type { EnumPlan, FieldPlan, InputFieldPlan, GrafastSchemaSpec, InputObjectPlan, InterfacePlan, ObjectPlan, ScalarPlan, Step, UnionPlan } from '${this.config.grafastModule ?? "grafast"}';`,
+        `import type { EnumPlan, FieldPlan, InputFieldPlan, GrafastSchemaConfig, InputObjectPlan, InterfacePlan, ObjectPlan, ScalarPlan, Step, UnionPlan } from '${this.config.grafastModule ?? "grafast"}';`,
         `import { makeGrafastSchema } from '${this.config.grafastModule ?? "grafast"}';`,
         this.config.overridesFile
           ? `import type { Overrides } from '${this.config.overridesFile ?? "./grafastTypeOverrides.ts"}';`
@@ -176,7 +176,7 @@ type Get<
     : TFallback
   : TFallback;`,
         "",
-        `export interface TypedGrafastSchemaSpec extends Omit<GrafastSchemaSpec, 'objectPlans' | 'interfacePlans' | 'unionPlans' | 'inputObjectPlans' | 'scalarPlans' | 'enumPlans'> {`,
+        `export interface TypedGrafastSchemaSpec extends Omit<GrafastSchemaConfig, 'objectPlans' | 'interfacePlans' | 'unionPlans' | 'inputObjectPlans' | 'scalarPlans' | 'enumPlans'> {`,
 
         `  objectPlans?: {`,
         ...this.getObjectPlans(),

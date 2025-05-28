@@ -266,7 +266,7 @@ export type UtilityItem = Item & {
 
 // Generated GraphQL SDK (auto-generated – do not edit)
 
-import type { EnumPlan, FieldPlan, InputFieldPlan, GrafastSchemaSpec, InputObjectPlan, InterfacePlan, ObjectPlan, ScalarPlan, Step, UnionPlan } from '../../dist/index.js';
+import type { EnumPlan, FieldPlan, InputFieldPlan, GrafastSchemaConfig, InputObjectPlan, InterfacePlan, ObjectPlan, ScalarPlan, Step, UnionPlan } from '../../dist/index.js';
 import { makeGrafastSchema } from '../../dist/index.js';
 import type { Overrides } from './dcc-type-overrides.ts';
 
@@ -284,7 +284,7 @@ type Get<
     : TFallback
   : TFallback;
 
-export interface TypedGrafastSchemaSpec extends Omit<GrafastSchemaSpec, 'objectPlans' | 'interfacePlans' | 'unionPlans' | 'inputObjectPlans' | 'scalarPlans' | 'enumPlans'> {
+export interface TypedGrafastSchemaSpec extends Omit<GrafastSchemaConfig, 'objectPlans' | 'interfacePlans' | 'unionPlans' | 'inputObjectPlans' | 'scalarPlans' | 'enumPlans'> {
   objectPlans?: {
     ActiveCrawler?: Omit<ObjectPlan<Get<"ActiveCrawler", "source", NonNullStep<Get<"ActiveCrawler", "nullable", Step>>>>, 'fields'> & {
       fields?: {
