@@ -1022,3 +1022,20 @@ values ('e0849772-7070-4fdf-8438-1ef846fc0daf', '0d126c0c-9710-478c-9aee-0be34b2
      , ('5751f977-209d-45ab-8620-b647ff67ded6', 'c46b4b59-0a29-4211-8e0f-659cb3e01c2f', 'A different chat', 'a13b8bac-f2c7-4444-bac6-4ae7c9c28bbc', '2020-01-01T00:00:00Z'::timestamptz - '3 minutes 30 seconds'::interval)
      , ('8b9e89dc-2e1b-461a-94d5-3afafa4f87ad', '0d126c0c-9710-478c-9aee-0be34b250573', 'John says 2', '935945c1-d824-4a98-93e5-c22215c58982', '2020-01-01T00:00:00Z'::timestamptz - '4 minutes'::interval)
      , ('cc20ffeb-0701-4619-acc3-4a9b67671272', '0d126c0c-9710-478c-9aee-0be34b250573', 'John says 1', '935945c1-d824-4a98-93e5-c22215c58982', '2020-01-01T00:00:00Z'::timestamptz - '6 minutes'::interval)
+
+insert into relay.users (name)
+values ('Alice')
+     , ('Bob');
+
+insert into relay.spectacles (model_number)
+values ('Model-1')
+     , ('Model-2')
+     , ('Model-3')
+     , ('Model-4');
+insert into relay.distances (user_id, spectacle_id, distance)
+values (1, null, 0.2)
+     , (1, 1, 0.3),
+     , (1, 2, 0.5),
+     , (2, null, 0.25),
+     , (2, 2, 0.45),
+     , (2, 3, 0.52);
