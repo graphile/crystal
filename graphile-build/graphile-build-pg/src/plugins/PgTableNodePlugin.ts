@@ -188,30 +188,28 @@ return function (list, constant) {
               ? // eslint-disable-next-line graphile-export/exhaustive-deps
                 EXPORTABLE(
                   te.run`\
-return function (access, inhibitOnNull) {
+return function (access) {
   return $list => ({ ${te.join(
     pk.map(
       (attributeName, index) =>
         te`${te.safeKeyOrThrow(
           attributeName,
-        )}: inhibitOnNull(access($list, [${te.lit(index + 1)}]))`,
+        )}: access($list, [${te.lit(index + 1)}])`,
     ),
     ", ",
   )} });
 }` as any,
-                  [access, inhibitOnNull],
+                  [access],
                 )
               : EXPORTABLE(
-                  (access, inhibitOnNull, pk) => ($list: ListStep<any[]>) => {
+                  (access, pk) => ($list: ListStep<any[]>) => {
                     const spec = pk.reduce((memo, attribute, index) => {
-                      memo[attribute] = inhibitOnNull(
-                        access($list, [index + 1]),
-                      );
+                      memo[attribute] = access($list, [index + 1]);
                       return memo;
                     }, Object.create(null));
                     return spec;
                   },
-                  [access, inhibitOnNull, pk],
+                  [access, pk],
                 ),
             getIdentifiers: EXPORTABLE(() => (value) => value.slice(1), []),
             get: EXPORTABLE(
