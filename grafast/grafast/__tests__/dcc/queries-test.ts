@@ -83,11 +83,19 @@ function resolveStreamDefer(r: AsyncExecutionResult[]): ExecutionResult {
     if (p.data !== undefined) {
       const data = deepClone(p.data);
       if ("path" in p && p.path) {
-        const target = getObj(payload.data!, p.path);
-        if (data) {
-          deepMerge(target, data);
+        if (typeof p.path[p.path.length - 1] === "number") {
+          const target = getObj(
+            payload.data!,
+            p.path.slice(0, p.path.length - 1),
+          );
+          target[p.path[p.path.length - 1]] = deepClone(data);
         } else {
-          console.warn(`Cannot set position at path ${p.path} to null`);
+          const target = getObj(payload.data!, p.path);
+          if (data) {
+            deepMerge(target, data);
+          } else {
+            console.warn(`Cannot set position at path ${p.path} to null`);
+          }
         }
       } else {
         if (payload.data !== undefined) {
