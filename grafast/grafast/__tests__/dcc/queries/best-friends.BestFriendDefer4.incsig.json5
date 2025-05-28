@@ -1,14 +1,12 @@
-[
-  {
-    data: {},
-    hasNext: true,
+{
+  initialData: '{}',
+  patches: {
+    '': {
+      '{character}': {
+        indicies: [
+          '',
+        ],
+      },
+    },
   },
-  {
-    data: '{character:...}',
-    hasNext: true,
-    path: [],
-  },
-  {
-    hasNext: false,
-  },
-]
+}

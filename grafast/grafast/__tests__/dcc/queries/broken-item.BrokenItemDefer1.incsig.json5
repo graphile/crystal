@@ -1,14 +1,12 @@
-[
-  {
-    data: {},
-    hasNext: true,
+{
+  initialData: '{}',
+  patches: {
+    '': {
+      '{brokenItem}': {
+        indicies: [
+          '',
+        ],
+      },
+    },
   },
-  {
-    data: '{brokenItem:...}',
-    hasNext: true,
-    path: [],
-  },
-  {
-    hasNext: false,
-  },
-]
+}
