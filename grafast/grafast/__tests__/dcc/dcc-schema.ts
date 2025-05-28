@@ -23,9 +23,9 @@ import type {
   Database,
   FloorData,
   ItemSpec,
+  ItemType,
   LocationData,
   NpcData,
-  ItemType,
 } from "./dcc-data.js";
 import {
   batchGetClubById,
@@ -392,7 +392,7 @@ export const makeBaseArgs = () => {
         },
       },
       UtilityItem: {
-        fields: {
+        plans: {
           canBeFoundIn($item) {
             const $id = get($item, "id");
             const $type = constant("UtilityItem");
@@ -401,7 +401,7 @@ export const makeBaseArgs = () => {
         },
       },
       MiscItem: {
-        fields: {
+        plans: {
           canBeFoundIn($item) {
             const $id = get($item, "id");
             const $type = constant("MiscItem");
@@ -441,7 +441,7 @@ export const makeBaseArgs = () => {
         },
       },
       LootBox: {
-        fields: {
+        plans: {
           possibleItems($lootBox) {
             const $id = get($lootBox, "id");
             const $db = context().get("dccDb");
