@@ -3,7 +3,7 @@ import type { Maybe, UnbatchedExecutionExtra } from "../interfaces.js";
 import type { Step } from "../step.js";
 import { UnbatchedStep } from "../step.js";
 
-export class CoalesceStep<T> extends UnbatchedStep<Maybe<T>> {
+export class CoalesceStep<T> extends UnbatchedStep<T | null> {
   static $$export = {
     moduleName: "grafast",
     exportName: "CoalesceStep",
@@ -25,7 +25,7 @@ export class CoalesceStep<T> extends UnbatchedStep<Maybe<T>> {
     _info: UnbatchedExecutionExtra,
     ...values: ReadonlyArray<T | null>
   ) {
-    return values.find((v) => v != null);
+    return values.find((v) => v != null) ?? null;
   }
 }
 
