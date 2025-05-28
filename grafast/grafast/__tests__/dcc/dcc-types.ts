@@ -12,6 +12,7 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
+  _RawJSON: { input: any; output: any; }
 };
 
 export type ActiveCrawler = Character & Crawler & HasInventory & {
@@ -508,6 +509,7 @@ export interface TypedGrafastSchemaSpec extends Omit<GrafastSchemaConfig, 'objec
   inputObjects?: {
   }
   scalars?: {
+    _RawJSON?: ScalarPlan;
   }
   enums?: {
     ItemType?: EnumPlan;
