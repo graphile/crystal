@@ -5384,19 +5384,19 @@ function isPeerLayerPlan(
     return false;
   }
   if (lp1 === lp2) return true;
-  const pr1 = getPeerRoot(lp1);
-  const pr2 = getPeerRoot(lp2);
+  if (lp1 === lp2.ancestry[lp1.depth]) return true;
+  const pr1 = getPolymorphicLayerPlanFromPartition(lp1);
+  const pr2 = getPolymorphicLayerPlanFromPartition(lp2);
   return pr1 === pr2;
 }
 
-function getPeerRoot(lp: LayerPlan): LayerPlan {
-  if (lp.reason.type === "polymorphicPartition") {
-    return lp.reason.parentLayerPlan;
-  }
-  if (lp.reason.type === "nullableBoundary") {
-    return lp.reason.parentLayerPlan;
-  }
-  return lp;
+/**
+ * Steps in polymorphicPartitions are allowed to deduplicate against their sibling polymorphic partitions
+ */
+function getPolymorphicLayerPlanFromPartition(lp: LayerPlan): LayerPlan {
+  return lp.reason.type === "polymorphicPartition"
+    ? lp.reason.parentLayerPlan
+    : lp;
 }
 
 type StepCache = Record<string, Map<any, any> | undefined>;
