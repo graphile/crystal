@@ -199,7 +199,7 @@ const nodeIdHandler_Network = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -233,7 +233,7 @@ function specForHandler(handler) {
 }
 const nodeFetcher_Network = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Network));
-  return nodeIdHandler_Network.get(nodeIdHandler_Network.getSpec($decoded));
+  return nodeIdHandler_Network.get(nodeIdHandler_Network.getSpec(inhibitOnNull($decoded)));
 };
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();

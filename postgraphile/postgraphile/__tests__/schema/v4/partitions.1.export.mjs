@@ -310,7 +310,7 @@ const nodeIdHandler_User = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -344,7 +344,7 @@ function specForHandler(handler) {
 }
 const nodeFetcher_User = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_User));
-  return nodeIdHandler_User.get(nodeIdHandler_User.getSpec($decoded));
+  return nodeIdHandler_User.get(nodeIdHandler_User.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_Measurement = {
   typeName: "Measurement",
@@ -355,8 +355,8 @@ const nodeIdHandler_Measurement = {
   },
   getSpec($list) {
     return {
-      timestamp: inhibitOnNull(access($list, [1])),
-      key: inhibitOnNull(access($list, [2]))
+      timestamp: access($list, [1]),
+      key: access($list, [2])
     };
   },
   getIdentifiers(value) {
@@ -371,7 +371,7 @@ const nodeIdHandler_Measurement = {
 };
 const nodeFetcher_Measurement = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Measurement));
-  return nodeIdHandler_Measurement.get(nodeIdHandler_Measurement.getSpec($decoded));
+  return nodeIdHandler_Measurement.get(nodeIdHandler_Measurement.getSpec(inhibitOnNull($decoded)));
 };
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();

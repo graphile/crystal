@@ -1080,7 +1080,7 @@ const nodeIdHandler_LetterDescription = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -1114,7 +1114,7 @@ function specForHandler(handler) {
 }
 const nodeFetcher_LetterDescription = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_LetterDescription));
-  return nodeIdHandler_LetterDescription.get(nodeIdHandler_LetterDescription.getSpec($decoded));
+  return nodeIdHandler_LetterDescription.get(nodeIdHandler_LetterDescription.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_ReferencingTable = {
   typeName: "ReferencingTable",
@@ -1125,7 +1125,7 @@ const nodeIdHandler_ReferencingTable = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -1140,7 +1140,7 @@ const nodeIdHandler_ReferencingTable = {
 };
 const nodeFetcher_ReferencingTable = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_ReferencingTable));
-  return nodeIdHandler_ReferencingTable.get(nodeIdHandler_ReferencingTable.getSpec($decoded));
+  return nodeIdHandler_ReferencingTable.get(nodeIdHandler_ReferencingTable.getSpec(inhibitOnNull($decoded)));
 };
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();

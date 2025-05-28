@@ -2304,7 +2304,7 @@ const nodeIdHandler_List = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -2338,7 +2338,7 @@ function specForHandler(handler) {
 }
 const nodeFetcher_List = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_List));
-  return nodeIdHandler_List.get(nodeIdHandler_List.getSpec($decoded));
+  return nodeIdHandler_List.get(nodeIdHandler_List.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_Type = {
   typeName: "Type",
@@ -2349,7 +2349,7 @@ const nodeIdHandler_Type = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -2364,7 +2364,7 @@ const nodeIdHandler_Type = {
 };
 const nodeFetcher_Type = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Type));
-  return nodeIdHandler_Type.get(nodeIdHandler_Type.getSpec($decoded));
+  return nodeIdHandler_Type.get(nodeIdHandler_Type.getSpec(inhibitOnNull($decoded)));
 };
 const resource_updatable_viewPgResource = registry.pgResources["updatable_view"];
 function qbWhereBuilder(qb) {

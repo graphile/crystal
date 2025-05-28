@@ -248,7 +248,7 @@ const nodeIdHandler_Geom = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -282,7 +282,7 @@ function specForHandler(handler) {
 }
 const nodeFetcher_Geom = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Geom));
-  return nodeIdHandler_Geom.get(nodeIdHandler_Geom.getSpec($decoded));
+  return nodeIdHandler_Geom.get(nodeIdHandler_Geom.getSpec(inhibitOnNull($decoded)));
 };
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();

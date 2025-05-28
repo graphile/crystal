@@ -369,7 +369,7 @@ const nodeIdHandler_T = {
   },
   getSpec($list) {
     return {
-      k: inhibitOnNull(access($list, [1]))
+      k: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -403,7 +403,7 @@ function specForHandler(handler) {
 }
 const nodeFetcher_T = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_T));
-  return nodeIdHandler_T.get(nodeIdHandler_T.getSpec($decoded));
+  return nodeIdHandler_T.get(nodeIdHandler_T.getSpec(inhibitOnNull($decoded)));
 };
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();

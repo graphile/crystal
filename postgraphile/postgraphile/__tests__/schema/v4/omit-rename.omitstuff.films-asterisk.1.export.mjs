@@ -1116,7 +1116,7 @@ const nodeIdHandler_Person = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -1203,7 +1203,7 @@ const nodeIdHandler_Studio = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -1218,7 +1218,7 @@ const nodeIdHandler_Studio = {
 };
 const nodeFetcher_Studio = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Studio));
-  return nodeIdHandler_Studio.get(nodeIdHandler_Studio.getSpec($decoded));
+  return nodeIdHandler_Studio.get(nodeIdHandler_Studio.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_Post = {
   typeName: "Post",
@@ -1229,7 +1229,7 @@ const nodeIdHandler_Post = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -1244,7 +1244,7 @@ const nodeIdHandler_Post = {
 };
 const nodeFetcher_Post = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Post));
-  return nodeIdHandler_Post.get(nodeIdHandler_Post.getSpec($decoded));
+  return nodeIdHandler_Post.get(nodeIdHandler_Post.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_TvEpisode = {
   typeName: "TvEpisode",
@@ -1255,7 +1255,7 @@ const nodeIdHandler_TvEpisode = {
   },
   getSpec($list) {
     return {
-      code: inhibitOnNull(access($list, [1]))
+      code: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -1270,11 +1270,11 @@ const nodeIdHandler_TvEpisode = {
 };
 const nodeFetcher_TvEpisode = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_TvEpisode));
-  return nodeIdHandler_TvEpisode.get(nodeIdHandler_TvEpisode.getSpec($decoded));
+  return nodeIdHandler_TvEpisode.get(nodeIdHandler_TvEpisode.getSpec(inhibitOnNull($decoded)));
 };
 const nodeFetcher_Person = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Person));
-  return nodeIdHandler_Person.get(nodeIdHandler_Person.getSpec($decoded));
+  return nodeIdHandler_Person.get(nodeIdHandler_Person.getSpec(inhibitOnNull($decoded)));
 };
 const resource_renamed_tablePgResource = registry.pgResources["renamed_table"];
 function qbWhereBuilder(qb) {

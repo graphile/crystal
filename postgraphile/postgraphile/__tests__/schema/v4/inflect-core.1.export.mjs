@@ -9699,7 +9699,7 @@ const nodeIdHandler_Input = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -9733,7 +9733,7 @@ function specForHandler(handler) {
 }
 const nodeFetcher_Input = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Input));
-  return nodeIdHandler_Input.get(nodeIdHandler_Input.getSpec($decoded));
+  return nodeIdHandler_Input.get(nodeIdHandler_Input.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_Patch = {
   typeName: "Patch",
@@ -9744,7 +9744,7 @@ const nodeIdHandler_Patch = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -9759,7 +9759,7 @@ const nodeIdHandler_Patch = {
 };
 const nodeFetcher_Patch = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Patch));
-  return nodeIdHandler_Patch.get(nodeIdHandler_Patch.getSpec($decoded));
+  return nodeIdHandler_Patch.get(nodeIdHandler_Patch.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_Reserved = {
   typeName: "Reserved",
@@ -9770,7 +9770,7 @@ const nodeIdHandler_Reserved = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -9785,7 +9785,7 @@ const nodeIdHandler_Reserved = {
 };
 const nodeFetcher_Reserved = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Reserved));
-  return nodeIdHandler_Reserved.get(nodeIdHandler_Reserved.getSpec($decoded));
+  return nodeIdHandler_Reserved.get(nodeIdHandler_Reserved.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_ReservedPatchRecord = {
   typeName: "ReservedPatchRecord",
@@ -9796,7 +9796,7 @@ const nodeIdHandler_ReservedPatchRecord = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -9811,7 +9811,7 @@ const nodeIdHandler_ReservedPatchRecord = {
 };
 const nodeFetcher_ReservedPatchRecord = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_ReservedPatchRecord));
-  return nodeIdHandler_ReservedPatchRecord.get(nodeIdHandler_ReservedPatchRecord.getSpec($decoded));
+  return nodeIdHandler_ReservedPatchRecord.get(nodeIdHandler_ReservedPatchRecord.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_ReservedInputRecord = {
   typeName: "ReservedInputRecord",
@@ -9822,7 +9822,7 @@ const nodeIdHandler_ReservedInputRecord = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -9837,7 +9837,7 @@ const nodeIdHandler_ReservedInputRecord = {
 };
 const nodeFetcher_ReservedInputRecord = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_ReservedInputRecord));
-  return nodeIdHandler_ReservedInputRecord.get(nodeIdHandler_ReservedInputRecord.getSpec($decoded));
+  return nodeIdHandler_ReservedInputRecord.get(nodeIdHandler_ReservedInputRecord.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_DefaultValue = {
   typeName: "DefaultValue",
@@ -9848,7 +9848,7 @@ const nodeIdHandler_DefaultValue = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -9863,7 +9863,7 @@ const nodeIdHandler_DefaultValue = {
 };
 const nodeFetcher_DefaultValue = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_DefaultValue));
-  return nodeIdHandler_DefaultValue.get(nodeIdHandler_DefaultValue.getSpec($decoded));
+  return nodeIdHandler_DefaultValue.get(nodeIdHandler_DefaultValue.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_MyTable = {
   typeName: "MyTable",
@@ -9874,7 +9874,7 @@ const nodeIdHandler_MyTable = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -9889,7 +9889,7 @@ const nodeIdHandler_MyTable = {
 };
 const nodeFetcher_MyTable = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_MyTable));
-  return nodeIdHandler_MyTable.get(nodeIdHandler_MyTable.getSpec($decoded));
+  return nodeIdHandler_MyTable.get(nodeIdHandler_MyTable.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_PersonSecret = {
   typeName: "PersonSecret",
@@ -9900,7 +9900,7 @@ const nodeIdHandler_PersonSecret = {
   },
   getSpec($list) {
     return {
-      person_id: inhibitOnNull(access($list, [1]))
+      person_id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -9916,7 +9916,7 @@ const nodeIdHandler_PersonSecret = {
 const nodeFetcher_PersonSecret = (handler => {
   const fn = $nodeId => {
     const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
+    return handler.get(handler.getSpec(inhibitOnNull($decoded)));
   };
   fn.deprecationReason = handler.deprecationReason;
   return fn;
@@ -9930,7 +9930,7 @@ const nodeIdHandler_ViewTable = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -9945,7 +9945,7 @@ const nodeIdHandler_ViewTable = {
 };
 const nodeFetcher_ViewTable = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_ViewTable));
-  return nodeIdHandler_ViewTable.get(nodeIdHandler_ViewTable.getSpec($decoded));
+  return nodeIdHandler_ViewTable.get(nodeIdHandler_ViewTable.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_CompoundKey = {
   typeName: "CompoundKey",
@@ -9956,8 +9956,8 @@ const nodeIdHandler_CompoundKey = {
   },
   getSpec($list) {
     return {
-      person_id_1: inhibitOnNull(access($list, [1])),
-      person_id_2: inhibitOnNull(access($list, [2]))
+      person_id_1: access($list, [1]),
+      person_id_2: access($list, [2])
     };
   },
   getIdentifiers(value) {
@@ -9972,7 +9972,7 @@ const nodeIdHandler_CompoundKey = {
 };
 const nodeFetcher_CompoundKey = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_CompoundKey));
-  return nodeIdHandler_CompoundKey.get(nodeIdHandler_CompoundKey.getSpec($decoded));
+  return nodeIdHandler_CompoundKey.get(nodeIdHandler_CompoundKey.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_SimilarTable1 = {
   typeName: "SimilarTable1",
@@ -9983,7 +9983,7 @@ const nodeIdHandler_SimilarTable1 = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -9998,7 +9998,7 @@ const nodeIdHandler_SimilarTable1 = {
 };
 const nodeFetcher_SimilarTable1 = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_SimilarTable1));
-  return nodeIdHandler_SimilarTable1.get(nodeIdHandler_SimilarTable1.getSpec($decoded));
+  return nodeIdHandler_SimilarTable1.get(nodeIdHandler_SimilarTable1.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_SimilarTable2 = {
   typeName: "SimilarTable2",
@@ -10009,7 +10009,7 @@ const nodeIdHandler_SimilarTable2 = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -10024,7 +10024,7 @@ const nodeIdHandler_SimilarTable2 = {
 };
 const nodeFetcher_SimilarTable2 = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_SimilarTable2));
-  return nodeIdHandler_SimilarTable2.get(nodeIdHandler_SimilarTable2.getSpec($decoded));
+  return nodeIdHandler_SimilarTable2.get(nodeIdHandler_SimilarTable2.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_NullTestRecord = {
   typeName: "NullTestRecord",
@@ -10035,7 +10035,7 @@ const nodeIdHandler_NullTestRecord = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -10050,7 +10050,7 @@ const nodeIdHandler_NullTestRecord = {
 };
 const nodeFetcher_NullTestRecord = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_NullTestRecord));
-  return nodeIdHandler_NullTestRecord.get(nodeIdHandler_NullTestRecord.getSpec($decoded));
+  return nodeIdHandler_NullTestRecord.get(nodeIdHandler_NullTestRecord.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_LeftArm = {
   typeName: "LeftArm",
@@ -10061,7 +10061,7 @@ const nodeIdHandler_LeftArm = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -10076,7 +10076,7 @@ const nodeIdHandler_LeftArm = {
 };
 const nodeFetcher_LeftArm = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_LeftArm));
-  return nodeIdHandler_LeftArm.get(nodeIdHandler_LeftArm.getSpec($decoded));
+  return nodeIdHandler_LeftArm.get(nodeIdHandler_LeftArm.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_Issue756 = {
   typeName: "Issue756",
@@ -10087,7 +10087,7 @@ const nodeIdHandler_Issue756 = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -10102,7 +10102,7 @@ const nodeIdHandler_Issue756 = {
 };
 const nodeFetcher_Issue756 = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Issue756));
-  return nodeIdHandler_Issue756.get(nodeIdHandler_Issue756.getSpec($decoded));
+  return nodeIdHandler_Issue756.get(nodeIdHandler_Issue756.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_Post = {
   typeName: "Post",
@@ -10113,7 +10113,7 @@ const nodeIdHandler_Post = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -10128,7 +10128,7 @@ const nodeIdHandler_Post = {
 };
 const nodeFetcher_Post = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Post));
-  return nodeIdHandler_Post.get(nodeIdHandler_Post.getSpec($decoded));
+  return nodeIdHandler_Post.get(nodeIdHandler_Post.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_Person = {
   typeName: "Person",
@@ -10139,7 +10139,7 @@ const nodeIdHandler_Person = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -10154,7 +10154,7 @@ const nodeIdHandler_Person = {
 };
 const nodeFetcher_Person = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Person));
-  return nodeIdHandler_Person.get(nodeIdHandler_Person.getSpec($decoded));
+  return nodeIdHandler_Person.get(nodeIdHandler_Person.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_List = {
   typeName: "List",
@@ -10165,7 +10165,7 @@ const nodeIdHandler_List = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -10180,7 +10180,7 @@ const nodeIdHandler_List = {
 };
 const nodeFetcher_List = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_List));
-  return nodeIdHandler_List.get(nodeIdHandler_List.getSpec($decoded));
+  return nodeIdHandler_List.get(nodeIdHandler_List.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_Type = {
   typeName: "Type",
@@ -10191,7 +10191,7 @@ const nodeIdHandler_Type = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -10206,7 +10206,7 @@ const nodeIdHandler_Type = {
 };
 const nodeFetcher_Type = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Type));
-  return nodeIdHandler_Type.get(nodeIdHandler_Type.getSpec($decoded));
+  return nodeIdHandler_Type.get(nodeIdHandler_Type.getSpec(inhibitOnNull($decoded)));
 };
 const resource_non_updatable_viewPgResource = registry.pgResources["non_updatable_view"];
 const resource_foreign_keyPgResource = registry.pgResources["foreign_key"];

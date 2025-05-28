@@ -4812,7 +4812,7 @@ const nodeIdHandlerByTypeName = {
     },
     getSpec($list) {
       return {
-        organization_id: inhibitOnNull(access($list, [1]))
+        organization_id: access($list, [1])
       };
     },
     getIdentifiers(value) {
@@ -4834,7 +4834,7 @@ const nodeIdHandlerByTypeName = {
     },
     getSpec($list) {
       return {
-        person_id: inhibitOnNull(access($list, [1]))
+        person_id: access($list, [1])
       };
     },
     getIdentifiers(value) {
@@ -4856,7 +4856,7 @@ const nodeIdHandlerByTypeName = {
     },
     getSpec($list) {
       return {
-        id: inhibitOnNull(access($list, [1]))
+        id: access($list, [1])
       };
     },
     getIdentifiers(value) {
@@ -4878,7 +4878,7 @@ const nodeIdHandlerByTypeName = {
     },
     getSpec($list) {
       return {
-        checklist_item_id: inhibitOnNull(access($list, [1]))
+        checklist_item_id: access($list, [1])
       };
     },
     getIdentifiers(value) {
@@ -4900,8 +4900,8 @@ const nodeIdHandlerByTypeName = {
     },
     getSpec($list) {
       return {
-        parent_id: inhibitOnNull(access($list, [1])),
-        child_id: inhibitOnNull(access($list, [2]))
+        parent_id: access($list, [1]),
+        child_id: access($list, [2])
       };
     },
     getIdentifiers(value) {
@@ -4923,7 +4923,7 @@ const nodeIdHandlerByTypeName = {
     },
     getSpec($list) {
       return {
-        topic_item_id: inhibitOnNull(access($list, [1]))
+        topic_item_id: access($list, [1])
       };
     },
     getIdentifiers(value) {
@@ -4945,8 +4945,8 @@ const nodeIdHandlerByTypeName = {
     },
     getSpec($list) {
       return {
-        parent_id: inhibitOnNull(access($list, [1])),
-        child_id: inhibitOnNull(access($list, [2]))
+        parent_id: access($list, [1]),
+        child_id: access($list, [2])
       };
     },
     getIdentifiers(value) {
@@ -4968,7 +4968,7 @@ const nodeIdHandlerByTypeName = {
     },
     getSpec($list) {
       return {
-        checklist_item_item_id: inhibitOnNull(access($list, [1]))
+        checklist_item_item_id: access($list, [1])
       };
     },
     getIdentifiers(value) {
@@ -4990,7 +4990,7 @@ const nodeIdHandlerByTypeName = {
     },
     getSpec($list) {
       return {
-        divider_item_id: inhibitOnNull(access($list, [1]))
+        divider_item_id: access($list, [1])
       };
     },
     getIdentifiers(value) {
@@ -5012,7 +5012,7 @@ const nodeIdHandlerByTypeName = {
     },
     getSpec($list) {
       return {
-        id: inhibitOnNull(access($list, [1]))
+        id: access($list, [1])
       };
     },
     getIdentifiers(value) {
@@ -5034,7 +5034,7 @@ const nodeIdHandlerByTypeName = {
     },
     getSpec($list) {
       return {
-        id: inhibitOnNull(access($list, [1]))
+        id: access($list, [1])
       };
     },
     getIdentifiers(value) {
@@ -5056,7 +5056,7 @@ const nodeIdHandlerByTypeName = {
     },
     getSpec($list) {
       return {
-        id: inhibitOnNull(access($list, [1]))
+        id: access($list, [1])
       };
     },
     getIdentifiers(value) {
@@ -5078,7 +5078,7 @@ const nodeIdHandlerByTypeName = {
     },
     getSpec($list) {
       return {
-        post_item_id: inhibitOnNull(access($list, [1]))
+        post_item_id: access($list, [1])
       };
     },
     getIdentifiers(value) {
@@ -5100,7 +5100,7 @@ const nodeIdHandlerByTypeName = {
     },
     getSpec($list) {
       return {
-        id: inhibitOnNull(access($list, [1]))
+        id: access($list, [1])
       };
     },
     getIdentifiers(value) {
@@ -5122,7 +5122,7 @@ const nodeIdHandlerByTypeName = {
     },
     getSpec($list) {
       return {
-        id: inhibitOnNull(access($list, [1]))
+        id: access($list, [1])
       };
     },
     getIdentifiers(value) {
@@ -5144,7 +5144,7 @@ const nodeIdHandlerByTypeName = {
     },
     getSpec($list) {
       return {
-        id: inhibitOnNull(access($list, [1]))
+        id: access($list, [1])
       };
     },
     getIdentifiers(value) {
@@ -5166,7 +5166,7 @@ const nodeIdHandlerByTypeName = {
     },
     getSpec($list) {
       return {
-        id: inhibitOnNull(access($list, [1]))
+        id: access($list, [1])
       };
     },
     getIdentifiers(value) {
@@ -5537,91 +5537,91 @@ function specForHandler(handler) {
 }
 const nodeFetcher_SingleTableTopic = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_SingleTableTopic));
-  return nodeIdHandler_SingleTableTopic.get(nodeIdHandler_SingleTableTopic.getSpec($decoded));
+  return nodeIdHandler_SingleTableTopic.get(nodeIdHandler_SingleTableTopic.getSpec(inhibitOnNull($decoded)));
 };
 const nodeFetcher_SingleTablePost = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.SingleTablePost));
-  return nodeIdHandlerByTypeName.SingleTablePost.get(nodeIdHandlerByTypeName.SingleTablePost.getSpec($decoded));
+  return nodeIdHandlerByTypeName.SingleTablePost.get(nodeIdHandlerByTypeName.SingleTablePost.getSpec(inhibitOnNull($decoded)));
 };
 const nodeFetcher_SingleTableDivider = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.SingleTableDivider));
-  return nodeIdHandlerByTypeName.SingleTableDivider.get(nodeIdHandlerByTypeName.SingleTableDivider.getSpec($decoded));
+  return nodeIdHandlerByTypeName.SingleTableDivider.get(nodeIdHandlerByTypeName.SingleTableDivider.getSpec(inhibitOnNull($decoded)));
 };
 const nodeFetcher_SingleTableChecklist = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.SingleTableChecklist));
-  return nodeIdHandlerByTypeName.SingleTableChecklist.get(nodeIdHandlerByTypeName.SingleTableChecklist.getSpec($decoded));
+  return nodeIdHandlerByTypeName.SingleTableChecklist.get(nodeIdHandlerByTypeName.SingleTableChecklist.getSpec(inhibitOnNull($decoded)));
 };
 const nodeFetcher_SingleTableChecklistItem = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.SingleTableChecklistItem));
-  return nodeIdHandlerByTypeName.SingleTableChecklistItem.get(nodeIdHandlerByTypeName.SingleTableChecklistItem.getSpec($decoded));
+  return nodeIdHandlerByTypeName.SingleTableChecklistItem.get(nodeIdHandlerByTypeName.SingleTableChecklistItem.getSpec(inhibitOnNull($decoded)));
 };
 const nodeFetcher_Organization = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Organization));
-  return nodeIdHandlerByTypeName.Organization.get(nodeIdHandlerByTypeName.Organization.getSpec($decoded));
+  return nodeIdHandlerByTypeName.Organization.get(nodeIdHandlerByTypeName.Organization.getSpec(inhibitOnNull($decoded)));
 };
 const nodeFetcher_Person = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Person));
-  return nodeIdHandlerByTypeName.Person.get(nodeIdHandlerByTypeName.Person.getSpec($decoded));
+  return nodeIdHandlerByTypeName.Person.get(nodeIdHandlerByTypeName.Person.getSpec(inhibitOnNull($decoded)));
 };
 const nodeFetcher_Priority = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Priority));
-  return nodeIdHandlerByTypeName.Priority.get(nodeIdHandlerByTypeName.Priority.getSpec($decoded));
+  return nodeIdHandlerByTypeName.Priority.get(nodeIdHandlerByTypeName.Priority.getSpec(inhibitOnNull($decoded)));
 };
 const nodeFetcher_RelationalChecklist = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.RelationalChecklist));
-  return nodeIdHandlerByTypeName.RelationalChecklist.get(nodeIdHandlerByTypeName.RelationalChecklist.getSpec($decoded));
+  return nodeIdHandlerByTypeName.RelationalChecklist.get(nodeIdHandlerByTypeName.RelationalChecklist.getSpec(inhibitOnNull($decoded)));
 };
 const nodeFetcher_RelationalItemRelationCompositePk = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.RelationalItemRelationCompositePk));
-  return nodeIdHandlerByTypeName.RelationalItemRelationCompositePk.get(nodeIdHandlerByTypeName.RelationalItemRelationCompositePk.getSpec($decoded));
+  return nodeIdHandlerByTypeName.RelationalItemRelationCompositePk.get(nodeIdHandlerByTypeName.RelationalItemRelationCompositePk.getSpec(inhibitOnNull($decoded)));
 };
 const nodeFetcher_RelationalTopic = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.RelationalTopic));
-  return nodeIdHandlerByTypeName.RelationalTopic.get(nodeIdHandlerByTypeName.RelationalTopic.getSpec($decoded));
+  return nodeIdHandlerByTypeName.RelationalTopic.get(nodeIdHandlerByTypeName.RelationalTopic.getSpec(inhibitOnNull($decoded)));
 };
 const nodeFetcher_SingleTableItemRelationCompositePk = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.SingleTableItemRelationCompositePk));
-  return nodeIdHandlerByTypeName.SingleTableItemRelationCompositePk.get(nodeIdHandlerByTypeName.SingleTableItemRelationCompositePk.getSpec($decoded));
+  return nodeIdHandlerByTypeName.SingleTableItemRelationCompositePk.get(nodeIdHandlerByTypeName.SingleTableItemRelationCompositePk.getSpec(inhibitOnNull($decoded)));
 };
 const nodeFetcher_RelationalChecklistItem = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.RelationalChecklistItem));
-  return nodeIdHandlerByTypeName.RelationalChecklistItem.get(nodeIdHandlerByTypeName.RelationalChecklistItem.getSpec($decoded));
+  return nodeIdHandlerByTypeName.RelationalChecklistItem.get(nodeIdHandlerByTypeName.RelationalChecklistItem.getSpec(inhibitOnNull($decoded)));
 };
 const nodeFetcher_RelationalDivider = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.RelationalDivider));
-  return nodeIdHandlerByTypeName.RelationalDivider.get(nodeIdHandlerByTypeName.RelationalDivider.getSpec($decoded));
+  return nodeIdHandlerByTypeName.RelationalDivider.get(nodeIdHandlerByTypeName.RelationalDivider.getSpec(inhibitOnNull($decoded)));
 };
 const nodeFetcher_RelationalItemRelation = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.RelationalItemRelation));
-  return nodeIdHandlerByTypeName.RelationalItemRelation.get(nodeIdHandlerByTypeName.RelationalItemRelation.getSpec($decoded));
+  return nodeIdHandlerByTypeName.RelationalItemRelation.get(nodeIdHandlerByTypeName.RelationalItemRelation.getSpec(inhibitOnNull($decoded)));
 };
 const nodeFetcher_SingleTableItemRelation = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.SingleTableItemRelation));
-  return nodeIdHandlerByTypeName.SingleTableItemRelation.get(nodeIdHandlerByTypeName.SingleTableItemRelation.getSpec($decoded));
+  return nodeIdHandlerByTypeName.SingleTableItemRelation.get(nodeIdHandlerByTypeName.SingleTableItemRelation.getSpec(inhibitOnNull($decoded)));
 };
 const nodeFetcher_LogEntry = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.LogEntry));
-  return nodeIdHandlerByTypeName.LogEntry.get(nodeIdHandlerByTypeName.LogEntry.getSpec($decoded));
+  return nodeIdHandlerByTypeName.LogEntry.get(nodeIdHandlerByTypeName.LogEntry.getSpec(inhibitOnNull($decoded)));
 };
 const nodeFetcher_RelationalPost = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.RelationalPost));
-  return nodeIdHandlerByTypeName.RelationalPost.get(nodeIdHandlerByTypeName.RelationalPost.getSpec($decoded));
+  return nodeIdHandlerByTypeName.RelationalPost.get(nodeIdHandlerByTypeName.RelationalPost.getSpec(inhibitOnNull($decoded)));
 };
 const nodeFetcher_FirstPartyVulnerability = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.FirstPartyVulnerability));
-  return nodeIdHandlerByTypeName.FirstPartyVulnerability.get(nodeIdHandlerByTypeName.FirstPartyVulnerability.getSpec($decoded));
+  return nodeIdHandlerByTypeName.FirstPartyVulnerability.get(nodeIdHandlerByTypeName.FirstPartyVulnerability.getSpec(inhibitOnNull($decoded)));
 };
 const nodeFetcher_ThirdPartyVulnerability = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.ThirdPartyVulnerability));
-  return nodeIdHandlerByTypeName.ThirdPartyVulnerability.get(nodeIdHandlerByTypeName.ThirdPartyVulnerability.getSpec($decoded));
+  return nodeIdHandlerByTypeName.ThirdPartyVulnerability.get(nodeIdHandlerByTypeName.ThirdPartyVulnerability.getSpec(inhibitOnNull($decoded)));
 };
 const nodeFetcher_AwsApplication = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.AwsApplication));
-  return nodeIdHandlerByTypeName.AwsApplication.get(nodeIdHandlerByTypeName.AwsApplication.getSpec($decoded));
+  return nodeIdHandlerByTypeName.AwsApplication.get(nodeIdHandlerByTypeName.AwsApplication.getSpec(inhibitOnNull($decoded)));
 };
 const nodeFetcher_GcpApplication = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.GcpApplication));
-  return nodeIdHandlerByTypeName.GcpApplication.get(nodeIdHandlerByTypeName.GcpApplication.getSpec($decoded));
+  return nodeIdHandlerByTypeName.GcpApplication.get(nodeIdHandlerByTypeName.GcpApplication.getSpec(inhibitOnNull($decoded)));
 };
 const members7 = [{
   resource: pgResource_first_party_vulnerabilitiesPgResource,

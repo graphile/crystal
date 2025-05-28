@@ -1133,7 +1133,7 @@ const nodeIdHandler_Film = {
   },
   getSpec($list) {
     return {
-      code: inhibitOnNull(access($list, [1]))
+      code: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -1167,7 +1167,7 @@ function specForHandler(handler) {
 }
 const nodeFetcher_Film = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Film));
-  return nodeIdHandler_Film.get(nodeIdHandler_Film.getSpec($decoded));
+  return nodeIdHandler_Film.get(nodeIdHandler_Film.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_Studio = {
   typeName: "Studio",
@@ -1178,7 +1178,7 @@ const nodeIdHandler_Studio = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -1193,7 +1193,7 @@ const nodeIdHandler_Studio = {
 };
 const nodeFetcher_Studio = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Studio));
-  return nodeIdHandler_Studio.get(nodeIdHandler_Studio.getSpec($decoded));
+  return nodeIdHandler_Studio.get(nodeIdHandler_Studio.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_Post = {
   typeName: "Post",
@@ -1204,7 +1204,7 @@ const nodeIdHandler_Post = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -1219,7 +1219,7 @@ const nodeIdHandler_Post = {
 };
 const nodeFetcher_Post = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Post));
-  return nodeIdHandler_Post.get(nodeIdHandler_Post.getSpec($decoded));
+  return nodeIdHandler_Post.get(nodeIdHandler_Post.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_TvEpisode = {
   typeName: "TvEpisode",
@@ -1230,7 +1230,7 @@ const nodeIdHandler_TvEpisode = {
   },
   getSpec($list) {
     return {
-      code: inhibitOnNull(access($list, [1]))
+      code: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -1245,7 +1245,7 @@ const nodeIdHandler_TvEpisode = {
 };
 const nodeFetcher_TvEpisode = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_TvEpisode));
-  return nodeIdHandler_TvEpisode.get(nodeIdHandler_TvEpisode.getSpec($decoded));
+  return nodeIdHandler_TvEpisode.get(nodeIdHandler_TvEpisode.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_TvShow = {
   typeName: "TvShow",
@@ -1256,7 +1256,7 @@ const nodeIdHandler_TvShow = {
   },
   getSpec($list) {
     return {
-      code: inhibitOnNull(access($list, [1]))
+      code: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -1271,7 +1271,7 @@ const nodeIdHandler_TvShow = {
 };
 const nodeFetcher_TvShow = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_TvShow));
-  return nodeIdHandler_TvShow.get(nodeIdHandler_TvShow.getSpec($decoded));
+  return nodeIdHandler_TvShow.get(nodeIdHandler_TvShow.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_Person = {
   typeName: "Person",
@@ -1282,7 +1282,7 @@ const nodeIdHandler_Person = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -1297,7 +1297,7 @@ const nodeIdHandler_Person = {
 };
 const nodeFetcher_Person = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Person));
-  return nodeIdHandler_Person.get(nodeIdHandler_Person.getSpec($decoded));
+  return nodeIdHandler_Person.get(nodeIdHandler_Person.getSpec(inhibitOnNull($decoded)));
 };
 const resource_renamed_tablePgResource = registry.pgResources["renamed_table"];
 function qbWhereBuilder(qb) {

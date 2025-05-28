@@ -668,7 +668,7 @@ const nodeIdHandler_AlwaysAsIdentity = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -702,7 +702,7 @@ function specForHandler(handler) {
 }
 const nodeFetcher_AlwaysAsIdentity = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_AlwaysAsIdentity));
-  return nodeIdHandler_AlwaysAsIdentity.get(nodeIdHandler_AlwaysAsIdentity.getSpec($decoded));
+  return nodeIdHandler_AlwaysAsIdentity.get(nodeIdHandler_AlwaysAsIdentity.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_ByDefaultAsIdentity = {
   typeName: "ByDefaultAsIdentity",
@@ -713,7 +713,7 @@ const nodeIdHandler_ByDefaultAsIdentity = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -728,7 +728,7 @@ const nodeIdHandler_ByDefaultAsIdentity = {
 };
 const nodeFetcher_ByDefaultAsIdentity = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_ByDefaultAsIdentity));
-  return nodeIdHandler_ByDefaultAsIdentity.get(nodeIdHandler_ByDefaultAsIdentity.getSpec($decoded));
+  return nodeIdHandler_ByDefaultAsIdentity.get(nodeIdHandler_ByDefaultAsIdentity.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_Network = {
   typeName: "Network",
@@ -739,7 +739,7 @@ const nodeIdHandler_Network = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -754,7 +754,7 @@ const nodeIdHandler_Network = {
 };
 const nodeFetcher_Network = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Network));
-  return nodeIdHandler_Network.get(nodeIdHandler_Network.getSpec($decoded));
+  return nodeIdHandler_Network.get(nodeIdHandler_Network.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_Type = {
   typeName: "Type",
@@ -765,7 +765,7 @@ const nodeIdHandler_Type = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -780,7 +780,7 @@ const nodeIdHandler_Type = {
 };
 const nodeFetcher_Type = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Type));
-  return nodeIdHandler_Type.get(nodeIdHandler_Type.getSpec($decoded));
+  return nodeIdHandler_Type.get(nodeIdHandler_Type.getSpec(inhibitOnNull($decoded)));
 };
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();

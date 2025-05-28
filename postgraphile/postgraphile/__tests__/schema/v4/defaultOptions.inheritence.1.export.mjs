@@ -370,7 +370,7 @@ const nodeIdHandler_File = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -404,7 +404,7 @@ function specForHandler(handler) {
 }
 const nodeFetcher_File = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_File));
-  return nodeIdHandler_File.get(nodeIdHandler_File.getSpec($decoded));
+  return nodeIdHandler_File.get(nodeIdHandler_File.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_User = {
   typeName: "User",
@@ -415,7 +415,7 @@ const nodeIdHandler_User = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -430,7 +430,7 @@ const nodeIdHandler_User = {
 };
 const nodeFetcher_User = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_User));
-  return nodeIdHandler_User.get(nodeIdHandler_User.getSpec($decoded));
+  return nodeIdHandler_User.get(nodeIdHandler_User.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_UserFile = {
   typeName: "UserFile",
@@ -441,7 +441,7 @@ const nodeIdHandler_UserFile = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -456,7 +456,7 @@ const nodeIdHandler_UserFile = {
 };
 const nodeFetcher_UserFile = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_UserFile));
-  return nodeIdHandler_UserFile.get(nodeIdHandler_UserFile.getSpec($decoded));
+  return nodeIdHandler_UserFile.get(nodeIdHandler_UserFile.getSpec(inhibitOnNull($decoded)));
 };
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
