@@ -3333,7 +3333,7 @@ export class OperationPlan {
         if (
           peerLayerPlan.depth >= minDepth &&
           possiblyPeer.dependencies.length === dependencyCount &&
-          isPeerLayerPlan(peerLayerPlan, ancestry[peerLayerPlan.depth]) &&
+          isPeerLayerPlan(peerLayerPlan, layerPlan) &&
           peerFlags[dependencyIndex] === flags[dependencyIndex] &&
           peerOnReject[dependencyIndex] === onReject[dependencyIndex]
         ) {
@@ -3399,7 +3399,7 @@ export class OperationPlan {
             } = possiblyPeer;
             if (
               peerDependencies.length === dependencyCount &&
-              isPeerLayerPlan(peerLayerPlan, ancestry[peerLayerPlan.depth]) &&
+              isPeerLayerPlan(peerLayerPlan, layerPlan) &&
               peerFlags[dependencyIndex] === flags[dependencyIndex] &&
               peerOnReject[dependencyIndex] === onReject[dependencyIndex]
             ) {
