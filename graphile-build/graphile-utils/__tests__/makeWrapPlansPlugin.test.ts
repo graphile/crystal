@@ -51,9 +51,11 @@ const makeSchemaWithSpyAndPlugins = (
               echo(message: String!): String
             }
           `,
-          plans: {
+          objectPlans: {
             Query: {
-              echo: spy,
+              fields: {
+                echo: spy,
+              },
             },
           },
         })),
@@ -63,7 +65,7 @@ const makeSchemaWithSpyAndPlugins = (
         optionKey: "optionValue",
       },
     },
-    {},
+    {} as GraphileBuild.BuildInput,
     {},
   );
 
@@ -357,11 +359,13 @@ describe("wrapping plans matching a filter", () => {
             c(arg1: String = "1", arg2: String = "2"): String
           }
         `,
-        plans: {
+        objectPlans: {
           Mutation: {
-            a: add,
-            b: add,
-            c: add,
+            fields: {
+              a: add,
+              b: add,
+              c: add,
+            },
           },
         },
       }),

@@ -312,12 +312,16 @@ const TestSideEffectCancellingPlugin = makeExtendSchemaPlugin({
       testSideEffectCancelling: Int
     }
   `,
-  plans: {
+  objectPlans: {
     Mutation: {
-      testSideEffectCancelling: testResolver,
+      fields: {
+        testSideEffectCancelling: testResolver,
+      },
     },
     Query: {
-      testSideEffectCancelling: testResolver,
+      fields: {
+        testSideEffectCancelling: testResolver,
+      },
     },
   },
 });

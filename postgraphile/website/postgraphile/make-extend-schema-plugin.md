@@ -76,10 +76,12 @@ export const MyPlugin = makeExtendSchemaPlugin((build) => {
       }
     `,
 
-    plans: {
+    objectPlans: {
       Query: {
-        meaningOfLife() {
-          return constant(42);
+        fields: {
+          meaningOfLife() {
+            return constant(42);
+          },
         },
       },
     },
@@ -193,7 +195,7 @@ const schema = makeExtendSchemaPlugin({
       id: Int
     }
   `,
-  plans: {
+  objectPlans: {
     MyObject: {
       assertStep($step) {
         if ($step instanceof PgSelectSingleStep) return true;
@@ -204,8 +206,10 @@ const schema = makeExtendSchemaPlugin({
             `or PgUpdateSingleStep; but found step of type '${$step.constructor.name}'.`,
         );
       },
-      a($obj: PgSelectSingleStep | PgInsertSingleStep | PgUpdateSingleStep) {
-        return $obj.get("id");
+      fields: {
+        a($obj: PgSelectSingleStep | PgInsertSingleStep | PgUpdateSingleStep) {
+          return $obj.get("id");
+        },
       },
     },
   },
@@ -241,22 +245,23 @@ const schema = makeExtendSchemaPlugin((build) => {
         id: Int
       }
     `,
-    plans: {
+    objectPlans: {
       MyObject: {
         // Graphile Build "scope" for the object type 'MyObject'
-        __scope: {
+        scope: {
           pgTypeResource: users,
         },
+        fields: {
+          id: {
+            // The Graphile Build "scope" for the 'MyObject.id' field
+            scope: {
+              pgFieldAttribute: users.codec.attributes.id,
+            },
 
-        id: {
-          // The Graphile Build "scope" for the 'MyObject.id' field
-          scope: {
-            pgFieldAttribute: users.codec.attributes.id,
-          },
-
-          // The plan resolver for the 'MyObject.id' field
-          plan($obj) {
-            return $obj.get("id");
+            // The plan resolver for the 'MyObject.id' field
+            plan($obj) {
+              return $obj.get("id");
+            },
           },
         },
       },
@@ -361,14 +366,16 @@ export const MyChannelsPlugin = makeExtendSchemaPlugin((build) => {
         myChannels: [Channel]
       }
     `,
-    plans: {
+    objectPlans: {
       Query: {
-        myChannels() {
-          const $userId = context().get("userId");
-          const $user = users.get({ id: $userId });
-          const $orgId = $user.get("organization_id");
-          const $channels = channels.find({ organization_id: $orgId });
-          return $channels;
+        fields: {
+          myChannels() {
+            const $userId = context().get("userId");
+            const $user = users.get({ id: $userId });
+            const $orgId = $user.get("organization_id");
+            const $channels = channels.find({ organization_id: $orgId });
+            return $channels;
+          },
         },
       },
     },
@@ -484,38 +491,40 @@ export const MyChannelsPlugin = makeExtendSchemaPlugin((build) => {
         myChannels: [Channel]
       }
     `,
-    plans: {
+    objectPlans: {
       Query: {
-        myChannels() {
-          const $userId = context().get("userId");
-          // highlight-start
-          const $orgId = withPgClient(
-            executor,
-            $userId,
-            async (
-              // The PgClient instance, with all of the "claims" (if any) already set:
-              pgClient,
-              // This is the runtime data that the `$userId` step represented
-              userId,
-            ) => {
-              if (!userId) return null;
+        fields: {
+          myChannels() {
+            const $userId = context().get("userId");
+            // highlight-start
+            const $orgId = withPgClient(
+              executor,
+              $userId,
+              async (
+                // The PgClient instance, with all of the "claims" (if any) already set:
+                pgClient,
+                // This is the runtime data that the `$userId` step represented
+                userId,
+              ) => {
+                if (!userId) return null;
 
-              // Here we're using the standard `pgClient.query` function that
-              // all adaptors must provide, but if you're using an adaptor
-              // related to your ORM of choice, you could likely use its
-              // various methods to retrieve this value instead.
-              const result = await pgClient.query<{ id: number }>({
-                text: `select id from get_organization_for_user_id($1)`,
-                values: [userId],
-              });
+                // Here we're using the standard `pgClient.query` function that
+                // all adaptors must provide, but if you're using an adaptor
+                // related to your ORM of choice, you could likely use its
+                // various methods to retrieve this value instead.
+                const result = await pgClient.query<{ id: number }>({
+                  text: `select id from get_organization_for_user_id($1)`,
+                  values: [userId],
+                });
 
-              // Return the 'id' value from the first (and only) row, if it exists:
-              return result.rows[0]?.id;
-            },
-          );
-          // highlight-end
-          const $channels = channels.find({ organization_id: $orgId });
-          return $channels;
+                // Return the 'id' value from the first (and only) row, if it exists:
+                return result.rows[0]?.id;
+              },
+            );
+            // highlight-end
+            const $channels = channels.find({ organization_id: $orgId });
+            return $channels;
+          },
         },
       },
     },
@@ -590,13 +599,15 @@ export const MyForeignExchangePlugin = makeExtendSchemaPlugin((build) => {
         priceInAuCents: Int!
       }
     `,
-    plans: {
+    objectPlans: {
       Product: {
-        priceInAuCents($product) {
-          // highlight-next-line
-          const $cents = $product.get("price_in_us_cents");
-          // highlight-next-line
-          return loadOne($cents, convertUsdToAud);
+        fields: {
+          priceInAuCents($product) {
+            // highlight-next-line
+            const $cents = $product.get("price_in_us_cents");
+            // highlight-next-line
+            return loadOne($cents, convertUsdToAud);
+          },
         },
       },
     },
@@ -623,15 +634,17 @@ export const MyProductReviewsPlugin = makeExtendSchemaPlugin((build) => {
         reviews: ReviewConnection
       }
     `,
-    plans: {
+    objectPlans: {
       Product: {
-        reviews($product) {
-          const $productId = $product.get("id");
-          const $reviews = reviews.find();
-          $reviews.where(sql`${$reviews}.product_id = ${$productId}`);
+        fields: {
+          reviews($product) {
+            const $productId = $product.get("id");
+            const $reviews = reviews.find();
+            $reviews.where(sql`${$reviews}.product_id = ${$productId}`);
 
-          // highlight-next-line
-          return connection($reviews);
+            // highlight-next-line
+            return connection($reviews);
+          },
         },
       },
     },
@@ -671,63 +684,67 @@ export const MyRegisterUserMutationPlugin = makeExtendSchemaPlugin((build) => {
         registerUser(input: RegisterUserInput!): RegisterUserPayload
       }
     `,
-    plans: {
+    objectPlans: {
       Mutation: {
-        registerUser(_, fieldArgs) {
-          const $input = fieldArgs.getRaw("input");
-          const $user = withPgClientTransaction(
-            executor,
-            $input,
-            async (pgClient, input) => {
-              // Our custom logic to register the user:
-              const {
-                rows: [user],
-              } = await pgClient.query({
-                text: `
+        fields: {
+          registerUser(_, fieldArgs) {
+            const $input = fieldArgs.getRaw("input");
+            const $user = withPgClientTransaction(
+              executor,
+              $input,
+              async (pgClient, input) => {
+                // Our custom logic to register the user:
+                const {
+                  rows: [user],
+                } = await pgClient.query({
+                  text: `
                   INSERT INTO app_public.users (name, email, bio)
                   VALUES ($1, $2, $3)
                   RETURNING *`,
-                values: [input.name, input.email, input.bio],
-              });
+                  values: [input.name, input.email, input.bio],
+                });
 
-              // Send the email. If this fails then the error will be caught
-              // and the transaction rolled back; it will be as if the user
-              // never registered
-              await mockSendEmail(
-                input.email,
-                "Welcome to my site",
-                `You're user ${user.id} - thanks for being awesome`,
-              );
+                // Send the email. If this fails then the error will be caught
+                // and the transaction rolled back; it will be as if the user
+                // never registered
+                await mockSendEmail(
+                  input.email,
+                  "Welcome to my site",
+                  `You're user ${user.id} - thanks for being awesome`,
+                );
 
-              // Return the newly created user
-              return user;
-            },
-          );
+                // Return the newly created user
+                return user;
+              },
+            );
 
-          // To allow for future expansion (and for the `clientMutationId`
-          // field to work), we'll return an object step containing our data:
-          return object({ user: $user });
+            // To allow for future expansion (and for the `clientMutationId`
+            // field to work), we'll return an object step containing our data:
+            return object({ user: $user });
+          },
         },
       },
 
       // The payload also needs plans detailing how to resolve its fields:
       RegisterUserPayload: {
-        user($data) {
-          const $user = $data.get("user");
-          // It would be tempting to return $user here, but the step class
-          // is not compatible with the auto-generated `User` type, so
-          // errors will occur. We must ensure that we return a compatible
-          // step, so we will retrieve the relevant record from the database:
+        fields: {
+          user($data) {
+            const $user = $data.get("user");
+            // It would be tempting to return $user here, but the step class
+            // is not compatible with the auto-generated `User` type, so
+            // errors will occur. We must ensure that we return a compatible
+            // step, so we will retrieve the relevant record from the database:
 
-          // Get the '.id' property from $user:
-          const $userId = access($user, "id");
+            // Get the '.id' property from $user:
+            const $userId = access($user, "id");
 
-          // Return a step representing this row in the database.
-          return users.get({ id: $userId });
-        },
-        query($user) {
-          // Anything truthy should work for the `query: Query` field.
-          return constant(true);
+            // Return a step representing this row in the database.
+            return users.get({ id: $userId });
+          },
+          query($user) {
+            // Anything truthy should work for the `query: Query` field.
+            return constant(true);
+          },
         },
       },
     },
@@ -771,46 +788,48 @@ const DeleteItemByNodeIdPlugin = makeExtendSchemaPlugin((build) => {
       }
     `,
 
-    plans: {
+    objectPlans: {
       Mutation: {
-        deleteItem(_, fieldArgs) {
-          // jwtClaims is decrypted jwt token data
-          const $jwtClaims = context().get("jwtClaims");
+        fields: {
+          deleteItem(_, fieldArgs) {
+            // jwtClaims is decrypted jwt token data
+            const $jwtClaims = context().get("jwtClaims");
 
-          // Read the input.id value from the arguments
-          const $nodeId = fieldArgs.getRaw(["input", "id"]);
+            // Read the input.id value from the arguments
+            const $nodeId = fieldArgs.getRaw(["input", "id"]);
 
-          // Decode the node ID, to something like: `{ id: $someStep }`
-          const spec = specFromNodeId(handler, $nodeId);
-          const $itemId = spec.id;
+            // Decode the node ID, to something like: `{ id: $someStep }`
+            const spec = specFromNodeId(handler, $nodeId);
+            const $itemId = spec.id;
 
-          const $success = withPgClientTransaction(
-            executor,
-            // Passing a `list` step allows us to pass more than one dependency
-            // through to our callback:
-            list([$jwtClaims, $itemId]),
-            async (pgClient, [jwtClaims, itemId]) => {
-              if (!itemId || !jwtClaims?.user_id) {
-                return false;
-              }
-              const {
-                rows: [row],
-              } = await pgClient.query(
-                ` UPDATE app_public.items
+            const $success = withPgClientTransaction(
+              executor,
+              // Passing a `list` step allows us to pass more than one dependency
+              // through to our callback:
+              list([$jwtClaims, $itemId]),
+              async (pgClient, [jwtClaims, itemId]) => {
+                if (!itemId || !jwtClaims?.user_id) {
+                  return false;
+                }
+                const {
+                  rows: [row],
+                } = await pgClient.query(
+                  ` UPDATE app_public.items
                   SET is_archived = true
                   WHERE id = $1
                   AND user_id = $2
                   RETURNING *;`,
-                [itemId, jwtClaims.user_id],
-              );
-              return !!row;
-            },
-          );
+                  [itemId, jwtClaims.user_id],
+                );
+                return !!row;
+              },
+            );
 
-          // Since we're returning this data in the same shape as the payload
-          // and the payload's fields don't need specific step classes, we don't
-          // need to implement plan resolvers on the payload.
-          return object({ success: $success });
+            // Since we're returning this data in the same shape as the payload
+            // and the payload's fields don't need specific step classes, we don't
+            // need to implement plan resolvers on the payload.
+            return object({ success: $success });
+          },
         },
       },
     },
@@ -871,75 +890,89 @@ export const RegisterUserPlugin = makeExtendSchemaPlugin((build) => {
         email: String!
       }
     `,
-    plans: {
+    objectPlans: {
       Mutation: {
-        registerUser(_, { $input: { $username, $email } }) {
-          const $result = withPgClient(
-            executor,
-            list([$username, $email]),
-            async (pgClient, [username, email]) => {
-              try {
-                return await pgClient.withTransaction(async (pgClient) => {
-                  const {
-                    rows: [user],
-                  } = await pgClient.query<{
-                    id: string;
-                    username: string;
-                  }>({
-                    text: `
+        fields: {
+          registerUser(_, { $input: { $username, $email } }) {
+            const $result = withPgClient(
+              executor,
+              list([$username, $email]),
+              async (pgClient, [username, email]) => {
+                try {
+                  return await pgClient.withTransaction(async (pgClient) => {
+                    const {
+                      rows: [user],
+                    } = await pgClient.query<{
+                      id: string;
+                      username: string;
+                    }>({
+                      text: `
                       insert into app_public.users (username)
                       values ($1)
                       returning *`,
-                    values: [username],
-                  });
+                      values: [username],
+                    });
 
-                  await pgClient.query({
-                    text: `
+                    await pgClient.query({
+                      text: `
                       insert into app_public.user_emails(user_id, email)
                       values ($1, $2)`,
-                    values: [user.id, email],
+                      values: [user.id, email],
+                    });
+
+                    await sendEmail(email, "Welcome!");
+
+                    return { id: user.id };
                   });
-
-                  await sendEmail(email, "Welcome!");
-
-                  return { id: user.id };
-                });
-              } catch (e) {
-                if (e instanceof DatabaseError && e.code === "23505") {
-                  if (e.constraint === "unique_user_username") {
-                    return {
-                      __typename: "UsernameConflict",
-                      message: `The username '${username}' is already in use`,
-                      username,
-                    };
-                  } else if (e.constraint === "unique_user_email") {
-                    return {
-                      __typename: "EmailAddressConflict",
-                      message: `The email address '${email}' is already in use`,
-                      email,
-                    };
+                } catch (e) {
+                  if (e instanceof DatabaseError && e.code === "23505") {
+                    if (e.constraint === "unique_user_username") {
+                      return {
+                        __typename: "UsernameConflict",
+                        message: `The username '${username}' is already in use`,
+                        username,
+                      };
+                    } else if (e.constraint === "unique_user_email") {
+                      return {
+                        __typename: "EmailAddressConflict",
+                        message: `The email address '${email}' is already in use`,
+                        email,
+                      };
+                    }
                   }
+                  throw e;
                 }
-                throw e;
-              }
-            },
-          );
+              },
+            );
 
-          return object({ result: $result });
+            return object({ result: $result });
+          },
         },
       },
 
       RegisterUserPayload: {
-        __assertStep: ObjectStep,
-        query() {
-          // The `Query` type just needs any truthy value.
-          return constant(true);
+        assertStep: ObjectStep,
+        fields: {
+          query() {
+            // The `Query` type just needs any truthy value.
+            return constant(true);
+          },
         },
       },
 
+      UsernameConflict: {
+        // Since User expects a step, our types must also expect a step. We
+        // don't care what the step is though.
+        assertStep: ExecutableStep,
+      },
+      EmailAddressConflict: {
+        assertStep: ExecutableStep,
+      },
+    },
+    unionPlans: {
       // Planning our polymorphic type
       RegisterUserResult: {
-        __planType($obj) {
+        planType($obj) {
           // Determine the type
           const $__typename = lambda($obj, (obj) => {
             // If it has typename, use that
@@ -971,15 +1004,6 @@ export const RegisterUserPlugin = makeExtendSchemaPlugin((build) => {
             },
           };
         },
-      },
-
-      UsernameConflict: {
-        // Since User expects a step, our types must also expect a step. We
-        // don't care what the step is though.
-        __assertStep: ExecutableStep,
-      },
-      EmailAddressConflict: {
-        __assertStep: ExecutableStep,
       },
     },
   };

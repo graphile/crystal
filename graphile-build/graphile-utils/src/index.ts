@@ -51,7 +51,7 @@ declare module "grafast" {
     TArgs extends BaseGraphQLArguments = any,
     TResultStep extends Step = Step,
   > {
-    scope?: GraphileBuild.ScopeObjectFieldsField;
+    scope?: Omit<GraphileBuild.ScopeObjectFieldsField, "fieldName">;
   }
 }
 /* eslint-enable @typescript-eslint/no-unused-vars */

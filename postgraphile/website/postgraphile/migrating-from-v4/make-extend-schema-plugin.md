@@ -127,13 +127,15 @@ in JS, you might use an SQL expression:
 +        nameWithSuffix(suffix: String!): String!
        }
      `,
-+    plans: {
++    objectPlans: {
 +      User: {
-+        nameWithSuffix($user, { $suffix }) {
-+          return $user.select(
-+            sql`${$user.getClassStep().alias}.name || ' ' || ${$user.placeholder($suffix, TYPES.text)}`,
-+            TYPES.text,
-+          );
++        fields: {
++          nameWithSuffix($user, { $suffix }) {
++            return $user.select(
++              sql`${$user.getClassStep().alias}.name || ' ' || ${$user.placeholder($suffix, TYPES.text)}`,
++              TYPES.text,
++            );
++          }
 +        }
 +      }
 +    }
@@ -204,7 +206,8 @@ function, passing through the `searchText` argument.
        }
      `,
 -    resolvers: {
--      Query: {
++    plans: {
+       Query: {
 -        matchingUser: async (parent, args, context, resolveInfo) => {
 -          const [row] = await resolveInfo.graphile.selectGraphQLResultFromTable(
 -            sql.fragment`(select * from match_user(${sql.value(
@@ -214,18 +217,58 @@ function, passing through the `searchText` argument.
 -          );
 -          return row;
 -        },
--      },
--    },
-+    plans: {
-+      Query: {
 +        matchingUser($parent, { $searchText }) {
 +          return matchUser.execute({ step: $searchText });
 +        },
-+      },
-+    },
+       },
+     },
    };
  });
 ```
+
+:::tip This pattern is deprecated
+
+We've demonstrated this pattern to show the easiest way to migrate, but the
+`typeDefs/plans` pattern is deprecated because it's hard to make it type safe.
+Instead, the new pattern would have `typeDefs/objects` (for object types, types
+that use the `type` keyword in GraphQL) with the plans within that:
+
+```diff
+ module.exports = makeExtendSchemaPlugin((build) => {
++  const matchUser = build.input.pgRegistry.pgResources.match_user;
+   return {
+     typeDefs: /* GraphQL */ `
+       type Query {
+         matchingUser(searchText: String!): User
+       }
+     `,
+-    resolvers: {
++    objects: {
+       Query: {
+-        matchingUser: async (parent, args, context, resolveInfo) => {
+-          const [row] = await resolveInfo.graphile.selectGraphQLResultFromTable(
+-            sql.fragment`(select * from match_user(${sql.value(
+-              args.searchText,
+-            )}))`,
+-            () => {}, // no-op
+-          );
+-          return row;
+-        },
++        plans: {
++          matchingUser($parent, { $searchText }) {
++            return matchUser.execute({ step: $searchText });
++          },
++        },
+       },
+     },
+   };
+ });
+```
+
+It's up to you whether you want to address this all at once, or migrate in two
+phases.
+
+:::
 
 ## `embed`
 
@@ -291,59 +334,63 @@ export default makeExtendSchemaPlugin((build) => {
       }
     `,
 
-    plans: {
+    objectPlans: {
       Mutation: {
-        myCustomMutation(_$root, { $input: { $count } }) {
-          /**
-           * This step dictates the data that will be passed as the second argument
-           * to the `withPgClientTransaction` callback. This is typically
-           * information about the field arguments, details from the GraphQL
-           * context, or data from previously executed steps.
-           */
-          const $data = object({
-            count: $count,
-          });
+        fields: {
+          myCustomMutation(_$root, { $input: { $count } }) {
+            /**
+             * This step dictates the data that will be passed as the second argument
+             * to the `withPgClientTransaction` callback. This is typically
+             * information about the field arguments, details from the GraphQL
+             * context, or data from previously executed steps.
+             */
+            const $data = object({
+              count: $count,
+            });
 
-          // Callback will be called with a client that's in a transaction,
-          // whatever it returns (plain data) will be the result of the
-          // `withPgClientTransaction` step; if it throws an error then the
-          // transaction will roll back and the error will be the result of the
-          // step.
-          // highlight-start
-          const $transactionResult = withPgClientTransaction(
-            executor,
-            $data,
-            async (client, data) => {
-              // The data from the `$data` step above
-              const { count } = data;
+            // Callback will be called with a client that's in a transaction,
+            // whatever it returns (plain data) will be the result of the
+            // `withPgClientTransaction` step; if it throws an error then the
+            // transaction will roll back and the error will be the result of the
+            // step.
+            // highlight-start
+            const $transactionResult = withPgClientTransaction(
+              executor,
+              $data,
+              async (client, data) => {
+                // The data from the `$data` step above
+                const { count } = data;
 
-              // Run some SQL
-              const { rows } = await client.query(
-                sql.compile(
-                  sql`select i from generate_series(1, ${sql.value(
-                    count ?? 1,
-                  )}) as i;`,
-                ),
-              );
+                // Run some SQL
+                const { rows } = await client.query(
+                  sql.compile(
+                    sql`select i from generate_series(1, ${sql.value(
+                      count ?? 1,
+                    )}) as i;`,
+                  ),
+                );
 
-              // Do some asynchronous work (e.g. talk to Stripe or whatever)
-              await sleep(2);
+                // Do some asynchronous work (e.g. talk to Stripe or whatever)
+                await sleep(2);
 
-              // Maybe run some more SQL as part of the transaction
-              await client.query(sql.compile(sql`select 1;`));
+                // Maybe run some more SQL as part of the transaction
+                await client.query(sql.compile(sql`select 1;`));
 
-              // Return whatever data you'll need later
-              return rows.map((row) => row.i);
-            },
-          );
-          // highlight-end
+                // Return whatever data you'll need later
+                return rows.map((row) => row.i);
+              },
+            );
+            // highlight-end
 
-          return $transactionResult;
+            return $transactionResult;
+          },
         },
       },
       MyCustomMutationPayload: {
-        numbers($transactionResult) {
-          return $transactionResult;
+        fields: {
+          numbers($transactionResult) {
+            return $transactionResult;
+          },
         },
       },
     },

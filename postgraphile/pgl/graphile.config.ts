@@ -118,39 +118,43 @@ const preset: GraphileConfig.Preset = {
           gql: Int
         }
       `,
-      plans: {
+      objectPlans: {
         Query: {
-          mol() {
-            return context().get("mol");
+          fields: {
+            mol() {
+              return context().get("mol");
+            },
           },
         },
         Subscription: {
-          // Test via SQL: `NOTIFY test, '{"a":40}';`
-          sub(_$root, args) {
-            const $topic = args.getRaw("topic");
-            const $pgSubscriber = context().get("pgSubscriber");
-            return listen($pgSubscriber, $topic, ($payload) =>
-              object({ sub: jsonParse($payload).get("a" as never) }),
-            );
-          },
-          gql: {
-            resolve: EXPORTABLE(
-              () =>
-                function resolve(e) {
-                  return e;
-                },
-              [],
-            ),
-            subscribe: EXPORTABLE(
-              (sleep) =>
-                async function* subscribe() {
-                  for (let i = 0; i < 10; i++) {
-                    yield i;
-                    await sleep(300);
-                  }
-                },
-              [sleep],
-            ),
+          fields: {
+            // Test via SQL: `NOTIFY test, '{"a":40}';`
+            sub(_$root, args) {
+              const $topic = args.getRaw("topic");
+              const $pgSubscriber = context().get("pgSubscriber");
+              return listen($pgSubscriber, $topic, ($payload) =>
+                object({ sub: jsonParse($payload).get("a" as never) }),
+              );
+            },
+            gql: {
+              resolve: EXPORTABLE(
+                () =>
+                  function resolve(e) {
+                    return e;
+                  },
+                [],
+              ),
+              subscribe: EXPORTABLE(
+                (sleep) =>
+                  async function* subscribe() {
+                    for (let i = 0; i < 10; i++) {
+                      yield i;
+                      await sleep(300);
+                    }
+                  },
+                [sleep],
+              ),
+            },
           },
         },
       },

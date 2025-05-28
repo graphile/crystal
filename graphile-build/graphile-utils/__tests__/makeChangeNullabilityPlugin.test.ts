@@ -43,13 +43,15 @@ const makeSchema = (plugins: GraphileConfig.Plugin[]) =>
               message: [[String]!]
             }
           `,
-          plans: {
+          objectPlans: {
             Query: {
-              echo(_, args) {
-                return args.get("message");
-              },
-              echo2(_, args) {
-                return args.get(["in", "message"]);
+              fields: {
+                echo(_, fieldArgs) {
+                  return fieldArgs.getRaw("message");
+                },
+                echo2(_, fieldArgs) {
+                  return fieldArgs.getRaw(["in", "message"]);
+                },
               },
             },
           },
@@ -57,11 +59,11 @@ const makeSchema = (plugins: GraphileConfig.Plugin[]) =>
         ...plugins,
       ],
     },
-    {},
+    {} as GraphileBuild.BuildInput,
     {},
   );
 
-function getNullability(type: GraphQLType) {
+function getNullability(type: GraphQLType): readonly boolean[] {
   if (isNonNullType(type)) {
     const nullableType = type.ofType;
     if (isListType(nullableType)) {
@@ -122,7 +124,7 @@ describe("object, interface and input", () => {
         const field = Query.getFields().echo;
         const nullability = getNullability(field.type);
         expect(nullability).toEqual(expectation);
-        const arg = field.args.find((a) => a.name === "message");
+        const arg = field.args.find((a) => a.name === "message")!;
         const argNullability = getNullability(arg.type);
         expect(argNullability).toEqual(expectation);
       }
@@ -139,7 +141,7 @@ describe("object, interface and input", () => {
       const field = EchoCapable.getFields().echo;
       const nullability = getNullability(field.type);
       expect(nullability).toEqual(expectation);
-      const arg = field.args.find((a) => a.name === "message");
+      const arg = field.args.find((a) => a.name === "message")!;
       const argNullability = getNullability(arg.type);
       expect(argNullability).toEqual(expectation);
     }

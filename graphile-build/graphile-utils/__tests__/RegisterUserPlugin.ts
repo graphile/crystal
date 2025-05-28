@@ -50,21 +50,18 @@ export const RegisterUserPlugin = makeExtendSchemaPlugin((build) => {
         email: String!
       }
     `,
-    plans: {
+    unionPlans: {
       RegisterUserResult: {
-        __planType($specifier) {
-          const $__typename = lambda(
-            $specifier as Step<Record<string, any>>,
-            (obj) => {
-              if (obj.__typename != null) {
-                return obj.__typename;
-              }
-              if (obj.id !== null) {
-                return "User";
-              }
-              return null;
-            },
-          );
+        planType($specifier: Step<Record<string, any>>) {
+          const $__typename = lambda($specifier, (obj) => {
+            if (obj.__typename != null) {
+              return obj.__typename;
+            }
+            if (obj.id !== null) {
+              return "User";
+            }
+            return null;
+          });
           return {
             $__typename,
             planForType(t: GraphQLObjectType) {
@@ -78,82 +75,88 @@ export const RegisterUserPlugin = makeExtendSchemaPlugin((build) => {
           };
         },
       },
+    },
+    objectPlans: {
       Mutation: {
-        registerUser(_, { $input: { $username, $email } }) {
-          const $result = withPgClient(
-            executor,
-            list([$username, $email]),
-            async (pgClient, [username, email]) => {
-              try {
-                return await pgClient.withTransaction(async (pgClient) => {
-                  const {
-                    rows: [user],
-                  } = await pgClient.query<{
-                    id: string;
-                    username: string;
-                  }>({
-                    text: `
+        fields: {
+          registerUser(_, { $input: { $username, $email } }) {
+            const $result = withPgClient(
+              executor,
+              list([$username, $email]),
+              async (pgClient, [username, email]) => {
+                try {
+                  return await pgClient.withTransaction(async (pgClient) => {
+                    const {
+                      rows: [user],
+                    } = await pgClient.query<{
+                      id: string;
+                      username: string;
+                    }>({
+                      text: `
                       insert into graphile_utils_2.users (username)
                       values ($1)
                       returning *`,
-                    values: [username],
-                  });
+                      values: [username],
+                    });
 
-                  await pgClient.query({
-                    text: `
+                    await pgClient.query({
+                      text: `
                       insert into graphile_utils_2.user_emails(user_id, email)
                       values ($1, $2)`,
-                    values: [user.id, email],
+                      values: [user.id, email],
+                    });
+
+                    await sendEmail(email as string, "Welcome!");
+
+                    return { id: user.id };
                   });
-
-                  await sendEmail(email as string, "Welcome!");
-
-                  return { id: user.id };
-                });
-              } catch (e) {
-                if (e instanceof DatabaseError && e.code === "23505") {
-                  if (e.constraint === "unique_user_username") {
-                    return {
-                      __typename: "UsernameConflict",
-                      message: `The username '${username}' is already in use`,
-                      username,
-                    };
-                  } else if (e.constraint === "unique_user_email") {
-                    return {
-                      __typename: "EmailAddressConflict",
-                      message: `The email address '${email}' is already in use`,
-                      email,
-                    };
+                } catch (e) {
+                  if (e instanceof DatabaseError && e.code === "23505") {
+                    if (e.constraint === "unique_user_username") {
+                      return {
+                        __typename: "UsernameConflict",
+                        message: `The username '${username}' is already in use`,
+                        username,
+                      };
+                    } else if (e.constraint === "unique_user_email") {
+                      return {
+                        __typename: "EmailAddressConflict",
+                        message: `The email address '${email}' is already in use`,
+                        email,
+                      };
+                    }
                   }
+                  throw e;
                 }
-                throw e;
-              }
-            },
-          );
+              },
+            );
 
-          return object({ result: $result });
+            return object({ result: $result });
+          },
         },
       },
 
       RegisterUserPayload: {
-        __assertStep: ObjectStep,
-        result($data: ObjectStep) {
-          const $result = $data.get("result");
-          return $result;
-        },
-        query() {
-          // The `Query` type just needs any truthy value.
-          return constant(true);
+        assertStep: ObjectStep,
+        fields: {
+          result($data: ObjectStep) {
+            const $result = $data.get("result");
+            return $result;
+          },
+          query() {
+            // The `Query` type just needs any truthy value.
+            return constant(true);
+          },
         },
       },
 
       UsernameConflict: {
         // Since User expects a step, our types must also expect a step. We
         // don't care what the step is though.
-        __assertStep: ExecutableStep,
+        assertStep: ExecutableStep,
       },
       EmailAddressConflict: {
-        __assertStep: ExecutableStep,
+        assertStep: ExecutableStep,
       },
     },
   };

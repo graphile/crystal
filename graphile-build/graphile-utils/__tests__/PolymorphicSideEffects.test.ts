@@ -79,56 +79,64 @@ const AchinthaSideEffectsPlugin = makeExtendSchemaPlugin((build) => {
         hasClinic: Boolean
       }
     `,
-    plans: {
+    objectPlans: {
       Shop: {
-        animals($shop, { $first }) {
-          sideEffect($first, (arg) => {
-            if (arg && arg > 10) {
-              throw new GraphQLError("wrong input");
-            }
-          });
-          const $animals = animal.find({
-            shop_id: $shop.get("id"),
-          });
+        fields: {
+          animals($shop, { $first }) {
+            sideEffect($first, (arg) => {
+              if (arg && arg > 10) {
+                throw new GraphQLError("wrong input");
+              }
+            });
+            const $animals = animal.find({
+              shop_id: $shop.get("id"),
+            });
 
-          return connection($animals);
+            return connection($animals);
+          },
         },
       },
       CatAnimal: {
-        owners($animal, { $first }) {
-          sideEffect($first, (arg) => {
-            if (arg && arg > 10) {
-              throw new GraphQLError("wrong input");
-            }
-          });
-          const $owners = owner.find({
-            animal_id: $animal.get("id"),
-          });
+        fields: {
+          owners($animal, { $first }) {
+            sideEffect($first, (arg) => {
+              if (arg && arg > 10) {
+                throw new GraphQLError("wrong input");
+              }
+            });
+            const $owners = owner.find({
+              animal_id: $animal.get("id"),
+            });
 
-          return connection($owners);
+            return connection($owners);
+          },
         },
       },
       DogAnimal: {
-        owners($animal, { $first }) {
-          sideEffect($first, (arg) => {
-            if (arg && arg > 10) {
-              throw new GraphQLError("wrong input");
-            }
-          });
-          const $owners = owner.find({
-            animal_id: $animal.get("id"),
-          });
+        fields: {
+          owners($animal, { $first }) {
+            sideEffect($first, (arg) => {
+              if (arg && arg > 10) {
+                throw new GraphQLError("wrong input");
+              }
+            });
+            const $owners = owner.find({
+              animal_id: $animal.get("id"),
+            });
 
-          return connection($owners);
+            return connection($owners);
+          },
         },
       },
       Owner: {
-        hasClinic($owner) {
-          const $shop = shop.get({
-            id: $owner.get("owner_id"),
-          });
+        fields: {
+          hasClinic($owner) {
+            const $shop = shop.get({
+              id: $owner.get("owner_id"),
+            });
 
-          return $shop.get("has_clinic");
+            return $shop.get("has_clinic");
+          },
         },
       },
     },
