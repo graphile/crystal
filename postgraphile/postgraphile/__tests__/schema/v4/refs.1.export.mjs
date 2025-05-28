@@ -312,7 +312,7 @@ const nodeIdHandler_Person = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -346,7 +346,7 @@ function specForHandler(handler) {
 }
 const nodeFetcher_Person = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Person));
-  return nodeIdHandler_Person.get(nodeIdHandler_Person.getSpec($decoded));
+  return nodeIdHandler_Person.get(nodeIdHandler_Person.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_Post = {
   typeName: "Post",
@@ -357,7 +357,7 @@ const nodeIdHandler_Post = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -372,7 +372,7 @@ const nodeIdHandler_Post = {
 };
 const nodeFetcher_Post = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Post));
-  return nodeIdHandler_Post.get(nodeIdHandler_Post.getSpec($decoded));
+  return nodeIdHandler_Post.get(nodeIdHandler_Post.getSpec(inhibitOnNull($decoded)));
 };
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();

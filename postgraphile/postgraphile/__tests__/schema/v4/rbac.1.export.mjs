@@ -9815,7 +9815,7 @@ const nodeIdHandler_PersonSecret = {
   },
   getSpec($list) {
     return {
-      person_id: inhibitOnNull(access($list, [1]))
+      person_id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -9850,7 +9850,7 @@ function specForHandler(handler) {
 const nodeFetcher_PersonSecret = (handler => {
   const fn = $nodeId => {
     const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
+    return handler.get(handler.getSpec(inhibitOnNull($decoded)));
   };
   fn.deprecationReason = handler.deprecationReason;
   return fn;
@@ -9864,7 +9864,7 @@ const nodeIdHandler_LeftArm = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -9879,7 +9879,7 @@ const nodeIdHandler_LeftArm = {
 };
 const nodeFetcher_LeftArm = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_LeftArm));
-  return nodeIdHandler_LeftArm.get(nodeIdHandler_LeftArm.getSpec($decoded));
+  return nodeIdHandler_LeftArm.get(nodeIdHandler_LeftArm.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_Post = {
   typeName: "Post",
@@ -9890,7 +9890,7 @@ const nodeIdHandler_Post = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -9905,7 +9905,7 @@ const nodeIdHandler_Post = {
 };
 const nodeFetcher_Post = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Post));
-  return nodeIdHandler_Post.get(nodeIdHandler_Post.getSpec($decoded));
+  return nodeIdHandler_Post.get(nodeIdHandler_Post.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_Person = {
   typeName: "Person",
@@ -9916,7 +9916,7 @@ const nodeIdHandler_Person = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -9931,7 +9931,7 @@ const nodeIdHandler_Person = {
 };
 const nodeFetcher_Person = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Person));
-  return nodeIdHandler_Person.get(nodeIdHandler_Person.getSpec($decoded));
+  return nodeIdHandler_Person.get(nodeIdHandler_Person.getSpec(inhibitOnNull($decoded)));
 };
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
@@ -10041,23 +10041,23 @@ const makeArgs_left_arm_identity = (args, path = []) => argDetailsSimple_left_ar
 const resource_left_arm_identityPgResource = registry.pgResources["left_arm_identity"];
 const specFromArgs_LeftArm = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_LeftArm, $nodeId);
+  return specFromNodeId(nodeIdHandler_LeftArm, inhibitOnNull($nodeId));
 };
 const specFromArgs_Person = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Person, $nodeId);
+  return specFromNodeId(nodeIdHandler_Person, inhibitOnNull($nodeId));
 };
 const specFromArgs_PersonSecret = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_PersonSecret, $nodeId);
+  return specFromNodeId(nodeIdHandler_PersonSecret, inhibitOnNull($nodeId));
 };
 const specFromArgs_LeftArm2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_LeftArm, $nodeId);
+  return specFromNodeId(nodeIdHandler_LeftArm, inhibitOnNull($nodeId));
 };
 const specFromArgs_Person2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Person, $nodeId);
+  return specFromNodeId(nodeIdHandler_Person, inhibitOnNull($nodeId));
 };
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {

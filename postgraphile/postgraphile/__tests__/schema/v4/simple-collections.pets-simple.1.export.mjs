@@ -328,7 +328,7 @@ const nodeIdHandler_Person = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -362,7 +362,7 @@ function specForHandler(handler) {
 }
 const nodeFetcher_Person = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Person));
-  return nodeIdHandler_Person.get(nodeIdHandler_Person.getSpec($decoded));
+  return nodeIdHandler_Person.get(nodeIdHandler_Person.getSpec(inhibitOnNull($decoded)));
 };
 const nodeIdHandler_Pet = {
   typeName: "Pet",
@@ -373,7 +373,7 @@ const nodeIdHandler_Pet = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -388,7 +388,7 @@ const nodeIdHandler_Pet = {
 };
 const nodeFetcher_Pet = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Pet));
-  return nodeIdHandler_Pet.get(nodeIdHandler_Pet.getSpec($decoded));
+  return nodeIdHandler_Pet.get(nodeIdHandler_Pet.getSpec(inhibitOnNull($decoded)));
 };
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
@@ -472,19 +472,19 @@ function CursorSerialize(value) {
 }
 const specFromArgs_Person = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Person, $nodeId);
+  return specFromNodeId(nodeIdHandler_Person, inhibitOnNull($nodeId));
 };
 const specFromArgs_Pet = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Pet, $nodeId);
+  return specFromNodeId(nodeIdHandler_Pet, inhibitOnNull($nodeId));
 };
 const specFromArgs_Person2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Person, $nodeId);
+  return specFromNodeId(nodeIdHandler_Person, inhibitOnNull($nodeId));
 };
 const specFromArgs_Pet2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Pet, $nodeId);
+  return specFromNodeId(nodeIdHandler_Pet, inhibitOnNull($nodeId));
 };
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {

@@ -199,7 +199,7 @@ const nodeIdHandler_Network = {
   },
   getSpec($list) {
     return {
-      id: inhibitOnNull(access($list, [1]))
+      id: access($list, [1])
     };
   },
   getIdentifiers(value) {
@@ -233,7 +233,7 @@ function specForHandler(handler) {
 }
 const nodeFetcher_Network = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Network));
-  return nodeIdHandler_Network.get(nodeIdHandler_Network.getSpec($decoded));
+  return nodeIdHandler_Network.get(nodeIdHandler_Network.getSpec(inhibitOnNull($decoded)));
 };
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
@@ -259,11 +259,11 @@ function InternetAddressSerialize(value) {
 }
 const specFromArgs_Network = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Network, $nodeId);
+  return specFromNodeId(nodeIdHandler_Network, inhibitOnNull($nodeId));
 };
 const specFromArgs_Network2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Network, $nodeId);
+  return specFromNodeId(nodeIdHandler_Network, inhibitOnNull($nodeId));
 };
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
