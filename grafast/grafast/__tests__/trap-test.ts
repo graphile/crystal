@@ -38,9 +38,9 @@ const makeSchema = () => {
         detail: String!
       }
     `,
-    objectPlans: {
+    objects: {
       Query: {
-        fields: {
+        plans: {
           unhandledError(_, { $setNullToError }) {
             const $a = assertNotNull($setNullToError, "Null!");
             return $a;

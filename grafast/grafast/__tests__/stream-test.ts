@@ -63,16 +63,16 @@ const makeSchema = (useStreamableStep = false) => {
         list: [Thing!]
       }
     `,
-    objectPlans: {
+    objects: {
       Query: {
-        fields: {
+        plans: {
           list() {
             return constant([1, 2]);
           },
         },
       },
       Thing: {
-        fields: {
+        plans: {
           id($i: Step<number>) {
             return $i;
           },
@@ -87,7 +87,7 @@ const makeSchema = (useStreamableStep = false) => {
         },
       },
       OtherThing: {
-        fields: {
+        plans: {
           id($i: Step<number>) {
             return $i;
           },

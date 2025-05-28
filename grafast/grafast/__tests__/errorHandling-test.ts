@@ -80,9 +80,9 @@ const schema = makeGrafastSchema({
       sideEffectListCheck(arr: [String]!): Int
     }
   `,
-  objectPlans: {
+  objects: {
     Query: {
-      fields: {
+      plans: {
         list() {
           return constant([1, 2]);
         },
@@ -98,7 +98,7 @@ const schema = makeGrafastSchema({
       },
     },
     Thing: {
-      fields: {
+      plans: {
         id($i: Step<number>) {
           return $i;
         },
@@ -111,7 +111,7 @@ const schema = makeGrafastSchema({
       },
     },
     OtherThing: {
-      fields: {
+      plans: {
         id($i: Step<number>) {
           return $i;
         },

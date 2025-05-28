@@ -43,9 +43,9 @@ const makeSchema = (plugins: GraphileConfig.Plugin[]) =>
               message: [[String]!]
             }
           `,
-          objectPlans: {
+          objects: {
             Query: {
-              fields: {
+              plans: {
                 echo(_, fieldArgs) {
                   return fieldArgs.getRaw("message");
                 },

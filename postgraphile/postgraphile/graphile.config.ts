@@ -239,9 +239,9 @@ const LeftArmPlugin = makeExtendSchemaPlugin((build) => {
         isTheirs: Boolean
       }
     `,
-    objectPlans: {
+    objects: {
       Person: {
-        fields: {
+        plans: {
           allArms: EXPORTABLE(
             (connection, left_arm, object) => ($person) => {
               const $arms = left_arm.find();
@@ -257,7 +257,7 @@ const LeftArmPlugin = makeExtendSchemaPlugin((build) => {
         },
       },
       PersonRelatedArmEdge: {
-        fields: {
+        plans: {
           isTheirs: EXPORTABLE(
             (aEqualsB, lambda) =>
               (
@@ -312,14 +312,14 @@ const TestSideEffectCancellingPlugin = makeExtendSchemaPlugin({
       testSideEffectCancelling: Int
     }
   `,
-  objectPlans: {
+  objects: {
     Mutation: {
-      fields: {
+      plans: {
         testSideEffectCancelling: testResolver,
       },
     },
     Query: {
-      fields: {
+      plans: {
         testSideEffectCancelling: testResolver,
       },
     },
@@ -364,9 +364,9 @@ const preset: GraphileConfig.Preset = {
             wrapMe: Int
           }
         `,
-        objectPlans: {
+        objects: {
           Query: {
-            fields: {
+            plans: {
               wrapMe: EXPORTABLE((constant) => () => constant(42), [constant]),
               throw: EXPORTABLE(
                 (error) => () => {
@@ -387,7 +387,7 @@ const preset: GraphileConfig.Preset = {
             },
           },
           Person: {
-            fields: {
+            plans: {
               greet: EXPORTABLE(
                 (TYPES, sql) =>
                   ($user: PgSelectSingleStep, { $greeting }) => {
@@ -435,9 +435,9 @@ const preset: GraphileConfig.Preset = {
           gql: Int
         }
       `,
-      objectPlans: {
+      objects: {
         Query: {
-          fields: {
+          plans: {
             mol: EXPORTABLE(
               (context) => () => {
                 return context().get("mol");
@@ -447,7 +447,7 @@ const preset: GraphileConfig.Preset = {
           },
         },
         Subscription: {
-          fields: {
+          plans: {
             // Test via SQL: `NOTIFY test, '{"a":40}';`
             sub: EXPORTABLE(
               (context, jsonParse, listen, object) => (_$root, args) => {
@@ -488,9 +488,9 @@ const preset: GraphileConfig.Preset = {
           error: Int
         }
       `,
-      objectPlans: {
+      objects: {
         Subscription: {
-          fields: {
+          plans: {
             error: {
               subscribePlan: EXPORTABLE(
                 (constant, lambda) =>

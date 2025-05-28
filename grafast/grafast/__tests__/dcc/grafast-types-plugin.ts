@@ -120,8 +120,8 @@ class GrafastGenerator {
     const lines: string[] = [];
     for (const type of this.types) {
       if (!isObjectType(type)) continue;
-      lines.push(`    ${type.name}?: Omit<ObjectPlan<${this.source(type)}>, 'fields'> & {
-      fields?: {
+      lines.push(`    ${type.name}?: Omit<ObjectPlan<${this.source(type)}>, 'plans'> & {
+      plans?: {
 ${Object.entries(type.getFields())
   .map(
     ([fieldName, fieldSpec]) =>
@@ -138,8 +138,8 @@ ${Object.entries(type.getFields())
     const lines: string[] = [];
     for (const type of this.types) {
       if (!isInputObjectType(type)) continue;
-      lines.push(`    ${type.name}?: Omit<InputObjectPlan, 'fields'> & {
-      fields?: {
+      lines.push(`    ${type.name}?: Omit<InputObjectPlan, 'plans'> & {
+      plans?: {
 ${Object.entries(type.getFields())
   .map(([fieldName, val]) => `        ${fieldName}?: InputFieldPlan<any, any>;`)
   .join("\n")}
@@ -176,24 +176,24 @@ type Get<
     : TFallback
   : TFallback;`,
         "",
-        `export interface TypedGrafastSchemaSpec extends Omit<GrafastSchemaConfig, 'objectPlans' | 'interfacePlans' | 'unionPlans' | 'inputObjectPlans' | 'scalarPlans' | 'enumPlans'> {`,
+        `export interface TypedGrafastSchemaSpec extends Omit<GrafastSchemaConfig, 'objects' | 'interfaces' | 'unions' | 'inputObjects' | 'scalars' | 'enums'> {`,
 
-        `  objectPlans?: {`,
+        `  objects?: {`,
         ...this.getObjectPlans(),
         `  }`,
-        `  interfacePlans?: {`,
+        `  interfaces?: {`,
         ...this.getInterfacePlans(),
         `  }`,
-        `  unionPlans?: {`,
+        `  unions?: {`,
         ...this.getUnionPlans(),
         `  }`,
-        `  inputObjectPlans?: {`,
+        `  inputObjects?: {`,
         ...this.getInputObjectPlans(),
         `  }`,
-        `  scalarPlans?: {`,
+        `  scalars?: {`,
         ...this.getScalarPlans(),
         `  }`,
-        `  enumPlans?: {`,
+        `  enums?: {`,
         ...this.getEnumPlans(),
         `  }`,
 

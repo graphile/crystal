@@ -17,9 +17,9 @@ const schema = makeGrafastSchema({
       interfacesSansPlan: [ZeroImplementations!]
     }
   `,
-  objectPlans: {
+  objects: {
     Query: {
-      fields: {
+      plans: {
         interface() {
           return constant(null);
         },

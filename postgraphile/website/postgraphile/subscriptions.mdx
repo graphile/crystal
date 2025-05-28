@@ -117,9 +117,9 @@ const MySubscriptionPlugin = makeExtendSchemaPlugin((build) => {
         message: Message
       }
     `,
-    objectPlans: {
+    objects: {
       Subscription: {
-        fields: {
+        plans: {
           forumMessage: {
             subscribePlan(_$root, args) {
               const $pgSubscriber = context().get("pgSubscriber");
@@ -134,7 +134,7 @@ const MySubscriptionPlugin = makeExtendSchemaPlugin((build) => {
         },
       },
       ForumMessageSubscriptionPayload: {
-        fields: {
+        plans: {
           event($event) {
             return $event.get("event");
           },

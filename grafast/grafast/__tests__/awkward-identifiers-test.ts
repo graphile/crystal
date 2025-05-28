@@ -26,16 +26,16 @@ const schema = makeGrafastSchema({
       o: Obj
     }
   `,
-  objectPlans: {
+  objects: {
     Query: {
-      fields: {
+      plans: {
         o() {
           return constant(Object.create(null));
         },
       },
     },
     Obj: {
-      fields: {
+      plans: {
         o($o: Step) {
           return $o;
         },

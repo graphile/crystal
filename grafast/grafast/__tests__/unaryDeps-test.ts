@@ -171,16 +171,16 @@ const makeSchema = () => {
         name: String
       }
     `,
-    objectPlans: {
+    objects: {
       Query: {
-        fields: {
+        plans: {
           allPeople(_: Step) {
             return getRecords("people");
           },
         },
       },
       Person: {
-        fields: {
+        plans: {
           pets($owner, { $first }) {
             const $ownerId = $owner.get("id");
             const $pets = getRecords("pets", { owner_id: $ownerId });

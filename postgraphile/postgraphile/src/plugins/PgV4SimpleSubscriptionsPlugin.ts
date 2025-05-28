@@ -31,9 +31,9 @@ export const PgV4SimpleSubscriptionsPlugin = makeExtendSchemaPlugin((build) => {
           ]
         : []),
     ],
-    objectPlans: {
+    objects: {
       Subscription: {
-        fields: {
+        plans: {
           listen: {
             subscribePlan: EXPORTABLE(
               (context, jsonParse, lambda, listen) =>
@@ -58,7 +58,7 @@ export const PgV4SimpleSubscriptionsPlugin = makeExtendSchemaPlugin((build) => {
         },
       } as ObjectPlan<Step>,
       ListenPayload: {
-        fields: {
+        plans: {
           event: EXPORTABLE(
             (get) => ($event) => {
               return get($event, "event");

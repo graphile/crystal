@@ -50,7 +50,7 @@ export const RegisterUserPlugin = makeExtendSchemaPlugin((build) => {
         email: String!
       }
     `,
-    unionPlans: {
+    unions: {
       RegisterUserResult: {
         planType($specifier: Step<Record<string, any>>) {
           const $__typename = lambda($specifier, (obj) => {
@@ -76,9 +76,9 @@ export const RegisterUserPlugin = makeExtendSchemaPlugin((build) => {
         },
       },
     },
-    objectPlans: {
+    objects: {
       Mutation: {
-        fields: {
+        plans: {
           registerUser(_, { $input: { $username, $email } }) {
             const $result = withPgClient(
               executor,
@@ -138,7 +138,7 @@ export const RegisterUserPlugin = makeExtendSchemaPlugin((build) => {
 
       RegisterUserPayload: {
         assertStep: ObjectStep,
-        fields: {
+        plans: {
           result($data: ObjectStep) {
             const $result = $data.get("result");
             return $result;

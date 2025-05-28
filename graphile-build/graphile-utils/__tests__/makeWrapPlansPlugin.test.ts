@@ -51,9 +51,9 @@ const makeSchemaWithSpyAndPlugins = (
               echo(message: String!): String
             }
           `,
-          objectPlans: {
+          objects: {
             Query: {
-              fields: {
+              plans: {
                 echo: spy,
               },
             },
@@ -359,9 +359,9 @@ describe("wrapping plans matching a filter", () => {
             c(arg1: String = "1", arg2: String = "2"): String
           }
         `,
-        objectPlans: {
+        objects: {
           Mutation: {
-            fields: {
+            plans: {
               a: add,
               b: add,
               c: add,

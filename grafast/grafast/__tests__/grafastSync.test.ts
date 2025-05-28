@@ -20,9 +20,9 @@ const makeSchema = () => {
         addTwoNumbers(a: Int!, b: Int!): Int
       }
     `,
-    objectPlans: {
+    objects: {
       Mutation: {
-        fields: {
+        plans: {
           addTwoNumbers(parentStep, fieldArgs) {
             return lambda(
               [fieldArgs.getRaw("a"), fieldArgs.getRaw("b")],
@@ -32,7 +32,7 @@ const makeSchema = () => {
         },
       },
       Query: {
-        fields: {
+        plans: {
           addTwoNumbers(parentStep, fieldArgs) {
             return lambda(
               [fieldArgs.getRaw("a"), fieldArgs.getRaw("b")],

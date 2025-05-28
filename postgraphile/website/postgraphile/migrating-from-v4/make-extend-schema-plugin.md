@@ -127,9 +127,9 @@ in JS, you might use an SQL expression:
 +        nameWithSuffix(suffix: String!): String!
        }
      `,
-+    objectPlans: {
++    objects: {
 +      User: {
-+        fields: {
++        plans: {
 +          nameWithSuffix($user, { $suffix }) {
 +            return $user.select(
 +              sql`${$user.getClassStep().alias}.name || ' ' || ${$user.placeholder($suffix, TYPES.text)}`,
@@ -334,9 +334,9 @@ export default makeExtendSchemaPlugin((build) => {
       }
     `,
 
-    objectPlans: {
+    objects: {
       Mutation: {
-        fields: {
+        plans: {
           myCustomMutation(_$root, { $input: { $count } }) {
             /**
              * This step dictates the data that will be passed as the second argument
@@ -387,7 +387,7 @@ export default makeExtendSchemaPlugin((build) => {
         },
       },
       MyCustomMutationPayload: {
-        fields: {
+        plans: {
           numbers($transactionResult) {
             return $transactionResult;
           },

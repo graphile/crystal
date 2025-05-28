@@ -19,9 +19,9 @@ const makeSchema = (useStreamableStep = false) => {
         echoNonNullableListOfString(in: [String]!): [String]!
       }
     `,
-    objectPlans: {
+    objects: {
       Query: {
-        fields: {
+        plans: {
           echoListOfString(_, { $in }) {
             return $in;
           },

@@ -68,9 +68,9 @@ const MySchemaExtensionPlugin =
   makeExtendSchemaPlugin(
     build => ({
       typeDefs: gql`...`,
-      objectPlans: ...,
-      interfacePlans: ...,
-      unionPlans: ...,
+      objects: {...},
+      interfaces: {...},
+      unions: {...},
     })
   );
 
@@ -94,16 +94,16 @@ makeExtendSchemaPlugin((build) => {
         random: Random
       }
     `,
-    objectPlans: {
+    objects: {
       Query: {
-        fields: {
+        plans: {
           random() {
             return constant({});
           },
         },
       },
       Random: {
-        fields: {
+        plans: {
           float() {
             return lambda(null, () => Math.random());
           },

@@ -79,9 +79,9 @@ const AchinthaSideEffectsPlugin = makeExtendSchemaPlugin((build) => {
         hasClinic: Boolean
       }
     `,
-    objectPlans: {
+    objects: {
       Shop: {
-        fields: {
+        plans: {
           animals($shop, { $first }) {
             sideEffect($first, (arg) => {
               if (arg && arg > 10) {
@@ -97,7 +97,7 @@ const AchinthaSideEffectsPlugin = makeExtendSchemaPlugin((build) => {
         },
       },
       CatAnimal: {
-        fields: {
+        plans: {
           owners($animal, { $first }) {
             sideEffect($first, (arg) => {
               if (arg && arg > 10) {
@@ -113,7 +113,7 @@ const AchinthaSideEffectsPlugin = makeExtendSchemaPlugin((build) => {
         },
       },
       DogAnimal: {
-        fields: {
+        plans: {
           owners($animal, { $first }) {
             sideEffect($first, (arg) => {
               if (arg && arg > 10) {
@@ -129,7 +129,7 @@ const AchinthaSideEffectsPlugin = makeExtendSchemaPlugin((build) => {
         },
       },
       Owner: {
-        fields: {
+        plans: {
           hasClinic($owner) {
             const $shop = shop.get({
               id: $owner.get("owner_id"),

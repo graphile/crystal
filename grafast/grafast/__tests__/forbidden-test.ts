@@ -68,9 +68,9 @@ const schema = makeGrafastSchema({
       badFinalize: Int
     }
   `,
-  objectPlans: {
+  objects: {
     Query: {
-      fields: {
+      plans: {
         badOptimize() {
           return new BadOptimizeStep(new SomeStep());
         },

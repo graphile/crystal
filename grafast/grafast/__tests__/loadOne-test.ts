@@ -196,9 +196,9 @@ const makeSchema = (useStreamableStep = false) => {
         thingByOrgIdRegNoObj(regNo: Int!): Thing
       }
     `,
-    objectPlans: {
+    objects: {
       Query: {
-        fields: {
+        plans: {
           thingById(_, { $id }) {
             return loadOne($id as Step<number>, loadThingByIds);
           },
@@ -239,14 +239,14 @@ const makeSchema = (useStreamableStep = false) => {
         },
       },
       Thing: {
-        fields: {
+        plans: {
           org($thing) {
             return loadOne($thing.get("orgId"), "id", loadOrgByIds);
           },
         },
       } as ObjectPlan<LoadedRecordStep<Thing>>,
       Org: {
-        fields: {
+        plans: {
           thingByTuple($org: LoadedRecordStep<Org>, { $regNo }) {
             const $orgId = $org.get("id");
             return loadOne(

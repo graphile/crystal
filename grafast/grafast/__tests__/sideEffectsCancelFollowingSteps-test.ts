@@ -42,14 +42,14 @@ const schema = makeGrafastSchema({
       test: Int
     }
   `,
-  objectPlans: {
+  objects: {
     Mutation: {
-      fields: {
+      plans: {
         test: testResolver,
       },
     },
     Query: {
-      fields: {
+      plans: {
         test: testResolver,
       },
     },

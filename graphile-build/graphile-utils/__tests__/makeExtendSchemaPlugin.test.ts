@@ -49,9 +49,9 @@ const ExtendPlugin = makeExtendSchemaPlugin({
       scalar2: Scalar2
     }
   `,
-  objectPlans: {
+  objects: {
     Query: {
-      fields: {
+      plans: {
         scalar1() {
           return constant("hello world");
         },
@@ -61,7 +61,7 @@ const ExtendPlugin = makeExtendSchemaPlugin({
       },
     },
   },
-  scalarPlans: {
+  scalars: {
     Scalar1: new GraphQLScalarType({
       name: "SomethingElse",
       serialize: EXPORTABLE(
@@ -172,9 +172,9 @@ it("enables overriding scope", async () => {
             favouritePets: PetConnection
           }
         `,
-        objectPlans: {
+        objects: {
           User: {
-            fields: {
+            plans: {
               favouritePets: {
                 scope: {
                   pgTypeResource: undefined,
@@ -213,9 +213,9 @@ it("supports unary steps in loadOne", async () => {
               uppercaseName: String
             }
           `,
-          objectPlans: {
+          objects: {
             User: {
-              fields: {
+              plans: {
                 uppercaseName($user) {
                   const $name = $user.get("name");
                   const $executorContext = main.context();
@@ -304,9 +304,9 @@ it("supports arbitrary sql queries, does not dedup unrelated queries", async () 
               two: UserConnection
             }
           `,
-          objectPlans: {
+          objects: {
             User: {
-              fields: {
+              plans: {
                 one($user) {
                   const $one = pgSelect({
                     identifiers: [],

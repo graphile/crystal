@@ -6,9 +6,9 @@ import { grafast, lambda, makeGrafastSchema } from "../dist/index.js";
 
 it("can create a schema with an input", async () => {
   const schema = makeGrafastSchema({
-    objectPlans: {
+    objects: {
       Query: {
-        fields: {
+        plans: {
           a(_, { $a }) {
             return lambda($a, (a) => JSON.stringify(a));
           },

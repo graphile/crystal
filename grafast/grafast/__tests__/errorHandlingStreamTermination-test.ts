@@ -79,16 +79,16 @@ const makeSchema = (setStreaming: (isStreaming: boolean) => void) =>
         list: [Thing]
       }
     `,
-    objectPlans: {
+    objects: {
       Query: {
-        fields: {
+        plans: {
           list() {
             return constant([1, 2]);
           },
         },
       },
       Thing: {
-        fields: {
+        plans: {
           id($i: Step<number>) {
             return $i;
           },
@@ -105,7 +105,7 @@ const makeSchema = (setStreaming: (isStreaming: boolean) => void) =>
         },
       },
       OtherThing: {
-        fields: {
+        plans: {
           id($i: Step<number>) {
             return $i;
           },

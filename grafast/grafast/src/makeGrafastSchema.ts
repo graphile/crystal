@@ -54,7 +54,7 @@ export interface ObjectFieldConfig<
 
 // TYPES: improve the types here!
 /**
- * When defining a field with `typeDefs/objectPlans` you can declare the field plan
+ * When defining a field with `typeDefs/objects` you can declare the field plan
  * directly, or you can define a configuration object that accepts the plan and
  * more.
  */
@@ -84,7 +84,7 @@ export interface ObjectPlan<TSource extends Step = Step> {
     | { new (...args: any[]): TSource };
   isTypeOf?: graphql.GraphQLIsTypeOfFn<any, any>;
   planType?($specifier: Step): TSource;
-  fields?: {
+  plans?: {
     [key: string]: FieldPlan<TSource, any, any>;
   };
 }
@@ -113,7 +113,7 @@ export type InputFieldPlan<TParent = any, TData = any> =
 
 export interface InputObjectPlan {
   baked?: InputObjectTypeBakedResolver;
-  fields?: {
+  plans?: {
     [fieldName: string]: InputFieldPlan;
   };
 }
@@ -221,16 +221,16 @@ export interface GrafastSchemaConfig {
    * All the different types of plans smooshed together to simulate the old
    * typeDefs/resolvers pattern. Avoid.
    *
-   * @deprecated Please use objectPlans, unionPlans, interfacePlans, inputObjectPlans, scalarPlans or enumPlans as appropriate.
+   * @deprecated Please use objects, unions, interfaces, inputObjects, scalars or enums as appropriate.
    */
   plans?: GrafastPlans;
 
-  scalarPlans?: { [typeName: string]: ScalarPlan };
-  enumPlans?: { [typeName: string]: EnumPlan };
-  objectPlans?: { [typeName: string]: ObjectPlan<any> };
-  unionPlans?: { [typeName: string]: UnionPlan<any> };
-  interfacePlans?: { [typeName: string]: InterfacePlan<any> };
-  inputObjectPlans?: { [typeName: string]: InputObjectPlan };
+  scalars?: { [typeName: string]: ScalarPlan };
+  enums?: { [typeName: string]: EnumPlan };
+  objects?: { [typeName: string]: ObjectPlan<any> };
+  unions?: { [typeName: string]: UnionPlan<any> };
+  interfaces?: { [typeName: string]: InterfacePlan<any> };
+  inputObjects?: { [typeName: string]: InputObjectPlan };
   enableDeferStream?: boolean;
 }
 
@@ -242,25 +242,18 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
   const {
     typeDefs,
     plans: rawPlans,
-    objectPlans,
-    unionPlans,
-    interfacePlans,
-    inputObjectPlans,
-    scalarPlans,
-    enumPlans,
+    objects,
+    unions,
+    interfaces,
+    inputObjects,
+    scalars,
+    enums,
     enableDeferStream = false,
   } = details;
 
   let plans: GrafastPlans;
   if (rawPlans) {
-    if (
-      objectPlans ||
-      unionPlans ||
-      interfacePlans ||
-      inputObjectPlans ||
-      scalarPlans ||
-      enumPlans
-    ) {
+    if (objects || unions || interfaces || inputObjects || scalars || enums) {
       throw new Error(
         `plans is deprecated and may not be specified alongside newer approaches`,
       );
@@ -271,33 +264,33 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
     // this in future, but for now it's the easiest way to ensure compatibility
     plans = {};
 
-    for (const [typeName, spec] of Object.entries(objectPlans ?? {})) {
+    for (const [typeName, spec] of Object.entries(objects ?? {})) {
       const o = {} as Record<string, any>;
       plans[typeName] = o as any;
 
-      const { fields = {}, ...rest } = spec;
+      const { plans: planResolvers = {}, ...rest } = spec;
       for (const [key, val] of Object.entries(rest)) {
         o[`__${key}`] = val;
       }
-      for (const [key, val] of Object.entries(fields)) {
+      for (const [key, val] of Object.entries(planResolvers)) {
         o[key] = val;
       }
     }
 
-    for (const [typeName, spec] of Object.entries(inputObjectPlans ?? {})) {
+    for (const [typeName, spec] of Object.entries(inputObjects ?? {})) {
       const o = {} as Record<string, any>;
       plans[typeName] = o as any;
 
-      const { fields = {}, ...rest } = spec;
+      const { plans: planResolvers = {}, ...rest } = spec;
       for (const [key, val] of Object.entries(rest)) {
         o[`__${key}`] = val;
       }
-      for (const [key, val] of Object.entries(fields)) {
+      for (const [key, val] of Object.entries(planResolvers)) {
         o[key] = val;
       }
     }
 
-    for (const [typeName, spec] of Object.entries(unionPlans ?? {})) {
+    for (const [typeName, spec] of Object.entries(unions ?? {})) {
       const o = {} as Record<string, any>;
       plans[typeName] = o as any;
 
@@ -306,7 +299,7 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
       }
     }
 
-    for (const [typeName, spec] of Object.entries(interfacePlans ?? {})) {
+    for (const [typeName, spec] of Object.entries(interfaces ?? {})) {
       const o = {} as Record<string, any>;
       plans[typeName] = o as any;
 
@@ -315,11 +308,11 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
       }
     }
 
-    for (const [typeName, spec] of Object.entries(scalarPlans ?? {})) {
+    for (const [typeName, spec] of Object.entries(scalars ?? {})) {
       plans[typeName] = spec;
     }
 
-    for (const [typeName, spec] of Object.entries(enumPlans ?? {})) {
+    for (const [typeName, spec] of Object.entries(enums ?? {})) {
       plans[typeName] = spec;
     }
   }
@@ -400,7 +393,7 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
       }
       if (isObjectType(astType)) {
         const rawConfig = astType.toConfig();
-        const objectPlans = plans[astType.name] as
+        const objectPlan = plans[astType.name] as
           | DeprecatedObjectPlan
           | undefined;
 
@@ -416,8 +409,8 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
           any,
           any
         >;
-        if (objectPlans) {
-          for (const [fieldName, rawFieldSpec] of Object.entries(objectPlans)) {
+        if (objectPlan) {
+          for (const [fieldName, rawFieldSpec] of Object.entries(objectPlan)) {
             if (fieldName === "__assertStep") {
               exportNameHint(rawFieldSpec, `${typeName}_assertStep`);
               ext.grafast ??= {};
@@ -477,8 +470,8 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
               continue;
             }
             const fieldSpec =
-              objectPlans && Object.hasOwn(objectPlans, fieldName)
-                ? objectPlans[fieldName]
+              objectPlan && Object.hasOwn(objectPlan, fieldName)
+                ? objectPlan[fieldName]
                 : undefined;
             const fieldConfig: graphql.GraphQLFieldConfig<any, any> = {
               ...rawFieldSpec,
@@ -592,13 +585,13 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
             },
           },
         };
-        const inputObjectPlans = plans[astType.name] as
+        const inputObjectPlan = plans[astType.name] as
           | DeprecatedInputObjectPlan
           | undefined;
 
-        if (inputObjectPlans) {
+        if (inputObjectPlan) {
           for (const [fieldName, fieldSpec] of Object.entries(
-            inputObjectPlans,
+            inputObjectPlan,
           )) {
             if (fieldName === "__baked") {
               config.extensions!.grafast!.baked =
@@ -628,8 +621,8 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
 
           for (const [fieldName, rawFieldConfig] of Object.entries(rawFields)) {
             const fieldSpec =
-              inputObjectPlans && Object.hasOwn(inputObjectPlans, fieldName)
-                ? inputObjectPlans[fieldName]
+              inputObjectPlan && Object.hasOwn(inputObjectPlan, fieldName)
+                ? inputObjectPlan[fieldName]
                 : undefined;
             const fieldConfig: graphql.GraphQLInputFieldConfig = {
               ...rawFieldConfig,
@@ -745,22 +738,22 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
             ...rawConfig.extensions,
           },
         };
-        const scalarPlans = plans[astType.name] as ScalarPlan | undefined;
-        if (typeof scalarPlans?.serialize === "function") {
-          exportNameHint(scalarPlans.serialize, `${typeName}_serialize`);
-          config.serialize = scalarPlans.serialize;
+        const scalarPlan = plans[astType.name] as ScalarPlan | undefined;
+        if (typeof scalarPlan?.serialize === "function") {
+          exportNameHint(scalarPlan.serialize, `${typeName}_serialize`);
+          config.serialize = scalarPlan.serialize;
         }
-        if (typeof scalarPlans?.parseValue === "function") {
-          exportNameHint(scalarPlans.parseValue, `${typeName}_parseValue`);
-          config.parseValue = scalarPlans.parseValue;
+        if (typeof scalarPlan?.parseValue === "function") {
+          exportNameHint(scalarPlan.parseValue, `${typeName}_parseValue`);
+          config.parseValue = scalarPlan.parseValue;
         }
-        if (typeof scalarPlans?.parseLiteral === "function") {
-          exportNameHint(scalarPlans.parseLiteral, `${typeName}_parseLiteral`);
-          config.parseLiteral = scalarPlans.parseLiteral;
+        if (typeof scalarPlan?.parseLiteral === "function") {
+          exportNameHint(scalarPlan.parseLiteral, `${typeName}_parseLiteral`);
+          config.parseLiteral = scalarPlan.parseLiteral;
         }
-        if (typeof scalarPlans?.plan === "function") {
-          exportNameHint(scalarPlans.plan, `${typeName}_plan`);
-          config.extensions!.grafast = { plan: scalarPlans.plan };
+        if (typeof scalarPlan?.plan === "function") {
+          exportNameHint(scalarPlan.plan, `${typeName}_plan`);
+          config.extensions!.grafast = { plan: scalarPlan.plan };
         }
         return new graphql.GraphQLScalarType(config);
       } else if (isEnumType(astType)) {
@@ -776,11 +769,11 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
             }
           >;
         };
-        const enumPlans = plans[astType.name] as EnumPlan | undefined;
+        const enumPlan = plans[astType.name] as EnumPlan | undefined;
         const enumValues = config.values;
-        if (enumPlans) {
+        if (enumPlan) {
           for (const [enumValueName, enumValueSpec] of Object.entries(
-            enumPlans,
+            enumPlan,
           )) {
             const enumValue = enumValues[enumValueName];
             if (!enumValue) {

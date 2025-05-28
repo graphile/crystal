@@ -108,16 +108,16 @@ const myPlugin = makeExtendSchemaPlugin(() => ({
       type: AnimalType!
     }
   `,
-  enumPlans: {
+  enums: {
     AnimalType: {
       CAT: "cat",
       DOG: "dog",
       FISH: "fish",
     },
   },
-  objectPlans: {
+  objects: {
     Pet: {
-      fields: {
+      plans: {
         type() {
           /* TODO: add logic here */
           return constant("cat");

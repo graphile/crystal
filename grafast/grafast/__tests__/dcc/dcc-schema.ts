@@ -249,7 +249,7 @@ export const makeBaseArgs = () => {
         brokenItem: Item
       }
     `,
-    enumPlans: {
+    enums: {
       Species: {
         HUMAN: { value: "Human" },
         CAT: { value: "Cat" },
@@ -261,9 +261,9 @@ export const makeBaseArgs = () => {
         BOPCA: { value: "Bopca Protector" },
       },
     },
-    objectPlans: {
+    objects: {
       Query: {
-        fields: {
+        plans: {
           crawler(_, { $id }) {
             const $db = context().get("dccDb");
             return loadOne($id, $db, null, batchGetCrawlerById);
@@ -286,7 +286,7 @@ export const makeBaseArgs = () => {
         },
       },
       ActiveCrawler: {
-        fields: {
+        plans: {
           bestFriend($activeCrawler) {
             const $id = inhibitOnNull(get($activeCrawler, "bestFriend"));
             const $db = context().get("dccDb");
@@ -299,7 +299,7 @@ export const makeBaseArgs = () => {
         },
       },
       Manager: {
-        fields: {
+        plans: {
           ...SharedNpcResolvers,
           client($manager) {
             const $id = inhibitOnNull(get($manager, "client"));
@@ -309,7 +309,7 @@ export const makeBaseArgs = () => {
         },
       },
       Security: {
-        fields: {
+        plans: {
           ...SharedNpcResolvers,
 
           clients($security) {
@@ -322,30 +322,30 @@ export const makeBaseArgs = () => {
         },
       },
       Guide: {
-        fields: {
+        plans: {
           ...SharedNpcResolvers,
         },
       },
       Staff: {
-        fields: {
+        plans: {
           ...SharedNpcResolvers,
         },
       },
 
       Equipment: {
-        fields: {
+        plans: {
           creator: getCreator,
         },
       },
       Consumable: {
-        fields: {
+        plans: {
           creator: getCreator,
         },
       },
       UtilityItem: {},
       MiscItem: {},
       Floor: {
-        fields: {
+        plans: {
           locations($floor) {
             const $number = get($floor, "number");
             const $db = context().get("dccDb");
@@ -354,12 +354,12 @@ export const makeBaseArgs = () => {
         },
       },
       SafeRoom: {
-        fields: {
+        plans: {
           ...SharedLocationResolvers,
         },
       },
       Club: {
-        fields: {
+        plans: {
           ...SharedLocationResolvers,
           security($club) {
             const $ids = inhibitOnNull(get($club, "security"));
@@ -371,16 +371,16 @@ export const makeBaseArgs = () => {
         },
       },
       Stairwell: {
-        fields: {
+        plans: {
           ...SharedLocationResolvers,
         },
       },
     },
-    unionPlans: {
+    unions: {
       SafeRoomStock: ItemResolver,
       ClubStock: ItemResolver,
     },
-    interfacePlans: {
+    interfaces: {
       Crawler: {
         planType($crawler) {
           const $__typename = lambda($crawler, crawlerToTypeName);

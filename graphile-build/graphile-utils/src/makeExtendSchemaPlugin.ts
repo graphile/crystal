@@ -91,7 +91,7 @@ export interface InputObjectResolver {
   __scope?: GraphileBuild.ScopeInputObject;
 }
 
-/** @deprecated Use objectPlans/scalarPlans/etc instead */
+/** @deprecated Use objects/scalars/etc instead */
 export interface Resolvers {
   [typeName: string]:
     | ObjectResolver
@@ -104,7 +104,7 @@ export interface Resolvers {
       });
 }
 
-/** @deprecated Use objectPlans/scalarPlans/etc instead */
+/** @deprecated Use objects/scalars/etc instead */
 export interface Plans {
   [typeName: string]:
     | (DeprecatedObjectPlan & { __scope?: GraphileBuild.ScopeObject })
@@ -120,12 +120,12 @@ export interface ExtensionDefinition
     GrafastSchemaConfig,
     | "typeDefs"
     | "plans"
-    | "scalarPlans"
-    | "enumPlans"
-    | "objectPlans"
-    | "unionPlans"
-    | "interfacePlans"
-    | "inputObjectPlans"
+    | "scalars"
+    | "enums"
+    | "objects"
+    | "unions"
+    | "interfaces"
+    | "inputObjects"
   > {
   /** @deprecated Use 'plans' instead */
   resolvers?: Resolvers;
@@ -241,12 +241,12 @@ export function makeExtendSchemaPlugin(
             typeDefs,
             resolvers = Object.create(null),
             plans: rawPlans,
-            enumPlans,
-            scalarPlans,
-            inputObjectPlans,
-            interfacePlans,
-            unionPlans,
-            objectPlans,
+            enums,
+            scalars,
+            inputObjects,
+            interfaces,
+            unions,
+            objects,
           } = typeof generator === "function"
             ? generator.length === 1
               ? generator(build)
@@ -260,12 +260,12 @@ export function makeExtendSchemaPlugin(
           let plans: Plans;
           if (rawPlans) {
             if (
-              objectPlans ||
-              unionPlans ||
-              interfacePlans ||
-              inputObjectPlans ||
-              scalarPlans ||
-              enumPlans
+              objects ||
+              unions ||
+              interfaces ||
+              inputObjects ||
+              scalars ||
+              enums
             ) {
               throw new Error(
                 `plans is deprecated and may not be specified alongside newer approaches`,
@@ -277,35 +277,33 @@ export function makeExtendSchemaPlugin(
             // this in future, but for now it's the easiest way to ensure compatibility
             plans = {};
 
-            for (const [typeName, spec] of Object.entries(objectPlans ?? {})) {
+            for (const [typeName, spec] of Object.entries(objects ?? {})) {
               const o = {} as Record<string, any>;
               plans[typeName] = o as any;
 
-              const { fields = {}, ...rest } = spec;
+              const { plans: fieldPlans = {}, ...rest } = spec;
               for (const [key, val] of Object.entries(rest)) {
                 o[`__${key}`] = val;
               }
-              for (const [key, val] of Object.entries(fields)) {
+              for (const [key, val] of Object.entries(fieldPlans)) {
                 o[key] = val;
               }
             }
 
-            for (const [typeName, spec] of Object.entries(
-              inputObjectPlans ?? {},
-            )) {
+            for (const [typeName, spec] of Object.entries(inputObjects ?? {})) {
               const o = {} as Record<string, any>;
               plans[typeName] = o as any;
 
-              const { fields = {}, ...rest } = spec;
+              const { plans: fieldPlans = {}, ...rest } = spec;
               for (const [key, val] of Object.entries(rest)) {
                 o[`__${key}`] = val;
               }
-              for (const [key, val] of Object.entries(fields)) {
+              for (const [key, val] of Object.entries(fieldPlans)) {
                 o[key] = val;
               }
             }
 
-            for (const [typeName, spec] of Object.entries(unionPlans ?? {})) {
+            for (const [typeName, spec] of Object.entries(unions ?? {})) {
               const o = {} as Record<string, any>;
               plans[typeName] = o as any;
 
@@ -314,9 +312,7 @@ export function makeExtendSchemaPlugin(
               }
             }
 
-            for (const [typeName, spec] of Object.entries(
-              interfacePlans ?? {},
-            )) {
+            for (const [typeName, spec] of Object.entries(interfaces ?? {})) {
               const o = {} as Record<string, any>;
               plans[typeName] = o as any;
 
@@ -325,11 +321,11 @@ export function makeExtendSchemaPlugin(
               }
             }
 
-            for (const [typeName, spec] of Object.entries(scalarPlans ?? {})) {
+            for (const [typeName, spec] of Object.entries(scalars ?? {})) {
               plans[typeName] = spec;
             }
 
-            for (const [typeName, spec] of Object.entries(enumPlans ?? {})) {
+            for (const [typeName, spec] of Object.entries(enums ?? {})) {
               plans[typeName] = spec;
             }
           }

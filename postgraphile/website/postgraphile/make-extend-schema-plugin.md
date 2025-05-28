@@ -76,9 +76,9 @@ export const MyPlugin = makeExtendSchemaPlugin((build) => {
       }
     `,
 
-    objectPlans: {
+    objects: {
       Query: {
-        fields: {
+        plans: {
           meaningOfLife() {
             return constant(42);
           },
@@ -195,7 +195,7 @@ const schema = makeExtendSchemaPlugin({
       id: Int
     }
   `,
-  objectPlans: {
+  objects: {
     MyObject: {
       assertStep($step) {
         if ($step instanceof PgSelectSingleStep) return true;
@@ -206,7 +206,7 @@ const schema = makeExtendSchemaPlugin({
             `or PgUpdateSingleStep; but found step of type '${$step.constructor.name}'.`,
         );
       },
-      fields: {
+      plans: {
         a($obj: PgSelectSingleStep | PgInsertSingleStep | PgUpdateSingleStep) {
           return $obj.get("id");
         },
@@ -245,13 +245,13 @@ const schema = makeExtendSchemaPlugin((build) => {
         id: Int
       }
     `,
-    objectPlans: {
+    objects: {
       MyObject: {
         // Graphile Build "scope" for the object type 'MyObject'
         scope: {
           pgTypeResource: users,
         },
-        fields: {
+        plans: {
           id: {
             // The Graphile Build "scope" for the 'MyObject.id' field
             scope: {
@@ -366,9 +366,9 @@ export const MyChannelsPlugin = makeExtendSchemaPlugin((build) => {
         myChannels: [Channel]
       }
     `,
-    objectPlans: {
+    objects: {
       Query: {
-        fields: {
+        plans: {
           myChannels() {
             const $userId = context().get("userId");
             const $user = users.get({ id: $userId });
@@ -491,9 +491,9 @@ export const MyChannelsPlugin = makeExtendSchemaPlugin((build) => {
         myChannels: [Channel]
       }
     `,
-    objectPlans: {
+    objects: {
       Query: {
-        fields: {
+        plans: {
           myChannels() {
             const $userId = context().get("userId");
             // highlight-start
@@ -599,9 +599,9 @@ export const MyForeignExchangePlugin = makeExtendSchemaPlugin((build) => {
         priceInAuCents: Int!
       }
     `,
-    objectPlans: {
+    objects: {
       Product: {
-        fields: {
+        plans: {
           priceInAuCents($product) {
             // highlight-next-line
             const $cents = $product.get("price_in_us_cents");
@@ -634,9 +634,9 @@ export const MyProductReviewsPlugin = makeExtendSchemaPlugin((build) => {
         reviews: ReviewConnection
       }
     `,
-    objectPlans: {
+    objects: {
       Product: {
-        fields: {
+        plans: {
           reviews($product) {
             const $productId = $product.get("id");
             const $reviews = reviews.find();
@@ -684,9 +684,9 @@ export const MyRegisterUserMutationPlugin = makeExtendSchemaPlugin((build) => {
         registerUser(input: RegisterUserInput!): RegisterUserPayload
       }
     `,
-    objectPlans: {
+    objects: {
       Mutation: {
-        fields: {
+        plans: {
           registerUser(_, fieldArgs) {
             const $input = fieldArgs.getRaw("input");
             const $user = withPgClientTransaction(
@@ -727,7 +727,7 @@ export const MyRegisterUserMutationPlugin = makeExtendSchemaPlugin((build) => {
 
       // The payload also needs plans detailing how to resolve its fields:
       RegisterUserPayload: {
-        fields: {
+        plans: {
           user($data) {
             const $user = $data.get("user");
             // It would be tempting to return $user here, but the step class
@@ -788,9 +788,9 @@ const DeleteItemByNodeIdPlugin = makeExtendSchemaPlugin((build) => {
       }
     `,
 
-    objectPlans: {
+    objects: {
       Mutation: {
-        fields: {
+        plans: {
           deleteItem(_, fieldArgs) {
             // jwtClaims is decrypted jwt token data
             const $jwtClaims = context().get("jwtClaims");
@@ -890,9 +890,9 @@ export const RegisterUserPlugin = makeExtendSchemaPlugin((build) => {
         email: String!
       }
     `,
-    objectPlans: {
+    objects: {
       Mutation: {
-        fields: {
+        plans: {
           registerUser(_, { $input: { $username, $email } }) {
             const $result = withPgClient(
               executor,
@@ -952,7 +952,7 @@ export const RegisterUserPlugin = makeExtendSchemaPlugin((build) => {
 
       RegisterUserPayload: {
         assertStep: ObjectStep,
-        fields: {
+        plans: {
           query() {
             // The `Query` type just needs any truthy value.
             return constant(true);
@@ -969,7 +969,7 @@ export const RegisterUserPlugin = makeExtendSchemaPlugin((build) => {
         assertStep: ExecutableStep,
       },
     },
-    unionPlans: {
+    unions: {
       // Planning our polymorphic type
       RegisterUserResult: {
         planType($obj) {

@@ -27,7 +27,7 @@ const makeSchema = () =>
         notifications: [UserNotification!]!
       }
     `,
-    interfacePlans: {
+    interfaces: {
       UserNotification: {
         resolveType(obj: any) {
           if (obj.type === "ready") return "UserNotificationReady";
@@ -35,9 +35,9 @@ const makeSchema = () =>
         },
       },
     },
-    objectPlans: {
+    objects: {
       Query: {
-        fields: {
+        plans: {
           notifications() {
             return constant([
               { type: "ready", isReady: true, id: "1" },

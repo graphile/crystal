@@ -40,9 +40,9 @@ export default makeExtendSchemaPlugin({
       httpBinHeaders: JSON
     }
   `,
-  objectPlans: {
+  objects: {
     Query: {
-      fields: {
+      plans: {
         httpBinHeaders() {
           return loadOne(null, async () => {
             const response = await fetch("https://httpbin.org/headers");

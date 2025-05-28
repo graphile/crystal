@@ -16,9 +16,9 @@ const schema = makeGrafastSchema({
       delayed: Delayed
     }
   `,
-  objectPlans: {
+  objects: {
     Query: {
-      fields: {
+      plans: {
         delayed() {
           return lambda(
             null,
@@ -31,7 +31,7 @@ const schema = makeGrafastSchema({
       },
     },
     Delayed: {
-      fields: {
+      plans: {
         meaningOfLife() {
           return constant(42);
         },

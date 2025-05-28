@@ -118,16 +118,16 @@ const preset: GraphileConfig.Preset = {
           gql: Int
         }
       `,
-      objectPlans: {
+      objects: {
         Query: {
-          fields: {
+          plans: {
             mol() {
               return context().get("mol");
             },
           },
         },
         Subscription: {
-          fields: {
+          plans: {
             // Test via SQL: `NOTIFY test, '{"a":40}';`
             sub(_$root, args) {
               const $topic = args.getRaw("topic");
