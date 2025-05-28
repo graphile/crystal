@@ -121,23 +121,53 @@ function resolveStreamDefer(r: AsyncExecutionResult[]): ExecutionResult {
   return payload as ExecutionResult;
 }
 
-function pruneAsyncResult(p: AsyncExecutionResult) {
-  const copy = { ...p };
-  delete copy.extensions;
-  if (copy.data != null && Object.keys(copy.data).length > 0) {
-    const keys = Object.keys(copy.data);
-    const MAX = 5;
-    if (keys.length > MAX) {
-      copy.data = `{${keys
-        .slice(0, MAX)
-        .map((k) => `${k}:...`)
-        .join(",")},...}`;
-    } else {
-      copy.data = `{${keys.map((k) => `${k}:...`).join(",")}}`;
-    }
+function sigObj(obj: unknown) {
+  if (obj == null) return String(obj);
+  const keys = Object.keys(obj);
+  const MAX = 15;
+  if (keys.length > MAX) {
+    return `{${keys.slice(0, MAX).join(",")},...}`;
+  } else {
+    return `{${keys.join(",")}}`;
   }
-  return copy;
 }
+
+function sigPath(path: ReadonlyArray<string | number>): string {
+  return path.map((n) => (typeof n === "number" ? "*" : n)).join(".");
+}
+
+/**
+ * Generate an "incremental signature" that indicates what happened without
+ * producing an overwhelmingly large amount of data
+ */
+function incsig(p: readonly AsyncExecutionResult[]) {
+  const result = {
+    initialData: sigObj(p[0].data),
+    patches: Object.create(null) as Record<
+      string,
+      Record<string, { indicies: string[] }>
+    >,
+  };
+  for (const payload of p.slice(1)) {
+    if (!payload.hasNext) break;
+    if (!("path" in payload)) {
+      throw new Error(`Invalid incremental stream; no path!`);
+    }
+    const pathSig = sigPath(payload.path!);
+    if (!result.patches[pathSig]) {
+      result.patches[pathSig] = Object.create(null);
+    }
+    const payloadSig = sigObj(payload.data);
+    if (!result.patches[pathSig][payloadSig]) {
+      result.patches[pathSig][payloadSig] = { indicies: [] };
+    }
+    const indicies = payload.path!.filter((n) => typeof n === "number");
+    result.patches[pathSig][payloadSig].indicies.push(indicies.join("/"));
+  }
+  return result;
+}
+
+//.map(pruneAsyncResult)
 
 describe("queries", () => {
   const files = readdirSync(BASE_DIR).filter(
@@ -200,8 +230,7 @@ describe("queries", () => {
             it("matched incremental signature", async function () {
               if (!Array.isArray(rawResult)) return this.skip();
               await snapshot(
-                JSON5.stringify(rawResult.map(pruneAsyncResult), null, 2) +
-                  "\n",
+                JSON5.stringify(incsig(rawResult), null, 2) + "\n",
                 // incremental signature
                 `${BASE_DIR}/${baseName}${suffix}.incsig.json5`,
               );
