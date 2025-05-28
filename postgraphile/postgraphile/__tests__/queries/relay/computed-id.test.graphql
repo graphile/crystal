@@ -1,4 +1,17 @@
-## expect(errors).toBeFalsy()
+## expect(errors).toHaveLength(6)
+#> dontLogErrors: true
+## expect(errors[0].message).toEqual("Invalid node identifier for 'Spectacle'")
+## expect(errors[0].path).toEqual(['a','nonsense1'])
+## expect(errors[1].message).toEqual("Invalid node identifier for 'Spectacle'")
+## expect(errors[1].path).toEqual(['a','nonsense2'])
+## expect(errors[2].message).toEqual("Invalid node identifier for 'Spectacle'")
+## expect(errors[2].path).toEqual(['a','nonsense3'])
+## expect(errors[3].message).toEqual("Invalid node identifier for 'Spectacle'")
+## expect(errors[3].path).toEqual(['b','nonsense1'])
+## expect(errors[4].message).toEqual("Invalid node identifier for 'Spectacle'")
+## expect(errors[4].path).toEqual(['b','nonsense2'])
+## expect(errors[5].message).toEqual("Invalid node identifier for 'Spectacle'")
+## expect(errors[5].path).toEqual(['b','nonsense3'])
 #> schema: ["relay"]
 #> extends: ["postgraphile/presets/relay:PgRelayPreset"]
 query Q {
@@ -9,7 +22,7 @@ query Q {
     model2: maxReadingDistance(withSpectacles: "WyJzcGVjdGFjbGVzIiwyXQ==")
     model3: maxReadingDistance(withSpectacles: "WyJzcGVjdGFjbGVzIiwzXQ==")
     model4: maxReadingDistance(withSpectacles: "WyJzcGVjdGFjbGVzIiw0XQ==")
-    # We treat invalid data as if `null` was specified
+    # Throw errors on invalid node IDs
     nonsense1: maxReadingDistance(withSpectacles: "WyJ1c2VycyIsMV0=") # User:1!
     nonsense2: maxReadingDistance(withSpectacles: "query")
     nonsense3: maxReadingDistance(withSpectacles: "invalidnodeid")
@@ -21,7 +34,7 @@ query Q {
     model2: maxReadingDistance(withSpectacles: "WyJzcGVjdGFjbGVzIiwyXQ==")
     model3: maxReadingDistance(withSpectacles: "WyJzcGVjdGFjbGVzIiwzXQ==")
     model4: maxReadingDistance(withSpectacles: "WyJzcGVjdGFjbGVzIiw0XQ==")
-    # We treat invalid data as if `null` was specified
+    # Throw errors on invalid node IDs
     nonsense1: maxReadingDistance(withSpectacles: "WyJ1c2VycyIsMV0=") # User:1!
     nonsense2: maxReadingDistance(withSpectacles: "query")
     nonsense3: maxReadingDistance(withSpectacles: "invalidnodeid")
