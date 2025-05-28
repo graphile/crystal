@@ -229,7 +229,7 @@ export type FieldArgs<TObj extends BaseGraphQLArguments = any> = {
           }
         : unknown);
 };
-export type FieldArg<TData extends any = any> = {
+export type FieldArg<TData = any> = {
   /** @deprecated Use bakedInput() step instead. */
   get?: never;
   getRaw<TKey extends keyof TData & string>(path: TKey): Step<TData[TKey]>;
@@ -303,10 +303,7 @@ export type FieldPlanResolver<
   info: FieldInfo,
 ) => TResultStep | null;
 
-export type InputObjectFieldApplyResolver<
-  TParent extends any = any,
-  TData extends any = any,
-> = (
+export type InputObjectFieldApplyResolver<TParent = any, TData = any> = (
   target: TParent,
   input: TData, // Don't use unknown here, otherwise users can't easily cast it
   info: {
@@ -329,7 +326,7 @@ export type InputObjectTypeBakedResolver = (
 export type ArgumentApplyPlanResolver<
   TSource extends Step = any,
   TFieldStep extends Step = any,
-  TData extends any = any,
+  TData = any,
 > = (
   $parentPlan: TSource,
   $fieldPlan: TFieldStep,
@@ -403,7 +400,7 @@ export type GrafastFieldConfigArgumentMap = {
 export type GrafastArgumentConfig<
   TSource extends Step = any,
   TFieldStep extends Step = any,
-  TData extends any = any,
+  TData = any,
 > = Omit<GraphQLArgumentConfig, "type"> & {
   type: GraphQLInputType;
   applyPlan?: ArgumentApplyPlanResolver<TSource, TFieldStep, TData>;

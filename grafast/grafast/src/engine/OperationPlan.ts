@@ -3298,7 +3298,7 @@ export class OperationPlan {
 
       const dependencyIndex = 0;
 
-      const { ancestry, deferBoundaryDepth } = layerPlan;
+      const { deferBoundaryDepth } = layerPlan;
       const dep = deps[dependencyIndex];
 
       const dl = dep.dependents.length;
@@ -3349,7 +3349,7 @@ export class OperationPlan {
       }
       return allPeers === null ? EMPTY_ARRAY : allPeers;
     } else {
-      const { ancestry, deferBoundaryDepth } = layerPlan;
+      const { deferBoundaryDepth } = layerPlan;
       /**
        * "compatible" layer plans are calculated by walking up the layer plan tree,
        * however:

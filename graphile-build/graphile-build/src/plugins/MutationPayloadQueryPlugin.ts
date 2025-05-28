@@ -1,10 +1,10 @@
 import "graphile-config";
 
 import { rootValue } from "grafast";
+import type { GraphQLOutputType } from "graphql";
 
 import { EXPORTABLE } from "../utils.js";
 import { version } from "../version.js";
-import { GraphQLOutputType } from "graphql";
 
 declare global {
   namespace GraphileConfig {

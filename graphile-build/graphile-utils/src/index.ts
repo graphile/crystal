@@ -44,6 +44,7 @@ export {
   PlanWrapperRulesGenerator,
 } from "./makeWrapPlansPlugin.js";
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 declare module "grafast" {
   interface ObjectFieldConfig<
     TSource extends Step = Step,
@@ -53,3 +54,4 @@ declare module "grafast" {
     scope?: GraphileBuild.ScopeObjectFieldsField;
   }
 }
+/* eslint-enable @typescript-eslint/no-unused-vars */

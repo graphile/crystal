@@ -34,8 +34,8 @@ import {
   batchGetUtilityItemById,
   makeDb,
 } from "./dcc-data.js";
-import { delegate } from "./delegate.js";
 import { typedMakeGrafastSchema } from "./dcc-types.js";
+import { delegate } from "./delegate.js";
 
 const resolvedPreset = resolvePreset({
   grafast: {

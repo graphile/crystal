@@ -8,7 +8,6 @@ import type {
   Step,
 } from "grafast";
 import type {
-  DefinitionNode,
   DirectiveDefinitionNode,
   DirectiveLocation,
   // Nodes:

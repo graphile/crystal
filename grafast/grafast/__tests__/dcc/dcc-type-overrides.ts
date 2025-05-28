@@ -1,5 +1,5 @@
-import { Maybe, Step } from "../../dist";
-import {
+import type { Maybe, Step } from "../../dist";
+import type {
   ClubData,
   ConsumableData,
   CrawlerData,

@@ -1,5 +1,6 @@
 import chalk from "chalk";
 
+import type { Maybe } from "../index.js";
 import type { ListCapableStep, Step } from "../step.js";
 import { isListCapableStep } from "../step.js";
 import { __ItemStep } from "./__item.js";
@@ -10,7 +11,6 @@ import type {
 } from "./connection.js";
 import type { __ListTransformStep } from "./listTransform.js";
 import { listTransform } from "./listTransform.js";
-import { Maybe } from "../index.js";
 
 const eachReduceCallback = (memo: any[], item: any) => {
   memo.push(item);

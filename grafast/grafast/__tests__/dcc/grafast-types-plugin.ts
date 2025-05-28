@@ -41,7 +41,7 @@ class GrafastGenerator {
   private _get(
     type: GraphQLNamedType,
     property: "nullable" | "source" | "specifier",
-    fallback: string = "Step",
+    fallback = "Step",
   ) {
     return `Get<${JSON.stringify(type.name)}, ${JSON.stringify(property)}, ${fallback}>`;
   }

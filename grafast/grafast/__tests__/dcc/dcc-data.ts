@@ -1,10 +1,10 @@
 /* ALL OF THIS IS TYPESCRIPT, NOT GRAPHQL */
 
-import {
-  loadOneCallback,
-  Maybe,
+import type {
   type LoadManyCallback,
   type LoadOneCallback,
+  loadOneCallback,
+  Maybe,
 } from "../../dist/index.js";
 
 export type ItemType = "Equipment" | "Consumable" | "UtilityItem" | "MiscItem";

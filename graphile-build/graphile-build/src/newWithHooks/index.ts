@@ -6,7 +6,6 @@ import type {
   GraphQLInputFieldConfig,
   GraphQLInputFieldConfigMap,
   GraphQLNamedType,
-  GraphQLOutputType,
   GraphQLScalarLiteralParser,
   GraphQLScalarTypeConfig,
   GraphQLSchemaConfig,

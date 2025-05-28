@@ -82,7 +82,7 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
           return _;
         }
         const {
-          grafast: { access, constant, inhibitOnNull, list },
+          grafast: { access, constant, list },
         } = build;
         const tableResources = Object.values(
           build.input.pgRegistry.pgResources,
