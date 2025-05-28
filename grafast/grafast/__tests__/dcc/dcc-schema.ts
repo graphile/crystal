@@ -338,7 +338,7 @@ export const makeBaseArgs = () => {
             lambda($specifier, extractNpcId),
           ) as Step<number>;
           const $npc = loadOne($npcId, $db, null, batchGetNpcById);
-          const $npcTypename = lambda($npc, npcToTypeName);
+          const $npcTypename = lambda(inhibitOnNull($npc), npcToTypeName);
 
           const $__typename = coalesce([$crawlerTypename, $npcTypename]);
           return {
@@ -367,7 +367,7 @@ export const makeBaseArgs = () => {
             null,
             batchGetNpcById,
           );
-          const $__typename = lambda($npc, npcToTypeName);
+          const $__typename = lambda(inhibitOnNull($npc), npcToTypeName);
 
           return {
             $__typename,

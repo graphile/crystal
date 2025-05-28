@@ -6,10 +6,15 @@ import { it } from "mocha";
 import type {
   ExecutableStep,
   LoadedRecordStep,
-  LoadOneCallback,
   ObjectPlans,
 } from "../dist/index.js";
-import { context, grafast, loadOne, makeGrafastSchema } from "../dist/index.js";
+import {
+  context,
+  grafast,
+  loadOne,
+  loadOneCallback,
+  makeGrafastSchema,
+} from "../dist/index.js";
 
 const resolvedPreset = resolvePreset({});
 const requestContext = {};
@@ -94,79 +99,78 @@ let CALLS: {
   params: object;
 }[] = [];
 
-const loadThingByIds: LoadOneCallback<number, Thing, Record<string, never>> = (
-  specs,
-  { attributes, params },
-) => {
-  const result = specs
-    .map((id) => THINGS.find((t) => t.id === id))
-    .map((t) => (t && attributes ? pick(t, attributes) : t));
-  CALLS.push({ specs, result, attributes, params });
-  return result;
-};
+const loadThingByIds = loadOneCallback(
+  (specs: readonly number[], { attributes, params }) => {
+    const result = specs
+      .map((id) => THINGS.find((t) => t.id === id))
+      .map((t) => (t && attributes ? pick(t, attributes) : t));
+    CALLS.push({ specs, result, attributes, params });
+    return result;
+  },
+);
 
-const loadThingByIdentifierObjs: LoadOneCallback<
-  { identifier: number },
-  Thing,
-  Record<string, never>
-> = (specs, { attributes, params }) => {
-  const result = specs
-    .map((spec) => THINGS.find((t) => t.id === spec.identifier))
-    .map((t) => (t && attributes ? pick(t, attributes) : t));
-  CALLS.push({ specs, result, attributes, params });
-  return result;
-};
+const loadThingByIdentifierObjs = loadOneCallback(
+  (specs: readonly { identifier: number }[], { attributes, params }) => {
+    const result = specs
+      .map((spec) => THINGS.find((t) => t.id === spec.identifier))
+      .map((t) => (t && attributes ? pick(t, attributes) : t));
+    CALLS.push({ specs, result, attributes, params });
+    return result;
+  },
+);
 
-const loadThingByIdentifierLists: LoadOneCallback<
-  readonly [identifier: number],
-  Thing,
-  Record<string, never>
-> = (specs, { attributes, params }) => {
-  const result = specs
-    .map((spec) => THINGS.find((t) => t.id === spec[0]))
-    .map((t) => (t && attributes ? pick(t, attributes) : t));
-  CALLS.push({ specs, result, attributes, params });
-  return result;
-};
+const loadThingByIdentifierLists = loadOneCallback(
+  (
+    specs: ReadonlyArray<readonly [identifier: number]>,
+    { attributes, params },
+  ) => {
+    const result = specs
+      .map((spec) => THINGS.find((t) => t.id === spec[0]))
+      .map((t) => (t && attributes ? pick(t, attributes) : t));
+    CALLS.push({ specs, result, attributes, params });
+    return result;
+  },
+);
 
-const loadThingByOrgIdRegNoObjs: LoadOneCallback<
-  { orgId: number; regNo: number },
-  Thing,
-  Record<string, never>
-> = (specs, { attributes, params }) => {
-  const result = specs
-    .map((spec) =>
-      THINGS.find((t) => t.orgId === spec.orgId && t.orgRegNo === spec.regNo),
-    )
-    .map((t) => (t && attributes ? pick(t, attributes) : t));
-  CALLS.push({ specs, result, attributes, params });
-  return result;
-};
+const loadThingByOrgIdRegNoObjs = loadOneCallback(
+  (
+    specs: ReadonlyArray<{ orgId: number; regNo: number }>,
+    { attributes, params },
+  ) => {
+    const result = specs
+      .map((spec) =>
+        THINGS.find((t) => t.orgId === spec.orgId && t.orgRegNo === spec.regNo),
+      )
+      .map((t) => (t && attributes ? pick(t, attributes) : t));
+    CALLS.push({ specs, result, attributes, params });
+    return result;
+  },
+);
 
-const loadThingByOrgIdRegNoTuples: LoadOneCallback<
-  readonly [orgId: number, regNo: number],
-  Thing,
-  Record<string, never>
-> = (specs, { attributes, params }) => {
-  const result = specs
-    .map((spec) =>
-      THINGS.find((t) => t.orgId === spec[0] && t.orgRegNo === spec[1]),
-    )
-    .map((t) => (t && attributes ? pick(t, attributes) : t));
-  CALLS.push({ specs, result, attributes, params });
-  return result;
-};
+const loadThingByOrgIdRegNoTuples = loadOneCallback(
+  (
+    specs: ReadonlyArray<readonly [orgId: number, regNo: number]>,
+    { attributes, params },
+  ) => {
+    const result = specs
+      .map((spec) =>
+        THINGS.find((t) => t.orgId === spec[0] && t.orgRegNo === spec[1]),
+      )
+      .map((t) => (t && attributes ? pick(t, attributes) : t));
+    CALLS.push({ specs, result, attributes, params });
+    return result;
+  },
+);
 
-const loadOrgByIds: LoadOneCallback<number, Org, Record<string, never>> = (
-  specs,
-  { attributes, params },
-) => {
-  const result = specs
-    .map((id) => ORGS.find((t) => t.id === id))
-    .map((t) => (t && attributes ? pick(t, attributes) : t));
-  // CALLS.push({ specs, result, attributes, params });
-  return result;
-};
+const loadOrgByIds = loadOneCallback(
+  (specs: readonly number[], { attributes, params }) => {
+    const result = specs
+      .map((id) => ORGS.find((t) => t.id === id))
+      .map((t) => (t && attributes ? pick(t, attributes) : t));
+    // CALLS.push({ specs, result, attributes, params });
+    return result;
+  },
+);
 
 const makeSchema = (useStreamableStep = false) => {
   return makeGrafastSchema({
