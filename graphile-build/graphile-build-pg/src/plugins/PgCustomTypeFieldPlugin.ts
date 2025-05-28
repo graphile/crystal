@@ -435,6 +435,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
           build[$$computed] = new Map();
           const {
             graphql: { GraphQLID, GraphQLList, GraphQLNonNull, isInputType },
+            grafast: { TRAP_INHIBITED, trap, inhibitOnNull },
             options: { pgFunctionsPreferNodeId },
           } = build;
           build.pgGetArgDetailsFromParameters = (
@@ -578,6 +579,51 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
             exportNameHint(
               argDetailsSimple,
               `argDetailsSimple_${resource.name}`,
+            );
+
+            const makeArg = EXPORTABLE(
+              (TRAP_INHIBITED, bakedInput, inhibitOnNull, trap) =>
+                function makeArg(
+                  path: string[],
+                  args: FieldArgs,
+                  details: {
+                    graphqlArgName: string;
+                    postgresArgName: string | null;
+                    pgCodec: PgCodec;
+                    fetcher:
+                      | null
+                      | ((
+                          $nodeId: Step<Maybe<string>>,
+                        ) =>
+                          | PgSelectSingleStep<any>
+                          | PgClassExpressionStep<any, any>);
+                  },
+                ): PgSelectArgumentSpec {
+                  const { graphqlArgName, postgresArgName, pgCodec, fetcher } =
+                    details;
+                  const fullPath = [...path, graphqlArgName];
+                  const $raw = args.getRaw(fullPath) as __TrackedValueStep;
+                  let step: Step;
+                  if (fetcher) {
+                    const $record = (
+                      fetcher(
+                        inhibitOnNull($raw as Step<Maybe<string>>),
+                      ) as PgSelectSingleStep
+                    ).record();
+                    step = trap($record, TRAP_INHIBITED, {
+                      valueForInhibited: "NULL",
+                    });
+                  } else {
+                    step = bakedInput(args.typeAt(fullPath), $raw);
+                  }
+
+                  return {
+                    step,
+                    pgCodec,
+                    name: postgresArgName ?? undefined,
+                  };
+                },
+              [TRAP_INHIBITED, bakedInput, inhibitOnNull, trap],
             );
 
             const makeArgs =
@@ -1523,38 +1569,6 @@ function getFunctionSourceReturnGraphQLType(
       : innerType;
   return type;
 }
-
-const makeArg = EXPORTABLE(
-  (bakedInput) =>
-    function makeArg(
-      path: string[],
-      args: FieldArgs,
-      details: {
-        graphqlArgName: string;
-        postgresArgName: string | null;
-        pgCodec: PgCodec;
-        fetcher:
-          | null
-          | ((
-              $nodeId: Step<Maybe<string>>,
-            ) => PgSelectSingleStep<any> | PgClassExpressionStep<any, any>);
-      },
-    ): PgSelectArgumentSpec {
-      const { graphqlArgName, postgresArgName, pgCodec, fetcher } = details;
-      const fullPath = [...path, graphqlArgName];
-      const $raw = args.getRaw(fullPath) as __TrackedValueStep;
-      const step = fetcher
-        ? (fetcher($raw as Step<Maybe<string>>) as PgSelectSingleStep).record()
-        : bakedInput(args.typeAt(fullPath), $raw);
-
-      return {
-        step,
-        pgCodec,
-        name: postgresArgName ?? undefined,
-      };
-    },
-  [bakedInput],
-);
 
 const makeArgRuntime = EXPORTABLE(
   (bakedInputRuntime) =>
