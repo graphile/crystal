@@ -12,6 +12,11 @@ query BestFriend2 {
             __typename
             id
             name
+            ... on Created {
+              creator {
+                id
+              }
+            }
           }
         }
       }

@@ -11,16 +11,23 @@
           __typename: 'Consumable',
           id: 205,
           name: "Dolores Doesn't Splat Potion",
+          creator: {
+            id: 106,
+          },
         },
         {
           __typename: 'Equipment',
           id: 211,
           name: "Enchanted Anarchist's Battle Rattle",
+          creator: null,
         },
         {
           __typename: 'Consumable',
           id: 206,
           name: "Carl's Jug O' Boom",
+          creator: {
+            id: 101,
+          },
         },
         {
           __typename: 'UtilityItem',
@@ -31,21 +38,25 @@
           __typename: 'Equipment',
           id: 201,
           name: 'Cloak of Stoutness',
+          creator: null,
         },
         {
           __typename: 'Equipment',
           id: 202,
           name: 'Toe Ring of the Splatter Skunk',
+          creator: null,
         },
         {
           __typename: 'Equipment',
           id: 203,
           name: 'Enchanted War Gauntlet',
+          creator: null,
         },
         {
           __typename: 'Consumable',
           id: 201,
           name: 'Rev-Up Immunity Smoothie',
+          creator: null,
         },
         {
           __typename: 'UtilityItem',
@@ -56,11 +67,13 @@
           __typename: 'Consumable',
           id: 203,
           name: 'Mana Potion',
+          creator: null,
         },
         {
           __typename: 'Consumable',
           id: 204,
           name: 'Healing Potion',
+          creator: null,
         },
       ],
     },
