@@ -67,3 +67,157 @@ query BestFriendWithVariables($first: Int) @variables(values: { first: 3 }) {
     }
   }
 }
+
+query BestFriendDefer1 @incremental {
+  ... @defer {
+    character(id: 102) {
+      id
+      name
+      ... on ActiveCrawler {
+        bestFriend {
+          __typename
+          id
+          name
+          ... on HasInventory {
+            items(first: 3) {
+              __typename
+              id
+              name
+            }
+          }
+        }
+      }
+      ... on NPC {
+        bestFriend {
+          __typename
+          id
+          name
+          ... on HasInventory {
+            items(first: 3) {
+              __typename
+              id
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+query BestFriendDefer2 {
+  character(id: 102) {
+    ... @defer {
+      id
+      name
+      ... on ActiveCrawler {
+        bestFriend {
+          __typename
+          id
+          name
+          ... on HasInventory {
+            items(first: 3) {
+              __typename
+              id
+              name
+            }
+          }
+        }
+      }
+      ... on NPC {
+        bestFriend {
+          __typename
+          id
+          name
+          ... on HasInventory {
+            items(first: 3) {
+              __typename
+              id
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+query BestFriendDefer3 {
+  character(id: 102) {
+    id
+    name
+    ... on ActiveCrawler {
+      ... @defer {
+        bestFriend {
+          __typename
+          id
+          name
+          ... on HasInventory {
+            items(first: 3) {
+              __typename
+              id
+              name
+            }
+          }
+        }
+      }
+    }
+    ... on NPC {
+      ... @defer {
+        bestFriend {
+          __typename
+          id
+          name
+          ... on HasInventory {
+            items(first: 3) {
+              __typename
+              id
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+query BestFriendDefer4 @incremental {
+  ... @defer {
+    character(id: 102) {
+      id
+      name
+      ... on ActiveCrawler {
+        ... @defer {
+          bestFriend {
+            __typename
+            id
+            name
+            ... on HasInventory {
+              items(first: 3) {
+                __typename
+                id
+                name
+              }
+            }
+          }
+        }
+      }
+      ... on NPC {
+        ... @defer {
+          bestFriend {
+            __typename
+            id
+            name
+            ... on HasInventory {
+              items(first: 3) {
+                __typename
+                id
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
