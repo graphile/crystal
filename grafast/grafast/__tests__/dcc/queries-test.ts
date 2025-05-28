@@ -137,8 +137,6 @@ describe("queries", () => {
   for (const file of files) {
     const baseName = file.substring(0, file.length - SUFFIX.length);
     describe(file, () => {
-      let rawResult: ExecutionResult | AsyncExecutionResult[];
-      let result: ExecutionResult;
       const source = readFileSync(BASE_DIR + "/" + file, "utf8");
       const document = parse(source);
       const operations = document.definitions.filter(
@@ -166,6 +164,8 @@ describe("queries", () => {
         }
         const suffix = i === 0 ? "" : `.${operationName}`;
         describe(operationName ?? "<anonymous>", () => {
+          let rawResult: ExecutionResult | AsyncExecutionResult[];
+          let result: ExecutionResult;
           before(async () => {
             const baseArgs = makeBaseArgs();
             rawResult = await streamToArray(
