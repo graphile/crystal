@@ -22,7 +22,8 @@ drop schema if exists
   composite_domains,
   refs,
   space,
-  issue_2210
+  issue_2210,
+  relay
 cascade;
 drop extension if exists tablefunc;
 drop extension if exists intarray;
@@ -2048,3 +2049,37 @@ $$ language sql stable;
 
 comment on table issue_2210.test_message is E'@behaviour -connection';
 comment on function issue_2210.some_messages(uuid) is E'@behaviour +connection';
+
+--------------------------------------------------------------------------------
+
+create schema relay;
+
+create table relay.users (
+  id serial primary key,
+  username text not null
+);
+
+create table relay.spectacles (
+  id serial primary key,
+  -- manufacturer int not null references relay.manufacturers,
+  model_number text not null
+);
+
+create table relay.distances (
+  id serial primary key,
+  user_id int not null references relay.users,
+  spectacle_id int null references relay.spectacles,
+  max_distance float not null
+  -- unique NULLS NOT DISTINCT (user_id, spectacle_id)
+);
+create unique index on relay.distances (user_id, coalesce(spectacle_id, -1));
+
+create function relay.users_max_reading_distance(u relay.users, with_spectacles relay.spectacles) returns float as $$
+  select max_distance
+  from relay.distances
+  where user_id = u.id
+  and spectacle_id is not distinct from with_spectacles.id;
+$$ language sql stable;
+
+comment on function relay.users_reading_distance is
+  E'Reading distance in metres with the given pair of spectacles (or specify null for no spectacles). If null then that combination hasn''t been measured.';
