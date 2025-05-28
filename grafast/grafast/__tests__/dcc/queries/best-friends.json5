@@ -8,19 +8,19 @@
       name: 'Carl',
       items: [
         {
-          __typename: 'UtilityItem',
+          __typename: 'Consumable',
+          id: 205,
+          name: "Dolores Doesn't Splat Potion",
+        },
+        {
+          __typename: 'Equipment',
+          id: 211,
+          name: "Enchanted Anarchist's Battle Rattle",
+        },
+        {
+          __typename: 'Consumable',
           id: 206,
-          name: 'Fireball or Custard? Scratchcard',
-        },
-        {
-          __typename: 'Equipment',
-          id: 201,
-          name: 'Cloak of Stoutness',
-        },
-        {
-          __typename: 'Equipment',
-          id: 202,
-          name: 'Toe Ring of the Splatter Skunk',
+          name: "Carl's Jug O' Boom",
         },
       ],
     },

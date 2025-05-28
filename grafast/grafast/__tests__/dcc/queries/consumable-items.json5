@@ -4,6 +4,79 @@
     name: 'Carl',
     items: [
       {
+        __typename: 'Consumable',
+        id: 205,
+        name: "Dolores Doesn't Splat Potion",
+        creator: {
+          id: 106,
+          name: 'Dolores',
+        },
+        effect: 'Soften impact surface. Impact x 5',
+        contents: [
+          {
+            __typename: 'Consumable',
+            id: 207,
+            name: 'Crowd Blast Potion',
+            effect: 'Imitates the Crowd Blast skill',
+          },
+          {
+            __typename: 'Consumable',
+            id: 208,
+            name: 'Rock Buffalo Potion',
+            effect: "A required component of Dolores Doesn't Splat Potion",
+          },
+        ],
+      },
+      {
+        __typename: 'Equipment',
+        id: 211,
+        name: "Enchanted Anarchist's Battle Rattle",
+        creator: null,
+        maxDurability: 10000,
+        contents: [
+          {
+            __typename: 'Equipment',
+            id: 212,
+            name: 'Earth Upgrade Patch',
+            maxDurability: 10000,
+          },
+          {
+            __typename: 'Equipment',
+            id: 213,
+            name: 'Skyfowl Upgrade Patch',
+            maxDurability: 10000,
+          },
+        ],
+      },
+      {
+        __typename: 'Consumable',
+        id: 206,
+        name: "Carl's Jug O' Boom",
+        creator: {
+          id: 101,
+          name: 'Carl',
+        },
+        effect: 'Intense Fire for (Incendiary Device Handling Skill Level x 15) sec.',
+        contents: [
+          {
+            __typename: 'Consumable',
+            id: 209,
+            name: 'Goblin Oil',
+            effect: 'Has many uses',
+          },
+          {
+            __typename: 'MiscItem',
+            id: 204,
+            name: 'Low-Grade Moonshine Jug',
+          },
+          {
+            __typename: 'MiscItem',
+            id: 205,
+            name: 'Torch',
+          },
+        ],
+      },
+      {
         __typename: 'UtilityItem',
         id: 206,
         name: 'Fireball or Custard? Scratchcard',
@@ -60,79 +133,6 @@
         creator: null,
         effect: 'Heal 50%+ total health',
         contents: null,
-      },
-      {
-        __typename: 'Consumable',
-        id: 205,
-        name: "Dolores Doesn't Splat Potion",
-        creator: {
-          id: 106,
-          name: 'Dolores',
-        },
-        effect: 'Soften impact surface. Impact x 5',
-        contents: [
-          {
-            __typename: 'Consumable',
-            id: 207,
-            name: 'Crowd Blast Potion',
-            effect: 'Imitates the Crowd Blast skill',
-          },
-          {
-            __typename: 'Consumable',
-            id: 208,
-            name: 'Rock Buffalo Potion',
-            effect: "A required component of Dolores Doesn't Splat Potion",
-          },
-        ],
-      },
-      {
-        __typename: 'Consumable',
-        id: 206,
-        name: "Carl's Jug O' Boom",
-        creator: {
-          id: 101,
-          name: 'Carl',
-        },
-        effect: 'Intense Fire for (Incendiary Device Handling Skill Level x 15) sec.',
-        contents: [
-          {
-            __typename: 'Consumable',
-            id: 209,
-            name: 'Goblin Oil',
-            effect: 'Has many uses',
-          },
-          {
-            __typename: 'MiscItem',
-            id: 204,
-            name: 'Low-Grade Moonshine Jug',
-          },
-          {
-            __typename: 'MiscItem',
-            id: 205,
-            name: 'Torch',
-          },
-        ],
-      },
-      {
-        __typename: 'Equipment',
-        id: 211,
-        name: "Enchanted Anarchist's Battle Rattle",
-        creator: null,
-        maxDurability: 10000,
-        contents: [
-          {
-            __typename: 'Equipment',
-            id: 212,
-            name: 'Earth Upgrade Patch',
-            maxDurability: 10000,
-          },
-          {
-            __typename: 'Equipment',
-            id: 213,
-            name: 'Skyfowl Upgrade Patch',
-            maxDurability: 10000,
-          },
-        ],
       },
     ],
   },
