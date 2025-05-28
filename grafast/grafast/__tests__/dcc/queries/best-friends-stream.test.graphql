@@ -1,0 +1,62 @@
+query BestFriend2 {
+  character(id: 102) {
+    id
+    name
+    ... on ActiveCrawler {
+      bestFriend {
+        __typename
+        id
+        name
+        ... on HasInventory {
+          items {
+            __typename
+            id
+            name
+          }
+        }
+      }
+    }
+    ... on NPC {
+      bestFriend {
+        __typename
+        id
+        name
+      }
+    }
+  }
+}
+
+# TODO: In future this should stream
+
+query BestFriendStream {
+  character(id: 102) {
+    id
+    name
+    ... on ActiveCrawler {
+      bestFriend {
+        __typename
+        id
+        name
+        ... on HasInventory {
+          items @stream(initialCount: 1) {
+            __typename
+            id
+            name
+            ... on Created {
+              creator {
+                id
+              }
+            }
+          }
+        }
+      }
+    }
+    ... on NPC {
+      bestFriend {
+        __typename
+        id
+        name
+      }
+    }
+  }
+}
