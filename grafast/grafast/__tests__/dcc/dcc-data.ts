@@ -1,9 +1,8 @@
 /* ALL OF THIS IS TYPESCRIPT, NOT GRAPHQL */
 
 import type {
-  type LoadManyCallback,
-  type LoadOneCallback,
-  loadOneCallback,
+  LoadManyCallback,
+  LoadOneCallback,
   Maybe,
 } from "../../dist/index.js";
 
