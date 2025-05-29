@@ -1974,6 +1974,32 @@ comment on table refs.posts is $$
 @ref author via:(user_id)->people(id) singular
 $$;
 
+CREATE TABLE refs.books (
+  id SERIAL PRIMARY KEY,
+  title TEXT NOT NULL,
+  isbn TEXT UNIQUE
+);
+
+CREATE TABLE refs.book_authors (
+  book_id INTEGER REFERENCES refs.books(id) ON DELETE CASCADE,
+  person_id INTEGER REFERENCES refs.people(id) ON DELETE CASCADE,
+  PRIMARY KEY (book_id, person_id)
+);
+
+CREATE TABLE refs.book_editors (
+  book_id INTEGER REFERENCES refs.books(id) ON DELETE CASCADE,
+  person_id INTEGER REFERENCES refs.people(id) ON DELETE CASCADE,
+  PRIMARY KEY (book_id, person_id)
+);
+
+COMMENT ON TABLE refs.books IS $$
+  @ref relatedPeople to:Person plural
+  @refVia relatedPeople via:(id)->book_authors(book_id);(person_id)->people(id)
+  @refVia relatedPeople via:(id)->book_editors(book_id);(person_id)->people(id)
+  @ref editors to:Person plural
+  @refVia editors via:(id)->book_editors(book_id);(person_id)->people(id)
+$$;
+
 --------------------------------------------------------------------------------
 
 -- From https://github.com/graphile/crystal/issues/1987

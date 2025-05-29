@@ -80,6 +80,12 @@ delete from d.person cascade;
 delete from issue_2210.test_message cascade;
 delete from issue_2210.test_user cascade;
 
+delete from refs.posts cascade;
+delete from refs.people cascade;
+delete from refs.book_editors cascade;
+delete from refs.book_authors cascade;
+delete from refs.books cascade;
+
 alter table b.types enable trigger user;
 
 alter sequence inheritence.file_id_seq restart with 1;
@@ -1051,3 +1057,29 @@ values (1, 1, null, 0.2)
 alter sequence relay.users_id_seq restart with 100;
 alter sequence relay.spectacles_id_seq restart with 100;
 alter sequence relay.distances_id_seq restart with 100;
+
+--------------------------------------------------------------------------------
+
+insert into refs.people (id, name) values
+  (1, 'Alice Smith'),
+  (2, 'Bob Jones'),
+  (3, 'Carol Wilson');
+
+insert into refs.posts (id, user_id) values
+  (1, 1), -- Alice's post
+  (2, 2), -- Bob's post
+  (3, 1), -- Another post by Alice
+  (4, 3); -- Carol's post
+
+insert into refs.books (id, title, isbn) values
+  (1, 'Dungeon Crawler Carl', '978-0593820247'),
+  (2, 'The Shining', '978-0385121675');
+
+insert into refs.book_authors (book_id, person_id) values
+  (1, 1),
+  (2, 2);
+
+insert into refs.book_editors (book_id, person_id) values
+  (1, 3), 
+  (1, 2),
+  (2, 3);
