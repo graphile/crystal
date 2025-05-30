@@ -33,62 +33,38 @@ where (
 select
   __users__."username" as "0",
   ("relay"."users_max_reading_distance"(
-    __users_2,
+    __users__,
     $1::"relay"."spectacles"
   ))::text as "1",
-  __users_2."id"::text as "2",
   ("relay"."users_max_reading_distance"(
-    __users_3,
+    __users__,
     $2::"relay"."spectacles"
-  ))::text as "3",
-  __users_3."id"::text as "4",
+  ))::text as "2",
   ("relay"."users_max_reading_distance"(
-    __users_4,
+    __users__,
     $3::"relay"."spectacles"
-  ))::text as "5",
-  __users_4."id"::text as "6",
+  ))::text as "3",
   ("relay"."users_max_reading_distance"(
-    __users_5,
+    __users__,
     $4::"relay"."spectacles"
-  ))::text as "7",
-  __users_5."id"::text as "8",
+  ))::text as "4",
   ("relay"."users_max_reading_distance"(
-    __users_6,
+    __users__,
     $5::"relay"."spectacles"
-  ))::text as "9",
-  __users_6."id"::text as "10",
+  ))::text as "5",
   ("relay"."users_max_reading_distance"(
-    __users_7,
+    __users__,
     $6::"relay"."spectacles"
-  ))::text as "11",
-  __users_7."id"::text as "12",
+  ))::text as "6",
   ("relay"."users_max_reading_distance"(
-    __users_8,
+    __users__,
     $7::"relay"."spectacles"
-  ))::text as "13",
-  __users_8."id"::text as "14",
+  ))::text as "7",
   ("relay"."users_max_reading_distance"(
-    __users_9,
+    __users__,
     $8::"relay"."spectacles"
-  ))::text as "15",
-  __users_9."id"::text as "16"
+  ))::text as "8"
 from "relay"."users" as __users__
-left outer join lateral (select (__users__).*) as __users_2
-on TRUE
-left outer join lateral (select (__users__).*) as __users_3
-on TRUE
-left outer join lateral (select (__users__).*) as __users_4
-on TRUE
-left outer join lateral (select (__users__).*) as __users_5
-on TRUE
-left outer join lateral (select (__users__).*) as __users_6
-on TRUE
-left outer join lateral (select (__users__).*) as __users_7
-on TRUE
-left outer join lateral (select (__users__).*) as __users_8
-on TRUE
-left outer join lateral (select (__users__).*) as __users_9
-on TRUE
 where (
   __users__."id" = $9::"int4"
 );
@@ -96,62 +72,38 @@ where (
 select
   __users__."username" as "0",
   ("relay"."users_max_reading_distance"(
-    __users_2,
+    __users__,
     $1::"relay"."spectacles"
   ))::text as "1",
-  __users_2."id"::text as "2",
   ("relay"."users_max_reading_distance"(
-    __users_3,
+    __users__,
     $2::"relay"."spectacles"
-  ))::text as "3",
-  __users_3."id"::text as "4",
+  ))::text as "2",
   ("relay"."users_max_reading_distance"(
-    __users_4,
+    __users__,
     $3::"relay"."spectacles"
-  ))::text as "5",
-  __users_4."id"::text as "6",
+  ))::text as "3",
   ("relay"."users_max_reading_distance"(
-    __users_5,
+    __users__,
     $4::"relay"."spectacles"
-  ))::text as "7",
-  __users_5."id"::text as "8",
+  ))::text as "4",
   ("relay"."users_max_reading_distance"(
-    __users_6,
+    __users__,
     $5::"relay"."spectacles"
-  ))::text as "9",
-  __users_6."id"::text as "10",
+  ))::text as "5",
   ("relay"."users_max_reading_distance"(
-    __users_7,
+    __users__,
     $6::"relay"."spectacles"
-  ))::text as "11",
-  __users_7."id"::text as "12",
+  ))::text as "6",
   ("relay"."users_max_reading_distance"(
-    __users_8,
+    __users__,
     $7::"relay"."spectacles"
-  ))::text as "13",
-  __users_8."id"::text as "14",
+  ))::text as "7",
   ("relay"."users_max_reading_distance"(
-    __users_9,
+    __users__,
     $8::"relay"."spectacles"
-  ))::text as "15",
-  __users_9."id"::text as "16"
+  ))::text as "8"
 from "relay"."users" as __users__
-left outer join lateral (select (__users__).*) as __users_2
-on TRUE
-left outer join lateral (select (__users__).*) as __users_3
-on TRUE
-left outer join lateral (select (__users__).*) as __users_4
-on TRUE
-left outer join lateral (select (__users__).*) as __users_5
-on TRUE
-left outer join lateral (select (__users__).*) as __users_6
-on TRUE
-left outer join lateral (select (__users__).*) as __users_7
-on TRUE
-left outer join lateral (select (__users__).*) as __users_8
-on TRUE
-left outer join lateral (select (__users__).*) as __users_9
-on TRUE
 where (
   __users__."id" = $9::"int4"
 );

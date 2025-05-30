@@ -18,10 +18,12 @@ import type {
   PgTypedStep,
 } from "../interfaces.js";
 import { makeScopedSQL } from "../utils.js";
-import type { PgClassExpressionStep } from "./pgClassExpression.js";
-import { pgClassExpression } from "./pgClassExpression.js";
+import {
+  pgClassExpression,
+  PgClassExpressionStep,
+} from "./pgClassExpression.js";
 import { PgCursorStep } from "./pgCursor.js";
-import type { PgSelectArgumentDigest, PgSelectMode } from "./pgSelect.js";
+import type { PgSelectMode } from "./pgSelect.js";
 import { PgSelectStep } from "./pgSelect.js";
 // import debugFactory from "debug";
 
@@ -570,10 +572,6 @@ export class PgSelectSingleStep<
   }
 }
 
-function fromRecord(record: PgSelectArgumentDigest) {
-  return sql`(select (${record.placeholder}).*)`;
-}
-
 /**
  * Given a plan that represents a single record (via
  * PgSelectSingleStep.record()) this turns it back into a PgSelectSingleStep
@@ -594,13 +592,25 @@ export function pgSelectFromRecord<
         [Attr in keyof TResource["codec"]["attributes"]]: Step;
       }>,
 ): PgSelectStep<TResource> {
-  return new PgSelectStep<TResource>({
+  const $select = new PgSelectStep<TResource>({
     resource: resource,
     identifiers: [],
-    from: fromRecord,
-    args: [{ step: $record, pgCodec: resource.codec }],
+    from: {
+      callback: ($select) =>
+        sql`(select (${$select.placeholder($record, resource.codec)}).*)`,
+    },
     joinAsLateral: true,
   });
+  if ($record instanceof PgClassExpressionStep) {
+    const $parent = $record.getParentStep();
+    if ($parent instanceof PgSelectSingleStep) {
+      $select.hints.isPgSelectFromRecordOf = {
+        parentId: $parent.getClassStep().id,
+        expression: $record.expression,
+      };
+    }
+  }
+  return $select;
 }
 
 /**

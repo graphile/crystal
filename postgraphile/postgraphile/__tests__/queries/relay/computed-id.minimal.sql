@@ -9,27 +9,18 @@ where (
 select
   __users__."username" as "0",
   ("relay"."users_max_reading_distance"(
-    __users_2,
+    __users__,
     $1::"relay"."spectacles"
   ))::text as "1",
-  __users_2."id"::text as "2",
   ("relay"."users_max_reading_distance"(
-    __users_3,
+    __users__,
     $2::"relay"."spectacles"
-  ))::text as "3",
-  __users_3."id"::text as "4",
+  ))::text as "2",
   ("relay"."users_max_reading_distance"(
-    __users_4,
+    __users__,
     $3::"relay"."spectacles"
-  ))::text as "5",
-  __users_4."id"::text as "6"
+  ))::text as "3"
 from "relay"."users" as __users__
-left outer join lateral (select (__users__).*) as __users_2
-on TRUE
-left outer join lateral (select (__users__).*) as __users_3
-on TRUE
-left outer join lateral (select (__users__).*) as __users_4
-on TRUE
 where (
   __users__."id" = $4::"int4"
 );
