@@ -3,17 +3,17 @@
 #> simpleCollections: "both"
 ## expect(data.allBooks.nodes.length).toEqual(2)
 ## expect(data.allBooks.nodes[0].relatedPeople.nodes[0].name).toEqual("Alice Smith")
-## expect(data.allBooks.nodes[0].relatedPeople.nodes[1].name).toEqual("Carol Wilson")
-## expect(data.allBooks.nodes[0].relatedPeople.nodes[2].name).toEqual("Bob Jones")
-## expect(data.allBooks.nodes[0].relatedPeople.length).toEqual(3)
+## expect(data.allBooks.nodes[0].relatedPeople.nodes[1].name).toEqual("Bob Jones")
+## expect(data.allBooks.nodes[0].relatedPeople.nodes[2].name).toEqual("Carol Wilson")
+## expect(data.allBooks.nodes[0].relatedPeople.nodes.length).toEqual(3)
 ## expect(data.allBooks.nodes[1].relatedPeople.nodes[0].name).toEqual("Bob Jones")
 ## expect(data.allBooks.nodes[1].relatedPeople.nodes[1].name).toEqual("Carol Wilson")
-## expect(data.allBooks.nodes[1].relatedPeople.length).toEqual(2)
-
+## expect(data.allBooks.nodes[1].relatedPeople.nodes.length).toEqual(2)
 
 {
   allBooks {
     nodes {
+      title
       relatedPeople {
         nodes {
           name
