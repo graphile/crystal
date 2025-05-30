@@ -1046,16 +1046,6 @@ function addRelations(
         }
       }
 
-      if (
-        refSpec.graphqlType &&
-        sharedFinalResource &&
-        refSpec.graphqlType !==
-          build.inflection.tableType(sharedFinalResource.codec)
-      ) {
-        // The might have been referencing a polymorphic thing
-        sharedFinalResource = null;
-      }
-
       if (refSpec.graphqlType) {
         // If this is a union/interface, can we find the associated codec?
 
@@ -1076,6 +1066,17 @@ function addRelations(
 
       if (hasExactlyOneSource) {
         sharedSource = firstSource;
+      }
+
+      if (
+        sharedCodec?.polymorphism?.mode === "union" &&
+        refSpec.graphqlType &&
+        sharedFinalResource &&
+        refSpec.graphqlType !==
+          build.inflection.tableType(sharedFinalResource.codec)
+      ) {
+        // The might have been referencing a polymorphic thing
+        sharedFinalResource = null;
       }
 
       // TEST: previously `sharedCodec?.polymorphism?.mode === "union" || paths.length > 1`
