@@ -1,0 +1,253 @@
+{
+  crawler: {
+    id: 103,
+    name: 'Katia',
+    items: [
+      {
+        __typename: 'Equipment',
+        id: 207,
+        name: 'Enchanted Repeating Crossbow',
+        creator: null,
+      },
+      {
+        __typename: 'Consumable',
+        id: 203,
+        name: 'Mana Potion',
+        creator: null,
+      },
+      {
+        __typename: 'Consumable',
+        id: 204,
+        name: 'Healing Potion',
+        creator: null,
+      },
+      {
+        __typename: 'Equipment',
+        id: 210,
+        name: 'Ugly Backpack With a Completely Useless Design',
+        creator: {
+          id: 101,
+          name: 'Carl',
+          friends: [
+            {
+              __typename: 'ActiveCrawler',
+              id: 102,
+              name: 'Princess Donut',
+              items: [
+                {
+                  __typename: 'Equipment',
+                  id: 204,
+                  name: 'Enchanted Crown',
+                  currentDurability: null,
+                },
+                {
+                  __typename: 'Equipment',
+                  id: 206,
+                  name: 'Enchanted Anklet',
+                  currentDurability: null,
+                },
+                {
+                  __typename: 'Consumable',
+                  id: 201,
+                  name: 'Rev-Up Immunity Smoothie',
+                  effect: 'Temporary immunity to all health-seeping conditions and debuffs',
+                },
+              ],
+            },
+            {
+              __typename: 'ActiveCrawler',
+              id: 103,
+              name: 'Katia',
+              items: [
+                {
+                  __typename: 'Equipment',
+                  id: 207,
+                  name: 'Enchanted Repeating Crossbow',
+                  currentDurability: 1500,
+                },
+                {
+                  __typename: 'Consumable',
+                  id: 203,
+                  name: 'Mana Potion',
+                  effect: 'Fully restores MP',
+                },
+                {
+                  __typename: 'Consumable',
+                  id: 204,
+                  name: 'Healing Potion',
+                  effect: 'Heal 50%+ total health',
+                },
+              ],
+            },
+            {
+              __typename: 'ActiveCrawler',
+              id: 104,
+              name: 'Imani',
+              items: [
+                {
+                  __typename: 'Equipment',
+                  id: 208,
+                  name: 'Longsword',
+                  currentDurability: 10000,
+                },
+                {
+                  __typename: 'Equipment',
+                  id: 209,
+                  name: 'Enchanted Cloak',
+                  currentDurability: 70,
+                },
+                {
+                  __typename: 'Consumable',
+                  id: 204,
+                  name: 'Healing Potion',
+                  effect: 'Heal 50%+ total health',
+                },
+              ],
+            },
+          ],
+        },
+      },
+    ],
+    favouriteItem: {
+      __typename: 'Equipment',
+      id: 210,
+      name: 'Ugly Backpack With a Completely Useless Design',
+      creator: {
+        id: 101,
+        name: 'Carl',
+        bestFriend: {
+          __typename: 'ActiveCrawler',
+          id: 102,
+          name: 'Princess Donut',
+          favouriteItem: {
+            id: 205,
+            name: 'Enchanted Tiara of Mana',
+          },
+        },
+        friends: [
+          {
+            __typename: 'ActiveCrawler',
+            id: 102,
+            name: 'Princess Donut',
+            crawlerNumber: 4119,
+            items: [
+              {
+                __typename: 'Equipment',
+                id: 204,
+                name: 'Enchanted Crown',
+              },
+              {
+                __typename: 'Equipment',
+                id: 206,
+                name: 'Enchanted Anklet',
+              },
+              {
+                __typename: 'Consumable',
+                id: 201,
+                name: 'Rev-Up Immunity Smoothie',
+              },
+            ],
+          },
+          {
+            __typename: 'ActiveCrawler',
+            id: 103,
+            name: 'Katia',
+            crawlerNumber: 9077265,
+            items: [
+              {
+                __typename: 'Equipment',
+                id: 207,
+                name: 'Enchanted Repeating Crossbow',
+              },
+              {
+                __typename: 'Consumable',
+                id: 203,
+                name: 'Mana Potion',
+              },
+              {
+                __typename: 'Consumable',
+                id: 204,
+                name: 'Healing Potion',
+              },
+            ],
+          },
+          {
+            __typename: 'ActiveCrawler',
+            id: 104,
+            name: 'Imani',
+            crawlerNumber: null,
+            items: [
+              {
+                __typename: 'Equipment',
+                id: 208,
+                name: 'Longsword',
+              },
+              {
+                __typename: 'Equipment',
+                id: 209,
+                name: 'Enchanted Cloak',
+              },
+              {
+                __typename: 'Consumable',
+                id: 204,
+                name: 'Healing Potion',
+              },
+            ],
+          },
+        ],
+      },
+    },
+  },
+  floor: {
+    locations: [
+      {
+        __typename: 'SafeRoom',
+        name: 'French storm shelter',
+        stock: null,
+      },
+      {
+        __typename: 'Club',
+        name: 'Desperado Club',
+        stock: [
+          {
+            id: 203,
+            name: 'Mana Potion',
+            contents: null,
+          },
+          {
+            id: 204,
+            name: 'Healing Potion',
+            contents: null,
+          },
+          {
+            id: 209,
+            name: 'Goblin Oil',
+            contents: null,
+          },
+          {
+            id: 206,
+            name: 'Fireball or Custard? Scratchcard',
+          },
+        ],
+      },
+      {
+        __typename: 'Club',
+        name: 'Club Vanquisher',
+        stock: [
+          {
+            id: 202,
+            name: 'Bandage',
+          },
+        ],
+      },
+      {
+        __typename: 'Stairwell',
+        name: 'Stairwell 3-1',
+      },
+      {
+        __typename: 'Stairwell',
+        name: 'Stairwell 3-2',
+      },
+    ],
+  },
+}

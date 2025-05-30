@@ -1,0 +1,371 @@
+query FavouriteItemsAndFloors {
+  crawler(id: 103) {
+    id
+    name
+    ... on ActiveCrawler {
+      items {
+        __typename
+        id
+        name
+        ... on Created {
+          creator {
+            id
+            name
+            ... on ActiveCrawler {
+              friends(first: 3) {
+                __typename
+                id
+                name
+                ... on HasInventory {
+                  items(first: 3) {
+                    __typename
+                    id
+                    name
+                    ... on Equipment {
+                      currentDurability
+                    }
+                    ... on Consumable {
+                      effect
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      favouriteItem {
+        __typename
+        id
+        name
+        ... on Created {
+          creator {
+            id
+            name
+            ... on ActiveCrawler {
+              bestFriend {
+                __typename
+                id
+                name
+                ... on ActiveCrawler {
+                  favouriteItem {
+                    id
+                    name
+                  }
+                }
+              }
+              friends(first: 3) {
+                __typename
+                id
+                name
+                ... on Crawler {
+                  crawlerNumber
+                }
+                ... on NPC {
+                  exCrawler
+                }
+                ... on Manager {
+                  client {
+                    id
+                    name
+                  }
+                }
+                ... on HasInventory {
+                  items(first: 3) {
+                    __typename
+                    id
+                    name
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  floor(number: 3) {
+    locations {
+      __typename
+      name
+      ... on Club {
+        stock {
+          ... on Item {
+            id
+            name
+            ... on HasContents {
+              contents {
+                id
+                name
+              }
+            }
+          }
+        }
+      }
+
+      ... on SafeRoom {
+        stock {
+          ... on Item {
+            id
+            name
+            ... on HasContents {
+              contents {
+                id
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+query FavouriteItemsAndFloorsWithVariables($first: Int)
+@variables(values: { first: 3 }) {
+  crawler(id: 103) {
+    id
+    name
+    ... on ActiveCrawler {
+      items {
+        __typename
+        id
+        name
+        ... on Created {
+          creator {
+            id
+            name
+            ... on ActiveCrawler {
+              friends(first: $first) {
+                __typename
+                id
+                name
+                ... on HasInventory {
+                  items(first: $first) {
+                    __typename
+                    id
+                    name
+                    ... on Equipment {
+                      currentDurability
+                    }
+                    ... on Consumable {
+                      effect
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      favouriteItem {
+        __typename
+        id
+        name
+        ... on Created {
+          creator {
+            id
+            name
+            ... on ActiveCrawler {
+              bestFriend {
+                __typename
+                id
+                name
+                ... on ActiveCrawler {
+                  favouriteItem {
+                    id
+                    name
+                  }
+                }
+              }
+              friends(first: $first) {
+                __typename
+                id
+                name
+                ... on Crawler {
+                  crawlerNumber
+                }
+                ... on NPC {
+                  exCrawler
+                }
+                ... on Manager {
+                  client {
+                    id
+                    name
+                  }
+                }
+                ... on HasInventory {
+                  items(first: $first) {
+                    __typename
+                    id
+                    name
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  floor(number: 3) {
+    locations {
+      __typename
+      name
+      ... on Club {
+        stock {
+          ... on Item {
+            id
+            name
+            ... on HasContents {
+              contents {
+                id
+                name
+              }
+            }
+          }
+        }
+      }
+
+      ... on SafeRoom {
+        stock {
+          ... on Item {
+            id
+            name
+            ... on HasContents {
+              contents {
+                id
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+query FavouriteItemsAndFloorsDefer1 @incremental {
+  ... @defer {
+    crawler(id: 103) {
+      id
+      name
+      ... on ActiveCrawler {
+        items {
+          __typename
+          id
+          name
+          ... on Created {
+            creator {
+              id
+              name
+              ... on ActiveCrawler {
+                friends(first: 3) {
+                  __typename
+                  id
+                  name
+                  ... on HasInventory {
+                    items(first: 3) {
+                      __typename
+                      id
+                      name
+                      ... on Equipment {
+                        currentDurability
+                      }
+                      ... on Consumable {
+                        effect
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        favouriteItem {
+          __typename
+          id
+          name
+          ... on Created {
+            creator {
+              id
+              name
+              ... on ActiveCrawler {
+                bestFriend {
+                  __typename
+                  id
+                  name
+                  ... on ActiveCrawler {
+                    favouriteItem {
+                      id
+                      name
+                    }
+                  }
+                }
+                friends(first: 3) {
+                  __typename
+                  id
+                  name
+                  ... on Crawler {
+                    crawlerNumber
+                  }
+                  ... on NPC {
+                    exCrawler
+                  }
+                  ... on Manager {
+                    client {
+                      id
+                      name
+                    }
+                  }
+                  ... on HasInventory {
+                    items(first: 3) {
+                      __typename
+                      id
+                      name
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  floor(number: 3) {
+    locations {
+      __typename
+      name
+      ... on Club {
+        stock {
+          ... on Item {
+            id
+            name
+            ... on HasContents {
+              contents {
+                id
+                name
+              }
+            }
+          }
+        }
+      }
+
+      ... on SafeRoom {
+        stock {
+          ... on Item {
+            id
+            name
+            ... on HasContents {
+              contents {
+                id
+                name
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
