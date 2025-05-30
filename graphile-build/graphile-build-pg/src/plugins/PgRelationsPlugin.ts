@@ -1289,7 +1289,26 @@ function addRelations(
                     te`from \${${te.ref(path.layers[penultimateIndex].resource, path.layers[penultimateIndex].resource.name)}.from} as ${lyr(penultimateIndex)}`,
                   );
 
-                  // TODO: inner joins
+                  for (
+                    let layerIdx = penultimateIndex - 1;
+                    layerIdx >= 0;
+                    layerIdx--
+                  ) {
+                    const { localAttributes, remoteAttributes } =
+                      path.layers[layerIdx + 1];
+                    lines.push(
+                      te`inner join \${${te.ref(path.layers[layerIdx].resource, path.layers[layerIdx].resource.name)}.from} as ${lyr(layerIdx)}`,
+                    );
+                    lines.push(
+                      te`on (${te.join(
+                        localAttributes.map(
+                          (attr, attrIdx) =>
+                            te`${lyr(layerIdx)}.\${${ref_sql}.identifier(${te.literal(attr)})} = ${lyr(layerIdx + 1)}.\${${ref_sql}.identifier(${te.literal(remoteAttributes[attrIdx])})}`,
+                        ),
+                        " and ",
+                      )})`,
+                    );
+                  }
 
                   lines.push(
                     te`where ${te.join(
