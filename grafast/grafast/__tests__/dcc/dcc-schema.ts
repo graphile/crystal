@@ -149,7 +149,7 @@ export const makeBaseArgs = () => {
         species: Species
         items(first: Int): [Item]
         favouriteItem: Item
-        friends: [Character]
+        friends(first: Int): [Character]
         bestFriend: ActiveCrawler
         crawlerNumber: Int
       }
@@ -319,9 +319,9 @@ export const makeBaseArgs = () => {
             const $db = context().get("dccDb");
             return loadOne($id, $db, null, batchGetCrawlerById);
           },
-          friends($activeCrawler) {
+          friends($activeCrawler, { $first }) {
             const $ids = get($activeCrawler, "friends");
-            return $ids;
+            return lambda([$ids, $first], applyLimit);
           },
           items($crawler, { $first }) {
             const $items = get($crawler, "items");

@@ -1,0 +1,12 @@
+{
+  initialData: '{floor}',
+  patches: {
+    '': {
+      '{crawler}': {
+        indicies: [
+          '',
+        ],
+      },
+    },
+  },
+}
