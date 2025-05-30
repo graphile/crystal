@@ -205,6 +205,20 @@ function assertSensible(step: Step): void {
 
 export type PgSelectMode = "normal" | "aggregate" | "mutation";
 
+/**
+ * Something that's placeholder/deferredSQL capable; typically a PgSelectStep
+ * but not guaranteed.
+ */
+export type PgRootStep = Step & {
+  placeholder(step: Step, codec: PgCodec): SQL;
+  deferredSQL($step: Step<SQL>): SQL;
+};
+
+export type PgSelectFromOption =
+  | SQL
+  | { callback: ($select: PgRootStep) => SQL }
+  | ((...args: PgSelectArgumentDigest[]) => SQL);
+
 export interface PgSelectOptions<
   TResource extends PgResource<any, any, any, any, any> = PgResource,
 > {
@@ -247,7 +261,7 @@ export interface PgSelectOptions<
    * override the `resource.from` here with your own from code. Defaults to
    * `resource.from`.
    */
-  from?: SQL | ((...args: PgSelectArgumentDigest[]) => SQL);
+  from?: PgSelectFromOption;
   /**
    * You should never rely on implicit order - use explicit `ORDER BY` (via
    * `$select.orderBy(...)`) instead. However, if you _are_ relying on implicit
@@ -511,6 +525,20 @@ export class PgSelectStep<
   protected locker: PgLocker<this> = new PgLocker(this);
 
   private _meta: Record<string, any> = Object.create(null);
+
+  /**
+   * Hints that **ARE NOT COMPARED FOR DEDUPLICATE** and so can be thrown away
+   * completely. Write stuff here at your own risk.
+   *
+   * @internal
+   * @experimental
+   */
+  public hints: {
+    isPgSelectFromRecordOf?: {
+      parentId: number;
+      expression: SQL;
+    };
+  } = Object.create(null);
 
   static clone<TResource extends PgResource<any, any, any, any, any>>(
     cloneFrom: PgSelectStep<TResource>,
@@ -1767,6 +1795,33 @@ export class PgSelectStep<
           $pgSelect,
           $pgSelectSingle,
         );
+        const recordOf = this.hints.isPgSelectFromRecordOf;
+        // TODO: the logic around this should move inside PgSelectInlineApplyStep instead.
+        let skipJoin = false;
+        if (
+          typeof this.symbol === "symbol" &&
+          recordOf &&
+          recordOf.parentId === $pgSelect.id
+        ) {
+          const symbol = sql.getIdentifierSymbol(recordOf.expression);
+          if (symbol) {
+            if (sql.isEquivalent($pgSelect.alias, recordOf.expression)) {
+              skipJoin = true;
+              $pgSelect._symbolSubstitutes.set(this.symbol, symbol);
+            } else {
+              const j = $pgSelect.joins.find((j) =>
+                sql.isEquivalent(j.alias, recordOf.expression),
+              );
+              if (j) {
+                const jSymbol = sql.getIdentifierSymbol(j.alias);
+                if (jSymbol) {
+                  skipJoin = true;
+                  $pgSelect._symbolSubstitutes.set(jSymbol, symbol);
+                }
+              }
+            }
+          }
+        }
         this.mergePlaceholdersInto($pgSelect);
         const identifier = `joinDetailsFor${this.id}`;
         $pgSelect.withLayerPlan(() => {
@@ -1779,6 +1834,7 @@ export class PgSelectStep<
               $after: this.maybeGetDep(this.afterStepId),
               $before: this.maybeGetDep(this.beforeStepId),
               applySteps: this.applyDepIds.map((depId) => this.getDep(depId)),
+              skipJoin,
             }),
           );
         });
@@ -2177,18 +2233,17 @@ exportAs("@dataplan/pg", sqlFromArgDigests, "sqlFromArgDigests");
 
 // Previously: digestsFromArgumentSpecs; now combined
 export function pgFromExpression(
-  $target: {
-    getPgRoot(): Step & {
-      placeholder(step: Step, codec: PgCodec): SQL;
-      deferredSQL($step: Step<SQL>): SQL;
-    };
-  },
-  baseFrom: SQL | ((...args: readonly PgSelectArgumentDigest[]) => SQL),
+  $target: { getPgRoot(): PgRootStep },
+  baseFrom: PgSelectFromOption,
   inParameters: readonly PgResourceParameter[] | undefined = undefined,
   specs: ReadonlyArray<PgSelectArgumentSpec | PgSelectArgumentDigest> = [],
 ): SQL {
   if (typeof baseFrom !== "function") {
-    return baseFrom;
+    if (sql.isSQL(baseFrom)) {
+      return baseFrom;
+    } else {
+      return baseFrom.callback($target.getPgRoot());
+    }
   }
   if (specs.length === 0) {
     return baseFrom();
@@ -3297,6 +3352,7 @@ class PgSelectInlineApplyStep<
   private beforeStepId: number | null;
   private applyDepIds: number[];
 
+  private skipJoin: boolean;
   constructor(
     private identifier: string,
     private viaSubquery: boolean,
@@ -3308,11 +3364,22 @@ class PgSelectInlineApplyStep<
       $after: Step | null;
       $before: Step | null;
       applySteps: Step[];
+      /** @internal @experimental */
+      skipJoin?: boolean;
     },
   ) {
     super();
-    const { staticInfo, $first, $last, $offset, $after, $before, applySteps } =
-      details;
+    const {
+      staticInfo,
+      $first,
+      $last,
+      $offset,
+      $after,
+      $before,
+      applySteps,
+      skipJoin,
+    } = details;
+    this.skipJoin = skipJoin ?? false;
     this.staticInfo = staticInfo;
     this.firstStepId = $first ? this.addUnaryDependency($first) : null;
     this.lastStepId = $last ? this.addUnaryDependency($last) : null;
@@ -3382,16 +3449,18 @@ class PgSelectInlineApplyStep<
             sql`/* WHERE becoming ON */`,
             whereConditions,
           );
-          queryBuilder.join({
-            type: "left",
-            from,
-            alias,
-            attributeNames: resource.codec.attributes ? sql.blank : sql`(v)`,
-            // Note the WHERE is now part of the JOIN condition (since
-            // it's a LEFT JOIN).
-            conditions: where !== sql.blank ? [where] : [],
-            lateral: joinAsLateral,
-          });
+          if (!this.skipJoin) {
+            queryBuilder.join({
+              type: "left",
+              from,
+              alias,
+              attributeNames: resource.codec.attributes ? sql.blank : sql`(v)`,
+              // Note the WHERE is now part of the JOIN condition (since
+              // it's a LEFT JOIN).
+              conditions: where !== sql.blank ? [where] : [],
+              lateral: joinAsLateral,
+            });
+          }
           for (const join of joins) {
             queryBuilder.join(join);
           }
