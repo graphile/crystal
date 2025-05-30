@@ -1083,3 +1083,7 @@ insert into refs.book_editors (book_id, person_id) values
   (1, 3), 
   (1, 2),
   (2, 3);
+
+alter sequence refs.people_id_seq restart with 100;
+alter sequence refs.posts_id_seq restart with 100;
+alter sequence refs.books_id_seq restart with 100;
