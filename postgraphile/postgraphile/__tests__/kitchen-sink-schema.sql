@@ -1980,10 +1980,16 @@ CREATE TABLE refs.books (
   isbn TEXT UNIQUE
 );
 
+CREATE TABLE refs.pen_names (
+  id serial primary key,
+  pen_name text not null,
+  person_id INTEGER REFERENCES refs.people(id) ON DELETE CASCADE
+);
+
 CREATE TABLE refs.book_authors (
   book_id INTEGER REFERENCES refs.books(id) ON DELETE CASCADE,
-  person_id INTEGER REFERENCES refs.people(id) ON DELETE CASCADE,
-  PRIMARY KEY (book_id, person_id)
+  pen_name_id INTEGER REFERENCES refs.pen_names(id) ON DELETE CASCADE,
+  PRIMARY KEY (book_id, pen_name_id)
 );
 
 CREATE TABLE refs.book_editors (
@@ -1994,7 +2000,7 @@ CREATE TABLE refs.book_editors (
 
 COMMENT ON TABLE refs.books IS $$
   @ref relatedPeople to:Person plural
-  @refVia relatedPeople via:(id)->book_authors(book_id);(person_id)->people(id)
+  @refVia relatedPeople via:(id)->book_authors(book_id);(pen_name_id)->pen_names(id);(person_id)->people(id)
   @refVia relatedPeople via:(id)->book_editors(book_id);(person_id)->people(id)
   @ref editors to:Person plural
   @refVia editors via:(id)->book_editors(book_id);(person_id)->people(id)

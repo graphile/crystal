@@ -84,6 +84,7 @@ delete from refs.posts cascade;
 delete from refs.people cascade;
 delete from refs.book_editors cascade;
 delete from refs.book_authors cascade;
+delete from refs.pen_names cascade;
 delete from refs.books cascade;
 
 alter table b.types enable trigger user;
@@ -1065,6 +1066,15 @@ insert into refs.people (id, name) values
   (2, 'Bob Jones'),
   (3, 'Carol Wilson');
 
+insert into refs.pen_names (id, person_id, pen_name) values
+  (1, 1, 'Smalice Ith'),
+  (2, 1, 'Sally Aces'),
+  (3, 1, 'Albert Smithe'),
+  (4, 2, 'Robert A.B.C. Dee'),
+  (5, 2, 'Jonesy McAdams'),
+  (6, 3, 'Carol Wilson');
+
+
 insert into refs.posts (id, user_id) values
   (1, 1), -- Alice's post
   (2, 2), -- Bob's post
@@ -1075,15 +1085,16 @@ insert into refs.books (id, title, isbn) values
   (1, 'Dungeon Crawler Carl', '978-0593820247'),
   (2, 'The Shining', '978-0385121675');
 
-insert into refs.book_authors (book_id, person_id) values
-  (1, 1),
-  (2, 2);
+insert into refs.book_authors (book_id, pen_name_id) values
+  (1, 3),
+  (2, 4);
 
 insert into refs.book_editors (book_id, person_id) values
-  (1, 3), 
+  (1, 3),
   (1, 2),
   (2, 3);
 
 alter sequence refs.people_id_seq restart with 100;
 alter sequence refs.posts_id_seq restart with 100;
 alter sequence refs.books_id_seq restart with 100;
+alter sequence refs.pen_names_id_seq restart with 100;
