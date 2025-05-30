@@ -36,42 +36,34 @@ select
     __users__,
     $1::"relay"."spectacles"
   ))::text as "1",
-  __users__."id"::text as "2",
   ("relay"."users_max_reading_distance"(
     __users__,
     $2::"relay"."spectacles"
-  ))::text as "3",
-  __users__."id"::text as "4",
+  ))::text as "2",
   ("relay"."users_max_reading_distance"(
     __users__,
     $3::"relay"."spectacles"
-  ))::text as "5",
-  __users__."id"::text as "6",
+  ))::text as "3",
   ("relay"."users_max_reading_distance"(
     __users__,
     $4::"relay"."spectacles"
-  ))::text as "7",
-  __users__."id"::text as "8",
+  ))::text as "4",
   ("relay"."users_max_reading_distance"(
     __users__,
     $5::"relay"."spectacles"
-  ))::text as "9",
-  __users__."id"::text as "10",
+  ))::text as "5",
   ("relay"."users_max_reading_distance"(
     __users__,
     $6::"relay"."spectacles"
-  ))::text as "11",
-  __users__."id"::text as "12",
+  ))::text as "6",
   ("relay"."users_max_reading_distance"(
     __users__,
     $7::"relay"."spectacles"
-  ))::text as "13",
-  __users__."id"::text as "14",
+  ))::text as "7",
   ("relay"."users_max_reading_distance"(
     __users__,
     $8::"relay"."spectacles"
-  ))::text as "15",
-  __users__."id"::text as "16"
+  ))::text as "8"
 from "relay"."users" as __users__
 where (
   __users__."id" = $9::"int4"
@@ -83,42 +75,34 @@ select
     __users__,
     $1::"relay"."spectacles"
   ))::text as "1",
-  __users__."id"::text as "2",
   ("relay"."users_max_reading_distance"(
     __users__,
     $2::"relay"."spectacles"
-  ))::text as "3",
-  __users__."id"::text as "4",
+  ))::text as "2",
   ("relay"."users_max_reading_distance"(
     __users__,
     $3::"relay"."spectacles"
-  ))::text as "5",
-  __users__."id"::text as "6",
+  ))::text as "3",
   ("relay"."users_max_reading_distance"(
     __users__,
     $4::"relay"."spectacles"
-  ))::text as "7",
-  __users__."id"::text as "8",
+  ))::text as "4",
   ("relay"."users_max_reading_distance"(
     __users__,
     $5::"relay"."spectacles"
-  ))::text as "9",
-  __users__."id"::text as "10",
+  ))::text as "5",
   ("relay"."users_max_reading_distance"(
     __users__,
     $6::"relay"."spectacles"
-  ))::text as "11",
-  __users__."id"::text as "12",
+  ))::text as "6",
   ("relay"."users_max_reading_distance"(
     __users__,
     $7::"relay"."spectacles"
-  ))::text as "13",
-  __users__."id"::text as "14",
+  ))::text as "7",
   ("relay"."users_max_reading_distance"(
     __users__,
     $8::"relay"."spectacles"
-  ))::text as "15",
-  __users__."id"::text as "16"
+  ))::text as "8"
 from "relay"."users" as __users__
 where (
   __users__."id" = $9::"int4"
