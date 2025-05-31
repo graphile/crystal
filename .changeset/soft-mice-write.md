@@ -11,10 +11,12 @@ traditional format) ended up being a mish-mash of lots of different types and
 `__`-prefixed fields for special cases. Instead the configuration should be
 split into `typeDefs` with `objects`, `interfaces`, `unions`, `inputObjects`,
 `scalars` and `enums`; and object and input object fields should be specified
-via the `plans` entry within themselves to avoid conflicts with
+via the `plans` entry within the type to avoid conflicts with
 `resolveType`/`isTypeOf`/`planType`/`scope` and similar type-level (rather than
 field-level) properties. This also means these type-level fields no longer have
-the `__` prefix. Migration is quite straightforward:
+the `__` prefix.
+
+Migration is quite straightforward:
 
 1. **Add new top-level properties**. Add `objects`, `interfaces`, `unions`,
    `inputObjects`, `scalars`, and `enums` as top level properties alongside
