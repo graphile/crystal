@@ -1,0 +1,27 @@
+{
+  allBooks: {
+    nodes: [
+      {
+        editors: {
+          nodes: [
+            {
+              name: "Bob Jones",
+            },
+            {
+              name: "Carol Wilson",
+            },
+          ],
+        },
+      },
+      {
+        editors: {
+          nodes: [
+            {
+              name: "Carol Wilson",
+            },
+          ],
+        },
+      },
+    ],
+  },
+}

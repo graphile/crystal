@@ -1,6 +1,6 @@
 #!/usr/bin/env zx
 
-/* global $, cd, fs */
+/* global $, cd */
 
 import "zx/globals";
 

@@ -4064,6 +4064,8 @@ input EdgeCaseCondition {
 """Methods to use when ordering `EdgeCase`."""
 enum EdgeCasesOrderBy {
   NATURAL
+  COMPUTED_ASC
+  COMPUTED_DESC
   NOT_NULL_HAS_DEFAULT_ASC
   NOT_NULL_HAS_DEFAULT_DESC
   WONT_CAST_EASY_ASC

@@ -48,9 +48,6 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
   schema: {
     hooks: {
       build(build) {
-        const {
-          grafast: { inhibitOnNull },
-        } = build;
         const nodeFetcherByTypeNameCache = new Map<
           string,
           ($id: ExecutableStep<Maybe<string>>) => ExecutableStep<any>
@@ -91,7 +88,7 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
               if (!handler) return null;
               const fetcher = handler.deprecationReason
                 ? EXPORTABLE(
-                    (handler, inhibitOnNull, lambda, specForHandler) => {
+                    (handler, lambda, specForHandler) => {
                       const fn: GraphileBuild.NodeFetcher = (
                         $nodeId: ExecutableStep<Maybe<string>>,
                       ) => {
@@ -99,27 +96,23 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
                           $nodeId,
                           specForHandler(handler),
                         );
-                        return handler.get(
-                          handler.getSpec(inhibitOnNull($decoded)),
-                        );
+                        return handler.get(handler.getSpec($decoded));
                       };
                       fn.deprecationReason = handler.deprecationReason;
                       return fn;
                     },
-                    [handler, inhibitOnNull, lambda, specForHandler],
+                    [handler, lambda, specForHandler],
                   )
                 : EXPORTABLE(
-                    (handler, inhibitOnNull, lambda, specForHandler) =>
+                    (handler, lambda, specForHandler) =>
                       ($nodeId: ExecutableStep<Maybe<string>>) => {
                         const $decoded = lambda(
                           $nodeId,
                           specForHandler(handler),
                         );
-                        return handler.get(
-                          handler.getSpec(inhibitOnNull($decoded)),
-                        );
+                        return handler.get(handler.getSpec($decoded));
                       },
-                    [handler, inhibitOnNull, lambda, specForHandler],
+                    [handler, lambda, specForHandler],
                   );
               exportNameHint(fetcher, `nodeFetcher_${typeName}`);
               nodeFetcherByTypeNameCache.set(typeName, fetcher);

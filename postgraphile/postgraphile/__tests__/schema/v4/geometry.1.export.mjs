@@ -248,7 +248,7 @@ const nodeIdHandler_Geom = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   getIdentifiers(value) {
@@ -282,7 +282,7 @@ function specForHandler(handler) {
 }
 const nodeFetcher_Geom = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Geom));
-  return nodeIdHandler_Geom.get(nodeIdHandler_Geom.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandler_Geom.get(nodeIdHandler_Geom.getSpec($decoded));
 };
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
@@ -308,11 +308,11 @@ function CursorSerialize(value) {
 }
 const specFromArgs_Geom = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Geom, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_Geom, $nodeId);
 };
 const specFromArgs_Geom2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Geom, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_Geom, $nodeId);
 };
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {

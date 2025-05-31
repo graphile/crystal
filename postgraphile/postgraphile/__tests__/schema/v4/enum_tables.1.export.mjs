@@ -1,5 +1,5 @@
 import { PgDeleteSingleStep, PgExecutor, PgSelectStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, operationPlan, rootValue, specFromNodeId, trap } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 const nodeIdHandler_Query = {
@@ -1080,7 +1080,7 @@ const nodeIdHandler_LetterDescription = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   getIdentifiers(value) {
@@ -1114,7 +1114,7 @@ function specForHandler(handler) {
 }
 const nodeFetcher_LetterDescription = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_LetterDescription));
-  return nodeIdHandler_LetterDescription.get(nodeIdHandler_LetterDescription.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandler_LetterDescription.get(nodeIdHandler_LetterDescription.getSpec($decoded));
 };
 const nodeIdHandler_ReferencingTable = {
   typeName: "ReferencingTable",
@@ -1125,7 +1125,7 @@ const nodeIdHandler_ReferencingTable = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   getIdentifiers(value) {
@@ -1140,7 +1140,7 @@ const nodeIdHandler_ReferencingTable = {
 };
 const nodeFetcher_ReferencingTable = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_ReferencingTable));
-  return nodeIdHandler_ReferencingTable.get(nodeIdHandler_ReferencingTable.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandler_ReferencingTable.get(nodeIdHandler_ReferencingTable.getSpec($decoded));
 };
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
@@ -1181,7 +1181,8 @@ function makeArg(path, args, details) {
   } = details;
   const fullPath = [...path, graphqlArgName];
   const $raw = args.getRaw(fullPath);
-  const step = fetcher ? fetcher($raw).record() : bakedInput(args.typeAt(fullPath), $raw);
+  // TODO: this should maybe be operationPlan().withLatestSideEffectLayerPlan()
+  const step = operationPlan().withRootLayerPlan(() => fetcher ? trap(fetcher($raw).record(), 4) : bakedInput(args.typeAt(fullPath), $raw));
   return {
     step,
     pgCodec,
@@ -1192,19 +1193,19 @@ const makeArgs_referencing_table_mutation = (args, path = []) => argDetailsSimpl
 const resource_referencing_table_mutationPgResource = registry.pgResources["referencing_table_mutation"];
 const specFromArgs_LetterDescription = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_LetterDescription, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_LetterDescription, $nodeId);
 };
 const specFromArgs_ReferencingTable = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_ReferencingTable, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_ReferencingTable, $nodeId);
 };
 const specFromArgs_LetterDescription2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_LetterDescription, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_LetterDescription, $nodeId);
 };
 const specFromArgs_ReferencingTable2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_ReferencingTable, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_ReferencingTable, $nodeId);
 };
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {

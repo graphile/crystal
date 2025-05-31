@@ -1,6 +1,7 @@
 import * as fs from "node:fs/promises";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+
 import { rimraf } from "rimraf";
 
 const __dirname = fileURLToPath(new URL(".", import.meta.url)).replace(

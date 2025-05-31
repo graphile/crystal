@@ -114,6 +114,7 @@ async function loadPresets(
     const exportName = colonIndex >= 0 ? spec.substring(colonIndex + 1) : null;
     let mod;
     try {
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       mod = require(moduleName);
     } catch (e) {
       if (e.code === "ERR_REQUIRE_ESM") {

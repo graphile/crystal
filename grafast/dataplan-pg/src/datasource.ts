@@ -1388,7 +1388,7 @@ function validateRelations(registry: PgRegistry<any, any, any, any>): void {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}, {}> {
   const registryConfig: PgRegistryConfig<any, any, any> = {
     pgExecutors: Object.create(null),

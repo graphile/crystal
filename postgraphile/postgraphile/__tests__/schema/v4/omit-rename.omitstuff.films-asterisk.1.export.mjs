@@ -1,5 +1,5 @@
 import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, PgSelectStep, TYPES, assertPgClassSingleStep, makeRegistry, pgClassExpression, pgDeleteSingle, pgFromExpression, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId, stepAMayDependOnStepB } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, operationPlan, rootValue, specFromNodeId, stepAMayDependOnStepB, trap } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 const nodeIdHandler_Query = {
@@ -1116,7 +1116,7 @@ const nodeIdHandler_Person = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   getIdentifiers(value) {
@@ -1172,7 +1172,8 @@ function makeArg(path, args, details) {
   } = details;
   const fullPath = [...path, graphqlArgName];
   const $raw = args.getRaw(fullPath);
-  const step = fetcher ? fetcher($raw).record() : bakedInput(args.typeAt(fullPath), $raw);
+  // TODO: this should maybe be operationPlan().withLatestSideEffectLayerPlan()
+  const step = operationPlan().withRootLayerPlan(() => fetcher ? trap(fetcher($raw).record(), 4) : bakedInput(args.typeAt(fullPath), $raw));
   return {
     step,
     pgCodec,
@@ -1203,7 +1204,7 @@ const nodeIdHandler_Studio = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   getIdentifiers(value) {
@@ -1218,7 +1219,7 @@ const nodeIdHandler_Studio = {
 };
 const nodeFetcher_Studio = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Studio));
-  return nodeIdHandler_Studio.get(nodeIdHandler_Studio.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandler_Studio.get(nodeIdHandler_Studio.getSpec($decoded));
 };
 const nodeIdHandler_Post = {
   typeName: "Post",
@@ -1229,7 +1230,7 @@ const nodeIdHandler_Post = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   getIdentifiers(value) {
@@ -1244,7 +1245,7 @@ const nodeIdHandler_Post = {
 };
 const nodeFetcher_Post = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Post));
-  return nodeIdHandler_Post.get(nodeIdHandler_Post.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandler_Post.get(nodeIdHandler_Post.getSpec($decoded));
 };
 const nodeIdHandler_TvEpisode = {
   typeName: "TvEpisode",
@@ -1255,7 +1256,7 @@ const nodeIdHandler_TvEpisode = {
   },
   getSpec($list) {
     return {
-      code: access($list, [1])
+      code: inhibitOnNull(access($list, [1]))
     };
   },
   getIdentifiers(value) {
@@ -1270,11 +1271,11 @@ const nodeIdHandler_TvEpisode = {
 };
 const nodeFetcher_TvEpisode = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_TvEpisode));
-  return nodeIdHandler_TvEpisode.get(nodeIdHandler_TvEpisode.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandler_TvEpisode.get(nodeIdHandler_TvEpisode.getSpec($decoded));
 };
 const nodeFetcher_Person = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Person));
-  return nodeIdHandler_Person.get(nodeIdHandler_Person.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandler_Person.get(nodeIdHandler_Person.getSpec($decoded));
 };
 const resource_renamed_tablePgResource = registry.pgResources["renamed_table"];
 function qbWhereBuilder(qb) {
@@ -1362,35 +1363,35 @@ const makeArgs_login = (args, path = []) => argDetailsSimple_login.map(details =
 const resource_loginPgResource = registry.pgResources["login"];
 const specFromArgs_Studio = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Studio, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_Studio, $nodeId);
 };
 const specFromArgs_Post = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Post, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_Post, $nodeId);
 };
 const specFromArgs_TvEpisode = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_TvEpisode, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_TvEpisode, $nodeId);
 };
 const specFromArgs_Person = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Person, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_Person, $nodeId);
 };
 const specFromArgs_Studio2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Studio, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_Studio, $nodeId);
 };
 const specFromArgs_Post2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Post, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_Post, $nodeId);
 };
 const specFromArgs_TvEpisode2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_TvEpisode, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_TvEpisode, $nodeId);
 };
 const specFromArgs_Person2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Person, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_Person, $nodeId);
 };
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {

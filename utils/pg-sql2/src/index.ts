@@ -1354,6 +1354,15 @@ export function withTransformer<TNewEmbed, TResult = SQL>(
   }
 }
 
+/** If node is an identifier, return its symbol, otherwise return null */
+function getIdentifierSymbol(potentialIdentifier: SQL): symbol | null {
+  if (potentialIdentifier[$$type] === "IDENTIFIER") {
+    return potentialIdentifier.s;
+  } else {
+    return null;
+  }
+}
+
 export const sql = sqlBase as PgSQL;
 export default sql;
 
@@ -1398,6 +1407,7 @@ export interface PgSQL<TEmbed = never> {
     transformer: Transformer<TNewEmbed>,
     callback: (sql: PgSQL<TEmbed | TNewEmbed>) => TResult,
   ): TResult;
+  getIdentifierSymbol: typeof getIdentifierSymbol;
 }
 
 const attributes = {
@@ -1425,6 +1435,7 @@ const attributes = {
   replaceSymbol,
   isSQL,
   withTransformer,
+  getIdentifierSymbol,
 };
 
 Object.entries(attributes).forEach(([exportName, value]) => {

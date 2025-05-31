@@ -125,7 +125,7 @@
     "@types/koa-bodyparser": "^4.3.10",
     "@whatwg-node/fetch": "^0.9.10",
     "express": "^4.20.0",
-    "fastify": "^4.22.1",
+    "fastify": "^4.29.1",
     "grafast": "workspace:^",
     "graphql-http": "^1.22.0",
     "h3": "^1.13.0",

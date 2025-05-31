@@ -3264,7 +3264,6 @@ export class OperationPlan {
       layerPlan: layerPlan,
       constructor: stepConstructor,
       peerKey,
-      implicitSideEffectStep,
     } = sstep;
     // const streamInitialCount = sstep._stepOptions.stream?.initialCount;
     const dependencyCount = deps.length;
@@ -3279,7 +3278,6 @@ export class OperationPlan {
         if (
           possiblyPeer !== step &&
           !possiblyPeer.hasSideEffects &&
-          possiblyPeer.implicitSideEffectStep === implicitSideEffectStep &&
           isPeerLayerPlan(possiblyPeer.layerPlan, layerPlan) &&
           possiblyPeer._stepOptions.stream == null &&
           possiblyPeer.peerKey === peerKey
@@ -3298,7 +3296,7 @@ export class OperationPlan {
 
       const dependencyIndex = 0;
 
-      const { deferBoundaryDepth } = layerPlan;
+      const { ancestry, deferBoundaryDepth } = layerPlan;
       const dep = deps[dependencyIndex];
 
       const dl = dep.dependents.length;
@@ -3319,7 +3317,6 @@ export class OperationPlan {
           peerDependencyIndex !== dependencyIndex ||
           rawPossiblyPeer === step ||
           rawPossiblyPeer.hasSideEffects ||
-          rawPossiblyPeer.implicitSideEffectStep !== implicitSideEffectStep ||
           rawPossiblyPeer._stepOptions.stream != null ||
           rawPossiblyPeer.constructor !== stepConstructor ||
           rawPossiblyPeer.peerKey !== peerKey
@@ -3336,7 +3333,7 @@ export class OperationPlan {
         if (
           peerLayerPlan.depth >= minDepth &&
           possiblyPeer.dependencies.length === dependencyCount &&
-          isPeerLayerPlan(peerLayerPlan, layerPlan) &&
+          isPeerLayerPlan(peerLayerPlan, ancestry[peerLayerPlan.depth]) &&
           peerFlags[dependencyIndex] === flags[dependencyIndex] &&
           peerOnReject[dependencyIndex] === onReject[dependencyIndex]
         ) {
@@ -3349,7 +3346,7 @@ export class OperationPlan {
       }
       return allPeers === null ? EMPTY_ARRAY : allPeers;
     } else {
-      const { deferBoundaryDepth } = layerPlan;
+      const { ancestry, deferBoundaryDepth } = layerPlan;
       /**
        * "compatible" layer plans are calculated by walking up the layer plan tree,
        * however:
@@ -3385,8 +3382,6 @@ export class OperationPlan {
             if (
               peerDependencyIndex !== dependencyIndex ||
               rawPossiblyPeer === step ||
-              rawPossiblyPeer.implicitSideEffectStep !==
-                implicitSideEffectStep ||
               rawPossiblyPeer.hasSideEffects ||
               rawPossiblyPeer._stepOptions.stream != null ||
               rawPossiblyPeer.constructor !== stepConstructor ||
@@ -3404,7 +3399,7 @@ export class OperationPlan {
             } = possiblyPeer;
             if (
               peerDependencies.length === dependencyCount &&
-              isPeerLayerPlan(peerLayerPlan, layerPlan) &&
+              isPeerLayerPlan(peerLayerPlan, ancestry[peerLayerPlan.depth]) &&
               peerFlags[dependencyIndex] === flags[dependencyIndex] &&
               peerOnReject[dependencyIndex] === onReject[dependencyIndex]
             ) {
@@ -4967,7 +4962,6 @@ export class OperationPlan {
       }
     }
     function printBucket(lp: LayerPlan): GrafastPlanBucketJSONv1 {
-      lp.reason;
       return {
         id: lp.id,
         reason: printBucketReason(lp),
@@ -5384,19 +5378,14 @@ function isPeerLayerPlan(
     return false;
   }
   if (lp1 === lp2) return true;
-  if (lp1 === lp2.ancestry[lp1.depth]) return true;
-  const pr1 = getPolymorphicLayerPlanFromPartition(lp1);
-  const pr2 = getPolymorphicLayerPlanFromPartition(lp2);
-  return pr1 === pr2;
-}
-
-/**
- * Steps in polymorphicPartitions are allowed to deduplicate against their sibling polymorphic partitions
- */
-function getPolymorphicLayerPlanFromPartition(lp: LayerPlan): LayerPlan {
-  return lp.reason.type === "polymorphicPartition"
-    ? lp.reason.parentLayerPlan
-    : lp;
+  if (
+    lp1.reason.type === "polymorphicPartition" &&
+    lp2.reason.type === "polymorphicPartition" &&
+    lp1.reason.parentLayerPlan === lp2.reason.parentLayerPlan
+  ) {
+    return true;
+  }
+  return false;
 }
 
 type StepCache = Record<string, Map<any, any> | undefined>;

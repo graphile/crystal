@@ -12,6 +12,7 @@ export let inspect: {
 };
 
 try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   inspect = require("util").inspect;
   if (typeof inspect !== "function") {
     throw new Error("Failed to load inspect");

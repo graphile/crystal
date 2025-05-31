@@ -1,7 +1,9 @@
 import { createServer } from "node:http";
+
+import { grafserv } from "grafserv/koa/v2";
 import Koa from "koa";
 import bodyParser from "koa-bodyparser";
-import { grafserv } from "grafserv/koa/v2";
+
 import preset from "./graphile.config.mjs";
 import schema from "./schema.mjs";
 

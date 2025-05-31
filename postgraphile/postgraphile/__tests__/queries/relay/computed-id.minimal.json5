@@ -1,0 +1,8 @@
+{
+  a: {
+    username: "Alice",
+    base: 0.2,
+    model1: 0.3,
+    nonsense2: 0.2,
+  },
+}

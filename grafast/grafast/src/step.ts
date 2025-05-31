@@ -742,7 +742,7 @@ ${printDeps(step, 1)}
    */
   /* abstract */
   execute(details: ExecutionDetails): ExecutionResults<TData> {
-    // ESLint/TS: ignore not used.
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     details;
     throw new Error(`${this} has not implemented an 'execute' method`);
   }

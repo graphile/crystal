@@ -10,6 +10,7 @@ import { resolvePreset } from "graphile-config";
 import { isAsyncIterable } from "iterall";
 import JSON5 from "json5";
 
+// eslint-disable-next-line import/no-unresolved
 import { schema } from "./exampleSchemaExport.mjs";
 
 const databaseName = "graphilecrystaltest";
@@ -87,7 +88,7 @@ async function runTestQuery(basePath) {
     await promise;
     const sortPayloads = (payload1, payload2) => {
       const ONE_AFTER_TWO = 1;
-      const ONE_BEFORE_TWO = -1;
+      // const ONE_BEFORE_TWO = -1;
       if (!payload1.path) {
         return 0;
       }

@@ -1,4 +1,4 @@
-import { access, constant, ExecutableStep, list } from "grafast";
+import { access, constant, list } from "grafast";
 
 import { postById, userById } from "./plans.mjs";
 
@@ -28,7 +28,7 @@ export { _base64JSONCodec as base64JSONCodec };
  * Creates a Grafast handler for NodeIDs.
  *
  * @param {string} typeName
- * @param {(spec: any) => ExecutableStep} get
+ * @param {(spec: any) => import('grafast').Step} get
  * @returns {import('grafast').NodeIdHandler}
  */
 function makeHandler(typeName, codec, get) {

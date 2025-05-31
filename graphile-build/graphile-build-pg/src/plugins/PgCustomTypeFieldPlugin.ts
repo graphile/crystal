@@ -46,7 +46,10 @@ import {
   connection,
   object,
   ObjectStep,
+  operationPlan,
   stepAMayDependOnStepB,
+  trap,
+  TRAP_INHIBITED,
 } from "grafast";
 import type {
   GraphQLInputType,
@@ -1522,7 +1525,7 @@ function getFunctionSourceReturnGraphQLType(
 }
 
 const makeArg = EXPORTABLE(
-  (bakedInput) =>
+  (TRAP_INHIBITED, bakedInput, operationPlan, trap) =>
     function makeArg(
       path: string[],
       args: FieldArgs,
@@ -1540,9 +1543,17 @@ const makeArg = EXPORTABLE(
       const { graphqlArgName, postgresArgName, pgCodec, fetcher } = details;
       const fullPath = [...path, graphqlArgName];
       const $raw = args.getRaw(fullPath) as __TrackedValueStep;
-      const step = fetcher
-        ? (fetcher($raw as Step<Maybe<string>>) as PgSelectSingleStep).record()
-        : bakedInput(args.typeAt(fullPath), $raw);
+      // TODO: this should maybe be operationPlan().withLatestSideEffectLayerPlan()
+      const step = operationPlan().withRootLayerPlan(() =>
+        fetcher
+          ? trap(
+              (
+                fetcher($raw as Step<Maybe<string>>) as PgSelectSingleStep
+              ).record(),
+              TRAP_INHIBITED,
+            )
+          : bakedInput(args.typeAt(fullPath), $raw),
+      );
 
       return {
         step,
@@ -1550,7 +1561,7 @@ const makeArg = EXPORTABLE(
         name: postgresArgName ?? undefined,
       };
     },
-  [bakedInput],
+  [TRAP_INHIBITED, bakedInput, operationPlan, trap],
 );
 
 const makeArgRuntime = EXPORTABLE(

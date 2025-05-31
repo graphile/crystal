@@ -1,0 +1,35 @@
+{
+  allBooks: {
+    nodes: [
+      {
+        title: "Dungeon Crawler Carl",
+        relatedPeople: {
+          nodes: [
+            {
+              name: "Alice Smith",
+            },
+            {
+              name: "Bob Jones",
+            },
+            {
+              name: "Carol Wilson",
+            },
+          ],
+        },
+      },
+      {
+        title: "The Shining",
+        relatedPeople: {
+          nodes: [
+            {
+              name: "Bob Jones",
+            },
+            {
+              name: "Carol Wilson",
+            },
+          ],
+        },
+      },
+    ],
+  },
+}

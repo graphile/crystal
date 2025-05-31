@@ -119,7 +119,7 @@ declare global {
          * - u = unlogged table/sequence
          * - t = temporary table/sequence
          */
-        // eslint-disable-next-line @typescript-eslint/ban-types
+        // eslint-disable-next-line @typescript-eslint/no-empty-object-type
         persistence?: "p" | "u" | "t" | (string & {}) | null;
       };
     }
@@ -154,7 +154,7 @@ declare global {
          * - u = unlogged table/sequence
          * - t = temporary table/sequence
          */
-        // eslint-disable-next-line @typescript-eslint/ban-types
+        // eslint-disable-next-line @typescript-eslint/no-empty-object-type
         persistence?: "p" | "u" | "t" | (string & {}) | null;
       };
     }

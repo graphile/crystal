@@ -1,5 +1,5 @@
 import { PgDeleteSingleStep, PgExecutor, PgSelectSingleStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgFromExpression, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId, stepAMayDependOnStepB } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, operationPlan, rootValue, specFromNodeId, stepAMayDependOnStepB, trap } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 const pkCols = ["id"];
@@ -1604,7 +1604,7 @@ const nodeIdHandler_RelationalTopic = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   getIdentifiers(value) {
@@ -1690,7 +1690,7 @@ const nodeIdHandlerByTypeName = {
     },
     getSpec($list) {
       const spec = __proto__Uniques[0].attributes.reduce((memo, attribute, index) => {
-        memo[attribute] = access($list, [index + 1]);
+        memo[attribute] = inhibitOnNull(access($list, [index + 1]));
         return memo;
       }, Object.create(null));
       return spec;
@@ -1714,7 +1714,7 @@ const nodeIdHandlerByTypeName = {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     getIdentifiers(value) {
@@ -1736,7 +1736,7 @@ const nodeIdHandlerByTypeName = {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     getIdentifiers(value) {
@@ -1758,7 +1758,7 @@ const nodeIdHandlerByTypeName = {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     getIdentifiers(value) {
@@ -1780,7 +1780,7 @@ const nodeIdHandlerByTypeName = {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     getIdentifiers(value) {
@@ -1802,7 +1802,7 @@ const nodeIdHandlerByTypeName = {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     getIdentifiers(value) {
@@ -1824,7 +1824,7 @@ const nodeIdHandlerByTypeName = {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     getIdentifiers(value) {
@@ -1846,7 +1846,7 @@ const nodeIdHandlerByTypeName = {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     getIdentifiers(value) {
@@ -1868,7 +1868,7 @@ const nodeIdHandlerByTypeName = {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     getIdentifiers(value) {
@@ -1890,7 +1890,7 @@ const nodeIdHandlerByTypeName = {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     getIdentifiers(value) {
@@ -1912,7 +1912,7 @@ const nodeIdHandlerByTypeName = {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     getIdentifiers(value) {
@@ -2028,7 +2028,8 @@ function makeArg(path, args, details) {
   } = details;
   const fullPath = [...path, graphqlArgName];
   const $raw = args.getRaw(fullPath);
-  const step = fetcher ? fetcher($raw).record() : bakedInput(args.typeAt(fullPath), $raw);
+  // TODO: this should maybe be operationPlan().withLatestSideEffectLayerPlan()
+  const step = operationPlan().withRootLayerPlan(() => fetcher ? trap(fetcher($raw).record(), 4) : bakedInput(args.typeAt(fullPath), $raw));
   return {
     step,
     pgCodec,
@@ -2112,51 +2113,51 @@ function specForHandler(handler) {
 }
 const nodeFetcher_RelationalTopic = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_RelationalTopic));
-  return nodeIdHandler_RelationalTopic.get(nodeIdHandler_RelationalTopic.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandler_RelationalTopic.get(nodeIdHandler_RelationalTopic.getSpec($decoded));
 };
 const nodeFetcher__Proto__ = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName._Proto__));
-  return nodeIdHandlerByTypeName._Proto__.get(nodeIdHandlerByTypeName._Proto__.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandlerByTypeName._Proto__.get(nodeIdHandlerByTypeName._Proto__.getSpec($decoded));
 };
 const nodeFetcher_Building = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Building));
-  return nodeIdHandlerByTypeName.Building.get(nodeIdHandlerByTypeName.Building.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandlerByTypeName.Building.get(nodeIdHandlerByTypeName.Building.getSpec($decoded));
 };
 const nodeFetcher_Constructor = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Constructor));
-  return nodeIdHandlerByTypeName.Constructor.get(nodeIdHandlerByTypeName.Constructor.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandlerByTypeName.Constructor.get(nodeIdHandlerByTypeName.Constructor.getSpec($decoded));
 };
 const nodeFetcher_Crop = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Crop));
-  return nodeIdHandlerByTypeName.Crop.get(nodeIdHandlerByTypeName.Crop.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandlerByTypeName.Crop.get(nodeIdHandlerByTypeName.Crop.getSpec($decoded));
 };
 const nodeFetcher_Machine = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Machine));
-  return nodeIdHandlerByTypeName.Machine.get(nodeIdHandlerByTypeName.Machine.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandlerByTypeName.Machine.get(nodeIdHandlerByTypeName.Machine.getSpec($decoded));
 };
 const nodeFetcher_Material = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Material));
-  return nodeIdHandlerByTypeName.Material.get(nodeIdHandlerByTypeName.Material.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandlerByTypeName.Material.get(nodeIdHandlerByTypeName.Material.getSpec($decoded));
 };
 const nodeFetcher_Null = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Null));
-  return nodeIdHandlerByTypeName.Null.get(nodeIdHandlerByTypeName.Null.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandlerByTypeName.Null.get(nodeIdHandlerByTypeName.Null.getSpec($decoded));
 };
 const nodeFetcher_Project = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Project));
-  return nodeIdHandlerByTypeName.Project.get(nodeIdHandlerByTypeName.Project.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandlerByTypeName.Project.get(nodeIdHandlerByTypeName.Project.getSpec($decoded));
 };
 const nodeFetcher_RelationalStatus = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.RelationalStatus));
-  return nodeIdHandlerByTypeName.RelationalStatus.get(nodeIdHandlerByTypeName.RelationalStatus.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandlerByTypeName.RelationalStatus.get(nodeIdHandlerByTypeName.RelationalStatus.getSpec($decoded));
 };
 const nodeFetcher_Yield = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Yield));
-  return nodeIdHandlerByTypeName.Yield.get(nodeIdHandlerByTypeName.Yield.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandlerByTypeName.Yield.get(nodeIdHandlerByTypeName.Yield.getSpec($decoded));
 };
 const nodeFetcher_Reserved = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Reserved));
-  return nodeIdHandlerByTypeName.Reserved.get(nodeIdHandlerByTypeName.Reserved.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandlerByTypeName.Reserved.get(nodeIdHandlerByTypeName.Reserved.getSpec($decoded));
 };
 const argDetailsSimple_null_yield = [{
   graphqlArgName: "yield",
@@ -2235,11 +2236,11 @@ const pgFunctionArgumentsFromArgs = (() => {
 const resource_null_yieldPgResource = registry.pgResources["null_yield"];
 const specFromArgs__Proto__ = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName._Proto__, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandlerByTypeName._Proto__, $nodeId);
 };
 const specFromArgs_Building = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Building, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandlerByTypeName.Building, $nodeId);
 };
 const uniqueAttributes = [["constructor", "constructor"]];
 const specFromArgs_Building2 = args => {
@@ -2250,19 +2251,19 @@ const specFromArgs_Building2 = args => {
 };
 const specFromArgs_Constructor = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Constructor, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandlerByTypeName.Constructor, $nodeId);
 };
 const specFromArgs_Crop = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Crop, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandlerByTypeName.Crop, $nodeId);
 };
 const specFromArgs_Machine = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Machine, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandlerByTypeName.Machine, $nodeId);
 };
 const specFromArgs_Material = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Material, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandlerByTypeName.Material, $nodeId);
 };
 const uniqueAttributes2 = [["valueOf", "valueOf"]];
 const specFromArgs_Material2 = args => {
@@ -2273,7 +2274,7 @@ const specFromArgs_Material2 = args => {
 };
 const specFromArgs_Null = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Null, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandlerByTypeName.Null, $nodeId);
 };
 const uniqueAttributes3 = [["hasOwnProperty", "hasOwnProperty"]];
 const specFromArgs_Null2 = args => {
@@ -2284,7 +2285,7 @@ const specFromArgs_Null2 = args => {
 };
 const specFromArgs_Project = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Project, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandlerByTypeName.Project, $nodeId);
 };
 const uniqueAttributes4 = [["__proto__", "_proto__"]];
 const specFromArgs_Project2 = args => {
@@ -2295,19 +2296,19 @@ const specFromArgs_Project2 = args => {
 };
 const specFromArgs_Yield = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Yield, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandlerByTypeName.Yield, $nodeId);
 };
 const specFromArgs_Reserved = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Reserved, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandlerByTypeName.Reserved, $nodeId);
 };
 const specFromArgs__Proto__2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName._Proto__, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandlerByTypeName._Proto__, $nodeId);
 };
 const specFromArgs_Building3 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Building, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandlerByTypeName.Building, $nodeId);
 };
 const uniqueAttributes5 = [["constructor", "constructor"]];
 const specFromArgs_Building4 = args => {
@@ -2318,19 +2319,19 @@ const specFromArgs_Building4 = args => {
 };
 const specFromArgs_Constructor2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Constructor, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandlerByTypeName.Constructor, $nodeId);
 };
 const specFromArgs_Crop2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Crop, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandlerByTypeName.Crop, $nodeId);
 };
 const specFromArgs_Machine2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Machine, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandlerByTypeName.Machine, $nodeId);
 };
 const specFromArgs_Material3 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Material, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandlerByTypeName.Material, $nodeId);
 };
 const uniqueAttributes6 = [["valueOf", "valueOf"]];
 const specFromArgs_Material4 = args => {
@@ -2341,7 +2342,7 @@ const specFromArgs_Material4 = args => {
 };
 const specFromArgs_Null3 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Null, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandlerByTypeName.Null, $nodeId);
 };
 const uniqueAttributes7 = [["hasOwnProperty", "hasOwnProperty"]];
 const specFromArgs_Null4 = args => {
@@ -2352,7 +2353,7 @@ const specFromArgs_Null4 = args => {
 };
 const specFromArgs_Project3 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Project, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandlerByTypeName.Project, $nodeId);
 };
 const uniqueAttributes8 = [["__proto__", "_proto__"]];
 const specFromArgs_Project4 = args => {
@@ -2363,11 +2364,11 @@ const specFromArgs_Project4 = args => {
 };
 const specFromArgs_Yield2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Yield, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandlerByTypeName.Yield, $nodeId);
 };
 const specFromArgs_Reserved2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Reserved, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandlerByTypeName.Reserved, $nodeId);
 };
 const specFromRecord4 = $record => {
   return registryConfig.pgRelations.machine.buildingByMyConstructor.remoteAttributes.reduce((memo, remoteAttributeName, i) => {

@@ -1,0 +1,26 @@
+{
+  allPosts: {
+    nodes: [
+      {
+        author: {
+          name: "Alice Smith",
+        },
+      },
+      {
+        author: {
+          name: "Bob Jones",
+        },
+      },
+      {
+        author: {
+          name: "Alice Smith",
+        },
+      },
+      {
+        author: {
+          name: "Carol Wilson",
+        },
+      },
+    ],
+  },
+}

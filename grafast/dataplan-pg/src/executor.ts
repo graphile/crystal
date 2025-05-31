@@ -456,7 +456,7 @@ ${duration}
                 const pendingResult = defer<any[]>(); // CRITICAL: this MUST resolve later
                 results[resultIndex] = pendingResult;
                 scopedCache.set(identifiersJSON, pendingResult);
-                remaining.push(identifiersJSON) - 1;
+                remaining.push(identifiersJSON);
                 remainingDeferreds.push(pendingResult);
               }
             }

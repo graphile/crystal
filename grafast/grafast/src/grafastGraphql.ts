@@ -38,6 +38,7 @@ let calculateQueryHash: (queryString: string) => string;
 try {
   let lastString: string;
   let lastHash: string;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const createHash = require("crypto").createHash;
   if (typeof createHash !== "function") {
     throw new Error("Failed to load createHash");

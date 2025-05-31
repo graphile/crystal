@@ -1,3 +1,310 @@
+type Book implements Node {
+  """Reads and enables pagination through a set of `BookAuthor`."""
+  bookAuthorsByBookId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: BookAuthorCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `BookAuthor`."""
+    orderBy: [BookAuthorsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): BookAuthorsConnection!
+
+  """Reads and enables pagination through a set of `BookEditor`."""
+  bookEditorsByBookId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: BookEditorCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `BookEditor`."""
+    orderBy: [BookEditorsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): BookEditorsConnection!
+
+  """Reads and enables pagination through a set of `Person`."""
+  editors(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PersonCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Person`."""
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PeopleConnection!
+  id: Int!
+  isbn: String
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+
+  """Reads and enables pagination through a set of `Person`."""
+  relatedPeople(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PersonCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Person`."""
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PeopleConnection!
+  title: String!
+}
+
+type BookAuthor implements Node {
+  """Reads a single `Book` that is related to this `BookAuthor`."""
+  bookByBookId: Book
+  bookId: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+
+  """Reads a single `PenName` that is related to this `BookAuthor`."""
+  penNameByPenNameId: PenName
+  penNameId: Int!
+}
+
+"""
+A condition to be used against `BookAuthor` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input BookAuthorCondition {
+  """Checks for equality with the object’s `bookId` field."""
+  bookId: Int
+
+  """Checks for equality with the object’s `penNameId` field."""
+  penNameId: Int
+}
+
+"""A connection to a list of `BookAuthor` values."""
+type BookAuthorsConnection {
+  """
+  A list of edges which contains the `BookAuthor` and cursor to aid in pagination.
+  """
+  edges: [BookAuthorsEdge]!
+
+  """A list of `BookAuthor` objects."""
+  nodes: [BookAuthor]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `BookAuthor` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `BookAuthor` edge in the connection."""
+type BookAuthorsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `BookAuthor` at the end of the edge."""
+  node: BookAuthor
+}
+
+"""Methods to use when ordering `BookAuthor`."""
+enum BookAuthorsOrderBy {
+  BOOK_ID_ASC
+  BOOK_ID_DESC
+  NATURAL
+  PEN_NAME_ID_ASC
+  PEN_NAME_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+A condition to be used against `Book` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input BookCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `isbn` field."""
+  isbn: String
+
+  """Checks for equality with the object’s `title` field."""
+  title: String
+}
+
+type BookEditor implements Node {
+  """Reads a single `Book` that is related to this `BookEditor`."""
+  bookByBookId: Book
+  bookId: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+
+  """Reads a single `Person` that is related to this `BookEditor`."""
+  personByPersonId: Person
+  personId: Int!
+}
+
+"""
+A condition to be used against `BookEditor` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input BookEditorCondition {
+  """Checks for equality with the object’s `bookId` field."""
+  bookId: Int
+
+  """Checks for equality with the object’s `personId` field."""
+  personId: Int
+}
+
+"""A connection to a list of `BookEditor` values."""
+type BookEditorsConnection {
+  """
+  A list of edges which contains the `BookEditor` and cursor to aid in pagination.
+  """
+  edges: [BookEditorsEdge]!
+
+  """A list of `BookEditor` objects."""
+  nodes: [BookEditor]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `BookEditor` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `BookEditor` edge in the connection."""
+type BookEditorsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `BookEditor` at the end of the edge."""
+  node: BookEditor
+}
+
+"""Methods to use when ordering `BookEditor`."""
+enum BookEditorsOrderBy {
+  BOOK_ID_ASC
+  BOOK_ID_DESC
+  NATURAL
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""A connection to a list of `Book` values."""
+type BooksConnection {
+  """
+  A list of edges which contains the `Book` and cursor to aid in pagination.
+  """
+  edges: [BooksEdge]!
+
+  """A list of `Book` objects."""
+  nodes: [Book]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Book` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Book` edge in the connection."""
+type BooksEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Book` at the end of the edge."""
+  node: Book
+}
+
+"""Methods to use when ordering `Book`."""
+enum BooksOrderBy {
+  ID_ASC
+  ID_DESC
+  ISBN_ASC
+  ISBN_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  TITLE_ASC
+  TITLE_DESC
+}
+
 """A location in a connection that can be used for resuming pagination."""
 scalar Cursor
 
@@ -22,6 +329,101 @@ type PageInfo {
 
   """When paginating backwards, the cursor to continue."""
   startCursor: Cursor
+}
+
+type PenName implements Node {
+  """Reads and enables pagination through a set of `BookAuthor`."""
+  bookAuthorsByPenNameId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: BookAuthorCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `BookAuthor`."""
+    orderBy: [BookAuthorsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): BookAuthorsConnection!
+  id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  penName: String!
+
+  """Reads a single `Person` that is related to this `PenName`."""
+  personByPersonId: Person
+  personId: Int
+}
+
+"""
+A condition to be used against `PenName` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input PenNameCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `penName` field."""
+  penName: String
+
+  """Checks for equality with the object’s `personId` field."""
+  personId: Int
+}
+
+"""A connection to a list of `PenName` values."""
+type PenNamesConnection {
+  """
+  A list of edges which contains the `PenName` and cursor to aid in pagination.
+  """
+  edges: [PenNamesEdge]!
+
+  """A list of `PenName` objects."""
+  nodes: [PenName]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `PenName` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `PenName` edge in the connection."""
+type PenNamesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PenName` at the end of the edge."""
+  node: PenName
+}
+
+"""Methods to use when ordering `PenName`."""
+enum PenNamesOrderBy {
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PEN_NAME_ASC
+  PEN_NAME_DESC
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
 }
 
 """A connection to a list of `Person` values."""
@@ -62,6 +464,34 @@ enum PeopleOrderBy {
 }
 
 type Person implements Node {
+  """Reads and enables pagination through a set of `BookEditor`."""
+  bookEditorsByPersonId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: BookEditorCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `BookEditor`."""
+    orderBy: [BookEditorsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): BookEditorsConnection!
   id: Int!
   name: String!
 
@@ -69,6 +499,35 @@ type Person implements Node {
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
   nodeId: ID!
+
+  """Reads and enables pagination through a set of `PenName`."""
+  penNamesByPersonId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PenNameCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PenName`."""
+    orderBy: [PenNamesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PenNamesConnection!
 }
 
 """
@@ -138,6 +597,122 @@ enum PostsOrderBy {
 
 """The root query type which gives access points into the data universe."""
 type Query implements Node {
+  """Reads and enables pagination through a set of `BookAuthor`."""
+  allBookAuthors(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: BookAuthorCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `BookAuthor`."""
+    orderBy: [BookAuthorsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): BookAuthorsConnection
+
+  """Reads and enables pagination through a set of `BookEditor`."""
+  allBookEditors(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: BookEditorCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `BookEditor`."""
+    orderBy: [BookEditorsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): BookEditorsConnection
+
+  """Reads and enables pagination through a set of `Book`."""
+  allBooks(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: BookCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Book`."""
+    orderBy: [BooksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): BooksConnection
+
+  """Reads and enables pagination through a set of `PenName`."""
+  allPenNames(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PenNameCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PenName`."""
+    orderBy: [PenNamesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PenNamesConnection
+
   """Reads and enables pagination through a set of `Person`."""
   allPeople(
     """Read all values in the set after (below) this cursor."""
@@ -196,6 +771,40 @@ type Query implements Node {
     orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PostsConnection
 
+  """Reads a single `Book` using its globally unique `ID`."""
+  book(
+    """The globally unique `ID` to be used in selecting a single `Book`."""
+    nodeId: ID!
+  ): Book
+
+  """Reads a single `BookAuthor` using its globally unique `ID`."""
+  bookAuthor(
+    """
+    The globally unique `ID` to be used in selecting a single `BookAuthor`.
+    """
+    nodeId: ID!
+  ): BookAuthor
+
+  """Get a single `BookAuthor`."""
+  bookAuthorByBookIdAndPenNameId(bookId: Int!, penNameId: Int!): BookAuthor
+
+  """Get a single `Book`."""
+  bookById(id: Int!): Book
+
+  """Get a single `Book`."""
+  bookByIsbn(isbn: String!): Book
+
+  """Reads a single `BookEditor` using its globally unique `ID`."""
+  bookEditor(
+    """
+    The globally unique `ID` to be used in selecting a single `BookEditor`.
+    """
+    nodeId: ID!
+  ): BookEditor
+
+  """Get a single `BookEditor`."""
+  bookEditorByBookIdAndPersonId(bookId: Int!, personId: Int!): BookEditor
+
   """Fetches an object given its globally unique `ID`."""
   node(
     """The globally unique `ID`."""
@@ -206,6 +815,15 @@ type Query implements Node {
   The root query type must be a `Node` to work well with Relay 1 mutations. This just resolves to `query`.
   """
   nodeId: ID!
+
+  """Reads a single `PenName` using its globally unique `ID`."""
+  penName(
+    """The globally unique `ID` to be used in selecting a single `PenName`."""
+    nodeId: ID!
+  ): PenName
+
+  """Get a single `PenName`."""
+  penNameById(id: Int!): PenName
 
   """Reads a single `Person` using its globally unique `ID`."""
   person(

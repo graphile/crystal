@@ -11,7 +11,7 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 15, 20<br /><br />1: PgSelect[11]<br />2: PgSelectRows[17]<br />ᐳ: 16, 18, 19"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 18, 14, 19<br /><br />ROOT Object{1}ᐸ{result}ᐳ[19]<br />1: <br />ᐳ: PgClassExpression[21]<br />2: PgSelect[22]<br />3: PgSelectRows[27]<br />ᐳ: First[26], PgSelectSingle[28]"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 18, 14, 28, 21<br /><br />ROOT PgSelectSingle{1}ᐸauthenticate_payloadᐳ[18]<br />1: <br />ᐳ: 29, 41, 34<br />2: PgSelect[30]<br />3: PgSelectRows[36]<br />ᐳ: 35, 37, 47"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 18, 14, 28, 21<br /><br />ROOT PgSelectSingle{1}ᐸauthenticate_payloadᐳ[18]<br />1: <br />ᐳ: 29, 40<br />2: PgSelect[30]<br />3: PgSelectRows[35]<br />ᐳ: 34, 36, 46"):::bucket
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 28<br /><br />ROOT PgSelectSingle{2}ᐸpersonᐳ[28]"):::bucket
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 28<br /><br />ROOT PgSelectSingle{2}ᐸpersonᐳ[28]"):::bucket
     end
@@ -21,8 +21,8 @@ graph TD
     Bucket3 --> Bucket5
 
     %% plan dependencies
-    __InputObject6{{"__InputObject[6∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ1ᐳ[50]<br />- Constantᐸ'2'ᐳ[51]<br />- Constantᐸ'3'ᐳ[52]"}}:::plan
-    PgFromExpression15{{"PgFromExpression[15∈0] ➊<br />More deps:<br />- Constantᐸ1ᐳ[50]<br />- Constantᐸ'2'ᐳ[51]<br />- Constantᐸ'3'ᐳ[52]"}}:::plan
+    __InputObject6{{"__InputObject[6∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ1ᐳ[49]<br />- Constantᐸ'2'ᐳ[50]<br />- Constantᐸ'3'ᐳ[51]"}}:::plan
+    PgFromExpression15{{"PgFromExpression[15∈0] ➊<br />More deps:<br />- Constantᐸ1ᐳ[49]<br />- Constantᐸ'2'ᐳ[50]<br />- Constantᐸ'3'ᐳ[51]"}}:::plan
     Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 3"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access13{{"Access[13∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -53,29 +53,27 @@ graph TD
     PgSelectSingle28{{"PgSelectSingle[28∈2] ➊<br />ᐸpersonᐳ"}}:::plan
     First26 --> PgSelectSingle28
     PgSelect30[["PgSelect[30∈3] ➊<br />ᐸfrmcdc_jwtTokenᐳ<br />More deps:<br />- Object[14]"]]:::plan
-    PgFromExpression34{{"PgFromExpression[34∈3] ➊"}}:::plan
-    PgFromExpression34 --> PgSelect30
     PgClassExpression29{{"PgClassExpression[29∈3] ➊<br />ᐸ__authenti...ad__.”jwt”ᐳ"}}:::plan
+    PgClassExpression29 --> PgSelect30
     PgSelectSingle18 --> PgClassExpression29
-    PgClassExpression29 --> PgFromExpression34
-    First35{{"First[35∈3] ➊"}}:::plan
-    PgSelectRows36[["PgSelectRows[36∈3] ➊"]]:::plan
-    PgSelectRows36 --> First35
-    PgSelect30 --> PgSelectRows36
-    PgSelectSingle37{{"PgSelectSingle[37∈3] ➊<br />ᐸfrmcdc_jwtTokenᐳ"}}:::plan
-    First35 --> PgSelectSingle37
-    PgClassExpression41{{"PgClassExpression[41∈3] ➊<br />ᐸ__authenti...__.”admin”ᐳ"}}:::plan
-    PgSelectSingle18 --> PgClassExpression41
-    PgClassExpression47{{"PgClassExpression[47∈3] ➊<br />ᐸ__frmcdc_jwt_token__ᐳ"}}:::plan
-    PgSelectSingle37 --> PgClassExpression47
-    PgClassExpression38{{"PgClassExpression[38∈4] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgSelectSingle28 --> PgClassExpression38
-    PgClassExpression40{{"PgClassExpression[40∈4] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle28 --> PgClassExpression40
-    PgClassExpression48{{"PgClassExpression[48∈5] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    First34{{"First[34∈3] ➊"}}:::plan
+    PgSelectRows35[["PgSelectRows[35∈3] ➊"]]:::plan
+    PgSelectRows35 --> First34
+    PgSelect30 --> PgSelectRows35
+    PgSelectSingle36{{"PgSelectSingle[36∈3] ➊<br />ᐸfrmcdc_jwtTokenᐳ"}}:::plan
+    First34 --> PgSelectSingle36
+    PgClassExpression40{{"PgClassExpression[40∈3] ➊<br />ᐸ__authenti...__.”admin”ᐳ"}}:::plan
+    PgSelectSingle18 --> PgClassExpression40
+    PgClassExpression46{{"PgClassExpression[46∈3] ➊<br />ᐸ__frmcdc_jwt_token__ᐳ"}}:::plan
+    PgSelectSingle36 --> PgClassExpression46
+    PgClassExpression37{{"PgClassExpression[37∈4] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle28 --> PgClassExpression37
+    PgClassExpression39{{"PgClassExpression[39∈4] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgSelectSingle28 --> PgClassExpression39
+    PgClassExpression47{{"PgClassExpression[47∈5] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle28 --> PgClassExpression47
+    PgClassExpression48{{"PgClassExpression[48∈5] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle28 --> PgClassExpression48
-    PgClassExpression49{{"PgClassExpression[49∈5] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle28 --> PgClassExpression49
 
     %% define steps
     classDef bucket0 stroke:#696969
@@ -85,9 +83,9 @@ graph TD
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression21,PgSelect22,First26,PgSelectRows27,PgSelectSingle28 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression29,PgSelect30,PgFromExpression34,First35,PgSelectRows36,PgSelectSingle37,PgClassExpression41,PgClassExpression47 bucket3
+    class Bucket3,PgClassExpression29,PgSelect30,First34,PgSelectRows35,PgSelectSingle36,PgClassExpression40,PgClassExpression46 bucket3
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgClassExpression38,PgClassExpression40 bucket4
+    class Bucket4,PgClassExpression37,PgClassExpression39 bucket4
     classDef bucket5 stroke:#7fff00
-    class Bucket5,PgClassExpression48,PgClassExpression49 bucket5
+    class Bucket5,PgClassExpression47,PgClassExpression48 bucket5
 

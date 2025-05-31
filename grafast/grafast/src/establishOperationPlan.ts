@@ -104,7 +104,6 @@ function isOperationPlanResultCompatible<
  * instead accept operation and fragments since they're easier to get a hold of
  * in GraphQL.js.
  */
-// eslint-disable-next-line @typescript-eslint/ban-types
 export function establishOperationPlan<
   TVariables extends BaseGraphQLVariables = BaseGraphQLVariables,
   TContext extends Grafast.Context = Grafast.Context,
