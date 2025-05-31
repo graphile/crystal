@@ -1,23 +1,25 @@
-const path = require("path");
-const fs = require("fs");
-const { defineConfig, globalIgnores } = require("eslint/config");
+import path from "path";
+import fs from "fs";
+import { defineConfig, globalIgnores } from "eslint/config";
 
-const babelParser = require("@babel/eslint-parser");
+import babelParser from "@babel/eslint-parser";
 
-const { fixupConfigRules, fixupPluginRules } = require("@eslint/compat");
+import { fixupConfigRules, fixupPluginRules } from "@eslint/compat";
 
-const jest = require("eslint-plugin-jest");
-const graphql = require("eslint-plugin-graphql");
-const tsdoc = require("eslint-plugin-tsdoc");
-const simpleImportSort = require("eslint-plugin-simple-import-sort");
-const _import = require("eslint-plugin-import");
-const graphileExport = require("eslint-plugin-graphile-export");
-const reactHooks = require("eslint-plugin-react-hooks");
-const globals = require("globals");
-const tsParser = require("@typescript-eslint/parser");
-const js = require("@eslint/js");
+import jest from "eslint-plugin-jest";
+import graphql from "eslint-plugin-graphql";
+import tsdoc from "eslint-plugin-tsdoc";
+import simpleImportSort from "eslint-plugin-simple-import-sort";
+import _import from "eslint-plugin-import";
+import graphileExport from "eslint-plugin-graphile-export";
+import reactHooks from "eslint-plugin-react-hooks";
+import globals from "globals";
+import tsParser from "@typescript-eslint/parser";
+import js from "@eslint/js";
 
-const { FlatCompat } = require("@eslint/eslintrc");
+import { FlatCompat } from "@eslint/eslintrc";
+
+const __dirname = import.meta.dirname;
 
 const compat = new FlatCompat({
   baseDirectory: __dirname,
@@ -422,7 +424,7 @@ const oldConfig = {
   ],
 };
 
-module.exports = defineConfig([
+export default defineConfig([
   config,
   ...oldConfig.overrides,
   globalIgnores(globalIgnoresFromFile),
