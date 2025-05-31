@@ -33,6 +33,9 @@ const globalIgnoresFromFile = fs
 
 /** @type {import('@eslint/config-helpers').ConfigWithExtends} */
 const config = {
+  linterOptions: {
+    reportUnusedDisableDirectives: false,
+  },
   languageOptions: {
     parser: babelParser,
     sourceType: "module",
@@ -345,7 +348,6 @@ const oldConfig = {
         ],
       },
     },
-
   ],
 };
 
