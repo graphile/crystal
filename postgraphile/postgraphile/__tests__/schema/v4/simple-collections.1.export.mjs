@@ -3863,7 +3863,10 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "edge_case_computed"
         },
-        tags: {}
+        tags: {
+          sortable: true,
+          behavior: ["orderBy order resource:connection:backwards"]
+        }
       },
       description: undefined
     },
@@ -8614,6 +8617,8 @@ input EdgeCaseCondition {
 """Methods to use when ordering \`EdgeCase\`."""
 enum EdgeCasesOrderBy {
   NATURAL
+  COMPUTED_ASC
+  COMPUTED_DESC
   NOT_NULL_HAS_DEFAULT_ASC
   NOT_NULL_HAS_DEFAULT_DESC
   WONT_CAST_EASY_ASC
@@ -14363,6 +14368,32 @@ export const plans = {
     }
   },
   EdgeCasesOrderBy: {
+    COMPUTED_ASC(queryBuilder) {
+      if (typeof resource_edge_case_computedPgResource.from !== "function") {
+        throw new Error("Invalid computed attribute 'from'");
+      }
+      const expression = sql`${resource_edge_case_computedPgResource.from({
+        placeholder: queryBuilder.alias
+      })}`;
+      queryBuilder.orderBy({
+        codec: resource_edge_case_computedPgResource.codec,
+        fragment: expression,
+        direction: "asc".toUpperCase()
+      });
+    },
+    COMPUTED_DESC(queryBuilder) {
+      if (typeof resource_edge_case_computedPgResource.from !== "function") {
+        throw new Error("Invalid computed attribute 'from'");
+      }
+      const expression = sql`${resource_edge_case_computedPgResource.from({
+        placeholder: queryBuilder.alias
+      })}`;
+      queryBuilder.orderBy({
+        codec: resource_edge_case_computedPgResource.codec,
+        fragment: expression,
+        direction: "desc".toUpperCase()
+      });
+    },
     NOT_NULL_HAS_DEFAULT_ASC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "not_null_has_default",
