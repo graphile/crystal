@@ -16,17 +16,24 @@ via the `plans` entry within themselves to avoid conflicts with
 field-level) properties. This also means these type-level fields no longer have
 the `__` prefix. Migration is quite straightforward:
 
+1. **Add new top-level properties**. Add `objects`, `interfaces`, `unions`,
+   `inputObjects`, `scalars`, and `enums` as top level properties alongside
+   `typeDefs` and `plans`. Each should be an empty object. You can skip any
+   where you're not defining types of that kind.
 1. **Split definitions based on type kind**. For each type defined in `plans`
-   move it into `objects`, `interfaces`, `union`, `inputObjects`, `scalars`, or
-   `enums` as appropriate based on the keyword used to define the type in the
-   `typeDefs` (respectively: `type`, `interface`, `union`, `input object`,
-   `scalar`, `enum`).
-2. **Move field plans into nested `plans: {...}` object**. For each type in
-   `objects` and `inputObjects`: create a `plans: { ... }` entry and move all
-   fields (anything not prefixed with `__`) inside this new (nested) property.
-3. **Remove `__` prefixes**. For each type across
-   objects/interfaces/unions/interfaceObjects/scalars and enums: remove the `__`
-   prefix from any methods/properties.
+   move it into the appropriate new property based on the keyword used to define
+   the type in the `typeDefs` (`type` &rarr; `objects`, `interface` &rarr;
+   `interfaces`, `union` &rarr; `unions`, `input object` &rarr; `inputObjects`,
+   `scalar` &rarr; `scalars`, `enum` &rarr; `enums`).
+1. **Move field plans into nested `plans: {...}` object**. For each type defined
+   in the new `objects` and `inputObjects` maps: create a `plans: { ... }` entry
+   inside the type and move all fields (anything not prefixed with `__`) inside
+   this new (nested) property.
+1. **Remove `__` prefixes**. For each type across
+   `objects`/`interfaces`/`unions`/`interfaceObjects`/`scalars` and `enums`:
+   remove the `__` prefix from any methods/properties.
+
+Example:
 
 ```diff
  typeDefs: ...,
