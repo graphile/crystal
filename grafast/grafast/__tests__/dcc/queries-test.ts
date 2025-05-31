@@ -14,7 +14,7 @@ import { it } from "mocha";
 
 import { grafast } from "../../dist/index.js";
 import { planToMermaid } from "../../dist/mermaid.js";
-import { snapshot } from "../snapshots.js";
+import { readSnapshot, snapshot } from "../snapshots.js";
 import { makeBaseArgs } from "./dcc-schema.js";
 
 // The text the file must end with
@@ -272,11 +272,24 @@ describe("queries", () => {
             });
           }
           it("matched data snapshot", async function () {
-            await snapshot(
-              JSON5.stringify(result.data, null, 2) + "\n",
-              `${BASE_DIR}/${baseName}.json5`,
-              i === 0,
-            );
+            if (i === 0 || !expectIncremental) {
+              await snapshot(
+                JSON5.stringify(result.data, null, 2) + "\n",
+                `${BASE_DIR}/${baseName}.json5`,
+                i === 0,
+              );
+            } else {
+              // Incremental is allowed to be out of order
+              const original = await readSnapshot(
+                `${BASE_DIR}/${baseName}.json5`,
+              );
+              if (original == null) {
+                throw new Error(
+                  `You need to run the primary test before you can check against the snapshot`,
+                );
+              }
+              expect(result.data).to.deep.equal(JSON5.parse(original));
+            }
           });
           it("did not error", function () {
             if (result.errors) {
