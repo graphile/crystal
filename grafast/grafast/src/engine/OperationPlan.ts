@@ -4252,6 +4252,11 @@ export class OperationPlan {
     for (const step of this.stepTracker.activeSteps) {
       const wasLocked = isDev && unlock(step);
       step.finalize();
+      if (step._stepOptions.stream) {
+        // (Potentially) streamed steps aren't sync and safe, we need to
+        // iterate them expensively
+        step.isSyncAndSafe = false;
+      }
       if (wasLocked) lock(step);
       assertFinalized(step);
       if (isDev && this.stepTracker.stepCount !== initialStepCount) {
@@ -5311,6 +5316,9 @@ type QueueTuple<T extends CommonPlanningDetails> = [
 ];
 
 function isSafeForUnbatched(step: UnbatchedExecutableStep): boolean {
+  // Never run (potential) stream steps as unbatched, otherwise they won't be
+  // able to stream!
+  if (step._stepOptions.stream) return false;
   // Non-unary steps are safe for unbatched execution
   if (step._isUnary === false) return true;
   // Unary steps are only safe for unbatched execution _if_ their polymorphic
