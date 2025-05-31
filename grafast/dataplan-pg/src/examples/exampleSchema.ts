@@ -3109,9 +3109,7 @@ export function makeExampleSchema(
     [fieldName: string]: GrafastFieldConfig<
       PgSelectSingleStep<
         PgResource<any, typeof singleTableItemsResource.codec, any, any, any>
-      >,
-      any,
-      any
+      >
     >;
   };
 
