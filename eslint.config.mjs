@@ -107,6 +107,7 @@ const config = {
       {
         argsIgnorePattern: "^_",
         varsIgnorePattern: "^_",
+        caughtErrorsIgnorePattern: "^_",
         args: "after-used",
         ignoreRestSiblings: true,
       },
