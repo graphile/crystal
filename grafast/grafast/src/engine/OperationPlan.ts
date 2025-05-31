@@ -3264,7 +3264,6 @@ export class OperationPlan {
       layerPlan: layerPlan,
       constructor: stepConstructor,
       peerKey,
-      implicitSideEffectStep,
     } = sstep;
     // const streamInitialCount = sstep._stepOptions.stream?.initialCount;
     const dependencyCount = deps.length;
@@ -3279,7 +3278,6 @@ export class OperationPlan {
         if (
           possiblyPeer !== step &&
           !possiblyPeer.hasSideEffects &&
-          possiblyPeer.implicitSideEffectStep === implicitSideEffectStep &&
           isPeerLayerPlan(possiblyPeer.layerPlan, layerPlan) &&
           possiblyPeer._stepOptions.stream == null &&
           possiblyPeer.peerKey === peerKey
@@ -3319,7 +3317,6 @@ export class OperationPlan {
           peerDependencyIndex !== dependencyIndex ||
           rawPossiblyPeer === step ||
           rawPossiblyPeer.hasSideEffects ||
-          rawPossiblyPeer.implicitSideEffectStep !== implicitSideEffectStep ||
           rawPossiblyPeer._stepOptions.stream != null ||
           rawPossiblyPeer.constructor !== stepConstructor ||
           rawPossiblyPeer.peerKey !== peerKey
@@ -3385,8 +3382,6 @@ export class OperationPlan {
             if (
               peerDependencyIndex !== dependencyIndex ||
               rawPossiblyPeer === step ||
-              rawPossiblyPeer.implicitSideEffectStep !==
-                implicitSideEffectStep ||
               rawPossiblyPeer.hasSideEffects ||
               rawPossiblyPeer._stepOptions.stream != null ||
               rawPossiblyPeer.constructor !== stepConstructor ||
