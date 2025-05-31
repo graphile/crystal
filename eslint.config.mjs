@@ -8,6 +8,7 @@ import graphileExport from "eslint-plugin-graphile-export";
 import graphql from "eslint-plugin-graphql";
 import importPlugin from "eslint-plugin-import";
 import jest from "eslint-plugin-jest";
+import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
 import tsdoc from "eslint-plugin-tsdoc";
@@ -67,6 +68,7 @@ const config = {
     graphql,
     tsdoc,
     "simple-import-sort": simpleImportSort,
+    react,
     "react-hooks": reactHooks,
   },
 
@@ -263,6 +265,7 @@ const oldConfig = {
         "**/website/src/**",
       ],
       rules: {
+        ...react.configs.recommended.rules,
         ...reactHooks.configs.recommended.rules,
         "react-hooks/rules-of-hooks": "error",
         "react-hooks/exhaustive-deps": [
