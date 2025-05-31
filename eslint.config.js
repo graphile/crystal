@@ -1,10 +1,11 @@
 // @ts-check
 import babelParser from "@babel/eslint-parser";
-import { fixupConfigRules, fixupPluginRules } from "@eslint/compat";
-import { FlatCompat } from "@eslint/eslintrc";
+import { fixupPluginRules } from "@eslint/compat";
 import js from "@eslint/js";
 import tsParser from "@typescript-eslint/parser";
+import tseslint from "@typescript-eslint/eslint-plugin";
 import { defineConfig, globalIgnores } from "eslint/config";
+import prettier from "eslint-config-prettier";
 import graphileExport from "eslint-plugin-graphile-export";
 import graphql from "eslint-plugin-graphql";
 import importPlugin from "eslint-plugin-import";
@@ -18,12 +19,6 @@ import path from "path";
 
 const __dirname = import.meta.dirname;
 
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  recommendedConfig: js.configs.recommended,
-  allConfig: js.configs.all,
-});
-
 const globalIgnoresFromFile = fs
   .readFileSync(path.resolve(__dirname, ".lintignore"), "utf8")
   .split("\n")
@@ -35,12 +30,6 @@ const globalIgnoresFromFile = fs
     text = text.endsWith("/") ? text + "**" : text;
     return text;
   });
-
-/**
- * @param {string[]} strings
- */
-const fixupExtends = (...strings) =>
-  fixupConfigRules(compat.extends(...strings));
 
 /** @type {import('@eslint/config-helpers').ConfigWithExtends} */
 const config = {
@@ -67,17 +56,6 @@ const config = {
     },
   },
 
-  extends: fixupExtends(
-    "eslint:recommended",
-    "plugin:@typescript-eslint/eslint-recommended",
-    "plugin:@typescript-eslint/recommended",
-    //'plugin:@typescript-eslint/recommended-requiring-type-checking',
-    "plugin:import/errors",
-    "plugin:import/typescript",
-    "plugin:graphile-export/recommended",
-    "prettier",
-  ),
-
   plugins: {
     jest,
     graphql,
@@ -85,7 +63,7 @@ const config = {
     "simple-import-sort": simpleImportSort,
     import: fixupPluginRules(importPlugin),
     "graphile-export": graphileExport,
-    "react-hooks": fixupPluginRules(reactHooks),
+    "react-hooks": reactHooks,
   },
 
   rules: {
@@ -278,8 +256,8 @@ const oldConfig = {
         "grafast/ruru/src/**/*.tsx",
         "**/website/src/**",
       ],
-      extends: compat.extends("plugin:react/recommended"),
       rules: {
+        ...reactHooks.configs.recommended.rules,
         "react-hooks/rules-of-hooks": "error",
         "react-hooks/exhaustive-deps": [
           "warn",
@@ -466,6 +444,23 @@ const oldConfig = {
 };
 
 export default defineConfig([
+  //"eslint:recommended",
+  js.configs.recommended,
+  // "plugin:@typescript-eslint/eslint-recommended",
+  tseslint.configs.eslintRecommended,
+  //"plugin:@typescript-eslint/recommended",
+  tseslint.configs.recommended,
+  //'plugin:@typescript-eslint/recommended-requiring-type-checking',
+  // ...tseslint.configs.recommendedTypeChecked, // requires parserOptions.project
+  // "plugin:import/errors",
+  importPlugin.configs.errors,
+  // "plugin:import/typescript",
+  importPlugin.configs.typescript,
+  // "plugin:graphile-export/recommended",
+  graphileExport.configs.recommended,
+  //"prettier",
+  prettier, // not a plugin, just a config object
+
   config,
   ...oldConfig.overrides,
   globalIgnores(globalIgnoresFromFile),
