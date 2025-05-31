@@ -384,19 +384,3 @@ lateral (
       "n" asc
   ) __owner__
 ) as __union_result__;
-
-select
-  __people__."person_id"::text as "0",
-  __people__."username" as "1"
-from "polymorphic"."people" as __people__
-where (
-  __people__."person_id" = $1::"int4"
-);
-
-select
-  __organizations__."organization_id"::text as "0",
-  __organizations__."name" as "1"
-from "polymorphic"."organizations" as __organizations__
-where (
-  __organizations__."organization_id" = $1::"int4"
-);

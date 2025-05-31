@@ -7,17 +7,20 @@ graph TD
     classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
+    subgraph "Buckets for mutations/v4/d.updatePerson"
+    Bucket0("Bucket 0 (root)"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 17, 30, 18<br /><br />1: PgUpdateSingle[14]<br />2: <br />ᐳ: Object[19]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 19, 14<br /><br />ROOT Object{1}ᐸ{result}ᐳ[19]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 14<br /><br />ROOT PgUpdateSingle{1}ᐸperson(id;)ᐳ[14]"):::bucket
+    end
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2
+    Bucket2 --> Bucket3
 
     %% plan dependencies
-    __InputObject9{{"__InputObject[9∈0] ➊"}}:::plan
-    Constant31{{"Constant[31∈0] ➊<br />ᐸ'Doe'ᐳ"}}:::plan
-    Constant32{{"Constant[32∈0] ➊<br />ᐸ'update2'ᐳ"}}:::plan
-    Constant33{{"Constant[33∈0] ➊<br />ᐸ'update1'ᐳ"}}:::plan
-    Constant34{{"Constant[34∈0] ➊<br />ᐸ'update3'ᐳ"}}:::plan
-    Constant31 & Constant32 & Constant33 & Constant34 --> __InputObject9
-    __InputObject6{{"__InputObject[6∈0] ➊"}}:::plan
-    Constant30{{"Constant[30∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Constant30 & __InputObject9 --> __InputObject6
+    __InputObject9{{"__InputObject[9∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ'Doe'ᐳ[31]<br />- Constantᐸ'update2'ᐳ[32]<br />- Constantᐸ'update1'ᐳ[33]<br />- Constantᐸ'update3'ᐳ[34]"}}:::plan
+    __InputObject6{{"__InputObject[6∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ1ᐳ[30]"}}:::plan
+    __InputObject9 --> __InputObject6
     Object17{{"Object[17∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access15{{"Access[15∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access16{{"Access[16∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
@@ -27,9 +30,8 @@ graph TD
     __Value2 --> Access16
     ApplyInput18{{"ApplyInput[18∈0] ➊"}}:::plan
     __InputObject6 --> ApplyInput18
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    PgUpdateSingle14[["PgUpdateSingle[14∈1] ➊<br />ᐸperson(id;)ᐳ"]]:::sideeffectplan
-    Object17 & Constant30 & ApplyInput18 --> PgUpdateSingle14
+    PgUpdateSingle14[["PgUpdateSingle[14∈1] ➊<br />ᐸperson(id;)ᐳ<br />More deps:<br />- Constantᐸ1ᐳ[30]"]]:::sideeffectplan
+    Object17 & ApplyInput18 --> PgUpdateSingle14
     Object19{{"Object[19∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgUpdateSingle14 --> Object19
     PgClassExpression20{{"PgClassExpression[20∈3] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
@@ -54,21 +56,12 @@ graph TD
     Access21 --> PgClassExpression29
 
     %% define steps
-
-    subgraph "Buckets for mutations/v4/d.updatePerson"
-    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,__InputObject6,__InputObject9,Access15,Access16,Object17,ApplyInput18,Constant30,Constant31,Constant32,Constant33,Constant34 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 17, 30, 18<br /><br />1: PgUpdateSingle[14]<br />2: <br />ᐳ: Object[19]"):::bucket
+    class Bucket0,__Value2,__InputObject6,__InputObject9,Access15,Access16,Object17,ApplyInput18 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUpdateSingle14,Object19 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 19, 14<br /><br />ROOT Object{1}ᐸ{result}ᐳ[19]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 14<br /><br />ROOT PgUpdateSingle{1}ᐸperson(id;)ᐳ[14]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression20,Access21,PgClassExpression22,PgClassExpression23,PgClassExpression24,PgClassExpression25,PgClassExpression26,PgClassExpression27,PgClassExpression28,PgClassExpression29 bucket3
-    Bucket0 --> Bucket1
-    Bucket1 --> Bucket2
-    Bucket2 --> Bucket3
-    end
+

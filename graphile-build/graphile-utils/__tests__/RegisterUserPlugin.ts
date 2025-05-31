@@ -1,13 +1,15 @@
 import { withPgClient } from "@dataplan/pg";
+import type { Step } from "grafast";
 import {
   access,
   constant,
   ExecutableStep,
+  get,
   list,
   object,
   ObjectStep,
-  polymorphicBranch,
 } from "grafast";
+import type { GraphQLObjectType } from "graphql";
 import { DatabaseError } from "pg";
 
 import { gql, makeExtendSchemaPlugin } from "../src/index.js";
@@ -15,6 +17,9 @@ import { gql, makeExtendSchemaPlugin } from "../src/index.js";
 // Changes to this file should be reflected in `postgraphile/website/postgraphile/make-extend-schema-plugin.md`
 
 export const RegisterUserPlugin = makeExtendSchemaPlugin((build) => {
+  const {
+    grafast: { lambda },
+  } = build;
   const { users } = build.input.pgRegistry.pgResources;
   const executor = build.input.pgRegistry.pgExecutors.main;
   return {
@@ -46,6 +51,33 @@ export const RegisterUserPlugin = makeExtendSchemaPlugin((build) => {
       }
     `,
     plans: {
+      RegisterUserResult: {
+        __planType($specifier) {
+          const $__typename = lambda(
+            $specifier as Step<Record<string, any>>,
+            (obj) => {
+              if (obj.__typename != null) {
+                return obj.__typename;
+              }
+              if (obj.id !== null) {
+                return "User";
+              }
+              return null;
+            },
+          );
+          return {
+            $__typename,
+            planForType(t: GraphQLObjectType) {
+              if (t.name === "User") {
+                const $id = get($specifier, "id");
+                return users.get({ id: $id });
+              } else {
+                return $specifier;
+              }
+            },
+          };
+        },
+      },
       Mutation: {
         registerUser(_, { $input: { $username, $email } }) {
           const $result = withPgClient(
@@ -107,35 +139,7 @@ export const RegisterUserPlugin = makeExtendSchemaPlugin((build) => {
         __assertStep: ObjectStep,
         result($data: ObjectStep) {
           const $result = $data.get("result");
-          return polymorphicBranch($result, {
-            UsernameConflict: {
-              // This is a `UsernameConflict` if the object has a `__typename` property.
-              match(obj) {
-                return obj.__typename === "UsernameConflict";
-              },
-              // In this case, we can just return the object itself as the step
-              // representing this polymorphic branch.
-              plan($obj) {
-                return $obj;
-              },
-            },
-            EmailAddressConflict: {
-              // If `match` is not specified, it defaults to checking
-              // `obj.__typename === 'EmailAddressConfict'`.
-              // If `plan` is not specified, it defaults to `($obj) => $obj`.
-            },
-            User: {
-              match(obj) {
-                return obj.id != null;
-              },
-              // In this case, we need to get the record from the database
-              // associated with the given user id.
-              plan($obj) {
-                const $id = access($obj, "id");
-                return users.get({ id: $id });
-              },
-            },
-          });
+          return $result;
         },
         query() {
           // The `Query` type just needs any truthy value.

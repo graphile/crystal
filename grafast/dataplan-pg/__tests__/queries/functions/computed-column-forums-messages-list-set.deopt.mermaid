@@ -7,31 +7,42 @@ graph TD
     classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
+    subgraph "Buckets for queries/functions/computed-column-forums-messages-list-set"
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 9, 10, 22, 35, 11, 13<br />2: PgSelect[8]<br />3: PgSelectRows[14]"):::bucket
+    Bucket1("Bucket 1 (listItem)<br />Deps: 11, 22<br /><br />ROOT __Item{1}ᐸ14ᐳ[15]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 11, 22<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[16]<br />1: <br />ᐳ: PgClassExpression[17]<br />2: PgSelect[18]<br />3: PgSelectRows[24]<br />4: __ListTransform[23]"):::bucket
+    Bucket3("Bucket 3 (subroutine)<br /><br />ROOT PgClassExpression{3}ᐸ__forums_m..._set_idx__ᐳ[27]"):::bucket
+    Bucket4("Bucket 4 (listItem)<br /><br />ROOT __Item{4}ᐸ23ᐳ[28]"):::bucket
+    Bucket6("Bucket 6 (listItem)<br /><br />ROOT __Item{6}ᐸ28ᐳ[31]"):::bucket
+    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 32<br /><br />ROOT PgSelectSingle{6}ᐸforums_messages_list_setᐳ[32]"):::bucket
+    end
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2
+    Bucket2 --> Bucket3 & Bucket4
+    Bucket4 --> Bucket6
+    Bucket6 --> Bucket7
 
     %% plan dependencies
-    PgSelect8[["PgSelect[8∈0] ➊<br />ᐸforumsᐳ"]]:::plan
-    Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Lambda13{{"Lambda[13∈0] ➊<br />ᐸincludeArchivedConditionᐳ"}}:::plan
-    Object11 & Lambda13 --> PgSelect8
+    PgSelect8[["PgSelect[8∈0] ➊<br />ᐸforumsᐳ<br />More deps:<br />- Object[11]"]]:::plan
+    Lambda13{{"Lambda[13∈0] ➊<br />ᐸincludeArchivedConditionᐳ<br />More deps:<br />- Constantᐸ[ undefined, 'INHERIT' ]ᐳ[35]"}}:::plan
+    Lambda13 --> PgSelect8
+    Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 2"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10
-    Constant35{{"Constant[35∈0] ➊<br />ᐸ[ undefined, 'INHERIT' ]ᐳ"}}:::plan
-    Constant35 --> Lambda13
     PgSelectRows14[["PgSelectRows[14∈0] ➊"]]:::plan
     PgSelect8 --> PgSelectRows14
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgFromExpression22{{"PgFromExpression[22∈0] ➊"}}:::plan
     __Item15[/"__Item[15∈1]<br />ᐸ14ᐳ"\]:::itemplan
     PgSelectRows14 ==> __Item15
     PgSelectSingle16{{"PgSelectSingle[16∈1]<br />ᐸforumsᐳ"}}:::plan
     __Item15 --> PgSelectSingle16
-    PgSelect18[["PgSelect[18∈2]<br />ᐸforums_messages_list_setᐳ"]]:::plan
+    PgSelect18[["PgSelect[18∈2]<br />ᐸforums_messages_list_setᐳ<br />More deps:<br />- Object[11]"]]:::plan
     PgClassExpression17{{"PgClassExpression[17∈2]<br />ᐸ__forums__ᐳ"}}:::plan
-    Object11 & PgClassExpression17 & PgFromExpression22 --> PgSelect18
+    PgClassExpression17 & PgFromExpression22 --> PgSelect18
     PgSelectSingle16 --> PgClassExpression17
     __ListTransform23[["__ListTransform[23∈2]<br />ᐸpartitionByIndex1:18ᐳ"]]:::plan
     PgSelectRows24[["PgSelectRows[24∈2]"]]:::plan
@@ -55,32 +66,18 @@ graph TD
     PgSelectSingle32 --> PgClassExpression34
 
     %% define steps
-
-    subgraph "Buckets for queries/functions/computed-column-forums-messages-list-set"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 9, 10, 22, 35, 11, 13<br />2: PgSelect[8]<br />3: PgSelectRows[14]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect8,Access9,Access10,Object11,Lambda13,PgSelectRows14,PgFromExpression22,Constant35 bucket0
-    Bucket1("Bucket 1 (listItem)<br />Deps: 11, 22<br /><br />ROOT __Item{1}ᐸ14ᐳ[15]"):::bucket
+    class Bucket0,__Value2,PgSelect8,Access9,Access10,Object11,Lambda13,PgSelectRows14,PgFromExpression22 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item15,PgSelectSingle16 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 11, 22<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[16]<br />1: <br />ᐳ: PgClassExpression[17]<br />2: PgSelect[18]<br />3: PgSelectRows[24]<br />4: __ListTransform[23]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression17,PgSelect18,__ListTransform23,PgSelectRows24 bucket2
-    Bucket3("Bucket 3 (subroutine)<br /><br />ROOT PgClassExpression{3}ᐸ__forums_m..._set_idx__ᐳ[27]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,__Item25,PgSelectSingle26,PgClassExpression27 bucket3
-    Bucket4("Bucket 4 (listItem)<br /><br />ROOT __Item{4}ᐸ23ᐳ[28]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item28 bucket4
-    Bucket6("Bucket 6 (listItem)<br /><br />ROOT __Item{6}ᐸ28ᐳ[31]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,__Item31,PgSelectSingle32 bucket6
-    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 32<br /><br />ROOT PgSelectSingle{6}ᐸforums_messages_list_setᐳ[32]"):::bucket
     classDef bucket7 stroke:#808000
     class Bucket7,PgClassExpression33,PgClassExpression34 bucket7
-    Bucket0 --> Bucket1
-    Bucket1 --> Bucket2
-    Bucket2 --> Bucket3 & Bucket4
-    Bucket4 --> Bucket6
-    Bucket6 --> Bucket7
-    end
+

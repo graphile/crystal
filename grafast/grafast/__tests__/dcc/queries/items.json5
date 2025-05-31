@@ -1,0 +1,69 @@
+{
+  crawler: {
+    id: 103,
+    name: 'Katia',
+    items: [
+      {
+        __typename: 'Equipment',
+        id: 207,
+        name: 'Enchanted Repeating Crossbow',
+        currentDurability: 1500,
+        maxDurability: 3000,
+        contents: null,
+      },
+      {
+        __typename: 'Consumable',
+        id: 203,
+        name: 'Mana Potion',
+        effect: 'Fully restores MP',
+        contents: null,
+      },
+      {
+        __typename: 'Consumable',
+        id: 204,
+        name: 'Healing Potion',
+        effect: 'Heal 50%+ total health',
+        contents: null,
+      },
+      {
+        __typename: 'Equipment',
+        id: 210,
+        name: 'Ugly Backpack With a Completely Useless Design',
+        currentDurability: 100,
+        maxDurability: 100,
+        contents: [
+          {
+            __typename: 'MiscItem',
+            id: 201,
+            name: 'Scrap Metal',
+          },
+          {
+            __typename: 'MiscItem',
+            id: 201,
+            name: 'Scrap Metal',
+          },
+          {
+            __typename: 'MiscItem',
+            id: 202,
+            name: 'Scrap Metal Pole',
+          },
+          {
+            __typename: 'MiscItem',
+            id: 202,
+            name: 'Scrap Metal Pole',
+          },
+          {
+            __typename: 'MiscItem',
+            id: 203,
+            name: 'Metal Bearing',
+          },
+          {
+            __typename: 'MiscItem',
+            id: 203,
+            name: 'Metal Bearing',
+          },
+        ],
+      },
+    ],
+  },
+}

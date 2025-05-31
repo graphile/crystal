@@ -824,9 +824,7 @@ This is a full example of adding a custom `registerUser` mutation whose payload
 contains a union of a successful result or two expected error types. It uses a
 transaction to perform the mutation, and catches errors that happen in that
 transaction (in which case the transaction will be rolled back) and if they are
-the known, supported, errors then it will return the given error type. It uses
-the `polymorphicBranch` logic to determine which of the event occurred, and
-thus which type to return.
+the known, supported, errors then it will return the given error type.
 
 ```ts
 import { withPgClient } from "@dataplan/pg";
@@ -837,7 +835,6 @@ import {
   object,
   ExecutableStep,
   access,
-  polymorphicBranch,
   list,
 } from "postgraphile/grafast";
 import { DatabaseError } from "pg";
@@ -934,41 +931,45 @@ export const RegisterUserPlugin = makeExtendSchemaPlugin((build) => {
 
       RegisterUserPayload: {
         __assertStep: ObjectStep,
-        result($data: ObjectStep) {
-          const $result = $data.get("result");
-          return polymorphicBranch($result, {
-            UsernameConflict: {
-              // This is a `UsernameConflict` if the object has a `__typename` property.
-              match(obj) {
-                return obj.__typename === "UsernameConflict";
-              },
-              // In this case, we can just return the object itself as the step
-              // representing this polymorphic branch.
-              plan($obj) {
-                return $obj;
-              },
-            },
-            EmailAddressConflict: {
-              // If `match` is not specified, it defaults to checking
-              // `obj.__typename === 'EmailAddressConfict'`.
-              // If `plan` is not specified, it defaults to `($obj) => $obj`.
-            },
-            User: {
-              match(obj) {
-                return obj.id != null;
-              },
-              // In this case, we need to get the record from the database
-              // associated with the given user id.
-              plan($obj) {
-                const $id = access($obj, "id");
-                return users.get({ id: $id });
-              },
-            },
-          });
-        },
         query() {
           // The `Query` type just needs any truthy value.
           return constant(true);
+        },
+      },
+
+      // Planning our polymorphic type
+      RegisterUserResult: {
+        __planType($obj) {
+          // Determine the type
+          const $__typename = lambda($obj, (obj) => {
+            // If it has typename, use that
+            if (obj.__typename) return obj.__typename;
+            // Otherwise, if it has an id it must be a user
+            if (obj.id != null) return "User";
+            // Otherwise, no idea!
+            throw new Error(`Could not determine type`);
+          });
+          return {
+            $__typename,
+            planForType(t) {
+              switch (t.name) {
+                case "UsernameConflict":
+                case "EmailAddressConflict":
+                  // These types just use their objects directly
+                  return $obj;
+
+                case "User": {
+                  // In this case, we need to get the record from the database
+                  // associated with the given user id.
+                  const $id = get($obj, "id");
+                  return users.get({ id: $id });
+                }
+                default: {
+                  throw new Error(`Don't know how to plan ${t}`);
+                }
+              }
+            },
+          };
         },
       },
 

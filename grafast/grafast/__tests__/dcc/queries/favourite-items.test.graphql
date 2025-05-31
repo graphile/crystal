@@ -1,0 +1,87 @@
+{
+  crawler(id: 103) {
+    id
+    name
+    ... on ActiveCrawler {
+      items {
+        __typename
+        id
+        name
+        ... on Created {
+          creator {
+            id
+            name
+            ... on ActiveCrawler {
+              friends {
+                __typename
+                id
+                name
+                ... on HasInventory {
+                  items {
+                    __typename
+                    id
+                    name
+                    ... on Equipment {
+                      currentDurability
+                    }
+                    ... on Consumable {
+                      effect
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      favouriteItem {
+        __typename
+        id
+        name
+        ... on Created {
+          creator {
+            id
+            name
+            ... on ActiveCrawler {
+              bestFriend {
+                __typename
+                id
+                name
+                ... on ActiveCrawler {
+                  favouriteItem {
+                    id
+                    name
+                  }
+                }
+              }
+              friends {
+                __typename
+                id
+                name
+                ... on Crawler {
+                  crawlerNumber
+                }
+                ... on NPC {
+                  exCrawler
+                }
+                ... on Manager {
+                  client {
+                    id
+                    name
+                  }
+                }
+                ... on HasInventory {
+                  items {
+                    __typename
+                    id
+                    name
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

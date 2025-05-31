@@ -1,0 +1,56 @@
+{
+  item: {
+    name: "Carl's Jug O' Boom",
+    creator: {
+      id: 101,
+      items: [
+        {
+          id: 206,
+        },
+        {
+          id: 201,
+          creator: null,
+        },
+        {
+          id: 202,
+          creator: null,
+        },
+        {
+          id: 203,
+          creator: null,
+        },
+        {
+          id: 201,
+          creator: null,
+        },
+        {
+          id: 202,
+        },
+        {
+          id: 203,
+          creator: null,
+        },
+        {
+          id: 204,
+          creator: null,
+        },
+        {
+          id: 205,
+          creator: {
+            id: 106,
+          },
+        },
+        {
+          id: 206,
+          creator: {
+            id: 101,
+          },
+        },
+        {
+          id: 211,
+          creator: null,
+        },
+      ],
+    },
+  },
+}

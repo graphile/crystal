@@ -1,0 +1,25 @@
+# Tests that two fields at the same path but with different abstract (but overlapping) types still resolve correctly
+{
+  floor(number: 3) {
+    number
+    locations {
+      id
+      ... on SafeRoom {
+        stock {
+          __typename
+          ... on Item {
+            id
+          }
+        }
+      }
+      ... on Club {
+        stock {
+          __typename
+          ... on Item {
+            id
+          }
+        }
+      }
+    }
+  }
+}

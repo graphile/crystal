@@ -1,8 +1,8 @@
 import { PgDeleteSingleStep, PgExecutor, TYPES, assertPgClassSingleStep, domainOfCodec, listOfCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectFromRecords, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, each, first, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, each, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, operationPlan, rootValue, specFromNodeId, trap } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
-const handler = {
+const nodeIdHandler_Query = {
   typeName: "Query",
   codec: {
     name: "raw",
@@ -52,7 +52,7 @@ const nodeIdCodecs_base64JSON_base64JSON = {
 };
 const nodeIdCodecs = {
   __proto__: null,
-  raw: handler.codec,
+  raw: nodeIdHandler_Query.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
@@ -334,33 +334,7 @@ const registry = makeRegistry({
     __proto__: null
   }
 });
-const pgResource_tPgResource = registry.pgResources["t"];
-const nodeIdHandlerByTypeName = {
-  __proto__: null,
-  Query: handler,
-  T: {
-    typeName: "T",
-    codec: nodeIdCodecs_base64JSON_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("ts", false), $record.get("k")]);
-    },
-    getSpec($list) {
-      return {
-        k: inhibitOnNull(access($list, [1]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return pgResource_tPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "ts";
-    }
-  }
-};
+const resource_tPgResource = registry.pgResources["t"];
 const argDetailsSimple_check_work_hours = [{
   graphqlArgName: "wh",
   postgresArgName: "wh",
@@ -377,7 +351,8 @@ function makeArg(path, args, details) {
   } = details;
   const fullPath = [...path, graphqlArgName];
   const $raw = args.getRaw(fullPath);
-  const step = fetcher ? fetcher($raw).record() : bakedInput(args.typeAt(fullPath), $raw);
+  // TODO: this should maybe be operationPlan().withLatestSideEffectLayerPlan()
+  const step = operationPlan().withRootLayerPlan(() => fetcher ? trap(fetcher($raw).record(), 4) : bakedInput(args.typeAt(fullPath), $raw));
   return {
     step,
     pgCodec,
@@ -386,6 +361,28 @@ function makeArg(path, args, details) {
 }
 const makeArgs_check_work_hours = (args, path = []) => argDetailsSimple_check_work_hours.map(details => makeArg(path, args, details));
 const resource_check_work_hoursPgResource = registry.pgResources["check_work_hours"];
+const nodeIdHandler_T = {
+  typeName: "T",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("ts", false), $record.get("k")]);
+  },
+  getSpec($list) {
+    return {
+      k: inhibitOnNull(access($list, [1]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_tPgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "ts";
+  }
+};
 function specForHandler(handler) {
   function spec(nodeId) {
     // We only want to return the specifier if it matches
@@ -406,11 +403,27 @@ function specForHandler(handler) {
   return spec;
 }
 const nodeFetcher_T = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.T));
-  return nodeIdHandlerByTypeName.T.get(nodeIdHandlerByTypeName.T.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_T));
+  return nodeIdHandler_T.get(nodeIdHandler_T.getSpec($decoded));
 };
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
+}
+const nodeIdHandlerByTypeName = {
+  __proto__: null,
+  Query: nodeIdHandler_Query,
+  T: nodeIdHandler_T
+};
+const decodeNodeId = makeDecodeNodeId(Object.values(nodeIdHandlerByTypeName));
+function findTypeNameMatch(specifier) {
+  if (!specifier) return null;
+  for (const [typeName, typeSpec] of Object.entries(nodeIdHandlerByTypeName)) {
+    const value = specifier[typeSpec.codec.name];
+    if (value != null && typeSpec.match(value)) {
+      return typeName;
+    }
+  }
+  return null;
 }
 const resource_frmcdc_workHourPgResource = registry.pgResources["frmcdc_workHour"];
 function CursorSerialize(value) {
@@ -418,11 +431,11 @@ function CursorSerialize(value) {
 }
 const specFromArgs_T = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.T, $nodeId);
+  return specFromNodeId(nodeIdHandler_T, $nodeId);
 };
 const specFromArgs_T2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.T, $nodeId);
+  return specFromNodeId(nodeIdHandler_T, $nodeId);
 };
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
@@ -780,16 +793,16 @@ export const plans = {
       return rootValue();
     },
     nodeId($parent) {
-      const specifier = handler.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler.codec.name].encode);
+      const specifier = nodeIdHandler_Query.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Query.codec.name].encode);
     },
-    node(_$root, args) {
-      return node(nodeIdHandlerByTypeName, args.getRaw("nodeId"));
+    node(_$root, fieldArgs) {
+      return fieldArgs.getRaw("nodeId");
     },
     tByK(_$root, {
       $k
     }) {
-      return pgResource_tPgResource.get({
+      return resource_tPgResource.get({
         k: $k
       });
     },
@@ -803,7 +816,7 @@ export const plans = {
     },
     allTs: {
       plan() {
-        return connection(pgResource_tPgResource.find());
+        return connection(resource_tPgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -832,11 +845,35 @@ export const plans = {
       }
     }
   },
+  Node: {
+    __planType($nodeId) {
+      const $specifier = decodeNodeId($nodeId);
+      const $__typename = lambda($specifier, findTypeNameMatch, true);
+      return {
+        $__typename,
+        planForType(type) {
+          const spec = nodeIdHandlerByTypeName[type.name];
+          if (spec) {
+            return spec.get(spec.getSpec(access($specifier, [spec.codec.name])));
+          } else {
+            throw new Error(`Failed to find handler for ${type.name}`);
+          }
+        }
+      };
+    }
+  },
   T: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of tUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_tPgResource.get(spec);
+    },
     nodeId($parent) {
-      const specifier = nodeIdHandlerByTypeName.T.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.T.codec.name].encode);
+      const specifier = nodeIdHandler_T.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_T.codec.name].encode);
     },
     v($record) {
       const $val = $record.get("v");
@@ -987,7 +1024,7 @@ export const plans = {
     __assertStep: __ValueStep,
     createT: {
       plan(_, args) {
-        const $insert = pgInsertSingle(pgResource_tPgResource, Object.create(null));
+        const $insert = pgInsertSingle(resource_tPgResource, Object.create(null));
         args.apply($insert);
         const plan = object({
           result: $insert
@@ -1002,7 +1039,7 @@ export const plans = {
     },
     updateT: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_tPgResource, specFromArgs_T(args));
+        const $update = pgUpdateSingle(resource_tPgResource, specFromArgs_T(args));
         args.apply($update);
         return object({
           result: $update
@@ -1016,7 +1053,7 @@ export const plans = {
     },
     updateTByK: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_tPgResource, {
+        const $update = pgUpdateSingle(resource_tPgResource, {
           k: args.getRaw(['input', "k"])
         });
         args.apply($update);
@@ -1032,7 +1069,7 @@ export const plans = {
     },
     deleteT: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_tPgResource, specFromArgs_T2(args));
+        const $delete = pgDeleteSingle(resource_tPgResource, specFromArgs_T2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -1046,7 +1083,7 @@ export const plans = {
     },
     deleteTByK: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_tPgResource, {
+        const $delete = pgDeleteSingle(resource_tPgResource, {
           k: args.getRaw(['input', "k"])
         });
         args.apply($delete);
@@ -1086,7 +1123,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_tPgResource.find(spec);
+          return resource_tPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -1148,7 +1185,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_tPgResource.find(spec);
+          return resource_tPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -1206,7 +1243,7 @@ export const plans = {
     },
     deletedTId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandlerByTypeName.T.plan($record);
+      const specifier = nodeIdHandler_T.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query() {
@@ -1225,7 +1262,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_tPgResource.find(spec);
+          return resource_tPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");

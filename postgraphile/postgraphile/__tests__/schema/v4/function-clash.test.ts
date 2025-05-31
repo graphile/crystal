@@ -15,6 +15,7 @@ Setting the DEBUG envvar could make this test fail.
 let consoleWarnSpy: ReturnType<typeof jest.spyOn>;
 beforeAll(() => {
   consoleWarnSpy = jest.spyOn(global.console, "warn");
+  consoleWarnSpy.mockReturnValue(undefined);
 });
 afterAll(() => {
   if (consoleWarnSpy) {
@@ -42,6 +43,15 @@ test(
             /same type 'CreatePostInput'/.test(stripAnsi(args[0])),
         ),
       ).toBeTruthy();
+    },
+    true,
+    {
+      gather: {
+        muteWarnings: false,
+      },
+      schema: {
+        muteWarnings: false,
+      },
     },
   ),
 );

@@ -157,7 +157,7 @@ export class AccessStep<TData> extends UnbatchedStep<TData> {
       (this.fallback === "undefined" ? "U" : "D") +
       (this.hasSymbols ? "§" : ".") +
       digestKeys(this.path);
-    this.addDependency(parentPlan);
+    this.addDataDependency(parentPlan);
   }
 
   toStringMeta(): string {
@@ -191,8 +191,12 @@ export class AccessStep<TData> extends UnbatchedStep<TData> {
   }
 
   // An access of an access can become a single access
-  optimize(): AccessStep<TData> {
+  optimize(): Step<TData> {
     const $dep = this.getDep(0);
+    if (this.fallback === undefined && this.path.length === 0) {
+      // I don't do anything
+      return $dep;
+    }
     if ($dep instanceof AccessStep && $dep.fallback === undefined) {
       return access(
         $dep.getDep(0),
@@ -278,4 +282,42 @@ export function access<TData>(
     }
   }
   return new AccessStep<TData>(parentPlan, path, fallback);
+}
+
+type StepGetReturn<TStep, TAttr extends string> = TStep extends {
+  get: (attr: TAttr) => infer U;
+}
+  ? U
+  : TStep extends { get: (attr: string) => infer U }
+    ? U
+    : never;
+
+type StepGetKeys<TStep extends Step> = TStep extends { get(attr: infer U): any }
+  ? U
+  : TStep extends Step<infer UData>
+    ? UData extends Record<string, any>
+      ? keyof UData
+      : string
+    : never;
+type StepAccessKey<
+  TStep extends Step,
+  TAttr extends StepGetKeys<TStep> & string,
+> = TStep extends { get(attr: any): any }
+  ? StepGetReturn<TStep, TAttr>
+  : TStep extends Step<infer UData>
+    ? UData extends Record<string, any>
+      ? Step<UData[TAttr]>
+      : Step<any>
+    : never;
+
+/**
+ * Call `$step.get(attr)` if possible, falling back to `access($step, attr)`.
+ */
+export function get<
+  TStep extends Step,
+  TAttr extends StepGetKeys<TStep> & string,
+>($step: TStep, attr: TAttr): StepAccessKey<TStep, TAttr> {
+  return "get" in $step && typeof $step.get === "function"
+    ? $step.get(attr)
+    : (access($step, attr) as any);
 }

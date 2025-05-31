@@ -39,13 +39,13 @@ function assertNotRuntime(operationPlan: OperationPlan, description: string) {
 
 export function withFieldArgsForArguments<T extends Step>(
   operationPlan: OperationPlan,
-  $all: TrackedArguments,
+  trackedArguments: TrackedArguments,
   field: GraphQLField<any, any, any>,
   $parent: Step,
   applyAfterMode: ApplyAfterModeArg,
   coordinate: string,
   callback: (fieldArgs: FieldArgs) => T | null | undefined,
-): Exclude<T, undefined | null> | null {
+): T | null {
   if (operationPlan.loc !== null)
     operationPlan.loc.push(`withFieldArgsForArguments(${field.name})`);
 
@@ -115,19 +115,15 @@ export function withFieldArgsForArguments<T extends Step>(
     getRaw(path) {
       assertNotRuntime(operationPlan, `fieldArgs.getRaw()`);
       if (path === undefined) {
-        return object(
-          Object.fromEntries(
-            Object.keys(args).map((argName) => [argName, $all.get(argName)]),
-          ),
-        );
+        return object(trackedArguments);
       } else if (typeof path === "string") {
-        return $all.get(path);
+        return trackedArguments[path];
       } else if (Array.isArray(path)) {
         const [first, ...rest] = path;
         if (!first) {
           throw new Error(`getRaw() must be called with a non-empty path`);
         }
-        let $entry = $all.get(first);
+        let $entry = trackedArguments[first];
         for (const pathSegment of rest) {
           if (typeof pathSegment === "number" && "at" in $entry) {
             $entry = $entry.at(pathSegment);
@@ -208,6 +204,11 @@ export function withFieldArgsForArguments<T extends Step>(
   }
 
   const result = callback(fieldArgs);
+  if (result === undefined) {
+    throw new Error(
+      `Field ${coordinate} returned 'undefined'; perhaps you forgot the 'return' statement?`,
+    );
+  }
   assertNotPromise(result, callback, operationPlan.loc?.join(">") ?? "???");
 
   if (!explicitlyApplied && result != null) {
@@ -216,7 +217,7 @@ export function withFieldArgsForArguments<T extends Step>(
 
   if (operationPlan.loc !== null) operationPlan.loc.pop();
 
-  return (result ?? null) as Exclude<T, null | undefined> | null;
+  return result;
 }
 
 function processAfter(

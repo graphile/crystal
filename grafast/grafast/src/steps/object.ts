@@ -2,6 +2,7 @@
 
 import te, { isSafeObjectPropertyName } from "tamedevil";
 
+import { isDev } from "../dev.js";
 import type {
   DataFromStep,
   ExecutionDetails,
@@ -315,11 +316,15 @@ ${inner}
   get<TKey extends keyof TPlans>(key: TKey): TPlans[TKey] {
     const index = this.keys.indexOf(key as string);
     if (index < 0) {
-      throw new Error(
-        `This ObjectStep doesn't have key '${String(
-          key,
-        )}'; supported keys: '${this.keys.join("', '")}'`,
-      );
+      if (isDev) {
+        // TODO: move this to diagnostics
+        console.warn(
+          `${this} doesn't have key '${String(
+            key,
+          )}'; supported keys: '${this.keys.join("', '")}'`,
+        );
+      }
+      return constant(undefined) as any;
     }
     return this.getDepOptions<TPlans[TKey]>(index).step;
   }

@@ -1,0 +1,342 @@
+{
+  allVulnerabilitiesList: [
+    {
+      __typename: "ThirdPartyVulnerability",
+      name: "XSS",
+      applicationsList: [
+        {
+          __typename: "AwsApplication",
+          name: "AWfulS",
+          vulnerabilitiesList: [
+            {
+              __typename: "FirstPartyVulnerability",
+              name: "Exponential backtracking",
+              applicationsList: [
+                {
+                  __typename: "AwsApplication",
+                  name: "AWfulS",
+                  vulnerabilitiesList: [
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Exponential backtracking",
+                    },
+                    {
+                      __typename: "ThirdPartyVulnerability",
+                      name: "CSRF",
+                    },
+                  ],
+                },
+                {
+                  __typename: "GcpApplication",
+                  name: "Grand Crayon Pasta",
+                  vulnerabilitiesList: [
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Index-out-of-bounds",
+                    },
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Exponential backtracking",
+                    },
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Information disclosure",
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              __typename: "ThirdPartyVulnerability",
+              name: "CSRF",
+              applicationsList: [
+                {
+                  __typename: "GcpApplication",
+                  name: "Grand Crayon Pasta",
+                  vulnerabilitiesList: [
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Index-out-of-bounds",
+                    },
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Exponential backtracking",
+                    },
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Information disclosure",
+                    },
+                  ],
+                },
+                {
+                  __typename: "GcpApplication",
+                  name: "Great Creative Project",
+                  vulnerabilitiesList: [
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Index-out-of-bounds",
+                    },
+                    {
+                      __typename: "ThirdPartyVulnerability",
+                      name: "CSRF",
+                    },
+                    {
+                      __typename: "ThirdPartyVulnerability",
+                      name: "SQL injection",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          __typename: "GcpApplication",
+          name: "Gargantual Crap Pile",
+          vulnerabilitiesList: [
+            {
+              __typename: "FirstPartyVulnerability",
+              name: "Off-by-one",
+              applicationsList: [
+                {
+                  __typename: "GcpApplication",
+                  name: "Gargantual Crap Pile",
+                  vulnerabilitiesList: [
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Off-by-one",
+                    },
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Exponential backtracking",
+                    },
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Information disclosure",
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              __typename: "FirstPartyVulnerability",
+              name: "Exponential backtracking",
+              applicationsList: [
+                {
+                  __typename: "AwsApplication",
+                  name: "AWfulS",
+                  vulnerabilitiesList: [
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Exponential backtracking",
+                    },
+                    {
+                      __typename: "ThirdPartyVulnerability",
+                      name: "CSRF",
+                    },
+                  ],
+                },
+                {
+                  __typename: "GcpApplication",
+                  name: "Grand Crayon Pasta",
+                  vulnerabilitiesList: [
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Index-out-of-bounds",
+                    },
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Exponential backtracking",
+                    },
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Information disclosure",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      __typename: "FirstPartyVulnerability",
+      name: "Exponential backtracking",
+      applicationsList: [
+        {
+          __typename: "AwsApplication",
+          name: "AWS App 5",
+          vulnerabilitiesList: [
+            {
+              __typename: "FirstPartyVulnerability",
+              name: "Exponential backtracking",
+              applicationsList: [
+                {
+                  __typename: "AwsApplication",
+                  name: "AWfulS",
+                  vulnerabilitiesList: [
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Exponential backtracking",
+                    },
+                    {
+                      __typename: "ThirdPartyVulnerability",
+                      name: "CSRF",
+                    },
+                  ],
+                },
+                {
+                  __typename: "GcpApplication",
+                  name: "Grand Crayon Pasta",
+                  vulnerabilitiesList: [
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Index-out-of-bounds",
+                    },
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Exponential backtracking",
+                    },
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Information disclosure",
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              __typename: "FirstPartyVulnerability",
+              name: "Timing attack",
+              applicationsList: [
+                {
+                  __typename: "GcpApplication",
+                  name: "Grand Crayon Pasta",
+                  vulnerabilitiesList: [
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Index-out-of-bounds",
+                    },
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Exponential backtracking",
+                    },
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Information disclosure",
+                    },
+                  ],
+                },
+                {
+                  __typename: "GcpApplication",
+                  name: "Gargantual Crap Pile",
+                  vulnerabilitiesList: [
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Off-by-one",
+                    },
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Exponential backtracking",
+                    },
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Information disclosure",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          __typename: "AwsApplication",
+          name: "AWfulS",
+          vulnerabilitiesList: [
+            {
+              __typename: "FirstPartyVulnerability",
+              name: "Exponential backtracking",
+              applicationsList: [
+                {
+                  __typename: "AwsApplication",
+                  name: "AWfulS",
+                  vulnerabilitiesList: [
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Exponential backtracking",
+                    },
+                    {
+                      __typename: "ThirdPartyVulnerability",
+                      name: "CSRF",
+                    },
+                  ],
+                },
+                {
+                  __typename: "GcpApplication",
+                  name: "Grand Crayon Pasta",
+                  vulnerabilitiesList: [
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Index-out-of-bounds",
+                    },
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Exponential backtracking",
+                    },
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Information disclosure",
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              __typename: "ThirdPartyVulnerability",
+              name: "CSRF",
+              applicationsList: [
+                {
+                  __typename: "GcpApplication",
+                  name: "Grand Crayon Pasta",
+                  vulnerabilitiesList: [
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Index-out-of-bounds",
+                    },
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Exponential backtracking",
+                    },
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Information disclosure",
+                    },
+                  ],
+                },
+                {
+                  __typename: "GcpApplication",
+                  name: "Great Creative Project",
+                  vulnerabilitiesList: [
+                    {
+                      __typename: "FirstPartyVulnerability",
+                      name: "Index-out-of-bounds",
+                    },
+                    {
+                      __typename: "ThirdPartyVulnerability",
+                      name: "CSRF",
+                    },
+                    {
+                      __typename: "ThirdPartyVulnerability",
+                      name: "SQL injection",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  ],
+}

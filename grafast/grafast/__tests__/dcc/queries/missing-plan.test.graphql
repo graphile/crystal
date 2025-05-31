@@ -1,0 +1,16 @@
+# Previously produced an error; exists to ensure the error doesn't come back.
+# Error: GrafastInternalError<d43e06d8-c533-4e7b-b3e7-af399f19c83f>: Invalid heirarchy - could not find direct layerPlan child of LayerPlan<19∈16∈15Σ12|13|14?polymorphicPartition{Stairwell}!x/31,40> that leads to LayerPlan<11∈6∈3∈2∈1∈0?listItem!47/9,31,40>
+
+{
+  floor(number: 3) {
+    locations {
+      floors {
+        locations {
+          floors {
+            __typename
+          }
+        }
+      }
+    }
+  }
+}

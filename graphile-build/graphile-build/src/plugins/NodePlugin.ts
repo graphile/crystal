@@ -1,15 +1,10 @@
 import "graphile-config";
 
-import type {
-  ExecutableStep,
-  Maybe,
-  NodeIdCodec,
-  NodeIdHandler,
-} from "grafast";
-import { node } from "grafast";
+import type { NodeIdCodec, NodeIdHandler } from "grafast";
+import { inspect, isDev, makeDecodeNodeId } from "grafast";
 import type { GraphQLObjectType } from "grafast/graphql";
 
-import { EXPORTABLE } from "../utils.js";
+import { EXPORTABLE, exportNameHint } from "../utils.js";
 
 declare global {
   namespace GraphileConfig {
@@ -129,6 +124,7 @@ export const NodePlugin: GraphileConfig.Plugin = {
                   `Attempted to register Node ID handler for type '${typeName}', but that isn't an object type! (constructor: ${details.Constructor.name})`,
                 );
               }
+              exportNameHint(handler, `nodeIdHandler_${typeName}`);
               nodeIdHandlerByTypeName[typeName] = handler;
             },
             getNodeIdHandler(typeName) {
@@ -144,28 +140,104 @@ export const NodePlugin: GraphileConfig.Plugin = {
 
       init(_, build) {
         const {
+          EXPORTABLE,
           graphql: { GraphQLNonNull, GraphQLID },
+          grafast: { access, lambda },
         } = build;
         const nodeTypeName = build.inflection.builtin("Node");
         const nodeIdFieldName = build.inflection.nodeIdFieldName();
         build.registerInterfaceType(
           nodeTypeName,
           {},
-          () => ({
-            description: build.wrapDescription(
-              "An object with a globally unique `ID`.",
-              "type",
-            ),
-            fields: {
-              [nodeIdFieldName]: {
-                description: build.wrapDescription(
-                  "A globally unique identifier. Can be used in various places throughout the system to identify this single value.",
-                  "field",
-                ),
-                type: new GraphQLNonNull(GraphQLID),
+          () => {
+            const nodeIdHandlerByTypeName = build.getNodeIdHandlerByTypeName!();
+            const decodeNodeId = EXPORTABLE(
+              (makeDecodeNodeId, nodeIdHandlerByTypeName) =>
+                makeDecodeNodeId(Object.values(nodeIdHandlerByTypeName)),
+              [makeDecodeNodeId, nodeIdHandlerByTypeName],
+            );
+            const muteWarnings = build.options.muteWarnings ?? false;
+            const displayWarning = isDev && !muteWarnings;
+            const findTypeNameMatch = EXPORTABLE(
+              (displayWarning, inspect, nodeIdHandlerByTypeName) =>
+                function findTypeNameMatch(
+                  specifier: Record<string, any> | null,
+                ) {
+                  if (!specifier) return null;
+                  for (const [typeName, typeSpec] of Object.entries(
+                    nodeIdHandlerByTypeName,
+                  )) {
+                    const value = specifier[typeSpec.codec.name];
+                    if (value != null && typeSpec.match(value)) {
+                      return typeName;
+                    }
+                  }
+                  if (displayWarning) {
+                    console.warn(
+                      `Could not find a type that matched the specifier '${inspect(
+                        specifier,
+                      )}'`,
+                    );
+                  }
+                  return null;
+                },
+              [displayWarning, inspect, nodeIdHandlerByTypeName],
+            );
+            return {
+              description: build.wrapDescription(
+                "An object with a globally unique `ID`.",
+                "type",
+              ),
+              fields: {
+                [nodeIdFieldName]: {
+                  description: build.wrapDescription(
+                    "A globally unique identifier. Can be used in various places throughout the system to identify this single value.",
+                    "field",
+                  ),
+                  type: new GraphQLNonNull(GraphQLID),
+                },
               },
-            },
-          }),
+              planType: EXPORTABLE(
+                (
+                  access,
+                  decodeNodeId,
+                  findTypeNameMatch,
+                  lambda,
+                  nodeIdHandlerByTypeName,
+                ) =>
+                  function planType($nodeId) {
+                    const $specifier = decodeNodeId($nodeId);
+                    const $__typename = lambda(
+                      $specifier,
+                      findTypeNameMatch,
+                      true,
+                    );
+                    return {
+                      $__typename,
+                      planForType(type) {
+                        const spec = nodeIdHandlerByTypeName[type.name];
+                        if (spec) {
+                          return spec.get(
+                            spec.getSpec(access($specifier, [spec.codec.name])),
+                          );
+                        } else {
+                          throw new Error(
+                            `Failed to find handler for ${type.name}`,
+                          );
+                        }
+                      },
+                    };
+                  },
+                [
+                  access,
+                  decodeNodeId,
+                  findTypeNameMatch,
+                  lambda,
+                  nodeIdHandlerByTypeName,
+                ],
+              ),
+            } as Omit<GraphileBuild.GrafastInterfaceTypeConfig<any>, "name">;
+          },
           "Node interface from NodePlugin",
         );
         return _;
@@ -186,7 +258,6 @@ export const NodePlugin: GraphileConfig.Plugin = {
           graphql: { GraphQLNonNull, GraphQLID },
           inflection,
         } = build;
-        const nodeIdHandlerByTypeName = build.getNodeIdHandlerByTypeName!();
         const nodeIdFieldName = build.inflection.nodeIdFieldName();
         const nodeType = getTypeByName(inflection.builtin("Node")) as
           | GraphQLObjectType
@@ -218,16 +289,11 @@ export const NodePlugin: GraphileConfig.Plugin = {
                   },
                 },
                 plan: EXPORTABLE(
-                  (node, nodeIdFieldName, nodeIdHandlerByTypeName) =>
-                    function plan(_$root, args) {
-                      return node(
-                        nodeIdHandlerByTypeName!,
-                        args.getRaw(nodeIdFieldName) as ExecutableStep<
-                          Maybe<string>
-                        >,
-                      );
+                  (nodeIdFieldName) =>
+                    function plan(_$root, fieldArgs) {
+                      return fieldArgs.getRaw(nodeIdFieldName);
                     },
-                  [node, nodeIdFieldName, nodeIdHandlerByTypeName],
+                  [nodeIdFieldName],
                 ),
               }),
             ),

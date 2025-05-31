@@ -2,6 +2,7 @@ import LRU from "@graphile/lru";
 import debugFactory from "debug";
 import type { GraphQLSchema, OperationDefinitionNode } from "graphql";
 
+import { $$cacheByOperation, $$timeout, $$ts } from "./constants.js";
 import type { Constraint } from "./constraints.js";
 import { matchesConstraints } from "./constraints.js";
 import { isDev, noop } from "./dev.js";
@@ -13,7 +14,7 @@ import type {
   Fragments,
   LinkedList,
 } from "./interfaces.js";
-import { $$cacheByOperation, $$timeout, $$ts } from "./interfaces.js";
+import type { GrafastOperationOptions } from "./prepare.js";
 import { timeSource } from "./timeSource.js";
 
 const debug = debugFactory("grafast:establishOperationPlan");
@@ -115,8 +116,9 @@ export function establishOperationPlan<
   variableValues: TVariables,
   context: TContext,
   rootValue: TRootValue,
-  planningTimeout: number | null = null,
+  options: GrafastOperationOptions,
 ): OperationPlan {
+  const planningTimeout = options.timeouts?.planning;
   let cacheByOperation = schema.extensions.grafast?.[$$cacheByOperation];
 
   let cache = cacheByOperation?.get(operation);
@@ -157,7 +159,7 @@ export function establishOperationPlan<
                 continue;
               }
               if (
-                planningTimeout !== null &&
+                planningTimeout != null &&
                 error.extensions[$$timeout] >= planningTimeout
               ) {
                 // It was a timeout error - do not retry
@@ -213,7 +215,7 @@ export function establishOperationPlan<
       context,
       rootValueConstraints,
       rootValue,
-      planningTimeout,
+      options,
     );
   } catch (e) {
     error = e;

@@ -1,7 +1,7 @@
 import chalk from "chalk";
 
+import { $$deepDepSkip } from "../constants.js";
 import type { GrafastResultsList, JSONValue } from "../index.js";
-import { $$deepDepSkip } from "../interfaces.js";
 import type { Step } from "../step.js";
 import { $$noExec, UnbatchedStep } from "../step.js";
 
@@ -47,7 +47,7 @@ export class __ItemStep<TData> extends UnbatchedStep<TData> {
     return this.getDep(0);
   }
   [$$deepDepSkip](): Step {
-    return this.getDep(0);
+    return this.getDepOptions(0).step;
   }
 
   execute(): GrafastResultsList<TData> {

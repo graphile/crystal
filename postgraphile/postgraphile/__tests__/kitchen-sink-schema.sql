@@ -22,7 +22,8 @@ drop schema if exists
   composite_domains,
   refs,
   space,
-  issue_2210
+  issue_2210,
+  relay
 cascade;
 drop extension if exists tablefunc;
 drop extension if exists intarray;
@@ -1973,6 +1974,38 @@ comment on table refs.posts is $$
 @ref author via:(user_id)->people(id) singular
 $$;
 
+CREATE TABLE refs.books (
+  id SERIAL PRIMARY KEY,
+  title TEXT NOT NULL,
+  isbn TEXT UNIQUE
+);
+
+CREATE TABLE refs.pen_names (
+  id serial primary key,
+  pen_name text not null,
+  person_id INTEGER REFERENCES refs.people(id) ON DELETE CASCADE
+);
+
+CREATE TABLE refs.book_authors (
+  book_id INTEGER REFERENCES refs.books(id) ON DELETE CASCADE,
+  pen_name_id INTEGER REFERENCES refs.pen_names(id) ON DELETE CASCADE,
+  PRIMARY KEY (book_id, pen_name_id)
+);
+
+CREATE TABLE refs.book_editors (
+  book_id INTEGER REFERENCES refs.books(id) ON DELETE CASCADE,
+  person_id INTEGER REFERENCES refs.people(id) ON DELETE CASCADE,
+  PRIMARY KEY (book_id, person_id)
+);
+
+COMMENT ON TABLE refs.books IS $$
+  @ref relatedPeople to:Person plural
+  @refVia relatedPeople via:(id)->book_authors(book_id);(pen_name_id)->pen_names(id);(person_id)->people(id)
+  @refVia relatedPeople via:(id)->book_editors(book_id);(person_id)->people(id)
+  @ref editors to:Person plural
+  @refVia editors via:(id)->book_editors(book_id);(person_id)->people(id)
+$$;
+
 --------------------------------------------------------------------------------
 
 -- From https://github.com/graphile/crystal/issues/1987
@@ -2048,3 +2081,37 @@ $$ language sql stable;
 
 comment on table issue_2210.test_message is E'@behaviour -connection';
 comment on function issue_2210.some_messages(uuid) is E'@behaviour +connection';
+
+--------------------------------------------------------------------------------
+
+create schema relay;
+
+create table relay.users (
+  id serial primary key,
+  username text not null
+);
+
+create table relay.spectacles (
+  id serial primary key,
+  -- manufacturer int not null references relay.manufacturers,
+  model_number text not null
+);
+
+create table relay.distances (
+  id serial primary key,
+  user_id int not null references relay.users,
+  spectacle_id int null references relay.spectacles,
+  max_distance float not null
+  -- unique NULLS NOT DISTINCT (user_id, spectacle_id)
+);
+create unique index on relay.distances (user_id, coalesce(spectacle_id, -1));
+
+create function relay.users_max_reading_distance(u relay.users, with_spectacles relay.spectacles) returns float as $$
+  select max_distance
+  from relay.distances
+  where user_id = u.id
+  and spectacle_id is not distinct from with_spectacles.id;
+$$ language sql stable;
+
+comment on function relay.users_max_reading_distance is
+  E'Reading distance in metres with the given pair of spectacles (or specify null for no spectacles). If null then that combination hasn''t been measured.';

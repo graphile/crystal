@@ -1,0 +1,13 @@
+# This test reproduced a bug where 'undefined' was not correctly marked with FLAG_NULL
+{
+  floor(number: 3) {
+    number
+    locations {
+      ... on Club {
+        manager {
+          __typename
+        }
+      }
+    }
+  }
+}

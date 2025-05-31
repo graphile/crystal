@@ -59,8 +59,8 @@ async function main() {
         name: "main",
         context: () =>
           object({
-            pgSettings: context<Grafast.Context>().get("pgSettings"),
-            withPgClient: context<Grafast.Context>().get("withPgClient"),
+            pgSettings: context().get("pgSettings"),
+            withPgClient: context().get("withPgClient"),
           } as PgExecutorContextPlans<any>),
       }),
     [PgExecutor, context, object],

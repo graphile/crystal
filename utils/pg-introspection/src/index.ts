@@ -77,7 +77,7 @@ export function parseIntrospectionResults(
 
 export { PgSmartTagsAndDescription, PgSmartTagsDict };
 
-declare module "./introspection" {
+declare module "./introspection.js" {
   interface Introspection {
     getCurrentUser(): PgRoles | undefined;
 

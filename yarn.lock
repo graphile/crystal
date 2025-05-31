@@ -12394,9 +12394,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fastify@npm:^4.22.1":
-  version: 4.29.0
-  resolution: "fastify@npm:4.29.0"
+"fastify@npm:^4.29.1":
+  version: 4.29.1
+  resolution: "fastify@npm:4.29.1"
   dependencies:
     "@fastify/ajv-compiler": "npm:^3.5.0"
     "@fastify/error": "npm:^3.4.0"
@@ -12414,7 +12414,7 @@ __metadata:
     secure-json-parse: "npm:^2.7.0"
     semver: "npm:^7.5.4"
     toad-cache: "npm:^3.3.0"
-  checksum: 10/e3ffa740fc1ec149d55cbf8caa52f3013becf181aaa40231f1d6f97ce54120ca40ee48497c00f4f0995d63692306e220f109bdcafffee0e616c65565de97c381
+  checksum: 10/7190c9a9f23b81ec4792deeef90eaa7325054770dfb4a6a165247d4180341562411fa85a1b0ea1d0f69a293893f890253569b9bf86291bb6956a49f0fb00fd74
   languageName: node
   linkType: hard
 
@@ -13396,7 +13396,7 @@ __metadata:
     debug: "npm:^4.3.4"
     eventemitter3: "npm:^5.0.1"
     express: "npm:^4.20.0"
-    fastify: "npm:^4.22.1"
+    fastify: "npm:^4.29.1"
     grafast: "workspace:^"
     graphile-config: "workspace:^"
     graphql-http: "npm:^1.22.0"
@@ -13456,7 +13456,7 @@ __metadata:
     debug: "npm:^4.3.4"
     express: "npm:^4.20.0"
     express-graphql: "npm:^0.12.0"
-    fastify: "npm:^4.22.1"
+    fastify: "npm:^4.29.1"
     fastify-static: "npm:^4.7.0"
     grafserv: "workspace:^"
     graphile-config: "workspace:^"

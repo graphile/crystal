@@ -8,6 +8,14 @@ import { isAsyncIterable } from "iterall";
 
 import * as assert from "./assert.js";
 import type { Bucket, RequestTools } from "./bucket.js";
+import {
+  $$contextPlanCache,
+  $$eventEmitter,
+  $$extensions,
+  $$streamMore,
+  FLAG_ERROR,
+  NO_FLAGS,
+} from "./constants.js";
 import type { Deferred } from "./deferred.js";
 import { defer } from "./deferred.js";
 import { isDev } from "./dev.js";
@@ -24,39 +32,32 @@ import type {
   SubsequentStreamSpec,
 } from "./engine/executeOutputPlan.js";
 import { executeOutputPlan } from "./engine/executeOutputPlan.js";
+import type { OperationPlan } from "./engine/OperationPlan.js";
 import { POLYMORPHIC_ROOT_PATH } from "./engine/OperationPlan.js";
 import type { OutputPlan } from "./engine/OutputPlan.js";
-import { coerceError, getChildBucketAndIndex } from "./engine/OutputPlan.js";
+import {
+  coerceError,
+  getChildBucketAndIndex,
+  getDirectLayerPlanChild,
+} from "./engine/OutputPlan.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
 import type {
-  GrafastExecutionArgs,
-  GrafastPlanJSON,
-  OperationPlan,
-} from "./index.js";
-import type {
   EstablishOperationPlanEvent,
+  GrafastExecutionArgs,
   GrafastTimeouts,
   JSONValue,
   PromiseOrDirect,
   StreamMaybeMoreableArray,
   StreamMoreableArray,
 } from "./interfaces.js";
-import {
-  $$eventEmitter,
-  $$extensions,
-  $$streamMore,
-  FLAG_ERROR,
-  NO_FLAGS,
-} from "./interfaces.js";
 import { timeSource } from "./timeSource.js";
 import { arrayOfLength, isPromiseLike } from "./utils.js";
 
 const { GraphQLError } = graphql;
 
-const $$contextPlanCache = Symbol("contextPlanCache");
 const $$bypassGraphQL = Symbol("bypassGraphQL");
 
-export interface GrafastPrepareOptions {
+export interface GrafastOperationOptions {
   /**
    * A list of 'explain' types that should be included in `extensions.explain`.
    *
@@ -75,6 +76,22 @@ export interface GrafastPrepareOptions {
   outputDataAsString?: boolean;
 
   timeouts?: GrafastTimeouts;
+
+  /**
+   * How many planning layers deep do we allow? Should be handled by validation.
+   *
+   * A planning layer can happen due to:
+   *
+   * - A nested selection set
+   * - Planning a field return type
+   * - A list position
+   * - A polymorphic type
+   * - A deferred/streamed response
+   *
+   * These reasons may each cause 1, 2 or 3 planning layers to be added, so this
+   * limit should be set quite high - e.g. 6x the selection set depth.
+   */
+  maxPlanningDepth?: number;
 }
 
 const bypassGraphQLObj = Object.assign(Object.create(null), {
@@ -322,17 +339,15 @@ function executePreemptive(
   store.set(operationPlan.contextStep.id, unaryExecutionValue(context));
   store.set(operationPlan.rootValueStep.id, unaryExecutionValue(rootValue));
 
-  const rootBucket = newBucket(
-    {
-      layerPlan: operationPlan.rootLayerPlan,
-      size,
-      store,
-      flagUnion: 0,
-      polymorphicPathList,
-      iterators,
-    },
-    null,
-  );
+  const rootBucket = newBucket(null, {
+    layerPlan: operationPlan.rootLayerPlan,
+    size,
+    store,
+    flagUnion: 0,
+    polymorphicPathList,
+    polymorphicType: null,
+    iterators,
+  });
   const startTime = timeSource.now();
   const stopTime =
     executionTimeout !== null ? startTime + executionTimeout : null;
@@ -372,17 +387,15 @@ function executePreemptive(
       : batchExecutionValue([payload]);
     store.set(rootStep!.id, rootExecutionValue);
 
-    const subscriptionBucket = newBucket(
-      {
-        layerPlan,
-        store,
-        flagUnion: rootBucket.flagUnion,
-        polymorphicPathList: [POLYMORPHIC_ROOT_PATH],
-        iterators: [new Set()],
-        size: 1, //store.size
-      },
-      rootBucket.metaByMetaKey,
-    );
+    const subscriptionBucket = newBucket(rootBucket, {
+      layerPlan,
+      store,
+      flagUnion: rootBucket.flagUnion,
+      polymorphicPathList: [POLYMORPHIC_ROOT_PATH],
+      polymorphicType: null,
+      iterators: [new Set()],
+      size: 1, //store.size
+    });
     const bucketPromise = executeBucket(subscriptionBucket, requestContext);
     function outputStreamBucket() {
       const [ctx, result] = outputBucket(
@@ -538,12 +551,6 @@ function executePreemptive(
   }
 }
 
-declare module "./engine/OperationPlan.js" {
-  interface OperationPlan {
-    [$$contextPlanCache]?: GrafastPlanJSON;
-  }
-}
-
 function establishOperationPlanFromEvent(event: EstablishOperationPlanEvent) {
   return establishOperationPlan(
     event.schema,
@@ -552,7 +559,7 @@ function establishOperationPlanFromEvent(event: EstablishOperationPlanEvent) {
     event.variableValues,
     event.context as any,
     event.rootValue,
-    event.planningTimeout,
+    event.options,
   );
 }
 
@@ -561,7 +568,7 @@ function establishOperationPlanFromEvent(event: EstablishOperationPlanEvent) {
  */
 export function grafastPrepare(
   args: GrafastExecutionArgs,
-  options: GrafastPrepareOptions = {},
+  options: GrafastOperationOptions,
 ): PromiseOrDirect<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {
@@ -584,7 +591,6 @@ export function grafastPrepare(
   }
 
   const { operation, fragments, variableValues } = exeContext;
-  const planningTimeout = options.timeouts?.planning;
   let operationPlan!: OperationPlan;
   try {
     if (middleware != null) {
@@ -597,8 +603,8 @@ export function grafastPrepare(
           variableValues,
           context: context as any,
           rootValue,
-          planningTimeout,
           args,
+          options,
         },
         establishOperationPlanFromEvent,
       );
@@ -610,7 +616,7 @@ export function grafastPrepare(
         variableValues,
         context as any,
         rootValue,
-        planningTimeout,
+        options,
       );
     }
   } catch (error) {
@@ -783,16 +789,10 @@ async function processStream(
     const polymorphicPathList: (string | null)[] = [];
     const iterators: Array<Set<AsyncIterator<any> | Iterator<any>>> = [];
 
-    let directLayerPlanChild = spec.outputPlan.layerPlan;
-    while (directLayerPlanChild.parentLayerPlan !== spec.bucket.layerPlan) {
-      const parent = directLayerPlanChild.parentLayerPlan;
-      if (!parent) {
-        throw new Error(
-          `GrafastInternalError<f6179ee1-ace2-429c-8f30-8fe6cd53ed03>: Invalid heirarchy - could not find direct layerPlan child of ${spec.bucket.layerPlan}`,
-        );
-      }
-      directLayerPlanChild = parent;
-    }
+    const directLayerPlanChild = getDirectLayerPlanChild(
+      spec.bucket.layerPlan,
+      spec.outputPlan.layerPlan,
+    );
     const { id: listItemStepId, _isUnary: isUnary } =
       directLayerPlanChild.rootStep!;
 
@@ -830,17 +830,15 @@ async function processStream(
 
     // const childBucket = newBucket(directLayerPlanChild, noDepsList, store);
     // const childBucketIndex = 0;
-    const rootBucket = newBucket(
-      {
-        layerPlan: directLayerPlanChild,
-        size,
-        store,
-        flagUnion: 0,
-        polymorphicPathList,
-        iterators,
-      },
-      spec.bucket.metaByMetaKey,
-    );
+    const rootBucket = newBucket(spec.bucket, {
+      layerPlan: directLayerPlanChild,
+      size,
+      store,
+      flagUnion: 0,
+      polymorphicPathList,
+      polymorphicType: null,
+      iterators,
+    });
 
     const bucketPromise = executeBucket(rootBucket, requestContext);
 
@@ -1000,17 +998,15 @@ function processSingleDeferred(
 
   // const childBucket = newBucket(spec.outputPlan.layerPlan, noDepsList, store);
   // const childBucketIndex = 0;
-  const rootBucket = newBucket(
-    {
-      layerPlan: outputPlan.layerPlan,
-      size,
-      store,
-      flagUnion: 0,
-      polymorphicPathList,
-      iterators,
-    },
-    null,
-  );
+  const rootBucket = newBucket(null, {
+    layerPlan: outputPlan.layerPlan,
+    size,
+    store,
+    flagUnion: 0,
+    polymorphicPathList,
+    polymorphicType: null,
+    iterators,
+  });
 
   const bucketPromise = executeBucket(rootBucket, requestContext);
 
@@ -1066,28 +1062,32 @@ function processBatches(
   whenDone: Deferred<void>,
   asString: boolean,
 ) {
-  // Key is only used for batching
-  const promises: PromiseLike<void>[] = [];
-  for (const [requestContext, batches] of batchesByRequestTools.entries()) {
-    for (const [outputPlan, specs] of batches.entries()) {
-      const promise = processSingleDeferred(
-        requestContext,
-        outputPlan,
-        specs,
-        asString,
-      );
-      if (isPromiseLike(promise)) {
-        promises.push(promise);
+  try {
+    // Key is only used for batching
+    const promises: PromiseLike<void>[] = [];
+    for (const [requestContext, batches] of batchesByRequestTools.entries()) {
+      for (const [outputPlan, specs] of batches.entries()) {
+        const promise = processSingleDeferred(
+          requestContext,
+          outputPlan,
+          specs,
+          asString,
+        );
+        if (isPromiseLike(promise)) {
+          promises.push(promise);
+        }
       }
     }
-  }
-  if (promises.length > 0) {
-    Promise.all(promises).then(
-      () => whenDone.resolve(),
-      (e) => whenDone.reject(e),
-    );
-  } else {
-    whenDone.resolve();
+    if (promises.length > 0) {
+      Promise.all(promises).then(
+        () => whenDone.resolve(),
+        (e) => whenDone.reject(e),
+      );
+    } else {
+      whenDone.resolve();
+    }
+  } catch (e) {
+    whenDone.reject(e);
   }
 }
 

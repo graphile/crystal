@@ -1,8 +1,8 @@
 import { PgExecutor, TYPES, assertPgClassSingleStep, makeRegistry, recordCodec, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, access, assertEdgeCapableStep, assertPageInfoCapableStep, connection, constant, context, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue } from "grafast";
+import { ConnectionStep, access, assertEdgeCapableStep, assertPageInfoCapableStep, connection, constant, context, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
-const handler = {
+const nodeIdHandler_Query = {
   typeName: "Query",
   codec: {
     name: "raw",
@@ -52,7 +52,7 @@ const nodeIdCodecs_base64JSON_base64JSON = {
 };
 const nodeIdCodecs = {
   __proto__: null,
-  raw: handler.codec,
+  raw: nodeIdHandler_Query.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
@@ -77,6 +77,208 @@ const executor = new PgExecutor({
       withPgClient: ctx.get("withPgClient")
     });
   }
+});
+const bookAuthorsIdentifier = sql.identifier("refs", "book_authors");
+const bookAuthorsCodec = recordCodec({
+  name: "bookAuthors",
+  identifier: bookAuthorsIdentifier,
+  attributes: {
+    __proto__: null,
+    book_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    pen_name_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  },
+  description: undefined,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "refs",
+      name: "book_authors"
+    },
+    tags: {
+      __proto__: null
+    }
+  },
+  executor: executor
+});
+const bookEditorsIdentifier = sql.identifier("refs", "book_editors");
+const bookEditorsCodec = recordCodec({
+  name: "bookEditors",
+  identifier: bookEditorsIdentifier,
+  attributes: {
+    __proto__: null,
+    book_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    person_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  },
+  description: undefined,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "refs",
+      name: "book_editors"
+    },
+    tags: {
+      __proto__: null
+    }
+  },
+  executor: executor
+});
+const booksIdentifier = sql.identifier("refs", "books");
+const spec_books = {
+  name: "books",
+  identifier: booksIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    title: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    isbn: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  },
+  description: undefined,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "refs",
+      name: "books"
+    },
+    tags: {
+      __proto__: null,
+      ref: ["relatedPeople to:Person plural", "editors to:Person plural"],
+      refVia: ["relatedPeople via:(id)->book_authors(book_id);(pen_name_id)->pen_names(id);(person_id)->people(id)", "relatedPeople via:(id)->book_editors(book_id);(person_id)->people(id)", "editors via:(id)->book_editors(book_id);(person_id)->people(id)"]
+    },
+    refDefinitions: {
+      __proto__: null,
+      relatedPeople: {
+        singular: false,
+        graphqlType: "Person",
+        sourceGraphqlType: undefined,
+        extensions: {
+          via: undefined,
+          tags: {
+            behavior: undefined
+          }
+        }
+      },
+      editors: {
+        singular: false,
+        graphqlType: "Person",
+        sourceGraphqlType: undefined,
+        extensions: {
+          via: undefined,
+          tags: {
+            behavior: undefined
+          }
+        }
+      }
+    }
+  },
+  executor: executor
+};
+const booksCodec = recordCodec(spec_books);
+const penNamesIdentifier = sql.identifier("refs", "pen_names");
+const penNamesCodec = recordCodec({
+  name: "penNames",
+  identifier: penNamesIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    pen_name: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    person_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  },
+  description: undefined,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "refs",
+      name: "pen_names"
+    },
+    tags: {
+      __proto__: null
+    }
+  },
+  executor: executor
 });
 const peopleIdentifier = sql.identifier("refs", "people");
 const peopleCodec = recordCodec({
@@ -174,6 +376,70 @@ const postsCodec = recordCodec({
   },
   executor: executor
 });
+const book_authorsUniques = [{
+  isPrimary: true,
+  attributes: ["book_id", "pen_name_id"],
+  description: undefined,
+  extensions: {
+    tags: {
+      __proto__: null
+    }
+  }
+}];
+const registryConfig_pgResources_book_authors_book_authors = {
+  executor: executor,
+  name: "book_authors",
+  identifier: "main.refs.book_authors",
+  from: bookAuthorsIdentifier,
+  codec: bookAuthorsCodec,
+  uniques: book_authorsUniques,
+  isVirtual: false,
+  description: undefined,
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "refs",
+      name: "book_authors"
+    },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
+    tags: {}
+  }
+};
+const book_editorsUniques = [{
+  isPrimary: true,
+  attributes: ["book_id", "person_id"],
+  description: undefined,
+  extensions: {
+    tags: {
+      __proto__: null
+    }
+  }
+}];
+const registryConfig_pgResources_book_editors_book_editors = {
+  executor: executor,
+  name: "book_editors",
+  identifier: "main.refs.book_editors",
+  from: bookEditorsIdentifier,
+  codec: bookEditorsCodec,
+  uniques: book_editorsUniques,
+  isVirtual: false,
+  description: undefined,
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "refs",
+      name: "book_editors"
+    },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
+    tags: {}
+  }
+};
 const peopleUniques = [{
   isPrimary: true,
   attributes: ["id"],
@@ -240,6 +506,82 @@ const registryConfig_pgResources_posts_posts = {
     }
   }
 };
+const booksUniques = [{
+  isPrimary: true,
+  attributes: ["id"],
+  description: undefined,
+  extensions: {
+    tags: {
+      __proto__: null
+    }
+  }
+}, {
+  isPrimary: false,
+  attributes: ["isbn"],
+  description: undefined,
+  extensions: {
+    tags: {
+      __proto__: null
+    }
+  }
+}];
+const registryConfig_pgResources_books_books = {
+  executor: executor,
+  name: "books",
+  identifier: "main.refs.books",
+  from: booksIdentifier,
+  codec: booksCodec,
+  uniques: booksUniques,
+  isVirtual: false,
+  description: undefined,
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "refs",
+      name: "books"
+    },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
+    tags: {
+      ref: spec_books.extensions.tags.ref,
+      refVia: spec_books.extensions.tags.refVia
+    }
+  }
+};
+const pen_namesUniques = [{
+  isPrimary: true,
+  attributes: ["id"],
+  description: undefined,
+  extensions: {
+    tags: {
+      __proto__: null
+    }
+  }
+}];
+const registryConfig_pgResources_pen_names_pen_names = {
+  executor: executor,
+  name: "pen_names",
+  identifier: "main.refs.pen_names",
+  from: penNamesIdentifier,
+  codec: penNamesCodec,
+  uniques: pen_namesUniques,
+  isVirtual: false,
+  description: undefined,
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "refs",
+      name: "pen_names"
+    },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
+    tags: {}
+  }
+};
 const registry = makeRegistry({
   pgExecutors: {
     __proto__: null,
@@ -251,16 +593,156 @@ const registry = makeRegistry({
     varchar: TYPES.varchar,
     bpchar: TYPES.bpchar,
     int4: TYPES.int,
+    bookAuthors: bookAuthorsCodec,
+    bookEditors: bookEditorsCodec,
+    books: booksCodec,
+    penNames: penNamesCodec,
     people: peopleCodec,
     posts: postsCodec
   },
   pgResources: {
     __proto__: null,
+    book_authors: registryConfig_pgResources_book_authors_book_authors,
+    book_editors: registryConfig_pgResources_book_editors_book_editors,
     people: registryConfig_pgResources_people_people,
-    posts: registryConfig_pgResources_posts_posts
+    posts: registryConfig_pgResources_posts_posts,
+    books: registryConfig_pgResources_books_books,
+    pen_names: registryConfig_pgResources_pen_names_pen_names
   },
   pgRelations: {
     __proto__: null,
+    bookAuthors: {
+      __proto__: null,
+      booksByMyBookId: {
+        localCodec: bookAuthorsCodec,
+        remoteResourceOptions: registryConfig_pgResources_books_books,
+        localCodecPolymorphicTypes: undefined,
+        localAttributes: ["book_id"],
+        remoteAttributes: ["id"],
+        isUnique: true,
+        isReferencee: false,
+        description: undefined,
+        extensions: {
+          tags: {
+            behavior: []
+          }
+        }
+      },
+      penNamesByMyPenNameId: {
+        localCodec: bookAuthorsCodec,
+        remoteResourceOptions: registryConfig_pgResources_pen_names_pen_names,
+        localCodecPolymorphicTypes: undefined,
+        localAttributes: ["pen_name_id"],
+        remoteAttributes: ["id"],
+        isUnique: true,
+        isReferencee: false,
+        description: undefined,
+        extensions: {
+          tags: {
+            behavior: []
+          }
+        }
+      }
+    },
+    bookEditors: {
+      __proto__: null,
+      booksByMyBookId: {
+        localCodec: bookEditorsCodec,
+        remoteResourceOptions: registryConfig_pgResources_books_books,
+        localCodecPolymorphicTypes: undefined,
+        localAttributes: ["book_id"],
+        remoteAttributes: ["id"],
+        isUnique: true,
+        isReferencee: false,
+        description: undefined,
+        extensions: {
+          tags: {
+            behavior: []
+          }
+        }
+      },
+      peopleByMyPersonId: {
+        localCodec: bookEditorsCodec,
+        remoteResourceOptions: registryConfig_pgResources_people_people,
+        localCodecPolymorphicTypes: undefined,
+        localAttributes: ["person_id"],
+        remoteAttributes: ["id"],
+        isUnique: true,
+        isReferencee: false,
+        description: undefined,
+        extensions: {
+          tags: {
+            behavior: []
+          }
+        }
+      }
+    },
+    books: {
+      __proto__: null,
+      bookAuthorsByTheirBookId: {
+        localCodec: booksCodec,
+        remoteResourceOptions: registryConfig_pgResources_book_authors_book_authors,
+        localCodecPolymorphicTypes: undefined,
+        localAttributes: ["id"],
+        remoteAttributes: ["book_id"],
+        isUnique: false,
+        isReferencee: true,
+        description: undefined,
+        extensions: {
+          tags: {
+            behavior: []
+          }
+        }
+      },
+      bookEditorsByTheirBookId: {
+        localCodec: booksCodec,
+        remoteResourceOptions: registryConfig_pgResources_book_editors_book_editors,
+        localCodecPolymorphicTypes: undefined,
+        localAttributes: ["id"],
+        remoteAttributes: ["book_id"],
+        isUnique: false,
+        isReferencee: true,
+        description: undefined,
+        extensions: {
+          tags: {
+            behavior: []
+          }
+        }
+      }
+    },
+    penNames: {
+      __proto__: null,
+      peopleByMyPersonId: {
+        localCodec: penNamesCodec,
+        remoteResourceOptions: registryConfig_pgResources_people_people,
+        localCodecPolymorphicTypes: undefined,
+        localAttributes: ["person_id"],
+        remoteAttributes: ["id"],
+        isUnique: true,
+        isReferencee: false,
+        description: undefined,
+        extensions: {
+          tags: {
+            behavior: []
+          }
+        }
+      },
+      bookAuthorsByTheirPenNameId: {
+        localCodec: penNamesCodec,
+        remoteResourceOptions: registryConfig_pgResources_book_authors_book_authors,
+        localCodecPolymorphicTypes: undefined,
+        localAttributes: ["id"],
+        remoteAttributes: ["pen_name_id"],
+        isUnique: false,
+        isReferencee: true,
+        description: undefined,
+        extensions: {
+          tags: {
+            behavior: []
+          }
+        }
+      }
+    },
     people: {
       __proto__: null,
       postsByTheirUserId: {
@@ -276,6 +758,36 @@ const registry = makeRegistry({
           tags: {
             omit: true,
             behavior: ["-select", "-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
+          }
+        }
+      },
+      penNamesByTheirPersonId: {
+        localCodec: peopleCodec,
+        remoteResourceOptions: registryConfig_pgResources_pen_names_pen_names,
+        localCodecPolymorphicTypes: undefined,
+        localAttributes: ["id"],
+        remoteAttributes: ["person_id"],
+        isUnique: false,
+        isReferencee: true,
+        description: undefined,
+        extensions: {
+          tags: {
+            behavior: []
+          }
+        }
+      },
+      bookEditorsByTheirPersonId: {
+        localCodec: peopleCodec,
+        remoteResourceOptions: registryConfig_pgResources_book_editors_book_editors,
+        localCodecPolymorphicTypes: undefined,
+        localAttributes: ["id"],
+        remoteAttributes: ["person_id"],
+        isUnique: false,
+        isReferencee: true,
+        description: undefined,
+        extensions: {
+          tags: {
+            behavior: []
           }
         }
       }
@@ -301,54 +813,33 @@ const registry = makeRegistry({
     }
   }
 });
-const pgResource_peoplePgResource = registry.pgResources["people"];
-const pgResource_postsPgResource = registry.pgResources["posts"];
-const nodeIdHandlerByTypeName = {
-  __proto__: null,
-  Query: handler,
-  Person: {
-    typeName: "Person",
-    codec: nodeIdCodecs_base64JSON_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("people", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return pgResource_peoplePgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "people";
-    }
+const resource_book_authorsPgResource = registry.pgResources["book_authors"];
+const resource_book_editorsPgResource = registry.pgResources["book_editors"];
+const resource_peoplePgResource = registry.pgResources["people"];
+const resource_postsPgResource = registry.pgResources["posts"];
+const resource_booksPgResource = registry.pgResources["books"];
+const resource_pen_namesPgResource = registry.pgResources["pen_names"];
+const nodeIdHandler_BookAuthor = {
+  typeName: "BookAuthor",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("book_authors", false), $record.get("book_id"), $record.get("pen_name_id")]);
   },
-  Post: {
-    typeName: "Post",
-    codec: nodeIdCodecs_base64JSON_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("posts", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return pgResource_postsPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "posts";
-    }
+  getSpec($list) {
+    return {
+      book_id: inhibitOnNull(access($list, [1])),
+      pen_name_id: inhibitOnNull(access($list, [2]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_book_authorsPgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "book_authors";
   }
 };
 function specForHandler(handler) {
@@ -370,16 +861,164 @@ function specForHandler(handler) {
   spec.isSyncAndSafe = true; // Optimization
   return spec;
 }
+const nodeFetcher_BookAuthor = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_BookAuthor));
+  return nodeIdHandler_BookAuthor.get(nodeIdHandler_BookAuthor.getSpec($decoded));
+};
+const nodeIdHandler_BookEditor = {
+  typeName: "BookEditor",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("book_editors", false), $record.get("book_id"), $record.get("person_id")]);
+  },
+  getSpec($list) {
+    return {
+      book_id: inhibitOnNull(access($list, [1])),
+      person_id: inhibitOnNull(access($list, [2]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_book_editorsPgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "book_editors";
+  }
+};
+const nodeFetcher_BookEditor = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_BookEditor));
+  return nodeIdHandler_BookEditor.get(nodeIdHandler_BookEditor.getSpec($decoded));
+};
+const nodeIdHandler_Person = {
+  typeName: "Person",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("people", false), $record.get("id")]);
+  },
+  getSpec($list) {
+    return {
+      id: inhibitOnNull(access($list, [1]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_peoplePgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "people";
+  }
+};
 const nodeFetcher_Person = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Person));
-  return nodeIdHandlerByTypeName.Person.get(nodeIdHandlerByTypeName.Person.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Person));
+  return nodeIdHandler_Person.get(nodeIdHandler_Person.getSpec($decoded));
+};
+const nodeIdHandler_Post = {
+  typeName: "Post",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("posts", false), $record.get("id")]);
+  },
+  getSpec($list) {
+    return {
+      id: inhibitOnNull(access($list, [1]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_postsPgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "posts";
+  }
 };
 const nodeFetcher_Post = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Post));
-  return nodeIdHandlerByTypeName.Post.get(nodeIdHandlerByTypeName.Post.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Post));
+  return nodeIdHandler_Post.get(nodeIdHandler_Post.getSpec($decoded));
+};
+const nodeIdHandler_Book = {
+  typeName: "Book",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("books", false), $record.get("id")]);
+  },
+  getSpec($list) {
+    return {
+      id: inhibitOnNull(access($list, [1]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_booksPgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "books";
+  }
+};
+const nodeFetcher_Book = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Book));
+  return nodeIdHandler_Book.get(nodeIdHandler_Book.getSpec($decoded));
+};
+const nodeIdHandler_PenName = {
+  typeName: "PenName",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("pen_names", false), $record.get("id")]);
+  },
+  getSpec($list) {
+    return {
+      id: inhibitOnNull(access($list, [1]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_pen_namesPgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "pen_names";
+  }
+};
+const nodeFetcher_PenName = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_PenName));
+  return nodeIdHandler_PenName.get(nodeIdHandler_PenName.getSpec($decoded));
 };
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
+}
+const nodeIdHandlerByTypeName = {
+  __proto__: null,
+  Query: nodeIdHandler_Query,
+  BookAuthor: nodeIdHandler_BookAuthor,
+  BookEditor: nodeIdHandler_BookEditor,
+  Person: nodeIdHandler_Person,
+  Post: nodeIdHandler_Post,
+  Book: nodeIdHandler_Book,
+  PenName: nodeIdHandler_PenName
+};
+const decodeNodeId = makeDecodeNodeId(Object.values(nodeIdHandlerByTypeName));
+function findTypeNameMatch(specifier) {
+  if (!specifier) return null;
+  for (const [typeName, typeSpec] of Object.entries(nodeIdHandlerByTypeName)) {
+    const value = specifier[typeSpec.codec.name];
+    if (value != null && typeSpec.match(value)) {
+      return typeName;
+    }
+  }
+  return null;
 }
 function CursorSerialize(value) {
   return "" + value;
@@ -403,11 +1042,42 @@ type Query implements Node {
     nodeId: ID!
   ): Node
 
+  """Get a single \`BookAuthor\`."""
+  bookAuthorByBookIdAndPenNameId(bookId: Int!, penNameId: Int!): BookAuthor
+
+  """Get a single \`BookEditor\`."""
+  bookEditorByBookIdAndPersonId(bookId: Int!, personId: Int!): BookEditor
+
   """Get a single \`Person\`."""
   personById(id: Int!): Person
 
   """Get a single \`Post\`."""
   postById(id: Int!): Post
+
+  """Get a single \`Book\`."""
+  bookById(id: Int!): Book
+
+  """Get a single \`Book\`."""
+  bookByIsbn(isbn: String!): Book
+
+  """Get a single \`PenName\`."""
+  penNameById(id: Int!): PenName
+
+  """Reads a single \`BookAuthor\` using its globally unique \`ID\`."""
+  bookAuthor(
+    """
+    The globally unique \`ID\` to be used in selecting a single \`BookAuthor\`.
+    """
+    nodeId: ID!
+  ): BookAuthor
+
+  """Reads a single \`BookEditor\` using its globally unique \`ID\`."""
+  bookEditor(
+    """
+    The globally unique \`ID\` to be used in selecting a single \`BookEditor\`.
+    """
+    nodeId: ID!
+  ): BookEditor
 
   """Reads a single \`Person\` using its globally unique \`ID\`."""
   person(
@@ -420,6 +1090,76 @@ type Query implements Node {
     """The globally unique \`ID\` to be used in selecting a single \`Post\`."""
     nodeId: ID!
   ): Post
+
+  """Reads a single \`Book\` using its globally unique \`ID\`."""
+  book(
+    """The globally unique \`ID\` to be used in selecting a single \`Book\`."""
+    nodeId: ID!
+  ): Book
+
+  """Reads a single \`PenName\` using its globally unique \`ID\`."""
+  penName(
+    """The globally unique \`ID\` to be used in selecting a single \`PenName\`."""
+    nodeId: ID!
+  ): PenName
+
+  """Reads and enables pagination through a set of \`BookAuthor\`."""
+  allBookAuthors(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: BookAuthorCondition
+
+    """The method to use when ordering \`BookAuthor\`."""
+    orderBy: [BookAuthorsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): BookAuthorsConnection
+
+  """Reads and enables pagination through a set of \`BookEditor\`."""
+  allBookEditors(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: BookEditorCondition
+
+    """The method to use when ordering \`BookEditor\`."""
+    orderBy: [BookEditorsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): BookEditorsConnection
 
   """Reads and enables pagination through a set of \`Person\`."""
   allPeople(
@@ -478,6 +1218,64 @@ type Query implements Node {
     """The method to use when ordering \`Post\`."""
     orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PostsConnection
+
+  """Reads and enables pagination through a set of \`Book\`."""
+  allBooks(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: BookCondition
+
+    """The method to use when ordering \`Book\`."""
+    orderBy: [BooksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): BooksConnection
+
+  """Reads and enables pagination through a set of \`PenName\`."""
+  allPenNames(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PenNameCondition
+
+    """The method to use when ordering \`PenName\`."""
+    orderBy: [PenNamesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PenNamesConnection
 }
 
 """An object with a globally unique \`ID\`."""
@@ -488,6 +1286,246 @@ interface Node {
   nodeId: ID!
 }
 
+type BookAuthor implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  bookId: Int!
+  penNameId: Int!
+
+  """Reads a single \`Book\` that is related to this \`BookAuthor\`."""
+  bookByBookId: Book
+
+  """Reads a single \`PenName\` that is related to this \`BookAuthor\`."""
+  penNameByPenNameId: PenName
+}
+
+type Book implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  id: Int!
+  title: String!
+  isbn: String
+
+  """Reads and enables pagination through a set of \`BookAuthor\`."""
+  bookAuthorsByBookId(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: BookAuthorCondition
+
+    """The method to use when ordering \`BookAuthor\`."""
+    orderBy: [BookAuthorsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): BookAuthorsConnection!
+
+  """Reads and enables pagination through a set of \`BookEditor\`."""
+  bookEditorsByBookId(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: BookEditorCondition
+
+    """The method to use when ordering \`BookEditor\`."""
+    orderBy: [BookEditorsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): BookEditorsConnection!
+
+  """Reads and enables pagination through a set of \`Person\`."""
+  relatedPeople(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PersonCondition
+
+    """The method to use when ordering \`Person\`."""
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PeopleConnection!
+
+  """Reads and enables pagination through a set of \`Person\`."""
+  editors(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PersonCondition
+
+    """The method to use when ordering \`Person\`."""
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PeopleConnection!
+}
+
+"""A connection to a list of \`BookAuthor\` values."""
+type BookAuthorsConnection {
+  """A list of \`BookAuthor\` objects."""
+  nodes: [BookAuthor]!
+
+  """
+  A list of edges which contains the \`BookAuthor\` and cursor to aid in pagination.
+  """
+  edges: [BookAuthorsEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`BookAuthor\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`BookAuthor\` edge in the connection."""
+type BookAuthorsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`BookAuthor\` at the end of the edge."""
+  node: BookAuthor
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+}
+
+"""
+A condition to be used against \`BookAuthor\` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input BookAuthorCondition {
+  """Checks for equality with the object’s \`bookId\` field."""
+  bookId: Int
+
+  """Checks for equality with the object’s \`penNameId\` field."""
+  penNameId: Int
+}
+
+"""Methods to use when ordering \`BookAuthor\`."""
+enum BookAuthorsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  BOOK_ID_ASC
+  BOOK_ID_DESC
+  PEN_NAME_ID_ASC
+  PEN_NAME_ID_DESC
+}
+
+"""A connection to a list of \`BookEditor\` values."""
+type BookEditorsConnection {
+  """A list of \`BookEditor\` objects."""
+  nodes: [BookEditor]!
+
+  """
+  A list of edges which contains the \`BookEditor\` and cursor to aid in pagination.
+  """
+  edges: [BookEditorsEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`BookEditor\` you could get from the connection."""
+  totalCount: Int!
+}
+
+type BookEditor implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  bookId: Int!
+  personId: Int!
+
+  """Reads a single \`Book\` that is related to this \`BookEditor\`."""
+  bookByBookId: Book
+
+  """Reads a single \`Person\` that is related to this \`BookEditor\`."""
+  personByPersonId: Person
+}
+
 type Person implements Node {
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
@@ -495,17 +1533,191 @@ type Person implements Node {
   nodeId: ID!
   id: Int!
   name: String!
+
+  """Reads and enables pagination through a set of \`PenName\`."""
+  penNamesByPersonId(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PenNameCondition
+
+    """The method to use when ordering \`PenName\`."""
+    orderBy: [PenNamesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PenNamesConnection!
+
+  """Reads and enables pagination through a set of \`BookEditor\`."""
+  bookEditorsByPersonId(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: BookEditorCondition
+
+    """The method to use when ordering \`BookEditor\`."""
+    orderBy: [BookEditorsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): BookEditorsConnection!
 }
 
-type Post implements Node {
+"""A connection to a list of \`PenName\` values."""
+type PenNamesConnection {
+  """A list of \`PenName\` objects."""
+  nodes: [PenName]!
+
+  """
+  A list of edges which contains the \`PenName\` and cursor to aid in pagination.
+  """
+  edges: [PenNamesEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`PenName\` you could get from the connection."""
+  totalCount: Int!
+}
+
+type PenName implements Node {
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
   nodeId: ID!
   id: Int!
+  penName: String!
+  personId: Int
 
-  """Reads a single \`Person\` that is related to this \`Post\`."""
-  author: Person!
+  """Reads a single \`Person\` that is related to this \`PenName\`."""
+  personByPersonId: Person
+
+  """Reads and enables pagination through a set of \`BookAuthor\`."""
+  bookAuthorsByPenNameId(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: BookAuthorCondition
+
+    """The method to use when ordering \`BookAuthor\`."""
+    orderBy: [BookAuthorsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): BookAuthorsConnection!
+}
+
+"""A \`PenName\` edge in the connection."""
+type PenNamesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`PenName\` at the end of the edge."""
+  node: PenName
+}
+
+"""
+A condition to be used against \`PenName\` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input PenNameCondition {
+  """Checks for equality with the object’s \`id\` field."""
+  id: Int
+
+  """Checks for equality with the object’s \`penName\` field."""
+  penName: String
+
+  """Checks for equality with the object’s \`personId\` field."""
+  personId: Int
+}
+
+"""Methods to use when ordering \`PenName\`."""
+enum PenNamesOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  PEN_NAME_ASC
+  PEN_NAME_DESC
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+}
+
+"""
+A condition to be used against \`BookEditor\` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input BookEditorCondition {
+  """Checks for equality with the object’s \`bookId\` field."""
+  bookId: Int
+
+  """Checks for equality with the object’s \`personId\` field."""
+  personId: Int
+}
+
+"""Methods to use when ordering \`BookEditor\`."""
+enum BookEditorsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  BOOK_ID_ASC
+  BOOK_ID_DESC
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+}
+
+"""A \`BookEditor\` edge in the connection."""
+type BookEditorsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`BookEditor\` at the end of the edge."""
+  node: BookEditor
 }
 
 """A connection to a list of \`Person\` values."""
@@ -534,24 +1746,6 @@ type PeopleEdge {
   node: Person
 }
 
-"""A location in a connection that can be used for resuming pagination."""
-scalar Cursor
-
-"""Information about pagination in a connection."""
-type PageInfo {
-  """When paginating forwards, are there more items?"""
-  hasNextPage: Boolean!
-
-  """When paginating backwards, are there more items?"""
-  hasPreviousPage: Boolean!
-
-  """When paginating backwards, the cursor to continue."""
-  startCursor: Cursor
-
-  """When paginating forwards, the cursor to continue."""
-  endCursor: Cursor
-}
-
 """
 A condition to be used against \`Person\` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
@@ -572,6 +1766,17 @@ enum PeopleOrderBy {
   ID_DESC
   NAME_ASC
   NAME_DESC
+}
+
+type Post implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  id: Int!
+
+  """Reads a single \`Person\` that is related to this \`Post\`."""
+  author: Person!
 }
 
 """A connection to a list of \`Post\` values."""
@@ -615,6 +1820,59 @@ enum PostsOrderBy {
   PRIMARY_KEY_DESC
   ID_ASC
   ID_DESC
+}
+
+"""A connection to a list of \`Book\` values."""
+type BooksConnection {
+  """A list of \`Book\` objects."""
+  nodes: [Book]!
+
+  """
+  A list of edges which contains the \`Book\` and cursor to aid in pagination.
+  """
+  edges: [BooksEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`Book\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`Book\` edge in the connection."""
+type BooksEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`Book\` at the end of the edge."""
+  node: Book
+}
+
+"""
+A condition to be used against \`Book\` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input BookCondition {
+  """Checks for equality with the object’s \`id\` field."""
+  id: Int
+
+  """Checks for equality with the object’s \`title\` field."""
+  title: String
+
+  """Checks for equality with the object’s \`isbn\` field."""
+  isbn: String
+}
+
+"""Methods to use when ordering \`Book\`."""
+enum BooksOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  TITLE_ASC
+  TITLE_DESC
+  ISBN_ASC
+  ISBN_DESC
 }`;
 export const plans = {
   Query: {
@@ -625,25 +1883,72 @@ export const plans = {
       return rootValue();
     },
     nodeId($parent) {
-      const specifier = handler.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler.codec.name].encode);
+      const specifier = nodeIdHandler_Query.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Query.codec.name].encode);
     },
-    node(_$root, args) {
-      return node(nodeIdHandlerByTypeName, args.getRaw("nodeId"));
+    node(_$root, fieldArgs) {
+      return fieldArgs.getRaw("nodeId");
+    },
+    bookAuthorByBookIdAndPenNameId(_$root, {
+      $bookId,
+      $penNameId
+    }) {
+      return resource_book_authorsPgResource.get({
+        book_id: $bookId,
+        pen_name_id: $penNameId
+      });
+    },
+    bookEditorByBookIdAndPersonId(_$root, {
+      $bookId,
+      $personId
+    }) {
+      return resource_book_editorsPgResource.get({
+        book_id: $bookId,
+        person_id: $personId
+      });
     },
     personById(_$root, {
       $id
     }) {
-      return pgResource_peoplePgResource.get({
+      return resource_peoplePgResource.get({
         id: $id
       });
     },
     postById(_$root, {
       $id
     }) {
-      return pgResource_postsPgResource.get({
+      return resource_postsPgResource.get({
         id: $id
       });
+    },
+    bookById(_$root, {
+      $id
+    }) {
+      return resource_booksPgResource.get({
+        id: $id
+      });
+    },
+    bookByIsbn(_$root, {
+      $isbn
+    }) {
+      return resource_booksPgResource.get({
+        isbn: $isbn
+      });
+    },
+    penNameById(_$root, {
+      $id
+    }) {
+      return resource_pen_namesPgResource.get({
+        id: $id
+      });
+    },
+    bookAuthor(_$parent, args) {
+      const $nodeId = args.getRaw("nodeId");
+      return nodeFetcher_BookAuthor($nodeId);
+    },
+    bookEditor(_$parent, args) {
+      const $nodeId = args.getRaw("nodeId");
+      return nodeFetcher_BookEditor($nodeId);
     },
     person(_$parent, args) {
       const $nodeId = args.getRaw("nodeId");
@@ -653,9 +1958,77 @@ export const plans = {
       const $nodeId = args.getRaw("nodeId");
       return nodeFetcher_Post($nodeId);
     },
+    book(_$parent, args) {
+      const $nodeId = args.getRaw("nodeId");
+      return nodeFetcher_Book($nodeId);
+    },
+    penName(_$parent, args) {
+      const $nodeId = args.getRaw("nodeId");
+      return nodeFetcher_PenName($nodeId);
+    },
+    allBookAuthors: {
+      plan() {
+        return connection(resource_book_authorsPgResource.find());
+      },
+      args: {
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
+        },
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
+        },
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
+        },
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
+        },
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
+        },
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
+        },
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
+        }
+      }
+    },
+    allBookEditors: {
+      plan() {
+        return connection(resource_book_editorsPgResource.find());
+      },
+      args: {
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
+        },
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
+        },
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
+        },
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
+        },
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
+        },
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
+        },
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
+        }
+      }
+    },
     allPeople: {
       plan() {
-        return connection(pgResource_peoplePgResource.find());
+        return connection(resource_peoplePgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -685,7 +2058,67 @@ export const plans = {
     },
     allPosts: {
       plan() {
-        return connection(pgResource_postsPgResource.find());
+        return connection(resource_postsPgResource.find());
+      },
+      args: {
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
+        },
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
+        },
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
+        },
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
+        },
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
+        },
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
+        },
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
+        }
+      }
+    },
+    allBooks: {
+      plan() {
+        return connection(resource_booksPgResource.find());
+      },
+      args: {
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
+        },
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
+        },
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
+        },
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
+        },
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
+        },
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
+        },
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
+        }
+      }
+    },
+    allPenNames: {
+      plan() {
+        return connection(resource_pen_namesPgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -714,32 +2147,228 @@ export const plans = {
       }
     }
   },
-  Person: {
-    __assertStep: assertPgClassSingleStep,
-    nodeId($parent) {
-      const specifier = nodeIdHandlerByTypeName.Person.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Person.codec.name].encode);
+  Node: {
+    __planType($nodeId) {
+      const $specifier = decodeNodeId($nodeId);
+      const $__typename = lambda($specifier, findTypeNameMatch, true);
+      return {
+        $__typename,
+        planForType(type) {
+          const spec = nodeIdHandlerByTypeName[type.name];
+          if (spec) {
+            return spec.get(spec.getSpec(access($specifier, [spec.codec.name])));
+          } else {
+            throw new Error(`Failed to find handler for ${type.name}`);
+          }
+        }
+      };
     }
   },
-  Post: {
+  BookAuthor: {
     __assertStep: assertPgClassSingleStep,
-    nodeId($parent) {
-      const specifier = nodeIdHandlerByTypeName.Post.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Post.codec.name].encode);
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of book_authorsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_book_authorsPgResource.get(spec);
     },
-    author($record) {
-      return pgResource_peoplePgResource.get({
-        id: $record.get("user_id")
+    nodeId($parent) {
+      const specifier = nodeIdHandler_BookAuthor.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_BookAuthor.codec.name].encode);
+    },
+    bookId($record) {
+      return $record.get("book_id");
+    },
+    penNameId($record) {
+      return $record.get("pen_name_id");
+    },
+    bookByBookId($record) {
+      return resource_booksPgResource.get({
+        id: $record.get("book_id")
+      });
+    },
+    penNameByPenNameId($record) {
+      return resource_pen_namesPgResource.get({
+        id: $record.get("pen_name_id")
       });
     }
   },
-  PeopleConnection: {
+  Book: {
+    __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of booksUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_booksPgResource.get(spec);
+    },
+    nodeId($parent) {
+      const specifier = nodeIdHandler_Book.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Book.codec.name].encode);
+    },
+    bookAuthorsByBookId: {
+      plan($record) {
+        const $records = resource_book_authorsPgResource.find({
+          book_id: $record.get("id")
+        });
+        return connection($records);
+      },
+      args: {
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
+        },
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
+        },
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
+        },
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
+        },
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
+        },
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
+        },
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
+        }
+      }
+    },
+    bookEditorsByBookId: {
+      plan($record) {
+        const $records = resource_book_editorsPgResource.find({
+          book_id: $record.get("id")
+        });
+        return connection($records);
+      },
+      args: {
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
+        },
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
+        },
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
+        },
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
+        },
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
+        },
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
+        },
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
+        }
+      }
+    },
+    relatedPeople: {
+      plan($record) {
+        const $people = resource_peoplePgResource.find();
+        const subquery = sql.identifier(Symbol('subquery'));
+        const selects = [];
+        selects.push(sql`select __l1__.${sql.identifier("person_id")} as "0"
+from ${resource_pen_namesPgResource.from} as __l1__
+inner join ${resource_book_authorsPgResource.from} as __l0__
+on (__l0__.${sql.identifier("pen_name_id")} = __l1__.${sql.identifier("id")})
+where __l0__.${sql.identifier("book_id")} = ${$people.placeholder($record.get("id"))}`);
+        selects.push(sql`select __l0__.${sql.identifier("person_id")} as "0"
+from ${resource_book_editorsPgResource.from} as __l0__
+where __l0__.${sql.identifier("book_id")} = ${$people.placeholder($record.get("id"))}`);
+        $people.join({
+          type: "inner",
+          from: sql`(${sql.indent(sql.join(selects.map(s => sql.indent(s)), '\n\nunion all\n\n'))})`,
+          alias: subquery,
+          conditions: [sql`${$people.alias}.${sql.identifier("id")} = ${subquery}."0"`]
+        });
+        return connection($people);
+      },
+      args: {
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
+        },
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
+        },
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
+        },
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
+        },
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
+        },
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
+        },
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
+        }
+      }
+    },
+    editors: {
+      plan($record) {
+        const $people = resource_peoplePgResource.find();
+        let previousAlias = $people.alias;
+        const book_editorsAlias = sql.identifier(Symbol("book_editors"));
+        $people.join({
+          type: "inner",
+          from: resource_book_editorsPgResource.from,
+          alias: book_editorsAlias,
+          conditions: [sql`${previousAlias}.${sql.identifier("id")} = ${book_editorsAlias}.${sql.identifier("person_id")}`]
+        });
+        previousAlias = book_editorsAlias;
+        $people.where(sql`${previousAlias}.${sql.identifier("book_id")} = ${$people.placeholder($record.get("id"))}`);
+        return connection($people);
+      },
+      args: {
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
+        },
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
+        },
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
+        },
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
+        },
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
+        },
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
+        },
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
+        }
+      }
+    }
+  },
+  BookAuthorsConnection: {
     __assertStep: ConnectionStep,
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
-  PeopleEdge: {
+  BookAuthorsEdge: {
     __assertStep: assertEdgeCapableStep,
     cursor($edge) {
       return $edge.cursor();
@@ -771,6 +2400,438 @@ export const plans = {
     },
     endCursor($pageInfo) {
       return $pageInfo.endCursor();
+    }
+  },
+  BookAuthorCondition: {
+    bookId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "book_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
+    },
+    penNameId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "pen_name_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
+    }
+  },
+  BookAuthorsOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      book_authorsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      book_authorsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    BOOK_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "book_id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    BOOK_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "book_id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PEN_NAME_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "pen_name_id",
+        direction: "ASC"
+      });
+    },
+    PEN_NAME_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "pen_name_id",
+        direction: "DESC"
+      });
+    }
+  },
+  BookEditorsConnection: {
+    __assertStep: ConnectionStep,
+    totalCount($connection) {
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+    }
+  },
+  BookEditor: {
+    __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of book_editorsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_book_editorsPgResource.get(spec);
+    },
+    nodeId($parent) {
+      const specifier = nodeIdHandler_BookEditor.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_BookEditor.codec.name].encode);
+    },
+    bookId($record) {
+      return $record.get("book_id");
+    },
+    personId($record) {
+      return $record.get("person_id");
+    },
+    bookByBookId($record) {
+      return resource_booksPgResource.get({
+        id: $record.get("book_id")
+      });
+    },
+    personByPersonId($record) {
+      return resource_peoplePgResource.get({
+        id: $record.get("person_id")
+      });
+    }
+  },
+  Person: {
+    __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of peopleUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_peoplePgResource.get(spec);
+    },
+    nodeId($parent) {
+      const specifier = nodeIdHandler_Person.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Person.codec.name].encode);
+    },
+    penNamesByPersonId: {
+      plan($record) {
+        const $records = resource_pen_namesPgResource.find({
+          person_id: $record.get("id")
+        });
+        return connection($records);
+      },
+      args: {
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
+        },
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
+        },
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
+        },
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
+        },
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
+        },
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
+        },
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
+        }
+      }
+    },
+    bookEditorsByPersonId: {
+      plan($record) {
+        const $records = resource_book_editorsPgResource.find({
+          person_id: $record.get("id")
+        });
+        return connection($records);
+      },
+      args: {
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
+        },
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
+        },
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
+        },
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
+        },
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
+        },
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
+        },
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
+        }
+      }
+    }
+  },
+  PenNamesConnection: {
+    __assertStep: ConnectionStep,
+    totalCount($connection) {
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+    }
+  },
+  PenName: {
+    __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of pen_namesUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_pen_namesPgResource.get(spec);
+    },
+    nodeId($parent) {
+      const specifier = nodeIdHandler_PenName.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_PenName.codec.name].encode);
+    },
+    penName($record) {
+      return $record.get("pen_name");
+    },
+    personId($record) {
+      return $record.get("person_id");
+    },
+    personByPersonId($record) {
+      return resource_peoplePgResource.get({
+        id: $record.get("person_id")
+      });
+    },
+    bookAuthorsByPenNameId: {
+      plan($record) {
+        const $records = resource_book_authorsPgResource.find({
+          pen_name_id: $record.get("id")
+        });
+        return connection($records);
+      },
+      args: {
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
+        },
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
+        },
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
+        },
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
+        },
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
+        },
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
+        },
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
+        }
+      }
+    }
+  },
+  PenNamesEdge: {
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
+  },
+  PenNameCondition: {
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
+    },
+    penName($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "pen_name",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+        }
+      });
+    },
+    personId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "person_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
+    }
+  },
+  PenNamesOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      pen_namesUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      pen_namesUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PEN_NAME_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "pen_name",
+        direction: "ASC"
+      });
+    },
+    PEN_NAME_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "pen_name",
+        direction: "DESC"
+      });
+    },
+    PERSON_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_id",
+        direction: "ASC"
+      });
+    },
+    PERSON_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_id",
+        direction: "DESC"
+      });
+    }
+  },
+  BookEditorCondition: {
+    bookId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "book_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
+    },
+    personId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "person_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
+    }
+  },
+  BookEditorsOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      book_editorsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      book_editorsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    BOOK_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "book_id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    BOOK_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "book_id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PERSON_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_id",
+        direction: "ASC"
+      });
+    },
+    PERSON_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_id",
+        direction: "DESC"
+      });
+    }
+  },
+  BookEditorsEdge: {
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
+  },
+  PeopleConnection: {
+    __assertStep: ConnectionStep,
+    totalCount($connection) {
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+    }
+  },
+  PeopleEdge: {
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
     }
   },
   PersonCondition: {
@@ -839,6 +2900,25 @@ export const plans = {
       });
     }
   },
+  Post: {
+    __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of postsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_postsPgResource.get(spec);
+    },
+    nodeId($parent) {
+      const specifier = nodeIdHandler_Post.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Post.codec.name].encode);
+    },
+    author($record) {
+      return resource_peoplePgResource.get({
+        id: $record.get("user_id")
+      });
+    }
+  },
   PostsConnection: {
     __assertStep: ConnectionStep,
     totalCount($connection) {
@@ -894,6 +2974,110 @@ export const plans = {
     ID_DESC(queryBuilder) {
       queryBuilder.orderBy({
         attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
+    }
+  },
+  BooksConnection: {
+    __assertStep: ConnectionStep,
+    totalCount($connection) {
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+    }
+  },
+  BooksEdge: {
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
+  },
+  BookCondition: {
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
+    },
+    title($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "title",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+        }
+      });
+    },
+    isbn($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "isbn",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+        }
+      });
+    }
+  },
+  BooksOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      booksUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      booksUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    TITLE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "title",
+        direction: "ASC"
+      });
+    },
+    TITLE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "title",
+        direction: "DESC"
+      });
+    },
+    ISBN_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "isbn",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ISBN_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "isbn",
         direction: "DESC"
       });
       queryBuilder.setOrderIsUnique();

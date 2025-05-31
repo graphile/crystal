@@ -316,20 +316,21 @@ async function runCompare() {
       ...makeDataLoaders(),
     },
   });
-  console.log("GRAPHQL");
-  console.dir(graphqlResult, { depth: Infinity });
-
-  console.log("GRAFAST");
-  console.dir(grafastResult, { depth: Infinity });
-
-  console.log("GRAFAST (RESOLVERS)");
-  console.dir(grafastResolversResult, { depth: Infinity });
 
   const same =
     JSON.stringify(graphqlResult) === JSON.stringify(grafastResult) &&
     JSON.stringify(graphqlResult) === JSON.stringify(grafastResolversResult);
 
   if (!same) {
+    console.log("GRAPHQL");
+    console.dir(graphqlResult, { depth: Infinity });
+
+    console.log("GRAFAST");
+    console.dir(grafastResult, { depth: Infinity });
+
+    console.log("GRAFAST (RESOLVERS)");
+    console.dir(grafastResolversResult, { depth: Infinity });
+
     console.error("Results do not match!");
     process.exit(1);
   } else {

@@ -1,0 +1,34 @@
+## expect(errors).toBeFalsy()
+#> schema: ["polymorphic"]
+#> simpleCollections: "both"
+
+{
+  allVulnerabilitiesList(orderBy: [CVSS_SCORE_DESC], first: 2, offset: 1) {
+    __typename
+    name
+    applicationsList(first: 2, offset: 3) {
+      __typename
+      name
+      vulnerabilitiesList(first: 2) {
+        __typename
+        name
+        applicationsList(first: 2, offset: 4) {
+          __typename
+          name
+          ... on AwsApplication {
+            vulnerabilitiesList(first: 2) {
+              __typename
+              name
+            }
+          }
+          ... on GcpApplication {
+            vulnerabilitiesList(first: 3) {
+              __typename
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+}

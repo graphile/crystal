@@ -1,5 +1,6 @@
 import * as assert from "../assert.js";
 import type { Bucket } from "../bucket.js";
+import { $$deepDepSkip } from "../constants.js";
 import { isDev } from "../dev.js";
 import {
   batchExecutionValue,
@@ -16,7 +17,6 @@ import type {
   ExecutionDetails,
 } from "../index.js";
 import type { GrafastResultsList } from "../interfaces.js";
-import { $$deepDepSkip } from "../interfaces.js";
 import type { ListCapableStep } from "../step.js";
 import { isListCapableStep, Step } from "../step.js";
 import { __ItemStep } from "./__item.js";
@@ -148,13 +148,15 @@ export class __ListTransformStep<
     this.connectionClone = connectionClone;
 
     // Plan this subroutine
-    this.subroutineLayer = new LayerPlan(this.operationPlan, this.layerPlan, {
+    this.subroutineLayer = new LayerPlan(this.operationPlan, {
       type: "subroutine",
+      parentLayerPlan: this.layerPlan,
       parentStep: this,
     });
     const itemPlan = withGlobalLayerPlan(
       this.subroutineLayer,
       listStep.polymorphicPaths,
+      null,
       () => {
         // This does NOT use `itemPlanFor` because __ListTransformPlans are special.
         const $__listItem = new __ItemStep(listStep);
@@ -311,17 +313,15 @@ export class __ListTransformStep<
     });
 
     if (size > 0) {
-      const childBucket = newBucket(
-        {
-          layerPlan: childLayerPlan,
-          size,
-          store,
-          flagUnion: bucket.flagUnion,
-          polymorphicPathList,
-          iterators,
-        },
-        bucket.metaByMetaKey,
-      );
+      const childBucket = newBucket(bucket, {
+        layerPlan: childLayerPlan,
+        size,
+        store,
+        flagUnion: bucket.flagUnion,
+        polymorphicPathList,
+        polymorphicType: null,
+        iterators,
+      });
       await executeBucket(childBucket, extra._requestContext);
     }
 

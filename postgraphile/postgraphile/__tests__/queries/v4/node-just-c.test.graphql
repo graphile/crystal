@@ -1,0 +1,14 @@
+## expect(errors).toBeFalsy();
+## expect(data.c.nodeId).toEqual("WyJjb21wb3VuZF9rZXlzIiwyLDNd");
+#> schema: ["a", "b", "c"]
+#> subscriptions: true
+query {
+  c: node(nodeId: "WyJjb21wb3VuZF9rZXlzIiwyLDNd") {
+    ...node
+  }
+}
+
+fragment node on Node {
+  __typename
+  nodeId
+}

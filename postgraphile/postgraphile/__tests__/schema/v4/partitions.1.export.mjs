@@ -1,8 +1,8 @@
 import { PgDeleteSingleStep, PgExecutor, TYPES, assertPgClassSingleStep, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
-const handler = {
+const nodeIdHandler_Query = {
   typeName: "Query",
   codec: {
     name: "raw",
@@ -52,7 +52,7 @@ const nodeIdCodecs_base64JSON_base64JSON = {
 };
 const nodeIdCodecs = {
   __proto__: null,
-  raw: handler.codec,
+  raw: nodeIdHandler_Query.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
@@ -299,55 +299,28 @@ const registry = makeRegistry({
     }
   }
 });
-const pgResource_usersPgResource = registry.pgResources["users"];
-const pgResource_measurementsPgResource = registry.pgResources["measurements"];
-const nodeIdHandlerByTypeName = {
-  __proto__: null,
-  Query: handler,
-  User: {
-    typeName: "User",
-    codec: nodeIdCodecs_base64JSON_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("users", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return pgResource_usersPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "users";
-    }
+const resource_usersPgResource = registry.pgResources["users"];
+const resource_measurementsPgResource = registry.pgResources["measurements"];
+const nodeIdHandler_User = {
+  typeName: "User",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("users", false), $record.get("id")]);
   },
-  Measurement: {
-    typeName: "Measurement",
-    codec: nodeIdCodecs_base64JSON_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("measurements", false), $record.get("timestamp"), $record.get("key")]);
-    },
-    getSpec($list) {
-      return {
-        timestamp: inhibitOnNull(access($list, [1])),
-        key: inhibitOnNull(access($list, [2]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return pgResource_measurementsPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "measurements";
-    }
+  getSpec($list) {
+    return {
+      id: inhibitOnNull(access($list, [1]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_usersPgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "users";
   }
 };
 function specForHandler(handler) {
@@ -370,34 +343,74 @@ function specForHandler(handler) {
   return spec;
 }
 const nodeFetcher_User = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.User));
-  return nodeIdHandlerByTypeName.User.get(nodeIdHandlerByTypeName.User.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_User));
+  return nodeIdHandler_User.get(nodeIdHandler_User.getSpec($decoded));
+};
+const nodeIdHandler_Measurement = {
+  typeName: "Measurement",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("measurements", false), $record.get("timestamp"), $record.get("key")]);
+  },
+  getSpec($list) {
+    return {
+      timestamp: inhibitOnNull(access($list, [1])),
+      key: inhibitOnNull(access($list, [2]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_measurementsPgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "measurements";
+  }
 };
 const nodeFetcher_Measurement = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Measurement));
-  return nodeIdHandlerByTypeName.Measurement.get(nodeIdHandlerByTypeName.Measurement.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Measurement));
+  return nodeIdHandler_Measurement.get(nodeIdHandler_Measurement.getSpec($decoded));
 };
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
+}
+const nodeIdHandlerByTypeName = {
+  __proto__: null,
+  Query: nodeIdHandler_Query,
+  User: nodeIdHandler_User,
+  Measurement: nodeIdHandler_Measurement
+};
+const decodeNodeId = makeDecodeNodeId(Object.values(nodeIdHandlerByTypeName));
+function findTypeNameMatch(specifier) {
+  if (!specifier) return null;
+  for (const [typeName, typeSpec] of Object.entries(nodeIdHandlerByTypeName)) {
+    const value = specifier[typeSpec.codec.name];
+    if (value != null && typeSpec.match(value)) {
+      return typeName;
+    }
+  }
+  return null;
 }
 function DatetimeSerialize(value) {
   return "" + value;
 }
 const specFromArgs_User = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.User, $nodeId);
+  return specFromNodeId(nodeIdHandler_User, $nodeId);
 };
 const specFromArgs_Measurement = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Measurement, $nodeId);
+  return specFromNodeId(nodeIdHandler_Measurement, $nodeId);
 };
 const specFromArgs_User2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.User, $nodeId);
+  return specFromNodeId(nodeIdHandler_User, $nodeId);
 };
 const specFromArgs_Measurement2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Measurement, $nodeId);
+  return specFromNodeId(nodeIdHandler_Measurement, $nodeId);
 };
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
@@ -1107,16 +1120,16 @@ export const plans = {
       return rootValue();
     },
     nodeId($parent) {
-      const specifier = handler.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler.codec.name].encode);
+      const specifier = nodeIdHandler_Query.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Query.codec.name].encode);
     },
-    node(_$root, args) {
-      return node(nodeIdHandlerByTypeName, args.getRaw("nodeId"));
+    node(_$root, fieldArgs) {
+      return fieldArgs.getRaw("nodeId");
     },
     userById(_$root, {
       $id
     }) {
-      return pgResource_usersPgResource.get({
+      return resource_usersPgResource.get({
         id: $id
       });
     },
@@ -1124,7 +1137,7 @@ export const plans = {
       $timestamp,
       $key
     }) {
-      return pgResource_measurementsPgResource.get({
+      return resource_measurementsPgResource.get({
         timestamp: $timestamp,
         key: $key
       });
@@ -1139,7 +1152,7 @@ export const plans = {
     },
     allUsers: {
       plan() {
-        return connection(pgResource_usersPgResource.find());
+        return connection(resource_usersPgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -1169,7 +1182,7 @@ export const plans = {
     },
     allMeasurements: {
       plan() {
-        return connection(pgResource_measurementsPgResource.find());
+        return connection(resource_measurementsPgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -1198,15 +1211,39 @@ export const plans = {
       }
     }
   },
+  Node: {
+    __planType($nodeId) {
+      const $specifier = decodeNodeId($nodeId);
+      const $__typename = lambda($specifier, findTypeNameMatch, true);
+      return {
+        $__typename,
+        planForType(type) {
+          const spec = nodeIdHandlerByTypeName[type.name];
+          if (spec) {
+            return spec.get(spec.getSpec(access($specifier, [spec.codec.name])));
+          } else {
+            throw new Error(`Failed to find handler for ${type.name}`);
+          }
+        }
+      };
+    }
+  },
   User: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of usersUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_usersPgResource.get(spec);
+    },
     nodeId($parent) {
-      const specifier = nodeIdHandlerByTypeName.User.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.User.codec.name].encode);
+      const specifier = nodeIdHandler_User.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_User.codec.name].encode);
     },
     measurementsByUserId: {
       plan($record) {
-        const $records = pgResource_measurementsPgResource.find({
+        const $records = resource_measurementsPgResource.find({
           user_id: $record.get("id")
         });
         return connection($records);
@@ -1246,15 +1283,22 @@ export const plans = {
   },
   Measurement: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of measurementsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_measurementsPgResource.get(spec);
+    },
     nodeId($parent) {
-      const specifier = nodeIdHandlerByTypeName.Measurement.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Measurement.codec.name].encode);
+      const specifier = nodeIdHandler_Measurement.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Measurement.codec.name].encode);
     },
     userId($record) {
       return $record.get("user_id");
     },
     userByUserId($record) {
-      return pgResource_usersPgResource.get({
+      return resource_usersPgResource.get({
         id: $record.get("user_id")
       });
     }
@@ -1496,7 +1540,7 @@ export const plans = {
     __assertStep: __ValueStep,
     createUser: {
       plan(_, args) {
-        const $insert = pgInsertSingle(pgResource_usersPgResource, Object.create(null));
+        const $insert = pgInsertSingle(resource_usersPgResource, Object.create(null));
         args.apply($insert);
         const plan = object({
           result: $insert
@@ -1511,7 +1555,7 @@ export const plans = {
     },
     createMeasurement: {
       plan(_, args) {
-        const $insert = pgInsertSingle(pgResource_measurementsPgResource, Object.create(null));
+        const $insert = pgInsertSingle(resource_measurementsPgResource, Object.create(null));
         args.apply($insert);
         const plan = object({
           result: $insert
@@ -1526,7 +1570,7 @@ export const plans = {
     },
     updateUser: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_usersPgResource, specFromArgs_User(args));
+        const $update = pgUpdateSingle(resource_usersPgResource, specFromArgs_User(args));
         args.apply($update);
         return object({
           result: $update
@@ -1540,7 +1584,7 @@ export const plans = {
     },
     updateUserById: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_usersPgResource, {
+        const $update = pgUpdateSingle(resource_usersPgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($update);
@@ -1556,7 +1600,7 @@ export const plans = {
     },
     updateMeasurement: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_measurementsPgResource, specFromArgs_Measurement(args));
+        const $update = pgUpdateSingle(resource_measurementsPgResource, specFromArgs_Measurement(args));
         args.apply($update);
         return object({
           result: $update
@@ -1570,7 +1614,7 @@ export const plans = {
     },
     updateMeasurementByTimestampAndKey: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_measurementsPgResource, {
+        const $update = pgUpdateSingle(resource_measurementsPgResource, {
           timestamp: args.getRaw(['input', "timestamp"]),
           key: args.getRaw(['input', "key"])
         });
@@ -1587,7 +1631,7 @@ export const plans = {
     },
     deleteUser: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_usersPgResource, specFromArgs_User2(args));
+        const $delete = pgDeleteSingle(resource_usersPgResource, specFromArgs_User2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -1601,7 +1645,7 @@ export const plans = {
     },
     deleteUserById: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_usersPgResource, {
+        const $delete = pgDeleteSingle(resource_usersPgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($delete);
@@ -1617,7 +1661,7 @@ export const plans = {
     },
     deleteMeasurement: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_measurementsPgResource, specFromArgs_Measurement2(args));
+        const $delete = pgDeleteSingle(resource_measurementsPgResource, specFromArgs_Measurement2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -1631,7 +1675,7 @@ export const plans = {
     },
     deleteMeasurementByTimestampAndKey: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_measurementsPgResource, {
+        const $delete = pgDeleteSingle(resource_measurementsPgResource, {
           timestamp: args.getRaw(['input', "timestamp"]),
           key: args.getRaw(['input', "key"])
         });
@@ -1672,7 +1716,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_usersPgResource.find(spec);
+          return resource_usersPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -1734,7 +1778,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_measurementsPgResource.find(spec);
+          return resource_measurementsPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -1746,7 +1790,7 @@ export const plans = {
       return new EdgeStep($connection, $single);
     },
     userByUserId($record) {
-      return pgResource_usersPgResource.get({
+      return resource_usersPgResource.get({
         id: $record.get("result").get("user_id")
       });
     }
@@ -1813,7 +1857,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_usersPgResource.find(spec);
+          return resource_usersPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -1885,7 +1929,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_measurementsPgResource.find(spec);
+          return resource_measurementsPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -1897,7 +1941,7 @@ export const plans = {
       return new EdgeStep($connection, $single);
     },
     userByUserId($record) {
-      return pgResource_usersPgResource.get({
+      return resource_usersPgResource.get({
         id: $record.get("result").get("user_id")
       });
     }
@@ -1960,7 +2004,7 @@ export const plans = {
     },
     deletedUserId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandlerByTypeName.User.plan($record);
+      const specifier = nodeIdHandler_User.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query() {
@@ -1979,7 +2023,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_usersPgResource.find(spec);
+          return resource_usersPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -2012,7 +2056,7 @@ export const plans = {
     },
     deletedMeasurementId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandlerByTypeName.Measurement.plan($record);
+      const specifier = nodeIdHandler_Measurement.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query() {
@@ -2031,7 +2075,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_measurementsPgResource.find(spec);
+          return resource_measurementsPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -2043,7 +2087,7 @@ export const plans = {
       return new EdgeStep($connection, $single);
     },
     userByUserId($record) {
-      return pgResource_usersPgResource.get({
+      return resource_usersPgResource.get({
         id: $record.get("result").get("user_id")
       });
     }

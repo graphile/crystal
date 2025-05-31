@@ -11,6 +11,7 @@
 # | `-`       | Non-greedy repetition         |
 # | `?`       | Matches 0 or 1                |
 # +-----------+-------------------------------+
+yarn.lock
 grafast/dataplan%-pg/__tests__/.*%.mermaid
 postgraphile/postgraphile/__tests__/.*%.mermaid
 postgraphile/postgraphile/__tests__/.*%.export%.mjs

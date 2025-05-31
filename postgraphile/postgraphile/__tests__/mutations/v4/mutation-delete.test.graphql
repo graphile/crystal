@@ -1,4 +1,5 @@
 ## expect(errors).toHaveLength(3);
+#> dontLogErrors: true
 #> schema: ["a", "b", "c"]
 mutation {
   a: deletePost(input: { nodeId: "WyJwb3N0cyIsMV0=" }) { ...deletePostPayload }

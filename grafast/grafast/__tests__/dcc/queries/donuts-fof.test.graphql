@@ -1,0 +1,40 @@
+{
+  crawler(id: 102) {
+    id
+    name
+    ... on ActiveCrawler {
+      species
+      friends {
+        __typename
+        id
+        name
+        ... on ActiveCrawler {
+          crawlerNumber
+          friends {
+            id
+            name
+          }
+        }
+        ... on NPC {
+          exCrawler
+          friends {
+            id
+            name
+          }
+        }
+        ... on Manager {
+          client {
+            id
+            name
+          }
+        }
+        ... on Security {
+          clients {
+            id
+            name
+          }
+        }
+      }
+    }
+  }
+}
