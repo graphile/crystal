@@ -7,7 +7,7 @@ import tsParser from "@typescript-eslint/parser";
 import { defineConfig, globalIgnores } from "eslint/config";
 import graphileExport from "eslint-plugin-graphile-export";
 import graphql from "eslint-plugin-graphql";
-import _import from "eslint-plugin-import";
+import importPlugin from "eslint-plugin-import";
 import jest from "eslint-plugin-jest";
 import reactHooks from "eslint-plugin-react-hooks";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
@@ -83,7 +83,7 @@ const config = {
     graphql,
     tsdoc,
     "simple-import-sort": simpleImportSort,
-    import: fixupPluginRules(_import),
+    import: fixupPluginRules(importPlugin),
     "graphile-export": graphileExport,
     "react-hooks": fixupPluginRules(reactHooks),
   },
