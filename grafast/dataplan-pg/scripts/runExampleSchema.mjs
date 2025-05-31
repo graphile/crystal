@@ -87,7 +87,7 @@ async function runTestQuery(basePath) {
     await promise;
     const sortPayloads = (payload1, payload2) => {
       const ONE_AFTER_TWO = 1;
-      const ONE_BEFORE_TWO = -1;
+      // const ONE_BEFORE_TWO = -1;
       if (!payload1.path) {
         return 0;
       }
