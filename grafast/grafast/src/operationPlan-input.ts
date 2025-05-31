@@ -112,7 +112,7 @@ export function withFieldArgsForArguments<T extends Step>(
         return type;
       }
     },
-    getRaw(path) {
+    getRaw(path?: string | ReadonlyArray<string | number>) {
       assertNotRuntime(operationPlan, `fieldArgs.getRaw()`);
       if (path === undefined) {
         return object(trackedArguments);
@@ -180,7 +180,7 @@ export function withFieldArgsForArguments<T extends Step>(
           throw new Error(`Invalid path; argument '${argName}' does not exist`);
         }
         const typeAtPath = getNullableInputTypeAtPath(arg.type, rest);
-        const $valueAtPath = fieldArgs.getRaw(inPath) as AnyInputStep;
+        const $valueAtPath = fieldArgs.getRaw(inPath as any) as AnyInputStep;
         if (
           $valueAtPath instanceof ConstantStep &&
           $valueAtPath.data === undefined
@@ -249,7 +249,7 @@ function processAfter(
         typeAt(path) {
           return rootFieldArgs.typeAt(concatPath(argName, path));
         },
-        getRaw(path) {
+        getRaw(path?: string | ReadonlyArray<string | number>) {
           return rootFieldArgs.getRaw(
             concatPath(argName, path),
           ) as AnyInputStep;

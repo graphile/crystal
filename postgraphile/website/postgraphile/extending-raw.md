@@ -31,6 +31,7 @@ not just at the root-level):
 
 ```ts title="add-http-bin-plugin.js"
 import { makeExtendSchemaPlugin, gql } from "postgraphile/utils";
+import { loadOne } from "postgraphile/grafast";
 import fetch from "node-fetch";
 
 export default makeExtendSchemaPlugin({
@@ -39,11 +40,15 @@ export default makeExtendSchemaPlugin({
       httpBinHeaders: JSON
     }
   `,
-  resolvers: {
+  objects: {
     Query: {
-      async httpBinHeaders() {
-        const response = await fetch("https://httpbin.org/headers");
-        return response.json();
+      plans: {
+        httpBinHeaders() {
+          return loadOne(null, async () => {
+            const response = await fetch("https://httpbin.org/headers");
+            return response.json();
+          });
+        },
       },
     },
   },
@@ -71,6 +76,7 @@ const AddHttpBinPlugin = {
         const {
           extend,
           getTypeByName,
+          grafast: { loadOne },
           options: { jsonScalarAsString },
         } = build;
         const {
@@ -89,15 +95,17 @@ const AddHttpBinPlugin = {
         return extend(fields, {
           httpBinHeaders: {
             type: JSONType,
-            async resolve() {
-              const response = await fetch("https://httpbin.org/headers");
-              if (jsonScalarAsString) {
-                // We've been told to provide JSON scalars in stringified format
-                return response.text();
-              } else {
-                // By default, we can just return a dynamic "JSON" scalar
-                return response.json();
-              }
+            plan() {
+              return loadOne(null, async () => {
+                const response = await fetch("https://httpbin.org/headers");
+                if (jsonScalarAsString) {
+                  // We've been told to provide JSON scalars in stringified format
+                  return response.text();
+                } else {
+                  // By default, we can just return a dynamic "JSON" scalar
+                  return response.json();
+                }
+              });
             },
           },
         });

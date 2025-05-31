@@ -63,28 +63,34 @@ const makeSchema = (useStreamableStep = false) => {
         list: [Thing!]
       }
     `,
-    plans: {
+    objects: {
       Query: {
-        list() {
-          return constant([1, 2]);
+        plans: {
+          list() {
+            return constant([1, 2]);
+          },
         },
       },
       Thing: {
-        id($i: Step<number>) {
-          return $i;
-        },
-        anotherList($i: Step<number>) {
-          const cb = (i: number) => [i + 0, i + 1, i + 2];
-          if (useStreamableStep) {
-            return new SyncListCallbackStep($i, cb);
-          } else {
-            return lambda($i, cb);
-          }
+        plans: {
+          id($i: Step<number>) {
+            return $i;
+          },
+          anotherList($i: Step<number>) {
+            const cb = (i: number) => [i + 0, i + 1, i + 2];
+            if (useStreamableStep) {
+              return new SyncListCallbackStep($i, cb);
+            } else {
+              return lambda($i, cb);
+            }
+          },
         },
       },
       OtherThing: {
-        id($i: Step<number>) {
-          return $i;
+        plans: {
+          id($i: Step<number>) {
+            return $i;
+          },
         },
       },
     },

@@ -1,7 +1,7 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import { resolvePreset } from "graphile-config";
 
-import type { AbstractTypePlanner, FieldArgs, Step } from "../../dist/index.js";
+import type { InterfacePlan, Step } from "../../dist/index.js";
 import {
   coalesce,
   constant,
@@ -12,12 +12,11 @@ import {
   lambda,
   loadMany,
   loadOne,
-  makeGrafastSchema,
 } from "../../dist/index.js";
 import type {
-  ClubData,
   CrawlerData,
   Database,
+  FloorData,
   ItemSpec,
   LocationData,
   NpcData,
@@ -35,6 +34,7 @@ import {
   batchGetUtilityItemById,
   makeDb,
 } from "./dcc-data.js";
+import { typedMakeGrafastSchema } from "./dcc-types.js";
 import { delegate } from "./delegate.js";
 
 const resolvedPreset = resolvePreset({
@@ -53,7 +53,7 @@ declare global {
 }
 
 export const makeBaseArgs = () => {
-  const schema = makeGrafastSchema({
+  const schema = typedMakeGrafastSchema({
     typeDefs: /* GraphQL */ `
       enum Species {
         HUMAN
@@ -249,7 +249,7 @@ export const makeBaseArgs = () => {
         brokenItem: Item
       }
     `,
-    plans: {
+    enums: {
       Species: {
         HUMAN: { value: "Human" },
         CAT: { value: "Cat" },
@@ -260,85 +260,150 @@ export const makeBaseArgs = () => {
         GONDII: { value: "Gondii" },
         BOPCA: { value: "Bopca Protector" },
       },
-
+    },
+    objects: {
       Query: {
-        crawler(_: any, { $id }: FieldArgs) {
-          const $db = context().get("dccDb");
-          return loadOne($id as Step<number>, $db, null, batchGetCrawlerById);
-        },
-        character(_: any, { $id }: FieldArgs) {
-          return $id;
-        },
-        floor(_: any, { $number }: FieldArgs) {
-          return lambda($number, getFloor);
-        },
-        brokenItem() {
-          return constant("Utility:999");
-        },
-        item(_: any, { $type, $id }: FieldArgs) {
-          return lambda([$type, $id], ([type, id]) => `${type}:${id}`);
+        plans: {
+          crawler(_, { $id }) {
+            const $db = context().get("dccDb");
+            return loadOne($id, $db, null, batchGetCrawlerById);
+          },
+          character(_, { $id }) {
+            return $id;
+          },
+          floor(_, { $number }) {
+            return lambda($number, getFloor);
+          },
+          brokenItem() {
+            return constant("Utility:999" as ItemSpec);
+          },
+          item(_, { $type, $id }) {
+            return lambda(
+              [$type, $id],
+              ([type, id]) => `${type}:${id}` as const,
+            );
+          },
         },
       },
       ActiveCrawler: {
-        bestFriend($activeCrawler: Step<CrawlerData>) {
-          const $id = inhibitOnNull(get($activeCrawler, "bestFriend"));
-          const $db = context().get("dccDb");
-          return loadOne($id, $db, null, batchGetCrawlerById);
-        },
-        friends($activeCrawler: Step<CrawlerData>) {
-          const $ids = get($activeCrawler, "friends");
-          return $ids;
+        plans: {
+          bestFriend($activeCrawler) {
+            const $id = inhibitOnNull(get($activeCrawler, "bestFriend"));
+            const $db = context().get("dccDb");
+            return loadOne($id, $db, null, batchGetCrawlerById);
+          },
+          friends($activeCrawler) {
+            const $ids = get($activeCrawler, "friends");
+            return $ids;
+          },
         },
       },
       Manager: {
-        ...SharedNpcResolvers,
-        client($manager: Step<NpcData>) {
-          const $id = inhibitOnNull(get($manager, "client"));
-          const $db = context().get("dccDb");
-          return loadOne($id, $db, null, batchGetCrawlerById);
+        plans: {
+          ...SharedNpcResolvers,
+          client($manager) {
+            const $id = inhibitOnNull(get($manager, "client"));
+            const $db = context().get("dccDb");
+            return loadOne($id, $db, null, batchGetCrawlerById);
+          },
         },
       },
       Security: {
-        ...SharedNpcResolvers,
+        plans: {
+          ...SharedNpcResolvers,
 
-        clients($security: Step<NpcData>) {
-          const $ids = inhibitOnNull(get($security, "clients"));
-          return each($ids, ($id) => {
-            const $db = context().get("dccDb");
-            return loadOne($id, $db, null, batchGetCrawlerById);
-          });
+          clients($security) {
+            const $ids = inhibitOnNull(get($security, "clients"));
+            return each($ids, ($id) => {
+              const $db = context().get("dccDb");
+              return loadOne($id, $db, null, batchGetCrawlerById);
+            });
+          },
         },
       },
       Guide: {
-        ...SharedNpcResolvers,
+        plans: {
+          ...SharedNpcResolvers,
+        },
       },
       Staff: {
-        ...SharedNpcResolvers,
+        plans: {
+          ...SharedNpcResolvers,
+        },
       },
+
+      Equipment: {
+        plans: {
+          creator: getCreator,
+        },
+      },
+      Consumable: {
+        plans: {
+          creator: getCreator,
+        },
+      },
+      UtilityItem: {},
+      MiscItem: {},
+      Floor: {
+        plans: {
+          locations($floor) {
+            const $number = get($floor, "number");
+            const $db = context().get("dccDb");
+            return loadMany($number, $db, null, batchGetLocationsByFloorNumber);
+          },
+        },
+      },
+      SafeRoom: {
+        plans: {
+          ...SharedLocationResolvers,
+        },
+      },
+      Club: {
+        plans: {
+          ...SharedLocationResolvers,
+          security($club) {
+            const $ids = inhibitOnNull(get($club, "security"));
+            return each($ids, ($id) => {
+              const $db = context().get("dccDb");
+              return loadOne($id, $db, null, batchGetNpcById);
+            });
+          },
+        },
+      },
+      Stairwell: {
+        plans: {
+          ...SharedLocationResolvers,
+        },
+      },
+    },
+    unions: {
+      SafeRoomStock: ItemResolver,
+      ClubStock: ItemResolver,
+    },
+    interfaces: {
       Crawler: {
-        __planType($crawler: Step<CrawlerData>) {
+        planType($crawler) {
           const $__typename = lambda($crawler, crawlerToTypeName);
           return { $__typename };
         },
       },
       Character: {
-        __planType($specifier: Step<number>) {
+        planType($specifier) {
           const $db = context().get("dccDb");
 
           const $crawlerId = inhibitOnNull(
             lambda($specifier, extractCrawlerId),
           );
-          const $crawler = loadOne($crawlerId, $db, null, batchGetCrawlerById);
-          const $crawlerTypename = lambda(
-            $crawler as Step<CrawlerData>,
-            crawlerToTypeName,
+          const $crawler = inhibitOnNull(
+            loadOne($crawlerId, $db, null, batchGetCrawlerById),
           );
+          const $crawlerTypename = lambda($crawler, crawlerToTypeName);
 
-          const $npcId = inhibitOnNull(
-            lambda($specifier, extractNpcId),
-          ) as Step<number>;
-          const $npc = loadOne($npcId, $db, null, batchGetNpcById);
-          const $npcTypename = lambda(inhibitOnNull($npc), npcToTypeName);
+          const $npcId = inhibitOnNull(lambda($specifier, extractNpcId));
+          const $npc = inhibitOnNull(
+            loadOne($npcId, $db, null, batchGetNpcById),
+          );
+          const $npcTypename = lambda($npc, npcToTypeName);
 
           const $__typename = coalesce([$crawlerTypename, $npcTypename]);
           return {
@@ -354,18 +419,14 @@ export const makeBaseArgs = () => {
                 return null;
               }
             },
-          } as AbstractTypePlanner;
+          };
         },
       },
       NPC: {
-        __planType($npcId: Step<number>) {
+        planType($npcId) {
           const $db = context().get("dccDb");
-          // TODO: Inhibit on null shouldn't be needed here
-          const $npc = loadOne(
-            inhibitOnNull($npcId),
-            $db,
-            null,
-            batchGetNpcById,
+          const $npc = inhibitOnNull(
+            loadOne($npcId, $db, null, batchGetNpcById),
           );
           const $__typename = lambda(inhibitOnNull($npc), npcToTypeName);
 
@@ -374,31 +435,13 @@ export const makeBaseArgs = () => {
             planForType(t) {
               return $npc;
             },
-          } as AbstractTypePlanner;
+          };
         },
       },
-
       Item: ItemResolver,
-      SafeRoomStock: ItemResolver,
-      ClubStock: ItemResolver,
 
-      Equipment: {
-        creator: getCreator,
-      },
-      Consumable: {
-        creator: getCreator,
-      },
-      UtilityItem: {},
-      MiscItem: {},
-      Floor: {
-        locations($floor: Step<FloorData>) {
-          const $number = get($floor, "number");
-          const $db = context().get("dccDb");
-          return loadMany($number, $db, null, batchGetLocationsByFloorNumber);
-        },
-      },
       Location: {
-        __planType($location: Step<LocationData>): AbstractTypePlanner {
+        planType($location) {
           const $db = context().get("dccDb");
           const $__typename = get($location, "type");
           return {
@@ -444,22 +487,6 @@ export const makeBaseArgs = () => {
           };
         },
       },
-      SafeRoom: {
-        ...SharedLocationResolvers,
-      },
-      Club: {
-        ...SharedLocationResolvers,
-        security($club: Step<ClubData & LocationData>) {
-          const $ids = inhibitOnNull(get($club, "security"));
-          return each($ids, ($id) => {
-            const $db = context().get("dccDb");
-            return loadOne($id, $db, null, batchGetNpcById);
-          });
-        },
-      },
-      Stairwell: {
-        ...SharedLocationResolvers,
-      },
     },
   });
   const dccDb = makeDb();
@@ -474,7 +501,7 @@ export const makeBaseArgs = () => {
 
 const SharedLocationResolvers = {
   floors($place: Step<LocationData>) {
-    const $floors = get($place, "floors") as Step<number[]>;
+    const $floors = get($place, "floors");
     return each($floors, ($floor) => lambda($floor, getFloor));
   },
 };
@@ -487,7 +514,7 @@ const SharedNpcResolvers = {
 };
 
 const ItemResolver = {
-  __planType($itemSpec: Step<ItemSpec>): AbstractTypePlanner {
+  planType($itemSpec) {
     const $decoded = lambda($itemSpec, decodeItemSpec);
     const $__typename = get($decoded, "__typename");
     return {
@@ -512,7 +539,7 @@ const ItemResolver = {
       },
     };
   },
-};
+} as InterfacePlan<Step<ItemSpec>>;
 
 function getCreator($source: Step<{ creator?: number }>) {
   const $db = context().get("dccDb");
@@ -550,10 +577,6 @@ function decodeItemSpec(itemSpec: ItemSpec): {
   const [__typename, rawID] = itemSpec.split(":");
   const id = parseInt(rawID, 10);
   return { __typename, id };
-}
-
-interface FloorData {
-  number: number;
 }
 
 function getFloor(number: number): FloorData | null {

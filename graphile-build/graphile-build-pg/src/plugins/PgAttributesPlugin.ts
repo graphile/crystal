@@ -160,7 +160,7 @@ function processAttribute(
   }
   const [baseCodec, type] = resolveResult;
 
-  const fieldSpec: GrafastFieldConfig<any, any, any, any> = {
+  const fieldSpec: GrafastFieldConfig<any, any, any> = {
     description: attribute.description,
     type: type as GraphQLOutputType,
   };

@@ -13,7 +13,6 @@ import type {
   GraphQLInputType,
   GraphQLNamedType,
   GraphQLObjectTypeConfig,
-  GraphQLOutputType,
   GraphQLSchema,
   SelectionNode,
   ValueNode,
@@ -32,7 +31,6 @@ import type {
   ExecutionEntryFlags,
   GrafastFieldConfig,
   GrafastInputFieldConfig,
-  OutputPlanForType,
 } from "./interfaces.js";
 import type { Step } from "./step.js";
 import { constant } from "./steps/constant.js";
@@ -430,7 +428,7 @@ export function setsMatch(
 }
 
 export type ObjectTypeFields<TParentStep extends Step> = {
-  [key: string]: GrafastFieldConfig<GraphQLOutputType, TParentStep, any, any>;
+  [key: string]: GrafastFieldConfig<TParentStep, any, any>;
 };
 
 export type ObjectTypeSpec<
@@ -520,12 +518,12 @@ export function newObjectTypeBuilder<TParentStep extends Step>(
  */
 export function objectFieldSpec<
   TSource extends Step,
-  TResult extends Step = Step,
   TArgs extends BaseGraphQLArguments = BaseGraphQLArguments,
+  TResult extends Step = Step,
 >(
-  grafastSpec: GrafastFieldConfig<GraphQLOutputType, TSource, TResult, TArgs>,
+  grafastSpec: GrafastFieldConfig<TSource, TArgs, TResult>,
   path: string,
-): GraphQLFieldConfig<any, TArgs> {
+): GraphQLFieldConfig<any, Grafast.Context, TArgs> {
   const { plan, subscribePlan, args, ...spec } = grafastSpec;
 
   assertNotAsync(plan, `${path ?? "?"}.plan`);
@@ -594,11 +592,10 @@ export function objectFieldSpec<
  * @see {@link https://kentcdodds.com/blog/how-to-write-a-constrained-identity-function-in-typescript}
  */
 export function newGrafastFieldConfigBuilder<TParentStep extends Step>(): <
-  TType extends GraphQLOutputType,
-  TFieldStep extends OutputPlanForType<TType>,
-  TArgs extends BaseGraphQLArguments,
+  TArgs extends BaseGraphQLArguments = BaseGraphQLArguments,
+  TFieldStep extends Step = Step,
 >(
-  config: GrafastFieldConfig<TType, TParentStep, TFieldStep, TArgs>,
+  config: GrafastFieldConfig<TParentStep, TArgs, TFieldStep>,
 ) => typeof config {
   return (config) => config;
 }

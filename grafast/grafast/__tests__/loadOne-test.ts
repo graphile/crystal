@@ -3,11 +3,7 @@ import { resolvePreset } from "graphile-config";
 import type { ExecutionResult } from "graphql";
 import { it } from "mocha";
 
-import type {
-  ExecutableStep,
-  LoadedRecordStep,
-  ObjectPlans,
-} from "../dist/index.js";
+import type { LoadedRecordStep, ObjectPlan, Step } from "../dist/index.js";
 import {
   context,
   grafast,
@@ -195,67 +191,75 @@ const makeSchema = (useStreamableStep = false) => {
         thingByOrgIdRegNoObj(regNo: Int!): Thing
       }
     `,
-    plans: {
+    objects: {
       Query: {
-        thingById(_, { $id }) {
-          return loadOne($id as ExecutableStep<number>, loadThingByIds);
-        },
-        thingByIdObj(_, { $id }) {
-          return loadOne(
-            { identifier: $id as ExecutableStep<number> },
-            { identifier: "id" },
-            loadThingByIdentifierObjs,
-          );
-        },
-        thingByIdList(_, { $id }) {
-          return loadOne(
-            [$id as ExecutableStep<number>],
-            ["id"],
-            loadThingByIdentifierLists,
-          );
-        },
-        thingByOrgIdRegNoTuple(_, { $regNo }) {
-          const $orgId = context().get("orgId");
-          return loadOne(
-            [$orgId, $regNo],
-            // Deliberately not using ioEquivalence here to test stable object/tuple creation
-            //["orgId", "orgRegNo"],
-            loadThingByOrgIdRegNoTuples,
-          );
-        },
-        thingByOrgIdRegNoObj(_, { $regNo }) {
-          const $orgId = context().get("orgId");
-          return loadOne(
-            { orgId: $orgId, regNo: $regNo },
-            // Deliberately not using ioEquivalence here to test stable object/tuple creation
-            //{ orgId: "orgId", regNo: "orgRegNo" },
-            loadThingByOrgIdRegNoObjs,
-          );
-        },
-      } as ObjectPlans,
-      Thing: {
-        org($thing: LoadedRecordStep<Thing>) {
-          return loadOne($thing.get("orgId"), "id", loadOrgByIds);
+        plans: {
+          thingById(_, { $id }) {
+            return loadOne($id as Step<number>, loadThingByIds);
+          },
+          thingByIdObj(_, { $id }) {
+            return loadOne(
+              { identifier: $id as Step<number> },
+              { identifier: "id" },
+              loadThingByIdentifierObjs,
+            );
+          },
+          thingByIdList(_, { $id }) {
+            return loadOne(
+              [$id as Step<number>],
+              ["id"],
+              loadThingByIdentifierLists,
+            );
+          },
+          thingByOrgIdRegNoTuple(_, fieldArgs) {
+            const $regNo = fieldArgs.getRaw("regNo") as Step<number>;
+            const $orgId = context().get("orgId");
+            return loadOne(
+              [$orgId, $regNo],
+              // Deliberately not using ioEquivalence here to test stable object/tuple creation
+              //["orgId", "orgRegNo"],
+              loadThingByOrgIdRegNoTuples,
+            );
+          },
+          thingByOrgIdRegNoObj(_, fieldArgs) {
+            const $regNo = fieldArgs.getRaw("regNo") as Step<number>;
+            const $orgId = context().get("orgId");
+            return loadOne(
+              { orgId: $orgId, regNo: $regNo },
+              // Deliberately not using ioEquivalence here to test stable object/tuple creation
+              //{ orgId: "orgId", regNo: "orgRegNo" },
+              loadThingByOrgIdRegNoObjs,
+            );
+          },
         },
       },
+      Thing: {
+        plans: {
+          org($thing) {
+            return loadOne($thing.get("orgId"), "id", loadOrgByIds);
+          },
+        },
+      } as ObjectPlan<LoadedRecordStep<Thing>>,
       Org: {
-        thingByTuple($org: LoadedRecordStep<Org>, { $regNo }) {
-          const $orgId = $org.get("id");
-          return loadOne(
-            [$orgId, $regNo],
-            ["orgId", "orgRegNo"],
-            loadThingByOrgIdRegNoTuples,
-          );
+        plans: {
+          thingByTuple($org: LoadedRecordStep<Org>, { $regNo }) {
+            const $orgId = $org.get("id");
+            return loadOne(
+              [$orgId, $regNo],
+              ["orgId", "orgRegNo"],
+              loadThingByOrgIdRegNoTuples,
+            );
+          },
+          thingByObj($org: LoadedRecordStep<Org>, { $regNo }) {
+            const $orgId = $org.get("id");
+            return loadOne(
+              { orgId: $orgId, regNo: $regNo },
+              { orgId: "orgId", regNo: "orgRegNo" },
+              loadThingByOrgIdRegNoObjs,
+            );
+          },
         },
-        thingByObj($org: LoadedRecordStep<Org>, { $regNo }) {
-          const $orgId = $org.get("id");
-          return loadOne(
-            { orgId: $orgId, regNo: $regNo },
-            { orgId: "orgId", regNo: "orgRegNo" },
-            loadThingByOrgIdRegNoObjs,
-          );
-        },
-      } as ObjectPlans,
+      },
     },
     enableDeferStream: true,
   });

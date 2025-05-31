@@ -4503,7 +4503,13 @@ export class OperationPlan {
           );
           if (se !== latestSideEffectStep) {
             throw new Error(
-              `You shouldn't have side effects in polymorphic positions; ${step} exists in ${polymorphicPaths} but these positions have mixed side effects`,
+              `You shouldn't have side effects in polymorphic positions; ${
+                step
+              } exists in ${
+                polymorphicPaths
+              } but these positions have mixed side effects (${
+                latestSideEffectStep
+              } @ ${polymorphicPaths[0]}, ${se} @ ${polymorphicPaths[i]})`,
             );
           }
         }

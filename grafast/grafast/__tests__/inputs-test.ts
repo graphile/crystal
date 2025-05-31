@@ -4,7 +4,6 @@ import { resolvePreset } from "graphile-config";
 import type { ExecutionResult } from "graphql";
 import { it } from "mocha";
 
-import type { ObjectPlans } from "../dist/index.js";
 import { grafast, makeGrafastSchema } from "../dist/index.js";
 
 const resolvedPreset = resolvePreset({});
@@ -20,21 +19,23 @@ const makeSchema = (useStreamableStep = false) => {
         echoNonNullableListOfString(in: [String]!): [String]!
       }
     `,
-    plans: {
+    objects: {
       Query: {
-        echoListOfString(_, { $in }) {
-          return $in;
+        plans: {
+          echoListOfString(_, { $in }) {
+            return $in;
+          },
+          echoListOfNonNullableString(_, { $in }) {
+            return $in;
+          },
+          echoNonNullableListOfString(_, { $in }) {
+            return $in;
+          },
+          echoNonNullableListOfNonNullableString(_, { $in }) {
+            return $in;
+          },
         },
-        echoListOfNonNullableString(_, { $in }) {
-          return $in;
-        },
-        echoNonNullableListOfString(_, { $in }) {
-          return $in;
-        },
-        echoNonNullableListOfNonNullableString(_, { $in }) {
-          return $in;
-        },
-      } as ObjectPlans,
+      },
     },
     enableDeferStream: false,
   });

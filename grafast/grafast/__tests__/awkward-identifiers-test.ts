@@ -26,27 +26,31 @@ const schema = makeGrafastSchema({
       o: Obj
     }
   `,
-  plans: {
+  objects: {
     Query: {
-      o() {
-        return constant(Object.create(null));
+      plans: {
+        o() {
+          return constant(Object.create(null));
+        },
       },
     },
     Obj: {
-      o($o: Step) {
-        return $o;
-      },
-      a($o: Step) {
-        return access($o, "a");
-      },
-      b($o: Step) {
-        return access($o, "b");
-      },
-      echoNumber(_: Step, { $nr }: FieldArgs) {
-        return $nr;
-      },
-      echoString(_: Step, { $str }: FieldArgs) {
-        return $str;
+      plans: {
+        o($o: Step) {
+          return $o;
+        },
+        a($o: Step) {
+          return access($o, "a");
+        },
+        b($o: Step) {
+          return access($o, "b");
+        },
+        echoNumber(_: Step, { $nr }: FieldArgs) {
+          return $nr;
+        },
+        echoString(_: Step, { $str }: FieldArgs) {
+          return $str;
+        },
       },
     },
   },

@@ -27,7 +27,8 @@
     }
   },
   "scripts": {
-    "test": "yarn test:mocha",
+    "codegen": "cd __tests__/dcc && node --experimental-strip-types ../../../../node_modules/.bin/graphql-codegen",
+    "test": "yarn codegen && yarn test:mocha",
     "test:mocha": "tsc -b tsconfig.test.json && NODE_ENV=test GRAPHILE_ENV=test mocha '**/__tests__/**/*-test.ts'",
     "build": "zx scripts/build-npm.mjs",
     "postpack": "echo 'FORBIDDEN' && exit 1",
@@ -88,6 +89,8 @@
     "browser"
   ],
   "devDependencies": {
+    "@graphql-codegen/cli": "^5.0.6",
+    "@graphql-codegen/plugin-helpers": "^5.1.0",
     "@types/chai": "^4.3.5",
     "@types/jest": "^29.5.4",
     "@types/lodash": "^4.14.197",

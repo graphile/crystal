@@ -128,7 +128,7 @@ export function makeChangeNullabilityPlugin(
   let pendingMatches = new Set<string>();
 
   function objectOrInterfaceFieldCallback<
-    T extends GrafastFieldConfig<any, any, any, any>,
+    T extends GrafastFieldConfig<any, any, any>,
   >(
     field: T,
     build: GraphileBuild.Build,

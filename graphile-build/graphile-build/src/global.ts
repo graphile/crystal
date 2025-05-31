@@ -6,7 +6,6 @@ import type {
   GrafastFieldConfigArgumentMap,
   GrafastInputFieldConfig,
   GrafastInputFieldConfigMap,
-  OutputPlanForType,
   PlanTypeInfo,
   Step,
 } from "grafast";
@@ -231,7 +230,7 @@ declare global {
 
     /** Our take on GraphQLFieldConfigMap that allows for plans */
     type GrafastFieldConfigMap<TParentStep extends Step = Step> = {
-      [fieldName: string]: GrafastFieldConfig<any, TParentStep, any, any>;
+      [fieldName: string]: GrafastFieldConfig<TParentStep, any, any>;
     };
 
     /** Our take on GraphQLObjectTypeConfig that allows for plans */
@@ -873,18 +872,17 @@ declare global {
      * non-trivial fields.
      */
     type FieldWithHooksFunction = <
-      TType extends GraphQLOutputType,
       TParentStep extends Step,
-      TFieldStep extends OutputPlanForType<TType>,
+      TFieldStep extends Step,
       TArgs extends BaseGraphQLArguments,
     >(
       fieldScope: ScopeObjectFieldsField,
       spec:
-        | GrafastFieldConfig<TType, TParentStep, TFieldStep, TArgs>
+        | GrafastFieldConfig<TParentStep, TArgs, TFieldStep>
         | ((
             context: ContextObjectFieldsField,
-          ) => GrafastFieldConfig<TType, TParentStep, TFieldStep, TArgs>),
-    ) => GrafastFieldConfig<TType, TParentStep, TFieldStep, TArgs>;
+          ) => GrafastFieldConfig<TParentStep, TArgs, TFieldStep>),
+    ) => GrafastFieldConfig<TParentStep, TArgs, TFieldStep>;
 
     type InterfaceFieldWithHooksFunction = (
       fieldScope: ScopeInterfaceFieldsField,
@@ -991,7 +989,7 @@ declare global {
         TBuild
       >[];
       GraphQLObjectType_fields_field: GraphileBuild.Hook<
-        GrafastFieldConfig<any, any, any, any>,
+        GrafastFieldConfig<any, any, any>,
         GraphileBuild.ContextObjectFieldsField,
         TBuild
       >[];

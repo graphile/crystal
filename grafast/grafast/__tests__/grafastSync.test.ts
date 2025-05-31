@@ -4,7 +4,6 @@ import { resolvePreset } from "graphile-config";
 import type { ExecutionResult } from "graphql";
 import { it } from "mocha";
 
-import type { ObjectPlans } from "../dist/index.js";
 import { grafastSync, lambda, makeGrafastSchema } from "../dist/index.js";
 
 const resolvedPreset = resolvePreset({});
@@ -21,23 +20,27 @@ const makeSchema = () => {
         addTwoNumbers(a: Int!, b: Int!): Int
       }
     `,
-    plans: {
+    objects: {
       Mutation: {
-        addTwoNumbers(parentStep, fieldArgs) {
-          return lambda(
-            [fieldArgs.getRaw("a"), fieldArgs.getRaw("b")],
-            ([a, b]) => a + b,
-          );
+        plans: {
+          addTwoNumbers(parentStep, fieldArgs) {
+            return lambda(
+              [fieldArgs.getRaw("a"), fieldArgs.getRaw("b")],
+              ([a, b]) => a + b,
+            );
+          },
         },
-      } as ObjectPlans,
+      },
       Query: {
-        addTwoNumbers(parentStep, fieldArgs) {
-          return lambda(
-            [fieldArgs.getRaw("a"), fieldArgs.getRaw("b")],
-            ([a, b]) => a + b,
-          );
+        plans: {
+          addTwoNumbers(parentStep, fieldArgs) {
+            return lambda(
+              [fieldArgs.getRaw("a"), fieldArgs.getRaw("b")],
+              ([a, b]) => a + b,
+            );
+          },
         },
-      } as ObjectPlans,
+      },
     },
     enableDeferStream: false,
   });

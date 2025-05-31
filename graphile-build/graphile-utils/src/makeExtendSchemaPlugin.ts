@@ -1,12 +1,13 @@
 import type {
   AbstractTypePlanner,
-  ExecutableStep,
-  FieldPlanResolver,
+  DeprecatedObjectPlan,
+  GrafastSchemaConfig,
+  ObjectFieldConfig,
+  ObjectPlan as GrafastObjectPlan,
   PlanTypeInfo,
   Step,
 } from "grafast";
 import type {
-  DefinitionNode,
   DirectiveDefinitionNode,
   DirectiveLocation,
   // Nodes:
@@ -61,36 +62,17 @@ import { EXPORTABLE } from "./exportable.js";
 
 type Maybe<T> = T | null | undefined;
 
-export interface ObjectFieldConfig<TSource = any, TContext = any> {
-  scope?: GraphileBuild.ScopeObjectFieldsField;
-  plan?: FieldPlanResolver<any, any, any>;
-  subscribePlan?: FieldPlanResolver<any, any, any>;
-  /** @deprecated Use 'plan' */
-  resolve?: GraphQLFieldResolver<TSource, TContext>;
-  /** @deprecated Use 'subscribePlan' */
-  subscribe?: GraphQLFieldResolver<TSource, TContext>;
+export type ObjectResolver<TSource = any, TContext = any> = {
+  [key: string]: GraphQLFieldResolver<TSource, TContext> | ObjectFieldConfig;
+} & {
   __resolveType?: GraphQLTypeResolver<TSource, TContext>;
   __isTypeOf?: GraphQLIsTypeOfFn<TSource, TContext>;
-}
-
-export interface ObjectResolver<TSource = any, TContext = any> {
-  [key: string]:
-    | GraphQLFieldResolver<TSource, TContext>
-    | ObjectFieldConfig<TSource, TContext>;
-}
-
-export type ObjectPlan<TSource = any, TContext = any> = {
-  __assertStep?:
-    | ((step: ExecutableStep) => asserts step is ExecutableStep)
-    | { new (...args: any[]): ExecutableStep };
-  __isTypeOf?: GraphQLIsTypeOfFn<any, any>;
-  __planType?($specifier: Step): Step;
-  __scope?: GraphileBuild.ScopeObject;
-} & {
-  [key: string]:
-    | FieldPlanResolver<any, any, any>
-    | ObjectFieldConfig<TSource, TContext>;
 };
+
+export interface ObjectPlan<TSource extends Step = Step>
+  extends GrafastObjectPlan<TSource> {
+  __scope?: GraphileBuild.ScopeObject;
+}
 
 export type EnumResolver = {
   __scope?: GraphileBuild.ScopeEnum;
@@ -109,10 +91,10 @@ export interface InputObjectResolver {
   __scope?: GraphileBuild.ScopeInputObject;
 }
 
-/** @deprecated Use Plans instead */
-export interface Resolvers<TSource = any, TContext = any> {
-  [key: string]:
-    | ObjectResolver<TSource, TContext>
+/** @deprecated Use objects/scalars/etc instead */
+export interface Resolvers {
+  [typeName: string]:
+    | ObjectResolver
     | EnumResolver
     | TypeResolver
     | InputObjectResolver
@@ -122,19 +104,31 @@ export interface Resolvers<TSource = any, TContext = any> {
       });
 }
 
-export interface Plans<TSource = any, TContext = any> {
-  [key: string]:
-    | ObjectPlan<TSource, TContext>
-    | EnumResolver
-    | GraphQLScalarType
-    | GraphQLScalarTypeConfig<any, any>;
+/** @deprecated Use objects/scalars/etc instead */
+export interface Plans {
+  [typeName: string]:
+    | (DeprecatedObjectPlan & { __scope?: GraphileBuild.ScopeObject })
+    | (EnumResolver & { __scope?: GraphileBuild.ScopeEnum })
+    | (GraphQLScalarType & { __scope?: GraphileBuild.ScopeScalar })
+    | (Omit<GraphQLScalarTypeConfig<any, any>, "name"> & {
+        __scope?: GraphileBuild.ScopeScalar;
+      });
 }
 
-export interface ExtensionDefinition {
-  typeDefs: DocumentNode | DocumentNode[];
+export interface ExtensionDefinition
+  extends Pick<
+    GrafastSchemaConfig,
+    | "typeDefs"
+    | "plans"
+    | "scalars"
+    | "enums"
+    | "objects"
+    | "unions"
+    | "interfaces"
+    | "inputObjects"
+  > {
   /** @deprecated Use 'plans' instead */
   resolvers?: Resolvers;
-  plans?: Plans;
 }
 
 type ParentConstructors<T> = { new (...args: any[]): T };
@@ -240,12 +234,19 @@ export function makeExtendSchemaPlugin(
             GraphQLScalarType,
             GraphQLUnionType,
             Kind,
+            parse,
           } = graphql;
 
           const {
             typeDefs,
             resolvers = Object.create(null),
-            plans = Object.create(null),
+            plans: rawPlans,
+            enums,
+            scalars,
+            inputObjects,
+            interfaces,
+            unions,
+            objects,
           } = typeof generator === "function"
             ? generator.length === 1
               ? generator(build)
@@ -256,24 +257,105 @@ export function makeExtendSchemaPlugin(
                 ) as ExtensionDefinition)
             : generator;
 
+          let plans: Plans;
+          if (rawPlans) {
+            if (
+              objects ||
+              unions ||
+              interfaces ||
+              inputObjects ||
+              scalars ||
+              enums
+            ) {
+              throw new Error(
+                `plans is deprecated and may not be specified alongside newer approaches`,
+              );
+            }
+            plans = rawPlans;
+          } else {
+            // Hackily convert the new format into the old format. We'll do away with
+            // this in future, but for now it's the easiest way to ensure compatibility
+            plans = {};
+
+            for (const [typeName, spec] of Object.entries(objects ?? {})) {
+              const o = {} as Record<string, any>;
+              plans[typeName] = o as any;
+
+              const { plans: fieldPlans = {}, ...rest } = spec;
+              for (const [key, val] of Object.entries(rest)) {
+                o[`__${key}`] = val;
+              }
+              for (const [key, val] of Object.entries(fieldPlans)) {
+                o[key] = val;
+              }
+            }
+
+            for (const [typeName, spec] of Object.entries(inputObjects ?? {})) {
+              const o = {} as Record<string, any>;
+              plans[typeName] = o as any;
+
+              const { plans: fieldPlans = {}, ...rest } = spec;
+              for (const [key, val] of Object.entries(rest)) {
+                o[`__${key}`] = val;
+              }
+              for (const [key, val] of Object.entries(fieldPlans)) {
+                o[key] = val;
+              }
+            }
+
+            for (const [typeName, spec] of Object.entries(unions ?? {})) {
+              const o = {} as Record<string, any>;
+              plans[typeName] = o as any;
+
+              for (const [key, val] of Object.entries(spec)) {
+                o[`__${key}`] = val;
+              }
+            }
+
+            for (const [typeName, spec] of Object.entries(interfaces ?? {})) {
+              const o = {} as Record<string, any>;
+              plans[typeName] = o as any;
+
+              for (const [key, val] of Object.entries(spec)) {
+                o[`__${key}`] = val;
+              }
+            }
+
+            for (const [typeName, spec] of Object.entries(scalars ?? {})) {
+              plans[typeName] = spec;
+            }
+
+            for (const [typeName, spec] of Object.entries(enums ?? {})) {
+              plans[typeName] = spec;
+            }
+          }
+
           if (typeDefs == null) {
             throw new Error(
               "The first argument to makeExtendSchemaPlugin must be an object containing a `typeDefs` field.",
             );
           }
-          const typeDefsArr = Array.isArray(typeDefs) ? typeDefs : [typeDefs];
-          const mergedTypeDefinitions = typeDefsArr.reduce(
-            (definitions, typeDef) => {
-              if (!(typeDef as any) || (typeDef as any).kind !== "Document") {
-                throw new Error(
-                  'The first argument to makeExtendSchemaPlugin must be an object containing a `typeDefs` field; the value for this field must be generated by the `gql` helper (`import { gql, makeExtendSchemaPlugin } from "postgraphile/utils"`), or be an array of the same.',
-                );
-              }
-              definitions.push(...typeDef.definitions);
-              return definitions;
-            },
-            [] as DefinitionNode[],
-          );
+          const document: DocumentNode =
+            typeof typeDefs === "string"
+              ? parse(typeDefs)
+              : Array.isArray(typeDefs)
+                ? {
+                    kind: graphql.Kind.DOCUMENT,
+                    definitions: typeDefs.flatMap((t) => {
+                      if (!t || t.kind !== "Document") {
+                        throw new Error(
+                          'The first argument to makeExtendSchemaPlugin must be an object containing a `typeDefs` field; the value for this field must be generated by the `gql` helper (`import { gql, makeExtendSchemaPlugin } from "postgraphile/utils"`), or be an array of the same.',
+                        );
+                      }
+                      return t.definitions;
+                    }),
+                  }
+                : typeDefs;
+          if (!document || document.kind !== "Document") {
+            throw new Error(
+              'The first argument to makeExtendSchemaPlugin must be an object containing a `typeDefs` field; the value for this field must be generated by the `gql` helper (`import { gql, makeExtendSchemaPlugin } from "postgraphile/utils"`), or be an array of the same.',
+            );
+          }
 
           const typeExtensions: TypeExtensions = {
             GraphQLSchema: {
@@ -285,7 +367,7 @@ export function makeExtendSchemaPlugin(
             GraphQLInterfaceType: {},
           };
           const newTypes: Array<NewTypeDef> = [];
-          mergedTypeDefinitions.forEach((definition) => {
+          document.definitions.forEach((definition) => {
             if (definition.kind === "EnumTypeDefinition") {
               newTypes.push({
                 type: GraphQLEnumType,
@@ -427,7 +509,7 @@ export function makeExtendSchemaPlugin(
               const name = getName(definition.name);
               const description = getDescription(definition.description);
               const directives = getDirectives(definition.directives);
-              const p = (plans[name] ?? {}) as ObjectPlan;
+              const p = (plans[name] ?? {}) as DeprecatedObjectPlan;
               const scope = {
                 __origin: `makeExtendSchemaPlugin`,
                 directives,
@@ -1107,12 +1189,14 @@ export function makeExtendSchemaPlugin(
            * other relevant methods.
            */
           const possiblePlan = (
-            plans[Self.name] as Maybe<ObjectPlan<any, any>>
+            plans[Self.name] as Maybe<DeprecatedObjectPlan>
           )?.[fieldName];
           build.exportNameHint(possiblePlan, `${Self.name}_${fieldName}_plan`);
           const possibleResolver = (
             resolvers[Self.name] as Maybe<ObjectResolver>
-          )?.[fieldName];
+          )?.[fieldName] as
+            | GraphQLFieldResolver<TSource, any>
+            | ObjectFieldConfig;
           build.exportNameHint(
             possibleResolver,
             `${Self.name}_${fieldName}_resolver`,

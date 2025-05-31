@@ -68,7 +68,9 @@ const MySchemaExtensionPlugin =
   makeExtendSchemaPlugin(
     build => ({
       typeDefs: gql`...`,
-      resolvers: ...
+      objects: {...},
+      interfaces: {...},
+      unions: {...},
     })
   );
 
@@ -78,32 +80,44 @@ module.exports = MySchemaExtensionPlugin;
 e.g.:
 
 ```js
-makeExtendSchemaPlugin((build) => ({
-  typeDefs: gql`
-    type Random {
-      float: Float!
-      number(min: Int!, max: Int!): Int!
-    }
-    extend type Query {
-      random: Random
-    }
-  `,
-  resolvers: {
-    Query: {
-      random() {
-        return {};
+makeExtendSchemaPlugin((build) => {
+  const {
+    grafast: { constant },
+  } = build;
+  return {
+    typeDefs: gql`
+      type Random {
+        float: Float!
+        number(min: Int!, max: Int!): Int!
+      }
+      extend type Query {
+        random: Random
+      }
+    `,
+    objects: {
+      Query: {
+        plans: {
+          random() {
+            return constant({});
+          },
+        },
+      },
+      Random: {
+        plans: {
+          float() {
+            return lambda(null, () => Math.random());
+          },
+          number(_parent, { $min, $max }) {
+            return lambda(
+              [$min, $max],
+              ([min, max]) => min + Math.floor(Math.random() * (max - min + 1)),
+            );
+          },
+        },
       },
     },
-    Random: {
-      float() {
-        return Math.random();
-      },
-      number(_parent, { min, max }) {
-        return min + Math.floor(Math.random() * (max - min + 1));
-      },
-    },
-  },
-}));
+  };
+});
 ```
 
 ### `makeAddInflectorsPlugin`

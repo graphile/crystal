@@ -1,6 +1,7 @@
 import "graphile-config";
 
 import { rootValue } from "grafast";
+import type { GraphQLOutputType } from "graphql";
 
 import { EXPORTABLE } from "../utils.js";
 import { version } from "../version.js";
@@ -41,7 +42,10 @@ export const MutationPayloadQueryPlugin: GraphileConfig.Plugin = {
             return fields;
           }
 
-          const Query = getTypeByName(inflection.builtin("Query"));
+          const Query = getTypeByName(
+            inflection.builtin("Query"),
+          ) as GraphQLOutputType;
+          if (Query == null) return fields;
           return extend<typeof fields, typeof fields>(
             fields,
             {

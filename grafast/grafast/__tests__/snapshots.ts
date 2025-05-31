@@ -28,17 +28,21 @@ function shouldUpdateSnapshot(filePath: string) {
  * filePath, otherwise it asserts that the snapshot matches the previous
  * snapshot.
  */
-export async function snapshot(actual: string, filePath: string) {
+export async function snapshot(
+  actual: string,
+  filePath: string,
+  allowUpdate = true,
+) {
   let expected: string | null = null;
   try {
     expected = await fsp.readFile(filePath, "utf8");
   } catch (e) {
     /* noop */
   }
-  if (expected == null || shouldUpdateSnapshot(filePath)) {
+  if (expected == null || (allowUpdate && shouldUpdateSnapshot(filePath))) {
     if (expected !== actual) {
       const relative = path.relative(process.cwd(), filePath);
-      console.warn(`      Updated snapshot in '${relative}'`);
+      console.warn(`          Updated snapshot in '${relative}'`);
       await fsp.writeFile(filePath, actual);
     }
   } else {

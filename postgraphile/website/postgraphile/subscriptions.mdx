@@ -117,27 +117,31 @@ const MySubscriptionPlugin = makeExtendSchemaPlugin((build) => {
         message: Message
       }
     `,
-    plans: {
+    objects: {
       Subscription: {
-        forumMessage: {
-          subscribePlan(_$root, args) {
-            const $pgSubscriber = context().get("pgSubscriber");
-            const $forumId = args.get("forumId");
-            const $topic = lambda($forumId, (id) => `forum:${id}:message`);
-            return listen($pgSubscriber, $topic, jsonParse);
-          },
-          plan($event) {
-            return $event;
+        plans: {
+          forumMessage: {
+            subscribePlan(_$root, args) {
+              const $pgSubscriber = context().get("pgSubscriber");
+              const $forumId = args.get("forumId");
+              const $topic = lambda($forumId, (id) => `forum:${id}:message`);
+              return listen($pgSubscriber, $topic, jsonParse);
+            },
+            plan($event) {
+              return $event;
+            },
           },
         },
       },
       ForumMessageSubscriptionPayload: {
-        event($event) {
-          return $event.get("event");
-        },
-        message($event) {
-          const $id = $event.get("id");
-          return messages.get({ id: $id });
+        plans: {
+          event($event) {
+            return $event.get("event");
+          },
+          message($event) {
+            const $id = $event.get("id");
+            return messages.get({ id: $id });
+          },
         },
       },
     },
