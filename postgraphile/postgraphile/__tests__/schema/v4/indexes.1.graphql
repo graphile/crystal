@@ -2585,6 +2585,8 @@ type EdgeCasesEdge {
 
 """Methods to use when ordering `EdgeCase`."""
 enum EdgeCasesOrderBy {
+  COMPUTED_ASC
+  COMPUTED_DESC
   NATURAL
 }
 

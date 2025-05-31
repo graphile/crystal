@@ -3,12 +3,7 @@ import { resolvePreset } from "graphile-config";
 import type { ExecutionResult } from "graphql";
 import { it } from "mocha";
 
-import type {
-  FieldArgs,
-  LoadedRecordStep,
-  ObjectPlan,
-  Step,
-} from "../dist/index.js";
+import type { LoadedRecordStep, ObjectPlan, Step } from "../dist/index.js";
 import {
   context,
   grafast,

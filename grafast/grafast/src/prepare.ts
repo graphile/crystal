@@ -780,8 +780,8 @@ async function processStream(
   type ResultTuple = [any, number];
 
   let queue: null | ResultTuple[] = null;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   let timeout: NodeJS.Timer | null = null;
-  timeout;
 
   const _processQueue = (entries: ResultTuple[]) => {
     const size = entries.length;

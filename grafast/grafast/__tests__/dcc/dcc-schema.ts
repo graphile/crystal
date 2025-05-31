@@ -428,7 +428,7 @@ export const makeBaseArgs = () => {
           const $npc = inhibitOnNull(
             loadOne($npcId, $db, null, batchGetNpcById),
           );
-          const $__typename = lambda($npc, npcToTypeName);
+          const $__typename = lambda(inhibitOnNull($npc), npcToTypeName);
 
           return {
             $__typename,

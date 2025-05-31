@@ -470,6 +470,7 @@ export interface StepOptimizeOptions {
    */
   stream:
     | null
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
     | {
         // if?: Step<Maybe<boolean>>;
         // initialCount?: Step<Maybe<number>>;

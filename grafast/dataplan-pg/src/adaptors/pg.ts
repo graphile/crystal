@@ -145,7 +145,7 @@ function newNodePostgresPgClient(
                 text: `rollback to savepoint tx${txLevel === 0 ? "" : txLevel}`,
               });
             }
-          } catch (e2) {
+          } catch (_e2) {
             console.error(`Error occurred whilst rolling back: ${e}`);
           }
           throw e;
@@ -710,7 +710,7 @@ export class PgSubscriber<
             await client.query(`UNLISTEN ${client.escapeIdentifier(topic)}`);
             this.subscribedTopics.delete(topic);
           }
-        } catch (e) {
+        } catch (_e) {
           // ignore
         }
         client.release();

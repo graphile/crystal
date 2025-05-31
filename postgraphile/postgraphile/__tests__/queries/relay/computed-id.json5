@@ -1,0 +1,24 @@
+{
+  a: {
+    username: "Alice",
+    base: 0.2,
+    model1: 0.3,
+    model2: 0.5,
+    model3: null,
+    model4: null,
+    nonsense1: 0.2,
+    nonsense2: 0.2,
+    nonsense3: 0.2,
+  },
+  b: {
+    username: "Bob",
+    base: 0.25,
+    model1: null,
+    model2: 0.45,
+    model3: 0.52,
+    model4: null,
+    nonsense1: 0.25,
+    nonsense2: 0.25,
+    nonsense3: 0.25,
+  },
+}
