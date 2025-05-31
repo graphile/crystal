@@ -6958,7 +6958,10 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "edge_case_computed"
         },
-        tags: {},
+        tags: {
+          sortable: true,
+          behavior: ["orderBy order resource:connection:backwards"]
+        },
         canExecute: false
       },
       description: undefined
