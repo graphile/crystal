@@ -1,0 +1,45 @@
+# Ref consumable-items.md
+
+query ConsumableItems {
+  crawler(id: 101) {
+    id
+    ... on HasInventory {
+      items(first: 3) {
+        __typename
+        id
+        ... on Created {
+          __typename
+          ... on HasContents {
+            contents(first: 3) {
+              __typename
+              id
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+query ConsumableItemsStream2 @incremental {
+  crawler(id: 101) {
+    id
+    ... on HasInventory {
+      items(first: 3) {
+        __typename
+        id
+        ... on Created {
+          __typename
+          ... on HasContents {
+            contents(first: 3) @stream {
+              __typename
+              id
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+}
