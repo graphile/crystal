@@ -33,12 +33,7 @@ export async function snapshot(
   filePath: string,
   allowUpdate = true,
 ) {
-  let expected: string | null = null;
-  try {
-    expected = await fsp.readFile(filePath, "utf8");
-  } catch (e) {
-    /* noop */
-  }
+  const expected = await readSnapshot(filePath);
   if (expected == null || (allowUpdate && shouldUpdateSnapshot(filePath))) {
     if (expected !== actual) {
       const relative = path.relative(process.cwd(), filePath);
@@ -48,4 +43,13 @@ export async function snapshot(
   } else {
     expect(actual).to.equal(expected);
   }
+}
+
+export async function readSnapshot(filePath: string) {
+  try {
+    return await fsp.readFile(filePath, "utf8");
+  } catch (e) {
+    /* noop */
+  }
+  return null;
 }
