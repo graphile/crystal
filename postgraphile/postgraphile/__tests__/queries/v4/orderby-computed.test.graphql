@@ -1,7 +1,7 @@
 ## expect(errors).toBeFalsy();
 #> schema: ["a", "b", "c"]
 {
-  allEdgeCases(orderBy: COMPUTED_ASC) {
+  allEdgeCases(orderBy: [COMPUTED_ASC, ROW_ID_ASC]) {
     nodes {
       computed
       wontCastEasy
