@@ -10,6 +10,7 @@ import { resolvePreset } from "graphile-config";
 import { isAsyncIterable } from "iterall";
 import JSON5 from "json5";
 
+// eslint-disable-next-line import/no-unresolved
 import { schema } from "./exampleSchemaExport.mjs";
 
 const databaseName = "graphilecrystaltest";
