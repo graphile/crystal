@@ -48,9 +48,6 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
   schema: {
     hooks: {
       build(build) {
-        const {
-          grafast: { inhibitOnNull },
-        } = build;
         const nodeFetcherByTypeNameCache = new Map<
           string,
           ($id: ExecutableStep<Maybe<string>>) => ExecutableStep<any>

@@ -1,10 +1,4 @@
-import type {
-  GraphQLFieldExtensions,
-  GraphQLFieldResolver,
-  GraphQLScalarLiteralParser,
-  GraphQLScalarSerializer,
-  GraphQLScalarValueParser,
-} from "graphql";
+import type { GraphQLFieldExtensions, GraphQLFieldResolver } from "graphql";
 import { GraphQLSchema } from "graphql";
 import * as graphql from "graphql";
 
