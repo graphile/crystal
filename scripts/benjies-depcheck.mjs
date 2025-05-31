@@ -79,7 +79,9 @@ for (const packagePath of packages) {
           nodir: true,
         },
       );
-    } catch {}
+    } catch {
+      // ignore
+    }
     const allFiles = negativeMatches
       ? positiveMatches.filter((m) => !negativeMatches.includes(m))
       : positiveMatches;
@@ -108,7 +110,9 @@ for (const packagePath of packages) {
           requires.delete(moduleName);
         }
       }
-    } catch (e) {}
+    } catch (e) {
+      // ignore
+    }
 
     for (const moduleName of requires) {
       if (NODE_MODULES.includes(moduleName)) {
