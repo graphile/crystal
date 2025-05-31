@@ -7,13 +7,16 @@ graph TD
     classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
+    subgraph "Buckets for queries/interfaces-single-table/single-topic-as-item"
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 7, 9, 10, 24, 11<br />2: PgSelect[8]<br />3: PgSelectRows[13]<br />ᐳ: First[12], PgSelectSingle[14]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14<br /><br />ROOT PgSelectSingleᐸsingle_table_itemsᐳ[14]"):::bucket
+    end
+    Bucket0 --> Bucket1
 
     %% plan dependencies
-    PgSelect8[["PgSelect[8∈0] ➊<br />ᐸsingle_table_itemsᐳ"]]:::plan
+    PgSelect8[["PgSelect[8∈0] ➊<br />ᐸsingle_table_itemsᐳ<br />More deps:<br />- Constantᐸ10ᐳ[24]<br />- Constantᐸ'TOPIC'ᐳ[7]"]]:::plan
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant24{{"Constant[24∈0] ➊<br />ᐸ10ᐳ"}}:::plan
-    Constant7{{"Constant[7∈0] ➊<br />ᐸ'TOPIC'ᐳ"}}:::plan
-    Object11 & Constant24 & Constant7 --> PgSelect8
+    Object11 --> PgSelect8
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
@@ -26,7 +29,6 @@ graph TD
     PgSelect8 --> PgSelectRows13
     PgSelectSingle14{{"PgSelectSingle[14∈0] ➊<br />ᐸsingle_table_itemsᐳ"}}:::plan
     First12 --> PgSelectSingle14
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     PgClassExpression15{{"PgClassExpression[15∈1] ➊<br />ᐸ__single_t...ems__.”id”ᐳ"}}:::plan
     PgSelectSingle14 --> PgClassExpression15
     PgClassExpression16{{"PgClassExpression[16∈1] ➊<br />ᐸ__single_t...s__.”type”ᐳ"}}:::plan
@@ -47,13 +49,8 @@ graph TD
     PgSelectSingle14 --> PgClassExpression23
 
     %% define steps
-
-    subgraph "Buckets for queries/interfaces-single-table/single-topic-as-item"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 7, 9, 10, 24, 11<br />2: PgSelect[8]<br />3: PgSelectRows[13]<br />ᐳ: First[12], PgSelectSingle[14]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Constant7,PgSelect8,Access9,Access10,Object11,First12,PgSelectRows13,PgSelectSingle14,Constant24 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14<br /><br />ROOT PgSelectSingleᐸsingle_table_itemsᐳ[14]"):::bucket
+    class Bucket0,__Value2,PgSelect8,Access9,Access10,Object11,First12,PgSelectRows13,PgSelectSingle14 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgClassExpression15,PgClassExpression16,PgClassExpression17,PgClassExpression18,PgClassExpression19,PgClassExpression20,PgClassExpression21,PgClassExpression22,PgClassExpression23 bucket1
-    Bucket0 --> Bucket1
-    end
+

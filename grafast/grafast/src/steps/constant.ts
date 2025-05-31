@@ -1,3 +1,4 @@
+import { operationPlan } from "../global.js";
 import { inspect } from "../inspect.js";
 import type {
   ExecutionDetails,
@@ -6,7 +7,6 @@ import type {
 } from "../interfaces.js";
 import { Step, UnbatchedStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
-import { operationPlan } from "./index.js";
 
 /**
  * Converts a constant value (e.g. a string/number/etc) into a plan
@@ -171,28 +171,26 @@ export function constant<TData>(
     }
     return constant(data[0], false);
   }
-  const opPlan = operationPlan();
-  const makeConst = () =>
-    operationPlan().withRootLayerPlan(
-      () => new ConstantStep<TData>(data, isSecret),
-    );
-  const t = typeof data;
-  if (
-    data == null ||
-    t === "boolean" ||
-    t === "string" ||
-    t === "number" ||
-    t === "symbol"
-  ) {
-    return opPlan.cacheStep(
-      opPlan.contextStep,
-      isSecret ? `constant-secret` : `constant`,
-      data as null | undefined | boolean | string | number | symbol,
-      makeConst,
-    );
-  } else {
-    return makeConst();
-  }
+  return operationPlan().withRootLayerPlan(() => {
+    const opPlan = operationPlan();
+    const makeConst = () => new ConstantStep<TData>(data, isSecret);
+    const t = typeof data;
+    if (
+      data == null ||
+      t === "boolean" ||
+      t === "string" ||
+      t === "number" ||
+      t === "symbol"
+    ) {
+      return opPlan.cacheImmutableStep(
+        isSecret ? `constant-secret` : `constant`,
+        data as null | undefined | boolean | string | number | symbol,
+        makeConst,
+      );
+    } else {
+      return makeConst();
+    }
+  });
 }
 
 // Have to overwrite the getDepOrConstant method due to circular dependency

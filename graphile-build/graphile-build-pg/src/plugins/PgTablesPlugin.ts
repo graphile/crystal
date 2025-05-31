@@ -656,9 +656,11 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
     hooks: {
       init(_, build, _context) {
         const {
+          grafast: { get },
           inflection,
           options: { pgForbidSetofFunctionsToReturnNull },
           setGraphQLTypeForPgCodec,
+          EXPORTABLE,
         } = build;
         for (const codec of build.pgCodecMetaLookup.keys()) {
           build.recoverable(null, () => {
@@ -679,6 +681,13 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             }
 
             if (isTable) {
+              const resource = Object.values(
+                build.input.pgRegistry.pgResources,
+              ).find((r) => !r.parameters && r.codec === codec);
+              const pk =
+                resource?.uniques.find((u) => u.isPrimary) ??
+                resource?.uniques[0];
+              const pkCols = pk?.attributes;
               build.registerObjectType(
                 tableTypeName,
                 {
@@ -688,6 +697,21 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                 () => ({
                   assertStep: assertPgClassSingleStep,
                   description: codec.description,
+                  planType:
+                    resource && pkCols
+                      ? // TODO: optimize this function to look like `return resource.get({...})` via eval
+                        EXPORTABLE(
+                          (get, pkCols, resource) =>
+                            function ($specifier) {
+                              const spec = Object.create(null);
+                              for (const pkCol of pkCols) {
+                                spec[pkCol] = get($specifier, pkCol);
+                              }
+                              return resource.get(spec);
+                            },
+                          [get, pkCols, resource],
+                        )
+                      : undefined,
                 }),
                 `PgTablesPlugin table type for ${codec.name}`,
               );

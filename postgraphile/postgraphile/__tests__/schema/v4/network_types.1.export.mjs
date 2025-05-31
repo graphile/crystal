@@ -1,8 +1,8 @@
 import { PgDeleteSingleStep, PgExecutor, TYPES, assertPgClassSingleStep, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
-const handler = {
+const nodeIdHandler_Query = {
   typeName: "Query",
   codec: {
     name: "raw",
@@ -52,7 +52,7 @@ const nodeIdCodecs_base64JSON_base64JSON = {
 };
 const nodeIdCodecs = {
   __proto__: null,
-  raw: handler.codec,
+  raw: nodeIdHandler_Query.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
@@ -145,7 +145,7 @@ const networkUniques = [{
     }
   }
 }];
-const pgResource_networkPgResource = makeRegistry({
+const resource_networkPgResource = makeRegistry({
   pgExecutors: {
     __proto__: null,
     main: executor
@@ -190,30 +190,26 @@ const pgResource_networkPgResource = makeRegistry({
     __proto__: null
   }
 }).pgResources["network"];
-const nodeIdHandlerByTypeName = {
-  __proto__: null,
-  Query: handler,
-  Network: {
-    typeName: "Network",
-    codec: nodeIdCodecs_base64JSON_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("networks", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return pgResource_networkPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "networks";
-    }
+const nodeIdHandler_Network = {
+  typeName: "Network",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("networks", false), $record.get("id")]);
+  },
+  getSpec($list) {
+    return {
+      id: inhibitOnNull(access($list, [1]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_networkPgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "networks";
   }
 };
 function specForHandler(handler) {
@@ -236,22 +232,38 @@ function specForHandler(handler) {
   return spec;
 }
 const nodeFetcher_Network = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Network));
-  return nodeIdHandlerByTypeName.Network.get(nodeIdHandlerByTypeName.Network.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Network));
+  return nodeIdHandler_Network.get(nodeIdHandler_Network.getSpec($decoded));
 };
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
+}
+const nodeIdHandlerByTypeName = {
+  __proto__: null,
+  Query: nodeIdHandler_Query,
+  Network: nodeIdHandler_Network
+};
+const decodeNodeId = makeDecodeNodeId(Object.values(nodeIdHandlerByTypeName));
+function findTypeNameMatch(specifier) {
+  if (!specifier) return null;
+  for (const [typeName, typeSpec] of Object.entries(nodeIdHandlerByTypeName)) {
+    const value = specifier[typeSpec.codec.name];
+    if (value != null && typeSpec.match(value)) {
+      return typeName;
+    }
+  }
+  return null;
 }
 function InternetAddressSerialize(value) {
   return "" + value;
 }
 const specFromArgs_Network = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Network, $nodeId);
+  return specFromNodeId(nodeIdHandler_Network, $nodeId);
 };
 const specFromArgs_Network2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Network, $nodeId);
+  return specFromNodeId(nodeIdHandler_Network, $nodeId);
 };
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
@@ -620,16 +632,16 @@ export const plans = {
       return rootValue();
     },
     nodeId($parent) {
-      const specifier = handler.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler.codec.name].encode);
+      const specifier = nodeIdHandler_Query.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Query.codec.name].encode);
     },
-    node(_$root, args) {
-      return node(nodeIdHandlerByTypeName, args.getRaw("nodeId"));
+    node(_$root, fieldArgs) {
+      return fieldArgs.getRaw("nodeId");
     },
     networkById(_$root, {
       $id
     }) {
-      return pgResource_networkPgResource.get({
+      return resource_networkPgResource.get({
         id: $id
       });
     },
@@ -639,7 +651,7 @@ export const plans = {
     },
     allNetworks: {
       plan() {
-        return connection(pgResource_networkPgResource.find());
+        return connection(resource_networkPgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -668,11 +680,35 @@ export const plans = {
       }
     }
   },
+  Node: {
+    __planType($nodeId) {
+      const $specifier = decodeNodeId($nodeId);
+      const $__typename = lambda($specifier, findTypeNameMatch, true);
+      return {
+        $__typename,
+        planForType(type) {
+          const spec = nodeIdHandlerByTypeName[type.name];
+          if (spec) {
+            return spec.get(spec.getSpec(access($specifier, [spec.codec.name])));
+          } else {
+            throw new Error(`Failed to find handler for ${type.name}`);
+          }
+        }
+      };
+    }
+  },
   Network: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of networkUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_networkPgResource.get(spec);
+    },
     nodeId($parent) {
-      const specifier = nodeIdHandlerByTypeName.Network.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Network.codec.name].encode);
+      const specifier = nodeIdHandler_Network.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Network.codec.name].encode);
     }
   },
   InternetAddress: {
@@ -837,7 +873,7 @@ export const plans = {
     __assertStep: __ValueStep,
     createNetwork: {
       plan(_, args) {
-        const $insert = pgInsertSingle(pgResource_networkPgResource, Object.create(null));
+        const $insert = pgInsertSingle(resource_networkPgResource, Object.create(null));
         args.apply($insert);
         const plan = object({
           result: $insert
@@ -852,7 +888,7 @@ export const plans = {
     },
     updateNetwork: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_networkPgResource, specFromArgs_Network(args));
+        const $update = pgUpdateSingle(resource_networkPgResource, specFromArgs_Network(args));
         args.apply($update);
         return object({
           result: $update
@@ -866,7 +902,7 @@ export const plans = {
     },
     updateNetworkById: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_networkPgResource, {
+        const $update = pgUpdateSingle(resource_networkPgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($update);
@@ -882,7 +918,7 @@ export const plans = {
     },
     deleteNetwork: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_networkPgResource, specFromArgs_Network2(args));
+        const $delete = pgDeleteSingle(resource_networkPgResource, specFromArgs_Network2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -896,7 +932,7 @@ export const plans = {
     },
     deleteNetworkById: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_networkPgResource, {
+        const $delete = pgDeleteSingle(resource_networkPgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($delete);
@@ -936,7 +972,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_networkPgResource.find(spec);
+          return resource_networkPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -1010,7 +1046,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_networkPgResource.find(spec);
+          return resource_networkPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -1080,7 +1116,7 @@ export const plans = {
     },
     deletedNetworkId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandlerByTypeName.Network.plan($record);
+      const specifier = nodeIdHandler_Network.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query() {
@@ -1099,7 +1135,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_networkPgResource.find(spec);
+          return resource_networkPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");

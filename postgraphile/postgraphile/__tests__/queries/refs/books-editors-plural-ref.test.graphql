@@ -1,0 +1,21 @@
+## expect(errors).toBeFalsy()
+#> schema: ["refs"]
+#> simpleCollections: "both"
+## expect(data.allBooks.nodes.length).toEqual(2)
+## expect(data.allBooks.nodes[0].editors.nodes.length).toEqual(2)
+## expect(data.allBooks.nodes[0].editors.nodes[0].name).toEqual("Bob Jones")
+## expect(data.allBooks.nodes[0].editors.nodes[1].name).toEqual("Carol Wilson")
+## expect(data.allBooks.nodes[1].editors.nodes.length).toEqual(1)
+## expect(data.allBooks.nodes[1].editors.nodes[0].name).toEqual("Carol Wilson")
+
+{
+  allBooks {
+    nodes {
+      editors {
+        nodes {
+          name
+        }
+      }
+    }
+  }
+}

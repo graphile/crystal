@@ -1,0 +1,16 @@
+# Previously produced an error; exists to ensure the error doesn't come back.
+# Error: Query planning error: GrafastInternalError<93da1006-3af9-44dd-a54b-5bf6fe3e791c>: Access{11}<47.number>[140] has polymorphic paths >SafeRoom>Stairwell; but >SafeRoom>Stairwell is not in >Stairwell.
+
+{
+  floor(number: 3) {
+    locations {
+      floors {
+        locations {
+          floors {
+            number
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,3 +1,4 @@
+import { $$deepDepSkip } from "../constants.js";
 import type {
   ExecutionDetails,
   GrafastResultsList,
@@ -23,7 +24,11 @@ export class FirstStep<TData> extends UnbatchedStep<TData> {
       | ConnectionCapableStep<Step<TData>, any>,
   ) {
     super();
-    this.addDependency(itemsOrStep(parentPlan));
+    this.addDataDependency(itemsOrStep(parentPlan));
+  }
+
+  [$$deepDepSkip](): Step {
+    return this.getDepOptions(0).step;
   }
 
   execute({

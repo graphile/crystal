@@ -1,18 +1,12 @@
-import type { GraphQLObjectType } from "graphql";
-
 import { isDev } from "../dev.js";
 import { inspect } from "../inspect.js";
 import type {
   Maybe,
   NodeIdHandler,
-  PolymorphicData,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
-import { polymorphicWrap } from "../polymorphic.js";
-import type { PolymorphicStep, Step } from "../step.js";
+import type { Step } from "../step.js";
 import { UnbatchedStep } from "../step.js";
-import { access } from "./access.js";
-import { constant } from "./constant.js";
 import { lambda } from "./lambda.js";
 
 /**
@@ -21,15 +15,16 @@ import { lambda } from "./lambda.js";
  * typeNames supported and their details (codec to use, how to find the record,
  * etc), and finally the Node id string plan.
  */
-export class NodeStep extends UnbatchedStep implements PolymorphicStep {
+export class NodeStep extends UnbatchedStep<{
+  __typename: string;
+  specifier: any;
+} | null> {
   static $$export = {
     moduleName: "grafast",
     exportName: "NodeStep",
   };
   isSyncAndSafe = true;
   allowMultipleOptimizations = true;
-
-  private specPlanDep: number;
 
   constructor(
     private possibleTypes: {
@@ -39,18 +34,7 @@ export class NodeStep extends UnbatchedStep implements PolymorphicStep {
   ) {
     super();
     const decodeNodeId = makeDecodeNodeId(Object.values(possibleTypes));
-    this.specPlanDep = this.addDependency(decodeNodeId($id));
-  }
-
-  planForType(type: GraphQLObjectType): Step {
-    const spec = this.possibleTypes[type.name];
-    if (spec !== undefined) {
-      return spec.get(
-        spec.getSpec(access(this.getDep(this.specPlanDep), [spec.codec.name])),
-      );
-    } else {
-      return constant(null);
-    }
+    this.addDependency(decodeNodeId($id));
   }
 
   private getTypeNameFromSpecifier(specifier: any) {
@@ -70,15 +54,11 @@ export class NodeStep extends UnbatchedStep implements PolymorphicStep {
     return null;
   }
 
-  unbatchedExecute = (
-    _extra: UnbatchedExecutionExtra,
-    specifier: any,
-  ): PolymorphicData<string, ReadonlyArray<any>> | null => {
-    const typeName = specifier
-      ? this.getTypeNameFromSpecifier(specifier)
-      : null;
-    return typeName ? polymorphicWrap(typeName) : null;
-  };
+  unbatchedExecute(_extra: UnbatchedExecutionExtra, specifier: any) {
+    const __typename =
+      specifier != null ? this.getTypeNameFromSpecifier(specifier) : null;
+    return __typename != null ? { __typename, specifier } : null;
+  }
 }
 
 /**

@@ -1,26 +1,32 @@
 ---
+title: "Abstract types & polymorphism"
 sidebar_position: 11
 ---
 
-# Polymorphism
+# Abstract types and polymorphism
 
-GraphQL has two types of output polymorphism currently: interfaces and unions.
-An interface defines a list of fields; all objects that implement the interface
-must implement fields compatible with these. A union is a simple list of
-possible object types.
+GraphQL supports two abstract types suitable for usage in output: interfaces and
+unions. An interface defines a list of fields; all objects that implement the
+interface must implement fields compatible with these. A union is a simple list
+of possible object types. At runtime, positions that return one of these
+abstract types must resolve to a concrete object type; thus abstract types allow
+GraphQL to describe positions where data polymorphism can occur.
 
-Gra*fast* supports both of these forms of GraphQL polymorphism, both through
-resolvers and through plans. Resolvers work the same (basically) as they do in
-GraphQL.js so we won't dig into them here, but let's look into how Gra*fast*
-supports polymorphism via plans.
+Gra*fast* supports GraphQL interfaces and unions, both through traditional
+GraphQL.js resolvers and through plan resolvers. Resolvers work the same
+(basically) as they do in GraphQL.js so we won't dig into them here, but let's
+look into how Gra*fast* supports abstract types via plan resolvers (which
+enables greater efficiency!).
 
 ## Polymorphic positions
 
-Let's define the term "polymorphic position" to make it easier to talk about
-planning our polymorphic GraphQL query. Imagine you have a GraphQL schema such
-as:
+To make it easier to talk about planning a polymorphic GraphQL query, let's
+define the term "polymorphic position" to refer to a position in our GraphQL
+operation whose return type is an abstract type (an interface or union).
 
-```graphql
+Imagine you have a GraphQL schema such as:
+
+```graphql {13,14}
 interface Animal {
   name: String!
 }
@@ -40,8 +46,8 @@ type Query {
 
 One query to this schema could be:
 
-```graphql
-{
+```graphql {2}
+query BestAnimal {
   bestAnimal {
     name
     ... on Cat {
@@ -54,14 +60,14 @@ One query to this schema could be:
 }
 ```
 
-Here the return type of the `bestAnimal` field is a polymorphic type (`Animal`,
+Here the return type of the `bestAnimal` field is an abstract type (`Animal`,
 which is an interface), so the return type of `bestAnimal` is a polymorphic
 position in this query.
 
 Another query could be:
 
-```graphql
-{
+```graphql {2}
+query RandomAnimals {
   randomAnimals {
     name
     ... on Cat {
@@ -75,72 +81,335 @@ Another query could be:
 ```
 
 Here the return type of `randomAnimals` is a list (`[Animal]`). A list is not
-itself polymorphic, however the type inside the list is a polymorphic type
+itself abstract, however the type inside the list is an abstract type
 (`Animal` again), so a polymorphic position in this query is inside the list
 returned by `randomAnimals`.
 
 Operations may have any number (0 or higher) of polymorphic positions.
 
-## Polymorphic-capable steps
+## Planning polymorphism
 
-When a polymorphic position in an operation is being planned, Gra*fast* will
-call the field's plan resolver function as usual (or the resulting step's
-`itemPlan` method for polymorphic positions occurring inside of lists) to get
-the step representing this polymorphic position. Gra*fast* requires that this
-step must be a polymorphic-capable step, that is a step whose class implements
-the `planForType` method, otherwise a planning error will be raised.
+Planning a polymorphic position is a collaboration between the field's plan
+resolver and the abstract type's `planType` method, which describes how to
+resolve abstract values into their concrete type and associated data.
+
+The plan returned by a field plan resolver representing the value to use
+for a polymorphic position is called a "specifier". It's called a specifier
+because it does not actually have to be the value itself (though it can be!),
+it can just be a description of that item sufficient for your abstract
+type to know how to fetch it.
+
+Gra*fast* recognizes that sometimes you need to fetch things to figure out what
+type they are, and sometimes you need to know what type they are in order to
+fetch them (and sometimes it's a little of both).
+
+For example you might have an "animals" table in your database that details if
+an individual record is a cat, dog, fish, budgie or similar. In this case you
+need to fetch the record in order to determine the type of the value. We'll call
+this "fetch-to-type", and for it we can have the specifier be the record's
+primary key, which we'll call `id`.
+
+An opposing example would be a GraphQL Node ID, here a string such as `User:1`
+(but typically Base64 encoded) indicates the type up front, along with an
+identifier, and you use this type to determine how to fetch the record. We'll
+call this "type-to-fetch", and for it the specifier is this string we mentioned:
+`User:1`.
+
+The specifier that a given abstract type requires is based on the expectations
+of its `planType` method, which the schema author supplies.
+
+### `planType`
+
+If you use `makeGrafastSchema()` then you can specify `__planType` on the
+interface or union type:
 
 ```ts
-  planForType(objectType: GraphQLObjectType): ExecutableStep;
+const schema = makeGrafastSchema({
+  typeDefs: /* GraphQL */ `
+    interface Animal {
+      id: ID!
+      #...
+    }
+    union Entity = Animal | Alien
+  `,
+  plans: {
+    Animal: {
+      __planType($specifier) {
+        /* ... */
+      },
+      // Also: __toSpecifier($step)
+    },
+    Entity: {
+      __planType($specifier) {
+        /* ... */
+      },
+      // Also: __toSpecifier($step)
+    },
+  },
+});
 ```
 
-Having determined the polymorphic-capable step that represents this polymorphic
-position, Gra*fast* will create a polymorphic LayerPlan and loop through all of
-the possible concrete object types valid at that location. For each concrete
-object type, Gra*fast* will pass the type to the polymorphic-capable step's
-`planForType` method and the resulting step will represent that concrete object
-type. Multiple concrete object types may be represented by the same step.
-
-Planning then continues with the child selection sets being traversed for each
-possible concrete object type and corresponding step.
-
-At run-time, when a polymorphic-capable step executes, each of the entries in
-the `execute()` result list must be either `null`, an error, or the result of
-calling Gra*fast*'s `polymorphicWrap` function, passing the concrete object
-type's name as the first argument, and optionally any associated data as the
-second argument. This allows Gra*fast* to determine which "polymorphic branch"
-has been taken, which will control which future steps will be executed against
-this data.
+If you're using GraphQL.js or another construction mechanism then the method
+actually lives inside extensions:
 
 ```ts
-export function polymorphicWrap<TType extends string>(
-  type: TType,
-  data?: unknown,
-): PolymorphicData<TType>;
+const Animal = new GraphQLInterfaceType({
+  name: "Animal",
+  fields: {
+    /* ... */
+  },
+  extensions: {
+    grafast: {
+      planType($specifier) {
+        /* ... */
+      },
+      // Also: toSpecifier($step)
+    },
+  },
+});
+const Entity = new GraphQLUnionType({
+  name: "Entity",
+  types: [Animal /* , ... */],
+  extensions: {
+    grafast: {
+      planType($specifier) {
+        /* ... */
+      },
+      // Also: toSpecifier($step)
+    },
+  },
+});
+```
+
+However you add it, `planType` accepts two parameters: the specifier step, and
+an `info` object you can find out more about in "Advanced" below. The function
+must return a `AbstractTypePlanner` object, which is an object with two
+entries:
+
+- `$__typename` (required): a step representing the name of the resolved
+  concrete object type.
+- `planForType(t)` (optional): a function that is called for each possible
+  concrete object type, `t`, and must return the step to use for that type (or
+  `null` if creating such a step is not possible). If
+  unspecified, the `$specifier` step will be used for all object types.
+
+In our "fetch-to-type" example from before, `planType` might look like this:
+
+```ts
+function planType($specifier: Step<number>): AbstractTypePlanner {
+  // Fetch the database record for this $specifier
+  const $record = animals.get({ id: $specifier });
+  // Extract the type from the relevant column
+  const $type = $record.get("type");
+  // Convert that to a GraphQL type name
+  const $__typename = lambda($type, animalTypeNameFromType, true);
+  // Return our polymorphic type planner
+  return {
+    $__typename,
+    planForType(t) {
+      // All the different types are represented by data from the same resource
+      return $record;
+    },
+  };
+}
+
+// Turns a database value such as "cat" into a GraphQL type name such as "Cat"
+function animalTypeNameFromType(type: string) {
+  return (
+    { cat: "Cat", dog: "Dog", fish: "Fish", budgie: "Budgie" }[type] ?? null
+  );
+}
+```
+
+However, in our "type-to-fetch" example, `planType` would perform more logic
+inside the `planForType` method, and needs less work to find the type name:
+
+```ts
+function planType($specifier: Step<string>): AbstractTypePlanner {
+  // Parse the NodeID into a typename and identifier
+  const $parsed = lambda($specifier, parseNodeId, true);
+  // Extract the type name:
+  const $__typename = get($parsed, "__typename");
+  // Return our polymorphic type planner
+  return {
+    $__typename,
+    planForType(t) {
+      // Each different type has its own plan:
+      switch (t.name) {
+        // This is the 'User' type, so extract the ID and fetch the user:
+        case "User": {
+          const $id = get(parsed, "id");
+          return users.get({ id: $id });
+        }
+        // Resolving other types may work in similar or different ways:
+        case "Organization": {
+          const $id = get(parsed, "id");
+          return organizations.get({ organizationId: $id });
+        }
+        default: {
+          console.warn(`Don't know how to fetch ${t.name}`);
+          return null;
+        }
+      }
+    },
+  };
+}
+
+function parseNodeId(nodeId: string) {
+  const [__typename, rawId] = nodeId.split(":");
+  const id = parseInt(rawId, 10);
+  return { __typename, id };
+}
+```
+
+Currently Gra*fast* will call `planForType` (if present) for each possible
+object type at a given polymorphic position, and then will group these by the
+ones returning the same (or equivalent) steps into a `polymorphicPartition` and
+continue planning for each type from there.
+
+:::info Not optimal enough? Get in touch!
+
+Walking all possible object types is a simple approach, but it can inflate the
+time spent planning an operation, especially for highly polymorphic operations.
+We minimize this cost by fanning in before fanning out (see the below infobox),
+but there's space for more optimization: at some point, Gra*fast* might add
+support for on-demand polymorphic planning.
+
+With on-demand polymorphic planning, each "polymorphic branch" of the plan will
+only be planned the first time that an object of that type is met at runtime.
+This on-demand polymorphic planning strategy should significantly decrease
+initial planning time for highly polymorphic operations, and may result in many
+of the paths never needing to be planned at all. If this is something your
+deployment of Gra*fast* needs, please get in touch.
+
+:::
+
+:::info Grafast avoids exponential branching
+
+Note the "type-to-fetch" example causes the operation plan to branch: `User` and
+`Organization` each have different steps, and so we split them into separate
+`polymorphicPartition` layer plans.
+
+Excessive branching complicates both planning and execution and could lead to
+denial of service. Gra*fast* made the fundamental choice to "fan in" before
+"fanning out" in polymorphism to avoid expontential branching and that choice
+has had a significant impact on the shape of the APIs we make available.
+
+If planned naively, nested polymorphic positions could lead to significant
+branching. Imagine a polymorphic type such as `Item` that can represent `P`
+different concrete object types, and imagine that `Item` contains a relationship
+to another `Item` (e.g. `parentItem: Item`). Now imagine a GraphQL request that
+queries this `D` levels deep:
+
+<!-- prettier-ignore -->
+```graphql
+query ItemAndAncestors($id: ID!) {
+  item(id: $id) {
+    ...ItemDetails
+    parentItem {
+      ...ItemDetails
+      parentItem {
+        ...ItemDetails
+        # and so on, D levels deep
+      }
+    }
+  }
+}
+
+fragment ItemDetails on Item {
+  id
+  ... on FooItem { foo }
+  ... on BarItem { bar }
+  ... on BazItem { baz }
+  # And so on, P types wide
+}
+```
+
+If we were to plan this naively, recursing through each different type at each
+level, there would be up to `P^D` different branches - the complexity would
+scale exponentially with query depth. This is good news for an attacker, and bad
+news for our server bills.
+
+Gra*fast* prevents this from happening by forcing polymorphism to "fan in"
+before it "fans out" again, so for ten types (`P=10`) and five levels (`D=10`)
+instead of having up to 10,000,000,000 (`P^D`) branches; Grafast scales linearly
+with depth meaning there's only up to 100 (`P*D`) branches.
+
+:::
+
+### Advanced
+
+If you want to be hyper-optimal, you may not want to always return a specifier
+from your field plan resolvers - you may want to return and use a step that
+already represents the relevant data and you already needed for some reason.
+However, if this field is queried through multiple polymorphic paths Gra*fast*
+will want to perform "fan in" to prevent excessive branching. To do so it will
+take the step returned from each of the relevant field plan resolvers and if
+there's more than one, it will do the first of these that yields results:
+
+1. it will call the abstract type's `toSpecifier($step)` method, if present, passing the step; or
+2. it will call the step's `$step.toRecord()` method, if present; or
+3. it will use `$step`'s data directly.
+
+Whichever of these it does, it will create a "combined data" step representing
+**just the data** from these steps, yielded via the above options. This combined
+step will then be input to `planType` as the specifier.
+
+For consistency, we also call `toSpecifier($step)` (if present) when there's
+only one step - this ensures the "specifier" step passed in to `planType` contains
+consistent data whether there's one step or many. However, if there was just one
+step then we also make available the original step via the `info` argument
+(`info.$original`); you may use this if you want to be extra efficient somehow.
+
+As shown in the [planType](#plantype) examples above, `toSpecifier` also goes in
+the union or interface type's extensions (`extensions.grafast.toSpecifier`); how
+you would populate this depends on the framework you're using; here's an example
+using `makeGrafastSchema`:
+
+```ts
+const schema = makeGrafastSchema({
+  typeDefs: /* GraphQL */ `
+    interface Animal {
+      id: ID!
+      #...
+    }
+  `,
+  plans: {
+    Animal: {
+      __toSpecifier($step) {
+        // A simple data object with just the ID, perfect for accumulating
+        return object({ id: get($step, "id") });
+      },
+      __planType($obj) {
+        // Extract the ID
+        const $id = get($obj, "id");
+        // Fetch the record (same for all types)
+        const $record = loadOne($id, batchGetAnimalById);
+        // Determine the GraphQL type name for the record
+        const $__typename = $record.get("typename");
+        // Return our polymorphic planner
+        return {
+          $__typename,
+          planForType() {
+            // We've already fetched the record, which is polymorphic, and we've
+            // already determined the type; all types can thus share this same
+            // step.
+            return $record;
+          },
+        };
+      },
+    },
+  },
+});
 ```
 
 ## Caveats
 
-Highly polymorphic operations may result in very significant planning time,
-this is something we're working to optimize but for now we recommend that you
-use persisted operations (aka persisted queries) to ensure that only your
-developers operations are allowed. Alternatively, use our plugin that validates
-that operations don't contain too much polymorphism (TODO: plugin not yet
-available).
-
-:::info
-
-Currently Gra*fast* uses a rudimentary strategy where all possible polymorphic
-types at each point in the GraphQL operation are planned at planning time. This
-is a simple approach, but it can inflate the time spent planning an operation,
-especially for highly polymorphic operations where combinatorics is a
-significant concern.
-
-At some point, Gra*fast* will add support for on-demand polymorphic planning.
-With this strategy, each "polymorphic branch" of the plan will only be planned
-the first time that an object of that type is met at runtime. This on-demand
-polymorphic planning strategy should significantly decrease initial planning
-time for highly polymorphic operations, and may result in many of the paths
-never needing to be planned at all!
-
-:::
+Though we limit the impact of abstract types, they are still quite expensive
+compared to regular types (a field returning an abstract type that could be N
+different concrete types can be similarly complex to having N fields that return
+concrete types). As such, to protect your servers from malicious queries we
+recommend that you implement trusted documents if you can, and if not that you
+apply an abstract type depth limit to avoid polymorphism's branching becoming an
+attack vector for your schema. We also make available planning timeouts, but
+these should be your fallback defence rather than your primary defence.

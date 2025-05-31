@@ -104,9 +104,9 @@ from "b"."updatable_view" as __updatable_view__
 order by __updatable_view__."constant" asc, __updatable_view__."x" asc;
 
 select
-  __post__."id"::text as "0",
-  __post__."headline" as "1",
-  __post__."author_id"::text as "2"
+  __post__."headline" as "0",
+  __post__."author_id"::text as "1",
+  __post__."id"::text as "2"
 from "a"."post" as __post__
 where (
   __post__."author_id" = $1::"int4"
@@ -121,9 +121,9 @@ where (
 );
 
 select
-  __post__."id"::text as "0",
-  __post__."headline" as "1",
-  __post__."author_id"::text as "2"
+  __post__."headline" as "0",
+  __post__."author_id"::text as "1",
+  __post__."id"::text as "2"
 from "a"."post" as __post__
 where (
   __post__."author_id" = $1::"int4"
@@ -132,9 +132,9 @@ order by __post__."id" asc
 limit 3;
 
 select
-  __post__."id"::text as "0",
-  __post__."headline" as "1",
-  __post__."author_id"::text as "2"
+  __post__."headline" as "0",
+  __post__."author_id"::text as "1",
+  __post__."id"::text as "2"
 from "a"."post" as __post__
 where (
   __post__."author_id" = $1::"int4"
@@ -237,9 +237,9 @@ where (
 );
 
 select
-  __post__."id"::text as "0",
-  __post__."headline" as "1",
-  __post__."author_id"::text as "2"
+  __post__."headline" as "0",
+  __post__."author_id"::text as "1",
+  __post__."id"::text as "2"
 from "a"."post" as __post__
 order by __post__."author_id" desc, __post__."headline" desc, __post__."id" asc
 limit 4;

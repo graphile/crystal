@@ -20,6 +20,7 @@ import {
   access,
   arrayOfLength,
   ConstantStep,
+  DEFAULT_ACCEPT_FLAGS,
   exportAs,
   first,
   isAsyncIterable,
@@ -30,7 +31,7 @@ import {
   SafeError,
   Step,
   stepAMayDependOnStepB,
-  stepsAreInSamePhase,
+  stepAShouldTryAndInlineIntoStepB,
   UnbatchedStep,
 } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
@@ -204,6 +205,20 @@ function assertSensible(step: Step): void {
 
 export type PgSelectMode = "normal" | "aggregate" | "mutation";
 
+/**
+ * Something that's placeholder/deferredSQL capable; typically a PgSelectStep
+ * but not guaranteed.
+ */
+export type PgRootStep = Step & {
+  placeholder(step: Step, codec: PgCodec): SQL;
+  deferredSQL($step: Step<SQL>): SQL;
+};
+
+export type PgSelectFromOption =
+  | SQL
+  | { callback: ($select: PgRootStep) => SQL }
+  | ((...args: PgSelectArgumentDigest[]) => SQL);
+
 export interface PgSelectOptions<
   TResource extends PgResource<any, any, any, any, any> = PgResource,
 > {
@@ -246,7 +261,7 @@ export interface PgSelectOptions<
    * override the `resource.from` here with your own from code. Defaults to
    * `resource.from`.
    */
-  from?: SQL | ((...args: PgSelectArgumentDigest[]) => SQL);
+  from?: PgSelectFromOption;
   /**
    * You should never rely on implicit order - use explicit `ORDER BY` (via
    * `$select.orderBy(...)`) instead. However, if you _are_ relying on implicit
@@ -511,6 +526,20 @@ export class PgSelectStep<
 
   private _meta: Record<string, any> = Object.create(null);
 
+  /**
+   * Hints that **ARE NOT COMPARED FOR DEDUPLICATE** and so can be thrown away
+   * completely. Write stuff here at your own risk.
+   *
+   * @internal
+   * @experimental
+   */
+  public hints: {
+    isPgSelectFromRecordOf?: {
+      parentId: number;
+      expression: SQL;
+    };
+  } = Object.create(null);
+
   static clone<TResource extends PgResource<any, any, any, any, any>>(
     cloneFrom: PgSelectStep<TResource>,
     mode: PgSelectMode = cloneFrom.mode,
@@ -648,7 +677,7 @@ export class PgSelectStep<
       }
     }
 
-    this.contextId = this.addDependency(
+    this.contextId = this.addDataDependency(
       inContext ?? resource.executor.context(),
     );
 
@@ -870,7 +899,7 @@ export class PgSelectStep<
   ): PgSelectStep<TResource> {
     const $plan = this.clone(mode);
     // In case any errors are raised
-    $plan.connectionDepId = $plan.addDependency($connection);
+    $plan.connectionDepId = $plan.addStrongDependency($connection);
     return $plan;
   }
 
@@ -1488,7 +1517,18 @@ export class PgSelectStep<
         // for now.
         continue;
       }
-      let $dep = this.getDep(dependencyIndex);
+      const depOptions = this.getDepOptions(dependencyIndex);
+      let $dep = depOptions.step;
+      if (
+        depOptions.acceptFlags !== DEFAULT_ACCEPT_FLAGS ||
+        depOptions.onReject != null
+      ) {
+        console.info(
+          `Forbidding inlining of ${$pgSelect} due to dependency ${dependencyIndex}/${$dep} having custom flags`,
+        );
+        // Forbid inlining
+        return null;
+      }
       if ($dep instanceof PgFromExpressionStep) {
         const digest0 = $dep.getDigest(0);
         if (digest0?.step && digest0.step instanceof PgClassExpressionStep) {
@@ -1513,7 +1553,7 @@ export class PgSelectStep<
         }
 
         // Don't allow merging across a stream/defer/subscription boundary
-        if (!stepsAreInSamePhase($depPgSelect, this)) {
+        if (!stepAShouldTryAndInlineIntoStepB(this, $depPgSelect)) {
           continue;
         }
 
@@ -1632,7 +1672,8 @@ export class PgSelectStep<
   ): void {
     for (const placeholder of this.placeholders) {
       const { dependencyIndex, symbol, codec, alreadyEncoded } = placeholder;
-      const dep = this.getDep(dependencyIndex);
+      const depOptions = this.getDepOptions(dependencyIndex);
+      const $dep = depOptions.step;
       /*
        * We have dependency `dep`. We're attempting to merge ourself into
        * `otherPlan`. We have two situations we need to handle:
@@ -1647,23 +1688,23 @@ export class PgSelectStep<
       // PERF: we know dep can't depend on otherPlan if
       // `isStaticInputStep(dep)` or `dep`'s layerPlan is an ancestor of
       // `otherPlan`'s layerPlan.
-      if (stepAMayDependOnStepB($target, dep)) {
+      if (stepAMayDependOnStepB($target, $dep)) {
         // Either dep is a static input plan (which isn't dependent on anything
         // else) or otherPlan is deeper than dep; either way we can use the dep
         // directly within otherPlan.
-        const newPlanIndex = $target.addDependency(dep);
+        const newPlanIndex = $target.addDataDependency(depOptions);
         $target.placeholders.push({
           dependencyIndex: newPlanIndex,
           codec,
           symbol,
           alreadyEncoded,
         });
-      } else if (dep instanceof PgClassExpressionStep) {
+      } else if ($dep instanceof PgClassExpressionStep) {
         // Replace with a reference.
-        $target.fixedPlaceholderValues.set(placeholder.symbol, dep.toSQL());
+        $target.fixedPlaceholderValues.set(placeholder.symbol, $dep.toSQL());
       } else {
         throw new Error(
-          `Could not merge placeholder from unsupported plan type: ${dep}`,
+          `Could not merge placeholder from unsupported plan type: ${$dep}`,
         );
       }
     }
@@ -1683,23 +1724,24 @@ export class PgSelectStep<
     }
 
     for (const { symbol, dependencyIndex } of this.deferreds) {
-      const dep = this.getDep(dependencyIndex);
-      if (stepAMayDependOnStepB($target, dep)) {
-        const newPlanIndex = $target.addDependency(dep);
+      const depOptions = this.getDepOptions(dependencyIndex);
+      const $dep = depOptions.step;
+      if (stepAMayDependOnStepB($target, $dep)) {
+        const newPlanIndex = $target.addDataDependency(depOptions);
         $target.deferreds.push({
           dependencyIndex: newPlanIndex,
           symbol,
         });
-      } else if (dep instanceof PgFromExpressionStep) {
-        const newDep = $target.withLayerPlan(() => dep.inlineInto($target));
-        const newPlanIndex = $target.addDependency(newDep);
+      } else if ($dep instanceof PgFromExpressionStep) {
+        const $newDep = $target.withLayerPlan(() => $dep.inlineInto($target));
+        const newPlanIndex = $target.addStrongDependency($newDep);
         $target.deferreds.push({
           dependencyIndex: newPlanIndex,
           symbol,
         });
       } else {
         throw new Error(
-          `Could not merge placeholder from unsupported plan type: ${dep}`,
+          `Could not merge placeholder from unsupported plan type: ${$dep}`,
         );
       }
     }
@@ -1753,6 +1795,33 @@ export class PgSelectStep<
           $pgSelect,
           $pgSelectSingle,
         );
+        const recordOf = this.hints.isPgSelectFromRecordOf;
+        // TODO: the logic around this should move inside PgSelectInlineApplyStep instead.
+        let skipJoin = false;
+        if (
+          typeof this.symbol === "symbol" &&
+          recordOf &&
+          recordOf.parentId === $pgSelect.id
+        ) {
+          const symbol = sql.getIdentifierSymbol(recordOf.expression);
+          if (symbol) {
+            if (sql.isEquivalent($pgSelect.alias, recordOf.expression)) {
+              skipJoin = true;
+              $pgSelect._symbolSubstitutes.set(this.symbol, symbol);
+            } else {
+              const j = $pgSelect.joins.find((j) =>
+                sql.isEquivalent(j.alias, recordOf.expression),
+              );
+              if (j) {
+                const jSymbol = sql.getIdentifierSymbol(j.alias);
+                if (jSymbol) {
+                  skipJoin = true;
+                  $pgSelect._symbolSubstitutes.set(jSymbol, symbol);
+                }
+              }
+            }
+          }
+        }
         this.mergePlaceholdersInto($pgSelect);
         const identifier = `joinDetailsFor${this.id}`;
         $pgSelect.withLayerPlan(() => {
@@ -1765,6 +1834,7 @@ export class PgSelectStep<
               $after: this.maybeGetDep(this.afterStepId),
               $before: this.maybeGetDep(this.beforeStepId),
               applySteps: this.applyDepIds.map((depId) => this.getDep(depId)),
+              skipJoin,
             }),
           );
         });
@@ -1969,6 +2039,7 @@ export class PgSelectStep<
     $source: PgSelectStep<TResource>,
   ): StaticInfo<TResource> {
     return {
+      sourceStepDescription: `PgSelectStep[${$source.id}]`,
       forceIdentity: $source.forceIdentity,
       havingConditions: $source.havingConditions,
       mode: $source.mode,
@@ -2011,7 +2082,7 @@ export class PgSelectRowsStep<
 
   constructor($pgSelect: PgSelectStep<TResource>) {
     super();
-    this.addDependency($pgSelect);
+    this.addStrongDependency($pgSelect);
   }
 
   public getClassStep(): PgSelectStep<TResource> {
@@ -2132,7 +2203,7 @@ export function pgSelectFromRecords<
         >,
         TResource
       >
-    | Step<any[]>,
+    | Step<readonly any[]>,
 ): PgSelectStep<TResource> {
   return new PgSelectStep<TResource>({
     resource,
@@ -2162,18 +2233,17 @@ exportAs("@dataplan/pg", sqlFromArgDigests, "sqlFromArgDigests");
 
 // Previously: digestsFromArgumentSpecs; now combined
 export function pgFromExpression(
-  $target: {
-    getPgRoot(): Step & {
-      placeholder(step: Step, codec: PgCodec): SQL;
-      deferredSQL($step: Step<SQL>): SQL;
-    };
-  },
-  baseFrom: SQL | ((...args: readonly PgSelectArgumentDigest[]) => SQL),
+  $target: { getPgRoot(): PgRootStep },
+  baseFrom: PgSelectFromOption,
   inParameters: readonly PgResourceParameter[] | undefined = undefined,
   specs: ReadonlyArray<PgSelectArgumentSpec | PgSelectArgumentDigest> = [],
 ): SQL {
   if (typeof baseFrom !== "function") {
-    return baseFrom;
+    if (sql.isSQL(baseFrom)) {
+      return baseFrom;
+    } else {
+      return baseFrom.callback($target.getPgRoot());
+    }
   }
   if (specs.length === 0) {
     return baseFrom();
@@ -2280,7 +2350,7 @@ class PgFromExpressionStep extends UnbatchedStep<SQL> {
     this.digests = digests.map((digest) => {
       if (digest.step) {
         const { step, ...rest } = digest;
-        const depId = this.addDependency(digest.step);
+        const depId = this.addDataDependency(digest.step);
         return { ...rest, depId };
       } else {
         return digest;
@@ -2584,6 +2654,8 @@ interface PgSelectQueryInfo<
   TResource extends PgResource<any, any, any, any, any> = PgResource,
 > extends PgStmtCommonQueryInfo,
     PgStmtCompileQueryInfo {
+  /** For debugging only */
+  readonly sourceStepDescription: string;
   readonly name: string;
   readonly resource: TResource;
   readonly mode: PgSelectMode;
@@ -3230,6 +3302,7 @@ ${lateralText};`;
 }
 
 type StaticKeys =
+  | "sourceStepDescription"
   | "forceIdentity"
   | "havingConditions"
   | "mode"
@@ -3279,6 +3352,7 @@ class PgSelectInlineApplyStep<
   private beforeStepId: number | null;
   private applyDepIds: number[];
 
+  private skipJoin: boolean;
   constructor(
     private identifier: string,
     private viaSubquery: boolean,
@@ -3290,11 +3364,22 @@ class PgSelectInlineApplyStep<
       $after: Step | null;
       $before: Step | null;
       applySteps: Step[];
+      /** @internal @experimental */
+      skipJoin?: boolean;
     },
   ) {
     super();
-    const { staticInfo, $first, $last, $offset, $after, $before, applySteps } =
-      details;
+    const {
+      staticInfo,
+      $first,
+      $last,
+      $offset,
+      $after,
+      $before,
+      applySteps,
+      skipJoin,
+    } = details;
+    this.skipJoin = skipJoin ?? false;
     this.staticInfo = staticInfo;
     this.firstStepId = $first ? this.addUnaryDependency($first) : null;
     this.lastStepId = $last ? this.addUnaryDependency($last) : null;
@@ -3325,6 +3410,7 @@ class PgSelectInlineApplyStep<
 
           // Data that's independent of dependencies
           ...this.staticInfo,
+          sourceStepDescription: `PgSelectInlineApplyStep[${this.id}] (from ${this.staticInfo.sourceStepDescription})`,
         });
 
         const { cursorDigest, cursorIndicies, groupIndicies } = info;
@@ -3363,16 +3449,18 @@ class PgSelectInlineApplyStep<
             sql`/* WHERE becoming ON */`,
             whereConditions,
           );
-          queryBuilder.join({
-            type: "left",
-            from,
-            alias,
-            attributeNames: resource.codec.attributes ? sql.blank : sql`(v)`,
-            // Note the WHERE is now part of the JOIN condition (since
-            // it's a LEFT JOIN).
-            conditions: where !== sql.blank ? [where] : [],
-            lateral: joinAsLateral,
-          });
+          if (!this.skipJoin) {
+            queryBuilder.join({
+              type: "left",
+              from,
+              alias,
+              attributeNames: resource.codec.attributes ? sql.blank : sql`(v)`,
+              // Note the WHERE is now part of the JOIN condition (since
+              // it's a LEFT JOIN).
+              conditions: where !== sql.blank ? [where] : [],
+              lateral: joinAsLateral,
+            });
+          }
           for (const join of joins) {
             queryBuilder.join(join);
           }
@@ -3628,6 +3716,7 @@ function buildQueryParts<TResource extends PgResource<any, any, any, any, any>>(
   const extraSelectIndexes = extraSelects.map((_, i) => i + l);
 
   return {
+    comment: sql.comment(`From ${info.sourceStepDescription}`),
     selects,
     from,
     joins: info.joins,
@@ -3660,6 +3749,7 @@ function buildQueryFromParts(
   options: { asArray?: boolean } = {},
 ) {
   const {
+    comment,
     selects,
     from,
     joins,
@@ -3676,7 +3766,7 @@ function buildQueryFromParts(
   const where = buildWhereOrHaving(sql`where`, whereConditions);
   const having = buildWhereOrHaving(sql`having`, havingConditions);
 
-  const baseQuery = sql`${aliases}${select}${from}${join}${where}${groupBy}${having}${orderBy}${limitAndOffset}`;
+  const baseQuery = sql`${comment}${aliases}${select}${from}${join}${where}${groupBy}${having}${orderBy}${limitAndOffset}`;
   return { sql: baseQuery, extraSelectIndexes };
 }
 

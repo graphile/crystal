@@ -7,60 +7,55 @@ graph TD
     classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
+    subgraph "Buckets for queries/connections/pagination-before-last-pagination-only.variables"
+    Bucket0("Bucket 0 (root)"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14, 17, 15, 18, 35, 6<br /><br />ROOT Connectionᐸ11ᐳ[15]<br />1: PgSelect[19], PgSelect[21]<br />ᐳ: 20, 27, 28, 29, 32, 33<br />2: PgSelectRows[23]<br />ᐳ: 22, 24, 25"):::bucket
+    end
+    Bucket0 --> Bucket1
 
     %% plan dependencies
     Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access13{{"Access[13∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access12 & Access13 --> Object14
-    Connection15{{"Connection[15∈0] ➊<br />ᐸ11ᐳ"}}:::plan
-    Constant36{{"Constant[36∈0] ➊<br />ᐸ3ᐳ"}}:::plan
-    Lambda18{{"Lambda[18∈0] ➊<br />ᐸparseCursorᐳ"}}:::plan
-    Constant36 & Lambda18 --> Connection15
+    Connection15{{"Connection[15∈0] ➊<br />ᐸ11ᐳ<br />More deps:<br />- Constantᐸ3ᐳ[35]<br />- Lambda[18]"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ0.valueᐳ"}}:::plan
     __Value0["__Value[0∈0] ➊<br />ᐸvariableValuesᐳ"]:::plan
     __Value0 --> Access9
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access12
     __Value2 --> Access13
-    Lambda17{{"Lambda[17∈0] ➊<br />ᐸincludeArchivedConditionᐳ"}}:::plan
-    Constant35{{"Constant[35∈0] ➊<br />ᐸ[ undefined, 'INHERIT' ]ᐳ"}}:::plan
-    Constant35 --> Lambda17
+    Lambda17{{"Lambda[17∈0] ➊<br />ᐸincludeArchivedConditionᐳ<br />More deps:<br />- Constantᐸ[ undefined, 'INHERIT' ]ᐳ[34]"}}:::plan
+    Lambda18{{"Lambda[18∈0] ➊<br />ᐸparseCursorᐳ<br />Dependents: 2"}}:::plan
     Access9 --> Lambda18
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    PgSelect19[["PgSelect[19∈1] ➊<br />ᐸmessages+1ᐳ"]]:::plan
-    Object14 & Lambda17 & Connection15 & Lambda18 & Constant36 --> PgSelect19
-    Object28{{"Object[28∈1] ➊<br />ᐸ{first,last,offset,hasMore}ᐳ"}}:::plan
-    Access23{{"Access[23∈1] ➊<br />ᐸ19.hasMoreᐳ"}}:::plan
-    Constant36 & Access23 --> Object28
-    Object24{{"Object[24∈1] ➊<br />ᐸ{first,last,hasMore}ᐳ"}}:::plan
-    Constant36 & Access23 --> Object24
-    PgSelect30[["PgSelect[30∈1] ➊<br />ᐸmessages(aggregate)ᐳ"]]:::plan
-    Object14 & Lambda17 & Connection15 --> PgSelect30
+    PgSelect19[["PgSelect[19∈1] ➊<br />ᐸmessages+1ᐳ<br />More deps:<br />- Lambda[18]<br />- Constantᐸ3ᐳ[35]"]]:::plan
+    Object14 & Lambda17 & Connection15 --> PgSelect19
+    Object32{{"Object[32∈1] ➊<br />ᐸ{first,last,offset,hasMore}ᐳ<br />More deps:<br />- Constantᐸundefinedᐳ[6]<br />- Constantᐸ3ᐳ[35]<br />- Constantᐸundefinedᐳ[6]"}}:::plan
+    Access27{{"Access[27∈1] ➊<br />ᐸ19.hasMoreᐳ"}}:::plan
+    Access27 --> Object32
+    PgSelect21[["PgSelect[21∈1] ➊<br />ᐸmessages(aggregate)ᐳ"]]:::plan
+    Object14 & Lambda17 & Connection15 --> PgSelect21
+    Object28{{"Object[28∈1] ➊<br />ᐸ{first,last,hasMore}ᐳ<br />More deps:<br />- Constantᐸundefinedᐳ[6]<br />- Constantᐸ3ᐳ[35]"}}:::plan
+    Access27 --> Object28
     PgPageInfo20{{"PgPageInfo[20∈1] ➊"}}:::plan
     Connection15 --> PgPageInfo20
-    PgSelect19 --> Access23
-    Lambda25{{"Lambda[25∈1] ➊<br />ᐸhasNextPageCbᐳ"}}:::plan
-    Object24 --> Lambda25
-    Lambda29{{"Lambda[29∈1] ➊<br />ᐸhasPreviousPageCbᐳ"}}:::plan
+    First22{{"First[22∈1] ➊"}}:::plan
+    PgSelectRows23[["PgSelectRows[23∈1] ➊"]]:::plan
+    PgSelectRows23 --> First22
+    PgSelect21 --> PgSelectRows23
+    PgSelectSingle24{{"PgSelectSingle[24∈1] ➊<br />ᐸmessagesᐳ"}}:::plan
+    First22 --> PgSelectSingle24
+    PgClassExpression25{{"PgClassExpression[25∈1] ➊<br />ᐸcount(*)ᐳ"}}:::plan
+    PgSelectSingle24 --> PgClassExpression25
+    PgSelect19 --> Access27
+    Lambda29{{"Lambda[29∈1] ➊<br />ᐸhasNextPageCbᐳ"}}:::plan
     Object28 --> Lambda29
-    First31{{"First[31∈1] ➊"}}:::plan
-    PgSelectRows32[["PgSelectRows[32∈1] ➊"]]:::plan
-    PgSelectRows32 --> First31
-    PgSelect30 --> PgSelectRows32
-    PgSelectSingle33{{"PgSelectSingle[33∈1] ➊<br />ᐸmessagesᐳ"}}:::plan
-    First31 --> PgSelectSingle33
-    PgClassExpression34{{"PgClassExpression[34∈1] ➊<br />ᐸcount(*)ᐳ"}}:::plan
-    PgSelectSingle33 --> PgClassExpression34
+    Lambda33{{"Lambda[33∈1] ➊<br />ᐸhasPreviousPageCbᐳ"}}:::plan
+    Object32 --> Lambda33
 
     %% define steps
-
-    subgraph "Buckets for queries/connections/pagination-before-last-pagination-only.variables"
-    Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value2,__Value4,Access9,Access12,Access13,Object14,Connection15,Lambda17,Lambda18,Constant35,Constant36 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14, 17, 15, 18, 36, 6<br /><br />ROOT Connectionᐸ11ᐳ[15]<br />1: PgSelect[19], PgSelect[30]<br />ᐳ: 20, 23, 24, 25, 28, 29<br />2: PgSelectRows[32]<br />ᐳ: 31, 33, 34"):::bucket
+    class Bucket0,__Value0,__Value2,Access9,Access12,Access13,Object14,Connection15,Lambda17,Lambda18 bucket0
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect19,PgPageInfo20,Access23,Object24,Lambda25,Object28,Lambda29,PgSelect30,First31,PgSelectRows32,PgSelectSingle33,PgClassExpression34 bucket1
-    Bucket0 --> Bucket1
-    end
+    class Bucket1,PgSelect19,PgPageInfo20,PgSelect21,First22,PgSelectRows23,PgSelectSingle24,PgClassExpression25,Access27,Object28,Lambda29,Object32,Lambda33 bucket1
+

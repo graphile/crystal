@@ -1,8 +1,8 @@
 import { PgDeleteSingleStep, PgExecutor, TYPES, assertPgClassSingleStep, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
-const handler = {
+const nodeIdHandler_Query = {
   typeName: "Query",
   codec: {
     name: "raw",
@@ -52,7 +52,7 @@ const nodeIdCodecs_base64JSON_base64JSON = {
 };
 const nodeIdCodecs = {
   __proto__: null,
-  raw: handler.codec,
+  raw: nodeIdHandler_Query.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
@@ -190,7 +190,7 @@ const geomUniques = [{
     }
   }
 }];
-const pgResource_geomPgResource = makeRegistry({
+const resource_geomPgResource = makeRegistry({
   pgExecutors: {
     __proto__: null,
     main: executor
@@ -239,30 +239,26 @@ const pgResource_geomPgResource = makeRegistry({
     __proto__: null
   }
 }).pgResources["geom"];
-const nodeIdHandlerByTypeName = {
-  __proto__: null,
-  Query: handler,
-  Geom: {
-    typeName: "Geom",
-    codec: nodeIdCodecs_base64JSON_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("geoms", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    getIdentifiers(value) {
-      return value.slice(1);
-    },
-    get(spec) {
-      return pgResource_geomPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "geoms";
-    }
+const nodeIdHandler_Geom = {
+  typeName: "Geom",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("geoms", false), $record.get("id")]);
+  },
+  getSpec($list) {
+    return {
+      id: inhibitOnNull(access($list, [1]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_geomPgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "geoms";
   }
 };
 function specForHandler(handler) {
@@ -285,22 +281,38 @@ function specForHandler(handler) {
   return spec;
 }
 const nodeFetcher_Geom = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandlerByTypeName.Geom));
-  return nodeIdHandlerByTypeName.Geom.get(nodeIdHandlerByTypeName.Geom.getSpec($decoded));
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Geom));
+  return nodeIdHandler_Geom.get(nodeIdHandler_Geom.getSpec($decoded));
 };
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
+}
+const nodeIdHandlerByTypeName = {
+  __proto__: null,
+  Query: nodeIdHandler_Query,
+  Geom: nodeIdHandler_Geom
+};
+const decodeNodeId = makeDecodeNodeId(Object.values(nodeIdHandlerByTypeName));
+function findTypeNameMatch(specifier) {
+  if (!specifier) return null;
+  for (const [typeName, typeSpec] of Object.entries(nodeIdHandlerByTypeName)) {
+    const value = specifier[typeSpec.codec.name];
+    if (value != null && typeSpec.match(value)) {
+      return typeName;
+    }
+  }
+  return null;
 }
 function CursorSerialize(value) {
   return "" + value;
 }
 const specFromArgs_Geom = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Geom, $nodeId);
+  return specFromNodeId(nodeIdHandler_Geom, $nodeId);
 };
 const specFromArgs_Geom2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Geom, $nodeId);
+  return specFromNodeId(nodeIdHandler_Geom, $nodeId);
 };
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
@@ -790,16 +802,16 @@ export const plans = {
       return rootValue();
     },
     nodeId($parent) {
-      const specifier = handler.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler.codec.name].encode);
+      const specifier = nodeIdHandler_Query.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Query.codec.name].encode);
     },
-    node(_$root, args) {
-      return node(nodeIdHandlerByTypeName, args.getRaw("nodeId"));
+    node(_$root, fieldArgs) {
+      return fieldArgs.getRaw("nodeId");
     },
     geomById(_$root, {
       $id
     }) {
-      return pgResource_geomPgResource.get({
+      return resource_geomPgResource.get({
         id: $id
       });
     },
@@ -809,7 +821,7 @@ export const plans = {
     },
     allGeoms: {
       plan() {
-        return connection(pgResource_geomPgResource.find());
+        return connection(resource_geomPgResource.find());
       },
       args: {
         first(_, $connection, arg) {
@@ -838,11 +850,35 @@ export const plans = {
       }
     }
   },
+  Node: {
+    __planType($nodeId) {
+      const $specifier = decodeNodeId($nodeId);
+      const $__typename = lambda($specifier, findTypeNameMatch, true);
+      return {
+        $__typename,
+        planForType(type) {
+          const spec = nodeIdHandlerByTypeName[type.name];
+          if (spec) {
+            return spec.get(spec.getSpec(access($specifier, [spec.codec.name])));
+          } else {
+            throw new Error(`Failed to find handler for ${type.name}`);
+          }
+        }
+      };
+    }
+  },
   Geom: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of geomUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_geomPgResource.get(spec);
+    },
     nodeId($parent) {
-      const specifier = nodeIdHandlerByTypeName.Geom.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Geom.codec.name].encode);
+      const specifier = nodeIdHandler_Geom.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Geom.codec.name].encode);
     },
     openPath($record) {
       return $record.get("open_path");
@@ -1108,7 +1144,7 @@ export const plans = {
     __assertStep: __ValueStep,
     createGeom: {
       plan(_, args) {
-        const $insert = pgInsertSingle(pgResource_geomPgResource, Object.create(null));
+        const $insert = pgInsertSingle(resource_geomPgResource, Object.create(null));
         args.apply($insert);
         const plan = object({
           result: $insert
@@ -1123,7 +1159,7 @@ export const plans = {
     },
     updateGeom: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_geomPgResource, specFromArgs_Geom(args));
+        const $update = pgUpdateSingle(resource_geomPgResource, specFromArgs_Geom(args));
         args.apply($update);
         return object({
           result: $update
@@ -1137,7 +1173,7 @@ export const plans = {
     },
     updateGeomById: {
       plan(_$root, args) {
-        const $update = pgUpdateSingle(pgResource_geomPgResource, {
+        const $update = pgUpdateSingle(resource_geomPgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($update);
@@ -1153,7 +1189,7 @@ export const plans = {
     },
     deleteGeom: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_geomPgResource, specFromArgs_Geom2(args));
+        const $delete = pgDeleteSingle(resource_geomPgResource, specFromArgs_Geom2(args));
         args.apply($delete);
         return object({
           result: $delete
@@ -1167,7 +1203,7 @@ export const plans = {
     },
     deleteGeomById: {
       plan(_$root, args) {
-        const $delete = pgDeleteSingle(pgResource_geomPgResource, {
+        const $delete = pgDeleteSingle(resource_geomPgResource, {
           id: args.getRaw(['input', "id"])
         });
         args.apply($delete);
@@ -1207,7 +1243,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_geomPgResource.find(spec);
+          return resource_geomPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -1311,7 +1347,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_geomPgResource.find(spec);
+          return resource_geomPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");
@@ -1411,7 +1447,7 @@ export const plans = {
     },
     deletedGeomId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandlerByTypeName.Geom.plan($record);
+      const specifier = nodeIdHandler_Geom.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query() {
@@ -1430,7 +1466,7 @@ export const plans = {
             memo[attributeName] = $result.get(attributeName);
             return memo;
           }, Object.create(null));
-          return pgResource_geomPgResource.find(spec);
+          return resource_geomPgResource.find(spec);
         }
       })();
       fieldArgs.apply($select, "orderBy");

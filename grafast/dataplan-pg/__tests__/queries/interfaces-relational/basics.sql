@@ -2,8 +2,8 @@ select
   __people__."username" as "0",
   array(
     select array[
-      __relational_items__."type"::text,
       __relational_items__."id"::text,
+      __relational_items__."type"::text,
       __relational_items__."type2"::text,
       __relational_items__."position"::text,
       to_char(__relational_items__."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text),

@@ -146,7 +146,21 @@ into the relevant folder and then run that single file with `jest` with
 
 ```shell
 cd postgraphile/postgraphile
-UPDATE_SNAPSHOTS=1 yarn jest __tests__/path/to/test.file.graphql
+UPDATE_SNAPSHOTS=1 yarn jest __tests__/path/to/file.test.graphql
+```
+
+Note: you only need to create/change the `.test.graphql` file; the `.sql`,
+`.mermaid` and `.json5` files are auto-generated snapshots. There will also be a
+`.errors.json5` snapshot if the test does not include a
+`## expect(errors).toBeFalsy();` comment.
+
+If you're making planning updates (e.g. optimizations) that shouldn't affect the
+resulting data, you can tell the system to only update certain types of
+snapshots:
+
+```shell
+cd postgraphile/postgraphile
+UPDATE_SNAPSHOTS="sql,mermaid" yarn jest __tests__/path/to/test.file.graphql
 ```
 
 ## ASK FIRST!

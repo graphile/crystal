@@ -13,12 +13,15 @@ import type {
   GraphQLInputFieldConfig,
   GraphQLInputObjectType,
   GraphQLInputType,
+  GraphQLInterfaceType,
   GraphQLList,
   GraphQLNonNull,
+  GraphQLObjectType,
   GraphQLOutputType,
   GraphQLScalarType,
   GraphQLSchema,
   GraphQLType,
+  GraphQLUnionType,
   OperationDefinitionNode,
   Source,
   ValueNode,
@@ -27,10 +30,17 @@ import type {
 import type { ObjMap } from "graphql/jsutils/ObjMap.js";
 
 import type { Bucket, RequestTools } from "./bucket.js";
+import type {
+  $$streamMore,
+  $$timeout,
+  $$ts,
+  ExecutionEntryFlags,
+} from "./constants.js";
 import type { Constraint } from "./constraints.js";
 import type { LayerPlanReasonListItemStream } from "./engine/LayerPlan.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import type { FlaggedValue, SafeError } from "./error.js";
+import type { GrafastOperationOptions } from "./prepare.js";
 import type { ListCapableStep, Step } from "./step.js";
 import type { __InputDefaultStep } from "./steps/__inputDefault.js";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
@@ -46,6 +56,8 @@ import type {
   ObjectStep,
 } from "./steps/index.js";
 import type { GrafastObjectType } from "./utils.js";
+
+export type { ExecutionEntryFlags };
 
 export interface GrafastTimeouts {
   /**
@@ -72,14 +84,6 @@ export interface GrafastTimeouts {
   // synchronous it's typically so fast that no timeout is required.
 }
 
-export const $$queryCache = Symbol("queryCache");
-
-/**
- * We store the cache directly onto the GraphQLSchema so that it gets garbage
- * collected along with the schema when it's not needed any more. To do so, we
- * attach it using this symbol.
- */
-export const $$cacheByOperation = Symbol("cacheByOperation");
 export type Fragments = {
   [key: string]: FragmentDefinitionNode;
 };
@@ -129,74 +133,6 @@ export interface CacheByOperationEntry {
 export interface LinkedList<T> {
   value: T;
   next: LinkedList<T> | null;
-}
-
-export const $$hooked = Symbol("hookArgsApplied");
-
-export const $$grafastContext = Symbol("context");
-export const $$planResults = Symbol("planResults");
-export const $$id = Symbol("id");
-/** Return the value verbatim, don't execute */
-export const $$verbatim = Symbol("verbatim");
-/**
- * If we're sure the data is the right shape and valid, we can set this key and
- * it can be returned directly
- */
-export const $$bypassGraphQL = Symbol("bypassGraphQL");
-export const $$data = Symbol("data");
-/**
- * For attaching additional metadata to the GraphQL execution result, for
- * example details of the plan or SQL queries or similar that were executed.
- */
-export const $$extensions = Symbol("extensions");
-
-/**
- * The "GraphQLObjectType" type name, useful when dealing with polymorphism.
- */
-export const $$concreteType = Symbol("concreteType");
-
-/**
- * Set this key on a type if that type's serialization is idempotent (that is
- * to say `serialize(serialize(thing)) === serialize(thing)`). This means we
- * don't have to "roll-back" serialization if we need to fallback to graphql-js
- * execution.
- */
-export const $$idempotent = Symbol("idempotent");
-
-/**
- * The event emitter used for outputting execution events.
- */
-export const $$eventEmitter = Symbol("executionEventEmitter");
-
-/**
- * Used to indicate that an array has more results available via a stream.
- */
-export const $$streamMore = Symbol("streamMore");
-
-export const $$proxy = Symbol("proxy");
-
-/**
- * If an error has this property set then it's safe to send through to the user
- * without being masked.
- */
-export const $$safeError = Symbol("safeError");
-
-/** The layerPlan used as a subroutine for this step */
-export const $$subroutine = Symbol("subroutine");
-
-/** For tracking the timeout a TimeoutError happened from */
-export const $$timeout = Symbol("timeout");
-
-/** For tracking _when_ the timeout happened (because once the JIT has warmed it might not need so long) */
-export const $$ts = Symbol("timestamp");
-
-/**
- * When dealing with a polymorphic thing we need to be able to determine what
- * the concrete type of it is, we use the $$concreteType property for that.
- */
-export interface PolymorphicData<TType extends string = string, TData = any> {
-  [$$concreteType]: TType;
-  [$$data]?: TData;
 }
 
 export interface IndexByListItemStepId {
@@ -344,9 +280,9 @@ export interface FieldInfo {
  * executions.
  */
 export type FieldPlanResolver<
-  _TArgs extends BaseGraphQLArguments,
-  TParentStep extends Step | null,
-  TResultStep extends Step | null,
+  _TArgs extends BaseGraphQLArguments = BaseGraphQLArguments,
+  TParentStep extends Step = Step,
+  TResultStep extends Step | null = Step | null,
 > = ($parentPlan: TParentStep, args: FieldArgs, info: FieldInfo) => TResultStep;
 
 export type InputObjectFieldApplyResolver<TParent> = (
@@ -447,7 +383,7 @@ export type OutputPlanForType<TType extends GraphQLOutputType> =
  */
 export type GrafastFieldConfig<
   TType extends GraphQLOutputType,
-  TParentStep extends Step | null,
+  TParentStep extends Step,
   TFieldStep extends Step, // TODO: should be OutputPlanForType<TType>, but that results in everything thinking it should be a ListStep
   TArgs extends BaseGraphQLArguments,
 > = Omit<GraphQLFieldConfig<any, any>, "args" | "type"> & {
@@ -505,7 +441,7 @@ export type GrafastInputFieldConfig<
 export type TrackedArguments<
   TArgs extends BaseGraphQLArguments = BaseGraphQLArguments,
 > = {
-  get<TKey extends keyof TArgs>(key: TKey): AnyInputStep;
+  [TKey in keyof TArgs & string]: AnyInputStep;
 };
 
 /**
@@ -706,45 +642,6 @@ export interface UnbatchedExecutionExtra extends ExecutionExtraBase {
   stream: ExecutionDetailsStream | null;
 }
 
-/**
- * A bitwise number representing a number of flags:
- *
- * - 0: normal execution value
- * - 1: errored (trappable)
- * - 2: null (trappable)
- * - 4: inhibited (trappable)
- * - 8: disabled due to polymorphism (untrappable)
- * - 16: stopped (untrappable) - e.g. due to fatal (unrecoverable) error
- * - 32: ...
- */
-export type ExecutionEntryFlags = number & { readonly tsBrand?: unique symbol };
-
-function flag(f: number): ExecutionEntryFlags {
-  return f as ExecutionEntryFlags;
-}
-
-export const NO_FLAGS = flag(0);
-export const FLAG_ERROR = flag(1 << 0);
-export const FLAG_NULL = flag(1 << 1);
-export const FLAG_INHIBITED = flag(1 << 2);
-export const FLAG_POLY_SKIPPED = flag(1 << 3);
-export const FLAG_STOPPED = flag(1 << 4);
-export const ALL_FLAGS = flag(
-  FLAG_ERROR | FLAG_NULL | FLAG_INHIBITED | FLAG_POLY_SKIPPED | FLAG_STOPPED,
-);
-
-/** By default, accept null values as an input */
-export const DEFAULT_ACCEPT_FLAGS = flag(FLAG_NULL);
-export const TRAPPABLE_FLAGS = flag(FLAG_ERROR | FLAG_NULL | FLAG_INHIBITED);
-export const DEFAULT_FORBIDDEN_FLAGS = flag(ALL_FLAGS & ~DEFAULT_ACCEPT_FLAGS);
-export const FORBIDDEN_BY_NULLABLE_BOUNDARY_FLAGS = flag(
-  FLAG_NULL | FLAG_POLY_SKIPPED,
-);
-// TODO: make `FORBIDDEN_BY_NULLABLE_BOUNDARY_FLAGS = flag(FLAG_ERROR | FLAG_NULL | FLAG_POLY_SKIPPED | FLAG_INHIBITED | FLAG_STOPPED);`
-// Currently this isn't enabled because the bucket has to exist for the output
-// plan to throw the error; really the root should be evaluated before
-// descending into the output plan rather than as part of descending?
-
 export type ExecutionValue<TData = any> =
   | BatchExecutionValue<TData>
   | UnaryExecutionValue<TData>;
@@ -840,27 +737,34 @@ export interface GrafastArgs extends GraphQLArgs {
 }
 export type Maybe<T> = T | null | undefined;
 
-export * from "./planJSONInterfaces.js";
+export type * from "./planJSONInterfaces.js";
 
-export interface AddDependencyOptions<TStep extends Step = Step> {
+export interface BaseDependencyOptions<TStep extends Step = Step> {
   step: TStep;
   skipDeduplication?: boolean;
   /** @defaultValue `FLAG_NULL` */
   acceptFlags?: ExecutionEntryFlags;
   onReject?: Maybe<Error>;
+}
+
+export interface AddDependencyOptions<TStep extends Step = Step>
+  extends BaseDependencyOptions<TStep> {
+  nonUnaryMessage?: never;
+  dataOnly?: boolean;
+}
+
+export interface AddUnaryDependencyOptions<TStep extends Step = Step>
+  extends BaseDependencyOptions<TStep> {
   nonUnaryMessage?: ($dependent: Step, $dependency: Step) => string;
+  dataOnly?: never;
 }
 
 export interface DependencyOptions<TStep extends Step = Step> {
   step: TStep;
   acceptFlags: ExecutionEntryFlags;
   onReject: Maybe<Error>;
+  dataOnly: boolean;
 }
-
-/**
- * @internal
- */
-export const $$deepDepSkip = Symbol("deepDepSkip_experimental");
 
 export type DataFromStep<TStep extends Step> =
   TStep extends Step<infer TData> ? TData : never;
@@ -897,11 +801,43 @@ export interface EstablishOperationPlanEvent {
   variableValues: Record<string, any>;
   context: any;
   rootValue: any;
-  planningTimeout: number | undefined;
   args: GrafastExecutionArgs;
+  options: GrafastOperationOptions;
 }
 export interface ExecuteStepEvent {
   args: GrafastExecutionArgs;
   step: Step;
   executeDetails: ExecutionDetails;
+}
+export interface PlanTypeInfo {
+  abstractType: GraphQLUnionType | GraphQLInterfaceType;
+  resolverEmulation: boolean;
+  /**
+   * If this polymorphic position was represented by exactly one source step,
+   * this will be that step and you may use it to implement a more optimal
+   * planType. If more than one step was combined as input to this
+   * polymorphism, this will be null.
+   */
+  $original: Step | null;
+}
+
+/**
+ * When planning an abstract type, an interface or union, it should have a
+ * `extensions.grafast.planType` method which accepts an incoming step
+ * representing the polymorphic data (we call this the `$specifier`) and will
+ * return a AbstractTypePlanner object. This object has a key `$__typename`
+ * whose value must be a step that represents the GraphQL type name to use for
+ * the given $specifier, and a method `planForType` that should return the step
+ * to use for a specific object type within the interface/union.
+ */
+export interface AbstractTypePlanner {
+  /**
+   * Must be a step representing the name of the object type associated with
+   * the given `$specifier`, or `null` if no such type could be determined.
+   */
+  $__typename: Step<string | null>;
+  /**
+   * If not provided, will call `t.planType($specifier)`
+   */
+  planForType?(t: GraphQLObjectType): Step | null;
 }

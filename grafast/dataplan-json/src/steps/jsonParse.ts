@@ -30,7 +30,7 @@ export class JSONParseStep<TJSON extends JSONValue> extends Step<TJSON> {
 
   constructor($stringPlan: Step<string | null>) {
     super();
-    this.addDependency($stringPlan);
+    this.addDataDependency($stringPlan);
   }
 
   toStringMeta(): string {

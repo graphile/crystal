@@ -16,6 +16,7 @@ import { __InputDefaultStep } from "./steps/__inputDefault.js";
 import { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import type { __InputObjectStepWithDollars } from "./steps/__inputObject.js";
 import { __InputObjectStep } from "./steps/__inputObject.js";
+import { __inputStaticLeaf } from "./steps/__inputStaticLeaf.js";
 import { __TrackedValueStepWithDollars } from "./steps/__trackedValue.js";
 import {
   __InputListStep,
@@ -90,6 +91,29 @@ export function inputStep(
   inputType: GraphQLInputType,
   inputValue: ValueNode | undefined,
   defaultValue: ConstValueNode | undefined = undefined,
+): AnyInputStep {
+  let c1 = operationPlan._inputStepCache.get(inputType);
+  if (!c1) {
+    c1 = new Map();
+    operationPlan._inputStepCache.set(inputType, c1);
+  }
+  let c2 = c1.get(inputValue);
+  if (!c2) {
+    c2 = new Map();
+    c1.set(inputValue, c2);
+  }
+  let c3 = c2.get(defaultValue);
+  if (c3) return c3;
+  c3 = _inputStep(operationPlan, inputType, inputValue, defaultValue);
+  c2.set(defaultValue, c3);
+  return c3;
+}
+
+function _inputStep(
+  operationPlan: OperationPlan,
+  inputType: GraphQLInputType,
+  inputValue: ValueNode | undefined,
+  defaultValue: ConstValueNode | undefined,
 ): AnyInputStep {
   const { valueNodeToStaticValueCache } = operationPlan;
   if (inputValue === undefined) {
@@ -172,7 +196,7 @@ export function inputStep(
     } else {
       // Variable is already ruled out, so it must be one of: Kind.INT | Kind.FLOAT | Kind.STRING | Kind.BOOLEAN | Kind.NULL | Kind.ENUM
       // none of which can contain a variable:
-      return new __InputStaticLeafStep(inputType, inputValue);
+      return __inputStaticLeaf(inputType, inputValue);
     }
   } else if (isObj) {
     return new __InputObjectStep(

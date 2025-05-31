@@ -8,7 +8,13 @@ import type {
 import type { Multistep, UnwrapMultistep } from "../multistep.js";
 import { isMultistep, multistep } from "../multistep.js";
 import { isListLikeStep, isObjectLikeStep, Step } from "../step.js";
-import { arrayOfLength, canonicalJSONStringify, isTuple } from "../utils.js";
+import {
+  arrayOfLength,
+  arraysMatch,
+  canonicalJSONStringify,
+  isTuple,
+  recordsMatch,
+} from "../utils.js";
 import { access } from "./access.js";
 
 export interface LoadOptions<
@@ -24,29 +30,35 @@ export interface LoadOptions<
 type LoadCallback<
   TSpec,
   TItem,
-  TData extends TItem | ReadonlyArray<TItem>,
+  TData extends
+    | Maybe<TItem> // loadOne
+    | Maybe<ReadonlyArray<Maybe<TItem>>>, // loadMany
   TParams extends Record<string, any>,
   TUnarySpec = never,
 > = {
   (
     specs: ReadonlyArray<TSpec>,
     options: LoadOptions<TItem, TParams, TUnarySpec>,
-  ): PromiseOrDirect<ReadonlyArray<Maybe<TData>>>;
+  ): PromiseOrDirect<ReadonlyArray<TData>>;
   displayName?: string;
 };
 
 export type LoadOneCallback<
   TSpec,
   TItem,
-  TParams extends Record<string, any>,
+  TData extends Maybe<TItem> = Maybe<TItem>,
+  TParams extends Record<string, any> = Record<string, any>,
   TUnarySpec = never,
-> = LoadCallback<TSpec, TItem, TItem, TParams, TUnarySpec>;
+> = LoadCallback<TSpec, TItem, TData, TParams, TUnarySpec>;
 export type LoadManyCallback<
   TSpec,
   TItem,
-  TParams extends Record<string, any>,
+  TData extends Maybe<ReadonlyArray<Maybe<TItem>>> = Maybe<
+    ReadonlyArray<Maybe<TItem>>
+  >,
+  TParams extends Record<string, any> = Record<string, any>,
   TUnarySpec = never,
-> = LoadCallback<TSpec, TItem, ReadonlyArray<TItem>, TParams, TUnarySpec>;
+> = LoadCallback<TSpec, TItem, TData, TParams, TUnarySpec>;
 
 /**
  * A TypeScript Identity Function to help you strongly type your
@@ -55,11 +67,12 @@ export type LoadManyCallback<
 export function loadOneCallback<
   TSpec,
   TItem,
-  TParams extends Record<string, any>,
+  TData extends Maybe<TItem> = Maybe<TItem>,
+  TParams extends Record<string, any> = Record<string, any>,
   TUnarySpec = never,
 >(
-  callback: LoadOneCallback<TSpec, TItem, TParams, TUnarySpec>,
-): LoadOneCallback<TSpec, TItem, TParams, TUnarySpec> {
+  callback: LoadOneCallback<TSpec, TItem, TData, TParams, TUnarySpec>,
+): LoadOneCallback<TSpec, TItem, TData, TParams, TUnarySpec> {
   return callback;
 }
 /**
@@ -69,11 +82,14 @@ export function loadOneCallback<
 export function loadManyCallback<
   TSpec,
   TItem,
-  TParams extends Record<string, any>,
+  TData extends Maybe<ReadonlyArray<Maybe<TItem>>> = Maybe<
+    ReadonlyArray<Maybe<TItem>>
+  >,
+  TParams extends Record<string, any> = Record<string, any>,
   TUnarySpec = never,
 >(
-  callback: LoadManyCallback<TSpec, TItem, TParams, TUnarySpec>,
-): LoadManyCallback<TSpec, TItem, TParams, TUnarySpec> {
+  callback: LoadManyCallback<TSpec, TItem, TData, TParams, TUnarySpec>,
+): LoadManyCallback<TSpec, TItem, TData, TParams, TUnarySpec> {
   return callback;
 }
 
@@ -97,8 +113,9 @@ let loadCounter = 0;
  */
 export class LoadedRecordStep<
   TItem,
+  TData extends Maybe<TItem> = Maybe<TItem>,
   TParams extends Record<string, any> = Record<string, any>,
-> extends Step<TItem> {
+> extends Step<TData> {
   static $$export = {
     moduleName: "grafast",
     exportName: "LoadedRecordStep",
@@ -109,7 +126,7 @@ export class LoadedRecordStep<
   attributes = new Set<keyof TItem>();
   params: Partial<TParams> = Object.create(null);
   constructor(
-    $data: Step<TItem>,
+    $data: Step<TData>,
     private isSingle: boolean,
     private sourceDescription: string,
     // Only safe to reference this during planning phase
@@ -147,6 +164,20 @@ export class LoadedRecordStep<
     }
     this.params[paramKey] = value;
   }
+  deduplicate(peers: LoadedRecordStep<any, any>[]) {
+    return peers.filter(
+      (p) =>
+        p.isSingle === this.isSingle &&
+        p.sourceDescription === this.sourceDescription &&
+        recordsMatch(p.ioEquivalence, this.ioEquivalence) &&
+        recordsMatch(p.params, this.params),
+    );
+  }
+  public deduplicatedWith(replacement: LoadedRecordStep<any, any>): void {
+    for (const attr of this.attributes) {
+      replacement.attributes.add(attr);
+    }
+  }
   optimize() {
     const $source = this.getDepDeep(0);
     if ($source instanceof LoadStep) {
@@ -170,7 +201,7 @@ export class LoadedRecordStep<
   execute({
     count,
     values: [values0],
-  }: ExecutionDetails<[TItem]>): GrafastResultsList<TItem> {
+  }: ExecutionDetails<[TData]>): GrafastResultsList<TData> {
     return values0.isBatch
       ? values0.entries
       : arrayOfLength(count, values0.value);
@@ -180,10 +211,12 @@ export class LoadedRecordStep<
 export class LoadStep<
   const TMultistep extends Multistep,
   TItem,
-  TData extends TItem | ReadonlyArray<TItem>,
+  TData extends
+    | Maybe<TItem> // loadOne
+    | Maybe<ReadonlyArray<Maybe<TItem>>>, // loadMany
   TParams extends Record<string, any>,
   const TUnaryMultistep extends Multistep = never,
-> extends Step {
+> extends Step<TData> {
   /* implements ListCapableStep<TItem, LoadedRecordStep<TItem, TParams>> */
   static $$export = { moduleName: "grafast", exportName: "LoadStep" };
 
@@ -252,17 +285,20 @@ export class LoadStep<
       );
     }
   }
-  listItem($item: __ItemStep<TItem>) {
-    return new LoadedRecordStep<TItem, TParams>(
-      $item,
-      false,
-      this.toStringMeta(),
-      this.makeAccessMap(),
-    );
+  listItem($item: Step) {
+    return new LoadedRecordStep<
+      TItem,
+      TData extends Maybe<ReadonlyArray<infer U>>
+        ? U extends Maybe<TItem>
+          ? U
+          : never
+        : never,
+      TParams
+    >($item, false, this.toStringMeta(), this.makeAccessMap());
   }
-  single(): TData extends ReadonlyArray<any>
-    ? never
-    : LoadedRecordStep<TItem, TParams> {
+  single(): TData extends Maybe<TItem>
+    ? LoadedRecordStep<TItem, TData, TParams>
+    : never {
     return new LoadedRecordStep(
       this,
       true,
@@ -279,6 +315,21 @@ export class LoadStep<
   addAttributes(attributes: Set<keyof TItem>): void {
     for (const attribute of attributes) {
       this.attributes.add(attribute);
+    }
+  }
+  public deduplicate(peers: readonly LoadStep<any, any, any, any, any>[]) {
+    return peers.filter(
+      (p) =>
+        p.load === this.load &&
+        ioEquivalenceMatches(p.ioEquivalence, this.ioEquivalence) &&
+        recordsMatch(p.params, this.params),
+    );
+  }
+  public deduplicatedWith(
+    replacement: LoadStep<any, any, any, any, any>,
+  ): void {
+    for (const attr of this.attributes) {
+      replacement.attributes.add(attr);
     }
   }
   finalize() {
@@ -322,7 +373,7 @@ export class LoadStep<
     extra,
   }: ExecutionDetails<
     [UnwrapMultistep<TMultistep>, UnwrapMultistep<TUnaryMultistep>]
-  >): PromiseOrDirect<GrafastResultsList<Maybe<TData>>> {
+  >): PromiseOrDirect<GrafastResultsList<TData>> {
     const meta = extra.meta as LoadMeta;
     let cache = meta.cache;
     if (!cache) {
@@ -332,14 +383,14 @@ export class LoadStep<
     const batch = new Map<UnwrapMultistep<TMultistep>, number[]>();
     const unary = values1?.isBatch === false ? values1.value : undefined;
 
-    const results: Array<PromiseOrDirect<Maybe<TData>>> = [];
+    const results: Array<PromiseOrDirect<TData>> = [];
     for (let i = 0; i < count; i++) {
       const spec = values0.at(i);
       if (cache.has(spec)) {
         results.push(cache.get(spec)!);
       } else {
         // We'll fill this in in a minute
-        const index = results.push(null) - 1;
+        const index = results.push(null as any) - 1;
         const existingIdx = batch.get(spec);
         if (existingIdx !== undefined) {
           existingIdx.push(index);
@@ -350,7 +401,7 @@ export class LoadStep<
     }
     const pendingCount = batch.size;
     if (pendingCount > 0) {
-      const deferred = defer<ReadonlyArray<Maybe<TData>>>();
+      const deferred = defer<ReadonlyArray<TData>>();
       const batchSpecs = [...batch.keys()];
       const loadBatch: LoadBatch = { deferred, batchSpecs };
       if (!meta.loadBatchesByLoad) {
@@ -438,7 +489,9 @@ async function executeBatches(
 function load<
   const TMultistep extends Multistep,
   TItem,
-  TData extends TItem | ReadonlyArray<TItem>,
+  TData extends
+    | Maybe<TItem> // loadOne
+    | Maybe<ReadonlyArray<Maybe<TItem>>>, // loadMany
   TParams extends Record<string, any>,
   const TUnaryMultistep extends Multistep = never,
 >(
@@ -459,6 +512,9 @@ function load<
 export function loadMany<
   const TMultistep extends Multistep,
   TItem,
+  TData extends Maybe<ReadonlyArray<Maybe<TItem>>> = Maybe<
+    ReadonlyArray<Maybe<TItem>>
+  >,
   TParams extends Record<string, any> = Record<string, any>,
   const TUnaryMultistep extends Multistep = never,
 >(
@@ -466,19 +522,23 @@ export function loadMany<
   loadCallback: LoadManyCallback<
     UnwrapMultistep<TMultistep>,
     TItem,
+    TData,
     TParams,
     UnwrapMultistep<TUnaryMultistep>
   >,
 ): LoadStep<
   UnwrapMultistep<TMultistep>,
   TItem,
-  ReadonlyArray<TItem>,
+  TData,
   TParams,
   UnwrapMultistep<TUnaryMultistep>
 >;
 export function loadMany<
   const TMultistep extends Multistep,
   TItem,
+  TData extends Maybe<ReadonlyArray<Maybe<TItem>>> = Maybe<
+    ReadonlyArray<Maybe<TItem>>
+  >,
   TParams extends Record<string, any> = Record<string, any>,
   const TUnaryMultistep extends Multistep = never,
 >(
@@ -487,19 +547,23 @@ export function loadMany<
   loadCallback: LoadManyCallback<
     UnwrapMultistep<TMultistep>,
     TItem,
+    TData,
     TParams,
     UnwrapMultistep<TUnaryMultistep>
   >,
 ): LoadStep<
   UnwrapMultistep<TMultistep>,
   TItem,
-  ReadonlyArray<TItem>,
+  TData,
   TParams,
   UnwrapMultistep<TUnaryMultistep>
 >;
 export function loadMany<
   const TMultistep extends Multistep,
   TItem,
+  TData extends Maybe<ReadonlyArray<Maybe<TItem>>> = Maybe<
+    ReadonlyArray<Maybe<TItem>>
+  >,
   TParams extends Record<string, any> = Record<string, any>,
   const TUnaryMultistep extends Multistep = never,
 >(
@@ -508,19 +572,23 @@ export function loadMany<
   loadCallback: LoadManyCallback<
     UnwrapMultistep<TMultistep>,
     TItem,
+    TData,
     TParams,
     UnwrapMultistep<TUnaryMultistep>
   >,
 ): LoadStep<
   UnwrapMultistep<TMultistep>,
   TItem,
-  ReadonlyArray<TItem>,
+  TData,
   TParams,
   UnwrapMultistep<TUnaryMultistep>
 >;
 export function loadMany<
   const TMultistep extends Multistep,
   TItem,
+  TData extends Maybe<ReadonlyArray<Maybe<TItem>>> = Maybe<
+    ReadonlyArray<Maybe<TItem>>
+  >,
   TParams extends Record<string, any> = Record<string, any>,
   const TUnaryMultistep extends Multistep = never,
 >(
@@ -530,19 +598,23 @@ export function loadMany<
   loadCallback: LoadManyCallback<
     UnwrapMultistep<TMultistep>,
     TItem,
+    TData,
     TParams,
     UnwrapMultistep<TUnaryMultistep>
   >,
 ): LoadStep<
   UnwrapMultistep<TMultistep>,
   TItem,
-  ReadonlyArray<TItem>,
+  TData,
   TParams,
   UnwrapMultistep<TUnaryMultistep>
 >;
 export function loadMany<
   const TMultistep extends Multistep,
   TItem,
+  TData extends Maybe<ReadonlyArray<Maybe<TItem>>> = Maybe<
+    ReadonlyArray<Maybe<TItem>>
+  >,
   TParams extends Record<string, any> = Record<string, any>,
   const TUnaryMultistep extends Multistep = never,
 >(
@@ -551,24 +623,26 @@ export function loadMany<
     | LoadManyCallback<
         UnwrapMultistep<TMultistep>,
         TItem,
+        TData,
         TParams,
         UnwrapMultistep<TUnaryMultistep>
       >
     | IOEquivalence<TMultistep>
     | TUnaryMultistep,
   loadCallbackOrIoEquivalence?:
-    | LoadManyCallback<UnwrapMultistep<TMultistep>, TItem, TParams>
+    | LoadManyCallback<UnwrapMultistep<TMultistep>, TItem, TData, TParams>
     | IOEquivalence<TMultistep>,
   loadCallbackOnly?: LoadManyCallback<
     UnwrapMultistep<TMultistep>,
     TItem,
+    TData,
     TParams,
     UnwrapMultistep<TUnaryMultistep>
   >,
 ): LoadStep<
   UnwrapMultistep<TMultistep>,
   TItem,
-  ReadonlyArray<TItem>,
+  TData,
   TParams,
   UnwrapMultistep<TUnaryMultistep>
 > {
@@ -580,13 +654,14 @@ export function loadMany<
       loadCallbackOnly as LoadManyCallback<
         UnwrapMultistep<TMultistep>,
         TItem,
+        TData,
         TParams,
         UnwrapMultistep<TUnaryMultistep>
       >,
     ) as LoadStep<
       UnwrapMultistep<TMultistep>,
       TItem,
-      ReadonlyArray<TItem>,
+      TData,
       TParams,
       UnwrapMultistep<TUnaryMultistep>
     >;
@@ -602,13 +677,14 @@ export function loadMany<
       loadCallbackOrIoEquivalence as LoadManyCallback<
         UnwrapMultistep<TMultistep>,
         TItem,
+        TData,
         TParams,
         UnwrapMultistep<TUnaryMultistep>
       >,
     ) as LoadStep<
       UnwrapMultistep<TMultistep>,
       TItem,
-      ReadonlyArray<TItem>,
+      TData,
       TParams,
       UnwrapMultistep<TUnaryMultistep>
     >;
@@ -622,13 +698,14 @@ export function loadMany<
       loadCallbackOrIoEquivalence as LoadManyCallback<
         UnwrapMultistep<TMultistep>,
         TItem,
+        TData,
         TParams,
         UnwrapMultistep<TUnaryMultistep>
       >,
     ) as LoadStep<
       UnwrapMultistep<TMultistep>,
       TItem,
-      ReadonlyArray<TItem>,
+      TData,
       TParams,
       UnwrapMultistep<TUnaryMultistep>
     >;
@@ -642,13 +719,14 @@ export function loadMany<
       loadCallbackOrIoEquivalenceOrUnarySpec as LoadManyCallback<
         UnwrapMultistep<TMultistep>,
         TItem,
+        TData,
         TParams,
         UnwrapMultistep<TUnaryMultistep>
       >,
     ) as LoadStep<
       UnwrapMultistep<TMultistep>,
       TItem,
-      ReadonlyArray<TItem>,
+      TData,
       TParams,
       UnwrapMultistep<TUnaryMultistep>
     >;
@@ -671,6 +749,7 @@ type IOEquivalence<TMultistep extends Multistep> =
 export function loadOne<
   const TMultistep extends Multistep,
   TItem,
+  TData extends Maybe<TItem> = Maybe<TItem>,
   TParams extends Record<string, any> = Record<string, any>,
   const TUnaryMultistep extends Multistep = never,
 >(
@@ -678,13 +757,15 @@ export function loadOne<
   loadCallback: LoadOneCallback<
     UnwrapMultistep<TMultistep>,
     TItem,
+    TData,
     TParams,
     UnwrapMultistep<TUnaryMultistep>
   >,
-): LoadedRecordStep<TItem, TParams>;
+): LoadedRecordStep<TItem, TData, TParams>;
 export function loadOne<
   const TMultistep extends Multistep,
   TItem,
+  TData extends Maybe<TItem> = Maybe<TItem>,
   TParams extends Record<string, any> = Record<string, any>,
   const TUnaryMultistep extends Multistep = never,
 >(
@@ -693,13 +774,15 @@ export function loadOne<
   loadCallback: LoadOneCallback<
     UnwrapMultistep<TMultistep>,
     TItem,
+    TData,
     TParams,
     UnwrapMultistep<TUnaryMultistep>
   >,
-): LoadedRecordStep<TItem, TParams>;
+): LoadedRecordStep<TItem, TData, TParams>;
 export function loadOne<
   const TMultistep extends Multistep,
   TItem,
+  TData extends Maybe<TItem> = Maybe<TItem>,
   TParams extends Record<string, any> = Record<string, any>,
   const TUnaryMultistep extends Multistep = never,
 >(
@@ -708,13 +791,15 @@ export function loadOne<
   loadCallback: LoadOneCallback<
     UnwrapMultistep<TMultistep>,
     TItem,
+    TData,
     TParams,
     UnwrapMultistep<TUnaryMultistep>
   >,
-): LoadedRecordStep<TItem, TParams>;
+): LoadedRecordStep<TItem, TData, TParams>;
 export function loadOne<
   const TMultistep extends Multistep,
   TItem,
+  TData extends Maybe<TItem> = Maybe<TItem>,
   TParams extends Record<string, any> = Record<string, any>,
   const TUnaryMultistep extends Multistep = never,
 >(
@@ -724,13 +809,15 @@ export function loadOne<
   loadCallback: LoadOneCallback<
     UnwrapMultistep<TMultistep>,
     TItem,
+    TData,
     TParams,
     UnwrapMultistep<TUnaryMultistep>
   >,
-): LoadedRecordStep<TItem, TParams>;
+): LoadedRecordStep<TItem, TData, TParams>;
 export function loadOne<
   const TMultistep extends Multistep,
   TItem,
+  TData extends Maybe<TItem> = Maybe<TItem>,
   TParams extends Record<string, any> = Record<string, any>,
   const TUnaryMultistep extends Multistep = never,
 >(
@@ -739,6 +826,7 @@ export function loadOne<
     | LoadOneCallback<
         UnwrapMultistep<TMultistep>,
         TItem,
+        TData,
         TParams,
         UnwrapMultistep<TUnaryMultistep>
       >
@@ -748,6 +836,7 @@ export function loadOne<
     | LoadOneCallback<
         UnwrapMultistep<TMultistep>,
         TItem,
+        TData,
         TParams,
         UnwrapMultistep<TUnaryMultistep>
       >
@@ -755,10 +844,11 @@ export function loadOne<
   loadCallbackOnly?: LoadOneCallback<
     UnwrapMultistep<TMultistep>,
     TItem,
+    TData,
     TParams,
     UnwrapMultistep<TUnaryMultistep>
   >,
-): LoadedRecordStep<TItem, TParams> {
+): LoadedRecordStep<TItem, TData, TParams> {
   if (loadCallbackOnly) {
     return load(
       spec,
@@ -767,6 +857,7 @@ export function loadOne<
       loadCallbackOnly as LoadOneCallback<
         UnwrapMultistep<TMultistep>,
         TItem,
+        TData,
         TParams,
         UnwrapMultistep<TUnaryMultistep>
       >,
@@ -783,6 +874,7 @@ export function loadOne<
       loadCallbackOrIoEquivalence as LoadOneCallback<
         UnwrapMultistep<TMultistep>,
         TItem,
+        TData,
         TParams,
         UnwrapMultistep<TUnaryMultistep>
       >,
@@ -797,6 +889,7 @@ export function loadOne<
       loadCallbackOrIoEquivalence as LoadOneCallback<
         UnwrapMultistep<TMultistep>,
         TItem,
+        TData,
         TParams,
         UnwrapMultistep<TUnaryMultistep>
       >,
@@ -809,9 +902,31 @@ export function loadOne<
       loadCallbackOrIoEquivalenceOrUnarySpec as LoadOneCallback<
         UnwrapMultistep<TMultistep>,
         TItem,
+        TData,
         TParams,
         UnwrapMultistep<TUnaryMultistep>
       >,
     ).single();
+  }
+}
+
+function ioEquivalenceMatches(
+  io1: IOEquivalence<Multistep>,
+  io2: IOEquivalence<Multistep>,
+): boolean {
+  if (io1 === io2) return true;
+
+  if (io1 == null) return false;
+  if (io2 == null) return false;
+
+  if (typeof io1 === "string") return false;
+  if (typeof io2 === "string") return false;
+
+  if (Array.isArray(io1)) {
+    if (!Array.isArray(io2)) return false;
+    return arraysMatch(io1, io2);
+  } else {
+    if (Array.isArray(io2)) return false;
+    return recordsMatch(io1, io2);
   }
 }

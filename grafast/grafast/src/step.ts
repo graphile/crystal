@@ -1,8 +1,15 @@
 import chalk from "chalk";
-import type { GraphQLObjectType } from "graphql";
 import type { TE } from "tamedevil";
 import te from "tamedevil";
 
+import {
+  $$deepDepSkip,
+  $$proxy,
+  $$subroutine,
+  ALL_FLAGS,
+  DEFAULT_FORBIDDEN_FLAGS,
+  TRAPPABLE_FLAGS,
+} from "./constants.js";
 import { isDev, noop } from "./dev.js";
 import type {
   LayerPlan,
@@ -20,6 +27,7 @@ import { getDebug } from "./global.js";
 import { inspect } from "./inspect.js";
 import type {
   AddDependencyOptions,
+  AddUnaryDependencyOptions,
   DependencyOptions,
   ExecutionDetails,
   ExecutionEntryFlags,
@@ -30,12 +38,6 @@ import type {
   StepOptimizeOptions,
   StepOptions,
   UnbatchedExecutionExtra,
-} from "./interfaces.js";
-import {
-  $$deepDepSkip,
-  $$subroutine,
-  ALL_FLAGS,
-  DEFAULT_FORBIDDEN_FLAGS,
 } from "./interfaces.js";
 import type { __FlagStep, __ItemStep } from "./steps/index.js";
 import { stepADependsOnStepB, stepAMayDependOnStepB } from "./utils.js";
@@ -111,12 +113,21 @@ export /* abstract */ class Step<TData = any> {
   public readonly layerPlan: LayerPlan;
   public readonly operationPlan: OperationPlan;
   public [$$subroutine]: LayerPlan<LayerPlanReasonSubroutine> | null = null;
+  /** @internal */
+  public [$$proxy]?: any;
   public isArgumentsFinalized: boolean;
   public isFinalized: boolean;
   /** @internal */
   public _isUnary: boolean;
   /** @internal */
   public _isUnaryLocked: boolean;
+  /**
+   * Set `true` if this step should only run for certain of the polymorphic
+   * paths available in its LayerPlan.
+   *
+   * @internal
+   */
+  public _isSelectiveStep: boolean;
   /**
    * For input values, set `true` if it comes from variables/arguments since
    * they cannot be modified (even by mutations), set `false` otherwise.
@@ -165,6 +176,8 @@ export /* abstract */ class Step<TData = any> {
    * The plan this plan will need data from in order to execute.
    */
   protected readonly dependencies: ReadonlyArray<Step>;
+  /** @internal */
+  protected readonly _refs: Array<number> = [];
   /**
    * If this step follows a side effects, it must implicitly depend on it (so
    * that any errors the side effect generated will be respected).
@@ -259,7 +272,17 @@ export /* abstract */ class Step<TData = any> {
    */
   public hasSideEffects: boolean;
 
+  /**
+   * DO NOT USE! (Specifically exists so that very VERY special steps could
+   * override it if they so wished.)
+   *
+   * @internal
+   * @experimental
+   */
+  public __trappableFlags: number;
+
   constructor() {
+    this.__trappableFlags = TRAPPABLE_FLAGS;
     this.isArgumentsFinalized = false;
     this.isFinalized = false;
     this.debug = getDebug();
@@ -268,6 +291,8 @@ export /* abstract */ class Step<TData = any> {
     this.operationPlan = layerPlan.operationPlan;
     this._isUnary = true;
     this._isUnaryLocked = false;
+    // Populated in `OperationPlan` during `finalizeLayerPlans`
+    this._isSelectiveStep = false;
 
     this.implicitSideEffectStep = null;
     this.hasSideEffects ??= false;
@@ -346,12 +371,22 @@ export /* abstract */ class Step<TData = any> {
   }
 
   protected withMyLayerPlan<T>(callback: () => T): T {
-    return withGlobalLayerPlan(this.layerPlan, this.polymorphicPaths, callback);
+    return withGlobalLayerPlan(
+      this.layerPlan,
+      this.polymorphicPaths,
+      null,
+      callback,
+    );
   }
 
   /** @experimental */
   public withLayerPlan<T>(callback: () => T): T {
-    return withGlobalLayerPlan(this.layerPlan, this.polymorphicPaths, callback);
+    return withGlobalLayerPlan(
+      this.layerPlan,
+      this.polymorphicPaths,
+      null,
+      callback,
+    );
   }
 
   protected getStep(id: number): Step {
@@ -364,8 +399,9 @@ export /* abstract */ class Step<TData = any> {
     const step = this.dependencies[depId] as TStep;
     const forbiddenFlags = this.dependencyForbiddenFlags[depId];
     const onReject = this.dependencyOnReject[depId];
+    const dataOnly = false;
     const acceptFlags = ALL_FLAGS & ~forbiddenFlags;
-    return { step, acceptFlags, onReject };
+    return { step, acceptFlags, onReject, dataOnly };
   }
 
   protected getDep<TStep extends Step = Step>(
@@ -476,9 +512,6 @@ export /* abstract */ class Step<TData = any> {
     return undefined;
   }
 
-  /** @internal */
-  private _refs = new Set<number>();
-
   /**
    * **IF IN DOUBT, USE `.addDependency()` INSTEAD!
    *
@@ -534,8 +567,7 @@ ${printDeps(step, 1)}
         `${this}.addRef(${step}) forbidden: invalid plan heirarchy`,
       );
     }
-    this._refs.add(-step.id);
-    return -step.id;
+    return this._refs.push(step.id) - 1;
   }
 
   /**
@@ -548,36 +580,63 @@ ${printDeps(step, 1)}
    *
    * @experimental
    */
-  protected getRef(id: number | null): Step | null {
+  protected getRef(refIdx: number | null): Step | null {
     if (!["plan", "validate", "optimize"].includes(this.operationPlan.phase)) {
       throw new Error(
         `Cannot call ${this}.getRef() when the operation plan phase is ${this.operationPlan.phase}; getRef may only be called during planning.`,
       );
     }
-    if (id == null) return null;
-    if (!this._refs.has(id)) {
-      throw new Error(
-        `Attempted to get a ref from ${this}, but no matching ref was made. Use .addRef() to add a reference.`,
-      );
-    }
-    return this.operationPlan.stepTracker.getStepById(-id) ?? null;
+    if (refIdx == null) return null;
+    return (
+      this.operationPlan.stepTracker.getStepById(this._refs[refIdx]) ?? null
+    );
   }
 
   protected canAddDependency(step: Step): boolean {
     return stepAMayDependOnStepB(this, step);
   }
 
-  protected addDependency(stepOrOptions: Step | AddDependencyOptions): number {
-    const options: AddDependencyOptions =
-      stepOrOptions instanceof Step
-        ? { step: stepOrOptions, skipDeduplication: false }
-        : stepOrOptions;
+  protected _addDependency(options: AddDependencyOptions): number {
     if (options.step.layerPlan.id > this.layerPlan.id) {
       throw new Error(
-        `Cannot add dependency ${options.step} to ${this} since the former is in a deeper layerPlan (creates a catch-22)`,
+        `Cannot add dependency ${options.step} to ${this} since the former is in a deeper layerPlan (${options.step.layerPlan} deeper than ${this.layerPlan}; creates a catch-22)`,
       );
     }
     return this.operationPlan.stepTracker.addStepDependency(this, options);
+  }
+  /**
+   * @deprecated Please use `.addDataDependency($step)` or
+   * `.addStrongDependency($step)` instead. The behavior of `addDependency`
+   * will change in a future release to mean "data" dependency.
+   */
+  protected addDependency(stepOrOptions: Step | AddDependencyOptions): number {
+    const options: AddDependencyOptions =
+      stepOrOptions instanceof Step
+        ? { dataOnly: false, skipDeduplication: false, step: stepOrOptions }
+        : { dataOnly: false, skipDeduplication: false, ...stepOrOptions };
+    return this._addDependency(options);
+  }
+  protected addDataDependency(
+    stepOrOptions: Step | AddDependencyOptions,
+  ): number {
+    const opts =
+      stepOrOptions instanceof Step ? { step: stepOrOptions } : stepOrOptions;
+    return this._addDependency({
+      dataOnly: true,
+      skipDeduplication: false,
+      ...opts,
+    });
+  }
+  protected addStrongDependency(
+    stepOrOptions: Step | AddDependencyOptions,
+  ): number {
+    const opts =
+      stepOrOptions instanceof Step ? { step: stepOrOptions } : stepOrOptions;
+    return this._addDependency({
+      dataOnly: false,
+      skipDeduplication: false,
+      ...opts,
+    });
   }
 
   /**
@@ -587,13 +646,13 @@ ${printDeps(step, 1)}
    * directly.
    */
   protected addUnaryDependency(
-    stepOrOptions: Step | AddDependencyOptions,
+    stepOrOptions: Step | AddUnaryDependencyOptions,
   ): number {
-    const options: AddDependencyOptions =
+    const options: AddUnaryDependencyOptions =
       stepOrOptions instanceof Step ? { step: stepOrOptions } : stepOrOptions;
     if (options.step.layerPlan.id > this.layerPlan.id) {
       throw new Error(
-        `Cannot add dependency ${options.step} to ${this} since the former is in a deeper layerPlan (creates a catch-22)`,
+        `Cannot add a unary dependency on ${options.step} to ${this} since the former is in a deeper layerPlan (creates a catch-22)`,
       );
     }
     return this.operationPlan.stepTracker.addStepUnaryDependency(this, options);
@@ -699,6 +758,12 @@ ${printDeps(step, 1)}
     this.finalize = throwDestroyed;
     this.execute = throwDestroyed;
   }
+
+  public toRecord?(): Step;
+  public toSpecifier?(): Step;
+  public toTypename?(): Step<string>;
+  public cursor?(): Step;
+  // public itemPlan?($item: Step): Step;
 }
 
 function _buildOptimizedExecuteV2Expression(
@@ -807,10 +872,7 @@ export abstract class UnbatchedStep<TData = any> extends Step<TData> {
     indexMap,
     values,
     extra,
-  }: ExecutionDetails): PromiseOrDirect<GrafastResultsList<TData>> {
-    console.warn(
-      `${this} didn't call 'super.finalize()' in the finalize method.`,
-    );
+  }: ExecutionDetails): GrafastResultsList<TData> {
     const depCount = this.dependencies.length;
     return indexMap((i) => {
       try {
@@ -879,17 +941,6 @@ export function isListLikeStep<TData extends [...Step[]] = [...Step[]]>(
   return "at" in plan && typeof (plan as any).at === "function";
 }
 
-export type PolymorphicStep = Step & {
-  planForType(objectType: GraphQLObjectType): Step;
-};
-
-export function isPolymorphicStep(s: Step): s is PolymorphicStep {
-  return (
-    "planForType" in s &&
-    typeof (s as PolymorphicStep).planForType === "function"
-  );
-}
-
 export interface ListCapableStep<
   TOutputData,
   TItemStep extends Step<TOutputData> = Step<TOutputData>,
@@ -912,6 +963,17 @@ export function assertListCapableStep<TData, TItemStep extends Step<TData>>(
       `The plan returned from '${pathDescription}' should be a list capable plan, but ${plan} does not implement the 'listItem' method.`,
     );
   }
+}
+
+export function stepHasToSpecifier<TStep extends Step>(
+  $step: TStep,
+): $step is TStep & { toSpecifier(): Step } {
+  return typeof $step.toSpecifier === "function";
+}
+export function stepHasToRecord<TStep extends Step>(
+  $step: TStep,
+): $step is TStep & { toRecord(): Step } {
+  return typeof $step.toRecord === "function";
 }
 
 export {

@@ -1,0 +1,19 @@
+## expect(errors).toBeFalsy()
+{
+  people(first: 1) {
+    __typename
+    username
+    items: singleTableItemsList(first: 1, offset: 1) {
+      __typename
+      id
+      type
+      type2
+      parent {
+        __typename
+        id
+        type
+        type2
+      }
+    }
+  }
+}
