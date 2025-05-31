@@ -1,59 +1,22 @@
 {
-  crawler: {
-    id: 101,
-    items: [
+  item: {
+    __typename: 'Consumable',
+    id: 206,
+    contents: [
       {
         __typename: 'Consumable',
+        id: 209,
+        name: 'Goblin Oil',
+      },
+      {
+        __typename: 'MiscItem',
+        id: 204,
+        name: 'Low-Grade Moonshine Jug',
+      },
+      {
+        __typename: 'MiscItem',
         id: 205,
-        contents: [
-          {
-            __typename: 'Consumable',
-            id: 207,
-            name: 'Crowd Blast Potion',
-          },
-          {
-            __typename: 'Consumable',
-            id: 208,
-            name: 'Rock Buffalo Potion',
-          },
-        ],
-      },
-      {
-        __typename: 'Equipment',
-        id: 211,
-        contents: [
-          {
-            __typename: 'Equipment',
-            id: 212,
-            name: 'Earth Upgrade Patch',
-          },
-          {
-            __typename: 'Equipment',
-            id: 213,
-            name: 'Skyfowl Upgrade Patch',
-          },
-        ],
-      },
-      {
-        __typename: 'Consumable',
-        id: 206,
-        contents: [
-          {
-            __typename: 'Consumable',
-            id: 209,
-            name: 'Goblin Oil',
-          },
-          {
-            __typename: 'MiscItem',
-            id: 204,
-            name: 'Low-Grade Moonshine Jug',
-          },
-          {
-            __typename: 'MiscItem',
-            id: 205,
-            name: 'Torch',
-          },
-        ],
+        name: 'Torch',
       },
     ],
   },
