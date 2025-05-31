@@ -1710,7 +1710,7 @@ export function makeExampleSchema(
   >;
 
   const {
-    pgCodecs: { union__entity: unionEntityCodec },
+    pgCodecs: { union__entity: _unionEntityCodec },
     pgResources: {
       messages: messageResource,
       users: userResource,
@@ -2860,7 +2860,7 @@ export function makeExampleSchema(
 
   const entityUnion = EXPORTABLE(
     (lambda) =>
-      <TCodec extends typeof unionEntityCodec>(
+      <TCodec extends typeof _unionEntityCodec>(
         $item:
           | PgSelectSingleStep<PgResource<any, TCodec, any, any, any>>
           | PgClassExpressionStep<TCodec, PgResource<any, any, any, any, any>>,

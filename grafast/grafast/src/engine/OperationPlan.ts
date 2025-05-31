@@ -4956,7 +4956,6 @@ export class OperationPlan {
       }
     }
     function printBucket(lp: LayerPlan): GrafastPlanBucketJSONv1 {
-      lp.reason;
       return {
         id: lp.id,
         reason: printBucketReason(lp),

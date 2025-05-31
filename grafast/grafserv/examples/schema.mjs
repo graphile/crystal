@@ -1,4 +1,4 @@
-import { makeGrafastSchema, lambda, context } from "grafast";
+import { context,lambda, makeGrafastSchema } from "grafast";
 
 const schema = makeGrafastSchema({
   typeDefs: `

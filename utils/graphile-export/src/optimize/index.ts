@@ -353,7 +353,6 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
       );
     },
     CallExpression(path) {
-      path.node.arguments;
       const argsPath = path.get("arguments");
       if (argsPath.length === 1) {
         const argPath = argsPath[0];

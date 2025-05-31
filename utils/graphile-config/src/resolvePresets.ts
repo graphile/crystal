@@ -22,6 +22,7 @@ const PROBABLY_A_PRESET_NOT_A_PLUGIN_KEYS = [
 let inspect: (obj: any, options?: { colors: boolean }) => string;
 
 try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   inspect = require("util").inspect;
   if (typeof inspect !== "function") {
     throw new Error("Failed to load inspect");

@@ -1,5 +1,5 @@
 import { serve } from "@hono/node-server";
-import { grafserv } from "grafserv/hono";
+import { grafserv } from "grafserv/hono/v4";
 import { Hono } from "hono";
 
 import preset from "./graphile.config.mjs";
