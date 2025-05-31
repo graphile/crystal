@@ -1,9 +1,10 @@
-import { schema } from "./schema-export-output.mjs";
-
 import { createServer } from "node:http";
+
+import { createWithPgClient } from "@dataplan/pg/adaptors/pg";
 import { grafserv } from "grafserv/node";
 import pg from "pg";
-import { createWithPgClient } from "@dataplan/pg/adaptors/pg";
+
+import { schema } from "./schema-export-output.mjs";
 
 const pool = new pg.Pool({
   connectionString: "postgres:///pagila",

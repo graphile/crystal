@@ -1,6 +1,7 @@
 // Inspired by eslint-plugin-react-hooks
 
-import { ESLint, Linter, Rule } from "eslint";
+import type { ESLint, Linter, Rule } from "eslint";
+
 import { ExhaustiveDeps } from "./ExhaustiveDeps.js";
 import { ExportInstances } from "./ExportInstances.js";
 import { ExportMethods } from "./ExportMethods.js";

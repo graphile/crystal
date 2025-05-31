@@ -1,10 +1,11 @@
 // This is a massively simplified but custom depcheck that catches issues that depcheck itself doesn't.
 
-import { glob } from "glob";
 import * as fs from "node:fs/promises";
-import { fileURLToPath } from "node:url";
-import babel from "@babel/core";
 import { basename } from "node:path";
+import { fileURLToPath } from "node:url";
+
+import babel from "@babel/core";
+import { glob } from "glob";
 
 const NODE_MODULES = [
   "assert",
