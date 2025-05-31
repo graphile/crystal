@@ -203,7 +203,7 @@ const oldConfig = {
 
     // Rules for TypeScript only
     {
-      files: ["**/*.ts", "**/*.tsx"],
+      files: ["**/*.ts", "**/*.tsx", "**/*.mts", "**/*.mtsx"],
 
       languageOptions: {
         parser: tsParser,
