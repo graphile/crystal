@@ -2305,7 +2305,7 @@ const nodeIdHandler_List = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   getIdentifiers(value) {
@@ -2339,7 +2339,7 @@ function specForHandler(handler) {
 }
 const nodeFetcher_List = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_List));
-  return nodeIdHandler_List.get(nodeIdHandler_List.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandler_List.get(nodeIdHandler_List.getSpec($decoded));
 };
 const nodeIdHandler_Type = {
   typeName: "Type",
@@ -2350,7 +2350,7 @@ const nodeIdHandler_Type = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   getIdentifiers(value) {
@@ -2365,7 +2365,7 @@ const nodeIdHandler_Type = {
 };
 const nodeFetcher_Type = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Type));
-  return nodeIdHandler_Type.get(nodeIdHandler_Type.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandler_Type.get(nodeIdHandler_Type.getSpec($decoded));
 };
 const resource_updatable_viewPgResource = registry.pgResources["updatable_view"];
 function qbWhereBuilder(qb) {
@@ -2596,19 +2596,19 @@ const resource_type_function_mutationPgResource = registry.pgResources["type_fun
 const resource_type_function_list_mutationPgResource = registry.pgResources["type_function_list_mutation"];
 const specFromArgs_List = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_List, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_List, $nodeId);
 };
 const specFromArgs_Type = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Type, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_Type, $nodeId);
 };
 const specFromArgs_List2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_List, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_List, $nodeId);
 };
 const specFromArgs_Type2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Type, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_Type, $nodeId);
 };
 const attributeNames = ["role", "exp", "a", "b", "c"];
 const resource_frmcdc_jwtTokenPgResource = registry.pgResources["frmcdc_jwtToken"];

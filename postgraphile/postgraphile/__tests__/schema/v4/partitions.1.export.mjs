@@ -310,7 +310,7 @@ const nodeIdHandler_User = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   getIdentifiers(value) {
@@ -344,7 +344,7 @@ function specForHandler(handler) {
 }
 const nodeFetcher_User = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_User));
-  return nodeIdHandler_User.get(nodeIdHandler_User.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandler_User.get(nodeIdHandler_User.getSpec($decoded));
 };
 const nodeIdHandler_Measurement = {
   typeName: "Measurement",
@@ -355,8 +355,8 @@ const nodeIdHandler_Measurement = {
   },
   getSpec($list) {
     return {
-      timestamp: access($list, [1]),
-      key: access($list, [2])
+      timestamp: inhibitOnNull(access($list, [1])),
+      key: inhibitOnNull(access($list, [2]))
     };
   },
   getIdentifiers(value) {
@@ -371,7 +371,7 @@ const nodeIdHandler_Measurement = {
 };
 const nodeFetcher_Measurement = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Measurement));
-  return nodeIdHandler_Measurement.get(nodeIdHandler_Measurement.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandler_Measurement.get(nodeIdHandler_Measurement.getSpec($decoded));
 };
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
@@ -398,19 +398,19 @@ function DatetimeSerialize(value) {
 }
 const specFromArgs_User = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_User, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_User, $nodeId);
 };
 const specFromArgs_Measurement = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Measurement, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_Measurement, $nodeId);
 };
 const specFromArgs_User2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_User, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_User, $nodeId);
 };
 const specFromArgs_Measurement2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Measurement, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_Measurement, $nodeId);
 };
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {

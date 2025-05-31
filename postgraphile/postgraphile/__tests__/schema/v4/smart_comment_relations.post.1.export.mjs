@@ -1253,7 +1253,7 @@ const nodeIdHandler_Post = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   getIdentifiers(value) {
@@ -1287,7 +1287,7 @@ function specForHandler(handler) {
 }
 const nodeFetcher_Post = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Post));
-  return nodeIdHandler_Post.get(nodeIdHandler_Post.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandler_Post.get(nodeIdHandler_Post.getSpec($decoded));
 };
 const nodeIdHandler_Offer = {
   typeName: "Offer",
@@ -1298,7 +1298,7 @@ const nodeIdHandler_Offer = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   getIdentifiers(value) {
@@ -1313,7 +1313,7 @@ const nodeIdHandler_Offer = {
 };
 const nodeFetcher_Offer = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Offer));
-  return nodeIdHandler_Offer.get(nodeIdHandler_Offer.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandler_Offer.get(nodeIdHandler_Offer.getSpec($decoded));
 };
 const nodeIdHandler_Street = {
   typeName: "Street",
@@ -1324,7 +1324,7 @@ const nodeIdHandler_Street = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   getIdentifiers(value) {
@@ -1339,7 +1339,7 @@ const nodeIdHandler_Street = {
 };
 const nodeFetcher_Street = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Street));
-  return nodeIdHandler_Street.get(nodeIdHandler_Street.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandler_Street.get(nodeIdHandler_Street.getSpec($decoded));
 };
 const nodeIdHandler_Property = {
   typeName: "Property",
@@ -1350,7 +1350,7 @@ const nodeIdHandler_Property = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   getIdentifiers(value) {
@@ -1365,7 +1365,7 @@ const nodeIdHandler_Property = {
 };
 const nodeFetcher_Property = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Property));
-  return nodeIdHandler_Property.get(nodeIdHandler_Property.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandler_Property.get(nodeIdHandler_Property.getSpec($decoded));
 };
 const nodeIdHandler_StreetProperty = {
   typeName: "StreetProperty",
@@ -1376,8 +1376,8 @@ const nodeIdHandler_StreetProperty = {
   },
   getSpec($list) {
     return {
-      str_id: access($list, [1]),
-      prop_id: access($list, [2])
+      str_id: inhibitOnNull(access($list, [1])),
+      prop_id: inhibitOnNull(access($list, [2]))
     };
   },
   getIdentifiers(value) {
@@ -1392,7 +1392,7 @@ const nodeIdHandler_StreetProperty = {
 };
 const nodeFetcher_StreetProperty = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_StreetProperty));
-  return nodeIdHandler_StreetProperty.get(nodeIdHandler_StreetProperty.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandler_StreetProperty.get(nodeIdHandler_StreetProperty.getSpec($decoded));
 };
 const nodeIdHandler_House = {
   typeName: "House",
@@ -1403,8 +1403,8 @@ const nodeIdHandler_House = {
   },
   getSpec($list) {
     return {
-      street_id: access($list, [1]),
-      property_id: access($list, [2])
+      street_id: inhibitOnNull(access($list, [1])),
+      property_id: inhibitOnNull(access($list, [2]))
     };
   },
   getIdentifiers(value) {
@@ -1419,7 +1419,7 @@ const nodeIdHandler_House = {
 };
 const nodeFetcher_House = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_House));
-  return nodeIdHandler_House.get(nodeIdHandler_House.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandler_House.get(nodeIdHandler_House.getSpec($decoded));
 };
 const nodeIdHandler_Building = {
   typeName: "Building",
@@ -1430,7 +1430,7 @@ const nodeIdHandler_Building = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   getIdentifiers(value) {
@@ -1445,7 +1445,7 @@ const nodeIdHandler_Building = {
 };
 const nodeFetcher_Building = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Building));
-  return nodeIdHandler_Building.get(nodeIdHandler_Building.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandler_Building.get(nodeIdHandler_Building.getSpec($decoded));
 };
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
@@ -1477,51 +1477,51 @@ function CursorSerialize(value) {
 }
 const specFromArgs_Post = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Post, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_Post, $nodeId);
 };
 const specFromArgs_Offer = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Offer, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_Offer, $nodeId);
 };
 const specFromArgs_Street = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Street, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_Street, $nodeId);
 };
 const specFromArgs_Property = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Property, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_Property, $nodeId);
 };
 const specFromArgs_StreetProperty = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_StreetProperty, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_StreetProperty, $nodeId);
 };
 const specFromArgs_Building = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Building, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_Building, $nodeId);
 };
 const specFromArgs_Post2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Post, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_Post, $nodeId);
 };
 const specFromArgs_Offer2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Offer, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_Offer, $nodeId);
 };
 const specFromArgs_Street2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Street, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_Street, $nodeId);
 };
 const specFromArgs_Property2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Property, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_Property, $nodeId);
 };
 const specFromArgs_StreetProperty2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_StreetProperty, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_StreetProperty, $nodeId);
 };
 const specFromArgs_Building2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Building, inhibitOnNull($nodeId));
+  return specFromNodeId(nodeIdHandler_Building, $nodeId);
 };
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {

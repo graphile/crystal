@@ -5723,7 +5723,7 @@ const nodeIdHandler_MyTable = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   getIdentifiers(value) {
@@ -5757,7 +5757,7 @@ function specForHandler(handler) {
 }
 const nodeFetcher_MyTable = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_MyTable));
-  return nodeIdHandler_MyTable.get(nodeIdHandler_MyTable.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandler_MyTable.get(nodeIdHandler_MyTable.getSpec($decoded));
 };
 const nodeIdHandler_PersonSecret = {
   typeName: "PersonSecret",
@@ -5768,7 +5768,7 @@ const nodeIdHandler_PersonSecret = {
   },
   getSpec($list) {
     return {
-      person_id: access($list, [1])
+      person_id: inhibitOnNull(access($list, [1]))
     };
   },
   getIdentifiers(value) {
@@ -5784,7 +5784,7 @@ const nodeIdHandler_PersonSecret = {
 const nodeFetcher_PersonSecret = (handler => {
   const fn = $nodeId => {
     const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec(inhibitOnNull($decoded)));
+    return handler.get(handler.getSpec($decoded));
   };
   fn.deprecationReason = handler.deprecationReason;
   return fn;
@@ -5798,8 +5798,8 @@ const nodeIdHandler_CompoundKey = {
   },
   getSpec($list) {
     return {
-      person_id_1: access($list, [1]),
-      person_id_2: access($list, [2])
+      person_id_1: inhibitOnNull(access($list, [1])),
+      person_id_2: inhibitOnNull(access($list, [2]))
     };
   },
   getIdentifiers(value) {
@@ -5814,7 +5814,7 @@ const nodeIdHandler_CompoundKey = {
 };
 const nodeFetcher_CompoundKey = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_CompoundKey));
-  return nodeIdHandler_CompoundKey.get(nodeIdHandler_CompoundKey.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandler_CompoundKey.get(nodeIdHandler_CompoundKey.getSpec($decoded));
 };
 const nodeIdHandler_NullTestRecord = {
   typeName: "NullTestRecord",
@@ -5825,7 +5825,7 @@ const nodeIdHandler_NullTestRecord = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   getIdentifiers(value) {
@@ -5840,7 +5840,7 @@ const nodeIdHandler_NullTestRecord = {
 };
 const nodeFetcher_NullTestRecord = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_NullTestRecord));
-  return nodeIdHandler_NullTestRecord.get(nodeIdHandler_NullTestRecord.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandler_NullTestRecord.get(nodeIdHandler_NullTestRecord.getSpec($decoded));
 };
 const nodeIdHandler_LeftArm = {
   typeName: "LeftArm",
@@ -5851,7 +5851,7 @@ const nodeIdHandler_LeftArm = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   getIdentifiers(value) {
@@ -5866,7 +5866,7 @@ const nodeIdHandler_LeftArm = {
 };
 const nodeFetcher_LeftArm = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_LeftArm));
-  return nodeIdHandler_LeftArm.get(nodeIdHandler_LeftArm.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandler_LeftArm.get(nodeIdHandler_LeftArm.getSpec($decoded));
 };
 const nodeIdHandler_Issue756 = {
   typeName: "Issue756",
@@ -5877,7 +5877,7 @@ const nodeIdHandler_Issue756 = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   getIdentifiers(value) {
@@ -5892,7 +5892,7 @@ const nodeIdHandler_Issue756 = {
 };
 const nodeFetcher_Issue756 = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Issue756));
-  return nodeIdHandler_Issue756.get(nodeIdHandler_Issue756.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandler_Issue756.get(nodeIdHandler_Issue756.getSpec($decoded));
 };
 const nodeIdHandler_Person = {
   typeName: "Person",
@@ -5903,7 +5903,7 @@ const nodeIdHandler_Person = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   getIdentifiers(value) {
@@ -5918,7 +5918,7 @@ const nodeIdHandler_Person = {
 };
 const nodeFetcher_Person = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Person));
-  return nodeIdHandler_Person.get(nodeIdHandler_Person.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandler_Person.get(nodeIdHandler_Person.getSpec($decoded));
 };
 const resource_edge_casePgResource = registry.pgResources["edge_case"];
 const nodeIdHandlerByTypeName = {

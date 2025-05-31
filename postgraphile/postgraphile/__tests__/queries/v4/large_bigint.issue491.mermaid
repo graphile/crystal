@@ -8,7 +8,7 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/v4/large_bigint.issue491"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 9, 10, 12, 33, 49, 50, 11, 15, 17, 24, 26<br />2: PgSelect[18], PgSelect[27]<br />3: PgSelectRows[21], PgSelectRows[30]<br />ᐳ: 20, 22, 29, 31"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 9, 10, 12, 33, 49, 50, 11, 15, 16, 24, 25<br />2: PgSelect[18], PgSelect[27]<br />3: PgSelectRows[21], PgSelectRows[30]<br />ᐳ: 20, 22, 29, 31"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12, 33<br /><br />ROOT Connectionᐸ8ᐳ[12]<br />1: PgSelect[32]<br />2: PgSelectRows[42]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 22, 33<br /><br />ROOT PgSelectSingleᐸlarge_node_idᐳ[22]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 31, 33<br /><br />ROOT PgSelectSingleᐸlarge_node_idᐳ[31]"):::bucket
@@ -25,16 +25,16 @@ graph TD
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
     PgSelect18[["PgSelect[18∈0] ➊<br />ᐸlarge_node_idᐳ<br />More deps:<br />- Object[11]"]]:::plan
-    Access17{{"Access[17∈0] ➊<br />ᐸ15.1ᐳ"}}:::plan
-    Access17 --> PgSelect18
+    Access16{{"Access[16∈0] ➊<br />ᐸ15.1ᐳ"}}:::plan
+    Access16 -->|rejectNull| PgSelect18
     PgSelect27[["PgSelect[27∈0] ➊<br />ᐸlarge_node_idᐳ<br />More deps:<br />- Object[11]"]]:::plan
-    Access26{{"Access[26∈0] ➊<br />ᐸ24.1ᐳ"}}:::plan
-    Access26 --> PgSelect27
+    Access25{{"Access[25∈0] ➊<br />ᐸ24.1ᐳ"}}:::plan
+    Access25 -->|rejectNull| PgSelect27
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10
     Lambda15{{"Lambda[15∈0] ➊<br />ᐸspecifier_LargeNodeId_base64JSONᐳ<br />More deps:<br />- Constantᐸ'WyJsYXJnZV9ub2RlX2lkcyIsOTAwNzE5OTI1NDc0MDk5MF0='ᐳ[49]"}}:::plan
-    Lambda15 -->|rejectNull| Access17
+    Lambda15 --> Access16
     First20{{"First[20∈0] ➊"}}:::plan
     PgSelectRows21[["PgSelectRows[21∈0] ➊"]]:::plan
     PgSelectRows21 --> First20
@@ -42,7 +42,7 @@ graph TD
     PgSelectSingle22{{"PgSelectSingle[22∈0] ➊<br />ᐸlarge_node_idᐳ"}}:::plan
     First20 --> PgSelectSingle22
     Lambda24{{"Lambda[24∈0] ➊<br />ᐸspecifier_LargeNodeId_base64JSONᐳ<br />More deps:<br />- Constantᐸ'WyJsYXJnZV9ub2RlX2lkcyIsIjIwOTgyODg2NjkyMTg1NzE3NjAiXQ=='ᐳ[50]"}}:::plan
-    Lambda24 -->|rejectNull| Access26
+    Lambda24 --> Access25
     First29{{"First[29∈0] ➊"}}:::plan
     PgSelectRows30[["PgSelectRows[30∈0] ➊"]]:::plan
     PgSelectRows30 --> First29
@@ -85,7 +85,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,Access9,Access10,Object11,Connection12,Lambda15,Access17,PgSelect18,First20,PgSelectRows21,PgSelectSingle22,Lambda24,Access26,PgSelect27,First29,PgSelectRows30,PgSelectSingle31 bucket0
+    class Bucket0,__Value2,Access9,Access10,Object11,Connection12,Lambda15,Access16,PgSelect18,First20,PgSelectRows21,PgSelectSingle22,Lambda24,Access25,PgSelect27,First29,PgSelectRows30,PgSelectSingle31 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect32,PgSelectRows42 bucket1
     classDef bucket2 stroke:#7f007f

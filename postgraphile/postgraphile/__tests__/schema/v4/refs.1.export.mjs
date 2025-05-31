@@ -828,8 +828,8 @@ const nodeIdHandler_BookAuthor = {
   },
   getSpec($list) {
     return {
-      book_id: access($list, [1]),
-      pen_name_id: access($list, [2])
+      book_id: inhibitOnNull(access($list, [1])),
+      pen_name_id: inhibitOnNull(access($list, [2]))
     };
   },
   getIdentifiers(value) {
@@ -863,7 +863,7 @@ function specForHandler(handler) {
 }
 const nodeFetcher_BookAuthor = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_BookAuthor));
-  return nodeIdHandler_BookAuthor.get(nodeIdHandler_BookAuthor.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandler_BookAuthor.get(nodeIdHandler_BookAuthor.getSpec($decoded));
 };
 const nodeIdHandler_BookEditor = {
   typeName: "BookEditor",
@@ -874,8 +874,8 @@ const nodeIdHandler_BookEditor = {
   },
   getSpec($list) {
     return {
-      book_id: access($list, [1]),
-      person_id: access($list, [2])
+      book_id: inhibitOnNull(access($list, [1])),
+      person_id: inhibitOnNull(access($list, [2]))
     };
   },
   getIdentifiers(value) {
@@ -890,7 +890,7 @@ const nodeIdHandler_BookEditor = {
 };
 const nodeFetcher_BookEditor = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_BookEditor));
-  return nodeIdHandler_BookEditor.get(nodeIdHandler_BookEditor.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandler_BookEditor.get(nodeIdHandler_BookEditor.getSpec($decoded));
 };
 const nodeIdHandler_Person = {
   typeName: "Person",
@@ -901,7 +901,7 @@ const nodeIdHandler_Person = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   getIdentifiers(value) {
@@ -916,7 +916,7 @@ const nodeIdHandler_Person = {
 };
 const nodeFetcher_Person = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Person));
-  return nodeIdHandler_Person.get(nodeIdHandler_Person.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandler_Person.get(nodeIdHandler_Person.getSpec($decoded));
 };
 const nodeIdHandler_Post = {
   typeName: "Post",
@@ -927,7 +927,7 @@ const nodeIdHandler_Post = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   getIdentifiers(value) {
@@ -942,7 +942,7 @@ const nodeIdHandler_Post = {
 };
 const nodeFetcher_Post = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Post));
-  return nodeIdHandler_Post.get(nodeIdHandler_Post.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandler_Post.get(nodeIdHandler_Post.getSpec($decoded));
 };
 const nodeIdHandler_Book = {
   typeName: "Book",
@@ -953,7 +953,7 @@ const nodeIdHandler_Book = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   getIdentifiers(value) {
@@ -968,7 +968,7 @@ const nodeIdHandler_Book = {
 };
 const nodeFetcher_Book = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Book));
-  return nodeIdHandler_Book.get(nodeIdHandler_Book.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandler_Book.get(nodeIdHandler_Book.getSpec($decoded));
 };
 const nodeIdHandler_PenName = {
   typeName: "PenName",
@@ -979,7 +979,7 @@ const nodeIdHandler_PenName = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   getIdentifiers(value) {
@@ -994,7 +994,7 @@ const nodeIdHandler_PenName = {
 };
 const nodeFetcher_PenName = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_PenName));
-  return nodeIdHandler_PenName.get(nodeIdHandler_PenName.getSpec(inhibitOnNull($decoded)));
+  return nodeIdHandler_PenName.get(nodeIdHandler_PenName.getSpec($decoded));
 };
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
