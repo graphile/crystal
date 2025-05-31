@@ -271,14 +271,16 @@ describe("queries", () => {
               }
             });
           }
-          it("matched data snapshot", async function () {
-            if (i === 0 || !expectIncremental) {
+          if (i === 0 || !expectIncremental) {
+            it("matched data snapshot exactly", async function () {
               await snapshot(
                 JSON5.stringify(result.data, null, 2) + "\n",
                 `${BASE_DIR}/${baseName}.json5`,
                 i === 0,
               );
-            } else {
+            });
+          } else {
+            it("matched data snapshot roughly (order ignored)", async function () {
               // Incremental is allowed to be out of order
               const original = await readSnapshot(
                 `${BASE_DIR}/${baseName}.json5`,
@@ -289,8 +291,8 @@ describe("queries", () => {
                 );
               }
               expect(result.data).to.deep.equal(JSON5.parse(original));
-            }
-          });
+            });
+          }
           it("did not error", function () {
             if (result.errors) {
               console.dir(result.errors);
