@@ -28,6 +28,15 @@ async function streamToArray(r: Awaited<ReturnType<typeof grafast>>) {
     for await (const payload of r) {
       payloads.push(payload);
     }
+    if (
+      payloads[0].hasNext === true &&
+      payloads[payloads.length - 1].hasNext !== false
+    ) {
+      console.dir(payloads);
+      throw new Error(
+        `Invalid stream! Last payload didn't have hasNext: false!`,
+      );
+    }
     return payloads;
   } else {
     return r;
