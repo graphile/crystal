@@ -82,7 +82,7 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
           return _;
         }
         const {
-          grafast: { access, constant, list },
+          grafast: { access, constant, inhibitOnNull, list },
         } = build;
         const tableResources = Object.values(
           build.input.pgRegistry.pgResources,
@@ -188,28 +188,30 @@ return function (list, constant) {
               ? // eslint-disable-next-line graphile-export/exhaustive-deps
                 EXPORTABLE(
                   te.run`\
-return function (access) {
+return function (access, inhibitOnNull) {
   return $list => ({ ${te.join(
     pk.map(
       (attributeName, index) =>
         te`${te.safeKeyOrThrow(
           attributeName,
-        )}: access($list, [${te.lit(index + 1)}])`,
+        )}: inhibitOnNull(access($list, [${te.lit(index + 1)}]))`,
     ),
     ", ",
   )} });
 }` as any,
-                  [access],
+                  [access, inhibitOnNull],
                 )
               : EXPORTABLE(
-                  (access, pk) => ($list: ListStep<any[]>) => {
+                  (access, inhibitOnNull, pk) => ($list: ListStep<any[]>) => {
                     const spec = pk.reduce((memo, attribute, index) => {
-                      memo[attribute] = access($list, [index + 1]);
+                      memo[attribute] = inhibitOnNull(
+                        access($list, [index + 1]),
+                      );
                       return memo;
                     }, Object.create(null));
                     return spec;
                   },
-                  [access, pk],
+                  [access, inhibitOnNull, pk],
                 ),
             getIdentifiers: EXPORTABLE(() => (value) => value.slice(1), []),
             get: EXPORTABLE(
