@@ -757,7 +757,7 @@ function newIterator<T = any>(
         abort(e);
         for (const entry of pullQueue) {
           try {
-            entry[0]({ done, value: undefined });
+            entry[1](e);
           } catch (e) {
             // ignore
           }
