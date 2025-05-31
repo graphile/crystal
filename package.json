@@ -50,9 +50,7 @@
     "@types/node": "^20.17.30",
     "@types/rimraf": "^4.0.5",
     "@types/ws": "^8",
-    "@typescript-eslint/eslint-plugin": "^8.32.0",
     "@typescript-eslint/parser": "^8.32.0",
-    "@typescript-eslint/typescript-estree": "^8.32.0",
     "babel-jest": "^29.7.0",
     "babel-plugin-transform-import-meta": "^2.2.1",
     "concurrently": "^8.2.1",
@@ -79,6 +77,7 @@
     "typedoc": "^0.28.2",
     "typedoc-monorepo-link-types": "^0.0.4",
     "typescript": "^5.8.3",
+    "typescript-eslint": "^8.33.0",
     "webpack": "^5.94.0",
     "ws": "^8.18.0",
     "zx": "^7.2.3"

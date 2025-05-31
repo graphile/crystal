@@ -3,7 +3,6 @@ import babelParser from "@babel/eslint-parser";
 import { fixupPluginRules } from "@eslint/compat";
 import js from "@eslint/js";
 import tsParser from "@typescript-eslint/parser";
-import tseslint from "@typescript-eslint/eslint-plugin";
 import { defineConfig, globalIgnores } from "eslint/config";
 import prettier from "eslint-config-prettier";
 import graphileExport from "eslint-plugin-graphile-export";
@@ -16,6 +15,7 @@ import tsdoc from "eslint-plugin-tsdoc";
 import fs from "fs";
 import globals from "globals";
 import path from "path";
+import tseslint from "typescript-eslint";
 
 const __dirname = import.meta.dirname;
 
@@ -61,8 +61,6 @@ const config = {
     graphql,
     tsdoc,
     "simple-import-sort": simpleImportSort,
-    import: fixupPluginRules(importPlugin),
-    "graphile-export": graphileExport,
     "react-hooks": reactHooks,
   },
 
@@ -447,15 +445,14 @@ export default defineConfig([
   //"eslint:recommended",
   js.configs.recommended,
   // "plugin:@typescript-eslint/eslint-recommended",
-  tseslint.configs.eslintRecommended,
   //"plugin:@typescript-eslint/recommended",
   tseslint.configs.recommended,
   //'plugin:@typescript-eslint/recommended-requiring-type-checking',
   // ...tseslint.configs.recommendedTypeChecked, // requires parserOptions.project
   // "plugin:import/errors",
-  importPlugin.configs.errors,
+  importPlugin.flatConfigs.errors,
   // "plugin:import/typescript",
-  importPlugin.configs.typescript,
+  { rules: importPlugin.flatConfigs.typescript.rules },
   // "plugin:graphile-export/recommended",
   graphileExport.configs.recommended,
   //"prettier",

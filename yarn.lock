@@ -7187,7 +7187,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/eslint-plugin@npm:^8.32.0":
+"@typescript-eslint/eslint-plugin@npm:8.33.0":
   version: 8.33.0
   resolution: "@typescript-eslint/eslint-plugin@npm:8.33.0"
   dependencies:
@@ -7208,7 +7208,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/parser@npm:^8.32.0":
+"@typescript-eslint/parser@npm:8.33.0, @typescript-eslint/parser@npm:^8.32.0":
   version: 8.33.0
   resolution: "@typescript-eslint/parser@npm:8.33.0"
   dependencies:
@@ -7276,7 +7276,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/typescript-estree@npm:8.33.0, @typescript-eslint/typescript-estree@npm:^8.32.0":
+"@typescript-eslint/typescript-estree@npm:8.33.0":
   version: 8.33.0
   resolution: "@typescript-eslint/typescript-estree@npm:8.33.0"
   dependencies:
@@ -20254,9 +20254,7 @@ __metadata:
     "@types/node": "npm:^20.17.30"
     "@types/rimraf": "npm:^4.0.5"
     "@types/ws": "npm:^8"
-    "@typescript-eslint/eslint-plugin": "npm:^8.32.0"
     "@typescript-eslint/parser": "npm:^8.32.0"
-    "@typescript-eslint/typescript-estree": "npm:^8.32.0"
     babel-jest: "npm:^29.7.0"
     babel-plugin-transform-import-meta: "npm:^2.2.1"
     concurrently: "npm:^8.2.1"
@@ -20283,6 +20281,7 @@ __metadata:
     typedoc: "npm:^0.28.2"
     typedoc-monorepo-link-types: "npm:^0.0.4"
     typescript: "npm:^5.8.3"
+    typescript-eslint: "npm:^8.33.0"
     webpack: "npm:^5.94.0"
     ws: "npm:^8.18.0"
     zx: "npm:^7.2.3"
@@ -22444,6 +22443,20 @@ __metadata:
   bin:
     typedoc: bin/typedoc
   checksum: 10/ee49b123ea2c0567984e68ce209a7157918f969669e6f2203ec073885f55cc32ce58790b0f858b220ffda6e0af233c115c8757bc6cccc569df6a1e95d0b0ae7c
+  languageName: node
+  linkType: hard
+
+"typescript-eslint@npm:^8.33.0":
+  version: 8.33.0
+  resolution: "typescript-eslint@npm:8.33.0"
+  dependencies:
+    "@typescript-eslint/eslint-plugin": "npm:8.33.0"
+    "@typescript-eslint/parser": "npm:8.33.0"
+    "@typescript-eslint/utils": "npm:8.33.0"
+  peerDependencies:
+    eslint: ^8.57.0 || ^9.0.0
+    typescript: ">=4.8.4 <5.9.0"
+  checksum: 10/45c3ac8859eea71171f1ffb422fa71c7f5b60ea3b01ed4e655d9604057408b144c961c52fa07c9d75c65d18ffbf3a0c433ff688a48a73b7afe5bcc4811fb401e
   languageName: node
   linkType: hard
 
