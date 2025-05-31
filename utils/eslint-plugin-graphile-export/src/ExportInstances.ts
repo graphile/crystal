@@ -42,7 +42,7 @@ export const ExportInstances: Rule.RuleModule = {
   },
   create(context) {
     const disableAutofix = context.options?.[0]?.disableAutofix ?? false;
-    // const scopeManager = context.getSourceCode().scopeManager;
+    // const scopeManager = context.sourceCode.scopeManager;
 
     const options: CommonOptions = {
       disableAutofix,
