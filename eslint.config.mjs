@@ -56,6 +56,10 @@ const config = {
     react: {
       version: "detect",
     },
+    "import/resolver": {
+      node: true,
+      typescript: true,
+    },
   },
 
   plugins: {
