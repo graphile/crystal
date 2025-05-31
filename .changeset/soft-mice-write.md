@@ -7,7 +7,7 @@
 In order to make the libraries more type safe, `makeGrafastSchema` (from
 `grafast`) and `makeExtendSchemaPlugin` (from `postgraphile/utils`) have
 deprecated the `typeDefs`/`plans` pattern since `plans` (like `resolvers` in the
-traditional format) ended up being a mis-mash of lots of different types and
+traditional format) ended up being a mish-mash of lots of different types and
 `__`-prefixed fields for special cases. Instead the configuration should be
 split into `typeDefs` with `objects`, `interfaces`, `unions`, `inputObjects`,
 `scalars` and `enums`; and object and input object fields should be specified
@@ -15,6 +15,18 @@ via the `plans` entry within themselves to avoid conflicts with
 `resolveType`/`isTypeOf`/`planType`/`scope` and similar type-level (rather than
 field-level) properties. This also means these type-level fields no longer have
 the `__` prefix. Migration is quite straightforward:
+
+1. **Split definitions based on type kind**. For each type defined in `plans`
+   move it into `objects`, `interfaces`, `union`, `inputObjects`, `scalars`, or
+   `enums` as appropriate based on the keyword used to define the type in the
+   `typeDefs` (respectively: `type`, `interface`, `union`, `input object`,
+   `scalar`, `enum`).
+2. **Move field plans into nested `plans: {...}` object**. For each type in
+   `objects` and `inputObjects`: create a `plans: { ... }` entry and move all
+   fields (anything not prefixed with `__`) inside this new (nested) property.
+3. **Remove `__` prefixes**. For each type across
+   objects/interfaces/unions/interfaceObjects/scalars and enums: remove the `__`
+   prefix from any methods/properties.
 
 ```diff
  typeDefs: ...,
