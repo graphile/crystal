@@ -121,7 +121,8 @@ const config = {
     "sort-imports": "off",
     "import/order": "off",
 
-    "import/extensions": ["error", "ignorePackages"],
+    // TODO: fix this properly, rather than turning off 'ts'
+    "import/extensions": ["error", "ignorePackages", { ts: "never" }],
     "import/no-deprecated": "warn",
 
     // Apply has been more optimised than spread, use whatever feels right.
@@ -370,7 +371,6 @@ export default defineConfig([
   graphileExport.configs.recommended,
   //"prettier",
   prettier, // not a plugin, just a config object
-
   config,
   ...oldConfig.overrides,
   globalIgnores(globalIgnoresFromFile),
