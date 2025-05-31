@@ -781,7 +781,6 @@ async function processStream(
 
   let queue: null | ResultTuple[] = null;
   let timeout: NodeJS.Timer | null = null;
-  timeout;
 
   const _processQueue = (entries: ResultTuple[]) => {
     const size = entries.length;
