@@ -124,8 +124,12 @@ const config = {
     "sort-imports": "off",
     "import/order": "off",
 
-    // TODO: fix this properly, rather than turning off 'ts'
-    "import/extensions": ["error", "ignorePackages", { ts: "never" }],
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      // TODO: fix this properly, rather than turning off 'ts'/'tsx'
+      { ts: "never", tsx: "never" },
+    ],
     "import/no-deprecated": "warn",
 
     // Apply has been more optimised than spread, use whatever feels right.
