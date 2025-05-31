@@ -1,23 +1,20 @@
-import path from "path";
-import fs from "fs";
-import { defineConfig, globalIgnores } from "eslint/config";
-
+// @ts-check
 import babelParser from "@babel/eslint-parser";
-
 import { fixupConfigRules, fixupPluginRules } from "@eslint/compat";
-
-import jest from "eslint-plugin-jest";
-import graphql from "eslint-plugin-graphql";
-import tsdoc from "eslint-plugin-tsdoc";
-import simpleImportSort from "eslint-plugin-simple-import-sort";
-import _import from "eslint-plugin-import";
-import graphileExport from "eslint-plugin-graphile-export";
-import reactHooks from "eslint-plugin-react-hooks";
-import globals from "globals";
-import tsParser from "@typescript-eslint/parser";
-import js from "@eslint/js";
-
 import { FlatCompat } from "@eslint/eslintrc";
+import js from "@eslint/js";
+import tsParser from "@typescript-eslint/parser";
+import { defineConfig, globalIgnores } from "eslint/config";
+import graphileExport from "eslint-plugin-graphile-export";
+import graphql from "eslint-plugin-graphql";
+import _import from "eslint-plugin-import";
+import jest from "eslint-plugin-jest";
+import reactHooks from "eslint-plugin-react-hooks";
+import simpleImportSort from "eslint-plugin-simple-import-sort";
+import tsdoc from "eslint-plugin-tsdoc";
+import fs from "fs";
+import globals from "globals";
+import path from "path";
 
 const __dirname = import.meta.dirname;
 
@@ -39,9 +36,13 @@ const globalIgnoresFromFile = fs
     return text;
   });
 
+/**
+ * @param {string[]} strings
+ */
 const fixupExtends = (...strings) =>
   fixupConfigRules(compat.extends(...strings));
 
+/** @type {import('@eslint/config-helpers').ConfigWithExtends} */
 const config = {
   languageOptions: {
     parser: babelParser,
@@ -83,7 +84,7 @@ const config = {
     tsdoc,
     "simple-import-sort": simpleImportSort,
     import: fixupPluginRules(_import),
-    "graphile-export": fixupPluginRules(graphileExport),
+    "graphile-export": graphileExport,
     "react-hooks": fixupPluginRules(reactHooks),
   },
 
@@ -150,7 +151,12 @@ const config = {
   },
 };
 
-// This object only exists to make our new eslint.config.js look more like the old .eslintrc.js
+/**
+ * This object only exists to make our new eslint.config.js look more like the
+ * old .eslintrc.js
+ *
+ * @type {{overrides: ReadonlyArray<import('@eslint/config-helpers').ConfigWithExtends>}}
+ */
 const oldConfig = {
   overrides: [
     // Rules for core plugins
