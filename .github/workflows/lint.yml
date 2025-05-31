@@ -24,7 +24,11 @@ jobs:
           cache: "yarn"
 
       - run: yarn --immutable
-      - name: Compile code
+
+      - name: "Build"
+        run: yarn build
+
+      - name: "Prepack"
         run: yarn workspaces foreach --parallel --topological --all run prepack
 
       - name: "Lint Code"
