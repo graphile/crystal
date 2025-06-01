@@ -171,6 +171,7 @@ export class __FlagStep<TStep extends Step> extends Step<DataFromStep<TStep>> {
     const step = this.dependencies[0];
     const forbiddenFlags = this.dependencyForbiddenFlags[0];
     const onReject = this.dependencyOnReject[0];
+    const dataOnly = this.dependencyDataOnly[0];
     const acceptFlags = ALL_FLAGS & ~forbiddenFlags;
     if (
       // TODO: this logic could be improved so that more flag checks were
@@ -191,7 +192,7 @@ export class __FlagStep<TStep extends Step> extends Step<DataFromStep<TStep>> {
         options.acceptFlags === acceptFlags ||
         false
       ) {
-        return { step, acceptFlags, onReject };
+        return { step, acceptFlags, onReject, dataOnly };
       }
     }
     return null;

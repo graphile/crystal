@@ -343,6 +343,11 @@ export function planToMermaid(
   const depDeets = (step: GrafastPlanStepJSONv1, idx: number) => {
     const forbiddenFlags = step.dependencyForbiddenFlags[idx];
     const onReject = step.dependencyOnReject[idx];
+
+    // TODO: factor 'data only' into the diagrams
+    //
+    // const dataOnly = step.dependencyDataOnly[idx];
+
     const info: string[] = [];
     if (forbiddenFlags) {
       if ((forbiddenFlags & 2) === 2) {

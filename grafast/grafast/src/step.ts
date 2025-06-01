@@ -196,6 +196,15 @@ export /* abstract */ class Step<TData = any> {
   protected readonly dependencyOnReject: ReadonlyArray<
     Error | null | undefined
   >;
+  /**
+   * In future we'll be able to merge "data only" dependencies somehow. For now
+   * we want people to use the right method so we encourage data only as the
+   * default and also forbid `getDep` on data only deps (no talking to your
+   * data only dependencies!)
+   *
+   * @internal
+   */
+  protected readonly dependencyDataOnly: ReadonlyArray<boolean>;
 
   /**
    * Just for mermaid
@@ -349,6 +358,7 @@ export /* abstract */ class Step<TData = any> {
     this.dependencies = [];
     this.dependencyForbiddenFlags = [];
     this.dependencyOnReject = [];
+    this.dependencyDataOnly = [];
     this.dependents = [];
     this.isOptimized = false;
     this.allowMultipleOptimizations = false;
@@ -399,7 +409,7 @@ export /* abstract */ class Step<TData = any> {
     const step = this.dependencies[depId] as TStep;
     const forbiddenFlags = this.dependencyForbiddenFlags[depId];
     const onReject = this.dependencyOnReject[depId];
-    const dataOnly = false;
+    const dataOnly = this.dependencyDataOnly[depId];
     const acceptFlags = ALL_FLAGS & ~forbiddenFlags;
     return { step, acceptFlags, onReject, dataOnly };
   }
