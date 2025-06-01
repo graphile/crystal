@@ -1,0 +1,27 @@
+{
+  item: {
+    name: 'Mana Potion',
+    canBeFoundIn: [
+      {
+        id: 501,
+        tier: 'Bronze',
+        category: 'Adventurer',
+      },
+      {
+        id: 502,
+        tier: 'Bronze',
+        category: 'Quest',
+      },
+      {
+        id: 503,
+        tier: 'Silver',
+        category: 'Adventurer',
+      },
+      {
+        id: 504,
+        tier: 'Silver',
+        category: 'Boss',
+      },
+    ],
+  },
+}

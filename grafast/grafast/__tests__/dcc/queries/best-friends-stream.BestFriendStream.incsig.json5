@@ -1,0 +1,25 @@
+{
+  initialData: '{character}',
+  patches: {
+    'character.bestFriend.items.*': {
+      '{__typename,id,name,creator}': {
+        indicies: [
+          '1',
+          '2',
+          '4',
+          '5',
+          '6',
+          '7',
+          '9',
+          '10',
+        ],
+      },
+      '{__typename,id,name}': {
+        indicies: [
+          '3',
+          '8',
+        ],
+      },
+    },
+  },
+}

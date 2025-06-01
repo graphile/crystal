@@ -1798,7 +1798,7 @@ export function getDirectLayerPlanChild(
   const child = _getDirectLayerPlanChild(targetParent, descendent);
   if (child == null) {
     throw new Error(
-      `GrafastInternalError<d43e06d8-c533-4e7b-b3e7-af399f19c83f>: Invalid heirarchy - could not find direct layerPlan child of ${targetParent} that leads to ${descendent}`,
+      `GrafastInternalError<d43e06d8-c533-4e7b-b3e7-af399f19c83f>: Invalid hierarchy - could not find direct layerPlan child of ${targetParent} that leads to ${descendent}`,
     );
   }
   return child;

@@ -73,9 +73,9 @@ export interface LootBoxData {
   category: LootCategory;
 }
 
-export interface LootData {
+export interface LootDataData {
   id: number;
-  itemType: string;
+  itemType: ItemType;
   itemId: number;
   lootBoxId: number;
   percentageChance: number;
@@ -111,6 +111,10 @@ export interface BetaLocationData {
   id: number;
 }
 
+export interface FloorData {
+  number: number;
+}
+
 export interface Database {
   crawlers: readonly CrawlerData[];
   npcs: readonly NpcData[];
@@ -119,7 +123,7 @@ export interface Database {
   utilityItems: readonly UtilityItemData[];
   miscItems: readonly MiscItemData[];
   lootBoxes: readonly LootBoxData[];
-  lootData: readonly LootData[];
+  lootData: readonly LootDataData[];
   locations: readonly LocationData[];
   saferooms: readonly SafeRoomData[];
   stairwells: readonly StairwellData[];
@@ -135,6 +139,9 @@ export function makeDb(): Database {
         species: "Human",
         name: "Carl",
         items: [
+          "Consumable:205",
+          "Equipment:211",
+          "Consumable:206",
           "UtilityItem:206",
           "Equipment:201",
           "Equipment:202",
@@ -143,9 +150,6 @@ export function makeDb(): Database {
           "UtilityItem:202",
           "Consumable:203",
           "Consumable:204",
-          "Consumable:205",
-          "Consumable:206",
-          "Equipment:211",
         ],
         favouriteItem: "Equipment:211",
         friends: [102, 103, 104, 105, 301],
@@ -727,6 +731,36 @@ export const batchGetBetaLocationById: LoadOneCallback<
   return ids.map((id) => data.betaLocations.find((c) => c.id === id));
 };
 
-export interface FloorData {
-  number: number;
-}
+export const batchGetLootDataByItemTypeAndId: LoadManyCallback<
+  readonly [string, number],
+  LootDataData,
+  Maybe<ReadonlyArray<Maybe<LootDataData>>>,
+  never,
+  Database
+> = (identifiersList, { unary: data }) => {
+  return identifiersList.map(([type, id]) =>
+    data.lootData.filter((c) => c.itemType === type && c.itemId === id),
+  );
+};
+
+export const batchGetLootDataByLootBoxId: LoadManyCallback<
+  number,
+  LootDataData,
+  Maybe<ReadonlyArray<Maybe<LootDataData>>>,
+  never,
+  Database
+> = (identifiersList, { unary: data }) => {
+  return identifiersList.map((id) =>
+    data.lootData.filter((c) => c.lootBoxId === id),
+  );
+};
+
+export const batchGetLootBoxById: LoadOneCallback<
+  number,
+  LootBoxData,
+  Maybe<LootBoxData>,
+  never,
+  Database
+> = (ids, { unary: data }) => {
+  return ids.map((id) => data.lootBoxes.find((c) => c.id === id));
+};

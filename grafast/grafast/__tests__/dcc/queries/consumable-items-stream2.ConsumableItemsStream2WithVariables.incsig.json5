@@ -1,0 +1,18 @@
+{
+  initialData: '{crawler}',
+  patches: {
+    'crawler.items.*': {
+      '{__typename,id,name,creator,effect,contents}': {
+        indicies: [
+          '0',
+          '2',
+        ],
+      },
+      '{__typename,id,name,creator,maxDurability,contents}': {
+        indicies: [
+          '1',
+        ],
+      },
+    },
+  },
+}

@@ -5,6 +5,22 @@
       id: 101,
       items: [
         {
+          id: 205,
+          creator: {
+            id: 106,
+          },
+        },
+        {
+          id: 211,
+          creator: null,
+        },
+        {
+          id: 206,
+          creator: {
+            id: 101,
+          },
+        },
+        {
           id: 206,
         },
         {
@@ -32,22 +48,6 @@
         },
         {
           id: 204,
-          creator: null,
-        },
-        {
-          id: 205,
-          creator: {
-            id: 106,
-          },
-        },
-        {
-          id: 206,
-          creator: {
-            id: 101,
-          },
-        },
-        {
-          id: 211,
           creator: null,
         },
       ],

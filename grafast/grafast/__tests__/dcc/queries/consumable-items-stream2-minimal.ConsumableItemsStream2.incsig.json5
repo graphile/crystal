@@ -1,0 +1,14 @@
+{
+  initialData: '{item}',
+  patches: {
+    'item.contents.*': {
+      '{__typename,id,name}': {
+        indicies: [
+          '0',
+          '1',
+          '2',
+        ],
+      },
+    },
+  },
+}

@@ -1,4 +1,5 @@
 # Tests that two fields at the same path but with different abstract (but overlapping) types still resolve correctly
+# Ref floor-stock-minimum.md
 {
   floor(number: 3) {
     number

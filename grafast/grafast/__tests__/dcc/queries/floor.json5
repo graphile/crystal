@@ -7,6 +7,7 @@
         name: 'French storm shelter',
         hasPersonalSpace: null,
         manager: null,
+        stock: null,
         floors: [
           {
             number: 2,
@@ -39,6 +40,23 @@
                     },
                   ],
                 },
+                stock: [
+                  {
+                    id: 203,
+                    __typename: 'Consumable',
+                    name: 'Mana Potion',
+                  },
+                  {
+                    id: 204,
+                    __typename: 'Consumable',
+                    name: 'Healing Potion',
+                  },
+                  {
+                    id: 205,
+                    __typename: 'MiscItem',
+                    name: 'Torch',
+                  },
+                ],
                 floors: [
                   {
                     number: 1,
@@ -72,12 +90,30 @@
                             },
                           ],
                         },
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 205,
+                            __typename: 'MiscItem',
+                            name: 'Torch',
+                          },
+                        ],
                       },
                       {
                         __typename: 'SafeRoom',
                         name: 'DMV waiting room',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -120,6 +156,23 @@
                           ],
                         },
                         security: null,
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Stairwell',
@@ -162,12 +215,30 @@
                             },
                           ],
                         },
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 205,
+                            __typename: 'MiscItem',
+                            name: 'Torch',
+                          },
+                        ],
                       },
                       {
                         __typename: 'SafeRoom',
                         name: 'DMV waiting room',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -210,12 +281,30 @@
                           ],
                         },
                         security: null,
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
+                          },
+                        ],
                       },
                       {
                         __typename: 'SafeRoom',
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Stairwell',
@@ -238,6 +327,7 @@
                 name: 'DMV waiting room',
                 hasPersonalSpace: null,
                 manager: null,
+                stock: null,
                 floors: [
                   {
                     number: 1,
@@ -271,12 +361,30 @@
                             },
                           ],
                         },
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 205,
+                            __typename: 'MiscItem',
+                            name: 'Torch',
+                          },
+                        ],
                       },
                       {
                         __typename: 'SafeRoom',
                         name: 'DMV waiting room',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -319,6 +427,23 @@
                           ],
                         },
                         security: null,
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Stairwell',
@@ -361,12 +486,30 @@
                             },
                           ],
                         },
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 205,
+                            __typename: 'MiscItem',
+                            name: 'Torch',
+                          },
+                        ],
                       },
                       {
                         __typename: 'SafeRoom',
                         name: 'DMV waiting room',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -409,12 +552,30 @@
                           ],
                         },
                         security: null,
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
+                          },
+                        ],
                       },
                       {
                         __typename: 'SafeRoom',
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Stairwell',
@@ -473,6 +634,23 @@
                   ],
                 },
                 security: null,
+                stock: [
+                  {
+                    id: 203,
+                    __typename: 'Consumable',
+                    name: 'Mana Potion',
+                  },
+                  {
+                    id: 204,
+                    __typename: 'Consumable',
+                    name: 'Healing Potion',
+                  },
+                  {
+                    id: 202,
+                    __typename: 'UtilityItem',
+                    name: 'Bandage',
+                  },
+                ],
                 floors: [
                   {
                     number: 1,
@@ -506,12 +684,30 @@
                             },
                           ],
                         },
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 205,
+                            __typename: 'MiscItem',
+                            name: 'Torch',
+                          },
+                        ],
                       },
                       {
                         __typename: 'SafeRoom',
                         name: 'DMV waiting room',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -554,6 +750,23 @@
                           ],
                         },
                         security: null,
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Stairwell',
@@ -596,12 +809,30 @@
                             },
                           ],
                         },
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 205,
+                            __typename: 'MiscItem',
+                            name: 'Torch',
+                          },
+                        ],
                       },
                       {
                         __typename: 'SafeRoom',
                         name: 'DMV waiting room',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -644,12 +875,30 @@
                           ],
                         },
                         security: null,
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
+                          },
+                        ],
                       },
                       {
                         __typename: 'SafeRoom',
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Stairwell',
@@ -672,6 +921,7 @@
                 name: 'French storm shelter',
                 hasPersonalSpace: null,
                 manager: null,
+                stock: null,
                 floors: [
                   {
                     number: 2,
@@ -704,12 +954,30 @@
                             },
                           ],
                         },
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 205,
+                            __typename: 'MiscItem',
+                            name: 'Torch',
+                          },
+                        ],
                       },
                       {
                         __typename: 'SafeRoom',
                         name: 'DMV waiting room',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -752,12 +1020,30 @@
                           ],
                         },
                         security: null,
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
+                          },
+                        ],
                       },
                       {
                         __typename: 'SafeRoom',
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Stairwell',
@@ -781,6 +1067,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -830,6 +1117,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -846,6 +1155,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -896,12 +1212,30 @@
                             },
                           ],
                         },
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 205,
+                            __typename: 'MiscItem',
+                            name: 'Torch',
+                          },
+                        ],
                       },
                       {
                         __typename: 'SafeRoom',
                         name: 'DMV waiting room',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -944,12 +1278,30 @@
                           ],
                         },
                         security: null,
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
+                          },
+                        ],
                       },
                       {
                         __typename: 'SafeRoom',
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Stairwell',
@@ -1002,12 +1354,30 @@
                             },
                           ],
                         },
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 205,
+                            __typename: 'MiscItem',
+                            name: 'Torch',
+                          },
+                        ],
                       },
                       {
                         __typename: 'SafeRoom',
                         name: 'DMV waiting room',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -1050,12 +1420,30 @@
                           ],
                         },
                         security: null,
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
+                          },
+                        ],
                       },
                       {
                         __typename: 'SafeRoom',
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Stairwell',
@@ -1108,12 +1496,30 @@
                             },
                           ],
                         },
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 205,
+                            __typename: 'MiscItem',
+                            name: 'Torch',
+                          },
+                        ],
                       },
                       {
                         __typename: 'SafeRoom',
                         name: 'DMV waiting room',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -1156,12 +1562,30 @@
                           ],
                         },
                         security: null,
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
+                          },
+                        ],
                       },
                       {
                         __typename: 'SafeRoom',
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Stairwell',
@@ -1189,6 +1613,7 @@
                 name: 'French storm shelter',
                 hasPersonalSpace: null,
                 manager: null,
+                stock: null,
                 floors: [
                   {
                     number: 2,
@@ -1221,12 +1646,30 @@
                             },
                           ],
                         },
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 205,
+                            __typename: 'MiscItem',
+                            name: 'Torch',
+                          },
+                        ],
                       },
                       {
                         __typename: 'SafeRoom',
                         name: 'DMV waiting room',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -1269,12 +1712,30 @@
                           ],
                         },
                         security: null,
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
+                          },
+                        ],
                       },
                       {
                         __typename: 'SafeRoom',
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Stairwell',
@@ -1298,6 +1759,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -1347,6 +1809,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -1363,6 +1847,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -1426,6 +1917,28 @@
                     ],
                   },
                 ],
+                stock: [
+                  {
+                    id: 203,
+                    __typename: 'Consumable',
+                    name: 'Mana Potion',
+                  },
+                  {
+                    id: 204,
+                    __typename: 'Consumable',
+                    name: 'Healing Potion',
+                  },
+                  {
+                    id: 209,
+                    __typename: 'Consumable',
+                    name: 'Goblin Oil',
+                  },
+                  {
+                    id: 206,
+                    __typename: 'UtilityItem',
+                    name: 'Fireball or Custard? Scratchcard',
+                  },
+                ],
                 floors: [
                   {
                     number: 3,
@@ -1435,6 +1948,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -1484,6 +1998,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -1500,6 +2036,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -1564,6 +2107,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -1580,6 +2145,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -1644,6 +2216,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -1660,6 +2254,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -1688,6 +2289,13 @@
                     ],
                   },
                 ],
+                stock: [
+                  {
+                    id: 202,
+                    __typename: 'UtilityItem',
+                    name: 'Bandage',
+                  },
+                ],
                 floors: [
                   {
                     number: 3,
@@ -1697,6 +2305,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -1746,6 +2355,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -1762,6 +2393,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -1826,6 +2464,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -1842,6 +2502,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -1906,6 +2573,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -1922,6 +2611,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -1945,6 +2641,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -1994,6 +2691,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -2010,6 +2729,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -2037,6 +2763,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -2086,6 +2813,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -2102,6 +2851,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -2169,6 +2925,28 @@
             ],
           },
         ],
+        stock: [
+          {
+            id: 203,
+            __typename: 'Consumable',
+            name: 'Mana Potion',
+          },
+          {
+            id: 204,
+            __typename: 'Consumable',
+            name: 'Healing Potion',
+          },
+          {
+            id: 209,
+            __typename: 'Consumable',
+            name: 'Goblin Oil',
+          },
+          {
+            id: 206,
+            __typename: 'UtilityItem',
+            name: 'Fireball or Custard? Scratchcard',
+          },
+        ],
         floors: [
           {
             number: 3,
@@ -2178,6 +2956,7 @@
                 name: 'French storm shelter',
                 hasPersonalSpace: null,
                 manager: null,
+                stock: null,
                 floors: [
                   {
                     number: 2,
@@ -2210,12 +2989,30 @@
                             },
                           ],
                         },
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 205,
+                            __typename: 'MiscItem',
+                            name: 'Torch',
+                          },
+                        ],
                       },
                       {
                         __typename: 'SafeRoom',
                         name: 'DMV waiting room',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -2258,12 +3055,30 @@
                           ],
                         },
                         security: null,
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
+                          },
+                        ],
                       },
                       {
                         __typename: 'SafeRoom',
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Stairwell',
@@ -2287,6 +3102,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -2336,6 +3152,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -2352,6 +3190,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -2415,6 +3260,28 @@
                     ],
                   },
                 ],
+                stock: [
+                  {
+                    id: 203,
+                    __typename: 'Consumable',
+                    name: 'Mana Potion',
+                  },
+                  {
+                    id: 204,
+                    __typename: 'Consumable',
+                    name: 'Healing Potion',
+                  },
+                  {
+                    id: 209,
+                    __typename: 'Consumable',
+                    name: 'Goblin Oil',
+                  },
+                  {
+                    id: 206,
+                    __typename: 'UtilityItem',
+                    name: 'Fireball or Custard? Scratchcard',
+                  },
+                ],
                 floors: [
                   {
                     number: 3,
@@ -2424,6 +3291,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -2473,6 +3341,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -2489,6 +3379,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -2553,6 +3450,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -2569,6 +3488,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -2633,6 +3559,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -2649,6 +3597,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -2677,6 +3632,13 @@
                     ],
                   },
                 ],
+                stock: [
+                  {
+                    id: 202,
+                    __typename: 'UtilityItem',
+                    name: 'Bandage',
+                  },
+                ],
                 floors: [
                   {
                     number: 3,
@@ -2686,6 +3648,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -2735,6 +3698,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -2751,6 +3736,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -2815,6 +3807,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -2831,6 +3845,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -2895,6 +3916,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -2911,6 +3954,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -2934,6 +3984,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -2983,6 +4034,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -2999,6 +4072,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -3026,6 +4106,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -3075,6 +4156,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -3091,6 +4194,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -3159,6 +4269,28 @@
                     ],
                   },
                 ],
+                stock: [
+                  {
+                    id: 203,
+                    __typename: 'Consumable',
+                    name: 'Mana Potion',
+                  },
+                  {
+                    id: 204,
+                    __typename: 'Consumable',
+                    name: 'Healing Potion',
+                  },
+                  {
+                    id: 209,
+                    __typename: 'Consumable',
+                    name: 'Goblin Oil',
+                  },
+                  {
+                    id: 206,
+                    __typename: 'UtilityItem',
+                    name: 'Fireball or Custard? Scratchcard',
+                  },
+                ],
                 floors: [
                   {
                     number: 3,
@@ -3168,6 +4300,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -3217,6 +4350,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -3233,6 +4388,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -3297,6 +4459,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -3313,6 +4497,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -3377,6 +4568,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -3393,6 +4606,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -3421,6 +4641,13 @@
                     ],
                   },
                 ],
+                stock: [
+                  {
+                    id: 202,
+                    __typename: 'UtilityItem',
+                    name: 'Bandage',
+                  },
+                ],
                 floors: [
                   {
                     number: 3,
@@ -3430,6 +4657,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -3479,6 +4707,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -3495,6 +4745,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -3559,6 +4816,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -3575,6 +4854,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -3639,6 +4925,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -3655,6 +4963,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -3721,6 +5036,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -3737,6 +5074,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -3807,6 +5151,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -3823,6 +5189,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -3891,6 +5264,28 @@
                     ],
                   },
                 ],
+                stock: [
+                  {
+                    id: 203,
+                    __typename: 'Consumable',
+                    name: 'Mana Potion',
+                  },
+                  {
+                    id: 204,
+                    __typename: 'Consumable',
+                    name: 'Healing Potion',
+                  },
+                  {
+                    id: 209,
+                    __typename: 'Consumable',
+                    name: 'Goblin Oil',
+                  },
+                  {
+                    id: 206,
+                    __typename: 'UtilityItem',
+                    name: 'Fireball or Custard? Scratchcard',
+                  },
+                ],
                 floors: [
                   {
                     number: 3,
@@ -3900,6 +5295,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -3949,6 +5345,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -3965,6 +5383,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -4029,6 +5454,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -4045,6 +5492,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -4109,6 +5563,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -4125,6 +5601,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -4153,6 +5636,13 @@
                     ],
                   },
                 ],
+                stock: [
+                  {
+                    id: 202,
+                    __typename: 'UtilityItem',
+                    name: 'Bandage',
+                  },
+                ],
                 floors: [
                   {
                     number: 3,
@@ -4162,6 +5652,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -4211,6 +5702,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -4227,6 +5740,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -4291,6 +5811,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -4307,6 +5849,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -4371,6 +5920,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -4387,6 +5958,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -4453,6 +6031,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -4469,6 +6069,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -4501,6 +6108,13 @@
             ],
           },
         ],
+        stock: [
+          {
+            id: 202,
+            __typename: 'UtilityItem',
+            name: 'Bandage',
+          },
+        ],
         floors: [
           {
             number: 3,
@@ -4510,6 +6124,7 @@
                 name: 'French storm shelter',
                 hasPersonalSpace: null,
                 manager: null,
+                stock: null,
                 floors: [
                   {
                     number: 2,
@@ -4542,12 +6157,30 @@
                             },
                           ],
                         },
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 205,
+                            __typename: 'MiscItem',
+                            name: 'Torch',
+                          },
+                        ],
                       },
                       {
                         __typename: 'SafeRoom',
                         name: 'DMV waiting room',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -4590,12 +6223,30 @@
                           ],
                         },
                         security: null,
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
+                          },
+                        ],
                       },
                       {
                         __typename: 'SafeRoom',
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Stairwell',
@@ -4619,6 +6270,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -4668,6 +6320,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -4684,6 +6358,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -4747,6 +6428,28 @@
                     ],
                   },
                 ],
+                stock: [
+                  {
+                    id: 203,
+                    __typename: 'Consumable',
+                    name: 'Mana Potion',
+                  },
+                  {
+                    id: 204,
+                    __typename: 'Consumable',
+                    name: 'Healing Potion',
+                  },
+                  {
+                    id: 209,
+                    __typename: 'Consumable',
+                    name: 'Goblin Oil',
+                  },
+                  {
+                    id: 206,
+                    __typename: 'UtilityItem',
+                    name: 'Fireball or Custard? Scratchcard',
+                  },
+                ],
                 floors: [
                   {
                     number: 3,
@@ -4756,6 +6459,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -4805,6 +6509,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -4821,6 +6547,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -4885,6 +6618,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -4901,6 +6656,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -4965,6 +6727,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -4981,6 +6765,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -5009,6 +6800,13 @@
                     ],
                   },
                 ],
+                stock: [
+                  {
+                    id: 202,
+                    __typename: 'UtilityItem',
+                    name: 'Bandage',
+                  },
+                ],
                 floors: [
                   {
                     number: 3,
@@ -5018,6 +6816,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -5067,6 +6866,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -5083,6 +6904,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -5147,6 +6975,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -5163,6 +7013,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -5227,6 +7084,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -5243,6 +7122,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -5266,6 +7152,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -5315,6 +7202,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -5331,6 +7240,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -5358,6 +7274,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -5407,6 +7324,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -5423,6 +7362,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -5491,6 +7437,28 @@
                     ],
                   },
                 ],
+                stock: [
+                  {
+                    id: 203,
+                    __typename: 'Consumable',
+                    name: 'Mana Potion',
+                  },
+                  {
+                    id: 204,
+                    __typename: 'Consumable',
+                    name: 'Healing Potion',
+                  },
+                  {
+                    id: 209,
+                    __typename: 'Consumable',
+                    name: 'Goblin Oil',
+                  },
+                  {
+                    id: 206,
+                    __typename: 'UtilityItem',
+                    name: 'Fireball or Custard? Scratchcard',
+                  },
+                ],
                 floors: [
                   {
                     number: 3,
@@ -5500,6 +7468,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -5549,6 +7518,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -5565,6 +7556,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -5629,6 +7627,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -5645,6 +7665,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -5709,6 +7736,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -5725,6 +7774,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -5753,6 +7809,13 @@
                     ],
                   },
                 ],
+                stock: [
+                  {
+                    id: 202,
+                    __typename: 'UtilityItem',
+                    name: 'Bandage',
+                  },
+                ],
                 floors: [
                   {
                     number: 3,
@@ -5762,6 +7825,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -5811,6 +7875,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -5827,6 +7913,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -5891,6 +7984,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -5907,6 +8022,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -5971,6 +8093,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -5987,6 +8131,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -6053,6 +8204,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -6069,6 +8242,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -6139,6 +8319,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -6155,6 +8357,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -6223,6 +8432,28 @@
                     ],
                   },
                 ],
+                stock: [
+                  {
+                    id: 203,
+                    __typename: 'Consumable',
+                    name: 'Mana Potion',
+                  },
+                  {
+                    id: 204,
+                    __typename: 'Consumable',
+                    name: 'Healing Potion',
+                  },
+                  {
+                    id: 209,
+                    __typename: 'Consumable',
+                    name: 'Goblin Oil',
+                  },
+                  {
+                    id: 206,
+                    __typename: 'UtilityItem',
+                    name: 'Fireball or Custard? Scratchcard',
+                  },
+                ],
                 floors: [
                   {
                     number: 3,
@@ -6232,6 +8463,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -6281,6 +8513,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -6297,6 +8551,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -6361,6 +8622,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -6377,6 +8660,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -6441,6 +8731,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -6457,6 +8769,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -6485,6 +8804,13 @@
                     ],
                   },
                 ],
+                stock: [
+                  {
+                    id: 202,
+                    __typename: 'UtilityItem',
+                    name: 'Bandage',
+                  },
+                ],
                 floors: [
                   {
                     number: 3,
@@ -6494,6 +8820,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -6543,6 +8870,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -6559,6 +8908,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -6623,6 +8979,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -6639,6 +9017,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -6703,6 +9088,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -6719,6 +9126,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -6785,6 +9199,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -6801,6 +9237,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -6828,6 +9271,7 @@
                 name: 'French storm shelter',
                 hasPersonalSpace: null,
                 manager: null,
+                stock: null,
                 floors: [
                   {
                     number: 2,
@@ -6860,12 +9304,30 @@
                             },
                           ],
                         },
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 205,
+                            __typename: 'MiscItem',
+                            name: 'Torch',
+                          },
+                        ],
                       },
                       {
                         __typename: 'SafeRoom',
                         name: 'DMV waiting room',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -6908,12 +9370,30 @@
                           ],
                         },
                         security: null,
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
+                          },
+                        ],
                       },
                       {
                         __typename: 'SafeRoom',
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Stairwell',
@@ -6937,6 +9417,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -6986,6 +9467,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -7002,6 +9505,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -7065,6 +9575,28 @@
                     ],
                   },
                 ],
+                stock: [
+                  {
+                    id: 203,
+                    __typename: 'Consumable',
+                    name: 'Mana Potion',
+                  },
+                  {
+                    id: 204,
+                    __typename: 'Consumable',
+                    name: 'Healing Potion',
+                  },
+                  {
+                    id: 209,
+                    __typename: 'Consumable',
+                    name: 'Goblin Oil',
+                  },
+                  {
+                    id: 206,
+                    __typename: 'UtilityItem',
+                    name: 'Fireball or Custard? Scratchcard',
+                  },
+                ],
                 floors: [
                   {
                     number: 3,
@@ -7074,6 +9606,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -7123,6 +9656,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -7139,6 +9694,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -7203,6 +9765,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -7219,6 +9803,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -7283,6 +9874,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -7299,6 +9912,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -7327,6 +9947,13 @@
                     ],
                   },
                 ],
+                stock: [
+                  {
+                    id: 202,
+                    __typename: 'UtilityItem',
+                    name: 'Bandage',
+                  },
+                ],
                 floors: [
                   {
                     number: 3,
@@ -7336,6 +9963,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -7385,6 +10013,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -7401,6 +10051,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -7465,6 +10122,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -7481,6 +10160,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -7545,6 +10231,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -7561,6 +10269,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -7584,6 +10299,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -7633,6 +10349,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -7649,6 +10387,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -7676,6 +10421,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -7725,6 +10471,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -7741,6 +10509,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -7772,6 +10547,7 @@
                 name: 'French storm shelter',
                 hasPersonalSpace: null,
                 manager: null,
+                stock: null,
                 floors: [
                   {
                     number: 2,
@@ -7804,12 +10580,30 @@
                             },
                           ],
                         },
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 205,
+                            __typename: 'MiscItem',
+                            name: 'Torch',
+                          },
+                        ],
                       },
                       {
                         __typename: 'SafeRoom',
                         name: 'DMV waiting room',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -7852,12 +10646,30 @@
                           ],
                         },
                         security: null,
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
+                          },
+                        ],
                       },
                       {
                         __typename: 'SafeRoom',
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Stairwell',
@@ -7881,6 +10693,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -7930,6 +10743,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -7946,6 +10781,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -8009,6 +10851,28 @@
                     ],
                   },
                 ],
+                stock: [
+                  {
+                    id: 203,
+                    __typename: 'Consumable',
+                    name: 'Mana Potion',
+                  },
+                  {
+                    id: 204,
+                    __typename: 'Consumable',
+                    name: 'Healing Potion',
+                  },
+                  {
+                    id: 209,
+                    __typename: 'Consumable',
+                    name: 'Goblin Oil',
+                  },
+                  {
+                    id: 206,
+                    __typename: 'UtilityItem',
+                    name: 'Fireball or Custard? Scratchcard',
+                  },
+                ],
                 floors: [
                   {
                     number: 3,
@@ -8018,6 +10882,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -8067,6 +10932,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -8083,6 +10970,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -8147,6 +11041,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -8163,6 +11079,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -8227,6 +11150,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -8243,6 +11188,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -8271,6 +11223,13 @@
                     ],
                   },
                 ],
+                stock: [
+                  {
+                    id: 202,
+                    __typename: 'UtilityItem',
+                    name: 'Bandage',
+                  },
+                ],
                 floors: [
                   {
                     number: 3,
@@ -8280,6 +11239,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -8329,6 +11289,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -8345,6 +11327,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -8409,6 +11398,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -8425,6 +11436,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -8489,6 +11507,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -8505,6 +11545,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -8528,6 +11575,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -8577,6 +11625,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -8593,6 +11663,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },
@@ -8620,6 +11697,7 @@
                         name: 'French storm shelter',
                         hasPersonalSpace: null,
                         manager: null,
+                        stock: null,
                       },
                       {
                         __typename: 'Club',
@@ -8669,6 +11747,28 @@
                             ],
                           },
                         ],
+                        stock: [
+                          {
+                            id: 203,
+                            __typename: 'Consumable',
+                            name: 'Mana Potion',
+                          },
+                          {
+                            id: 204,
+                            __typename: 'Consumable',
+                            name: 'Healing Potion',
+                          },
+                          {
+                            id: 209,
+                            __typename: 'Consumable',
+                            name: 'Goblin Oil',
+                          },
+                          {
+                            id: 206,
+                            __typename: 'UtilityItem',
+                            name: 'Fireball or Custard? Scratchcard',
+                          },
+                        ],
                       },
                       {
                         __typename: 'Club',
@@ -8685,6 +11785,13 @@
                                 name: 'Elle',
                               },
                             ],
+                          },
+                        ],
+                        stock: [
+                          {
+                            id: 202,
+                            __typename: 'UtilityItem',
+                            name: 'Bandage',
                           },
                         ],
                       },

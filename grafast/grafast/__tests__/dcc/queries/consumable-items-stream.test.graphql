@@ -1,0 +1,123 @@
+# Ref consumable-items.md
+
+query ConsumableItems {
+  crawler(id: 101) {
+    id
+    name
+    ... on HasInventory {
+      items(first: 3) {
+        __typename
+        id
+        name
+        ... on Created {
+          __typename
+          creator {
+            id
+            name
+          }
+          ... on Equipment {
+            maxDurability
+          }
+          ... on Consumable {
+            effect
+          }
+          ... on HasContents {
+            contents(first: 3) {
+              __typename
+              id
+              name
+              ... on Equipment {
+                maxDurability
+              }
+              ... on Consumable {
+                effect
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+query ConsumableItemsStream @incremental {
+  crawler(id: 101) {
+    id
+    name
+    ... on HasInventory {
+      items(first: 3) @stream {
+        __typename
+        id
+        name
+        ... on Created {
+          __typename
+          creator {
+            id
+            name
+          }
+          ... on Equipment {
+            maxDurability
+          }
+          ... on Consumable {
+            effect
+          }
+          ... on HasContents {
+            contents(first: 3) {
+              __typename
+              id
+              name
+              ... on Equipment {
+                maxDurability
+              }
+              ... on Consumable {
+                effect
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+query ConsumableItemsStreamWithVariables($first: Int)
+@variables(values: { first: 3 })
+@incremental {
+  crawler(id: 101) {
+    id
+    name
+    ... on HasInventory {
+      items(first: $first) @stream {
+        __typename
+        id
+        name
+        ... on Created {
+          __typename
+          creator {
+            id
+            name
+          }
+          ... on Equipment {
+            maxDurability
+          }
+          ... on Consumable {
+            effect
+          }
+          ... on HasContents {
+            contents(first: $first) {
+              __typename
+              id
+              name
+              ... on Equipment {
+                maxDurability
+              }
+              ... on Consumable {
+                effect
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

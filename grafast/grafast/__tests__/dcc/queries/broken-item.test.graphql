@@ -1,5 +1,5 @@
 # Tests what happens when an non-existent typename is returned from planType
-{
+query BaseBrokenItem {
   brokenItem {
     __typename
     id
@@ -10,6 +10,61 @@
     }
     ... on Consumable {
       effect
+    }
+  }
+}
+
+query BrokenItemDefer1 @incremental {
+  ... @defer {
+    brokenItem {
+      __typename
+      id
+      name
+      ... on Equipment {
+        currentDurability
+        maxDurability
+      }
+      ... on Consumable {
+        effect
+      }
+    }
+  }
+}
+
+query BrokenItemDefer2 {
+  brokenItem {
+    ... @defer {
+      __typename
+      id
+      name
+      ... on Equipment {
+        currentDurability
+        maxDurability
+      }
+      ... on Consumable {
+        effect
+      }
+    }
+  }
+}
+
+query BrokenItemDefer3 @incremental {
+  ... @defer {
+    brokenItem {
+      ... @defer {
+        __typename
+        id
+        name
+        ... @defer {
+          ... on Equipment {
+            currentDurability
+            maxDurability
+          }
+          ... on Consumable {
+            effect
+          }
+        }
+      }
     }
   }
 }

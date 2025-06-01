@@ -1,7 +1,12 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import { resolvePreset } from "graphile-config";
 
-import type { InterfacePlan, Step } from "../../dist/index.js";
+import type {
+  FieldArgs,
+  InterfacePlan,
+  Maybe,
+  Step,
+} from "../../dist/index.js";
 import {
   coalesce,
   constant,
@@ -18,6 +23,7 @@ import type {
   Database,
   FloorData,
   ItemSpec,
+  ItemType,
   LocationData,
   NpcData,
 } from "./dcc-data.js";
@@ -27,6 +33,9 @@ import {
   batchGetCrawlerById,
   batchGetEquipmentById,
   batchGetLocationsByFloorNumber,
+  batchGetLootBoxById,
+  batchGetLootDataByItemTypeAndId,
+  batchGetLootDataByLootBoxId,
   batchGetMiscItemById,
   batchGetNpcById,
   batchGetSafeRoomById,
@@ -54,7 +63,13 @@ declare global {
 
 export const makeBaseArgs = () => {
   const schema = typedMakeGrafastSchema({
+    enableDeferStream: true,
     typeDefs: /* GraphQL */ `
+      # For the tests
+      directive @incremental on QUERY | MUTATION | SUBSCRIPTION
+      scalar _RawJSON
+      directive @variables(values: _RawJSON!) on QUERY | MUTATION | SUBSCRIPTION
+
       enum Species {
         HUMAN
         CAT
@@ -66,7 +81,7 @@ export const makeBaseArgs = () => {
         BOPCA
       }
       interface HasInventory {
-        items: [Item]
+        items(first: Int): [Item]
       }
 
       type Guide implements NPC & Character {
@@ -74,7 +89,7 @@ export const makeBaseArgs = () => {
         name: String!
         species: Species
         exCrawler: Boolean
-        friends: [Character]
+        friends(first: Int): [Character]
         bestFriend: Character
         saferoomLocation: String
       }
@@ -82,9 +97,9 @@ export const makeBaseArgs = () => {
         id: Int!
         name: String!
         species: Species
-        items: [Item]
+        items(first: Int): [Item]
         exCrawler: Boolean
-        friends: [Character]
+        friends(first: Int): [Character]
         bestFriend: Character
         client: ActiveCrawler
       }
@@ -93,7 +108,7 @@ export const makeBaseArgs = () => {
         name: String!
         species: Species
         exCrawler: Boolean
-        friends: [Character]
+        friends(first: Int): [Character]
         bestFriend: Character
         clients: [ActiveCrawler!]
       }
@@ -103,8 +118,8 @@ export const makeBaseArgs = () => {
         species: Species
         exCrawler: Boolean
         bestFriend: Character
-        friends: [Character]
-        items: [Item]
+        friends(first: Int): [Character]
+        items(first: Int): [Item]
       }
       interface NPC implements Character {
         id: Int!
@@ -112,7 +127,7 @@ export const makeBaseArgs = () => {
         species: Species
         exCrawler: Boolean
         bestFriend: Character
-        friends: [Character]
+        friends(first: Int): [Character]
       }
       interface Character {
         id: Int!
@@ -132,18 +147,19 @@ export const makeBaseArgs = () => {
         id: Int!
         name: String!
         species: Species
-        items: [Item]
+        items(first: Int): [Item]
         favouriteItem: Item
-        friends: [Character]
+        friends(first: Int): [Character]
         bestFriend: ActiveCrawler
         crawlerNumber: Int
       }
       interface Item {
         id: Int!
         name: String
+        canBeFoundIn: [LootBox]
       }
       interface HasContents {
-        contents: [Item]
+        contents(first: Int): [Item]
       }
       interface Created {
         creator: Crawler
@@ -151,7 +167,8 @@ export const makeBaseArgs = () => {
       type Equipment implements Item & Created & HasContents {
         id: Int!
         name: String
-        contents: [Item]
+        canBeFoundIn: [LootBox]
+        contents(first: Int): [Item]
         creator: Crawler
         currentDurability: Int
         maxDurability: Int
@@ -159,21 +176,27 @@ export const makeBaseArgs = () => {
       type Consumable implements Item & Created & HasContents {
         id: Int!
         name: String
-        contents: [Item]
+        canBeFoundIn: [LootBox]
+        contents(first: Int): [Item]
         creator: Crawler
         effect: String
       }
       type MiscItem implements Item {
         id: Int!
         name: String
+        canBeFoundIn: [LootBox]
       }
       type UtilityItem implements Item {
         id: Int!
         name: String
+        canBeFoundIn: [LootBox]
       }
 
       type LootBox {
         id: Int!
+        tier: String
+        category: String
+        possibleItems: [Item]
       }
       type LootData {
         id: Int!
@@ -238,6 +261,7 @@ export const makeBaseArgs = () => {
       type Query {
         crawler(id: Int!): Crawler
         character(id: Int!): Character
+        npc(id: Int!): NPC
         floor(number: Int!): Floor
         item(type: ItemType!, id: Int!): Item
 
@@ -274,6 +298,9 @@ export const makeBaseArgs = () => {
           floor(_, { $number }) {
             return lambda($number, getFloor);
           },
+          npc(_, { $id }) {
+            return $id;
+          },
           brokenItem() {
             return constant("Utility:999" as ItemSpec);
           },
@@ -292,9 +319,13 @@ export const makeBaseArgs = () => {
             const $db = context().get("dccDb");
             return loadOne($id, $db, null, batchGetCrawlerById);
           },
-          friends($activeCrawler) {
+          friends($activeCrawler, { $first }) {
             const $ids = get($activeCrawler, "friends");
-            return $ids;
+            return lambda([$ids, $first], applyLimit);
+          },
+          items($crawler, { $first }) {
+            const $items = get($crawler, "items");
+            return lambda([$items, $first], applyLimit);
           },
         },
       },
@@ -305,6 +336,10 @@ export const makeBaseArgs = () => {
             const $id = inhibitOnNull(get($manager, "client"));
             const $db = context().get("dccDb");
             return loadOne($id, $db, null, batchGetCrawlerById);
+          },
+          items($npc, { $first }) {
+            const $items = get($npc, "items");
+            return lambda([$items, $first], applyLimit);
           },
         },
       },
@@ -329,21 +364,51 @@ export const makeBaseArgs = () => {
       Staff: {
         plans: {
           ...SharedNpcResolvers,
+          items($npc, { $first }) {
+            const $items = get($npc, "items");
+            return lambda([$items, $first], applyLimit);
+          },
         },
       },
 
       Equipment: {
         plans: {
           creator: getCreator,
+          canBeFoundIn($item) {
+            const $id = get($item, "id");
+            const $type = constant("Equipment");
+            return lootBoxesForItem($type, $id);
+          },
         },
       },
       Consumable: {
         plans: {
           creator: getCreator,
+          canBeFoundIn($item) {
+            const $id = get($item, "id");
+            const $type = constant("Consumable");
+            return lootBoxesForItem($type, $id);
+          },
         },
       },
-      UtilityItem: {},
-      MiscItem: {},
+      UtilityItem: {
+        plans: {
+          canBeFoundIn($item) {
+            const $id = get($item, "id");
+            const $type = constant("UtilityItem");
+            return lootBoxesForItem($type, $id);
+          },
+        },
+      },
+      MiscItem: {
+        plans: {
+          canBeFoundIn($item) {
+            const $id = get($item, "id");
+            const $type = constant("MiscItem");
+            return lootBoxesForItem($type, $id);
+          },
+        },
+      },
       Floor: {
         plans: {
           locations($floor) {
@@ -373,6 +438,23 @@ export const makeBaseArgs = () => {
       Stairwell: {
         plans: {
           ...SharedLocationResolvers,
+        },
+      },
+      LootBox: {
+        plans: {
+          possibleItems($lootBox) {
+            const $id = get($lootBox, "id");
+            const $db = context().get("dccDb");
+
+            const $lootData = inhibitOnNull(
+              loadMany($id, $db, null, batchGetLootDataByLootBoxId),
+            );
+            return each($lootData, ($lootDatum) => {
+              const $id = get($lootDatum, "itemId");
+              const $type = get($lootDatum, "itemType");
+              return lambda([$type, $id], encodeItemSpec);
+            });
+          },
         },
       },
     },
@@ -499,6 +581,24 @@ export const makeBaseArgs = () => {
   };
 };
 
+function lootBoxesForItem($type: Step<string>, $id: Step<number>) {
+  const $db = context().get("dccDb");
+
+  const $lootData = inhibitOnNull(
+    loadMany([$type, $id], $db, null, batchGetLootDataByItemTypeAndId),
+  );
+  return each($lootData, ($lootDatum) => {
+    const $db = context().get("dccDb");
+
+    return loadOne(
+      get($lootDatum, "lootBoxId"),
+      $db,
+      null,
+      batchGetLootBoxById,
+    );
+  });
+}
+
 const SharedLocationResolvers = {
   floors($place: Step<LocationData>) {
     const $floors = get($place, "floors");
@@ -507,11 +607,27 @@ const SharedLocationResolvers = {
 };
 
 const SharedNpcResolvers = {
+  friends(
+    $npc: Step<NpcData>,
+    { $first }: FieldArgs<{ first: Maybe<number> }>,
+  ) {
+    const $friends = get($npc, "friends");
+    return lambda([$friends, $first], applyLimit);
+  },
   bestFriend($npc: Step<NpcData>) {
     const $id = get($npc, "bestFriend");
     return $id;
   },
 };
+
+function applyLimit<T>([list, count]: readonly [
+  list: ReadonlyArray<T> | null | undefined,
+  count: Maybe<number>,
+]) {
+  if (list == null) return list;
+  if (count != null) return list.slice(0, count);
+  return list;
+}
 
 const ItemResolver = {
   planType($itemSpec) {
@@ -553,6 +669,7 @@ function crawlerToTypeName(crawler: CrawlerData): string | null {
 }
 
 function npcToTypeName(npc: NpcData): string | null {
+  if (!npc) return null;
   if (["Manager", "Security", "Guide", "Staff"].includes(npc.type)) {
     return npc.type;
   } else {
@@ -577,6 +694,13 @@ function decodeItemSpec(itemSpec: ItemSpec): {
   const [__typename, rawID] = itemSpec.split(":");
   const id = parseInt(rawID, 10);
   return { __typename, id };
+}
+
+function encodeItemSpec([type, id]: readonly [
+  type: ItemType,
+  id: number,
+]): ItemSpec {
+  return `${type}:${id}`;
 }
 
 function getFloor(number: number): FloorData | null {

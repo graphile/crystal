@@ -1,0 +1,70 @@
+{
+  item: {
+    name: 'Mana Potion',
+    canBeFoundIn: [
+      {
+        id: 501,
+        tier: 'Bronze',
+        category: 'Adventurer',
+        possibleItems: [
+          {
+            __typename: 'Equipment',
+            id: 201,
+            name: 'Cloak of Stoutness',
+          },
+          {
+            __typename: 'Consumable',
+            id: 203,
+            name: 'Mana Potion',
+          },
+        ],
+      },
+      {
+        id: 502,
+        tier: 'Bronze',
+        category: 'Quest',
+        possibleItems: [
+          {
+            __typename: 'Consumable',
+            id: 203,
+            name: 'Mana Potion',
+          },
+        ],
+      },
+      {
+        id: 503,
+        tier: 'Silver',
+        category: 'Adventurer',
+        possibleItems: [
+          {
+            __typename: 'Equipment',
+            id: 202,
+            name: 'Toe Ring of the Splatter Skunk',
+          },
+          {
+            __typename: 'Equipment',
+            id: 203,
+            name: 'Enchanted War Gauntlet',
+          },
+          {
+            __typename: 'Consumable',
+            id: 203,
+            name: 'Mana Potion',
+          },
+        ],
+      },
+      {
+        id: 504,
+        tier: 'Silver',
+        category: 'Boss',
+        possibleItems: [
+          {
+            __typename: 'Consumable',
+            id: 203,
+            name: 'Mana Potion',
+          },
+        ],
+      },
+    ],
+  },
+}
