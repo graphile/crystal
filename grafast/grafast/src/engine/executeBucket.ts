@@ -1251,9 +1251,16 @@ function markLayerPlanAsDone(
   }
 }
 
-function makeSharedState(): SharedBucketState {
+function makeSharedState(layerPlan: LayerPlan): SharedBucketState {
+  // This is from a stream/defer/similar.
+  // There might be combined layer plans in it.
+  // These combined layer plans might reference other layer plans which will
+  // never execute (they're outside of our tree).
+  // We should mark these other layer plans as "done".
+  const _doneBucketIds = new Set<number>(layerPlan.outOfBoundsLayerPlanIds);
+
   return {
-    _doneBucketIds: new Set(),
+    _doneBucketIds,
     _retainedBuckets: new Map(),
     retain(bucket) {
       this._retainedBuckets.set(bucket.layerPlan.id, bucket);
@@ -1289,8 +1296,8 @@ export function newBucket(
   const sharedState: SharedBucketState =
     // Do not copy state across phase transitions
     isPhaseTransitionLayerPlan(spec.layerPlan)
-      ? makeSharedState()
-      : (parent?.sharedState ?? makeSharedState());
+      ? makeSharedState(spec.layerPlan)
+      : (parent?.sharedState ?? makeSharedState(spec.layerPlan));
   if (isDev) {
     // Some validations
     if (!(spec.size > 0)) {

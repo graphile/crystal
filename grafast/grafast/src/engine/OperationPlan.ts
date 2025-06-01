@@ -93,6 +93,7 @@ import {
   directiveArgument,
   findVariableNamesUsed,
   hasItemPlan,
+  isPhaseTransitionLayerPlan,
   isTypePlanned,
   layerPlanHeirarchyContains,
   pathsFromAncestorToTargetLayerPlan,
@@ -105,8 +106,11 @@ import {
 import type {
   LayerPlanPhase,
   LayerPlanReasonCombined,
+  LayerPlanReasonDefer,
+  LayerPlanReasonListItem,
   LayerPlanReasonListItemStream,
   LayerPlanReasonSubroutine,
+  LayerPlanReasonSubscription,
 } from "./LayerPlan.js";
 import { LayerPlan } from "./LayerPlan.js";
 import { defaultPlanResolver } from "./lib/defaultPlanResolver.js";
@@ -4328,12 +4332,68 @@ export class OperationPlan {
     };
 
     // Track exactly which steps are in which layer plans
+    const phaseTransitionLayerPlans = new Set<
+      | LayerPlan<LayerPlanReasonDefer>
+      | LayerPlan<LayerPlanReasonListItem>
+      | LayerPlan<LayerPlanReasonSubscription>
+    >();
+    const combinedLayerPlans = new Set<LayerPlan<LayerPlanReasonCombined>>();
+    const childrenByLayerPlan = new Map<LayerPlan, LayerPlan[]>();
+    const addParent = (lp: LayerPlan, parent: LayerPlan) => {
+      let list = childrenByLayerPlan.get(parent);
+      if (!list) {
+        list = [];
+        childrenByLayerPlan.set(parent, list);
+      }
+      list.push(lp);
+    };
     for (const layerPlan of this.stepTracker.layerPlans) {
       if (!layerPlan) {
         continue;
       }
+      if (isPhaseTransitionLayerPlan(layerPlan)) {
+        phaseTransitionLayerPlans.add(layerPlan);
+      }
+      if (layerPlan.reason.type === "combined") {
+        combinedLayerPlans.add(layerPlan as LayerPlan<LayerPlanReasonCombined>);
+      }
       layerPlan.steps = [];
+      switch (layerPlan.reason.type) {
+        case "root":
+          break;
+        case "combined": {
+          for (const parent of layerPlan.reason.parentLayerPlans) {
+            addParent(layerPlan, parent);
+          }
+          break;
+        }
+        default: {
+          addParent(layerPlan, layerPlan.reason.parentLayerPlan);
+        }
+      }
     }
+
+    // Go through all the phase transition layer plans and populate their
+    // "outOfBoundsLayerPlanIds". These are "external inputs" to the subgraph
+    // of layer plans starting at the phase transition layer plan. The external
+    // inputs will always be parent nodes of combined layer plans that are
+    // descendents of the phase transition layer plan.
+    for (const phaseTransitionNode of phaseTransitionLayerPlans) {
+      const descendents = getDescendents(
+        phaseTransitionNode,
+        childrenByLayerPlan,
+      );
+      for (const combo of combinedLayerPlans) {
+        if (descendents.has(combo)) {
+          for (const parent of combo.reason.parentLayerPlans) {
+            if (!descendents.has(parent)) {
+              phaseTransitionNode.outOfBoundsLayerPlanIds.add(parent.id);
+            }
+          }
+        }
+      }
+    }
+
     for (const step of this.stepTracker.activeSteps) {
       step.layerPlan.steps.push(step);
     }
@@ -5425,4 +5485,32 @@ interface PlanFieldBatch {
   complete: boolean;
   batch: Array<PlanFieldDetails>;
   results: Array<PlanFieldBatchResult>;
+}
+
+/**
+ * NOTE: includes `start` itself, so it's not _truly_ descendents
+ */
+function getDescendents(
+  start: LayerPlan,
+  childrenByLayerPlan: ReadonlyMap<LayerPlan, readonly LayerPlan[]>,
+): Set<LayerPlan> {
+  const descendents = new Set<LayerPlan>();
+  const queue = [start];
+
+  while (queue.length > 0) {
+    const current = queue.pop()!;
+
+    // Already seen
+    if (descendents.has(current)) continue;
+    descendents.add(current);
+
+    const children = childrenByLayerPlan.get(current);
+    if (children) {
+      for (const child of children) {
+        queue.push(child);
+      }
+    }
+  }
+
+  return descendents;
 }
