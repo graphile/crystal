@@ -22,7 +22,12 @@ import * as graphql from "graphql";
 import * as assert from "./assert.js";
 import type { Deferred } from "./deferred.js";
 import { isDev } from "./dev.js";
-import type { LayerPlan } from "./engine/LayerPlan.js";
+import type {
+  LayerPlan,
+  LayerPlanReasonDefer,
+  LayerPlanReasonListItem,
+  LayerPlanReasonSubscription,
+} from "./engine/LayerPlan.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import { SafeError } from "./error.js";
 import { inspect } from "./inspect.js";
@@ -1243,7 +1248,12 @@ export function stepsAreInSamePhase(ancestor: Step, descendent: Step) {
   return true;
 }
 
-export function isPhaseTransitionLayerPlan(layerPlan: LayerPlan): boolean {
+export function isPhaseTransitionLayerPlan(
+  layerPlan: LayerPlan,
+): layerPlan is
+  | LayerPlan<LayerPlanReasonListItem>
+  | LayerPlan<LayerPlanReasonDefer>
+  | LayerPlan<LayerPlanReasonSubscription> {
   const t = layerPlan.reason.type;
   switch (t) {
     case "subscription":

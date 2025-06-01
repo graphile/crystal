@@ -492,6 +492,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     );
     if (
       $root instanceof AccessStep &&
+      $root.isSyncAndSafe && // Make sure we're not using it for streaming!
       $root.fallback === undefined &&
       $root.implicitSideEffectStep === null &&
       (!this.sideEffectStep || !stepADependsOnStepB($root, this.sideEffectStep))

@@ -287,7 +287,7 @@ function outputBucket(
     );
     if (!c) {
       throw new Error(
-        `GrafastInternalError<8bbf56c1-8e2a-4ee9-b5fc-724fd0ee222b>: could not find relevant bucket for output plan`,
+        `GrafastInternalError<8bbf56c1-8e2a-4ee9-b5fc-724fd0ee222b>: could not find relevant bucket for output plan ${outputPlan} from ${rootBucket}[${rootBucketIndex}]`,
       );
     }
     [childBucket, childBucketIndex] = c;
@@ -757,7 +757,7 @@ function newIterator<T = any>(
         abort(e);
         for (const entry of pullQueue) {
           try {
-            entry[0]({ done, value: undefined });
+            entry[1](e);
           } catch (e) {
             // ignore
           }

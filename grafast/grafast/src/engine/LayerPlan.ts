@@ -379,6 +379,22 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   stepsByConstructor: Map<Function, Set<Step>>;
 
+  // TODO: is it possible for this to go wrong by one of the stream items not
+  // streaming and the other one streaming? Technically the arguments need to
+  // match or it wouldn't be allowed to combine (the planning paths would
+  // differ because they factor in the argument step ids) but what if we
+  // decided to fulfil one without streaming and the other streaming only?
+  /**
+   * Populated during `finalize`, this will be empty except for phase
+   * transition layer plans (defer/stream) wherein it will contain a list of
+   * "unreachable" layer plan IDs relevant to the "combined" layer plans trying
+   * to refer to parent layer plans which are outside of this incremental
+   * boundary (e.g. if two lists both stream, we might combine those, but at
+   * runtime only one will be populated so we can't wait for the other to
+   * complete otherwise nothing will happen).
+   */
+  public outOfBoundsLayerPlanIds = new Set<number>();
+
   constructor(
     public readonly operationPlan: OperationPlan,
     public readonly reason: TReason, //parentStep: ExecutableStep | null,
