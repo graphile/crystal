@@ -33,3 +33,21 @@ query ConsumableItemsStream2 @incremental {
     }
   }
 }
+
+query ConsumableItemsNoStream($stream: Boolean!)
+@variables(values: { stream: false }) {
+  item(type: Consumable, id: 206) {
+    __typename
+    id
+    ... on Created {
+      __typename
+      ... on HasContents {
+        contents(first: 3) @stream(if: $stream) {
+          __typename
+          id
+          name
+        }
+      }
+    }
+  }
+}
