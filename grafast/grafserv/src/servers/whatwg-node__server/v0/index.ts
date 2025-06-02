@@ -3,15 +3,15 @@ import type { Server as HTTPSServer } from "node:https";
 
 import { createServerAdapter } from "@whatwg-node/server";
 
-import { GrafservBase } from "../../core/base.js";
+import { GrafservBase } from "../../../core/base.js";
 import type {
   GrafservBody,
   GrafservConfig,
   RequestDigest,
   Result,
-} from "../../interfaces.js";
-import type { OptionsFromConfig } from "../../options.js";
-import { httpError } from "../../utils.js";
+} from "../../../interfaces.js";
+import type { OptionsFromConfig } from "../../../options.js";
+import { httpError } from "../../../utils.js";
 
 export async function getBodyFromRequest(
   req: Request /* IncomingMessage */,
@@ -42,7 +42,7 @@ export async function getBodyFromRequest(
 declare global {
   namespace Grafast {
     interface RequestContext {
-      whatwgv1: {
+      whatwgv0: {
         request: Request;
       };
     }
@@ -73,7 +73,7 @@ export class WhatwgGrafserv extends GrafservBase {
         return getBodyFromRequest(request, dynamicOptions.maxRequestLength);
       },
       requestContext: {
-        whatwgv1: {
+        whatwgv0: {
           request,
         },
       },
