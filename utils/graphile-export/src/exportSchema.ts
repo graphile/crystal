@@ -1764,7 +1764,7 @@ function exportSchemaTypeDefs({
             );
         plansProperties[fieldName] = fieldSpec;
       }
-      sortAndAddFieldsToTypeIfNotEmpty(typeProperties, plansProperties);
+      sortAndSet(typeProperties, "plans", plansProperties);
 
       if (typeProperties.length > 0) {
         objectPlansProperties.push(
@@ -1841,7 +1841,7 @@ function exportSchemaTypeDefs({
             : []),
         ]);
       }
-      sortAndAddFieldsToTypeIfNotEmpty(typeProperties, plansProperties);
+      sortAndSet(typeProperties, "plans", plansProperties);
 
       if (typeProperties.length > 0) {
         inputObjectPlansProperties.push(
@@ -2290,16 +2290,17 @@ function isNotEmpty(
   return true;
 }
 
-function sortAndAddFieldsToTypeIfNotEmpty(
-  typeProperties: t.ObjectProperty[],
-  plansProperties: Record<string, t.Expression>,
+function sortAndSet(
+  target: t.ObjectProperty[],
+  key: string,
+  value: Record<string, t.Expression>,
 ): void {
-  if (Object.keys(plansProperties).length > 0) {
-    const finalProps = Object.entries(plansProperties)
+  if (Object.keys(value).length > 0) {
+    const finalProps = Object.entries(value)
       .sort((a, z) => a[0].localeCompare(z[0], "und"))
       .map(([k, v]) => t.objectProperty(identifierOrLiteral(k), v));
-    typeProperties.push(
-      t.objectProperty(t.identifier("plans"), t.objectExpression(finalProps)),
+    target.push(
+      t.objectProperty(t.identifier(key), t.objectExpression(finalProps)),
     );
   }
 }
