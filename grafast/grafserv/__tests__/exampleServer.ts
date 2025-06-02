@@ -5,8 +5,14 @@ import { constant, error, makeGrafastSchema } from "grafast";
 import { resolvePreset } from "graphile-config";
 
 import { GrafservBase } from "../src/index.js";
-import { grafserv as grafservNode } from "../src/servers/node/index.js";
-import { grafserv as grafservWhatwg } from "../src/servers/whatwg-node-server";
+import {
+  grafserv as grafservNode,
+  NodeGrafserv,
+} from "../src/servers/node/index.js";
+import {
+  grafserv as grafservWhatwg,
+  WhatwgGrafserv,
+} from "../src/servers/whatwg-node-server";
 
 export async function makeExampleServer(
   preset: GraphileConfig.Preset = {
@@ -38,24 +44,12 @@ export async function makeExampleServer(
     },
   });
 
-  let serv: GrafservBase;
-  let server: ReturnType<typeof createServer>;
-  switch (type) {
-    case "whatwg": {
-      const servWhatwg = grafservWhatwg({ schema, preset });
-      server = createServer(servWhatwg.createHandler());
-      serv = servWhatwg;
-      break;
-    }
-    case "node":
-    default: {
-      const servNode = grafservNode({ schema, preset });
-      server = createServer();
-      servNode.addTo(server);
-      serv = servNode;
-      break;
-    }
-  }
+  const serv =
+    type === "whatwg"
+      ? grafservWhatwg({ schema, preset })
+      : grafservNode({ schema, preset });
+  const server = createServer();
+  serv.addTo(server);
   const promise = new Promise<void>((resolve, reject) => {
     server.on("listening", () => {
       server.off("error", reject);

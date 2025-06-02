@@ -1,3 +1,6 @@
+import type { Server as HTTPServer } from "node:http";
+import type { Server as HTTPSServer } from "node:https";
+
 import { createServerAdapter } from "@whatwg-node/server";
 
 import { GrafservBase } from "../../core/base.js";
@@ -147,6 +150,14 @@ export class WhatwgGrafserv extends GrafservBase {
           this.whatwgRequestToGrafserv(dynamicOptions, request),
         ),
       );
+    });
+  }
+
+  addTo(server: HTTPServer | HTTPSServer) {
+    const handler = this.createHandler();
+    server.on("request", handler);
+    this.onRelease(() => {
+      server.off("request", handler);
     });
   }
 
