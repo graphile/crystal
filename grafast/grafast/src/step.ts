@@ -406,12 +406,26 @@ export /* abstract */ class Step<TData = any> {
   protected getDepOptions<TStep extends Step = Step>(
     depId: number,
   ): DependencyOptions<TStep> {
+    this._assertAccessAllowed(depId);
     const step = this.dependencies[depId] as TStep;
     const forbiddenFlags = this.dependencyForbiddenFlags[depId];
     const onReject = this.dependencyOnReject[depId];
     const dataOnly = this.dependencyDataOnly[depId];
     const acceptFlags = ALL_FLAGS & ~forbiddenFlags;
     return { step, acceptFlags, onReject, dataOnly };
+  }
+
+  /**
+   * @internal
+   */
+  public _assertAccessAllowed(depId: number): void {
+    const step = this.dependencies[depId];
+    const dataOnly = this.dependencyDataOnly[depId];
+    if (dataOnly) {
+      throw new Error(
+        `Dependency ${depId} (${step}) was declared as "data only", you are not permitted to communicate with it.`,
+      );
+    }
   }
 
   protected getDep<TStep extends Step = Step>(

@@ -336,6 +336,7 @@ export function trap<TStep extends Step>(
   depId: number,
   throwOnFlagged = false,
 ) {
+  this._assertAccessAllowed(depId);
   const { step, acceptFlags, onReject, dataOnly } = this.getDepOptions(depId);
   if (acceptFlags === DEFAULT_ACCEPT_FLAGS && onReject == null) {
     return step;
