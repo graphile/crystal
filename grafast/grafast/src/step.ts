@@ -407,6 +407,11 @@ export /* abstract */ class Step<TData = any> {
     depId: number,
   ): DependencyOptions<TStep> {
     this._assertAccessAllowed(depId);
+    return this._getDepOptions(depId);
+  }
+  protected _getDepOptions<TStep extends Step = Step>(
+    depId: number,
+  ): DependencyOptions<TStep> {
     const step = this.dependencies[depId] as TStep;
     const forbiddenFlags = this.dependencyForbiddenFlags[depId];
     const onReject = this.dependencyOnReject[depId];

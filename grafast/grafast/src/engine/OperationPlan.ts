@@ -4225,7 +4225,7 @@ export class OperationPlan {
           const { step, dependencyIndex } = dependent;
           const $dependent = sudo(step);
           const inlineDetails = $flag.inline(
-            $dependent.getDepOptions(dependencyIndex),
+            $dependent._getDepOptions(dependencyIndex),
           );
           if (inlineDetails === null) {
             continue flagLoop;

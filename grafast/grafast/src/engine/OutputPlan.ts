@@ -501,7 +501,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
         | [ReadonlyArray<string | number>, any]
         | undefined = ($root.unbatchedExecute! as any)[expressionSymbol];
       // @ts-ignore
-      const { step: $parent, onReject, acceptFlags } = $root.getDepOptions(0);
+      const { step: $parent, onReject, acceptFlags } = $root._getDepOptions(0);
       if (
         expressionDetails !== undefined &&
         onReject == null &&
