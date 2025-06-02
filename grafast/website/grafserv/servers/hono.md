@@ -3,7 +3,7 @@
 **THIS INTEGRATION IS EXPERIMENTAL**. PRs improving it are welcome.
 
 ```ts
-import { grafserv } from "grafserv/hono";
+import { grafserv } from "grafserv/hono/v4";
 import preset from "./graphile.config.mjs";
 import schema from "./schema.mjs";
 
