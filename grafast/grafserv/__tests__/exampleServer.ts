@@ -68,7 +68,14 @@ export async function makeExampleServer(
 }
 
 if (require.main === module) {
-  const serverPromise = makeExampleServer();
+  const type = process.argv[2];
+  if (type !== undefined && type !== "node" && type !== "whatwg") {
+    throw new Error(`Unsupported type ${type}`);
+  }
+  if (type === "whatwg") {
+    console.log("Running whatwg");
+  }
+  const serverPromise = makeExampleServer(undefined, type);
   serverPromise.then(
     (server) => {
       console.log(server.url);
