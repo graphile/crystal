@@ -57,10 +57,11 @@ export class __TrackedValueStep<
   isSyncAndSafe = true;
 
   /**
-   * Could be anything. In the case of context it could even have exotic
-   * entries such as `pgClient`.
+   * The value that was seen during planning, for us to use during eval (and
+   * add constraints on). DO NOT USE IN USER CODE because it will not
+   * necessarily reflect the values that should be used at runtime.
    */
-  private readonly value: TData | undefined;
+  private readonly _initialValue: TData | undefined;
 
   /**
    * A reference to the relevant
@@ -115,7 +116,7 @@ export class __TrackedValueStep<
     super();
     this._isImmutable = isImmutable;
     this.addDependency(valuePlan);
-    this.value = value;
+    this._initialValue = value;
     this.constraints = constraints;
     this.path = path;
     this.nullableGraphQLType =
@@ -207,7 +208,7 @@ export class __TrackedValueStep<
       ? ReturnType<TInputType["getFields"]>[TAttribute]["type"]
       : undefined
   > {
-    const { value, path, constraints } = this;
+    const { _initialValue: value, path, constraints } = this;
     const newValue = value?.[attrName];
     const newValuePlan = this.getValuePlan().get(attrName);
     const newPath = [...path, attrName];
@@ -316,7 +317,7 @@ export class __TrackedValueStep<
         ? U & GraphQLInputType
         : undefined
   > {
-    const { value, path, constraints } = this;
+    const { _initialValue: value, path, constraints } = this;
     const newValue = value?.[index];
     const newValuePlan = this.getValuePlan().at(index);
     const newPath = [...path, index];
@@ -368,7 +369,7 @@ export class __TrackedValueStep<
    * @internal
    */
   eval(): TData | undefined {
-    const { path, value } = this;
+    const { path, _initialValue: value } = this;
     this.constraints.push({
       type: "value",
       path,
@@ -389,7 +390,7 @@ export class __TrackedValueStep<
    * @internal
    */
   evalIs(expectedValue: unknown): boolean {
-    const { value, path } = this;
+    const { _initialValue: value, path } = this;
     const pass = value === expectedValue;
     this.constraints.push({
       type: "equal",
@@ -402,7 +403,7 @@ export class __TrackedValueStep<
 
   /** @internal */
   evalIsEmpty() {
-    const { value, path } = this;
+    const { _initialValue: value, path } = this;
     const isEmpty =
       typeof value === "object" &&
       value !== null &&
@@ -425,7 +426,7 @@ export class __TrackedValueStep<
    * @internal
    */
   evalHas(key: string): boolean {
-    const { value, path } = this;
+    const { _initialValue: value, path } = this;
     const newPath = [...path, key];
 
     // NOTE: `key in value` would be more performant here, but we cannot trust
@@ -455,7 +456,7 @@ export class __TrackedValueStep<
    * @internal
    */
   evalKeys(): ReadonlyArray<keyof TData & string> | null {
-    const { value, path } = this;
+    const { _initialValue: value, path } = this;
     if (!isInputObjectType(this.nullableGraphQLType)) {
       throw new Error("evalKeys must only be called for object types");
     }
@@ -502,7 +503,7 @@ export class __TrackedValueStep<
    * @internal
    */
   evalLength(): number | null {
-    const { value, path } = this;
+    const { _initialValue: value, path } = this;
     const length = Array.isArray(value) ? value.length : null;
     this.constraints.push({
       type: "length",
