@@ -1573,7 +1573,12 @@ function exportSchemaTypeDefs({
   file,
 }: SchemaExportDetails) {
   const typeDefsExportName = file.makeVariable("typeDefs");
-  const plansExportName = file.makeVariable("plans");
+  const objectPlansProperties: t.ObjectProperty[] = [];
+  const interfacePlansProperties: t.ObjectProperty[] = [];
+  const unionPlansProperties: t.ObjectProperty[] = [];
+  const inputObjectPlansProperties: t.ObjectProperty[] = [];
+  const scalarPlansProperties: t.ObjectProperty[] = [];
+  const enumPlansProperties: t.ObjectProperty[] = [];
   const schemaExportName = file.makeVariable("schema");
 
   const typeDefsString = printSchema(schema);
@@ -1585,15 +1590,15 @@ function exportSchemaTypeDefs({
     { type: "CommentBlock", value: " GraphQL " } as any,
   ];
 
-  const plansProperties: t.ObjectProperty[] = [];
   customTypes.forEach((type) => {
     if (type instanceof GraphQLObjectType) {
       const typeProperties: t.ObjectProperty[] = [];
+      const plansProperties: t.ObjectProperty[] = [];
 
       if (type.extensions.grafast?.assertStep) {
         typeProperties.push(
           t.objectProperty(
-            t.identifier("__assertStep"),
+            t.identifier("assertStep"),
             convertToIdentifierViaAST(
               file,
               type.extensions.grafast.assertStep,
@@ -1606,7 +1611,7 @@ function exportSchemaTypeDefs({
       if (type.isTypeOf) {
         typeProperties.push(
           t.objectProperty(
-            t.identifier("__isTypeOf"),
+            t.identifier("isTypeOf"),
             convertToIdentifierViaAST(
               file,
               type.isTypeOf,
@@ -1620,7 +1625,7 @@ function exportSchemaTypeDefs({
       if (type.extensions.grafast?.planType) {
         typeProperties.push(
           t.objectProperty(
-            t.identifier("__planType"),
+            t.identifier("planType"),
             convertToIdentifierViaAST(
               file,
               type.extensions.grafast.planType,
@@ -1754,13 +1759,21 @@ function exportSchemaTypeDefs({
                 args: argsAST,
               }),
             );
-        typeProperties.push(
+        plansProperties.push(
           t.objectProperty(identifierOrLiteral(fieldName), fieldSpec),
+        );
+      }
+      if (plansProperties.length > 0) {
+        typeProperties.push(
+          t.objectProperty(
+            t.identifier("plans"),
+            t.objectExpression(plansProperties),
+          ),
         );
       }
 
       if (typeProperties.length > 0) {
-        plansProperties.push(
+        objectPlansProperties.push(
           t.objectProperty(
             identifierOrLiteral(type.name),
             t.objectExpression(typeProperties),
@@ -1769,11 +1782,12 @@ function exportSchemaTypeDefs({
       }
     } else if (type instanceof GraphQLInputObjectType) {
       const typeProperties: t.ObjectProperty[] = [];
+      const plansProperties: t.ObjectProperty[] = [];
 
       if (type.extensions?.grafast?.baked) {
         typeProperties.push(
           t.objectProperty(
-            t.identifier("__baked"),
+            t.identifier("baked"),
             convertToIdentifierViaAST(
               file,
               type.extensions?.grafast.baked,
@@ -1797,7 +1811,7 @@ function exportSchemaTypeDefs({
           if (!grafast) continue;
           const keys = Object.keys(grafast);
           if (keys.length === 1 && keys[0] === "apply") {
-            typeProperties.push(
+            plansProperties.push(
               t.objectProperty(
                 identifierOrLiteral(fieldName),
                 convertToIdentifierViaAST(
@@ -1812,7 +1826,7 @@ function exportSchemaTypeDefs({
           }
         }
 
-        typeProperties.push(
+        plansProperties.push(
           t.objectProperty(
             identifierOrLiteral(fieldName),
             t.objectExpression([
@@ -1840,9 +1854,17 @@ function exportSchemaTypeDefs({
           ),
         );
       }
+      if (plansProperties.length > 0) {
+        typeProperties.push(
+          t.objectProperty(
+            t.identifier("plans"),
+            t.objectExpression(plansProperties),
+          ),
+        );
+      }
 
       if (typeProperties.length > 0) {
-        plansProperties.push(
+        inputObjectPlansProperties.push(
           t.objectProperty(
             identifierOrLiteral(type.name),
             t.objectExpression(typeProperties),
@@ -1859,12 +1881,16 @@ function exportSchemaTypeDefs({
         config.extensions.grafast?.toSpecifier ||
         config.extensions.grafast?.planType
       ) {
-        plansProperties.push(
+        const target =
+          type instanceof GraphQLInterfaceType
+            ? interfacePlansProperties
+            : unionPlansProperties;
+        target.push(
           t.objectProperty(
             identifierOrLiteral(type.name),
             t.objectExpression(
-              dangerousObjectToObjectPropertiesWithIdentifierKeys({
-                __resolveType: type.resolveType
+              objectToObjectProperties({
+                resolveType: type.resolveType
                   ? convertToIdentifierViaAST(
                       file,
                       type.resolveType,
@@ -1872,7 +1898,7 @@ function exportSchemaTypeDefs({
                       `${type.name}.resolveType`,
                     )
                   : null,
-                __toSpecifier: type.extensions?.grafast?.toSpecifier
+                toSpecifier: type.extensions?.grafast?.toSpecifier
                   ? convertToIdentifierViaAST(
                       file,
                       type.extensions?.grafast?.toSpecifier,
@@ -1880,7 +1906,7 @@ function exportSchemaTypeDefs({
                       `${type.name}.toSpecifier`,
                     )
                   : null,
-                __planType: type.extensions?.grafast?.planType
+                planType: type.extensions?.grafast?.planType
                   ? convertToIdentifierViaAST(
                       file,
                       type.extensions?.grafast?.planType,
@@ -1909,7 +1935,7 @@ function exportSchemaTypeDefs({
         type.parseValue !== GraphQLScalarType.prototype.parseValue ||
         type.parseLiteral !== GraphQLScalarType.prototype.parseLiteral
       ) {
-        plansProperties.push(
+        scalarPlansProperties.push(
           t.objectProperty(
             identifierOrLiteral(type.name),
             t.objectExpression(
@@ -2022,7 +2048,7 @@ function exportSchemaTypeDefs({
       }
 
       if (enumValues.length > 0) {
-        plansProperties.push(
+        enumPlansProperties.push(
           t.objectProperty(
             identifierOrLiteral(type.name),
             t.objectExpression(enumValues),
@@ -2040,26 +2066,46 @@ function exportSchemaTypeDefs({
       t.variableDeclarator(typeDefsExportName, graphqlAST),
     ]),
   );
-  const plans = t.exportNamedDeclaration(
-    t.variableDeclaration("const", [
-      t.variableDeclarator(
-        plansExportName,
-        t.objectExpression(plansProperties),
-      ),
-    ]),
-  );
-
   file.addStatements(typeDefs);
-  file.addStatements(plans);
+
+  const typeDefsEtc: Record<string, t.Identifier> = {
+    typeDefs: typeDefsExportName,
+  };
+
+  const stuff = {
+    objects: objectPlansProperties,
+    interfaces: interfacePlansProperties,
+    unions: unionPlansProperties,
+    inputObjects: inputObjectPlansProperties,
+    scalars: scalarPlansProperties,
+    enums: enumPlansProperties,
+  };
+
+  const todos: Array<() => void> = [];
+  for (const [key, props] of Object.entries(stuff)) {
+    const exportName = file.makeVariable(key);
+    if (props.length > 0) {
+      // Do this afterwards so all the variables are reserved first.
+      todos.push(() => {
+        const plans = t.exportNamedDeclaration(
+          t.variableDeclaration("const", [
+            t.variableDeclarator(exportName, t.objectExpression(props)),
+          ]),
+        );
+        file.addStatements(plans);
+        typeDefsEtc[key] = exportName;
+      });
+    }
+  }
+  // Now all variables are declared, we can populate them
+  for (const todo of todos) {
+    todo();
+  }
+
   const makeGrafastSchemaAST = file.import("grafast", "makeGrafastSchema");
 
   const schemaAST = t.callExpression(makeGrafastSchemaAST, [
-    t.objectExpression(
-      objectToObjectProperties({
-        typeDefs: typeDefsExportName,
-        plans: plansExportName,
-      }),
-    ),
+    t.objectExpression(objectToObjectProperties(typeDefsEtc)),
   ]);
   file.addStatements(
     t.exportNamedDeclaration(
