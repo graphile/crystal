@@ -1,0 +1,7 @@
+{
+  jsonIdentity: {
+    someValue: {
+      ohnoavariable: 42,
+    },
+  },
+}

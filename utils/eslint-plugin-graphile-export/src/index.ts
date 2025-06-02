@@ -1,4 +1,6 @@
-// Inspired by babel-plugin-react-hooks
+// Inspired by eslint-plugin-react-hooks
+
+import type { ESLint, Linter, Rule } from "eslint";
 
 import { ExhaustiveDeps } from "./ExhaustiveDeps.js";
 import { ExportInstances } from "./ExportInstances.js";
@@ -8,7 +10,12 @@ import { NoNested } from "./NoNested.js";
 
 export const configs = {
   recommended: {
-    plugins: ["graphile-export"],
+    name: "graphile-export/recommended",
+    plugins: {
+      get "graphile-export"(): ESLint.Plugin {
+        return plugin;
+      },
+    },
     rules: {
       "graphile-export/exhaustive-deps": [
         "error",
@@ -25,6 +32,8 @@ export const configs = {
             "resolve",
             "subscribe",
             "plan",
+            "planType",
+            "toSpecifier",
             "subscribePlan",
             "isTypeOf",
             "resolveType",
@@ -32,7 +41,9 @@ export const configs = {
             "parseValue",
             "parseLiteral",
             "inputPlan",
+            "baked",
             "applyPlan",
+            "apply",
             "assertStep",
           ],
         },
@@ -55,8 +66,12 @@ export const configs = {
           disableAutofix: false,
         },
       ],
-    },
+    } satisfies Linter.RulesRecord,
   },
+};
+
+export const meta = {
+  name: "eslint-plugin-graphile-export",
 };
 
 export const rules = {
@@ -65,4 +80,10 @@ export const rules = {
   "export-instances": ExportInstances,
   "export-subclasses": ExportSubclasses,
   "no-nested": NoNested,
+} satisfies Record<string, Rule.RuleModule>;
+
+const plugin = {
+  configs,
+  meta,
+  rules,
 };

@@ -18,26 +18,29 @@ export interface MiddlewareNext<TRawResult> {
 type ActivityFn<
   TActivities extends FunctionalityObject<TActivities>,
   TActivityName extends keyof TActivities,
-> = TActivities[TActivityName] extends CallbackOrDescriptor<infer UFn>
-  ? UFn
-  : never;
+> =
+  TActivities[TActivityName] extends CallbackOrDescriptor<infer UFn>
+    ? UFn
+    : never;
 type ActivityParameter<
   TActivities extends FunctionalityObject<TActivities>,
   TActivityName extends keyof TActivities,
-> = TActivities[TActivityName] extends CallbackOrDescriptor<
-  (arg: infer UArg) => any
->
-  ? UArg
-  : never;
+> =
+  TActivities[TActivityName] extends CallbackOrDescriptor<
+    (arg: infer UArg) => any
+  >
+    ? UArg
+    : never;
 
 type RealActivityFn<
   TActivities extends FunctionalityObject<TActivities>,
   TActivityName extends keyof TActivities,
-> = TActivities[TActivityName] extends CallbackOrDescriptor<
-  (arg: infer UArg) => infer UResult
->
-  ? (next: MiddlewareNext<UResult>, arg: UArg) => UResult
-  : never;
+> =
+  TActivities[TActivityName] extends CallbackOrDescriptor<
+    (arg: infer UArg) => infer UResult
+  >
+    ? (next: MiddlewareNext<UResult>, arg: UArg) => UResult
+    : never;
 
 export class Middleware<TActivities extends FunctionalityObject<TActivities>> {
   middleware: {
@@ -45,14 +48,14 @@ export class Middleware<TActivities extends FunctionalityObject<TActivities>> {
   } = Object.create(null);
 
   register<TActivityName extends keyof TActivities>(
-    event: TActivityName,
+    activityName: TActivityName,
     fn: RealActivityFn<TActivities, TActivityName>,
   ): void {
-    const list = this.middleware[event];
+    const list = this.middleware[activityName];
     if (list !== undefined) {
       list.push(fn);
     } else {
-      this.middleware[event] = [fn];
+      this.middleware[activityName] = [fn];
     }
   }
 

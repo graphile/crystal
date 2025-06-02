@@ -150,17 +150,3 @@ lateral (
     __third_party_vulnerabilities__."id" = __third_party_vulnerabilities_identifiers__."id0"
   )
 ) as __third_party_vulnerabilities_result__;
-
-select __third_party_vulnerabilities_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __third_party_vulnerabilities_identifiers__,
-lateral (
-  select
-    __third_party_vulnerabilities__."id"::text as "0",
-    __third_party_vulnerabilities__."name" as "1",
-    __third_party_vulnerabilities__."vendor_name" as "2",
-    __third_party_vulnerabilities_identifiers__.idx as "3"
-  from "polymorphic"."third_party_vulnerabilities" as __third_party_vulnerabilities__
-  where (
-    __third_party_vulnerabilities__."id" = __third_party_vulnerabilities_identifiers__."id0"
-  )
-) as __third_party_vulnerabilities_result__;

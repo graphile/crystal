@@ -1,9 +1,8 @@
-import { PgDeleteSingleStep, PgExecutor, PgSelectStep, PgUnionAllStep, TYPES, assertPgClassSingleStep, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
+import { PgDeleteSingleStep, PgExecutor, TYPES, assertPgClassSingleStep, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec, sqlValueWithCodec } from "@dataplan/pg";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
-import { inspect } from "util";
-const handler = {
+const nodeIdHandler_Query = {
   typeName: "Query",
   codec: {
     name: "raw",
@@ -20,6 +19,9 @@ const handler = {
   },
   match(specifier) {
     return specifier === "query";
+  },
+  getIdentifiers(_value) {
+    return [];
   },
   getSpec() {
     return "irrelevant";
@@ -48,8 +50,9 @@ const nodeIdCodecs_base64JSON_base64JSON = {
     return base64JSONDecode;
   })()
 };
-const nodeIdCodecs = Object.assign(Object.create(null), {
-  raw: handler.codec,
+const nodeIdCodecs = {
+  __proto__: null,
+  raw: nodeIdHandler_Query.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
@@ -64,7 +67,7 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
       isSyncAndSafe: true
     })
   }
-});
+};
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -76,10 +79,11 @@ const executor = new PgExecutor({
   }
 });
 const geomIdentifier = sql.identifier("geometry", "geom");
-const spec_geom = {
+const geomCodec = recordCodec({
   name: "geom",
   identifier: geomIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     id: {
       description: undefined,
       codec: TYPES.int,
@@ -161,7 +165,7 @@ const spec_geom = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -170,24 +174,29 @@ const spec_geom = {
       schemaName: "geometry",
       name: "geom"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   executor: executor
-};
-const geomCodec = recordCodec(spec_geom);
+});
 const geomUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }];
-const pgResource_geomPgResource = makeRegistry({
-  pgExecutors: Object.assign(Object.create(null), {
+const resource_geomPgResource = makeRegistry({
+  pgExecutors: {
+    __proto__: null,
     main: executor
-  }),
-  pgCodecs: Object.assign(Object.create(null), {
+  },
+  pgCodecs: {
+    __proto__: null,
     text: TYPES.text,
     varchar: TYPES.varchar,
     bpchar: TYPES.bpchar,
@@ -200,8 +209,9 @@ const pgResource_geomPgResource = makeRegistry({
     path: TYPES.path,
     polygon: TYPES.polygon,
     circle: TYPES.circle
-  }),
-  pgResources: Object.assign(Object.create(null), {
+  },
+  pgResources: {
+    __proto__: null,
     geom: {
       executor: executor,
       name: "geom",
@@ -224,35 +234,38 @@ const pgResource_geomPgResource = makeRegistry({
         tags: {}
       }
     }
-  }),
-  pgRelations: Object.create(null)
-}).pgResources["geom"];
-const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
-  Query: handler,
-  Geom: {
-    typeName: "Geom",
-    codec: nodeIdCodecs_base64JSON_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("geoms", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    get(spec) {
-      return pgResource_geomPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "geoms";
-    }
+  },
+  pgRelations: {
+    __proto__: null
   }
-});
+}).pgResources["geom"];
+const nodeIdHandler_Geom = {
+  typeName: "Geom",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("geoms", false), $record.get("id")]);
+  },
+  getSpec($list) {
+    return {
+      id: inhibitOnNull(access($list, [1]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_geomPgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "geoms";
+  }
+};
 function specForHandler(handler) {
   function spec(nodeId) {
     // We only want to return the specifier if it matches
     // this handler; otherwise return null.
+    if (nodeId == null) return null;
     try {
       const specifier = handler.codec.decode(nodeId);
       if (handler.match(specifier)) {
@@ -267,44 +280,39 @@ function specForHandler(handler) {
   spec.isSyncAndSafe = true; // Optimization
   return spec;
 }
-const fetcher = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.Geom);
-const applyOrderToPlan = ($select, $value, TableOrderByType) => {
-  if (!("evalLength" in $value)) {
-    return;
-  }
-  const length = $value.evalLength();
-  if (length == null) {
-    return;
-  }
-  for (let i = 0; i < length; i++) {
-    const order = $value.at(i).eval();
-    if (order == null) continue;
-    const config = getEnumValueConfig(TableOrderByType, order);
-    const plan = config?.extensions?.grafast?.applyPlan;
-    if (typeof plan !== "function") {
-      console.error(`Internal server error: invalid orderBy configuration: expected function, but received ${inspect(plan)}`);
-      throw new SafeError("Internal server error: invalid orderBy configuration");
-    }
-    plan($select);
-  }
+const nodeFetcher_Geom = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Geom));
+  return nodeIdHandler_Geom.get(nodeIdHandler_Geom.getSpec($decoded));
 };
+function qbWhereBuilder(qb) {
+  return qb.whereBuilder();
+}
+const nodeIdHandlerByTypeName = {
+  __proto__: null,
+  Query: nodeIdHandler_Query,
+  Geom: nodeIdHandler_Geom
+};
+const decodeNodeId = makeDecodeNodeId(Object.values(nodeIdHandlerByTypeName));
+function findTypeNameMatch(specifier) {
+  if (!specifier) return null;
+  for (const [typeName, typeSpec] of Object.entries(nodeIdHandlerByTypeName)) {
+    const value = specifier[typeSpec.codec.name];
+    if (value != null && typeSpec.match(value)) {
+      return typeName;
+    }
+  }
+  return null;
+}
 function CursorSerialize(value) {
   return "" + value;
 }
-const specFromArgs = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Geom, $nodeId);
+const specFromArgs_Geom = args => {
+  const $nodeId = args.getRaw(["input", "nodeId"]);
+  return specFromNodeId(nodeIdHandler_Geom, $nodeId);
 };
-const specFromArgs2 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Geom, $nodeId);
+const specFromArgs_Geom2 = args => {
+  const $nodeId = args.getRaw(["input", "nodeId"]);
+  return specFromNodeId(nodeIdHandler_Geom, $nodeId);
 };
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
@@ -354,13 +362,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`Geom\`."""
-    orderBy: [GeomsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: GeomCondition
+
+    """The method to use when ordering \`Geom\`."""
+    orderBy: [GeomsOrderBy!] = [PRIMARY_KEY_ASC]
   ): GeomsConnection
 }
 
@@ -475,31 +483,6 @@ type PageInfo {
   endCursor: Cursor
 }
 
-"""Methods to use when ordering \`Geom\`."""
-enum GeomsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  POINT_ASC
-  POINT_DESC
-  LINE_ASC
-  LINE_DESC
-  LSEG_ASC
-  LSEG_DESC
-  BOX_ASC
-  BOX_DESC
-  OPEN_PATH_ASC
-  OPEN_PATH_DESC
-  CLOSED_PATH_ASC
-  CLOSED_PATH_DESC
-  POLYGON_ASC
-  POLYGON_DESC
-  CIRCLE_ASC
-  CIRCLE_DESC
-}
-
 """
 A condition to be used against \`Geom\` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
@@ -573,6 +556,31 @@ input PolygonInput {
 input CircleInput {
   center: PointInput!
   radius: Float!
+}
+
+"""Methods to use when ordering \`Geom\`."""
+enum GeomsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  POINT_ASC
+  POINT_DESC
+  LINE_ASC
+  LINE_DESC
+  LSEG_ASC
+  LSEG_DESC
+  BOX_ASC
+  BOX_DESC
+  OPEN_PATH_ASC
+  OPEN_PATH_DESC
+  CLOSED_PATH_ASC
+  CLOSED_PATH_DESC
+  POLYGON_ASC
+  POLYGON_DESC
+  CIRCLE_ASC
+  CIRCLE_DESC
 }
 
 """
@@ -794,143 +802,93 @@ export const plans = {
       return rootValue();
     },
     nodeId($parent) {
-      const specifier = handler.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler.codec.name].encode);
+      const specifier = nodeIdHandler_Query.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Query.codec.name].encode);
     },
-    node: {
-      plan(_$root, args) {
-        return node(nodeIdHandlerByTypeName, args.get("nodeId"));
-      },
-      args: {
-        nodeId: undefined
-      }
+    node(_$root, fieldArgs) {
+      return fieldArgs.getRaw("nodeId");
     },
-    geomById: {
-      plan(_$root, args) {
-        return pgResource_geomPgResource.get({
-          id: args.get("id")
-        });
-      },
-      args: {
-        id: undefined
-      }
+    geomById(_$root, {
+      $id
+    }) {
+      return resource_geomPgResource.get({
+        id: $id
+      });
     },
-    geom: {
-      plan(_$parent, args) {
-        const $nodeId = args.get("nodeId");
-        return fetcher($nodeId);
-      },
-      args: {
-        nodeId: undefined
-      }
+    geom(_$parent, args) {
+      const $nodeId = args.getRaw("nodeId");
+      return nodeFetcher_Geom($nodeId);
     },
     allGeoms: {
       plan() {
-        return connection(pgResource_geomPgResource.find());
+        return connection(resource_geomPgResource.find());
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("GeomsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     }
   },
+  Node: {
+    __planType($nodeId) {
+      const $specifier = decodeNodeId($nodeId);
+      const $__typename = lambda($specifier, findTypeNameMatch, true);
+      return {
+        $__typename,
+        planForType(type) {
+          const spec = nodeIdHandlerByTypeName[type.name];
+          if (spec) {
+            return spec.get(spec.getSpec(access($specifier, [spec.codec.name])));
+          } else {
+            throw new Error(`Failed to find handler for ${type.name}`);
+          }
+        }
+      };
+    }
+  },
   Geom: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of geomUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_geomPgResource.get(spec);
+    },
     nodeId($parent) {
-      const specifier = nodeIdHandlerByTypeName.Geom.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Geom.codec.name].encode);
-    },
-    id($record) {
-      return $record.get("id");
-    },
-    point($record) {
-      return $record.get("point");
-    },
-    line($record) {
-      return $record.get("line");
-    },
-    lseg($record) {
-      return $record.get("lseg");
-    },
-    box($record) {
-      return $record.get("box");
+      const specifier = nodeIdHandler_Geom.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Geom.codec.name].encode);
     },
     openPath($record) {
       return $record.get("open_path");
     },
     closedPath($record) {
       return $record.get("closed_path");
-    },
-    polygon($record) {
-      return $record.get("polygon");
-    },
-    circle($record) {
-      return $record.get("circle");
     }
   },
-  Point: {},
-  Line: {},
-  LineSegment: {},
-  Box: {},
-  Path: {},
-  Polygon: {},
-  Circle: {},
   GeomsConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
@@ -969,669 +927,293 @@ export const plans = {
       return $pageInfo.endCursor();
     }
   },
-  GeomsOrderBy: {
-    NATURAL: {
-      applyPlan() {}
-    },
-    PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        geomUniques[0].attributes.forEach(attributeName => {
-          const attribute = geomCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
-    },
-    PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        geomUniques[0].attributes.forEach(attributeName => {
-          const attribute = geomCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
-    },
-    ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    POINT_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "point",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    POINT_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "point",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    LINE_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "line",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    LINE_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "line",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    LSEG_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "lseg",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    LSEG_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "lseg",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    BOX_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "box",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    BOX_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "box",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    OPEN_PATH_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "open_path",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    OPEN_PATH_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "open_path",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CLOSED_PATH_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "closed_path",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CLOSED_PATH_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "closed_path",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    POLYGON_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "polygon",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    POLYGON_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "polygon",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CIRCLE_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "circle",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CIRCLE_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "circle",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    }
-  },
   GeomCondition: {
-    id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_geom.attributes.id.codec)}`;
-            }
-          });
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      });
     },
-    point: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "point",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "point",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_geom.attributes.point.codec)}`;
-            }
-          });
+    point($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "point",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.point)}`;
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      });
     },
-    line: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "line",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "line",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_geom.attributes.line.codec)}`;
-            }
-          });
+    line($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "line",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.line)}`;
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      });
     },
-    lseg: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "lseg",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "lseg",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_geom.attributes.lseg.codec)}`;
-            }
-          });
+    lseg($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "lseg",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.lseg)}`;
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      });
     },
-    box: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "box",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "box",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_geom.attributes.box.codec)}`;
-            }
-          });
+    box($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "box",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.box)}`;
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      });
     },
-    openPath: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "open_path",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "open_path",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_geom.attributes.open_path.codec)}`;
-            }
-          });
+    openPath($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "open_path",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.path)}`;
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      });
     },
-    closedPath: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "closed_path",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "closed_path",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_geom.attributes.closed_path.codec)}`;
-            }
-          });
+    closedPath($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "closed_path",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.path)}`;
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      });
     },
-    polygon: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "polygon",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "polygon",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_geom.attributes.polygon.codec)}`;
-            }
-          });
+    polygon($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "polygon",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.polygon)}`;
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      });
     },
-    circle: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "circle",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "circle",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_geom.attributes.circle.codec)}`;
-            }
-          });
+    circle($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "circle",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.circle)}`;
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      });
     }
   },
-  PointInput: {
-    x: undefined,
-    y: undefined
-  },
-  LineInput: {
-    a: undefined,
-    b: undefined
-  },
-  LineSegmentInput: {
-    a: undefined,
-    b: undefined
-  },
-  BoxInput: {
-    a: undefined,
-    b: undefined
-  },
-  PathInput: {
-    points: undefined,
-    isOpen: undefined
-  },
-  PolygonInput: {
-    points: undefined
-  },
-  CircleInput: {
-    center: undefined,
-    radius: undefined
+  GeomsOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      geomUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      geomUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    POINT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "point",
+        direction: "ASC"
+      });
+    },
+    POINT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "point",
+        direction: "DESC"
+      });
+    },
+    LINE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "line",
+        direction: "ASC"
+      });
+    },
+    LINE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "line",
+        direction: "DESC"
+      });
+    },
+    LSEG_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "lseg",
+        direction: "ASC"
+      });
+    },
+    LSEG_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "lseg",
+        direction: "DESC"
+      });
+    },
+    BOX_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "box",
+        direction: "ASC"
+      });
+    },
+    BOX_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "box",
+        direction: "DESC"
+      });
+    },
+    OPEN_PATH_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "open_path",
+        direction: "ASC"
+      });
+    },
+    OPEN_PATH_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "open_path",
+        direction: "DESC"
+      });
+    },
+    CLOSED_PATH_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "closed_path",
+        direction: "ASC"
+      });
+    },
+    CLOSED_PATH_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "closed_path",
+        direction: "DESC"
+      });
+    },
+    POLYGON_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "polygon",
+        direction: "ASC"
+      });
+    },
+    POLYGON_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "polygon",
+        direction: "DESC"
+      });
+    },
+    CIRCLE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "circle",
+        direction: "ASC"
+      });
+    },
+    CIRCLE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "circle",
+        direction: "DESC"
+      });
+    }
   },
   Mutation: {
     __assertStep: __ValueStep,
     createGeom: {
       plan(_, args) {
+        const $insert = pgInsertSingle(resource_geomPgResource, Object.create(null));
+        args.apply($insert);
         const plan = object({
-          result: pgInsertSingle(pgResource_geomPgResource, Object.create(null))
+          result: $insert
         });
-        args.apply(plan);
         return plan;
       },
       args: {
-        input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateGeom: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_geomPgResource, specFromArgs(args))
+        const $update = pgUpdateSingle(resource_geomPgResource, specFromArgs_Geom(args));
+        args.apply($update);
+        return object({
+          result: $update
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateGeomById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_geomPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $update = pgUpdateSingle(resource_geomPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteGeom: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_geomPgResource, specFromArgs2(args))
+        const $delete = pgDeleteSingle(resource_geomPgResource, specFromArgs_Geom2(args));
+        args.apply($delete);
+        return object({
+          result: $delete
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteGeomById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_geomPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $delete = pgDeleteSingle(resource_geomPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     }
@@ -1639,7 +1221,8 @@ export const plans = {
   CreateGeomPayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
     },
     geom($object) {
       return $object.get("result");
@@ -1647,125 +1230,103 @@ export const plans = {
     query() {
       return rootValue();
     },
-    geomEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = geomUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_geomPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("GeomsOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    geomEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = geomUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return resource_geomPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   CreateGeomInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    geom: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
-      },
-      autoApplyAfterParentApplyPlan: true
+    geom(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
+      }
     }
   },
   GeomInput: {
-    "__inputPlan": function GeomInput_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    point(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("point", bakedInputRuntime(schema, field.type, val));
     },
-    point: {
-      applyPlan($insert, val) {
-        $insert.set("point", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    line(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("line", bakedInputRuntime(schema, field.type, val));
     },
-    line: {
-      applyPlan($insert, val) {
-        $insert.set("line", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    lseg(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("lseg", bakedInputRuntime(schema, field.type, val));
     },
-    lseg: {
-      applyPlan($insert, val) {
-        $insert.set("lseg", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    box(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("box", bakedInputRuntime(schema, field.type, val));
     },
-    box: {
-      applyPlan($insert, val) {
-        $insert.set("box", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    openPath(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("open_path", bakedInputRuntime(schema, field.type, val));
     },
-    openPath: {
-      applyPlan($insert, val) {
-        $insert.set("open_path", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    closedPath(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("closed_path", bakedInputRuntime(schema, field.type, val));
     },
-    closedPath: {
-      applyPlan($insert, val) {
-        $insert.set("closed_path", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    polygon(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("polygon", bakedInputRuntime(schema, field.type, val));
     },
-    polygon: {
-      applyPlan($insert, val) {
-        $insert.set("polygon", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    circle: {
-      applyPlan($insert, val) {
-        $insert.set("circle", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    circle(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("circle", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateGeomPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     geom($object) {
       return $object.get("result");
@@ -1773,197 +1334,159 @@ export const plans = {
     query() {
       return rootValue();
     },
-    geomEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = geomUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_geomPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("GeomsOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    geomEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = geomUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return resource_geomPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   UpdateGeomInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    geomPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+    geomPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   GeomPatch: {
-    "__inputPlan": function GeomPatch_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    point(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("point", bakedInputRuntime(schema, field.type, val));
     },
-    point: {
-      applyPlan($insert, val) {
-        $insert.set("point", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    line(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("line", bakedInputRuntime(schema, field.type, val));
     },
-    line: {
-      applyPlan($insert, val) {
-        $insert.set("line", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    lseg(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("lseg", bakedInputRuntime(schema, field.type, val));
     },
-    lseg: {
-      applyPlan($insert, val) {
-        $insert.set("lseg", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    box(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("box", bakedInputRuntime(schema, field.type, val));
     },
-    box: {
-      applyPlan($insert, val) {
-        $insert.set("box", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    openPath(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("open_path", bakedInputRuntime(schema, field.type, val));
     },
-    openPath: {
-      applyPlan($insert, val) {
-        $insert.set("open_path", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    closedPath(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("closed_path", bakedInputRuntime(schema, field.type, val));
     },
-    closedPath: {
-      applyPlan($insert, val) {
-        $insert.set("closed_path", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    polygon(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("polygon", bakedInputRuntime(schema, field.type, val));
     },
-    polygon: {
-      applyPlan($insert, val) {
-        $insert.set("polygon", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    circle: {
-      applyPlan($insert, val) {
-        $insert.set("circle", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    circle(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("circle", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateGeomByIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    geomPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+    geomPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   DeleteGeomPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     geom($object) {
       return $object.get("result");
     },
     deletedGeomId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandlerByTypeName.Geom.plan($record);
+      const specifier = nodeIdHandler_Geom.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query() {
       return rootValue();
     },
-    geomEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = geomUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_geomPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("GeomsOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    geomEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = geomUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return resource_geomPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   DeleteGeomInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteGeomByIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   }
 };
 export const schema = makeGrafastSchema({

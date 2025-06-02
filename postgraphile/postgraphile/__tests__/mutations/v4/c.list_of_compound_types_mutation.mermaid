@@ -1,0 +1,83 @@
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
+graph TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:1px,color:#000
+    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+    classDef unbatchedplan fill:#dff,stroke-width:1px,color:#000
+    classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
+
+    subgraph "Buckets for mutations/v4/c.list_of_compound_types_mutation"
+    Bucket0("Bucket 0 (root)"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 15, 17<br /><br />1: PgSelect[11]<br />2: <br />ᐳ: Object[16]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 11, 16<br /><br />ROOT Object{1}ᐸ{result}ᐳ[16]"):::bucket
+    Bucket3("Bucket 3 (listItem)<br /><br />ROOT __Item{3}ᐸ18ᐳ[19]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 20<br /><br />ROOT PgSelectSingle{3}ᐸlist_of_compound_types_mutationᐳ[20]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 27<br /><br />ROOT PgClassExpression{4}ᐸ__list_of_...tion__.”g”ᐳ[27]"):::bucket
+    end
+    Bucket0 --> Bucket1
+    Bucket1 --> Bucket2
+    Bucket2 --> Bucket3
+    Bucket3 --> Bucket4
+    Bucket4 --> Bucket5
+
+    %% plan dependencies
+    Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access12{{"Access[12∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access13{{"Access[13∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access12 & Access13 --> Object14
+    Access6{{"Access[6∈0] ➊<br />ᐸ0.inputᐳ"}}:::plan
+    __Value0["__Value[0∈0] ➊<br />ᐸvariableValuesᐳ"]:::plan
+    __Value0 --> Access6
+    Access8{{"Access[8∈0] ➊<br />ᐸ0.input.recordsᐳ"}}:::plan
+    __Value0 --> Access8
+    BakedInput10{{"BakedInput[10∈0] ➊"}}:::plan
+    Access8 --> BakedInput10
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
+    __Value2 --> Access12
+    __Value2 --> Access13
+    PgFromExpression15{{"PgFromExpression[15∈0] ➊"}}:::plan
+    BakedInput10 --> PgFromExpression15
+    ApplyInput17{{"ApplyInput[17∈0] ➊"}}:::plan
+    Access6 --> ApplyInput17
+    PgSelect11[["PgSelect[11∈1] ➊<br />ᐸlist_of_compound_types_mutation(mutation)ᐳ"]]:::sideeffectplan
+    Object14 & PgFromExpression15 & ApplyInput17 --> PgSelect11
+    Object16{{"Object[16∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgSelect11 --> Object16
+    PgSelectRows18[["PgSelectRows[18∈2] ➊"]]:::plan
+    PgSelect11 --> PgSelectRows18
+    __Item19[/"__Item[19∈3]<br />ᐸ18ᐳ"\]:::itemplan
+    PgSelectRows18 ==> __Item19
+    PgSelectSingle20{{"PgSelectSingle[20∈3]<br />ᐸlist_of_compound_types_mutationᐳ"}}:::plan
+    __Item19 --> PgSelectSingle20
+    PgClassExpression21{{"PgClassExpression[21∈4]<br />ᐸ__list_of_...tion__.”a”ᐳ"}}:::plan
+    PgSelectSingle20 --> PgClassExpression21
+    PgClassExpression22{{"PgClassExpression[22∈4]<br />ᐸ__list_of_...tion__.”b”ᐳ"}}:::plan
+    PgSelectSingle20 --> PgClassExpression22
+    PgClassExpression23{{"PgClassExpression[23∈4]<br />ᐸ__list_of_...tion__.”c”ᐳ"}}:::plan
+    PgSelectSingle20 --> PgClassExpression23
+    PgClassExpression24{{"PgClassExpression[24∈4]<br />ᐸ__list_of_...tion__.”d”ᐳ"}}:::plan
+    PgSelectSingle20 --> PgClassExpression24
+    PgClassExpression25{{"PgClassExpression[25∈4]<br />ᐸ__list_of_...tion__.”e”ᐳ"}}:::plan
+    PgSelectSingle20 --> PgClassExpression25
+    PgClassExpression26{{"PgClassExpression[26∈4]<br />ᐸ__list_of_...tion__.”f”ᐳ"}}:::plan
+    PgSelectSingle20 --> PgClassExpression26
+    PgClassExpression27{{"PgClassExpression[27∈4]<br />ᐸ__list_of_...tion__.”g”ᐳ"}}:::plan
+    PgSelectSingle20 --> PgClassExpression27
+    PgClassExpression28{{"PgClassExpression[28∈4]<br />ᐸ__list_of_....”foo_bar”ᐳ"}}:::plan
+    PgSelectSingle20 --> PgClassExpression28
+
+    %% define steps
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value0,__Value2,Access6,Access8,BakedInput10,Access12,Access13,Object14,PgFromExpression15,ApplyInput17 bucket0
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,PgSelect11,Object16 bucket1
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,PgSelectRows18 bucket2
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,__Item19,PgSelectSingle20 bucket3
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,PgClassExpression21,PgClassExpression22,PgClassExpression23,PgClassExpression24,PgClassExpression25,PgClassExpression26,PgClassExpression27,PgClassExpression28 bucket4
+    classDef bucket5 stroke:#7fff00
+    class Bucket5 bucket5
+

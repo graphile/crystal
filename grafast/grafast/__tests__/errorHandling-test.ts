@@ -4,15 +4,20 @@ import { resolvePreset } from "graphile-config";
 import type { AsyncExecutionResult, ExecutionResult } from "graphql";
 import { it } from "mocha";
 
-import type { ExecutionDetails, PromiseOrDirect } from "../dist/index.js";
+import type {
+  ExecutionDetails,
+  ExecutionResults,
+  FieldArgs,
+  PromiseOrDirect,
+} from "../dist/index.js";
 import {
   constant,
   context,
-  ExecutableStep,
   grafast,
   lambda,
   makeGrafastSchema,
   sideEffect,
+  Step,
 } from "../dist/index.js";
 
 const resolvedPreset = resolvePreset({});
@@ -28,13 +33,10 @@ declare global {
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-class SyncListCallbackStep<
-  TIn,
-  TOut extends any[],
-> extends ExecutableStep<TOut> {
+class SyncListCallbackStep<TIn, TOut extends any[]> extends Step<TOut> {
   isSyncAndSafe = false;
   constructor(
-    $dep: ExecutableStep<TIn>,
+    $dep: Step<TIn>,
     private callback: (val: TIn) => PromiseOrDirect<TOut>,
   ) {
     super();
@@ -43,19 +45,23 @@ class SyncListCallbackStep<
   execute({
     indexMap,
     values: [values0],
-  }: ExecutionDetails<[TIn]>): ReadonlyArray<PromiseOrDirect<TOut>> {
-    return indexMap((i) => this.callback(values0.at(i)));
-  }
-  async stream({ indexMap, values: [values0] }: ExecutionDetails<[TIn]>) {
-    await sleep(0);
-    const { callback } = this;
-    return indexMap((i) => {
-      const entry = values0.at(i);
-      return (async function* () {
-        const data = await callback(entry);
-        yield* data;
+    stream,
+  }: ExecutionDetails<[TIn]>): ExecutionResults<TOut> {
+    if (!stream) {
+      return indexMap((i) => this.callback(values0.at(i)));
+    } else {
+      return (async () => {
+        await sleep(0);
+        const { callback } = this;
+        return indexMap((i) => {
+          const entry = values0.at(i);
+          return (async function* () {
+            const data = await callback(entry);
+            yield* data;
+          })();
+        });
       })();
-    });
+    }
   }
 }
 
@@ -74,35 +80,41 @@ const schema = makeGrafastSchema({
       sideEffectListCheck(arr: [String]!): Int
     }
   `,
-  plans: {
+  objects: {
     Query: {
-      list() {
-        return constant([1, 2]);
-      },
-      sideEffectListCheck(_, fieldArgs) {
-        const $mol = context().get("mol");
-        sideEffect($mol, () => {});
-        const $count = lambda(fieldArgs.get("arr"), (arr) => {
-          return arr.length;
-        });
-        $count.hasSideEffects = true;
-        return $count;
+      plans: {
+        list() {
+          return constant([1, 2]);
+        },
+        sideEffectListCheck(_: Step, fieldArgs: FieldArgs) {
+          const $mol = context().get("mol");
+          sideEffect($mol, () => {});
+          const $count = lambda(fieldArgs.getRaw("arr"), (arr) => {
+            return arr.length;
+          });
+          $count.hasSideEffects = true;
+          return $count;
+        },
       },
     },
     Thing: {
-      id($i: ExecutableStep<number>) {
-        return $i;
-      },
-      anotherList($i: ExecutableStep<number>) {
-        return new SyncListCallbackStep($i, (i) => [i + 0, i + 1, i + 2]);
-      },
-      throw() {
-        return lambda(null, () => Promise.reject(new Error("ERROR")));
+      plans: {
+        id($i: Step<number>) {
+          return $i;
+        },
+        anotherList($i: Step<number>) {
+          return new SyncListCallbackStep($i, (i) => [i + 0, i + 1, i + 2]);
+        },
+        throw() {
+          return lambda(null, () => Promise.reject(new Error("ERROR")));
+        },
       },
     },
     OtherThing: {
-      id($i: ExecutableStep<number>) {
-        return $i;
+      plans: {
+        id($i: Step<number>) {
+          return $i;
+        },
       },
     },
   },

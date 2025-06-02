@@ -49,15 +49,19 @@ const ExtendPlugin = makeExtendSchemaPlugin({
       scalar2: Scalar2
     }
   `,
-  plans: {
+  objects: {
     Query: {
-      scalar1() {
-        return constant("hello world");
-      },
-      scalar2() {
-        return constant("hello world");
+      plans: {
+        scalar1() {
+          return constant("hello world");
+        },
+        scalar2() {
+          return constant("hello world");
+        },
       },
     },
+  },
+  scalars: {
     Scalar1: new GraphQLScalarType({
       name: "SomethingElse",
       serialize: EXPORTABLE(
@@ -168,12 +172,14 @@ it("enables overriding scope", async () => {
             favouritePets: PetConnection
           }
         `,
-        plans: {
+        objects: {
           User: {
-            favouritePets: {
-              scope: {
-                pgTypeResource: undefined,
-                isPgFieldConnection: undefined,
+            plans: {
+              favouritePets: {
+                scope: {
+                  pgTypeResource: undefined,
+                  isPgFieldConnection: undefined,
+                },
               },
             },
           },
@@ -207,27 +213,32 @@ it("supports unary steps in loadOne", async () => {
               uppercaseName: String
             }
           `,
-          plans: {
+          objects: {
             User: {
-              uppercaseName($user) {
-                const $name = $user.get("name");
-                const $executorContext = main.context();
-                return loadOne(
-                  $name,
-                  $executorContext,
-                  async (names, { unary: executorContext }) => {
-                    const { withPgClient, pgSettings } = executorContext;
-                    const { rows } = await withPgClient(pgSettings, (client) =>
-                      client.query<{ i: string; upper_name: string }>({
-                        text: "select (i - 1)::text as i, upper(name) as upper_name from json_array_elements_text($1::json) with ordinality as el(name, i)",
-                        values: [JSON.stringify(names)],
-                      }),
-                    );
-                    return names.map(
-                      (_, i) => rows.find((r) => r.i === String(i))?.upper_name,
-                    );
-                  },
-                );
+              plans: {
+                uppercaseName($user) {
+                  const $name = $user.get("name");
+                  const $executorContext = main.context();
+                  return loadOne(
+                    $name,
+                    $executorContext,
+                    async (names, { unary: executorContext }) => {
+                      const { withPgClient, pgSettings } = executorContext;
+                      const { rows } = await withPgClient(
+                        pgSettings,
+                        (client) =>
+                          client.query<{ i: string; upper_name: string }>({
+                            text: "select (i - 1)::text as i, upper(name) as upper_name from json_array_elements_text($1::json) with ordinality as el(name, i)",
+                            values: [JSON.stringify(names)],
+                          }),
+                      );
+                      return names.map(
+                        (_, i) =>
+                          rows.find((r) => r.i === String(i))?.upper_name,
+                      );
+                    },
+                  );
+                },
               },
             },
           },
@@ -293,55 +304,57 @@ it("supports arbitrary sql queries, does not dedup unrelated queries", async () 
               two: UserConnection
             }
           `,
-          plans: {
+          objects: {
             User: {
-              one($user) {
-                const $one = pgSelect({
-                  identifiers: [],
-                  name: "one",
-                  resource: users,
-                  args: [
-                    {
-                      step: $user.get("id"),
-                      pgCodec: TYPES.text,
-                      name: "user_id",
+              plans: {
+                one($user) {
+                  const $one = pgSelect({
+                    identifiers: [],
+                    name: "one",
+                    resource: users,
+                    args: [
+                      {
+                        step: $user.get("id"),
+                        pgCodec: TYPES.int,
+                        name: "user_id",
+                      },
+                    ],
+                    from: (userIdArg) => {
+                      const usersTblId = sql.identifier(Symbol());
+                      return sql`(select * from ${
+                        users!.codec.sqlType
+                      } as ${usersTblId} where id != ${
+                        userIdArg.placeholder
+                      } order by ${usersTblId}.id limit 1)`;
                     },
-                  ],
-                  from: ($userId) => {
-                    const usersTblId = sql.identifier(Symbol());
-                    return sql`(select * from ${
-                      users!.codec.sqlType
-                    } as ${usersTblId} where id != ${
-                      $userId.placeholder
-                    } order by ${usersTblId}.id limit 1)`;
-                  },
-                });
-                $one.setOrderIsUnique();
-                return connection($one);
-              },
-              two($user) {
-                const $two = pgSelect({
-                  identifiers: [],
-                  name: "two",
-                  resource: users,
-                  args: [
-                    {
-                      step: $user.get("id"),
-                      pgCodec: TYPES.text,
-                      name: "user_id",
+                  });
+                  $one.setOrderIsUnique();
+                  return connection($one);
+                },
+                two($user) {
+                  const $two = pgSelect({
+                    identifiers: [],
+                    name: "two",
+                    resource: users,
+                    args: [
+                      {
+                        step: $user.get("id"),
+                        pgCodec: TYPES.int,
+                        name: "user_id",
+                      },
+                    ],
+                    from: (userIdArg) => {
+                      const usersTblId = sql.identifier(Symbol());
+                      return sql`(select * from ${
+                        users!.codec.sqlType
+                      } as ${usersTblId} where id != ${
+                        userIdArg.placeholder
+                      } order by ${usersTblId}.id limit 1 offset 1)`;
                     },
-                  ],
-                  from: ($userId) => {
-                    const usersTblId = sql.identifier(Symbol());
-                    return sql`(select * from ${
-                      users!.codec.sqlType
-                    } as ${usersTblId} where id != ${
-                      $userId.placeholder
-                    } order by ${usersTblId}.id limit 1 offset 1)`;
-                  },
-                });
-                $two.setOrderIsUnique();
-                return connection($two);
+                  });
+                  $two.setOrderIsUnique();
+                  return connection($two);
+                },
               },
             },
           },

@@ -1,0 +1,12 @@
+# Ref item-lootbox-minimum.md
+
+{
+  item(type: Consumable, id: 203) {
+    name
+    canBeFoundIn {
+      id
+      tier
+      category
+    }
+  }
+}

@@ -104,8 +104,8 @@ export const useFetcher = (
   const subscriptionUrl = props.subscriptionEndpoint
     ? makeWsUrl(props.subscriptionEndpoint)
     : props.endpoint
-    ? makeWsUrl(props.endpoint)
-    : undefined;
+      ? makeWsUrl(props.endpoint)
+      : undefined;
   const [explainResults, setExplainResults] = useState<ExplainResults | null>(
     null,
   );

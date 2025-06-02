@@ -1,6 +1,6 @@
 {
   "name": "eslint-plugin-graphile-export",
-  "version": "0.0.2-beta.5",
+  "version": "0.0.2-beta.6",
   "description": "ESLint plugin to help ensure your schema is exportable by graphile-export",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -25,7 +25,7 @@
   },
   "homepage": "https://graphile.org/",
   "dependencies": {
-    "tslib": "^2.6.2"
+    "tslib": "^2.8.1"
   },
   "engines": {
     "node": ">=16"
@@ -43,6 +43,6 @@
     "@types/jest": "^29.5.4",
     "jest": "^29.6.4",
     "ts-node": "^10.9.1",
-    "typescript": "^5.2.2"
+    "typescript": "^5.8.3"
   }
 }

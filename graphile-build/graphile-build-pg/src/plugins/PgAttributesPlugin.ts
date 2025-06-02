@@ -8,13 +8,17 @@ import type {
   PgCodecAttributes,
   PgCodecList,
   PgCodecWithAttributes,
-  PgConditionStep,
+  PgCondition,
+  PgSelectQueryBuilder,
   PgSelectSingleStep,
-  PgSelectStep,
 } from "@dataplan/pg";
-import { pgSelectFromRecords, pgSelectSingleFromRecord } from "@dataplan/pg";
-import type { GrafastFieldConfig, SetterStep } from "grafast";
-import { each } from "grafast";
+import {
+  pgSelectFromRecords,
+  pgSelectSingleFromRecord,
+  sqlValueWithCodec,
+} from "@dataplan/pg";
+import type { GrafastFieldConfig, Setter, Step } from "grafast";
+import { bakedInputRuntime, each } from "grafast";
 import type { GraphQLFieldConfigMap, GraphQLOutputType } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 
@@ -156,7 +160,7 @@ function processAttribute(
   }
   const [baseCodec, type] = resolveResult;
 
-  const fieldSpec: GrafastFieldConfig<any, any, any, any, any> = {
+  const fieldSpec: GrafastFieldConfig<any, any, any> = {
     description: attribute.description,
     type: type as GraphQLOutputType,
   };
@@ -174,6 +178,10 @@ function processAttribute(
       // See if there's a resource to pull record types from (e.g. for relations/etc)
       if (!baseCodec.attributes) {
         // Simply get the value
+        if (attributeName === attributeFieldName) {
+          // Use default getter
+          return undefined;
+        }
         return EXPORTABLE(
           (attributeName) => ($record: PgSelectSingleStep) => {
             return $record.get(attributeName);
@@ -220,7 +228,10 @@ function processAttribute(
                   attributeName,
                 ) as PgClassExpressionStep<PgCodecList<PgCodecList>, any>;
                 return each($val, ($list) => {
-                  const $select = pgSelectFromRecords(resource, $list);
+                  const $select = pgSelectFromRecords(
+                    resource,
+                    $list as Step<readonly unknown[]>,
+                  );
                   $select.setTrusted();
                   return $select;
                 });
@@ -484,7 +495,12 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
         return fields;
       },
       GraphQLInputObjectType_fields(fields, build, context) {
-        const { extend, inflection, sql } = build;
+        const {
+          extend,
+          inflection,
+          sql,
+          graphql: { isInputType },
+        } = build;
         const {
           scope: {
             isPgRowType,
@@ -538,10 +554,10 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
               const fieldBehaviorScope = isPgBaseInput
                 ? `attribute:base`
                 : isPgPatch
-                ? `attribute:update`
-                : isPgCondition
-                ? `condition:attribute:filterBy`
-                : `attribute:insert`;
+                  ? `attribute:update`
+                  : isPgCondition
+                    ? `condition:attribute:filterBy`
+                    : `attribute:insert`;
 
               if (
                 !build.behavior.pgCodecAttributeMatches(
@@ -561,12 +577,18 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
                   `Two attributes produce the same GraphQL field name '${fieldName}' on input PgCodec '${pgCodec.name}'; one of them is '${attributeName}'`,
                 );
               }
+              const attributeCodec = attribute.codec;
               const attributeType = build.getGraphQLTypeByPgCodec(
-                attribute.codec,
+                attributeCodec,
                 "input",
               );
               if (!attributeType) {
                 return memo;
+              }
+              if (!isInputType(attributeType)) {
+                throw new Error(
+                  `Expected ${attributeType} to be an input type`,
+                );
               }
               return extend(
                 memo,
@@ -596,45 +618,50 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
                           Boolean(attribute.extensions?.tags?.hasDefault),
                         attributeType,
                       ),
-                      autoApplyAfterParentInputPlan: true,
-                      autoApplyAfterParentApplyPlan: true,
-                      applyPlan: isPgCondition
+                      apply: isPgCondition
                         ? EXPORTABLE(
-                            (attribute, attributeName, sql) =>
+                            (
+                              attributeCodec,
+                              attributeName,
+                              sql,
+                              sqlValueWithCodec,
+                            ) =>
                               function plan(
-                                $condition: PgConditionStep<PgSelectStep<any>>,
-                                val,
+                                $condition: PgCondition<PgSelectQueryBuilder>,
+                                val: unknown,
                               ) {
-                                if (val.getRaw().evalIs(null)) {
-                                  $condition.where({
-                                    type: "attribute",
-                                    attribute: attributeName,
-                                    callback: (expression) =>
-                                      sql`${expression} is null`,
-                                  });
-                                } else {
-                                  $condition.where({
-                                    type: "attribute",
-                                    attribute: attributeName,
-                                    callback: (expression) =>
-                                      sql`${expression} = ${$condition.placeholder(
-                                        val.get(),
-                                        attribute.codec,
-                                      )}`,
-                                  });
-                                }
+                                $condition.where({
+                                  type: "attribute",
+                                  attribute: attributeName,
+                                  callback: (expression) =>
+                                    val === null
+                                      ? sql`${expression} is null`
+                                      : sql`${expression} = ${sqlValueWithCodec(
+                                          val,
+                                          attributeCodec,
+                                        )}`,
+                                });
                               },
-                            [attribute, attributeName, sql],
+                            [
+                              attributeCodec,
+                              attributeName,
+                              sql,
+                              sqlValueWithCodec,
+                            ],
                           )
                         : EXPORTABLE(
-                            (attributeName) =>
+                            (attributeName, bakedInputRuntime) =>
                               function plan(
-                                $insert: SetterStep<any, any>,
-                                val,
+                                obj: Setter,
+                                val: unknown,
+                                { field, schema },
                               ) {
-                                $insert.set(attributeName, val.get());
+                                obj.set(
+                                  attributeName,
+                                  bakedInputRuntime(schema, field.type, val),
+                                );
                               },
-                            [attributeName],
+                            [attributeName, bakedInputRuntime],
                           ),
                     },
                   ),

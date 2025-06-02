@@ -17,6 +17,13 @@ module.exports = {
       },
     },
     {
+      // Wrapping commands in yaml is gross
+      files: [".github/**/*.yml"],
+      options: {
+        proseWrap: "preserve",
+      },
+    },
+    {
       files: "grafast/grafast/vendor/graphql-js/**",
       options: {
         singleQuote: true,

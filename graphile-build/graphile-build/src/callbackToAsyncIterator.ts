@@ -59,7 +59,7 @@ export default function callbackToAsyncIterator<CallbackInput, ReturnVal>(
       pullQueue.forEach((resolve) => resolve({ value: undefined, done: true }));
       pullQueue = [];
       pushQueue = [];
-      onClose && onClose(listenerReturnValue);
+      onClose?.(listenerReturnValue);
     }
   }
 

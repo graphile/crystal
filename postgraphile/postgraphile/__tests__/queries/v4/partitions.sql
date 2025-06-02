@@ -6,7 +6,10 @@ select
   __users__."name" as "4"
 from "partitions"."measurements" as __measurements__
 left outer join "partitions"."users" as __users__
-on (__measurements__."user_id"::"int4" = __users__."id")
+on (
+/* WHERE becoming ON */ (
+  __users__."id" = __measurements__."user_id"
+))
 order by __measurements__."timestamp" asc, __measurements__."key" asc;
 
 select

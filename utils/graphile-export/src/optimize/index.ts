@@ -43,6 +43,16 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
   // Reset the full AST
   ast = parse(generate(ast).code, { sourceType: "module" });
   traverse(ast, {
+    SpreadElement: {
+      enter(path) {
+        if (
+          path.node.argument.type === "NullLiteral" &&
+          path.parentPath.isObjectExpression()
+        ) {
+          path.remove();
+        }
+      },
+    },
     VariableDeclaration: {
       enter(path) {
         const node = path.node;
@@ -258,13 +268,50 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
         }
       },
     },
+    BlockStatement(path) {
+      const body = path.node.body;
+
+      // Only strip if it's a statement within another block statement or the
+      // program. We don't want to trim block wrappers around for/if/while/etc
+      if (!path.parentPath.isBlockStatement() && !path.parentPath.isProgram()) {
+        return;
+      }
+
+      // Don't strip a block if there's any variable declarations in it.
+      if (body.some((stmt) => stmt.type === "VariableDeclaration")) {
+        return;
+      }
+
+      path.replaceWithMultiple(body);
+    },
   });
 
   ast = parse(generate(ast).code, { sourceType: "module" });
 
   // convert `plan: function plan() {...}` to `plan() { ... }`
   // convert `fn(...["a", "b"])` to `fn("a", "b")`
+  // remove `if (false) { ... }` / `if (null)` / `if (undefined)`
   traverse(ast, {
+    IfStatement(path) {
+      const test = path.node.test;
+      if (expressionIsAlwaysFalsy(test)) {
+        if (path.node.alternate) {
+          path.replaceWith(path.node.alternate);
+        } else {
+          path.remove();
+        }
+      } else if (expressionIsAlwaysTruthy(test)) {
+        path.replaceWith(path.node.consequent);
+      }
+    },
+    ConditionalExpression(path) {
+      const test = path.node.test;
+      if (expressionIsAlwaysFalsy(test)) {
+        path.replaceWith(path.node.alternate);
+      } else if (expressionIsAlwaysTruthy(test)) {
+        path.replaceWith(path.node.consequent);
+      }
+    },
     ObjectProperty(path) {
       if (!t.isIdentifier(path.node.key)) {
         return;
@@ -306,7 +353,6 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
       );
     },
     CallExpression(path) {
-      path.node.arguments;
       const argsPath = path.get("arguments");
       if (argsPath.length === 1) {
         const argPath = argsPath[0];
@@ -331,4 +377,48 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
 
 function isNotNullish<T>(o: T | null | undefined): o is T {
   return o != null;
+}
+
+function expressionIsAlwaysFalsy(test: t.Expression) {
+  switch (test.type) {
+    case "Identifier":
+      return test.name === "undefined";
+    case "NullLiteral":
+      return true;
+    case "BooleanLiteral":
+      return !test.value;
+    case "BinaryExpression": {
+      switch (test.operator) {
+        case "!=": {
+          if (
+            expressionIsNullOrUndefined(test.left) &&
+            expressionIsNullOrUndefined(test.right)
+          ) {
+            return true;
+          }
+          return false;
+        }
+        default: {
+          return false;
+        }
+      }
+    }
+    default:
+      return false;
+  }
+}
+
+function expressionIsAlwaysTruthy(test: t.Expression) {
+  switch (test.type) {
+    case "BooleanLiteral":
+      return test.value;
+    default:
+      return false;
+  }
+}
+function expressionIsNullOrUndefined(expr: t.Expression | t.PrivateName) {
+  return (
+    expr.type === "NullLiteral" ||
+    (expr.type === "Identifier" && expr.name === "undefined")
+  );
 }

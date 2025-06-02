@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-types */
 import chalk from "chalk";
 import te, { isSafeObjectPropertyName } from "tamedevil";
 
@@ -7,8 +6,8 @@ import type {
   GrafastResultsList,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
-import type { ExecutableStep } from "../step.js";
-import { UnbatchedExecutableStep } from "../step.js";
+import type { Step } from "../step.js";
+import { UnbatchedStep } from "../step.js";
 import { digestKeys } from "../utils.js";
 
 export type ActualKeyByDesiredKey = { [desiredKey: string]: string };
@@ -58,7 +57,7 @@ function makeMapper(
  * A plan that returns an object resulting from extracting the given
  * `actualKey` from the input and storing it as the `desiredKey` in the output.
  */
-export class RemapKeysStep extends UnbatchedExecutableStep {
+export class RemapKeysStep extends UnbatchedStep {
   static $$export = {
     moduleName: "grafast",
     exportName: "RemapKeysStep",
@@ -68,7 +67,7 @@ export class RemapKeysStep extends UnbatchedExecutableStep {
 
   private mapper!: (obj: object | null) => object | null;
   constructor(
-    $plan: ExecutableStep,
+    $plan: Step,
     private readonly actualKeyByDesiredKey: ActualKeyByDesiredKey,
   ) {
     super();
@@ -87,14 +86,14 @@ export class RemapKeysStep extends UnbatchedExecutableStep {
     );
   }
 
-  optimize() {
+  optimize(): Step {
     for (const [key, val] of Object.entries(this.actualKeyByDesiredKey)) {
       if (String(key) !== String(val)) {
         return this;
       }
     }
     // If we're not actually remapping, just return the parent
-    return this.getDep(0);
+    return this.getDep(0) as Step;
   }
 
   finalize(): void {
@@ -128,7 +127,7 @@ export class RemapKeysStep extends UnbatchedExecutableStep {
  * `actualKey` from the input and storing it as the `desiredKey` in the output.
  */
 export function remapKeys(
-  $step: ExecutableStep,
+  $step: Step,
   actualKeyByDesiredKey: { [desiredKey: string]: string },
 ): RemapKeysStep {
   return new RemapKeysStep($step, actualKeyByDesiredKey);

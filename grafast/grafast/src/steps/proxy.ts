@@ -1,11 +1,11 @@
+import { $$proxy } from "../constants.js";
 import type {
   ExecutionDetails,
   GrafastResultsList,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
-import { $$proxy } from "../interfaces.js";
-import type { ExecutableStep } from "../step.js";
-import { UnbatchedExecutableStep } from "../step.js";
+import type { Step } from "../step.js";
+import { UnbatchedStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
 
 /**
@@ -13,14 +13,14 @@ import { arrayOfLength } from "../utils.js";
  *
  * Never build this class directly.
  */
-export class ProxyStep<T> extends UnbatchedExecutableStep<T> {
+export class ProxyStep<T> extends UnbatchedStep<T> {
   static $$export = {
     moduleName: "grafast",
     exportName: "ProxyStep",
   };
   isSyncAndSafe = true;
   private $depId: number;
-  constructor($dep: ExecutableStep<T>, $actualDep: ExecutableStep) {
+  constructor($dep: Step<T>, $actualDep: Step) {
     super();
     this.$depId = $dep.id;
     this.addDependency($actualDep);
@@ -30,7 +30,7 @@ export class ProxyStep<T> extends UnbatchedExecutableStep<T> {
     return $dep.toString();
   }
   // Publicly expose this
-  public addDependency(step: ExecutableStep): number {
+  public addDependency(step: Step): number {
     return super.addDependency(step);
   }
   execute({
@@ -48,15 +48,7 @@ export class ProxyStep<T> extends UnbatchedExecutableStep<T> {
   stream = undefined;
 }
 
-declare module "../step.js" {
-  interface ExecutableStep {
-    [$$proxy]?: any;
-  }
-}
-
-function makeProxyHandler<T>(
-  $toStep: ExecutableStep<T>,
-): ProxyHandler<ExecutableStep<T>> {
+function makeProxyHandler<T>($toStep: Step<T>): ProxyHandler<Step<T>> {
   return {
     // $proxy - the ProxyStep instance
     // p - the property being accessed
@@ -124,10 +116,10 @@ function makeProxyHandler<T>(
  * This could change at any time, may impact performance, and just, generally,
  * needs more work. You shouldn't need this in the vast majority of cases.
  */
-export function proxy<TData, TStep extends ExecutableStep<TData>>(
+export function proxy<TData, TStep extends Step<TData>>(
   $step: TStep,
-  $actualDep: ExecutableStep = $step,
-): TStep & { addDependency(step: ExecutableStep): number } {
+  $actualDep: Step = $step,
+): TStep & { addDependency(step: Step): number } {
   const $proxy = new ProxyStep($step, $actualDep);
   const proxy = new Proxy($proxy, makeProxyHandler($step)) as any; // Lie.
   $proxy[$$proxy] = proxy;

@@ -4,26 +4,26 @@ import { resolvePreset } from "graphile-config";
 import type { AsyncExecutionResult } from "graphql";
 import { it } from "mocha";
 
-import type { ExecutionDetails, PromiseOrDirect } from "../dist/index.js";
+import type {
+  ExecutionDetails,
+  ExecutionResults,
+  PromiseOrDirect,
+} from "../dist/index.js";
 import {
   constant,
-  ExecutableStep,
   grafast,
   lambda,
   makeGrafastSchema,
+  Step,
 } from "../dist/index.js";
-import type { StreamDetails } from "../dist/interfaces.js";
 
 const resolvedPreset = resolvePreset({});
 const requestContext = {};
 
-class SyncListCallbackStep<
-  TIn,
-  TOut extends any[],
-> extends ExecutableStep<TOut> {
+class SyncListCallbackStep<TIn, TOut extends any[]> extends Step<TOut> {
   isSyncAndSafe = false;
   constructor(
-    $dep: ExecutableStep<TIn>,
+    $dep: Step<TIn>,
     private callback: (val: TIn) => PromiseOrDirect<TOut>,
   ) {
     super();
@@ -32,17 +32,19 @@ class SyncListCallbackStep<
   execute({
     indexMap,
     values: [values0],
-  }: ExecutionDetails<[TIn]>): ReadonlyArray<PromiseOrDirect<TOut>> {
-    return indexMap((i) => this.callback(values0.at(i)));
-  }
-  stream({ indexMap, values: [values0] }: StreamDetails<[TIn]>) {
+    stream,
+  }: ExecutionDetails<[TIn]>): ExecutionResults<TOut> {
     const { callback } = this;
     return indexMap((i) => {
       const entry = values0.at(i);
-      return (async function* () {
-        const data = await callback(entry);
-        yield* data;
-      })();
+      if (!stream) {
+        return callback(entry);
+      } else {
+        return (async function* () {
+          const data = await callback(entry);
+          yield* data;
+        })();
+      }
     });
   }
 }
@@ -61,28 +63,34 @@ const makeSchema = (useStreamableStep = false) => {
         list: [Thing!]
       }
     `,
-    plans: {
+    objects: {
       Query: {
-        list() {
-          return constant([1, 2]);
+        plans: {
+          list() {
+            return constant([1, 2]);
+          },
         },
       },
       Thing: {
-        id($i: ExecutableStep<number>) {
-          return $i;
-        },
-        anotherList($i: ExecutableStep<number>) {
-          const cb = (i: number) => [i + 0, i + 1, i + 2];
-          if (useStreamableStep) {
-            return new SyncListCallbackStep($i, cb);
-          } else {
-            return lambda($i, cb);
-          }
+        plans: {
+          id($i: Step<number>) {
+            return $i;
+          },
+          anotherList($i: Step<number>) {
+            const cb = (i: number) => [i + 0, i + 1, i + 2];
+            if (useStreamableStep) {
+              return new SyncListCallbackStep($i, cb);
+            } else {
+              return lambda($i, cb);
+            }
+          },
         },
       },
       OtherThing: {
-        id($i: ExecutableStep<number>) {
-          return $i;
+        plans: {
+          id($i: Step<number>) {
+            return $i;
+          },
         },
       },
     },

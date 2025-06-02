@@ -1,8 +1,15 @@
 import chalk from "chalk";
-import type { GraphQLObjectType } from "graphql";
 import type { TE } from "tamedevil";
 import te from "tamedevil";
 
+import {
+  $$deepDepSkip,
+  $$proxy,
+  $$subroutine,
+  ALL_FLAGS,
+  DEFAULT_FORBIDDEN_FLAGS,
+  TRAPPABLE_FLAGS,
+} from "./constants.js";
 import { isDev, noop } from "./dev.js";
 import type {
   LayerPlan,
@@ -20,24 +27,19 @@ import { getDebug } from "./global.js";
 import { inspect } from "./inspect.js";
 import type {
   AddDependencyOptions,
+  AddUnaryDependencyOptions,
+  DependencyOptions,
   ExecutionDetails,
   ExecutionEntryFlags,
+  ExecutionResults,
   GrafastResultsList,
-  GrafastResultStreamList,
   JSONValue,
   PromiseOrDirect,
   StepOptimizeOptions,
   StepOptions,
-  StreamDetails,
   UnbatchedExecutionExtra,
 } from "./interfaces.js";
-import {
-  $$deepDepSkip,
-  $$subroutine,
-  ALL_FLAGS,
-  DEFAULT_FORBIDDEN_FLAGS,
-} from "./interfaces.js";
-import type { __ItemStep } from "./steps/index.js";
+import type { __FlagStep, __ItemStep } from "./steps/index.js";
 import { stepADependsOnStepB, stepAMayDependOnStepB } from "./utils.js";
 
 /**
@@ -50,7 +52,7 @@ export const $$noExec = Symbol("noExec");
 
 const ref_flagError = te.ref(flagError, "flagError");
 
-function throwDestroyed(this: ExecutableStep): any {
+function throwDestroyed(this: Step): any {
   let message: string;
   try {
     message = `${this} has been destroyed; calling methods on it is no longer possible`;
@@ -60,17 +62,15 @@ function throwDestroyed(this: ExecutableStep): any {
   throw new Error(message);
 }
 
-type DeepDepSkippable<T> = ExecutableStep<T> & {
-  [$$deepDepSkip](): ExecutableStep;
+type DeepDepSkippable<T> = Step<T> & {
+  [$$deepDepSkip](): Step;
 };
 
-function isDeepDepSkippable<T>(
-  $dep: ExecutableStep,
-): $dep is DeepDepSkippable<T> {
+function isDeepDepSkippable<T>($dep: Step): $dep is DeepDepSkippable<T> {
   return $$deepDepSkip in $dep && typeof $dep[$$deepDepSkip] === "function";
 }
 
-function reallyAssertFinalized(plan: BaseStep): void {
+function reallyAssertFinalized(plan: Step): void {
   if (!plan.isFinalized) {
     throw new Error(
       `Step ${plan} is not finalized; did you forget to call \`super.finalize()\` from its \`finalize()\` method?`,
@@ -82,23 +82,10 @@ function reallyAssertFinalized(plan: BaseStep): void {
 export const assertFinalized = !isDev ? noop : reallyAssertFinalized;
 
 /**
- * The base abstract plan type; you should not extend this directly - instead
- * use an ExecutableStep (for use when planning output fields) or a
- * ModifierStep (for use when planning arguments/input fields).
- *
- * @remarks
- *
- * Though it might seem that ModifierStep should be used for all inputs
- * (arguments, input objects), this is not the case. When planning an output
- * field, all inputs to it (including arguments, parent plan, context, etc)
- * should be other executable plans. The only time that ModifierStep is used is
- * when writing specific plans as part of the argument or input field
- * definitions themself; even in these cases the inputs to these plan resolvers
- * will be ExecutablePlans.
+ * Executable plans are the plans associated with leaves on the GraphQL tree,
+ * they must be able to execute to return values.
  */
-export abstract class BaseStep {
-  // Explicitly we do not add $$export here because we want children to set it
-
+export /* abstract */ class Step<TData = any> {
   /**
    * This identifies the "bucket" into which this plan's results will be stored.
    * New buckets are introduced when you cross boundaries that may change the
@@ -126,63 +113,30 @@ export abstract class BaseStep {
   public readonly layerPlan: LayerPlan;
   public readonly operationPlan: OperationPlan;
   public [$$subroutine]: LayerPlan<LayerPlanReasonSubroutine> | null = null;
+  /** @internal */
+  public [$$proxy]?: any;
   public isArgumentsFinalized: boolean;
   public isFinalized: boolean;
   /** @internal */
   public _isUnary: boolean;
   /** @internal */
   public _isUnaryLocked: boolean;
+  /**
+   * Set `true` if this step should only run for certain of the polymorphic
+   * paths available in its LayerPlan.
+   *
+   * @internal
+   */
+  public _isSelectiveStep: boolean;
+  /**
+   * For input values, set `true` if it comes from variables/arguments since
+   * they cannot be modified (even by mutations), set `false` otherwise.
+   *
+   * @internal
+   */
+  public _isImmutable = false;
   public debug: boolean;
 
-  constructor() {
-    this.isArgumentsFinalized = false;
-    this.isFinalized = false;
-    this.debug = getDebug();
-    const layerPlan = currentLayerPlan();
-    this.layerPlan = layerPlan;
-    this.operationPlan = layerPlan.operationPlan;
-    this._isUnary = true;
-    this._isUnaryLocked = false;
-  }
-
-  public toString(): string {
-    const meta = this.toStringMeta();
-    return chalk.bold.blue(
-      `${this.constructor.name.replace(/Step$/, "")}${
-        meta != null && meta.length ? chalk.grey(`<${meta}>`) : ""
-      }`,
-    );
-  }
-
-  /**
-   * This metadata will be merged into toString when referencing this plan.
-   */
-  public toStringMeta(): string | null {
-    return null;
-  }
-
-  public planJSONExtra(): Record<string, JSONValue | undefined> | undefined {
-    return undefined;
-  }
-
-  public finalize(): void {
-    if (!this.isFinalized) {
-      this.isFinalized = true;
-    } else {
-      throw new Error(
-        `Step ${this} has already been finalized - do not call \`finalize()\` from user code!`,
-      );
-    }
-  }
-
-  public destroy(): void {}
-}
-
-/**
- * Executable plans are the plans associated with leaves on the GraphQL tree,
- * they must be able to execute to return values.
- */
-export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   // Explicitly we do not add $$export here because we want children to set it
   static $$export: any;
 
@@ -221,29 +175,43 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   /**
    * The plan this plan will need data from in order to execute.
    */
-  protected readonly dependencies: ReadonlyArray<ExecutableStep>;
+  protected readonly dependencies: ReadonlyArray<Step>;
+  /** @internal */
+  protected readonly _refs: Array<number> = [];
   /**
    * If this step follows a side effects, it must implicitly depend on it (so
    * that any errors the side effect generated will be respected).
    *
    * @internal
    */
-  public readonly implicitSideEffectStep: ExecutableStep | null;
+  public readonly implicitSideEffectStep: Step | null;
   /**
    * What execution entry flags we can't handle for the given indexed dependency
    * (default = this.defaultForbiddenFlags)
+   *
+   * @internal
    */
   protected readonly dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>;
+  /** @internal */
   protected readonly dependencyOnReject: ReadonlyArray<
     Error | null | undefined
   >;
+  /**
+   * In future we'll be able to merge "data only" dependencies somehow. For now
+   * we want people to use the right method so we encourage data only as the
+   * default and also forbid `getDep` on data only deps (no talking to your
+   * data only dependencies!)
+   *
+   * @internal
+   */
+  protected readonly dependencyDataOnly: ReadonlyArray<boolean>;
 
   /**
    * Just for mermaid
    * @internal
    */
   public readonly dependents: ReadonlyArray<{
-    step: ExecutableStep;
+    step: Step;
     dependencyIndex: number;
   }>;
 
@@ -313,22 +281,42 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    */
   public hasSideEffects: boolean;
 
+  /**
+   * DO NOT USE! (Specifically exists so that very VERY special steps could
+   * override it if they so wished.)
+   *
+   * @internal
+   * @experimental
+   */
+  public __trappableFlags: number;
+
   constructor() {
-    super();
+    this.__trappableFlags = TRAPPABLE_FLAGS;
+    this.isArgumentsFinalized = false;
+    this.isFinalized = false;
+    this.debug = getDebug();
+    const layerPlan = currentLayerPlan();
+    this.layerPlan = layerPlan;
+    this.operationPlan = layerPlan.operationPlan;
+    this._isUnary = true;
+    this._isUnaryLocked = false;
+    // Populated in `OperationPlan` during `finalizeLayerPlans`
+    this._isSelectiveStep = false;
+
     this.implicitSideEffectStep = null;
     this.hasSideEffects ??= false;
     let hasSideEffects = false;
     const stepTracker = this.layerPlan.operationPlan.stepTracker;
     Object.defineProperty(this, "hasSideEffects", {
-      get(this: ExecutableStep<TData>) {
+      get(this: Step<TData>) {
         return hasSideEffects;
       },
-      set(this: ExecutableStep<TData>, value) {
+      set(this: Step<TData>, value) {
         /**
          * If steps were created after this step, an this step doesn't depend
          * on them, then it's no longer safe to change hasSideEffects.
          */
-        let nonDependentSteps: ExecutableStep[] | null = null;
+        let nonDependentSteps: Step[] | null = null;
 
         const maxStepId = stepTracker.stepCount - 1;
         if (this.id === maxStepId) {
@@ -370,10 +358,11 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     this.dependencies = [];
     this.dependencyForbiddenFlags = [];
     this.dependencyOnReject = [];
+    this.dependencyDataOnly = [];
     this.dependents = [];
     this.isOptimized = false;
     this.allowMultipleOptimizations = false;
-    this._stepOptions = { stream: null };
+    this._stepOptions = { stream: null, walkIterable: false };
     this.store = true;
     this.polymorphicPaths = currentPolymorphicPaths();
 
@@ -381,24 +370,111 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     this.id = this.layerPlan._addStep(this);
   }
 
-  protected withMyLayerPlan<T>(callback: () => T): T {
-    return withGlobalLayerPlan(this.layerPlan, this.polymorphicPaths, callback);
+  /**
+   * Generally you should only use this once the dependencies of a step are
+   * established, if you use it beforehand and it returns `true` then adding a
+   * non-unary dependency later will result in an error.
+   */
+  public getAndFreezeIsUnary() {
+    this._isUnaryLocked = true;
+    return this._isUnary;
   }
 
-  protected getStep(id: number): ExecutableStep {
+  protected withMyLayerPlan<T>(callback: () => T): T {
+    return withGlobalLayerPlan(
+      this.layerPlan,
+      this.polymorphicPaths,
+      null,
+      callback,
+    );
+  }
+
+  /** @experimental */
+  public withLayerPlan<T>(callback: () => T): T {
+    return withGlobalLayerPlan(
+      this.layerPlan,
+      this.polymorphicPaths,
+      null,
+      callback,
+    );
+  }
+
+  protected getStep(id: number): Step {
     return this.layerPlan.getStep(id, this);
   }
 
-  protected getDepOptions(depId: number): AddDependencyOptions {
-    const step = this.dependencies[depId];
+  protected getDepOptions<TStep extends Step = Step>(
+    depId: number,
+  ): DependencyOptions<TStep> {
+    this._assertAccessAllowed(depId);
+    return this._getDepOptions(depId);
+  }
+  protected _getDepOptions<TStep extends Step = Step>(
+    depId: number,
+  ): DependencyOptions<TStep> {
+    const step = this.dependencies[depId] as TStep;
     const forbiddenFlags = this.dependencyForbiddenFlags[depId];
     const onReject = this.dependencyOnReject[depId];
+    const dataOnly = this.dependencyDataOnly[depId];
     const acceptFlags = ALL_FLAGS & ~forbiddenFlags;
-    return { step, acceptFlags, onReject };
+    return { step, acceptFlags, onReject, dataOnly };
   }
 
-  protected getDep(_depId: number): ExecutableStep {
+  /**
+   * @internal
+   */
+  public _assertAccessAllowed(depId: number): void {
+    const phase = this.operationPlan.phase;
+    if (phase !== "optimize" && phase !== "plan") return;
+    const step = this.dependencies[depId];
+    const dataOnly = this.dependencyDataOnly[depId];
+    if (dataOnly) {
+      throw new Error(
+        `Dependency ${depId} (${step}) of ${this} was declared as "data only", so retrieval is forbidden.`,
+      );
+    }
+  }
+
+  protected getDep<TStep extends Step = Step>(
+    _depId: number,
+  ): TStep | __FlagStep<TStep>;
+  protected getDep<TStep extends Step = Step>(
+    _depId: number,
+    throwOnFlagged: true,
+  ): TStep;
+  protected getDep<TStep extends Step = Step>(
+    _depId: number,
+    _throwOnFlagged = false,
+  ): TStep | __FlagStep<TStep> {
     // This gets replaced when `__FlagStep` is loaded. Were we on ESM we could
+    // just put the code here, but since we're not we have to avoid the
+    // circular dependency.
+    throw new Error(`Grafast failed to load correctly`);
+  }
+
+  protected maybeGetDep<TStep extends Step = Step>(
+    depId: number | null | undefined,
+  ): TStep | __FlagStep<TStep> | null;
+  protected maybeGetDep<TStep extends Step = Step>(
+    depId: number | null | undefined,
+    throwOnFlagged: true,
+  ): TStep | null;
+  protected maybeGetDep<TStep extends Step = Step>(
+    depId: number | null | undefined,
+    throwOnFlagged = false,
+  ): TStep | __FlagStep<TStep> | null {
+    return depId == null
+      ? null
+      : throwOnFlagged
+        ? this.getDep<TStep>(depId, true)
+        : this.getDep<TStep>(depId);
+  }
+
+  protected getDepOrConstant<TData = any>(
+    _depId: number | null,
+    _fallback: TData,
+  ): Step<TData> {
+    // This gets replaced when `constant` is loaded. Were we on ESM we could
     // just put the code here, but since we're not we have to avoid the
     // circular dependency.
     throw new Error(`Grafast failed to load correctly`);
@@ -410,7 +486,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    *
    * @experimental
    */
-  protected getDepDeep(depId: number): ExecutableStep {
+  protected getDepDeep(depId: number): Step {
     let $dep = this.getDep(depId);
     // Walk up the tree, looking for the source of this record. We know that
     // __ItemStep and __ListTransformStep are safe to walk through, but other
@@ -428,7 +504,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    *
    * @experimental
    */
-  protected cacheStep<T extends ExecutableStep>(
+  protected cacheStep<T extends Step>(
     actionKey: string,
     cacheKey: symbol | string | number,
     cb: () => T,
@@ -448,30 +524,149 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
       `${this.constructor.name.replace(/Step$/, "")}${
         this.layerPlan.id === 0 ? "" : chalk.grey(`{${this.layerPlan.id}}`)
       }${this._isUnary ? "➊" : ""}${
-        meta != null && meta.length ? chalk.grey(`<${meta}>`) : ""
-      }[${inspect(this.id, {
-        colors: true,
-      })}]`,
+        this._stepOptions.stream != null ? "@s" : ""
+      }${meta != null && meta.length ? chalk.grey(`<${meta}>`) : ""}[${inspect(
+        this.id,
+        { colors: true },
+      )}]`,
     );
   }
 
-  protected canAddDependency(step: ExecutableStep): boolean {
+  /**
+   * This metadata will be merged into toString when referencing this plan.
+   */
+  public toStringMeta(): string | null {
+    return null;
+  }
+
+  public planJSONExtra(): Record<string, JSONValue | undefined> | undefined {
+    return undefined;
+  }
+
+  /**
+   * **IF IN DOUBT, USE `.addDependency()` INSTEAD!
+   *
+   * This **DANGEROUS** method allows you to create a reference to another
+   * step. A reference is like a dependency except it has no runtime impact -
+   * the data is not passed into execute. In general you should only add
+   * references to steps that you directly or indirectly depend on (e.g. an
+   * ancestor step) so that you may communicate with said step during
+   * `optimize` (for example). Sometimes it's acceptable to reference steps
+   * that you don't transitively depend on; in those cases you're permitted to
+   * pass an `allowIndirectReason` to explain to yourself and others why you
+   * are breaking these rules.
+   *
+   * @experimental
+   */
+  protected addRef(
+    rawStep: Step,
+    allowIndirectReason: string | null = null,
+  ): number | null {
+    const step = this.operationPlan.stepTracker.getStepById(rawStep.id);
+    if (isDev && !allowIndirectReason && !stepADependsOnStepB(this, step)) {
+      const allRefs = (
+        step: Step,
+        allDepIds = new Set<number>(),
+      ): Set<number> => {
+        allDepIds.add(step.id);
+        for (const dep of step.dependencies) {
+          allRefs(dep, allDepIds);
+        }
+        return allDepIds;
+      };
+      const refs1 = allRefs(this);
+      const refs2 = allRefs(step);
+      // const commonRefs = refs1.union(refs2);
+      const commonRefs = new Set([...refs1].filter((v) => refs2.has(v)));
+      const printDeps = (step: Step, depth: number): string => {
+        const isCommon = commonRefs.has(step.id);
+        const stepDesc = isCommon
+          ? chalk.bgWhite.black`<${step}>`
+          : String(step);
+        return `${"  ".repeat(depth)}${stepDesc}${!isCommon && step.dependencies.length > 0 ? `:\n${step.dependencies.map((d) => printDeps(d, depth + 1)).join("\n")}` : ""}`;
+      };
+      throw new Error(
+        `${this} has created a reference to ${step} which is not depended on (directly or indirectly)
+Self:
+${printDeps(this, 1)}
+Reference:
+${printDeps(step, 1)}
+  `,
+      );
+    } else if (!stepAMayDependOnStepB(this, step)) {
+      throw new Error(
+        `${this}.addRef(${step}) forbidden: invalid plan heirarchy`,
+      );
+    }
+    return this._refs.push(step.id) - 1;
+  }
+
+  /**
+   * Allows you to dereference a reference made via `addRef`. Will resolve to
+   * whatever that step is now (or null if not found). Note that referenced
+   * referenced steps may change to a new step instance due to lifecycle
+   * methods (e.g. deduplicate) or even to an entirely separate class
+   * altogether (e.g. due to optimize). References are not guaranteed to be
+   * honoured.
+   *
+   * @experimental
+   */
+  protected getRef(refIdx: number | null): Step | null {
+    if (!["plan", "validate", "optimize"].includes(this.operationPlan.phase)) {
+      throw new Error(
+        `Cannot call ${this}.getRef() when the operation plan phase is ${this.operationPlan.phase}; getRef may only be called during planning.`,
+      );
+    }
+    if (refIdx == null) return null;
+    return (
+      this.operationPlan.stepTracker.getStepById(this._refs[refIdx]) ?? null
+    );
+  }
+
+  protected canAddDependency(step: Step): boolean {
     return stepAMayDependOnStepB(this, step);
   }
 
-  protected addDependency(
-    stepOrOptions: ExecutableStep | AddDependencyOptions,
-  ): number {
-    const options: AddDependencyOptions =
-      stepOrOptions instanceof ExecutableStep
-        ? { step: stepOrOptions, skipDeduplication: false }
-        : stepOrOptions;
+  protected _addDependency(options: AddDependencyOptions): number {
     if (options.step.layerPlan.id > this.layerPlan.id) {
       throw new Error(
-        `Cannot add dependency ${options.step} to ${this} since the former is in a deeper layerPlan (creates a catch-22)`,
+        `Cannot add dependency ${options.step} to ${this} since the former is in a deeper layerPlan (${options.step.layerPlan} deeper than ${this.layerPlan}; creates a catch-22)`,
       );
     }
     return this.operationPlan.stepTracker.addStepDependency(this, options);
+  }
+  protected addDependency(stepOrOptions: Step | AddDependencyOptions): number {
+    const options: AddDependencyOptions = {
+      dataOnly: false,
+      skipDeduplication: false,
+      ...(stepOrOptions instanceof Step
+        ? { step: stepOrOptions }
+        : stepOrOptions),
+    };
+    return this._addDependency(options);
+  }
+  protected addDataDependency(
+    stepOrOptions: Step | AddDependencyOptions,
+  ): number {
+    const opts =
+      stepOrOptions instanceof Step ? { step: stepOrOptions } : stepOrOptions;
+    return this._addDependency({
+      dataOnly: true,
+      skipDeduplication: false,
+      ...opts,
+    });
+  }
+  // Currently identical to addDependency
+  protected addStrongDependency(
+    stepOrOptions: Step | AddDependencyOptions,
+  ): number {
+    return this._addDependency({
+      dataOnly: false,
+      skipDeduplication: false,
+      ...(stepOrOptions instanceof Step
+        ? { step: stepOrOptions }
+        : stepOrOptions),
+    });
   }
 
   /**
@@ -481,15 +676,13 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    * directly.
    */
   protected addUnaryDependency(
-    stepOrOptions: ExecutableStep | AddDependencyOptions,
+    stepOrOptions: Step | AddUnaryDependencyOptions,
   ): number {
-    const options: AddDependencyOptions =
-      stepOrOptions instanceof ExecutableStep
-        ? { step: stepOrOptions }
-        : stepOrOptions;
+    const options: AddUnaryDependencyOptions =
+      stepOrOptions instanceof Step ? { step: stepOrOptions } : stepOrOptions;
     if (options.step.layerPlan.id > this.layerPlan.id) {
       throw new Error(
-        `Cannot add dependency ${options.step} to ${this} since the former is in a deeper layerPlan (creates a catch-22)`,
+        `Cannot add a unary dependency on ${options.step} to ${this} since the former is in a deeper layerPlan (creates a catch-22)`,
       );
     }
     return this.operationPlan.stepTracker.addStepUnaryDependency(this, options);
@@ -505,22 +698,20 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    * If you need to transform the peer to be equivalent you should do so via
    * the `deduplicatedWith` callback later.
    */
-  public deduplicate?(
-    _peers: readonly ExecutableStep[],
-  ): readonly ExecutableStep[];
+  public deduplicate?(_peers: readonly Step[]): readonly Step[];
 
   /**
    * If this plan is replaced via deduplication, this method gives it a chance
    * to hand over its responsibilities to its replacement.
    */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public deduplicatedWith?(replacement: ExecutableStep): void;
+  public deduplicatedWith?(replacement: Step): void;
 
   /**
    * Our chance to optimise the plan (which could go as far as to inline the
    * plan into the parent plan).
    */
-  public optimize?(_options: StepOptimizeOptions): ExecutableStep;
+  public optimize?(_options: StepOptimizeOptions): Step;
 
   public finalize() {
     if (typeof (this as any).isSyncAndSafe !== "boolean") {
@@ -544,7 +735,14 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
         `${this} claims to be synchronous, however the execute method is asynchronous`,
       );
     }
-    super.finalize();
+
+    if (!this.isFinalized) {
+      this.isFinalized = true;
+    } else {
+      throw new Error(
+        `Step ${this} has already been finalized - do not call \`finalize()\` from user code!`,
+      );
+    }
   }
 
   /**
@@ -573,10 +771,8 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    * memoizing results) so that you can expand your usage of meta in future.
    */
   /* abstract */
-  execute(
-    details: ExecutionDetails,
-  ): PromiseOrDirect<GrafastResultsList<TData>> {
-    // ESLint/TS: ignore not used.
+  execute(details: ExecutionDetails): ExecutionResults<TData> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     details;
     throw new Error(`${this} has not implemented an 'execute' method`);
   }
@@ -591,9 +787,13 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     this.optimize = throwDestroyed;
     this.finalize = throwDestroyed;
     this.execute = throwDestroyed;
-
-    super.destroy();
   }
+
+  public toRecord?(): Step;
+  public toSpecifier?(): Step;
+  public toTypename?(): Step<string>;
+  public cursor?(): Step;
+  // public itemPlan?($item: Step): Step;
 }
 
 function _buildOptimizedExecuteV2Expression(
@@ -678,16 +878,14 @@ function buildOptimizedExecute(
   });
 }
 
-export abstract class UnbatchedExecutableStep<
-  TData = any,
-> extends ExecutableStep<TData> {
+export abstract class UnbatchedStep<TData = any> extends Step<TData> {
   static $$export = {
     moduleName: "grafast",
-    exportName: "UnbatchedExecutableStep",
+    exportName: "UnbatchedStep",
   };
 
   finalize() {
-    if (this.execute === UnbatchedExecutableStep.prototype.execute) {
+    if (this.execute === UnbatchedStep.prototype.execute) {
       // If they've not replaced 'execute', use our optimized form
       buildOptimizedExecute(
         this.dependencies.length,
@@ -704,13 +902,14 @@ export abstract class UnbatchedExecutableStep<
     indexMap,
     values,
     extra,
-  }: ExecutionDetails): PromiseOrDirect<GrafastResultsList<TData>> {
-    console.warn(
-      `${this} didn't call 'super.finalize()' in the finalize method.`,
-    );
+  }: ExecutionDetails): GrafastResultsList<TData> {
+    const depCount = this.dependencies.length;
     return indexMap((i) => {
       try {
-        const tuple = values.map((list) => list.at(i));
+        const tuple = [];
+        for (let j = 0; j < depCount; j++) {
+          tuple[j] = values[j].at(i);
+        }
         return this.unbatchedExecute(extra, ...tuple);
       } catch (e) {
         return flagError(e);
@@ -724,169 +923,69 @@ export abstract class UnbatchedExecutableStep<
   ): PromiseOrDirect<TData>;
 }
 
-export function isExecutableStep<TData = any>(
-  step: unknown,
-): step is ExecutableStep<TData> {
-  return (
-    step instanceof BaseStep &&
-    "execute" in step &&
-    typeof (step as any).execute === "function"
-  );
+export function isStep<TData = any>(step: unknown): step is Step<TData> {
+  return step instanceof Step;
 }
 
-export function assertExecutableStep<TData>(
-  step: BaseStep,
-): asserts step is ExecutableStep<TData> {
-  if (!isExecutableStep(step)) {
+export function assertStep<TData>(step: unknown): asserts step is Step<TData> {
+  if (!isStep(step)) {
     throw new Error(
-      `Expected an executable step, but received something else: ${inspect(
-        step,
-      )}`,
+      `Expected a step, but received something else: ${inspect(step)}`,
     );
   }
 }
 
-export function isUnbatchedExecutableStep<TData = any>(
+export function isUnbatchedStep<TData = any>(
   step: unknown,
-): step is UnbatchedExecutableStep<TData> {
-  return (
-    isExecutableStep(step) &&
-    typeof (step as any).unbatchedExecute === "function"
-  );
+): step is UnbatchedStep<TData> {
+  return isStep(step) && typeof (step as any).unbatchedExecute === "function";
 }
 
 export type ObjectLikeStep<
-  TData extends { [key: string]: ExecutableStep } = {
-    [key: string]: ExecutableStep;
+  TData extends { [key: string]: Step } = {
+    [key: string]: Step;
   },
-> = ExecutableStep<{
-  [key in keyof TData]: TData[key] extends ExecutableStep<infer U> ? U : never;
+> = Step<{
+  [key in keyof TData]: TData[key] extends Step<infer U> ? U : never;
 }> & {
-  get<TKey extends keyof TData>(key: TKey): ExecutableStep<TData[TKey]>;
+  get<TKey extends keyof TData>(key: TKey): Step<TData[TKey]>;
 };
 
 export function isObjectLikeStep<
-  TData extends { [key: string]: ExecutableStep } = {
-    [key: string]: ExecutableStep;
+  TData extends { [key: string]: Step } = {
+    [key: string]: Step;
   },
->(plan: ExecutableStep): plan is ObjectLikeStep<TData> {
+>(plan: Step): plan is ObjectLikeStep<TData> {
   return "get" in plan && typeof (plan as any).get === "function";
 }
 
-export type ListLikeStep<
-  TData extends [...ExecutableStep[]] = [...ExecutableStep[]],
-> = ExecutableStep<{
-  [key in keyof TData]: TData[key] extends ExecutableStep<infer U> ? U : never;
+export type ListLikeStep<TData extends [...Step[]] = [...Step[]]> = Step<{
+  [key in keyof TData]: TData[key] extends Step<infer U> ? U : never;
 }> & {
-  at<TKey extends keyof TData>(key: TKey): ExecutableStep<TData[TKey]>;
+  at<TKey extends keyof TData>(key: TKey): Step<TData[TKey]>;
 };
 
-export function isListLikeStep<
-  TData extends [...ExecutableStep[]] = [...ExecutableStep[]],
->(plan: ExecutableStep): plan is ListLikeStep<TData> {
+export function isListLikeStep<TData extends [...Step[]] = [...Step[]]>(
+  plan: Step,
+): plan is ListLikeStep<TData> {
   return "at" in plan && typeof (plan as any).at === "function";
-}
-
-export type StreamableStep<TData> = ExecutableStep<ReadonlyArray<TData>> & {
-  stream(
-    details: StreamDetails,
-  ): PromiseOrDirect<GrafastResultStreamList<TData>>;
-};
-
-export function isStreamableStep<TData>(
-  plan: ExecutableStep<ReadonlyArray<TData>>,
-): plan is StreamableStep<TData> {
-  return typeof (plan as StreamableStep<TData>).stream === "function";
-}
-
-export type PolymorphicStep = ExecutableStep & {
-  planForType(objectType: GraphQLObjectType): ExecutableStep;
-};
-
-export function isPolymorphicStep(s: ExecutableStep): s is PolymorphicStep {
-  return (
-    "planForType" in s &&
-    typeof (s as PolymorphicStep).planForType === "function"
-  );
-}
-
-/**
- * Modifier plans modify their parent plan (which may be another ModifierStep
- * or an ExecutableStep). First they gather all the requirements from their
- * children (if any) being applied to them, then they apply themselves to their
- * parent plan. This application is done through the `apply()` method.
- *
- * Modifier plans do not use dependencies.
- */
-export abstract class ModifierStep<
-  TParentStep extends BaseStep = BaseStep,
-> extends BaseStep {
-  // Explicitly we do not add $$export here because we want children to set it
-  static $$export: any;
-
-  public readonly id: string;
-  constructor(protected readonly $parent: TParentStep) {
-    super();
-    this.id = this.layerPlan._addModifierStep(this);
-  }
-
-  public toString(): string {
-    const meta = this.toStringMeta();
-    return chalk.bold.blue(
-      `${this.constructor.name.replace(/Step$/, "")}${
-        meta != null && meta.length ? chalk.grey(`<${meta}>`) : ""
-      }[${inspect(this.id, {
-        colors: true,
-      })}]`,
-    );
-  }
-
-  /**
-   * In this method, you should apply the changes to your `this.$parent` plan
-   */
-  abstract apply(): void;
-}
-
-export function isModifierStep<
-  TParentStep extends ExecutableStep | ModifierStep<any>,
->(plan: BaseStep): plan is ModifierStep<TParentStep> {
-  return "apply" in plan && typeof (plan as any).apply === "function";
-}
-
-export function assertModifierStep<
-  TParentStep extends ExecutableStep | ModifierStep<any>,
->(
-  plan: BaseStep,
-  pathDescription: string,
-): asserts plan is ModifierStep<TParentStep> {
-  if (!isModifierStep(plan)) {
-    throw new Error(
-      `The plan returned from '${pathDescription}' should be a modifier plan, but it does not implement the 'apply' method.`,
-    );
-  }
 }
 
 export interface ListCapableStep<
   TOutputData,
-  TItemStep extends ExecutableStep<TOutputData> = ExecutableStep<TOutputData>,
-> extends ExecutableStep<ReadonlyArray<any>> {
+  TItemStep extends Step<TOutputData> = Step<TOutputData>,
+> extends Step<ReadonlyArray<any>> {
   listItem(itemPlan: __ItemStep<this>): TItemStep;
 }
 
-export function isListCapableStep<
-  TData,
-  TItemStep extends ExecutableStep<TData>,
->(
-  plan: ExecutableStep<ReadonlyArray<TData>>,
+export function isListCapableStep<TData, TItemStep extends Step<TData>>(
+  plan: Step<ReadonlyArray<TData>>,
 ): plan is ListCapableStep<TData, TItemStep> {
   return "listItem" in plan && typeof (plan as any).listItem === "function";
 }
 
-export function assertListCapableStep<
-  TData,
-  TItemStep extends ExecutableStep<TData>,
->(
-  plan: ExecutableStep<ReadonlyArray<TData>>,
+export function assertListCapableStep<TData, TItemStep extends Step<TData>>(
+  plan: Step<ReadonlyArray<TData>>,
   pathDescription: string,
 ): asserts plan is ListCapableStep<TData, TItemStep> {
   if (!isListCapableStep(plan)) {
@@ -894,4 +993,31 @@ export function assertListCapableStep<
       `The plan returned from '${pathDescription}' should be a list capable plan, but ${plan} does not implement the 'listItem' method.`,
     );
   }
+}
+
+export function stepHasToSpecifier<TStep extends Step>(
+  $step: TStep,
+): $step is TStep & { toSpecifier(): Step } {
+  return typeof $step.toSpecifier === "function";
+}
+export function stepHasToRecord<TStep extends Step>(
+  $step: TStep,
+): $step is TStep & { toRecord(): Step } {
+  return typeof $step.toRecord === "function";
+}
+
+export {
+  /** @deprecated Use ExecutableStep instead */
+  Step as ExecutableStep,
+  /** @deprecated Use UnbatchedStep instead */
+  UnbatchedStep as UnbatchedExecutableStep,
+};
+
+/** @deprecated Use isStep instead */
+export const isExecutableStep = isStep;
+/** @deprecated Use isStep instead */
+export function assertExecutableStep<TData>(
+  step: unknown,
+): asserts step is Step<TData> {
+  return assertStep(step);
 }

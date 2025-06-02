@@ -112,8 +112,8 @@ function printAPB(
           hits.length === 0
             ? chalk.strikethrough(str)
             : allGood
-            ? chalk.green(str)
-            : chalk.red(str)
+              ? chalk.green(str)
+              : chalk.red(str)
         }${
           hits.length > 0 ? chalk.gray(`[${hits.map((h) => h.index + 1)}]`) : ""
         }`;

@@ -1,27 +1,25 @@
 ---
-layout: page
-path: /postgraphile/make-extend-schema-plugin/
 title: makeExtendSchemaPlugin
 ---
 
-`makeExtendSchemaPlugin` is _the_ plugin generator you need to know about. It's
-the "bread and butter" of customizing your PostGraphile schema, enabling you to
+`makeExtendSchemaPlugin` is _the_ plugin generator you need to know about. It’s
+the “bread and butter” of customizing your PostGraphile schema, enabling you to
 add new fields and types to your GraphQL schema in a convenient and concise
-familiar syntax - GraphQL SDL.
+familiar syntax — GraphQL SDL.
 
-:::info
+:::info The SDL is not validated
 
-Though the SDL syntax is used, it is not validated - if you define a type but
+Though the SDL syntax is used, it is not validated — if you define a type but
 never use that type, that will likely not cause a schema validation error. If
 you use a directive that does not exist (or pass the wrong arguments to a
-directive), that's also unlikely to error. The SDL is just used as a convenient
+directive), that’s also unlikely to error. The SDL is just used as a convenient
 syntax, it is converted under the hood into [schema
-hooks](https://build.graphile.org/graphile-build/hooks) as if you had written
+hooks](https://build.graphile.org/graphile-build/5/hooks) as if you had written
 a Graphile Build plugin by hand.
 
 :::
 
-If you're already familiar with the `typeDefs`/`resolvers` pattern used by
+If you’re already familiar with the `typeDefs`/`resolvers` pattern used by
 systems such as `graphql-tools` then using `makeExtendSchemaPlugin` should feel
 familiar for you.
 
@@ -44,15 +42,15 @@ The callback should return an object with the following keys:
 - `typeDefs`: a GraphQL AST generated with the `gql` helper from
   `postgraphile/utils` (note this is NOT from the `graphql-tag` library, ours
   works in a slightly different way).
-- `plans` (optional, recommended): an object keyed by GraphQL type name that you're adding
+- `plans` (optional, recommended): an object keyed by GraphQL type name that you’re adding
   or extending in `typeDefs`, the values of which are objects keyed by the
-  fieldName you've added, and the value of which is typically a plan resolver
+  fieldName you’ve added, and the value of which is typically a plan resolver
   function (although it can be an object that defines both this and other
   details)
 - `resolvers` (optional, not recommended): like `plans`, except the functions are
   a traditional resolver functions rather than plan resolver functions
 
-:::info
+:::info Use Plans, not Resolvers
 
 Unlike in PostGraphile v4, the fourth argument to the resolver functions in
 `resolvers` does _not_ contain Graphile Build-related helpers. Since the
@@ -78,10 +76,12 @@ export const MyPlugin = makeExtendSchemaPlugin((build) => {
       }
     `,
 
-    plans: {
+    objects: {
       Query: {
-        meaningOfLife() {
-          return constant(42);
+        plans: {
+          meaningOfLife() {
+            return constant(42);
+          },
         },
       },
     },
@@ -108,7 +108,7 @@ The `gql` helper is responsible for turning the human-readable GraphQL schema
 language you write into an abstract syntax tree (AST) that the application can
 understand. Our `gql` help differs slightly from the one you may be familiar
 with in the `graphql-tag` npm module, namely in how the placeholders work. Ours
-is designed to work with PostGraphile's [inflection system](./inflection), so
+is designed to work with PostGraphile’s [inflection system](./inflection), so
 you can embed strings directly. You may also embed other gql tags directly. For
 example:
 
@@ -158,7 +158,7 @@ const typeDefs = gql`
 
 -->
 
-## "Special" fields
+## “Special” fields
 
 In GraphQL, it is forbidden to name any fields beginning with `__` (two
 underscores) since that is reserved for introspection. We therefore use this
@@ -173,17 +173,17 @@ step](https://grafast.org/grafast/plan-resolvers#asserting-an-object-types-step)
 or one of a set of steps; this can help to catch bugs early. For example, in
 PostGraphile a database table resource should be represented by a
 `pgSelectSingle` or similar class; representing it with `object({id: 1})` or
-similar would mean the step doesn't have the expected helper methods and
+similar would mean the step doesn’t have the expected helper methods and
 downstream fields may fail to plan because their expectations are broken.
 
-Object types' `plans` entries may define an `__assertStep` property to indicate
-the type of step the object type's fields' resolvers will be expecting; this is
+Object types’ `plans` entries may define an `__assertStep` property to indicate
+the type of step the object type’s fields’ resolvers will be expecting; this is
 equivalent to `typeConfig.extensions.grafast.assertStep` when defining a object
-type programatically.
+type programmatically.
 
 The value for `__assertStep` can either be a step class itself (e.g.
 `PgSelectSingleStep`) or
-it can be an "assertion function" that throws an error if the passed step is
+it can be an “assertion function” that throws an error if the passed step is
 not of the right type, e.g.:
 
 ```ts
@@ -195,7 +195,7 @@ const schema = makeExtendSchemaPlugin({
       id: Int
     }
   `,
-  plans: {
+  objects: {
     MyObject: {
       assertStep($step) {
         if ($step instanceof PgSelectSingleStep) return true;
@@ -206,8 +206,10 @@ const schema = makeExtendSchemaPlugin({
             `or PgUpdateSingleStep; but found step of type '${$step.constructor.name}'.`,
         );
       },
-      a($obj: PgSelectSingleStep | PgInsertSingleStep | PgUpdateSingleStep) {
-        return $obj.get("id");
+      plans: {
+        a($obj: PgSelectSingleStep | PgInsertSingleStep | PgUpdateSingleStep) {
+          return $obj.get("id");
+        },
       },
     },
   },
@@ -216,15 +218,15 @@ const schema = makeExtendSchemaPlugin({
 
 ### Type and field scopes
 
-Graphile Build plugins use the "scope" that a type/field/argument/etc is
+Graphile Build plugins use the “scope” that a type/field/argument/etc is
 defined with in order to determine whether or not to hook that entity and
 augment it. For example, the builtin `PgFirstLastBeforeAfterArgsPlugin` will
 automatically add `first`, `last`, `before` and `after` arguments to fields
 that are scoped as `isPgFieldConnection: true` and have an associated and
 suitable `pgFieldResource` scope set.
 
-You can add to/overwrite the Graphile Build "scope" of a type by adding the
-`__scope` property to the object's `plans` object.
+You can add to/overwrite the Graphile Build “scope” of a type by adding the
+`__scope` property to the object’s `plans` object.
 
 You can add to/overwrite the Graphile Build scope of a field by making the
 field definition an object (if it was previously a function, move the function
@@ -243,22 +245,23 @@ const schema = makeExtendSchemaPlugin((build) => {
         id: Int
       }
     `,
-    plans: {
+    objects: {
       MyObject: {
         // Graphile Build "scope" for the object type 'MyObject'
-        __scope: {
+        scope: {
           pgTypeResource: users,
         },
+        plans: {
+          id: {
+            // The Graphile Build "scope" for the 'MyObject.id' field
+            scope: {
+              pgFieldAttribute: users.codec.attributes.id,
+            },
 
-        id: {
-          // The Graphile Build "scope" for the 'MyObject.id' field
-          scope: {
-            pgFieldAttribute: users.codec.attributes.id,
-          },
-
-          // The plan resolver for the 'MyObject.id' field
-          plan($obj) {
-            return $obj.get("id");
+            // The plan resolver for the 'MyObject.id' field
+            plan($obj) {
+              return $obj.get("id");
+            },
           },
         },
       },
@@ -267,7 +270,7 @@ const schema = makeExtendSchemaPlugin((build) => {
 });
 ```
 
-:::note
+:::note It is possible to unset or overwrite automatic scopes
 
 `makeExtendSchemaPlugin` might try and guess the scopes to use to be helpful;
 if it gets them wrong then be sure to overwrite them using the instructions
@@ -278,11 +281,11 @@ above. To unset scopes, set them to `undefined`.
 ## Querying the database
 
 You should read [the Gra*fast* introduction](https://grafast.org/grafast/) and
-the [page on "plan resolvers"](https://grafast.org/grafast/plan-resolvers)
+the [page on “plan resolvers”](https://grafast.org/grafast/plan-resolvers)
 before reading further here.
 
-Gra*fast* operate based on "steps", instances of step classes, returned from
-"plan resolvers". Though there are many different step classes, most will
+Gra*fast* operate based on “steps”, instances of step classes, returned from
+“plan resolvers”. Though there are many different step classes, most will
 accept as input any other step, no matter the class.
 
 However, the plan resolvers attached to the fields on a GraphQL type will
@@ -294,21 +297,21 @@ may do things like `$row.get('avatar_url')` and have that access the relevant
 column in the database.
 
 Thus, what you do inside your plan resolver and what you return from your plan
-resolver are two different concerns. It's essential that you return the right
+resolver are two different concerns. It’s essential that you return the right
 class of step from your plan resolver, to be compatible with what the schema is
 expecting, but you have a lot of freedom within your plan resolver as to how to
 achieve that.
 
 One common desire is to access the data in the GraphQL context. You can access
 this in Gra*fast* using the `context()` step; for example, you may have stored
-the current user's ID on the GraphQL context via the `userId` property, to
+the current user’s ID on the GraphQL context via the `userId` property, to
 retrieve these you might do this in your plan resolver function:
 
 ```ts
 const $userId = context().get("userId");
 ```
 
-Data from the database can be retrieved using "resources." Resources can be
+Data from the database can be retrieved using “resources.” Resources can be
 found on `build.input.pgRegistry.pgResources`, keyed by their name. For
 example, if you have `organizations`, `users` and `channels` tables, you can
 get the resources for them via:
@@ -363,14 +366,16 @@ export const MyChannelsPlugin = makeExtendSchemaPlugin((build) => {
         myChannels: [Channel]
       }
     `,
-    plans: {
+    objects: {
       Query: {
-        myChannels() {
-          const $userId = context().get("userId");
-          const $user = users.get({ id: $userId });
-          const $orgId = $user.get("organization_id");
-          const $channels = channels.find({ organization_id: $orgId });
-          return $channels;
+        plans: {
+          myChannels() {
+            const $userId = context().get("userId");
+            const $user = users.get({ id: $userId });
+            const $orgId = $user.get("organization_id");
+            const $channels = channels.find({ organization_id: $orgId });
+            return $channels;
+          },
         },
       },
     },
@@ -378,16 +383,16 @@ export const MyChannelsPlugin = makeExtendSchemaPlugin((build) => {
 });
 ```
 
-:::note
+:::note Automatic type generation
 
 The `Channel` type used in the `typeDefs` above is the type that PostGraphile
 generated automatically for the `channels` table. See
-[Tables](/postgraphile/next/tables) for more on the artifacts generated for each
+[Tables](/postgraphile/5/tables) for more on the artifacts generated for each
 database table.
 
 :::
 
-:::info
+:::info Gra*fast* will optimize the requests
 
 Though you might be thinking that this would result in multiple requests being
 issued to the database, thanks to the magic of Gra*fast* and `@dataplan/pg`,
@@ -416,16 +421,16 @@ a `PgSelectStep` representing a set of rows.
 
 One way to issue arbitrary SQL queries against the database is to use the
 `withPgClient` step, or its cousin `withPgClientTransaction`. These both accept
-an "executor" as the first argument, a step representing arbitrary data as the
+an “executor” as the first argument, a step representing arbitrary data as the
 second argument, and an asynchronous callback as the third argument. The callback
 will be called with a `PgClient` instance and the resolved data from the step
 in the second argument.
 
-:::info
+:::info `PgClient` is an abstraction
 
 The `PgClient` instance is an abstraction provided by `@dataplan/pg`, it
 contains common functionality but also any helpers that the specific Postgres
-adaptor you're using wishes to expose. [Read more about Postgres adaptors in
+adaptor you’re using wishes to expose. [Read more about Postgres adaptors in
 the @dataplan/pg
 documentation](https://grafast.org/grafast/step-library/dataplan-pg/adaptors).
 
@@ -435,9 +440,9 @@ documentation](https://grafast.org/grafast/step-library/dataplan-pg/adaptors).
 
 **What is an executor?**
 
-It's the thing that tells Gra*fast* (or, more
+It’s the thing that tells Gra*fast* (or, more
 specifically, `@dataplan/pg`) how to communicate with the database. Normally
-it's embedded directly into the resources, but since we're doing arbitrary SQL
+it’s embedded directly into the resources, but since we’re doing arbitrary SQL
 no resource is involved.
 
 **Why is it explicit rather than implicit?**
@@ -448,7 +453,7 @@ database.
 
 **How do I get an executor?**
 
-Executors are available in the registry; by default there's one executor called
+Executors are available in the registry; by default there’s one executor called
 `main` which you can access like this:
 
 ```ts
@@ -456,7 +461,7 @@ const executor = build.input.pgRegistry.pgExecutors.main;
 ```
 
 However, PostGraphile can handle multiple sources, or custom source/executor
-names, via `preset.pgServices`. If you don't know the name of the executor but
+names, via `preset.pgServices`. If you don’t know the name of the executor but
 you do have a resource representing the target database, you can extract the
 executor for that DB from the resource, for example:
 
@@ -466,7 +471,7 @@ const executor = channels.executor;
 
 ### Example
 
-Here's the previous example again, this time rewritten to use `withPgClient` to
+Here’s the previous example again, this time rewritten to use `withPgClient` to
 retrieve the `organization_id` rather than the user resource:
 
 ```ts
@@ -486,38 +491,40 @@ export const MyChannelsPlugin = makeExtendSchemaPlugin((build) => {
         myChannels: [Channel]
       }
     `,
-    plans: {
+    objects: {
       Query: {
-        myChannels() {
-          const $userId = context().get("userId");
-          // highlight-start
-          const $orgId = withPgClient(
-            executor,
-            $userId,
-            async (
-              // The PgClient instance, with all of the "claims" (if any) already set:
-              pgClient,
-              // This is the runtime data that the `$userId` step represented
-              userId,
-            ) => {
-              if (!userId) return null;
+        plans: {
+          myChannels() {
+            const $userId = context().get("userId");
+            // highlight-start
+            const $orgId = withPgClient(
+              executor,
+              $userId,
+              async (
+                // The PgClient instance, with all of the "claims" (if any) already set:
+                pgClient,
+                // This is the runtime data that the `$userId` step represented
+                userId,
+              ) => {
+                if (!userId) return null;
 
-              // Here we're using the standard `pgClient.query` function that
-              // all adaptors must provide, but if you're using an adaptor
-              // related to your ORM of choice, you could likely use its
-              // various methods to retrieve this value instead.
-              const result = await pgClient.query<{ id: number }>({
-                text: `select id from get_organization_for_user_id($1)`,
-                values: [userId],
-              });
+                // Here we're using the standard `pgClient.query` function that
+                // all adaptors must provide, but if you're using an adaptor
+                // related to your ORM of choice, you could likely use its
+                // various methods to retrieve this value instead.
+                const result = await pgClient.query<{ id: number }>({
+                  text: `select id from get_organization_for_user_id($1)`,
+                  values: [userId],
+                });
 
-              // Return the 'id' value from the first (and only) row, if it exists:
-              return result.rows[0]?.id;
-            },
-          );
-          // highlight-end
-          const $channels = channels.find({ organization_id: $orgId });
-          return $channels;
+                // Return the 'id' value from the first (and only) row, if it exists:
+                return result.rows[0]?.id;
+              },
+            );
+            // highlight-end
+            const $channels = channels.find({ organization_id: $orgId });
+            return $channels;
+          },
         },
       },
     },
@@ -529,16 +536,16 @@ export const MyChannelsPlugin = makeExtendSchemaPlugin((build) => {
 
 ## Reading database column values
 
-When extending a schema, it's often because you want to expose data from Node.js
+When extending a schema, it’s often because you want to expose data from Node.js
 that would be too difficult (or impossible) to access from PostgreSQL. When
-defining a field on an existing table-backed type defined by PostGraphile, it's
+defining a field on an existing table-backed type defined by PostGraphile, it’s
 useful to access data from the underlying table in the plan resolver.
 
 To do this you can use the `$row.get(columnName)` method, where `$row` is the
 first parameter passed to your plan resolver function (representing the current
 record).
 
-Here's an example to illustrate.
+Here’s an example to illustrate:
 
 In the database you have a `product` table (imagine an online store), that
 PostGraphile will include in the GraphQL schema by creating a type `Product`
@@ -562,13 +569,13 @@ type Product {
 }
 ```
 
-However imagine you're selling internationally, and you want to expose the price
+However, imagine you’re selling internationally, and you want to expose the price
 in other currencies directly from the `Product` type itself. This kind of
 functionality is well suited to being performed in Node.js (e.g. by making a
 REST call to a foreign exchange service over the internet) but might be a
 struggle from with PostgreSQL.
 
-We'll retrieve the `price_in_us_cents` value from the database, and then use
+We’ll retrieve the `price_in_us_cents` value from the database, and then use
 the [`loadOne`
 step](https://grafast.org/grafast/step-library/standard-steps/loadOne) to
 batch-convert these values from USD to AUD:
@@ -592,13 +599,52 @@ export const MyForeignExchangePlugin = makeExtendSchemaPlugin((build) => {
         priceInAuCents: Int!
       }
     `,
-    plans: {
+    objects: {
       Product: {
-        priceInAuCents($product) {
-          // highlight-next-line
-          const $cents = $product.get("price_in_us_cents");
-          // highlight-next-line
-          return loadOne($cents, convertUsdToAud);
+        plans: {
+          priceInAuCents($product) {
+            // highlight-next-line
+            const $cents = $product.get("price_in_us_cents");
+            // highlight-next-line
+            return loadOne($cents, convertUsdToAud);
+          },
+        },
+      },
+    },
+  };
+});
+```
+
+## Returning a connection
+
+When returning a connection in `makeExtendSchemaPlugin`, you must be sure that your plan resolver yields a `connection(...)` step; failure to do this may result in errors such as `$connection.getSubplan is not a function`.
+
+For example, if you want to expose a related `ReviewConnection` from `Product`:
+
+```js
+import { makeExtendSchemaPlugin, gql } from "postgraphile/utils";
+import { connection } from "postgraphile/grafast";
+
+export const MyProductReviewsPlugin = makeExtendSchemaPlugin((build) => {
+  const { reviews } = build.input.pgRegistry.pgResources;
+
+  return {
+    typeDefs: gql`
+      extend type Product {
+        reviews: ReviewConnection
+      }
+    `,
+    objects: {
+      Product: {
+        plans: {
+          reviews($product) {
+            const $productId = $product.get("id");
+            const $reviews = reviews.find();
+            $reviews.where(sql`${$reviews}.product_id = ${$productId}`);
+
+            // highlight-next-line
+            return connection($reviews);
+          },
         },
       },
     },
@@ -638,63 +684,67 @@ export const MyRegisterUserMutationPlugin = makeExtendSchemaPlugin((build) => {
         registerUser(input: RegisterUserInput!): RegisterUserPayload
       }
     `,
-    plans: {
+    objects: {
       Mutation: {
-        registerUser(_, fieldArgs) {
-          const $input = fieldArgs.getRaw("input");
-          const $user = withPgClientTransaction(
-            executor,
-            $input,
-            async (pgClient, input) => {
-              // Our custom logic to register the user:
-              const {
-                rows: [user],
-              } = await pgClient.query({
-                text: `
+        plans: {
+          registerUser(_, fieldArgs) {
+            const $input = fieldArgs.getRaw("input");
+            const $user = withPgClientTransaction(
+              executor,
+              $input,
+              async (pgClient, input) => {
+                // Our custom logic to register the user:
+                const {
+                  rows: [user],
+                } = await pgClient.query({
+                  text: `
                   INSERT INTO app_public.users (name, email, bio)
                   VALUES ($1, $2, $3)
                   RETURNING *`,
-                values: [input.name, input.email, input.bio],
-              });
+                  values: [input.name, input.email, input.bio],
+                });
 
-              // Send the email. If this fails then the error will be caught
-              // and the transaction rolled back; it will be as if the user
-              // never registered
-              await mockSendEmail(
-                input.email,
-                "Welcome to my site",
-                `You're user ${user.id} - thanks for being awesome`,
-              );
+                // Send the email. If this fails then the error will be caught
+                // and the transaction rolled back; it will be as if the user
+                // never registered
+                await mockSendEmail(
+                  input.email,
+                  "Welcome to my site",
+                  `You're user ${user.id} - thanks for being awesome`,
+                );
 
-              // Return the newly created user
-              return user;
-            },
-          );
+                // Return the newly created user
+                return user;
+              },
+            );
 
-          // To allow for future expansion (and for the `clientMutationId`
-          // field to work), we'll return an object step containing our data:
-          return object({ user: $user });
+            // To allow for future expansion (and for the `clientMutationId`
+            // field to work), we'll return an object step containing our data:
+            return object({ user: $user });
+          },
         },
       },
 
       // The payload also needs plans detailing how to resolve its fields:
       RegisterUserPayload: {
-        user($data) {
-          const $user = $data.get("user");
-          // It would be tempting to return $user here, but the step class
-          // is not compatible with the auto-generated `User` type, so
-          // errors will occur. We must ensure that we return a compatible
-          // step, so we will retrieve the relevant record from the database:
+        plans: {
+          user($data) {
+            const $user = $data.get("user");
+            // It would be tempting to return $user here, but the step class
+            // is not compatible with the auto-generated `User` type, so
+            // errors will occur. We must ensure that we return a compatible
+            // step, so we will retrieve the relevant record from the database:
 
-          // Get the '.id' property from $user:
-          const $userId = access($user, "id");
+            // Get the '.id' property from $user:
+            const $userId = access($user, "id");
 
-          // Return a step representing this row in the database.
-          return users.get({ id: $userId });
-        },
-        query($user) {
-          // Anything truthy should work for the `query: Query` field.
-          return constant(true);
+            // Return a step representing this row in the database.
+            return users.get({ id: $userId });
+          },
+          query($user) {
+            // Anything truthy should work for the `query: Query` field.
+            return constant(true);
+          },
         },
       },
     },
@@ -704,11 +754,11 @@ export const MyRegisterUserMutationPlugin = makeExtendSchemaPlugin((build) => {
 
 ## Mutation Example with Node ID
 
-In this example we'll use a GraphQL Global Object Identifier (aka Node ID) to
-soft-delete an entry from our `app_public.items` table. We're also going to
+In this example we’ll use a GraphQL Global Object Identifier (aka Node ID) to
+soft-delete an entry from our `app_public.items` table. We’re also going to
 check that the user performing the soft-delete is the owner of the record.
 
-**Aside**: if you're interested in soft-deletes, check out
+**Aside**: if you’re interested in soft-deletes, check out
 [@graphile-contrib/pg-omit-archived](https://github.com/graphile-contrib/pg-omit-archived)
 
 ```ts
@@ -738,46 +788,48 @@ const DeleteItemByNodeIdPlugin = makeExtendSchemaPlugin((build) => {
       }
     `,
 
-    plans: {
+    objects: {
       Mutation: {
-        deleteItem(_, fieldArgs) {
-          // jwtClaims is decrypted jwt token data
-          const $jwtClaims = context().get("jwtClaims");
+        plans: {
+          deleteItem(_, fieldArgs) {
+            // jwtClaims is decrypted jwt token data
+            const $jwtClaims = context().get("jwtClaims");
 
-          // Read the input.id value from the arguments
-          const $nodeId = fieldArgs.getRaw(["input", "id"]);
+            // Read the input.id value from the arguments
+            const $nodeId = fieldArgs.getRaw(["input", "id"]);
 
-          // Decode the node ID, to something like: `{ id: $someStep }`
-          const spec = specFromNodeId(handler, $nodeId);
-          const $itemId = spec.id;
+            // Decode the node ID, to something like: `{ id: $someStep }`
+            const spec = specFromNodeId(handler, $nodeId);
+            const $itemId = spec.id;
 
-          const $success = withPgClientTransaction(
-            executor,
-            // Passing a `list` step allows us to pass more than one dependency
-            // through to our callback:
-            list([$jwtClaims, $itemId]),
-            async (pgClient, [jwtClaims, itemId]) => {
-              if (!itemId || !jwtClaims?.user_id) {
-                return false;
-              }
-              const {
-                rows: [row],
-              } = await pgClient.query(
-                ` UPDATE app_public.items
+            const $success = withPgClientTransaction(
+              executor,
+              // Passing a `list` step allows us to pass more than one dependency
+              // through to our callback:
+              list([$jwtClaims, $itemId]),
+              async (pgClient, [jwtClaims, itemId]) => {
+                if (!itemId || !jwtClaims?.user_id) {
+                  return false;
+                }
+                const {
+                  rows: [row],
+                } = await pgClient.query(
+                  ` UPDATE app_public.items
                   SET is_archived = true
                   WHERE id = $1
                   AND user_id = $2
                   RETURNING *;`,
-                [itemId, jwtClaims.user_id],
-              );
-              return !!row;
-            },
-          );
+                  [itemId, jwtClaims.user_id],
+                );
+                return !!row;
+              },
+            );
 
-          // Since we're returning this data in the same shape as the payload
-          // and the payload's fields don't need specific step classes, we don't
-          // need to implement plan resolvers on the payload.
-          return object({ success: $success });
+            // Since we're returning this data in the same shape as the payload
+            // and the payload's fields don't need specific step classes, we don't
+            // need to implement plan resolvers on the payload.
+            return object({ success: $success });
+          },
         },
       },
     },
@@ -791,9 +843,7 @@ This is a full example of adding a custom `registerUser` mutation whose payload
 contains a union of a successful result or two expected error types. It uses a
 transaction to perform the mutation, and catches errors that happen in that
 transaction (in which case the transaction will be rolled back) and if they are
-the known, supported, errors then it will return the given error type. It uses
-the `polymorphicBranch` logic to determine which of the event occurred, and
-thus which type to return.
+the known, supported, errors then it will return the given error type.
 
 ```ts
 import { withPgClient } from "@dataplan/pg";
@@ -804,7 +854,6 @@ import {
   object,
   ExecutableStep,
   access,
-  polymorphicBranch,
   list,
 } from "postgraphile/grafast";
 import { DatabaseError } from "pg";
@@ -841,111 +890,120 @@ export const RegisterUserPlugin = makeExtendSchemaPlugin((build) => {
         email: String!
       }
     `,
-    plans: {
+    objects: {
       Mutation: {
-        registerUser(_, { $input: { $username, $email } }) {
-          const $result = withPgClient(
-            executor,
-            list([$username, $email]),
-            async (pgClient, [username, email]) => {
-              try {
-                return await pgClient.withTransaction(async (pgClient) => {
-                  const {
-                    rows: [user],
-                  } = await pgClient.query<{
-                    id: string;
-                    username: string;
-                  }>({
-                    text: `
+        plans: {
+          registerUser(_, { $input: { $username, $email } }) {
+            const $result = withPgClient(
+              executor,
+              list([$username, $email]),
+              async (pgClient, [username, email]) => {
+                try {
+                  return await pgClient.withTransaction(async (pgClient) => {
+                    const {
+                      rows: [user],
+                    } = await pgClient.query<{
+                      id: string;
+                      username: string;
+                    }>({
+                      text: `
                       insert into app_public.users (username)
                       values ($1)
                       returning *`,
-                    values: [username],
-                  });
+                      values: [username],
+                    });
 
-                  await pgClient.query({
-                    text: `
+                    await pgClient.query({
+                      text: `
                       insert into app_public.user_emails(user_id, email)
                       values ($1, $2)`,
-                    values: [user.id, email],
+                      values: [user.id, email],
+                    });
+
+                    await sendEmail(email, "Welcome!");
+
+                    return { id: user.id };
                   });
-
-                  await sendEmail(email, "Welcome!");
-
-                  return { id: user.id };
-                });
-              } catch (e) {
-                if (e instanceof DatabaseError && e.code === "23505") {
-                  if (e.constraint === "unique_user_username") {
-                    return {
-                      __typename: "UsernameConflict",
-                      message: `The username '${username}' is already in use`,
-                      username,
-                    };
-                  } else if (e.constraint === "unique_user_email") {
-                    return {
-                      __typename: "EmailAddressConflict",
-                      message: `The email address '${email}' is already in use`,
-                      email,
-                    };
+                } catch (e) {
+                  if (e instanceof DatabaseError && e.code === "23505") {
+                    if (e.constraint === "unique_user_username") {
+                      return {
+                        __typename: "UsernameConflict",
+                        message: `The username '${username}' is already in use`,
+                        username,
+                      };
+                    } else if (e.constraint === "unique_user_email") {
+                      return {
+                        __typename: "EmailAddressConflict",
+                        message: `The email address '${email}' is already in use`,
+                        email,
+                      };
+                    }
                   }
+                  throw e;
                 }
-                throw e;
-              }
-            },
-          );
+              },
+            );
 
-          return object({ result: $result });
+            return object({ result: $result });
+          },
         },
       },
 
       RegisterUserPayload: {
-        __assertStep: ObjectStep,
-        result($data: ObjectStep) {
-          const $result = $data.get("result");
-          return polymorphicBranch($result, {
-            UsernameConflict: {
-              // This is a `UsernameConflict` if the object has a `__typename` property.
-              match(obj) {
-                return obj.__typename === "UsernameConflict";
-              },
-              // In this case, we can just return the object itself as the step
-              // representing this polymorphic branch.
-              plan($obj) {
-                return $obj;
-              },
-            },
-            EmailAddressConflict: {
-              // If `match` is not specified, it defaults to checking
-              // `obj.__typename === 'EmailAddressConfict'`.
-              // If `plan` is not specified, it defaults to `($obj) => $obj`.
-            },
-            User: {
-              match(obj) {
-                return obj.id != null;
-              },
-              // In this case, we need to get the record from the database
-              // associated with the given user id.
-              plan($obj) {
-                const $id = access($obj, "id");
-                return users.get({ id: $id });
-              },
-            },
-          });
-        },
-        query() {
-          // The `Query` type just needs any truthy value.
-          return constant(true);
+        assertStep: ObjectStep,
+        plans: {
+          query() {
+            // The `Query` type just needs any truthy value.
+            return constant(true);
+          },
         },
       },
 
       UsernameConflict: {
         // Since User expects a step, our types must also expect a step. We
         // don't care what the step is though.
-        __assertStep: ExecutableStep,
+        assertStep: ExecutableStep,
       },
       EmailAddressConflict: {
-        __assertStep: ExecutableStep,
+        assertStep: ExecutableStep,
+      },
+    },
+    unions: {
+      // Planning our polymorphic type
+      RegisterUserResult: {
+        planType($obj) {
+          // Determine the type
+          const $__typename = lambda($obj, (obj) => {
+            // If it has typename, use that
+            if (obj.__typename) return obj.__typename;
+            // Otherwise, if it has an id it must be a user
+            if (obj.id != null) return "User";
+            // Otherwise, no idea!
+            throw new Error(`Could not determine type`);
+          });
+          return {
+            $__typename,
+            planForType(t) {
+              switch (t.name) {
+                case "UsernameConflict":
+                case "EmailAddressConflict":
+                  // These types just use their objects directly
+                  return $obj;
+
+                case "User": {
+                  // In this case, we need to get the record from the database
+                  // associated with the given user id.
+                  const $id = get($obj, "id");
+                  return users.get({ id: $id });
+                }
+                default: {
+                  throw new Error(`Don't know how to plan ${t}`);
+                }
+              }
+            },
+          };
+        },
       },
     },
   };
@@ -962,10 +1020,10 @@ async function sendEmail(email: string, message: string) {
 
 ## Plugin SQL Privileges
 
-Plugins access the database with the same privileges as everything else - they
+Plugins access the database with the same privileges as everything else — they
 are subject to RLS/RBAC/etc. If your database user does not have privileges to
 perform the action your plugin is attempting to achieve then you may need to
 create a companion database function that is marked as `SECURITY DEFINER` in
 order to perform the action with elevated privileges; alternatively you could
-use this database function directly - see [Custom
+use this database function directly — see [Custom
 Mutations](./custom-mutations) for more details.

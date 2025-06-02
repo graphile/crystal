@@ -1,9 +1,8 @@
-import { PgDeleteSingleStep, PgExecutor, PgSelectStep, PgUnionAllStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
+import { PgDeleteSingleStep, PgExecutor, PgSelectStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, operationPlan, rootValue, specFromNodeId, trap } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
-import { inspect } from "util";
-const handler = {
+const nodeIdHandler_Query = {
   typeName: "Query",
   codec: {
     name: "raw",
@@ -20,6 +19,9 @@ const handler = {
   },
   match(specifier) {
     return specifier === "query";
+  },
+  getIdentifiers(_value) {
+    return [];
   },
   getSpec() {
     return "irrelevant";
@@ -48,8 +50,9 @@ const nodeIdCodecs_base64JSON_base64JSON = {
     return base64JSONDecode;
   })()
 };
-const nodeIdCodecs = Object.assign(Object.create(null), {
-  raw: handler.codec,
+const nodeIdCodecs = {
+  __proto__: null,
+  raw: nodeIdHandler_Query.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
@@ -64,7 +67,7 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
       isSyncAndSafe: true
     })
   }
-});
+};
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -79,7 +82,8 @@ const abcdIdentifier = sql.identifier("enum_tables", "abcd");
 const abcdCodec = recordCodec({
   name: "abcd",
   identifier: abcdIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     letter: {
       description: undefined,
       codec: TYPES.text,
@@ -100,7 +104,7 @@ const abcdCodec = recordCodec({
         }
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -109,10 +113,11 @@ const abcdCodec = recordCodec({
       schemaName: "enum_tables",
       name: "abcd"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       enum: true,
       enumName: "LetterAToD"
-    })
+    }
   },
   executor: executor
 });
@@ -120,7 +125,8 @@ const abcdViewIdentifier = sql.identifier("enum_tables", "abcd_view");
 const abcdViewCodec = recordCodec({
   name: "abcdView",
   identifier: abcdViewIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     letter: {
       description: undefined,
       codec: TYPES.text,
@@ -139,7 +145,7 @@ const abcdViewCodec = recordCodec({
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -148,11 +154,12 @@ const abcdViewCodec = recordCodec({
       schemaName: "enum_tables",
       name: "abcd_view"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       primaryKey: "letter",
       enum: true,
       enumName: "LetterAToDViaView"
-    })
+    }
   },
   executor: executor
 });
@@ -160,7 +167,8 @@ const simpleEnumIdentifier = sql.identifier("enum_tables", "simple_enum");
 const simpleEnumCodec = recordCodec({
   name: "simpleEnum",
   identifier: simpleEnumIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     value: {
       description: undefined,
       codec: TYPES.text,
@@ -179,7 +187,7 @@ const simpleEnumCodec = recordCodec({
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -188,9 +196,10 @@ const simpleEnumCodec = recordCodec({
       schemaName: "enum_tables",
       name: "simple_enum"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       enum: true
-    })
+    }
   },
   executor: executor
 });
@@ -241,10 +250,11 @@ const spec_letterDescriptions_attributes_letter_via_view_codec_LetterAToDViaView
     }
   }
 });
-const spec_letterDescriptions = {
+const letterDescriptionsCodec = recordCodec({
   name: "letterDescriptions",
   identifier: letterDescriptionsIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     id: {
       description: undefined,
       codec: TYPES.int,
@@ -281,7 +291,7 @@ const spec_letterDescriptions = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -290,13 +300,13 @@ const spec_letterDescriptions = {
       schemaName: "enum_tables",
       name: "letter_descriptions"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       foreignKey: "(letter_via_view) references enum_tables.abcd_view"
-    })
+    }
   },
   executor: executor
-};
-const letterDescriptionsCodec = recordCodec(spec_letterDescriptions);
+});
 const referencingTableIdentifier = sql.identifier("enum_tables", "referencing_table");
 const spec_referencingTable_attributes_enum_1_codec_EnumTheFirstEnum = enumCodec({
   name: "EnumTheFirstEnum",
@@ -390,10 +400,11 @@ const spec_referencingTable_attributes_simple_enum_codec_SimpleEnumEnum = enumCo
     }
   }
 });
-const spec_referencingTable = {
+const referencingTableCodec = recordCodec({
   name: "referencingTable",
   identifier: referencingTableIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     id: {
       description: undefined,
       codec: TYPES.int,
@@ -439,7 +450,7 @@ const spec_referencingTable = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -448,16 +459,18 @@ const spec_referencingTable = {
       schemaName: "enum_tables",
       name: "referencing_table"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   executor: executor
-};
-const referencingTableCodec = recordCodec(spec_referencingTable);
+});
 const lotsOfEnumsIdentifier = sql.identifier("enum_tables", "lots_of_enums");
 const spec_lotsOfEnums = {
   name: "lotsOfEnums",
   identifier: lotsOfEnumsIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     id: {
       description: undefined,
       codec: TYPES.int,
@@ -512,7 +525,7 @@ const spec_lotsOfEnums = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -521,10 +534,11 @@ const spec_lotsOfEnums = {
       schemaName: "enum_tables",
       name: "lots_of_enums"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       omit: true,
       behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
-    })
+    }
   },
   executor: executor
 };
@@ -540,7 +554,9 @@ const registryConfig_pgResources_abcd_abcd = {
     attributes: ["letter"],
     description: undefined,
     extensions: {
-      tags: Object.create(null)
+      tags: {
+        __proto__: null
+      }
     }
   }],
   isVirtual: false,
@@ -572,7 +588,9 @@ const registryConfig_pgResources_abcd_view_abcd_view = {
     attributes: ["letter"],
     description: undefined,
     extensions: {
-      tags: Object.create(null)
+      tags: {
+        __proto__: null
+      }
     }
   }],
   isVirtual: false,
@@ -605,7 +623,9 @@ const registryConfig_pgResources_simple_enum_simple_enum = {
     attributes: ["value"],
     description: undefined,
     extensions: {
-      tags: Object.create(null)
+      tags: {
+        __proto__: null
+      }
     }
   }],
   isVirtual: false,
@@ -631,21 +651,27 @@ const letter_descriptionsUniques = [{
   attributes: ["id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }, {
   isPrimary: false,
   attributes: ["letter"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }, {
   isPrimary: false,
   attributes: ["letter_via_view"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }];
 const registryConfig_pgResources_letter_descriptions_letter_descriptions = {
@@ -677,7 +703,9 @@ const referencing_tableUniques = [{
   attributes: ["id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }];
 const registryConfig_pgResources_referencing_table_referencing_table = {
@@ -713,45 +741,51 @@ const registryConfig_pgResources_lots_of_enums_lots_of_enums = {
     attributes: ["id"],
     description: undefined,
     extensions: {
-      tags: Object.create(null)
+      tags: {
+        __proto__: null
+      }
     }
   }, {
     isPrimary: false,
     attributes: ["enum_1"],
     description: undefined,
     extensions: {
-      tags: Object.assign(Object.create(null), {
+      tags: {
+        __proto__: null,
         enum: true,
         enumName: "EnumTheFirst"
-      })
+      }
     }
   }, {
     isPrimary: false,
     attributes: ["enum_2"],
     description: undefined,
     extensions: {
-      tags: Object.assign(Object.create(null), {
+      tags: {
+        __proto__: null,
         enum: true,
         enumName: "EnumTheSecond"
-      })
+      }
     }
   }, {
     isPrimary: false,
     attributes: ["enum_3"],
     description: undefined,
     extensions: {
-      tags: Object.assign(Object.create(null), {
+      tags: {
+        __proto__: null,
         enum: true
-      })
+      }
     }
   }, {
     isPrimary: false,
     attributes: ["enum_4"],
     description: undefined,
     extensions: {
-      tags: Object.assign(Object.create(null), {
+      tags: {
+        __proto__: null,
         enum: true
-      })
+      }
     }
   }],
   isVirtual: false,
@@ -773,10 +807,12 @@ const registryConfig_pgResources_lots_of_enums_lots_of_enums = {
   }
 };
 const registry = makeRegistry({
-  pgExecutors: Object.assign(Object.create(null), {
+  pgExecutors: {
+    __proto__: null,
     main: executor
-  }),
-  pgCodecs: Object.assign(Object.create(null), {
+  },
+  pgCodecs: {
+    __proto__: null,
     abcd: abcdCodec,
     text: TYPES.text,
     abcdView: abcdViewCodec,
@@ -793,8 +829,9 @@ const registry = makeRegistry({
     lotsOfEnums: lotsOfEnumsCodec,
     varchar: TYPES.varchar,
     bpchar: TYPES.bpchar
-  }),
-  pgResources: Object.assign(Object.create(null), {
+  },
+  pgResources: {
+    __proto__: null,
     abcd: registryConfig_pgResources_abcd_abcd,
     abcd_view: registryConfig_pgResources_abcd_view_abcd_view,
     simple_enum: registryConfig_pgResources_simple_enum_simple_enum,
@@ -829,9 +866,11 @@ const registry = makeRegistry({
     letter_descriptions: registryConfig_pgResources_letter_descriptions_letter_descriptions,
     referencing_table: registryConfig_pgResources_referencing_table_referencing_table,
     lots_of_enums: registryConfig_pgResources_lots_of_enums_lots_of_enums
-  }),
-  pgRelations: Object.assign(Object.create(null), {
-    abcd: Object.assign(Object.create(null), {
+  },
+  pgRelations: {
+    __proto__: null,
+    abcd: {
+      __proto__: null,
       letterDescriptionsByTheirLetter: {
         localCodec: abcdCodec,
         remoteResourceOptions: registryConfig_pgResources_letter_descriptions_letter_descriptions,
@@ -847,8 +886,9 @@ const registry = makeRegistry({
           }
         }
       }
-    }),
-    abcdView: Object.assign(Object.create(null), {
+    },
+    abcdView: {
+      __proto__: null,
       letterDescriptionsByTheirLetterViaView: {
         localCodec: abcdViewCodec,
         remoteResourceOptions: registryConfig_pgResources_letter_descriptions_letter_descriptions,
@@ -864,8 +904,9 @@ const registry = makeRegistry({
           }
         }
       }
-    }),
-    letterDescriptions: Object.assign(Object.create(null), {
+    },
+    letterDescriptions: {
+      __proto__: null,
       abcdViewByMyLetterViaView: {
         localCodec: letterDescriptionsCodec,
         remoteResourceOptions: registryConfig_pgResources_abcd_view_abcd_view,
@@ -896,8 +937,9 @@ const registry = makeRegistry({
           }
         }
       }
-    }),
-    lotsOfEnums: Object.assign(Object.create(null), {
+    },
+    lotsOfEnums: {
+      __proto__: null,
       referencingTablesByTheirEnum1: {
         localCodec: lotsOfEnumsCodec,
         remoteResourceOptions: registryConfig_pgResources_referencing_table_referencing_table,
@@ -943,8 +985,9 @@ const registry = makeRegistry({
           }
         }
       }
-    }),
-    referencingTable: Object.assign(Object.create(null), {
+    },
+    referencingTable: {
+      __proto__: null,
       lotsOfEnumsByMyEnum1: {
         localCodec: referencingTableCodec,
         remoteResourceOptions: registryConfig_pgResources_lots_of_enums_lots_of_enums,
@@ -1005,8 +1048,9 @@ const registry = makeRegistry({
           }
         }
       }
-    }),
-    simpleEnum: Object.assign(Object.create(null), {
+    },
+    simpleEnum: {
+      __proto__: null,
       referencingTablesByTheirSimpleEnum: {
         localCodec: simpleEnumCodec,
         remoteResourceOptions: registryConfig_pgResources_referencing_table_referencing_table,
@@ -1022,56 +1066,38 @@ const registry = makeRegistry({
           }
         }
       }
-    })
-  })
-});
-const pgResource_letter_descriptionsPgResource = registry.pgResources["letter_descriptions"];
-const pgResource_referencing_tablePgResource = registry.pgResources["referencing_table"];
-const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
-  Query: handler,
-  LetterDescription: {
-    typeName: "LetterDescription",
-    codec: nodeIdCodecs_base64JSON_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("letter_descriptions", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    get(spec) {
-      return pgResource_letter_descriptionsPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "letter_descriptions";
-    }
-  },
-  ReferencingTable: {
-    typeName: "ReferencingTable",
-    codec: nodeIdCodecs_base64JSON_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("referencing_tables", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    get(spec) {
-      return pgResource_referencing_tablePgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "referencing_tables";
     }
   }
 });
+const resource_letter_descriptionsPgResource = registry.pgResources["letter_descriptions"];
+const resource_referencing_tablePgResource = registry.pgResources["referencing_table"];
+const nodeIdHandler_LetterDescription = {
+  typeName: "LetterDescription",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("letter_descriptions", false), $record.get("id")]);
+  },
+  getSpec($list) {
+    return {
+      id: inhibitOnNull(access($list, [1]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_letter_descriptionsPgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "letter_descriptions";
+  }
+};
 function specForHandler(handler) {
   function spec(nodeId) {
     // We only want to return the specifier if it matches
     // this handler; otherwise return null.
+    if (nodeId == null) return null;
     try {
       const specifier = handler.codec.decode(nodeId);
       if (handler.match(specifier)) {
@@ -1086,112 +1112,100 @@ function specForHandler(handler) {
   spec.isSyncAndSafe = true; // Optimization
   return spec;
 }
-const fetcher = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.LetterDescription);
-const fetcher2 = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.ReferencingTable);
-const applyOrderToPlan = ($select, $value, TableOrderByType) => {
-  if (!("evalLength" in $value)) {
-    return;
-  }
-  const length = $value.evalLength();
-  if (length == null) {
-    return;
-  }
-  for (let i = 0; i < length; i++) {
-    const order = $value.at(i).eval();
-    if (order == null) continue;
-    const config = getEnumValueConfig(TableOrderByType, order);
-    const plan = config?.extensions?.grafast?.applyPlan;
-    if (typeof plan !== "function") {
-      console.error(`Internal server error: invalid orderBy configuration: expected function, but received ${inspect(plan)}`);
-      throw new SafeError("Internal server error: invalid orderBy configuration");
-    }
-    plan($select);
+const nodeFetcher_LetterDescription = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_LetterDescription));
+  return nodeIdHandler_LetterDescription.get(nodeIdHandler_LetterDescription.getSpec($decoded));
+};
+const nodeIdHandler_ReferencingTable = {
+  typeName: "ReferencingTable",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("referencing_tables", false), $record.get("id")]);
+  },
+  getSpec($list) {
+    return {
+      id: inhibitOnNull(access($list, [1]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_referencing_tablePgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "referencing_tables";
   }
 };
+const nodeFetcher_ReferencingTable = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_ReferencingTable));
+  return nodeIdHandler_ReferencingTable.get(nodeIdHandler_ReferencingTable.getSpec($decoded));
+};
+function qbWhereBuilder(qb) {
+  return qb.whereBuilder();
+}
+const nodeIdHandlerByTypeName = {
+  __proto__: null,
+  Query: nodeIdHandler_Query,
+  LetterDescription: nodeIdHandler_LetterDescription,
+  ReferencingTable: nodeIdHandler_ReferencingTable
+};
+const decodeNodeId = makeDecodeNodeId(Object.values(nodeIdHandlerByTypeName));
+function findTypeNameMatch(specifier) {
+  if (!specifier) return null;
+  for (const [typeName, typeSpec] of Object.entries(nodeIdHandlerByTypeName)) {
+    const value = specifier[typeSpec.codec.name];
+    if (value != null && typeSpec.match(value)) {
+      return typeName;
+    }
+  }
+  return null;
+}
 function CursorSerialize(value) {
   return "" + value;
 }
-const argDetailsSimple = [{
+const argDetailsSimple_referencing_table_mutation = [{
   graphqlArgName: "t",
   postgresArgName: "t",
   pgCodec: referencingTableCodec,
   required: true,
   fetcher: null
 }];
-const makeArgs = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 1; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
-    } else {
-      step = args.get([...path, graphqlArgName]);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
+function makeArg(path, args, details) {
+  const {
+    graphqlArgName,
+    postgresArgName,
+    pgCodec,
+    fetcher
+  } = details;
+  const fullPath = [...path, graphqlArgName];
+  const $raw = args.getRaw(fullPath);
+  // TODO: this should maybe be operationPlan().withLatestSideEffectLayerPlan()
+  const step = operationPlan().withRootLayerPlan(() => fetcher ? trap(fetcher($raw).record(), 4) : bakedInput(args.typeAt(fullPath), $raw));
+  return {
+    step,
+    pgCodec,
+    name: postgresArgName ?? undefined
+  };
+}
+const makeArgs_referencing_table_mutation = (args, path = []) => argDetailsSimple_referencing_table_mutation.map(details => makeArg(path, args, details));
 const resource_referencing_table_mutationPgResource = registry.pgResources["referencing_table_mutation"];
-const specFromArgs = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.LetterDescription, $nodeId);
+const specFromArgs_LetterDescription = args => {
+  const $nodeId = args.getRaw(["input", "nodeId"]);
+  return specFromNodeId(nodeIdHandler_LetterDescription, $nodeId);
 };
-const specFromArgs2 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.ReferencingTable, $nodeId);
+const specFromArgs_ReferencingTable = args => {
+  const $nodeId = args.getRaw(["input", "nodeId"]);
+  return specFromNodeId(nodeIdHandler_ReferencingTable, $nodeId);
 };
-const specFromArgs3 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.LetterDescription, $nodeId);
+const specFromArgs_LetterDescription2 = args => {
+  const $nodeId = args.getRaw(["input", "nodeId"]);
+  return specFromNodeId(nodeIdHandler_LetterDescription, $nodeId);
 };
-const specFromArgs4 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.ReferencingTable, $nodeId);
+const specFromArgs_ReferencingTable2 = args => {
+  const $nodeId = args.getRaw(["input", "nodeId"]);
+  return specFromNodeId(nodeIdHandler_ReferencingTable, $nodeId);
 };
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
@@ -1260,13 +1274,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`LetterDescription\`."""
-    orderBy: [LetterDescriptionsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: LetterDescriptionCondition
+
+    """The method to use when ordering \`LetterDescription\`."""
+    orderBy: [LetterDescriptionsOrderBy!] = [PRIMARY_KEY_ASC]
   ): LetterDescriptionsConnection
 
   """Reads and enables pagination through a set of \`ReferencingTable\`."""
@@ -1289,13 +1303,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`ReferencingTable\`."""
-    orderBy: [ReferencingTablesOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: ReferencingTableCondition
+
+    """The method to use when ordering \`ReferencingTable\`."""
+    orderBy: [ReferencingTablesOrderBy!] = [PRIMARY_KEY_ASC]
   ): ReferencingTablesConnection
 }
 
@@ -1456,21 +1470,6 @@ type PageInfo {
   endCursor: Cursor
 }
 
-"""Methods to use when ordering \`LetterDescription\`."""
-enum LetterDescriptionsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  LETTER_ASC
-  LETTER_DESC
-  LETTER_VIA_VIEW_ASC
-  LETTER_VIA_VIEW_DESC
-  DESCRIPTION_ASC
-  DESCRIPTION_DESC
-}
-
 """
 A condition to be used against \`LetterDescription\` object types. All fields are
 tested for equality and combined with a logical ‘and.’
@@ -1487,6 +1486,21 @@ input LetterDescriptionCondition {
 
   """Checks for equality with the object’s \`description\` field."""
   description: String
+}
+
+"""Methods to use when ordering \`LetterDescription\`."""
+enum LetterDescriptionsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  LETTER_ASC
+  LETTER_DESC
+  LETTER_VIA_VIEW_ASC
+  LETTER_VIA_VIEW_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
 }
 
 """A connection to a list of \`ReferencingTable\` values."""
@@ -1517,23 +1531,6 @@ type ReferencingTablesEdge {
   node: ReferencingTable
 }
 
-"""Methods to use when ordering \`ReferencingTable\`."""
-enum ReferencingTablesOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  ENUM_1_ASC
-  ENUM_1_DESC
-  ENUM_2_ASC
-  ENUM_2_DESC
-  ENUM_3_ASC
-  ENUM_3_DESC
-  SIMPLE_ENUM_ASC
-  SIMPLE_ENUM_DESC
-}
-
 """
 A condition to be used against \`ReferencingTable\` object types. All fields are
 tested for equality and combined with a logical ‘and.’
@@ -1553,6 +1550,23 @@ input ReferencingTableCondition {
 
   """Checks for equality with the object’s \`simpleEnum\` field."""
   simpleEnum: SimpleEnum
+}
+
+"""Methods to use when ordering \`ReferencingTable\`."""
+enum ReferencingTablesOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  ENUM_1_ASC
+  ENUM_1_DESC
+  ENUM_2_ASC
+  ENUM_2_DESC
+  ENUM_3_ASC
+  ENUM_3_DESC
+  SIMPLE_ENUM_ASC
+  SIMPLE_ENUM_DESC
 }
 
 """
@@ -2084,209 +2098,155 @@ export const plans = {
       return rootValue();
     },
     nodeId($parent) {
-      const specifier = handler.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler.codec.name].encode);
+      const specifier = nodeIdHandler_Query.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Query.codec.name].encode);
     },
-    node: {
-      plan(_$root, args) {
-        return node(nodeIdHandlerByTypeName, args.get("nodeId"));
-      },
-      args: {
-        nodeId: undefined
-      }
+    node(_$root, fieldArgs) {
+      return fieldArgs.getRaw("nodeId");
     },
-    letterDescriptionById: {
-      plan(_$root, args) {
-        return pgResource_letter_descriptionsPgResource.get({
-          id: args.get("id")
-        });
-      },
-      args: {
-        id: undefined
-      }
+    letterDescriptionById(_$root, {
+      $id
+    }) {
+      return resource_letter_descriptionsPgResource.get({
+        id: $id
+      });
     },
-    letterDescriptionByLetter: {
-      plan(_$root, args) {
-        return pgResource_letter_descriptionsPgResource.get({
-          letter: args.get("letter")
-        });
-      },
-      args: {
-        letter: undefined
-      }
+    letterDescriptionByLetter(_$root, {
+      $letter
+    }) {
+      return resource_letter_descriptionsPgResource.get({
+        letter: $letter
+      });
     },
-    letterDescriptionByLetterViaView: {
-      plan(_$root, args) {
-        return pgResource_letter_descriptionsPgResource.get({
-          letter_via_view: args.get("letterViaView")
-        });
-      },
-      args: {
-        letterViaView: undefined
-      }
+    letterDescriptionByLetterViaView(_$root, {
+      $letterViaView
+    }) {
+      return resource_letter_descriptionsPgResource.get({
+        letter_via_view: $letterViaView
+      });
     },
-    referencingTableById: {
-      plan(_$root, args) {
-        return pgResource_referencing_tablePgResource.get({
-          id: args.get("id")
-        });
-      },
-      args: {
-        id: undefined
-      }
+    referencingTableById(_$root, {
+      $id
+    }) {
+      return resource_referencing_tablePgResource.get({
+        id: $id
+      });
     },
-    letterDescription: {
-      plan(_$parent, args) {
-        const $nodeId = args.get("nodeId");
-        return fetcher($nodeId);
-      },
-      args: {
-        nodeId: undefined
-      }
+    letterDescription(_$parent, args) {
+      const $nodeId = args.getRaw("nodeId");
+      return nodeFetcher_LetterDescription($nodeId);
     },
-    referencingTable: {
-      plan(_$parent, args) {
-        const $nodeId = args.get("nodeId");
-        return fetcher2($nodeId);
-      },
-      args: {
-        nodeId: undefined
-      }
+    referencingTable(_$parent, args) {
+      const $nodeId = args.getRaw("nodeId");
+      return nodeFetcher_ReferencingTable($nodeId);
     },
     allLetterDescriptions: {
       plan() {
-        return connection(pgResource_letter_descriptionsPgResource.find());
+        return connection(resource_letter_descriptionsPgResource.find());
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("LetterDescriptionsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
     allReferencingTables: {
       plan() {
-        return connection(pgResource_referencing_tablePgResource.find());
+        return connection(resource_referencing_tablePgResource.find());
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("ReferencingTablesOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     }
   },
+  Node: {
+    __planType($nodeId) {
+      const $specifier = decodeNodeId($nodeId);
+      const $__typename = lambda($specifier, findTypeNameMatch, true);
+      return {
+        $__typename,
+        planForType(type) {
+          const spec = nodeIdHandlerByTypeName[type.name];
+          if (spec) {
+            return spec.get(spec.getSpec(access($specifier, [spec.codec.name])));
+          } else {
+            throw new Error(`Failed to find handler for ${type.name}`);
+          }
+        }
+      };
+    }
+  },
   LetterDescription: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of letter_descriptionsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_letter_descriptionsPgResource.get(spec);
+    },
     nodeId($parent) {
-      const specifier = nodeIdHandlerByTypeName.LetterDescription.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.LetterDescription.codec.name].encode);
-    },
-    id($record) {
-      return $record.get("id");
-    },
-    letter($record) {
-      return $record.get("letter");
+      const specifier = nodeIdHandler_LetterDescription.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_LetterDescription.codec.name].encode);
     },
     letterViaView($record) {
       return $record.get("letter_via_view");
-    },
-    description($record) {
-      return $record.get("description");
     }
   },
   ReferencingTable: {
     __assertStep: assertPgClassSingleStep,
-    nodeId($parent) {
-      const specifier = nodeIdHandlerByTypeName.ReferencingTable.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.ReferencingTable.codec.name].encode);
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of referencing_tableUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_referencing_tablePgResource.get(spec);
     },
-    id($record) {
-      return $record.get("id");
+    nodeId($parent) {
+      const specifier = nodeIdHandler_ReferencingTable.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_ReferencingTable.codec.name].encode);
     },
     enum1($record) {
       return $record.get("enum_1");
@@ -2359,16 +2319,6 @@ export const plans = {
   },
   LetterDescriptionsConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
@@ -2407,285 +2357,120 @@ export const plans = {
       return $pageInfo.endCursor();
     }
   },
-  LetterDescriptionsOrderBy: {
-    NATURAL: {
-      applyPlan() {}
+  LetterDescriptionCondition: {
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
-    PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        letter_descriptionsUniques[0].attributes.forEach(attributeName => {
-          const attribute = letterDescriptionsCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
+    letter($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "letter",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, spec_letterDescriptions_attributes_letter_codec_LetterAToDEnum)}`;
+        }
+      });
     },
-    PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        letter_descriptionsUniques[0].attributes.forEach(attributeName => {
-          const attribute = letterDescriptionsCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
+    letterViaView($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "letter_via_view",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, spec_letterDescriptions_attributes_letter_via_view_codec_LetterAToDViaViewEnum)}`;
+        }
+      });
     },
-    ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    description($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "description",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
         }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    LETTER_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "letter",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    LETTER_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "letter",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    LETTER_VIA_VIEW_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "letter_via_view",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    LETTER_VIA_VIEW_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "letter_via_view",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    DESCRIPTION_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "description",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    DESCRIPTION_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "description",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     }
   },
-  LetterDescriptionCondition: {
-    id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_letterDescriptions.attributes.id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+  LetterDescriptionsOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      letter_descriptionsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    letter: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "letter",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "letter",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_letterDescriptions.attributes.letter.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    PRIMARY_KEY_DESC(queryBuilder) {
+      letter_descriptionsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    letterViaView: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "letter_via_view",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "letter_via_view",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_letterDescriptions.attributes.letter_via_view.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    description: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "description",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "description",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_letterDescriptions.attributes.description.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    LETTER_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "letter",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    LETTER_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "letter",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    LETTER_VIA_VIEW_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "letter_via_view",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    LETTER_VIA_VIEW_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "letter_via_view",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    DESCRIPTION_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "description",
+        direction: "ASC"
+      });
+    },
+    DESCRIPTION_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "description",
+        direction: "DESC"
+      });
     }
   },
   ReferencingTablesConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
@@ -2699,588 +2484,372 @@ export const plans = {
       return $edge.node();
     }
   },
-  ReferencingTablesOrderBy: {
-    NATURAL: {
-      applyPlan() {}
+  ReferencingTableCondition: {
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
-    PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        referencing_tableUniques[0].attributes.forEach(attributeName => {
-          const attribute = referencingTableCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
+    enum1($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "enum_1",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, spec_referencingTable_attributes_enum_1_codec_EnumTheFirstEnum)}`;
+        }
+      });
     },
-    PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        referencing_tableUniques[0].attributes.forEach(attributeName => {
-          const attribute = referencingTableCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
+    enum2($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "enum_2",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, spec_referencingTable_attributes_enum_2_codec_EnumTheSecondEnum)}`;
+        }
+      });
     },
-    ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    enum3($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "enum_3",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, spec_referencingTable_attributes_enum_3_codec_LotsOfEnumsEnum3Enum)}`;
         }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    simpleEnum($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "simple_enum",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, spec_referencingTable_attributes_simple_enum_codec_SimpleEnumEnum)}`;
         }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ENUM_1_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "enum_1",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ENUM_1_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "enum_1",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ENUM_2_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "enum_2",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ENUM_2_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "enum_2",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ENUM_3_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "enum_3",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ENUM_3_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "enum_3",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    SIMPLE_ENUM_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "simple_enum",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    SIMPLE_ENUM_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "simple_enum",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     }
   },
-  ReferencingTableCondition: {
-    id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_referencingTable.attributes.id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+  ReferencingTablesOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      referencing_tableUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    enum1: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "enum_1",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "enum_1",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_referencingTable.attributes.enum_1.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    PRIMARY_KEY_DESC(queryBuilder) {
+      referencing_tableUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    enum2: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "enum_2",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "enum_2",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_referencingTable.attributes.enum_2.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    enum3: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "enum_3",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "enum_3",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_referencingTable.attributes.enum_3.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    simpleEnum: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "simple_enum",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "simple_enum",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_referencingTable.attributes.simple_enum.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ENUM_1_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "enum_1",
+        direction: "ASC"
+      });
+    },
+    ENUM_1_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "enum_1",
+        direction: "DESC"
+      });
+    },
+    ENUM_2_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "enum_2",
+        direction: "ASC"
+      });
+    },
+    ENUM_2_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "enum_2",
+        direction: "DESC"
+      });
+    },
+    ENUM_3_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "enum_3",
+        direction: "ASC"
+      });
+    },
+    ENUM_3_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "enum_3",
+        direction: "DESC"
+      });
+    },
+    SIMPLE_ENUM_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "simple_enum",
+        direction: "ASC"
+      });
+    },
+    SIMPLE_ENUM_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "simple_enum",
+        direction: "DESC"
+      });
     }
   },
   Mutation: {
     __assertStep: __ValueStep,
     referencingTableMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs(args, ["input"]);
+        const selectArgs = makeArgs_referencing_table_mutation(args, ["input"]);
         const $result = resource_referencing_table_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
         });
       },
       args: {
-        input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
+        input(_, $object, arg) {
+          // We might have any number of step types here; we need
+          // to get back to the underlying pgSelect.
+          const $result = $object.getStepForKey("result");
+          const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+          const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+          if ($pgSelect instanceof PgSelectStep) {
+            // Mostly so `clientMutationId` works!
+            arg.apply($pgSelect);
+          } else {
+            throw new Error(`Could not determine PgSelectStep for ${$result}`);
           }
         }
       }
     },
     createLetterDescription: {
       plan(_, args) {
+        const $insert = pgInsertSingle(resource_letter_descriptionsPgResource, Object.create(null));
+        args.apply($insert);
         const plan = object({
-          result: pgInsertSingle(pgResource_letter_descriptionsPgResource, Object.create(null))
+          result: $insert
         });
-        args.apply(plan);
         return plan;
       },
       args: {
-        input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     createReferencingTable: {
       plan(_, args) {
+        const $insert = pgInsertSingle(resource_referencing_tablePgResource, Object.create(null));
+        args.apply($insert);
         const plan = object({
-          result: pgInsertSingle(pgResource_referencing_tablePgResource, Object.create(null))
+          result: $insert
         });
-        args.apply(plan);
         return plan;
       },
       args: {
-        input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateLetterDescription: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_letter_descriptionsPgResource, specFromArgs(args))
+        const $update = pgUpdateSingle(resource_letter_descriptionsPgResource, specFromArgs_LetterDescription(args));
+        args.apply($update);
+        return object({
+          result: $update
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateLetterDescriptionById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_letter_descriptionsPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $update = pgUpdateSingle(resource_letter_descriptionsPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateLetterDescriptionByLetter: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_letter_descriptionsPgResource, {
-            letter: args.get(['input', "letter"])
-          })
+        const $update = pgUpdateSingle(resource_letter_descriptionsPgResource, {
+          letter: args.getRaw(['input', "letter"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateLetterDescriptionByLetterViaView: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_letter_descriptionsPgResource, {
-            letter_via_view: args.get(['input', "letterViaView"])
-          })
+        const $update = pgUpdateSingle(resource_letter_descriptionsPgResource, {
+          letter_via_view: args.getRaw(['input', "letterViaView"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateReferencingTable: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_referencing_tablePgResource, specFromArgs2(args))
+        const $update = pgUpdateSingle(resource_referencing_tablePgResource, specFromArgs_ReferencingTable(args));
+        args.apply($update);
+        return object({
+          result: $update
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateReferencingTableById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_referencing_tablePgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $update = pgUpdateSingle(resource_referencing_tablePgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteLetterDescription: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_letter_descriptionsPgResource, specFromArgs3(args))
+        const $delete = pgDeleteSingle(resource_letter_descriptionsPgResource, specFromArgs_LetterDescription2(args));
+        args.apply($delete);
+        return object({
+          result: $delete
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteLetterDescriptionById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_letter_descriptionsPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $delete = pgDeleteSingle(resource_letter_descriptionsPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteLetterDescriptionByLetter: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_letter_descriptionsPgResource, {
-            letter: args.get(['input', "letter"])
-          })
+        const $delete = pgDeleteSingle(resource_letter_descriptionsPgResource, {
+          letter: args.getRaw(['input', "letter"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteLetterDescriptionByLetterViaView: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_letter_descriptionsPgResource, {
-            letter_via_view: args.get(['input', "letterViaView"])
-          })
+        const $delete = pgDeleteSingle(resource_letter_descriptionsPgResource, {
+          letter_via_view: args.getRaw(['input', "letterViaView"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteReferencingTable: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_referencing_tablePgResource, specFromArgs4(args))
+        const $delete = pgDeleteSingle(resource_referencing_tablePgResource, specFromArgs_ReferencingTable2(args));
+        args.apply($delete);
+        return object({
+          result: $delete
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteReferencingTableById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_referencing_tablePgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $delete = pgDeleteSingle(resource_referencing_tablePgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     }
@@ -3288,7 +2857,8 @@ export const plans = {
   ReferencingTableMutationPayload: {
     __assertStep: ObjectStep,
     clientMutationId($object) {
-      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+      const $result = $object.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     integer($object) {
       return $object.get("result");
@@ -3298,58 +2868,48 @@ export const plans = {
     }
   },
   ReferencingTableMutationInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
-    },
-    t: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   ReferencingTableInput: {
-    "__inputPlan": function ReferencingTableInput_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    enum1(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("enum_1", bakedInputRuntime(schema, field.type, val));
     },
-    enum1: {
-      applyPlan($insert, val) {
-        $insert.set("enum_1", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    enum2(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("enum_2", bakedInputRuntime(schema, field.type, val));
     },
-    enum2: {
-      applyPlan($insert, val) {
-        $insert.set("enum_2", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    enum3(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("enum_3", bakedInputRuntime(schema, field.type, val));
     },
-    enum3: {
-      applyPlan($insert, val) {
-        $insert.set("enum_3", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    simpleEnum: {
-      applyPlan($insert, val) {
-        $insert.set("simple_enum", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    simpleEnum(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("simple_enum", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateLetterDescriptionPayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
     },
     letterDescription($object) {
       return $object.get("result");
@@ -3357,90 +2917,73 @@ export const plans = {
     query() {
       return rootValue();
     },
-    letterDescriptionEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = letter_descriptionsUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_letter_descriptionsPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("LetterDescriptionsOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    letterDescriptionEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = letter_descriptionsUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return resource_letter_descriptionsPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   CreateLetterDescriptionInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    letterDescription: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
-      },
-      autoApplyAfterParentApplyPlan: true
+    letterDescription(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
+      }
     }
   },
   LetterDescriptionInput: {
-    "__inputPlan": function LetterDescriptionInput_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    letter(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("letter", bakedInputRuntime(schema, field.type, val));
     },
-    letter: {
-      applyPlan($insert, val) {
-        $insert.set("letter", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    letterViaView(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("letter_via_view", bakedInputRuntime(schema, field.type, val));
     },
-    letterViaView: {
-      applyPlan($insert, val) {
-        $insert.set("letter_via_view", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    description: {
-      applyPlan($insert, val) {
-        $insert.set("description", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    description(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("description", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateReferencingTablePayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
     },
     referencingTable($object) {
       return $object.get("result");
@@ -3448,57 +2991,46 @@ export const plans = {
     query() {
       return rootValue();
     },
-    referencingTableEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = referencing_tableUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_referencing_tablePgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("ReferencingTablesOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    referencingTableEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = referencing_tableUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return resource_referencing_tablePgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   CreateReferencingTableInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    referencingTable: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
-      },
-      autoApplyAfterParentApplyPlan: true
+    referencingTable(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
+      }
     }
   },
   UpdateLetterDescriptionPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     letterDescription($object) {
       return $object.get("result");
@@ -3506,131 +3038,103 @@ export const plans = {
     query() {
       return rootValue();
     },
-    letterDescriptionEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = letter_descriptionsUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_letter_descriptionsPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("LetterDescriptionsOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    letterDescriptionEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = letter_descriptionsUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return resource_letter_descriptionsPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   UpdateLetterDescriptionInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    letterDescriptionPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+    letterDescriptionPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   LetterDescriptionPatch: {
-    "__inputPlan": function LetterDescriptionPatch_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    letter(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("letter", bakedInputRuntime(schema, field.type, val));
     },
-    letter: {
-      applyPlan($insert, val) {
-        $insert.set("letter", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    letterViaView(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("letter_via_view", bakedInputRuntime(schema, field.type, val));
     },
-    letterViaView: {
-      applyPlan($insert, val) {
-        $insert.set("letter_via_view", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    description: {
-      applyPlan($insert, val) {
-        $insert.set("description", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    description(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("description", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateLetterDescriptionByIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    letterDescriptionPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+    letterDescriptionPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   UpdateLetterDescriptionByLetterInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    letter: undefined,
-    letterDescriptionPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+    letterDescriptionPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   UpdateLetterDescriptionByLetterViaViewInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    letterViaView: undefined,
-    letterDescriptionPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+    letterDescriptionPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   UpdateReferencingTablePayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     referencingTable($object) {
       return $object.get("result");
@@ -3638,249 +3142,197 @@ export const plans = {
     query() {
       return rootValue();
     },
-    referencingTableEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = referencing_tableUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_referencing_tablePgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("ReferencingTablesOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    referencingTableEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = referencing_tableUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return resource_referencing_tablePgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   UpdateReferencingTableInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    referencingTablePatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+    referencingTablePatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   ReferencingTablePatch: {
-    "__inputPlan": function ReferencingTablePatch_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    enum1(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("enum_1", bakedInputRuntime(schema, field.type, val));
     },
-    enum1: {
-      applyPlan($insert, val) {
-        $insert.set("enum_1", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    enum2(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("enum_2", bakedInputRuntime(schema, field.type, val));
     },
-    enum2: {
-      applyPlan($insert, val) {
-        $insert.set("enum_2", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    enum3(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("enum_3", bakedInputRuntime(schema, field.type, val));
     },
-    enum3: {
-      applyPlan($insert, val) {
-        $insert.set("enum_3", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    simpleEnum: {
-      applyPlan($insert, val) {
-        $insert.set("simple_enum", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    simpleEnum(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("simple_enum", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateReferencingTableByIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    referencingTablePatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+    referencingTablePatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   DeleteLetterDescriptionPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     letterDescription($object) {
       return $object.get("result");
     },
     deletedLetterDescriptionId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandlerByTypeName.LetterDescription.plan($record);
+      const specifier = nodeIdHandler_LetterDescription.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query() {
       return rootValue();
     },
-    letterDescriptionEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = letter_descriptionsUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_letter_descriptionsPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("LetterDescriptionsOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    letterDescriptionEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = letter_descriptionsUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return resource_letter_descriptionsPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   DeleteLetterDescriptionInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteLetterDescriptionByIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteLetterDescriptionByLetterInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
-    },
-    letter: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteLetterDescriptionByLetterViaViewInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
-    },
-    letterViaView: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteReferencingTablePayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     referencingTable($object) {
       return $object.get("result");
     },
     deletedReferencingTableId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandlerByTypeName.ReferencingTable.plan($record);
+      const specifier = nodeIdHandler_ReferencingTable.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query() {
       return rootValue();
     },
-    referencingTableEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = referencing_tableUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_referencing_tablePgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("ReferencingTablesOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    referencingTableEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = referencing_tableUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return resource_referencing_tablePgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   DeleteReferencingTableInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteReferencingTableByIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   }
 };
 export const schema = makeGrafastSchema({

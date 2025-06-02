@@ -1,9 +1,8 @@
-import { PgDeleteSingleStep, PgExecutor, PgSelectStep, PgUnionAllStep, TYPES, assertPgClassSingleStep, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
+import { PgDeleteSingleStep, PgExecutor, TYPES, assertPgClassSingleStep, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec, sqlValueWithCodec } from "@dataplan/pg";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
-import { inspect } from "util";
-const handler = {
+const nodeIdHandler_Query = {
   typeName: "Query",
   codec: {
     name: "raw",
@@ -20,6 +19,9 @@ const handler = {
   },
   match(specifier) {
     return specifier === "query";
+  },
+  getIdentifiers(_value) {
+    return [];
   },
   getSpec() {
     return "irrelevant";
@@ -48,8 +50,9 @@ const nodeIdCodecs_base64JSON_base64JSON = {
     return base64JSONDecode;
   })()
 };
-const nodeIdCodecs = Object.assign(Object.create(null), {
-  raw: handler.codec,
+const nodeIdCodecs = {
+  __proto__: null,
+  raw: nodeIdHandler_Query.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
@@ -64,7 +67,7 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
       isSyncAndSafe: true
     })
   }
-});
+};
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -76,10 +79,11 @@ const executor = new PgExecutor({
   }
 });
 const fileIdentifier = sql.identifier("inheritence", "file");
-const spec_file = {
+const fileCodec = recordCodec({
   name: "file",
   identifier: fileIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     id: {
       description: undefined,
       codec: TYPES.int,
@@ -98,7 +102,7 @@ const spec_file = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -107,16 +111,18 @@ const spec_file = {
       schemaName: "inheritence",
       name: "file"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   executor: executor
-};
-const fileCodec = recordCodec(spec_file);
+});
 const userIdentifier = sql.identifier("inheritence", "user");
-const spec_user = {
+const userCodec = recordCodec({
   name: "user",
   identifier: userIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     id: {
       description: undefined,
       codec: TYPES.int,
@@ -135,7 +141,7 @@ const spec_user = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -144,16 +150,18 @@ const spec_user = {
       schemaName: "inheritence",
       name: "user"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   executor: executor
-};
-const userCodec = recordCodec(spec_user);
+});
 const userFileIdentifier = sql.identifier("inheritence", "user_file");
-const spec_userFile = {
+const userFileCodec = recordCodec({
   name: "userFile",
   identifier: userFileIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     id: {
       description: undefined,
       codec: TYPES.int,
@@ -181,7 +189,7 @@ const spec_userFile = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -190,17 +198,20 @@ const spec_userFile = {
       schemaName: "inheritence",
       name: "user_file"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   executor: executor
-};
-const userFileCodec = recordCodec(spec_userFile);
+});
 const fileUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }];
 const userUniques = [{
@@ -208,7 +219,9 @@ const userUniques = [{
   attributes: ["id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }];
 const registryConfig_pgResources_user_user = {
@@ -264,10 +277,12 @@ const registryConfig_pgResources_user_file_user_file = {
   }
 };
 const registry = makeRegistry({
-  pgExecutors: Object.assign(Object.create(null), {
+  pgExecutors: {
+    __proto__: null,
     main: executor
-  }),
-  pgCodecs: Object.assign(Object.create(null), {
+  },
+  pgCodecs: {
+    __proto__: null,
     text: TYPES.text,
     varchar: TYPES.varchar,
     bpchar: TYPES.bpchar,
@@ -275,8 +290,9 @@ const registry = makeRegistry({
     file: fileCodec,
     user: userCodec,
     userFile: userFileCodec
-  }),
-  pgResources: Object.assign(Object.create(null), {
+  },
+  pgResources: {
+    __proto__: null,
     file: {
       executor: executor,
       name: "file",
@@ -301,9 +317,11 @@ const registry = makeRegistry({
     },
     user: registryConfig_pgResources_user_user,
     user_file: registryConfig_pgResources_user_file_user_file
-  }),
-  pgRelations: Object.assign(Object.create(null), {
-    user: Object.assign(Object.create(null), {
+  },
+  pgRelations: {
+    __proto__: null,
+    user: {
+      __proto__: null,
       userFilesByTheirUserId: {
         localCodec: userCodec,
         remoteResourceOptions: registryConfig_pgResources_user_file_user_file,
@@ -319,8 +337,9 @@ const registry = makeRegistry({
           }
         }
       }
-    }),
-    userFile: Object.assign(Object.create(null), {
+    },
+    userFile: {
+      __proto__: null,
       userByMyUserId: {
         localCodec: userFileCodec,
         remoteResourceOptions: registryConfig_pgResources_user_user,
@@ -336,76 +355,39 @@ const registry = makeRegistry({
           }
         }
       }
-    })
-  })
-});
-const pgResource_filePgResource = registry.pgResources["file"];
-const pgResource_userPgResource = registry.pgResources["user"];
-const pgResource_user_filePgResource = registry.pgResources["user_file"];
-const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
-  Query: handler,
-  File: {
-    typeName: "File",
-    codec: nodeIdCodecs_base64JSON_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("files", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    get(spec) {
-      return pgResource_filePgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "files";
-    }
-  },
-  User: {
-    typeName: "User",
-    codec: nodeIdCodecs_base64JSON_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("users", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    get(spec) {
-      return pgResource_userPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "users";
-    }
-  },
-  UserFile: {
-    typeName: "UserFile",
-    codec: nodeIdCodecs_base64JSON_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("user_files", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    get(spec) {
-      return pgResource_user_filePgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "user_files";
     }
   }
 });
+const resource_filePgResource = registry.pgResources["file"];
+const resource_userPgResource = registry.pgResources["user"];
+const resource_user_filePgResource = registry.pgResources["user_file"];
+const nodeIdHandler_File = {
+  typeName: "File",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("files", false), $record.get("id")]);
+  },
+  getSpec($list) {
+    return {
+      id: inhibitOnNull(access($list, [1]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_filePgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "files";
+  }
+};
 function specForHandler(handler) {
   function spec(nodeId) {
     // We only want to return the specifier if it matches
     // this handler; otherwise return null.
+    if (nodeId == null) return null;
     try {
       const specifier = handler.codec.decode(nodeId);
       if (handler.match(specifier)) {
@@ -420,76 +402,109 @@ function specForHandler(handler) {
   spec.isSyncAndSafe = true; // Optimization
   return spec;
 }
-const fetcher = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.File);
-const fetcher2 = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.User);
-const fetcher3 = (handler => {
-  const fn = $nodeId => {
-    const $decoded = lambda($nodeId, specForHandler(handler));
-    return handler.get(handler.getSpec($decoded));
-  };
-  fn.deprecationReason = handler.deprecationReason;
-  return fn;
-})(nodeIdHandlerByTypeName.UserFile);
-const applyOrderToPlan = ($select, $value, TableOrderByType) => {
-  if (!("evalLength" in $value)) {
-    return;
-  }
-  const length = $value.evalLength();
-  if (length == null) {
-    return;
-  }
-  for (let i = 0; i < length; i++) {
-    const order = $value.at(i).eval();
-    if (order == null) continue;
-    const config = getEnumValueConfig(TableOrderByType, order);
-    const plan = config?.extensions?.grafast?.applyPlan;
-    if (typeof plan !== "function") {
-      console.error(`Internal server error: invalid orderBy configuration: expected function, but received ${inspect(plan)}`);
-      throw new SafeError("Internal server error: invalid orderBy configuration");
-    }
-    plan($select);
+const nodeFetcher_File = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_File));
+  return nodeIdHandler_File.get(nodeIdHandler_File.getSpec($decoded));
+};
+const nodeIdHandler_User = {
+  typeName: "User",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("users", false), $record.get("id")]);
+  },
+  getSpec($list) {
+    return {
+      id: inhibitOnNull(access($list, [1]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_userPgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "users";
   }
 };
+const nodeFetcher_User = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_User));
+  return nodeIdHandler_User.get(nodeIdHandler_User.getSpec($decoded));
+};
+const nodeIdHandler_UserFile = {
+  typeName: "UserFile",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("user_files", false), $record.get("id")]);
+  },
+  getSpec($list) {
+    return {
+      id: inhibitOnNull(access($list, [1]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_user_filePgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "user_files";
+  }
+};
+const nodeFetcher_UserFile = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_UserFile));
+  return nodeIdHandler_UserFile.get(nodeIdHandler_UserFile.getSpec($decoded));
+};
+function qbWhereBuilder(qb) {
+  return qb.whereBuilder();
+}
+const nodeIdHandlerByTypeName = {
+  __proto__: null,
+  Query: nodeIdHandler_Query,
+  File: nodeIdHandler_File,
+  User: nodeIdHandler_User,
+  UserFile: nodeIdHandler_UserFile
+};
+const decodeNodeId = makeDecodeNodeId(Object.values(nodeIdHandlerByTypeName));
+function findTypeNameMatch(specifier) {
+  if (!specifier) return null;
+  for (const [typeName, typeSpec] of Object.entries(nodeIdHandlerByTypeName)) {
+    const value = specifier[typeSpec.codec.name];
+    if (value != null && typeSpec.match(value)) {
+      return typeName;
+    }
+  }
+  return null;
+}
 function CursorSerialize(value) {
   return "" + value;
 }
-const specFromArgs = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.File, $nodeId);
+const specFromArgs_File = args => {
+  const $nodeId = args.getRaw(["input", "nodeId"]);
+  return specFromNodeId(nodeIdHandler_File, $nodeId);
 };
-const specFromArgs2 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.User, $nodeId);
+const specFromArgs_User = args => {
+  const $nodeId = args.getRaw(["input", "nodeId"]);
+  return specFromNodeId(nodeIdHandler_User, $nodeId);
 };
-const specFromArgs3 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.UserFile, $nodeId);
+const specFromArgs_UserFile = args => {
+  const $nodeId = args.getRaw(["input", "nodeId"]);
+  return specFromNodeId(nodeIdHandler_UserFile, $nodeId);
 };
-const specFromArgs4 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.File, $nodeId);
+const specFromArgs_File2 = args => {
+  const $nodeId = args.getRaw(["input", "nodeId"]);
+  return specFromNodeId(nodeIdHandler_File, $nodeId);
 };
-const specFromArgs5 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.User, $nodeId);
+const specFromArgs_User2 = args => {
+  const $nodeId = args.getRaw(["input", "nodeId"]);
+  return specFromNodeId(nodeIdHandler_User, $nodeId);
 };
-const specFromArgs6 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.UserFile, $nodeId);
+const specFromArgs_UserFile2 = args => {
+  const $nodeId = args.getRaw(["input", "nodeId"]);
+  return specFromNodeId(nodeIdHandler_UserFile, $nodeId);
 };
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
@@ -557,13 +572,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`File\`."""
-    orderBy: [FilesOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: FileCondition
+
+    """The method to use when ordering \`File\`."""
+    orderBy: [FilesOrderBy!] = [PRIMARY_KEY_ASC]
   ): FilesConnection
 
   """Reads and enables pagination through a set of \`User\`."""
@@ -586,13 +601,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`User\`."""
-    orderBy: [UsersOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: UserCondition
+
+    """The method to use when ordering \`User\`."""
+    orderBy: [UsersOrderBy!] = [PRIMARY_KEY_ASC]
   ): UsersConnection
 
   """Reads and enables pagination through a set of \`UserFile\`."""
@@ -615,13 +630,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`UserFile\`."""
-    orderBy: [UserFilesOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: UserFileCondition
+
+    """The method to use when ordering \`UserFile\`."""
+    orderBy: [UserFilesOrderBy!] = [PRIMARY_KEY_ASC]
   ): UserFilesConnection
 }
 
@@ -670,13 +685,13 @@ type User implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`UserFile\`."""
-    orderBy: [UserFilesOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: UserFileCondition
+
+    """The method to use when ordering \`UserFile\`."""
+    orderBy: [UserFilesOrderBy!] = [PRIMARY_KEY_ASC]
   ): UserFilesConnection!
 }
 
@@ -737,19 +752,6 @@ type PageInfo {
   endCursor: Cursor
 }
 
-"""Methods to use when ordering \`UserFile\`."""
-enum UserFilesOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  FILENAME_ASC
-  FILENAME_DESC
-  USER_ID_ASC
-  USER_ID_DESC
-}
-
 """
 A condition to be used against \`UserFile\` object types. All fields are tested
 for equality and combined with a logical ‘and.’
@@ -763,6 +765,19 @@ input UserFileCondition {
 
   """Checks for equality with the object’s \`userId\` field."""
   userId: Int
+}
+
+"""Methods to use when ordering \`UserFile\`."""
+enum UserFilesOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  FILENAME_ASC
+  FILENAME_DESC
+  USER_ID_ASC
+  USER_ID_DESC
 }
 
 """A connection to a list of \`File\` values."""
@@ -791,17 +806,6 @@ type FilesEdge {
   node: File
 }
 
-"""Methods to use when ordering \`File\`."""
-enum FilesOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  FILENAME_ASC
-  FILENAME_DESC
-}
-
 """
 A condition to be used against \`File\` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
@@ -811,6 +815,17 @@ input FileCondition {
 
   """Checks for equality with the object’s \`filename\` field."""
   filename: String
+}
+
+"""Methods to use when ordering \`File\`."""
+enum FilesOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  FILENAME_ASC
+  FILENAME_DESC
 }
 
 """A connection to a list of \`User\` values."""
@@ -839,17 +854,6 @@ type UsersEdge {
   node: User
 }
 
-"""Methods to use when ordering \`User\`."""
-enum UsersOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
-}
-
 """
 A condition to be used against \`User\` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
@@ -859,6 +863,17 @@ input UserCondition {
 
   """Checks for equality with the object’s \`name\` field."""
   name: String
+}
+
+"""Methods to use when ordering \`User\`."""
+enum UsersOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
 }
 
 """
@@ -1463,349 +1478,238 @@ export const plans = {
       return rootValue();
     },
     nodeId($parent) {
-      const specifier = handler.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler.codec.name].encode);
+      const specifier = nodeIdHandler_Query.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Query.codec.name].encode);
     },
-    node: {
-      plan(_$root, args) {
-        return node(nodeIdHandlerByTypeName, args.get("nodeId"));
-      },
-      args: {
-        nodeId: undefined
-      }
+    node(_$root, fieldArgs) {
+      return fieldArgs.getRaw("nodeId");
     },
-    fileById: {
-      plan(_$root, args) {
-        return pgResource_filePgResource.get({
-          id: args.get("id")
-        });
-      },
-      args: {
-        id: undefined
-      }
+    fileById(_$root, {
+      $id
+    }) {
+      return resource_filePgResource.get({
+        id: $id
+      });
     },
-    userById: {
-      plan(_$root, args) {
-        return pgResource_userPgResource.get({
-          id: args.get("id")
-        });
-      },
-      args: {
-        id: undefined
-      }
+    userById(_$root, {
+      $id
+    }) {
+      return resource_userPgResource.get({
+        id: $id
+      });
     },
-    userFileById: {
-      plan(_$root, args) {
-        return pgResource_user_filePgResource.get({
-          id: args.get("id")
-        });
-      },
-      args: {
-        id: undefined
-      }
+    userFileById(_$root, {
+      $id
+    }) {
+      return resource_user_filePgResource.get({
+        id: $id
+      });
     },
-    file: {
-      plan(_$parent, args) {
-        const $nodeId = args.get("nodeId");
-        return fetcher($nodeId);
-      },
-      args: {
-        nodeId: undefined
-      }
+    file(_$parent, args) {
+      const $nodeId = args.getRaw("nodeId");
+      return nodeFetcher_File($nodeId);
     },
-    user: {
-      plan(_$parent, args) {
-        const $nodeId = args.get("nodeId");
-        return fetcher2($nodeId);
-      },
-      args: {
-        nodeId: undefined
-      }
+    user(_$parent, args) {
+      const $nodeId = args.getRaw("nodeId");
+      return nodeFetcher_User($nodeId);
     },
-    userFile: {
-      plan(_$parent, args) {
-        const $nodeId = args.get("nodeId");
-        return fetcher3($nodeId);
-      },
-      args: {
-        nodeId: undefined
-      }
+    userFile(_$parent, args) {
+      const $nodeId = args.getRaw("nodeId");
+      return nodeFetcher_UserFile($nodeId);
     },
     allFiles: {
       plan() {
-        return connection(pgResource_filePgResource.find());
+        return connection(resource_filePgResource.find());
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("FilesOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
     allUsers: {
       plan() {
-        return connection(pgResource_userPgResource.find());
+        return connection(resource_userPgResource.find());
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("UsersOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
     allUserFiles: {
       plan() {
-        return connection(pgResource_user_filePgResource.find());
+        return connection(resource_user_filePgResource.find());
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("UserFilesOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     }
   },
+  Node: {
+    __planType($nodeId) {
+      const $specifier = decodeNodeId($nodeId);
+      const $__typename = lambda($specifier, findTypeNameMatch, true);
+      return {
+        $__typename,
+        planForType(type) {
+          const spec = nodeIdHandlerByTypeName[type.name];
+          if (spec) {
+            return spec.get(spec.getSpec(access($specifier, [spec.codec.name])));
+          } else {
+            throw new Error(`Failed to find handler for ${type.name}`);
+          }
+        }
+      };
+    }
+  },
   File: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of fileUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_filePgResource.get(spec);
+    },
     nodeId($parent) {
-      const specifier = nodeIdHandlerByTypeName.File.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.File.codec.name].encode);
-    },
-    id($record) {
-      return $record.get("id");
-    },
-    filename($record) {
-      return $record.get("filename");
+      const specifier = nodeIdHandler_File.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_File.codec.name].encode);
     }
   },
   User: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of userUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_userPgResource.get(spec);
+    },
     nodeId($parent) {
-      const specifier = nodeIdHandlerByTypeName.User.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.User.codec.name].encode);
-    },
-    id($record) {
-      return $record.get("id");
-    },
-    name($record) {
-      return $record.get("name");
+      const specifier = nodeIdHandler_User.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_User.codec.name].encode);
     },
     userFilesByUserId: {
       plan($record) {
-        const $records = pgResource_user_filePgResource.find({
+        const $records = resource_user_filePgResource.find({
           user_id: $record.get("id")
         });
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("UserFilesOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     }
   },
   UserFilesConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   UserFile: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of user_fileUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_user_filePgResource.get(spec);
+    },
     nodeId($parent) {
-      const specifier = nodeIdHandlerByTypeName.UserFile.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.UserFile.codec.name].encode);
-    },
-    id($record) {
-      return $record.get("id");
-    },
-    filename($record) {
-      return $record.get("filename");
+      const specifier = nodeIdHandler_UserFile.plan($parent);
+      return lambda(specifier, nodeIdCodecs[nodeIdHandler_UserFile.codec.name].encode);
     },
     userId($record) {
       return $record.get("user_id");
     },
     userByUserId($record) {
-      return pgResource_userPgResource.get({
+      return resource_userPgResource.get({
         id: $record.get("user_id")
       });
     }
@@ -1844,228 +1748,95 @@ export const plans = {
       return $pageInfo.endCursor();
     }
   },
-  UserFilesOrderBy: {
-    NATURAL: {
-      applyPlan() {}
+  UserFileCondition: {
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
-    PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        user_fileUniques[0].attributes.forEach(attributeName => {
-          const attribute = userFileCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
+    filename($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "filename",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+        }
+      });
     },
-    PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        user_fileUniques[0].attributes.forEach(attributeName => {
-          const attribute = userFileCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
-    },
-    ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    userId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "user_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    FILENAME_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "filename",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    FILENAME_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "filename",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    USER_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "user_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    USER_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "user_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     }
   },
-  UserFileCondition: {
-    id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_userFile.attributes.id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+  UserFilesOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      user_fileUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    filename: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "filename",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "filename",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_userFile.attributes.filename.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    PRIMARY_KEY_DESC(queryBuilder) {
+      user_fileUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    userId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "user_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "user_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_userFile.attributes.user_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    FILENAME_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "filename",
+        direction: "ASC"
+      });
+    },
+    FILENAME_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "filename",
+        direction: "DESC"
+      });
+    },
+    USER_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "user_id",
+        direction: "ASC"
+      });
+    },
+    USER_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "user_id",
+        direction: "DESC"
+      });
     }
   },
   FilesConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
@@ -2079,171 +1850,74 @@ export const plans = {
       return $edge.node();
     }
   },
-  FilesOrderBy: {
-    NATURAL: {
-      applyPlan() {}
+  FileCondition: {
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
-    PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        fileUniques[0].attributes.forEach(attributeName => {
-          const attribute = fileCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
-    },
-    PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        fileUniques[0].attributes.forEach(attributeName => {
-          const attribute = fileCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
-    },
-    ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    filename($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "filename",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
         }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    FILENAME_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "filename",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    FILENAME_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "filename",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     }
   },
-  FileCondition: {
-    id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_file.attributes.id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+  FilesOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      fileUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    filename: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "filename",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "filename",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_file.attributes.filename.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    PRIMARY_KEY_DESC(queryBuilder) {
+      fileUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    FILENAME_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "filename",
+        direction: "ASC"
+      });
+    },
+    FILENAME_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "filename",
+        direction: "DESC"
+      });
     }
   },
   UsersConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
@@ -2257,413 +1931,296 @@ export const plans = {
       return $edge.node();
     }
   },
-  UsersOrderBy: {
-    NATURAL: {
-      applyPlan() {}
+  UserCondition: {
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
-    PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        userUniques[0].attributes.forEach(attributeName => {
-          const attribute = userCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
-    },
-    PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        userUniques[0].attributes.forEach(attributeName => {
-          const attribute = userCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
-    },
-    ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    name($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "name",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
         }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    NAME_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "name",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    NAME_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "name",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     }
   },
-  UserCondition: {
-    id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_user.attributes.id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+  UsersOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      userUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    name: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_user.attributes.name.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    PRIMARY_KEY_DESC(queryBuilder) {
+      userUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    NAME_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "name",
+        direction: "ASC"
+      });
+    },
+    NAME_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "name",
+        direction: "DESC"
+      });
     }
   },
   Mutation: {
     __assertStep: __ValueStep,
     createFile: {
       plan(_, args) {
+        const $insert = pgInsertSingle(resource_filePgResource, Object.create(null));
+        args.apply($insert);
         const plan = object({
-          result: pgInsertSingle(pgResource_filePgResource, Object.create(null))
+          result: $insert
         });
-        args.apply(plan);
         return plan;
       },
       args: {
-        input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     createUser: {
       plan(_, args) {
+        const $insert = pgInsertSingle(resource_userPgResource, Object.create(null));
+        args.apply($insert);
         const plan = object({
-          result: pgInsertSingle(pgResource_userPgResource, Object.create(null))
+          result: $insert
         });
-        args.apply(plan);
         return plan;
       },
       args: {
-        input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     createUserFile: {
       plan(_, args) {
+        const $insert = pgInsertSingle(resource_user_filePgResource, Object.create(null));
+        args.apply($insert);
         const plan = object({
-          result: pgInsertSingle(pgResource_user_filePgResource, Object.create(null))
+          result: $insert
         });
-        args.apply(plan);
         return plan;
       },
       args: {
-        input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateFile: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_filePgResource, specFromArgs(args))
+        const $update = pgUpdateSingle(resource_filePgResource, specFromArgs_File(args));
+        args.apply($update);
+        return object({
+          result: $update
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateFileById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_filePgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $update = pgUpdateSingle(resource_filePgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateUser: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_userPgResource, specFromArgs2(args))
+        const $update = pgUpdateSingle(resource_userPgResource, specFromArgs_User(args));
+        args.apply($update);
+        return object({
+          result: $update
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateUserById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_userPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $update = pgUpdateSingle(resource_userPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateUserFile: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_user_filePgResource, specFromArgs3(args))
+        const $update = pgUpdateSingle(resource_user_filePgResource, specFromArgs_UserFile(args));
+        args.apply($update);
+        return object({
+          result: $update
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateUserFileById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_user_filePgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $update = pgUpdateSingle(resource_user_filePgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteFile: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_filePgResource, specFromArgs4(args))
+        const $delete = pgDeleteSingle(resource_filePgResource, specFromArgs_File2(args));
+        args.apply($delete);
+        return object({
+          result: $delete
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteFileById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_filePgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $delete = pgDeleteSingle(resource_filePgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteUser: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_userPgResource, specFromArgs5(args))
+        const $delete = pgDeleteSingle(resource_userPgResource, specFromArgs_User2(args));
+        args.apply($delete);
+        return object({
+          result: $delete
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteUserById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_userPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $delete = pgDeleteSingle(resource_userPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteUserFile: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_user_filePgResource, specFromArgs6(args))
+        const $delete = pgDeleteSingle(resource_user_filePgResource, specFromArgs_UserFile2(args));
+        args.apply($delete);
+        return object({
+          result: $delete
         });
-        args.apply(plan);
-        return plan;
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteUserFileById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_user_filePgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $delete = pgDeleteSingle(resource_user_filePgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     }
@@ -2671,7 +2228,8 @@ export const plans = {
   CreateFilePayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
     },
     file($object) {
       return $object.get("result");
@@ -2679,76 +2237,61 @@ export const plans = {
     query() {
       return rootValue();
     },
-    fileEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = fileUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_filePgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("FilesOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    fileEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = fileUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return resource_filePgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   CreateFileInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    file: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
-      },
-      autoApplyAfterParentApplyPlan: true
+    file(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
+      }
     }
   },
   FileInput: {
-    "__inputPlan": function FileInput_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    filename: {
-      applyPlan($insert, val) {
-        $insert.set("filename", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    filename(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("filename", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateUserPayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
     },
     user($object) {
       return $object.get("result");
@@ -2756,76 +2299,61 @@ export const plans = {
     query() {
       return rootValue();
     },
-    userEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = userUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_userPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("UsersOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    userEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = userUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return resource_userPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   CreateUserInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    user: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
-      },
-      autoApplyAfterParentApplyPlan: true
+    user(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
+      }
     }
   },
   UserInput: {
-    "__inputPlan": function UserInput_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    name: {
-      applyPlan($insert, val) {
-        $insert.set("name", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    name(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("name", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateUserFilePayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
     },
     userFile($object) {
       return $object.get("result");
@@ -2833,88 +2361,72 @@ export const plans = {
     query() {
       return rootValue();
     },
-    userFileEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = user_fileUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_user_filePgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("UserFilesOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    userFileEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = user_fileUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return resource_user_filePgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     },
     userByUserId($record) {
-      return pgResource_userPgResource.get({
+      return resource_userPgResource.get({
         id: $record.get("result").get("user_id")
       });
     }
   },
   CreateUserFileInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    userFile: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
-      },
-      autoApplyAfterParentApplyPlan: true
+    userFile(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
+      }
     }
   },
   UserFileInput: {
-    "__inputPlan": function UserFileInput_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    filename(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("filename", bakedInputRuntime(schema, field.type, val));
     },
-    filename: {
-      applyPlan($insert, val) {
-        $insert.set("filename", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    userId: {
-      applyPlan($insert, val) {
-        $insert.set("user_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    userId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("user_id", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateFilePayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     file($object) {
       return $object.get("result");
@@ -2922,89 +2434,71 @@ export const plans = {
     query() {
       return rootValue();
     },
-    fileEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = fileUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_filePgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("FilesOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    fileEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = fileUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return resource_filePgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   UpdateFileInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    filePatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+    filePatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   FilePatch: {
-    "__inputPlan": function FilePatch_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    filename: {
-      applyPlan($insert, val) {
-        $insert.set("filename", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    filename(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("filename", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateFileByIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    filePatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+    filePatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   UpdateUserPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     user($object) {
       return $object.get("result");
@@ -3012,89 +2506,71 @@ export const plans = {
     query() {
       return rootValue();
     },
-    userEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = userUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_userPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("UsersOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    userEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = userUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return resource_userPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   UpdateUserInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    userPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+    userPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   UserPatch: {
-    "__inputPlan": function UserPatch_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    name: {
-      applyPlan($insert, val) {
-        $insert.set("name", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    name(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("name", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateUserByIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    userPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+    userPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   UpdateUserFilePayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     userFile($object) {
       return $object.get("result");
@@ -3102,293 +2578,237 @@ export const plans = {
     query() {
       return rootValue();
     },
-    userFileEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = user_fileUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_user_filePgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("UserFilesOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    userFileEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = user_fileUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return resource_user_filePgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     },
     userByUserId($record) {
-      return pgResource_userPgResource.get({
+      return resource_userPgResource.get({
         id: $record.get("result").get("user_id")
       });
     }
   },
   UpdateUserFileInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    nodeId: undefined,
-    userFilePatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+    userFilePatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   UserFilePatch: {
-    "__inputPlan": function UserFilePatch_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    filename(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("filename", bakedInputRuntime(schema, field.type, val));
     },
-    filename: {
-      applyPlan($insert, val) {
-        $insert.set("filename", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    userId: {
-      applyPlan($insert, val) {
-        $insert.set("user_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    userId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("user_id", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateUserFileByIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    userFilePatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+    userFilePatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   DeleteFilePayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     file($object) {
       return $object.get("result");
     },
     deletedFileId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandlerByTypeName.File.plan($record);
+      const specifier = nodeIdHandler_File.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query() {
       return rootValue();
     },
-    fileEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = fileUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_filePgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("FilesOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    fileEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = fileUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return resource_filePgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   DeleteFileInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteFileByIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteUserPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     user($object) {
       return $object.get("result");
     },
     deletedUserId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandlerByTypeName.User.plan($record);
+      const specifier = nodeIdHandler_User.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query() {
       return rootValue();
     },
-    userEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = userUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_userPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("UsersOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    userEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = userUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return resource_userPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   DeleteUserInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteUserByIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteUserFilePayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     userFile($object) {
       return $object.get("result");
     },
     deletedUserFileId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandlerByTypeName.UserFile.plan($record);
+      const specifier = nodeIdHandler_UserFile.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query() {
       return rootValue();
     },
-    userFileEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = user_fileUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_user_filePgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("UserFilesOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    userFileEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = user_fileUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return resource_user_filePgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     },
     userByUserId($record) {
-      return pgResource_userPgResource.get({
+      return resource_userPgResource.get({
         id: $record.get("result").get("user_id")
       });
     }
   },
   DeleteUserFileInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
-    },
-    nodeId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteUserFileByIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   }
 };
 export const schema = makeGrafastSchema({

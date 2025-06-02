@@ -6,7 +6,7 @@ import type {
   PgResourceUnique,
 } from "@dataplan/pg";
 import { assertPgClassSingleStep, makePgResourceOptions } from "@dataplan/pg";
-import { object } from "grafast";
+import { createObjectAndApplyChildren } from "grafast";
 import {
   EXPORTABLE,
   EXPORTABLE_OBJECT_CLONE,
@@ -656,9 +656,11 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
     hooks: {
       init(_, build, _context) {
         const {
+          grafast: { get },
           inflection,
           options: { pgForbidSetofFunctionsToReturnNull },
           setGraphQLTypeForPgCodec,
+          EXPORTABLE,
         } = build;
         for (const codec of build.pgCodecMetaLookup.keys()) {
           build.recoverable(null, () => {
@@ -679,6 +681,13 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             }
 
             if (isTable) {
+              const resource = Object.values(
+                build.input.pgRegistry.pgResources,
+              ).find((r) => !r.parameters && r.codec === codec);
+              const pk =
+                resource?.uniques.find((u) => u.isPrimary) ??
+                resource?.uniques[0];
+              const pkCols = pk?.attributes;
               build.registerObjectType(
                 tableTypeName,
                 {
@@ -688,6 +697,21 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                 () => ({
                   assertStep: assertPgClassSingleStep,
                   description: codec.description,
+                  planType:
+                    resource && pkCols
+                      ? // TODO: optimize this function to look like `return resource.get({...})` via eval
+                        EXPORTABLE(
+                          (get, pkCols, resource) =>
+                            function ($specifier) {
+                              const spec = Object.create(null);
+                              for (const pkCol of pkCols) {
+                                spec[pkCol] = get($specifier, pkCol);
+                              }
+                              return resource.get(spec);
+                            },
+                          [get, pkCols, resource],
+                        )
+                      : undefined,
                 }),
                 `PgTablesPlugin table type for ${codec.name}`,
               );
@@ -712,13 +736,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                   description: `An input for mutations affecting \`${tableTypeName}\``,
                   extensions: {
                     grafast: {
-                      inputPlan: EXPORTABLE(
-                        (object) =>
-                          function inputPlan() {
-                            return object(Object.create(null));
-                          },
-                        [object],
-                      ),
+                      baked: createObjectAndApplyChildren,
                     },
                   },
                 }),
@@ -745,13 +763,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                   description: `Represents an update to a \`${tableTypeName}\`. Fields that are set will be updated.`,
                   extensions: {
                     grafast: {
-                      inputPlan: EXPORTABLE(
-                        (object) =>
-                          function inputPlan() {
-                            return object(Object.create(null));
-                          },
-                        [object],
-                      ),
+                      baked: createObjectAndApplyChildren,
                     },
                   },
                 }),
@@ -774,13 +786,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                   description: `An input representation of \`${tableTypeName}\` with nullable fields.`,
                   extensions: {
                     grafast: {
-                      inputPlan: EXPORTABLE(
-                        (object) =>
-                          function inputPlan() {
-                            return object(Object.create(null));
-                          },
-                        [object],
-                      ),
+                      baked: createObjectAndApplyChildren,
                     },
                   },
                 }),

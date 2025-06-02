@@ -1,5 +1,7 @@
-import type { ExecutableStep, ModifierStep } from "grafast";
-import type { SQL, SQLRawValue } from "pg-sql2";
+import type { Modifier, Step } from "grafast";
+import type { PgSQL, SQL, SQLRawValue } from "pg-sql2";
+import { $$toSQL } from "pg-sql2";
+import type { CustomInspectFunction, inspect } from "util";
 
 import type { PgCodecAttributes } from "./codecs.js";
 import type {
@@ -12,7 +14,9 @@ import type {
 import type { PgExecutor } from "./executor.js";
 import type { PgDeleteSingleStep } from "./steps/pgDeleteSingle.js";
 import type { PgInsertSingleStep } from "./steps/pgInsertSingle.js";
+import type { PgSelectQueryBuilder } from "./steps/pgSelect.js";
 import type { PgSelectSingleStep } from "./steps/pgSelectSingle.js";
+import type { PgUnionAllQueryBuilder } from "./steps/pgUnionAll.js";
 import type { PgUpdateSingleStep } from "./steps/pgUpdateSingle.js";
 
 /**
@@ -261,6 +265,9 @@ export interface PgCodec<
    * type of an attribute itself.
    */
   executor: PgExecutor | null;
+
+  /** @internal */
+  [inspect.custom]?: CustomInspectFunction;
 }
 
 export type PgCodecWithAttributes<
@@ -313,45 +320,44 @@ export interface PgEnumCodec<
 }
 
 /**
- * A PgTypedExecutableStep has a 'pgCodec' property which means we don't need
+ * A PgTypedStep has a 'pgCodec' property which means we don't need
  * to also state the pgCodec to use, this can be an added convenience.
  */
-export interface PgTypedExecutableStep<TCodec extends PgCodec>
-  extends ExecutableStep {
+export interface PgTypedStep<TCodec extends PgCodec> extends Step {
   pgCodec: TCodec;
 }
 
 type PgOrderCommonSpec = {
-  direction: "ASC" | "DESC";
+  readonly direction: "ASC" | "DESC";
   /** `NULLS FIRST` or `NULLS LAST` or nothing */
-  nulls?: "FIRST" | "LAST" | null;
+  readonly nulls?: "FIRST" | "LAST" | null;
 };
 
 export type PgOrderFragmentSpec = {
   /** The expression we're ordering by. */
-  fragment: SQL;
+  readonly fragment: SQL;
   /** The codec of the expression that we're ordering by, this is useful when constructing a cursor for it. */
-  codec: PgCodec<string, any, any, any, any, any, any>;
+  readonly codec: PgCodec<string, any, any, any, any, any, any>;
 
-  attribute?: never;
-  callback?: never;
+  readonly attribute?: never;
+  readonly callback?: never;
 
-  nullable?: boolean;
+  readonly nullable?: boolean;
 } & PgOrderCommonSpec;
 
 export type PgOrderAttributeSpec = {
   /** The attribute you're using for ordering */
-  attribute: string;
+  readonly attribute: string;
   /** An optional expression to wrap this attribute with, and the type that expression returns */
-  callback?: (
+  readonly callback?: (
     attributeExpression: SQL,
     attributeCodec: PgCodec,
     nullable: boolean,
   ) => [fragment: SQL, codec: PgCodec, nullable?: boolean];
 
-  fragment?: never;
-  codec?: never;
-  nullable?: boolean;
+  readonly fragment?: never;
+  readonly codec?: never;
+  readonly nullable?: boolean;
 } & PgOrderCommonSpec;
 
 /**
@@ -364,7 +370,8 @@ export type PgOrderSpec = PgOrderFragmentSpec | PgOrderAttributeSpec;
  */
 export interface PgGroupSpec {
   fragment: SQL;
-  // codec: PgCodec<string, any, any, any>;
+  codec: PgCodec<string, any, any, any>;
+  guaranteedNotNull?: boolean;
   // ENHANCE: consider if 'cube', 'rollup', 'grouping sets' need special handling or can just be part of the fragment
 }
 
@@ -374,21 +381,20 @@ export type TuplePlanMap<
 > = {
   [Index in keyof TTuple]: {
     // Optional attributes
-    [key in keyof TAttributes as Exclude<
-      key,
-      keyof TTuple[number]
-    >]?: ExecutableStep<ReturnType<TAttributes[key]["codec"]["fromPg"]>>;
+    [key in keyof TAttributes as Exclude<key, keyof TTuple[number]>]?: Step<
+      ReturnType<TAttributes[key]["codec"]["fromPg"]>
+    >;
   } & {
     // Required unique combination of attributes
-    [key in TTuple[number]]: ExecutableStep<
+    [key in TTuple[number]]: Step<
       ReturnType<TAttributes[key]["codec"]["fromPg"]>
     >;
   };
 };
 
 /**
- * Represents a spec like `{user_id: ExecutableStep}` or
- * `{organization_id: ExecutableStep, item_id: ExecutableStep}`. The keys in
+ * Represents a spec like `{user_id: Step}` or
+ * `{organization_id: Step, item_id: Step}`. The keys in
  * the spec can be any of the attributes in TAttributes, however there must be at
  * least one of the unique sets of attributes represented (as specified in
  * TUniqueAttributes) - you can then add arbitrary additional attributes if you need
@@ -404,9 +410,8 @@ export type PlanByUniques<
     >[number]
   : undefined;
 
-export type PgConditionLikeStep = (ModifierStep<any> | ExecutableStep) & {
+export type PgConditionLike = Modifier<any> & {
   alias: SQL;
-  placeholder($step: ExecutableStep, codec: PgCodec): SQL;
   where(condition: SQL): void;
   having(condition: SQL): void;
 };
@@ -449,7 +454,7 @@ export interface PgCodecRelationBase<
   /**
    * The attributes locally used in this relationship.
    */
-  localAttributes: readonly (keyof TLocalCodec["attributes"])[];
+  localAttributes: readonly (keyof TLocalCodec["attributes"] & string)[];
 
   /**
    * The remote attributes that are joined against.
@@ -703,11 +708,12 @@ export type GetPgRegistryCodecRelations<
 
 export type GetPgCodecAttributes<
   TCodec extends PgCodec<any, any, any, any, any, any, any>,
-> = TCodec extends PgCodec<any, infer UAttributes, any, any, any, any, any>
-  ? UAttributes extends undefined
-    ? never
-    : UAttributes
-  : PgCodecAttributes;
+> =
+  TCodec extends PgCodec<any, infer UAttributes, any, any, any, any, any>
+    ? UAttributes extends undefined
+      ? never
+      : UAttributes
+    : PgCodecAttributes;
 
 export type GetPgResourceRegistry<
   TResource extends PgResource<any, any, any, any, any>,
@@ -718,7 +724,7 @@ export type GetPgResourceCodec<
 > = TResource["codec"];
 
 export type GetPgResourceAttributes<
-  TResource extends PgResource<any, any, any, any, any>,
+  TResource extends PgResource<any, PgCodecWithAttributes, any, any, any>,
 > = GetPgCodecAttributes<TResource["codec"]>;
 
 export type GetPgResourceRelations<
@@ -728,3 +734,35 @@ export type GetPgResourceRelations<
 export type GetPgResourceUniques<
   TResource extends PgResource<any, any, any, any, any>,
 > = TResource["uniques"];
+
+export type PgSQLCallback<TResult> = (
+  sql: PgSQL<PgTypedStep<PgCodec>>,
+) => TResult;
+export type PgSQLCallbackOrDirect<TResult> = PgSQLCallback<TResult> | TResult;
+
+export interface PgQueryBuilder {
+  /** The alias of the current table */
+  alias: SQL;
+  [$$toSQL](): SQL;
+  setMeta(key: string, value: unknown): void;
+  getMetaRaw(key: string): unknown;
+}
+
+export type PgSelectQueryBuilderCallback = (qb: PgSelectQueryBuilder) => void;
+export type PgUnionAllQueryBuilderCallback = (
+  qb: PgUnionAllQueryBuilder,
+) => void;
+export type ReadonlyArrayOrDirect<T> = T | ReadonlyArray<T>;
+
+export type ObjectForResource<
+  TResource extends PgResource<any, PgCodecWithAttributes, any, any, any>,
+> = {
+  [key in keyof GetPgResourceAttributes<TResource> & string]?: any; // TYPES: we should be able to make this stronger using the attribute codec
+};
+
+export interface PgQueryRootStep extends Step {
+  getPgRoot(): PgQueryRootStep;
+  placeholder($step: PgTypedStep<PgCodec>): SQL;
+  placeholder($step: Step, codec: PgCodec, alreadyEncoded?: boolean): SQL;
+  deferredSQL($step: Step<SQL>): SQL;
+}

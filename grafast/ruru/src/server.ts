@@ -1,18 +1,9 @@
-import { readFileSync } from "fs";
 import type { GraphiQLProps } from "graphiql";
-import * as path from "path";
 
+import { graphiQLContent } from "./bundleData.js";
 import type { RuruConfig } from "./interfaces.js";
+import { version } from "./version.js";
 export { RuruConfig } from "./interfaces.js";
-
-const { version } = JSON.parse(
-  readFileSync(path.resolve(__dirname, `../package.json`), "utf8"),
-);
-// ENHANCE: make this 'readFileSync' call webpackable
-const graphiQLContent = readFileSync(
-  path.resolve(__dirname, "../bundle/ruru.min.js"),
-  "utf8",
-);
 
 // Ref: https://v8.dev/features/subsume-json
 const escapeJS = (str: string) => {
@@ -43,7 +34,7 @@ const baseHeaderScripts = `\
 const baseElements = `\
 <div id="ruru-root"></div>`;
 const baseBodyScripts = `\
-<script src="https://cdn.jsdelivr.net/npm/mermaid@9.4.3"></script>
+<script type="module"> import merm from 'https://cdn.jsdelivr.net/npm/mermaid@11.6.0/+esm'; window.mermaid = merm </script>
 <script>/*! For license information, see https://unpkg.com/ruru@${version}/bundle/ruru.min.js.LICENSE.txt */
 ${escapeJS(graphiQLContent)}</script>`;
 const baseBodyInitScript = `\

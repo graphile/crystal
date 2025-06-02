@@ -8,28 +8,28 @@
           totalCount: 4,
           edges: [
             {
-              cursor: "WyJjMDM4YzQzNTYwIiwiQXdzQXBwbGljYXRpb24iLCJbXCI0XCJdIl0=",
+              cursor: "WyI0OTgwM2MxZTJiIiwiQXdzQXBwbGljYXRpb24iLCJbXCI0XCJdIl0=",
               node: {
                 __typename: "AwsApplication",
                 id: 4,
               },
             },
             {
-              cursor: "WyJjMDM4YzQzNTYwIiwiQXdzQXBwbGljYXRpb24iLCJbXCI1XCJdIl0=",
+              cursor: "WyI0OTgwM2MxZTJiIiwiQXdzQXBwbGljYXRpb24iLCJbXCI1XCJdIl0=",
               node: {
                 __typename: "AwsApplication",
                 id: 5,
               },
             },
             {
-              cursor: "WyJjMDM4YzQzNTYwIiwiQXdzQXBwbGljYXRpb24iLCJbXCI2XCJdIl0=",
+              cursor: "WyI0OTgwM2MxZTJiIiwiQXdzQXBwbGljYXRpb24iLCJbXCI2XCJdIl0=",
               node: {
                 __typename: "AwsApplication",
                 id: 6,
               },
             },
             {
-              cursor: "WyJjMDM4YzQzNTYwIiwiR2NwQXBwbGljYXRpb24iLCJbXCI1XCJdIl0=",
+              cursor: "WyI0OTgwM2MxZTJiIiwiR2NwQXBwbGljYXRpb24iLCJbXCI1XCJdIl0=",
               node: {
                 __typename: "GcpApplication",
                 id: 5,
@@ -74,7 +74,7 @@
                 totalCount: 3,
                 edges: [
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
                     node: {
                       cvssScore: 7.7,
                       id: 3,
@@ -82,7 +82,7 @@
                     },
                   },
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI0XCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI0XCJdIl0=",
                     node: {
                       cvssScore: 7.2,
                       id: 4,
@@ -90,7 +90,7 @@
                     },
                   },
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIxXCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIxXCJdIl0=",
                     node: {
                       cvssScore: 7.5,
                       id: 1,
@@ -137,7 +137,7 @@
                 totalCount: 3,
                 edges: [
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
                     node: {
                       cvssScore: 7.7,
                       id: 3,
@@ -145,7 +145,7 @@
                     },
                   },
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI1XCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI1XCJdIl0=",
                     node: {
                       cvssScore: 7.2,
                       id: 5,
@@ -153,7 +153,7 @@
                     },
                   },
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI0XCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI0XCJdIl0=",
                     node: {
                       cvssScore: 7.2,
                       id: 4,
@@ -207,7 +207,7 @@
                 totalCount: 4,
                 edges: [
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIxXCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIxXCJdIl0=",
                     node: {
                       cvssScore: 3,
                       id: 1,
@@ -215,7 +215,7 @@
                     },
                   },
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIyXCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIyXCJdIl0=",
                     node: {
                       cvssScore: 9.1,
                       id: 2,
@@ -223,7 +223,7 @@
                     },
                   },
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI0XCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI0XCJdIl0=",
                     node: {
                       cvssScore: 7.2,
                       id: 4,
@@ -231,7 +231,7 @@
                     },
                   },
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI1XCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI1XCJdIl0=",
                     node: {
                       cvssScore: 7.2,
                       id: 5,
@@ -278,7 +278,7 @@
                 totalCount: 3,
                 edges: [
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
                     node: {
                       cvssScore: 7.7,
                       id: 3,
@@ -286,7 +286,7 @@
                     },
                   },
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI0XCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI0XCJdIl0=",
                     node: {
                       cvssScore: 7.2,
                       id: 4,
@@ -294,7 +294,7 @@
                     },
                   },
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI1XCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI1XCJdIl0=",
                     node: {
                       cvssScore: 7.2,
                       id: 5,
@@ -314,28 +314,28 @@
           totalCount: 4,
           edges: [
             {
-              cursor: "WyJjMDM4YzQzNTYwIiwiQXdzQXBwbGljYXRpb24iLCJbXCIyXCJdIl0=",
+              cursor: "WyI0OTgwM2MxZTJiIiwiQXdzQXBwbGljYXRpb24iLCJbXCIyXCJdIl0=",
               node: {
                 __typename: "AwsApplication",
                 id: 2,
               },
             },
             {
-              cursor: "WyJjMDM4YzQzNTYwIiwiQXdzQXBwbGljYXRpb24iLCJbXCI4XCJdIl0=",
+              cursor: "WyI0OTgwM2MxZTJiIiwiQXdzQXBwbGljYXRpb24iLCJbXCI4XCJdIl0=",
               node: {
                 __typename: "AwsApplication",
                 id: 8,
               },
             },
             {
-              cursor: "WyJjMDM4YzQzNTYwIiwiR2NwQXBwbGljYXRpb24iLCJbXCIzXCJdIl0=",
+              cursor: "WyI0OTgwM2MxZTJiIiwiR2NwQXBwbGljYXRpb24iLCJbXCIzXCJdIl0=",
               node: {
                 __typename: "GcpApplication",
                 id: 3,
               },
             },
             {
-              cursor: "WyJjMDM4YzQzNTYwIiwiR2NwQXBwbGljYXRpb24iLCJbXCI0XCJdIl0=",
+              cursor: "WyI0OTgwM2MxZTJiIiwiR2NwQXBwbGljYXRpb24iLCJbXCI0XCJdIl0=",
               node: {
                 __typename: "GcpApplication",
                 id: 4,
@@ -410,7 +410,7 @@
                 totalCount: 5,
                 edges: [
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
                     node: {
                       cvssScore: 7.7,
                       id: 3,
@@ -418,7 +418,7 @@
                     },
                   },
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIxXCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIxXCJdIl0=",
                     node: {
                       cvssScore: 7.5,
                       id: 1,
@@ -426,7 +426,7 @@
                     },
                   },
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIyXCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIyXCJdIl0=",
                     node: {
                       cvssScore: 9.1,
                       id: 2,
@@ -434,7 +434,7 @@
                     },
                   },
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI0XCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI0XCJdIl0=",
                     node: {
                       cvssScore: 7.2,
                       id: 4,
@@ -442,7 +442,7 @@
                     },
                   },
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI1XCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI1XCJdIl0=",
                     node: {
                       cvssScore: 7.2,
                       id: 5,
@@ -489,7 +489,7 @@
                 totalCount: 3,
                 edges: [
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIyXCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIyXCJdIl0=",
                     node: {
                       cvssScore: 7.2,
                       id: 2,
@@ -497,7 +497,7 @@
                     },
                   },
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIxXCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIxXCJdIl0=",
                     node: {
                       cvssScore: 7.5,
                       id: 1,
@@ -505,7 +505,7 @@
                     },
                   },
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
                     node: {
                       cvssScore: 10,
                       id: 3,
@@ -566,7 +566,7 @@
                 totalCount: 5,
                 edges: [
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIxXCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIxXCJdIl0=",
                     node: {
                       cvssScore: 3,
                       id: 1,
@@ -574,7 +574,7 @@
                     },
                   },
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
                     node: {
                       cvssScore: 7.7,
                       id: 3,
@@ -582,7 +582,7 @@
                     },
                   },
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI0XCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI0XCJdIl0=",
                     node: {
                       cvssScore: 7.2,
                       id: 4,
@@ -590,7 +590,7 @@
                     },
                   },
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI1XCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI1XCJdIl0=",
                     node: {
                       cvssScore: 7.2,
                       id: 5,
@@ -598,7 +598,7 @@
                     },
                   },
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIyXCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIyXCJdIl0=",
                     node: {
                       cvssScore: 9.1,
                       id: 2,
@@ -618,7 +618,7 @@
           totalCount: 1,
           edges: [
             {
-              cursor: "WyJjMDM4YzQzNTYwIiwiR2NwQXBwbGljYXRpb24iLCJbXCIyXCJdIl0=",
+              cursor: "WyI0OTgwM2MxZTJiIiwiR2NwQXBwbGljYXRpb24iLCJbXCIyXCJdIl0=",
               node: {
                 __typename: "GcpApplication",
                 id: 2,
@@ -698,7 +698,7 @@
                 totalCount: 8,
                 edges: [
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIyXCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIyXCJdIl0=",
                     node: {
                       cvssScore: 7.2,
                       id: 2,
@@ -706,7 +706,7 @@
                     },
                   },
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
                     node: {
                       cvssScore: 7.7,
                       id: 3,
@@ -714,7 +714,7 @@
                     },
                   },
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI0XCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI0XCJdIl0=",
                     node: {
                       cvssScore: 7.2,
                       id: 4,
@@ -722,7 +722,7 @@
                     },
                   },
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI1XCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI1XCJdIl0=",
                     node: {
                       cvssScore: 7.2,
                       id: 5,
@@ -730,7 +730,7 @@
                     },
                   },
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIxXCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIxXCJdIl0=",
                     node: {
                       cvssScore: 7.5,
                       id: 1,
@@ -738,7 +738,7 @@
                     },
                   },
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
                     node: {
                       cvssScore: 10,
                       id: 3,
@@ -746,7 +746,7 @@
                     },
                   },
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI0XCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI0XCJdIl0=",
                     node: {
                       cvssScore: 7.2,
                       id: 4,
@@ -754,7 +754,7 @@
                     },
                   },
                   {
-                    cursor: "WyI4YWE0YzNkMWU4IiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI1XCJdIl0=",
+                    cursor: "WyI0OTgwM2MxZTJiIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI1XCJdIl0=",
                     node: {
                       cvssScore: 7.2,
                       id: 5,

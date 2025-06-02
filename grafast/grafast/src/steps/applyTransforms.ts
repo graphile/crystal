@@ -1,5 +1,6 @@
 import * as assert from "../assert.js";
 import type { Bucket } from "../bucket.js";
+import { FLAG_ERROR } from "../constants.js";
 import { isDev } from "../dev.js";
 import {
   batchExecutionValue,
@@ -11,19 +12,17 @@ import type { LayerPlanReasonSubroutine } from "../engine/LayerPlan.js";
 import { LayerPlan } from "../engine/LayerPlan.js";
 import { withGlobalLayerPlan } from "../engine/lib/withGlobalLayerPlan.js";
 import { flagError } from "../error.js";
-import {
-  type ExecutionDetails,
-  FLAG_ERROR,
-  type GrafastResultsList,
-} from "../interfaces.js";
+import type { ExecutionDetails, GrafastResultsList } from "../interfaces.js";
 import type { ListCapableStep } from "../step.js";
-import { ExecutableStep, isListCapableStep } from "../step.js";
+import { isListCapableStep, Step } from "../step.js";
 import { __ItemStep } from "./__item.js";
+import type { ConnectionCapableStep } from "./connection.js";
+import { itemsOrStep } from "./connection.js";
 
 /**
  * @internal
  */
-export class ApplyTransformsStep extends ExecutableStep {
+export class ApplyTransformsStep extends Step {
   static $$export = {
     moduleName: "grafast",
     exportName: "ApplyTransformsStep",
@@ -40,18 +39,23 @@ export class ApplyTransformsStep extends ExecutableStep {
    */
   public subroutineLayer: LayerPlan<LayerPlanReasonSubroutine>;
 
-  constructor(listPlan: ListCapableStep<any, any>) {
+  constructor(
+    $step: ListCapableStep<any, any> | ConnectionCapableStep<any, any>,
+  ) {
     super();
-    this.addDependency(listPlan);
+    const listPlan = itemsOrStep($step);
+    this.addDataDependency(listPlan);
 
     // Plan this subroutine
-    this.subroutineLayer = new LayerPlan(this.operationPlan, this.layerPlan, {
+    this.subroutineLayer = new LayerPlan(this.operationPlan, {
       type: "subroutine",
+      parentLayerPlan: this.layerPlan,
       parentStep: this,
     });
     const itemPlan = withGlobalLayerPlan(
       this.subroutineLayer,
       listPlan.polymorphicPaths,
+      null,
       () => {
         // This does NOT use `itemPlanFor` because __ListTransformPlans are special.
         const $__listItem = new __ItemStep(listPlan);
@@ -105,7 +109,7 @@ export class ApplyTransformsStep extends ExecutableStep {
       );
     }
     if (itemStep._isUnary) {
-      store.set(itemStepId, unaryExecutionValue(values0.at(0)));
+      store.set(itemStepId, unaryExecutionValue(values0.unaryValue()));
     } else {
       store.set(itemStepId, batchExecutionValue([]));
     }
@@ -163,17 +167,15 @@ export class ApplyTransformsStep extends ExecutableStep {
     });
 
     if (size > 0) {
-      const childBucket = newBucket(
-        {
-          layerPlan: childLayerPlan,
-          size,
-          store,
-          flagUnion: bucket.flagUnion,
-          polymorphicPathList,
-          iterators,
-        },
-        bucket.metaByMetaKey,
-      );
+      const childBucket = newBucket(bucket, {
+        layerPlan: childLayerPlan,
+        size,
+        store,
+        flagUnion: bucket.flagUnion,
+        polymorphicPathList,
+        polymorphicType: null,
+        iterators,
+      });
       await executeBucket(childBucket, extra._requestContext);
     }
 
@@ -217,7 +219,7 @@ export class ApplyTransformsStep extends ExecutableStep {
  * send the result to an external service) rather than processing them through
  * the GraphQL response, then you may need to call `applyTransforms` on it.
  */
-export function applyTransforms($step: ExecutableStep) {
+export function applyTransforms($step: Step) {
   if (isListCapableStep($step)) {
     return $step.operationPlan.cacheStep(
       $step,

@@ -182,7 +182,7 @@ export const ExhaustiveDeps: Rule.RuleModule = {
       sortExports,
     };
 
-    const scopeManager = context.getSourceCode().scopeManager;
+    const scopeManager = context.sourceCode.scopeManager;
 
     /**
      * Visitor for both function expressions and arrow function expressions.
@@ -239,7 +239,7 @@ export const ExhaustiveDeps: Rule.RuleModule = {
           node: writeExpr,
           message:
             `Assignments to the '${key}' variable from inside ` +
-            `${context.getSource(fnCall)} cannot be safely exported.`,
+            `${context.sourceCode.getText(fnCall as ESTreeNode)} cannot be safely exported.`,
         });
       }
 
@@ -257,8 +257,8 @@ export const ExhaustiveDeps: Rule.RuleModule = {
         if (arg.type !== "Identifier") {
           reportProblem(context, options, {
             node: arg as unknown as ESTreeNode,
-            message: `${context.getSource(
-              fnCall,
+            message: `${context.sourceCode.getText(
+              fnCall as ESTreeNode,
             )} has an argument which isn't a plain identifier, we don't support this currently.`,
           });
           argNames.push(null);
@@ -282,7 +282,7 @@ export const ExhaustiveDeps: Rule.RuleModule = {
         reportProblem(context, options, {
           node: declaredDependenciesNode as unknown as ESTreeNode,
           message:
-            `${context.getSource(fnCall)} was passed a ` +
+            `${context.sourceCode.getText(fnCall as ESTreeNode)} was passed a ` +
             "dependency map that is not an array. This means we " +
             "can't statically verify whether you've passed the correct " +
             "dependencies.",
@@ -299,7 +299,7 @@ export const ExhaustiveDeps: Rule.RuleModule = {
               reportProblem(context, options, {
                 node: declaredDependencyNode as unknown as ESTreeNode,
                 message:
-                  `${context.getSource(fnCall)} has a spread element ` +
+                  `${context.sourceCode.getText(fnCall as ESTreeNode)} has a spread element ` +
                   "in its dependency map. This means we can't " +
                   "statically verify whether you've passed the " +
                   "correct dependencies.",
@@ -320,8 +320,8 @@ export const ExhaustiveDeps: Rule.RuleModule = {
         if (node.params.length !== declaredDependenciesNode.elements.length) {
           reportProblem(context, options, {
             node: declaredDependenciesNode as unknown as ESTreeNode,
-            message: `${context.getSource(
-              fnCall,
+            message: `${context.sourceCode.getText(
+              fnCall as ESTreeNode,
             )} has different arguments count (${
               node.params.length
             }) versus dependencies count (${
@@ -364,7 +364,7 @@ export const ExhaustiveDeps: Rule.RuleModule = {
       reportProblem(context, options, {
         node: declaredDependenciesNode as unknown as ESTreeNode,
         message:
-          `${context.getSource(fnCall)} has ` +
+          `${context.sourceCode.getText(fnCall as ESTreeNode)} has ` +
           // To avoid a long message, show the next actionable item.
           (getWarningMessage(missingDependencies, "a", "missing", "include") ||
             getWarningMessage(
@@ -393,8 +393,8 @@ export const ExhaustiveDeps: Rule.RuleModule = {
                 node.range != null && node.body.range != null
                   ? [node.range[0], node.body.range[0]]
                   : node.start != null && node.body.start != null
-                  ? [node.start, node.body.start]
-                  : null;
+                    ? [node.start, node.body.start]
+                    : null;
               if (range != null) {
                 const preferredArgs = `(${suggestedDeps.join(", ")})`;
                 if (node.type === "ArrowFunctionExpression") {
@@ -482,8 +482,7 @@ export const ExhaustiveDeps: Rule.RuleModule = {
 
                 fix(fixer) {
                   // Add `, []` just before the `)` for the call.
-                  const sourceCode = context.getSourceCode();
-                  const nextToken = sourceCode.getTokenAfter(callback);
+                  const nextToken = context.sourceCode.getTokenAfter(callback);
                   const hasComma =
                     nextToken &&
                     nextToken.value === "," &&

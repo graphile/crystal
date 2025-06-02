@@ -1,9 +1,14 @@
 import chalk from "chalk";
 
-import type { ExecutableStep, ListCapableStep } from "../step.js";
+import type { Maybe } from "../index.js";
+import type { ListCapableStep, Step } from "../step.js";
 import { isListCapableStep } from "../step.js";
 import { __ItemStep } from "./__item.js";
-import type { ConnectionCapableStep, ConnectionStep } from "./connection.js";
+import type {
+  ConnectionCapableStep,
+  ConnectionStep,
+  ItemsStep,
+} from "./connection.js";
 import type { __ListTransformStep } from "./listTransform.js";
 import { listTransform } from "./listTransform.js";
 
@@ -11,7 +16,7 @@ const eachReduceCallback = (memo: any[], item: any) => {
   memo.push(item);
   return memo;
 };
-const eachItemPlanCallback = (itemPlan: ExecutableStep) => itemPlan;
+const eachItemPlanCallback = (itemPlan: Step) => itemPlan;
 const eachInitialState = () => [] as any;
 
 const outerCache = new WeakMap<any, WeakMap<any, any>>();
@@ -37,15 +42,16 @@ const eachCallbackForListPlan = (
  * Transforms a list by wrapping each element in the list with the given mapper.
  */
 export function each<
-  TListStep extends ExecutableStep<readonly any[]> &
-    Partial<ConnectionCapableStep<any, any>>,
-  TResultItemStep extends ExecutableStep,
+  TListStep extends
+    | (Step<readonly any[]> & Partial<ConnectionCapableStep<any, any>>)
+    | ConnectionCapableStep<any, any>,
+  TResultItemStep extends Step,
 >(
   listStep: TListStep,
   mapper: (
-    itemPlan: TListStep extends ListCapableStep<any, any>
-      ? ReturnType<TListStep["listItem"]>
-      : __ItemStep<any>,
+    itemPlan: ItemsStep<TListStep> extends ListCapableStep<any, any>
+      ? ReturnType<ItemsStep<TListStep>["listItem"]>
+      : Step<TListStep extends Step<Maybe<ReadonlyArray<infer U>>> ? U : any>,
   ) => TResultItemStep,
 ): __ListTransformStep<any, any, any, any> {
   return listTransform<any, any, any, any>({

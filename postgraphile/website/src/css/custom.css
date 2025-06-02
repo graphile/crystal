@@ -37,6 +37,10 @@
   --ifm-footer-color: var(--ifm-color-primary-lightest);
 }
 
+.theme-code-block-highlighted-line {
+  border-left: 0.25em solid var(--ifm-color-primary);
+}
+
 figure {
   margin-left: 0;
   margin-right: 0;
@@ -44,6 +48,7 @@ figure {
 
 figure p {
   margin: 0;
+  text-align: center;
 }
 
 figure figcaption {
@@ -114,4 +119,13 @@ figure figcaption {
   background-position: 0px 3px;
   padding-left: 30px;
   list-style-type: none;
+}
+
+.full-width main.container,
+.full-width main.container > .row,
+.full-width main.container > .row > .col {
+  margin: 0;
+  margin-top: 0 !important;
+  padding: 0;
+  max-width: initial;
 }

@@ -1,10 +1,18 @@
 import chalk from "chalk";
 
 import type { Bucket } from "./bucket.js";
+import {
+  FLAG_ERROR,
+  FLAG_INHIBITED,
+  FLAG_NULL,
+  FLAG_POLY_SKIPPED,
+  FLAG_STOPPED,
+} from "./constants.js";
 import { bucketToString } from "./engine/executeBucket.js";
+import { LayerPlan } from "./engine/LayerPlan.js";
 import { OutputPlan } from "./engine/OutputPlan.js";
 import { inspect } from "./inspect.js";
-import { ExecutableStep } from "./step.js";
+import { Step } from "./step.js";
 import { stripAnsi } from "./stripAnsi.js";
 import {
   isDeferred,
@@ -60,7 +68,10 @@ export function _grafastPrint(
   if (symbol === ROOT_VALUE_OBJECT) {
     return chalk.gray`(blank)`;
   }
-  if (symbol instanceof ExecutableStep) {
+  if (symbol instanceof Step) {
+    return String(symbol);
+  }
+  if (symbol instanceof LayerPlan) {
     return String(symbol);
   }
   if (Array.isArray(symbol)) {
@@ -166,7 +177,12 @@ function indent(level: number, string: string) {
 export function recursivePrintBucket(bucket: Bucket, indentLevel = 0): string {
   return indent(
     indentLevel,
-    `Bucket for ${bucket.layerPlan} (size = ${bucket.size}):
+    `Bucket for ${bucket.layerPlan} (size = ${bucket.size}):${
+      bucket.polymorphicPathList.some((p) => p != null)
+        ? `
+${bucket.polymorphicPathList.map((p, i) => `${String(i).padStart(4, " ")}: ${p}`)}`
+        : ""
+    }
   Store:
 ${indent(4, printStore(bucket))}
   Children:
@@ -204,14 +220,14 @@ export function printStore(bucket: Bucket): string {
         true,
       );
       output.push(
-        `${printKey} (BATCH): ${step ?? "-"}\n${indent(
+        `${printKey} (BATCH): ${step ?? "-"} ${[...(step?.polymorphicPaths ?? [])]}\n${indent(
           2,
           val.entries
             .map(
               (e, i) =>
-                `${String(i).padStart(3, " ")}: flags=${String(
+                `${String(i).padStart(3, " ")}: flags=${printFlags(
                   val._flagsAt(i),
-                ).padStart(2, " ")} value=${indentIfMultiline(
+                )} value=${indentIfMultiline(
                   inspect(val.at(i), PRINT_STORE_INSPECT_OPTIONS),
                 )}`,
             )
@@ -224,9 +240,9 @@ export function printStore(bucket: Bucket): string {
         true,
       );
       output.push(
-        `${printKey} (UNARY/${String(val._entryFlags).padStart(2, " ")}) ${
+        `${printKey} (UNARY/${printFlags(val._entryFlags)}) ${
           step ?? "-"
-        }\n${indent(4, inspect(val.value, PRINT_STORE_INSPECT_OPTIONS))}`,
+        } ${[...(step?.polymorphicPaths ?? [])]}\n${indent(4, inspect(val.value, PRINT_STORE_INSPECT_OPTIONS))}`,
       );
     }
   }
@@ -303,4 +319,33 @@ export function ansiPad(
   } else {
     return ansiString;
   }
+}
+
+function printFlags(flags: number | undefined) {
+  if (flags === undefined) return "  ?  ";
+  if (flags === 0) return "     ";
+
+  // This should not fire, added in case we add future flags and forget to update this
+  if (
+    flags !==
+    (flags &
+      (FLAG_POLY_SKIPPED |
+        FLAG_ERROR |
+        FLAG_NULL |
+        FLAG_INHIBITED |
+        FLAG_STOPPED))
+  ) {
+    return String(flags).padStart(5, " ");
+  }
+
+  let flagString = "";
+
+  // Alphabetically sorted to avoid an unfortunate word they would spell
+  flagString += flags & FLAG_ERROR ? "E" : " ";
+  flagString += flags & FLAG_INHIBITED ? "I" : " ";
+  flagString += flags & FLAG_NULL ? "N" : " ";
+  flagString += flags & FLAG_POLY_SKIPPED ? "P" : " ";
+  flagString += flags & FLAG_STOPPED ? "S" : " ";
+
+  return flagString;
 }

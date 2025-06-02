@@ -8,6 +8,7 @@ import type {
 import * as graphql from "graphql";
 import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 
+import { $$queryCache } from "./constants.js";
 import { SafeError } from "./error.js";
 import { execute } from "./execute.js";
 import { hookArgs } from "./index.js";
@@ -17,7 +18,6 @@ import type {
   ParseAndValidateEvent,
   ValidateSchemaEvent,
 } from "./interfaces.js";
-import { $$queryCache } from "./interfaces.js";
 import { getGrafastMiddleware } from "./middleware.js";
 import { isPromiseLike } from "./utils.js";
 
@@ -38,6 +38,7 @@ let calculateQueryHash: (queryString: string) => string;
 try {
   let lastString: string;
   let lastHash: string;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const createHash = require("crypto").createHash;
   if (typeof createHash !== "function") {
     throw new Error("Failed to load createHash");
@@ -169,8 +170,8 @@ export function grafast(
     rawMiddleware !== undefined
       ? rawMiddleware
       : resolvedPreset != null
-      ? getGrafastMiddleware(resolvedPreset)
-      : null;
+        ? getGrafastMiddleware(resolvedPreset)
+        : null;
 
   // Validate Schema
   const schemaValidationErrors =

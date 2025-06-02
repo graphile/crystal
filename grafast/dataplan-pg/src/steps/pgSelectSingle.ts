@@ -1,22 +1,9 @@
-import type {
-  EdgeCapableStep,
-  ExecutableStep,
-  UnbatchedExecutionExtra,
-} from "grafast";
-import {
-  exportAs,
-  list,
-  polymorphicWrap,
-  UnbatchedExecutableStep,
-} from "grafast";
-import type { GraphQLObjectType } from "grafast/graphql";
+import type { EdgeCapableStep, Step, UnbatchedExecutionExtra } from "grafast";
+import { exportAs, UnbatchedStep } from "grafast";
 import type { SQL, SQLable } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 
-import type {
-  ObjectFromPgCodecAttributes,
-  PgCodecAttribute,
-} from "../codecs.js";
+import type { PgCodecAttribute } from "../codecs.js";
 import { TYPES } from "../codecs.js";
 import type { PgResource } from "../datasource.js";
 import type {
@@ -25,14 +12,19 @@ import type {
   GetPgResourceRelations,
   PgCodec,
   PgCodecRelation,
+  PgQueryRootStep,
   PgRegistry,
-  PgTypedExecutableStep,
+  PgSQLCallbackOrDirect,
+  PgTypedStep,
 } from "../interfaces.js";
-import type { PgClassExpressionStep } from "./pgClassExpression.js";
-import { pgClassExpression } from "./pgClassExpression.js";
+import { makeScopedSQL } from "../utils.js";
+import {
+  pgClassExpression,
+  PgClassExpressionStep,
+} from "./pgClassExpression.js";
 import { PgCursorStep } from "./pgCursor.js";
-import type { PgSelectArgumentDigest, PgSelectMode } from "./pgSelect.js";
-import { getFragmentAndCodecFromOrder, PgSelectStep } from "./pgSelect.js";
+import type { PgSelectMode } from "./pgSelect.js";
+import { PgSelectStep } from "./pgSelect.js";
 // import debugFactory from "debug";
 
 // const debugPlan = debugFactory("@dataplan/pg:PgSelectSingleStep:plan");
@@ -43,6 +35,8 @@ import { getFragmentAndCodecFromOrder, PgSelectStep } from "./pgSelect.js";
 export interface PgSelectSinglePlanOptions {
   fromRelation?: [PgSelectSingleStep<PgResource>, string];
 }
+
+const EMPTY_TUPLE = Object.freeze([]) as never[];
 
 // Types that only take a few bytes so adding them to the selection would be
 // cheap to do.
@@ -70,11 +64,12 @@ const CHEAP_ATTRIBUTE_TYPES = new Set([
 export class PgSelectSingleStep<
     TResource extends PgResource<any, any, any, any, any> = PgResource,
   >
-  extends UnbatchedExecutableStep<
-    unknown[] /* What we return will be a tuple based on the values selected */
+  extends UnbatchedStep<
+    | unknown[]
+    | null /* What we return will be a tuple based on the values selected */
   >
   implements
-    PgTypedExecutableStep<
+    PgTypedStep<
       TResource extends PgResource<any, infer UCodec, any, any, any>
         ? UCodec
         : never
@@ -95,12 +90,13 @@ export class PgSelectSingleStep<
   private nullCheckId: number | null = null;
   public readonly resource: TResource;
   private _coalesceToEmptyObject = false;
-  private typeStepIndexList: number[] | null = null;
+  private fromRelation: { refId: number | null; relationName: string } | null =
+    null;
 
   constructor(
     $class: PgSelectStep<TResource>,
-    $item: ExecutableStep<unknown[]>,
-    private options: PgSelectSinglePlanOptions = Object.create(null),
+    $item: Step<unknown[]>,
+    options: PgSelectSinglePlanOptions = Object.create(null),
   ) {
     super();
     this.itemStepId = this.addDependency($item);
@@ -109,6 +105,16 @@ export class PgSelectSingleStep<
     this.mode = $class.mode;
     this.classStepId = $class.id;
     this.peerKey = this.resource.name;
+    if (options.fromRelation) {
+      const [$pgSelectSingle, relationName] = options.fromRelation;
+      this.fromRelation = {
+        refId: this.addRef(
+          $pgSelectSingle,
+          "Indirect reference allowed due to relational field potentially pulling from a parent relation",
+        ),
+        relationName,
+      };
+    }
   }
 
   public coalesceToEmptyObject(): void {
@@ -133,7 +139,7 @@ export class PgSelectSingleStep<
   }
 
   /** @internal */
-  public getItemStep(): ExecutableStep<unknown[]> {
+  public getItemStep(): Step<unknown[]> {
     const plan = this.getDep(this.itemStepId);
     return plan;
   }
@@ -223,26 +229,29 @@ export class PgSelectSingleStep<
       }
     }
 
-    if (this.options.fromRelation) {
-      const [$fromPlan, fromRelationName] = this.options.fromRelation;
-      const matchingAttribute = (
-        Object.entries($fromPlan.resource.codec.attributes!) as Array<
-          [string, PgCodecAttribute]
-        >
-      ).find(([name, col]) => {
-        if (col.identicalVia) {
-          const { relation, attribute } = $fromPlan.resource.resolveVia(
-            col.identicalVia,
-            name,
-          );
-          if (attribute === attr && relation === fromRelationName) {
-            return true;
+    if (this.fromRelation) {
+      const { refId, relationName } = this.fromRelation;
+      const $fromPlan = this.getRef(refId);
+      if ($fromPlan instanceof PgSelectSingleStep) {
+        const matchingAttribute = (
+          Object.entries($fromPlan.resource.codec.attributes!) as Array<
+            [string, PgCodecAttribute]
+          >
+        ).find(([name, col]) => {
+          if (col.identicalVia) {
+            const { relation, attribute } = $fromPlan.resource.resolveVia(
+              col.identicalVia,
+              name,
+            );
+            if (attribute === attr && relation === relationName) {
+              return true;
+            }
           }
+          return false;
+        });
+        if (matchingAttribute) {
+          return $fromPlan.get(matchingAttribute[0]) as any;
         }
-        return false;
-      });
-      if (matchingAttribute) {
-        return $fromPlan.get(matchingAttribute[0]) as any;
       }
     }
 
@@ -285,11 +294,15 @@ export class PgSelectSingleStep<
     return colPlan as any;
   }
 
+  public getMeta(key: string) {
+    return this.getClassStep().getMeta(key);
+  }
+
   /**
    * Returns a plan representing the result of an expression.
    */
   public select<TExpressionCodec extends PgCodec>(
-    fragment: SQL,
+    fragment: PgSQLCallbackOrDirect<SQL>,
     codec: TExpressionCodec,
     guaranteedNotNull?: boolean,
   ): PgClassExpressionStep<TExpressionCodec, TResource> {
@@ -298,7 +311,7 @@ export class PgSelectSingleStep<
       codec,
       guaranteedNotNull,
     );
-    return sqlExpr`${fragment}`;
+    return sqlExpr`${this.scopedSQL(fragment)}`;
   }
 
   /**
@@ -307,19 +320,31 @@ export class PgSelectSingleStep<
    *
    * @internal
    */
-  public selectAndReturnIndex(fragment: SQL): number {
-    return this.getClassStep().selectAndReturnIndex(fragment);
+  public selectAndReturnIndex(fragment: PgSQLCallbackOrDirect<SQL>): number {
+    return this.getClassStep().selectAndReturnIndex(this.scopedSQL(fragment));
   }
 
-  public placeholder($step: PgTypedExecutableStep<any>): SQL;
-  public placeholder($step: ExecutableStep, codec: PgCodec): SQL;
+  public scopedSQL = makeScopedSQL(this);
+
+  public getPgRoot(): PgQueryRootStep {
+    return this.getClassStep();
+  }
+
+  /** @deprecated Use .getPgRoot().placeholder() */
+  public placeholder($step: PgTypedStep<any>): SQL;
+  /** @deprecated Use .getPgRoot().placeholder() */
+  public placeholder($step: Step, codec: PgCodec): SQL;
   public placeholder(
-    $step: ExecutableStep | PgTypedExecutableStep<any>,
+    $step: Step | PgTypedStep<any>,
     overrideCodec?: PgCodec,
   ): SQL {
     return overrideCodec
       ? this.getClassStep().placeholder($step, overrideCodec)
-      : this.getClassStep().placeholder($step as PgTypedExecutableStep<any>);
+      : this.getClassStep().placeholder($step as PgTypedStep<any>);
+  }
+
+  public deferredSQL($step: Step<SQL>): SQL {
+    return this.getClassStep().deferredSQL($step);
   }
 
   private existingSingleRelation<
@@ -329,19 +354,22 @@ export class PgSelectSingleStep<
   ): PgSelectSingleStep<
     GetPgResourceRelations<TResource>[TRelationName]["remoteResource"]
   > | null {
-    if (this.options.fromRelation) {
-      const [$fromPlan, fromRelationName] = this.options.fromRelation;
-      // check to see if we already came via this relationship
-      const reciprocal = this.resource.getReciprocal(
-        $fromPlan.resource.codec,
-        fromRelationName,
-      );
-      if (reciprocal) {
-        const reciprocalRelationName = reciprocal[0];
-        if (reciprocalRelationName === relationIdentifier) {
-          const reciprocalRelation = reciprocal[1];
-          if (reciprocalRelation.isUnique) {
-            return $fromPlan as PgSelectSingleStep<any>;
+    if (this.fromRelation) {
+      const { refId, relationName } = this.fromRelation;
+      const $fromPlan = this.getRef(refId);
+      if ($fromPlan instanceof PgSelectSingleStep) {
+        // check to see if we already came via this relationship
+        const reciprocal = this.resource.getReciprocal(
+          $fromPlan.resource.codec,
+          relationName,
+        );
+        if (reciprocal) {
+          const reciprocalRelationName = reciprocal[0];
+          if (reciprocalRelationName === relationIdentifier) {
+            const reciprocalRelation = reciprocal[1];
+            if (reciprocalRelation.isUnique) {
+              return $fromPlan as PgSelectSingleStep<any>;
+            }
           }
         }
       }
@@ -423,34 +451,8 @@ export class PgSelectSingleStep<
     )`${this.getClassStep().alias}`;
   }
 
-  /**
-   * @internal
-   * For use by PgCursorStep
-   */
-  public getCursorDigestAndStep(): [string, ExecutableStep] {
-    const classPlan = this.getClassStep();
-    const digest = classPlan.getOrderByDigest();
-    const orders = classPlan.getOrderBy();
-    const step = list(
-      orders.length > 0
-        ? orders.map((o) => {
-            const [frag, codec] = getFragmentAndCodecFromOrder(
-              this.getClassStep().alias,
-              o,
-              this.getClassStep().resource.codec,
-            );
-            return this.select(frag, codec, o.nullable === false);
-          })
-        : // No ordering; so use row number
-          [
-            this.select(
-              sql`row_number() over (partition by 1)`,
-              TYPES.int,
-              true,
-            ),
-          ],
-    );
-    return [digest, step];
+  public toRecord(): Step {
+    return this.record();
   }
 
   /**
@@ -459,7 +461,10 @@ export class PgSelectSingleStep<
    * find nodes before/after it.
    */
   public cursor(): PgCursorStep<this> {
-    const cursorPlan = new PgCursorStep<this>(this);
+    const cursorPlan = new PgCursorStep<this>(
+      this,
+      this.getClassStep().getCursorDetails(),
+    );
     return cursorPlan;
   }
 
@@ -489,65 +494,12 @@ export class PgSelectSingleStep<
     });
   }
 
-  planForType(type: GraphQLObjectType): ExecutableStep {
-    const poly = (this.resource.codec as PgCodec).polymorphism;
-    if (poly?.mode === "single") {
-      return this;
-    } else if (poly?.mode === "relational") {
-      for (const spec of Object.values(poly.types)) {
-        if (spec.name === type.name) {
-          return this.singleRelation(spec.relationName as any);
-        }
-      }
-      throw new Error(
-        `${this} Could not find matching name for relational polymorphic '${type.name}'`,
-      );
-    } else {
-      throw new Error(
-        `${this}: Don't know how to plan this as polymorphic for ${type}`,
-      );
-    }
-  }
-
-  /**
-   * The polymorphism if this is a "regular" (non-aggregate) request over a
-   * single/relational polymorphic codec; otherwise null.
-   */
-  private singleOrRelationalPolyIfRegular() {
-    const poly = (this.resource.codec as PgCodec).polymorphism;
-    if (
-      this.mode !== "aggregate" &&
-      (poly?.mode === "single" || poly?.mode === "relational")
-    ) {
-      return poly;
-    } else {
-      return null;
-    }
-  }
-
   private nonNullAttribute: {
     attribute: PgCodecAttribute;
     attr: string;
   } | null = null;
   private nullCheckAttributeIndex: number | null = null;
   optimize() {
-    const poly = this.singleOrRelationalPolyIfRegular();
-    if (poly) {
-      const $class = this.getClassStep();
-      this.typeStepIndexList = poly.typeAttributes.map((col) => {
-        const attr = this.resource.codec.attributes![col];
-        const expr = sql`${$class.alias}.${sql.identifier(String(col))}`;
-
-        return $class.selectAndReturnIndex(
-          attr.codec.castFromPg
-            ? attr.codec.castFromPg(expr)
-            : sql`${expr}::text`,
-        );
-      });
-    } else {
-      this.typeStepIndexList = null;
-    }
-
     const attributes = this.resource.codec.attributes;
     if (attributes && this.getClassStep().mode !== "aggregate") {
       // We need to see if this row is null. The cheapest way is to select a
@@ -592,35 +544,16 @@ export class PgSelectSingleStep<
     return this;
   }
 
-  finalize() {
-    const poly = this.singleOrRelationalPolyIfRegular();
-    if (poly) {
-      this.handlePolymorphism = (val) => {
-        if (val == null) return val;
-        const typeList = this.typeStepIndexList!.map((i) => val[i]);
-        const key = String(typeList);
-        const entry = poly.types[key];
-        if (entry) {
-          return polymorphicWrap(entry.name, val);
-        }
-        return null;
-      };
-    }
-    return super.finalize();
-  }
-
-  handlePolymorphism?: (result: any) => any;
-
   unbatchedExecute(
     _extra: UnbatchedExecutionExtra,
-    result: ObjectFromPgCodecAttributes<GetPgResourceAttributes<TResource>>,
-  ): unknown[] {
+    result: string[] | null,
+  ): unknown[] | null {
     if (result == null) {
-      return this._coalesceToEmptyObject ? Object.create(null) : null;
+      return this._coalesceToEmptyObject ? EMPTY_TUPLE : null;
     } else if (this.nullCheckAttributeIndex != null) {
       const nullIfAttributeNull = result[this.nullCheckAttributeIndex];
       if (nullIfAttributeNull == null) {
-        return this._coalesceToEmptyObject ? Object.create(null) : null;
+        return this._coalesceToEmptyObject ? EMPTY_TUPLE : null;
       }
     } else if (this.nullCheckId != null) {
       const nullIfExpressionNotTrue = result[this.nullCheckId];
@@ -628,19 +561,15 @@ export class PgSelectSingleStep<
         nullIfExpressionNotTrue == null ||
         TYPES.boolean.fromPg(nullIfExpressionNotTrue) != true
       ) {
-        return this._coalesceToEmptyObject ? Object.create(null) : null;
+        return this._coalesceToEmptyObject ? EMPTY_TUPLE : null;
       }
     }
-    return this.handlePolymorphism ? this.handlePolymorphism(result) : result;
+    return result;
   }
 
   [$$toSQL]() {
     return this.getClassStep().alias;
   }
-}
-
-function fromRecord(record: PgSelectArgumentDigest) {
-  return sql`(select (${record.placeholder}).*)`;
 }
 
 /**
@@ -659,17 +588,29 @@ export function pgSelectFromRecord<
   resource: TResource,
   $record:
     | PgClassExpressionStep<GetPgResourceCodec<TResource>, TResource>
-    | ExecutableStep<{
-        [Attr in keyof TResource["codec"]["attributes"]]: ExecutableStep;
+    | Step<{
+        [Attr in keyof TResource["codec"]["attributes"]]: Step;
       }>,
 ): PgSelectStep<TResource> {
-  return new PgSelectStep<TResource>({
+  const $select = new PgSelectStep<TResource>({
     resource: resource,
     identifiers: [],
-    from: fromRecord,
-    args: [{ step: $record, pgCodec: resource.codec }],
+    from: {
+      callback: ($select) =>
+        sql`(select (${$select.placeholder($record, resource.codec)}).*)`,
+    },
     joinAsLateral: true,
   });
+  if ($record instanceof PgClassExpressionStep) {
+    const $parent = $record.getParentStep();
+    if ($parent instanceof PgSelectSingleStep) {
+      $select.hints.isPgSelectFromRecordOf = {
+        parentId: $parent.getClassStep().id,
+        expression: $record.expression,
+      };
+    }
+  }
+  return $select;
 }
 
 /**
@@ -680,7 +621,9 @@ export function pgSelectSingleFromRecord<
   TResource extends PgResource<any, any, any, any>,
 >(
   resource: TResource,
-  $record: PgClassExpressionStep<GetPgResourceCodec<TResource>, TResource>,
+  $record:
+    | PgClassExpressionStep<GetPgResourceCodec<TResource>, TResource>
+    | Step,
 ): PgSelectSingleStep<TResource> {
   // OPTIMIZE: we should be able to optimise this so that `plan.record()` returns the original record again.
   return pgSelectFromRecord(

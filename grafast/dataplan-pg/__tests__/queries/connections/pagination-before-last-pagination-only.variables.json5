@@ -1,0 +1,9 @@
+{
+  allMessagesConnection: {
+    pageInfo: {
+      hasNextPage: false,
+      hasPreviousPage: true,
+    },
+    totalCount: 6,
+  },
+}

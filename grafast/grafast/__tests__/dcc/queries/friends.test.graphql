@@ -1,0 +1,15 @@
+# Ref friends.md
+
+{
+  crawler(id: 101) {
+    id
+    name
+    ... on ActiveCrawler {
+      species
+      friends {
+        id
+        name
+      }
+    }
+  }
+}

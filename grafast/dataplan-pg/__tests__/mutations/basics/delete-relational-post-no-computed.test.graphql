@@ -7,6 +7,7 @@
 ## expect(queries[0].text).toContain('__relational_posts__."id"::text')
 
 ## expect(errors).toHaveLength(1)
+#> dontLogErrors: true
 
 ## expect(data.d1.id).toEqual(4)
 

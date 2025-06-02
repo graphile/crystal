@@ -1,0 +1,22 @@
+{
+  people: [
+    {
+      __typename: "Person",
+      username: "Alice",
+      items: [
+        {
+          __typename: "SingleTablePost",
+          id: 15,
+          type: "POST",
+          type2: "POST",
+          parent: {
+            __typename: "SingleTableTopic",
+            id: 2,
+            type: "TOPIC",
+            type2: "TOPIC",
+          },
+        },
+      ],
+    },
+  ],
+}

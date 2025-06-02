@@ -1,5 +1,32 @@
 # ruru
 
+## 2.0.0-beta.22
+
+### Patch Changes
+
+- [#2426](https://github.com/graphile/crystal/pull/2426)
+  [`658d46c9a5b246e3beb4ba2a004334278f7bb24d`](https://github.com/graphile/crystal/commit/658d46c9a5b246e3beb4ba2a004334278f7bb24d)
+  Thanks [@benjie](https://github.com/benjie)! - Upgrade GraphiQL and fix
+  duplicate module issue
+
+## 2.0.0-beta.21
+
+### Patch Changes
+
+- Updated dependencies
+  [[`00d79e6f5608affc3f36bb0ce4ca2547230174e7`](https://github.com/graphile/crystal/commit/00d79e6f5608affc3f36bb0ce4ca2547230174e7)]:
+  - graphile-config@0.0.1-beta.15
+
+## 2.0.0-beta.20
+
+### Patch Changes
+
+- [#2365](https://github.com/graphile/crystal/pull/2365)
+  [`ba2847f3e`](https://github.com/graphile/crystal/commit/ba2847f3e87b3c081e4b9fc4e62a81cc8bd8bb15)
+  Thanks [@benjie](https://github.com/benjie)! - `ruru/server` no longer uses
+  `fs` module to read data/version from disk, instead data is bundled in source
+  files. This may aid people attempting to bundle ruru.
+
 ## 2.0.0-beta.19
 
 ### Patch Changes

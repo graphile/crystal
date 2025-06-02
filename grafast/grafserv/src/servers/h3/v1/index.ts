@@ -1,6 +1,5 @@
 import { PassThrough } from "node:stream";
 
-//@ts-expect-error type imports.
 import type { Hooks, Peer } from "crossws";
 import { GRAPHQL_TRANSPORT_WS_PROTOCOL, makeServer } from "graphql-ws";
 import type { App, H3Event } from "h3";
@@ -278,7 +277,6 @@ export class H3Grafserv extends GrafservBase {
           { socket: peer.websocket, request: peer.request },
         );
         client.closed = async (code, reason) => {
-          // @ts-expect-error fixed in unreleased https://github.com/enisdenjo/graphql-ws/pull/573
           onClose(code, reason);
         };
       },

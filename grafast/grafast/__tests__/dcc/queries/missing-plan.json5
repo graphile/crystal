@@ -1,0 +1,523 @@
+{
+  floor: {
+    locations: [
+      {
+        floors: [
+          {
+            locations: [
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            locations: [
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        floors: [
+          {
+            locations: [
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            locations: [
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            locations: [
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        floors: [
+          {
+            locations: [
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            locations: [
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+            ],
+          },
+          {
+            locations: [
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        floors: [
+          {
+            locations: [
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+      {
+        floors: [
+          {
+            locations: [
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+              {
+                floors: [
+                  {
+                    __typename: 'Floor',
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+}

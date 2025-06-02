@@ -19,19 +19,21 @@ const makeSchema = (useStreamableStep = false) => {
         echoNonNullableListOfString(in: [String]!): [String]!
       }
     `,
-    plans: {
+    objects: {
       Query: {
-        echoListOfString(_, { $in }) {
-          return $in;
-        },
-        echoListOfNonNullableString(_, { $in }) {
-          return $in;
-        },
-        echoNonNullableListOfString(_, { $in }) {
-          return $in;
-        },
-        echoNonNullableListOfNonNullableString(_, { $in }) {
-          return $in;
+        plans: {
+          echoListOfString(_, { $in }) {
+            return $in;
+          },
+          echoListOfNonNullableString(_, { $in }) {
+            return $in;
+          },
+          echoNonNullableListOfString(_, { $in }) {
+            return $in;
+          },
+          echoNonNullableListOfNonNullableString(_, { $in }) {
+            return $in;
+          },
         },
       },
     },

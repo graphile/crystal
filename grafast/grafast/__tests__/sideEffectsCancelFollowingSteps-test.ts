@@ -42,12 +42,16 @@ const schema = makeGrafastSchema({
       test: Int
     }
   `,
-  plans: {
+  objects: {
     Mutation: {
-      test: testResolver,
+      plans: {
+        test: testResolver,
+      },
     },
     Query: {
-      test: testResolver,
+      plans: {
+        test: testResolver,
+      },
     },
   },
   enableDeferStream: true,
@@ -74,12 +78,15 @@ it("cancels future steps on error", async () => {
   assert.deepEqual(result.data, {
     test: null,
   });
-  assert.deepEqual(result.errors?.map((e) => e.toJSON()), [
-    {
-      message: "Side effect 3 failed",
-      path: ["test"],
-      locations: [{ line: 3, column: 7 }],
-    },
-  ]);
+  assert.deepEqual(
+    result.errors?.map((e) => e.toJSON()),
+    [
+      {
+        message: "Side effect 3 failed",
+        path: ["test"],
+        locations: [{ line: 3, column: 7 }],
+      },
+    ],
+  );
   assert.equal(contextValue.number, 4);
 });

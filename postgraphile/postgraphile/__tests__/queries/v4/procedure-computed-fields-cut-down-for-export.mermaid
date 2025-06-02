@@ -7,51 +7,60 @@ graph TD
     classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
-
-    %% plan dependencies
-    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸpostᐳ"]]:::plan
-    Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant39{{"Constant[39∈0] ➊<br />ᐸ1ᐳ"}}:::plan
-    Constant40{{"Constant[40∈0] ➊<br />ᐸ[Object: null prototype] {}ᐳ"}}:::plan
-    Object10 & Constant39 & Constant40 --> PgSelect7
-    Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
-    Access8 & Access9 --> Object10
-    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
-    __Value2 --> Access8
-    __Value2 --> Access9
-    First11{{"First[11∈0] ➊"}}:::plan
-    PgSelect7 --> First11
-    PgSelectSingle12{{"PgSelectSingle[12∈0] ➊<br />ᐸpostᐳ"}}:::plan
-    First11 --> PgSelectSingle12
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    PgClassExpression13{{"PgClassExpression[13∈1] ➊<br />ᐸ__post__.”id”ᐳ"}}:::plan
-    PgSelectSingle12 --> PgClassExpression13
-    Access36{{"Access[36∈1] ➊<br />ᐸ37.0ᐳ"}}:::plan
-    RemapKeys37{{"RemapKeys[37∈1] ➊<br />ᐸ12:{”0”:1}ᐳ"}}:::plan
-    RemapKeys37 --> Access36
-    PgSelectSingle12 --> RemapKeys37
-    __Item34[/"__Item[34∈2]<br />ᐸ36ᐳ"\]:::itemplan
-    Access36 ==> __Item34
-    PgSelectSingle35{{"PgSelectSingle[35∈2]<br />ᐸpost_computed_compound_type_arrayᐳ"}}:::plan
-    __Item34 --> PgSelectSingle35
-
-    %% define steps
-
     subgraph "Buckets for queries/v4/procedure-computed-fields-cut-down-for-export"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 39, 40, 10<br />2: PgSelect[7]<br />ᐳ: First[11], PgSelectSingle[12]"):::bucket
-    classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectSingle12,Constant39,Constant40 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12<br /><br />ROOT PgSelectSingleᐸpostᐳ[12]"):::bucket
-    classDef bucket1 stroke:#00bfff
-    class Bucket1,PgClassExpression13,Access36,RemapKeys37 bucket1
-    Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ36ᐳ[34]"):::bucket
-    classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item34,PgSelectSingle35 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 35<br /><br />ROOT PgSelectSingle{2}ᐸpost_computed_compound_type_arrayᐳ[35]"):::bucket
-    classDef bucket3 stroke:#ffa500
-    class Bucket3 bucket3
+    Bucket0("Bucket 0 (root)<br /><br />1: PgSelectInlineApply[28]<br />ᐳ: 8, 9, 16, 32, 10, 15, 17, 27<br />2: PgSelect[7]<br />ᐳ: Access[29]<br />3: PgSelectRows[12]<br />ᐳ: 11, 13, 30, 31"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 31<br /><br />ROOT PgSelectSingleᐸpostᐳ[13]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ24ᐳ[25]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 26<br /><br />ROOT PgSelectSingle{2}ᐸpost_computed_compound_type_arrayᐳ[26]"):::bucket
+    end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
-    end
+
+    %% plan dependencies
+    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸpostᐳ<br />More deps:<br />- Constantᐸ1ᐳ[32]"]]:::plan
+    Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    PgFromExpression27{{"PgFromExpression[27∈0] ➊"}}:::plan
+    PgSelectInlineApply28["PgSelectInlineApply[28∈0] ➊"]:::plan
+    Object10 & PgFromExpression27 & PgSelectInlineApply28 --> PgSelect7
+    Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access8 & Access9 --> Object10
+    List30{{"List[30∈0] ➊<br />ᐸ29,11ᐳ"}}:::plan
+    Access29{{"Access[29∈0] ➊<br />ᐸ7.m.subqueryDetailsFor19ᐳ"}}:::plan
+    First11{{"First[11∈0] ➊"}}:::plan
+    Access29 & First11 --> List30
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
+    __Value2 --> Access8
+    __Value2 --> Access9
+    PgSelectRows12[["PgSelectRows[12∈0] ➊"]]:::plan
+    PgSelectRows12 --> First11
+    PgSelect7 --> PgSelectRows12
+    PgSelectSingle13{{"PgSelectSingle[13∈0] ➊<br />ᐸpostᐳ"}}:::plan
+    First11 --> PgSelectSingle13
+    __InputObject15{{"__InputObject[15∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[16]"}}:::plan
+    BakedInput17{{"BakedInput[17∈0] ➊"}}:::plan
+    __InputObject15 --> BakedInput17
+    BakedInput17 --> PgFromExpression27
+    PgSelect7 --> Access29
+    Lambda31{{"Lambda[31∈0] ➊<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
+    List30 --> Lambda31
+    PgClassExpression14{{"PgClassExpression[14∈1] ➊<br />ᐸ__post__.”id”ᐳ"}}:::plan
+    PgSelectSingle13 --> PgClassExpression14
+    PgSelectRows24[["PgSelectRows[24∈1] ➊"]]:::plan
+    Lambda31 --> PgSelectRows24
+    __Item25[/"__Item[25∈2]<br />ᐸ24ᐳ"\]:::itemplan
+    PgSelectRows24 ==> __Item25
+    PgSelectSingle26{{"PgSelectSingle[26∈2]<br />ᐸpost_computed_compound_type_arrayᐳ"}}:::plan
+    __Item25 --> PgSelectSingle26
+
+    %% define steps
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value2,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,__InputObject15,BakedInput17,PgFromExpression27,PgSelectInlineApply28,Access29,List30,Lambda31 bucket0
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,PgClassExpression14,PgSelectRows24 bucket1
+    classDef bucket2 stroke:#7f007f
+    class Bucket2,__Item25,PgSelectSingle26 bucket2
+    classDef bucket3 stroke:#ffa500
+    class Bucket3 bucket3
+

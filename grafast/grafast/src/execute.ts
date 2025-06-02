@@ -6,6 +6,7 @@ import type {
 } from "graphql";
 import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 
+import { $$eventEmitter, $$extensions } from "./constants.js";
 import { isDev } from "./dev.js";
 import { inspect } from "./inspect.js";
 import type {
@@ -14,8 +15,8 @@ import type {
   ExecutionEventMap,
   GrafastExecutionArgs,
 } from "./interfaces.js";
-import { $$eventEmitter, $$extensions } from "./interfaces.js";
 import { getGrafastMiddleware } from "./middleware.js";
+import type { GrafastOperationOptions } from "./prepare.js";
 import { grafastPrepare } from "./prepare.js";
 import { isPromiseLike } from "./utils.js";
 
@@ -76,12 +77,14 @@ export function withGrafastArgs(
     };
   }
 
-  const rootValue = grafastPrepare(args, {
+  const operationOptions: RequireAllKeys<GrafastOperationOptions> = {
     explain: options?.explain,
     timeouts: options?.timeouts,
+    maxPlanningDepth: options?.maxPlanningDepth,
     // TODO: Delete this
     outputDataAsString: args.outputDataAsString,
-  });
+  };
+  const rootValue = grafastPrepare(args, operationOptions);
   if (unlisten !== null) {
     Promise.resolve(rootValue).then(unlisten, unlisten);
   }
@@ -132,7 +135,7 @@ export function execute(
   const middleware =
     args.middleware === undefined && resolvedPreset != null
       ? getGrafastMiddleware(resolvedPreset)
-      : args.middleware ?? null;
+      : (args.middleware ?? null);
   if (args.middleware === undefined) {
     args.middleware = middleware;
   }
@@ -145,3 +148,5 @@ export function execute(
 
 const executeMiddlewareCallback = (event: ExecuteEvent) =>
   withGrafastArgs(event.args);
+
+type RequireAllKeys<T> = { [P in keyof Required<T>]: T[P] | undefined };

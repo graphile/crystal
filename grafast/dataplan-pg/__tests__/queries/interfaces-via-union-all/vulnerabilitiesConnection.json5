@@ -2,7 +2,7 @@
   vulnerabilitiesConnection: {
     edges: [
       {
-        cursor: "WyI2Y2M3ZmU5NDM2IiwiMyIsIkZpcnN0UGFydHlWdWxuZXJhYmlsaXR5IiwiW1wiMVwiXSJd",
+        cursor: "WyJkMTg1OWM4N2RhIiwiMyIsIkZpcnN0UGFydHlWdWxuZXJhYmlsaXR5IiwiW1wiMVwiXSJd",
         node: {
           __typename: "FirstPartyVulnerability",
           cvssScore: 3,
@@ -12,7 +12,7 @@
         },
       },
       {
-        cursor: "WyI2Y2M3ZmU5NDM2IiwiNy4yIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIyXCJdIl0=",
+        cursor: "WyJkMTg1OWM4N2RhIiwiNy4yIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIyXCJdIl0=",
         node: {
           __typename: "FirstPartyVulnerability",
           cvssScore: 7.2,
@@ -22,7 +22,7 @@
         },
       },
       {
-        cursor: "WyI2Y2M3ZmU5NDM2IiwiNy4yIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI0XCJdIl0=",
+        cursor: "WyJkMTg1OWM4N2RhIiwiNy4yIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI0XCJdIl0=",
         node: {
           __typename: "FirstPartyVulnerability",
           cvssScore: 7.2,
@@ -32,7 +32,7 @@
         },
       },
       {
-        cursor: "WyI2Y2M3ZmU5NDM2IiwiNy4yIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI1XCJdIl0=",
+        cursor: "WyJkMTg1OWM4N2RhIiwiNy4yIiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI1XCJdIl0=",
         node: {
           __typename: "FirstPartyVulnerability",
           cvssScore: 7.2,
@@ -42,7 +42,7 @@
         },
       },
       {
-        cursor: "WyI2Y2M3ZmU5NDM2IiwiNy4yIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI0XCJdIl0=",
+        cursor: "WyJkMTg1OWM4N2RhIiwiNy4yIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI0XCJdIl0=",
         node: {
           __typename: "ThirdPartyVulnerability",
           cvssScore: 7.2,
@@ -52,7 +52,7 @@
         },
       },
       {
-        cursor: "WyI2Y2M3ZmU5NDM2IiwiNy4yIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI1XCJdIl0=",
+        cursor: "WyJkMTg1OWM4N2RhIiwiNy4yIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCI1XCJdIl0=",
         node: {
           __typename: "ThirdPartyVulnerability",
           cvssScore: 7.2,
@@ -62,7 +62,7 @@
         },
       },
       {
-        cursor: "WyI2Y2M3ZmU5NDM2IiwiNy41IiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIxXCJdIl0=",
+        cursor: "WyJkMTg1OWM4N2RhIiwiNy41IiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIxXCJdIl0=",
         node: {
           __typename: "ThirdPartyVulnerability",
           cvssScore: 7.5,
@@ -72,7 +72,7 @@
         },
       },
       {
-        cursor: "WyI2Y2M3ZmU5NDM2IiwiNy43IiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
+        cursor: "WyJkMTg1OWM4N2RhIiwiNy43IiwiRmlyc3RQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIzXCJdIl0=",
         node: {
           __typename: "FirstPartyVulnerability",
           cvssScore: 7.7,
@@ -82,7 +82,7 @@
         },
       },
       {
-        cursor: "WyI2Y2M3ZmU5NDM2IiwiOS4xIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIyXCJdIl0=",
+        cursor: "WyJkMTg1OWM4N2RhIiwiOS4xIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkiLCJbXCIyXCJdIl0=",
         node: {
           __typename: "ThirdPartyVulnerability",
           cvssScore: 9.1,
@@ -92,7 +92,7 @@
         },
       },
       {
-        cursor: "WyI2Y2M3ZmU5NDM2IiwiMTAiLCJUaGlyZFBhcnR5VnVsbmVyYWJpbGl0eSIsIltcIjNcIl0iXQ==",
+        cursor: "WyJkMTg1OWM4N2RhIiwiMTAiLCJUaGlyZFBhcnR5VnVsbmVyYWJpbGl0eSIsIltcIjNcIl0iXQ==",
         node: {
           __typename: "ThirdPartyVulnerability",
           cvssScore: 10,

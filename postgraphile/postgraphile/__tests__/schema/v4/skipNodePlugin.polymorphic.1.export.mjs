@@ -1,56 +1,57 @@
-import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, PgSelectStep, PgUnionAllStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUnionAll, pgUpdateSingle, recordCodec, sqlFromArgDigests } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, makeGrafastSchema, object, rootValue, stepAMayDependOnStepB } from "grafast";
+import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, PgUnionAllSingleStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgFromExpression, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUnionAll, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
+import { ConnectionStep, ConstantStep, EdgeStep, ObjectStep, __ValueStep, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, lambda, makeGrafastSchema, object, operationPlan, rootValue, stepAMayDependOnStepB, trap } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
-import { inspect } from "util";
+const EMPTY_ARRAY = [];
+const makeArgs_first_party_vulnerabilities_cvss_score_int = () => EMPTY_ARRAY;
 function hasRecord($row) {
   return "record" in $row && typeof $row.record === "function";
 }
-const argDetailsSimple = [];
-const makeArgs = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 0; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
-    } else {
-      step = args.get([...path, graphqlArgName]);
+const pgFunctionArgumentsFromArgs = (() => {
+  function pgFunctionArgumentsFromArgs($in, extraSelectArgs, inlining = false) {
+    if (!hasRecord($in)) {
+      throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
     }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
+    /**
+     * An optimisation - if all our dependencies are
+     * compatible with the expression's class plan then we
+     * can inline ourselves into that, otherwise we must
+     * issue the query separately.
+     */
+    const canUseExpressionDirectly = $in instanceof PgSelectSingleStep && extraSelectArgs.every(a => stepAMayDependOnStepB($in.getClassStep(), a.step));
+    const $row = canUseExpressionDirectly ? $in : pgSelectSingleFromRecord($in.resource, $in.record());
+    const selectArgs = [{
+      step: $row.record()
+    }, ...extraSelectArgs];
+    if (inlining) {
+      // This is a scalar computed attribute, let's inline the expression
+      const newSelectArgs = selectArgs.map((arg, i) => {
+        if (i === 0) {
+          const {
+            step,
+            ...rest
+          } = arg;
+          return {
+            ...rest,
+            placeholder: $row.getClassStep().alias
+          };
+        } else {
+          return arg;
+        }
       });
+      return {
+        $row,
+        selectArgs: newSelectArgs
+      };
     } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
+      return {
+        $row,
+        selectArgs: selectArgs
+      };
     }
   }
-  return selectArgs;
-};
+  return pgFunctionArgumentsFromArgs;
+})();
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -65,7 +66,8 @@ const awsApplicationFirstPartyVulnerabilitiesIdentifier = sql.identifier("polymo
 const spec_awsApplicationFirstPartyVulnerabilities = {
   name: "awsApplicationFirstPartyVulnerabilities",
   identifier: awsApplicationFirstPartyVulnerabilitiesIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     aws_application_id: {
       description: undefined,
       codec: TYPES.int,
@@ -84,7 +86,7 @@ const spec_awsApplicationFirstPartyVulnerabilities = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -93,10 +95,11 @@ const spec_awsApplicationFirstPartyVulnerabilities = {
       schemaName: "polymorphic",
       name: "aws_application_first_party_vulnerabilities"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       omit: true,
       behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
-    })
+    }
   },
   executor: executor
 };
@@ -105,7 +108,8 @@ const awsApplicationThirdPartyVulnerabilitiesIdentifier = sql.identifier("polymo
 const spec_awsApplicationThirdPartyVulnerabilities = {
   name: "awsApplicationThirdPartyVulnerabilities",
   identifier: awsApplicationThirdPartyVulnerabilitiesIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     aws_application_id: {
       description: undefined,
       codec: TYPES.int,
@@ -124,7 +128,7 @@ const spec_awsApplicationThirdPartyVulnerabilities = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -133,10 +137,11 @@ const spec_awsApplicationThirdPartyVulnerabilities = {
       schemaName: "polymorphic",
       name: "aws_application_third_party_vulnerabilities"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       omit: true,
       behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
-    })
+    }
   },
   executor: executor
 };
@@ -145,7 +150,8 @@ const gcpApplicationFirstPartyVulnerabilitiesIdentifier = sql.identifier("polymo
 const spec_gcpApplicationFirstPartyVulnerabilities = {
   name: "gcpApplicationFirstPartyVulnerabilities",
   identifier: gcpApplicationFirstPartyVulnerabilitiesIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     gcp_application_id: {
       description: undefined,
       codec: TYPES.int,
@@ -164,7 +170,7 @@ const spec_gcpApplicationFirstPartyVulnerabilities = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -173,10 +179,11 @@ const spec_gcpApplicationFirstPartyVulnerabilities = {
       schemaName: "polymorphic",
       name: "gcp_application_first_party_vulnerabilities"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       omit: true,
       behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
-    })
+    }
   },
   executor: executor
 };
@@ -185,7 +192,8 @@ const gcpApplicationThirdPartyVulnerabilitiesIdentifier = sql.identifier("polymo
 const spec_gcpApplicationThirdPartyVulnerabilities = {
   name: "gcpApplicationThirdPartyVulnerabilities",
   identifier: gcpApplicationThirdPartyVulnerabilitiesIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     gcp_application_id: {
       description: undefined,
       codec: TYPES.int,
@@ -204,7 +212,7 @@ const spec_gcpApplicationThirdPartyVulnerabilities = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -213,19 +221,21 @@ const spec_gcpApplicationThirdPartyVulnerabilities = {
       schemaName: "polymorphic",
       name: "gcp_application_third_party_vulnerabilities"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       omit: true,
       behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
-    })
+    }
   },
   executor: executor
 };
 const gcpApplicationThirdPartyVulnerabilitiesCodec = recordCodec(spec_gcpApplicationThirdPartyVulnerabilities);
 const organizationsIdentifier = sql.identifier("polymorphic", "organizations");
-const spec_organizations = {
+const organizationsCodec = recordCodec({
   name: "organizations",
   identifier: organizationsIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     organization_id: {
       description: undefined,
       codec: TYPES.int,
@@ -244,7 +254,7 @@ const spec_organizations = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -253,18 +263,19 @@ const spec_organizations = {
       schemaName: "polymorphic",
       name: "organizations"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       unionMember: "PersonOrOrganization"
-    })
+    }
   },
   executor: executor
-};
-const organizationsCodec = recordCodec(spec_organizations);
+});
 const peopleIdentifier = sql.identifier("polymorphic", "people");
 const spec_people = {
   name: "people",
   identifier: peopleIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     person_id: {
       description: undefined,
       codec: TYPES.int,
@@ -283,7 +294,7 @@ const spec_people = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -292,12 +303,14 @@ const spec_people = {
       schemaName: "polymorphic",
       name: "people"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       unionMember: "PersonOrOrganization",
       ref: "applications to:Application",
       refVia: ["applications via:aws_applications", "applications via:gcp_applications"]
-    }),
-    refDefinitions: Object.assign(Object.create(null), {
+    },
+    refDefinitions: {
+      __proto__: null,
       applications: {
         singular: false,
         graphqlType: "Application",
@@ -309,7 +322,7 @@ const spec_people = {
           }
         }
       }
-    })
+    }
   },
   executor: executor
 };
@@ -318,7 +331,8 @@ const prioritiesIdentifier = sql.identifier("polymorphic", "priorities");
 const spec_priorities = {
   name: "priorities",
   identifier: prioritiesIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     id: {
       description: undefined,
       codec: TYPES.int,
@@ -337,7 +351,7 @@ const spec_priorities = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -346,10 +360,11 @@ const spec_priorities = {
       schemaName: "polymorphic",
       name: "priorities"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       omit: "create,update,delete,filter,order",
       behavior: ["-insert -update -delete -filter -filterBy -order -orderBy"]
-    })
+    }
   },
   executor: executor
 };
@@ -366,13 +381,16 @@ const itemTypeCodec = enumCodec({
       schemaName: "polymorphic",
       name: "item_type"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 });
 const spec_relationalChecklists = {
   name: "relationalChecklists",
   identifier: relationalChecklistsIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     checklist_item_id: {
       description: undefined,
       codec: TYPES.int,
@@ -501,7 +519,7 @@ const spec_relationalChecklists = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -510,17 +528,20 @@ const spec_relationalChecklists = {
       schemaName: "polymorphic",
       name: "relational_checklists"
     },
-    tags: Object.create(null),
+    tags: {
+      __proto__: null
+    },
     relationalInterfaceCodecName: "relationalItems"
   },
   executor: executor
 };
 const relationalChecklistsCodec = recordCodec(spec_relationalChecklists);
 const relationalItemRelationCompositePksIdentifier = sql.identifier("polymorphic", "relational_item_relation_composite_pks");
-const spec_relationalItemRelationCompositePks = {
+const relationalItemRelationCompositePksCodec = recordCodec({
   name: "relationalItemRelationCompositePks",
   identifier: relationalItemRelationCompositePksIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     parent_id: {
       description: undefined,
       codec: TYPES.int,
@@ -539,7 +560,7 @@ const spec_relationalItemRelationCompositePks = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -548,16 +569,18 @@ const spec_relationalItemRelationCompositePks = {
       schemaName: "polymorphic",
       name: "relational_item_relation_composite_pks"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   executor: executor
-};
-const relationalItemRelationCompositePksCodec = recordCodec(spec_relationalItemRelationCompositePks);
+});
 const relationalTopicsIdentifier = sql.identifier("polymorphic", "relational_topics");
-const spec_relationalTopics = {
+const relationalTopicsCodec = recordCodec({
   name: "relationalTopics",
   identifier: relationalTopicsIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     topic_item_id: {
       description: undefined,
       codec: TYPES.int,
@@ -686,7 +709,7 @@ const spec_relationalTopics = {
         tags: spec_relationalChecklists.attributes.archived_at.extensions.tags
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -695,17 +718,19 @@ const spec_relationalTopics = {
       schemaName: "polymorphic",
       name: "relational_topics"
     },
-    tags: Object.create(null),
+    tags: {
+      __proto__: null
+    },
     relationalInterfaceCodecName: "relationalItems"
   },
   executor: executor
-};
-const relationalTopicsCodec = recordCodec(spec_relationalTopics);
+});
 const singleTableItemRelationCompositePksIdentifier = sql.identifier("polymorphic", "single_table_item_relation_composite_pks");
-const spec_singleTableItemRelationCompositePks = {
+const singleTableItemRelationCompositePksCodec = recordCodec({
   name: "singleTableItemRelationCompositePks",
   identifier: singleTableItemRelationCompositePksIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     parent_id: {
       description: undefined,
       codec: TYPES.int,
@@ -724,7 +749,7 @@ const spec_singleTableItemRelationCompositePks = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -733,16 +758,18 @@ const spec_singleTableItemRelationCompositePks = {
       schemaName: "polymorphic",
       name: "single_table_item_relation_composite_pks"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   executor: executor
-};
-const singleTableItemRelationCompositePksCodec = recordCodec(spec_singleTableItemRelationCompositePks);
+});
 const relationalChecklistItemsIdentifier = sql.identifier("polymorphic", "relational_checklist_items");
-const spec_relationalChecklistItems = {
+const relationalChecklistItemsCodec = recordCodec({
   name: "relationalChecklistItems",
   identifier: relationalChecklistItemsIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     checklist_item_item_id: {
       description: undefined,
       codec: TYPES.int,
@@ -880,7 +907,7 @@ const spec_relationalChecklistItems = {
         tags: spec_relationalChecklists.attributes.archived_at.extensions.tags
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -889,17 +916,19 @@ const spec_relationalChecklistItems = {
       schemaName: "polymorphic",
       name: "relational_checklist_items"
     },
-    tags: Object.create(null),
+    tags: {
+      __proto__: null
+    },
     relationalInterfaceCodecName: "relationalItems"
   },
   executor: executor
-};
-const relationalChecklistItemsCodec = recordCodec(spec_relationalChecklistItems);
+});
 const relationalDividersIdentifier = sql.identifier("polymorphic", "relational_dividers");
-const spec_relationalDividers = {
+const relationalDividersCodec = recordCodec({
   name: "relationalDividers",
   identifier: relationalDividersIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     divider_item_id: {
       description: undefined,
       codec: TYPES.int,
@@ -1037,7 +1066,7 @@ const spec_relationalDividers = {
         tags: spec_relationalChecklists.attributes.archived_at.extensions.tags
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -1046,17 +1075,19 @@ const spec_relationalDividers = {
       schemaName: "polymorphic",
       name: "relational_dividers"
     },
-    tags: Object.create(null),
+    tags: {
+      __proto__: null
+    },
     relationalInterfaceCodecName: "relationalItems"
   },
   executor: executor
-};
-const relationalDividersCodec = recordCodec(spec_relationalDividers);
+});
 const relationalItemRelationsIdentifier = sql.identifier("polymorphic", "relational_item_relations");
-const spec_relationalItemRelations = {
+const relationalItemRelationsCodec = recordCodec({
   name: "relationalItemRelations",
   identifier: relationalItemRelationsIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     id: {
       description: undefined,
       codec: TYPES.int,
@@ -1084,7 +1115,7 @@ const spec_relationalItemRelations = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -1093,16 +1124,18 @@ const spec_relationalItemRelations = {
       schemaName: "polymorphic",
       name: "relational_item_relations"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   executor: executor
-};
-const relationalItemRelationsCodec = recordCodec(spec_relationalItemRelations);
+});
 const singleTableItemRelationsIdentifier = sql.identifier("polymorphic", "single_table_item_relations");
-const spec_singleTableItemRelations = {
+const singleTableItemRelationsCodec = recordCodec({
   name: "singleTableItemRelations",
   identifier: singleTableItemRelationsIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     id: {
       description: undefined,
       codec: TYPES.int,
@@ -1130,7 +1163,7 @@ const spec_singleTableItemRelations = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -1139,16 +1172,18 @@ const spec_singleTableItemRelations = {
       schemaName: "polymorphic",
       name: "single_table_item_relations"
     },
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   },
   executor: executor
-};
-const singleTableItemRelationsCodec = recordCodec(spec_singleTableItemRelations);
+});
 const logEntriesIdentifier = sql.identifier("polymorphic", "log_entries");
 const spec_logEntries = {
   name: "logEntries",
   identifier: logEntriesIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     id: {
       description: undefined,
       codec: TYPES.int,
@@ -1185,7 +1220,7 @@ const spec_logEntries = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -1194,11 +1229,13 @@ const spec_logEntries = {
       schemaName: "polymorphic",
       name: "log_entries"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       ref: "author to:PersonOrOrganization singular",
       refVia: ["author via:people", "author via:organizations"]
-    }),
-    refDefinitions: Object.assign(Object.create(null), {
+    },
+    refDefinitions: {
+      __proto__: null,
       author: {
         singular: true,
         graphqlType: "PersonOrOrganization",
@@ -1210,16 +1247,17 @@ const spec_logEntries = {
           }
         }
       }
-    })
+    }
   },
   executor: executor
 };
 const logEntriesCodec = recordCodec(spec_logEntries);
 const relationalPostsIdentifier = sql.identifier("polymorphic", "relational_posts");
-const spec_relationalPosts = {
+const relationalPostsCodec = recordCodec({
   name: "relationalPosts",
   identifier: relationalPostsIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     post_item_id: {
       description: undefined,
       codec: TYPES.int,
@@ -1366,7 +1404,7 @@ const spec_relationalPosts = {
         tags: spec_relationalChecklists.attributes.archived_at.extensions.tags
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -1375,17 +1413,19 @@ const spec_relationalPosts = {
       schemaName: "polymorphic",
       name: "relational_posts"
     },
-    tags: Object.create(null),
+    tags: {
+      __proto__: null
+    },
     relationalInterfaceCodecName: "relationalItems"
   },
   executor: executor
-};
-const relationalPostsCodec = recordCodec(spec_relationalPosts);
+});
 const firstPartyVulnerabilitiesIdentifier = sql.identifier("polymorphic", "first_party_vulnerabilities");
 const spec_firstPartyVulnerabilities = {
   name: "firstPartyVulnerabilities",
   identifier: firstPartyVulnerabilitiesIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     id: {
       description: undefined,
       codec: TYPES.int,
@@ -1422,7 +1462,7 @@ const spec_firstPartyVulnerabilities = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -1431,12 +1471,14 @@ const spec_firstPartyVulnerabilities = {
       schemaName: "polymorphic",
       name: "first_party_vulnerabilities"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       implements: "Vulnerability",
       ref: ["applications to:Application plural", "owners to:PersonOrOrganization plural"],
       refVia: ["applications via:aws_application_first_party_vulnerabilities;aws_applications", "applications via:gcp_application_first_party_vulnerabilities;gcp_applications", "owners via:aws_application_first_party_vulnerabilities;aws_applications;people", "owners via:aws_application_first_party_vulnerabilities;aws_applications;organizations", "owners via:gcp_application_first_party_vulnerabilities;gcp_applications;people", "owners via:gcp_application_first_party_vulnerabilities;gcp_applications;organizations"]
-    }),
-    refDefinitions: Object.assign(Object.create(null), {
+    },
+    refDefinitions: {
+      __proto__: null,
       applications: {
         singular: false,
         graphqlType: "Application",
@@ -1459,7 +1501,7 @@ const spec_firstPartyVulnerabilities = {
           }
         }
       }
-    })
+    }
   },
   executor: executor
 };
@@ -1468,7 +1510,8 @@ const thirdPartyVulnerabilitiesIdentifier = sql.identifier("polymorphic", "third
 const spec_thirdPartyVulnerabilities = {
   name: "thirdPartyVulnerabilities",
   identifier: thirdPartyVulnerabilitiesIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     id: {
       description: undefined,
       codec: TYPES.int,
@@ -1505,7 +1548,7 @@ const spec_thirdPartyVulnerabilities = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -1514,12 +1557,14 @@ const spec_thirdPartyVulnerabilities = {
       schemaName: "polymorphic",
       name: "third_party_vulnerabilities"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       implements: "Vulnerability",
       ref: ["applications to:Application plural", "owners to:PersonOrOrganization plural"],
       refVia: ["applications via:aws_application_third_party_vulnerabilities;aws_applications", "applications via:gcp_application_third_party_vulnerabilities;gcp_applications", "owners via:aws_application_third_party_vulnerabilities;aws_applications;people", "owners via:aws_application_third_party_vulnerabilities;aws_applications;organizations", "owners via:gcp_application_third_party_vulnerabilities;gcp_applications;people", "owners via:gcp_application_third_party_vulnerabilities;gcp_applications;organizations"]
-    }),
-    refDefinitions: Object.assign(Object.create(null), {
+    },
+    refDefinitions: {
+      __proto__: null,
       applications: {
         singular: false,
         graphqlType: "Application",
@@ -1542,7 +1587,7 @@ const spec_thirdPartyVulnerabilities = {
           }
         }
       }
-    })
+    }
   },
   executor: executor
 };
@@ -1551,7 +1596,8 @@ const awsApplicationsIdentifier = sql.identifier("polymorphic", "aws_application
 const spec_awsApplications = {
   name: "awsApplications",
   identifier: awsApplicationsIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     id: {
       description: undefined,
       codec: TYPES.int,
@@ -1606,7 +1652,7 @@ const spec_awsApplications = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -1615,12 +1661,14 @@ const spec_awsApplications = {
       schemaName: "polymorphic",
       name: "aws_applications"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       implements: "Application",
       ref: ["vulnerabilities to:Vulnerability plural", "owner to:PersonOrOrganization singular"],
       refVia: ["vulnerabilities via:(id)->aws_application_first_party_vulnerabilities(aws_application_id);(first_party_vulnerability_id)->first_party_vulnerabilities(id)", "vulnerabilities via:(id)->aws_application_third_party_vulnerabilities(aws_application_id);(third_party_vulnerability_id)->third_party_vulnerabilities(id)", "owner via:people", "owner via:organizations"]
-    }),
-    refDefinitions: Object.assign(Object.create(null), {
+    },
+    refDefinitions: {
+      __proto__: null,
       vulnerabilities: {
         singular: false,
         graphqlType: "Vulnerability",
@@ -1643,7 +1691,7 @@ const spec_awsApplications = {
           }
         }
       }
-    })
+    }
   },
   executor: executor
 };
@@ -1652,7 +1700,8 @@ const gcpApplicationsIdentifier = sql.identifier("polymorphic", "gcp_application
 const spec_gcpApplications = {
   name: "gcpApplications",
   identifier: gcpApplicationsIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     id: {
       description: undefined,
       codec: TYPES.int,
@@ -1707,7 +1756,7 @@ const spec_gcpApplications = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -1716,12 +1765,14 @@ const spec_gcpApplications = {
       schemaName: "polymorphic",
       name: "gcp_applications"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       implements: "Application",
       ref: ["vulnerabilities to:Vulnerability plural", "owner to:PersonOrOrganization singular"],
       refVia: ["vulnerabilities via:(id)->gcp_application_first_party_vulnerabilities(gcp_application_id);(first_party_vulnerability_id)->first_party_vulnerabilities(id)", "vulnerabilities via:(id)->gcp_application_third_party_vulnerabilities(gcp_application_id);(third_party_vulnerability_id)->third_party_vulnerabilities(id)", "owner via:people", "owner via:organizations"]
-    }),
-    refDefinitions: Object.assign(Object.create(null), {
+    },
+    refDefinitions: {
+      __proto__: null,
       vulnerabilities: {
         singular: false,
         graphqlType: "Vulnerability",
@@ -1744,7 +1795,7 @@ const spec_gcpApplications = {
           }
         }
       }
-    })
+    }
   },
   executor: executor
 };
@@ -1753,7 +1804,8 @@ const singleTableItemsIdentifier = sql.identifier("polymorphic", "single_table_i
 const spec_singleTableItems = {
   name: "singleTableItems",
   identifier: singleTableItemsIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     id: {
       description: undefined,
       codec: TYPES.int,
@@ -1889,7 +1941,7 @@ const spec_singleTableItems = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -1898,12 +1950,14 @@ const spec_singleTableItems = {
       schemaName: "polymorphic",
       name: "single_table_items"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       interface: "mode:single type:type",
       type: ["TOPIC name:SingleTableTopic attributes:title!", "POST name:SingleTablePost attributes:title>subject,description,note,priority_id", "DIVIDER name:SingleTableDivider attributes:title,color", "CHECKLIST name:SingleTableChecklist attributes:title", "CHECKLIST_ITEM name:SingleTableChecklistItem attributes:description,note,priority_id"],
       ref: ["rootTopic to:SingleTableTopic singular via:(root_topic_id)->polymorphic.single_table_items(id)", "rootChecklistTopic from:SingleTableChecklist to:SingleTableTopic singular via:(root_topic_id)->polymorphic.single_table_items(id)"]
-    }),
-    refDefinitions: Object.assign(Object.create(null), {
+    },
+    refDefinitions: {
+      __proto__: null,
       rootTopic: {
         singular: true,
         graphqlType: "SingleTableTopic",
@@ -1926,14 +1980,15 @@ const spec_singleTableItems = {
           }
         }
       }
-    })
+    }
   },
   executor: executor,
   polymorphism: {
     mode: "single",
     commonAttributes: ["id", "type", "parent_id", "root_topic_id", "author_id", "position", "created_at", "updated_at", "is_explicitly_archived", "archived_at"],
     typeAttributes: ["type"],
-    types: Object.assign(Object.create(null), {
+    types: {
+      __proto__: null,
       TOPIC: {
         name: "SingleTableTopic",
         attributes: [{
@@ -1998,7 +2053,7 @@ const spec_singleTableItems = {
           rename: undefined
         }]
       }
-    })
+    }
   }
 };
 const singleTableItemsCodec = recordCodec(spec_singleTableItems);
@@ -2006,7 +2061,8 @@ const relationalItemsIdentifier = sql.identifier("polymorphic", "relational_item
 const spec_relationalItems = {
   name: "relationalItems",
   identifier: relationalItemsIdentifier,
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     id: {
       description: undefined,
       codec: TYPES.int,
@@ -2097,7 +2153,7 @@ const spec_relationalItems = {
         tags: spec_relationalChecklists.attributes.archived_at.extensions.tags
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -2106,16 +2162,18 @@ const spec_relationalItems = {
       schemaName: "polymorphic",
       name: "relational_items"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       interface: "mode:relational",
       type: ["TOPIC references:relational_topics", "POST references:relational_posts", "DIVIDER references:relational_dividers", "CHECKLIST references:relational_checklists", "CHECKLIST_ITEM references:relational_checklist_items"]
-    })
+    }
   },
   executor: executor,
   polymorphism: {
     mode: "relational",
     typeAttributes: ["type"],
-    types: Object.assign(Object.create(null), {
+    types: {
+      __proto__: null,
       TOPIC: {
         name: "RelationalTopic",
         references: "relational_topics",
@@ -2141,14 +2199,15 @@ const spec_relationalItems = {
         references: "relational_checklist_items",
         relationName: "relationalChecklistItemsByTheirChecklistItemItemId"
       }
-    })
+    }
   }
 };
 const relationalItemsCodec = recordCodec(spec_relationalItems);
 const spec_Application = {
   name: "Application",
   identifier: sql.identifier("polymorphic", "applications"),
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     id: {
       description: undefined,
       codec: TYPES.int,
@@ -2180,7 +2239,7 @@ const spec_Application = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: false,
@@ -2189,13 +2248,15 @@ const spec_Application = {
       schemaName: "polymorphic",
       name: "applications"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       interface: "mode:union",
       name: "Application",
       behavior: "node",
       ref: ["vulnerabilities to:Vulnerability plural", "owner to:PersonOrOrganization singular"]
-    }),
-    refDefinitions: Object.assign(Object.create(null), {
+    },
+    refDefinitions: {
+      __proto__: null,
       vulnerabilities: {
         singular: false,
         graphqlType: "Vulnerability",
@@ -2218,7 +2279,7 @@ const spec_Application = {
           }
         }
       }
-    })
+    }
   },
   executor: executor,
   polymorphism: {
@@ -2228,7 +2289,8 @@ const spec_Application = {
 const spec_Vulnerability = {
   name: "Vulnerability",
   identifier: sql.identifier("polymorphic", "vulnerabilities"),
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     id: {
       description: undefined,
       codec: TYPES.int,
@@ -2262,7 +2324,7 @@ const spec_Vulnerability = {
         }
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: false,
@@ -2271,13 +2333,15 @@ const spec_Vulnerability = {
       schemaName: "polymorphic",
       name: "vulnerabilities"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       interface: "mode:union",
       name: "Vulnerability",
       behavior: "node",
       ref: ["applications to:Application plural", "owners to:PersonOrOrganization plural"]
-    }),
-    refDefinitions: Object.assign(Object.create(null), {
+    },
+    refDefinitions: {
+      __proto__: null,
       applications: {
         singular: false,
         graphqlType: "Application",
@@ -2300,7 +2364,7 @@ const spec_Vulnerability = {
           }
         }
       }
-    })
+    }
   },
   executor: executor,
   polymorphism: {
@@ -2310,7 +2374,8 @@ const spec_Vulnerability = {
 const spec_ZeroImplementation = {
   name: "ZeroImplementation",
   identifier: sql.identifier("polymorphic", "zero_implementation"),
-  attributes: Object.assign(Object.create(null), {
+  attributes: {
+    __proto__: null,
     id: {
       description: undefined,
       codec: TYPES.int,
@@ -2329,7 +2394,7 @@ const spec_ZeroImplementation = {
         tags: {}
       }
     }
-  }),
+  },
   description: undefined,
   extensions: {
     isTableLike: false,
@@ -2338,11 +2403,12 @@ const spec_ZeroImplementation = {
       schemaName: "polymorphic",
       name: "zero_implementation"
     },
-    tags: Object.assign(Object.create(null), {
+    tags: {
+      __proto__: null,
       interface: "mode:union",
       name: "ZeroImplementation",
       behavior: "node"
-    })
+    }
   },
   executor: executor,
   polymorphism: {
@@ -2360,7 +2426,9 @@ const registryConfig_pgResources_aws_application_first_party_vulnerabilities_aws
     attributes: ["aws_application_id", "first_party_vulnerability_id"],
     description: undefined,
     extensions: {
-      tags: Object.create(null)
+      tags: {
+        __proto__: null
+      }
     }
   }],
   isVirtual: false,
@@ -2392,7 +2460,9 @@ const registryConfig_pgResources_aws_application_third_party_vulnerabilities_aws
     attributes: ["aws_application_id", "third_party_vulnerability_id"],
     description: undefined,
     extensions: {
-      tags: Object.create(null)
+      tags: {
+        __proto__: null
+      }
     }
   }],
   isVirtual: false,
@@ -2424,7 +2494,9 @@ const registryConfig_pgResources_gcp_application_first_party_vulnerabilities_gcp
     attributes: ["gcp_application_id", "first_party_vulnerability_id"],
     description: undefined,
     extensions: {
-      tags: Object.create(null)
+      tags: {
+        __proto__: null
+      }
     }
   }],
   isVirtual: false,
@@ -2456,7 +2528,9 @@ const registryConfig_pgResources_gcp_application_third_party_vulnerabilities_gcp
     attributes: ["gcp_application_id", "third_party_vulnerability_id"],
     description: undefined,
     extensions: {
-      tags: Object.create(null)
+      tags: {
+        __proto__: null
+      }
     }
   }],
   isVirtual: false,
@@ -2482,14 +2556,18 @@ const organizationsUniques = [{
   attributes: ["organization_id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }, {
   isPrimary: false,
   attributes: ["name"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }];
 const registryConfig_pgResources_organizations_organizations = {
@@ -2521,14 +2599,18 @@ const peopleUniques = [{
   attributes: ["person_id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }, {
   isPrimary: false,
   attributes: ["username"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }];
 const registryConfig_pgResources_people_people = {
@@ -2557,20 +2639,23 @@ const registryConfig_pgResources_people_people = {
     }
   }
 };
+const prioritiesUniques = [{
+  isPrimary: true,
+  attributes: ["id"],
+  description: undefined,
+  extensions: {
+    tags: {
+      __proto__: null
+    }
+  }
+}];
 const registryConfig_pgResources_priorities_priorities = {
   executor: executor,
   name: "priorities",
   identifier: "main.polymorphic.priorities",
   from: prioritiesIdentifier,
   codec: prioritiesCodec,
-  uniques: [{
-    isPrimary: true,
-    attributes: ["id"],
-    description: undefined,
-    extensions: {
-      tags: Object.create(null)
-    }
-  }],
+  uniques: prioritiesUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -2594,7 +2679,9 @@ const relational_checklistsUniques = [{
   attributes: ["checklist_item_id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }];
 const registryConfig_pgResources_relational_checklists_relational_checklists = {
@@ -2624,7 +2711,9 @@ const relational_item_relation_composite_pksUniques = [{
   attributes: ["parent_id", "child_id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }];
 const registryConfig_pgResources_relational_item_relation_composite_pks_relational_item_relation_composite_pks = {
@@ -2654,7 +2743,9 @@ const relational_topicsUniques = [{
   attributes: ["topic_item_id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }];
 const registryConfig_pgResources_relational_topics_relational_topics = {
@@ -2684,7 +2775,9 @@ const single_table_item_relation_composite_pksUniques = [{
   attributes: ["parent_id", "child_id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }];
 const registryConfig_pgResources_single_table_item_relation_composite_pks_single_table_item_relation_composite_pks = {
@@ -2714,7 +2807,9 @@ const relational_checklist_itemsUniques = [{
   attributes: ["checklist_item_item_id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }];
 const registryConfig_pgResources_relational_checklist_items_relational_checklist_items = {
@@ -2744,7 +2839,9 @@ const relational_dividersUniques = [{
   attributes: ["divider_item_id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }];
 const registryConfig_pgResources_relational_dividers_relational_dividers = {
@@ -2774,14 +2871,18 @@ const relational_item_relationsUniques = [{
   attributes: ["id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }, {
   isPrimary: false,
   attributes: ["parent_id", "child_id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }];
 const registryConfig_pgResources_relational_item_relations_relational_item_relations = {
@@ -2811,14 +2912,18 @@ const single_table_item_relationsUniques = [{
   attributes: ["id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }, {
   isPrimary: false,
   attributes: ["parent_id", "child_id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }];
 const registryConfig_pgResources_single_table_item_relations_single_table_item_relations = {
@@ -2848,7 +2953,9 @@ const log_entriesUniques = [{
   attributes: ["id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }];
 const registryConfig_pgResources_log_entries_log_entries = {
@@ -2881,7 +2988,9 @@ const relational_postsUniques = [{
   attributes: ["post_item_id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }];
 const registryConfig_pgResources_relational_posts_relational_posts = {
@@ -2906,12 +3015,16 @@ const registryConfig_pgResources_relational_posts_relational_posts = {
     tags: {}
   }
 };
+const first_party_vulnerabilities_cvss_score_intFunctionIdentifer = sql.identifier("polymorphic", "first_party_vulnerabilities_cvss_score_int");
+const third_party_vulnerabilities_cvss_score_intFunctionIdentifer = sql.identifier("polymorphic", "third_party_vulnerabilities_cvss_score_int");
 const first_party_vulnerabilitiesUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }];
 const registryConfig_pgResources_first_party_vulnerabilities_first_party_vulnerabilities = {
@@ -2945,7 +3058,9 @@ const third_party_vulnerabilitiesUniques = [{
   attributes: ["id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }];
 const registryConfig_pgResources_third_party_vulnerabilities_third_party_vulnerabilities = {
@@ -2979,7 +3094,9 @@ const aws_applicationsUniques = [{
   attributes: ["id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }];
 const registryConfig_pgResources_aws_applications_aws_applications = {
@@ -3013,7 +3130,9 @@ const gcp_applicationsUniques = [{
   attributes: ["id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }];
 const registryConfig_pgResources_gcp_applications_gcp_applications = {
@@ -3050,7 +3169,9 @@ const single_table_itemsUniques = [{
   attributes: ["id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }];
 const registryConfig_pgResources_single_table_items_single_table_items = {
@@ -3086,7 +3207,9 @@ const relational_itemsUniques = [{
   attributes: ["id"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    tags: {
+      __proto__: null
+    }
   }
 }];
 const registryConfig_pgResources_relational_items_relational_items = {
@@ -3115,10 +3238,12 @@ const registryConfig_pgResources_relational_items_relational_items = {
   }
 };
 const registryConfig = {
-  pgExecutors: Object.assign(Object.create(null), {
+  pgExecutors: {
+    __proto__: null,
     main: executor
-  }),
-  pgCodecs: Object.assign(Object.create(null), {
+  },
+  pgCodecs: {
+    __proto__: null,
     awsApplicationFirstPartyVulnerabilities: awsApplicationFirstPartyVulnerabilitiesCodec,
     int4: TYPES.int,
     awsApplicationThirdPartyVulnerabilities: awsApplicationThirdPartyVulnerabilitiesCodec,
@@ -3154,8 +3279,9 @@ const registryConfig = {
     Application: recordCodec(spec_Application),
     Vulnerability: recordCodec(spec_Vulnerability),
     ZeroImplementation: recordCodec(spec_ZeroImplementation)
-  }),
-  pgResources: Object.assign(Object.create(null), {
+  },
+  pgResources: {
+    __proto__: null,
     aws_application_first_party_vulnerabilities: registryConfig_pgResources_aws_application_first_party_vulnerabilities_aws_application_first_party_vulnerabilities,
     aws_application_third_party_vulnerabilities: registryConfig_pgResources_aws_application_third_party_vulnerabilities_aws_application_third_party_vulnerabilities,
     gcp_application_first_party_vulnerabilities: registryConfig_pgResources_gcp_application_first_party_vulnerabilities_gcp_application_first_party_vulnerabilities,
@@ -3173,6 +3299,62 @@ const registryConfig = {
     single_table_item_relations: registryConfig_pgResources_single_table_item_relations_single_table_item_relations,
     log_entries: registryConfig_pgResources_log_entries_log_entries,
     relational_posts: registryConfig_pgResources_relational_posts_relational_posts,
+    first_party_vulnerabilities_cvss_score_int: {
+      executor,
+      name: "first_party_vulnerabilities_cvss_score_int",
+      identifier: "main.polymorphic.first_party_vulnerabilities_cvss_score_int(polymorphic.first_party_vulnerabilities)",
+      from(...args) {
+        return sql`${first_party_vulnerabilities_cvss_score_intFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "r",
+        required: true,
+        notNull: false,
+        codec: firstPartyVulnerabilitiesCodec
+      }],
+      isUnique: !false,
+      codec: TYPES.int,
+      uniques: [],
+      isMutation: false,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "first_party_vulnerabilities_cvss_score_int"
+        },
+        tags: {}
+      },
+      description: undefined
+    },
+    third_party_vulnerabilities_cvss_score_int: {
+      executor,
+      name: "third_party_vulnerabilities_cvss_score_int",
+      identifier: "main.polymorphic.third_party_vulnerabilities_cvss_score_int(polymorphic.third_party_vulnerabilities)",
+      from(...args) {
+        return sql`${third_party_vulnerabilities_cvss_score_intFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "r",
+        required: true,
+        notNull: false,
+        codec: thirdPartyVulnerabilitiesCodec
+      }],
+      isUnique: !false,
+      codec: TYPES.int,
+      uniques: [],
+      isMutation: false,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "third_party_vulnerabilities_cvss_score_int"
+        },
+        tags: {}
+      },
+      description: undefined
+    },
     first_party_vulnerabilities: registryConfig_pgResources_first_party_vulnerabilities_first_party_vulnerabilities,
     third_party_vulnerabilities: registryConfig_pgResources_third_party_vulnerabilities_third_party_vulnerabilities,
     aws_applications: registryConfig_pgResources_aws_applications_aws_applications,
@@ -3317,9 +3499,11 @@ const registryConfig = {
       description: undefined
     }),
     relational_items: registryConfig_pgResources_relational_items_relational_items
-  }),
-  pgRelations: Object.assign(Object.create(null), {
-    awsApplicationFirstPartyVulnerabilities: Object.assign(Object.create(null), {
+  },
+  pgRelations: {
+    __proto__: null,
+    awsApplicationFirstPartyVulnerabilities: {
+      __proto__: null,
       firstPartyVulnerabilitiesByMyFirstPartyVulnerabilityId: {
         localCodec: awsApplicationFirstPartyVulnerabilitiesCodec,
         remoteResourceOptions: registryConfig_pgResources_first_party_vulnerabilities_first_party_vulnerabilities,
@@ -3350,8 +3534,9 @@ const registryConfig = {
           }
         }
       }
-    }),
-    awsApplicationThirdPartyVulnerabilities: Object.assign(Object.create(null), {
+    },
+    awsApplicationThirdPartyVulnerabilities: {
+      __proto__: null,
       thirdPartyVulnerabilitiesByMyThirdPartyVulnerabilityId: {
         localCodec: awsApplicationThirdPartyVulnerabilitiesCodec,
         remoteResourceOptions: registryConfig_pgResources_third_party_vulnerabilities_third_party_vulnerabilities,
@@ -3382,8 +3567,9 @@ const registryConfig = {
           }
         }
       }
-    }),
-    awsApplications: Object.assign(Object.create(null), {
+    },
+    awsApplications: {
+      __proto__: null,
       organizationsByMyOrganizationId: {
         localCodec: awsApplicationsCodec,
         remoteResourceOptions: registryConfig_pgResources_organizations_organizations,
@@ -3444,8 +3630,9 @@ const registryConfig = {
           }
         }
       }
-    }),
-    firstPartyVulnerabilities: Object.assign(Object.create(null), {
+    },
+    firstPartyVulnerabilities: {
+      __proto__: null,
       awsApplicationFirstPartyVulnerabilitiesByTheirFirstPartyVulnerabilityId: {
         localCodec: firstPartyVulnerabilitiesCodec,
         remoteResourceOptions: registryConfig_pgResources_aws_application_first_party_vulnerabilities_aws_application_first_party_vulnerabilities,
@@ -3476,8 +3663,9 @@ const registryConfig = {
           }
         }
       }
-    }),
-    gcpApplicationFirstPartyVulnerabilities: Object.assign(Object.create(null), {
+    },
+    gcpApplicationFirstPartyVulnerabilities: {
+      __proto__: null,
       firstPartyVulnerabilitiesByMyFirstPartyVulnerabilityId: {
         localCodec: gcpApplicationFirstPartyVulnerabilitiesCodec,
         remoteResourceOptions: registryConfig_pgResources_first_party_vulnerabilities_first_party_vulnerabilities,
@@ -3508,8 +3696,9 @@ const registryConfig = {
           }
         }
       }
-    }),
-    gcpApplicationThirdPartyVulnerabilities: Object.assign(Object.create(null), {
+    },
+    gcpApplicationThirdPartyVulnerabilities: {
+      __proto__: null,
       thirdPartyVulnerabilitiesByMyThirdPartyVulnerabilityId: {
         localCodec: gcpApplicationThirdPartyVulnerabilitiesCodec,
         remoteResourceOptions: registryConfig_pgResources_third_party_vulnerabilities_third_party_vulnerabilities,
@@ -3540,8 +3729,9 @@ const registryConfig = {
           }
         }
       }
-    }),
-    gcpApplications: Object.assign(Object.create(null), {
+    },
+    gcpApplications: {
+      __proto__: null,
       organizationsByMyOrganizationId: {
         localCodec: gcpApplicationsCodec,
         remoteResourceOptions: registryConfig_pgResources_organizations_organizations,
@@ -3602,8 +3792,9 @@ const registryConfig = {
           }
         }
       }
-    }),
-    logEntries: Object.assign(Object.create(null), {
+    },
+    logEntries: {
+      __proto__: null,
       organizationsByMyOrganizationId: {
         localCodec: logEntriesCodec,
         remoteResourceOptions: registryConfig_pgResources_organizations_organizations,
@@ -3634,8 +3825,9 @@ const registryConfig = {
           }
         }
       }
-    }),
-    organizations: Object.assign(Object.create(null), {
+    },
+    organizations: {
+      __proto__: null,
       logEntriesByTheirOrganizationId: {
         localCodec: organizationsCodec,
         remoteResourceOptions: registryConfig_pgResources_log_entries_log_entries,
@@ -3681,8 +3873,9 @@ const registryConfig = {
           }
         }
       }
-    }),
-    people: Object.assign(Object.create(null), {
+    },
+    people: {
+      __proto__: null,
       logEntriesByTheirPersonId: {
         localCodec: peopleCodec,
         remoteResourceOptions: registryConfig_pgResources_log_entries_log_entries,
@@ -3758,8 +3951,9 @@ const registryConfig = {
           }
         }
       }
-    }),
-    priorities: Object.assign(Object.create(null), {
+    },
+    priorities: {
+      __proto__: null,
       singleTableItemsByTheirPriorityId: {
         localCodec: prioritiesCodec,
         remoteResourceOptions: registryConfig_pgResources_single_table_items_single_table_items,
@@ -3775,8 +3969,9 @@ const registryConfig = {
           }
         }
       }
-    }),
-    relationalChecklistItems: Object.assign(Object.create(null), {
+    },
+    relationalChecklistItems: {
+      __proto__: null,
       relationalItemsByMyChecklistItemItemId: {
         localCodec: relationalChecklistItemsCodec,
         remoteResourceOptions: registryConfig_pgResources_relational_items_relational_items,
@@ -3792,8 +3987,9 @@ const registryConfig = {
           }
         }
       }
-    }),
-    relationalChecklists: Object.assign(Object.create(null), {
+    },
+    relationalChecklists: {
+      __proto__: null,
       relationalItemsByMyChecklistItemId: {
         localCodec: relationalChecklistsCodec,
         remoteResourceOptions: registryConfig_pgResources_relational_items_relational_items,
@@ -3809,8 +4005,9 @@ const registryConfig = {
           }
         }
       }
-    }),
-    relationalDividers: Object.assign(Object.create(null), {
+    },
+    relationalDividers: {
+      __proto__: null,
       relationalItemsByMyDividerItemId: {
         localCodec: relationalDividersCodec,
         remoteResourceOptions: registryConfig_pgResources_relational_items_relational_items,
@@ -3826,8 +4023,9 @@ const registryConfig = {
           }
         }
       }
-    }),
-    relationalItemRelationCompositePks: Object.assign(Object.create(null), {
+    },
+    relationalItemRelationCompositePks: {
+      __proto__: null,
       relationalItemsByMyChildId: {
         localCodec: relationalItemRelationCompositePksCodec,
         remoteResourceOptions: registryConfig_pgResources_relational_items_relational_items,
@@ -3858,8 +4056,9 @@ const registryConfig = {
           }
         }
       }
-    }),
-    relationalItemRelations: Object.assign(Object.create(null), {
+    },
+    relationalItemRelations: {
+      __proto__: null,
       relationalItemsByMyChildId: {
         localCodec: relationalItemRelationsCodec,
         remoteResourceOptions: registryConfig_pgResources_relational_items_relational_items,
@@ -3890,8 +4089,9 @@ const registryConfig = {
           }
         }
       }
-    }),
-    relationalItems: Object.assign(Object.create(null), {
+    },
+    relationalItems: {
+      __proto__: null,
       peopleByMyAuthorId: {
         localCodec: relationalItemsCodec,
         remoteResourceOptions: registryConfig_pgResources_people_people,
@@ -4087,8 +4287,9 @@ const registryConfig = {
           }
         }
       }
-    }),
-    relationalPosts: Object.assign(Object.create(null), {
+    },
+    relationalPosts: {
+      __proto__: null,
       relationalItemsByMyPostItemId: {
         localCodec: relationalPostsCodec,
         remoteResourceOptions: registryConfig_pgResources_relational_items_relational_items,
@@ -4104,8 +4305,9 @@ const registryConfig = {
           }
         }
       }
-    }),
-    relationalTopics: Object.assign(Object.create(null), {
+    },
+    relationalTopics: {
+      __proto__: null,
       relationalItemsByMyTopicItemId: {
         localCodec: relationalTopicsCodec,
         remoteResourceOptions: registryConfig_pgResources_relational_items_relational_items,
@@ -4136,8 +4338,9 @@ const registryConfig = {
           }
         }
       }
-    }),
-    singleTableItemRelationCompositePks: Object.assign(Object.create(null), {
+    },
+    singleTableItemRelationCompositePks: {
+      __proto__: null,
       singleTableItemsByMyChildId: {
         localCodec: singleTableItemRelationCompositePksCodec,
         remoteResourceOptions: registryConfig_pgResources_single_table_items_single_table_items,
@@ -4168,8 +4371,9 @@ const registryConfig = {
           }
         }
       }
-    }),
-    singleTableItemRelations: Object.assign(Object.create(null), {
+    },
+    singleTableItemRelations: {
+      __proto__: null,
       singleTableItemsByMyChildId: {
         localCodec: singleTableItemRelationsCodec,
         remoteResourceOptions: registryConfig_pgResources_single_table_items_single_table_items,
@@ -4200,8 +4404,9 @@ const registryConfig = {
           }
         }
       }
-    }),
-    singleTableItems: Object.assign(Object.create(null), {
+    },
+    singleTableItems: {
+      __proto__: null,
       peopleByMyAuthorId: {
         localCodec: singleTableItemsCodec,
         remoteResourceOptions: registryConfig_pgResources_people_people,
@@ -4352,8 +4557,9 @@ const registryConfig = {
           }
         }
       }
-    }),
-    thirdPartyVulnerabilities: Object.assign(Object.create(null), {
+    },
+    thirdPartyVulnerabilities: {
+      __proto__: null,
       awsApplicationThirdPartyVulnerabilitiesByTheirThirdPartyVulnerabilityId: {
         localCodec: thirdPartyVulnerabilitiesCodec,
         remoteResourceOptions: registryConfig_pgResources_aws_application_third_party_vulnerabilities_aws_application_third_party_vulnerabilities,
@@ -4384,35 +4590,26 @@ const registryConfig = {
           }
         }
       }
-    })
-  })
+    }
+  }
 };
 const registry = makeRegistry(registryConfig);
 const resource_single_table_items_meaning_of_lifePgResource = registry.pgResources["single_table_items_meaning_of_life"];
 const otherSource_peoplePgResource = registry.pgResources["people"];
 const otherSource_single_table_itemsPgResource = registry.pgResources["single_table_items"];
-const applyOrderToPlan = ($select, $value, TableOrderByType) => {
-  if (!("evalLength" in $value)) {
-    return;
-  }
-  const length = $value.evalLength();
-  if (length == null) {
-    return;
-  }
-  for (let i = 0; i < length; i++) {
-    const order = $value.at(i).eval();
-    if (order == null) continue;
-    const config = getEnumValueConfig(TableOrderByType, order);
-    const plan = config?.extensions?.grafast?.applyPlan;
-    if (typeof plan !== "function") {
-      console.error(`Internal server error: invalid orderBy configuration: expected function, but received ${inspect(plan)}`);
-      throw new SafeError("Internal server error: invalid orderBy configuration");
-    }
-    plan($select);
-  }
-};
+function qbWhereBuilder(qb) {
+  return qb.whereBuilder();
+}
 const otherSource_single_table_item_relationsPgResource = registry.pgResources["single_table_item_relations"];
 const otherSource_single_table_item_relation_composite_pksPgResource = registry.pgResources["single_table_item_relation_composite_pks"];
+const SingleTableItem_typeNameFromType = ((interfaceTypeName, polymorphism) => {
+  function typeNameFromType(typeVal) {
+    if (typeof typeVal !== "string") return null;
+    return polymorphism.types[typeVal]?.name ?? null;
+  }
+  typeNameFromType.displayName = `${interfaceTypeName}_typeNameFromType`;
+  return typeNameFromType;
+})("SingleTableItem", spec_singleTableItems.polymorphism);
 function BigIntSerialize(value) {
   return "" + value;
 }
@@ -4452,10 +4649,18 @@ const paths = [{
     isUnique: false
   }]
 }];
-const resourceByTypeName = Object.assign(Object.create(null), {
+const resourceByTypeName = {
+  __proto__: null,
   AwsApplication: otherSource_aws_applicationsPgResource,
   GcpApplication: otherSource_gcp_applicationsPgResource
-});
+};
+function limitToTypes(ltt) {
+  if (ltt) {
+    return qb => qb.limitToTypes(ltt);
+  } else {
+    return () => {};
+  }
+}
 const otherSource_organizationsPgResource = registry.pgResources["organizations"];
 const attributes = {};
 const members2 = [{
@@ -4490,10 +4695,11 @@ const paths2 = [{
     isUnique: true
   }]
 }];
-const resourceByTypeName2 = Object.assign(Object.create(null), {
+const resourceByTypeName2 = {
+  __proto__: null,
   Person: otherSource_peoplePgResource,
   Organization: otherSource_organizationsPgResource
-});
+};
 const members_0_resource_aws_application_first_party_vulnerabilitiesPgResource = registry.pgResources["aws_application_first_party_vulnerabilities"];
 const members_1_resource_aws_application_third_party_vulnerabilitiesPgResource = registry.pgResources["aws_application_third_party_vulnerabilities"];
 const members3 = [{
@@ -4546,10 +4752,11 @@ const paths3 = [{
     isUnique: true
   }]
 }];
-const resourceByTypeName3 = Object.assign(Object.create(null), {
+const resourceByTypeName3 = {
+  __proto__: null,
   FirstPartyVulnerability: paths_0_resource_first_party_vulnerabilitiesPgResource,
   ThirdPartyVulnerability: paths_1_resource_third_party_vulnerabilitiesPgResource
-});
+};
 const attributes2 = {};
 const members4 = [{
   resource: otherSource_peoplePgResource,
@@ -4583,10 +4790,26 @@ const paths4 = [{
     isUnique: true
   }]
 }];
-const resourceByTypeName4 = Object.assign(Object.create(null), {
+const resourceByTypeName4 = {
+  __proto__: null,
   Person: otherSource_peoplePgResource,
   Organization: otherSource_organizationsPgResource
-});
+};
+const resourceByTypeName5 = {
+  __proto__: null,
+  AwsApplication: otherSource_aws_applicationsPgResource,
+  GcpApplication: otherSource_gcp_applicationsPgResource
+};
+const resourceByTypeName6 = {
+  __proto__: null,
+  FirstPartyVulnerability: paths_0_resource_first_party_vulnerabilitiesPgResource,
+  ThirdPartyVulnerability: paths_1_resource_third_party_vulnerabilitiesPgResource
+};
+const resourceByTypeName7 = {
+  __proto__: null,
+  Organization: otherSource_organizationsPgResource,
+  Person: otherSource_peoplePgResource
+};
 const members_0_resource_gcp_application_first_party_vulnerabilitiesPgResource = registry.pgResources["gcp_application_first_party_vulnerabilities"];
 const members_1_resource_gcp_application_third_party_vulnerabilitiesPgResource = registry.pgResources["gcp_application_third_party_vulnerabilities"];
 const members5 = [{
@@ -4637,10 +4860,11 @@ const paths5 = [{
     isUnique: true
   }]
 }];
-const resourceByTypeName5 = Object.assign(Object.create(null), {
+const resourceByTypeName8 = {
+  __proto__: null,
   FirstPartyVulnerability: paths_0_resource_first_party_vulnerabilitiesPgResource,
   ThirdPartyVulnerability: paths_1_resource_third_party_vulnerabilitiesPgResource
-});
+};
 const attributes3 = {};
 const members6 = [{
   resource: otherSource_peoplePgResource,
@@ -4674,299 +4898,57 @@ const paths6 = [{
     isUnique: true
   }]
 }];
-const resourceByTypeName6 = Object.assign(Object.create(null), {
+const resourceByTypeName9 = {
+  __proto__: null,
   Person: otherSource_peoplePgResource,
   Organization: otherSource_organizationsPgResource
-});
-const argDetailsSimple2 = [];
-const makeArgs2 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 0; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple2[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
-    } else {
-      step = args.get([...path, graphqlArgName]);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
 };
+const RelationalItem_typeNameFromType = ((interfaceTypeName, polymorphism) => {
+  function typeNameFromType(typeVal) {
+    if (typeof typeVal !== "string") return null;
+    return polymorphism.types[typeVal]?.name ?? null;
+  }
+  typeNameFromType.displayName = `${interfaceTypeName}_typeNameFromType`;
+  return typeNameFromType;
+})("RelationalItem", spec_relationalItems.polymorphism);
+const resource_relational_item_relationsPgResource = registry.pgResources["relational_item_relations"];
+const resource_relational_item_relation_composite_pksPgResource = registry.pgResources["relational_item_relation_composite_pks"];
 const otherSource_prioritiesPgResource = registry.pgResources["priorities"];
-const argDetailsSimple3 = [];
-const makeArgs3 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 0; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple3[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
-    } else {
-      step = args.get([...path, graphqlArgName]);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
-const argDetailsSimple4 = [];
-const makeArgs4 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 0; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple4[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
-    } else {
-      step = args.get([...path, graphqlArgName]);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
-const argDetailsSimple5 = [];
-const makeArgs5 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 0; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple5[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
-    } else {
-      step = args.get([...path, graphqlArgName]);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
-const relational_topics_relational_topicsPgResource = registry.pgResources["relational_topics"];
-const relational_item_relations_relational_item_relationsPgResource = registry.pgResources["relational_item_relations"];
-const relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource = registry.pgResources["relational_item_relation_composite_pks"];
+const resource_relational_topicsPgResource = registry.pgResources["relational_topics"];
+const resource_relational_postsPgResource = registry.pgResources["relational_posts"];
+const resource_relational_dividersPgResource = registry.pgResources["relational_dividers"];
 const resource_relational_checklistsPgResource = registry.pgResources["relational_checklists"];
 const resource_relational_checklist_itemsPgResource = registry.pgResources["relational_checklist_items"];
-const resource_relational_dividersPgResource = registry.pgResources["relational_dividers"];
-const resource_relational_postsPgResource = registry.pgResources["relational_posts"];
-const argDetailsSimple6 = [];
-const makeArgs6 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 0; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple6[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
-    } else {
-      step = args.get([...path, graphqlArgName]);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
 const resource_all_single_tablesPgResource = registry.pgResources["all_single_tables"];
 const getSelectPlanFromParentAndArgs = ($root, args, _info) => {
-  const selectArgs = makeArgs6(args);
+  const selectArgs = makeArgs_first_party_vulnerabilities_cvss_score_int(args);
   return resource_all_single_tablesPgResource.execute(selectArgs);
 };
-const argDetailsSimple7 = [{
+const argDetailsSimple_get_single_table_topic_by_id = [{
   graphqlArgName: "id",
   postgresArgName: "id",
   pgCodec: TYPES.int,
   required: true,
   fetcher: null
 }];
-const makeArgs7 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 1; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple7[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
-    } else {
-      step = args.get([...path, graphqlArgName]);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
+function makeArg(path, args, details) {
+  const {
+    graphqlArgName,
+    postgresArgName,
+    pgCodec,
+    fetcher
+  } = details;
+  const fullPath = [...path, graphqlArgName];
+  const $raw = args.getRaw(fullPath);
+  // TODO: this should maybe be operationPlan().withLatestSideEffectLayerPlan()
+  const step = operationPlan().withRootLayerPlan(() => fetcher ? trap(fetcher($raw).record(), 4) : bakedInput(args.typeAt(fullPath), $raw));
+  return {
+    step,
+    pgCodec,
+    name: postgresArgName ?? undefined
+  };
+}
+const makeArgs_get_single_table_topic_by_id = (args, path = []) => argDetailsSimple_get_single_table_topic_by_id.map(details => makeArg(path, args, details));
 const resource_get_single_table_topic_by_idPgResource = registry.pgResources["get_single_table_topic_by_id"];
 const members7 = [{
   resource: paths_0_resource_first_party_vulnerabilitiesPgResource,
@@ -4975,10 +4957,11 @@ const members7 = [{
   resource: paths_1_resource_third_party_vulnerabilitiesPgResource,
   typeName: "ThirdPartyVulnerability"
 }];
-const resourceByTypeName7 = Object.assign(Object.create(null), {
+const resourceByTypeName10 = {
+  __proto__: null,
   FirstPartyVulnerability: paths_0_resource_first_party_vulnerabilitiesPgResource,
   ThirdPartyVulnerability: paths_1_resource_third_party_vulnerabilitiesPgResource
-});
+};
 const members8 = [{
   resource: otherSource_aws_applicationsPgResource,
   typeName: "AwsApplication"
@@ -4986,12 +4969,16 @@ const members8 = [{
   resource: otherSource_gcp_applicationsPgResource,
   typeName: "GcpApplication"
 }];
-const resourceByTypeName8 = Object.assign(Object.create(null), {
+const resourceByTypeName11 = {
+  __proto__: null,
   AwsApplication: otherSource_aws_applicationsPgResource,
   GcpApplication: otherSource_gcp_applicationsPgResource
-});
+};
 const members9 = [];
-const resourceByTypeName9 = Object.create(null);
+const resourceByTypeName12 = {
+  __proto__: null
+};
+const resource_first_party_vulnerabilities_cvss_score_intPgResource = registry.pgResources["first_party_vulnerabilities_cvss_score_int"];
 const members10 = [{
   resource: members_0_resource_aws_application_first_party_vulnerabilitiesPgResource,
   typeName: "AwsApplication",
@@ -5040,10 +5027,11 @@ const paths7 = [{
     isUnique: true
   }]
 }];
-const resourceByTypeName10 = Object.assign(Object.create(null), {
+const resourceByTypeName13 = {
+  __proto__: null,
   AwsApplication: otherSource_aws_applicationsPgResource,
   GcpApplication: otherSource_gcp_applicationsPgResource
-});
+};
 const attributes4 = {};
 const members11 = [{
   resource: members_0_resource_aws_application_first_party_vulnerabilitiesPgResource,
@@ -5171,10 +5159,12 @@ const paths8 = [{
     isUnique: true
   }]
 }];
-const resourceByTypeName11 = Object.assign(Object.create(null), {
+const resourceByTypeName14 = {
+  __proto__: null,
   Person: otherSource_peoplePgResource,
   Organization: otherSource_organizationsPgResource
-});
+};
+const resource_third_party_vulnerabilities_cvss_score_intPgResource = registry.pgResources["third_party_vulnerabilities_cvss_score_int"];
 const members12 = [{
   resource: members_1_resource_aws_application_third_party_vulnerabilitiesPgResource,
   typeName: "AwsApplication",
@@ -5223,10 +5213,11 @@ const paths9 = [{
     isUnique: true
   }]
 }];
-const resourceByTypeName12 = Object.assign(Object.create(null), {
+const resourceByTypeName15 = {
+  __proto__: null,
   AwsApplication: otherSource_aws_applicationsPgResource,
   GcpApplication: otherSource_gcp_applicationsPgResource
-});
+};
 const attributes5 = {};
 const members13 = [{
   resource: members_1_resource_aws_application_third_party_vulnerabilitiesPgResource,
@@ -5354,10 +5345,14 @@ const paths10 = [{
     isUnique: true
   }]
 }];
-const resourceByTypeName13 = Object.assign(Object.create(null), {
+const resourceByTypeName16 = {
+  __proto__: null,
   Person: otherSource_peoplePgResource,
   Organization: otherSource_organizationsPgResource
-});
+};
+const resourceByTypeName17 = {
+  __proto__: null
+};
 export const typeDefs = /* GraphQL */`type SingleTableTopic implements SingleTableItem {
   meaningOfLife: Int
   id: Int!
@@ -5400,13 +5395,13 @@ export const typeDefs = /* GraphQL */`type SingleTableTopic implements SingleTab
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`SingleTableItem\`."""
-    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: SingleTableItemCondition
+
+    """The method to use when ordering \`SingleTableItem\`."""
+    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemsConnection!
 
   """
@@ -5431,13 +5426,13 @@ export const typeDefs = /* GraphQL */`type SingleTableTopic implements SingleTab
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`SingleTableItemRelation\`."""
-    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: SingleTableItemRelationCondition
+
+    """The method to use when ordering \`SingleTableItemRelation\`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemRelationsConnection!
 
   """
@@ -5462,13 +5457,13 @@ export const typeDefs = /* GraphQL */`type SingleTableTopic implements SingleTab
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`SingleTableItemRelation\`."""
-    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: SingleTableItemRelationCondition
+
+    """The method to use when ordering \`SingleTableItemRelation\`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemRelationsConnection!
 
   """
@@ -5493,13 +5488,13 @@ export const typeDefs = /* GraphQL */`type SingleTableTopic implements SingleTab
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`SingleTableItemRelationCompositePk\`."""
-    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: SingleTableItemRelationCompositePkCondition
+
+    """The method to use when ordering \`SingleTableItemRelationCompositePk\`."""
+    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemRelationCompositePksConnection!
 
   """
@@ -5524,13 +5519,13 @@ export const typeDefs = /* GraphQL */`type SingleTableTopic implements SingleTab
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`SingleTableItemRelationCompositePk\`."""
-    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: SingleTableItemRelationCompositePkCondition
+
+    """The method to use when ordering \`SingleTableItemRelationCompositePk\`."""
+    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemRelationCompositePksConnection!
 
   """
@@ -5726,13 +5721,13 @@ type Person {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`LogEntry\`."""
-    orderBy: [LogEntriesOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: LogEntryCondition
+
+    """The method to use when ordering \`LogEntry\`."""
+    orderBy: [LogEntriesOrderBy!] = [PRIMARY_KEY_ASC]
   ): LogEntriesConnection!
 
   """Reads and enables pagination through a set of \`SingleTableItem\`."""
@@ -5755,13 +5750,13 @@ type Person {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`SingleTableItem\`."""
-    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: SingleTableItemCondition
+
+    """The method to use when ordering \`SingleTableItem\`."""
+    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemsConnection!
 
   """Reads and enables pagination through a set of \`RelationalItem\`."""
@@ -5784,13 +5779,13 @@ type Person {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalItem\`."""
-    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalItemCondition
+
+    """The method to use when ordering \`RelationalItem\`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemsConnection!
 
   """Reads and enables pagination through a set of \`AwsApplication\`."""
@@ -5813,13 +5808,13 @@ type Person {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`AwsApplication\`."""
-    orderBy: [AwsApplicationsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: AwsApplicationCondition
+
+    """The method to use when ordering \`AwsApplication\`."""
+    orderBy: [AwsApplicationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): AwsApplicationsConnection!
 
   """Reads and enables pagination through a set of \`GcpApplication\`."""
@@ -5842,13 +5837,13 @@ type Person {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`GcpApplication\`."""
-    orderBy: [GcpApplicationsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: GcpApplicationCondition
+
+    """The method to use when ordering \`GcpApplication\`."""
+    orderBy: [GcpApplicationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): GcpApplicationsConnection!
 
   """Reads and enables pagination through a set of \`Application\`."""
@@ -5871,9 +5866,6 @@ type Person {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`Application\`."""
-    orderBy: [ApplicationsOrderBy!]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
@@ -5881,6 +5873,9 @@ type Person {
 
     """Filter results to only those of the given types"""
     only: [ApplicationType!] @deprecated(reason: "EXPERIMENTAL")
+
+    """The method to use when ordering \`Application\`."""
+    orderBy: [ApplicationsOrderBy!]
   ): ApplicationsConnection!
 }
 
@@ -5943,13 +5938,13 @@ type Organization {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`LogEntry\`."""
-    orderBy: [LogEntriesOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: LogEntryCondition
+
+    """The method to use when ordering \`LogEntry\`."""
+    orderBy: [LogEntriesOrderBy!] = [PRIMARY_KEY_ASC]
   ): LogEntriesConnection!
 
   """Reads and enables pagination through a set of \`AwsApplication\`."""
@@ -5972,13 +5967,13 @@ type Organization {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`AwsApplication\`."""
-    orderBy: [AwsApplicationsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: AwsApplicationCondition
+
+    """The method to use when ordering \`AwsApplication\`."""
+    orderBy: [AwsApplicationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): AwsApplicationsConnection!
 
   """Reads and enables pagination through a set of \`GcpApplication\`."""
@@ -6001,33 +5996,18 @@ type Organization {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`GcpApplication\`."""
-    orderBy: [GcpApplicationsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: GcpApplicationCondition
+
+    """The method to use when ordering \`GcpApplication\`."""
+    orderBy: [GcpApplicationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): GcpApplicationsConnection!
 }
 
 """A location in a connection that can be used for resuming pagination."""
 scalar Cursor
-
-"""Methods to use when ordering \`LogEntry\`."""
-enum LogEntriesOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  PERSON_ID_ASC
-  PERSON_ID_DESC
-  ORGANIZATION_ID_ASC
-  ORGANIZATION_ID_DESC
-  TEXT_ASC
-  TEXT_DESC
-}
 
 """
 A condition to be used against \`LogEntry\` object types. All fields are tested
@@ -6045,6 +6025,21 @@ input LogEntryCondition {
 
   """Checks for equality with the object’s \`text\` field."""
   text: String
+}
+
+"""Methods to use when ordering \`LogEntry\`."""
+enum LogEntriesOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+  ORGANIZATION_ID_ASC
+  ORGANIZATION_ID_DESC
+  TEXT_ASC
+  TEXT_DESC
 }
 
 """A connection to a list of \`AwsApplication\` values."""
@@ -6100,9 +6095,6 @@ type AwsApplication implements Application {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`Vulnerability\`."""
-    orderBy: [VulnerabilitiesOrderBy!]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
@@ -6110,6 +6102,9 @@ type AwsApplication implements Application {
 
     """Filter results to only those of the given types"""
     only: [VulnerabilityType!] @deprecated(reason: "EXPERIMENTAL")
+
+    """The method to use when ordering \`Vulnerability\`."""
+    orderBy: [VulnerabilitiesOrderBy!]
   ): VulnerabilitiesConnection!
 
   """
@@ -6288,17 +6283,6 @@ enum VulnerabilityType {
   ThirdPartyVulnerability
 }
 
-"""Methods to use when ordering \`Vulnerability\`."""
-enum VulnerabilitiesOrderBy {
-  NATURAL
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
-  CVSS_SCORE_ASC
-  CVSS_SCORE_DESC
-}
-
 """
 A condition to be used against \`Vulnerability\` object types. All fields are
 tested for equality and combined with a logical ‘and.’
@@ -6314,6 +6298,17 @@ input VulnerabilityCondition {
   cvssScore: Float
 }
 
+"""Methods to use when ordering \`Vulnerability\`."""
+enum VulnerabilitiesOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  CVSS_SCORE_ASC
+  CVSS_SCORE_DESC
+}
+
 """A \`AwsApplication\` edge in the connection."""
 type AwsApplicationsEdge {
   """A cursor for use in pagination."""
@@ -6321,25 +6316,6 @@ type AwsApplicationsEdge {
 
   """The \`AwsApplication\` at the end of the edge."""
   node: AwsApplication
-}
-
-"""Methods to use when ordering \`AwsApplication\`."""
-enum AwsApplicationsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
-  LAST_DEPLOYED_ASC
-  LAST_DEPLOYED_DESC
-  PERSON_ID_ASC
-  PERSON_ID_DESC
-  ORGANIZATION_ID_ASC
-  ORGANIZATION_ID_DESC
-  AWS_ID_ASC
-  AWS_ID_DESC
 }
 
 """
@@ -6364,6 +6340,25 @@ input AwsApplicationCondition {
 
   """Checks for equality with the object’s \`awsId\` field."""
   awsId: String
+}
+
+"""Methods to use when ordering \`AwsApplication\`."""
+enum AwsApplicationsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  LAST_DEPLOYED_ASC
+  LAST_DEPLOYED_DESC
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+  ORGANIZATION_ID_ASC
+  ORGANIZATION_ID_DESC
+  AWS_ID_ASC
+  AWS_ID_DESC
 }
 
 """A connection to a list of \`GcpApplication\` values."""
@@ -6419,9 +6414,6 @@ type GcpApplication implements Application {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`Vulnerability\`."""
-    orderBy: [VulnerabilitiesOrderBy!]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
@@ -6429,6 +6421,9 @@ type GcpApplication implements Application {
 
     """Filter results to only those of the given types"""
     only: [VulnerabilityType!] @deprecated(reason: "EXPERIMENTAL")
+
+    """The method to use when ordering \`Vulnerability\`."""
+    orderBy: [VulnerabilitiesOrderBy!]
   ): VulnerabilitiesConnection!
 
   """
@@ -6444,25 +6439,6 @@ type GcpApplicationsEdge {
 
   """The \`GcpApplication\` at the end of the edge."""
   node: GcpApplication
-}
-
-"""Methods to use when ordering \`GcpApplication\`."""
-enum GcpApplicationsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
-  LAST_DEPLOYED_ASC
-  LAST_DEPLOYED_DESC
-  PERSON_ID_ASC
-  PERSON_ID_DESC
-  ORGANIZATION_ID_ASC
-  ORGANIZATION_ID_DESC
-  GCP_ID_ASC
-  GCP_ID_DESC
 }
 
 """
@@ -6487,6 +6463,25 @@ input GcpApplicationCondition {
 
   """Checks for equality with the object’s \`gcpId\` field."""
   gcpId: String
+}
+
+"""Methods to use when ordering \`GcpApplication\`."""
+enum GcpApplicationsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  LAST_DEPLOYED_ASC
+  LAST_DEPLOYED_DESC
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+  ORGANIZATION_ID_ASC
+  ORGANIZATION_ID_DESC
+  GCP_ID_ASC
+  GCP_ID_DESC
 }
 
 """A \`LogEntry\` edge in the connection."""
@@ -6526,33 +6521,6 @@ type SingleTableItemsEdge {
   node: SingleTableItem
 }
 
-"""Methods to use when ordering \`SingleTableItem\`."""
-enum SingleTableItemsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  TYPE_ASC
-  TYPE_DESC
-  PARENT_ID_ASC
-  PARENT_ID_DESC
-  ROOT_TOPIC_ID_ASC
-  ROOT_TOPIC_ID_DESC
-  AUTHOR_ID_ASC
-  AUTHOR_ID_DESC
-  POSITION_ASC
-  POSITION_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-  IS_EXPLICITLY_ARCHIVED_ASC
-  IS_EXPLICITLY_ARCHIVED_DESC
-  ARCHIVED_AT_ASC
-  ARCHIVED_AT_DESC
-}
-
 """
 A condition to be used against \`SingleTableItem\` object types. All fields are
 tested for equality and combined with a logical ‘and.’
@@ -6587,6 +6555,33 @@ input SingleTableItemCondition {
 
   """Checks for equality with the object’s \`archivedAt\` field."""
   archivedAt: Datetime
+}
+
+"""Methods to use when ordering \`SingleTableItem\`."""
+enum SingleTableItemsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  TYPE_ASC
+  TYPE_DESC
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  ROOT_TOPIC_ID_ASC
+  ROOT_TOPIC_ID_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  POSITION_ASC
+  POSITION_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  IS_EXPLICITLY_ARCHIVED_ASC
+  IS_EXPLICITLY_ARCHIVED_DESC
+  ARCHIVED_AT_ASC
+  ARCHIVED_AT_DESC
 }
 
 """A connection to a list of \`RelationalItem\` values."""
@@ -6841,33 +6836,6 @@ type RelationalItemsEdge {
   node: RelationalItem
 }
 
-"""Methods to use when ordering \`RelationalItem\`."""
-enum RelationalItemsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  TYPE_ASC
-  TYPE_DESC
-  PARENT_ID_ASC
-  PARENT_ID_DESC
-  ROOT_TOPIC_ID_ASC
-  ROOT_TOPIC_ID_DESC
-  AUTHOR_ID_ASC
-  AUTHOR_ID_DESC
-  POSITION_ASC
-  POSITION_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-  IS_EXPLICITLY_ARCHIVED_ASC
-  IS_EXPLICITLY_ARCHIVED_DESC
-  ARCHIVED_AT_ASC
-  ARCHIVED_AT_DESC
-}
-
 """
 A condition to be used against \`RelationalItem\` object types. All fields are
 tested for equality and combined with a logical ‘and.’
@@ -6904,15 +6872,31 @@ input RelationalItemCondition {
   archivedAt: Datetime
 }
 
-"""Methods to use when ordering \`Application\`."""
-enum ApplicationsOrderBy {
+"""Methods to use when ordering \`RelationalItem\`."""
+enum RelationalItemsOrderBy {
   NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
   ID_ASC
   ID_DESC
-  NAME_ASC
-  NAME_DESC
-  LAST_DEPLOYED_ASC
-  LAST_DEPLOYED_DESC
+  TYPE_ASC
+  TYPE_DESC
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  ROOT_TOPIC_ID_ASC
+  ROOT_TOPIC_ID_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  POSITION_ASC
+  POSITION_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  IS_EXPLICITLY_ARCHIVED_ASC
+  IS_EXPLICITLY_ARCHIVED_DESC
+  ARCHIVED_AT_ASC
+  ARCHIVED_AT_DESC
 }
 
 """
@@ -6928,6 +6912,17 @@ input ApplicationCondition {
 
   """Checks for equality with the object’s \`lastDeployed\` field."""
   lastDeployed: Datetime
+}
+
+"""Methods to use when ordering \`Application\`."""
+enum ApplicationsOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  LAST_DEPLOYED_ASC
+  LAST_DEPLOYED_DESC
 }
 
 """A connection to a list of \`SingleTableItemRelation\` values."""
@@ -7017,19 +7012,6 @@ type SingleTableItemRelationCompositePksEdge {
   node: SingleTableItemRelationCompositePk
 }
 
-"""Methods to use when ordering \`SingleTableItemRelation\`."""
-enum SingleTableItemRelationsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  PARENT_ID_ASC
-  PARENT_ID_DESC
-  CHILD_ID_ASC
-  CHILD_ID_DESC
-}
-
 """
 A condition to be used against \`SingleTableItemRelation\` object types. All
 fields are tested for equality and combined with a logical ‘and.’
@@ -7045,11 +7027,13 @@ input SingleTableItemRelationCondition {
   childId: Int
 }
 
-"""Methods to use when ordering \`SingleTableItemRelationCompositePk\`."""
-enum SingleTableItemRelationCompositePksOrderBy {
+"""Methods to use when ordering \`SingleTableItemRelation\`."""
+enum SingleTableItemRelationsOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
   PARENT_ID_ASC
   PARENT_ID_DESC
   CHILD_ID_ASC
@@ -7066,6 +7050,17 @@ input SingleTableItemRelationCompositePkCondition {
 
   """Checks for equality with the object’s \`childId\` field."""
   childId: Int
+}
+
+"""Methods to use when ordering \`SingleTableItemRelationCompositePk\`."""
+enum SingleTableItemRelationCompositePksOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  CHILD_ID_ASC
+  CHILD_ID_DESC
 }
 
 type SingleTablePost implements SingleTableItem {
@@ -7116,13 +7111,13 @@ type SingleTablePost implements SingleTableItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`SingleTableItem\`."""
-    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: SingleTableItemCondition
+
+    """The method to use when ordering \`SingleTableItem\`."""
+    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemsConnection!
 
   """
@@ -7147,13 +7142,13 @@ type SingleTablePost implements SingleTableItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`SingleTableItemRelation\`."""
-    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: SingleTableItemRelationCondition
+
+    """The method to use when ordering \`SingleTableItemRelation\`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemRelationsConnection!
 
   """
@@ -7178,13 +7173,13 @@ type SingleTablePost implements SingleTableItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`SingleTableItemRelation\`."""
-    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: SingleTableItemRelationCondition
+
+    """The method to use when ordering \`SingleTableItemRelation\`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemRelationsConnection!
 
   """
@@ -7209,13 +7204,13 @@ type SingleTablePost implements SingleTableItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`SingleTableItemRelationCompositePk\`."""
-    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: SingleTableItemRelationCompositePkCondition
+
+    """The method to use when ordering \`SingleTableItemRelationCompositePk\`."""
+    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemRelationCompositePksConnection!
 
   """
@@ -7240,13 +7235,13 @@ type SingleTablePost implements SingleTableItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`SingleTableItemRelationCompositePk\`."""
-    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: SingleTableItemRelationCompositePkCondition
+
+    """The method to use when ordering \`SingleTableItemRelationCompositePk\`."""
+    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemRelationCompositePksConnection!
 
   """
@@ -7279,13 +7274,13 @@ type Priority {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`SingleTableItem\`."""
-    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: SingleTableItemCondition
+
+    """The method to use when ordering \`SingleTableItem\`."""
+    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemsConnection!
 }
 
@@ -7332,13 +7327,13 @@ type SingleTableDivider implements SingleTableItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`SingleTableItem\`."""
-    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: SingleTableItemCondition
+
+    """The method to use when ordering \`SingleTableItem\`."""
+    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemsConnection!
 
   """
@@ -7363,13 +7358,13 @@ type SingleTableDivider implements SingleTableItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`SingleTableItemRelation\`."""
-    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: SingleTableItemRelationCondition
+
+    """The method to use when ordering \`SingleTableItemRelation\`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemRelationsConnection!
 
   """
@@ -7394,13 +7389,13 @@ type SingleTableDivider implements SingleTableItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`SingleTableItemRelation\`."""
-    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: SingleTableItemRelationCondition
+
+    """The method to use when ordering \`SingleTableItemRelation\`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemRelationsConnection!
 
   """
@@ -7425,13 +7420,13 @@ type SingleTableDivider implements SingleTableItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`SingleTableItemRelationCompositePk\`."""
-    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: SingleTableItemRelationCompositePkCondition
+
+    """The method to use when ordering \`SingleTableItemRelationCompositePk\`."""
+    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemRelationCompositePksConnection!
 
   """
@@ -7456,13 +7451,13 @@ type SingleTableDivider implements SingleTableItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`SingleTableItemRelationCompositePk\`."""
-    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: SingleTableItemRelationCompositePkCondition
+
+    """The method to use when ordering \`SingleTableItemRelationCompositePk\`."""
+    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemRelationCompositePksConnection!
 
   """
@@ -7513,13 +7508,13 @@ type SingleTableChecklist implements SingleTableItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`SingleTableItem\`."""
-    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: SingleTableItemCondition
+
+    """The method to use when ordering \`SingleTableItem\`."""
+    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemsConnection!
 
   """
@@ -7544,13 +7539,13 @@ type SingleTableChecklist implements SingleTableItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`SingleTableItemRelation\`."""
-    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: SingleTableItemRelationCondition
+
+    """The method to use when ordering \`SingleTableItemRelation\`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemRelationsConnection!
 
   """
@@ -7575,13 +7570,13 @@ type SingleTableChecklist implements SingleTableItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`SingleTableItemRelation\`."""
-    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: SingleTableItemRelationCondition
+
+    """The method to use when ordering \`SingleTableItemRelation\`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemRelationsConnection!
 
   """
@@ -7606,13 +7601,13 @@ type SingleTableChecklist implements SingleTableItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`SingleTableItemRelationCompositePk\`."""
-    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: SingleTableItemRelationCompositePkCondition
+
+    """The method to use when ordering \`SingleTableItemRelationCompositePk\`."""
+    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemRelationCompositePksConnection!
 
   """
@@ -7637,13 +7632,13 @@ type SingleTableChecklist implements SingleTableItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`SingleTableItemRelationCompositePk\`."""
-    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: SingleTableItemRelationCompositePkCondition
+
+    """The method to use when ordering \`SingleTableItemRelationCompositePk\`."""
+    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemRelationCompositePksConnection!
 
   """
@@ -7704,13 +7699,13 @@ type SingleTableChecklistItem implements SingleTableItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`SingleTableItem\`."""
-    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: SingleTableItemCondition
+
+    """The method to use when ordering \`SingleTableItem\`."""
+    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemsConnection!
 
   """
@@ -7735,13 +7730,13 @@ type SingleTableChecklistItem implements SingleTableItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`SingleTableItemRelation\`."""
-    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: SingleTableItemRelationCondition
+
+    """The method to use when ordering \`SingleTableItemRelation\`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemRelationsConnection!
 
   """
@@ -7766,13 +7761,13 @@ type SingleTableChecklistItem implements SingleTableItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`SingleTableItemRelation\`."""
-    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: SingleTableItemRelationCondition
+
+    """The method to use when ordering \`SingleTableItemRelation\`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemRelationsConnection!
 
   """
@@ -7797,13 +7792,13 @@ type SingleTableChecklistItem implements SingleTableItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`SingleTableItemRelationCompositePk\`."""
-    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: SingleTableItemRelationCompositePkCondition
+
+    """The method to use when ordering \`SingleTableItemRelationCompositePk\`."""
+    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemRelationCompositePksConnection!
 
   """
@@ -7828,13 +7823,13 @@ type SingleTableChecklistItem implements SingleTableItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`SingleTableItemRelationCompositePk\`."""
-    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: SingleTableItemRelationCompositePkCondition
+
+    """The method to use when ordering \`SingleTableItemRelationCompositePk\`."""
+    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemRelationCompositePksConnection!
 
   """
@@ -7876,13 +7871,13 @@ type RelationalTopic implements RelationalItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalItem\`."""
-    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalItemCondition
+
+    """The method to use when ordering \`RelationalItem\`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemsConnection!
 
   """Reads a single \`Person\` that is related to this \`RelationalTopic\`."""
@@ -7918,13 +7913,13 @@ type RelationalTopic implements RelationalItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalItem\`."""
-    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalItemCondition
+
+    """The method to use when ordering \`RelationalItem\`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemsConnection!
 
   """
@@ -7949,13 +7944,13 @@ type RelationalTopic implements RelationalItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalItemRelation\`."""
-    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalItemRelationCondition
+
+    """The method to use when ordering \`RelationalItemRelation\`."""
+    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationsConnection!
 
   """
@@ -7980,13 +7975,13 @@ type RelationalTopic implements RelationalItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalItemRelation\`."""
-    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalItemRelationCondition
+
+    """The method to use when ordering \`RelationalItemRelation\`."""
+    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationsConnection!
 
   """
@@ -8011,13 +8006,13 @@ type RelationalTopic implements RelationalItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalItemRelationCompositePk\`."""
-    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalItemRelationCompositePkCondition
+
+    """The method to use when ordering \`RelationalItemRelationCompositePk\`."""
+    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationCompositePksConnection!
 
   """
@@ -8042,27 +8037,14 @@ type RelationalTopic implements RelationalItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalItemRelationCompositePk\`."""
-    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalItemRelationCompositePkCondition
-  ): RelationalItemRelationCompositePksConnection!
-}
 
-"""Methods to use when ordering \`RelationalItemRelation\`."""
-enum RelationalItemRelationsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  PARENT_ID_ASC
-  PARENT_ID_DESC
-  CHILD_ID_ASC
-  CHILD_ID_DESC
+    """The method to use when ordering \`RelationalItemRelationCompositePk\`."""
+    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationCompositePksConnection!
 }
 
 """
@@ -8080,11 +8062,13 @@ input RelationalItemRelationCondition {
   childId: Int
 }
 
-"""Methods to use when ordering \`RelationalItemRelationCompositePk\`."""
-enum RelationalItemRelationCompositePksOrderBy {
+"""Methods to use when ordering \`RelationalItemRelation\`."""
+enum RelationalItemRelationsOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
   PARENT_ID_ASC
   PARENT_ID_DESC
   CHILD_ID_ASC
@@ -8101,6 +8085,17 @@ input RelationalItemRelationCompositePkCondition {
 
   """Checks for equality with the object’s \`childId\` field."""
   childId: Int
+}
+
+"""Methods to use when ordering \`RelationalItemRelationCompositePk\`."""
+enum RelationalItemRelationCompositePksOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  CHILD_ID_ASC
+  CHILD_ID_DESC
 }
 
 type RelationalPost implements RelationalItem {
@@ -8151,13 +8146,13 @@ type RelationalPost implements RelationalItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalItem\`."""
-    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalItemCondition
+
+    """The method to use when ordering \`RelationalItem\`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemsConnection!
 
   """
@@ -8182,13 +8177,13 @@ type RelationalPost implements RelationalItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalItemRelation\`."""
-    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalItemRelationCondition
+
+    """The method to use when ordering \`RelationalItemRelation\`."""
+    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationsConnection!
 
   """
@@ -8213,13 +8208,13 @@ type RelationalPost implements RelationalItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalItemRelation\`."""
-    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalItemRelationCondition
+
+    """The method to use when ordering \`RelationalItemRelation\`."""
+    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationsConnection!
 
   """
@@ -8244,13 +8239,13 @@ type RelationalPost implements RelationalItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalItemRelationCompositePk\`."""
-    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalItemRelationCompositePkCondition
+
+    """The method to use when ordering \`RelationalItemRelationCompositePk\`."""
+    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationCompositePksConnection!
 
   """
@@ -8275,13 +8270,13 @@ type RelationalPost implements RelationalItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalItemRelationCompositePk\`."""
-    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalItemRelationCompositePkCondition
+
+    """The method to use when ordering \`RelationalItemRelationCompositePk\`."""
+    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationCompositePksConnection!
 }
 
@@ -8332,13 +8327,13 @@ type RelationalDivider implements RelationalItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalItem\`."""
-    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalItemCondition
+
+    """The method to use when ordering \`RelationalItem\`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemsConnection!
 
   """
@@ -8363,13 +8358,13 @@ type RelationalDivider implements RelationalItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalItemRelation\`."""
-    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalItemRelationCondition
+
+    """The method to use when ordering \`RelationalItemRelation\`."""
+    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationsConnection!
 
   """
@@ -8394,13 +8389,13 @@ type RelationalDivider implements RelationalItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalItemRelation\`."""
-    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalItemRelationCondition
+
+    """The method to use when ordering \`RelationalItemRelation\`."""
+    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationsConnection!
 
   """
@@ -8425,13 +8420,13 @@ type RelationalDivider implements RelationalItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalItemRelationCompositePk\`."""
-    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalItemRelationCompositePkCondition
+
+    """The method to use when ordering \`RelationalItemRelationCompositePk\`."""
+    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationCompositePksConnection!
 
   """
@@ -8456,13 +8451,13 @@ type RelationalDivider implements RelationalItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalItemRelationCompositePk\`."""
-    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalItemRelationCompositePkCondition
+
+    """The method to use when ordering \`RelationalItemRelationCompositePk\`."""
+    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationCompositePksConnection!
 }
 
@@ -8512,13 +8507,13 @@ type RelationalChecklist implements RelationalItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalItem\`."""
-    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalItemCondition
+
+    """The method to use when ordering \`RelationalItem\`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemsConnection!
 
   """
@@ -8543,13 +8538,13 @@ type RelationalChecklist implements RelationalItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalItemRelation\`."""
-    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalItemRelationCondition
+
+    """The method to use when ordering \`RelationalItemRelation\`."""
+    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationsConnection!
 
   """
@@ -8574,13 +8569,13 @@ type RelationalChecklist implements RelationalItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalItemRelation\`."""
-    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalItemRelationCondition
+
+    """The method to use when ordering \`RelationalItemRelation\`."""
+    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationsConnection!
 
   """
@@ -8605,13 +8600,13 @@ type RelationalChecklist implements RelationalItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalItemRelationCompositePk\`."""
-    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalItemRelationCompositePkCondition
+
+    """The method to use when ordering \`RelationalItemRelationCompositePk\`."""
+    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationCompositePksConnection!
 
   """
@@ -8636,13 +8631,13 @@ type RelationalChecklist implements RelationalItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalItemRelationCompositePk\`."""
-    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalItemRelationCompositePkCondition
+
+    """The method to use when ordering \`RelationalItemRelationCompositePk\`."""
+    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationCompositePksConnection!
 }
 
@@ -8695,13 +8690,13 @@ type RelationalChecklistItem implements RelationalItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalItem\`."""
-    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalItemCondition
+
+    """The method to use when ordering \`RelationalItem\`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemsConnection!
 
   """
@@ -8726,13 +8721,13 @@ type RelationalChecklistItem implements RelationalItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalItemRelation\`."""
-    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalItemRelationCondition
+
+    """The method to use when ordering \`RelationalItemRelation\`."""
+    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationsConnection!
 
   """
@@ -8757,13 +8752,13 @@ type RelationalChecklistItem implements RelationalItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalItemRelation\`."""
-    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalItemRelationCondition
+
+    """The method to use when ordering \`RelationalItemRelation\`."""
+    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationsConnection!
 
   """
@@ -8788,13 +8783,13 @@ type RelationalChecklistItem implements RelationalItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalItemRelationCompositePk\`."""
-    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalItemRelationCompositePkCondition
+
+    """The method to use when ordering \`RelationalItemRelationCompositePk\`."""
+    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationCompositePksConnection!
 
   """
@@ -8819,13 +8814,13 @@ type RelationalChecklistItem implements RelationalItem {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalItemRelationCompositePk\`."""
-    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalItemRelationCompositePkCondition
+
+    """The method to use when ordering \`RelationalItemRelationCompositePk\`."""
+    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationCompositePksConnection!
 }
 
@@ -8940,9 +8935,6 @@ type Query {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`Vulnerability\`."""
-    orderBy: [VulnerabilitiesOrderBy!]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
@@ -8950,6 +8942,9 @@ type Query {
 
     """Filter results to only those of the given types"""
     only: [VulnerabilityType!] @deprecated(reason: "EXPERIMENTAL")
+
+    """The method to use when ordering \`Vulnerability\`."""
+    orderBy: [VulnerabilitiesOrderBy!]
   ): VulnerabilitiesConnection
   allApplications(
     """Only read the first \`n\` values of the set."""
@@ -8970,9 +8965,6 @@ type Query {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`Application\`."""
-    orderBy: [ApplicationsOrderBy!]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
@@ -8980,6 +8972,9 @@ type Query {
 
     """Filter results to only those of the given types"""
     only: [ApplicationType!] @deprecated(reason: "EXPERIMENTAL")
+
+    """The method to use when ordering \`Application\`."""
+    orderBy: [ApplicationsOrderBy!]
   ): ApplicationsConnection
   allZeroImplementations(
     """Only read the first \`n\` values of the set."""
@@ -9000,13 +8995,13 @@ type Query {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`ZeroImplementation\`."""
-    orderBy: [ZeroImplementationsOrderBy!]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: ZeroImplementationCondition
+
+    """The method to use when ordering \`ZeroImplementation\`."""
+    orderBy: [ZeroImplementationsOrderBy!]
   ): ZeroImplementationsConnection
 
   """Reads and enables pagination through a set of \`Organization\`."""
@@ -9029,13 +9024,13 @@ type Query {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`Organization\`."""
-    orderBy: [OrganizationsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: OrganizationCondition
+
+    """The method to use when ordering \`Organization\`."""
+    orderBy: [OrganizationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): OrganizationsConnection
 
   """Reads and enables pagination through a set of \`Person\`."""
@@ -9058,13 +9053,13 @@ type Query {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`Person\`."""
-    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: PersonCondition
+
+    """The method to use when ordering \`Person\`."""
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
   ): PeopleConnection
 
   """Reads and enables pagination through a set of \`Priority\`."""
@@ -9108,13 +9103,13 @@ type Query {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalChecklist\`."""
-    orderBy: [RelationalChecklistsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalChecklistCondition
+
+    """The method to use when ordering \`RelationalChecklist\`."""
+    orderBy: [RelationalChecklistsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalChecklistsConnection
 
   """
@@ -9139,13 +9134,13 @@ type Query {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalItemRelationCompositePk\`."""
-    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalItemRelationCompositePkCondition
+
+    """The method to use when ordering \`RelationalItemRelationCompositePk\`."""
+    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationCompositePksConnection
 
   """Reads and enables pagination through a set of \`RelationalTopic\`."""
@@ -9168,13 +9163,13 @@ type Query {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalTopic\`."""
-    orderBy: [RelationalTopicsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalTopicCondition
+
+    """The method to use when ordering \`RelationalTopic\`."""
+    orderBy: [RelationalTopicsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalTopicsConnection
 
   """
@@ -9199,13 +9194,13 @@ type Query {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`SingleTableItemRelationCompositePk\`."""
-    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: SingleTableItemRelationCompositePkCondition
+
+    """The method to use when ordering \`SingleTableItemRelationCompositePk\`."""
+    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemRelationCompositePksConnection
 
   """
@@ -9230,13 +9225,13 @@ type Query {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalChecklistItem\`."""
-    orderBy: [RelationalChecklistItemsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalChecklistItemCondition
+
+    """The method to use when ordering \`RelationalChecklistItem\`."""
+    orderBy: [RelationalChecklistItemsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalChecklistItemsConnection
 
   """Reads and enables pagination through a set of \`RelationalDivider\`."""
@@ -9259,13 +9254,13 @@ type Query {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalDivider\`."""
-    orderBy: [RelationalDividersOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalDividerCondition
+
+    """The method to use when ordering \`RelationalDivider\`."""
+    orderBy: [RelationalDividersOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalDividersConnection
 
   """
@@ -9290,13 +9285,13 @@ type Query {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalItemRelation\`."""
-    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalItemRelationCondition
+
+    """The method to use when ordering \`RelationalItemRelation\`."""
+    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationsConnection
 
   """
@@ -9321,13 +9316,13 @@ type Query {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`SingleTableItemRelation\`."""
-    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: SingleTableItemRelationCondition
+
+    """The method to use when ordering \`SingleTableItemRelation\`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemRelationsConnection
 
   """Reads and enables pagination through a set of \`LogEntry\`."""
@@ -9350,13 +9345,13 @@ type Query {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`LogEntry\`."""
-    orderBy: [LogEntriesOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: LogEntryCondition
+
+    """The method to use when ordering \`LogEntry\`."""
+    orderBy: [LogEntriesOrderBy!] = [PRIMARY_KEY_ASC]
   ): LogEntriesConnection
 
   """Reads and enables pagination through a set of \`RelationalPost\`."""
@@ -9379,13 +9374,13 @@ type Query {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalPost\`."""
-    orderBy: [RelationalPostsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalPostCondition
+
+    """The method to use when ordering \`RelationalPost\`."""
+    orderBy: [RelationalPostsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalPostsConnection
 
   """
@@ -9410,13 +9405,13 @@ type Query {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`FirstPartyVulnerability\`."""
-    orderBy: [FirstPartyVulnerabilitiesOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: FirstPartyVulnerabilityCondition
+
+    """The method to use when ordering \`FirstPartyVulnerability\`."""
+    orderBy: [FirstPartyVulnerabilitiesOrderBy!] = [PRIMARY_KEY_ASC]
   ): FirstPartyVulnerabilitiesConnection
 
   """
@@ -9441,13 +9436,13 @@ type Query {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`ThirdPartyVulnerability\`."""
-    orderBy: [ThirdPartyVulnerabilitiesOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: ThirdPartyVulnerabilityCondition
+
+    """The method to use when ordering \`ThirdPartyVulnerability\`."""
+    orderBy: [ThirdPartyVulnerabilitiesOrderBy!] = [PRIMARY_KEY_ASC]
   ): ThirdPartyVulnerabilitiesConnection
 
   """Reads and enables pagination through a set of \`AwsApplication\`."""
@@ -9470,13 +9465,13 @@ type Query {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`AwsApplication\`."""
-    orderBy: [AwsApplicationsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: AwsApplicationCondition
+
+    """The method to use when ordering \`AwsApplication\`."""
+    orderBy: [AwsApplicationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): AwsApplicationsConnection
 
   """Reads and enables pagination through a set of \`GcpApplication\`."""
@@ -9499,13 +9494,13 @@ type Query {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`GcpApplication\`."""
-    orderBy: [GcpApplicationsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: GcpApplicationCondition
+
+    """The method to use when ordering \`GcpApplication\`."""
+    orderBy: [GcpApplicationsOrderBy!] = [PRIMARY_KEY_ASC]
   ): GcpApplicationsConnection
 
   """Reads and enables pagination through a set of \`SingleTableItem\`."""
@@ -9528,13 +9523,13 @@ type Query {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`SingleTableItem\`."""
-    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: SingleTableItemCondition
+
+    """The method to use when ordering \`SingleTableItem\`."""
+    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemsConnection
 
   """Reads and enables pagination through a set of \`RelationalItem\`."""
@@ -9557,17 +9552,18 @@ type Query {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`RelationalItem\`."""
-    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: RelationalItemCondition
+
+    """The method to use when ordering \`RelationalItem\`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemsConnection
 }
 
 type FirstPartyVulnerability implements Vulnerability {
+  cvssScoreInt: Int
   id: Int!
   name: String!
   cvssScore: Float!
@@ -9593,9 +9589,6 @@ type FirstPartyVulnerability implements Vulnerability {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`Application\`."""
-    orderBy: [ApplicationsOrderBy!]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
@@ -9603,6 +9596,9 @@ type FirstPartyVulnerability implements Vulnerability {
 
     """Filter results to only those of the given types"""
     only: [ApplicationType!] @deprecated(reason: "EXPERIMENTAL")
+
+    """The method to use when ordering \`Application\`."""
+    orderBy: [ApplicationsOrderBy!]
   ): ApplicationsConnection!
 
   """Reads and enables pagination through a set of \`PersonOrOrganization\`."""
@@ -9610,6 +9606,7 @@ type FirstPartyVulnerability implements Vulnerability {
 }
 
 type ThirdPartyVulnerability implements Vulnerability {
+  cvssScoreInt: Int
   id: Int!
   name: String!
   cvssScore: Float!
@@ -9635,9 +9632,6 @@ type ThirdPartyVulnerability implements Vulnerability {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`Application\`."""
-    orderBy: [ApplicationsOrderBy!]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
@@ -9645,6 +9639,9 @@ type ThirdPartyVulnerability implements Vulnerability {
 
     """Filter results to only those of the given types"""
     only: [ApplicationType!] @deprecated(reason: "EXPERIMENTAL")
+
+    """The method to use when ordering \`Application\`."""
+    orderBy: [ApplicationsOrderBy!]
   ): ApplicationsConnection!
 
   """Reads and enables pagination through a set of \`PersonOrOrganization\`."""
@@ -9684,15 +9681,6 @@ type ZeroImplementationsEdge {
   node: ZeroImplementation
 }
 
-"""Methods to use when ordering \`ZeroImplementation\`."""
-enum ZeroImplementationsOrderBy {
-  NATURAL
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
-}
-
 """
 A condition to be used against \`ZeroImplementation\` object types. All fields are
 tested for equality and combined with a logical ‘and.’
@@ -9703,6 +9691,15 @@ input ZeroImplementationCondition {
 
   """Checks for equality with the object’s \`name\` field."""
   name: String
+}
+
+"""Methods to use when ordering \`ZeroImplementation\`."""
+enum ZeroImplementationsOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
 }
 
 """A connection to a list of \`Organization\` values."""
@@ -9731,17 +9728,6 @@ type OrganizationsEdge {
   node: Organization
 }
 
-"""Methods to use when ordering \`Organization\`."""
-enum OrganizationsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ORGANIZATION_ID_ASC
-  ORGANIZATION_ID_DESC
-  NAME_ASC
-  NAME_DESC
-}
-
 """
 A condition to be used against \`Organization\` object types. All fields are
 tested for equality and combined with a logical ‘and.’
@@ -9752,6 +9738,17 @@ input OrganizationCondition {
 
   """Checks for equality with the object’s \`name\` field."""
   name: String
+}
+
+"""Methods to use when ordering \`Organization\`."""
+enum OrganizationsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ORGANIZATION_ID_ASC
+  ORGANIZATION_ID_DESC
+  NAME_ASC
+  NAME_DESC
 }
 
 """A connection to a list of \`Person\` values."""
@@ -9780,17 +9777,6 @@ type PeopleEdge {
   node: Person
 }
 
-"""Methods to use when ordering \`Person\`."""
-enum PeopleOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  PERSON_ID_ASC
-  PERSON_ID_DESC
-  USERNAME_ASC
-  USERNAME_DESC
-}
-
 """
 A condition to be used against \`Person\` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
@@ -9800,6 +9786,17 @@ input PersonCondition {
 
   """Checks for equality with the object’s \`username\` field."""
   username: String
+}
+
+"""Methods to use when ordering \`Person\`."""
+enum PeopleOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+  USERNAME_ASC
+  USERNAME_DESC
 }
 
 """A connection to a list of \`Priority\` values."""
@@ -9856,35 +9853,6 @@ type RelationalChecklistsEdge {
   node: RelationalChecklist
 }
 
-"""Methods to use when ordering \`RelationalChecklist\`."""
-enum RelationalChecklistsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  TITLE_ASC
-  TITLE_DESC
-  ID_ASC
-  ID_DESC
-  TYPE_ASC
-  TYPE_DESC
-  PARENT_ID_ASC
-  PARENT_ID_DESC
-  ROOT_TOPIC_ID_ASC
-  ROOT_TOPIC_ID_DESC
-  AUTHOR_ID_ASC
-  AUTHOR_ID_DESC
-  POSITION_ASC
-  POSITION_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-  IS_EXPLICITLY_ARCHIVED_ASC
-  IS_EXPLICITLY_ARCHIVED_DESC
-  ARCHIVED_AT_ASC
-  ARCHIVED_AT_DESC
-}
-
 """
 A condition to be used against \`RelationalChecklist\` object types. All fields
 are tested for equality and combined with a logical ‘and.’
@@ -9924,6 +9892,35 @@ input RelationalChecklistCondition {
   archivedAt: Datetime
 }
 
+"""Methods to use when ordering \`RelationalChecklist\`."""
+enum RelationalChecklistsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  TITLE_ASC
+  TITLE_DESC
+  ID_ASC
+  ID_DESC
+  TYPE_ASC
+  TYPE_DESC
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  ROOT_TOPIC_ID_ASC
+  ROOT_TOPIC_ID_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  POSITION_ASC
+  POSITION_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  IS_EXPLICITLY_ARCHIVED_ASC
+  IS_EXPLICITLY_ARCHIVED_DESC
+  ARCHIVED_AT_ASC
+  ARCHIVED_AT_DESC
+}
+
 """A connection to a list of \`RelationalTopic\` values."""
 type RelationalTopicsConnection {
   """A list of \`RelationalTopic\` objects."""
@@ -9950,35 +9947,6 @@ type RelationalTopicsEdge {
 
   """The \`RelationalTopic\` at the end of the edge."""
   node: RelationalTopic
-}
-
-"""Methods to use when ordering \`RelationalTopic\`."""
-enum RelationalTopicsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  TITLE_ASC
-  TITLE_DESC
-  ID_ASC
-  ID_DESC
-  TYPE_ASC
-  TYPE_DESC
-  PARENT_ID_ASC
-  PARENT_ID_DESC
-  ROOT_TOPIC_ID_ASC
-  ROOT_TOPIC_ID_DESC
-  AUTHOR_ID_ASC
-  AUTHOR_ID_DESC
-  POSITION_ASC
-  POSITION_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-  IS_EXPLICITLY_ARCHIVED_ASC
-  IS_EXPLICITLY_ARCHIVED_DESC
-  ARCHIVED_AT_ASC
-  ARCHIVED_AT_DESC
 }
 
 """
@@ -10020,6 +9988,35 @@ input RelationalTopicCondition {
   archivedAt: Datetime
 }
 
+"""Methods to use when ordering \`RelationalTopic\`."""
+enum RelationalTopicsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  TITLE_ASC
+  TITLE_DESC
+  ID_ASC
+  ID_DESC
+  TYPE_ASC
+  TYPE_DESC
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  ROOT_TOPIC_ID_ASC
+  ROOT_TOPIC_ID_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  POSITION_ASC
+  POSITION_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  IS_EXPLICITLY_ARCHIVED_ASC
+  IS_EXPLICITLY_ARCHIVED_DESC
+  ARCHIVED_AT_ASC
+  ARCHIVED_AT_DESC
+}
+
 """A connection to a list of \`RelationalChecklistItem\` values."""
 type RelationalChecklistItemsConnection {
   """A list of \`RelationalChecklistItem\` objects."""
@@ -10046,37 +10043,6 @@ type RelationalChecklistItemsEdge {
 
   """The \`RelationalChecklistItem\` at the end of the edge."""
   node: RelationalChecklistItem
-}
-
-"""Methods to use when ordering \`RelationalChecklistItem\`."""
-enum RelationalChecklistItemsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  DESCRIPTION_ASC
-  DESCRIPTION_DESC
-  NOTE_ASC
-  NOTE_DESC
-  ID_ASC
-  ID_DESC
-  TYPE_ASC
-  TYPE_DESC
-  PARENT_ID_ASC
-  PARENT_ID_DESC
-  ROOT_TOPIC_ID_ASC
-  ROOT_TOPIC_ID_DESC
-  AUTHOR_ID_ASC
-  AUTHOR_ID_DESC
-  POSITION_ASC
-  POSITION_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-  IS_EXPLICITLY_ARCHIVED_ASC
-  IS_EXPLICITLY_ARCHIVED_DESC
-  ARCHIVED_AT_ASC
-  ARCHIVED_AT_DESC
 }
 
 """
@@ -10121,6 +10087,37 @@ input RelationalChecklistItemCondition {
   archivedAt: Datetime
 }
 
+"""Methods to use when ordering \`RelationalChecklistItem\`."""
+enum RelationalChecklistItemsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  NOTE_ASC
+  NOTE_DESC
+  ID_ASC
+  ID_DESC
+  TYPE_ASC
+  TYPE_DESC
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  ROOT_TOPIC_ID_ASC
+  ROOT_TOPIC_ID_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  POSITION_ASC
+  POSITION_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  IS_EXPLICITLY_ARCHIVED_ASC
+  IS_EXPLICITLY_ARCHIVED_DESC
+  ARCHIVED_AT_ASC
+  ARCHIVED_AT_DESC
+}
+
 """A connection to a list of \`RelationalDivider\` values."""
 type RelationalDividersConnection {
   """A list of \`RelationalDivider\` objects."""
@@ -10147,37 +10144,6 @@ type RelationalDividersEdge {
 
   """The \`RelationalDivider\` at the end of the edge."""
   node: RelationalDivider
-}
-
-"""Methods to use when ordering \`RelationalDivider\`."""
-enum RelationalDividersOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  TITLE_ASC
-  TITLE_DESC
-  COLOR_ASC
-  COLOR_DESC
-  ID_ASC
-  ID_DESC
-  TYPE_ASC
-  TYPE_DESC
-  PARENT_ID_ASC
-  PARENT_ID_DESC
-  ROOT_TOPIC_ID_ASC
-  ROOT_TOPIC_ID_DESC
-  AUTHOR_ID_ASC
-  AUTHOR_ID_DESC
-  POSITION_ASC
-  POSITION_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-  IS_EXPLICITLY_ARCHIVED_ASC
-  IS_EXPLICITLY_ARCHIVED_DESC
-  ARCHIVED_AT_ASC
-  ARCHIVED_AT_DESC
 }
 
 """
@@ -10222,6 +10188,37 @@ input RelationalDividerCondition {
   archivedAt: Datetime
 }
 
+"""Methods to use when ordering \`RelationalDivider\`."""
+enum RelationalDividersOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  TITLE_ASC
+  TITLE_DESC
+  COLOR_ASC
+  COLOR_DESC
+  ID_ASC
+  ID_DESC
+  TYPE_ASC
+  TYPE_DESC
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  ROOT_TOPIC_ID_ASC
+  ROOT_TOPIC_ID_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  POSITION_ASC
+  POSITION_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  IS_EXPLICITLY_ARCHIVED_ASC
+  IS_EXPLICITLY_ARCHIVED_DESC
+  ARCHIVED_AT_ASC
+  ARCHIVED_AT_DESC
+}
+
 """A connection to a list of \`RelationalPost\` values."""
 type RelationalPostsConnection {
   """A list of \`RelationalPost\` objects."""
@@ -10246,39 +10243,6 @@ type RelationalPostsEdge {
 
   """The \`RelationalPost\` at the end of the edge."""
   node: RelationalPost
-}
-
-"""Methods to use when ordering \`RelationalPost\`."""
-enum RelationalPostsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  TITLE_ASC
-  TITLE_DESC
-  DESCRIPTION_ASC
-  DESCRIPTION_DESC
-  NOTE_ASC
-  NOTE_DESC
-  ID_ASC
-  ID_DESC
-  TYPE_ASC
-  TYPE_DESC
-  PARENT_ID_ASC
-  PARENT_ID_DESC
-  ROOT_TOPIC_ID_ASC
-  ROOT_TOPIC_ID_DESC
-  AUTHOR_ID_ASC
-  AUTHOR_ID_DESC
-  POSITION_ASC
-  POSITION_DESC
-  CREATED_AT_ASC
-  CREATED_AT_DESC
-  UPDATED_AT_ASC
-  UPDATED_AT_DESC
-  IS_EXPLICITLY_ARCHIVED_ASC
-  IS_EXPLICITLY_ARCHIVED_DESC
-  ARCHIVED_AT_ASC
-  ARCHIVED_AT_DESC
 }
 
 """
@@ -10326,6 +10290,39 @@ input RelationalPostCondition {
   archivedAt: Datetime
 }
 
+"""Methods to use when ordering \`RelationalPost\`."""
+enum RelationalPostsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  TITLE_ASC
+  TITLE_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  NOTE_ASC
+  NOTE_DESC
+  ID_ASC
+  ID_DESC
+  TYPE_ASC
+  TYPE_DESC
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  ROOT_TOPIC_ID_ASC
+  ROOT_TOPIC_ID_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  POSITION_ASC
+  POSITION_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+  IS_EXPLICITLY_ARCHIVED_ASC
+  IS_EXPLICITLY_ARCHIVED_DESC
+  ARCHIVED_AT_ASC
+  ARCHIVED_AT_DESC
+}
+
 """A connection to a list of \`FirstPartyVulnerability\` values."""
 type FirstPartyVulnerabilitiesConnection {
   """A list of \`FirstPartyVulnerability\` objects."""
@@ -10354,21 +10351,6 @@ type FirstPartyVulnerabilitiesEdge {
   node: FirstPartyVulnerability
 }
 
-"""Methods to use when ordering \`FirstPartyVulnerability\`."""
-enum FirstPartyVulnerabilitiesOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
-  CVSS_SCORE_ASC
-  CVSS_SCORE_DESC
-  TEAM_NAME_ASC
-  TEAM_NAME_DESC
-}
-
 """
 A condition to be used against \`FirstPartyVulnerability\` object types. All
 fields are tested for equality and combined with a logical ‘and.’
@@ -10385,6 +10367,21 @@ input FirstPartyVulnerabilityCondition {
 
   """Checks for equality with the object’s \`teamName\` field."""
   teamName: String
+}
+
+"""Methods to use when ordering \`FirstPartyVulnerability\`."""
+enum FirstPartyVulnerabilitiesOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  CVSS_SCORE_ASC
+  CVSS_SCORE_DESC
+  TEAM_NAME_ASC
+  TEAM_NAME_DESC
 }
 
 """A connection to a list of \`ThirdPartyVulnerability\` values."""
@@ -10415,21 +10412,6 @@ type ThirdPartyVulnerabilitiesEdge {
   node: ThirdPartyVulnerability
 }
 
-"""Methods to use when ordering \`ThirdPartyVulnerability\`."""
-enum ThirdPartyVulnerabilitiesOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
-  CVSS_SCORE_ASC
-  CVSS_SCORE_DESC
-  VENDOR_NAME_ASC
-  VENDOR_NAME_DESC
-}
-
 """
 A condition to be used against \`ThirdPartyVulnerability\` object types. All
 fields are tested for equality and combined with a logical ‘and.’
@@ -10446,6 +10428,21 @@ input ThirdPartyVulnerabilityCondition {
 
   """Checks for equality with the object’s \`vendorName\` field."""
   vendorName: String
+}
+
+"""Methods to use when ordering \`ThirdPartyVulnerability\`."""
+enum ThirdPartyVulnerabilitiesOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  CVSS_SCORE_ASC
+  CVSS_SCORE_DESC
+  VENDOR_NAME_ASC
+  VENDOR_NAME_DESC
 }
 
 """
@@ -12502,54 +12499,12 @@ export const plans = {
   SingleTableTopic: {
     __assertStep: assertPgClassSingleStep,
     meaningOfLife($in, args, _info) {
-      if (!hasRecord($in)) {
-        throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
-      }
-      const extraSelectArgs = makeArgs(args);
-      /**
-       * An optimisation - if all our dependencies are
-       * compatible with the expression's class plan then we
-       * can inline ourselves into that, otherwise we must
-       * issue the query separately.
-       */
-      const canUseExpressionDirectly = $in instanceof PgSelectSingleStep && extraSelectArgs.every(a => stepAMayDependOnStepB($in.getClassStep(), a.step));
-      const $row = canUseExpressionDirectly ? $in : pgSelectSingleFromRecord($in.resource, $in.record());
-      const selectArgs = [{
-        step: $row.record()
-      }, ...extraSelectArgs];
-      if (resource_single_table_items_meaning_of_lifePgResource.isUnique && !resource_single_table_items_meaning_of_lifePgResource.codec.attributes && typeof resource_single_table_items_meaning_of_lifePgResource.from === "function") {
-        // This is a scalar computed attribute, let's inline the expression
-        const newSelectArgs = selectArgs.map((arg, i) => {
-          const {
-            name
-          } = arg;
-          if (i === 0) {
-            return {
-              name,
-              placeholder: $row.getClassStep().alias
-            };
-          } else if ("pgCodec" in arg && arg.pgCodec) {
-            return {
-              name,
-              placeholder: $row.placeholder(arg.step, arg.pgCodec)
-            };
-          } else {
-            return {
-              name,
-              placeholder: $row.placeholder(arg.step)
-            };
-          }
-        });
-        return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec, undefined)`${resource_single_table_items_meaning_of_lifePgResource.from(...newSelectArgs)}`;
-      }
-      // PERF: or here, if scalar add select to `$row`?
-      return resource_single_table_items_meaning_of_lifePgResource.execute(selectArgs);
-    },
-    id($record) {
-      return $record.get("id");
-    },
-    type($record) {
-      return $record.get("type");
+      const {
+        $row,
+        selectArgs
+      } = pgFunctionArgumentsFromArgs($in, makeArgs_first_party_vulnerabilities_cvss_score_int(args), true);
+      const from = pgFromExpression($row, resource_single_table_items_meaning_of_lifePgResource.from, resource_single_table_items_meaning_of_lifePgResource.parameters, selectArgs);
+      return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec, undefined)`${from}`;
     },
     parentId($record) {
       return $record.get("parent_id");
@@ -12559,9 +12514,6 @@ export const plans = {
     },
     authorId($record) {
       return $record.get("author_id");
-    },
-    position($record) {
-      return $record.get("position");
     },
     createdAt($record) {
       return $record.get("created_at");
@@ -12574,9 +12526,6 @@ export const plans = {
     },
     archivedAt($record) {
       return $record.get("archived_at");
-    },
-    title($record) {
-      return $record.get("title");
     },
     personByAuthorId($record) {
       return otherSource_peoplePgResource.get({
@@ -12596,51 +12545,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -12652,51 +12578,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -12708,51 +12611,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -12764,51 +12644,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationCompositePksOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -12820,51 +12677,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationCompositePksOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -12872,6 +12706,25 @@ export const plans = {
       return otherSource_single_table_itemsPgResource.get({
         id: $record.get("root_topic_id")
       });
+    }
+  },
+  SingleTableItem: {
+    __toSpecifier(step) {
+      return object(Object.fromEntries(single_table_itemsUniques[0].attributes.map(attrName => [attrName, get2(step, attrName)])));
+    },
+    __planType($specifier, {
+      $original
+    }) {
+      const $inStep = $original ?? $specifier;
+      const $record = $inStep instanceof PgSelectSingleStep ? $inStep : otherSource_single_table_itemsPgResource.get(Object.fromEntries(single_table_itemsUniques[0].attributes.map(attrName => [attrName, get2($inStep, attrName)])));
+      const $typeVal = get2($record, "type");
+      const $__typename = lambda($typeVal, SingleTableItem_typeNameFromType, true);
+      return {
+        $__typename,
+        planForType() {
+          return $record;
+        }
+      };
     }
   },
   BigInt: {
@@ -12896,11 +12749,15 @@ export const plans = {
   },
   Person: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of peopleUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return otherSource_peoplePgResource.get(spec);
+    },
     personId($record) {
       return $record.get("person_id");
-    },
-    username($record) {
-      return $record.get("username");
     },
     logEntriesByPersonId: {
       plan($record) {
@@ -12910,51 +12767,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("LogEntriesOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -12966,51 +12800,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -13022,51 +12833,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -13078,51 +12866,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("AwsApplicationsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -13134,57 +12899,34 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("GcpApplicationsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
     applications: {
       plan($parent) {
-        const $record = undefined ? $parent.get("result") : $parent;
+        const $record = $parent;
         for (let i = 0, l = paths.length; i < l; i++) {
           const path = paths[i];
           const firstLayer = path.layers[0];
@@ -13202,100 +12944,64 @@ export const plans = {
           members,
           name: "applications"
         });
-        if (true) {
-          return connection($list);
-        } else if (false) {
-          return $list.single();
-        } else {
-          return $list;
-        }
+        return connection($list);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
+        },
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
+        },
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
+        },
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
+        },
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
+        },
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
+        },
+        only($parent, $connection, fieldArgs) {
+          const $union = $connection.getSubplan();
+          const $ltt = fieldArgs.getRaw();
+          if ($ltt instanceof ConstantStep && $ltt.data == null) {
+            // No action
+          } else {
+            $union.apply(lambda($ltt, limitToTypes));
           }
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
-        },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
-        },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
-        },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
-        },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("ApplicationsOrderBy"));
-            return null;
-          }
-        },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
-        },
-        only: {
-          autoApplyAfterParentPlan: true,
-          applyPlan($parent, $connection, fieldArgs) {
-            const $union = $connection.getSubplan();
-            $union.limitToTypes(fieldArgs.getRaw().eval());
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     }
   },
   LogEntriesConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   LogEntry: {
     __assertStep: assertPgClassSingleStep,
-    id($record) {
-      return $record.get("id");
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of log_entriesUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return otherSource_log_entriesPgResource.get(spec);
     },
     personId($record) {
       return $record.get("person_id");
     },
     organizationId($record) {
       return $record.get("organization_id");
-    },
-    text($record) {
-      return $record.get("text");
     },
     organizationByOrganizationId($record) {
       return otherSource_organizationsPgResource.get({
@@ -13308,7 +13014,7 @@ export const plans = {
       });
     },
     author($parent) {
-      const $record = undefined ? $parent.get("result") : $parent;
+      const $record = $parent;
       for (let i = 0, l = paths2.length; i < l; i++) {
         const path = paths2[i];
         const firstLayer = path.layers[0];
@@ -13326,22 +13032,20 @@ export const plans = {
         members: members2,
         name: "author"
       });
-      if (false) {
-        return connection($list);
-      } else if (true) {
-        return $list.single();
-      } else {
-        return $list;
-      }
+      return $list.single();
     }
   },
   Organization: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of organizationsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return otherSource_organizationsPgResource.get(spec);
+    },
     organizationId($record) {
       return $record.get("organization_id");
-    },
-    name($record) {
-      return $record.get("name");
     },
     logEntriesByOrganizationId: {
       plan($record) {
@@ -13351,51 +13055,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("LogEntriesOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -13407,51 +13088,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("AwsApplicationsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -13463,51 +13121,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("GcpApplicationsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     }
@@ -13522,296 +13157,128 @@ export const plans = {
       return ast.value;
     }
   },
-  LogEntriesOrderBy: {
-    NATURAL: {
-      applyPlan() {}
+  LogEntryCondition: {
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
-    PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        log_entriesUniques[0].attributes.forEach(attributeName => {
-          const attribute = logEntriesCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
+    personId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "person_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
-    PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        log_entriesUniques[0].attributes.forEach(attributeName => {
-          const attribute = logEntriesCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
+    organizationId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "organization_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
-    ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    text($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "text",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
         }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    PERSON_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "person_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    PERSON_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "person_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ORGANIZATION_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "organization_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ORGANIZATION_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "organization_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    TEXT_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "text",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    TEXT_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "text",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     }
   },
-  LogEntryCondition: {
-    id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_logEntries.attributes.id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+  LogEntriesOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      log_entriesUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    personId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "person_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "person_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_logEntries.attributes.person_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    PRIMARY_KEY_DESC(queryBuilder) {
+      log_entriesUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    organizationId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "organization_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "organization_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_logEntries.attributes.organization_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    text: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "text",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "text",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_logEntries.attributes.text.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PERSON_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_id",
+        direction: "ASC"
+      });
+    },
+    PERSON_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_id",
+        direction: "DESC"
+      });
+    },
+    ORGANIZATION_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "organization_id",
+        direction: "ASC"
+      });
+    },
+    ORGANIZATION_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "organization_id",
+        direction: "DESC"
+      });
+    },
+    TEXT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "text",
+        direction: "ASC"
+      });
+    },
+    TEXT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "text",
+        direction: "DESC"
+      });
     }
   },
   AwsApplicationsConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   AwsApplication: {
     __assertStep: assertPgClassSingleStep,
-    id($record) {
-      return $record.get("id");
-    },
-    name($record) {
-      return $record.get("name");
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of aws_applicationsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return otherSource_aws_applicationsPgResource.get(spec);
     },
     lastDeployed($record) {
       return $record.get("last_deployed");
@@ -13837,7 +13304,7 @@ export const plans = {
     },
     vulnerabilities: {
       plan($parent) {
-        const $record = undefined ? $parent.get("result") : $parent;
+        const $record = $parent;
         for (let i = 0, l = paths3.length; i < l; i++) {
           const path = paths3[i];
           const firstLayer = path.layers[0];
@@ -13855,72 +13322,45 @@ export const plans = {
           members: members3,
           name: "vulnerabilities"
         });
-        if (true) {
-          return connection($list);
-        } else if (false) {
-          return $list.single();
-        } else {
-          return $list;
-        }
+        return connection($list);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
+        },
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
+        },
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
+        },
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
+        },
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
+        },
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
+        },
+        only($parent, $connection, fieldArgs) {
+          const $union = $connection.getSubplan();
+          const $ltt = fieldArgs.getRaw();
+          if ($ltt instanceof ConstantStep && $ltt.data == null) {
+            // No action
+          } else {
+            $union.apply(lambda($ltt, limitToTypes));
           }
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
-        },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
-        },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
-        },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
-        },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("VulnerabilitiesOrderBy"));
-            return null;
-          }
-        },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
-        },
-        only: {
-          autoApplyAfterParentPlan: true,
-          applyPlan($parent, $connection, fieldArgs) {
-            const $union = $connection.getSubplan();
-            $union.limitToTypes(fieldArgs.getRaw().eval());
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
     owner($parent) {
-      const $record = undefined ? $parent.get("result") : $parent;
+      const $record = $parent;
       for (let i = 0, l = paths4.length; i < l; i++) {
         const path = paths4[i];
         const firstLayer = path.layers[0];
@@ -13938,43 +13378,71 @@ export const plans = {
         members: members4,
         name: "owner"
       });
-      if (false) {
-        return connection($list);
-      } else if (true) {
-        return $list.single();
+      return $list.single();
+    }
+  },
+  Application: {
+    __toSpecifier($step) {
+      if ($step instanceof PgUnionAllSingleStep) {
+        return $step.toSpecifier();
       } else {
-        return $list;
+        return $step;
       }
+    },
+    __planType($specifier) {
+      const $__typename = get2($specifier, "__typename");
+      return {
+        $__typename,
+        planForType(t) {
+          const resource = resourceByTypeName5[t.name];
+          if (!resource) {
+            throw new Error(`Type ${t.name} has no associated resource`);
+          }
+          const pk = resource.uniques.find(u => u.isPrimary) ?? resource.uniques[0];
+          const spec = Object.create(null);
+          for (const attrName of pk.attributes) {
+            spec[attrName] = get2($specifier, attrName);
+          }
+          return resource.get(spec);
+        }
+      };
     }
   },
   VulnerabilitiesConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
+  Vulnerability: {
+    __toSpecifier($step) {
+      if ($step instanceof PgUnionAllSingleStep) {
+        return $step.toSpecifier();
+      } else {
+        return $step;
+      }
+    },
+    __planType($specifier) {
+      const $__typename = get2($specifier, "__typename");
+      return {
+        $__typename,
+        planForType(t) {
+          const resource = resourceByTypeName6[t.name];
+          if (!resource) {
+            throw new Error(`Type ${t.name} has no associated resource`);
+          }
+          const pk = resource.uniques.find(u => u.isPrimary) ?? resource.uniques[0];
+          const spec = Object.create(null);
+          for (const attrName of pk.attributes) {
+            spec[attrName] = get2($specifier, attrName);
+          }
+          return resource.get(spec);
+        }
+      };
+    }
+  },
   ApplicationsConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
@@ -14004,16 +13472,26 @@ export const plans = {
     }
   },
   PersonOrOrganizationConnection: {
-    __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
+    __assertStep: ConnectionStep
+  },
+  PersonOrOrganization: {
+    __planType($specifier) {
+      const $__typename = get2($specifier, "__typename");
+      return {
+        $__typename,
+        planForType(t) {
+          const resource = resourceByTypeName7[t.name];
+          if (!resource) {
+            throw new Error(`Could not determine resource for ${t.name}`);
+          }
+          const pk = resource.uniques.find(u => u.isPrimary) ?? resource.uniques[0];
+          const spec = Object.create(null);
+          for (const attrName of pk.attributes) {
+            spec[attrName] = get2($specifier, attrName);
+          }
+          return resource.get(spec);
+        }
+      };
     }
   },
   PersonOrOrganizationEdge: {
@@ -14034,182 +13512,71 @@ export const plans = {
       return $edge.node();
     }
   },
-  VulnerabilitiesOrderBy: {
-    NATURAL: {
-      applyPlan() {}
+  VulnerabilityCondition: {
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
-    ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    name($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "name",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
         }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    cvssScore($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "cvss_score",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.float)}`;
         }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    NAME_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "name",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    NAME_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "name",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CVSS_SCORE_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "cvss_score",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CVSS_SCORE_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "cvss_score",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     }
   },
-  VulnerabilityCondition: {
-    id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_Vulnerability.attributes.id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+  VulnerabilitiesOrderBy: {
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
     },
-    name: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_Vulnerability.attributes.name.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
     },
-    cvssScore: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "cvss_score",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "cvss_score",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_Vulnerability.attributes.cvss_score.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    NAME_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "name",
+        direction: "ASC"
+      });
+    },
+    NAME_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "name",
+        direction: "DESC"
+      });
+    },
+    CVSS_SCORE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "cvss_score",
+        direction: "ASC"
+      });
+    },
+    CVSS_SCORE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "cvss_score",
+        direction: "DESC"
+      });
     }
   },
   AwsApplicationsEdge: {
@@ -14221,410 +13588,170 @@ export const plans = {
       return $edge.node();
     }
   },
-  AwsApplicationsOrderBy: {
-    NATURAL: {
-      applyPlan() {}
+  AwsApplicationCondition: {
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
-    PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        aws_applicationsUniques[0].attributes.forEach(attributeName => {
-          const attribute = awsApplicationsCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
+    name($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "name",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+        }
+      });
     },
-    PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        aws_applicationsUniques[0].attributes.forEach(attributeName => {
-          const attribute = awsApplicationsCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
+    lastDeployed($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "last_deployed",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
+        }
+      });
     },
-    ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    personId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "person_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    organizationId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "organization_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    NAME_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    awsId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "aws_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
         }
-        plan.orderBy({
-          attribute: "name",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    NAME_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "name",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    LAST_DEPLOYED_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "last_deployed",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    LAST_DEPLOYED_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "last_deployed",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    PERSON_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "person_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    PERSON_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "person_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ORGANIZATION_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "organization_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ORGANIZATION_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "organization_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    AWS_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "aws_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    AWS_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "aws_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     }
   },
-  AwsApplicationCondition: {
-    id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_awsApplications.attributes.id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+  AwsApplicationsOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      aws_applicationsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    name: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_awsApplications.attributes.name.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    PRIMARY_KEY_DESC(queryBuilder) {
+      aws_applicationsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    lastDeployed: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "last_deployed",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "last_deployed",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_awsApplications.attributes.last_deployed.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    personId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "person_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "person_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_awsApplications.attributes.person_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    organizationId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "organization_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "organization_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_awsApplications.attributes.organization_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    NAME_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "name",
+        direction: "ASC"
+      });
     },
-    awsId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "aws_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "aws_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_awsApplications.attributes.aws_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    NAME_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "name",
+        direction: "DESC"
+      });
+    },
+    LAST_DEPLOYED_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "last_deployed",
+        direction: "ASC"
+      });
+    },
+    LAST_DEPLOYED_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "last_deployed",
+        direction: "DESC"
+      });
+    },
+    PERSON_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_id",
+        direction: "ASC"
+      });
+    },
+    PERSON_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_id",
+        direction: "DESC"
+      });
+    },
+    ORGANIZATION_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "organization_id",
+        direction: "ASC"
+      });
+    },
+    ORGANIZATION_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "organization_id",
+        direction: "DESC"
+      });
+    },
+    AWS_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "aws_id",
+        direction: "ASC"
+      });
+    },
+    AWS_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "aws_id",
+        direction: "DESC"
+      });
     }
   },
   GcpApplicationsConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   GcpApplication: {
     __assertStep: assertPgClassSingleStep,
-    id($record) {
-      return $record.get("id");
-    },
-    name($record) {
-      return $record.get("name");
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of gcp_applicationsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return otherSource_gcp_applicationsPgResource.get(spec);
     },
     lastDeployed($record) {
       return $record.get("last_deployed");
@@ -14650,7 +13777,7 @@ export const plans = {
     },
     vulnerabilities: {
       plan($parent) {
-        const $record = undefined ? $parent.get("result") : $parent;
+        const $record = $parent;
         for (let i = 0, l = paths5.length; i < l; i++) {
           const path = paths5[i];
           const firstLayer = path.layers[0];
@@ -14664,76 +13791,49 @@ export const plans = {
         }
         const $list = pgUnionAll({
           attributes: spec_Vulnerability.attributes,
-          resourceByTypeName: resourceByTypeName5,
+          resourceByTypeName: resourceByTypeName8,
           members: members5,
           name: "vulnerabilities"
         });
-        if (true) {
-          return connection($list);
-        } else if (false) {
-          return $list.single();
-        } else {
-          return $list;
-        }
+        return connection($list);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
+        },
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
+        },
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
+        },
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
+        },
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
+        },
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
+        },
+        only($parent, $connection, fieldArgs) {
+          const $union = $connection.getSubplan();
+          const $ltt = fieldArgs.getRaw();
+          if ($ltt instanceof ConstantStep && $ltt.data == null) {
+            // No action
+          } else {
+            $union.apply(lambda($ltt, limitToTypes));
           }
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
-        },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
-        },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
-        },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
-        },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("VulnerabilitiesOrderBy"));
-            return null;
-          }
-        },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
-        },
-        only: {
-          autoApplyAfterParentPlan: true,
-          applyPlan($parent, $connection, fieldArgs) {
-            const $union = $connection.getSubplan();
-            $union.limitToTypes(fieldArgs.getRaw().eval());
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
     owner($parent) {
-      const $record = undefined ? $parent.get("result") : $parent;
+      const $record = $parent;
       for (let i = 0, l = paths6.length; i < l; i++) {
         const path = paths6[i];
         const firstLayer = path.layers[0];
@@ -14747,17 +13847,11 @@ export const plans = {
       }
       const $list = pgUnionAll({
         attributes: attributes3,
-        resourceByTypeName: resourceByTypeName6,
+        resourceByTypeName: resourceByTypeName9,
         members: members6,
         name: "owner"
       });
-      if (false) {
-        return connection($list);
-      } else if (true) {
-        return $list.single();
-      } else {
-        return $list;
-      }
+      return $list.single();
     }
   },
   GcpApplicationsEdge: {
@@ -14769,385 +13863,154 @@ export const plans = {
       return $edge.node();
     }
   },
-  GcpApplicationsOrderBy: {
-    NATURAL: {
-      applyPlan() {}
+  GcpApplicationCondition: {
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
-    PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        gcp_applicationsUniques[0].attributes.forEach(attributeName => {
-          const attribute = gcpApplicationsCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
+    name($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "name",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+        }
+      });
     },
-    PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        gcp_applicationsUniques[0].attributes.forEach(attributeName => {
-          const attribute = gcpApplicationsCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
+    lastDeployed($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "last_deployed",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
+        }
+      });
     },
-    ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    personId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "person_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    organizationId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "organization_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    NAME_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    gcpId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "gcp_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
         }
-        plan.orderBy({
-          attribute: "name",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    NAME_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "name",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    LAST_DEPLOYED_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "last_deployed",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    LAST_DEPLOYED_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "last_deployed",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    PERSON_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "person_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    PERSON_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "person_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ORGANIZATION_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "organization_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ORGANIZATION_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "organization_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    GCP_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "gcp_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    GCP_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "gcp_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     }
   },
-  GcpApplicationCondition: {
-    id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_gcpApplications.attributes.id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+  GcpApplicationsOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      gcp_applicationsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    name: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_gcpApplications.attributes.name.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    PRIMARY_KEY_DESC(queryBuilder) {
+      gcp_applicationsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    lastDeployed: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "last_deployed",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "last_deployed",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_gcpApplications.attributes.last_deployed.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    personId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "person_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "person_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_gcpApplications.attributes.person_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    organizationId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "organization_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "organization_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_gcpApplications.attributes.organization_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    NAME_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "name",
+        direction: "ASC"
+      });
     },
-    gcpId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "gcp_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "gcp_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_gcpApplications.attributes.gcp_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    NAME_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "name",
+        direction: "DESC"
+      });
+    },
+    LAST_DEPLOYED_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "last_deployed",
+        direction: "ASC"
+      });
+    },
+    LAST_DEPLOYED_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "last_deployed",
+        direction: "DESC"
+      });
+    },
+    PERSON_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_id",
+        direction: "ASC"
+      });
+    },
+    PERSON_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_id",
+        direction: "DESC"
+      });
+    },
+    ORGANIZATION_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "organization_id",
+        direction: "ASC"
+      });
+    },
+    ORGANIZATION_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "organization_id",
+        direction: "DESC"
+      });
+    },
+    GCP_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "gcp_id",
+        direction: "ASC"
+      });
+    },
+    GCP_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "gcp_id",
+        direction: "DESC"
+      });
     }
   },
   LogEntriesEdge: {
@@ -15161,16 +14024,6 @@ export const plans = {
   },
   SingleTableItemsConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
@@ -15184,651 +14037,323 @@ export const plans = {
       return $edge.node();
     }
   },
-  SingleTableItemsOrderBy: {
-    NATURAL: {
-      applyPlan() {}
+  SingleTableItemCondition: {
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
-    PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        single_table_itemsUniques[0].attributes.forEach(attributeName => {
-          const attribute = singleTableItemsCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
+    type($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "type",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
+        }
+      });
     },
-    PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        single_table_itemsUniques[0].attributes.forEach(attributeName => {
-          const attribute = singleTableItemsCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
+    parentId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "parent_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
-    ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    rootTopicId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "root_topic_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    authorId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "author_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    TYPE_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    position($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "position",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.bigint)}`;
         }
-        plan.orderBy({
-          attribute: "type",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    TYPE_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    createdAt($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "created_at",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
         }
-        plan.orderBy({
-          attribute: "type",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    PARENT_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    updatedAt($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "updated_at",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
         }
-        plan.orderBy({
-          attribute: "parent_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    PARENT_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    isExplicitlyArchived($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "is_explicitly_archived",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
         }
-        plan.orderBy({
-          attribute: "parent_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    ROOT_TOPIC_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    archivedAt($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "archived_at",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
         }
-        plan.orderBy({
-          attribute: "root_topic_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ROOT_TOPIC_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "root_topic_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    AUTHOR_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "author_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    AUTHOR_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "author_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    POSITION_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "position",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    POSITION_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "position",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CREATED_AT_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "created_at",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CREATED_AT_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "created_at",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    UPDATED_AT_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "updated_at",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    UPDATED_AT_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "updated_at",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    IS_EXPLICITLY_ARCHIVED_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "is_explicitly_archived",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    IS_EXPLICITLY_ARCHIVED_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "is_explicitly_archived",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ARCHIVED_AT_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "archived_at",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ARCHIVED_AT_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "archived_at",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     }
   },
-  SingleTableItemCondition: {
-    id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItems.attributes.id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+  SingleTableItemsOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      single_table_itemsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    type: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "type",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "type",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItems.attributes.type.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    PRIMARY_KEY_DESC(queryBuilder) {
+      single_table_itemsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    parentId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "parent_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "parent_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItems.attributes.parent_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    rootTopicId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "root_topic_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "root_topic_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItems.attributes.root_topic_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    authorId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "author_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "author_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItems.attributes.author_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    TYPE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "type",
+        direction: "ASC"
+      });
     },
-    position: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "position",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "position",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItems.attributes.position.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    TYPE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "type",
+        direction: "DESC"
+      });
     },
-    createdAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "created_at",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "created_at",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItems.attributes.created_at.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    PARENT_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "parent_id",
+        direction: "ASC"
+      });
     },
-    updatedAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "updated_at",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "updated_at",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItems.attributes.updated_at.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    PARENT_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "parent_id",
+        direction: "DESC"
+      });
     },
-    isExplicitlyArchived: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "is_explicitly_archived",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "is_explicitly_archived",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItems.attributes.is_explicitly_archived.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ROOT_TOPIC_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "root_topic_id",
+        direction: "ASC"
+      });
     },
-    archivedAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "archived_at",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "archived_at",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItems.attributes.archived_at.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ROOT_TOPIC_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "root_topic_id",
+        direction: "DESC"
+      });
+    },
+    AUTHOR_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "author_id",
+        direction: "ASC"
+      });
+    },
+    AUTHOR_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "author_id",
+        direction: "DESC"
+      });
+    },
+    POSITION_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "position",
+        direction: "ASC"
+      });
+    },
+    POSITION_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "position",
+        direction: "DESC"
+      });
+    },
+    CREATED_AT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "created_at",
+        direction: "ASC"
+      });
+    },
+    CREATED_AT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "created_at",
+        direction: "DESC"
+      });
+    },
+    UPDATED_AT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "updated_at",
+        direction: "ASC"
+      });
+    },
+    UPDATED_AT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "updated_at",
+        direction: "DESC"
+      });
+    },
+    IS_EXPLICITLY_ARCHIVED_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "is_explicitly_archived",
+        direction: "ASC"
+      });
+    },
+    IS_EXPLICITLY_ARCHIVED_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "is_explicitly_archived",
+        direction: "DESC"
+      });
+    },
+    ARCHIVED_AT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "archived_at",
+        direction: "ASC"
+      });
+    },
+    ARCHIVED_AT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "archived_at",
+        direction: "DESC"
+      });
     }
   },
   RelationalItemsConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
+  RelationalItem: {
+    __toSpecifier(step) {
+      if (step instanceof PgSelectSingleStep && step.resource !== otherSource_relational_itemsPgResource) {
+        // Assume it's a child; return description of base
+        // PERF: ideally we'd use relationship
+        // traversal instead, this would both be
+        // shorter and also cacheable.
+        const stepPk = step.resource.uniques.find(u => u.isPrimary)?.attributes;
+        if (!stepPk) {
+          throw new Error(`Expected a relational record for ${otherSource_relational_itemsPgResource.name}, but found one for ${step.resource.name} which has no primary key!`);
+        }
+        if (stepPk.length !== relational_itemsUniques[0].attributes.length) {
+          throw new Error(`Expected a relational record for ${otherSource_relational_itemsPgResource.name}, but found one for ${step.resource.name} which has a primary key with a different number of columns!`);
+        }
+        return object(Object.fromEntries(relational_itemsUniques[0].attributes.map((attrName, idx) => [attrName, get2(step, stepPk[idx])])));
+      } else {
+        // Assume it is or describes the base:
+        return object(Object.fromEntries(relational_itemsUniques[0].attributes.map(attrName => [attrName, get2(step, attrName)])));
+      }
+    },
+    __planType($specifier, {
+      $original
+    }) {
+      const $inStep = $original ?? $specifier;
+      // A PgSelectSingleStep representing the base relational table
+      const $base = (() => {
+        if ($inStep instanceof PgSelectSingleStep) {
+          if ($inStep.resource.codec === otherSource_relational_itemsPgResource.codec) {
+            // It's the core table; that's what we want!
+            return $inStep;
+          } else {
+            // Assume it's a child; get base record by primary key
+            // PERF: ideally we'd use relationship
+            // traversal instead, this would both be
+            // shorter and also cacheable.
+            const stepPk = $inStep.resource.uniques.find(u => u.isPrimary)?.attributes;
+            if (!stepPk) {
+              throw new Error(`Expected a relational record for ${otherSource_relational_itemsPgResource.name}, but found one for ${$inStep.resource.name} which has no primary key!`);
+            }
+            if (stepPk.length !== relational_itemsUniques[0].attributes.length) {
+              throw new Error(`Expected a relational record for ${otherSource_relational_itemsPgResource.name}, but found one for ${$inStep.resource.name} which has a primary key with a different number of columns!`);
+            }
+            return otherSource_relational_itemsPgResource.get(Object.fromEntries(relational_itemsUniques[0].attributes.map((attrName, idx) => [attrName, get2($inStep, stepPk[idx])])));
+          }
+        } else {
+          // Assume it's an object representing the base table
+          return otherSource_relational_itemsPgResource.get(Object.fromEntries(relational_itemsUniques[0].attributes.map(attrName => [attrName, get2($inStep, attrName)])));
+        }
+      })();
+      const $typeVal = get2($base, "type");
+      const $__typename = lambda($typeVal, RelationalItem_typeNameFromType, true);
+      return {
+        $__typename,
+        planForType(type) {
+          const spec = Object.values(spec_relationalItems.polymorphism.types).find(s => s.name === type.name);
+          if (!spec) {
+            throw new Error(`${this} Could not find matching name for relational polymorphic '${type.name}'`);
+          }
+          return $base.singleRelation(spec.relationName);
+        }
+      };
+    }
+  },
   RelationalItemRelationsConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   RelationalItemRelation: {
     __assertStep: assertPgClassSingleStep,
-    id($record) {
-      return $record.get("id");
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of relational_item_relationsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_relational_item_relationsPgResource.get(spec);
     },
     parentId($record) {
       return $record.get("parent_id");
@@ -15858,22 +14383,19 @@ export const plans = {
   },
   RelationalItemRelationCompositePksConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   RelationalItemRelationCompositePk: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of relational_item_relation_composite_pksUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_relational_item_relation_composite_pksPgResource.get(spec);
+    },
     parentId($record) {
       return $record.get("parent_id");
     },
@@ -15909,813 +14431,321 @@ export const plans = {
       return $edge.node();
     }
   },
-  RelationalItemsOrderBy: {
-    NATURAL: {
-      applyPlan() {}
-    },
-    PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        relational_itemsUniques[0].attributes.forEach(attributeName => {
-          const attribute = relationalItemsCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
-    },
-    PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        relational_itemsUniques[0].attributes.forEach(attributeName => {
-          const attribute = relationalItemsCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
-    },
-    ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    TYPE_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "type",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    TYPE_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "type",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    PARENT_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "parent_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    PARENT_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "parent_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ROOT_TOPIC_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "root_topic_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ROOT_TOPIC_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "root_topic_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    AUTHOR_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "author_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    AUTHOR_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "author_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    POSITION_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "position",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    POSITION_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "position",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CREATED_AT_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "created_at",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CREATED_AT_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "created_at",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    UPDATED_AT_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "updated_at",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    UPDATED_AT_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "updated_at",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    IS_EXPLICITLY_ARCHIVED_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "is_explicitly_archived",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    IS_EXPLICITLY_ARCHIVED_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "is_explicitly_archived",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ARCHIVED_AT_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "archived_at",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ARCHIVED_AT_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "archived_at",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    }
-  },
   RelationalItemCondition: {
-    id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.id.codec)}`;
-            }
-          });
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      });
     },
-    type: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "type",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "type",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.type.codec)}`;
-            }
-          });
+    type($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "type",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      });
     },
-    parentId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "parent_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "parent_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.parent_id.codec)}`;
-            }
-          });
+    parentId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "parent_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      });
     },
-    rootTopicId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "root_topic_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "root_topic_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.root_topic_id.codec)}`;
-            }
-          });
+    rootTopicId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "root_topic_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      });
     },
-    authorId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "author_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "author_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.author_id.codec)}`;
-            }
-          });
+    authorId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "author_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      });
     },
-    position: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "position",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "position",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.position.codec)}`;
-            }
-          });
+    position($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "position",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.bigint)}`;
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      });
     },
-    createdAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "created_at",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "created_at",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.created_at.codec)}`;
-            }
-          });
+    createdAt($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "created_at",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      });
     },
-    updatedAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "updated_at",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "updated_at",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.updated_at.codec)}`;
-            }
-          });
+    updatedAt($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "updated_at",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      });
     },
-    isExplicitlyArchived: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "is_explicitly_archived",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "is_explicitly_archived",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.is_explicitly_archived.codec)}`;
-            }
-          });
+    isExplicitlyArchived($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "is_explicitly_archived",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      });
     },
-    archivedAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "archived_at",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "archived_at",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.archived_at.codec)}`;
-            }
-          });
+    archivedAt($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "archived_at",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      });
     }
   },
-  ApplicationsOrderBy: {
-    NATURAL: {
-      applyPlan() {}
-    },
-    ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+  RelationalItemsOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      relational_itemsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
         });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
+    PRIMARY_KEY_DESC(queryBuilder) {
+      relational_itemsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
         });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    NAME_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "name",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    NAME_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "name",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    LAST_DEPLOYED_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "last_deployed",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+    TYPE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "type",
+        direction: "ASC"
+      });
     },
-    LAST_DEPLOYED_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "last_deployed",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+    TYPE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "type",
+        direction: "DESC"
+      });
+    },
+    PARENT_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "parent_id",
+        direction: "ASC"
+      });
+    },
+    PARENT_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "parent_id",
+        direction: "DESC"
+      });
+    },
+    ROOT_TOPIC_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "root_topic_id",
+        direction: "ASC"
+      });
+    },
+    ROOT_TOPIC_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "root_topic_id",
+        direction: "DESC"
+      });
+    },
+    AUTHOR_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "author_id",
+        direction: "ASC"
+      });
+    },
+    AUTHOR_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "author_id",
+        direction: "DESC"
+      });
+    },
+    POSITION_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "position",
+        direction: "ASC"
+      });
+    },
+    POSITION_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "position",
+        direction: "DESC"
+      });
+    },
+    CREATED_AT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "created_at",
+        direction: "ASC"
+      });
+    },
+    CREATED_AT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "created_at",
+        direction: "DESC"
+      });
+    },
+    UPDATED_AT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "updated_at",
+        direction: "ASC"
+      });
+    },
+    UPDATED_AT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "updated_at",
+        direction: "DESC"
+      });
+    },
+    IS_EXPLICITLY_ARCHIVED_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "is_explicitly_archived",
+        direction: "ASC"
+      });
+    },
+    IS_EXPLICITLY_ARCHIVED_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "is_explicitly_archived",
+        direction: "DESC"
+      });
+    },
+    ARCHIVED_AT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "archived_at",
+        direction: "ASC"
+      });
+    },
+    ARCHIVED_AT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "archived_at",
+        direction: "DESC"
+      });
     }
   },
   ApplicationCondition: {
-    id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_Application.attributes.id.codec)}`;
-            }
-          });
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      });
     },
-    name: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_Application.attributes.name.codec)}`;
-            }
-          });
+    name($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "name",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      });
     },
-    lastDeployed: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "last_deployed",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "last_deployed",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_Application.attributes.last_deployed.codec)}`;
-            }
-          });
+    lastDeployed($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "last_deployed",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      });
+    }
+  },
+  ApplicationsOrderBy: {
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+    },
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+    },
+    NAME_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "name",
+        direction: "ASC"
+      });
+    },
+    NAME_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "name",
+        direction: "DESC"
+      });
+    },
+    LAST_DEPLOYED_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "last_deployed",
+        direction: "ASC"
+      });
+    },
+    LAST_DEPLOYED_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "last_deployed",
+        direction: "DESC"
+      });
     }
   },
   SingleTableItemRelationsConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   SingleTableItemRelation: {
     __assertStep: assertPgClassSingleStep,
-    id($record) {
-      return $record.get("id");
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of single_table_item_relationsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return otherSource_single_table_item_relationsPgResource.get(spec);
     },
     parentId($record) {
       return $record.get("parent_id");
@@ -16745,22 +14775,19 @@ export const plans = {
   },
   SingleTableItemRelationCompositePksConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
   },
   SingleTableItemRelationCompositePk: {
     __assertStep: assertPgClassSingleStep,
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of single_table_item_relation_composite_pksUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return otherSource_single_table_item_relation_composite_pksPgResource.get(spec);
+    },
     parentId($record) {
       return $record.get("parent_id");
     },
@@ -16787,420 +14814,170 @@ export const plans = {
       return $edge.node();
     }
   },
-  SingleTableItemRelationsOrderBy: {
-    NATURAL: {
-      applyPlan() {}
-    },
-    PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        single_table_item_relationsUniques[0].attributes.forEach(attributeName => {
-          const attribute = singleTableItemRelationsCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
-    },
-    PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        single_table_item_relationsUniques[0].attributes.forEach(attributeName => {
-          const attribute = singleTableItemRelationsCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
-    },
-    ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    PARENT_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "parent_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    PARENT_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "parent_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CHILD_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "child_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CHILD_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "child_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    }
-  },
   SingleTableItemRelationCondition: {
-    id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItemRelations.attributes.id.codec)}`;
-            }
-          });
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      });
     },
-    parentId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "parent_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "parent_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItemRelations.attributes.parent_id.codec)}`;
-            }
-          });
+    parentId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "parent_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      });
     },
-    childId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "child_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "child_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItemRelations.attributes.child_id.codec)}`;
-            }
-          });
+    childId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "child_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      });
     }
   },
-  SingleTableItemRelationCompositePksOrderBy: {
-    NATURAL: {
-      applyPlan() {}
-    },
-    PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        single_table_item_relation_composite_pksUniques[0].attributes.forEach(attributeName => {
-          const attribute = singleTableItemRelationCompositePksCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
+  SingleTableItemRelationsOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      single_table_item_relationsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
         });
-        step.setOrderIsUnique();
-      }
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        single_table_item_relation_composite_pksUniques[0].attributes.forEach(attributeName => {
-          const attribute = singleTableItemRelationCompositePksCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
+    PRIMARY_KEY_DESC(queryBuilder) {
+      single_table_item_relationsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
         });
-        step.setOrderIsUnique();
-      }
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    PARENT_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "parent_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    PARENT_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "parent_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    CHILD_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "child_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+    PARENT_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "parent_id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    CHILD_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "child_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+    PARENT_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "parent_id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    CHILD_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "child_id",
+        direction: "ASC"
+      });
+    },
+    CHILD_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "child_id",
+        direction: "DESC"
+      });
     }
   },
   SingleTableItemRelationCompositePkCondition: {
-    parentId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "parent_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "parent_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItemRelationCompositePks.attributes.parent_id.codec)}`;
-            }
-          });
+    parentId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "parent_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      });
     },
-    childId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "child_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "child_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItemRelationCompositePks.attributes.child_id.codec)}`;
-            }
-          });
+    childId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "child_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      });
+    }
+  },
+  SingleTableItemRelationCompositePksOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      single_table_item_relation_composite_pksUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      single_table_item_relation_composite_pksUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PARENT_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "parent_id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PARENT_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "parent_id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    CHILD_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "child_id",
+        direction: "ASC"
+      });
+    },
+    CHILD_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "child_id",
+        direction: "DESC"
+      });
     }
   },
   SingleTablePost: {
     __assertStep: assertPgClassSingleStep,
     meaningOfLife($in, args, _info) {
-      if (!hasRecord($in)) {
-        throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
-      }
-      const extraSelectArgs = makeArgs2(args);
-      /**
-       * An optimisation - if all our dependencies are
-       * compatible with the expression's class plan then we
-       * can inline ourselves into that, otherwise we must
-       * issue the query separately.
-       */
-      const canUseExpressionDirectly = $in instanceof PgSelectSingleStep && extraSelectArgs.every(a => stepAMayDependOnStepB($in.getClassStep(), a.step));
-      const $row = canUseExpressionDirectly ? $in : pgSelectSingleFromRecord($in.resource, $in.record());
-      const selectArgs = [{
-        step: $row.record()
-      }, ...extraSelectArgs];
-      if (resource_single_table_items_meaning_of_lifePgResource.isUnique && !resource_single_table_items_meaning_of_lifePgResource.codec.attributes && typeof resource_single_table_items_meaning_of_lifePgResource.from === "function") {
-        // This is a scalar computed attribute, let's inline the expression
-        const newSelectArgs = selectArgs.map((arg, i) => {
-          const {
-            name
-          } = arg;
-          if (i === 0) {
-            return {
-              name,
-              placeholder: $row.getClassStep().alias
-            };
-          } else if ("pgCodec" in arg && arg.pgCodec) {
-            return {
-              name,
-              placeholder: $row.placeholder(arg.step, arg.pgCodec)
-            };
-          } else {
-            return {
-              name,
-              placeholder: $row.placeholder(arg.step)
-            };
-          }
-        });
-        return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec, undefined)`${resource_single_table_items_meaning_of_lifePgResource.from(...newSelectArgs)}`;
-      }
-      // PERF: or here, if scalar add select to `$row`?
-      return resource_single_table_items_meaning_of_lifePgResource.execute(selectArgs);
-    },
-    id($record) {
-      return $record.get("id");
-    },
-    type($record) {
-      return $record.get("type");
+      const {
+        $row,
+        selectArgs
+      } = pgFunctionArgumentsFromArgs($in, makeArgs_first_party_vulnerabilities_cvss_score_int(args), true);
+      const from = pgFromExpression($row, resource_single_table_items_meaning_of_lifePgResource.from, resource_single_table_items_meaning_of_lifePgResource.parameters, selectArgs);
+      return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec, undefined)`${from}`;
     },
     parentId($record) {
       return $record.get("parent_id");
@@ -17210,9 +14987,6 @@ export const plans = {
     },
     authorId($record) {
       return $record.get("author_id");
-    },
-    position($record) {
-      return $record.get("position");
     },
     createdAt($record) {
       return $record.get("created_at");
@@ -17228,12 +15002,6 @@ export const plans = {
     },
     subject($record) {
       return $record.get("title");
-    },
-    description($record) {
-      return $record.get("description");
-    },
-    note($record) {
-      return $record.get("note");
     },
     priorityId($record) {
       return $record.get("priority_id");
@@ -17261,51 +15029,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -17317,51 +15062,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -17373,51 +15095,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -17429,51 +15128,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationCompositePksOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -17485,51 +15161,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationCompositePksOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -17541,11 +15194,12 @@ export const plans = {
   },
   Priority: {
     __assertStep: assertPgClassSingleStep,
-    id($record) {
-      return $record.get("id");
-    },
-    title($record) {
-      return $record.get("title");
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of prioritiesUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return otherSource_prioritiesPgResource.get(spec);
     },
     singleTableItemsByPriorityId: {
       plan($record) {
@@ -17555,51 +15209,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     }
@@ -17607,54 +15238,12 @@ export const plans = {
   SingleTableDivider: {
     __assertStep: assertPgClassSingleStep,
     meaningOfLife($in, args, _info) {
-      if (!hasRecord($in)) {
-        throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
-      }
-      const extraSelectArgs = makeArgs3(args);
-      /**
-       * An optimisation - if all our dependencies are
-       * compatible with the expression's class plan then we
-       * can inline ourselves into that, otherwise we must
-       * issue the query separately.
-       */
-      const canUseExpressionDirectly = $in instanceof PgSelectSingleStep && extraSelectArgs.every(a => stepAMayDependOnStepB($in.getClassStep(), a.step));
-      const $row = canUseExpressionDirectly ? $in : pgSelectSingleFromRecord($in.resource, $in.record());
-      const selectArgs = [{
-        step: $row.record()
-      }, ...extraSelectArgs];
-      if (resource_single_table_items_meaning_of_lifePgResource.isUnique && !resource_single_table_items_meaning_of_lifePgResource.codec.attributes && typeof resource_single_table_items_meaning_of_lifePgResource.from === "function") {
-        // This is a scalar computed attribute, let's inline the expression
-        const newSelectArgs = selectArgs.map((arg, i) => {
-          const {
-            name
-          } = arg;
-          if (i === 0) {
-            return {
-              name,
-              placeholder: $row.getClassStep().alias
-            };
-          } else if ("pgCodec" in arg && arg.pgCodec) {
-            return {
-              name,
-              placeholder: $row.placeholder(arg.step, arg.pgCodec)
-            };
-          } else {
-            return {
-              name,
-              placeholder: $row.placeholder(arg.step)
-            };
-          }
-        });
-        return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec, undefined)`${resource_single_table_items_meaning_of_lifePgResource.from(...newSelectArgs)}`;
-      }
-      // PERF: or here, if scalar add select to `$row`?
-      return resource_single_table_items_meaning_of_lifePgResource.execute(selectArgs);
-    },
-    id($record) {
-      return $record.get("id");
-    },
-    type($record) {
-      return $record.get("type");
+      const {
+        $row,
+        selectArgs
+      } = pgFunctionArgumentsFromArgs($in, makeArgs_first_party_vulnerabilities_cvss_score_int(args), true);
+      const from = pgFromExpression($row, resource_single_table_items_meaning_of_lifePgResource.from, resource_single_table_items_meaning_of_lifePgResource.parameters, selectArgs);
+      return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec, undefined)`${from}`;
     },
     parentId($record) {
       return $record.get("parent_id");
@@ -17664,9 +15253,6 @@ export const plans = {
     },
     authorId($record) {
       return $record.get("author_id");
-    },
-    position($record) {
-      return $record.get("position");
     },
     createdAt($record) {
       return $record.get("created_at");
@@ -17679,12 +15265,6 @@ export const plans = {
     },
     archivedAt($record) {
       return $record.get("archived_at");
-    },
-    title($record) {
-      return $record.get("title");
-    },
-    color($record) {
-      return $record.get("color");
     },
     personByAuthorId($record) {
       return otherSource_peoplePgResource.get({
@@ -17704,51 +15284,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -17760,51 +15317,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -17816,51 +15350,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -17872,51 +15383,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationCompositePksOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -17928,51 +15416,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationCompositePksOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -17985,54 +15450,12 @@ export const plans = {
   SingleTableChecklist: {
     __assertStep: assertPgClassSingleStep,
     meaningOfLife($in, args, _info) {
-      if (!hasRecord($in)) {
-        throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
-      }
-      const extraSelectArgs = makeArgs4(args);
-      /**
-       * An optimisation - if all our dependencies are
-       * compatible with the expression's class plan then we
-       * can inline ourselves into that, otherwise we must
-       * issue the query separately.
-       */
-      const canUseExpressionDirectly = $in instanceof PgSelectSingleStep && extraSelectArgs.every(a => stepAMayDependOnStepB($in.getClassStep(), a.step));
-      const $row = canUseExpressionDirectly ? $in : pgSelectSingleFromRecord($in.resource, $in.record());
-      const selectArgs = [{
-        step: $row.record()
-      }, ...extraSelectArgs];
-      if (resource_single_table_items_meaning_of_lifePgResource.isUnique && !resource_single_table_items_meaning_of_lifePgResource.codec.attributes && typeof resource_single_table_items_meaning_of_lifePgResource.from === "function") {
-        // This is a scalar computed attribute, let's inline the expression
-        const newSelectArgs = selectArgs.map((arg, i) => {
-          const {
-            name
-          } = arg;
-          if (i === 0) {
-            return {
-              name,
-              placeholder: $row.getClassStep().alias
-            };
-          } else if ("pgCodec" in arg && arg.pgCodec) {
-            return {
-              name,
-              placeholder: $row.placeholder(arg.step, arg.pgCodec)
-            };
-          } else {
-            return {
-              name,
-              placeholder: $row.placeholder(arg.step)
-            };
-          }
-        });
-        return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec, undefined)`${resource_single_table_items_meaning_of_lifePgResource.from(...newSelectArgs)}`;
-      }
-      // PERF: or here, if scalar add select to `$row`?
-      return resource_single_table_items_meaning_of_lifePgResource.execute(selectArgs);
-    },
-    id($record) {
-      return $record.get("id");
-    },
-    type($record) {
-      return $record.get("type");
+      const {
+        $row,
+        selectArgs
+      } = pgFunctionArgumentsFromArgs($in, makeArgs_first_party_vulnerabilities_cvss_score_int(args), true);
+      const from = pgFromExpression($row, resource_single_table_items_meaning_of_lifePgResource.from, resource_single_table_items_meaning_of_lifePgResource.parameters, selectArgs);
+      return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec, undefined)`${from}`;
     },
     parentId($record) {
       return $record.get("parent_id");
@@ -18042,9 +15465,6 @@ export const plans = {
     },
     authorId($record) {
       return $record.get("author_id");
-    },
-    position($record) {
-      return $record.get("position");
     },
     createdAt($record) {
       return $record.get("created_at");
@@ -18057,9 +15477,6 @@ export const plans = {
     },
     archivedAt($record) {
       return $record.get("archived_at");
-    },
-    title($record) {
-      return $record.get("title");
     },
     personByAuthorId($record) {
       return otherSource_peoplePgResource.get({
@@ -18079,51 +15496,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -18135,51 +15529,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -18191,51 +15562,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -18247,51 +15595,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationCompositePksOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -18303,51 +15628,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationCompositePksOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -18365,54 +15667,12 @@ export const plans = {
   SingleTableChecklistItem: {
     __assertStep: assertPgClassSingleStep,
     meaningOfLife($in, args, _info) {
-      if (!hasRecord($in)) {
-        throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
-      }
-      const extraSelectArgs = makeArgs5(args);
-      /**
-       * An optimisation - if all our dependencies are
-       * compatible with the expression's class plan then we
-       * can inline ourselves into that, otherwise we must
-       * issue the query separately.
-       */
-      const canUseExpressionDirectly = $in instanceof PgSelectSingleStep && extraSelectArgs.every(a => stepAMayDependOnStepB($in.getClassStep(), a.step));
-      const $row = canUseExpressionDirectly ? $in : pgSelectSingleFromRecord($in.resource, $in.record());
-      const selectArgs = [{
-        step: $row.record()
-      }, ...extraSelectArgs];
-      if (resource_single_table_items_meaning_of_lifePgResource.isUnique && !resource_single_table_items_meaning_of_lifePgResource.codec.attributes && typeof resource_single_table_items_meaning_of_lifePgResource.from === "function") {
-        // This is a scalar computed attribute, let's inline the expression
-        const newSelectArgs = selectArgs.map((arg, i) => {
-          const {
-            name
-          } = arg;
-          if (i === 0) {
-            return {
-              name,
-              placeholder: $row.getClassStep().alias
-            };
-          } else if ("pgCodec" in arg && arg.pgCodec) {
-            return {
-              name,
-              placeholder: $row.placeholder(arg.step, arg.pgCodec)
-            };
-          } else {
-            return {
-              name,
-              placeholder: $row.placeholder(arg.step)
-            };
-          }
-        });
-        return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec, undefined)`${resource_single_table_items_meaning_of_lifePgResource.from(...newSelectArgs)}`;
-      }
-      // PERF: or here, if scalar add select to `$row`?
-      return resource_single_table_items_meaning_of_lifePgResource.execute(selectArgs);
-    },
-    id($record) {
-      return $record.get("id");
-    },
-    type($record) {
-      return $record.get("type");
+      const {
+        $row,
+        selectArgs
+      } = pgFunctionArgumentsFromArgs($in, makeArgs_first_party_vulnerabilities_cvss_score_int(args), true);
+      const from = pgFromExpression($row, resource_single_table_items_meaning_of_lifePgResource.from, resource_single_table_items_meaning_of_lifePgResource.parameters, selectArgs);
+      return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec, undefined)`${from}`;
     },
     parentId($record) {
       return $record.get("parent_id");
@@ -18422,9 +15682,6 @@ export const plans = {
     },
     authorId($record) {
       return $record.get("author_id");
-    },
-    position($record) {
-      return $record.get("position");
     },
     createdAt($record) {
       return $record.get("created_at");
@@ -18437,12 +15694,6 @@ export const plans = {
     },
     archivedAt($record) {
       return $record.get("archived_at");
-    },
-    description($record) {
-      return $record.get("description");
-    },
-    note($record) {
-      return $record.get("note");
     },
     priorityId($record) {
       return $record.get("priority_id");
@@ -18470,51 +15721,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -18526,51 +15754,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -18582,51 +15787,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -18638,51 +15820,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationCompositePksOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -18694,51 +15853,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationCompositePksOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -18750,14 +15886,12 @@ export const plans = {
   },
   RelationalTopic: {
     __assertStep: assertPgClassSingleStep,
-    title($record) {
-      return $record.get("title");
-    },
-    id($record) {
-      return $record.get("id");
-    },
-    type($record) {
-      return $record.get("type");
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of relational_topicsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_relational_topicsPgResource.get(spec);
     },
     parentId($record) {
       return $record.get("parent_id");
@@ -18767,9 +15901,6 @@ export const plans = {
     },
     authorId($record) {
       return $record.get("author_id");
-    },
-    position($record) {
-      return $record.get("position");
     },
     createdAt($record) {
       return $record.get("created_at");
@@ -18791,51 +15922,28 @@ export const plans = {
         return connection($records);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -18868,7 +15976,7 @@ export const plans = {
       return $relational_items.single();
     },
     relationalTopicByRootTopicId($record) {
-      const $relational_topics = relational_topics_relational_topicsPgResource.find();
+      const $relational_topics = resource_relational_topicsPgResource.find();
       let previousAlias = $relational_topics.alias;
       const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
       $relational_topics.join({
@@ -18897,57 +16005,34 @@ export const plans = {
         return connection($relational_items);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
     relationalItemRelationsByChildId: {
       plan($record) {
-        const $relational_item_relations = relational_item_relations_relational_item_relationsPgResource.find();
+        const $relational_item_relations = resource_relational_item_relationsPgResource.find();
         let previousAlias = $relational_item_relations.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relations.join({
@@ -18961,57 +16046,34 @@ export const plans = {
         return connection($relational_item_relations);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemRelationsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
     relationalItemRelationsByParentId: {
       plan($record) {
-        const $relational_item_relations = relational_item_relations_relational_item_relationsPgResource.find();
+        const $relational_item_relations = resource_relational_item_relationsPgResource.find();
         let previousAlias = $relational_item_relations.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relations.join({
@@ -19025,57 +16087,34 @@ export const plans = {
         return connection($relational_item_relations);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemRelationsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
     relationalItemRelationCompositePksByChildId: {
       plan($record) {
-        const $relational_item_relation_composite_pks = relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource.find();
+        const $relational_item_relation_composite_pks = resource_relational_item_relation_composite_pksPgResource.find();
         let previousAlias = $relational_item_relation_composite_pks.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relation_composite_pks.join({
@@ -19089,57 +16128,34 @@ export const plans = {
         return connection($relational_item_relation_composite_pks);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemRelationCompositePksOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
     relationalItemRelationCompositePksByParentId: {
       plan($record) {
-        const $relational_item_relation_composite_pks = relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource.find();
+        const $relational_item_relation_composite_pks = resource_relational_item_relation_composite_pksPgResource.find();
         let previousAlias = $relational_item_relation_composite_pks.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relation_composite_pks.join({
@@ -19153,434 +16169,195 @@ export const plans = {
         return connection($relational_item_relation_composite_pks);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemRelationCompositePksOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
-        }
-      }
-    }
-  },
-  RelationalItemRelationsOrderBy: {
-    NATURAL: {
-      applyPlan() {}
-    },
-    PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        relational_item_relationsUniques[0].attributes.forEach(attributeName => {
-          const attribute = relationalItemRelationsCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
-    },
-    PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        relational_item_relationsUniques[0].attributes.forEach(attributeName => {
-          const attribute = relationalItemRelationsCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
-    },
-    ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    PARENT_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "parent_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    PARENT_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "parent_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CHILD_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "child_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CHILD_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "child_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     }
   },
   RelationalItemRelationCondition: {
-    id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItemRelations.attributes.id.codec)}`;
-            }
-          });
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      });
     },
-    parentId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "parent_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "parent_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItemRelations.attributes.parent_id.codec)}`;
-            }
-          });
+    parentId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "parent_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      });
     },
-    childId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "child_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "child_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItemRelations.attributes.child_id.codec)}`;
-            }
-          });
+    childId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "child_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      });
     }
   },
-  RelationalItemRelationCompositePksOrderBy: {
-    NATURAL: {
-      applyPlan() {}
-    },
-    PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        relational_item_relation_composite_pksUniques[0].attributes.forEach(attributeName => {
-          const attribute = relationalItemRelationCompositePksCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
+  RelationalItemRelationsOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      relational_item_relationsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
         });
-        step.setOrderIsUnique();
-      }
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        relational_item_relation_composite_pksUniques[0].attributes.forEach(attributeName => {
-          const attribute = relationalItemRelationCompositePksCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
+    PRIMARY_KEY_DESC(queryBuilder) {
+      relational_item_relationsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
         });
-        step.setOrderIsUnique();
-      }
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    PARENT_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "parent_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    PARENT_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "parent_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    CHILD_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "child_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+    PARENT_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "parent_id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    CHILD_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "child_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+    PARENT_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "parent_id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    CHILD_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "child_id",
+        direction: "ASC"
+      });
+    },
+    CHILD_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "child_id",
+        direction: "DESC"
+      });
     }
   },
   RelationalItemRelationCompositePkCondition: {
-    parentId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "parent_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "parent_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItemRelationCompositePks.attributes.parent_id.codec)}`;
-            }
-          });
+    parentId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "parent_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      });
     },
-    childId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "child_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "child_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItemRelationCompositePks.attributes.child_id.codec)}`;
-            }
-          });
+    childId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "child_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+      });
+    }
+  },
+  RelationalItemRelationCompositePksOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      relational_item_relation_composite_pksUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      relational_item_relation_composite_pksUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PARENT_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "parent_id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PARENT_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "parent_id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    CHILD_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "child_id",
+        direction: "ASC"
+      });
+    },
+    CHILD_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "child_id",
+        direction: "DESC"
+      });
     }
   },
   RelationalPost: {
     __assertStep: assertPgClassSingleStep,
-    title($record) {
-      return $record.get("title");
-    },
-    description($record) {
-      return $record.get("description");
-    },
-    note($record) {
-      return $record.get("note");
-    },
-    id($record) {
-      return $record.get("id");
-    },
-    type($record) {
-      return $record.get("type");
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of relational_postsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_relational_postsPgResource.get(spec);
     },
     parentId($record) {
       return $record.get("parent_id");
@@ -19590,9 +16367,6 @@ export const plans = {
     },
     authorId($record) {
       return $record.get("author_id");
-    },
-    position($record) {
-      return $record.get("position");
     },
     createdAt($record) {
       return $record.get("created_at");
@@ -19635,7 +16409,7 @@ export const plans = {
       return $relational_items.single();
     },
     relationalTopicByRootTopicId($record) {
-      const $relational_topics = relational_topics_relational_topicsPgResource.find();
+      const $relational_topics = resource_relational_topicsPgResource.find();
       let previousAlias = $relational_topics.alias;
       const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
       $relational_topics.join({
@@ -19664,57 +16438,34 @@ export const plans = {
         return connection($relational_items);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
     relationalItemRelationsByChildId: {
       plan($record) {
-        const $relational_item_relations = relational_item_relations_relational_item_relationsPgResource.find();
+        const $relational_item_relations = resource_relational_item_relationsPgResource.find();
         let previousAlias = $relational_item_relations.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relations.join({
@@ -19728,57 +16479,34 @@ export const plans = {
         return connection($relational_item_relations);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemRelationsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
     relationalItemRelationsByParentId: {
       plan($record) {
-        const $relational_item_relations = relational_item_relations_relational_item_relationsPgResource.find();
+        const $relational_item_relations = resource_relational_item_relationsPgResource.find();
         let previousAlias = $relational_item_relations.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relations.join({
@@ -19792,57 +16520,34 @@ export const plans = {
         return connection($relational_item_relations);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemRelationsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
     relationalItemRelationCompositePksByChildId: {
       plan($record) {
-        const $relational_item_relation_composite_pks = relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource.find();
+        const $relational_item_relation_composite_pks = resource_relational_item_relation_composite_pksPgResource.find();
         let previousAlias = $relational_item_relation_composite_pks.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relation_composite_pks.join({
@@ -19856,57 +16561,34 @@ export const plans = {
         return connection($relational_item_relation_composite_pks);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemRelationCompositePksOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
     relationalItemRelationCompositePksByParentId: {
       plan($record) {
-        const $relational_item_relation_composite_pks = relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource.find();
+        const $relational_item_relation_composite_pks = resource_relational_item_relation_composite_pksPgResource.find();
         let previousAlias = $relational_item_relation_composite_pks.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relation_composite_pks.join({
@@ -19920,68 +16602,40 @@ export const plans = {
         return connection($relational_item_relation_composite_pks);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemRelationCompositePksOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     }
   },
   RelationalDivider: {
     __assertStep: assertPgClassSingleStep,
-    title($record) {
-      return $record.get("title");
-    },
-    color($record) {
-      return $record.get("color");
-    },
-    id($record) {
-      return $record.get("id");
-    },
-    type($record) {
-      return $record.get("type");
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of relational_dividersUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_relational_dividersPgResource.get(spec);
     },
     parentId($record) {
       return $record.get("parent_id");
@@ -19991,9 +16645,6 @@ export const plans = {
     },
     authorId($record) {
       return $record.get("author_id");
-    },
-    position($record) {
-      return $record.get("position");
     },
     createdAt($record) {
       return $record.get("created_at");
@@ -20036,7 +16687,7 @@ export const plans = {
       return $relational_items.single();
     },
     relationalTopicByRootTopicId($record) {
-      const $relational_topics = relational_topics_relational_topicsPgResource.find();
+      const $relational_topics = resource_relational_topicsPgResource.find();
       let previousAlias = $relational_topics.alias;
       const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
       $relational_topics.join({
@@ -20065,57 +16716,34 @@ export const plans = {
         return connection($relational_items);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
     relationalItemRelationsByChildId: {
       plan($record) {
-        const $relational_item_relations = relational_item_relations_relational_item_relationsPgResource.find();
+        const $relational_item_relations = resource_relational_item_relationsPgResource.find();
         let previousAlias = $relational_item_relations.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relations.join({
@@ -20129,57 +16757,34 @@ export const plans = {
         return connection($relational_item_relations);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemRelationsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
     relationalItemRelationsByParentId: {
       plan($record) {
-        const $relational_item_relations = relational_item_relations_relational_item_relationsPgResource.find();
+        const $relational_item_relations = resource_relational_item_relationsPgResource.find();
         let previousAlias = $relational_item_relations.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relations.join({
@@ -20193,57 +16798,34 @@ export const plans = {
         return connection($relational_item_relations);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemRelationsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
     relationalItemRelationCompositePksByChildId: {
       plan($record) {
-        const $relational_item_relation_composite_pks = relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource.find();
+        const $relational_item_relation_composite_pks = resource_relational_item_relation_composite_pksPgResource.find();
         let previousAlias = $relational_item_relation_composite_pks.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relation_composite_pks.join({
@@ -20257,57 +16839,34 @@ export const plans = {
         return connection($relational_item_relation_composite_pks);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemRelationCompositePksOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
     relationalItemRelationCompositePksByParentId: {
       plan($record) {
-        const $relational_item_relation_composite_pks = relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource.find();
+        const $relational_item_relation_composite_pks = resource_relational_item_relation_composite_pksPgResource.find();
         let previousAlias = $relational_item_relation_composite_pks.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relation_composite_pks.join({
@@ -20321,65 +16880,40 @@ export const plans = {
         return connection($relational_item_relation_composite_pks);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemRelationCompositePksOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     }
   },
   RelationalChecklist: {
     __assertStep: assertPgClassSingleStep,
-    title($record) {
-      return $record.get("title");
-    },
-    id($record) {
-      return $record.get("id");
-    },
-    type($record) {
-      return $record.get("type");
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of relational_checklistsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_relational_checklistsPgResource.get(spec);
     },
     parentId($record) {
       return $record.get("parent_id");
@@ -20389,9 +16923,6 @@ export const plans = {
     },
     authorId($record) {
       return $record.get("author_id");
-    },
-    position($record) {
-      return $record.get("position");
     },
     createdAt($record) {
       return $record.get("created_at");
@@ -20434,7 +16965,7 @@ export const plans = {
       return $relational_items.single();
     },
     relationalTopicByRootTopicId($record) {
-      const $relational_topics = relational_topics_relational_topicsPgResource.find();
+      const $relational_topics = resource_relational_topicsPgResource.find();
       let previousAlias = $relational_topics.alias;
       const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
       $relational_topics.join({
@@ -20463,57 +16994,34 @@ export const plans = {
         return connection($relational_items);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
     relationalItemRelationsByChildId: {
       plan($record) {
-        const $relational_item_relations = relational_item_relations_relational_item_relationsPgResource.find();
+        const $relational_item_relations = resource_relational_item_relationsPgResource.find();
         let previousAlias = $relational_item_relations.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relations.join({
@@ -20527,57 +17035,34 @@ export const plans = {
         return connection($relational_item_relations);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemRelationsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
     relationalItemRelationsByParentId: {
       plan($record) {
-        const $relational_item_relations = relational_item_relations_relational_item_relationsPgResource.find();
+        const $relational_item_relations = resource_relational_item_relationsPgResource.find();
         let previousAlias = $relational_item_relations.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relations.join({
@@ -20591,57 +17076,34 @@ export const plans = {
         return connection($relational_item_relations);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemRelationsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
     relationalItemRelationCompositePksByChildId: {
       plan($record) {
-        const $relational_item_relation_composite_pks = relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource.find();
+        const $relational_item_relation_composite_pks = resource_relational_item_relation_composite_pksPgResource.find();
         let previousAlias = $relational_item_relation_composite_pks.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relation_composite_pks.join({
@@ -20655,57 +17117,34 @@ export const plans = {
         return connection($relational_item_relation_composite_pks);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemRelationCompositePksOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
     relationalItemRelationCompositePksByParentId: {
       plan($record) {
-        const $relational_item_relation_composite_pks = relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource.find();
+        const $relational_item_relation_composite_pks = resource_relational_item_relation_composite_pksPgResource.find();
         let previousAlias = $relational_item_relation_composite_pks.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relation_composite_pks.join({
@@ -20719,68 +17158,40 @@ export const plans = {
         return connection($relational_item_relation_composite_pks);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemRelationCompositePksOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     }
   },
   RelationalChecklistItem: {
     __assertStep: assertPgClassSingleStep,
-    description($record) {
-      return $record.get("description");
-    },
-    note($record) {
-      return $record.get("note");
-    },
-    id($record) {
-      return $record.get("id");
-    },
-    type($record) {
-      return $record.get("type");
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of relational_checklist_itemsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_relational_checklist_itemsPgResource.get(spec);
     },
     parentId($record) {
       return $record.get("parent_id");
@@ -20790,9 +17201,6 @@ export const plans = {
     },
     authorId($record) {
       return $record.get("author_id");
-    },
-    position($record) {
-      return $record.get("position");
     },
     createdAt($record) {
       return $record.get("created_at");
@@ -20835,7 +17243,7 @@ export const plans = {
       return $relational_items.single();
     },
     relationalTopicByRootTopicId($record) {
-      const $relational_topics = relational_topics_relational_topicsPgResource.find();
+      const $relational_topics = resource_relational_topicsPgResource.find();
       let previousAlias = $relational_topics.alias;
       const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
       $relational_topics.join({
@@ -20864,57 +17272,34 @@ export const plans = {
         return connection($relational_items);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
     relationalItemRelationsByChildId: {
       plan($record) {
-        const $relational_item_relations = relational_item_relations_relational_item_relationsPgResource.find();
+        const $relational_item_relations = resource_relational_item_relationsPgResource.find();
         let previousAlias = $relational_item_relations.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relations.join({
@@ -20928,57 +17313,34 @@ export const plans = {
         return connection($relational_item_relations);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemRelationsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
     relationalItemRelationsByParentId: {
       plan($record) {
-        const $relational_item_relations = relational_item_relations_relational_item_relationsPgResource.find();
+        const $relational_item_relations = resource_relational_item_relationsPgResource.find();
         let previousAlias = $relational_item_relations.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relations.join({
@@ -20992,57 +17354,34 @@ export const plans = {
         return connection($relational_item_relations);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemRelationsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
     relationalItemRelationCompositePksByChildId: {
       plan($record) {
-        const $relational_item_relation_composite_pks = relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource.find();
+        const $relational_item_relation_composite_pks = resource_relational_item_relation_composite_pksPgResource.find();
         let previousAlias = $relational_item_relation_composite_pks.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relation_composite_pks.join({
@@ -21056,57 +17395,34 @@ export const plans = {
         return connection($relational_item_relation_composite_pks);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemRelationCompositePksOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
     relationalItemRelationCompositePksByParentId: {
       plan($record) {
-        const $relational_item_relation_composite_pks = relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource.find();
+        const $relational_item_relation_composite_pks = resource_relational_item_relation_composite_pksPgResource.find();
         let previousAlias = $relational_item_relation_composite_pks.alias;
         const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
         $relational_item_relation_composite_pks.join({
@@ -21120,51 +17436,28 @@ export const plans = {
         return connection($relational_item_relation_composite_pks);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemRelationCompositePksOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     }
@@ -21176,339 +17469,234 @@ export const plans = {
     query() {
       return rootValue();
     },
-    organizationByOrganizationId: {
-      plan(_$root, args) {
-        return otherSource_organizationsPgResource.get({
-          organization_id: args.get("organizationId")
-        });
-      },
-      args: {
-        organizationId: undefined
-      }
+    organizationByOrganizationId(_$root, {
+      $organizationId
+    }) {
+      return otherSource_organizationsPgResource.get({
+        organization_id: $organizationId
+      });
     },
-    organizationByName: {
-      plan(_$root, args) {
-        return otherSource_organizationsPgResource.get({
-          name: args.get("name")
-        });
-      },
-      args: {
-        name: undefined
-      }
+    organizationByName(_$root, {
+      $name
+    }) {
+      return otherSource_organizationsPgResource.get({
+        name: $name
+      });
     },
-    personByPersonId: {
-      plan(_$root, args) {
-        return otherSource_peoplePgResource.get({
-          person_id: args.get("personId")
-        });
-      },
-      args: {
-        personId: undefined
-      }
+    personByPersonId(_$root, {
+      $personId
+    }) {
+      return otherSource_peoplePgResource.get({
+        person_id: $personId
+      });
     },
-    personByUsername: {
-      plan(_$root, args) {
-        return otherSource_peoplePgResource.get({
-          username: args.get("username")
-        });
-      },
-      args: {
-        username: undefined
-      }
+    personByUsername(_$root, {
+      $username
+    }) {
+      return otherSource_peoplePgResource.get({
+        username: $username
+      });
     },
-    priorityById: {
-      plan(_$root, args) {
-        return otherSource_prioritiesPgResource.get({
-          id: args.get("id")
-        });
-      },
-      args: {
-        id: undefined
-      }
+    priorityById(_$root, {
+      $id
+    }) {
+      return otherSource_prioritiesPgResource.get({
+        id: $id
+      });
     },
-    relationalChecklistByChecklistItemId: {
-      plan(_$root, args) {
-        return resource_relational_checklistsPgResource.get({
-          checklist_item_id: args.get("checklistItemId")
-        });
-      },
-      args: {
-        checklistItemId: undefined
-      }
+    relationalChecklistByChecklistItemId(_$root, {
+      $checklistItemId
+    }) {
+      return resource_relational_checklistsPgResource.get({
+        checklist_item_id: $checklistItemId
+      });
     },
-    relationalItemRelationCompositePkByParentIdAndChildId: {
-      plan(_$root, args) {
-        return relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource.get({
-          parent_id: args.get("parentId"),
-          child_id: args.get("childId")
-        });
-      },
-      args: {
-        parentId: undefined,
-        childId: undefined
-      }
+    relationalItemRelationCompositePkByParentIdAndChildId(_$root, {
+      $parentId,
+      $childId
+    }) {
+      return resource_relational_item_relation_composite_pksPgResource.get({
+        parent_id: $parentId,
+        child_id: $childId
+      });
     },
-    relationalTopicByTopicItemId: {
-      plan(_$root, args) {
-        return relational_topics_relational_topicsPgResource.get({
-          topic_item_id: args.get("topicItemId")
-        });
-      },
-      args: {
-        topicItemId: undefined
-      }
+    relationalTopicByTopicItemId(_$root, {
+      $topicItemId
+    }) {
+      return resource_relational_topicsPgResource.get({
+        topic_item_id: $topicItemId
+      });
     },
-    singleTableItemRelationCompositePkByParentIdAndChildId: {
-      plan(_$root, args) {
-        return otherSource_single_table_item_relation_composite_pksPgResource.get({
-          parent_id: args.get("parentId"),
-          child_id: args.get("childId")
-        });
-      },
-      args: {
-        parentId: undefined,
-        childId: undefined
-      }
+    singleTableItemRelationCompositePkByParentIdAndChildId(_$root, {
+      $parentId,
+      $childId
+    }) {
+      return otherSource_single_table_item_relation_composite_pksPgResource.get({
+        parent_id: $parentId,
+        child_id: $childId
+      });
     },
-    relationalChecklistItemByChecklistItemItemId: {
-      plan(_$root, args) {
-        return resource_relational_checklist_itemsPgResource.get({
-          checklist_item_item_id: args.get("checklistItemItemId")
-        });
-      },
-      args: {
-        checklistItemItemId: undefined
-      }
+    relationalChecklistItemByChecklistItemItemId(_$root, {
+      $checklistItemItemId
+    }) {
+      return resource_relational_checklist_itemsPgResource.get({
+        checklist_item_item_id: $checklistItemItemId
+      });
     },
-    relationalDividerByDividerItemId: {
-      plan(_$root, args) {
-        return resource_relational_dividersPgResource.get({
-          divider_item_id: args.get("dividerItemId")
-        });
-      },
-      args: {
-        dividerItemId: undefined
-      }
+    relationalDividerByDividerItemId(_$root, {
+      $dividerItemId
+    }) {
+      return resource_relational_dividersPgResource.get({
+        divider_item_id: $dividerItemId
+      });
     },
-    relationalItemRelationById: {
-      plan(_$root, args) {
-        return relational_item_relations_relational_item_relationsPgResource.get({
-          id: args.get("id")
-        });
-      },
-      args: {
-        id: undefined
-      }
+    relationalItemRelationById(_$root, {
+      $id
+    }) {
+      return resource_relational_item_relationsPgResource.get({
+        id: $id
+      });
     },
-    relationalItemRelationByParentIdAndChildId: {
-      plan(_$root, args) {
-        return relational_item_relations_relational_item_relationsPgResource.get({
-          parent_id: args.get("parentId"),
-          child_id: args.get("childId")
-        });
-      },
-      args: {
-        parentId: undefined,
-        childId: undefined
-      }
+    relationalItemRelationByParentIdAndChildId(_$root, {
+      $parentId,
+      $childId
+    }) {
+      return resource_relational_item_relationsPgResource.get({
+        parent_id: $parentId,
+        child_id: $childId
+      });
     },
-    singleTableItemRelationById: {
-      plan(_$root, args) {
-        return otherSource_single_table_item_relationsPgResource.get({
-          id: args.get("id")
-        });
-      },
-      args: {
-        id: undefined
-      }
+    singleTableItemRelationById(_$root, {
+      $id
+    }) {
+      return otherSource_single_table_item_relationsPgResource.get({
+        id: $id
+      });
     },
-    singleTableItemRelationByParentIdAndChildId: {
-      plan(_$root, args) {
-        return otherSource_single_table_item_relationsPgResource.get({
-          parent_id: args.get("parentId"),
-          child_id: args.get("childId")
-        });
-      },
-      args: {
-        parentId: undefined,
-        childId: undefined
-      }
+    singleTableItemRelationByParentIdAndChildId(_$root, {
+      $parentId,
+      $childId
+    }) {
+      return otherSource_single_table_item_relationsPgResource.get({
+        parent_id: $parentId,
+        child_id: $childId
+      });
     },
-    logEntryById: {
-      plan(_$root, args) {
-        return otherSource_log_entriesPgResource.get({
-          id: args.get("id")
-        });
-      },
-      args: {
-        id: undefined
-      }
+    logEntryById(_$root, {
+      $id
+    }) {
+      return otherSource_log_entriesPgResource.get({
+        id: $id
+      });
     },
-    relationalPostByPostItemId: {
-      plan(_$root, args) {
-        return resource_relational_postsPgResource.get({
-          post_item_id: args.get("postItemId")
-        });
-      },
-      args: {
-        postItemId: undefined
-      }
+    relationalPostByPostItemId(_$root, {
+      $postItemId
+    }) {
+      return resource_relational_postsPgResource.get({
+        post_item_id: $postItemId
+      });
     },
-    firstPartyVulnerabilityById: {
-      plan(_$root, args) {
-        return paths_0_resource_first_party_vulnerabilitiesPgResource.get({
-          id: args.get("id")
-        });
-      },
-      args: {
-        id: undefined
-      }
+    firstPartyVulnerabilityById(_$root, {
+      $id
+    }) {
+      return paths_0_resource_first_party_vulnerabilitiesPgResource.get({
+        id: $id
+      });
     },
-    thirdPartyVulnerabilityById: {
-      plan(_$root, args) {
-        return paths_1_resource_third_party_vulnerabilitiesPgResource.get({
-          id: args.get("id")
-        });
-      },
-      args: {
-        id: undefined
-      }
+    thirdPartyVulnerabilityById(_$root, {
+      $id
+    }) {
+      return paths_1_resource_third_party_vulnerabilitiesPgResource.get({
+        id: $id
+      });
     },
-    awsApplicationById: {
-      plan(_$root, args) {
-        return otherSource_aws_applicationsPgResource.get({
-          id: args.get("id")
-        });
-      },
-      args: {
-        id: undefined
-      }
+    awsApplicationById(_$root, {
+      $id
+    }) {
+      return otherSource_aws_applicationsPgResource.get({
+        id: $id
+      });
     },
-    gcpApplicationById: {
-      plan(_$root, args) {
-        return otherSource_gcp_applicationsPgResource.get({
-          id: args.get("id")
-        });
-      },
-      args: {
-        id: undefined
-      }
+    gcpApplicationById(_$root, {
+      $id
+    }) {
+      return otherSource_gcp_applicationsPgResource.get({
+        id: $id
+      });
     },
     allSingleTables: {
       plan($parent, args, info) {
         const $select = getSelectPlanFromParentAndArgs($parent, args, info);
         return connection($select, {
-          // nodePlan: ($item) => $item,
           cursorPlan($item) {
             return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
           }
         });
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         }
       }
     },
-    getSingleTableTopicById: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs7(args);
-        return resource_get_single_table_topic_by_idPgResource.execute(selectArgs);
-      },
-      args: {
-        id: undefined
-      }
+    getSingleTableTopicById($root, args, _info) {
+      const selectArgs = makeArgs_get_single_table_topic_by_id(args);
+      return resource_get_single_table_topic_by_idPgResource.execute(selectArgs);
     },
     allVulnerabilities: {
       plan() {
         const $list = pgUnionAll({
           attributes: spec_Vulnerability.attributes,
-          resourceByTypeName: resourceByTypeName7,
+          resourceByTypeName: resourceByTypeName10,
           members: members7,
           name: "Vulnerability"
         });
-        return true ? connection($list) : $list;
+        return connection($list);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
+        },
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
+        },
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
+        },
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
+        },
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
+        },
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
+        },
+        only($parent, $connection, fieldArgs) {
+          const $union = $connection.getSubplan();
+          const $ltt = fieldArgs.getRaw();
+          if ($ltt instanceof ConstantStep && $ltt.data == null) {
+            // No action
+          } else {
+            $union.apply(lambda($ltt, limitToTypes));
           }
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
-        },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
-        },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
-        },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
-        },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("VulnerabilitiesOrderBy"));
-            return null;
-          }
-        },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
-        },
-        only: {
-          autoApplyAfterParentPlan: true,
-          applyPlan($parent, $connection, fieldArgs) {
-            const $union = $connection.getSubplan();
-            $union.limitToTypes(fieldArgs.getRaw().eval());
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -21516,65 +17704,44 @@ export const plans = {
       plan() {
         const $list = pgUnionAll({
           attributes: spec_Application.attributes,
-          resourceByTypeName: resourceByTypeName8,
+          resourceByTypeName: resourceByTypeName11,
           members: members8,
           name: "Application"
         });
-        return true ? connection($list) : $list;
+        return connection($list);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
+        },
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
+        },
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
+        },
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
+        },
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
+        },
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
+        },
+        only($parent, $connection, fieldArgs) {
+          const $union = $connection.getSubplan();
+          const $ltt = fieldArgs.getRaw();
+          if ($ltt instanceof ConstantStep && $ltt.data == null) {
+            // No action
+          } else {
+            $union.apply(lambda($ltt, limitToTypes));
           }
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
-        },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
-        },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
-        },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
-        },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("ApplicationsOrderBy"));
-            return null;
-          }
-        },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
-        },
-        only: {
-          autoApplyAfterParentPlan: true,
-          applyPlan($parent, $connection, fieldArgs) {
-            const $union = $connection.getSubplan();
-            $union.limitToTypes(fieldArgs.getRaw().eval());
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -21582,58 +17749,35 @@ export const plans = {
       plan() {
         const $list = pgUnionAll({
           attributes: spec_ZeroImplementation.attributes,
-          resourceByTypeName: resourceByTypeName9,
+          resourceByTypeName: resourceByTypeName12,
           members: members9,
           name: "ZeroImplementation"
         });
-        return true ? connection($list) : $list;
+        return connection($list);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("ZeroImplementationsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -21642,51 +17786,28 @@ export const plans = {
         return connection(otherSource_organizationsPgResource.find());
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("OrganizationsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -21695,51 +17816,28 @@ export const plans = {
         return connection(otherSource_peoplePgResource.find());
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("PeopleOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -21748,35 +17846,20 @@ export const plans = {
         return connection(otherSource_prioritiesPgResource.find());
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         }
       }
     },
@@ -21785,157 +17868,88 @@ export const plans = {
         return connection(resource_relational_checklistsPgResource.find());
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalChecklistsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
     allRelationalItemRelationCompositePks: {
       plan() {
-        return connection(relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource.find());
+        return connection(resource_relational_item_relation_composite_pksPgResource.find());
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemRelationCompositePksOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
     allRelationalTopics: {
       plan() {
-        return connection(relational_topics_relational_topicsPgResource.find());
+        return connection(resource_relational_topicsPgResource.find());
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalTopicsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -21944,51 +17958,28 @@ export const plans = {
         return connection(otherSource_single_table_item_relation_composite_pksPgResource.find());
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationCompositePksOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -21997,51 +17988,28 @@ export const plans = {
         return connection(resource_relational_checklist_itemsPgResource.find());
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalChecklistItemsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -22050,104 +18018,58 @@ export const plans = {
         return connection(resource_relational_dividersPgResource.find());
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalDividersOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
     allRelationalItemRelations: {
       plan() {
-        return connection(relational_item_relations_relational_item_relationsPgResource.find());
+        return connection(resource_relational_item_relationsPgResource.find());
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemRelationsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -22156,51 +18078,28 @@ export const plans = {
         return connection(otherSource_single_table_item_relationsPgResource.find());
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -22209,51 +18108,28 @@ export const plans = {
         return connection(otherSource_log_entriesPgResource.find());
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("LogEntriesOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -22262,51 +18138,28 @@ export const plans = {
         return connection(resource_relational_postsPgResource.find());
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalPostsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -22315,51 +18168,28 @@ export const plans = {
         return connection(paths_0_resource_first_party_vulnerabilitiesPgResource.find());
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("FirstPartyVulnerabilitiesOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -22368,51 +18198,28 @@ export const plans = {
         return connection(paths_1_resource_third_party_vulnerabilitiesPgResource.find());
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("ThirdPartyVulnerabilitiesOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -22421,51 +18228,28 @@ export const plans = {
         return connection(otherSource_aws_applicationsPgResource.find());
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("AwsApplicationsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -22474,51 +18258,28 @@ export const plans = {
         return connection(otherSource_gcp_applicationsPgResource.find());
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("GcpApplicationsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -22527,51 +18288,28 @@ export const plans = {
         return connection(otherSource_single_table_itemsPgResource.find());
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
@@ -22580,62 +18318,48 @@ export const plans = {
         return connection(otherSource_relational_itemsPgResource.find());
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
         },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
         },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
         },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
         },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemsOrderBy"));
-            return null;
-          }
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
         },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     }
   },
   FirstPartyVulnerability: {
     __assertStep: assertPgClassSingleStep,
-    id($record) {
-      return $record.get("id");
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of first_party_vulnerabilitiesUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return paths_0_resource_first_party_vulnerabilitiesPgResource.get(spec);
     },
-    name($record) {
-      return $record.get("name");
+    cvssScoreInt($in, args, _info) {
+      const {
+        $row,
+        selectArgs
+      } = pgFunctionArgumentsFromArgs($in, makeArgs_first_party_vulnerabilities_cvss_score_int(args), true);
+      const from = pgFromExpression($row, resource_first_party_vulnerabilities_cvss_score_intPgResource.from, resource_first_party_vulnerabilities_cvss_score_intPgResource.parameters, selectArgs);
+      return pgClassExpression($row, resource_first_party_vulnerabilities_cvss_score_intPgResource.codec, undefined)`${from}`;
     },
     cvssScore($record) {
       return $record.get("cvss_score");
@@ -22645,7 +18369,7 @@ export const plans = {
     },
     applications: {
       plan($parent) {
-        const $record = undefined ? $parent.get("result") : $parent;
+        const $record = $parent;
         for (let i = 0, l = paths7.length; i < l; i++) {
           const path = paths7[i];
           const firstLayer = path.layers[0];
@@ -22659,76 +18383,49 @@ export const plans = {
         }
         const $list = pgUnionAll({
           attributes: spec_Application.attributes,
-          resourceByTypeName: resourceByTypeName10,
+          resourceByTypeName: resourceByTypeName13,
           members: members10,
           name: "applications"
         });
-        if (true) {
-          return connection($list);
-        } else if (false) {
-          return $list.single();
-        } else {
-          return $list;
-        }
+        return connection($list);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
+        },
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
+        },
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
+        },
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
+        },
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
+        },
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
+        },
+        only($parent, $connection, fieldArgs) {
+          const $union = $connection.getSubplan();
+          const $ltt = fieldArgs.getRaw();
+          if ($ltt instanceof ConstantStep && $ltt.data == null) {
+            // No action
+          } else {
+            $union.apply(lambda($ltt, limitToTypes));
           }
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
-        },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
-        },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
-        },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
-        },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("ApplicationsOrderBy"));
-            return null;
-          }
-        },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
-        },
-        only: {
-          autoApplyAfterParentPlan: true,
-          applyPlan($parent, $connection, fieldArgs) {
-            const $union = $connection.getSubplan();
-            $union.limitToTypes(fieldArgs.getRaw().eval());
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
     owners($parent) {
-      const $record = undefined ? $parent.get("result") : $parent;
+      const $record = $parent;
       for (let i = 0, l = paths8.length; i < l; i++) {
         const path = paths8[i];
         const firstLayer = path.layers[0];
@@ -22742,26 +18439,29 @@ export const plans = {
       }
       const $list = pgUnionAll({
         attributes: attributes4,
-        resourceByTypeName: resourceByTypeName11,
+        resourceByTypeName: resourceByTypeName14,
         members: members11,
         name: "owners"
       });
-      if (true) {
-        return connection($list);
-      } else if (false) {
-        return $list.single();
-      } else {
-        return $list;
-      }
+      return connection($list);
     }
   },
   ThirdPartyVulnerability: {
     __assertStep: assertPgClassSingleStep,
-    id($record) {
-      return $record.get("id");
+    __planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of third_party_vulnerabilitiesUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return paths_1_resource_third_party_vulnerabilitiesPgResource.get(spec);
     },
-    name($record) {
-      return $record.get("name");
+    cvssScoreInt($in, args, _info) {
+      const {
+        $row,
+        selectArgs
+      } = pgFunctionArgumentsFromArgs($in, makeArgs_first_party_vulnerabilities_cvss_score_int(args), true);
+      const from = pgFromExpression($row, resource_third_party_vulnerabilities_cvss_score_intPgResource.from, resource_third_party_vulnerabilities_cvss_score_intPgResource.parameters, selectArgs);
+      return pgClassExpression($row, resource_third_party_vulnerabilities_cvss_score_intPgResource.codec, undefined)`${from}`;
     },
     cvssScore($record) {
       return $record.get("cvss_score");
@@ -22771,7 +18471,7 @@ export const plans = {
     },
     applications: {
       plan($parent) {
-        const $record = undefined ? $parent.get("result") : $parent;
+        const $record = $parent;
         for (let i = 0, l = paths9.length; i < l; i++) {
           const path = paths9[i];
           const firstLayer = path.layers[0];
@@ -22785,76 +18485,49 @@ export const plans = {
         }
         const $list = pgUnionAll({
           attributes: spec_Application.attributes,
-          resourceByTypeName: resourceByTypeName12,
+          resourceByTypeName: resourceByTypeName15,
           members: members12,
           name: "applications"
         });
-        if (true) {
-          return connection($list);
-        } else if (false) {
-          return $list.single();
-        } else {
-          return $list;
-        }
+        return connection($list);
       },
       args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
+        first(_, $connection, arg) {
+          $connection.setFirst(arg.getRaw());
+        },
+        last(_, $connection, val) {
+          $connection.setLast(val.getRaw());
+        },
+        offset(_, $connection, val) {
+          $connection.setOffset(val.getRaw());
+        },
+        before(_, $connection, val) {
+          $connection.setBefore(val.getRaw());
+        },
+        after(_, $connection, val) {
+          $connection.setAfter(val.getRaw());
+        },
+        condition(_condition, $connection, arg) {
+          const $select = $connection.getSubplan();
+          arg.apply($select, qbWhereBuilder);
+        },
+        only($parent, $connection, fieldArgs) {
+          const $union = $connection.getSubplan();
+          const $ltt = fieldArgs.getRaw();
+          if ($ltt instanceof ConstantStep && $ltt.data == null) {
+            // No action
+          } else {
+            $union.apply(lambda($ltt, limitToTypes));
           }
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
-        },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
-        },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
-        },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
-        },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("ApplicationsOrderBy"));
-            return null;
-          }
-        },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
-        },
-        only: {
-          autoApplyAfterParentPlan: true,
-          applyPlan($parent, $connection, fieldArgs) {
-            const $union = $connection.getSubplan();
-            $union.limitToTypes(fieldArgs.getRaw().eval());
-          }
+        orderBy(parent, $connection, value) {
+          const $select = $connection.getSubplan();
+          value.apply($select);
         }
       }
     },
     owners($parent) {
-      const $record = undefined ? $parent.get("result") : $parent;
+      const $record = $parent;
       for (let i = 0, l = paths10.length; i < l; i++) {
         const path = paths10[i];
         const firstLayer = path.layers[0];
@@ -22868,33 +18541,44 @@ export const plans = {
       }
       const $list = pgUnionAll({
         attributes: attributes5,
-        resourceByTypeName: resourceByTypeName13,
+        resourceByTypeName: resourceByTypeName16,
         members: members13,
         name: "owners"
       });
-      if (true) {
-        return connection($list);
-      } else if (false) {
-        return $list.single();
-      } else {
-        return $list;
-      }
+      return connection($list);
     }
   },
   ZeroImplementationsConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+    }
+  },
+  ZeroImplementation: {
+    __toSpecifier($step) {
+      if ($step instanceof PgUnionAllSingleStep) {
+        return $step.toSpecifier();
+      } else {
+        return $step;
+      }
+    },
+    __planType($specifier) {
+      const $__typename = get2($specifier, "__typename");
+      return {
+        $__typename,
+        planForType(t) {
+          const resource = resourceByTypeName17[t.name];
+          if (!resource) {
+            throw new Error(`Type ${t.name} has no associated resource`);
+          }
+          const pk = resource.uniques.find(u => u.isPrimary) ?? resource.uniques[0];
+          const spec = Object.create(null);
+          for (const attrName of pk.attributes) {
+            spec[attrName] = get2($specifier, attrName);
+          }
+          return resource.get(spec);
+        }
+      };
     }
   },
   ZeroImplementationsEdge: {
@@ -22906,139 +18590,54 @@ export const plans = {
       return $edge.node();
     }
   },
-  ZeroImplementationsOrderBy: {
-    NATURAL: {
-      applyPlan() {}
+  ZeroImplementationCondition: {
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
-    ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    name($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "name",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
         }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    NAME_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "name",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    NAME_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "name",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     }
   },
-  ZeroImplementationCondition: {
-    id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_ZeroImplementation.attributes.id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+  ZeroImplementationsOrderBy: {
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
     },
-    name: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_ZeroImplementation.attributes.name.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+    },
+    NAME_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "name",
+        direction: "ASC"
+      });
+    },
+    NAME_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "name",
+        direction: "DESC"
+      });
     }
   },
   OrganizationsConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
@@ -23052,171 +18651,76 @@ export const plans = {
       return $edge.node();
     }
   },
-  OrganizationsOrderBy: {
-    NATURAL: {
-      applyPlan() {}
+  OrganizationCondition: {
+    organizationId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "organization_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
-    PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        organizationsUniques[0].attributes.forEach(attributeName => {
-          const attribute = organizationsCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
-    },
-    PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        organizationsUniques[0].attributes.forEach(attributeName => {
-          const attribute = organizationsCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
-    },
-    ORGANIZATION_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    name($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "name",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
         }
-        plan.orderBy({
-          attribute: "organization_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ORGANIZATION_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "organization_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    NAME_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "name",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    NAME_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "name",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     }
   },
-  OrganizationCondition: {
-    organizationId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "organization_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "organization_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_organizations.attributes.organization_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+  OrganizationsOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      organizationsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    name: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_organizations.attributes.name.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    PRIMARY_KEY_DESC(queryBuilder) {
+      organizationsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ORGANIZATION_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "organization_id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ORGANIZATION_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "organization_id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    NAME_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "name",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    NAME_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "name",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
     }
   },
   PeopleConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
@@ -23230,171 +18734,76 @@ export const plans = {
       return $edge.node();
     }
   },
-  PeopleOrderBy: {
-    NATURAL: {
-      applyPlan() {}
+  PersonCondition: {
+    personId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "person_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
-    PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        peopleUniques[0].attributes.forEach(attributeName => {
-          const attribute = peopleCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
-    },
-    PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        peopleUniques[0].attributes.forEach(attributeName => {
-          const attribute = peopleCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
-    },
-    PERSON_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    username($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "username",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
         }
-        plan.orderBy({
-          attribute: "person_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    PERSON_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "person_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    USERNAME_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "username",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    USERNAME_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "username",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     }
   },
-  PersonCondition: {
-    personId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "person_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "person_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_people.attributes.person_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+  PeopleOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      peopleUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    username: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "username",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "username",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_people.attributes.username.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    PRIMARY_KEY_DESC(queryBuilder) {
+      peopleUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PERSON_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PERSON_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    USERNAME_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "username",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    USERNAME_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "username",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
     }
   },
   PrioritiesConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
@@ -23410,16 +18819,6 @@ export const plans = {
   },
   RelationalChecklistsConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
@@ -23433,684 +18832,261 @@ export const plans = {
       return $edge.node();
     }
   },
-  RelationalChecklistsOrderBy: {
-    NATURAL: {
-      applyPlan() {}
+  RelationalChecklistCondition: {
+    title($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "title",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+        }
+      });
     },
-    PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        relational_checklistsUniques[0].attributes.forEach(attributeName => {
-          const attribute = relationalChecklistsCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
-    PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        relational_checklistsUniques[0].attributes.forEach(attributeName => {
-          const attribute = relationalChecklistsCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
+    type($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "type",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
+        }
+      });
     },
-    TITLE_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    parentId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "parent_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-        plan.orderBy({
-          attribute: "title",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    TITLE_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    rootTopicId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "root_topic_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-        plan.orderBy({
-          attribute: "title",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    authorId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "author_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    position($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "position",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.bigint)}`;
         }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    TYPE_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    createdAt($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "created_at",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
         }
-        plan.orderBy({
-          attribute: "type",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    TYPE_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    updatedAt($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "updated_at",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
         }
-        plan.orderBy({
-          attribute: "type",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    PARENT_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    isExplicitlyArchived($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "is_explicitly_archived",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
         }
-        plan.orderBy({
-          attribute: "parent_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    PARENT_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    archivedAt($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "archived_at",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
         }
-        plan.orderBy({
-          attribute: "parent_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ROOT_TOPIC_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "root_topic_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ROOT_TOPIC_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "root_topic_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    AUTHOR_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "author_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    AUTHOR_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "author_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    POSITION_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "position",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    POSITION_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "position",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CREATED_AT_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "created_at",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CREATED_AT_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "created_at",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    UPDATED_AT_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "updated_at",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    UPDATED_AT_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "updated_at",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    IS_EXPLICITLY_ARCHIVED_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "is_explicitly_archived",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    IS_EXPLICITLY_ARCHIVED_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "is_explicitly_archived",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ARCHIVED_AT_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "archived_at",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ARCHIVED_AT_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "archived_at",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     }
   },
-  RelationalChecklistCondition: {
-    title: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "title",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "title",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.title.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+  RelationalChecklistsOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      relational_checklistsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    PRIMARY_KEY_DESC(queryBuilder) {
+      relational_checklistsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    type: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "type",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "type",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.type.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    TITLE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "title",
+        direction: "ASC"
+      });
     },
-    parentId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "parent_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "parent_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.parent_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    TITLE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "title",
+        direction: "DESC"
+      });
     },
-    rootTopicId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "root_topic_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "root_topic_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.root_topic_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
     },
-    authorId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "author_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "author_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.author_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
     },
-    position: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "position",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "position",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.position.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    TYPE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "type",
+        direction: "ASC"
+      });
     },
-    createdAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "created_at",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "created_at",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.created_at.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    TYPE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "type",
+        direction: "DESC"
+      });
     },
-    updatedAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "updated_at",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "updated_at",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.updated_at.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    PARENT_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "parent_id",
+        direction: "ASC"
+      });
     },
-    isExplicitlyArchived: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "is_explicitly_archived",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "is_explicitly_archived",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.is_explicitly_archived.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    PARENT_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "parent_id",
+        direction: "DESC"
+      });
     },
-    archivedAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "archived_at",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "archived_at",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.archived_at.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ROOT_TOPIC_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "root_topic_id",
+        direction: "ASC"
+      });
+    },
+    ROOT_TOPIC_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "root_topic_id",
+        direction: "DESC"
+      });
+    },
+    AUTHOR_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "author_id",
+        direction: "ASC"
+      });
+    },
+    AUTHOR_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "author_id",
+        direction: "DESC"
+      });
+    },
+    POSITION_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "position",
+        direction: "ASC"
+      });
+    },
+    POSITION_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "position",
+        direction: "DESC"
+      });
+    },
+    CREATED_AT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "created_at",
+        direction: "ASC"
+      });
+    },
+    CREATED_AT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "created_at",
+        direction: "DESC"
+      });
+    },
+    UPDATED_AT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "updated_at",
+        direction: "ASC"
+      });
+    },
+    UPDATED_AT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "updated_at",
+        direction: "DESC"
+      });
+    },
+    IS_EXPLICITLY_ARCHIVED_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "is_explicitly_archived",
+        direction: "ASC"
+      });
+    },
+    IS_EXPLICITLY_ARCHIVED_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "is_explicitly_archived",
+        direction: "DESC"
+      });
+    },
+    ARCHIVED_AT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "archived_at",
+        direction: "ASC"
+      });
+    },
+    ARCHIVED_AT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "archived_at",
+        direction: "DESC"
+      });
     }
   },
   RelationalTopicsConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
@@ -24124,684 +19100,261 @@ export const plans = {
       return $edge.node();
     }
   },
-  RelationalTopicsOrderBy: {
-    NATURAL: {
-      applyPlan() {}
+  RelationalTopicCondition: {
+    title($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "title",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+        }
+      });
     },
-    PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        relational_topicsUniques[0].attributes.forEach(attributeName => {
-          const attribute = relationalTopicsCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
-    PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        relational_topicsUniques[0].attributes.forEach(attributeName => {
-          const attribute = relationalTopicsCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
+    type($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "type",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
+        }
+      });
     },
-    TITLE_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    parentId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "parent_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-        plan.orderBy({
-          attribute: "title",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    TITLE_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    rootTopicId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "root_topic_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-        plan.orderBy({
-          attribute: "title",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    authorId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "author_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    position($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "position",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.bigint)}`;
         }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    TYPE_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    createdAt($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "created_at",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
         }
-        plan.orderBy({
-          attribute: "type",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    TYPE_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    updatedAt($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "updated_at",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
         }
-        plan.orderBy({
-          attribute: "type",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    PARENT_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    isExplicitlyArchived($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "is_explicitly_archived",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
         }
-        plan.orderBy({
-          attribute: "parent_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    PARENT_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    archivedAt($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "archived_at",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
         }
-        plan.orderBy({
-          attribute: "parent_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ROOT_TOPIC_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "root_topic_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ROOT_TOPIC_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "root_topic_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    AUTHOR_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "author_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    AUTHOR_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "author_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    POSITION_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "position",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    POSITION_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "position",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CREATED_AT_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "created_at",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CREATED_AT_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "created_at",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    UPDATED_AT_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "updated_at",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    UPDATED_AT_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "updated_at",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    IS_EXPLICITLY_ARCHIVED_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "is_explicitly_archived",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    IS_EXPLICITLY_ARCHIVED_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "is_explicitly_archived",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ARCHIVED_AT_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "archived_at",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ARCHIVED_AT_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "archived_at",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     }
   },
-  RelationalTopicCondition: {
-    title: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "title",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "title",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.title.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+  RelationalTopicsOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      relational_topicsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    PRIMARY_KEY_DESC(queryBuilder) {
+      relational_topicsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    type: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "type",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "type",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.type.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    TITLE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "title",
+        direction: "ASC"
+      });
     },
-    parentId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "parent_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "parent_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.parent_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    TITLE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "title",
+        direction: "DESC"
+      });
     },
-    rootTopicId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "root_topic_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "root_topic_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.root_topic_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
     },
-    authorId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "author_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "author_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.author_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
     },
-    position: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "position",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "position",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.position.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    TYPE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "type",
+        direction: "ASC"
+      });
     },
-    createdAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "created_at",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "created_at",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.created_at.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    TYPE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "type",
+        direction: "DESC"
+      });
     },
-    updatedAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "updated_at",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "updated_at",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.updated_at.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    PARENT_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "parent_id",
+        direction: "ASC"
+      });
     },
-    isExplicitlyArchived: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "is_explicitly_archived",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "is_explicitly_archived",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.is_explicitly_archived.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    PARENT_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "parent_id",
+        direction: "DESC"
+      });
     },
-    archivedAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "archived_at",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "archived_at",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.archived_at.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ROOT_TOPIC_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "root_topic_id",
+        direction: "ASC"
+      });
+    },
+    ROOT_TOPIC_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "root_topic_id",
+        direction: "DESC"
+      });
+    },
+    AUTHOR_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "author_id",
+        direction: "ASC"
+      });
+    },
+    AUTHOR_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "author_id",
+        direction: "DESC"
+      });
+    },
+    POSITION_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "position",
+        direction: "ASC"
+      });
+    },
+    POSITION_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "position",
+        direction: "DESC"
+      });
+    },
+    CREATED_AT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "created_at",
+        direction: "ASC"
+      });
+    },
+    CREATED_AT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "created_at",
+        direction: "DESC"
+      });
+    },
+    UPDATED_AT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "updated_at",
+        direction: "ASC"
+      });
+    },
+    UPDATED_AT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "updated_at",
+        direction: "DESC"
+      });
+    },
+    IS_EXPLICITLY_ARCHIVED_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "is_explicitly_archived",
+        direction: "ASC"
+      });
+    },
+    IS_EXPLICITLY_ARCHIVED_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "is_explicitly_archived",
+        direction: "DESC"
+      });
+    },
+    ARCHIVED_AT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "archived_at",
+        direction: "ASC"
+      });
+    },
+    ARCHIVED_AT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "archived_at",
+        direction: "DESC"
+      });
     }
   },
   RelationalChecklistItemsConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
@@ -24815,741 +19368,282 @@ export const plans = {
       return $edge.node();
     }
   },
-  RelationalChecklistItemsOrderBy: {
-    NATURAL: {
-      applyPlan() {}
+  RelationalChecklistItemCondition: {
+    description($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "description",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+        }
+      });
     },
-    PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        relational_checklist_itemsUniques[0].attributes.forEach(attributeName => {
-          const attribute = relationalChecklistItemsCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
+    note($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "note",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+        }
+      });
     },
-    PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        relational_checklist_itemsUniques[0].attributes.forEach(attributeName => {
-          const attribute = relationalChecklistItemsCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
-    DESCRIPTION_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    type($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "type",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
         }
-        plan.orderBy({
-          attribute: "description",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    DESCRIPTION_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    parentId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "parent_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-        plan.orderBy({
-          attribute: "description",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    NOTE_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    rootTopicId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "root_topic_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-        plan.orderBy({
-          attribute: "note",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    NOTE_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    authorId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "author_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-        plan.orderBy({
-          attribute: "note",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    position($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "position",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.bigint)}`;
         }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    createdAt($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "created_at",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
         }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    TYPE_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    updatedAt($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "updated_at",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
         }
-        plan.orderBy({
-          attribute: "type",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    TYPE_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    isExplicitlyArchived($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "is_explicitly_archived",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
         }
-        plan.orderBy({
-          attribute: "type",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    PARENT_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    archivedAt($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "archived_at",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
         }
-        plan.orderBy({
-          attribute: "parent_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    PARENT_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "parent_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ROOT_TOPIC_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "root_topic_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ROOT_TOPIC_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "root_topic_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    AUTHOR_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "author_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    AUTHOR_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "author_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    POSITION_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "position",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    POSITION_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "position",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CREATED_AT_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "created_at",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CREATED_AT_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "created_at",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    UPDATED_AT_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "updated_at",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    UPDATED_AT_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "updated_at",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    IS_EXPLICITLY_ARCHIVED_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "is_explicitly_archived",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    IS_EXPLICITLY_ARCHIVED_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "is_explicitly_archived",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ARCHIVED_AT_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "archived_at",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ARCHIVED_AT_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "archived_at",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     }
   },
-  RelationalChecklistItemCondition: {
-    description: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "description",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "description",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.description.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+  RelationalChecklistItemsOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      relational_checklist_itemsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    note: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "note",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "note",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.note.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    PRIMARY_KEY_DESC(queryBuilder) {
+      relational_checklist_itemsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    DESCRIPTION_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "description",
+        direction: "ASC"
+      });
     },
-    type: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "type",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "type",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.type.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    DESCRIPTION_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "description",
+        direction: "DESC"
+      });
     },
-    parentId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "parent_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "parent_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.parent_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    NOTE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "note",
+        direction: "ASC"
+      });
     },
-    rootTopicId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "root_topic_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "root_topic_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.root_topic_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    NOTE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "note",
+        direction: "DESC"
+      });
     },
-    authorId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "author_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "author_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.author_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
     },
-    position: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "position",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "position",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.position.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
     },
-    createdAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "created_at",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "created_at",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.created_at.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    TYPE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "type",
+        direction: "ASC"
+      });
     },
-    updatedAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "updated_at",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "updated_at",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.updated_at.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    TYPE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "type",
+        direction: "DESC"
+      });
     },
-    isExplicitlyArchived: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "is_explicitly_archived",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "is_explicitly_archived",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.is_explicitly_archived.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    PARENT_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "parent_id",
+        direction: "ASC"
+      });
     },
-    archivedAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "archived_at",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "archived_at",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.archived_at.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    PARENT_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "parent_id",
+        direction: "DESC"
+      });
+    },
+    ROOT_TOPIC_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "root_topic_id",
+        direction: "ASC"
+      });
+    },
+    ROOT_TOPIC_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "root_topic_id",
+        direction: "DESC"
+      });
+    },
+    AUTHOR_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "author_id",
+        direction: "ASC"
+      });
+    },
+    AUTHOR_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "author_id",
+        direction: "DESC"
+      });
+    },
+    POSITION_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "position",
+        direction: "ASC"
+      });
+    },
+    POSITION_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "position",
+        direction: "DESC"
+      });
+    },
+    CREATED_AT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "created_at",
+        direction: "ASC"
+      });
+    },
+    CREATED_AT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "created_at",
+        direction: "DESC"
+      });
+    },
+    UPDATED_AT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "updated_at",
+        direction: "ASC"
+      });
+    },
+    UPDATED_AT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "updated_at",
+        direction: "DESC"
+      });
+    },
+    IS_EXPLICITLY_ARCHIVED_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "is_explicitly_archived",
+        direction: "ASC"
+      });
+    },
+    IS_EXPLICITLY_ARCHIVED_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "is_explicitly_archived",
+        direction: "DESC"
+      });
+    },
+    ARCHIVED_AT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "archived_at",
+        direction: "ASC"
+      });
+    },
+    ARCHIVED_AT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "archived_at",
+        direction: "DESC"
+      });
     }
   },
   RelationalDividersConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
@@ -25563,741 +19657,282 @@ export const plans = {
       return $edge.node();
     }
   },
-  RelationalDividersOrderBy: {
-    NATURAL: {
-      applyPlan() {}
+  RelationalDividerCondition: {
+    title($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "title",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+        }
+      });
     },
-    PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        relational_dividersUniques[0].attributes.forEach(attributeName => {
-          const attribute = relationalDividersCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
+    color($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "color",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+        }
+      });
     },
-    PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        relational_dividersUniques[0].attributes.forEach(attributeName => {
-          const attribute = relationalDividersCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
-    TITLE_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    type($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "type",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
         }
-        plan.orderBy({
-          attribute: "title",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    TITLE_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    parentId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "parent_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-        plan.orderBy({
-          attribute: "title",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    COLOR_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    rootTopicId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "root_topic_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-        plan.orderBy({
-          attribute: "color",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    COLOR_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    authorId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "author_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-        plan.orderBy({
-          attribute: "color",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    position($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "position",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.bigint)}`;
         }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    createdAt($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "created_at",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
         }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    TYPE_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    updatedAt($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "updated_at",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
         }
-        plan.orderBy({
-          attribute: "type",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    TYPE_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    isExplicitlyArchived($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "is_explicitly_archived",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
         }
-        plan.orderBy({
-          attribute: "type",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    PARENT_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    archivedAt($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "archived_at",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
         }
-        plan.orderBy({
-          attribute: "parent_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    PARENT_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "parent_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ROOT_TOPIC_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "root_topic_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ROOT_TOPIC_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "root_topic_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    AUTHOR_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "author_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    AUTHOR_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "author_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    POSITION_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "position",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    POSITION_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "position",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CREATED_AT_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "created_at",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CREATED_AT_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "created_at",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    UPDATED_AT_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "updated_at",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    UPDATED_AT_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "updated_at",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    IS_EXPLICITLY_ARCHIVED_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "is_explicitly_archived",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    IS_EXPLICITLY_ARCHIVED_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "is_explicitly_archived",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ARCHIVED_AT_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "archived_at",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ARCHIVED_AT_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "archived_at",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     }
   },
-  RelationalDividerCondition: {
-    title: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "title",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "title",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.title.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+  RelationalDividersOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      relational_dividersUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    color: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "color",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "color",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.color.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    PRIMARY_KEY_DESC(queryBuilder) {
+      relational_dividersUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    TITLE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "title",
+        direction: "ASC"
+      });
     },
-    type: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "type",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "type",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.type.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    TITLE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "title",
+        direction: "DESC"
+      });
     },
-    parentId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "parent_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "parent_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.parent_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    COLOR_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "color",
+        direction: "ASC"
+      });
     },
-    rootTopicId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "root_topic_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "root_topic_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.root_topic_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    COLOR_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "color",
+        direction: "DESC"
+      });
     },
-    authorId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "author_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "author_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.author_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
     },
-    position: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "position",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "position",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.position.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
     },
-    createdAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "created_at",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "created_at",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.created_at.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    TYPE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "type",
+        direction: "ASC"
+      });
     },
-    updatedAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "updated_at",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "updated_at",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.updated_at.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    TYPE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "type",
+        direction: "DESC"
+      });
     },
-    isExplicitlyArchived: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "is_explicitly_archived",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "is_explicitly_archived",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.is_explicitly_archived.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    PARENT_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "parent_id",
+        direction: "ASC"
+      });
     },
-    archivedAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "archived_at",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "archived_at",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.archived_at.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    PARENT_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "parent_id",
+        direction: "DESC"
+      });
+    },
+    ROOT_TOPIC_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "root_topic_id",
+        direction: "ASC"
+      });
+    },
+    ROOT_TOPIC_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "root_topic_id",
+        direction: "DESC"
+      });
+    },
+    AUTHOR_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "author_id",
+        direction: "ASC"
+      });
+    },
+    AUTHOR_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "author_id",
+        direction: "DESC"
+      });
+    },
+    POSITION_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "position",
+        direction: "ASC"
+      });
+    },
+    POSITION_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "position",
+        direction: "DESC"
+      });
+    },
+    CREATED_AT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "created_at",
+        direction: "ASC"
+      });
+    },
+    CREATED_AT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "created_at",
+        direction: "DESC"
+      });
+    },
+    UPDATED_AT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "updated_at",
+        direction: "ASC"
+      });
+    },
+    UPDATED_AT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "updated_at",
+        direction: "DESC"
+      });
+    },
+    IS_EXPLICITLY_ARCHIVED_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "is_explicitly_archived",
+        direction: "ASC"
+      });
+    },
+    IS_EXPLICITLY_ARCHIVED_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "is_explicitly_archived",
+        direction: "DESC"
+      });
+    },
+    ARCHIVED_AT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "archived_at",
+        direction: "ASC"
+      });
+    },
+    ARCHIVED_AT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "archived_at",
+        direction: "DESC"
+      });
     }
   },
   RelationalPostsConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
@@ -26311,798 +19946,303 @@ export const plans = {
       return $edge.node();
     }
   },
-  RelationalPostsOrderBy: {
-    NATURAL: {
-      applyPlan() {}
+  RelationalPostCondition: {
+    title($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "title",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+        }
+      });
     },
-    PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        relational_postsUniques[0].attributes.forEach(attributeName => {
-          const attribute = relationalPostsCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
+    description($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "description",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+        }
+      });
     },
-    PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        relational_postsUniques[0].attributes.forEach(attributeName => {
-          const attribute = relationalPostsCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
+    note($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "note",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+        }
+      });
     },
-    TITLE_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-        plan.orderBy({
-          attribute: "title",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    TITLE_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    type($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "type",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
         }
-        plan.orderBy({
-          attribute: "title",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    DESCRIPTION_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    parentId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "parent_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-        plan.orderBy({
-          attribute: "description",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    DESCRIPTION_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    rootTopicId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "root_topic_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-        plan.orderBy({
-          attribute: "description",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    NOTE_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    authorId($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "author_id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
         }
-        plan.orderBy({
-          attribute: "note",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    NOTE_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    position($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "position",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.bigint)}`;
         }
-        plan.orderBy({
-          attribute: "note",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    createdAt($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "created_at",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
         }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    updatedAt($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "updated_at",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
         }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    TYPE_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    isExplicitlyArchived($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "is_explicitly_archived",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
         }
-        plan.orderBy({
-          attribute: "type",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     },
-    TYPE_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    archivedAt($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "archived_at",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
         }
-        plan.orderBy({
-          attribute: "type",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    PARENT_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "parent_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    PARENT_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "parent_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ROOT_TOPIC_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "root_topic_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ROOT_TOPIC_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "root_topic_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    AUTHOR_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "author_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    AUTHOR_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "author_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    POSITION_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "position",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    POSITION_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "position",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CREATED_AT_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "created_at",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CREATED_AT_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "created_at",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    UPDATED_AT_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "updated_at",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    UPDATED_AT_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "updated_at",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    IS_EXPLICITLY_ARCHIVED_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "is_explicitly_archived",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    IS_EXPLICITLY_ARCHIVED_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "is_explicitly_archived",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ARCHIVED_AT_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "archived_at",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ARCHIVED_AT_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "archived_at",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     }
   },
-  RelationalPostCondition: {
-    title: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "title",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "title",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.title.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+  RelationalPostsOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      relational_postsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    description: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "description",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "description",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.description.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    PRIMARY_KEY_DESC(queryBuilder) {
+      relational_postsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    note: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "note",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "note",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.note.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    TITLE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "title",
+        direction: "ASC"
+      });
     },
-    id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    TITLE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "title",
+        direction: "DESC"
+      });
     },
-    type: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "type",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "type",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.type.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    DESCRIPTION_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "description",
+        direction: "ASC"
+      });
     },
-    parentId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "parent_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "parent_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.parent_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    DESCRIPTION_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "description",
+        direction: "DESC"
+      });
     },
-    rootTopicId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "root_topic_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "root_topic_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.root_topic_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    NOTE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "note",
+        direction: "ASC"
+      });
     },
-    authorId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "author_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "author_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.author_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    NOTE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "note",
+        direction: "DESC"
+      });
     },
-    position: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "position",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "position",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.position.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
     },
-    createdAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "created_at",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "created_at",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.created_at.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
     },
-    updatedAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "updated_at",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "updated_at",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.updated_at.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    TYPE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "type",
+        direction: "ASC"
+      });
     },
-    isExplicitlyArchived: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "is_explicitly_archived",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "is_explicitly_archived",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.is_explicitly_archived.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    TYPE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "type",
+        direction: "DESC"
+      });
     },
-    archivedAt: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "archived_at",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "archived_at",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.archived_at.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    PARENT_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "parent_id",
+        direction: "ASC"
+      });
+    },
+    PARENT_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "parent_id",
+        direction: "DESC"
+      });
+    },
+    ROOT_TOPIC_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "root_topic_id",
+        direction: "ASC"
+      });
+    },
+    ROOT_TOPIC_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "root_topic_id",
+        direction: "DESC"
+      });
+    },
+    AUTHOR_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "author_id",
+        direction: "ASC"
+      });
+    },
+    AUTHOR_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "author_id",
+        direction: "DESC"
+      });
+    },
+    POSITION_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "position",
+        direction: "ASC"
+      });
+    },
+    POSITION_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "position",
+        direction: "DESC"
+      });
+    },
+    CREATED_AT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "created_at",
+        direction: "ASC"
+      });
+    },
+    CREATED_AT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "created_at",
+        direction: "DESC"
+      });
+    },
+    UPDATED_AT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "updated_at",
+        direction: "ASC"
+      });
+    },
+    UPDATED_AT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "updated_at",
+        direction: "DESC"
+      });
+    },
+    IS_EXPLICITLY_ARCHIVED_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "is_explicitly_archived",
+        direction: "ASC"
+      });
+    },
+    IS_EXPLICITLY_ARCHIVED_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "is_explicitly_archived",
+        direction: "DESC"
+      });
+    },
+    ARCHIVED_AT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "archived_at",
+        direction: "ASC"
+      });
+    },
+    ARCHIVED_AT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "archived_at",
+        direction: "DESC"
+      });
     }
   },
   FirstPartyVulnerabilitiesConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
@@ -27116,285 +20256,116 @@ export const plans = {
       return $edge.node();
     }
   },
-  FirstPartyVulnerabilitiesOrderBy: {
-    NATURAL: {
-      applyPlan() {}
+  FirstPartyVulnerabilityCondition: {
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
-    PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        first_party_vulnerabilitiesUniques[0].attributes.forEach(attributeName => {
-          const attribute = firstPartyVulnerabilitiesCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
+    name($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "name",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+        }
+      });
     },
-    PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        first_party_vulnerabilitiesUniques[0].attributes.forEach(attributeName => {
-          const attribute = firstPartyVulnerabilitiesCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
+    cvssScore($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "cvss_score",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.float)}`;
+        }
+      });
     },
-    ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    teamName($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "team_name",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
         }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    NAME_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "name",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    NAME_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "name",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CVSS_SCORE_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "cvss_score",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CVSS_SCORE_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "cvss_score",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    TEAM_NAME_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "team_name",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    TEAM_NAME_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "team_name",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     }
   },
-  FirstPartyVulnerabilityCondition: {
-    id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_firstPartyVulnerabilities.attributes.id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+  FirstPartyVulnerabilitiesOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      first_party_vulnerabilitiesUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    name: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_firstPartyVulnerabilities.attributes.name.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    PRIMARY_KEY_DESC(queryBuilder) {
+      first_party_vulnerabilitiesUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    cvssScore: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "cvss_score",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "cvss_score",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_firstPartyVulnerabilities.attributes.cvss_score.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    teamName: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "team_name",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "team_name",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_firstPartyVulnerabilities.attributes.team_name.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    NAME_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "name",
+        direction: "ASC"
+      });
+    },
+    NAME_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "name",
+        direction: "DESC"
+      });
+    },
+    CVSS_SCORE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "cvss_score",
+        direction: "ASC"
+      });
+    },
+    CVSS_SCORE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "cvss_score",
+        direction: "DESC"
+      });
+    },
+    TEAM_NAME_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "team_name",
+        direction: "ASC"
+      });
+    },
+    TEAM_NAME_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "team_name",
+        direction: "DESC"
+      });
     }
   },
   ThirdPartyVulnerabilitiesConnection: {
     __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
     }
@@ -27408,1007 +20379,766 @@ export const plans = {
       return $edge.node();
     }
   },
-  ThirdPartyVulnerabilitiesOrderBy: {
-    NATURAL: {
-      applyPlan() {}
+  ThirdPartyVulnerabilityCondition: {
+    id($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "id",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        }
+      });
     },
-    PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        third_party_vulnerabilitiesUniques[0].attributes.forEach(attributeName => {
-          const attribute = thirdPartyVulnerabilitiesCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
+    name($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "name",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+        }
+      });
     },
-    PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        third_party_vulnerabilitiesUniques[0].attributes.forEach(attributeName => {
-          const attribute = thirdPartyVulnerabilitiesCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
+    cvssScore($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "cvss_score",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.float)}`;
+        }
+      });
     },
-    ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+    vendorName($condition, val) {
+      $condition.where({
+        type: "attribute",
+        attribute: "vendor_name",
+        callback(expression) {
+          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
         }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    NAME_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "name",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    NAME_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "name",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CVSS_SCORE_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "cvss_score",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CVSS_SCORE_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "cvss_score",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    VENDOR_NAME_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "vendor_name",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    VENDOR_NAME_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "vendor_name",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
+      });
     }
   },
-  ThirdPartyVulnerabilityCondition: {
-    id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_thirdPartyVulnerabilities.attributes.id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+  ThirdPartyVulnerabilitiesOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      third_party_vulnerabilitiesUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    name: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_thirdPartyVulnerabilities.attributes.name.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    PRIMARY_KEY_DESC(queryBuilder) {
+      third_party_vulnerabilitiesUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    cvssScore: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "cvss_score",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "cvss_score",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_thirdPartyVulnerabilities.attributes.cvss_score.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    vendorName: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "vendor_name",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "vendor_name",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_thirdPartyVulnerabilities.attributes.vendor_name.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    NAME_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "name",
+        direction: "ASC"
+      });
+    },
+    NAME_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "name",
+        direction: "DESC"
+      });
+    },
+    CVSS_SCORE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "cvss_score",
+        direction: "ASC"
+      });
+    },
+    CVSS_SCORE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "cvss_score",
+        direction: "DESC"
+      });
+    },
+    VENDOR_NAME_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "vendor_name",
+        direction: "ASC"
+      });
+    },
+    VENDOR_NAME_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "vendor_name",
+        direction: "DESC"
+      });
     }
   },
   Mutation: {
     __assertStep: __ValueStep,
     createOrganization: {
       plan(_, args) {
+        const $insert = pgInsertSingle(otherSource_organizationsPgResource, Object.create(null));
+        args.apply($insert);
         const plan = object({
-          result: pgInsertSingle(otherSource_organizationsPgResource, Object.create(null))
+          result: $insert
         });
-        args.apply(plan);
         return plan;
       },
       args: {
-        input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     createPerson: {
       plan(_, args) {
+        const $insert = pgInsertSingle(otherSource_peoplePgResource, Object.create(null));
+        args.apply($insert);
         const plan = object({
-          result: pgInsertSingle(otherSource_peoplePgResource, Object.create(null))
+          result: $insert
         });
-        args.apply(plan);
         return plan;
       },
       args: {
-        input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     createRelationalItemRelationCompositePk: {
       plan(_, args) {
+        const $insert = pgInsertSingle(resource_relational_item_relation_composite_pksPgResource, Object.create(null));
+        args.apply($insert);
         const plan = object({
-          result: pgInsertSingle(relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource, Object.create(null))
+          result: $insert
         });
-        args.apply(plan);
         return plan;
       },
       args: {
-        input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     createSingleTableItemRelationCompositePk: {
       plan(_, args) {
+        const $insert = pgInsertSingle(otherSource_single_table_item_relation_composite_pksPgResource, Object.create(null));
+        args.apply($insert);
         const plan = object({
-          result: pgInsertSingle(otherSource_single_table_item_relation_composite_pksPgResource, Object.create(null))
+          result: $insert
         });
-        args.apply(plan);
         return plan;
       },
       args: {
-        input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     createRelationalItemRelation: {
       plan(_, args) {
+        const $insert = pgInsertSingle(resource_relational_item_relationsPgResource, Object.create(null));
+        args.apply($insert);
         const plan = object({
-          result: pgInsertSingle(relational_item_relations_relational_item_relationsPgResource, Object.create(null))
+          result: $insert
         });
-        args.apply(plan);
         return plan;
       },
       args: {
-        input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     createSingleTableItemRelation: {
       plan(_, args) {
+        const $insert = pgInsertSingle(otherSource_single_table_item_relationsPgResource, Object.create(null));
+        args.apply($insert);
         const plan = object({
-          result: pgInsertSingle(otherSource_single_table_item_relationsPgResource, Object.create(null))
+          result: $insert
         });
-        args.apply(plan);
         return plan;
       },
       args: {
-        input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     createLogEntry: {
       plan(_, args) {
+        const $insert = pgInsertSingle(otherSource_log_entriesPgResource, Object.create(null));
+        args.apply($insert);
         const plan = object({
-          result: pgInsertSingle(otherSource_log_entriesPgResource, Object.create(null))
+          result: $insert
         });
-        args.apply(plan);
         return plan;
       },
       args: {
-        input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     createFirstPartyVulnerability: {
       plan(_, args) {
+        const $insert = pgInsertSingle(paths_0_resource_first_party_vulnerabilitiesPgResource, Object.create(null));
+        args.apply($insert);
         const plan = object({
-          result: pgInsertSingle(paths_0_resource_first_party_vulnerabilitiesPgResource, Object.create(null))
+          result: $insert
         });
-        args.apply(plan);
         return plan;
       },
       args: {
-        input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     createThirdPartyVulnerability: {
       plan(_, args) {
+        const $insert = pgInsertSingle(paths_1_resource_third_party_vulnerabilitiesPgResource, Object.create(null));
+        args.apply($insert);
         const plan = object({
-          result: pgInsertSingle(paths_1_resource_third_party_vulnerabilitiesPgResource, Object.create(null))
+          result: $insert
         });
-        args.apply(plan);
         return plan;
       },
       args: {
-        input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     createAwsApplication: {
       plan(_, args) {
+        const $insert = pgInsertSingle(otherSource_aws_applicationsPgResource, Object.create(null));
+        args.apply($insert);
         const plan = object({
-          result: pgInsertSingle(otherSource_aws_applicationsPgResource, Object.create(null))
+          result: $insert
         });
-        args.apply(plan);
         return plan;
       },
       args: {
-        input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     createGcpApplication: {
       plan(_, args) {
+        const $insert = pgInsertSingle(otherSource_gcp_applicationsPgResource, Object.create(null));
+        args.apply($insert);
         const plan = object({
-          result: pgInsertSingle(otherSource_gcp_applicationsPgResource, Object.create(null))
+          result: $insert
         });
-        args.apply(plan);
         return plan;
       },
       args: {
-        input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateOrganizationByOrganizationId: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(otherSource_organizationsPgResource, {
-            organization_id: args.get(['input', "organizationId"])
-          })
+        const $update = pgUpdateSingle(otherSource_organizationsPgResource, {
+          organization_id: args.getRaw(['input', "organizationId"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateOrganizationByName: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(otherSource_organizationsPgResource, {
-            name: args.get(['input', "name"])
-          })
+        const $update = pgUpdateSingle(otherSource_organizationsPgResource, {
+          name: args.getRaw(['input', "name"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updatePersonByPersonId: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(otherSource_peoplePgResource, {
-            person_id: args.get(['input', "personId"])
-          })
+        const $update = pgUpdateSingle(otherSource_peoplePgResource, {
+          person_id: args.getRaw(['input', "personId"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updatePersonByUsername: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(otherSource_peoplePgResource, {
-            username: args.get(['input', "username"])
-          })
+        const $update = pgUpdateSingle(otherSource_peoplePgResource, {
+          username: args.getRaw(['input', "username"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateRelationalItemRelationCompositePkByParentIdAndChildId: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource, {
-            parent_id: args.get(['input', "parentId"]),
-            child_id: args.get(['input', "childId"])
-          })
+        const $update = pgUpdateSingle(resource_relational_item_relation_composite_pksPgResource, {
+          parent_id: args.getRaw(['input', "parentId"]),
+          child_id: args.getRaw(['input', "childId"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateSingleTableItemRelationCompositePkByParentIdAndChildId: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(otherSource_single_table_item_relation_composite_pksPgResource, {
-            parent_id: args.get(['input', "parentId"]),
-            child_id: args.get(['input', "childId"])
-          })
+        const $update = pgUpdateSingle(otherSource_single_table_item_relation_composite_pksPgResource, {
+          parent_id: args.getRaw(['input', "parentId"]),
+          child_id: args.getRaw(['input', "childId"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateRelationalItemRelationById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(relational_item_relations_relational_item_relationsPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $update = pgUpdateSingle(resource_relational_item_relationsPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateRelationalItemRelationByParentIdAndChildId: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(relational_item_relations_relational_item_relationsPgResource, {
-            parent_id: args.get(['input', "parentId"]),
-            child_id: args.get(['input', "childId"])
-          })
+        const $update = pgUpdateSingle(resource_relational_item_relationsPgResource, {
+          parent_id: args.getRaw(['input', "parentId"]),
+          child_id: args.getRaw(['input', "childId"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateSingleTableItemRelationById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(otherSource_single_table_item_relationsPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $update = pgUpdateSingle(otherSource_single_table_item_relationsPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateSingleTableItemRelationByParentIdAndChildId: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(otherSource_single_table_item_relationsPgResource, {
-            parent_id: args.get(['input', "parentId"]),
-            child_id: args.get(['input', "childId"])
-          })
+        const $update = pgUpdateSingle(otherSource_single_table_item_relationsPgResource, {
+          parent_id: args.getRaw(['input', "parentId"]),
+          child_id: args.getRaw(['input', "childId"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateLogEntryById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(otherSource_log_entriesPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $update = pgUpdateSingle(otherSource_log_entriesPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateFirstPartyVulnerabilityById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(paths_0_resource_first_party_vulnerabilitiesPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $update = pgUpdateSingle(paths_0_resource_first_party_vulnerabilitiesPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateThirdPartyVulnerabilityById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(paths_1_resource_third_party_vulnerabilitiesPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $update = pgUpdateSingle(paths_1_resource_third_party_vulnerabilitiesPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateAwsApplicationById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(otherSource_aws_applicationsPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $update = pgUpdateSingle(otherSource_aws_applicationsPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     updateGcpApplicationById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(otherSource_gcp_applicationsPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $update = pgUpdateSingle(otherSource_gcp_applicationsPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($update);
+        return object({
+          result: $update
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteOrganizationByOrganizationId: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(otherSource_organizationsPgResource, {
-            organization_id: args.get(['input', "organizationId"])
-          })
+        const $delete = pgDeleteSingle(otherSource_organizationsPgResource, {
+          organization_id: args.getRaw(['input', "organizationId"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteOrganizationByName: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(otherSource_organizationsPgResource, {
-            name: args.get(['input', "name"])
-          })
+        const $delete = pgDeleteSingle(otherSource_organizationsPgResource, {
+          name: args.getRaw(['input', "name"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deletePersonByPersonId: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(otherSource_peoplePgResource, {
-            person_id: args.get(['input', "personId"])
-          })
+        const $delete = pgDeleteSingle(otherSource_peoplePgResource, {
+          person_id: args.getRaw(['input', "personId"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deletePersonByUsername: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(otherSource_peoplePgResource, {
-            username: args.get(['input', "username"])
-          })
+        const $delete = pgDeleteSingle(otherSource_peoplePgResource, {
+          username: args.getRaw(['input', "username"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteRelationalItemRelationCompositePkByParentIdAndChildId: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource, {
-            parent_id: args.get(['input', "parentId"]),
-            child_id: args.get(['input', "childId"])
-          })
+        const $delete = pgDeleteSingle(resource_relational_item_relation_composite_pksPgResource, {
+          parent_id: args.getRaw(['input', "parentId"]),
+          child_id: args.getRaw(['input', "childId"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteSingleTableItemRelationCompositePkByParentIdAndChildId: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(otherSource_single_table_item_relation_composite_pksPgResource, {
-            parent_id: args.get(['input', "parentId"]),
-            child_id: args.get(['input', "childId"])
-          })
+        const $delete = pgDeleteSingle(otherSource_single_table_item_relation_composite_pksPgResource, {
+          parent_id: args.getRaw(['input', "parentId"]),
+          child_id: args.getRaw(['input', "childId"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteRelationalItemRelationById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(relational_item_relations_relational_item_relationsPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $delete = pgDeleteSingle(resource_relational_item_relationsPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteRelationalItemRelationByParentIdAndChildId: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(relational_item_relations_relational_item_relationsPgResource, {
-            parent_id: args.get(['input', "parentId"]),
-            child_id: args.get(['input', "childId"])
-          })
+        const $delete = pgDeleteSingle(resource_relational_item_relationsPgResource, {
+          parent_id: args.getRaw(['input', "parentId"]),
+          child_id: args.getRaw(['input', "childId"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteSingleTableItemRelationById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(otherSource_single_table_item_relationsPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $delete = pgDeleteSingle(otherSource_single_table_item_relationsPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteSingleTableItemRelationByParentIdAndChildId: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(otherSource_single_table_item_relationsPgResource, {
-            parent_id: args.get(['input', "parentId"]),
-            child_id: args.get(['input', "childId"])
-          })
+        const $delete = pgDeleteSingle(otherSource_single_table_item_relationsPgResource, {
+          parent_id: args.getRaw(['input', "parentId"]),
+          child_id: args.getRaw(['input', "childId"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteLogEntryById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(otherSource_log_entriesPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $delete = pgDeleteSingle(otherSource_log_entriesPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteFirstPartyVulnerabilityById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(paths_0_resource_first_party_vulnerabilitiesPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $delete = pgDeleteSingle(paths_0_resource_first_party_vulnerabilitiesPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteThirdPartyVulnerabilityById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(paths_1_resource_third_party_vulnerabilitiesPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $delete = pgDeleteSingle(paths_1_resource_third_party_vulnerabilitiesPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteAwsApplicationById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(otherSource_aws_applicationsPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $delete = pgDeleteSingle(otherSource_aws_applicationsPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     },
     deleteGcpApplicationById: {
       plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(otherSource_gcp_applicationsPgResource, {
-            id: args.get(['input', "id"])
-          })
+        const $delete = pgDeleteSingle(otherSource_gcp_applicationsPgResource, {
+          id: args.getRaw(['input', "id"])
         });
-        args.apply(plan);
-        return plan;
+        args.apply($delete);
+        return object({
+          result: $delete
+        });
       },
       args: {
-        input: {
-          applyPlan(_, $object) {
-            return $object;
-          }
+        input(_, $object) {
+          return $object;
         }
       }
     }
@@ -28416,7 +21146,8 @@ export const plans = {
   CreateOrganizationPayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
     },
     organization($object) {
       return $object.get("result");
@@ -28424,76 +21155,61 @@ export const plans = {
     query() {
       return rootValue();
     },
-    organizationEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = organizationsUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return otherSource_organizationsPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("OrganizationsOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    organizationEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = organizationsUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return otherSource_organizationsPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   CreateOrganizationInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    organization: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
-      },
-      autoApplyAfterParentApplyPlan: true
+    organization(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
+      }
     }
   },
   OrganizationInput: {
-    "__inputPlan": function OrganizationInput_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    organizationId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("organization_id", bakedInputRuntime(schema, field.type, val));
     },
-    organizationId: {
-      applyPlan($insert, val) {
-        $insert.set("organization_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    name: {
-      applyPlan($insert, val) {
-        $insert.set("name", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    name(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("name", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreatePersonPayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
     },
     person($object) {
       return $object.get("result");
@@ -28501,76 +21217,61 @@ export const plans = {
     query() {
       return rootValue();
     },
-    personEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = peopleUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return otherSource_peoplePgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("PeopleOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    personEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = peopleUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return otherSource_peoplePgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   CreatePersonInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    person: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
-      },
-      autoApplyAfterParentApplyPlan: true
+    person(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
+      }
     }
   },
   PersonInput: {
-    "__inputPlan": function PersonInput_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    personId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("person_id", bakedInputRuntime(schema, field.type, val));
     },
-    personId: {
-      applyPlan($insert, val) {
-        $insert.set("person_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    username: {
-      applyPlan($insert, val) {
-        $insert.set("username", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    username(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("username", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateRelationalItemRelationCompositePkPayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
     },
     relationalItemRelationCompositePk($object) {
       return $object.get("result");
@@ -28578,36 +21279,29 @@ export const plans = {
     query() {
       return rootValue();
     },
-    relationalItemRelationCompositePkEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = relational_item_relation_composite_pksUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("RelationalItemRelationCompositePksOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    relationalItemRelationCompositePkEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = relational_item_relation_composite_pksUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return resource_relational_item_relation_composite_pksPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     },
     relationalItemByChildId($record) {
       return otherSource_relational_itemsPgResource.get({
@@ -28621,43 +21315,35 @@ export const plans = {
     }
   },
   CreateRelationalItemRelationCompositePkInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    relationalItemRelationCompositePk: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
-      },
-      autoApplyAfterParentApplyPlan: true
+    relationalItemRelationCompositePk(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
+      }
     }
   },
   RelationalItemRelationCompositePkInput: {
-    "__inputPlan": function RelationalItemRelationCompositePkInput_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    parentId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("parent_id", bakedInputRuntime(schema, field.type, val));
     },
-    parentId: {
-      applyPlan($insert, val) {
-        $insert.set("parent_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    childId: {
-      applyPlan($insert, val) {
-        $insert.set("child_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    childId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("child_id", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateSingleTableItemRelationCompositePkPayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
     },
     singleTableItemRelationCompositePk($object) {
       return $object.get("result");
@@ -28665,36 +21351,29 @@ export const plans = {
     query() {
       return rootValue();
     },
-    singleTableItemRelationCompositePkEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = single_table_item_relation_composite_pksUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return otherSource_single_table_item_relation_composite_pksPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationCompositePksOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    singleTableItemRelationCompositePkEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = single_table_item_relation_composite_pksUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return otherSource_single_table_item_relation_composite_pksPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     },
     singleTableItemByChildId($record) {
       return otherSource_single_table_itemsPgResource.get({
@@ -28708,43 +21387,35 @@ export const plans = {
     }
   },
   CreateSingleTableItemRelationCompositePkInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    singleTableItemRelationCompositePk: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
-      },
-      autoApplyAfterParentApplyPlan: true
+    singleTableItemRelationCompositePk(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
+      }
     }
   },
   SingleTableItemRelationCompositePkInput: {
-    "__inputPlan": function SingleTableItemRelationCompositePkInput_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    parentId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("parent_id", bakedInputRuntime(schema, field.type, val));
     },
-    parentId: {
-      applyPlan($insert, val) {
-        $insert.set("parent_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    childId: {
-      applyPlan($insert, val) {
-        $insert.set("child_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    childId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("child_id", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateRelationalItemRelationPayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
     },
     relationalItemRelation($object) {
       return $object.get("result");
@@ -28752,36 +21423,29 @@ export const plans = {
     query() {
       return rootValue();
     },
-    relationalItemRelationEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = relational_item_relationsUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return relational_item_relations_relational_item_relationsPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("RelationalItemRelationsOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    relationalItemRelationEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = relational_item_relationsUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return resource_relational_item_relationsPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     },
     relationalItemByChildId($record) {
       return otherSource_relational_itemsPgResource.get({
@@ -28795,50 +21459,41 @@ export const plans = {
     }
   },
   CreateRelationalItemRelationInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    relationalItemRelation: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
-      },
-      autoApplyAfterParentApplyPlan: true
+    relationalItemRelation(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
+      }
     }
   },
   RelationalItemRelationInput: {
-    "__inputPlan": function RelationalItemRelationInput_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    parentId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("parent_id", bakedInputRuntime(schema, field.type, val));
     },
-    parentId: {
-      applyPlan($insert, val) {
-        $insert.set("parent_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    childId: {
-      applyPlan($insert, val) {
-        $insert.set("child_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    childId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("child_id", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateSingleTableItemRelationPayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
     },
     singleTableItemRelation($object) {
       return $object.get("result");
@@ -28846,36 +21501,29 @@ export const plans = {
     query() {
       return rootValue();
     },
-    singleTableItemRelationEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = single_table_item_relationsUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return otherSource_single_table_item_relationsPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationsOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    singleTableItemRelationEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = single_table_item_relationsUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return otherSource_single_table_item_relationsPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     },
     singleTableItemByChildId($record) {
       return otherSource_single_table_itemsPgResource.get({
@@ -28889,50 +21537,41 @@ export const plans = {
     }
   },
   CreateSingleTableItemRelationInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    singleTableItemRelation: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
-      },
-      autoApplyAfterParentApplyPlan: true
+    singleTableItemRelation(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
+      }
     }
   },
   SingleTableItemRelationInput: {
-    "__inputPlan": function SingleTableItemRelationInput_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    parentId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("parent_id", bakedInputRuntime(schema, field.type, val));
     },
-    parentId: {
-      applyPlan($insert, val) {
-        $insert.set("parent_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    childId: {
-      applyPlan($insert, val) {
-        $insert.set("child_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    childId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("child_id", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateLogEntryPayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
     },
     logEntry($object) {
       return $object.get("result");
@@ -28940,36 +21579,29 @@ export const plans = {
     query() {
       return rootValue();
     },
-    logEntryEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = log_entriesUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return otherSource_log_entriesPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("LogEntriesOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    logEntryEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = log_entriesUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return otherSource_log_entriesPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     },
     organizationByOrganizationId($record) {
       return otherSource_organizationsPgResource.get({
@@ -28983,57 +21615,47 @@ export const plans = {
     }
   },
   CreateLogEntryInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    logEntry: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
-      },
-      autoApplyAfterParentApplyPlan: true
+    logEntry(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
+      }
     }
   },
   LogEntryInput: {
-    "__inputPlan": function LogEntryInput_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    personId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("person_id", bakedInputRuntime(schema, field.type, val));
     },
-    personId: {
-      applyPlan($insert, val) {
-        $insert.set("person_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    organizationId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("organization_id", bakedInputRuntime(schema, field.type, val));
     },
-    organizationId: {
-      applyPlan($insert, val) {
-        $insert.set("organization_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    text: {
-      applyPlan($insert, val) {
-        $insert.set("text", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    text(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("text", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateFirstPartyVulnerabilityPayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
     },
     firstPartyVulnerability($object) {
       return $object.get("result");
@@ -29041,90 +21663,73 @@ export const plans = {
     query() {
       return rootValue();
     },
-    firstPartyVulnerabilityEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = first_party_vulnerabilitiesUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return paths_0_resource_first_party_vulnerabilitiesPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("FirstPartyVulnerabilitiesOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    firstPartyVulnerabilityEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = first_party_vulnerabilitiesUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return paths_0_resource_first_party_vulnerabilitiesPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   CreateFirstPartyVulnerabilityInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    firstPartyVulnerability: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
-      },
-      autoApplyAfterParentApplyPlan: true
+    firstPartyVulnerability(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
+      }
     }
   },
   FirstPartyVulnerabilityInput: {
-    "__inputPlan": function FirstPartyVulnerabilityInput_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    name(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("name", bakedInputRuntime(schema, field.type, val));
     },
-    name: {
-      applyPlan($insert, val) {
-        $insert.set("name", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    cvssScore(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("cvss_score", bakedInputRuntime(schema, field.type, val));
     },
-    cvssScore: {
-      applyPlan($insert, val) {
-        $insert.set("cvss_score", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    teamName: {
-      applyPlan($insert, val) {
-        $insert.set("team_name", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    teamName(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("team_name", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateThirdPartyVulnerabilityPayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
     },
     thirdPartyVulnerability($object) {
       return $object.get("result");
@@ -29132,90 +21737,73 @@ export const plans = {
     query() {
       return rootValue();
     },
-    thirdPartyVulnerabilityEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = third_party_vulnerabilitiesUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return paths_1_resource_third_party_vulnerabilitiesPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("ThirdPartyVulnerabilitiesOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    thirdPartyVulnerabilityEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = third_party_vulnerabilitiesUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return paths_1_resource_third_party_vulnerabilitiesPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   CreateThirdPartyVulnerabilityInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    thirdPartyVulnerability: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
-      },
-      autoApplyAfterParentApplyPlan: true
+    thirdPartyVulnerability(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
+      }
     }
   },
   ThirdPartyVulnerabilityInput: {
-    "__inputPlan": function ThirdPartyVulnerabilityInput_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    name(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("name", bakedInputRuntime(schema, field.type, val));
     },
-    name: {
-      applyPlan($insert, val) {
-        $insert.set("name", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    cvssScore(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("cvss_score", bakedInputRuntime(schema, field.type, val));
     },
-    cvssScore: {
-      applyPlan($insert, val) {
-        $insert.set("cvss_score", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    vendorName: {
-      applyPlan($insert, val) {
-        $insert.set("vendor_name", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    vendorName(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("vendor_name", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateAwsApplicationPayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
     },
     awsApplication($object) {
       return $object.get("result");
@@ -29223,36 +21811,29 @@ export const plans = {
     query() {
       return rootValue();
     },
-    awsApplicationEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = aws_applicationsUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return otherSource_aws_applicationsPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("AwsApplicationsOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    awsApplicationEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = aws_applicationsUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return otherSource_aws_applicationsPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     },
     organizationByOrganizationId($record) {
       return otherSource_organizationsPgResource.get({
@@ -29266,71 +21847,59 @@ export const plans = {
     }
   },
   CreateAwsApplicationInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    awsApplication: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
-      },
-      autoApplyAfterParentApplyPlan: true
+    awsApplication(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
+      }
     }
   },
   AwsApplicationInput: {
-    "__inputPlan": function AwsApplicationInput_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    name(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("name", bakedInputRuntime(schema, field.type, val));
     },
-    name: {
-      applyPlan($insert, val) {
-        $insert.set("name", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    lastDeployed(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("last_deployed", bakedInputRuntime(schema, field.type, val));
     },
-    lastDeployed: {
-      applyPlan($insert, val) {
-        $insert.set("last_deployed", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    personId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("person_id", bakedInputRuntime(schema, field.type, val));
     },
-    personId: {
-      applyPlan($insert, val) {
-        $insert.set("person_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    organizationId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("organization_id", bakedInputRuntime(schema, field.type, val));
     },
-    organizationId: {
-      applyPlan($insert, val) {
-        $insert.set("organization_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    awsId: {
-      applyPlan($insert, val) {
-        $insert.set("aws_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    awsId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("aws_id", bakedInputRuntime(schema, field.type, val));
     }
   },
   CreateGcpApplicationPayload: {
     __assertStep: assertExecutableStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $insert = $mutation.getStepForKey("result");
+      return $insert.getMeta("clientMutationId");
     },
     gcpApplication($object) {
       return $object.get("result");
@@ -29338,36 +21907,29 @@ export const plans = {
     query() {
       return rootValue();
     },
-    gcpApplicationEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = gcp_applicationsUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return otherSource_gcp_applicationsPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("GcpApplicationsOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    gcpApplicationEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = gcp_applicationsUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return otherSource_gcp_applicationsPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     },
     organizationByOrganizationId($record) {
       return otherSource_organizationsPgResource.get({
@@ -29381,71 +21943,59 @@ export const plans = {
     }
   },
   CreateGcpApplicationInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    gcpApplication: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
-      },
-      autoApplyAfterParentApplyPlan: true
+    gcpApplication(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
+      }
     }
   },
   GcpApplicationInput: {
-    "__inputPlan": function GcpApplicationInput_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    name(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("name", bakedInputRuntime(schema, field.type, val));
     },
-    name: {
-      applyPlan($insert, val) {
-        $insert.set("name", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    lastDeployed(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("last_deployed", bakedInputRuntime(schema, field.type, val));
     },
-    lastDeployed: {
-      applyPlan($insert, val) {
-        $insert.set("last_deployed", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    personId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("person_id", bakedInputRuntime(schema, field.type, val));
     },
-    personId: {
-      applyPlan($insert, val) {
-        $insert.set("person_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    organizationId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("organization_id", bakedInputRuntime(schema, field.type, val));
     },
-    organizationId: {
-      applyPlan($insert, val) {
-        $insert.set("organization_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    gcpId: {
-      applyPlan($insert, val) {
-        $insert.set("gcp_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    gcpId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("gcp_id", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateOrganizationPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     organization($object) {
       return $object.get("result");
@@ -29453,89 +22003,71 @@ export const plans = {
     query() {
       return rootValue();
     },
-    organizationEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = organizationsUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return otherSource_organizationsPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("OrganizationsOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    organizationEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = organizationsUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return otherSource_organizationsPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   UpdateOrganizationByOrganizationIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    organizationId: undefined,
-    organizationPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+    organizationPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   OrganizationPatch: {
-    "__inputPlan": function OrganizationPatch_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    organizationId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("organization_id", bakedInputRuntime(schema, field.type, val));
     },
-    organizationId: {
-      applyPlan($insert, val) {
-        $insert.set("organization_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    name: {
-      applyPlan($insert, val) {
-        $insert.set("name", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    name(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("name", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateOrganizationByNameInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    name: undefined,
-    organizationPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+    organizationPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   UpdatePersonPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     person($object) {
       return $object.get("result");
@@ -29543,89 +22075,71 @@ export const plans = {
     query() {
       return rootValue();
     },
-    personEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = peopleUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return otherSource_peoplePgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("PeopleOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    personEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = peopleUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return otherSource_peoplePgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   UpdatePersonByPersonIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    personId: undefined,
-    personPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+    personPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   PersonPatch: {
-    "__inputPlan": function PersonPatch_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    personId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("person_id", bakedInputRuntime(schema, field.type, val));
     },
-    personId: {
-      applyPlan($insert, val) {
-        $insert.set("person_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    username: {
-      applyPlan($insert, val) {
-        $insert.set("username", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    username(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("username", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdatePersonByUsernameInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    username: undefined,
-    personPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+    personPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   UpdateRelationalItemRelationCompositePkPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     relationalItemRelationCompositePk($object) {
       return $object.get("result");
@@ -29633,36 +22147,29 @@ export const plans = {
     query() {
       return rootValue();
     },
-    relationalItemRelationCompositePkEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = relational_item_relation_composite_pksUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("RelationalItemRelationCompositePksOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    relationalItemRelationCompositePkEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = relational_item_relation_composite_pksUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return resource_relational_item_relation_composite_pksPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     },
     relationalItemByChildId($record) {
       return otherSource_relational_itemsPgResource.get({
@@ -29676,43 +22183,35 @@ export const plans = {
     }
   },
   UpdateRelationalItemRelationCompositePkByParentIdAndChildIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    parentId: undefined,
-    childId: undefined,
-    relationalItemRelationCompositePkPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+    relationalItemRelationCompositePkPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   RelationalItemRelationCompositePkPatch: {
-    "__inputPlan": function RelationalItemRelationCompositePkPatch_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    parentId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("parent_id", bakedInputRuntime(schema, field.type, val));
     },
-    parentId: {
-      applyPlan($insert, val) {
-        $insert.set("parent_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    childId: {
-      applyPlan($insert, val) {
-        $insert.set("child_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    childId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("child_id", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateSingleTableItemRelationCompositePkPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     singleTableItemRelationCompositePk($object) {
       return $object.get("result");
@@ -29720,36 +22219,29 @@ export const plans = {
     query() {
       return rootValue();
     },
-    singleTableItemRelationCompositePkEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = single_table_item_relation_composite_pksUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return otherSource_single_table_item_relation_composite_pksPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationCompositePksOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    singleTableItemRelationCompositePkEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = single_table_item_relation_composite_pksUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return otherSource_single_table_item_relation_composite_pksPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     },
     singleTableItemByChildId($record) {
       return otherSource_single_table_itemsPgResource.get({
@@ -29763,43 +22255,35 @@ export const plans = {
     }
   },
   UpdateSingleTableItemRelationCompositePkByParentIdAndChildIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    parentId: undefined,
-    childId: undefined,
-    singleTableItemRelationCompositePkPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+    singleTableItemRelationCompositePkPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   SingleTableItemRelationCompositePkPatch: {
-    "__inputPlan": function SingleTableItemRelationCompositePkPatch_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    parentId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("parent_id", bakedInputRuntime(schema, field.type, val));
     },
-    parentId: {
-      applyPlan($insert, val) {
-        $insert.set("parent_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    childId: {
-      applyPlan($insert, val) {
-        $insert.set("child_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    childId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("child_id", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateRelationalItemRelationPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     relationalItemRelation($object) {
       return $object.get("result");
@@ -29807,36 +22291,29 @@ export const plans = {
     query() {
       return rootValue();
     },
-    relationalItemRelationEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = relational_item_relationsUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return relational_item_relations_relational_item_relationsPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("RelationalItemRelationsOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    relationalItemRelationEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = relational_item_relationsUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return resource_relational_item_relationsPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     },
     relationalItemByChildId($record) {
       return otherSource_relational_itemsPgResource.get({
@@ -29850,64 +22327,51 @@ export const plans = {
     }
   },
   UpdateRelationalItemRelationByIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    relationalItemRelationPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+    relationalItemRelationPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   RelationalItemRelationPatch: {
-    "__inputPlan": function RelationalItemRelationPatch_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    parentId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("parent_id", bakedInputRuntime(schema, field.type, val));
     },
-    parentId: {
-      applyPlan($insert, val) {
-        $insert.set("parent_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    childId: {
-      applyPlan($insert, val) {
-        $insert.set("child_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    childId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("child_id", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateRelationalItemRelationByParentIdAndChildIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    parentId: undefined,
-    childId: undefined,
-    relationalItemRelationPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+    relationalItemRelationPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   UpdateSingleTableItemRelationPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     singleTableItemRelation($object) {
       return $object.get("result");
@@ -29915,36 +22379,29 @@ export const plans = {
     query() {
       return rootValue();
     },
-    singleTableItemRelationEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = single_table_item_relationsUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return otherSource_single_table_item_relationsPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationsOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    singleTableItemRelationEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = single_table_item_relationsUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return otherSource_single_table_item_relationsPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     },
     singleTableItemByChildId($record) {
       return otherSource_single_table_itemsPgResource.get({
@@ -29958,64 +22415,51 @@ export const plans = {
     }
   },
   UpdateSingleTableItemRelationByIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    singleTableItemRelationPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+    singleTableItemRelationPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   SingleTableItemRelationPatch: {
-    "__inputPlan": function SingleTableItemRelationPatch_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    parentId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("parent_id", bakedInputRuntime(schema, field.type, val));
     },
-    parentId: {
-      applyPlan($insert, val) {
-        $insert.set("parent_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    childId: {
-      applyPlan($insert, val) {
-        $insert.set("child_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    childId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("child_id", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateSingleTableItemRelationByParentIdAndChildIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    parentId: undefined,
-    childId: undefined,
-    singleTableItemRelationPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+    singleTableItemRelationPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   UpdateLogEntryPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     logEntry($object) {
       return $object.get("result");
@@ -30023,36 +22467,29 @@ export const plans = {
     query() {
       return rootValue();
     },
-    logEntryEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = log_entriesUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return otherSource_log_entriesPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("LogEntriesOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    logEntryEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = log_entriesUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return otherSource_log_entriesPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     },
     organizationByOrganizationId($record) {
       return otherSource_organizationsPgResource.get({
@@ -30066,56 +22503,47 @@ export const plans = {
     }
   },
   UpdateLogEntryByIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    logEntryPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+    logEntryPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   LogEntryPatch: {
-    "__inputPlan": function LogEntryPatch_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    personId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("person_id", bakedInputRuntime(schema, field.type, val));
     },
-    personId: {
-      applyPlan($insert, val) {
-        $insert.set("person_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    organizationId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("organization_id", bakedInputRuntime(schema, field.type, val));
     },
-    organizationId: {
-      applyPlan($insert, val) {
-        $insert.set("organization_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    text: {
-      applyPlan($insert, val) {
-        $insert.set("text", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    text(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("text", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateFirstPartyVulnerabilityPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     firstPartyVulnerability($object) {
       return $object.get("result");
@@ -30123,89 +22551,73 @@ export const plans = {
     query() {
       return rootValue();
     },
-    firstPartyVulnerabilityEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = first_party_vulnerabilitiesUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return paths_0_resource_first_party_vulnerabilitiesPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("FirstPartyVulnerabilitiesOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    firstPartyVulnerabilityEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = first_party_vulnerabilitiesUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return paths_0_resource_first_party_vulnerabilitiesPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   UpdateFirstPartyVulnerabilityByIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    firstPartyVulnerabilityPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+    firstPartyVulnerabilityPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   FirstPartyVulnerabilityPatch: {
-    "__inputPlan": function FirstPartyVulnerabilityPatch_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    name(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("name", bakedInputRuntime(schema, field.type, val));
     },
-    name: {
-      applyPlan($insert, val) {
-        $insert.set("name", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    cvssScore(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("cvss_score", bakedInputRuntime(schema, field.type, val));
     },
-    cvssScore: {
-      applyPlan($insert, val) {
-        $insert.set("cvss_score", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    teamName: {
-      applyPlan($insert, val) {
-        $insert.set("team_name", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    teamName(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("team_name", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateThirdPartyVulnerabilityPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     thirdPartyVulnerability($object) {
       return $object.get("result");
@@ -30213,89 +22625,73 @@ export const plans = {
     query() {
       return rootValue();
     },
-    thirdPartyVulnerabilityEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = third_party_vulnerabilitiesUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return paths_1_resource_third_party_vulnerabilitiesPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("ThirdPartyVulnerabilitiesOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    thirdPartyVulnerabilityEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = third_party_vulnerabilitiesUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return paths_1_resource_third_party_vulnerabilitiesPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   UpdateThirdPartyVulnerabilityByIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    thirdPartyVulnerabilityPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+    thirdPartyVulnerabilityPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   ThirdPartyVulnerabilityPatch: {
-    "__inputPlan": function ThirdPartyVulnerabilityPatch_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    name(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("name", bakedInputRuntime(schema, field.type, val));
     },
-    name: {
-      applyPlan($insert, val) {
-        $insert.set("name", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    cvssScore(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("cvss_score", bakedInputRuntime(schema, field.type, val));
     },
-    cvssScore: {
-      applyPlan($insert, val) {
-        $insert.set("cvss_score", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    vendorName: {
-      applyPlan($insert, val) {
-        $insert.set("vendor_name", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    vendorName(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("vendor_name", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateAwsApplicationPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     awsApplication($object) {
       return $object.get("result");
@@ -30303,36 +22699,29 @@ export const plans = {
     query() {
       return rootValue();
     },
-    awsApplicationEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = aws_applicationsUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return otherSource_aws_applicationsPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("AwsApplicationsOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    awsApplicationEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = aws_applicationsUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return otherSource_aws_applicationsPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     },
     organizationByOrganizationId($record) {
       return otherSource_organizationsPgResource.get({
@@ -30346,70 +22735,59 @@ export const plans = {
     }
   },
   UpdateAwsApplicationByIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    awsApplicationPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+    awsApplicationPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   AwsApplicationPatch: {
-    "__inputPlan": function AwsApplicationPatch_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    name(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("name", bakedInputRuntime(schema, field.type, val));
     },
-    name: {
-      applyPlan($insert, val) {
-        $insert.set("name", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    lastDeployed(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("last_deployed", bakedInputRuntime(schema, field.type, val));
     },
-    lastDeployed: {
-      applyPlan($insert, val) {
-        $insert.set("last_deployed", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    personId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("person_id", bakedInputRuntime(schema, field.type, val));
     },
-    personId: {
-      applyPlan($insert, val) {
-        $insert.set("person_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    organizationId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("organization_id", bakedInputRuntime(schema, field.type, val));
     },
-    organizationId: {
-      applyPlan($insert, val) {
-        $insert.set("organization_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    awsId: {
-      applyPlan($insert, val) {
-        $insert.set("aws_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    awsId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("aws_id", bakedInputRuntime(schema, field.type, val));
     }
   },
   UpdateGcpApplicationPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     gcpApplication($object) {
       return $object.get("result");
@@ -30417,36 +22795,29 @@ export const plans = {
     query() {
       return rootValue();
     },
-    gcpApplicationEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = gcp_applicationsUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return otherSource_gcp_applicationsPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("GcpApplicationsOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    gcpApplicationEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = gcp_applicationsUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return otherSource_gcp_applicationsPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     },
     organizationByOrganizationId($record) {
       return otherSource_organizationsPgResource.get({
@@ -30460,70 +22831,59 @@ export const plans = {
     }
   },
   UpdateGcpApplicationByIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
     },
-    id: undefined,
-    gcpApplicationPatch: {
-      applyPlan($object) {
-        const $record = $object.getStepForKey("result");
-        return $record.setPlan();
+    gcpApplicationPatch(qb, arg) {
+      if (arg != null) {
+        return qb.setBuilder();
       }
     }
   },
   GcpApplicationPatch: {
-    "__inputPlan": function GcpApplicationPatch_inputPlan() {
-      return object(Object.create(null));
+    __baked: createObjectAndApplyChildren,
+    id(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("id", bakedInputRuntime(schema, field.type, val));
     },
-    id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    name(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("name", bakedInputRuntime(schema, field.type, val));
     },
-    name: {
-      applyPlan($insert, val) {
-        $insert.set("name", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    lastDeployed(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("last_deployed", bakedInputRuntime(schema, field.type, val));
     },
-    lastDeployed: {
-      applyPlan($insert, val) {
-        $insert.set("last_deployed", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    personId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("person_id", bakedInputRuntime(schema, field.type, val));
     },
-    personId: {
-      applyPlan($insert, val) {
-        $insert.set("person_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    organizationId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("organization_id", bakedInputRuntime(schema, field.type, val));
     },
-    organizationId: {
-      applyPlan($insert, val) {
-        $insert.set("organization_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    gcpId: {
-      applyPlan($insert, val) {
-        $insert.set("gcp_id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
+    gcpId(obj, val, {
+      field,
+      schema
+    }) {
+      obj.set("gcp_id", bakedInputRuntime(schema, field.type, val));
     }
   },
   DeleteOrganizationPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     organization($object) {
       return $object.get("result");
@@ -30531,58 +22891,46 @@ export const plans = {
     query() {
       return rootValue();
     },
-    organizationEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = organizationsUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return otherSource_organizationsPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("OrganizationsOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    organizationEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = organizationsUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return otherSource_organizationsPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   DeleteOrganizationByOrganizationIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
-    },
-    organizationId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteOrganizationByNameInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
-    },
-    name: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeletePersonPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     person($object) {
       return $object.get("result");
@@ -30590,58 +22938,46 @@ export const plans = {
     query() {
       return rootValue();
     },
-    personEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = peopleUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return otherSource_peoplePgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("PeopleOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    personEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = peopleUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return otherSource_peoplePgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   DeletePersonByPersonIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
-    },
-    personId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeletePersonByUsernameInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
-    },
-    username: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteRelationalItemRelationCompositePkPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     relationalItemRelationCompositePk($object) {
       return $object.get("result");
@@ -30649,36 +22985,29 @@ export const plans = {
     query() {
       return rootValue();
     },
-    relationalItemRelationCompositePkEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = relational_item_relation_composite_pksUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("RelationalItemRelationCompositePksOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    relationalItemRelationCompositePkEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = relational_item_relation_composite_pksUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return resource_relational_item_relation_composite_pksPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     },
     relationalItemByChildId($record) {
       return otherSource_relational_itemsPgResource.get({
@@ -30692,18 +23021,15 @@ export const plans = {
     }
   },
   DeleteRelationalItemRelationCompositePkByParentIdAndChildIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
-    },
-    parentId: undefined,
-    childId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteSingleTableItemRelationCompositePkPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     singleTableItemRelationCompositePk($object) {
       return $object.get("result");
@@ -30711,36 +23037,29 @@ export const plans = {
     query() {
       return rootValue();
     },
-    singleTableItemRelationCompositePkEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = single_table_item_relation_composite_pksUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return otherSource_single_table_item_relation_composite_pksPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationCompositePksOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    singleTableItemRelationCompositePkEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = single_table_item_relation_composite_pksUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return otherSource_single_table_item_relation_composite_pksPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     },
     singleTableItemByChildId($record) {
       return otherSource_single_table_itemsPgResource.get({
@@ -30754,18 +23073,15 @@ export const plans = {
     }
   },
   DeleteSingleTableItemRelationCompositePkByParentIdAndChildIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
-    },
-    parentId: undefined,
-    childId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteRelationalItemRelationPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     relationalItemRelation($object) {
       return $object.get("result");
@@ -30773,36 +23089,29 @@ export const plans = {
     query() {
       return rootValue();
     },
-    relationalItemRelationEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = relational_item_relationsUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return relational_item_relations_relational_item_relationsPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("RelationalItemRelationsOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    relationalItemRelationEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = relational_item_relationsUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return resource_relational_item_relationsPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     },
     relationalItemByChildId($record) {
       return otherSource_relational_itemsPgResource.get({
@@ -30816,26 +23125,20 @@ export const plans = {
     }
   },
   DeleteRelationalItemRelationByIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteRelationalItemRelationByParentIdAndChildIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
-    },
-    parentId: undefined,
-    childId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteSingleTableItemRelationPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     singleTableItemRelation($object) {
       return $object.get("result");
@@ -30843,36 +23146,29 @@ export const plans = {
     query() {
       return rootValue();
     },
-    singleTableItemRelationEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = single_table_item_relationsUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return otherSource_single_table_item_relationsPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationsOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    singleTableItemRelationEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = single_table_item_relationsUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return otherSource_single_table_item_relationsPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     },
     singleTableItemByChildId($record) {
       return otherSource_single_table_itemsPgResource.get({
@@ -30886,26 +23182,20 @@ export const plans = {
     }
   },
   DeleteSingleTableItemRelationByIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteSingleTableItemRelationByParentIdAndChildIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
-    },
-    parentId: undefined,
-    childId: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteLogEntryPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     logEntry($object) {
       return $object.get("result");
@@ -30913,36 +23203,29 @@ export const plans = {
     query() {
       return rootValue();
     },
-    logEntryEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = log_entriesUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return otherSource_log_entriesPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("LogEntriesOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    logEntryEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = log_entriesUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return otherSource_log_entriesPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     },
     organizationByOrganizationId($record) {
       return otherSource_organizationsPgResource.get({
@@ -30956,17 +23239,15 @@ export const plans = {
     }
   },
   DeleteLogEntryByIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteFirstPartyVulnerabilityPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     firstPartyVulnerability($object) {
       return $object.get("result");
@@ -30974,50 +23255,41 @@ export const plans = {
     query() {
       return rootValue();
     },
-    firstPartyVulnerabilityEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = first_party_vulnerabilitiesUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return paths_0_resource_first_party_vulnerabilitiesPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("FirstPartyVulnerabilitiesOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    firstPartyVulnerabilityEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = first_party_vulnerabilitiesUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return paths_0_resource_first_party_vulnerabilitiesPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   DeleteFirstPartyVulnerabilityByIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteThirdPartyVulnerabilityPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     thirdPartyVulnerability($object) {
       return $object.get("result");
@@ -31025,50 +23297,41 @@ export const plans = {
     query() {
       return rootValue();
     },
-    thirdPartyVulnerabilityEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = third_party_vulnerabilitiesUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return paths_1_resource_third_party_vulnerabilitiesPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("ThirdPartyVulnerabilitiesOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    thirdPartyVulnerabilityEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = third_party_vulnerabilitiesUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return paths_1_resource_third_party_vulnerabilitiesPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     }
   },
   DeleteThirdPartyVulnerabilityByIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteAwsApplicationPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     awsApplication($object) {
       return $object.get("result");
@@ -31076,36 +23339,29 @@ export const plans = {
     query() {
       return rootValue();
     },
-    awsApplicationEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = aws_applicationsUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return otherSource_aws_applicationsPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("AwsApplicationsOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    awsApplicationEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = aws_applicationsUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return otherSource_aws_applicationsPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     },
     organizationByOrganizationId($record) {
       return otherSource_organizationsPgResource.get({
@@ -31119,17 +23375,15 @@ export const plans = {
     }
   },
   DeleteAwsApplicationByIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   },
   DeleteGcpApplicationPayload: {
     __assertStep: ObjectStep,
     clientMutationId($mutation) {
-      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+      const $result = $mutation.getStepForKey("result");
+      return $result.getMeta("clientMutationId");
     },
     gcpApplication($object) {
       return $object.get("result");
@@ -31137,36 +23391,29 @@ export const plans = {
     query() {
       return rootValue();
     },
-    gcpApplicationEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = gcp_applicationsUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return otherSource_gcp_applicationsPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("GcpApplicationsOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
+    gcpApplicationEdge($mutation, fieldArgs) {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) {
+        return constant(null);
       }
+      const $select = (() => {
+        if ($result instanceof PgDeleteSingleStep) {
+          return pgSelectFromRecord($result.resource, $result.record());
+        } else {
+          const spec = gcp_applicationsUniques[0].attributes.reduce((memo, attributeName) => {
+            memo[attributeName] = $result.get(attributeName);
+            return memo;
+          }, Object.create(null));
+          return otherSource_gcp_applicationsPgResource.find(spec);
+        }
+      })();
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      // NOTE: you must not use `$single = $select.single()`
+      // here because doing so will mark the row as unique, and
+      // then the ordering logic (and thus cursor) will differ.
+      const $single = $select.row(first($select));
+      return new EdgeStep($connection, $single);
     },
     organizationByOrganizationId($record) {
       return otherSource_organizationsPgResource.get({
@@ -31180,12 +23427,9 @@ export const plans = {
     }
   },
   DeleteGcpApplicationByIdInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      }
-    },
-    id: undefined
+    clientMutationId(qb, val) {
+      qb.setMeta("clientMutationId", val);
+    }
   }
 };
 export const schema = makeGrafastSchema({

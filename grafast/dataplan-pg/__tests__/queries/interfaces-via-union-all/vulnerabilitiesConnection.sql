@@ -1,6 +1,6 @@
 select
-  __vulnerabilities__."0"::text as "0",
-  __vulnerabilities__."1" as "1",
+  __vulnerabilities__."0" as "0",
+  __vulnerabilities__."1"::text as "1",
   __vulnerabilities__."2"::text as "2"
 from (
     select
@@ -10,9 +10,9 @@ from (
       "n"
     from (
       select
-        __first_party_vulnerabilities__."cvss_score" as "0",
-        'FirstPartyVulnerability' as "1",
-        json_build_array((__first_party_vulnerabilities__."id")::text) as "2",
+        'FirstPartyVulnerability' as "0",
+        json_build_array((__first_party_vulnerabilities__."id")::text) as "1",
+        __first_party_vulnerabilities__."cvss_score" as "2",
         row_number() over (
           order by
             __first_party_vulnerabilities__."cvss_score" asc,
@@ -31,9 +31,9 @@ from (
       "n"
     from (
       select
-        __third_party_vulnerabilities__."cvss_score" as "0",
-        'ThirdPartyVulnerability' as "1",
-        json_build_array((__third_party_vulnerabilities__."id")::text) as "2",
+        'ThirdPartyVulnerability' as "0",
+        json_build_array((__third_party_vulnerabilities__."id")::text) as "1",
+        __third_party_vulnerabilities__."cvss_score" as "2",
         row_number() over (
           order by
             __third_party_vulnerabilities__."cvss_score" asc,
@@ -45,8 +45,8 @@ from (
         __third_party_vulnerabilities__."id" asc
     ) as __third_party_vulnerabilities__
   order by
+    "2" asc,
     "0" asc,
-    "1" asc,
     "n" asc
 ) __vulnerabilities__
 
@@ -63,9 +63,9 @@ lateral (
   from interfaces_and_unions.first_party_vulnerabilities as __first_party_vulnerabilities__
   where
     (
-      true /* authorization checks */
-    ) and (
       __first_party_vulnerabilities__."id" = __first_party_vulnerabilities_identifiers__."id0"
+    ) and (
+      true /* authorization checks */
     )
 ) as __first_party_vulnerabilities_result__;
 
@@ -81,8 +81,8 @@ lateral (
   from interfaces_and_unions.third_party_vulnerabilities as __third_party_vulnerabilities__
   where
     (
-      true /* authorization checks */
-    ) and (
       __third_party_vulnerabilities__."id" = __third_party_vulnerabilities_identifiers__."id0"
+    ) and (
+      true /* authorization checks */
     )
 ) as __third_party_vulnerabilities_result__;

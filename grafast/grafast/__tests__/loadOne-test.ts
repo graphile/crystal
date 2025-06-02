@@ -3,12 +3,14 @@ import { resolvePreset } from "graphile-config";
 import type { ExecutionResult } from "graphql";
 import { it } from "mocha";
 
-import type {
-  ExecutableStep,
-  LoadedRecordStep,
-  LoadOneCallback,
+import type { LoadedRecordStep, ObjectPlan, Step } from "../dist/index.js";
+import {
+  context,
+  grafast,
+  loadOne,
+  loadOneCallback,
+  makeGrafastSchema,
 } from "../dist/index.js";
-import { context, grafast, loadOne, makeGrafastSchema } from "../dist/index.js";
 
 const resolvedPreset = resolvePreset({});
 const requestContext = {};
@@ -93,79 +95,78 @@ let CALLS: {
   params: object;
 }[] = [];
 
-const loadThingByIds: LoadOneCallback<number, Thing, Record<string, never>> = (
-  specs,
-  { attributes, params },
-) => {
-  const result = specs
-    .map((id) => THINGS.find((t) => t.id === id))
-    .map((t) => (t && attributes ? pick(t, attributes) : t));
-  CALLS.push({ specs, result, attributes, params });
-  return result;
-};
+const loadThingByIds = loadOneCallback(
+  (specs: readonly number[], { attributes, params }) => {
+    const result = specs
+      .map((id) => THINGS.find((t) => t.id === id))
+      .map((t) => (t && attributes ? pick(t, attributes) : t));
+    CALLS.push({ specs, result, attributes, params });
+    return result;
+  },
+);
 
-const loadThingByIdentifierObjs: LoadOneCallback<
-  { identifier: number },
-  Thing,
-  Record<string, never>
-> = (specs, { attributes, params }) => {
-  const result = specs
-    .map((spec) => THINGS.find((t) => t.id === spec.identifier))
-    .map((t) => (t && attributes ? pick(t, attributes) : t));
-  CALLS.push({ specs, result, attributes, params });
-  return result;
-};
+const loadThingByIdentifierObjs = loadOneCallback(
+  (specs: readonly { identifier: number }[], { attributes, params }) => {
+    const result = specs
+      .map((spec) => THINGS.find((t) => t.id === spec.identifier))
+      .map((t) => (t && attributes ? pick(t, attributes) : t));
+    CALLS.push({ specs, result, attributes, params });
+    return result;
+  },
+);
 
-const loadThingByIdentifierLists: LoadOneCallback<
-  readonly [identifier: number],
-  Thing,
-  Record<string, never>
-> = (specs, { attributes, params }) => {
-  const result = specs
-    .map((spec) => THINGS.find((t) => t.id === spec[0]))
-    .map((t) => (t && attributes ? pick(t, attributes) : t));
-  CALLS.push({ specs, result, attributes, params });
-  return result;
-};
+const loadThingByIdentifierLists = loadOneCallback(
+  (
+    specs: ReadonlyArray<readonly [identifier: number]>,
+    { attributes, params },
+  ) => {
+    const result = specs
+      .map((spec) => THINGS.find((t) => t.id === spec[0]))
+      .map((t) => (t && attributes ? pick(t, attributes) : t));
+    CALLS.push({ specs, result, attributes, params });
+    return result;
+  },
+);
 
-const loadThingByOrgIdRegNoObjs: LoadOneCallback<
-  { orgId: number; regNo: number },
-  Thing,
-  Record<string, never>
-> = (specs, { attributes, params }) => {
-  const result = specs
-    .map((spec) =>
-      THINGS.find((t) => t.orgId === spec.orgId && t.orgRegNo === spec.regNo),
-    )
-    .map((t) => (t && attributes ? pick(t, attributes) : t));
-  CALLS.push({ specs, result, attributes, params });
-  return result;
-};
+const loadThingByOrgIdRegNoObjs = loadOneCallback(
+  (
+    specs: ReadonlyArray<{ orgId: number; regNo: number }>,
+    { attributes, params },
+  ) => {
+    const result = specs
+      .map((spec) =>
+        THINGS.find((t) => t.orgId === spec.orgId && t.orgRegNo === spec.regNo),
+      )
+      .map((t) => (t && attributes ? pick(t, attributes) : t));
+    CALLS.push({ specs, result, attributes, params });
+    return result;
+  },
+);
 
-const loadThingByOrgIdRegNoTuples: LoadOneCallback<
-  readonly [orgId: number, regNo: number],
-  Thing,
-  Record<string, never>
-> = (specs, { attributes, params }) => {
-  const result = specs
-    .map((spec) =>
-      THINGS.find((t) => t.orgId === spec[0] && t.orgRegNo === spec[1]),
-    )
-    .map((t) => (t && attributes ? pick(t, attributes) : t));
-  CALLS.push({ specs, result, attributes, params });
-  return result;
-};
+const loadThingByOrgIdRegNoTuples = loadOneCallback(
+  (
+    specs: ReadonlyArray<readonly [orgId: number, regNo: number]>,
+    { attributes, params },
+  ) => {
+    const result = specs
+      .map((spec) =>
+        THINGS.find((t) => t.orgId === spec[0] && t.orgRegNo === spec[1]),
+      )
+      .map((t) => (t && attributes ? pick(t, attributes) : t));
+    CALLS.push({ specs, result, attributes, params });
+    return result;
+  },
+);
 
-const loadOrgByIds: LoadOneCallback<number, Org, Record<string, never>> = (
-  specs,
-  { attributes, params },
-) => {
-  const result = specs
-    .map((id) => ORGS.find((t) => t.id === id))
-    .map((t) => (t && attributes ? pick(t, attributes) : t));
-  // CALLS.push({ specs, result, attributes, params });
-  return result;
-};
+const loadOrgByIds = loadOneCallback(
+  (specs: readonly number[], { attributes, params }) => {
+    const result = specs
+      .map((id) => ORGS.find((t) => t.id === id))
+      .map((t) => (t && attributes ? pick(t, attributes) : t));
+    // CALLS.push({ specs, result, attributes, params });
+    return result;
+  },
+);
 
 const makeSchema = (useStreamableStep = false) => {
   return makeGrafastSchema({
@@ -190,65 +191,73 @@ const makeSchema = (useStreamableStep = false) => {
         thingByOrgIdRegNoObj(regNo: Int!): Thing
       }
     `,
-    plans: {
+    objects: {
       Query: {
-        thingById(_, { $id }) {
-          return loadOne($id as ExecutableStep<number>, loadThingByIds);
-        },
-        thingByIdObj(_, { $id }) {
-          return loadOne(
-            { identifier: $id as ExecutableStep<number> },
-            { identifier: "id" },
-            loadThingByIdentifierObjs,
-          );
-        },
-        thingByIdList(_, { $id }) {
-          return loadOne(
-            [$id as ExecutableStep<number>],
-            ["id"],
-            loadThingByIdentifierLists,
-          );
-        },
-        thingByOrgIdRegNoTuple(_, { $regNo }) {
-          const $orgId = context().get("orgId");
-          return loadOne(
-            [$orgId, $regNo],
-            // Deliberately not using ioEquivalence here to test stable object/tuple creation
-            //["orgId", "orgRegNo"],
-            loadThingByOrgIdRegNoTuples,
-          );
-        },
-        thingByOrgIdRegNoObj(_, { $regNo }) {
-          const $orgId = context().get("orgId");
-          return loadOne(
-            { orgId: $orgId, regNo: $regNo },
-            // Deliberately not using ioEquivalence here to test stable object/tuple creation
-            //{ orgId: "orgId", regNo: "orgRegNo" },
-            loadThingByOrgIdRegNoObjs,
-          );
+        plans: {
+          thingById(_, { $id }) {
+            return loadOne($id as Step<number>, loadThingByIds);
+          },
+          thingByIdObj(_, { $id }) {
+            return loadOne(
+              { identifier: $id as Step<number> },
+              { identifier: "id" },
+              loadThingByIdentifierObjs,
+            );
+          },
+          thingByIdList(_, { $id }) {
+            return loadOne(
+              [$id as Step<number>],
+              ["id"],
+              loadThingByIdentifierLists,
+            );
+          },
+          thingByOrgIdRegNoTuple(_, fieldArgs) {
+            const $regNo = fieldArgs.getRaw("regNo") as Step<number>;
+            const $orgId = context().get("orgId");
+            return loadOne(
+              [$orgId, $regNo],
+              // Deliberately not using ioEquivalence here to test stable object/tuple creation
+              //["orgId", "orgRegNo"],
+              loadThingByOrgIdRegNoTuples,
+            );
+          },
+          thingByOrgIdRegNoObj(_, fieldArgs) {
+            const $regNo = fieldArgs.getRaw("regNo") as Step<number>;
+            const $orgId = context().get("orgId");
+            return loadOne(
+              { orgId: $orgId, regNo: $regNo },
+              // Deliberately not using ioEquivalence here to test stable object/tuple creation
+              //{ orgId: "orgId", regNo: "orgRegNo" },
+              loadThingByOrgIdRegNoObjs,
+            );
+          },
         },
       },
       Thing: {
-        org($thing: LoadedRecordStep<Thing>) {
-          return loadOne($thing.get("orgId"), "id", loadOrgByIds);
+        plans: {
+          org($thing) {
+            return loadOne($thing.get("orgId"), "id", loadOrgByIds);
+          },
         },
-      },
+      } as ObjectPlan<LoadedRecordStep<Thing>>,
       Org: {
-        thingByTuple($org: LoadedRecordStep<Org>, { $regNo }) {
-          const $orgId = $org.get("id");
-          return loadOne(
-            [$orgId, $regNo],
-            ["orgId", "orgRegNo"],
-            loadThingByOrgIdRegNoTuples,
-          );
-        },
-        thingByObj($org: LoadedRecordStep<Org>, { $regNo }) {
-          const $orgId = $org.get("id");
-          return loadOne(
-            { orgId: $orgId, regNo: $regNo },
-            { orgId: "orgId", regNo: "orgRegNo" },
-            loadThingByOrgIdRegNoObjs,
-          );
+        plans: {
+          thingByTuple($org: LoadedRecordStep<Org>, { $regNo }) {
+            const $orgId = $org.get("id");
+            return loadOne(
+              [$orgId, $regNo],
+              ["orgId", "orgRegNo"],
+              loadThingByOrgIdRegNoTuples,
+            );
+          },
+          thingByObj($org: LoadedRecordStep<Org>, { $regNo }) {
+            const $orgId = $org.get("id");
+            return loadOne(
+              { orgId: $orgId, regNo: $regNo },
+              { orgId: "orgId", regNo: "orgRegNo" },
+              loadThingByOrgIdRegNoObjs,
+            );
+          },
         },
       },
     },

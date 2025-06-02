@@ -22,14 +22,16 @@ import type {
   PgResourceOptions,
   PgResourceUnique,
   PgSelectSingleStep,
+  PgUnionAllStepMember,
 } from "@dataplan/pg";
-import { assertPgClassSingleStep } from "@dataplan/pg";
 import type {
   DataFromObjectSteps,
   ExecutableStep,
   LambdaStep,
   ListStep,
+  Maybe,
   NodeIdHandler,
+  Step,
 } from "grafast";
 import {
   access,
@@ -37,6 +39,7 @@ import {
   lambda,
   list,
   makeDecodeNodeId,
+  makeDecodeNodeIdRuntime,
   object,
 } from "grafast";
 import type {
@@ -81,8 +84,16 @@ declare global {
         [polymorphicTypeName: string]: PgCodec;
       };
 
+      nodeIdHelpersForCodec(
+        codec: PgCodec<any, any, any, any, any, any, any>,
+      ): {
+        getSpec: ($nodeId: ExecutableStep<Maybe<string>>) => {
+          [key: string]: ExecutableStep<any>;
+        };
+        getIdentifiers: (nodeId: Maybe<string>) => null | readonly any[];
+      } | null;
       nodeIdSpecForCodec(codec: PgCodec<any, any, any, any, any, any, any>):
-        | (($nodeId: ExecutableStep<string>) => {
+        | (($nodeId: ExecutableStep<Maybe<string>>) => {
             [key: string]: ExecutableStep<any>;
           })
         | null;
@@ -301,8 +312,9 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   );
                 if (!pgConstraint) {
                   throw new Error(
-                    `Could not build polymorphic reference from '${pgClass.getNamespace()
-                      ?.nspname}.${
+                    `Could not build polymorphic reference from '${
+                      pgClass.getNamespace()?.nspname
+                    }.${
                       pgClass.relname
                     }' to '${referencedClass.getNamespace()?.nspname}.${
                       referencedClass.relname
@@ -796,9 +808,9 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 resource.uniques as PgResourceUnique[] | undefined
               )?.find((u) => u.isPrimary);
               if (pk) {
-                const pkAttributes = pk.attributes;
+                const remotePkAttributes = pk.attributes;
                 const pkRelations = Object.values(relations).filter((r) =>
-                  arraysMatch(r.localAttributes, pkAttributes),
+                  arraysMatch(r.localAttributes, remotePkAttributes),
                 );
                 if (
                   pkRelations.some(
@@ -909,7 +921,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
           {
             pgResourcesByPolymorphicTypeName,
             pgCodecByPolymorphicUnionModeTypeName,
-            nodeIdSpecForCodec(codec) {
+            nodeIdHelpersForCodec(codec) {
               const table = build.pgTableResource!(codec);
               if (!table) {
                 return null;
@@ -920,10 +932,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
               }
               const tablePkAttributes = tablePk.attributes;
               if (codec.polymorphism?.mode === "relational") {
-                const details: Array<{
-                  handler: NodeIdHandler;
-                  pkAttributes: readonly string[];
-                }> = [];
+                const details: Array<NodeIdHandlerAndPkAttributes> = [];
                 for (const spec of Object.values(codec.polymorphism.types)) {
                   const relation = table.getRelation(spec.relationName);
                   const typeName = build.inflection.tableType(
@@ -940,81 +949,15 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                     return null;
                   }
                   details.push({
-                    pkAttributes: pk.attributes,
+                    remotePkAttributes: pk.attributes,
                     handler,
                   });
                 }
                 const handlers = details.map((d) => d.handler);
-                const decodeNodeId = EXPORTABLE(
-                  (handlers, makeDecodeNodeId) => makeDecodeNodeId(handlers),
-                  [handlers, makeDecodeNodeId],
-                );
-                return EXPORTABLE(
-                  (
-                    access,
-                    decodeNodeId,
-                    details,
-                    lambda,
-                    list,
-                    object,
-                    tablePkAttributes,
-                  ) =>
-                    (
-                      $nodeId: ExecutableStep<string>,
-                    ): { [key: string]: ExecutableStep<any> } => {
-                      const $specifier = decodeNodeId($nodeId);
-                      const $handlerMatches = list(
-                        details.map(({ handler, pkAttributes }) => {
-                          const spec = handler.getSpec(
-                            access($specifier, handler.codec.name),
-                          );
-                          return object({
-                            match: lambda($specifier, (specifier) => {
-                              const value = specifier?.[handler.codec.name];
-                              return value != null
-                                ? handler.match(value)
-                                : false;
-                            }),
-                            pks: list(pkAttributes.map((n) => spec[n])),
-                          });
-                        }),
-                      );
-                      const $pkValues = lambda(
-                        $handlerMatches,
-                        (handlerMatches) => {
-                          const match = (
-                            handlerMatches as DataFromObjectSteps<{
-                              match: LambdaStep<
-                                {
-                                  [codecName: string]: any;
-                                } | null,
-                                boolean
-                              >;
-                              pks: ListStep<any[]>;
-                            }>[]
-                          ).find((pk) => pk.match);
-                          return match?.pks;
-                        },
-                        true,
-                      );
-                      return tablePkAttributes.reduce(
-                        (memo, pkAttribute, i) => {
-                          memo[pkAttribute] = access($pkValues, i);
-                          return memo;
-                        },
-                        Object.create(null),
-                      );
-                    },
-                  [
-                    access,
-                    decodeNodeId,
-                    details,
-                    lambda,
-                    list,
-                    object,
-                    tablePkAttributes,
-                  ],
-                );
+                return {
+                  getSpec: makeGetRelationalSpec(details, tablePkAttributes),
+                  getIdentifiers: makeGetIdentifiers(handlers),
+                };
               } else if (codec.polymorphism?.mode === "single") {
                 // Lots of type names, but they all relate to the same table
                 const handlers: Array<NodeIdHandler> = [];
@@ -1026,78 +969,10 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   }
                   handlers.push(handler);
                 }
-                const decodeNodeId = EXPORTABLE(
-                  (handlers, makeDecodeNodeId) => makeDecodeNodeId(handlers),
-                  [handlers, makeDecodeNodeId],
-                );
-                return EXPORTABLE(
-                  (
-                    access,
-                    decodeNodeId,
-                    handlers,
-                    lambda,
-                    list,
-                    object,
-                    tablePkAttributes,
-                  ) =>
-                    (
-                      $nodeId: ExecutableStep<string>,
-                    ): { [key: string]: ExecutableStep<any> } => {
-                      const $specifier = decodeNodeId($nodeId);
-                      const $handlerMatches = list(
-                        handlers.map((handler) => {
-                          const spec = handler.getSpec(
-                            access($specifier, handler.codec.name),
-                          );
-                          return object({
-                            match: lambda($specifier, (specifier) => {
-                              const value = specifier?.[handler.codec.name];
-                              return value != null
-                                ? handler.match(value)
-                                : false;
-                            }),
-                            pks: list(tablePkAttributes.map((n) => spec[n])),
-                          });
-                        }),
-                      );
-                      const $pkValues = lambda(
-                        $handlerMatches,
-                        (handlerMatches) => {
-                          // Explicit typing because TypeScript has lost the
-                          // plot.
-                          const match = (
-                            handlerMatches as DataFromObjectSteps<{
-                              match: LambdaStep<
-                                {
-                                  [codecName: string]: any;
-                                } | null,
-                                boolean
-                              >;
-                              pks: ListStep<any[]>;
-                            }>[]
-                          ).find((pk) => pk.match);
-                          return match?.pks;
-                        },
-                        true,
-                      );
-                      return tablePkAttributes.reduce(
-                        (memo, pkAttribute, i) => {
-                          memo[pkAttribute] = access($pkValues, i);
-                          return memo;
-                        },
-                        Object.create(null),
-                      );
-                    },
-                  [
-                    access,
-                    decodeNodeId,
-                    handlers,
-                    lambda,
-                    list,
-                    object,
-                    tablePkAttributes,
-                  ],
-                );
+                return {
+                  getSpec: makeGetSingleSpec(handlers, tablePkAttributes),
+                  getIdentifiers: makeGetIdentifiers(handlers),
+                };
               } else if (codec.polymorphism) {
                 throw new Error(
                   `Don't know how to get the spec for nodeId for codec with polymorphism mode '${codec.polymorphism.mode}'`,
@@ -1109,19 +984,31 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 if (!handler || !specForHandler) {
                   return null;
                 }
-                return EXPORTABLE(
-                  (handler, lambda, specForHandler) =>
-                    (
-                      $nodeId: ExecutableStep<string>,
-                    ): { [key: string]: ExecutableStep<any> } => {
-                      // TODO: should change this to a common method like
-                      // `const $decoded = getDecodedNodeIdForHandler(handler, $nodeId)`
-                      const $decoded = lambda($nodeId, specForHandler(handler));
-                      return handler.getSpec($decoded);
-                    },
-                  [handler, lambda, specForHandler],
-                );
+                return {
+                  getSpec: EXPORTABLE(
+                    (handler, lambda, specForHandler) =>
+                      (
+                        $nodeId: ExecutableStep<Maybe<string>>,
+                      ): { [key: string]: ExecutableStep<any> } => {
+                        // TODO: should change this to a common method like
+                        // `const $decoded = getDecodedNodeIdForHandler(handler, $nodeId)`
+                        const $decoded = lambda(
+                          $nodeId,
+                          specForHandler(handler),
+                        );
+                        return handler.getSpec($decoded);
+                      },
+                    [handler, lambda, specForHandler],
+                  ),
+                  getIdentifiers: makeGetIdentifiers([handler]),
+                };
               }
+            },
+            nodeIdSpecForCodec(codec) {
+              const helpers = (
+                build as GraphileBuild.Build
+              ).nodeIdHelpersForCodec(codec);
+              return helpers ? helpers.getSpec : null;
             },
           },
           "Adding PgPolmorphismPlugin helpers to Build",
@@ -1132,7 +1019,13 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
           inflection,
           options: { pgForbidSetofFunctionsToReturnNull },
           setGraphQLTypeForPgCodec,
-          grafast: { list, constant, access, inhibitOnNull },
+          grafast: { list, constant, access, inhibitOnNull, get },
+          dataplanPg: {
+            assertPgClassSingleStep,
+            PgSelectSingleStep,
+            PgUnionAllSingleStep,
+          },
+          EXPORTABLE,
         } = build;
         const unionsToRegister = new Map<string, PgCodec[]>();
         for (const codec of build.pgCodecMetaLookup.keys()) {
@@ -1169,7 +1062,246 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   codec,
                   "interface:node",
                 );
+                const resource = build.pgTableResource(
+                  codec as PgCodecWithAttributes,
+                );
+                const primaryKey = resource
+                  ? (resource.uniques as PgResourceUnique[]).find(
+                      (u) => u.isPrimary === true,
+                    )
+                  : undefined;
+                const pk = primaryKey?.attributes;
+                if (!pk || !resource) {
+                  return;
+                }
                 const interfaceTypeName = inflection.tableType(codec);
+
+                if (polymorphism.typeAttributes.length !== 1) {
+                  throw new Error(
+                    `Currently only support one polymorphic type attribute`,
+                  );
+                }
+                const typeAttrName = polymorphism.typeAttributes[0];
+                const typeNameFromType = EXPORTABLE(
+                  (interfaceTypeName, polymorphism) => {
+                    function typeNameFromType(typeVal: unknown) {
+                      if (typeof typeVal !== "string") return null;
+                      return polymorphism.types[typeVal]?.name ?? null;
+                    }
+                    typeNameFromType.displayName = `${interfaceTypeName}_typeNameFromType`;
+                    return typeNameFromType;
+                  },
+                  [interfaceTypeName, polymorphism],
+                  `${interfaceTypeName}_typeNameFromType`,
+                );
+
+                let grafastExtensions: Grafast.UnionTypeExtensions;
+                if (polymorphism.mode === "single") {
+                  grafastExtensions = {
+                    toSpecifier: EXPORTABLE(
+                      (get, object, pk) => (step: Step) =>
+                        object(
+                          Object.fromEntries(
+                            pk.map((attrName) => [
+                              attrName,
+                              get(step, attrName),
+                            ]),
+                          ),
+                        ),
+                      [get, object, pk],
+                    ),
+                    planType: EXPORTABLE(
+                      (
+                        PgSelectSingleStep,
+                        get,
+                        lambda,
+                        pk,
+                        resource,
+                        typeAttrName,
+                        typeNameFromType,
+                      ) =>
+                        function planType($specifier, { $original }) {
+                          const $inStep = $original ?? $specifier;
+                          const $record =
+                            $inStep instanceof PgSelectSingleStep
+                              ? $inStep
+                              : resource.get(
+                                  Object.fromEntries(
+                                    pk.map((attrName) => [
+                                      attrName,
+                                      get($inStep, attrName),
+                                    ]),
+                                  ),
+                                );
+                          const $typeVal = get($record, typeAttrName);
+                          const $__typename = lambda(
+                            $typeVal,
+                            typeNameFromType,
+                            true,
+                          );
+                          return {
+                            $__typename,
+                            planForType() {
+                              return $record;
+                            },
+                          };
+                        },
+                      [
+                        PgSelectSingleStep,
+                        get,
+                        lambda,
+                        pk,
+                        resource,
+                        typeAttrName,
+                        typeNameFromType,
+                      ],
+                    ),
+                  };
+                } else if (polymorphism.mode === "relational") {
+                  grafastExtensions = {
+                    toSpecifier: EXPORTABLE(
+                      (PgSelectSingleStep, get, object, pk, resource) =>
+                        (step: Step) => {
+                          if (
+                            step instanceof PgSelectSingleStep &&
+                            step.resource !== resource
+                          ) {
+                            // Assume it's a child; return description of base
+                            // PERF: ideally we'd use relationship
+                            // traversal instead, this would both be
+                            // shorter and also cacheable.
+                            const stepPk = (
+                              step.resource.uniques as PgResourceUnique[]
+                            ).find((u) => u.isPrimary)?.attributes;
+                            if (!stepPk) {
+                              throw new Error(
+                                `Expected a relational record for ${resource.name}, but found one for ${step.resource.name} which has no primary key!`,
+                              );
+                            }
+                            if (stepPk.length !== pk.length) {
+                              throw new Error(
+                                `Expected a relational record for ${resource.name}, but found one for ${step.resource.name} which has a primary key with a different number of columns!`,
+                              );
+                            }
+                            return object(
+                              Object.fromEntries(
+                                pk.map((attrName, idx) => [
+                                  attrName,
+                                  get(step, stepPk[idx]),
+                                ]),
+                              ),
+                            );
+                          } else {
+                            // Assume it is or describes the base:
+                            return object(
+                              Object.fromEntries(
+                                pk.map((attrName) => [
+                                  attrName,
+                                  get(step, attrName),
+                                ]),
+                              ),
+                            );
+                          }
+                        },
+                      [PgSelectSingleStep, get, object, pk, resource],
+                    ),
+                    planType: EXPORTABLE(
+                      (
+                        PgSelectSingleStep,
+                        get,
+                        lambda,
+                        pk,
+                        polymorphism,
+                        resource,
+                        typeAttrName,
+                        typeNameFromType,
+                      ) =>
+                        ($specifier, { $original }) => {
+                          const $inStep = $original ?? $specifier;
+                          // A PgSelectSingleStep representing the base relational table
+                          const $base = (() => {
+                            if ($inStep instanceof PgSelectSingleStep) {
+                              if ($inStep.resource.codec === resource.codec) {
+                                // It's the core table; that's what we want!
+                                return $inStep;
+                              } else {
+                                // Assume it's a child; get base record by primary key
+                                // PERF: ideally we'd use relationship
+                                // traversal instead, this would both be
+                                // shorter and also cacheable.
+                                const stepPk = (
+                                  $inStep.resource.uniques as PgResourceUnique[]
+                                ).find((u) => u.isPrimary)?.attributes;
+                                if (!stepPk) {
+                                  throw new Error(
+                                    `Expected a relational record for ${resource.name}, but found one for ${$inStep.resource.name} which has no primary key!`,
+                                  );
+                                }
+                                if (stepPk.length !== pk.length) {
+                                  throw new Error(
+                                    `Expected a relational record for ${resource.name}, but found one for ${$inStep.resource.name} which has a primary key with a different number of columns!`,
+                                  );
+                                }
+                                return resource.get(
+                                  Object.fromEntries(
+                                    pk.map((attrName, idx) => [
+                                      attrName,
+                                      get($inStep, stepPk[idx]),
+                                    ]),
+                                  ),
+                                );
+                              }
+                            } else {
+                              // Assume it's an object representing the base table
+                              return resource.get(
+                                Object.fromEntries(
+                                  pk.map((attrName) => [
+                                    attrName,
+                                    get($inStep, attrName),
+                                  ]),
+                                ),
+                              );
+                            }
+                          })();
+                          const $typeVal = get($base, typeAttrName);
+                          const $__typename = lambda(
+                            $typeVal,
+                            typeNameFromType,
+                            true,
+                          );
+                          return {
+                            $__typename,
+                            planForType(type) {
+                              const spec = Object.values(
+                                polymorphism.types,
+                              ).find((s) => s.name === type.name);
+                              if (!spec) {
+                                throw new Error(
+                                  `${this} Could not find matching name for relational polymorphic '${type.name}'`,
+                                );
+                              }
+                              return $base.singleRelation(spec.relationName);
+                            },
+                          };
+                        },
+                      [
+                        PgSelectSingleStep,
+                        get,
+                        lambda,
+                        pk,
+                        polymorphism,
+                        resource,
+                        typeAttrName,
+                        typeNameFromType,
+                      ],
+                    ),
+                  };
+                } else {
+                  const never: never = polymorphism;
+                  throw new Error(
+                    `${this}: Don't know how to plan polymorphism mode ${(never as any).mode}`,
+                  );
+                }
                 build.registerInterfaceType(
                   interfaceTypeName,
                   {
@@ -1181,6 +1313,9 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   },
                   () => ({
                     description: codec.description,
+                    extensions: {
+                      grafast: grafastExtensions,
+                    },
                   }),
                   `PgPolymorphismPlugin single/relational interface type for ${codec.name}`,
                 );
@@ -1195,15 +1330,6 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   },
                   nonNullNode: pgForbidSetofFunctionsToReturnNull,
                 });
-                const resource = build.pgTableResource(
-                  codec as PgCodecWithAttributes,
-                );
-                const primaryKey = resource
-                  ? (resource.uniques as PgResourceUnique[]).find(
-                      (u) => u.isPrimary === true,
-                    )
-                  : undefined;
-                const pk = primaryKey?.attributes;
                 for (const [typeIdentifier, spec] of Object.entries(
                   polymorphism.types,
                 ) as Array<
@@ -1326,6 +1452,9 @@ return function (access, inhibitOnNull) {
                                 },
                               [access, inhibitOnNull, pk],
                             ),
+                        getIdentifiers(value) {
+                          return value.slice(1);
+                        },
                         get: EXPORTABLE(
                           (resource) => (spec: any) => resource.get(spec),
                           [resource],
@@ -1354,9 +1483,61 @@ return function (access, inhibitOnNull) {
                     pgPolymorphism: polymorphism,
                     supportsNodeInterface: nodeable,
                   },
-                  () => ({
-                    description: codec.description,
-                  }),
+                  () => {
+                    const spec =
+                      build.pgResourcesByPolymorphicTypeName[interfaceTypeName];
+                    const resourceByTypeName: Record<string, PgResource> =
+                      Object.create(null);
+                    const members: PgUnionAllStepMember<string>[] = [];
+                    for (const resource of spec.resources) {
+                      const typeName = inflection.tableType(resource.codec);
+                      resourceByTypeName[typeName] = resource;
+                      members.push({
+                        resource,
+                        typeName,
+                      });
+                    }
+                    return {
+                      description: codec.description,
+                      toSpecifier: EXPORTABLE(
+                        (PgUnionAllSingleStep) =>
+                          function toSpecifier($step) {
+                            if ($step instanceof PgUnionAllSingleStep) {
+                              return $step.toSpecifier();
+                            } else {
+                              return $step;
+                            }
+                          },
+                        [PgUnionAllSingleStep],
+                      ),
+                      planType: EXPORTABLE(
+                        (get, resourceByTypeName) =>
+                          function planType($specifier) {
+                            const $__typename = get($specifier, "__typename");
+                            return {
+                              $__typename,
+                              planForType(t) {
+                                const resource = resourceByTypeName[t.name];
+                                if (!resource) {
+                                  throw new Error(
+                                    `Type ${t.name} has no associated resource`,
+                                  );
+                                }
+                                const pk =
+                                  resource.uniques.find((u) => u.isPrimary) ??
+                                  resource.uniques[0];
+                                const spec = Object.create(null);
+                                for (const attrName of pk.attributes) {
+                                  spec[attrName] = get($specifier, attrName);
+                                }
+                                return resource.get(spec);
+                              },
+                            };
+                          },
+                        [get, resourceByTypeName],
+                      ),
+                    };
+                  },
                   `PgPolymorphismPlugin union interface type for ${codec.name}`,
                 );
                 setGraphQLTypeForPgCodec(codec, ["output"], interfaceTypeName);
@@ -1400,17 +1581,53 @@ return function (access, inhibitOnNull) {
             build.registerUnionType(
               unionName,
               { isPgUnionMemberUnion: true },
-              () => ({
-                types: () =>
-                  codecs
-                    .map(
-                      (codec) =>
-                        build.getTypeByName(
-                          build.inflection.tableType(codec),
-                        ) as GraphQLObjectType | undefined,
-                    )
-                    .filter(isNotNullish),
-              }),
+              () => {
+                const resourceByTypeName = Object.create(null) as Record<
+                  string,
+                  ReturnType<typeof build.pgTableResource>
+                >;
+                for (const codec of codecs) {
+                  resourceByTypeName[build.inflection.tableType(codec)] =
+                    build.pgTableResource(codec as PgCodecWithAttributes);
+                }
+                return {
+                  types: () =>
+                    codecs
+                      .map(
+                        (codec) =>
+                          build.getTypeByName(
+                            build.inflection.tableType(codec),
+                          ) as GraphQLObjectType | undefined,
+                      )
+                      .filter(isNotNullish),
+                  planType: EXPORTABLE(
+                    (get, resourceByTypeName) =>
+                      function planType($specifier) {
+                        const $__typename = get($specifier, "__typename");
+                        return {
+                          $__typename,
+                          planForType(t) {
+                            const resource = resourceByTypeName[t.name];
+                            if (!resource) {
+                              throw new Error(
+                                `Could not determine resource for ${t.name}`,
+                              );
+                            }
+                            const pk =
+                              resource.uniques.find((u) => u.isPrimary) ??
+                              resource.uniques[0];
+                            const spec = Object.create(null);
+                            for (const attrName of pk.attributes) {
+                              spec[attrName] = get($specifier, attrName);
+                            }
+                            return resource.get(spec);
+                          },
+                        };
+                      },
+                    [get, resourceByTypeName],
+                  ),
+                };
+              },
               "PgPolymorphismPlugin @unionMember unions",
             );
             build.registerCursorConnection({
@@ -1498,3 +1715,143 @@ return function (access, inhibitOnNull) {
     },
   },
 };
+
+function makeGetIdentifiers(handlers: ReadonlyArray<NodeIdHandler>) {
+  const decodeNodeId = EXPORTABLE(
+    (handlers, makeDecodeNodeIdRuntime) => makeDecodeNodeIdRuntime(handlers),
+    [handlers, makeDecodeNodeIdRuntime],
+  );
+  return EXPORTABLE(
+    (decodeNodeId, handlers) => (nodeId: string | null | undefined) => {
+      const specifier = decodeNodeId(nodeId);
+      if (specifier == null) return null;
+      for (const handler of handlers) {
+        const value = specifier?.[handler.codec.name];
+        const match = value != null ? handler.match(value) : false;
+        if (match) {
+          return handler.getIdentifiers(value);
+        }
+      }
+      return null;
+    },
+    [decodeNodeId, handlers],
+  );
+}
+
+function makeGetRelationalSpec(
+  details: ReadonlyArray<NodeIdHandlerAndPkAttributes>,
+  tablePkAttributes: readonly string[],
+) {
+  const handlers = details.map((d) => d.handler);
+  const decodeNodeId = EXPORTABLE(
+    (handlers, makeDecodeNodeId) => makeDecodeNodeId(handlers),
+    [handlers, makeDecodeNodeId],
+  );
+  return EXPORTABLE(
+    (access, decodeNodeId, details, lambda, list, object, tablePkAttributes) =>
+      (
+        $nodeId: ExecutableStep<Maybe<string>>,
+      ): { [key: string]: ExecutableStep<any> } => {
+        const $specifier = decodeNodeId($nodeId);
+        const $handlerMatches = list(
+          details.map(({ handler, remotePkAttributes }) => {
+            const spec = handler.getSpec(
+              access($specifier, handler.codec.name),
+            );
+            return object({
+              match: lambda($specifier, (specifier) => {
+                const value = specifier?.[handler.codec.name];
+                return value != null ? handler.match(value) : false;
+              }),
+              pks: list(remotePkAttributes.map((n) => spec[n])),
+            });
+          }),
+        );
+        const $pkValues = lambda(
+          $handlerMatches,
+          (handlerMatches) => {
+            const match = (
+              handlerMatches as DataFromObjectSteps<{
+                match: LambdaStep<
+                  {
+                    [codecName: string]: any;
+                  } | null,
+                  boolean
+                >;
+                pks: ListStep<any[]>;
+              }>[]
+            ).find((pk) => pk.match);
+            return match?.pks;
+          },
+          true,
+        );
+        return tablePkAttributes.reduce((memo, pkAttribute, i) => {
+          memo[pkAttribute] = access($pkValues, i);
+          return memo;
+        }, Object.create(null));
+      },
+    [access, decodeNodeId, details, lambda, list, object, tablePkAttributes],
+  );
+}
+
+interface NodeIdHandlerAndPkAttributes {
+  handler: NodeIdHandler;
+  remotePkAttributes: readonly string[];
+}
+
+function makeGetSingleSpec(
+  handlers: ReadonlyArray<NodeIdHandler>,
+  tablePkAttributes: readonly string[],
+) {
+  const decodeNodeId = EXPORTABLE(
+    (handlers, makeDecodeNodeId) => makeDecodeNodeId(handlers),
+    [handlers, makeDecodeNodeId],
+  );
+  return EXPORTABLE(
+    (access, decodeNodeId, handlers, lambda, list, object, tablePkAttributes) =>
+      (
+        $nodeId: ExecutableStep<Maybe<string>>,
+      ): { [key: string]: ExecutableStep<any> } => {
+        const $specifier = decodeNodeId($nodeId);
+        const $handlerMatches = list(
+          handlers.map((handler) => {
+            const spec = handler.getSpec(
+              access($specifier, handler.codec.name),
+            );
+            return object({
+              match: lambda($specifier, (specifier) => {
+                const value = specifier?.[handler.codec.name];
+                return value != null ? handler.match(value) : false;
+              }),
+              pks: list(tablePkAttributes.map((n) => spec[n])),
+            });
+          }),
+        );
+        const $pkValues = lambda(
+          $handlerMatches,
+          (handlerMatches) => {
+            // Explicit typing because TypeScript has lost the
+            // plot.
+            const match = (
+              handlerMatches as DataFromObjectSteps<{
+                match: LambdaStep<
+                  {
+                    [codecName: string]: any;
+                  } | null,
+                  boolean
+                >;
+                pks: ListStep<any[]>;
+              }>[]
+            ).find((pk) => pk.match);
+            return match?.pks;
+          },
+          true,
+        );
+        return tablePkAttributes.reduce((memo, pkAttribute, i) => {
+          memo[pkAttribute] = access($pkValues, i);
+          return memo;
+        }, Object.create(null));
+      },
+    [access, decodeNodeId, handlers, lambda, list, object, tablePkAttributes],
+  );
+}

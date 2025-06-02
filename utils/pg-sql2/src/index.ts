@@ -1,5 +1,6 @@
 import LRU from "@graphile/lru";
 import * as assert from "assert";
+import type { CustomInspectFunction } from "util";
 import { inspect } from "util";
 
 import { $$type } from "./thereCanBeOnlyOne.js";
@@ -32,13 +33,64 @@ const isDev =
   (process.env.GRAPHILE_ENV === "development" ||
     process.env.GRAPHILE_ENV === "test");
 
+const includeComments =
+  typeof process !== "undefined" && process.env.PGSQL2_DEBUG === "1";
+
+const nodeInspect: CustomInspectFunction = function (
+  this: SQLNode | SQLQuery,
+  depth,
+  options,
+) {
+  if (this[$$type] === "VALUE") {
+    if (depth < 0) {
+      return `sql.value(...)`;
+    }
+    return `sql.value(${inspect(this.v, {
+      ...options,
+      depth: options.depth == null ? null : options.depth - 1,
+    })})`;
+  } else if (this[$$type] === "RAW") {
+    return `sql\`${this.t}\``;
+  } else if (this[$$type] === "IDENTIFIER") {
+    return `sql.identifier(${JSON.stringify(this.n)})`;
+  } else if (this[$$type] === "QUERY") {
+    if (depth < 0) {
+      return `sql\`...\``;
+    } else {
+      return `sql\`${this.n.map((n) => (n[$$type] === "RAW" ? n.t : "${" + nodeInspect.call(n, depth + 1, options) + "}")).join("")}\``;
+    }
+  } else {
+    return `sql{${this[$$type]}}`;
+  }
+};
+
+interface PgSQL2Proto {
+  /** @internal */
+  [inspect.custom]?: CustomInspectFunction;
+}
+
+const pgSQL2Proto: PgSQL2Proto = Object.assign(Object.create(null), {
+  [inspect.custom]: nodeInspect,
+});
+
 /**
  * Represents raw SQL, the text will be output verbatim into the compiled query.
  */
 export interface SQLRawNode {
+  __proto__?: PgSQL2Proto;
   readonly [$$type]: "RAW";
   /** text @internal */
   readonly t: string;
+}
+
+/**
+ * An SQL comment, ignored during comparisons
+ */
+export interface SQLCommentNode {
+  __proto__?: PgSQL2Proto;
+  readonly [$$type]: "COMMENT";
+  /** @internal */
+  readonly commentText: string;
 }
 
 /**
@@ -47,6 +99,7 @@ export interface SQLRawNode {
  * reserved words.
  */
 export interface SQLIdentifierNode {
+  __proto__?: PgSQL2Proto;
   readonly [$$type]: "IDENTIFIER";
   /** symbol @internal */
   readonly s: symbol;
@@ -70,6 +123,7 @@ export type SQLRawValue =
  * compiled SQL statement.
  */
 export interface SQLValueNode {
+  __proto__?: PgSQL2Proto;
   readonly [$$type]: "VALUE";
   /** value @internal */
   readonly v: SQLRawValue;
@@ -111,6 +165,7 @@ export interface SQLPlaceholderNode {
 
 export type SQLNode =
   | SQLRawNode
+  | SQLCommentNode
   | SQLValueNode
   | SQLIdentifierNode
   | SQLIndentNode
@@ -118,6 +173,7 @@ export type SQLNode =
   | SQLPlaceholderNode;
 
 export interface SQLQuery {
+  __proto__?: PgSQL2Proto;
   readonly [$$type]: "QUERY";
   /** nodes @internal */
   readonly n: ReadonlyArray<SQLNode>;
@@ -201,6 +257,7 @@ function makeRawNode(text: string, exportName?: string): SQLRawNode {
     );
   }
   const newNode: SQLRawNode = {
+    __proto__: pgSQL2Proto,
     [$$type]: "RAW" as const,
     t: text,
   };
@@ -213,12 +270,32 @@ function makeRawNode(text: string, exportName?: string): SQLRawNode {
   return newNode;
 }
 
+function makeCommentNode(commentText: string): SQLCommentNode {
+  if (typeof commentText !== "string") {
+    throw new Error(
+      `[pg-sql2] Invalid argument to makeCommentNode - expected string, but received '${inspect(
+        commentText,
+      )}'`,
+    );
+  }
+  if (commentText.includes("*/") || commentText.includes("/*")) {
+    throw new Error(`Forbidden comment text!`);
+  }
+  const newNode: SQLCommentNode = {
+    __proto__: pgSQL2Proto,
+    [$$type]: "COMMENT" as const,
+    commentText,
+  };
+  return newNode;
+}
+
 // Simple function to help V8 optimize it.
 function makeIdentifierNode(
   s: symbol,
   n = getSymbolName(s),
 ): SQLIdentifierNode {
   return Object.freeze({
+    __proto__: pgSQL2Proto,
     [$$type]: "IDENTIFIER" as const,
     s,
     n,
@@ -228,9 +305,10 @@ function makeIdentifierNode(
 // Simple function to help V8 optimize it.
 function makeValueNode(rawValue: SQLRawValue): SQLValueNode {
   return Object.freeze({
-    [$$type]: "VALUE" as const,
+    __proto__: pgSQL2Proto,
+    [$$type]: "VALUE",
     v: rawValue,
-  });
+  } as SQLValueNode);
 }
 
 function makeIndentNode(content: SQL): SQLIndentNode {
@@ -273,6 +351,9 @@ function makeQueryNode(nodes: ReadonlyArray<SQLNode>, flags = 0): SQLQuery {
         }
         break;
       }
+      case "COMMENT": {
+        break;
+      }
       case "VALUE": {
         checksum += 211;
         break;
@@ -300,6 +381,7 @@ function makeQueryNode(nodes: ReadonlyArray<SQLNode>, flags = 0): SQLQuery {
     }
   }
   return Object.freeze({
+    __proto__: pgSQL2Proto,
     [$$type]: "QUERY" as const,
     n: nodes,
     f: flags,
@@ -331,9 +413,19 @@ function isSQLable(value: any): value is SQLable {
 function enforceValidNode(node: SQLQuery, where?: string): SQLQuery;
 function enforceValidNode(node: SQLNode, where?: string): SQLNode;
 function enforceValidNode(node: SQL | SQLable, where?: string): SQL;
+function enforceValidNode(node: unknown, where?: string): SQL;
 function enforceValidNode(node: unknown, where?: string): SQL {
   if (isSQL(node)) {
     return node;
+  }
+  for (let i = _userTransformers.length - 1; i >= 0; i--) {
+    const transformer = _userTransformers[i];
+    const transformed = transformer(sql, node, where);
+    if (transformed !== node) {
+      return enforceValidNode(transformed);
+    } else {
+      // Continue onward; `node` is unchanged
+    }
   }
   if (isSQLable(node)) {
     return enforceValidNode(node[$$toSQL](), where);
@@ -343,7 +435,7 @@ function enforceValidNode(node: unknown, where?: string): SQL {
       where ? ` at ${where}` : ""
     } but received '${inspect(
       node,
-    )}'. This may mean that there is an issue in the SQL expression where a dynamic value was not escaped via 'sql.value(...)', an identifier wasn't wrapped with 'sql.identifier(...)', or a SQL expression was added without using the \`sql\` tagged template literal.`,
+    )}'. This may mean that there is an issue in the SQL expression where a dynamic value was not escaped via 'sql.value(...)', an identifier wasn't wrapped with 'sql.identifier(...)', or a SQL expression was added without using the \`sql\` tagged template literal. Alternatively, perhaps you forgot to call sql.withTransformer() when building your SQL?`,
   );
 }
 
@@ -353,7 +445,7 @@ function enforceValidNode(node: unknown, where?: string): SQL {
  */
 export function compile(
   sql: SQL,
-  options?: { placeholderValues?: Map<symbol, SQL> },
+  options?: { placeholderValues?: ReadonlyMap<symbol, SQL> },
 ): {
   text: string;
   values: SQLRawValue[];
@@ -412,7 +504,7 @@ export function compile(
     const sqlFragments: string[] = [];
 
     const trustedInput =
-      untrustedInput[$$type] !== undefined
+      untrustedInput?.[$$type] !== undefined
         ? untrustedInput
         : enforceValidNode(untrustedInput, ``);
     const items: ReadonlyArray<SQLNode> =
@@ -424,7 +516,7 @@ export function compile(
     for (let itemIndex = 0; itemIndex < itemCount; itemIndex++) {
       const itemAtIndex = items[itemIndex];
       const item =
-        itemAtIndex[$$type] !== undefined
+        itemAtIndex?.[$$type] !== undefined
           ? itemAtIndex
           : enforceValidNode(itemAtIndex as SQLNode, `item ${itemIndex}`);
       switch (item[$$type]) {
@@ -444,6 +536,10 @@ export function compile(
           sqlFragments.push(
             isDev ? item.t.replace(/\n/g, "\n" + "  ".repeat(indent)) : item.t,
           );
+          break;
+        }
+        case "COMMENT": {
+          sqlFragments.push(`/* ${item.commentText} */`);
           break;
         }
         case "IDENTIFIER": {
@@ -521,7 +617,10 @@ export function compile(
               "ERROR: sql.placeholder was used in this query, but no value was supplied for it, and it has no fallback.",
             );
           }
-          sqlFragments.push(print(resolvedPlaceholder, indent));
+          const resolved = print(resolvedPlaceholder, indent);
+          if (resolved !== "") {
+            sqlFragments.push(resolved);
+          }
           break;
         }
         default: {
@@ -589,7 +688,7 @@ const sqlBase = function sql(
     if (i < l - 1) {
       const rawVal = values[i];
       const valid: SQL =
-        rawVal[$$type] !== undefined
+        rawVal?.[$$type] !== undefined
           ? (rawVal as SQL)
           : enforceValidNode(rawVal, `template literal placeholder ${i}`);
       if (valid[$$type] === "RAW") {
@@ -755,7 +854,7 @@ export function literal(val: string | number | boolean | null): SQL {
  * dealing with lists of SQL items, for example a dynamic list of columns or
  * variadic SQL function arguments.
  */
-export function join(items: Array<SQL>, separator = ""): SQL {
+export function join(items: ReadonlyArray<SQL>, separator = ""): SQL {
   if (!Array.isArray(items)) {
     throw new Error(
       `[pg-sql2] Invalid sql.join call - the first argument should be an array, but it was '${inspect(
@@ -777,7 +876,7 @@ export function join(items: Array<SQL>, separator = ""): SQL {
   } else if (items.length === 1) {
     const rawNode = items[0];
     const node: SQL =
-      rawNode[$$type] !== undefined
+      rawNode?.[$$type] !== undefined
         ? rawNode
         : enforceValidNode(rawNode, `join item ${0}`);
     return node;
@@ -790,7 +889,7 @@ export function join(items: Array<SQL>, separator = ""): SQL {
     const rawNode = items[i];
     const addSeparator = i > 0 && hasSeparator;
     const node: SQL =
-      rawNode[$$type] !== undefined
+      rawNode?.[$$type] !== undefined
         ? rawNode
         : enforceValidNode(rawNode, `join item ${i}`);
     if (addSeparator) {
@@ -973,6 +1072,8 @@ export function parens(frag: SQL, force?: boolean): SQL {
     return frag;
   } else if (frag[$$type] === "IDENTIFIER") {
     return frag;
+  } else if (frag[$$type] === "COMMENT") {
+    return frag;
   } else if (frag[$$type] === "RAW") {
     const expr = frag.t;
     if (expr.match(NUMBER_REGEX_1) || expr.match(NUMBER_REGEX_2)) {
@@ -1001,6 +1102,14 @@ export function placeholder(
   return makePlaceholderNode(symbol, fallback);
 }
 
+export function comment(commentText: string): SQLCommentNode | SQLRawNode {
+  if (includeComments) {
+    return makeCommentNode(commentText);
+  } else {
+    return sql.blank;
+  }
+}
+
 export function arraysMatch<T>(
   array1: ReadonlyArray<T>,
   array2: ReadonlyArray<T>,
@@ -1011,11 +1120,19 @@ export function arraysMatch<T>(
   if (l !== array2.length) {
     return false;
   }
-  for (let i = 0; i < l; i++) {
-    if (
-      comparator ? !comparator(array1[i]!, array2[i]!) : array1[i] !== array2[i]
-    ) {
-      return false;
+  if (comparator != null) {
+    for (let i = 0; i < l; i++) {
+      const a = array1[i]!;
+      const b = array2[i]!;
+      if (a !== b && !comparator(a, b)) {
+        return false;
+      }
+    }
+  } else {
+    for (let i = 0; i < l; i++) {
+      if (array1[i]! !== array2[i]!) {
+        return false;
+      }
     }
   }
   return true;
@@ -1041,7 +1158,7 @@ export function isEquivalent(
   sql1: SQL,
   sql2: SQL,
   options?: {
-    symbolSubstitutes?: Map<symbol, symbol>;
+    symbolSubstitutes?: ReadonlyMap<symbol, symbol>;
   },
 ): boolean {
   if (sql1 === sql2) {
@@ -1072,6 +1189,9 @@ export function isEquivalent(
           return false;
         }
         return isEquivalent(sql1.c, sql2.c, options);
+      }
+      case "COMMENT": {
+        return true;
       }
       case "IDENTIFIER": {
         if (sql2[$$type] !== sql1[$$type]) {
@@ -1114,6 +1234,7 @@ function replaceSymbolInNode(
   replacement: symbol,
 ): SQLNode {
   switch (frag[$$type]) {
+    case "COMMENT":
     case "RAW": {
       return frag;
     }
@@ -1184,7 +1305,7 @@ export function replaceSymbol(
  */
 function getSubstitute(
   initialSymbol: symbol,
-  symbolSubstitutes?: Map<symbol, symbol>,
+  symbolSubstitutes?: ReadonlyMap<symbol, symbol>,
 ): symbol {
   const path: symbol[] = [];
   let symbol = initialSymbol;
@@ -1213,6 +1334,35 @@ function getSubstitute(
   throw new Error("symbolSubstitutes depth too deep");
 }
 
+export type Transformer<TNewEmbed> = <TValue>(
+  sql: PgSQL,
+  value: TNewEmbed | TValue,
+  where?: string,
+) => SQL | TValue;
+
+const _userTransformers: Transformer<any>[] = [];
+
+export function withTransformer<TNewEmbed, TResult = SQL>(
+  transformer: Transformer<TNewEmbed>,
+  callback: (sql: PgSQL<TNewEmbed>) => TResult,
+): TResult {
+  _userTransformers.push(transformer);
+  try {
+    return callback(sql as PgSQL<TNewEmbed>);
+  } finally {
+    _userTransformers.pop();
+  }
+}
+
+/** If node is an identifier, return its symbol, otherwise return null */
+function getIdentifierSymbol(potentialIdentifier: SQL): symbol | null {
+  if (potentialIdentifier[$$type] === "IDENTIFIER") {
+    return potentialIdentifier.s;
+  } else {
+    return null;
+  }
+}
+
 export const sql = sqlBase as PgSQL;
 export default sql;
 
@@ -1225,12 +1375,15 @@ export {
   trueNode as true,
 };
 
-export interface PgSQL {
-  (strings: TemplateStringsArray, ...values: Array<SQL | SQLable>): SQL;
+export interface PgSQL<TEmbed = never> {
+  (
+    strings: TemplateStringsArray,
+    ...values: Array<SQL | SQLable | TEmbed>
+  ): SQL;
   escapeSqlIdentifier: typeof escapeSqlIdentifier;
   compile: typeof compile;
   isEquivalent: typeof isEquivalent;
-  query: PgSQL;
+  query: PgSQL<TEmbed>;
   raw: typeof raw;
   identifier: typeof identifier;
   value: typeof value;
@@ -1239,16 +1392,22 @@ export interface PgSQL {
   indent: typeof indent;
   indentIf: typeof indentIf;
   parens: typeof parens;
+  comment: typeof comment;
   symbolAlias: typeof symbolAlias;
   placeholder: typeof placeholder;
   blank: typeof blank;
-  fragment: PgSQL;
+  fragment: PgSQL<TEmbed>;
   true: typeof trueNode;
   false: typeof falseNode;
   null: typeof nullNode;
   isSQL: typeof isSQL;
   replaceSymbol: typeof replaceSymbol;
-  sql: PgSQL;
+  sql: PgSQL<TEmbed>;
+  withTransformer<TNewEmbed, TResult = SQL>(
+    transformer: Transformer<TNewEmbed>,
+    callback: (sql: PgSQL<TEmbed | TNewEmbed>) => TResult,
+  ): TResult;
+  getIdentifierSymbol: typeof getIdentifierSymbol;
 }
 
 const attributes = {
@@ -1265,6 +1424,7 @@ const attributes = {
   indent,
   indentIf,
   parens,
+  comment,
   symbolAlias,
   placeholder,
   blank,
@@ -1274,6 +1434,8 @@ const attributes = {
   null: nullNode,
   replaceSymbol,
   isSQL,
+  withTransformer,
+  getIdentifierSymbol,
 };
 
 Object.entries(attributes).forEach(([exportName, value]) => {

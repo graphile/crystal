@@ -12,9 +12,11 @@ import * as graphql from "graphql";
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import { inspect } from "./inspect.js";
 import type { AnyInputStep } from "./interfaces.js";
+import { __InputDefaultStep } from "./steps/__inputDefault.js";
 import { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import type { __InputObjectStepWithDollars } from "./steps/__inputObject.js";
 import { __InputObjectStep } from "./steps/__inputObject.js";
+import { __inputStaticLeaf } from "./steps/__inputStaticLeaf.js";
 import { __TrackedValueStepWithDollars } from "./steps/__trackedValue.js";
 import {
   __InputListStep,
@@ -22,6 +24,10 @@ import {
   __TrackedValueStep,
   constant,
 } from "./steps/index.js";
+import {
+  findVariableNamesUsedInValueNode,
+  valueNodeToStaticValue,
+} from "./utils.js";
 
 const {
   assertScalarType,
@@ -83,18 +89,51 @@ export function graphqlGetTypeForNode(
 export function inputStep(
   operationPlan: OperationPlan,
   inputType: GraphQLInputType,
-  rawInputValue: ValueNode | undefined,
+  inputValue: ValueNode | undefined,
   defaultValue: ConstValueNode | undefined = undefined,
 ): AnyInputStep {
-  // This prevents recursion
-  if (rawInputValue === undefined && defaultValue === undefined) {
-    return constant(undefined);
+  let c1 = operationPlan._inputStepCache.get(inputType);
+  if (!c1) {
+    c1 = new Map();
+    operationPlan._inputStepCache.set(inputType, c1);
+  }
+  let c2 = c1.get(inputValue);
+  if (!c2) {
+    c2 = new Map();
+    c1.set(inputValue, c2);
+  }
+  let c3 = c2.get(defaultValue);
+  if (c3) return c3;
+  c3 = _inputStep(operationPlan, inputType, inputValue, defaultValue);
+  c2.set(defaultValue, c3);
+  return c3;
+}
+
+function _inputStep(
+  operationPlan: OperationPlan,
+  inputType: GraphQLInputType,
+  inputValue: ValueNode | undefined,
+  defaultValue: ConstValueNode | undefined,
+): AnyInputStep {
+  const { valueNodeToStaticValueCache } = operationPlan;
+  if (inputValue === undefined) {
+    // Definitely can't be or contain a variable!
+    if (defaultValue === undefined) {
+      return constant(undefined);
+    } else {
+      return valueNodeToCachedStaticValueConstantStep(
+        valueNodeToStaticValueCache,
+        defaultValue,
+        inputType,
+      );
+    }
   }
 
   const isObj = isInputObjectType(inputType);
 
-  let inputValue = rawInputValue;
-  if (inputValue?.kind === "Variable") {
+  if (inputValue.kind === "Variable") {
+    // Note: this is the only other place where `defaultValue` might be used
+    // we know `inputValue` is not a variable.
     const variableName = inputValue.name.value;
     const variableDefinition =
       operationPlan.operation.variableDefinitions?.find(
@@ -112,19 +151,24 @@ export function inputStep(
     if (!isInputType(variableType)) {
       throw new Error(`Expected varible type to be an input type`);
     }
+    const variableWillDefinitelyBeSet =
+      variableType instanceof GraphQLNonNull ||
+      variableDefinition.defaultValue != null;
     return inputVariablePlan(
       operationPlan,
       variableName,
       variableType,
       inputType,
       defaultValue,
+      variableWillDefinitelyBeSet,
     );
-  }
-  // Note: past here we know whether `defaultValue` will be used or not because
-  // we know `inputValue` is not a variable.
-  inputValue = inputValue ?? defaultValue;
-  if (inputType instanceof GraphQLNonNull) {
+  } else if (inputType instanceof GraphQLNonNull) {
     const innerType = inputType.ofType;
+    if (inputValue.kind === Kind.NULL) {
+      throw new Error(
+        `Null found in non-null position; this should have been prevented by validation.`,
+      );
+    }
     const valuePlan = inputStep(
       operationPlan,
       innerType,
@@ -132,7 +176,18 @@ export function inputStep(
       undefined,
     );
     return inputNonNullPlan(operationPlan, valuePlan);
+  } else if (inputValue.kind === Kind.NULL) {
+    return constant(null);
   } else if (inputType instanceof GraphQLList) {
+    const variableNames = new Set<string>();
+    findVariableNamesUsedInValueNode(inputValue, variableNames);
+    if (variableNames.size === 0) {
+      return valueNodeToCachedStaticValueConstantStep(
+        valueNodeToStaticValueCache,
+        inputValue,
+        inputType,
+      );
+    }
     return new __InputListStep(inputType, inputValue);
   } else if (isLeafType(inputType)) {
     if (inputValue?.kind === Kind.OBJECT || inputValue?.kind === Kind.LIST) {
@@ -141,7 +196,7 @@ export function inputStep(
     } else {
       // Variable is already ruled out, so it must be one of: Kind.INT | Kind.FLOAT | Kind.STRING | Kind.BOOLEAN | Kind.NULL | Kind.ENUM
       // none of which can contain a variable:
-      return new __InputStaticLeafStep(inputType, inputValue);
+      return __inputStaticLeaf(inputType, inputValue);
     }
   } else if (isObj) {
     return new __InputObjectStep(
@@ -176,12 +231,26 @@ function doTypesMatch(
   }
 }
 
+/**
+ * Returns a step representing a variable's value.
+ *
+ * @param operationPlan -
+ * @param variableName -
+ * @param variableType -
+ * @param inputType -
+ * @param defaultValue -
+ * @param variableWillDefinitelyBeSet - If `true` the variable is either
+ * non-null _or_ it has a default value (including null). In this case, the
+ * variable will never be `undefined` and thus an input position's defaultValue
+ * will never be invoked where it is used.
+ */
 function inputVariablePlan(
   operationPlan: OperationPlan,
   variableName: string,
   variableType: GraphQLInputType,
   inputType: GraphQLInputType,
-  defaultValue: ConstValueNode | undefined = undefined,
+  defaultValue: ConstValueNode | undefined,
+  variableWillDefinitelyBeSet: boolean,
 ): AnyInputStep {
   if (
     variableType instanceof GraphQLNonNull &&
@@ -194,6 +263,7 @@ function inputVariablePlan(
       unwrappedVariableType,
       inputType,
       defaultValue,
+      variableWillDefinitelyBeSet,
     );
   }
   const typesMatch = doTypesMatch(variableType, inputType);
@@ -209,8 +279,13 @@ function inputVariablePlan(
         variableType,
         inputType.ofType,
         defaultValue,
+        variableWillDefinitelyBeSet,
       );
-      if (variablePlan.evalIs(null) || variablePlan.evalIs(undefined)) {
+      // TODO: find a way to do this without doing eval. For example: track list of variables that may not be nullish.
+      if (
+        variablePlan.evalIs(null) ||
+        (!variableWillDefinitelyBeSet && variablePlan.evalIs(undefined))
+      ) {
         throw new GraphQLError(
           `Expected non-null value of type ${inputType.ofType.toString()}`,
           // FIXME: The error here needs more details to make it conform to spec (AST nodes, etc). At least I think so?
@@ -220,17 +295,22 @@ function inputVariablePlan(
     }
     throw new Error("Expected variable and input types to match");
   }
-  const variableValuePlan =
+  const $variableValue =
     operationPlan.trackedVariableValuesStep.get(variableName);
-  if (defaultValue === undefined || !variableValuePlan.evalIs(undefined)) {
-    // There's no default value, or we know for sure that our variable will be
-    // set (even if null) and thus the default will not be used; use the variable.
-    return variableValuePlan;
+  if (defaultValue === undefined) {
+    // There's no default value and thus the default will not be used; use the variable.
+    return $variableValue;
+  } else if (variableWillDefinitelyBeSet) {
+    // The variable will DEFINITELY be set (even if it is set to null, possibly
+    // by a default), so the input position's default value will never apply.
+    return $variableValue;
   } else {
-    // `defaultValue` is NOT undefined, and we know variableValue is
-    // `undefined` (and always will be); we're going to loop back and pretend
-    // that no value was passed in the first place (instead of the variable):
-    return inputStep(operationPlan, inputType, undefined, defaultValue);
+    // Here:
+    // - the variable is nullable, optional, and has no default value
+    // - the input position has a default value
+    // We thus need a step that results in `variableValue === undefined ? defaultValue : variableValue`
+    const runtimeDefaultValue = valueNodeToStaticValue(defaultValue, inputType);
+    return new __InputDefaultStep($variableValue, runtimeDefaultValue);
   }
 }
 
@@ -242,4 +322,17 @@ function inputNonNullPlan(
   innerPlan: AnyInputStep,
 ): AnyInputStep {
   return innerPlan;
+}
+
+function valueNodeToCachedStaticValueConstantStep(
+  cache: Map<ValueNode, AnyInputStep>,
+  valueNode: ValueNode,
+  inputType: GraphQLInputType,
+) {
+  let step = cache.get(valueNode);
+  if (!step) {
+    step = constant(valueNodeToStaticValue(valueNode, inputType), false);
+    cache.set(valueNode, step);
+  }
+  return step;
 }

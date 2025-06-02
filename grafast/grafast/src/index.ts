@@ -17,67 +17,79 @@ type PromiseOrValue<T> = T | Promise<T>;
 import { exportAs, exportAsMany } from "./exportAs.js";
 import { grafastPrint } from "./grafastPrint.js";
 import {
-  EnumPlans,
-  FieldPlans,
-  GrafastPlans,
-  InputObjectPlans,
-  InterfaceOrUnionPlans,
+  AbstractTypePlan,
+  DeprecatedInputObjectPlan,
+  DeprecatedObjectPlan,
+  EnumPlan,
+  FieldPlan,
+  GrafastSchemaConfig,
+  InputFieldPlan,
+  InputObjectPlan,
+  InterfacePlan,
   makeGrafastSchema,
-  ObjectPlans,
-  ScalarPlans,
+  ObjectFieldConfig,
+  ObjectPlan,
+  ScalarPlan,
+  UnionPlan,
 } from "./makeGrafastSchema.js";
 
 // HACK: doing this here feels "naughty".
 debugFactory.formatters.c = grafastPrint;
 
-import { defer, Deferred } from "./deferred.js";
-// Handy for debugging
-import { isDev, noop } from "./dev.js";
-import { isUnaryStep } from "./engine/lib/withGlobalLayerPlan.js";
-import { OperationPlan } from "./engine/OperationPlan.js";
-import { $$inhibit, flagError, isSafeError, SafeError } from "./error.js";
-import { execute } from "./execute.js";
-import { grafast, grafastSync } from "./grafastGraphql.js";
 import type {
   $$cacheByOperation,
   $$hooked,
   $$queryCache,
-  CacheByOperationEntry,
-  DataFromStep,
-  EstablishOperationPlanEvent,
-  ExecuteEvent,
-  ExecuteStepEvent,
-  GrafastExecutionArgs,
-  GrafastTimeouts,
-  ParseAndValidateEvent,
-  PrepareArgsEvent,
-  ScalarInputPlanResolver,
-  StreamStepEvent,
-  ValidateSchemaEvent,
-} from "./interfaces.js";
+} from "./constants.js";
 import {
   $$bypassGraphQL,
   $$eventEmitter,
   $$extensions,
   $$idempotent,
   $$verbatim,
+  DEFAULT_ACCEPT_FLAGS,
+} from "./constants.js";
+import { defer, Deferred } from "./deferred.js";
+// Handy for debugging
+import { isDev, noop } from "./dev.js";
+import { defaultPlanResolver } from "./engine/lib/defaultPlanResolver.js";
+import { isUnaryStep } from "./engine/lib/withGlobalLayerPlan.js";
+import { OperationPlan } from "./engine/OperationPlan.js";
+import { $$inhibit, flagError, isSafeError, SafeError } from "./error.js";
+import { execute } from "./execute.js";
+import { context, debugPlans, operationPlan, rootValue } from "./global.js";
+import { grafast, grafastSync } from "./grafastGraphql.js";
+import { inspect } from "./inspect.js";
+import type {
+  AbstractTypePlanner,
   ArgumentApplyPlanResolver,
-  ArgumentInputPlanResolver,
   BaseEventMap,
   BaseGraphQLArguments,
   BaseGraphQLRootValue,
   BaseGraphQLVariables,
-  EnumValueApplyPlanResolver,
+  BatchExecutionValue,
+  CacheByOperationEntry,
+  DataFromStep,
+  EnumValueApplyResolver,
+  EstablishOperationPlanEvent,
   EventCallback,
   EventMapKey,
+  ExecuteEvent,
+  ExecuteStepEvent,
   ExecutionDetails,
+  ExecutionDetailsStream,
   ExecutionEventEmitter,
   ExecutionEventMap,
   ExecutionExtra,
+  ExecutionResults,
+  ExecutionResultValue,
+  ExecutionValue,
+  FieldArg,
   FieldArgs,
   FieldInfo,
   FieldPlanResolver,
   GrafastArgumentConfig,
+  GrafastExecutionArgs,
   GrafastFieldConfig,
   GrafastFieldConfigArgumentMap,
   GrafastInputFieldConfig,
@@ -85,49 +97,48 @@ import {
   GrafastResultsList,
   GrafastResultStreamList,
   GrafastSubscriber,
+  GrafastTimeouts,
   GrafastValuesList,
-  InputObjectFieldApplyPlanResolver,
-  InputObjectFieldInputPlanResolver,
-  InputObjectTypeInputPlanResolver,
-  InputStep,
+  InputObjectFieldApplyResolver,
+  InputObjectTypeBakedInfo,
+  InputObjectTypeBakedResolver,
   JSONArray,
   JSONObject,
   JSONValue,
   Maybe,
   NodeIdCodec,
   NodeIdHandler,
-  OutputPlanForType,
-  PolymorphicData,
+  ParseAndValidateEvent,
+  PlanTypeInfo,
+  PrepareArgsEvent,
   PromiseOrDirect,
+  ScalarInputPlanResolver,
   ScalarPlanResolver,
   StepOptimizeOptions,
   StepStreamOptions,
   TypedEventEmitter,
+  UnaryExecutionValue,
   UnbatchedExecutionExtra,
+  ValidateSchemaEvent,
 } from "./interfaces.js";
 import { getGrafastMiddleware } from "./middleware.js";
 import type { Multistep, UnwrapMultistep } from "./multistep.js";
 import { multistep } from "./multistep.js";
-import { polymorphicWrap } from "./polymorphic.js";
+import { getNullableInputTypeAtPath } from "./operationPlan-input.js";
 import {
   assertExecutableStep,
   assertListCapableStep,
-  assertModifierStep,
-  BaseStep,
-  ExecutableStep,
+  assertStep,
   isExecutableStep,
   isListCapableStep,
   isListLikeStep,
-  isModifierStep,
   isObjectLikeStep,
-  isStreamableStep,
+  isStep,
   ListCapableStep,
   ListLikeStep,
-  ModifierStep,
   ObjectLikeStep,
-  PolymorphicStep,
-  StreamableStep,
-  UnbatchedExecutableStep,
+  Step,
+  UnbatchedStep,
 } from "./step.js";
 import {
   __FlagStep,
@@ -143,11 +154,19 @@ import {
   access,
   AccessStep,
   ActualKeyByDesiredKey,
+  applyInput,
+  ApplyInputStep,
   applyTransforms,
   ApplyTransformsStep,
   assertEdgeCapableStep,
+  assertModifier,
   assertNotNull,
   assertPageInfoCapableStep,
+  bakedInput,
+  bakedInputRuntime,
+  BakedInputStep,
+  coalesce,
+  CoalesceStep,
   condition,
   ConditionStep,
   connection,
@@ -155,8 +174,7 @@ import {
   ConnectionStep,
   constant,
   ConstantStep,
-  context,
-  debugPlans,
+  createObjectAndApplyChildren,
   each,
   EdgeCapableStep,
   EdgeStep,
@@ -166,13 +184,13 @@ import {
   FilterPlanMemo,
   first,
   FirstStep,
-  GraphQLItemHandler,
-  graphqlItemHandler,
+  get,
   graphqlResolver,
   GraphQLResolverStep,
   groupBy,
   GroupByPlanMemo,
   inhibitOnNull,
+  isModifier,
   lambda,
   LambdaStep,
   last,
@@ -195,19 +213,16 @@ import {
   LoadOptions,
   LoadStep,
   makeDecodeNodeId,
+  makeDecodeNodeIdRuntime,
+  Modifier,
   node,
   nodeIdFromNode,
   NodeStep,
   object,
   ObjectPlanMeta,
   ObjectStep,
-  operationPlan,
   PageInfoCapableStep,
   partitionByIndex,
-  polymorphicBranch,
-  PolymorphicBranchMatcher,
-  PolymorphicBranchMatchers,
-  PolymorphicBranchStep,
   proxy,
   ProxyStep,
   remapKeys,
@@ -215,15 +230,12 @@ import {
   reverse,
   reverseArray,
   ReverseStep,
-  rootValue,
+  Setter,
   setter,
-  SetterCapableStep,
-  SetterStep,
+  SetterCapable,
   sideEffect,
   SideEffectStep,
   specFromNodeId,
-  trackedContext,
-  trackedRootValue,
   trap,
   TRAP_ERROR,
   TRAP_ERROR_OR_INHIBITED,
@@ -236,12 +248,14 @@ import {
   arrayOfLength,
   arraysMatch,
   getEnumValueConfig,
+  getEnumValueConfigs,
   GrafastInputFieldConfigMap,
   GrafastInputObjectType,
   GrafastObjectType,
   inputObjectFieldSpec,
   InputObjectTypeSpec,
   isPromiseLike,
+  mapsMatch,
   newGrafastFieldConfigBuilder,
   newInputObjectTypeBuilder,
   newObjectTypeBuilder,
@@ -249,8 +263,11 @@ import {
   objectSpec,
   ObjectTypeFields,
   ObjectTypeSpec,
+  recordsMatch,
+  setsMatch,
   stepADependsOnStepB,
   stepAMayDependOnStepB,
+  stepAShouldTryAndInlineIntoStepB,
   stepsAreInSamePhase,
 } from "./utils.js";
 
@@ -272,26 +289,34 @@ export {
   $$idempotent,
   $$inhibit,
   $$verbatim,
+  AbstractTypePlan,
+  AbstractTypePlanner,
   access,
   AccessStep,
   ActualKeyByDesiredKey,
+  applyInput,
+  ApplyInputStep,
   applyTransforms,
   ApplyTransformsStep,
-  ArgumentApplyPlanResolver,
-  ArgumentInputPlanResolver,
   arrayOfLength,
   arraysMatch,
   assertEdgeCapableStep,
   assertExecutableStep,
   assertListCapableStep,
-  assertModifierStep,
+  assertModifier,
   assertNotNull,
   assertPageInfoCapableStep,
+  assertStep,
+  bakedInput,
+  bakedInputRuntime,
+  BakedInputStep,
   BaseEventMap,
   BaseGraphQLArguments,
   BaseGraphQLRootValue,
   BaseGraphQLVariables,
-  BaseStep,
+  BatchExecutionValue,
+  coalesce,
+  CoalesceStep,
   condition,
   ConditionStep,
   connection,
@@ -300,39 +325,51 @@ export {
   constant,
   ConstantStep,
   context,
+  createObjectAndApplyChildren,
   DataFromObjectSteps,
   DataFromStep,
   debugPlans,
+  DEFAULT_ACCEPT_FLAGS,
+  defaultPlanResolver,
   defer,
   Deferred,
+  DeprecatedInputObjectPlan,
+  DeprecatedObjectPlan,
   each,
   EdgeCapableStep,
   EdgeStep,
-  EnumPlans,
-  EnumValueApplyPlanResolver,
+  EnumPlan,
   error,
   ErrorStep,
   EventCallback,
   EventMapKey,
-  ExecutableStep,
+  Step as ExecutableStep,
   execute,
   ExecutionDetails,
+  ExecutionDetailsStream,
   ExecutionEventEmitter,
   ExecutionEventMap,
   ExecutionExtra,
+  ExecutionResults,
+  ExecutionResultValue,
+  ExecutionValue,
   exportAs,
   exportAsMany,
+  FieldArg,
   FieldArgs,
   FieldInfo,
+  FieldPlan,
   FieldPlanResolver,
-  FieldPlans,
   filter,
   FilterPlanMemo,
   first,
   FirstStep,
   flagError,
+  get,
   getEnumValueConfig,
+  getEnumValueConfigs,
   getGrafastMiddleware,
+  getNullableInputTypeAtPath,
   grafast,
   GrafastArgumentConfig,
   GrafastExecutionArgs,
@@ -345,37 +382,37 @@ export {
   GrafastInputObjectType,
   GrafastObjectType,
   GrafastPlanJSON,
-  GrafastPlans,
   grafastPrint,
   GrafastResultsList,
   GrafastResultStreamList,
+  GrafastSchemaConfig,
   GrafastSubscriber,
   grafastSync,
   GrafastValuesList,
-  GraphQLItemHandler,
-  graphqlItemHandler,
   graphqlResolver,
   GraphQLResolverStep,
   groupBy,
   GroupByPlanMemo,
   inhibitOnNull,
-  InputObjectFieldApplyPlanResolver,
-  InputObjectFieldInputPlanResolver,
+  InputFieldPlan,
+  InputObjectFieldApplyResolver,
   inputObjectFieldSpec,
-  InputObjectPlans,
-  InputObjectTypeInputPlanResolver,
+  InputObjectPlan,
+  InputObjectTypeBakedInfo,
+  InputObjectTypeBakedResolver,
   InputObjectTypeSpec,
-  InputStep,
-  InterfaceOrUnionPlans,
+  inspect,
+  AbstractTypePlan as InterfaceOrUnionPlans,
+  InterfacePlan,
   isDev,
   isExecutableStep,
   isListCapableStep,
   isListLikeStep,
-  isModifierStep,
+  isModifier,
   isObjectLikeStep,
   isPromiseLike,
   isSafeError,
-  isStreamableStep,
+  isStep,
   isUnaryStep,
   JSONArray,
   JSONObject,
@@ -404,9 +441,11 @@ export {
   LoadOptions,
   LoadStep,
   makeDecodeNodeId,
+  makeDecodeNodeIdRuntime,
   makeGrafastSchema,
+  mapsMatch,
   Maybe,
-  ModifierStep,
+  Modifier,
   Multistep,
   multistep,
   newGrafastFieldConfigBuilder,
@@ -419,29 +458,24 @@ export {
   NodeStep,
   noop,
   object,
+  ObjectFieldConfig,
   objectFieldSpec,
   ObjectLikeStep,
+  ObjectPlan,
   ObjectPlanMeta,
-  ObjectPlans,
   objectSpec,
   ObjectStep,
   ObjectTypeFields,
   ObjectTypeSpec,
   OperationPlan,
   operationPlan,
-  OutputPlanForType,
   PageInfoCapableStep,
   partitionByIndex,
-  polymorphicBranch,
-  PolymorphicBranchMatcher,
-  PolymorphicBranchMatchers,
-  PolymorphicBranchStep,
-  PolymorphicData,
-  PolymorphicStep,
-  polymorphicWrap,
+  PlanTypeInfo,
   PromiseOrDirect,
   proxy,
   ProxyStep,
+  recordsMatch,
   remapKeys,
   RemapKeysStep,
   reverse,
@@ -449,32 +483,35 @@ export {
   ReverseStep,
   rootValue,
   SafeError,
+  ScalarPlan,
   ScalarPlanResolver,
-  ScalarPlans,
+  setsMatch,
+  Setter,
   setter,
-  SetterCapableStep,
-  SetterStep,
+  SetterCapable,
   sideEffect,
   SideEffectStep,
   specFromNodeId,
+  Step,
   stepADependsOnStepB,
   stepAMayDependOnStepB,
+  stepAShouldTryAndInlineIntoStepB,
   StepOptimizeOptions,
   stepsAreInSamePhase,
   StepStreamOptions,
-  StreamableStep,
   stringifyPayload,
   stripAnsi,
   subscribe,
-  trackedContext,
-  trackedRootValue,
   trap,
   TRAP_ERROR,
   TRAP_ERROR_OR_INHIBITED,
   TRAP_INHIBITED,
   TypedEventEmitter,
-  UnbatchedExecutableStep,
+  UnaryExecutionValue,
+  UnbatchedStep as UnbatchedExecutableStep,
   UnbatchedExecutionExtra,
+  UnbatchedStep,
+  UnionPlan,
   UnwrapMultistep,
 };
 
@@ -486,6 +523,7 @@ exportAsMany("grafast", {
   OperationPlan,
   defer,
   execute,
+  getNullableInputTypeAtPath,
   getGrafastMiddleware,
   grafast,
   grafastSync,
@@ -495,20 +533,27 @@ exportAsMany("grafast", {
   __InputObjectStep,
   __InputStaticLeafStep,
   assertExecutableStep,
+  assertStep,
   assertListCapableStep,
-  assertModifierStep,
-  isExecutableStep,
+  assertModifier,
+  isStep,
   isListCapableStep,
-  isModifierStep,
+  isModifier,
   isObjectLikeStep,
   isListLikeStep,
-  isStreamableStep,
   __ItemStep,
   __ListTransformStep,
   __TrackedValueStep,
   __ValueStep,
+  inspect,
   access,
+  get,
   AccessStep,
+  applyInput,
+  ApplyInputStep,
+  bakedInput,
+  bakedInputRuntime,
+  BakedInputStep,
   operationPlan,
   connection,
   assertEdgeCapableStep,
@@ -521,8 +566,6 @@ exportAsMany("grafast", {
   ConstantStep,
   context,
   rootValue,
-  trackedContext,
-  trackedRootValue,
   inhibitOnNull,
   assertNotNull,
   trap,
@@ -538,21 +581,20 @@ exportAsMany("grafast", {
   filter,
   partitionByIndex,
   listTransform,
+  coalesce,
+  CoalesceStep,
   first,
   node,
   specFromNodeId,
   nodeIdFromNode,
-  polymorphicBranch,
-  PolymorphicBranchStep,
   makeDecodeNodeId,
+  makeDecodeNodeIdRuntime,
   proxy,
   applyTransforms,
   ApplyTransformsStep,
   ProxyStep,
   graphqlResolver,
   GraphQLResolverStep,
-  GraphQLItemHandler,
-  graphqlItemHandler,
   NodeStep,
   FirstStep,
   last,
@@ -571,12 +613,15 @@ exportAsMany("grafast", {
   reverseArray,
   ReverseStep,
   setter,
-  SetterStep,
+  createObjectAndApplyChildren,
+  Setter,
   listen,
   ListenStep,
-  polymorphicWrap,
   stripAnsi,
   arraysMatch,
+  mapsMatch,
+  recordsMatch,
+  setsMatch,
   inputObjectFieldSpec,
   newGrafastFieldConfigBuilder,
   newInputObjectTypeBuilder,
@@ -587,10 +632,12 @@ exportAsMany("grafast", {
   stepADependsOnStepB,
   stepAMayDependOnStepB,
   stepsAreInSamePhase,
+  stepAShouldTryAndInlineIntoStepB,
   isPromiseLike,
   isDev,
   noop,
   getEnumValueConfig,
+  getEnumValueConfigs,
   loadOne,
   loadMany,
   loadOneCallback,
@@ -602,6 +649,7 @@ exportAsMany("grafast", {
   flagError,
   SafeError,
   isUnaryStep,
+  defaultPlanResolver,
   multistep,
 });
 
@@ -649,29 +697,90 @@ declare global {
 
     interface ArgumentExtensions {
       // fooPlan?: ArgumentPlanResolver<any, any, any, any, any>;
-      inputPlan?: ArgumentInputPlanResolver;
       applyPlan?: ArgumentApplyPlanResolver;
-      autoApplyAfterParentPlan?: boolean;
-      autoApplyAfterParentSubscribePlan?: boolean;
+      applySubscribePlan?: ArgumentApplyPlanResolver;
+
+      // Legacy fields, no longer supported
+      inputPlan?: never;
+      autoApplyAfterParentPlan?: never;
+      autoApplyAfterParentSubscribePlan?: never;
     }
 
     interface InputObjectTypeExtensions {
-      inputPlan?: InputObjectTypeInputPlanResolver;
+      baked?: InputObjectTypeBakedResolver;
     }
 
     interface InputFieldExtensions {
-      // fooPlan?: InputObjectFieldPlanResolver<any, any, any, any>;
-      inputPlan?: InputObjectFieldInputPlanResolver;
-      applyPlan?: InputObjectFieldApplyPlanResolver;
-      autoApplyAfterParentInputPlan?: boolean;
-      autoApplyAfterParentApplyPlan?: boolean;
+      apply?: InputObjectFieldApplyResolver<any>;
+
+      // Legacy fields, no longer supported
+      inputPlan?: never;
+      applyPlan?: never;
+      autoApplyAfterParentInputPlan?: never;
+      autoApplyAfterParentApplyPlan?: never;
     }
 
     interface ObjectTypeExtensions {
       assertStep?:
-        | ((step: ExecutableStep) => asserts step is ExecutableStep)
-        | { new (...args: any[]): ExecutableStep }
+        | ((step: Step) => asserts step is Step)
+        | { new (...args: any[]): Step }
         | null;
+
+      /**
+       * Plantime. Given `$stepOrSpecifier`, a step that _hopefully_ represents
+       * relevant data for this object type, return a step that can be used for
+       * planning this object type. Used in the default implementation of
+       * `AbstractTypePlanner.planForType` if that method is not provided.
+       */
+      planType?($stepOrSpecifier: Step): Step;
+    }
+
+    interface InterfaceTypeExtensions {
+      /**
+       * Takes a step representing this polymorphic position, and returns a
+       * "specifier" step that will be input to planType. If not specified, the
+       * step's own `.toSpecifier()` will be used, if present, otherwise the
+       * step's own `.toRecord()`, and failing that the step itself.
+       */
+      toSpecifier?($step: Step): Step;
+
+      /**
+       * Plantime. `$stepOrSpecifier` is either a step returned from a field or
+       * list position with an abstract type, or a `__ValueStep` that
+       * represents the combined values of such steps (to prevent unbounded
+       * plan branching). `__planType` must then construct a step that
+       * represents the `__typename` related to this given specifier (or `null`
+       * if no match can be found) and a `planForType` method which, when
+       * called, should return the step for the given type.
+       */
+      planType?(
+        $stepOrSpecifier: Step,
+        info: PlanTypeInfo,
+      ): AbstractTypePlanner;
+    }
+
+    interface UnionTypeExtensions {
+      /**
+       * Takes a step representing this polymorphic position, and returns a
+       * "specifier" step that will be input to planType. If not specified, the
+       * step's own `.toSpecifier()` will be used, if present, otherwise the
+       * step's own `.toRecord()`, and failing that the step itself.
+       */
+      toSpecifier?($step: Step): Step;
+
+      /**
+       * Plantime. `$stepOrSpecifier` is either a step returned from a field or
+       * list position with an abstract type, or a `__ValueStep` that
+       * represents the combined values of such steps (to prevent unbounded
+       * plan branching). `__planType` must then construct a step that
+       * represents the `__typename` related to this given specifier (or `null`
+       * if no match can be found) and a `planForType` method which, when
+       * called, should return the step for the given type.
+       */
+      planType?(
+        $stepOrSpecifier: Step,
+        info: PlanTypeInfo,
+      ): AbstractTypePlanner;
     }
 
     interface EnumTypeExtensions {}
@@ -682,7 +791,10 @@ declare global {
        *
        * @experimental
        */
-      applyPlan?: EnumValueApplyPlanResolver<any>;
+      apply?: EnumValueApplyResolver<any>;
+
+      // Legacy fields, no longer supported
+      applyPlan?: never;
     }
 
     interface ScalarTypeExtensions {
@@ -749,6 +861,22 @@ declare global {
       explain?: boolean | string[];
 
       timeouts?: GrafastTimeouts;
+
+      /**
+       * How many planning layers deep do we allow? Should be handled by validation.
+       *
+       * A planning layer can happen due to:
+       *
+       * - A nested selection set
+       * - Planning a field return type
+       * - A list position
+       * - A polymorphic type
+       * - A deferred/streamed response
+       *
+       * These reasons may each cause 1, 2 or 3 planning layers to be added, so this
+       * limit should be set quite high - e.g. 6x the selection set depth.
+       */
+      maxPlanningDepth?: number;
     }
     interface Preset {
       /**
@@ -774,9 +902,6 @@ declare global {
       executeStep(
         event: ExecuteStepEvent,
       ): PromiseOrDirect<GrafastResultsList<any>>;
-      streamStep(
-        event: StreamStepEvent,
-      ): PromiseOrDirect<GrafastResultStreamList<unknown>>;
     }
     interface Plugin {
       grafast?: {
@@ -810,6 +935,14 @@ declare module "graphql" {
 
   interface GraphQLObjectTypeExtensions<_TSource = any, _TContext = any> {
     grafast?: Grafast.ObjectTypeExtensions;
+  }
+
+  interface GraphQLInterfaceTypeExtensions {
+    grafast?: Grafast.InterfaceTypeExtensions;
+  }
+
+  interface GraphQLUnionTypeExtensions {
+    grafast?: Grafast.UnionTypeExtensions;
   }
 
   interface GraphQLEnumTypeExtensions {

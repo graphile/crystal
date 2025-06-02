@@ -618,8 +618,8 @@ export function convertHandlerResultToResult(
         dynamicOptions,
       } = handlerResult;
       const headers = Object.create(null);
-      (headers["Content-Type"] = 'multipart/mixed; boundary="-"'),
-        (headers["Transfer-Encoding"] = "chunked");
+      headers["Content-Type"] = 'multipart/mixed; boundary="-"';
+      headers["Transfer-Encoding"] = "chunked";
       if (dynamicOptions.watch) {
         headers["X-GraphQL-Event-Stream"] = dynamicOptions.eventStreamPath;
       }

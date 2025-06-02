@@ -8,6 +8,10 @@
   color: var(--ifm-color-primary-lightest);
 }
 
+:global(.full-width) .calloutSection {
+  max-width: initial;
+}
+
 .calloutRow {
   align-items: center;
   background-color: var(--ifm-color-primary-darker);

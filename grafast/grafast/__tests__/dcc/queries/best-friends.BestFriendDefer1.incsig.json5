@@ -1,0 +1,12 @@
+{
+  initialData: '{}',
+  patches: {
+    '': {
+      '{character}': {
+        indicies: [
+          '',
+        ],
+      },
+    },
+  },
+}

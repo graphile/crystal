@@ -4,18 +4,31 @@ sidebar_position: 3
 
 # Using with existing schema
 
+If you already have a GraphQL.js schema and you're looking to migrate to
+<grafast /> then it's not necessary to translate everything into <grafast />
+plan resolvers from the get-go, instead <grafast/> includes emulation of
+GraphQL.js behaviors that allows it to run an existing GraphQL.js schema
+directly in many cases (or with small modification in other cases).
+
 ## Requirements
 
-To run an existing GraphQL schema with <grafast /> you must ensure that the
+To run an existing GraphQL.js schema with <grafast /> you must ensure that the
 following hold:
 
-- Your resolvers are built into your schema as is the norm (not passed via `rootValue`)
+- Your resolvers are built into your schema as is the norm (not passed via
+  `rootValue`)
 - If any of your resolvers use `GraphQLResolveInfo` (the 4th argument to the
   resolver) then they must not rely on the `path` property since we can't
   currently populate that in an equivalent fashion
 - `context` must be an object (anything suitable to be used as the key to a
   `WeakMap`); if you do not need a context then `{}` is perfectly acceptable
 - `rootValue`, if specified, must be an object or `null`/`undefined`
+- `resolveType` and `isTypeOf`, if specified, must return the
+  GraphQL type name as a string (rather than returning the object type itself)
+  and their version of `GraphQLResolveInfo` is even more cut down (but you
+  shouldn't be using that anyway?). We only have tests of synchronous
+  `resolveType` currently, so if you're going to rely on this we suggest you submit
+  tests matching the patterns you use to our test suite.
 
 (If you face any issues with your resolvers, please file an issue - it's
 possible that this list of constraints is not complete.)

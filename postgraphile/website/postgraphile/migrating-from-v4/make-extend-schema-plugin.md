@@ -85,7 +85,7 @@ rather than once-per-value as with `lambda`.
 
 ## `@pgField`
 
-This directive was always a workaround and is no longer meaningful in V5 - just
+This directive was always a workaround and is no longer meaningful in V5 — just
 make sure you add the right plans to the right fields and everything should work
 how you desire, and in a much more efficient and straightforward way than many
 patterns (particularly around mutation payloads) in V4.
@@ -127,13 +127,15 @@ in JS, you might use an SQL expression:
 +        nameWithSuffix(suffix: String!): String!
        }
      `,
-+    plans: {
++    objects: {
 +      User: {
-+        nameWithSuffix($user, { $suffix }) {
-+          return $user.select(
-+            sql`${$user.getClassStep().alias}.name || ' ' || ${$user.placeholder($suffix, TYPES.text)}`,
-+            TYPES.text,
-+          );
++        plans: {
++          nameWithSuffix($user, { $suffix }) {
++            return $user.select(
++              sql`${$user.getClassStep().alias}.name || ' ' || ${$user.placeholder($suffix, TYPES.text)}`,
++              TYPES.text,
++            );
++          }
 +        }
 +      }
 +    }
@@ -183,7 +185,7 @@ problem. Many users found it confusing, and would often try and use it to
 retrieve data for themselves to use inside a resolver, which did not align with
 its intent at all.
 
-In Version 5 there is no need for this helper any more - every plan step is
+In Version 5 there is no need for this helper any more — every plan step is
 opted into the planning system without any ceremony, and the N+1 problem is
 automatically solved by Gra*fast*. The method to retrieve the data to use in
 the plan, and the method to populate the data are now the same so there's no
@@ -204,7 +206,8 @@ function, passing through the `searchText` argument.
        }
      `,
 -    resolvers: {
--      Query: {
++    plans: {
+       Query: {
 -        matchingUser: async (parent, args, context, resolveInfo) => {
 -          const [row] = await resolveInfo.graphile.selectGraphQLResultFromTable(
 -            sql.fragment`(select * from match_user(${sql.value(
@@ -214,18 +217,58 @@ function, passing through the `searchText` argument.
 -          );
 -          return row;
 -        },
--      },
--    },
-+    plans: {
-+      Query: {
 +        matchingUser($parent, { $searchText }) {
 +          return matchUser.execute({ step: $searchText });
 +        },
-+      },
-+    },
+       },
+     },
    };
  });
 ```
+
+:::tip This pattern is deprecated
+
+We've demonstrated this pattern to show the easiest way to migrate, but the
+`typeDefs/plans` pattern is deprecated because it's hard to make it type safe.
+Instead, the new pattern would have `typeDefs/objects` (for object types, types
+that use the `type` keyword in GraphQL) with the plans within that:
+
+```diff
+ module.exports = makeExtendSchemaPlugin((build) => {
++  const matchUser = build.input.pgRegistry.pgResources.match_user;
+   return {
+     typeDefs: /* GraphQL */ `
+       type Query {
+         matchingUser(searchText: String!): User
+       }
+     `,
+-    resolvers: {
++    objects: {
+       Query: {
+-        matchingUser: async (parent, args, context, resolveInfo) => {
+-          const [row] = await resolveInfo.graphile.selectGraphQLResultFromTable(
+-            sql.fragment`(select * from match_user(${sql.value(
+-              args.searchText,
+-            )}))`,
+-            () => {}, // no-op
+-          );
+-          return row;
+-        },
++        plans: {
++          matchingUser($parent, { $searchText }) {
++            return matchUser.execute({ step: $searchText });
++          },
++        },
+       },
+     },
+   };
+ });
+```
+
+It's up to you whether you want to address this all at once, or migrate in two
+phases.
+
+:::
 
 ## `embed`
 
@@ -291,59 +334,63 @@ export default makeExtendSchemaPlugin((build) => {
       }
     `,
 
-    plans: {
+    objects: {
       Mutation: {
-        myCustomMutation(_$root, { $input: { $count } }) {
-          /**
-           * This step dictates the data that will be passed as the second argument
-           * to the `withPgClientTransaction` callback. This is typically
-           * information about the field arguments, details from the GraphQL
-           * context, or data from previously executed steps.
-           */
-          const $data = object({
-            count: $count,
-          });
+        plans: {
+          myCustomMutation(_$root, { $input: { $count } }) {
+            /**
+             * This step dictates the data that will be passed as the second argument
+             * to the `withPgClientTransaction` callback. This is typically
+             * information about the field arguments, details from the GraphQL
+             * context, or data from previously executed steps.
+             */
+            const $data = object({
+              count: $count,
+            });
 
-          // Callback will be called with a client that's in a transaction,
-          // whatever it returns (plain data) will be the result of the
-          // `withPgClientTransaction` step; if it throws an error then the
-          // transaction will roll back and the error will be the result of the
-          // step.
-          // highlight-start
-          const $transactionResult = withPgClientTransaction(
-            executor,
-            $data,
-            async (client, data) => {
-              // The data from the `$data` step above
-              const { count } = data;
+            // Callback will be called with a client that's in a transaction,
+            // whatever it returns (plain data) will be the result of the
+            // `withPgClientTransaction` step; if it throws an error then the
+            // transaction will roll back and the error will be the result of the
+            // step.
+            // highlight-start
+            const $transactionResult = withPgClientTransaction(
+              executor,
+              $data,
+              async (client, data) => {
+                // The data from the `$data` step above
+                const { count } = data;
 
-              // Run some SQL
-              const { rows } = await client.query(
-                sql.compile(
-                  sql`select i from generate_series(1, ${sql.value(
-                    count ?? 1,
-                  )}) as i;`,
-                ),
-              );
+                // Run some SQL
+                const { rows } = await client.query(
+                  sql.compile(
+                    sql`select i from generate_series(1, ${sql.value(
+                      count ?? 1,
+                    )}) as i;`,
+                  ),
+                );
 
-              // Do some asynchronous work (e.g. talk to Stripe or whatever)
-              await sleep(2);
+                // Do some asynchronous work (e.g. talk to Stripe or whatever)
+                await sleep(2);
 
-              // Maybe run some more SQL as part of the transaction
-              await client.query(sql.compile(sql`select 1;`));
+                // Maybe run some more SQL as part of the transaction
+                await client.query(sql.compile(sql`select 1;`));
 
-              // Return whatever data you'll need later
-              return rows.map((row) => row.i);
-            },
-          );
-          // highlight-end
+                // Return whatever data you'll need later
+                return rows.map((row) => row.i);
+              },
+            );
+            // highlight-end
 
-          return $transactionResult;
+            return $transactionResult;
+          },
         },
       },
       MyCustomMutationPayload: {
-        numbers($transactionResult) {
-          return $transactionResult;
+        plans: {
+          numbers($transactionResult) {
+            return $transactionResult;
+          },
         },
       },
     },

@@ -9,9 +9,9 @@ import type { ExecutionDetails, GrafastResultsList } from "../dist/index.js";
 import {
   access,
   context,
-  ExecutableStep,
   grafast,
   makeGrafastSchema,
+  Step,
 } from "../dist/index.js";
 
 const resolvedPreset = resolvePreset({});
@@ -49,12 +49,12 @@ function run(db: sqlite3.Database, sql: string, values: any[] = []) {
   });
 }
 
-class GetRecordsStep<T extends Record<string, any>> extends ExecutableStep {
+class GetRecordsStep<T extends Record<string, any>> extends Step {
   depIdByIdentifier: Record<string, number>;
   dbDepId: number;
   constructor(
     private tableName: string,
-    identifiers: Record<string, ExecutableStep> = Object.create(null),
+    identifiers: Record<string, Step> = Object.create(null),
   ) {
     super();
     this.dbDepId = this.addUnaryDependency(context().get("db"));
@@ -78,7 +78,7 @@ class GetRecordsStep<T extends Record<string, any>> extends ExecutableStep {
 
   // Unary Dep Id
   private firstUDI: number | undefined;
-  setFirst($first: ExecutableStep) {
+  setFirst($first: Step) {
     this.firstUDI = this.addUnaryDependency($first);
   }
 
@@ -86,8 +86,9 @@ class GetRecordsStep<T extends Record<string, any>> extends ExecutableStep {
     indexMap,
     values,
   }: ExecutionDetails): Promise<GrafastResultsList<any>> {
-    const db = values[this.dbDepId].value as sqlite3.Database;
-    const first = this.firstUDI != null ? values[this.firstUDI].value : null;
+    const db = values[this.dbDepId].unaryValue() as sqlite3.Database;
+    const first =
+      this.firstUDI != null ? values[this.firstUDI].unaryValue() : null;
 
     const identifierCols = Object.keys(this.depIdByIdentifier);
 
@@ -151,7 +152,7 @@ ${orderBy ? `order by ${orderBy}` : ""}
       });
     });
   }
-  listItem($item: ExecutableStep) {
+  listItem($item: Step) {
     return access($item);
   }
 }
@@ -170,18 +171,22 @@ const makeSchema = () => {
         name: String
       }
     `,
-    plans: {
+    objects: {
       Query: {
-        allPeople(_: ExecutableStep) {
-          return getRecords("people");
+        plans: {
+          allPeople(_: Step) {
+            return getRecords("people");
+          },
         },
       },
       Person: {
-        pets($owner, { $first }) {
-          const $ownerId = $owner.get("id");
-          const $pets = getRecords("pets", { owner_id: $ownerId });
-          $pets.setFirst($first);
-          return $pets;
+        plans: {
+          pets($owner, { $first }) {
+            const $ownerId = $owner.get("id");
+            const $pets = getRecords("pets", { owner_id: $ownerId });
+            $pets.setFirst($first);
+            return $pets;
+          },
         },
       },
     },
@@ -189,10 +194,7 @@ const makeSchema = () => {
   });
 };
 
-function getRecords(
-  tableName: string,
-  identifiers?: Record<string, ExecutableStep>,
-) {
+function getRecords(tableName: string, identifiers?: Record<string, Step>) {
   return new GetRecordsStep(tableName, identifiers);
 }
 

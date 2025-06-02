@@ -428,7 +428,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         const tags = JSON.parse(JSON.stringify(rawTags));
         const description = isReferencee
           ? tags.backwardDescription
-          : tags.forwardDescription ?? constraintDescription;
+          : (tags.forwardDescription ?? constraintDescription);
         const baseBehavior = tags.behavior;
         const specificBehavior = isReferencee
           ? tags.backwardBehavior
@@ -481,7 +481,9 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
             pgClass.relname
           }', but a relation by that name already exists; consider renaming the relation by overriding the 'sourceRelationName' inflector`;
           if (isEquivalent) {
-            console.warn(message);
+            if (!info.options.muteWarnings) {
+              console.warn(message);
+            }
             return;
           } else {
             throw new Error(message);
@@ -685,21 +687,21 @@ return function (otherSource) {
           [otherSource],
         ) as any)
       : isMutationPayload
-      ? EXPORTABLE(
-          (otherSource, specFromRecord) =>
-            function plan($in: MutationPayload) {
-              const $record = $in.get("result");
-              return otherSource.get(specFromRecord($record));
-            },
-          [otherSource, specFromRecord],
-        )
-      : EXPORTABLE(
-          (otherSource, specFromRecord) =>
-            function plan($record: PgSelectSingleStep) {
-              return otherSource.get(specFromRecord($record));
-            },
-          [otherSource, specFromRecord],
-        );
+        ? EXPORTABLE(
+            (otherSource, specFromRecord) =>
+              function plan($in: MutationPayload) {
+                const $record = $in.get("result");
+                return otherSource.get(specFromRecord($record));
+              },
+            [otherSource, specFromRecord],
+          )
+        : EXPORTABLE(
+            (otherSource, specFromRecord) =>
+              function plan($record: PgSelectSingleStep) {
+                return otherSource.get(specFromRecord($record));
+              },
+            [otherSource, specFromRecord],
+          );
 
   const listPlan =
     clean && specString
@@ -712,21 +714,21 @@ return function (otherSource) {
           [otherSource],
         ) as any)
       : isMutationPayload
-      ? EXPORTABLE(
-          (otherSource, specFromRecord) =>
-            function plan($in: MutationPayload) {
-              const $record = $in.get("result");
-              return otherSource.find(specFromRecord($record));
-            },
-          [otherSource, specFromRecord],
-        )
-      : EXPORTABLE(
-          (otherSource, specFromRecord) =>
-            function plan($record: PgSelectSingleStep) {
-              return otherSource.find(specFromRecord($record));
-            },
-          [otherSource, specFromRecord],
-        );
+        ? EXPORTABLE(
+            (otherSource, specFromRecord) =>
+              function plan($in: MutationPayload) {
+                const $record = $in.get("result");
+                return otherSource.find(specFromRecord($record));
+              },
+            [otherSource, specFromRecord],
+          )
+        : EXPORTABLE(
+            (otherSource, specFromRecord) =>
+              function plan($record: PgSelectSingleStep) {
+                return otherSource.find(specFromRecord($record));
+              },
+            [otherSource, specFromRecord],
+          );
 
   const connectionPlan =
     clean && specString
@@ -742,21 +744,21 @@ return function (otherSource, connection) {
           [otherSource, connection],
         ) as any)
       : isMutationPayload
-      ? EXPORTABLE(
-          (connection, otherSource, specFromRecord) =>
-            function plan($in: MutationPayload) {
-              const $record = $in.get("result");
-              return connection(otherSource.find(specFromRecord($record)));
-            },
-          [connection, otherSource, specFromRecord],
-        )
-      : EXPORTABLE(
-          (connection, otherSource, specFromRecord) =>
-            function plan($record: PgSelectSingleStep) {
-              return connection(otherSource.find(specFromRecord($record)));
-            },
-          [connection, otherSource, specFromRecord],
-        );
+        ? EXPORTABLE(
+            (connection, otherSource, specFromRecord) =>
+              function plan($in: MutationPayload) {
+                const $record = $in.get("result");
+                return connection(otherSource.find(specFromRecord($record)));
+              },
+            [connection, otherSource, specFromRecord],
+          )
+        : EXPORTABLE(
+            (connection, otherSource, specFromRecord) =>
+              function plan($record: PgSelectSingleStep) {
+                return connection(otherSource.find(specFromRecord($record)));
+              },
+            [connection, otherSource, specFromRecord],
+          );
   return { singleRecordPlan, listPlan, connectionPlan };
 }
 
@@ -824,32 +826,32 @@ function addRelations(
   }> = isMutationPayload
     ? []
     : codec.refs
-    ? Object.entries(codec.refs)
-        .filter(
-          ([, spec]) =>
-            !spec.definition.sourceGraphqlType ||
-            spec.definition.sourceGraphqlType === context.Self.name,
+      ? Object.entries(codec.refs)
+          .filter(
+            ([, spec]) =>
+              !spec.definition.sourceGraphqlType ||
+              spec.definition.sourceGraphqlType === context.Self.name,
+          )
+          .map(([refName, spec]) => ({
+            codec,
+            refName,
+            refDefinition: spec.definition,
+            ref: spec,
+          }))
+      : Object.entries(
+          codec.extensions?.refDefinitions ??
+            (Object.create(null) as Record<string, never>),
         )
-        .map(([refName, spec]) => ({
-          codec,
-          refName,
-          refDefinition: spec.definition,
-          ref: spec,
-        }))
-    : Object.entries(
-        codec.extensions?.refDefinitions ??
-          (Object.create(null) as Record<string, never>),
-      )
-        .filter(
-          ([, refDefinition]) =>
-            !refDefinition.sourceGraphqlType ||
-            refDefinition.sourceGraphqlType === context.Self.name,
-        )
-        .map(([refName, refDefinition]) => ({
-          codec,
-          refName,
-          refDefinition,
-        }));
+          .filter(
+            ([, refDefinition]) =>
+              !refDefinition.sourceGraphqlType ||
+              refDefinition.sourceGraphqlType === context.Self.name,
+          )
+          .map(([refName, refDefinition]) => ({
+            codec,
+            refName,
+            refDefinition,
+          }));
 
   type Digest = {
     identifier: string;
@@ -1034,6 +1036,15 @@ function addRelations(
       if (!type) {
         continue;
       }
+      let sharedFinalResource: PgResource | null | undefined;
+      for (const path of paths) {
+        const res = path.layers[path.layers.length - 1].resource;
+        if (sharedFinalResource === undefined) {
+          sharedFinalResource = res;
+        } else if (sharedFinalResource !== res) {
+          sharedFinalResource = null;
+        }
+      }
 
       if (refSpec.graphqlType) {
         // If this is a union/interface, can we find the associated codec?
@@ -1057,9 +1068,19 @@ function addRelations(
         sharedSource = firstSource;
       }
 
-      // TEST: if there's only one path do we still need union?
-      const needsPgUnionAll =
-        sharedCodec?.polymorphism?.mode === "union" || paths.length > 1;
+      if (
+        sharedCodec?.polymorphism?.mode === "union" &&
+        refSpec.graphqlType &&
+        sharedFinalResource &&
+        refSpec.graphqlType !==
+          build.inflection.tableType(sharedFinalResource.codec)
+      ) {
+        // The might have been referencing a polymorphic thing
+        sharedFinalResource = null;
+      }
+
+      // TEST: previously `sharedCodec?.polymorphism?.mode === "union" || paths.length > 1`
+      const needsPgUnionAll = !sharedFinalResource;
 
       // If we're pulling from a shared codec into a PgUnionAllStep then we can
       // use that codec's attributes as shared attributes; otherwise there are not
@@ -1083,20 +1104,24 @@ function addRelations(
       ({ singleRecordPlan, listPlan, connectionPlan } = (() => {
         // Add forbidden names here
 
-        if (ref.paths.length === 1 && ref.paths[0].length === 1) {
-          const relation: PgCodecRelation = resource.getRelation(
-            ref.paths[0][0].relationName,
-          );
-          const remoteResource = relation.remoteResource;
-          return makeRelationPlans(
-            relation.localAttributes as string[],
-            relation.remoteAttributes as string[],
-            remoteResource as PgResource,
-            isMutationPayload ?? false,
-          );
-        } else if (!needsPgUnionAll) {
-          // Definitely just one chain
-          const path = paths[0];
+        if (!needsPgUnionAll) {
+          if (ref.paths.length === 1 && ref.paths[0].length === 1) {
+            const relation: PgCodecRelation = resource.getRelation(
+              ref.paths[0][0].relationName,
+            );
+            const remoteResource = relation.remoteResource;
+            return makeRelationPlans(
+              relation.localAttributes as string[],
+              relation.remoteAttributes as string[],
+              remoteResource as PgResource,
+              isMutationPayload ?? false,
+            );
+          }
+          if (!sharedFinalResource) {
+            throw new Error(
+              `Non-polymorphic type must target a single resource`,
+            );
+          }
           const makePlanResolver = (
             mode: "singleRecord" | "list" | "connection",
           ) => {
@@ -1125,36 +1150,38 @@ function addRelations(
               );
             }
 
-            const finalLayer = path.layers[path.layers.length - 1];
             const ref_finalLayerResource = te.ref(
-              finalLayer.resource,
-              finalLayer.resource.name,
+              sharedFinalResource,
+              sharedFinalResource.name,
             );
             const collectionIdentifier = te.identifier(
-              `$` + build.inflection.pluralize(finalLayer.resource.name),
+              `$` + build.inflection.pluralize(sharedFinalResource.name),
             );
             functionLines.push(
               te`  const ${collectionIdentifier} = ${ref_finalLayerResource}.find();`,
             );
-            // NOTE: do we ever need to make the above `DISTINCT ON (primary key)`?
-            functionLines.push(
-              te`  let previousAlias = ${collectionIdentifier}.alias;`,
-            );
-
-            // Process each layer
-            for (let i = path.layers.length - 1; i >= 1; i--) {
-              const layer = path.layers[i];
-              const resource = path.layers[i - 1].resource;
-              const { localAttributes, remoteAttributes } = layer;
-              const ref_resource = te.ref(resource, resource.name);
-              const layerAlias = te.identifier(resource.name + "Alias");
+            if (paths.length === 1) {
+              const path = paths[0];
+              // NOTE: do we ever need to make the above `DISTINCT ON (primary key)`?
               functionLines.push(
-                te`  const ${layerAlias} = ${ref_sql}.identifier(Symbol(${te.lit(
-                  resource.name,
-                )}));`,
+                te`  let previousAlias = ${collectionIdentifier}.alias;`,
               );
-              functionLines.push(
-                te`  ${collectionIdentifier}.join({
+
+              // const finalLayer = path.layers[path.layers.length - 1];
+              // Process each layer
+              for (let i = path.layers.length - 1; i >= 1; i--) {
+                const layer = path.layers[i];
+                const resource = path.layers[i - 1].resource;
+                const { localAttributes, remoteAttributes } = layer;
+                const ref_resource = te.ref(resource, resource.name);
+                const layerAlias = te.identifier(resource.name + "Alias");
+                functionLines.push(
+                  te`  const ${layerAlias} = ${ref_sql}.identifier(Symbol(${te.lit(
+                    resource.name,
+                  )}));`,
+                );
+                functionLines.push(
+                  te`  ${collectionIdentifier}.join({
     type: "inner",
     from: ${ref_resource}.from,
     alias: ${layerAlias},
@@ -1171,23 +1198,154 @@ function addRelations(
       )}
     ]
   });`,
-              );
-              functionLines.push(te`  previousAlias = ${layerAlias};`);
-            }
-
-            // Now apply `$record`
-            {
-              const firstLayer = path.layers[0];
-              const { localAttributes, remoteAttributes } = firstLayer;
-              remoteAttributes.forEach((remoteAttrName, i) => {
-                functionLines.push(
-                  te`  ${collectionIdentifier}.where(${ref_sql}\`\${previousAlias}.\${${ref_sql}.identifier(${te.lit(
-                    remoteAttrName,
-                  )})} = \${${collectionIdentifier}.placeholder($record.get(${te.lit(
-                    localAttributes[i],
-                  )}))}\`);`,
                 );
-              });
+                functionLines.push(te`  previousAlias = ${layerAlias};`);
+              }
+              // Now apply `$record`
+              {
+                const firstLayer = path.layers[0];
+                const { localAttributes, remoteAttributes } = firstLayer;
+                remoteAttributes.forEach((remoteAttrName, i) => {
+                  functionLines.push(
+                    te`  ${collectionIdentifier}.where(${ref_sql}\`\${previousAlias}.\${${
+                      ref_sql
+                    }.identifier(${te.lit(
+                      remoteAttrName,
+                    )})} = \${${collectionIdentifier}.placeholder($record.get(${te.lit(
+                      localAttributes[i],
+                    )}))}\`);`,
+                  );
+                });
+              }
+            } else {
+              let commonCols: ReadonlyArray<string> | undefined;
+              for (const path of paths) {
+                const attrs =
+                  path.layers[path.layers.length - 1].remoteAttributes;
+                if (commonCols === undefined) {
+                  commonCols = attrs;
+                } else if (!arraysMatch(commonCols, attrs)) {
+                  throw new Error(
+                    `Expected all refs to reference the same final set of columns, but ${commonCols} and ${attrs} don't match`,
+                  );
+                }
+              }
+              if (!commonCols) {
+                throw new Error(`No refVia?!`);
+              }
+              // Multipath, lets build an SQL expression instead
+              const subqueryAlias = te.identifier("subquery");
+              functionLines.push(
+                te`  const ${subqueryAlias} = ${ref_sql}.identifier(Symbol('subquery'));`,
+              );
+
+              const selects = te.identifier("selects");
+              functionLines.push(te`  const ${selects} = [];`);
+
+              for (const path of paths) {
+                const firstLayer = path.layers[0];
+                const lastLayer = path.layers[path.layers.length - 1];
+                const {
+                  localAttributes: firstLayerLocal,
+                  remoteAttributes: firstLayerRemote,
+                } = firstLayer;
+                const { localAttributes: lastLayerLocal } = lastLayer;
+                const refs = firstLayerLocal.map(
+                  (attr) =>
+                    te`\${${collectionIdentifier}.placeholder($record.get(${te.lit(
+                      attr,
+                    )}))}`,
+                );
+                if (firstLayer === lastLayer) {
+                  // Special case (for path.layers.length === 1)
+                  functionLines.push(
+                    te`  ${selects}.push(${ref_sql}\`select ${te.join(
+                      refs.map((ref, i) => te`${ref} as "${te.literal(i)}"`),
+                      ", ",
+                    )}\`);`,
+                  );
+                } else {
+                  // select PENULTIMATE.FINAL_LOCAL
+                  // from PENULTIMATE PENULTIMATE
+                  //
+                  // inner join NTH as NTH
+                  // on (NTH.(N+1th)_LOCAL = (N+1th).(N+1th)_REMOTE
+                  //
+                  // where FIRST.FIRST_REMOTE[0] = ${refs[0]} AND ...
+                  const lines: TE[] = [];
+                  const penultimateIndex = path.layers.length - 2;
+                  const lyr = (i: number) => te`__l${te.literal(i)}__`;
+                  lines.push(
+                    te`select ${te.join(
+                      lastLayerLocal.map(
+                        (attr, attrIdx) =>
+                          te`${lyr(penultimateIndex)}.\${${
+                            ref_sql
+                          }.identifier(${te.lit(attr)})} as "${te.lit(attrIdx)}"`,
+                      ),
+                      ", ",
+                    )}`,
+                  );
+                  lines.push(
+                    te`from \${${te.ref(path.layers[penultimateIndex].resource, path.layers[penultimateIndex].resource.name)}.from} as ${lyr(penultimateIndex)}`,
+                  );
+
+                  for (
+                    let layerIdx = penultimateIndex - 1;
+                    layerIdx >= 0;
+                    layerIdx--
+                  ) {
+                    const { localAttributes, remoteAttributes } =
+                      path.layers[layerIdx + 1];
+                    lines.push(
+                      te`inner join \${${te.ref(path.layers[layerIdx].resource, path.layers[layerIdx].resource.name)}.from} as ${lyr(layerIdx)}`,
+                    );
+                    lines.push(
+                      te`on (${te.join(
+                        localAttributes.map(
+                          (attr, attrIdx) =>
+                            te`${lyr(layerIdx)}.\${${ref_sql}.identifier(${te.literal(attr)})} = ${lyr(layerIdx + 1)}.\${${ref_sql}.identifier(${te.literal(remoteAttributes[attrIdx])})}`,
+                        ),
+                        " and ",
+                      )})`,
+                    );
+                  }
+
+                  lines.push(
+                    te`where ${te.join(
+                      firstLayerRemote.map(
+                        (attr, i) =>
+                          te`${lyr(0)}.\${${ref_sql}.identifier(${te.lit(attr)})} = ${refs[i]}`,
+                      ),
+                      " and ",
+                    )}`,
+                  );
+                  functionLines.push(
+                    te`  ${selects}.push(${ref_sql}\`${te.join(lines, "\n")}\`);`,
+                  );
+                }
+              }
+
+              functionLines.push(
+                te`  ${collectionIdentifier}.join({
+    type: "inner",
+    from: ${ref_sql}\`(\${${ref_sql}.indent(${ref_sql}.join(${selects}.map(s => ${ref_sql}.indent(s)), '\\n\\nunion all\\n\\n'))})\`,
+    alias: ${subqueryAlias},
+    conditions: [
+      ${te.join(
+        commonCols.map(
+          (attr, i) =>
+            te`${ref_sql}\`\${${collectionIdentifier}.alias}.\${${
+              ref_sql
+            }.identifier(${te.literal(attr)})} = \${${
+              subqueryAlias
+            }}."${te.literal(i)}"\``,
+        ),
+        ",\n      ",
+      )}
+    ]
+  });`,
+              );
             }
 
             if (single) {

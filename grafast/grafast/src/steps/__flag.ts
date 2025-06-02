@@ -1,12 +1,3 @@
-import type { FlaggedValue } from "../error.js";
-import { $$inhibit, flagError, SafeError } from "../error.js";
-import { inspect } from "../inspect.js";
-import type {
-  AddDependencyOptions,
-  ExecutionDetails,
-  ExecutionEntryFlags,
-  GrafastResultsList,
-} from "../interfaces.js";
 import {
   $$deepDepSkip,
   ALL_FLAGS,
@@ -16,9 +7,19 @@ import {
   FLAG_INHIBITED,
   FLAG_NULL,
   TRAPPABLE_FLAGS,
+} from "../constants.js";
+import type { FlaggedValue } from "../error.js";
+import { $$inhibit, flagError, SafeError } from "../error.js";
+import { inspect } from "../inspect.js";
+import type {
+  AddDependencyOptions,
+  DataFromStep,
+  ExecutionDetails,
+  ExecutionEntryFlags,
+  GrafastResultsList,
 } from "../interfaces.js";
 import type { ListCapableStep } from "../step.js";
-import { ExecutableStep, isListCapableStep } from "../step.js";
+import { isListCapableStep, Step } from "../step.js";
 import type { __ItemStep } from "./__item.js";
 
 // PUBLIC FLAGS
@@ -54,7 +55,8 @@ export type ResolvedTrapValue = false | null | undefined | readonly never[];
 export interface FlagStepOptions {
   acceptFlags?: ExecutionEntryFlags;
   onReject?: Error | null;
-  if?: ExecutableStep<boolean>;
+  dataOnly?: boolean;
+  if?: Step<boolean>;
   // Trapping an error might want to result in a null or an empty list.
   valueForInhibited?: TrapValue;
   valueForError?: TrapValue;
@@ -89,7 +91,7 @@ function resolveTrapValue(tv: TrapValue): ResolvedTrapValue {
   }
 }
 
-export class __FlagStep<TData> extends ExecutableStep<TData> {
+export class __FlagStep<TStep extends Step> extends Step<DataFromStep<TStep>> {
   static $$export = {
     moduleName: "grafast",
     exportName: "__FlagStep",
@@ -102,11 +104,12 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
   private valueForInhibited: ResolvedTrapValue;
   private valueForError: ResolvedTrapValue;
   private canBeInlined: boolean;
-  constructor(step: ExecutableStep, options: FlagStepOptions) {
+  constructor(step: TStep, options: FlagStepOptions) {
     super();
     const {
       acceptFlags = DEFAULT_ACCEPT_FLAGS,
       onReject,
+      dataOnly,
       if: $cond,
       valueForInhibited = "PASS_THROUGH",
       valueForError = "PASS_THROUGH",
@@ -130,7 +133,7 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
         this.ifDep = this.addDependency($cond);
       }
     } else {
-      this.addDependency({ step, acceptFlags, onReject });
+      this.addDependency({ step, acceptFlags, onReject, dataOnly });
     }
     if (isListCapableStep(step)) {
       this.listItem = this._listItem;
@@ -147,16 +150,14 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
       $if ? `if(${$if.id}), ` : ``
     }${digestAcceptFlags(acceptFlags)}, onReject: ${rej}`;
   }
-  [$$deepDepSkip](): ExecutableStep {
+  [$$deepDepSkip](): Step {
     return this.getDepOptions(0).step;
   }
   listItem?: (
-    $item: __ItemStep<ListCapableStep<unknown, ExecutableStep<unknown>>>,
-  ) => ExecutableStep;
+    $item: __ItemStep<ListCapableStep<unknown, Step<unknown>>>,
+  ) => Step;
   // Copied over listItem if the dependent step is a list capable step
-  _listItem(
-    $item: __ItemStep<ListCapableStep<unknown, ExecutableStep<unknown>>>,
-  ) {
+  _listItem($item: __ItemStep<ListCapableStep<unknown, Step<unknown>>>) {
     const $dep = this.dependencies[0];
     return isListCapableStep($dep) ? $dep.listItem($item) : $item;
   }
@@ -170,6 +171,7 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
     const step = this.dependencies[0];
     const forbiddenFlags = this.dependencyForbiddenFlags[0];
     const onReject = this.dependencyOnReject[0];
+    const dataOnly = this.dependencyDataOnly[0];
     const acceptFlags = ALL_FLAGS & ~forbiddenFlags;
     if (
       // TODO: this logic could be improved so that more flag checks were
@@ -190,15 +192,13 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
         options.acceptFlags === acceptFlags ||
         false
       ) {
-        return { step, acceptFlags, onReject };
+        return { step, acceptFlags, onReject, dataOnly };
       }
     }
     return null;
   }
 
-  public deduplicate(
-    _peers: readonly ExecutableStep<any>[],
-  ): readonly ExecutableStep<any>[] {
+  public deduplicate(_peers: readonly Step<any>[]): readonly Step<any>[] {
     return (_peers as __FlagStep<any>[]).filter((p) => {
       // ifDep has already been tested by Grafast (it's a dependency)
       if (p.forbiddenFlags !== this.forbiddenFlags) return false;
@@ -211,8 +211,8 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
   }
 
   public execute(
-    _details: ExecutionDetails<[data: TData, cond?: boolean]>,
-  ): GrafastResultsList<TData> {
+    _details: ExecutionDetails<[data: DataFromStep<TStep>, cond?: boolean]>,
+  ): GrafastResultsList<DataFromStep<TStep>> {
     throw new Error(`${this} not finalized?`);
   }
 
@@ -226,7 +226,7 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
   }
 
   private fancyExecute(
-    details: ExecutionDetails<[data: TData, cond?: boolean]>,
+    details: ExecutionDetails<[data: DataFromStep<TStep>, cond?: boolean]>,
   ): any {
     const dataEv = details.values[0]!;
     const condEv =
@@ -272,7 +272,7 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
 
   // Checks already performed via addDependency, just pass everything through. Should have been inlined!
   private passThroughExecute(
-    details: ExecutionDetails<[data: TData, cond?: boolean]>,
+    details: ExecutionDetails<[data: DataFromStep<TStep>, cond?: boolean]>,
   ): any {
     const ev = details.values[0];
     if (ev.isBatch) {
@@ -288,14 +288,14 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
  * Example use case: get user by id, but id is null: no need to fetch the user
  * since we know they won't exist.
  */
-export function inhibitOnNull<T>(
-  $step: ExecutableStep<T>,
+export function inhibitOnNull<TStep extends Step>(
+  $step: TStep,
   options?: { if?: FlagStepOptions["if"] },
 ) {
-  return new __FlagStep<T>($step, {
+  return new __FlagStep<TStep>($step, {
     ...options,
     acceptFlags: DEFAULT_ACCEPT_FLAGS & ~FLAG_NULL,
-  });
+  }) as Step<TStep extends Step<infer U> ? Exclude<U, null | undefined> : any>;
 }
 
 /**
@@ -303,20 +303,20 @@ export function inhibitOnNull<T>(
  * that represents a Post instead: throw error to tell user they've sent invalid
  * data.
  */
-export function assertNotNull<T>(
-  $step: ExecutableStep<T>,
+export function assertNotNull<TStep extends Step>(
+  $step: TStep,
   message: string,
   options?: { if?: FlagStepOptions["if"] },
 ) {
-  return new __FlagStep<T>($step, {
+  return new __FlagStep<TStep>($step, {
     ...options,
     acceptFlags: DEFAULT_ACCEPT_FLAGS & ~FLAG_NULL,
     onReject: new SafeError(message),
   });
 }
 
-export function trap<T>(
-  $step: ExecutableStep<T>,
+export function trap<TStep extends Step>(
+  $step: TStep,
   acceptFlags: ExecutionEntryFlags,
   options?: {
     valueForInhibited?: FlagStepOptions["valueForInhibited"];
@@ -324,22 +324,33 @@ export function trap<T>(
     if?: FlagStepOptions["if"];
   },
 ) {
-  return new __FlagStep<T>($step, {
+  return new __FlagStep<TStep>($step, {
     ...options,
     acceptFlags: (acceptFlags & TRAPPABLE_FLAGS) | FLAG_NULL,
   });
 }
 
 // Have to overwrite the getDep method due to circular dependency
-(ExecutableStep.prototype as any).getDep = function (
-  this: ExecutableStep,
+(Step.prototype as any).getDep = function (
+  this: Step,
   depId: number,
+  throwOnFlagged = false,
 ) {
-  const { step, acceptFlags, onReject } = this.getDepOptions(depId);
+  this._assertAccessAllowed(depId);
+  const { step, acceptFlags, onReject, dataOnly } = this.getDepOptions(depId);
   if (acceptFlags === DEFAULT_ACCEPT_FLAGS && onReject == null) {
     return step;
   } else {
+    if (throwOnFlagged) {
+      throw new Error(
+        `When retrieving dependency ${step} of ${this}, the dependency is flagged as ${digestAcceptFlags(
+          acceptFlags,
+        )}/onReject=${String(
+          onReject,
+        )}. Please use \`this.getDepOptions(depId)\` instead, and handle the flags`,
+      );
+    }
     // Return a __FlagStep around options.step so that all the options are preserved.
-    return new __FlagStep(step, { acceptFlags, onReject });
+    return new __FlagStep(step, { acceptFlags, onReject, dataOnly });
   }
 };

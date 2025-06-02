@@ -14,10 +14,12 @@ export interface GrafastPlanStepJSONv1 {
   dependencyIds: ReadonlyArray<string | number>;
   dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>;
   dependencyOnReject: ReadonlyArray<string | null | undefined>;
+  dependencyDataOnly: ReadonlyArray<boolean>;
   polymorphicPaths: readonly string[] | undefined;
   isSyncAndSafe: boolean | undefined;
   supportsUnbatched: boolean | undefined;
   hasSideEffects: boolean | undefined;
+  stream: { initialCountStepId?: number } | undefined;
   extra?: Record<string, JSONValue | undefined>;
 }
 
@@ -34,6 +36,8 @@ export type GrafastPlanBucketReasonJSONv1 =
   | GrafastPlanBucketReasonMutationFieldJSONv1
   | GrafastPlanBucketReasonDeferJSONv1
   | GrafastPlanBucketReasonPolymorphicJSONv1
+  | GrafastPlanBucketReasonPolymorphicPartitionJSONv1
+  | GrafastPlanBucketReasonCombinedJSONv1
   | GrafastPlanBucketReasonSubroutineJSONv1;
 
 export interface GrafastPlanBucketReasonRootJSONv1 {
@@ -51,8 +55,9 @@ export interface GrafastPlanBucketReasonListItemJSONv1 {
 
   /** If this listItem is to be streamed, the configuration for that streaming */
   stream?: {
-    initialCount: number;
-    label?: string;
+    initialCountStepId?: number;
+    ifStepId?: number;
+    labelStepId?: number;
   };
 }
 /** Non-branching, deferred */
@@ -69,11 +74,17 @@ export interface GrafastPlanBucketReasonDeferJSONv1 {
   type: "defer";
   label?: string;
 }
-/** Branching, non-deferred */
+/** Non-branching, non-deferred */
 export interface GrafastPlanBucketReasonPolymorphicJSONv1 {
   type: "polymorphic";
   typeNames: readonly string[];
   parentStepId: string | number;
+  polymorphicPaths: ReadonlyArray<string>;
+}
+/** Branching, non-deferred */
+export interface GrafastPlanBucketReasonPolymorphicPartitionJSONv1 {
+  type: "polymorphicPartition";
+  typeNames: readonly string[];
   polymorphicPaths: ReadonlyArray<string>;
 }
 /** Non-branching, non-deferred */
@@ -81,21 +92,33 @@ export interface GrafastPlanBucketReasonSubroutineJSONv1 {
   type: "subroutine";
   parentStepId: string | number;
 }
+/** Anti-branching, non-deferred */
+export interface GrafastPlanBucketReasonCombinedJSONv1 {
+  type: "combined";
+  parentLayerPlanIds: ReadonlyArray<string | number>;
+  combinations: ReadonlyArray<{
+    sources: readonly {
+      layerPlanId: string | number;
+      stepId: string | number;
+    }[];
+    targetStepId: number;
+  }>;
+}
 
 export interface GrafastPlanBucketJSONv1 {
-  id: number;
+  id: number | string;
   reason: GrafastPlanBucketReasonJSONv1;
   parentSideEffectStepId: string | number | null;
   copyStepIds: ReadonlyArray<string | number>;
   steps: ReadonlyArray<GrafastPlanStepJSONv1>;
   rootStepId: string | number | null;
   phases: ReadonlyArray<GrafastPlanBucketPhaseJSONv1>;
-  children: ReadonlyArray<GrafastPlanBucketJSONv1>;
+  childIds: ReadonlyArray<number | string>;
 }
 
 export interface GrafastPlanJSONv1 extends GrafastPlanJSON {
   version: "v1";
-  rootBucket: GrafastPlanBucketJSONv1;
+  buckets: ReadonlyArray<GrafastPlanBucketJSONv1>;
 }
 
 export type JSONValue =

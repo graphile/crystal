@@ -1,16 +1,18 @@
 import type {
   PgCodec,
   PgCodecPolymorphismRelationalTypeSpec,
+  PgUnionAllQueryBuilderCallback,
   PgUnionAllStep,
 } from "@dataplan/pg";
 import type {
   ConnectionStep,
   FieldArgs,
   GrafastFieldConfigArgumentMap,
+  Maybe,
 } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 import type { GraphileConfig } from "graphile-config";
-import type { GraphQLFieldConfigArgumentMap } from "graphql";
+import type { GraphQLEnumType, GraphQLFieldConfigArgumentMap } from "graphql";
 
 import { version } from "../version.js";
 
@@ -158,9 +160,7 @@ export const PgPolymorphismOnlyArgumentPlugin: GraphileConfig.Plugin = {
 };
 function makeFieldsHook(isInterface: boolean) {
   return (
-    args:
-      | GrafastFieldConfigArgumentMap<any, any, any, any>
-      | GraphQLFieldConfigArgumentMap,
+    args: GrafastFieldConfigArgumentMap | GraphQLFieldConfigArgumentMap,
 
     build: GraphileBuild.Build,
     context:
@@ -170,6 +170,7 @@ function makeFieldsHook(isInterface: boolean) {
     const {
       getTypeByName,
       graphql: { GraphQLList, GraphQLNonNull },
+      grafast: { lambda, ConstantStep },
       inflection,
     } = build;
     const {
@@ -188,7 +189,7 @@ function makeFieldsHook(isInterface: boolean) {
       return args;
     }
     const enumTypeName = inflection.pgPolymorphismEnumType(codec);
-    const enumType = getTypeByName(enumTypeName);
+    const enumType = getTypeByName(enumTypeName) as GraphQLEnumType;
     if (!enumType) {
       return args;
     }
@@ -204,10 +205,9 @@ function makeFieldsHook(isInterface: boolean) {
             ...(isInterface
               ? null
               : {
-                  autoApplyAfterParentPlan: true,
                   applyPlan: isPgFieldConnection
                     ? EXPORTABLE(
-                        () =>
+                        (ConstantStep, lambda, limitToTypes) =>
                           (
                             $parent: any,
                             $connection: ConnectionStep<
@@ -219,20 +219,36 @@ function makeFieldsHook(isInterface: boolean) {
                             fieldArgs: FieldArgs,
                           ) => {
                             const $union = $connection.getSubplan();
-                            $union.limitToTypes(fieldArgs.getRaw().eval());
+                            const $ltt = fieldArgs.getRaw();
+                            if (
+                              $ltt instanceof ConstantStep &&
+                              $ltt.data == null
+                            ) {
+                              // No action
+                            } else {
+                              $union.apply(lambda($ltt, limitToTypes));
+                            }
                           },
-                        [],
+                        [ConstantStep, lambda, limitToTypes],
                       )
                     : EXPORTABLE(
-                        () =>
+                        (ConstantStep, lambda, limitToTypes) =>
                           (
                             $parent: any,
                             $union: PgUnionAllStep,
                             fieldArgs: FieldArgs,
                           ) => {
-                            $union.limitToTypes(fieldArgs.getRaw().eval());
+                            const $ltt = fieldArgs.getRaw();
+                            if (
+                              $ltt instanceof ConstantStep &&
+                              $ltt.data == null
+                            ) {
+                              // No action
+                            } else {
+                              $union.apply(lambda($ltt, limitToTypes));
+                            }
                           },
-                        [],
+                        [ConstantStep, lambda, limitToTypes],
                       ),
                 }),
           },
@@ -243,4 +259,12 @@ function makeFieldsHook(isInterface: boolean) {
 
     return args;
   };
+}
+
+function limitToTypes(ltt: Maybe<string[]>): PgUnionAllQueryBuilderCallback {
+  if (ltt) {
+    return (qb) => qb.limitToTypes(ltt);
+  } else {
+    return () => {};
+  }
 }

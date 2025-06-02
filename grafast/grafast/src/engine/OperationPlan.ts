@@ -4,44 +4,54 @@ import type {
   FragmentDefinitionNode,
   GraphQLArgument,
   GraphQLField,
-  GraphQLFieldMap,
   GraphQLFieldResolver,
+  GraphQLInterfaceType,
   GraphQLObjectType,
   GraphQLOutputType,
   GraphQLSchema,
   GraphQLUnionType,
   OperationDefinitionNode,
-  SelectionNode,
 } from "graphql";
 import * as graphql from "graphql";
 import te from "tamedevil";
 
 import * as assert from "../assert.js";
-import type { Constraint } from "../constraints.js";
-import type { SelectionSetDigest } from "../graphqlCollectFields.js";
 import {
-  evalDirectiveArg,
+  $$contextPlanCache,
+  $$proxy,
+  $$subroutine,
+  $$timeout,
+  $$ts,
+  ALL_FLAGS,
+  DEFAULT_ACCEPT_FLAGS,
+} from "../constants.js";
+import type { Constraint } from "../constraints.js";
+import {
   graphqlCollectFields,
   newSelectionSetDigest,
 } from "../graphqlCollectFields.js";
 import { fieldSelectionsForType } from "../graphqlMergeSelectionSets.js";
-import type { GrafastPlanJSON, ModifierStep } from "../index.js";
+import type { GrafastPlanJSON } from "../index.js";
 import {
   __FlagStep,
   __ItemStep,
   __TrackedValueStep,
   __ValueStep,
+  $$inhibit,
   error,
-  ExecutableStep,
+  get,
   isDev,
   object,
   SafeError,
+  Step,
   stripAnsi,
 } from "../index.js";
 import { inputStep } from "../input.js";
 import { inspect } from "../inspect.js";
 import type {
+  AbstractTypePlanner,
   AddDependencyOptions,
+  AnyInputStep,
   FieldPlanResolver,
   GrafastPlanBucketJSONv1,
   GrafastPlanBucketPhaseJSONv1,
@@ -49,69 +59,104 @@ import type {
   GrafastPlanJSONv1,
   GrafastPlanStepJSONv1,
   LocationDetails,
-  StepOptions,
+  Maybe,
+  PlanTypeInfo,
   TrackedArguments,
-} from "../interfaces.js";
-import {
-  $$proxy,
-  $$subroutine,
-  $$timeout,
-  $$ts,
-  ALL_FLAGS,
-  DEFAULT_ACCEPT_FLAGS,
 } from "../interfaces.js";
 import type { ApplyAfterModeArg } from "../operationPlan-input.js";
 import { withFieldArgsForArguments } from "../operationPlan-input.js";
-import type { ListCapableStep, PolymorphicStep } from "../step.js";
+import type { GrafastOperationOptions } from "../prepare.js";
+import type { UnbatchedExecutableStep } from "../step.js";
 import {
   $$noExec,
   assertExecutableStep,
   assertFinalized,
   isListCapableStep,
-  isPolymorphicStep,
-  isUnbatchedExecutableStep,
+  isUnbatchedStep,
+  stepHasToRecord,
+  stepHasToSpecifier,
 } from "../step.js";
 import { __TrackedValueStepWithDollars } from "../steps/__trackedValue.js";
-import { access } from "../steps/access.js";
+import { itemsOrStep } from "../steps/connection.js";
 import { constant, ConstantStep } from "../steps/constant.js";
-import { graphqlResolver } from "../steps/graphqlResolver.js";
+import {
+  graphqlResolver,
+  graphqlResolveType,
+} from "../steps/graphqlResolver.js";
 import { timeSource } from "../timeSource.js";
 import type { Sudo } from "../utils.js";
 import {
+  arraysMatch,
   assertNotAsync,
   assertNotPromise,
   defaultValueToValueNode,
+  directiveArgument,
   findVariableNamesUsed,
   hasItemPlan,
+  isPhaseTransitionLayerPlan,
   isTypePlanned,
+  layerPlanHeirarchyContains,
+  pathsFromAncestorToTargetLayerPlan,
+  recordsMatch,
+  setsMatch,
   stepADependsOnStepB,
   sudo,
   writeableArray,
 } from "../utils.js";
 import type {
   LayerPlanPhase,
-  LayerPlanReason,
-  LayerPlanReasonPolymorphic,
+  LayerPlanReasonCombined,
+  LayerPlanReasonDefer,
+  LayerPlanReasonListItem,
+  LayerPlanReasonListItemStream,
   LayerPlanReasonSubroutine,
+  LayerPlanReasonSubscription,
 } from "./LayerPlan.js";
 import { LayerPlan } from "./LayerPlan.js";
+import { defaultPlanResolver } from "./lib/defaultPlanResolver.js";
 import {
   currentLayerPlan,
+  currentPolymorphicPaths,
   withGlobalLayerPlan,
 } from "./lib/withGlobalLayerPlan.js";
 import { lock, unlock } from "./lock.js";
+import type {
+  CommonPlanningDetails,
+  PlanFieldReturnTypeDetails,
+  PlanIntoOutputPlanDetails,
+  PlanListItemDetails,
+  PlanSelectionSetDetails,
+  PolymorphicPlanObjectTypeDetails,
+  PolymorphicResolveTypeDetails,
+  ProcessGroupedFieldSetDetails,
+  StreamDetails,
+} from "./OperationPlanTypes.js";
+import type { OutputPlanTypePolymorphicObject } from "./OutputPlan.js";
 import { OutputPlan } from "./OutputPlan.js";
 import { StepTracker } from "./StepTracker.js";
+
+type ProcessStepActionDescription =
+  | "deduplicate"
+  | "hoist"
+  | "pushDown"
+  | "optimize"
+  | "optimizeDataOnly";
+
+type Todo = ReadonlyArray<
+  [string, QueueTuple<CommonPlanningDetails<GraphQLOutputType>>[]]
+>;
 
 const atpe =
   typeof process !== "undefined" && process.env.ALWAYS_THROW_PLANNING_ERRORS;
 const ALWAYS_THROW_PLANNING_ERRORS = atpe === "1";
 const THROW_PLANNING_ERRORS_ON_SIDE_EFFECTS = atpe === "2";
 
+const DEFAULT_MAX_DEPTH = 100;
+
 /**
  * Returns true for steps that the system populates automatically without executing.
  */
-function isPrepopulatedStep(step: ExecutableStep) {
+function isPrepopulatedStep(step: Step) {
   return step instanceof __ItemStep || step instanceof __ValueStep;
 }
 
@@ -147,6 +192,7 @@ const {
  */
 let planningTimeoutWarmupMultiplier = 5;
 const EMPTY_ARRAY = Object.freeze([]);
+const EMPTY_SET: ReadonlySet<never> = new Set();
 
 export const POLYMORPHIC_ROOT_PATH = null;
 export const POLYMORPHIC_ROOT_PATHS: ReadonlySet<string> | null = null;
@@ -173,18 +219,28 @@ export interface MetaByMetaKey {
 const REASON_ROOT = Object.freeze({ type: "root" });
 const OUTPUT_PLAN_TYPE_NULL = Object.freeze({ mode: "null" });
 const OUTPUT_PLAN_TYPE_ARRAY = Object.freeze({ mode: "array" });
-const newValueStepCallback = () => new __ValueStep();
+const newValueStepCallback = (isImmutable: boolean) =>
+  new __ValueStep(isImmutable);
 
-const NO_ARGS: TrackedArguments = {
-  get() {
-    throw new Error(`This field doesn't have any arguments`);
-  },
-};
+const NO_ARGS: TrackedArguments = Object.create(null);
 
 export class OperationPlan {
   /* This only exists to make establishOperationPlan easier for TypeScript */
   public readonly [$$timeout]: undefined;
   public readonly [$$ts]: undefined;
+  /** @internal */
+  public [$$contextPlanCache]?: GrafastPlanJSON;
+  /**
+   * For use by `inputStep()` only.
+   * @internal
+   */
+  public _inputStepCache = new Map<
+    graphql.GraphQLInputType,
+    Map<
+      graphql.ValueNode | undefined,
+      Map<graphql.ConstValueNode | undefined, AnyInputStep>
+    >
+  >();
 
   public readonly queryType: GraphQLObjectType;
   public readonly mutationType: GraphQLObjectType | null;
@@ -225,18 +281,11 @@ export class OperationPlan {
    */
   public rootOutputPlan!: OutputPlan;
 
-  private modifierStepCount = 0;
-  private modifierDepthCount = 0;
-  private modifierSteps: ModifierStep[] = [];
-
   /** @internal */
   public readonly stepTracker = new StepTracker(this);
 
-  private maxDeduplicatedStepId = -1;
-  private maxValidatedStepId = -1;
-
   /** Constraints based on evaluating variables. @internal */
-  public readonly variableValuesConstraints: Constraint[] = [];
+  public readonly variableValuesConstraints: Constraint[];
   /** Stores the actual variableValues. @internal */
   public readonly variableValuesStep: __ValueStep<{ [key: string]: any }>;
   /** A step for accessing variableValues in a tracked manner (allowing eval). @internal */
@@ -245,14 +294,14 @@ export class OperationPlan {
   }>;
 
   /** Constraints based on evaluating context. @internal */
-  public readonly contextConstraints: Constraint[] = [];
+  public readonly contextConstraints: Constraint[];
   /** Stores the actual value of the context. @internal */
   public readonly contextStep: __ValueStep<Grafast.Context>;
   /** Allows accessing context in a tracked manner (allowing eval). @internal */
   public readonly trackedContextStep: __TrackedValueStep<Grafast.Context>;
 
   /** Constraints based on evaluating rootValue. @internal */
-  public readonly rootValueConstraints: Constraint[] = [];
+  public readonly rootValueConstraints: Constraint[];
   /** Stores the actual value of rootValue. @internal */
   public readonly rootValueStep: __ValueStep<any>;
   /** Allows accessing rootValue in a tracked manner (allowing eval). @internal */
@@ -264,8 +313,10 @@ export class OperationPlan {
   /**
    * @internal
    */
-  public readonly itemStepIdByListStepId: {
-    [listStepId: number]: number | undefined;
+  public readonly itemStepIdByListStepIdByParentLayerPlanId: {
+    [parentLayerPlanId: number]:
+      | { [listStepId: number]: number | undefined }
+      | undefined;
   } = Object.create(null);
 
   /**
@@ -288,17 +339,47 @@ export class OperationPlan {
 
   private scalarPlanInfo: { schema: GraphQLSchema };
 
+  /** @internal */
+  public valueNodeToStaticValueCache = new Map<
+    graphql.ValueNode,
+    AnyInputStep
+  >();
+
+  private frozenPlanningPaths = isDev ? null : new Set<string>();
+
+  /** @internal */
+  public resolveInfoOperationBase: Pick<
+    graphql.GraphQLResolveInfo,
+    "schema" | "operation" | "fragments"
+  >;
+
+  private readonly planningTimeout: number | null;
+  private readonly maxPlanningDepth: number;
+
   constructor(
     public readonly schema: GraphQLSchema,
     public readonly operation: OperationDefinitionNode,
     public readonly fragments: {
       [fragmentName: string]: FragmentDefinitionNode;
     },
+    variableValuesConstraints: Constraint[],
     public readonly variableValues: { [key: string]: any },
+    contextConstraints: Constraint[],
     public readonly context: { [key: string]: any },
+    rootValueConstraints: Constraint[],
     public readonly rootValue: any,
-    private readonly planningTimeout: number | null,
+    options: GrafastOperationOptions,
   ) {
+    this.planningTimeout = options?.timeouts?.planning ?? null;
+    this.maxPlanningDepth = options?.maxPlanningDepth ?? DEFAULT_MAX_DEPTH;
+    this.resolveInfoOperationBase = {
+      schema,
+      operation,
+      fragments,
+    };
+    this.variableValuesConstraints = variableValuesConstraints;
+    this.contextConstraints = contextConstraints;
+    this.rootValueConstraints = rootValueConstraints;
     this.scalarPlanInfo = { schema: this.schema };
     const queryType = schema.getQueryType();
     assert.ok(queryType, "Schema must have a query type");
@@ -336,7 +417,7 @@ export class OperationPlan {
     this.operationType = operation.operation;
 
     this.phase = "plan";
-    this.rootLayerPlan = new LayerPlan(this, null, REASON_ROOT);
+    this.rootLayerPlan = new LayerPlan(this, REASON_ROOT);
 
     // Set up the shared steps for variables, context and rootValue
     [this.variableValuesStep, this.trackedVariableValuesStep] = this.track(
@@ -543,7 +624,7 @@ export class OperationPlan {
    *
    * @internal
    */
-  public _addStep(plan: ExecutableStep): number {
+  public _addStep(plan: Step): number {
     if (!["plan", "validate", "optimize"].includes(this.phase)) {
       throw new Error(
         `Creating a plan during the '${this.phase}' phase is forbidden.`,
@@ -552,29 +633,8 @@ export class OperationPlan {
     return this.stepTracker.addStep(plan);
   }
 
-  /**
-   * Adds a plan to the known steps and returns the number to use as the plan
-   * id. ONLY to be used from Step, user code should never call this directly.
-   *
-   * @internal
-   */
-  public _addModifierStep(step: ModifierStep<any>): string {
-    if (!["plan", "validate", "optimize"].includes(this.phase)) {
-      throw new Error(
-        `Creating a step during the '${this.phase}' phase is forbidden.`,
-      );
-    }
-    const modifierStepId = `${this.modifierDepthCount}-${this
-      .modifierStepCount++}`;
-    this.modifierSteps.push(step);
-    return modifierStepId;
-  }
-
   /** @internal Use plan.getStep(id) instead. */
-  public getStep: (
-    id: number,
-    requestingStep: ExecutableStep,
-  ) => ExecutableStep = isDev
+  public getStep: (id: number, requestingStep: Step) => Step = isDev
     ? (id, requestingStep) => {
         if (!["plan", "validate", "optimize"].includes(this.phase)) {
           throw new Error(
@@ -612,7 +672,7 @@ export class OperationPlan {
    *
    * @internal
    */
-  public dangerouslyGetStep(id: number): ExecutableStep {
+  public dangerouslyGetStep(id: number): Step {
     return this.stepTracker.getStepById(id);
   }
 
@@ -678,16 +738,18 @@ export class OperationPlan {
       locationDetails,
     );
     this.rootOutputPlan = outputPlan;
-    this.planSelectionSet(
+    this.queueNextLayer(this.planSelectionSet, {
       outputPlan,
-      [],
-      POLYMORPHIC_ROOT_PATH,
-      POLYMORPHIC_ROOT_PATHS,
-      this.trackedRootValueStep,
-      rootType,
-      this.operation.selectionSet.selections,
-      true,
-    );
+      path: [],
+      planningPath: rootType.name + ".",
+      polymorphicPaths: POLYMORPHIC_ROOT_PATHS,
+      parentStep: this.trackedRootValueStep,
+      positionType: rootType,
+      layerPlan: this.rootLayerPlan,
+      selections: this.operation.selectionSet.selections,
+      resolverEmulation: true,
+    });
+    this.planPending();
     if (this.loc !== null) this.loc.pop();
   }
 
@@ -700,8 +762,6 @@ export class OperationPlan {
     if (!rootType) {
       throw new SafeError("No mutation type found in schema");
     }
-
-    this.deduplicateSteps();
 
     const locationDetails: LocationDetails = {
       node: this.operation.selectionSet.selections,
@@ -719,17 +779,19 @@ export class OperationPlan {
       locationDetails,
     );
     this.rootOutputPlan = outputPlan;
-    this.planSelectionSet(
+    this.queueNextLayer(this.planSelectionSet, {
       outputPlan,
-      [],
-      POLYMORPHIC_ROOT_PATH,
-      POLYMORPHIC_ROOT_PATHS,
-      this.trackedRootValueStep,
-      rootType,
-      this.operation.selectionSet.selections,
-      true,
-      true,
-    );
+      path: [],
+      planningPath: rootType.name + ".",
+      polymorphicPaths: POLYMORPHIC_ROOT_PATHS,
+      parentStep: this.trackedRootValueStep,
+      positionType: rootType,
+      layerPlan: this.rootLayerPlan,
+      selections: this.operation.selectionSet.selections,
+      resolverEmulation: true,
+      isMutation: true,
+    });
+    this.planPending();
     if (this.loc !== null) this.loc.pop();
   }
 
@@ -742,10 +804,12 @@ export class OperationPlan {
     if (!rootType) {
       throw new SafeError("No subscription type found in schema");
     }
+    const planningPath = rootType.name + ".";
     const selectionSet = this.operation.selectionSet;
     const groupedFieldSet = withGlobalLayerPlan(
       this.rootLayerPlan,
       POLYMORPHIC_ROOT_PATHS,
+      planningPath,
       graphqlCollectFields,
       null,
       this,
@@ -793,61 +857,57 @@ export class OperationPlan {
         ? withGlobalLayerPlan(
             this.rootLayerPlan,
             POLYMORPHIC_ROOT_PATHS,
+            planningPath,
             this.getTrackedArguments,
             this,
             fieldArgsSpec,
             field,
           )
         : NO_ARGS;
+
     if (subscriptionPlanResolver !== undefined) {
       // PERF: optimize this
-      const { haltTree, step: subscribeStep } = this.planField(
-        this.rootLayerPlan,
+      const { haltTree, step: subscribeStep } = this.batchPlanField({
+        typeName: rootType.name,
+        fieldName,
+        layerPlan: this.rootLayerPlan,
         path,
-        POLYMORPHIC_ROOT_PATHS,
-        fields,
-        subscriptionPlanResolver,
-        "autoApplyAfterParentSubscribePlan",
-        this.trackedRootValueStep,
-        fieldSpec,
+        polymorphicPaths: POLYMORPHIC_ROOT_PATHS,
+        planningPath,
+        planResolver: subscriptionPlanResolver,
+        applyAfterMode: "subscribePlan",
+        rawParentStep: this.trackedRootValueStep,
+        field: fieldSpec,
         trackedArguments,
-      );
+        streamDetails: true,
+      })();
       if (haltTree) {
         throw new SafeError("Failed to setup subscription");
       }
-      const stepOptions: StepOptions = {
-        stream: { initialCount: 0 },
-      };
-      subscribeStep._stepOptions = stepOptions;
       this.rootLayerPlan.setRootStep(subscribeStep);
 
-      const subscriptionEventLayerPlan = new LayerPlan(
-        this,
-        this.rootLayerPlan,
-        {
-          type: "subscription",
-        },
-      );
+      const subscriptionEventLayerPlan = new LayerPlan(this, {
+        type: "subscription",
+        parentLayerPlan: this.rootLayerPlan,
+      });
 
       const $__item = withGlobalLayerPlan(
         subscriptionEventLayerPlan,
         POLYMORPHIC_ROOT_PATHS,
+        planningPath,
         () => new __ItemStep(subscribeStep),
       );
       subscriptionEventLayerPlan.setRootStep($__item);
-      let streamItemPlan = hasItemPlan(subscribeStep)
+      const streamItemPlan = hasItemPlan(subscribeStep)
         ? withGlobalLayerPlan(
             subscriptionEventLayerPlan,
             POLYMORPHIC_ROOT_PATHS,
+            planningPath,
             subscribeStep.itemPlan,
             subscribeStep,
             $__item,
           )
         : $__item;
-
-      // WE MUST RE-FETCH STEPS AFTER DEDUPLICATION!
-      this.deduplicateSteps();
-      streamItemPlan = this.stepTracker.getStepById(streamItemPlan.id);
 
       const outputPlan = new OutputPlan(
         subscriptionEventLayerPlan,
@@ -856,27 +916,25 @@ export class OperationPlan {
         locationDetails,
       );
       this.rootOutputPlan = outputPlan;
-      this.planSelectionSet(
+      this.queueNextLayer(this.planSelectionSet, {
         outputPlan,
-        [],
-        POLYMORPHIC_ROOT_PATH,
-        POLYMORPHIC_ROOT_PATHS,
-        streamItemPlan,
-        rootType,
-        selectionSet.selections,
-        false,
-      );
+        path: [],
+        planningPath,
+        polymorphicPaths: POLYMORPHIC_ROOT_PATHS,
+        parentStep: streamItemPlan,
+        positionType: rootType,
+        layerPlan: subscriptionEventLayerPlan,
+        selections: selectionSet.selections,
+        resolverEmulation: false,
+      });
+      this.planPending();
     } else {
       const subscribeStep = withGlobalLayerPlan(
         this.rootLayerPlan,
         POLYMORPHIC_ROOT_PATHS,
+        planningPath,
         () => {
-          const $args = object(
-            field.arguments?.reduce((memo, arg) => {
-              memo[arg.name.value] = trackedArguments.get(arg.name.value);
-              return memo;
-            }, Object.create(null)) ?? Object.create(null),
-          );
+          const $args = object(trackedArguments);
           const rawResolver = fieldSpec.resolve;
           const rawSubscriber = fieldSpec.subscribe;
           return graphqlResolver(
@@ -885,13 +943,11 @@ export class OperationPlan {
             this.trackedRootValueStep,
             $args,
             {
+              ...this.resolveInfoOperationBase,
               fieldName,
               fieldNodes: fields,
-              fragments: this.fragments,
-              operation: this.operation,
               parentType: this.subscriptionType!,
               returnType: fieldSpec.type,
-              schema: this.schema,
               // @ts-ignore
               path: {
                 typename: this.subscriptionType!.name,
@@ -902,42 +958,35 @@ export class OperationPlan {
           );
         },
       );
-      const stepOptions: StepOptions = {
-        stream: { initialCount: 0 },
-      };
-      subscribeStep._stepOptions = stepOptions;
+      subscribeStep._stepOptions.stream = {};
+      subscribeStep._stepOptions.walkIterable = true;
 
       this.rootLayerPlan.setRootStep(subscribeStep);
 
-      const subscriptionEventLayerPlan = new LayerPlan(
-        this,
-        this.rootLayerPlan,
-        {
-          type: "subscription",
-        },
-      );
+      const subscriptionEventLayerPlan = new LayerPlan(this, {
+        type: "subscription",
+        parentLayerPlan: this.rootLayerPlan,
+      });
 
       const $__item = withGlobalLayerPlan(
         subscriptionEventLayerPlan,
         POLYMORPHIC_ROOT_PATHS,
+        planningPath,
         () => new __ItemStep(subscribeStep),
       );
 
       subscriptionEventLayerPlan.setRootStep($__item);
 
-      let streamItemPlan = hasItemPlan(subscribeStep)
+      const streamItemPlan = hasItemPlan(subscribeStep)
         ? withGlobalLayerPlan(
             subscriptionEventLayerPlan,
             POLYMORPHIC_ROOT_PATHS,
+            planningPath,
             subscribeStep.itemPlan,
             subscribeStep,
             $__item,
           )
         : $__item;
-
-      // WE MUST RE-FETCH STEPS AFTER DEDUPLICATION!
-      this.deduplicateSteps();
-      streamItemPlan = this.stepTracker.getStepById(streamItemPlan.id);
 
       const outputPlan = new OutputPlan(
         subscriptionEventLayerPlan,
@@ -946,18 +995,41 @@ export class OperationPlan {
         locationDetails,
       );
       this.rootOutputPlan = outputPlan;
-      this.planSelectionSet(
+      this.queueNextLayer(this.planSelectionSet, {
         outputPlan,
-        [],
-        POLYMORPHIC_ROOT_PATH,
-        POLYMORPHIC_ROOT_PATHS,
-        streamItemPlan,
-        rootType,
-        selectionSet.selections,
-        true,
-      );
+        path: [],
+        planningPath,
+        polymorphicPaths: POLYMORPHIC_ROOT_PATHS,
+        parentStep: streamItemPlan,
+        positionType: rootType,
+        layerPlan: subscriptionEventLayerPlan,
+        selections: selectionSet.selections,
+        resolverEmulation: true,
+      });
+      this.planPending();
     }
     if (this.loc !== null) this.loc.pop();
+  }
+
+  private getCombinedLayerPlanForLayerPlans(
+    setOfParentLayerPlans: ReadonlySet<LayerPlan>,
+  ) {
+    const parentLayerPlans = [...setOfParentLayerPlans];
+
+    // See if one already exists with the same layer plans in the same order
+    for (const lp of this.stepTracker.layerPlans) {
+      if (
+        lp?.reason.type === "combined" &&
+        arraysMatch(parentLayerPlans, lp.reason.parentLayerPlans)
+      ) {
+        return lp;
+      }
+    }
+
+    return new LayerPlan(this, {
+      type: "combined",
+      parentLayerPlans,
+    });
   }
 
   /**
@@ -966,41 +1038,60 @@ export class OperationPlan {
    */
   private itemStepForListStep<TData>(
     parentLayerPlan: LayerPlan,
-    listStep: ExecutableStep<TData> | ExecutableStep<TData[]>,
-    depth = 0,
+    planningPath: string,
+    listStep: Step<TData> | Step<TData[]>,
+    depth: number,
+    stream: LayerPlanReasonListItemStream | undefined,
   ): __ItemStep<TData> {
-    const itemStepId = this.itemStepIdByListStepId[listStep.id];
+    const itemStepIdByListStepId =
+      (this.itemStepIdByListStepIdByParentLayerPlanId[parentLayerPlan.id] ??=
+        Object.create(null));
+    const itemStepId = itemStepIdByListStepId[listStep.id];
     if (itemStepId !== undefined) {
-      return this.stepTracker.getStepById(itemStepId) as __ItemStep<TData>;
+      const itemStep = this.stepTracker.getStepById(
+        itemStepId,
+      ) as __ItemStep<TData>;
+      if (
+        listStep.polymorphicPaths !== null &&
+        itemStep.polymorphicPaths !== null
+      ) {
+        for (const p of listStep.polymorphicPaths) {
+          (itemStep.polymorphicPaths as Set<string>).add(p);
+        }
+      }
+      return itemStep;
     }
     // Create a new LayerPlan for this list item
-    const layerPlan = new LayerPlan(this, parentLayerPlan, {
+    const layerPlan = new LayerPlan(this, {
       type: "listItem",
+      parentLayerPlan,
       parentStep: listStep,
-      stream: listStep._stepOptions.stream ?? undefined,
+      stream,
     });
-    const itemPlan = withGlobalLayerPlan(
+    const itemStep = withGlobalLayerPlan(
       layerPlan,
       listStep.polymorphicPaths,
+      planningPath,
       () => new __ItemStep(listStep, depth),
     );
-    layerPlan.setRootStep(itemPlan);
-    this.itemStepIdByListStepId[listStep.id] = itemPlan.id;
-    return itemPlan;
+    layerPlan.setRootStep(itemStep);
+    itemStepIdByListStepId[listStep.id] = itemStep.id;
+    return itemStep;
   }
 
-  processGroupedFieldSet(
-    // Deliberately shadows
-    outputPlan: OutputPlan,
-    path: readonly string[],
-    polymorphicPath: string | null,
-    polymorphicPaths: ReadonlySet<string> | null,
-    parentStep: ExecutableStep,
-    objectType: GraphQLObjectType,
-    objectTypeFields: GraphQLFieldMap<any, any>,
-    isMutation: boolean,
-    groupedFieldSet: SelectionSetDigest,
-  ) {
+  *processGroupedFieldSet(details: ProcessGroupedFieldSetDetails) {
+    const {
+      outputPlan,
+      path,
+      planningPath,
+      polymorphicPaths,
+      parentStep,
+      positionType: objectType,
+      // layerPlan,
+      objectTypeFields,
+      isMutation,
+      groupedFieldSet,
+    } = details;
     // `__typename` shouldn't bump the mutation index since it has no side effects.
     let mutationIndex = -1;
     const $sideEffect = outputPlan.layerPlan.latestSideEffectStep;
@@ -1074,23 +1165,19 @@ export class OperationPlan {
         const usesDefaultResolver =
           resolvedResolver == null || resolvedResolver === defaultFieldResolver;
 
-        const isPolymorphic =
-          isUnionType(namedReturnType) || isInterfaceType(namedReturnType);
-
         // We should use a resolver if:
         // 1. they give us a non-default resolver
-        // 2. we're emulating resolvers AND the field is polymorphic
+        // 2. we're emulating resolvers
         const resolver =
           resolvedResolver && !usesDefaultResolver
             ? resolvedResolver
-            : resolverEmulation && isPolymorphic
-            ? defaultFieldResolver
-            : null;
+            : resolverEmulation
+              ? defaultFieldResolver
+              : null;
 
         // Apply a default plan to fields that do not have a plan nor a resolver.
         const planResolver =
-          rawPlanResolver ??
-          (resolver ? undefined : makeDefaultPlan(fieldName));
+          rawPlanResolver ?? (resolver ? undefined : defaultPlanResolver);
 
         /*
          *  When considering resolvers on fields, there's three booleans to
@@ -1172,39 +1259,108 @@ export class OperationPlan {
           );
         }
 
-        let step: ExecutableStep | PolymorphicStep;
+        let step: Step;
         let haltTree = false;
         const fieldLayerPlan = isMutation
-          ? new LayerPlan(this, outputPlan.layerPlan, {
+          ? new LayerPlan(this, {
               type: "mutationField",
+              parentLayerPlan: outputPlan.layerPlan,
               mutationIndex: ++mutationIndex,
             })
           : outputPlan.layerPlan;
         const objectFieldArgs = objectField.args;
+        const fieldPath = [...path, responseKey];
+        const fieldPlanningPath = planningPath + responseKey;
         const trackedArguments =
           objectFieldArgs.length > 0
             ? withGlobalLayerPlan(
                 this.rootLayerPlan,
                 POLYMORPHIC_ROOT_PATHS,
+                fieldPlanningPath,
                 this.getTrackedArguments,
                 this,
                 objectFieldArgs,
                 field,
               )
             : NO_ARGS;
-        const fieldPath = [...path, responseKey];
+        let streamDetails: StreamDetails | null = null;
+        const isList = isListType(getNullableType(fieldType));
+        if (isList) {
+          // read the @stream directive, if present
+          // TODO: Check SameStreamDirective still exists in @stream spec at release.
+          /*
+           * `SameStreamDirective`
+           * (https://github.com/graphql/graphql-spec/blob/26fd78c4a89a79552dcc0c7e0140a975ce654400/spec/Section%205%20--%20Validation.md#L450-L458)
+           * ensures that every field that has `@stream` must have the same
+           * `@stream` arguments; so we can just check the first node in the
+           * merged set to see our stream options. NOTE: if this changes before
+           * release then we may need to find the stream with the largest
+           * `initialCount` to figure what to do; something like:
+           *
+           *      const streamDirective = firstField.directives?.filter(
+           *        (d) => d.name.value === "stream",
+           *      ).sort(
+           *        (a, z) => getArg(z, 'initialCount', 0) - getArg(a, 'initialCount', 0)
+           *      )[0]
+           */
+
+          for (const n of fieldNodes) {
+            const streamDirective = n.directives?.find(
+              (d) => d.name.value === "stream",
+            );
+            if (streamDirective === undefined) {
+              // Undo any previous stream details; the non-@stream wins.
+              streamDetails = null;
+              break;
+            } else if (streamDetails !== null) {
+              // Validation promises the values are the same
+              continue;
+            } else {
+              // Create streamDetails
+              streamDetails = this.withRootLayerPlan(() => ({
+                initialCount: this.internalDependency(
+                  directiveArgument<number>(
+                    this,
+                    streamDirective,
+                    "initialCount",
+                    graphql.Kind.INT,
+                  ) ?? constant(0),
+                ),
+                if: this.internalDependency(
+                  directiveArgument<boolean>(
+                    this,
+                    streamDirective,
+                    "if",
+                    graphql.Kind.BOOLEAN,
+                  ) ?? constant(true),
+                ),
+                label: this.internalDependency(
+                  directiveArgument<Maybe<string>>(
+                    this,
+                    streamDirective,
+                    "label",
+                    graphql.Kind.STRING,
+                  ) ?? constant(undefined),
+                ),
+              }));
+            }
+          }
+        }
         if (typeof planResolver === "function") {
-          ({ step, haltTree } = this.planField(
-            fieldLayerPlan,
-            fieldPath,
+          ({ step, haltTree } = yield this.batchPlanField({
+            typeName: objectType.name,
+            fieldName,
+            layerPlan: fieldLayerPlan,
+            path: fieldPath,
             polymorphicPaths,
-            fieldNodes,
+            planningPath: fieldPlanningPath,
             planResolver,
-            "autoApplyAfterParentPlan",
-            parentStep,
-            objectField,
+            applyAfterMode: "plan",
+            rawParentStep: parentStep,
+            field: objectField,
             trackedArguments,
-          ));
+            streamDetails: isList ? (streamDetails ?? false) : null,
+          }));
         } else {
           // No plan resolver (or plan resolver fallback) so there must be a
           // `resolve` method, so we'll feed the full parent step into the
@@ -1221,23 +1377,21 @@ export class OperationPlan {
         }
 
         if (resolver !== null) {
-          step = withGlobalLayerPlan(fieldLayerPlan, polymorphicPaths, () => {
-            const $args = object(
-              field.arguments?.reduce((memo, arg) => {
-                memo[arg.name.value] = trackedArguments.get(arg.name.value);
-                return memo;
-              }, Object.create(null)) ?? Object.create(null),
-            );
-            return graphqlResolver(resolver, subscriber, step, $args, {
-              fieldName,
-              fieldNodes,
-              fragments: this.fragments,
-              operation: this.operation,
-              parentType: objectType,
-              returnType: fieldType,
-              schema: this.schema,
-            });
-          });
+          step = withGlobalLayerPlan(
+            fieldLayerPlan,
+            polymorphicPaths,
+            fieldPlanningPath,
+            () => {
+              const $args = object(trackedArguments);
+              return graphqlResolver(resolver, subscriber, step, $args, {
+                ...this.resolveInfoOperationBase,
+                fieldName,
+                fieldNodes,
+                parentType: objectType,
+                returnType: fieldType,
+              });
+            },
+          );
         }
 
         // May have changed due to deduplicate
@@ -1256,23 +1410,36 @@ export class OperationPlan {
             locationDetails,
           });
         } else {
-          this.planIntoOutputPlan(
+          if (isDev && polymorphicPaths) {
+            const invalid = [...polymorphicPaths].filter(
+              (p) => !stepIsValidInPolyPath(step, p),
+            );
+            if (invalid.length > 0) {
+              throw new Error(
+                `${objectType}.${fieldName} (as ${responseKey}) returned ${step}, but that's not valid in ${invalid.length} out of ${polymorphicPaths.size} of the expected polymorphic paths. Invalid paths: ${invalid}`,
+              );
+            }
+          }
+          outputPlan.expectChild(objectType, responseKey);
+          this.queueNextLayer(this.planFieldReturnType, {
             outputPlan,
-            fieldLayerPlan,
-            fieldPath,
-            polymorphicPath,
+            path: fieldPath,
+            planningPath: fieldPlanningPath,
             polymorphicPaths,
+            parentStep: step,
+            positionType: fieldType,
+            layerPlan: fieldLayerPlan,
             // If one field has a selection set, they all have a selection set (guaranteed by validation).
-            field.selectionSet != null
-              ? fieldNodes.flatMap((n) => n.selectionSet!.selections)
-              : undefined,
-            objectType,
+            selections:
+              field.selectionSet != null
+                ? fieldNodes.flatMap((n) => n.selectionSet!.selections)
+                : undefined,
+            parentObjectType: objectType,
             responseKey,
-            fieldType,
-            step,
             locationDetails,
             resolverEmulation,
-          );
+            streamDetails,
+          });
         }
       } finally {
         outputPlan.layerPlan.latestSideEffectStep = $sideEffect;
@@ -1280,8 +1447,9 @@ export class OperationPlan {
     }
     if (groupedFieldSet.deferred !== undefined) {
       for (const deferred of groupedFieldSet.deferred) {
-        const deferredLayerPlan = new LayerPlan(this, outputPlan.layerPlan, {
+        const deferredLayerPlan = new LayerPlan(this, {
           type: "defer",
+          parentLayerPlan: outputPlan.layerPlan,
           label: deferred.label,
         });
         const deferredOutputPlan = new OutputPlan(
@@ -1299,17 +1467,18 @@ export class OperationPlan {
         const $sideEffect = deferredOutputPlan.layerPlan.latestSideEffectStep;
         try {
           outputPlan.deferredOutputPlans.push(deferredOutputPlan);
-          this.processGroupedFieldSet(
-            deferredOutputPlan,
+          this.queueNextLayer(this.processGroupedFieldSet, {
+            outputPlan: deferredOutputPlan,
             path,
-            polymorphicPath,
+            planningPath: planningPath + "#",
             polymorphicPaths,
             parentStep,
-            objectType,
+            positionType: objectType,
+            layerPlan: deferredLayerPlan,
             objectTypeFields,
             isMutation,
-            deferred,
-          );
+            groupedFieldSet: deferred,
+          });
         } finally {
           deferredOutputPlan.layerPlan.latestSideEffectStep = $sideEffect;
         }
@@ -1326,31 +1495,39 @@ export class OperationPlan {
    * @param selections - The GraphQL selections (fields, fragment spreads, inline fragments) to evaluate
    * @param isMutation - If true this selection set should be executed serially rather than in parallel (each field gets its own LayerPlan)
    */
-  private planSelectionSet(
-    outputPlan: OutputPlan,
-    path: readonly string[],
-    polymorphicPath: string | null,
-    polymorphicPaths: ReadonlySet<string> | null,
-    parentStep: ExecutableStep,
-    objectType: GraphQLObjectType,
-    selections: readonly SelectionNode[],
-    resolverEmulation: boolean,
-    isMutation = false,
-  ) {
+  private planSelectionSet(details: PlanSelectionSetDetails) {
+    const {
+      outputPlan,
+      path,
+      planningPath,
+      polymorphicPaths,
+      parentStep,
+      positionType: objectType,
+      layerPlan,
+      selections,
+      resolverEmulation,
+      isMutation = false,
+    } = details;
     if (this.loc !== null) {
       this.loc.push(
         `planSelectionSet(${objectType.name} @ ${
           outputPlan.layerPlan.id
-        } @ ${path.join(".")} @ ${polymorphicPath ?? ""})`,
+        } @ ${path.join(".")} @ ${polymorphicPaths ? [...polymorphicPaths] : ""})`,
       );
     }
 
     if (isDev) {
       assertObjectType(objectType);
+      if (outputPlan.layerPlan !== layerPlan) {
+        throw new Error(
+          `GrafastInternalError<3ea1a3dd-1e11-4eb7-a31b-e125996d7eb4>: expected ${outputPlan} to have layer plan ${layerPlan}`,
+        );
+      }
     }
     const groupedFieldSet = withGlobalLayerPlan(
-      outputPlan.layerPlan,
+      layerPlan,
       polymorphicPaths,
+      planningPath,
       graphqlCollectFields,
       null,
       this,
@@ -1361,46 +1538,635 @@ export class OperationPlan {
       isMutation,
     );
     const objectTypeFields = objectType.getFields();
-    this.processGroupedFieldSet(
+    this.queueNextLayer(this.processGroupedFieldSet, {
       outputPlan,
       path,
-      polymorphicPath,
+      planningPath: planningPath + ">",
       polymorphicPaths,
       parentStep,
-      objectType,
+      positionType: objectType,
+      layerPlan,
       objectTypeFields,
       isMutation,
       groupedFieldSet,
-    );
+    });
 
     if (this.loc !== null) this.loc.pop();
   }
 
-  // Similar to the old 'planFieldReturnType'
-  private planIntoOutputPlan(
-    parentOutputPlan: OutputPlan,
-    // Typically this is parentOutputPlan.layerPlan; but in the case of mutationFields it isn't.
-    parentLayerPlan: LayerPlan,
-    // This is the LAYER-RELATIVE path, not the absolute path! It resets!
-    path: readonly string[],
-    polymorphicPath: string | null,
-    polymorphicPaths: ReadonlySet<string> | null,
-    selections: readonly SelectionNode[] | undefined,
-    parentObjectType: GraphQLObjectType | null,
-    responseKey: string | null,
-    fieldType: GraphQLOutputType,
-    $step: ExecutableStep,
-    locationDetails: LocationDetails,
-    resolverEmulation: boolean,
-    listDepth = 0,
+  // This is the queue of things to be done _IN ORDER_
+  private planningQueue: Array<QueueTuple<any>> = [];
+  // This is the queue of things to be done grouped by their planning path.
+  // The result of this is not necessarily in order, but it does save us
+  // time and effort in `planPending()`
+  private planningQueueByPlanningPath = new Map<
+    string,
+    Array<QueueTuple<any>>
+  >();
+
+  private queueNextLayer<TDetails extends CommonPlanningDetails<any>>(
+    method: (details: TDetails) => void | Generator<() => any, void, any>,
+    details: TDetails,
+  ): void {
+    const { planningPath } = details;
+    if (this.frozenPlanningPaths?.has(planningPath)) {
+      throw new Error(
+        `GrafastInternalError<93c64f55-4f3f-442f-a17b-391e28bd3629>: Already processed planning path ${planningPath}`,
+      );
+    }
+    let list = this.planningQueueByPlanningPath.get(planningPath);
+    if (!list) {
+      list = [];
+      this.planningQueueByPlanningPath.set(planningPath, list);
+    }
+    const tuple: QueueTuple<TDetails> = [
+      method,
+      details,
+      this.loc ? [...this.loc] : null,
+      details.layerPlan,
+      details.layerPlan.latestSideEffectStep,
+    ];
+    this.planningQueue.push(tuple);
+    list.push(tuple);
+  }
+
+  private planPending() {
+    for (let depth = 0; depth <= this.maxPlanningDepth; depth++) {
+      // Process the next batch
+
+      const l = this.planningQueue.length;
+      if (l === 0) break;
+      if (depth === this.maxPlanningDepth) {
+        throw new Error(
+          `Query is too complex, Grafast refuses to continue processing at planning depth ${this.maxPlanningDepth}. You can configure this through \`preset.grafast.maxPlanningDepth\``,
+        );
+      }
+
+      // NOTE: `batch` and `todo` are different views of the same information,
+      // specifically: `batch` is stored in the order in which the calls were
+      // made (critical for ensuring the OutputPlans output fields in the
+      // correct order); whereas `todo` is the result of grouping `batch` into
+      // groups where the planning paths match.
+      const batch = this.planningQueue.slice(0, l);
+      const todo: Todo = [...this.planningQueueByPlanningPath.entries()];
+      // Now clear the stores ready to start collecting the next lot.
+      this.planningQueue.length = 0;
+      this.planningQueueByPlanningPath.clear();
+
+      // First, do a planning-path-aware deduplicate
+      this.deduplicateSteps();
+
+      // Update the step references (and freeze the paths)
+      for (const [planningPath, batch] of todo) {
+        if (this.frozenPlanningPaths?.has(planningPath)) {
+          throw new Error(
+            `GrafastInternalError<dd30288e-9375-4025-91a6-66b64e74cf74>: planning path already processed - ${planningPath}`,
+          );
+        }
+        this.frozenPlanningPaths?.add(planningPath);
+        for (const entry of batch) {
+          const step = entry[1].parentStep;
+          const actualStep = this.stepTracker.getStepById(step.id);
+          if (actualStep !== step) {
+            entry[1].parentStep = actualStep;
+          }
+        }
+      }
+
+      // Then, apply the per-method batch tweaks (such as resolving
+      // polymorphism)
+      this.mutateTodos(todo);
+
+      const DONE = Symbol("done");
+      /** Our generators, for batching */
+      interface GennySpec {
+        genny: Generator<() => any, void, any>;
+        loc: string[] | null;
+        layerPlan: LayerPlan;
+        layerPlanLatestSideEffect: Step | null;
+        result: any;
+      }
+      const gennies: Array<GennySpec> = [];
+
+      // Finally plan this layer
+      for (const [
+        fn,
+        rawDetails,
+        loc,
+        originalLayerPlan,
+        layerPlanLatestSideEffect,
+      ] of batch) {
+        const details = rawDetails as CommonPlanningDetails;
+        this.withLocLpSE(
+          loc,
+          originalLayerPlan,
+          layerPlanLatestSideEffect,
+          () => {
+            /** Still just genny from the block */
+            const genny = fn.call(this, details);
+            if (genny != null) {
+              gennies.push({
+                genny,
+                loc,
+                layerPlan: details.layerPlan,
+                layerPlanLatestSideEffect:
+                  details.layerPlan.latestSideEffectStep,
+                result: undefined,
+              });
+            }
+          },
+        );
+      }
+
+      // And go through all the generators
+      while (gennies.length > 0) {
+        const cbs: Array<{ spec: GennySpec; cb: () => any }> = [];
+        for (const spec of gennies) {
+          const { genny, loc, layerPlan, layerPlanLatestSideEffect, result } =
+            spec;
+          this.withLocLpSE(loc, layerPlan, layerPlanLatestSideEffect, () => {
+            const r = genny.next(result);
+            if (r.done) {
+              spec.result = DONE;
+            } else {
+              cbs.push({ spec, cb: r.value });
+            }
+          });
+        }
+        for (const { spec, cb } of cbs) {
+          spec.result = cb();
+        }
+        // Remove the generators that are done.
+        for (let i = gennies.length - 1; i >= 0; i--) {
+          if (gennies[i].result === DONE) {
+            gennies.splice(i, 1);
+          }
+        }
+      }
+    }
+
+    // A final deduplicate
+    this.deduplicateSteps();
+  }
+
+  withLocLpSE(
+    loc: string[] | null,
+    layerPlan: LayerPlan,
+    layerPlanLatestSideEffect: Step | null,
+    cb: () => void,
   ) {
+    const $sideEffect = layerPlan.latestSideEffectStep;
+    layerPlan.latestSideEffectStep = layerPlanLatestSideEffect;
+    try {
+      const prevLoc = this.loc;
+      this.loc = loc;
+      cb();
+      this.loc = prevLoc;
+    } finally {
+      layerPlan.latestSideEffectStep = $sideEffect;
+    }
+  }
+
+  private mutateTodos(todo: Todo) {
+    for (const [_planningPath, batch] of todo) {
+      const polymorphicResolveTypeEntriesByPolyType = new Map<
+        GraphQLUnionType | GraphQLInterfaceType,
+        Array<PolymorphicResolveTypeDetails>
+      >();
+      const planFieldReturnTypeEntriesByStepByLayerPlan = new Map<
+        LayerPlan,
+        Map<Step, Array<PolymorphicPlanObjectTypeDetails>>
+      >();
+      for (const entry of batch) {
+        const [method, rawArgs] = entry;
+
+        // Tidy up after dedupe
+        rawArgs.parentStep = this.stepTracker.getStepById(
+          rawArgs.parentStep.id,
+        );
+
+        if (method === this.polymorphicResolveType) {
+          const args = rawArgs as PolymorphicResolveTypeDetails;
+          const polyType = args.positionType;
+          if (!isUnionType(polyType) && !isInterfaceType(polyType)) {
+            throw new Error(
+              `GrafastInternalError<b0a276d0-134f-4a26-9c33-00af5ead38e6>: expected ${polyType} to be an interface or union type`,
+            );
+          }
+          let list = polymorphicResolveTypeEntriesByPolyType.get(polyType);
+          if (!list) {
+            list = [];
+            polymorphicResolveTypeEntriesByPolyType.set(polyType, list);
+          }
+          list.push(args);
+        } else if (method == this.polymorphicPlanObjectType) {
+          const args = rawArgs as PolymorphicPlanObjectTypeDetails;
+          const lp = args.layerPlan;
+          let planFieldReturnTypeEntriesByStep =
+            planFieldReturnTypeEntriesByStepByLayerPlan.get(lp);
+          if (!planFieldReturnTypeEntriesByStep) {
+            planFieldReturnTypeEntriesByStep = new Map();
+            planFieldReturnTypeEntriesByStepByLayerPlan.set(
+              lp,
+              planFieldReturnTypeEntriesByStep,
+            );
+          }
+          const step = args.parentStep;
+          let list = planFieldReturnTypeEntriesByStep.get(step);
+          if (list) {
+            list.push(args);
+          } else {
+            list = [args];
+            planFieldReturnTypeEntriesByStep.set(step, list);
+          }
+        }
+      }
+
+      // Handle calls to `polymorphicResolveType` by performing the combined
+      // layer plan / `planType` shuffle.
+      for (const [
+        graphqlType,
+        // A list of all the `details` argument objects capture for this type
+        detailsRecordList,
+      ] of polymorphicResolveTypeEntriesByPolyType) {
+        const firstDetailsRecord = detailsRecordList[0];
+
+        // All of these properties should be in common
+        // const path = firstDetailsRecord.path;
+        const planningPath = firstDetailsRecord.planningPath;
+        const allPossibleObjectTypes =
+          firstDetailsRecord.allPossibleObjectTypes;
+
+        // The existence of this is common (i.e. either all have it set, or all
+        // have it null, but the actual contents may differ)
+        const polymorphicPaths = firstDetailsRecord.polymorphicPaths;
+
+        const combinedPolymorphicPaths = polymorphicPaths
+          ? new Set<string>(/* Populated below */)
+          : null;
+
+        let commonLayerPlan: LayerPlan;
+        let $original: Step | null;
+        let commonStep: Step;
+        const steps = new Set(detailsRecordList.map((t) => t.parentStep));
+        if (steps.size > 1) {
+          $original = null;
+          // Make combined
+          const layerPlans = new Set(detailsRecordList.map((t) => t.layerPlan));
+          const combinedLayerPlan =
+            this.getCombinedLayerPlanForLayerPlans(layerPlans);
+          const toCombine: { step: Step; layerPlan: LayerPlan }[] = [];
+          let isUnary = true;
+          for (const detailsRecord of detailsRecordList) {
+            const parentStep = detailsRecord.parentStep;
+            const polymorphicPaths = detailsRecord.polymorphicPaths;
+            const layerPlan = detailsRecord.layerPlan;
+            if (!parentStep._isUnary) {
+              isUnary = false;
+            }
+            if (polymorphicPaths) {
+              for (const path of polymorphicPaths) {
+                combinedPolymorphicPaths!.add(path);
+              }
+            }
+            const $data = graphqlType.extensions?.grafast?.toSpecifier
+              ? withGlobalLayerPlan(
+                  layerPlan,
+                  polymorphicPaths,
+                  planningPath,
+                  graphqlType.extensions.grafast.toSpecifier,
+                  graphqlType.extensions.grafast,
+                  parentStep,
+                )
+              : stepHasToSpecifier(parentStep)
+                ? withGlobalLayerPlan(
+                    layerPlan,
+                    polymorphicPaths,
+                    planningPath,
+                    parentStep.toSpecifier,
+                    parentStep,
+                  )
+                : stepHasToRecord(parentStep)
+                  ? withGlobalLayerPlan(
+                      layerPlan,
+                      polymorphicPaths,
+                      planningPath,
+                      parentStep.toRecord,
+                      parentStep,
+                    )
+                  : parentStep;
+            toCombine.push({ step: $data, layerPlan });
+          }
+          // Create a __ValueStep in the new combined layer plan that
+          // represents all of these values
+          const $combined = withGlobalLayerPlan(
+            combinedLayerPlan,
+            combinedPolymorphicPaths,
+            planningPath,
+            newValueStepCallback,
+            null,
+            false,
+          );
+          if (!isUnary) {
+            $combined._isUnary = false;
+          }
+          // Tell it to populate the __ValuePlan $combined with the combination
+          // of all the values from toCombine.
+          combinedLayerPlan.addCombo(toCombine, $combined);
+
+          commonLayerPlan = combinedLayerPlan;
+          commonStep = $combined;
+        } else {
+          $original = [...steps][0];
+          const layerPlans = new Set<LayerPlan>();
+          for (const tuple of detailsRecordList) {
+            layerPlans.add(tuple.layerPlan);
+          }
+          if (layerPlans.size === 1) {
+            commonLayerPlan = [...layerPlans][0];
+          } else {
+            commonLayerPlan =
+              this.getCombinedLayerPlanForLayerPlans(layerPlans);
+          }
+
+          commonStep = graphqlType.extensions?.grafast?.toSpecifier
+            ? withGlobalLayerPlan(
+                commonLayerPlan,
+                polymorphicPaths,
+                planningPath,
+                graphqlType.extensions.grafast.toSpecifier,
+                graphqlType.extensions.grafast,
+                $original,
+              )
+            : stepHasToSpecifier($original)
+              ? withGlobalLayerPlan(
+                  commonLayerPlan,
+                  polymorphicPaths,
+                  planningPath,
+                  $original.toSpecifier,
+                  $original,
+                )
+              : stepHasToRecord($original)
+                ? withGlobalLayerPlan(
+                    commonLayerPlan,
+                    polymorphicPaths,
+                    planningPath,
+                    $original.toRecord,
+                    $original,
+                  )
+                : $original;
+
+          for (const detailsRecord of detailsRecordList) {
+            detailsRecord.layerPlan = commonLayerPlan;
+            const polymorphicPaths = detailsRecord.polymorphicPaths;
+            if (polymorphicPaths) {
+              for (const path of polymorphicPaths) {
+                combinedPolymorphicPaths!.add(path);
+              }
+            }
+          }
+        }
+
+        // Call planTypes and plan each of the types?
+        const planType =
+          graphqlType.extensions?.grafast?.planType ?? defaultPlanType;
+        // TODO: revisit this. If planType exists then no need? If resolver emulation then always?
+        const resolverEmulation =
+          // detailsRecordList.some((a) => a.resolverEmulation) && (
+          graphqlType.resolveType != null ||
+          allPossibleObjectTypes.some((t) => t.isTypeOf != null);
+        const info: PlanTypeInfo = {
+          abstractType: graphqlType,
+          resolverEmulation,
+          $original,
+        };
+        const polymorphicTypePlanner = withGlobalLayerPlan(
+          commonLayerPlan,
+          combinedPolymorphicPaths,
+          planningPath,
+          planType,
+          null,
+          commonStep,
+          info,
+        );
+        const stepForType = new Map<GraphQLObjectType, Step>();
+        const allTypeNames = allPossibleObjectTypes.map((t) => t.name);
+        const basePaths = [...(combinedPolymorphicPaths ?? [""])];
+        const polymorphicLayerPlan = new LayerPlan(this, {
+          type: "polymorphic",
+          parentLayerPlan: commonLayerPlan,
+          polymorphicPaths: new Set(
+            // BUG: this isn't 100% correct, it's possible that this layer
+            // plan might not be used in some of these polymorphic paths (e.g.
+            // if fragment types caused certain fields to not be selected in
+            // certain scenarios). We should instead figure out the concrete
+            // list of polymorphic paths actually seen during planning.
+            allTypeNames.flatMap((t) => basePaths.map((p) => `${p}>${t}`)),
+          ),
+          typeNames: allTypeNames,
+          parentStep: polymorphicTypePlanner.$__typename,
+        });
+        for (const type of allPossibleObjectTypes) {
+          const polymorphicPaths = new Set(
+            basePaths.map((p) => `${p}>${type.name}`),
+          );
+          const $stepForType =
+            (polymorphicTypePlanner.planForType
+              ? withGlobalLayerPlan(
+                  polymorphicLayerPlan,
+                  polymorphicPaths,
+                  planningPath + "?",
+                  polymorphicTypePlanner.planForType,
+                  polymorphicTypePlanner,
+                  type,
+                )
+              : type.extensions?.grafast?.planType
+                ? withGlobalLayerPlan(
+                    polymorphicLayerPlan,
+                    polymorphicPaths,
+                    planningPath + "?",
+                    type.extensions.grafast.planType,
+                    type.extensions.grafast,
+                    commonStep,
+                  )
+                : commonStep) ??
+            withGlobalLayerPlan(
+              polymorphicLayerPlan,
+              polymorphicPaths,
+              planningPath + "?",
+              constant,
+              null,
+              $$inhibit,
+            );
+          stepForType.set(type, $stepForType);
+          if (isDev) {
+            // Check that this plan is compatible with every poly path
+            if ($stepForType.polymorphicPaths === null) {
+              // All good, valid in all paths
+            } else {
+              const missedPaths = [...polymorphicPaths].filter(
+                (p) => !stepIsValidInPolyPath($stepForType, p),
+              );
+              if (missedPaths.length > 0) {
+                throw new Error(
+                  `When planning ${graphqlType}'s planForType for ${
+                    type.name
+                  }, returned step ${
+                    $stepForType
+                  } is not valid in ${missedPaths.length} out of ${polymorphicPaths.size} expected paths; missed paths: ${missedPaths}`,
+                );
+              }
+            }
+          }
+        }
+
+        // Now replace references to layer plan and step
+        for (const detailsRecord of detailsRecordList) {
+          detailsRecord.parentStep = commonStep;
+          detailsRecord.layerPlan = polymorphicLayerPlan;
+
+          // TODO: do we want to set the polymorphic paths here or not?
+          // detailsRecord.polymorphicPaths = combinedPolymorphicPaths;
+
+          const {
+            locationDetails,
+            parentObjectType,
+            responseKey,
+            isNonNull,
+            outputPlan: parentOutputPlan,
+          } = detailsRecord;
+          const polymorphicOutputPlan = new OutputPlan(
+            commonLayerPlan,
+            polymorphicTypePlanner.$__typename,
+            {
+              mode: "polymorphic",
+              deferLabel: undefined,
+              typeNames: allPossibleObjectTypes.map((t) => t.name),
+            },
+            locationDetails,
+          );
+          detailsRecord.outputPlan = polymorphicOutputPlan;
+          parentOutputPlan.addChild(parentObjectType, responseKey, {
+            type: "outputPlan",
+            outputPlan: polymorphicOutputPlan,
+            isNonNull,
+            locationDetails,
+          });
+          detailsRecord.stepForType = stepForType;
+        }
+      }
+
+      for (const [
+        parentLayerPlan,
+        planFieldReturnTypeEntriesByStep,
+      ] of planFieldReturnTypeEntriesByStepByLayerPlan) {
+        if (planFieldReturnTypeEntriesByStep.size <= 1) {
+          continue;
+        }
+        for (const [step, entries] of planFieldReturnTypeEntriesByStep) {
+          // We already know the planningPath lines up.
+          // We know all `entries` resolved to the same `step`.
+          // We know all `entries` come from the same layer plan.
+
+          // TODO: I'm not sure if we care if the field result type is the
+          // same or not. I don't think so?
+
+          // We want to create a polymorphicPartition layer plan for these, if
+          // it makes sense.
+          // It makes sense if there are multiple different groups; which we
+          // checked in the `if` above. So, yes.
+
+          // TODO: Check assumption: the different groups should relate to
+          // different types.
+
+          const typeNameSet = new Set<string>();
+          entries.forEach((e) => void typeNameSet.add(e.positionType.name));
+          const typeNames = [...typeNameSet];
+
+          // TODO: eliminate this
+          const polymorphicPaths = new Set(
+            entries.flatMap((e) => [...(e.polymorphicPaths ?? [])]),
+          );
+          const partitionedLayerPlan = parentLayerPlan.getPartition(
+            typeNames,
+            polymorphicPaths,
+          );
+
+          /**
+           * Moves all the steps that match these polymorphic paths only into
+           * the polymorphicPartition layer plan
+           */
+          const recursivelyMoveSteps = (step: Step) => {
+            if (step.layerPlan !== parentLayerPlan) return;
+            if (!setsMatch(step.polymorphicPaths, polymorphicPaths)) return;
+            this.stepTracker.moveStepToLayerPlan(step, partitionedLayerPlan);
+            for (const dep of sudo(step).dependencies) {
+              recursivelyMoveSteps(dep);
+            }
+          };
+          recursivelyMoveSteps(step);
+
+          // TODO: Do we need to update the outputPlan.layerPlan too?
+          for (const entry of entries) {
+            entry.layerPlan = partitionedLayerPlan;
+          }
+        }
+      }
+    }
+  }
+
+  private internalDependency<TStep extends Step>($step: TStep): TStep {
+    this.stepTracker.internalDependencies.add($step);
+    return $step;
+  }
+
+  private planFieldReturnType(details: PlanFieldReturnTypeDetails): void {
+    return this.planIntoOutputPlan({ ...details, listDepth: 0 });
+  }
+
+  private planIntoOutputPlan(details: PlanIntoOutputPlanDetails): void {
+    const {
+      outputPlan: parentOutputPlan,
+      path,
+      planningPath,
+      polymorphicPaths,
+      parentStep: $step,
+      positionType: fieldType,
+      layerPlan: parentLayerPlan,
+      selections,
+      parentObjectType,
+      responseKey,
+      locationDetails,
+      resolverEmulation,
+      listDepth,
+      streamDetails,
+    } = details;
     const nullableFieldType = getNullableType(fieldType);
     const isNonNull = nullableFieldType !== fieldType;
 
     if (isListType(nullableFieldType)) {
+      const listItemPlanningPath =
+        planningPath +
+        `[${
+          streamDetails
+            ? `#${streamDetails.initialCount.id}|${streamDetails.if.id}|${streamDetails.label.id}`
+            : ""
+        }]`;
+      const $list = withGlobalLayerPlan(
+        parentLayerPlan,
+        polymorphicPaths,
+        listItemPlanningPath,
+        itemsOrStep,
+        null,
+        $step,
+      );
+      if ($list !== $step) {
+        $list._stepOptions.stream = $step._stepOptions.stream;
+      }
+      $list._stepOptions.walkIterable = true;
       const listOutputPlan = new OutputPlan(
         parentLayerPlan,
-        $step,
+        $list,
         OUTPUT_PLAN_TYPE_ARRAY,
         locationDetails,
       );
@@ -1411,40 +2177,29 @@ export class OperationPlan {
         locationDetails,
       });
 
-      const $__item = this.itemStepForListStep(
-        parentLayerPlan,
-        $step,
+      const stream: LayerPlanReasonListItemStream | undefined = streamDetails
+        ? {
+            // These are already marked as internal dependencies
+            initialCountStepId: streamDetails.initialCount.id,
+            ifStepId: streamDetails.if.id,
+            labelStepId: streamDetails.label.id,
+          }
+        : undefined;
+
+      this.queueNextLayer(this.planListItem, {
+        outputPlan: listOutputPlan,
+        path,
+        planningPath: listItemPlanningPath,
+        polymorphicPaths,
+        parentStep: $list,
+        positionType: nullableFieldType,
+        layerPlan: parentLayerPlan,
+        selections,
         listDepth,
-      );
-      const $sideEffect = $__item.layerPlan.latestSideEffectStep;
-      try {
-        const $item = isListCapableStep($step)
-          ? withGlobalLayerPlan(
-              $__item.layerPlan,
-              $__item.polymorphicPaths,
-              ($step as ListCapableStep<any>).listItem,
-              $step,
-              $__item,
-            )
-          : $__item;
-        this.planIntoOutputPlan(
-          listOutputPlan,
-          $item.layerPlan,
-          path,
-          polymorphicPath,
-          polymorphicPaths,
-          selections,
-          null,
-          null,
-          nullableFieldType.ofType,
-          $item,
-          locationDetails,
-          resolverEmulation,
-          listDepth + 1,
-        );
-      } finally {
-        $__item.layerPlan.latestSideEffectStep = $sideEffect;
-      }
+        stream,
+        locationDetails,
+        resolverEmulation,
+      });
     } else if (isScalarType(nullableFieldType)) {
       const scalarPlanResolver = nullableFieldType.extensions?.grafast?.plan;
       const fnDescription = `${nullableFieldType.name}.plan`;
@@ -1457,6 +2212,7 @@ export class OperationPlan {
                 withGlobalLayerPlan(
                   parentLayerPlan,
                   polymorphicPaths,
+                  planningPath,
                   scalarPlanResolver,
                   null,
                   $step,
@@ -1513,20 +2269,20 @@ export class OperationPlan {
         if (stepAssertion != null) {
           try {
             if (
-              stepAssertion === ExecutableStep ||
-              stepAssertion.prototype instanceof ExecutableStep
+              stepAssertion === Step ||
+              stepAssertion.prototype instanceof Step
             ) {
               if (!($step instanceof stepAssertion)) {
                 throw new Error(
                   `Step mis-match: expected ${
                     stepAssertion.name
                   }, but instead found ${
-                    ($step as ExecutableStep).constructor.name
+                    ($step as Step).constructor.name
                   } (${$step})`,
                 );
               }
             } else {
-              (stepAssertion as ($step: ExecutableStep) => void)($step);
+              (stepAssertion as ($step: Step) => void)($step);
             }
           } catch (e) {
             throw new Error(
@@ -1563,8 +2319,9 @@ export class OperationPlan {
         if (match !== undefined) {
           objectLayerPlan = match;
         } else {
-          objectLayerPlan = new LayerPlan(this, parentLayerPlan, {
+          objectLayerPlan = new LayerPlan(this, {
             type: "nullableBoundary",
+            parentLayerPlan,
             parentStep: $step,
           });
           objectLayerPlan.setRootStep($step);
@@ -1589,16 +2346,17 @@ export class OperationPlan {
           isNonNull,
           locationDetails,
         });
-        this.planSelectionSet(
-          objectOutputPlan,
+        this.queueNextLayer(this.planSelectionSet, {
+          outputPlan: objectOutputPlan,
           path,
-          polymorphicPath,
+          planningPath: planningPath + ".",
           polymorphicPaths,
-          $step,
-          nullableFieldType,
-          selections!,
+          parentStep: $step,
+          positionType: nullableFieldType,
+          layerPlan: objectLayerPlan,
+          selections: selections!,
           resolverEmulation,
-        );
+        });
       } finally {
         objectLayerPlan.latestSideEffectStep = $sideEffect;
       }
@@ -1607,8 +2365,9 @@ export class OperationPlan {
       const isUnion = isUnionType(nullableFieldType);
       const isInterface = isInterfaceType(nullableFieldType);
       if (!(isUnion || isInterface)) {
+        const never: never = nullableFieldType;
         throw new Error(
-          `GrafastInternalError<a54d6d63-d186-4ab9-9299-05f817894300>: Wasn't expecting ${nullableFieldType}`,
+          `GrafastInternalError<a54d6d63-d186-4ab9-9299-05f817894300>: Wasn't expecting ${never}`,
         );
       }
       assert.ok(
@@ -1621,10 +2380,11 @@ export class OperationPlan {
        * other types.
        *
        * First, we figure out the list of `possibleTypes` based on the
-       * union/interface and any other constraints that we know. NOTE: we can't
+       * union/interface and any other constraints that we know. Note: we can't
        * discount a type just because it doesn't have any fragments that apply
        * to it - instead we must still plan an empty selection set (or one just
-       * using `{__typename}`), and we need to know it exists for that. See
+       * using `{__typename}`), and we need to know it exists (is not null) for
+       * that. See
        * https://github.com/graphql/graphql-spec/issues/951#issuecomment-1140957685
        */
       const allPossibleObjectTypes = isUnion
@@ -1647,207 +2407,435 @@ export class OperationPlan {
           locationDetails,
         });
       } else {
-        /*
-         * Next, we ensure we're dealing with a polymorphic step.
-         */
-        if (!isPolymorphicStep($step)) {
-          throw new Error(
-            `${$step} is not a polymorphic capable step, it must have a planForType method`,
-          );
-        }
-
-        /*
-         * An output plan for it (knows how to branch the different object
-         * output plans).
-         */
-        const polymorphicOutputPlan = new OutputPlan(
-          parentLayerPlan,
-          $step,
-          {
-            mode: "polymorphic",
-            deferLabel: undefined,
-            typeNames: allPossibleObjectTypes.map((t) => t.name),
-          },
-          locationDetails,
-        );
-        parentOutputPlan.addChild(parentObjectType, responseKey, {
-          type: "outputPlan",
-          outputPlan: polymorphicOutputPlan,
-          isNonNull,
-          locationDetails,
-        });
-
-        /*
-         * Now a polymorphic layer plan for all the plans to live in
-         */
-        const polymorphicLayerPlan = this.getPolymorphicLayerPlan(
-          parentLayerPlan,
+        const polymorphicResolvePlanningPath = planningPath + "<*>";
+        this.queueNextLayer(this.polymorphicResolveType, {
+          outputPlan: parentOutputPlan,
           path,
-          $step,
+          planningPath: polymorphicResolvePlanningPath,
+          polymorphicPaths,
+          parentStep: $step, // NOTE: This may be batched and turned into a $specifier step
+          positionType: nullableFieldType,
+          layerPlan: parentLayerPlan, // NOTE: This may be batched and turned into a combined layer plan
+          selections,
           allPossibleObjectTypes,
-        );
-
-        /*
-         * Now we need to loop through each type and plan it.
-         */
-        const polyBase = polymorphicPath ?? "";
-        const $oldStep = $step;
-        for (const type of allPossibleObjectTypes) {
-          const $sideEffect = polymorphicLayerPlan.latestSideEffectStep;
-          try {
-            /* TODO: this $oldStep / $step dance turned out to be necessary
-             * because `$step` was being replaced in the following query against
-             * the graphilecrystaltest `polymorpic` schema; but I'm not sure this is the
-             * right behavior - shouldn't deduplication have been temporarily
-             * disabled during this?
-             *
-             * ```graphql
-             * {
-             *   allSingleTableItems {
-             *     nodes {
-             *       id
-             *       type
-             *       singleTableItemsByParentIdList {
-             *         id
-             *         position
-             *       }
-             *     }
-             *   }
-             * }
-             * ```
-             */
-            const $step = this.stepTracker.getStepById(
-              $oldStep.id,
-            ) as typeof $oldStep;
-
-            // Bit of a hack, but saves passing it around through all the arguments
-            const newPolymorphicPath = `${polyBase}>${type.name}`;
-            polymorphicLayerPlan.reason.polymorphicPaths.add(
-              newPolymorphicPath,
-            );
-            const newPolymorphicPaths = new Set<string>();
-            newPolymorphicPaths.add(newPolymorphicPath);
-
-            const $root = withGlobalLayerPlan(
-              polymorphicLayerPlan,
-              newPolymorphicPaths,
-              $step.planForType,
-              $step,
-              type,
-            );
-            const objectOutputPlan = new OutputPlan(
-              polymorphicLayerPlan,
-              $root,
-              {
-                mode: "object",
-                deferLabel: undefined,
-                typeName: type.name,
-              },
-              locationDetails,
-            );
-            // find all selections compatible with `type`
-            const fieldNodes = fieldSelectionsForType(this, type, selections);
-            this.planSelectionSet(
-              objectOutputPlan,
-              path,
-              newPolymorphicPath,
-              newPolymorphicPaths,
-              $root,
-              type,
-              fieldNodes,
-              false,
-            );
-            polymorphicOutputPlan.addChild(type, null, {
-              type: "outputPlan",
-              isNonNull,
-              outputPlan: objectOutputPlan,
-              locationDetails,
-            });
-          } finally {
-            polymorphicLayerPlan.latestSideEffectStep = $sideEffect;
-          }
-        }
+          locationDetails,
+          parentObjectType,
+          responseKey,
+          isNonNull,
+          resolverEmulation,
+        });
       }
     }
   }
 
-  private polymorphicLayerPlanByPathByLayerPlan = new Map<
-    LayerPlan,
-    Map<
-      string,
-      { stepId: number; layerPlan: LayerPlan<LayerPlanReasonPolymorphic> }
-    >
-  >();
-  private getPolymorphicLayerPlan(
-    parentLayerPlan: LayerPlan,
-    path: readonly string[],
-    $step: ExecutableStep,
-    allPossibleObjectTypes: readonly GraphQLObjectType[],
-  ): LayerPlan<LayerPlanReasonPolymorphic> {
-    // OPTIMIZE: I added the $step.id to pathString to fix a planning issue; but maybe we can do this without branching?
-    // https://github.com/benjie/crystal/issues/109
-    const pathString = `${path.join("|")}!${$step.id}`;
-    const polymorphicLayerPlanByPath =
-      this.polymorphicLayerPlanByPathByLayerPlan.get(parentLayerPlan) ??
-      new Map<
-        string,
-        { stepId: number; layerPlan: LayerPlan<LayerPlanReasonPolymorphic> }
-      >();
-    if (polymorphicLayerPlanByPath.size === 0) {
-      this.polymorphicLayerPlanByPathByLayerPlan.set(
-        parentLayerPlan,
-        polymorphicLayerPlanByPath,
+  /** @internal */
+  private planListItem(details: PlanListItemDetails) {
+    const {
+      outputPlan: listOutputPlan,
+      path,
+      planningPath: listItemPlanningPath,
+      polymorphicPaths,
+      parentStep: $list,
+      positionType: nullableFieldType,
+      layerPlan: parentLayerPlan,
+      selections,
+      listDepth,
+      stream,
+      locationDetails,
+      resolverEmulation,
+    } = details;
+    const $__item = this.itemStepForListStep(
+      parentLayerPlan,
+      listItemPlanningPath,
+      $list,
+      listDepth,
+      stream,
+    );
+    const $sideEffect = $__item.layerPlan.latestSideEffectStep;
+    try {
+      let $item: Step;
+      if (isListCapableStep($list)) {
+        $item = withGlobalLayerPlan(
+          $__item.layerPlan,
+          $__item.polymorphicPaths,
+          listItemPlanningPath,
+          $list.listItem,
+          $list,
+          $__item,
+        );
+      } else {
+        $item = $__item;
+      }
+
+      this.queueNextLayer(this.planIntoOutputPlan, {
+        outputPlan: listOutputPlan,
+        path,
+        planningPath: listItemPlanningPath + "^",
+        polymorphicPaths,
+        parentStep: $item,
+        positionType: nullableFieldType.ofType,
+        layerPlan: $item.layerPlan,
+        selections,
+        parentObjectType: null,
+        responseKey: null,
+        locationDetails,
+        resolverEmulation,
+        listDepth: listDepth + 1,
+        streamDetails: null,
+      });
+    } finally {
+      $__item.layerPlan.latestSideEffectStep = $sideEffect;
+    }
+  }
+
+  /** @internal */
+  private polymorphicResolveType(details: PolymorphicResolveTypeDetails) {
+    const {
+      outputPlan,
+      path,
+      planningPath: polymorphicResolvePlanningPath,
+      polymorphicPaths,
+      layerPlan,
+      selections,
+      allPossibleObjectTypes,
+      locationDetails,
+      isNonNull,
+      resolverEmulation,
+      stepForType,
+    } = details;
+    if (!stepForType) {
+      throw new Error(
+        "GrafastInternalError<6afce944-f963-470f-8575-0d0420b4c838>: planForType wasn't set!",
       );
     }
-    const prev = polymorphicLayerPlanByPath.get(pathString);
-    if (prev !== undefined) {
-      // NOTE: this is typically hit when you have a polymorphic field inside
-      // another polymorphic field - in these cases rather than having the
-      // polymorphism multiply out, we can aim for fewer polymorphic buckets
-      // keeping the plan simpler (and more efficient).
-      const { stepId, layerPlan } = prev;
-      const stepByStepId = this.stepTracker.getStepById(stepId);
-      const stepBy$stepId = this.stepTracker.getStepById($step.id);
-      if (stepByStepId !== stepBy$stepId) {
-        throw new Error(
-          `GrafastInternalError<e01bdc40-7c89-41c6-8d84-56efa22c872a>: unexpected inconsistency when determining the polymorphic LayerPlan to use (pathString = ${pathString}, ${stepByStepId} (${stepId}) != ${stepBy$stepId} (${$step.id}))`,
-        );
-      }
-      for (const t of allPossibleObjectTypes) {
-        if (!layerPlan.reason.typeNames.includes(t.name)) {
-          // Since we're re-using an existing LayerPlan, we should be careful to
-          // ensure none of the previous assumptions have been broken.
-          layerPlan.reason.typeNames.push(t.name);
+    if (outputPlan.type.mode !== "polymorphic") {
+      throw new Error(
+        `GrafastInternalError<21de2f87-45c9-42c6-a1a3-c2c0f6e72ccb>: expected a polymorphic output plan`,
+      );
+    }
+    const polymorphicOutputPlan =
+      outputPlan as OutputPlan<OutputPlanTypePolymorphicObject>;
+
+    /*
+     * Now we need to loop through each type and plan it.
+     */
+    const polyBases = [...(polymorphicPaths ?? [""])];
+    const polymorphicPlanningPath = polymorphicResolvePlanningPath + "!";
+    for (const type of allPossibleObjectTypes) {
+      const $sideEffect = layerPlan.latestSideEffectStep;
+      try {
+        // Bit of a hack, but saves passing it around through all the arguments
+        const newPolymorphicPaths = new Set<string>();
+        for (const polyBase of polyBases) {
+          const newPolymorphicPath = `${polyBase}>${type.name}`;
+          //resolveTypeLayerPlan.reason.polymorphicPaths.add(newPolymorphicPath);
+          newPolymorphicPaths.add(newPolymorphicPath);
         }
+
+        let $root = stepForType.get(type);
+        if ($root == null) {
+          console.warn(
+            `${details.positionType}'s planType().planForType(${type}) returned ${$root}`,
+          );
+          $root = this.withRootLayerPlan(() => constant(null));
+        }
+
+        // find all selections compatible with `type`
+        const fieldNodes = fieldSelectionsForType(this, type, selections);
+        this.queueNextLayer(this.polymorphicPlanObjectType, {
+          outputPlan: polymorphicOutputPlan,
+          path,
+          planningPath: polymorphicPlanningPath,
+          polymorphicPaths: newPolymorphicPaths,
+          parentStep: $root,
+          positionType: type,
+          layerPlan,
+          fieldNodes,
+          locationDetails,
+          isNonNull,
+          resolverEmulation,
+        });
+      } finally {
+        layerPlan.latestSideEffectStep = $sideEffect;
       }
-      return layerPlan;
-    } else {
-      const layerPlan = new LayerPlan(this, parentLayerPlan, {
-        type: "polymorphic",
-        typeNames: allPossibleObjectTypes.map((t) => t.name),
-        parentStep: $step,
-        polymorphicPaths: new Set(),
-      });
-      polymorphicLayerPlanByPath.set(pathString, {
-        stepId: $step.id,
-        layerPlan,
-      });
-      return layerPlan;
     }
   }
 
-  private planField(
-    layerPlan: LayerPlan,
-    path: readonly string[],
-    polymorphicPaths: ReadonlySet<string> | null,
-    fieldNodes: FieldNode[],
-    planResolver: FieldPlanResolver<any, ExecutableStep, ExecutableStep>,
-    applyAfterMode: ApplyAfterModeArg,
-    rawParentStep: ExecutableStep,
-    field: GraphQLField<any, any>,
-    trackedArguments: TrackedArguments,
-    deduplicate = true,
-  ): { haltTree: boolean; step: ExecutableStep } {
+  // Before calling this, all the deduplication in the resolveType layer plan
+  // should have taken place, and for each step that survives, a polymorphic
+  // layer plan matching those relevant types should be created, and passed
+  // through here as `polymorphicLayerPlan`.
+  private polymorphicPlanObjectType(details: PolymorphicPlanObjectTypeDetails) {
+    const {
+      outputPlan,
+      path,
+      planningPath: polymorphicPlanningPath,
+      polymorphicPaths: newPolymorphicPaths,
+      parentStep: $root,
+      positionType: type,
+      layerPlan: polymorphicLayerPlan,
+      fieldNodes,
+      locationDetails,
+      isNonNull,
+      resolverEmulation,
+    } = details;
+    if (outputPlan.type.mode !== "polymorphic") {
+      throw new Error(
+        `GrafastInternalError<4c8d9d82-6cb2-4712-aa1e-fdd2173a0760>: expected a polymorphic output plan`,
+      );
+    }
+    const polymorphicOutputPlan =
+      outputPlan as OutputPlan<OutputPlanTypePolymorphicObject>;
+
+    if (
+      polymorphicLayerPlan.reason.type !== "polymorphic" &&
+      polymorphicLayerPlan.reason.type !== "polymorphicPartition"
+    ) {
+      // NOTE: when queued, this method will be queued with a different layer
+      // plan, but `planPending` should go through and convert it to the
+      // relevant polymorphic layer plans for us.
+      throw new Error(
+        `GrafastInternalError<877eaa1c-30c9-4526-ada4-3ccce020ee0e>: expected ${polymorphicLayerPlan} to be a polymorphic or polymorphicPartition layer plan`,
+      );
+    }
+
+    const objectOutputPlan = new OutputPlan(
+      polymorphicLayerPlan,
+      $root,
+      {
+        mode: "object",
+        deferLabel: undefined,
+        typeName: type.name,
+      },
+      locationDetails,
+    );
+    this.planSelectionSet({
+      outputPlan: objectOutputPlan,
+      path,
+      planningPath: polymorphicPlanningPath + ".",
+      polymorphicPaths: newPolymorphicPaths,
+      parentStep: $root,
+      positionType: type,
+      layerPlan: polymorphicLayerPlan,
+      selections: fieldNodes,
+      resolverEmulation,
+    });
+    polymorphicOutputPlan.addChild(type, null, {
+      type: "outputPlan",
+      isNonNull,
+      outputPlan: objectOutputPlan,
+      locationDetails,
+    });
+  }
+
+  planFieldBatch: PlanFieldBatch | null = null;
+  private batchPlanField(
+    batchPlanFieldDetails: PlanFieldDetails,
+  ): () => { haltTree: boolean; step: Step } {
+    let b: PlanFieldBatch;
+    if (this.planFieldBatch != null) {
+      b = this.planFieldBatch;
+    } else {
+      b = this.planFieldBatch = {
+        complete: false,
+        batch: [],
+        results: [],
+      };
+    }
+    const myIndex = b.batch.length;
+    b.batch.push(batchPlanFieldDetails);
+    return () => {
+      if (!b.complete) {
+        this.processPlanField(b);
+      }
+      const result = b.results[myIndex];
+      if (result.error) {
+        throw result.error;
+      }
+      return result;
+    };
+  }
+
+  private processPlanField(b: PlanFieldBatch) {
+    b.complete = true;
+    this.planFieldBatch = null;
+
+    const groups = new Map<
+      string,
+      {
+        firstDetails: PlanFieldDetails;
+        extraDetails: { polymorphicPaths: ReadonlySet<string> | null }[];
+        streamDetails: boolean | StreamDetails | null;
+        indexes: number[];
+      }
+    >();
+    for (let i = 0, l = b.batch.length; i < l; i++) {
+      const batchPlanFieldDetails = b.batch[i];
+      const {
+        typeName,
+        fieldName,
+        layerPlan,
+        // path,
+        polymorphicPaths,
+        planningPath,
+        // planResolver,
+        // applyAfterMode,
+        rawParentStep,
+        // field,
+        trackedArguments,
+        streamDetails,
+      } = batchPlanFieldDetails;
+      const argsSig = Object.entries(trackedArguments)
+        .map(([key, step]) => `${key}:${step.id}`)
+        .join(",");
+
+      /**
+       * Our tests don't come up with anywhere where rawParentStep.id needs
+       * incorporation into the signature, but I'm feeling paranoid.
+       */
+      const benjiesParanoia = `[${rawParentStep.id}]`;
+
+      const signature = `${planningPath}@${layerPlan.id}${benjiesParanoia}=${typeName}.${fieldName}(${argsSig})`;
+      let entry = groups.get(signature);
+      if (!entry) {
+        entry = {
+          firstDetails: batchPlanFieldDetails,
+          extraDetails: [{ polymorphicPaths }],
+          streamDetails,
+          indexes: [i],
+        };
+        groups.set(signature, entry);
+      } else {
+        if (isDev) {
+          // Check everything lines up as we would expect
+          for (const key of Object.keys(
+            batchPlanFieldDetails,
+          ) as (keyof typeof batchPlanFieldDetails)[]) {
+            const myVal = batchPlanFieldDetails[key];
+            const first = entry.firstDetails[key];
+            if (myVal === first) continue;
+            switch (key) {
+              case "typeName":
+                throw new Error(
+                  `GraphileInternalError<15e09f3f-1a83-48a8-822c-1158b9740ef7>: processPlanField signature failure - mismatch typeName`,
+                );
+              case "fieldName":
+                throw new Error(
+                  `GraphileInternalError<2999cbf9-7143-4677-9592-0bfc52e12cb0>: processPlanField signature failure - mismatch fieldName`,
+                );
+              case "layerPlan":
+                throw new Error(
+                  `GraphileInternalError<52786d18-cfda-4ed6-a309-9cb31dcd5f34>: processPlanField signature failure - mismatch layerPlan`,
+                );
+              case "path":
+                if (
+                  !arraysMatch(
+                    batchPlanFieldDetails.path,
+                    entry.firstDetails.path,
+                  )
+                ) {
+                  throw new Error(
+                    `GraphileInternalError<cb84829d-ee4c-40cd-a3a6-f53d1029ad83>: processPlanField signature failure - mismatch path`,
+                  );
+                }
+                break;
+              case "polymorphicPaths":
+                // Explicitly differences in polymorphicPaths are allowed
+                break;
+              case "planningPath":
+                throw new Error(
+                  `GraphileInternalError<1b708215-1549-47c3-9cf5-8fd8d7eb9bd0>: processPlanField signature failure - mismatch planningPath`,
+                );
+              case "planResolver":
+                throw new Error(
+                  `GraphileInternalError<7f14700f-2272-4b6a-a927-7600d934fdf0>: processPlanField signature failure - mismatch planResolver`,
+                );
+              case "applyAfterMode":
+                throw new Error(
+                  `GraphileInternalError<bbddad4f-68aa-49c7-b82c-09ceebf14a3f>: processPlanField signature failure - mismatch applyAfterMode`,
+                );
+              case "rawParentStep":
+                throw new Error(
+                  `GraphileInternalError<3306994d-7881-4495-89d1-6c9252840369>: processPlanField signature failure - mismatch rawParentStep`,
+                );
+              case "field":
+                throw new Error(
+                  `GraphileInternalError<67d2a787-2383-4228-8358-6ea9b3321445>: processPlanField signature failure - mismatch field`,
+                );
+              case "trackedArguments":
+                if (
+                  !recordsMatch(
+                    batchPlanFieldDetails.trackedArguments,
+                    entry.firstDetails.trackedArguments,
+                  )
+                ) {
+                  throw new Error(
+                    `GraphileInternalError<ec3f1e44-0ab6-445c-a644-a4d276f4b787>: processPlanField signature failure - mismatch trackedArguments`,
+                  );
+                }
+                break;
+              case "streamDetails":
+                // If any of them don't stream, turn streaming off
+                if (!streamDetails) {
+                  entry.streamDetails = null;
+                }
+                break;
+              default: {
+                const never: never = key;
+                throw new Error(
+                  `GraphileInternalError<3f039c33-0b43-47d8-8da8-57873186cd60>: unexpected key '${never}'`,
+                );
+              }
+            }
+          }
+        }
+
+        entry.indexes.push(i);
+        entry.extraDetails.push({ polymorphicPaths });
+      }
+    }
+
+    // Loop through the groups and resolve the plan ONCE per group.
+    // We don't care about the signature here; that was just for grouping
+    for (const entry of groups.values()) {
+      const planFieldDetails: PlanFieldDetails = {
+        ...entry.firstDetails,
+        polymorphicPaths: entry.firstDetails.polymorphicPaths
+          ? new Set([
+              ...entry.firstDetails.polymorphicPaths,
+              ...entry.extraDetails.flatMap((d) => [...d.polymorphicPaths!]),
+            ])
+          : null,
+      };
+      let result: PlanFieldBatchResult;
+      try {
+        result = this._realPlanField(planFieldDetails);
+      } catch (error) {
+        result = { error };
+      }
+      for (const i of entry.indexes) {
+        b.results[i] = result;
+      }
+    }
+  }
+
+  _realPlanField(planFieldDetails: PlanFieldDetails) {
+    const {
+      typeName,
+      fieldName,
+      layerPlan,
+      path,
+      polymorphicPaths,
+      planningPath,
+      planResolver,
+      applyAfterMode,
+      rawParentStep,
+      field,
+      trackedArguments,
+      streamDetails,
+    } = planFieldDetails;
+    const coordinate = `${typeName}.${fieldName}`;
+
     // The step may have been de-duped whilst sibling steps were planned
     // PERF: this should be handled in the parent?
     const parentStep = this.stepTracker.getStepById(rawParentStep.id);
@@ -1860,15 +2848,18 @@ export class OperationPlan {
       let step = withGlobalLayerPlan(
         layerPlan,
         polymorphicPaths,
+        planningPath,
         withFieldArgsForArguments,
         null,
         this,
-        parentStep,
         trackedArguments,
         field,
+        parentStep,
         applyAfterMode,
+        coordinate,
         (fieldArgs) =>
           planResolver(parentStep, fieldArgs, {
+            fieldName,
             field,
             schema: this.schema,
           }),
@@ -1882,6 +2873,7 @@ export class OperationPlan {
           withGlobalLayerPlan(
             layerPlan,
             polymorphicPaths,
+            planningPath,
             constant,
             null,
             null,
@@ -1890,56 +2882,20 @@ export class OperationPlan {
       }
       assertExecutableStep(step);
 
-      // TODO: Check SameStreamDirective still exists in @stream spec at release.
-      /*
-       * `SameStreamDirective`
-       * (https://github.com/graphql/graphql-spec/blob/26fd78c4a89a79552dcc0c7e0140a975ce654400/spec/Section%205%20--%20Validation.md#L450-L458)
-       * ensures that every field that has `@stream` must have the same
-       * `@stream` arguments; so we can just check the first node in the
-       * merged set to see our stream options. NOTE: if this changes before
-       * release then we may need to find the stream with the largest
-       * `initialCount` to figure what to do; something like:
-       *
-       *      const streamDirective = firstField.directives?.filter(
-       *        (d) => d.name.value === "stream",
-       *      ).sort(
-       *        (a, z) => getArg(z, 'initialCount', 0) - getArg(a, 'initialCount', 0)
-       *      )[0]
-       */
-      const streamDirective = fieldNodes[0].directives?.find(
-        (d) => d.name.value === "stream",
-      );
-
-      const stepOptions: StepOptions = {
-        stream:
-          !haltTree && streamDirective
-            ? {
-                initialCount:
-                  Number(
-                    evalDirectiveArg<number | null>(
-                      fieldNodes[0],
-                      "stream",
-                      "initialCount",
-                      this.trackedVariableValuesStep,
-                      null,
-                    ),
-                  ) || 0,
-              }
-            : null,
-      };
-      step._stepOptions = stepOptions;
-
-      if (deduplicate) {
-        // Now that the field has been planned (including arguments, but NOT
-        // including selection set) we can deduplicate it to see if any of its
-        // peers are identical.
-        this.deduplicateSteps();
-
-        // After deduplication, this step may have been substituted; get the
-        // updated reference.
-        step = this.stepTracker.getStepById(step.id)!;
+      if (streamDetails === true) {
+        // subscription
+        step._stepOptions.stream = {};
+        step._stepOptions.walkIterable = true;
+      } else if (streamDetails === false) {
+        step._stepOptions.walkIterable = true;
+      } else if (streamDetails != null) {
+        step._stepOptions.stream = {
+          initialCountStepId: streamDetails.initialCount.id,
+          ifStepId: streamDetails.if.id,
+          labelStepId: streamDetails.label.id,
+        };
+        step._stepOptions.walkIterable = true;
       }
-
       return { step, haltTree };
     } catch (e) {
       if (ALWAYS_THROW_PLANNING_ERRORS) {
@@ -1968,12 +2924,12 @@ export class OperationPlan {
       const step = withGlobalLayerPlan(
         layerPlan,
         polymorphicPaths,
+        planningPath,
         error,
         null,
         e,
       );
       const haltTree = true;
-      this.modifierSteps = [];
       // PERF: consider deleting all steps that were allocated during this. For
       // now we'll just rely on tree-shaking.
       return { step, haltTree };
@@ -2017,46 +2973,7 @@ export class OperationPlan {
       );
       trackedArgumentValues[argumentName] = argumentPlan;
     }
-    return {
-      get(name) {
-        return trackedArgumentValues[name];
-      },
-    };
-  }
-
-  public withModifiers<T>(cb: () => T): T {
-    // Stash previous modifiers
-    const previousModifierDepthCount = this.modifierDepthCount++;
-    const previousCount = this.modifierStepCount;
-    const previousStack = this.modifierSteps.splice(
-      0,
-      this.modifierSteps.length,
-    );
-    this.modifierStepCount = 0;
-    let result;
-    let plansToApply;
-    try {
-      result = cb();
-    } finally {
-      // Remove the modifier plans from operationPlan and sort them ready for application.
-      plansToApply = this.modifierSteps
-        .splice(0, this.modifierSteps.length)
-        .reverse();
-      // Restore previous modifiers
-      this.modifierStepCount = previousCount;
-      for (const mod of previousStack) {
-        this.modifierSteps.push(mod);
-      }
-      // Restore previous depth
-      this.modifierDepthCount = previousModifierDepthCount;
-    }
-
-    // Apply the plans.
-    for (let i = 0, l = plansToApply.length; i < l; i++) {
-      plansToApply[i].apply();
-    }
-
-    return result;
+    return trackedArgumentValues;
   }
 
   /**
@@ -2070,17 +2987,22 @@ export class OperationPlan {
     const valueStep = withGlobalLayerPlan(
       this.rootLayerPlan,
       POLYMORPHIC_ROOT_PATHS,
+      "",
       newValueStepCallback,
+      null,
+      variableDefinitions != null,
     );
     const trackedObjectStep = withGlobalLayerPlan(
       this.rootLayerPlan,
       POLYMORPHIC_ROOT_PATHS,
+      "",
       () =>
         new __TrackedValueStep(
           value,
           valueStep,
           constraints,
           [],
+          variableDefinitions != null,
           variableDefinitions,
         ),
     );
@@ -2098,8 +3020,8 @@ export class OperationPlan {
       for (const key in step) {
         const val = step[key as keyof typeof step];
         if (
-          key !== ("implicitSideEffectStep" satisfies keyof ExecutableStep) &&
-          val instanceof ExecutableStep
+          key !== ("implicitSideEffectStep" satisfies keyof Step) &&
+          val instanceof Step
         ) {
           errors.push(
             new Error(
@@ -2115,20 +3037,17 @@ export class OperationPlan {
     }
   }
 
-  private replaceStep(
-    $original: ExecutableStep,
-    $replacement: ExecutableStep,
-  ): void {
+  private replaceStep($original: Step, $replacement: Step): void {
     this.stepTracker.replaceStep($original, $replacement);
   }
 
   private processStep(
-    actionDescription: string,
+    actionDescription: ProcessStepActionDescription,
     order: "dependents-first" | "dependencies-first",
     isReadonly: boolean,
-    callback: (plan: ExecutableStep) => ExecutableStep,
-    processed: Set<ExecutableStep>,
-    step: ExecutableStep,
+    callback: (plan: Step) => Step,
+    processed: Set<Step>,
+    step: Step,
   ) {
     // MUST come before anything else, otherwise infinite loops may occur
     processed.add(step);
@@ -2194,11 +3113,12 @@ export class OperationPlan {
       return step;
     }
 
-    let replacementStep: ExecutableStep = step;
+    let replacementStep: Step = step;
     try {
       replacementStep = withGlobalLayerPlan(
         step.layerPlan,
         step.polymorphicPaths,
+        null,
         callback,
         this,
         step,
@@ -2224,7 +3144,9 @@ export class OperationPlan {
       if (replacementStep !== step) {
         this.replaceStep(step, replacementStep);
       }
-      this.deduplicateSteps();
+      if (actionDescription !== "deduplicate") {
+        this.deduplicateSteps();
+      }
     }
 
     return replacementStep;
@@ -2238,15 +3160,15 @@ export class OperationPlan {
    * @internal
    */
   public processSteps(
-    actionDescription: string,
+    actionDescription: ProcessStepActionDescription,
     order: "dependents-first" | "dependencies-first",
     isReadonly: boolean,
-    callback: (plan: ExecutableStep) => ExecutableStep,
+    callback: (plan: Step) => Step,
   ): void {
     if (isDev) this.stepTracker.lockNewSteps();
     const previousStepCount = this.stepTracker.stepCount;
 
-    const processed = new Set<ExecutableStep>();
+    const processed = new Set<Step>();
 
     for (let i = 0; i < this.stepTracker.stepCount; i++) {
       const step = this.stepTracker.getStepById(i, true);
@@ -2306,23 +3228,53 @@ export class OperationPlan {
    * compatible layers and have the same dependencies. Peers must not have side
    * effects. A step is not its own peer.
    */
-  private getPeers(step: ExecutableStep): ReadonlyArray<ExecutableStep> {
+  private getPeers(step: Step): ReadonlyArray<Step> {
     if (step.hasSideEffects) {
+      // Plans with side effects have no peers.
       return EMPTY_ARRAY;
     }
 
+    // NOTE: Streams have no peers - we cannot reference the stream more than
+    // once (and we aim to not cache the stream because we want its entries to
+    // be garbage collected) - however if we're already fetching the list then
+    // we shouldn't fetch it again via stream... We should deduplicate a stream
+    // to return a non-stream.
+
+    if (step._stepOptions.stream != null) {
+      // Streams have no peers - we cannot reference the stream more
+      // than once (and we aim to not cache the stream because we want its
+      // entries to be garbage collected).
+      //
+      // HOWEVER! There may be lifecycle parts that need to be called... So
+      // call the function with an empty array; ignore the result.
+
+      // TODO: remove this if block when we implement the new stream/defer -
+      // deduplicating a stream should be fine. (Not subscriptions though - may
+      // need a check for that!)
+
+      return EMPTY_ARRAY;
+    }
+
+    if (this.stepTracker.internalDependencies.has(step)) {
+      // PERF: we need to set up correct tracking, then internal deps can be deduped
+      return EMPTY_ARRAY;
+    }
+
+    const sstep = sudo(step);
     const {
       dependencies: deps,
       dependencyForbiddenFlags: flags,
       dependencyOnReject: onReject,
+      dependencyDataOnly: dataOnly,
       layerPlan: layerPlan,
       constructor: stepConstructor,
       peerKey,
-    } = sudo(step);
+    } = sstep;
+    // const streamInitialCount = sstep._stepOptions.stream?.initialCount;
     const dependencyCount = deps.length;
 
     if (dependencyCount === 0) {
-      let allPeers: ExecutableStep[] | null = null;
+      let allPeers: Step[] | null = null;
       const stepsWithNoDependencies =
         this.stepTracker.stepsWithNoDependenciesByConstructor.get(
           step.constructor,
@@ -2331,8 +3283,10 @@ export class OperationPlan {
         if (
           possiblyPeer !== step &&
           !possiblyPeer.hasSideEffects &&
-          possiblyPeer.layerPlan === layerPlan &&
+          isPeerLayerPlan(possiblyPeer.layerPlan, layerPlan) &&
+          possiblyPeer._stepOptions.stream == null &&
           possiblyPeer.peerKey === peerKey
+          // && possiblyPeer._stepOptions.stream?.initialCount === streamInitialCount
         ) {
           if (allPeers === null) {
             allPeers = [possiblyPeer];
@@ -2345,8 +3299,10 @@ export class OperationPlan {
     } else if (dependencyCount === 1) {
       // Optimized form for steps that have one dependency (extremely common!)
 
+      const dependencyIndex = 0;
+
       const { ancestry, deferBoundaryDepth } = layerPlan;
-      const dep = deps[0];
+      const dep = deps[dependencyIndex];
 
       const dl = dep.dependents.length;
       if (dl === 1) {
@@ -2356,18 +3312,20 @@ export class OperationPlan {
       }
 
       const minDepth = Math.max(deferBoundaryDepth, dep.layerPlan.depth);
-      let allPeers: ExecutableStep[] | null = null;
+      let allPeers: Step[] | null = null;
 
       for (const {
         dependencyIndex: peerDependencyIndex,
         step: rawPossiblyPeer,
       } of dep.dependents) {
         if (
-          peerDependencyIndex !== 0 ||
+          peerDependencyIndex !== dependencyIndex ||
           rawPossiblyPeer === step ||
           rawPossiblyPeer.hasSideEffects ||
+          rawPossiblyPeer._stepOptions.stream != null ||
           rawPossiblyPeer.constructor !== stepConstructor ||
           rawPossiblyPeer.peerKey !== peerKey
+          // || rawPossiblyPeer._stepOptions.stream?.initialCount !== streamInitialCount
         ) {
           continue;
         }
@@ -2376,13 +3334,15 @@ export class OperationPlan {
           layerPlan: peerLayerPlan,
           dependencyForbiddenFlags: peerFlags,
           dependencyOnReject: peerOnReject,
+          dependencyDataOnly: peerDataOnly,
         } = possiblyPeer;
         if (
           peerLayerPlan.depth >= minDepth &&
           possiblyPeer.dependencies.length === dependencyCount &&
-          peerLayerPlan === ancestry[peerLayerPlan.depth] &&
-          peerFlags[0] === flags[0] &&
-          peerOnReject[0] === onReject[0]
+          isPeerLayerPlan(peerLayerPlan, ancestry[peerLayerPlan.depth]) &&
+          peerFlags[dependencyIndex] === flags[dependencyIndex] &&
+          peerOnReject[dependencyIndex] === onReject[dependencyIndex] &&
+          peerDataOnly[dependencyIndex] === dataOnly[dependencyIndex]
         ) {
           if (allPeers === null) {
             allPeers = [possiblyPeer];
@@ -2404,7 +3364,7 @@ export class OperationPlan {
        * Compatible layer plans are no less deep than minDepth.
        */
       let minDepth = deferBoundaryDepth;
-      const possiblePeers: ExecutableStep[] = [];
+      const possiblePeers: Step[] = [];
       // Loop backwards since last dependency is most likely to be most unique
       for (
         let dependencyIndex = dependencyCount - 1;
@@ -2430,8 +3390,10 @@ export class OperationPlan {
               peerDependencyIndex !== dependencyIndex ||
               rawPossiblyPeer === step ||
               rawPossiblyPeer.hasSideEffects ||
+              rawPossiblyPeer._stepOptions.stream != null ||
               rawPossiblyPeer.constructor !== stepConstructor ||
               rawPossiblyPeer.peerKey !== peerKey
+              // || rawPossiblyPeer._stepOptions.stream?.initialCount !== streamInitialCount
             ) {
               continue;
             }
@@ -2440,13 +3402,15 @@ export class OperationPlan {
               layerPlan: peerLayerPlan,
               dependencyForbiddenFlags: peerFlags,
               dependencyOnReject: peerOnReject,
+              dependencyDataOnly: peerDataOnly,
               dependencies: peerDependencies,
             } = possiblyPeer;
             if (
               peerDependencies.length === dependencyCount &&
-              peerLayerPlan === ancestry[peerLayerPlan.depth] &&
-              peerFlags[0] === flags[0] &&
-              peerOnReject[0] === onReject[0]
+              isPeerLayerPlan(peerLayerPlan, ancestry[peerLayerPlan.depth]) &&
+              peerFlags[dependencyIndex] === flags[dependencyIndex] &&
+              peerOnReject[dependencyIndex] === onReject[dependencyIndex] &&
+              peerDataOnly[dependencyIndex] === dataOnly[dependencyIndex]
             ) {
               possiblePeers.push(possiblyPeer);
             }
@@ -2460,13 +3424,27 @@ export class OperationPlan {
       if (possiblePeers.length === 0) {
         return EMPTY_ARRAY;
       }
-      let allPeers: ExecutableStep[] | null = null;
+      let allPeers: Step[] | null = null;
       outerloop: for (const possiblyPeer of possiblePeers) {
         if (possiblyPeer.layerPlan.depth < minDepth) continue;
+        const speer = sudo(possiblyPeer);
+        // PERF: I'm not sure we strictly require this.
+        if (
+          !arraysMatch(
+            sstep._refs,
+            speer._refs,
+            (refA, refB) =>
+              refA === refB ||
+              this.stepTracker.getStepById(refA) ===
+                this.stepTracker.getStepById(refB),
+          )
+        ) {
+          continue;
+        }
         // We know the final dependency matches and the dependency count
         // matches - check the other dependencies match.
         for (let i = 0; i < dependencyCount - 1; i++) {
-          if (deps[i] !== sudo(possiblyPeer).dependencies[i]) {
+          if (deps[i] !== speer.dependencies[i]) {
             continue outerloop;
           }
         }
@@ -2480,7 +3458,7 @@ export class OperationPlan {
     }
   }
 
-  private isImmoveable(step: ExecutableStep): boolean {
+  private isImmoveable(step: Step): boolean {
     if (step.hasSideEffects) {
       return true;
     }
@@ -2499,7 +3477,7 @@ export class OperationPlan {
    * Attempts to hoist the step into a higher layerPlan to maximize
    * deduplication.
    */
-  private hoistStep(step: ExecutableStep) {
+  private hoistStep(step: Step) {
     if (this.isImmoveable(step)) {
       return;
     }
@@ -2517,15 +3495,20 @@ export class OperationPlan {
     }
     */
 
-    if (step.layerPlan.parentLayerPlan?.reason.type === "mutationField") {
+    if (step.layerPlan.reason.type === "root") {
+      // There is no higher layerPlan
+      return;
+    } else if (step.layerPlan.reason.type === "combined") {
+      // Cannot hoist out of a combination
+      return;
+    } else if (
+      step.layerPlan.reason.parentLayerPlan.reason.type === "mutationField"
+    ) {
       // Never hoist into a mutation layer
       return;
     }
+
     switch (step.layerPlan.reason.type) {
-      case "root": {
-        // There is no higher layerPlan
-        return;
-      }
       case "subscription":
       case "defer": {
         // Should be deferred, don't evaluate early (unless it's cheap to do so)
@@ -2537,22 +3520,27 @@ export class OperationPlan {
         }
       }
       case "polymorphic": {
-        // May only need to be evaluated for certain types, so avoid hoisting anything expensive.
+        // Only hoist steps that are executed for all the types
         if (
-          step.isSyncAndSafe &&
-          step.polymorphicPaths!.size ===
+          step.polymorphicPaths === null ||
+          step.polymorphicPaths.size ===
             step.layerPlan.reason.polymorphicPaths.size
         ) {
-          // It's cheap and covers all types, try and hoist it.
-          // NOTE: I have concerns about whether this is safe or not, but I
-          // have not been able to come up with a counterexample that is
-          // unsafe. Should we do so, we should remove this.
+          // It covers all types, try and hoist it.
           break;
         } else if (step instanceof __FlagStep) {
+          // Flag step is cheap, try and hoist
           break;
         } else {
           return;
         }
+      }
+      case "polymorphicPartition": {
+        // Don't want to hoist out of a polymorphic partition
+        // TODO: revisit this, e.g. global unary steps should be hoistable? But
+        // we should only do that if they're cheap, we don't want to run
+        // expensive stuff at a higher level if only certain types need it.
+        return;
       }
       case "subroutine": {
         // Should be safe to hoist.
@@ -2611,47 +3599,26 @@ export class OperationPlan {
     }
 
     // All our checks passed, hoist it.
-    assert.ok(
-      step.layerPlan.parentLayerPlan !== null,
-      "GrafastInternalError<55c8940f-e8ac-4985-8b34-96fc6f81d62d>: A non-root layer plan had no parent?!",
-    );
 
     // 1: adjust polymorphicPaths to fit new layerPlan
     if (step.layerPlan.reason.type === "polymorphic") {
       // PERF: this is cacheable
-      /** The closest ancestor layer plan that is polymorphic */
-      let ancestor: LayerPlan | null = step.layerPlan;
-      while ((ancestor = ancestor.parentLayerPlan)) {
-        if (ancestor.reason.type === "polymorphic") {
+      let newPolyPaths: null | Set<string> = new Set();
+      for (const polyPath of step.polymorphicPaths!) {
+        const i = polyPath.lastIndexOf(">");
+        if (i > 0) {
+          const newPath = polyPath.slice(0, i);
+          newPolyPaths.add(newPath);
+        } else if (i === 0) {
+          newPolyPaths = null;
           break;
+        } else {
+          throw new Error(
+            `GrafastInternalError<42f1c7e7-e544-46d2-81b3-00db11eb5def>: invalid poly path ${polyPath}`,
+          );
         }
       }
-      const parentPolymorphicPaths = ancestor
-        ? (ancestor as LayerPlan<LayerPlanReasonPolymorphic>).reason
-            .polymorphicPaths
-        : POLYMORPHIC_ROOT_PATHS;
-
-      const myPaths = [...step.polymorphicPaths!];
-      if (parentPolymorphicPaths?.has(myPaths[0])) {
-        // All the others must be valid too
-      } else if (parentPolymorphicPaths === null) {
-        step.polymorphicPaths = null;
-      } else {
-        const layerPaths = [...step.layerPlan.reason.polymorphicPaths];
-        const newPaths = new Set<string>();
-        for (const path of parentPolymorphicPaths) {
-          const prefix = path + ">";
-          const matches = myPaths.filter((p) => p.startsWith(prefix));
-          const layerMatches = layerPaths.filter((p) => p.startsWith(prefix));
-          if (matches.length !== layerMatches.length) {
-            // Can't hoist because it's not used for all polymorphicPaths of this type
-            return;
-          } else if (matches.length > 0) {
-            newPaths.add(path);
-          }
-        }
-        step.polymorphicPaths = newPaths;
-      }
+      step.polymorphicPaths = newPolyPaths;
     }
 
     const $subroutine =
@@ -2660,7 +3627,10 @@ export class OperationPlan {
         : null;
 
     // 2: move it up a layer
-    this.stepTracker.moveStepToLayerPlan(step, step.layerPlan.parentLayerPlan);
+    this.stepTracker.moveStepToLayerPlan(
+      step,
+      step.layerPlan.reason.parentLayerPlan,
+    );
 
     // 3: if it's was in a subroutine, the subroutine parent plan needs to list it as a dependency
     if ($subroutine) {
@@ -2676,8 +3646,13 @@ export class OperationPlan {
    * Attempts to push the step into the lowest layerPlan to minimize the need
    * for copying between layer plans.
    */
-  private pushDown<T extends ExecutableStep>(step: T): T {
+  private pushDown<T extends Step>(step: T): T {
     if (this.isImmoveable(step)) {
+      return step;
+    }
+    if (step._isUnary) {
+      step._isUnaryLocked = true;
+      // Don't push unary steps down
       return step;
     }
     switch (step.layerPlan.reason.type) {
@@ -2685,11 +3660,15 @@ export class OperationPlan {
       case "subscription":
       case "defer":
       case "polymorphic":
+      case "polymorphicPartition":
       case "subroutine":
       case "nullableBoundary":
       case "listItem": {
         // Fine to push lower
         break;
+      }
+      case "combined": {
+        return step;
       }
       case "mutationField": {
         // NOTE: It's the user's responsibility to ensure that steps that have
@@ -2738,10 +3717,26 @@ export class OperationPlan {
       this.stepTracker.layerPlansByParentStep.get(step);
     if (layerPlansByParent !== undefined) {
       for (const layerPlan of layerPlansByParent) {
-        if (layerPlan.parentLayerPlan === step.layerPlan) {
+        if (layerPlan.reason.parentLayerPlan === step.layerPlan) {
           return step;
         } else {
-          dependentLayerPlans.add(layerPlan.parentLayerPlan!);
+          dependentLayerPlans.add(layerPlan.reason.parentLayerPlan);
+        }
+      }
+    }
+
+    const layerPlansByDependent =
+      this.stepTracker.layerPlansByDependentStep.get(step);
+    if (layerPlansByDependent !== undefined) {
+      for (const layerPlan of layerPlansByDependent) {
+        for (const parentLayerPlan of layerPlan.reason.parentLayerPlans) {
+          if (parentLayerPlan === step.layerPlan) {
+            return step;
+          } else if (
+            layerPlanHeirarchyContains(parentLayerPlan, step.layerPlan)
+          ) {
+            dependentLayerPlans.add(parentLayerPlan);
+          }
         }
       }
     }
@@ -2767,32 +3762,34 @@ export class OperationPlan {
       );
     }
 
-    const paths: LayerPlan[][] = [];
+    const paths: Array<readonly LayerPlan[]> = [];
     let minPathLength = Infinity;
 
     for (const dependentLayerPlan of dependentLayerPlans) {
-      let lp = dependentLayerPlan;
-      const path: LayerPlan[] = [lp];
-      while (lp.parentLayerPlan != step.layerPlan) {
-        const parent = lp.parentLayerPlan;
-        if (!parent) {
-          throw new Error(
-            `GrafastInternalError<64c07427-4fe2-43c4-9858-272d33bee0b8>: invalid layer plan heirarchy`,
-          );
-        }
-        lp = parent;
-        path.push(lp);
+      const lp = dependentLayerPlan;
+      const childPaths = pathsFromAncestorToTargetLayerPlan(step.layerPlan, lp);
+      if (childPaths.length === 0) {
+        throw new Error(
+          `GrafastInternalError<64c07427-4fe2-43c4-9858-272d33bee0b8>: invalid layer plan heirarchy; step ${step} cannot be found from ${dependentLayerPlan}`,
+        );
       }
-      paths.push(path);
-      minPathLength = Math.min(path.length, minPathLength);
+      for (const path of childPaths) {
+        paths.push(path);
+        minPathLength = Math.min(path.length, minPathLength);
+      }
     }
 
     const dependentLayerPlanCount = dependentLayerPlans.size;
 
     let deepest = step.layerPlan;
-    outerloop: for (let i = 0; i < minPathLength; i++) {
+    outerloop: for (let i = minPathLength - 1; i >= 0; i--) {
       const expected = paths[0][i];
       if (expected.reason.type === "polymorphic") {
+        // PERF: reconsider
+        // Let's not pass polymorphic boundaries for now
+        break;
+      }
+      if (expected.reason.type === "polymorphicPartition") {
         // PERF: reconsider
         // Let's not pass polymorphic boundaries for now
         break;
@@ -2838,28 +3835,14 @@ export class OperationPlan {
     return step;
   }
 
-  private _deduplicateInnerLogic(step: ExecutableStep) {
-    if (step.hasSideEffects) {
-      // Never deduplicate plans with side effects.
-      return null;
-    }
-
+  private _deduplicateInnerLogic(step: Step) {
     if (step instanceof __ItemStep) {
       // __ItemStep cannot be deduplicated
       return null;
     }
 
-    // OPTIMIZE: Past Benjie thought we might want to revisit this under the
-    // new Grafast system. No idea what he had in mind there though...
-    if (step._stepOptions.stream) {
-      // Never deduplicate streaming plans, we cannot reference the stream more
-      // than once (and we aim to not cache the stream because we want its
-      // entries to be garbage collected).
-      return null;
-    }
-
     const peers = this.getPeers(step);
-    // Even if there is just one peer, we must still deduplicate because
+    // Even if there are no peers, we must still deduplicate because
     // `deduplicate` is called to indicate that the field is done being
     // planned, which the step class may want to acknowledge by locking certain
     // facets of its functionality (such as adding filters). We'll simplify its
@@ -2886,7 +3869,7 @@ export class OperationPlan {
 
     // Prefer the step that's closest to the root LayerPlan; failing that, prefer the step with the lowest id.
     let minDepth = step.layerPlan.depth;
-    let stepsAtMinDepth: ExecutableStep[] = [step];
+    let stepsAtMinDepth: Step[] = [step];
     for (const step of equivalentSteps) {
       const depth = step.layerPlan.depth;
       if (depth < minDepth) {
@@ -2900,8 +3883,17 @@ export class OperationPlan {
     return { stepsAtMinDepth, equivalentSteps };
   }
 
-  private deduplicateStep(step: ExecutableStep): ExecutableStep {
+  private deduplicateStep(step: Step): Step {
+    // Conditions applied to this step are now finalized, though we may still
+    // tell the step to do more stuff (like fetch extra data), it can no longer
+    // change its order, conditions, etc.
     step.isArgumentsFinalized = true;
+
+    // If a step is unary at this point, it must always remain unary.
+    if (step._isUnary) {
+      step._isUnaryLocked = true;
+    }
+
     if (step.deduplicate == null) return step;
     const result = this._deduplicateInnerLogic(step);
     if (result == null) {
@@ -2915,12 +3907,52 @@ export class OperationPlan {
 
     if (winner.polymorphicPaths !== null) {
       const polymorphicPaths = new Set<string>();
-      for (const s of stepsAtMinDepth) {
-        for (const p of s.polymorphicPaths!) {
-          polymorphicPaths.add(p);
+
+      // If the paths don't match up we must be in a polymorphicPartition and
+      // need to move the winner out of it
+      tryAgain: for (let attempts = 0; attempts < 2; attempts++) {
+        const layerPolymorphicPaths = polymorphicPathsForLayer(
+          winner.layerPlan,
+        )!;
+        // PERF: this string trimming is hideous
+        for (const s of [step, ...equivalentSteps]) {
+          for (const p of s.polymorphicPaths!) {
+            let trimmed = p;
+            let i;
+            while (
+              !layerPolymorphicPaths.has(trimmed) &&
+              (i = trimmed.lastIndexOf(">")) >= 0
+            ) {
+              if (i === 0) {
+                const reason = winner.layerPlan.reason;
+                if (reason.type === "polymorphicPartition") {
+                  // Hoist winner into the polymorphic layer plan, and restart
+                  // the loop
+                  this.stepTracker.moveStepToLayerPlan(
+                    winner,
+                    reason.parentLayerPlan,
+                  );
+                  polymorphicPaths.clear();
+                  continue tryAgain;
+                } else {
+                  throw new Error(
+                    `GrafastInternalError<93da1006-3af9-44dd-a54b-5bf6fe3e791c>: ${s} has polymorphic paths ${[...(s.polymorphicPaths ?? [])]}; but ${p} is not in ${[...layerPolymorphicPaths]}.`,
+                  );
+                }
+              }
+              trimmed = trimmed.slice(0, i);
+            }
+            polymorphicPaths.add(trimmed);
+          }
         }
+        break;
       }
       winner.polymorphicPaths = polymorphicPaths;
+    }
+
+    // Equivalent steps cannot be streaming; so we can no longer stream either.
+    if (equivalentSteps.length > 0) {
+      winner._stepOptions.stream = null;
     }
 
     // Give the steps a chance to pass their responsibilities to the winner.
@@ -2930,6 +3962,7 @@ export class OperationPlan {
       if (wasLocked) lock(step);
       this.stepTracker.replaceStep(step, winner);
     }
+
     for (const target of equivalentSteps) {
       if (winner !== target) {
         const wasLocked = isDev && unlock(target);
@@ -2974,9 +4007,9 @@ export class OperationPlan {
    */
 
   private deduplicateStepsProcess(
-    processed: Set<ExecutableStep>,
+    processed: Set<Step>,
     start: number,
-    step: ExecutableStep,
+    step: Step,
   ) {
     processed.add(step);
     for (const dep of sudo(step).dependencies) {
@@ -2987,7 +4020,8 @@ export class OperationPlan {
     withGlobalLayerPlan(
       step.layerPlan,
       step.polymorphicPaths,
-      this.deduplicateStep,
+      null, // TODO: can we get the operation path when phase === "plan"?
+      this.phase === "plan" ? this.deduplicateStep : this.hoistAndDeduplicate,
       this,
       step,
     );
@@ -3004,26 +4038,33 @@ export class OperationPlan {
    * former SELECT additional fields, then transform the results back to what
    * our child plans would be expecting.
    */
-  private deduplicateSteps(depth = 0): void {
+  private deduplicateSteps(): void {
     const start = this.stepTracker.nextStepIdToDeduplicate;
-    const end = this.stepTracker.stepCount;
-    if (end === start) {
+    if (start === this.stepTracker.stepCount) {
+      // No action necessary since there are no new steps
       return;
     }
 
-    const processed = new Set<ExecutableStep>();
+    // Then we deduplicate
+    this._deduplicateStepsInner(start, 0);
+  }
+
+  private _deduplicateStepsInner(start: number, depth: number): void {
+    const end = this.stepTracker.stepCount;
+    const processed = new Set<Step>();
     for (let i = start; i < end; i++) {
       const step = this.stepTracker.stepById[i];
       if (!step || step.id !== i || processed.has(step)) continue;
       this.deduplicateStepsProcess(processed, start, step);
     }
+
     this.stepTracker.nextStepIdToDeduplicate = end;
 
     if (this.stepTracker.stepCount > end) {
       // More steps were created during deduplicate; let's deduplicate those!
       const MAX_DEPTH = 5;
       if (depth > MAX_DEPTH) {
-        const newSteps: (ExecutableStep | null)[] = [];
+        const newSteps: (Step | null)[] = [];
         for (let i = end, l = this.stepTracker.stepCount; i < l; i++) {
           newSteps.push(this.stepTracker.stepById[i]);
         }
@@ -3033,11 +4074,11 @@ export class OperationPlan {
             .join(", ")}.`,
         );
       }
-      return this.deduplicateSteps(depth + 1);
+      return this._deduplicateStepsInner(end, depth + 1);
     }
   }
 
-  private hoistAndDeduplicate(step: ExecutableStep) {
+  private hoistAndDeduplicate(step: Step) {
     this.hoistStep(step);
     // Even if step wasn't hoisted, its deps may have been so we should still
     // re-deduplicate it.
@@ -3057,34 +4098,12 @@ export class OperationPlan {
     this.processSteps("pushDown", "dependents-first", false, this.pushDown);
   }
 
-  private getStepOptionsForStep(step: ExecutableStep): StepOptions {
-    return step._stepOptions;
-    /*
-    // NOTE: streams can only be merged if their parameters are compatible
-    // (namely they need to have equivalent `initialCount`)
-    const streamLayerPlan = step.childLayerPlans.find(
-      (lp) => lp.reason.type === "stream",
-    );
-
-    // PERF: if step isn't streamable, don't create a streamLayerPlan because
-    // there's no point (and then we can leverage better optimisations).
-
-    return {
-      stream:
-        streamLayerPlan && isStreamableStep(step)
-          ? // && streamLayerPlan.parentStep === step
-            { initialCount: streamLayerPlan.reason.initialCount }
-          : null,
-    };
-    */
-  }
-
   /**
    * Calls the 'optimize' method on a plan, which may cause the plan to
    * communicate with its (deep) dependencies, and even to replace itself with
    * a different plan.
    */
-  private optimizeStep(inStep: ExecutableStep): ExecutableStep {
+  private optimizeStep(inStep: Step): Step {
     const step =
       inStep.allowMultipleOptimizations && inStep.deduplicate
         ? this.deduplicateStep(inStep)
@@ -3098,7 +4117,7 @@ export class OperationPlan {
     }
 
     // We know if it's streaming or not based on the LayerPlan it's contained within.
-    const stepOptions = this.getStepOptionsForStep(step);
+    // const stepOptions = step._stepOptions;
     let meta;
     if (step.optimizeMetaKey !== undefined) {
       meta = this.optimizeMeta.get(step.optimizeMetaKey);
@@ -3109,7 +4128,11 @@ export class OperationPlan {
     }
     const wasLocked = isDev && unlock(step);
     const replacementStep = step.optimize({
-      ...stepOptions,
+      stream: step._stepOptions.stream
+        ? {
+            // We could add more details here, but for now we don't really need them?
+          }
+        : null,
       meta,
     });
     if (wasLocked) lock(step);
@@ -3127,7 +4150,7 @@ export class OperationPlan {
    * know all our dependent's needs before we optimise ourself.
    */
   private optimizeSteps() {
-    const thirdAndFutureLoopReplacedPlans: ExecutableStep[] = [];
+    const thirdAndFutureLoopReplacedPlans: Step[] = [];
     for (let loops = 0; loops < MAX_OPTIMIZATION_LOOPS; loops++) {
       let replacedPlan = false;
       this.processSteps(
@@ -3193,16 +4216,16 @@ export class OperationPlan {
 
         // We're only going to inline one if we can inline all.
         const toInline: Array<{
-          $dependent: Sudo<ExecutableStep>;
+          $dependent: Sudo<Step>;
           dependencyIndex: number;
           inlineDetails: AddDependencyOptions;
-          dependent: ExecutableStep["dependents"][number];
+          dependent: Step["dependents"][number];
         }> = [];
         for (const dependent of $flag.dependents) {
           const { step, dependencyIndex } = dependent;
           const $dependent = sudo(step);
           const inlineDetails = $flag.inline(
-            $dependent.getDepOptions(dependencyIndex),
+            $dependent._getDepOptions(dependencyIndex),
           );
           if (inlineDetails === null) {
             continue flagLoop;
@@ -3219,10 +4242,16 @@ export class OperationPlan {
           const {
             $dependent,
             dependencyIndex,
-            inlineDetails: { onReject, acceptFlags = DEFAULT_ACCEPT_FLAGS },
+            inlineDetails: {
+              onReject,
+              acceptFlags = DEFAULT_ACCEPT_FLAGS,
+              dataOnly = false,
+            },
           } = todo;
           writeableArray($dependent.dependencyOnReject)[dependencyIndex] =
             onReject;
+          writeableArray($dependent.dependencyDataOnly)[dependencyIndex] =
+            dataOnly;
           writeableArray($dependent.dependencyForbiddenFlags)[dependencyIndex] =
             ALL_FLAGS & ~acceptFlags;
         }
@@ -3235,14 +4264,14 @@ export class OperationPlan {
   /** Finalizes each step */
   private finalizeSteps(): void {
     const initialStepCount = this.stepTracker.stepCount;
-    assert.strictEqual(
-      this.modifierSteps.length,
-      0,
-      "No modifier steps expected when performing finalizeSteps",
-    );
     for (const step of this.stepTracker.activeSteps) {
       const wasLocked = isDev && unlock(step);
       step.finalize();
+      if (step._stepOptions.stream) {
+        // (Potentially) streamed steps aren't sync and safe, we need to
+        // iterate them expensively
+        step.isSyncAndSafe = false;
+      }
       if (wasLocked) lock(step);
       assertFinalized(step);
       if (isDev && this.stepTracker.stepCount !== initialStepCount) {
@@ -3259,12 +4288,17 @@ export class OperationPlan {
      * ancestor layers until we hit the layerPlan that `dep` is from.
      */
     const ensurePlanAvailableInLayer = (
-      dep: ExecutableStep,
+      dep: Step,
       layerPlan: LayerPlan,
     ): void => {
       let currentLayerPlan: LayerPlan | null = layerPlan;
 
       while (dep.layerPlan !== currentLayerPlan) {
+        if (currentLayerPlan.reason.type === "root") {
+          throw new Error(
+            `GrafastInternalError<7f3ce201-810c-4639-8e69-f44a95221c6d>: reached root whilst ensuring ${dep} is available in ${layerPlan}`,
+          );
+        }
         if (currentLayerPlan.copyStepIds.includes(dep.id)) {
           break;
         }
@@ -3280,7 +4314,26 @@ export class OperationPlan {
           targetStep._isUnaryLocked = true;
         }
         currentLayerPlan.copyStepIds.push(dep.id);
-        currentLayerPlan = currentLayerPlan.parentLayerPlan;
+        if (currentLayerPlan.reason.type === "combined") {
+          const prev = currentLayerPlan as LayerPlan<LayerPlanReasonCombined>;
+          currentLayerPlan = null;
+          // Figure out which of our parent layer plans contains the step
+          for (const parentLayerPlan of prev.reason.parentLayerPlans) {
+            if (dep.layerPlan === parentLayerPlan) {
+              currentLayerPlan = parentLayerPlan;
+              break;
+            } else if (
+              layerPlanHeirarchyContains(parentLayerPlan, dep.layerPlan)
+            ) {
+              ensurePlanAvailableInLayer(dep, parentLayerPlan);
+            }
+          }
+          if (currentLayerPlan == null) {
+            return;
+          }
+        } else {
+          currentLayerPlan = currentLayerPlan.reason.parentLayerPlan;
+        }
         if (!currentLayerPlan) {
           throw new Error(
             `GrafastInternalError<8c1640b9-fa3c-440d-99e5-7693d0d7e5d1>: could not find layer plan for '${dep}' in chain from layer plan ${layerPlan}`,
@@ -3289,14 +4342,214 @@ export class OperationPlan {
       }
     };
 
+    // Track exactly which steps are in which layer plans
+    const phaseTransitionLayerPlans = new Set<
+      | LayerPlan<LayerPlanReasonDefer>
+      | LayerPlan<LayerPlanReasonListItem>
+      | LayerPlan<LayerPlanReasonSubscription>
+    >();
+    const combinedLayerPlans = new Set<LayerPlan<LayerPlanReasonCombined>>();
+    const childrenByLayerPlan = new Map<LayerPlan, LayerPlan[]>();
+    const addParent = (lp: LayerPlan, parent: LayerPlan) => {
+      let list = childrenByLayerPlan.get(parent);
+      if (!list) {
+        list = [];
+        childrenByLayerPlan.set(parent, list);
+      }
+      list.push(lp);
+    };
     for (const layerPlan of this.stepTracker.layerPlans) {
       if (!layerPlan) {
         continue;
       }
+      if (isPhaseTransitionLayerPlan(layerPlan)) {
+        phaseTransitionLayerPlans.add(layerPlan);
+      }
+      if (layerPlan.reason.type === "combined") {
+        combinedLayerPlans.add(layerPlan as LayerPlan<LayerPlanReasonCombined>);
+      }
       layerPlan.steps = [];
+      switch (layerPlan.reason.type) {
+        case "root":
+          break;
+        case "combined": {
+          for (const parent of layerPlan.reason.parentLayerPlans) {
+            addParent(layerPlan, parent);
+          }
+          break;
+        }
+        default: {
+          addParent(layerPlan, layerPlan.reason.parentLayerPlan);
+        }
+      }
     }
+
+    // Go through all the phase transition layer plans and populate their
+    // "outOfBoundsLayerPlanIds". These are "external inputs" to the subgraph
+    // of layer plans starting at the phase transition layer plan. The external
+    // inputs will always be parent nodes of combined layer plans that are
+    // descendents of the phase transition layer plan.
+    for (const phaseTransitionNode of phaseTransitionLayerPlans) {
+      const descendents = getDescendents(
+        phaseTransitionNode,
+        childrenByLayerPlan,
+      );
+      for (const combo of combinedLayerPlans) {
+        if (descendents.has(combo)) {
+          for (const parent of combo.reason.parentLayerPlans) {
+            if (!descendents.has(parent)) {
+              phaseTransitionNode.outOfBoundsLayerPlanIds.add(parent.id);
+            }
+          }
+        }
+      }
+    }
+
     for (const step of this.stepTracker.activeSteps) {
       step.layerPlan.steps.push(step);
+    }
+
+    // For each layer plan, track the polymorphic types, and mark the steps in
+    // that layer plan as selective if they don't possess the same number of
+    // poly paths.
+    const polyPathsByLayerPlan = new Map<LayerPlan, ReadonlySet<string>>();
+    const processPolymorphicPathsInLayerPlan = (
+      layerPlan: LayerPlan,
+    ): ReadonlySet<string> => {
+      const existing = polyPathsByLayerPlan.get(layerPlan);
+      if (existing) {
+        return existing;
+      }
+
+      const parentPolyPaths: ReadonlySet<string> =
+        layerPlan.reason.type === "root"
+          ? EMPTY_SET
+          : layerPlan.reason.type === "combined"
+            ? new Set(
+                layerPlan.reason.parentLayerPlans.flatMap((p) => [
+                  ...processPolymorphicPathsInLayerPlan(p),
+                ]),
+              )
+            : processPolymorphicPathsInLayerPlan(
+                layerPlan.reason.parentLayerPlan,
+              );
+      let polyPaths: ReadonlySet<string>;
+      const reason = layerPlan.reason;
+      switch (reason.type) {
+        case "root":
+        case "nullableBoundary":
+        case "listItem":
+        case "defer":
+        case "subroutine":
+        case "subscription":
+        case "mutationField": {
+          polyPaths = parentPolyPaths;
+          break;
+        }
+        case "combined": {
+          // Resolve redundant combinations now plans have been deduped/optimized
+          for (const combo of layerPlan.combinations) {
+            const { sources } = combo;
+            let newSources: Array<(typeof sources)[number]> | null = null;
+            const l = sources.length;
+            // Deliberately miss the first (index=0) item
+            for (let i = l - 1; i > 0; i--) {
+              const source = sources[i];
+              const { layerPlanId, stepId } = source;
+              for (let j = i - 1; j >= 0; j--) {
+                const otherSource = sources[j];
+                if (
+                  otherSource.layerPlanId === layerPlanId &&
+                  otherSource.stepId === stepId
+                ) {
+                  if (!newSources) newSources = [...sources];
+                  // Duplicate! Remove it!
+                  newSources.splice(i, 1);
+                  break;
+                }
+              }
+            }
+            if (newSources) {
+              combo.sources = newSources;
+            }
+          }
+
+          // Populate our final polyPaths
+          const newPolyPaths = new Set<string>();
+          for (const lp of reason.parentLayerPlans) {
+            const paths = processPolymorphicPathsInLayerPlan(lp);
+            for (const p of paths) {
+              newPolyPaths.add(p);
+            }
+          }
+          polyPaths = newPolyPaths;
+
+          // Check that everything is sensible
+          if (isDev) {
+            // Let's check we're being sensible - each poly path should only be
+            // sourceable from one step, and these steps should only have poly
+            // paths that we understand
+            for (const { sources } of layerPlan.combinations) {
+              const overlapCheck = new Map<string, (typeof sources)[number]>();
+              for (const source of sources) {
+                const { layerPlanId, stepId } = source;
+                const step = this.stepTracker.getStepById(stepId);
+                const paths = step.polymorphicPaths;
+                if (paths === null) {
+                  throw new Error(
+                    `GrafastInternalError<170ac297-e7b2-4d15-bf3b-1c0c50a0da40>: Step ${step} shouldn't be used in a combo because it's valid in all polymorphic paths`,
+                  );
+                }
+                for (const p of paths) {
+                  if (overlapCheck.has(p)) {
+                    const sourceLp = this.stepTracker.layerPlans[layerPlanId];
+                    const dup = overlapCheck.get(p)!;
+                    const dupStep = this.stepTracker.getStepById(dup.stepId);
+                    const dupLp = this.stepTracker.layerPlans[dup.layerPlanId];
+                    throw new Error(
+                      `GrafastInternalError<f2d906fe-7f52-4234-a172-42691613f733>: Overlapping path ${p} in ${layerPlan} found; sourced from both ${step} in ${sourceLp} and ${dupStep} in ${dupLp}`,
+                    );
+                  }
+                  if (!newPolyPaths.has(p)) {
+                    throw new Error(
+                      `GrafastInternalError<c697df8f-e194-42f0-9f73-c510bc2e9b74>: path ${p} in ${layerPlan} not expected; sourced from ${step}`,
+                    );
+                  }
+                  overlapCheck.set(p, source);
+                }
+              }
+            }
+          }
+          break;
+        }
+        case "polymorphic":
+        case "polymorphicPartition": {
+          polyPaths = reason.polymorphicPaths;
+          break;
+        }
+        default: {
+          const never: never = reason;
+          throw new Error(
+            `GrafastInternalError<032aef95-97d8-4900-95f7-edc34a5d3703>: unexpected layer plan reason ${inspect(never)}`,
+          );
+        }
+      }
+
+      for (const step of layerPlan.steps) {
+        if (
+          step.polymorphicPaths !== null &&
+          step.polymorphicPaths.size !== polyPaths.size
+        ) {
+          step._isSelectiveStep = true;
+        }
+      }
+
+      polyPathsByLayerPlan.set(layerPlan, polyPaths);
+      return polyPaths;
+    };
+    for (const layerPlan of this.stepTracker.layerPlans) {
+      if (!layerPlan) continue;
+      processPolymorphicPathsInLayerPlan(layerPlan);
     }
 
     for (const layerPlan of this.stepTracker.layerPlans) {
@@ -3307,11 +4560,47 @@ export class OperationPlan {
       const sideEffectSteps = layerPlan.pendingSteps.filter(
         (s) => s.hasSideEffects,
       );
-      const pending = new Set<ExecutableStep>(layerPlan.pendingSteps);
-      const processed = new Set<ExecutableStep>();
+      const pending = new Set<Step>(layerPlan.pendingSteps);
+      const processed = new Set<Step>();
 
-      let latestSideEffectStep: ExecutableStep | null = null;
-      const processSideEffectPlan = (step: ExecutableStep) => {
+      const latestSideEffectStepByPolymorphicPath = new Map<
+        string,
+        Step | undefined
+      >();
+
+      const getLatestSideEffectStepFor = (step: Step) => {
+        const polymorphicPaths = [...(step.polymorphicPaths ?? [""])];
+        const latestSideEffectStep = latestSideEffectStepByPolymorphicPath.get(
+          polymorphicPaths[0],
+        );
+        for (let i = 1, l = polymorphicPaths.length; i < l; i++) {
+          const se = latestSideEffectStepByPolymorphicPath.get(
+            polymorphicPaths[i],
+          );
+          if (se !== latestSideEffectStep) {
+            throw new Error(
+              `You shouldn't have side effects in polymorphic positions; ${
+                step
+              } exists in ${
+                polymorphicPaths
+              } but these positions have mixed side effects (${
+                latestSideEffectStep
+              } @ ${polymorphicPaths[0]}, ${se} @ ${polymorphicPaths[i]})`,
+            );
+          }
+        }
+        return latestSideEffectStep;
+      };
+
+      const setLatestSideEffectStep = (step: Step) => {
+        const polymorphicPaths = [...(step.polymorphicPaths ?? [""])];
+        // Store this side effect for use from now on
+        for (let i = 0, l = polymorphicPaths.length; i < l; i++) {
+          latestSideEffectStepByPolymorphicPath.set(polymorphicPaths[i], step);
+        }
+      };
+
+      const processSideEffectPlan = (step: Step) => {
         if (processed.has(step) || isPrepopulatedStep(step)) {
           return;
         }
@@ -3319,8 +4608,8 @@ export class OperationPlan {
         processed.add(step);
         pending.delete(step);
 
-        const sideEffectDeps: ExecutableStep[] = [];
-        const rest: ExecutableStep[] = [];
+        const sideEffectDeps: Step[] = [];
+        const rest: Step[] = [];
         for (const dep of sstep.dependencies) {
           if (dep.layerPlan !== layerPlan) {
             continue;
@@ -3346,14 +4635,17 @@ export class OperationPlan {
           processSideEffectPlan(dep);
         }
 
+        const latestSideEffectStep = getLatestSideEffectStepFor(step);
+
         if (
-          latestSideEffectStep !== null &&
+          latestSideEffectStep !== undefined &&
           !stepADependsOnStepB(sstep, latestSideEffectStep)
         ) {
           sstep.implicitSideEffectStep = latestSideEffectStep;
         }
+
         if (step.hasSideEffects) {
-          latestSideEffectStep = step;
+          setLatestSideEffectStep(step);
         }
 
         const phase = /*#__INLINE__*/ newLayerPlanPhase();
@@ -3368,7 +4660,7 @@ export class OperationPlan {
         processSideEffectPlan(sideEffectStep);
       }
 
-      const readyToExecute = (step: ExecutableStep): boolean => {
+      const readyToExecute = (step: Step): boolean => {
         for (const dep of sudo(step).dependencies) {
           if (dep.layerPlan === layerPlan && pending.has(dep)) {
             return false;
@@ -3378,7 +4670,7 @@ export class OperationPlan {
       };
 
       while (pending.size > 0) {
-        const nextSteps: ExecutableStep[] = [];
+        const nextSteps: Step[] = [];
         for (const step of pending) {
           if (readyToExecute(step)) {
             nextSteps.push(step);
@@ -3398,13 +4690,18 @@ export class OperationPlan {
           processed.add(step);
           pending.delete(step);
           const sstep = sudo(step);
+          const latestSideEffectStep = getLatestSideEffectStepFor(step);
           if (
-            latestSideEffectStep !== null &&
+            latestSideEffectStep !== undefined &&
             !stepADependsOnStepB(sstep, latestSideEffectStep)
           ) {
             sstep.implicitSideEffectStep = latestSideEffectStep;
           }
-          if (step.isSyncAndSafe && isUnbatchedExecutableStep(step)) {
+          if (
+            step.isSyncAndSafe &&
+            isUnbatchedStep(step) &&
+            isSafeForUnbatched(step)
+          ) {
             if (phase.unbatchedSyncAndSafeSteps !== undefined) {
               phase.unbatchedSyncAndSafeSteps.push({
                 step,
@@ -3432,13 +4729,14 @@ export class OperationPlan {
         do {
           foundOne = false;
           for (const step of pending) {
-            if (step.isSyncAndSafe && isUnbatchedExecutableStep(step)) {
+            if (step.isSyncAndSafe && isUnbatchedStep(step)) {
               if (readyToExecute(step)) {
                 processed.add(step);
                 pending.delete(step);
                 const sstep = sudo(step);
+                const latestSideEffectStep = getLatestSideEffectStepFor(step);
                 if (
-                  latestSideEffectStep !== null &&
+                  latestSideEffectStep !== undefined &&
                   !stepADependsOnStepB(sstep, latestSideEffectStep)
                 ) {
                   sstep.implicitSideEffectStep = latestSideEffectStep;
@@ -3511,7 +4809,18 @@ export class OperationPlan {
         // don't need to actually scale it up/down.
         //
         // If parentSideEffectStep exists then parentLayerPlan must exist.
-        ensurePlanAvailableInLayer($sideEffect, layerPlan.parentLayerPlan!);
+        if (layerPlan.reason.type === "root") {
+          // No action
+        } else if (layerPlan.reason.type === "combined") {
+          throw new Error(
+            `GrafastInternalError<26f6b639-637b-4db5-980b-294697317e35>: combined layer plan ${layerPlan} is not permitted to reference side effects`,
+          );
+        } else {
+          ensurePlanAvailableInLayer(
+            $sideEffect,
+            layerPlan.reason.parentLayerPlan,
+          );
+        }
       }
 
       // Copy polymorphic parentStepId
@@ -3523,7 +4832,50 @@ export class OperationPlan {
       // Ensure list is accessible in parent layerPlan
       if (layerPlan.reason.type === "listItem") {
         const parentStep = layerPlan.reason.parentStep;
-        ensurePlanAvailableInLayer(parentStep, layerPlan.parentLayerPlan!);
+        ensurePlanAvailableInLayer(
+          parentStep,
+          layerPlan.reason.parentLayerPlan,
+        );
+        const stream = layerPlan.reason.stream;
+        if (stream != null) {
+          if (stream.initialCountStepId) {
+            ensurePlanAvailableInLayer(
+              this.stepTracker.getStepById(stream.initialCountStepId),
+              layerPlan.reason.parentLayerPlan,
+            );
+          }
+          if (stream.ifStepId) {
+            ensurePlanAvailableInLayer(
+              this.stepTracker.getStepById(stream.ifStepId),
+              layerPlan.reason.parentLayerPlan,
+            );
+          }
+          if (stream.labelStepId) {
+            ensurePlanAvailableInLayer(
+              this.stepTracker.getStepById(stream.labelStepId),
+              layerPlan.reason.parentLayerPlan,
+            );
+          }
+        }
+      }
+
+      if (layerPlan.reason.type === "combined") {
+        // Loop through combinations and ensure source step is available in parent layer plan
+        for (const combo of layerPlan.combinations) {
+          for (const source of combo.sources) {
+            const { stepId, layerPlanId } = source;
+            const sourceLayerPlan = layerPlan.reason.parentLayerPlans.find(
+              (p) => p.id === layerPlanId,
+            );
+            if (!sourceLayerPlan) {
+              throw new Error(
+                `GrafastInternalError<86d15f1e-7ec8-4095-869a-548daa2cea0e>: Could not find the parent layer plan ${layerPlanId} of ${layerPlan}`,
+              );
+            }
+            const step = this.stepTracker.getStepById(stepId);
+            ensurePlanAvailableInLayer(step, sourceLayerPlan);
+          }
+        }
       }
     }
 
@@ -3577,7 +4929,7 @@ export class OperationPlan {
   }
 
   generatePlanJSON(): GrafastPlanJSON {
-    function printStep(step: ExecutableStep): GrafastPlanStepJSONv1 {
+    function printStep(step: Step): GrafastPlanStepJSONv1 {
       const metaString = step.toStringMeta();
       const sstep = sudo(step);
       return {
@@ -3592,6 +4944,7 @@ export class OperationPlan {
         dependencyOnReject: sstep.dependencyOnReject.map((or) =>
           or ? String(or) : or,
         ),
+        dependencyDataOnly: sstep.dependencyDataOnly.slice(),
         polymorphicPaths: step.polymorphicPaths
           ? [...step.polymorphicPaths]
           : undefined,
@@ -3599,6 +4952,9 @@ export class OperationPlan {
         supportsUnbatched:
           typeof (step as any).unbatchedExecute === "function" || undefined,
         hasSideEffects: step.hasSideEffects || undefined,
+        stream: step._stepOptions.stream
+          ? { initialCountStepId: step._stepOptions.stream.initialCountStepId }
+          : undefined,
         extra: step.planJSONExtra(),
       };
     }
@@ -3611,8 +4967,9 @@ export class OperationPlan {
       };
     }
     function printBucketReason(
-      reason: LayerPlanReason,
+      layerPlan: LayerPlan,
     ): GrafastPlanBucketReasonJSONv1 {
+      const { reason } = layerPlan;
       switch (reason.type) {
         case "root": {
           const { type } = reason;
@@ -3642,14 +4999,36 @@ export class OperationPlan {
           const { type, typeNames, parentStep, polymorphicPaths } = reason;
           return {
             type,
-            typeNames,
+            typeNames: [...typeNames],
             parentStepId: parentStep.id,
+            polymorphicPaths: [...polymorphicPaths],
+          };
+        }
+        case "polymorphicPartition": {
+          const { type, typeNames, polymorphicPaths } = reason;
+          return {
+            type,
+            typeNames: [...typeNames],
             polymorphicPaths: [...polymorphicPaths],
           };
         }
         case "subroutine": {
           const { type, parentStep } = reason;
           return { type, parentStepId: parentStep.id };
+        }
+        case "combined": {
+          const { type, parentLayerPlans } = reason;
+          return {
+            type,
+            parentLayerPlanIds: [...parentLayerPlans].map((l) => l.id),
+            combinations: layerPlan.combinations.map((c) => ({
+              sources: c.sources.map((f) => ({
+                layerPlanId: f.layerPlanId,
+                stepId: f.stepId,
+              })),
+              targetStepId: c.targetStepId,
+            })),
+          };
         }
         default: {
           const never: never = reason;
@@ -3660,26 +5039,27 @@ export class OperationPlan {
       }
     }
     function printBucket(lp: LayerPlan): GrafastPlanBucketJSONv1 {
-      lp.reason;
       return {
         id: lp.id,
-        reason: printBucketReason(lp.reason),
+        reason: printBucketReason(lp),
         parentSideEffectStepId: lp.parentSideEffectStep?.id ?? null,
         copyStepIds: lp.copyStepIds,
         phases: lp.phases.map(printPhase),
         steps: lp.steps.map(printStep),
-        children: lp.children.map(printBucket),
+        childIds: lp.children.map((c) => c.id),
         rootStepId: lp.rootStep ? lp.rootStep.id : null,
       };
     }
     return {
       version: "v1",
-      rootBucket: printBucket(this.rootLayerPlan),
+      buckets: this.stepTracker.layerPlans
+        .filter((b) => b != null)
+        .map(printBucket),
     } as GrafastPlanJSONv1;
   }
 
   finishSubroutine(
-    subroutineStep: ExecutableStep,
+    subroutineStep: Step,
     layerPlan: LayerPlan<LayerPlanReasonSubroutine>,
   ): void {
     // Now find anything that these plans are dependent on and make ourself
@@ -3711,8 +5091,8 @@ export class OperationPlan {
     this.stepTracker.deleteLayerPlan(layerPlan);
   }
 
-  getStepsByMetaKey(metaKey: string | number | symbol): ExecutableStep[] {
-    const matches: ExecutableStep[] = [];
+  getStepsByMetaKey(metaKey: string | number | symbol): Step[] {
+    const matches: Step[] = [];
     for (const step of this.stepTracker.activeSteps) {
       if (step.metaKey === metaKey) {
         matches.push(step);
@@ -3721,7 +5101,7 @@ export class OperationPlan {
     return matches;
   }
 
-  getStepsByStepClass<TClass extends ExecutableStep>(klass: {
+  getStepsByStepClass<TClass extends Step>(klass: {
     new (...args: any[]): TClass;
   }): TClass[] {
     const matches: TClass[] = [];
@@ -3733,10 +5113,9 @@ export class OperationPlan {
     return matches;
   }
 
-  private _cacheStepStoreByLayerPlanAndActionKey: Record<
-    string,
-    Record<symbol | string | number, any> | undefined
-  > = Object.create(null);
+  private _cacheStepStoreByActionKeyByLayerPlan: Map<number, StepCache> =
+    new Map();
+  private _immutableCacheStepStoreAndActionKey: StepCache = Object.create(null);
   /**
    * Cache a generated step by a given identifier (cacheKey) such that we don't
    * need to regenerate it on future calls, significantly reducing the load on
@@ -3744,37 +5123,73 @@ export class OperationPlan {
    *
    * @experimental
    */
-  cacheStep<T extends ExecutableStep>(
-    ownerStep: ExecutableStep,
+  cacheStep<T extends Step>(
+    ownerStep: Step,
     actionKey: string,
-    cacheKey: symbol | string | number,
+    cacheKey: symbol | string | number | boolean | null | undefined,
     cb: () => T,
   ): T {
     const layerPlan = currentLayerPlan();
-    const cache = (this._cacheStepStoreByLayerPlanAndActionKey[
-      `${actionKey}|${layerPlan.id}|${ownerStep.id}`
-    ] ??= Object.create(null));
+    let cache = this._cacheStepStoreByActionKeyByLayerPlan.get(layerPlan.id);
+    if (!cache) {
+      cache = Object.create(null) as StepCache;
+      this._cacheStepStoreByActionKeyByLayerPlan.set(layerPlan.id, cache);
+    }
+    return this._cacheStep(cache, ownerStep, actionKey, cacheKey, cb);
+  }
+
+  /** @internal */
+  cacheImmutableStep<T extends Step>(
+    actionKey: string,
+    cacheKey: any /* Anything suitable to be the key in a Map */,
+    cb: () => T,
+  ): T {
+    const cache = this._immutableCacheStepStoreAndActionKey;
+    return this._cacheStep(
+      cache,
+      this.variableValuesStep,
+      actionKey,
+      cacheKey,
+      cb,
+    );
+  }
+
+  _cacheStep<T extends Step>(
+    store: StepCache,
+    ownerStep: Step,
+    actionKey: string,
+    cacheKey: any /* Anything suitable to be the key in a Map */,
+    cb: () => T,
+  ): T {
+    const paths = currentPolymorphicPaths();
+    const cache = (store[
+      `${actionKey}|${ownerStep.id}|${paths == null ? "" : [...paths].join(",")}`
+    ] ??= new Map());
 
     const cacheIt = () => {
       const stepToCache = cb();
-      if (!(stepToCache instanceof ExecutableStep)) {
+      if (!(stepToCache instanceof Step)) {
         throw new Error(
           `The callback passed to cacheStep must always return an ExecutableStep; but this call from ${ownerStep} returned instead ${inspect(
             stepToCache,
           )}`,
         );
       }
-      cache[cacheKey] = stepToCache.id;
+      cache.set(cacheKey, stepToCache.id);
       return stepToCache;
     };
 
-    if (!(cacheKey in cache)) {
+    if (!cache.has(cacheKey)) {
       return cacheIt();
     }
 
-    const cachedStepId = cache[cacheKey];
+    const cachedStepId = cache.get(cacheKey);
     const cachedStep = this.stepTracker.stepById[cachedStepId] as T | undefined;
-    return cachedStep ?? cacheIt();
+    if (cachedStep) {
+      return cachedStep;
+    } else {
+      return cacheIt();
+    }
   }
 
   /**
@@ -3782,17 +5197,17 @@ export class OperationPlan {
    * from setting hasSideEffects on an ExecutableStep, among other places.
    */
   public resetCache() {
-    this._cacheStepStoreByLayerPlanAndActionKey = Object.create(null);
+    this._cacheStepStoreByActionKeyByLayerPlan.clear();
   }
-}
 
-function makeDefaultPlan(fieldName: string) {
-  return (
-    $step: ExecutableStep & { get?: (field: string) => ExecutableStep },
-  ) =>
-    typeof $step.get === "function"
-      ? $step.get(fieldName)
-      : access($step, [fieldName]);
+  public withRootLayerPlan<T>(cb: () => T): T {
+    return withGlobalLayerPlan(
+      this.rootLayerPlan,
+      POLYMORPHIC_ROOT_PATHS,
+      null,
+      cb,
+    );
+  }
 }
 
 function makeMetaByMetaKeysFactory(
@@ -3945,11 +5360,11 @@ function newLayerPlanPhase(): LayerPlanPhase {
 function throwNoNewStepsError(
   operationPlan: OperationPlan,
   actionDescription: string,
-  step: ExecutableStep,
+  step: Step,
   previousStepCount: number,
   message: string,
 ) {
-  const newSteps: (ExecutableStep | null)[] = [];
+  const newSteps: (Step | null)[] = [];
   for (
     let i = previousStepCount, l = operationPlan.stepTracker.stepCount;
     i < l;
@@ -3962,4 +5377,152 @@ function throwNoNewStepsError(
       .map((s) => String(s))
       .join(", ")}`,
   );
+}
+
+type QueueTuple<T extends CommonPlanningDetails> = [
+  method: (details: T) => void | Generator<() => any, void, any>,
+  details: T,
+  loc: string[] | null,
+  originalLayerPlan: LayerPlan,
+  layerPlanLatestSideEffect: Step | null,
+];
+
+function isSafeForUnbatched(step: UnbatchedExecutableStep): boolean {
+  // Never run (potential) stream steps as unbatched, otherwise they won't be
+  // able to stream!
+  if (step._stepOptions.stream) return false;
+  // Non-unary steps are safe for unbatched execution
+  if (step._isUnary === false) return true;
+  // Unary steps are only safe for unbatched execution _if_ their polymorphic
+  // paths match that of their bucket.
+  // !! search "f4ce2c83"
+  if (step.polymorphicPaths === null) return true;
+  // PERF: this can probably be optimized further
+  return false;
+}
+
+function defaultPlanType(
+  $stepOrSpecifier: Step,
+  info: PlanTypeInfo,
+): AbstractTypePlanner {
+  const $__typename =
+    $stepOrSpecifier.toTypename?.() ??
+    (info.resolverEmulation
+      ? graphqlResolveType($stepOrSpecifier, info)
+      : get($stepOrSpecifier, "__typename"));
+  return { $__typename };
+}
+
+function polymorphicPathsForLayer(
+  layer: LayerPlan,
+): ReadonlySet<string> | null {
+  switch (layer.reason.type) {
+    case "polymorphic":
+    case "polymorphicPartition": {
+      return layer.reason.polymorphicPaths;
+    }
+    case "combined": {
+      const set = new Set<string>();
+      for (const lp of layer.reason.parentLayerPlans) {
+        for (const p of polymorphicPathsForLayer(lp)!) {
+          set.add(p);
+        }
+      }
+      return set;
+    }
+    case "root": {
+      return null;
+    }
+    default: {
+      return polymorphicPathsForLayer(layer.reason.parentLayerPlan);
+    }
+  }
+}
+
+function stepIsValidInPolyPath($step: Step, polyPath: string): boolean {
+  if (!$step.polymorphicPaths) return true;
+  let trimmed = polyPath;
+  do {
+    if ($step.polymorphicPaths.has(trimmed)) return true;
+    const i = trimmed.lastIndexOf(">");
+    trimmed = trimmed.slice(0, i);
+  } while (trimmed.length > 0 && trimmed[0] === ">");
+  return false;
+}
+
+function isPeerLayerPlan(
+  lp1: LayerPlan | undefined,
+  lp2: LayerPlan | undefined,
+) {
+  if (lp1 == null || lp2 == null) {
+    return false;
+  }
+  if (lp1 === lp2) return true;
+  if (
+    lp1.reason.type === "polymorphicPartition" &&
+    lp2.reason.type === "polymorphicPartition" &&
+    lp1.reason.parentLayerPlan === lp2.reason.parentLayerPlan
+  ) {
+    return true;
+  }
+  return false;
+}
+
+type StepCache = Record<string, Map<any, any> | undefined>;
+
+interface PlanFieldDetails {
+  typeName: string;
+  fieldName: string;
+  layerPlan: LayerPlan;
+  path: readonly string[];
+  polymorphicPaths: ReadonlySet<string> | null;
+  planningPath: string;
+  planResolver: FieldPlanResolver;
+  applyAfterMode: ApplyAfterModeArg;
+  rawParentStep: Step;
+  field: GraphQLField<any, any>;
+  trackedArguments: TrackedArguments;
+  // If 'true' this is a subscription rather than a stream
+  // If 'false' this is a list but it will never stream
+  // If 'null' this is neither subscribe field nor list field
+  // Otherwise, it's a list field that has the `@stream` directive applied
+  streamDetails: StreamDetails | true | false | null;
+}
+
+type PlanFieldBatchResult =
+  | { error: Error }
+  | { error?: never; haltTree: boolean; step: Step };
+
+interface PlanFieldBatch {
+  complete: boolean;
+  batch: Array<PlanFieldDetails>;
+  results: Array<PlanFieldBatchResult>;
+}
+
+/**
+ * NOTE: includes `start` itself, so it's not _truly_ descendents
+ */
+function getDescendents(
+  start: LayerPlan,
+  childrenByLayerPlan: ReadonlyMap<LayerPlan, readonly LayerPlan[]>,
+): Set<LayerPlan> {
+  const descendents = new Set<LayerPlan>();
+  const queue = [start];
+
+  while (queue.length > 0) {
+    const current = queue.pop()!;
+
+    // Already seen
+    if (descendents.has(current)) continue;
+    descendents.add(current);
+
+    const children = childrenByLayerPlan.get(current);
+    if (children) {
+      for (const child of children) {
+        queue.push(child);
+      }
+    }
+  }
+
+  return descendents;
 }

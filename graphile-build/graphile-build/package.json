@@ -1,6 +1,6 @@
 {
   "name": "graphile-build",
-  "version": "5.0.0-beta.31",
+  "version": "5.0.0-beta.33",
   "description": "Build a GraphQL schema from plugins",
   "type": "commonjs",
   "main": "./dist/index.js",
@@ -36,7 +36,7 @@
   },
   "homepage": "https://graphile.org/graphile-build/",
   "dependencies": {
-    "@types/node": "^20.5.7",
+    "@types/node": "^20.17.30",
     "@types/pluralize": "^0.0.30",
     "@types/semver": "^7.5.1",
     "chalk": "^4.1.2",
@@ -47,7 +47,7 @@
     "pluralize": "^7.0.0",
     "semver": "^7.5.4",
     "tamedevil": "workspace:^",
-    "tslib": "^2.6.2"
+    "tslib": "^2.8.1"
   },
   "engines": {
     "node": ">=16"
@@ -68,6 +68,6 @@
     "graphql": "16.1.0-experimental-stream-defer.6",
     "jest": "^29.6.4",
     "ts-node": "^10.9.1",
-    "typescript": "^5.2.2"
+    "typescript": "^5.8.3"
   }
 }

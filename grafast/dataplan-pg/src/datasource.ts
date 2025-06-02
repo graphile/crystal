@@ -455,7 +455,7 @@ export class PgResource<
     const selectAuth =
       overrideSelectAuth === null
         ? null
-        : overrideSelectAuth ?? originalSelectAuth;
+        : (overrideSelectAuth ?? originalSelectAuth);
     if (!returnsArray) {
       // This is the easy case
       return {
@@ -725,7 +725,7 @@ export class PgResource<
   }
 
   execute(
-    args: Array<PgSelectArgumentSpec> = [],
+    args: ReadonlyArray<PgSelectArgumentSpec> = [],
     mode: PgSelectMode = this.isMutation ? "mutation" : "normal",
   ): ExecutableStep<unknown> {
     const $select = pgSelect({
@@ -819,12 +819,13 @@ export class PgResource<
     } else {
       // Every column in a primary key is non-nullable; so just see if one is null
       const pk = this.uniques.find((u) => u.isPrimary);
-      const nonNullableAttribute = this.codec.attributes
-        ? Object.entries(this.codec.attributes).find(
-            ([_attributeName, spec]) =>
-              !spec.via && !spec.expression && spec.notNull,
-          )?.[0]
-        : null ?? pk?.attributes[0];
+      const nonNullableAttribute =
+        (this.codec.attributes
+          ? Object.entries(this.codec.attributes).find(
+              ([_attributeName, spec]) =>
+                !spec.via && !spec.expression && spec.notNull,
+            )?.[0]
+          : null) ?? pk?.attributes[0];
       if (nonNullableAttribute) {
         const firstAttribute = sql`${alias}.${sql.identifier(
           nonNullableAttribute,
@@ -1387,7 +1388,7 @@ function validateRelations(registry: PgRegistry<any, any, any, any>): void {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}, {}> {
   const registryConfig: PgRegistryConfig<any, any, any> = {
     pgExecutors: Object.create(null),
@@ -1519,8 +1520,9 @@ exportAs("@dataplan/pg", makePgResourceOptions, "makePgResourceOptions");
 
 function printResourceFrom(resource: PgResourceOptions): string {
   if (typeof resource.from === "function") {
-    return `a function accepting ${resource.parameters
-      ?.length} parameters and returning SQL type '${
+    return `a function accepting ${
+      resource.parameters?.length
+    } parameters and returning SQL type '${
       sql.compile(resource.codec.sqlType).text
     }'`;
   } else {

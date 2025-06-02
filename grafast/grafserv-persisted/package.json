@@ -1,6 +1,6 @@
 {
   "name": "@grafserv/persisted",
-  "version": "0.0.0-beta.31",
+  "version": "0.0.0-beta.34",
   "description": "Persisted operations support for Grafserv",
   "type": "commonjs",
   "main": "dist/index.js",
@@ -40,7 +40,7 @@
   "homepage": "https://github.com/graphile/crystal/tree/main/grafast/grafserv-persisted",
   "dependencies": {
     "@graphile/lru": "workspace:^",
-    "tslib": "^2.6.2"
+    "tslib": "^2.8.1"
   },
   "engines": {
     "node": ">=16.10"
@@ -62,7 +62,7 @@
     "jest": "^29.6.4",
     "jest-serializer-graphql-schema": "workspace:^",
     "ts-node": "^10.9.1",
-    "typescript": "^5.2.2"
+    "typescript": "^5.8.3"
   },
   "files": [
     "dist",

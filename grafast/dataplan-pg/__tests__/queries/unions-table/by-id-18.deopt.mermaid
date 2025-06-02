@@ -7,185 +7,221 @@ graph TD
     classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
+    subgraph "Buckets for queries/unions-table/by-id-18"
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 61, 134, 10<br />2: PgSelect[7], PgUnionAll[19]<br />ᐳ: 133, 21, 59, 60, 62, 63, 64, 65<br />3: PgSelectRows[12]<br />ᐳ: 11, 13, 14, 16, 17"):::bucket
+    Bucket1("Bucket 1 (polymorphic)<br />__typename: Lambda[16]<br />Deps: 16, 10, 17"):::bucket
+    Bucket2("Bucket 2 (polymorphic)<br />__typename: Access[64]<br />Deps: 64, 10, 65"):::bucket
+    Bucket3("Bucket 3 (polymorphicPartition)<br />|UnionTopic<br />Deps: 10, 17<br />ᐳUnionTopic<br /><br />1: PgSelect[24]<br />2: PgSelectRows[29]<br />ᐳ: 28, 30, 105, 115"):::bucket
+    Bucket4("Bucket 4 (polymorphicPartition)<br />|UnionPost<br />Deps: 10, 17<br />ᐳUnionPost<br /><br />1: PgSelect[31]<br />2: PgSelectRows[36]<br />ᐳ: 35, 37, 106, 116, 125, 131"):::bucket
+    Bucket5("Bucket 5 (polymorphicPartition)<br />|UnionDivider<br />Deps: 10, 17<br />ᐳUnionDivider<br /><br />1: PgSelect[38]<br />2: PgSelectRows[43]<br />ᐳ: 42, 44, 107, 117, 126"):::bucket
+    Bucket6("Bucket 6 (polymorphicPartition)<br />|UnionChecklist<br />Deps: 10, 17<br />ᐳUnionChecklist<br /><br />1: PgSelect[45]<br />2: PgSelectRows[50]<br />ᐳ: 49, 51, 108, 118"):::bucket
+    Bucket7("Bucket 7 (polymorphicPartition)<br />|UnionChecklistItem<br />Deps: 10, 17<br />ᐳUnionChecklistItem<br /><br />1: PgSelect[52]<br />2: PgSelectRows[57]<br />ᐳ: 56, 58, 109, 119, 127"):::bucket
+    Bucket8("Bucket 8 (polymorphicPartition)<br />|UnionTopic<br />Deps: 10, 65<br />ᐳUnionTopic<br /><br />1: PgSelect[66]<br />2: PgSelectRows[71]<br />ᐳ: 70, 72, 110, 120"):::bucket
+    Bucket9("Bucket 9 (polymorphicPartition)<br />|UnionPost<br />Deps: 10, 65<br />ᐳUnionPost<br /><br />1: PgSelect[74]<br />2: PgSelectRows[79]<br />ᐳ: 78, 80, 111, 121, 128, 132"):::bucket
+    Bucket10("Bucket 10 (polymorphicPartition)<br />|UnionDivider<br />Deps: 10, 65<br />ᐳUnionDivider<br /><br />1: PgSelect[82]<br />2: PgSelectRows[87]<br />ᐳ: 86, 88, 112, 122, 129"):::bucket
+    Bucket11("Bucket 11 (polymorphicPartition)<br />|UnionChecklist<br />Deps: 10, 65<br />ᐳUnionChecklist<br /><br />1: PgSelect[90]<br />2: PgSelectRows[95]<br />ᐳ: 94, 96, 113, 123"):::bucket
+    Bucket12("Bucket 12 (polymorphicPartition)<br />|UnionChecklistItem<br />Deps: 10, 65<br />ᐳUnionChecklistItem<br /><br />1: PgSelect[98]<br />2: PgSelectRows[103]<br />ᐳ: 102, 104, 114, 124, 130"):::bucket
+    end
+    Bucket0 --> Bucket1 & Bucket2
+    Bucket1 --> Bucket3 & Bucket4 & Bucket5 & Bucket6 & Bucket7
+    Bucket2 --> Bucket8 & Bucket9 & Bucket10 & Bucket11 & Bucket12
 
     %% plan dependencies
-    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸunion_itemsᐳ"]]:::plan
-    Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant104{{"Constant[104∈0] ➊<br />ᐸ18ᐳ"}}:::plan
-    Object10 & Constant104 --> PgSelect7
+    List62{{"List[62∈0] ➊<br />ᐸ59,60,61ᐳ<br />More deps:<br />- Constantᐸ[HIDDEN]ᐳ[61]"}}:::plan
+    Access59{{"Access[59∈0] ➊<br />ᐸ21.0ᐳ"}}:::plan
+    Access60{{"Access[60∈0] ➊<br />ᐸ21.1ᐳ"}}:::plan
+    Access59 & Access60 --> List62
+    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸunion_itemsᐳ<br />More deps:<br />- Object[10]<br />- Constantᐸ18ᐳ[134]"]]:::plan
+    Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 12"}}:::plan
     Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
-    PgPolymorphic14{{"PgPolymorphic[14∈0] ➊"}}:::plan
-    PgSelectSingle12{{"PgSelectSingle[12∈0] ➊<br />ᐸunion_itemsᐳ"}}:::plan
-    PgClassExpression13{{"PgClassExpression[13∈0] ➊<br />ᐸ__union_items__.”type”ᐳ"}}:::plan
-    PgSelectSingle12 & PgClassExpression13 --> PgPolymorphic14
-    PgUnionAll53[["PgUnionAll[53∈0] ➊"]]:::plan
-    Object10 & Constant104 --> PgUnionAll53
+    PgUnionAll19[["PgUnionAll[19∈0] ➊<br />ᐸUnionTopic,UnionPost,UnionDivider,UnionChecklist,UnionChecklistItemᐳ<br />More deps:<br />- Object[10]<br />- Constantᐸ18ᐳ[134]"]]:::plan
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
     First11{{"First[11∈0] ➊"}}:::plan
-    PgSelect7 --> First11
-    First11 --> PgSelectSingle12
-    PgSelectSingle12 --> PgClassExpression13
-    First55{{"First[55∈0] ➊"}}:::plan
-    PgUnionAll53 --> First55
-    PgUnionAllSingle56["PgUnionAllSingle[56∈0] ➊"]:::plan
-    First55 --> PgUnionAllSingle56
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    PgSelect16[["PgSelect[16∈1] ➊<br />ᐸunion_topicsᐳ<br />ᐳUnionTopic"]]:::plan
-    PgClassExpression15{{"PgClassExpression[15∈1] ➊<br />ᐸ__union_items__.”id”ᐳ<br />ᐳUnionTopic"}}:::plan
-    Object10 & PgClassExpression15 --> PgSelect16
-    PgSelect24[["PgSelect[24∈1] ➊<br />ᐸunion_postsᐳ<br />ᐳUnionPost"]]:::plan
-    Object10 & PgClassExpression15 --> PgSelect24
-    PgSelect32[["PgSelect[32∈1] ➊<br />ᐸunion_dividersᐳ<br />ᐳUnionDivider"]]:::plan
-    Object10 & PgClassExpression15 --> PgSelect32
-    PgSelect39[["PgSelect[39∈1] ➊<br />ᐸunion_checklistsᐳ<br />ᐳUnionChecklist"]]:::plan
-    Object10 & PgClassExpression15 --> PgSelect39
-    PgSelect45[["PgSelect[45∈1] ➊<br />ᐸunion_checklist_itemsᐳ<br />ᐳUnionChecklistItem"]]:::plan
-    Object10 & PgClassExpression15 --> PgSelect45
-    PgSelectSingle12 --> PgClassExpression15
-    First20{{"First[20∈1] ➊"}}:::plan
-    PgSelect16 --> First20
-    PgSelectSingle21{{"PgSelectSingle[21∈1] ➊<br />ᐸunion_topicsᐳ"}}:::plan
-    First20 --> PgSelectSingle21
-    PgClassExpression22{{"PgClassExpression[22∈1] ➊<br />ᐸ__union_topics__.”id”ᐳ"}}:::plan
-    PgSelectSingle21 --> PgClassExpression22
-    PgClassExpression23{{"PgClassExpression[23∈1] ➊<br />ᐸ__union_to...__.”title”ᐳ"}}:::plan
-    PgSelectSingle21 --> PgClassExpression23
-    First26{{"First[26∈1] ➊"}}:::plan
-    PgSelect24 --> First26
-    PgSelectSingle27{{"PgSelectSingle[27∈1] ➊<br />ᐸunion_postsᐳ"}}:::plan
-    First26 --> PgSelectSingle27
-    PgClassExpression28{{"PgClassExpression[28∈1] ➊<br />ᐸ__union_posts__.”id”ᐳ"}}:::plan
-    PgSelectSingle27 --> PgClassExpression28
-    PgClassExpression29{{"PgClassExpression[29∈1] ➊<br />ᐸ__union_posts__.”title”ᐳ"}}:::plan
-    PgSelectSingle27 --> PgClassExpression29
-    PgClassExpression30{{"PgClassExpression[30∈1] ➊<br />ᐸ__union_po...scription”ᐳ"}}:::plan
-    PgSelectSingle27 --> PgClassExpression30
-    PgClassExpression31{{"PgClassExpression[31∈1] ➊<br />ᐸ__union_posts__.”note”ᐳ"}}:::plan
-    PgSelectSingle27 --> PgClassExpression31
-    First34{{"First[34∈1] ➊"}}:::plan
-    PgSelect32 --> First34
-    PgSelectSingle35{{"PgSelectSingle[35∈1] ➊<br />ᐸunion_dividersᐳ"}}:::plan
-    First34 --> PgSelectSingle35
-    PgClassExpression36{{"PgClassExpression[36∈1] ➊<br />ᐸ__union_dividers__.”id”ᐳ"}}:::plan
-    PgSelectSingle35 --> PgClassExpression36
-    PgClassExpression37{{"PgClassExpression[37∈1] ➊<br />ᐸ__union_di...__.”title”ᐳ"}}:::plan
-    PgSelectSingle35 --> PgClassExpression37
-    PgClassExpression38{{"PgClassExpression[38∈1] ➊<br />ᐸ__union_di...__.”color”ᐳ"}}:::plan
-    PgSelectSingle35 --> PgClassExpression38
-    First41{{"First[41∈1] ➊"}}:::plan
-    PgSelect39 --> First41
-    PgSelectSingle42{{"PgSelectSingle[42∈1] ➊<br />ᐸunion_checklistsᐳ"}}:::plan
-    First41 --> PgSelectSingle42
-    PgClassExpression43{{"PgClassExpression[43∈1] ➊<br />ᐸ__union_ch...sts__.”id”ᐳ"}}:::plan
-    PgSelectSingle42 --> PgClassExpression43
-    PgClassExpression44{{"PgClassExpression[44∈1] ➊<br />ᐸ__union_ch...__.”title”ᐳ"}}:::plan
-    PgSelectSingle42 --> PgClassExpression44
-    First47{{"First[47∈1] ➊"}}:::plan
-    PgSelect45 --> First47
-    PgSelectSingle48{{"PgSelectSingle[48∈1] ➊<br />ᐸunion_checklist_itemsᐳ"}}:::plan
-    First47 --> PgSelectSingle48
-    PgClassExpression49{{"PgClassExpression[49∈1] ➊<br />ᐸ__union_ch...ems__.”id”ᐳ"}}:::plan
-    PgSelectSingle48 --> PgClassExpression49
-    PgClassExpression50{{"PgClassExpression[50∈1] ➊<br />ᐸ__union_ch...scription”ᐳ"}}:::plan
-    PgSelectSingle48 --> PgClassExpression50
-    PgClassExpression51{{"PgClassExpression[51∈1] ➊<br />ᐸ__union_ch...s__.”note”ᐳ"}}:::plan
-    PgSelectSingle48 --> PgClassExpression51
-    PgSelect60[["PgSelect[60∈2] ➊<br />ᐸunion_topicsᐳ<br />ᐳUnionTopic"]]:::plan
-    Access59{{"Access[59∈2] ➊<br />ᐸ58.0ᐳ"}}:::plan
-    Object10 & Access59 --> PgSelect60
-    PgSelect70[["PgSelect[70∈2] ➊<br />ᐸunion_postsᐳ<br />ᐳUnionPost"]]:::plan
-    Access69{{"Access[69∈2] ➊<br />ᐸ68.0ᐳ"}}:::plan
-    Object10 & Access69 --> PgSelect70
-    PgSelect80[["PgSelect[80∈2] ➊<br />ᐸunion_dividersᐳ<br />ᐳUnionDivider"]]:::plan
-    Access79{{"Access[79∈2] ➊<br />ᐸ78.0ᐳ"}}:::plan
-    Object10 & Access79 --> PgSelect80
-    PgSelect89[["PgSelect[89∈2] ➊<br />ᐸunion_checklistsᐳ<br />ᐳUnionChecklist"]]:::plan
-    Access88{{"Access[88∈2] ➊<br />ᐸ87.0ᐳ"}}:::plan
-    Object10 & Access88 --> PgSelect89
-    PgSelect97[["PgSelect[97∈2] ➊<br />ᐸunion_checklist_itemsᐳ<br />ᐳUnionChecklistItem"]]:::plan
-    Access96{{"Access[96∈2] ➊<br />ᐸ95.0ᐳ"}}:::plan
-    Object10 & Access96 --> PgSelect97
-    Access57{{"Access[57∈2] ➊<br />ᐸ56.1ᐳ<br />ᐳUnionTopic"}}:::plan
-    PgUnionAllSingle56 --> Access57
-    JSONParse58[["JSONParse[58∈2] ➊<br />ᐸ57ᐳ"]]:::plan
-    Access57 --> JSONParse58
-    JSONParse58 --> Access59
-    First64{{"First[64∈2] ➊"}}:::plan
-    PgSelect60 --> First64
-    PgSelectSingle65{{"PgSelectSingle[65∈2] ➊<br />ᐸunion_topicsᐳ"}}:::plan
-    First64 --> PgSelectSingle65
-    PgClassExpression66{{"PgClassExpression[66∈2] ➊<br />ᐸ__union_topics__.”id”ᐳ"}}:::plan
-    PgSelectSingle65 --> PgClassExpression66
-    PgClassExpression67{{"PgClassExpression[67∈2] ➊<br />ᐸ__union_to...__.”title”ᐳ"}}:::plan
-    PgSelectSingle65 --> PgClassExpression67
-    JSONParse68[["JSONParse[68∈2] ➊<br />ᐸ57ᐳ<br />ᐳUnionPost"]]:::plan
-    Access57 --> JSONParse68
-    JSONParse68 --> Access69
-    First72{{"First[72∈2] ➊"}}:::plan
-    PgSelect70 --> First72
-    PgSelectSingle73{{"PgSelectSingle[73∈2] ➊<br />ᐸunion_postsᐳ"}}:::plan
-    First72 --> PgSelectSingle73
-    PgClassExpression74{{"PgClassExpression[74∈2] ➊<br />ᐸ__union_posts__.”id”ᐳ"}}:::plan
-    PgSelectSingle73 --> PgClassExpression74
-    PgClassExpression75{{"PgClassExpression[75∈2] ➊<br />ᐸ__union_posts__.”title”ᐳ"}}:::plan
-    PgSelectSingle73 --> PgClassExpression75
-    PgClassExpression76{{"PgClassExpression[76∈2] ➊<br />ᐸ__union_po...scription”ᐳ"}}:::plan
-    PgSelectSingle73 --> PgClassExpression76
-    PgClassExpression77{{"PgClassExpression[77∈2] ➊<br />ᐸ__union_posts__.”note”ᐳ"}}:::plan
-    PgSelectSingle73 --> PgClassExpression77
-    JSONParse78[["JSONParse[78∈2] ➊<br />ᐸ57ᐳ<br />ᐳUnionDivider"]]:::plan
-    Access57 --> JSONParse78
-    JSONParse78 --> Access79
-    First82{{"First[82∈2] ➊"}}:::plan
-    PgSelect80 --> First82
-    PgSelectSingle83{{"PgSelectSingle[83∈2] ➊<br />ᐸunion_dividersᐳ"}}:::plan
-    First82 --> PgSelectSingle83
-    PgClassExpression84{{"PgClassExpression[84∈2] ➊<br />ᐸ__union_dividers__.”id”ᐳ"}}:::plan
-    PgSelectSingle83 --> PgClassExpression84
-    PgClassExpression85{{"PgClassExpression[85∈2] ➊<br />ᐸ__union_di...__.”title”ᐳ"}}:::plan
-    PgSelectSingle83 --> PgClassExpression85
-    PgClassExpression86{{"PgClassExpression[86∈2] ➊<br />ᐸ__union_di...__.”color”ᐳ"}}:::plan
-    PgSelectSingle83 --> PgClassExpression86
-    JSONParse87[["JSONParse[87∈2] ➊<br />ᐸ57ᐳ<br />ᐳUnionChecklist"]]:::plan
-    Access57 --> JSONParse87
-    JSONParse87 --> Access88
-    First91{{"First[91∈2] ➊"}}:::plan
-    PgSelect89 --> First91
-    PgSelectSingle92{{"PgSelectSingle[92∈2] ➊<br />ᐸunion_checklistsᐳ"}}:::plan
-    First91 --> PgSelectSingle92
-    PgClassExpression93{{"PgClassExpression[93∈2] ➊<br />ᐸ__union_ch...sts__.”id”ᐳ"}}:::plan
-    PgSelectSingle92 --> PgClassExpression93
-    PgClassExpression94{{"PgClassExpression[94∈2] ➊<br />ᐸ__union_ch...__.”title”ᐳ"}}:::plan
-    PgSelectSingle92 --> PgClassExpression94
-    JSONParse95[["JSONParse[95∈2] ➊<br />ᐸ57ᐳ<br />ᐳUnionChecklistItem"]]:::plan
-    Access57 --> JSONParse95
-    JSONParse95 --> Access96
-    First99{{"First[99∈2] ➊"}}:::plan
-    PgSelect97 --> First99
-    PgSelectSingle100{{"PgSelectSingle[100∈2] ➊<br />ᐸunion_checklist_itemsᐳ"}}:::plan
-    First99 --> PgSelectSingle100
-    PgClassExpression101{{"PgClassExpression[101∈2] ➊<br />ᐸ__union_ch...ems__.”id”ᐳ"}}:::plan
-    PgSelectSingle100 --> PgClassExpression101
-    PgClassExpression102{{"PgClassExpression[102∈2] ➊<br />ᐸ__union_ch...scription”ᐳ"}}:::plan
-    PgSelectSingle100 --> PgClassExpression102
-    PgClassExpression103{{"PgClassExpression[103∈2] ➊<br />ᐸ__union_ch...s__.”note”ᐳ"}}:::plan
-    PgSelectSingle100 --> PgClassExpression103
+    PgSelectRows12[["PgSelectRows[12∈0] ➊"]]:::plan
+    PgSelectRows12 --> First11
+    PgSelect7 --> PgSelectRows12
+    PgSelectSingle13{{"PgSelectSingle[13∈0] ➊<br />ᐸunion_itemsᐳ"}}:::plan
+    First11 --> PgSelectSingle13
+    PgClassExpression14{{"PgClassExpression[14∈0] ➊<br />ᐸ__union_items__.”type”ᐳ"}}:::plan
+    PgSelectSingle13 --> PgClassExpression14
+    PgClassExpression17{{"PgClassExpression[17∈0] ➊<br />ᐸ__union_items__.”id”ᐳ"}}:::plan
+    PgSelectSingle13 --> PgClassExpression17
+    First21{{"First[21∈0] ➊"}}:::plan
+    Access133{{"Access[133∈0] ➊<br />ᐸ19.itemsᐳ"}}:::plan
+    Access133 --> First21
+    First21 --> Access59
+    First21 --> Access60
+    Lambda63{{"Lambda[63∈0] ➊<br />ᐸtoSpecifierᐳ"}}:::plan
+    List62 --> Lambda63
+    Access65{{"Access[65∈0] ➊<br />ᐸ63.idᐳ"}}:::plan
+    Lambda63 --> Access65
+    PgUnionAll19 --> Access133
+    PgSelect24[["PgSelect[24∈3] ➊<br />ᐸunion_topicsᐳ<br />ᐳUnionTopic<br />More deps:<br />- Object[10]"]]:::plan
+    PgClassExpression17 --> PgSelect24
+    First28{{"First[28∈3] ➊^"}}:::plan
+    PgSelectRows29[["PgSelectRows[29∈3] ➊^"]]:::plan
+    PgSelectRows29 --> First28
+    PgSelect24 --> PgSelectRows29
+    PgSelectSingle30{{"PgSelectSingle[30∈3] ➊^<br />ᐸunion_topicsᐳ"}}:::plan
+    First28 --> PgSelectSingle30
+    PgClassExpression105{{"PgClassExpression[105∈3] ➊^<br />ᐸ__union_topics__.”id”ᐳ"}}:::plan
+    PgSelectSingle30 --> PgClassExpression105
+    PgClassExpression115{{"PgClassExpression[115∈3] ➊^<br />ᐸ__union_to...__.”title”ᐳ"}}:::plan
+    PgSelectSingle30 --> PgClassExpression115
+    PgSelect31[["PgSelect[31∈4] ➊<br />ᐸunion_postsᐳ<br />ᐳUnionPost<br />More deps:<br />- Object[10]"]]:::plan
+    PgClassExpression17 --> PgSelect31
+    First35{{"First[35∈4] ➊^"}}:::plan
+    PgSelectRows36[["PgSelectRows[36∈4] ➊^"]]:::plan
+    PgSelectRows36 --> First35
+    PgSelect31 --> PgSelectRows36
+    PgSelectSingle37{{"PgSelectSingle[37∈4] ➊^<br />ᐸunion_postsᐳ"}}:::plan
+    First35 --> PgSelectSingle37
+    PgClassExpression106{{"PgClassExpression[106∈4] ➊^<br />ᐸ__union_posts__.”id”ᐳ"}}:::plan
+    PgSelectSingle37 --> PgClassExpression106
+    PgClassExpression116{{"PgClassExpression[116∈4] ➊^<br />ᐸ__union_posts__.”title”ᐳ"}}:::plan
+    PgSelectSingle37 --> PgClassExpression116
+    PgClassExpression125{{"PgClassExpression[125∈4] ➊^<br />ᐸ__union_po...scription”ᐳ"}}:::plan
+    PgSelectSingle37 --> PgClassExpression125
+    PgClassExpression131{{"PgClassExpression[131∈4] ➊^<br />ᐸ__union_posts__.”note”ᐳ"}}:::plan
+    PgSelectSingle37 --> PgClassExpression131
+    PgSelect38[["PgSelect[38∈5] ➊<br />ᐸunion_dividersᐳ<br />ᐳUnionDivider<br />More deps:<br />- Object[10]"]]:::plan
+    PgClassExpression17 --> PgSelect38
+    First42{{"First[42∈5] ➊^"}}:::plan
+    PgSelectRows43[["PgSelectRows[43∈5] ➊^"]]:::plan
+    PgSelectRows43 --> First42
+    PgSelect38 --> PgSelectRows43
+    PgSelectSingle44{{"PgSelectSingle[44∈5] ➊^<br />ᐸunion_dividersᐳ"}}:::plan
+    First42 --> PgSelectSingle44
+    PgClassExpression107{{"PgClassExpression[107∈5] ➊^<br />ᐸ__union_dividers__.”id”ᐳ"}}:::plan
+    PgSelectSingle44 --> PgClassExpression107
+    PgClassExpression117{{"PgClassExpression[117∈5] ➊^<br />ᐸ__union_di...__.”title”ᐳ"}}:::plan
+    PgSelectSingle44 --> PgClassExpression117
+    PgClassExpression126{{"PgClassExpression[126∈5] ➊^<br />ᐸ__union_di...__.”color”ᐳ"}}:::plan
+    PgSelectSingle44 --> PgClassExpression126
+    PgSelect45[["PgSelect[45∈6] ➊<br />ᐸunion_checklistsᐳ<br />ᐳUnionChecklist<br />More deps:<br />- Object[10]"]]:::plan
+    PgClassExpression17 --> PgSelect45
+    First49{{"First[49∈6] ➊^"}}:::plan
+    PgSelectRows50[["PgSelectRows[50∈6] ➊^"]]:::plan
+    PgSelectRows50 --> First49
+    PgSelect45 --> PgSelectRows50
+    PgSelectSingle51{{"PgSelectSingle[51∈6] ➊^<br />ᐸunion_checklistsᐳ"}}:::plan
+    First49 --> PgSelectSingle51
+    PgClassExpression108{{"PgClassExpression[108∈6] ➊^<br />ᐸ__union_ch...sts__.”id”ᐳ"}}:::plan
+    PgSelectSingle51 --> PgClassExpression108
+    PgClassExpression118{{"PgClassExpression[118∈6] ➊^<br />ᐸ__union_ch...__.”title”ᐳ"}}:::plan
+    PgSelectSingle51 --> PgClassExpression118
+    PgSelect52[["PgSelect[52∈7] ➊<br />ᐸunion_checklist_itemsᐳ<br />ᐳUnionChecklistItem<br />More deps:<br />- Object[10]"]]:::plan
+    PgClassExpression17 --> PgSelect52
+    First56{{"First[56∈7] ➊^"}}:::plan
+    PgSelectRows57[["PgSelectRows[57∈7] ➊^"]]:::plan
+    PgSelectRows57 --> First56
+    PgSelect52 --> PgSelectRows57
+    PgSelectSingle58{{"PgSelectSingle[58∈7] ➊^<br />ᐸunion_checklist_itemsᐳ"}}:::plan
+    First56 --> PgSelectSingle58
+    PgClassExpression109{{"PgClassExpression[109∈7] ➊^<br />ᐸ__union_ch...ems__.”id”ᐳ"}}:::plan
+    PgSelectSingle58 --> PgClassExpression109
+    PgClassExpression119{{"PgClassExpression[119∈7] ➊^<br />ᐸ__union_ch...scription”ᐳ"}}:::plan
+    PgSelectSingle58 --> PgClassExpression119
+    PgClassExpression127{{"PgClassExpression[127∈7] ➊^<br />ᐸ__union_ch...s__.”note”ᐳ"}}:::plan
+    PgSelectSingle58 --> PgClassExpression127
+    PgSelect66[["PgSelect[66∈8] ➊<br />ᐸunion_topicsᐳ<br />ᐳUnionTopic<br />More deps:<br />- Object[10]"]]:::plan
+    Access65 --> PgSelect66
+    First70{{"First[70∈8] ➊^"}}:::plan
+    PgSelectRows71[["PgSelectRows[71∈8] ➊^"]]:::plan
+    PgSelectRows71 --> First70
+    PgSelect66 --> PgSelectRows71
+    PgSelectSingle72{{"PgSelectSingle[72∈8] ➊^<br />ᐸunion_topicsᐳ"}}:::plan
+    First70 --> PgSelectSingle72
+    PgClassExpression110{{"PgClassExpression[110∈8] ➊^<br />ᐸ__union_topics__.”id”ᐳ"}}:::plan
+    PgSelectSingle72 --> PgClassExpression110
+    PgClassExpression120{{"PgClassExpression[120∈8] ➊^<br />ᐸ__union_to...__.”title”ᐳ"}}:::plan
+    PgSelectSingle72 --> PgClassExpression120
+    PgSelect74[["PgSelect[74∈9] ➊<br />ᐸunion_postsᐳ<br />ᐳUnionPost<br />More deps:<br />- Object[10]"]]:::plan
+    Access65 --> PgSelect74
+    First78{{"First[78∈9] ➊^"}}:::plan
+    PgSelectRows79[["PgSelectRows[79∈9] ➊^"]]:::plan
+    PgSelectRows79 --> First78
+    PgSelect74 --> PgSelectRows79
+    PgSelectSingle80{{"PgSelectSingle[80∈9] ➊^<br />ᐸunion_postsᐳ"}}:::plan
+    First78 --> PgSelectSingle80
+    PgClassExpression111{{"PgClassExpression[111∈9] ➊^<br />ᐸ__union_posts__.”id”ᐳ"}}:::plan
+    PgSelectSingle80 --> PgClassExpression111
+    PgClassExpression121{{"PgClassExpression[121∈9] ➊^<br />ᐸ__union_posts__.”title”ᐳ"}}:::plan
+    PgSelectSingle80 --> PgClassExpression121
+    PgClassExpression128{{"PgClassExpression[128∈9] ➊^<br />ᐸ__union_po...scription”ᐳ"}}:::plan
+    PgSelectSingle80 --> PgClassExpression128
+    PgClassExpression132{{"PgClassExpression[132∈9] ➊^<br />ᐸ__union_posts__.”note”ᐳ"}}:::plan
+    PgSelectSingle80 --> PgClassExpression132
+    PgSelect82[["PgSelect[82∈10] ➊<br />ᐸunion_dividersᐳ<br />ᐳUnionDivider<br />More deps:<br />- Object[10]"]]:::plan
+    Access65 --> PgSelect82
+    First86{{"First[86∈10] ➊^"}}:::plan
+    PgSelectRows87[["PgSelectRows[87∈10] ➊^"]]:::plan
+    PgSelectRows87 --> First86
+    PgSelect82 --> PgSelectRows87
+    PgSelectSingle88{{"PgSelectSingle[88∈10] ➊^<br />ᐸunion_dividersᐳ"}}:::plan
+    First86 --> PgSelectSingle88
+    PgClassExpression112{{"PgClassExpression[112∈10] ➊^<br />ᐸ__union_dividers__.”id”ᐳ"}}:::plan
+    PgSelectSingle88 --> PgClassExpression112
+    PgClassExpression122{{"PgClassExpression[122∈10] ➊^<br />ᐸ__union_di...__.”title”ᐳ"}}:::plan
+    PgSelectSingle88 --> PgClassExpression122
+    PgClassExpression129{{"PgClassExpression[129∈10] ➊^<br />ᐸ__union_di...__.”color”ᐳ"}}:::plan
+    PgSelectSingle88 --> PgClassExpression129
+    PgSelect90[["PgSelect[90∈11] ➊<br />ᐸunion_checklistsᐳ<br />ᐳUnionChecklist<br />More deps:<br />- Object[10]"]]:::plan
+    Access65 --> PgSelect90
+    First94{{"First[94∈11] ➊^"}}:::plan
+    PgSelectRows95[["PgSelectRows[95∈11] ➊^"]]:::plan
+    PgSelectRows95 --> First94
+    PgSelect90 --> PgSelectRows95
+    PgSelectSingle96{{"PgSelectSingle[96∈11] ➊^<br />ᐸunion_checklistsᐳ"}}:::plan
+    First94 --> PgSelectSingle96
+    PgClassExpression113{{"PgClassExpression[113∈11] ➊^<br />ᐸ__union_ch...sts__.”id”ᐳ"}}:::plan
+    PgSelectSingle96 --> PgClassExpression113
+    PgClassExpression123{{"PgClassExpression[123∈11] ➊^<br />ᐸ__union_ch...__.”title”ᐳ"}}:::plan
+    PgSelectSingle96 --> PgClassExpression123
+    PgSelect98[["PgSelect[98∈12] ➊<br />ᐸunion_checklist_itemsᐳ<br />ᐳUnionChecklistItem<br />More deps:<br />- Object[10]"]]:::plan
+    Access65 --> PgSelect98
+    First102{{"First[102∈12] ➊^"}}:::plan
+    PgSelectRows103[["PgSelectRows[103∈12] ➊^"]]:::plan
+    PgSelectRows103 --> First102
+    PgSelect98 --> PgSelectRows103
+    PgSelectSingle104{{"PgSelectSingle[104∈12] ➊^<br />ᐸunion_checklist_itemsᐳ"}}:::plan
+    First102 --> PgSelectSingle104
+    PgClassExpression114{{"PgClassExpression[114∈12] ➊^<br />ᐸ__union_ch...ems__.”id”ᐳ"}}:::plan
+    PgSelectSingle104 --> PgClassExpression114
+    PgClassExpression124{{"PgClassExpression[124∈12] ➊^<br />ᐸ__union_ch...scription”ᐳ"}}:::plan
+    PgSelectSingle104 --> PgClassExpression124
+    PgClassExpression130{{"PgClassExpression[130∈12] ➊^<br />ᐸ__union_ch...s__.”note”ᐳ"}}:::plan
+    PgSelectSingle104 --> PgClassExpression130
 
     %% define steps
-
-    subgraph "Buckets for queries/unions-table/by-id-18"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 104, 10<br />2: PgSelect[7], PgUnionAll[53]<br />ᐳ: 11, 12, 13, 14, 55<br />3: PgUnionAllSingle[56]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,PgSelect7,Access8,Access9,Object10,First11,PgSelectSingle12,PgClassExpression13,PgPolymorphic14,PgUnionAll53,First55,PgUnionAllSingle56,Constant104 bucket0
-    Bucket1("Bucket 1 (polymorphic)<br />UnionTopic,UnionPost,UnionDivider,UnionChecklist,UnionChecklistItem<br />Deps: 12, 10, 14<br />ᐳUnionTopic<br />ᐳUnionPost<br />ᐳUnionDivider<br />ᐳUnionChecklist<br />ᐳUnionChecklistItem<br /><br />1: <br />ᐳ: PgClassExpression[15]<br />2: 16, 24, 32, 39, 45<br />ᐳ: 20, 21, 22, 23, 26, 27, 28, 29, 30, 31, 34, 35, 36, 37, 38, 41, 42, 43, 44, 47, 48, 49, 50, 51"):::bucket
+    class Bucket0,__Value2,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,PgClassExpression14,PgClassExpression17,PgUnionAll19,First21,Access59,Access60,List62,Lambda63,Access65,Access133 bucket0
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgClassExpression15,PgSelect16,First20,PgSelectSingle21,PgClassExpression22,PgClassExpression23,PgSelect24,First26,PgSelectSingle27,PgClassExpression28,PgClassExpression29,PgClassExpression30,PgClassExpression31,PgSelect32,First34,PgSelectSingle35,PgClassExpression36,PgClassExpression37,PgClassExpression38,PgSelect39,First41,PgSelectSingle42,PgClassExpression43,PgClassExpression44,PgSelect45,First47,PgSelectSingle48,PgClassExpression49,PgClassExpression50,PgClassExpression51 bucket1
-    Bucket2("Bucket 2 (polymorphic)<br />UnionTopic,UnionPost,UnionDivider,UnionChecklist,UnionChecklistItem<br />Deps: 56, 10<br />ᐳUnionTopic<br />ᐳUnionPost<br />ᐳUnionDivider<br />ᐳUnionChecklist<br />ᐳUnionChecklistItem<br /><br />1: <br />ᐳ: Access[57]<br />2: 58, 68, 78, 87, 95<br />ᐳ: 59, 69, 79, 88, 96<br />3: 60, 70, 80, 89, 97<br />ᐳ: 64, 65, 66, 67, 72, 73, 74, 75, 76, 77, 82, 83, 84, 85, 86, 91, 92, 93, 94, 99, 100, 101, 102, 103"):::bucket
+    class Bucket1 bucket1
     classDef bucket2 stroke:#7f007f
-    class Bucket2,Access57,JSONParse58,Access59,PgSelect60,First64,PgSelectSingle65,PgClassExpression66,PgClassExpression67,JSONParse68,Access69,PgSelect70,First72,PgSelectSingle73,PgClassExpression74,PgClassExpression75,PgClassExpression76,PgClassExpression77,JSONParse78,Access79,PgSelect80,First82,PgSelectSingle83,PgClassExpression84,PgClassExpression85,PgClassExpression86,JSONParse87,Access88,PgSelect89,First91,PgSelectSingle92,PgClassExpression93,PgClassExpression94,JSONParse95,Access96,PgSelect97,First99,PgSelectSingle100,PgClassExpression101,PgClassExpression102,PgClassExpression103 bucket2
-    Bucket0 --> Bucket1 & Bucket2
-    end
+    class Bucket2 bucket2
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,PgSelect24,First28,PgSelectRows29,PgSelectSingle30,PgClassExpression105,PgClassExpression115 bucket3
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,PgSelect31,First35,PgSelectRows36,PgSelectSingle37,PgClassExpression106,PgClassExpression116,PgClassExpression125,PgClassExpression131 bucket4
+    classDef bucket5 stroke:#7fff00
+    class Bucket5,PgSelect38,First42,PgSelectRows43,PgSelectSingle44,PgClassExpression107,PgClassExpression117,PgClassExpression126 bucket5
+    classDef bucket6 stroke:#ff1493
+    class Bucket6,PgSelect45,First49,PgSelectRows50,PgSelectSingle51,PgClassExpression108,PgClassExpression118 bucket6
+    classDef bucket7 stroke:#808000
+    class Bucket7,PgSelect52,First56,PgSelectRows57,PgSelectSingle58,PgClassExpression109,PgClassExpression119,PgClassExpression127 bucket7
+    classDef bucket8 stroke:#dda0dd
+    class Bucket8,PgSelect66,First70,PgSelectRows71,PgSelectSingle72,PgClassExpression110,PgClassExpression120 bucket8
+    classDef bucket9 stroke:#ff0000
+    class Bucket9,PgSelect74,First78,PgSelectRows79,PgSelectSingle80,PgClassExpression111,PgClassExpression121,PgClassExpression128,PgClassExpression132 bucket9
+    classDef bucket10 stroke:#ffff00
+    class Bucket10,PgSelect82,First86,PgSelectRows87,PgSelectSingle88,PgClassExpression112,PgClassExpression122,PgClassExpression129 bucket10
+    classDef bucket11 stroke:#00ffff
+    class Bucket11,PgSelect90,First94,PgSelectRows95,PgSelectSingle96,PgClassExpression113,PgClassExpression123 bucket11
+    classDef bucket12 stroke:#4169e1
+    class Bucket12,PgSelect98,First102,PgSelectRows103,PgSelectSingle104,PgClassExpression114,PgClassExpression124,PgClassExpression130 bucket12
+

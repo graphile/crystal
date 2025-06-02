@@ -1,47 +1,31 @@
-select __single_table_items_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __single_table_items_identifiers__,
-lateral (
-  select
-    __single_table_items__."type"::text as "0",
-    __single_table_items__."parent_id"::text as "1",
-    __single_table_items__."id"::text as "2",
-    __single_table_items_identifiers__.idx as "3"
-  from interfaces_and_unions.single_table_items as __single_table_items__
-  where
-    (
-      true /* authorization checks */
-    ) and (
-      __single_table_items__."id" = __single_table_items_identifiers__."id0"
-    )
-) as __single_table_items_result__;
-
-select __single_table_items_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __single_table_items_identifiers__,
-lateral (
-  select
-    __single_table_items__."type"::text as "0",
-    __single_table_items__."author_id"::text as "1",
-    __single_table_items_identifiers__.idx as "2"
-  from interfaces_and_unions.single_table_items as __single_table_items__
-  where
-    (
-      true /* authorization checks */
-    ) and (
-      __single_table_items__."id" = __single_table_items_identifiers__."id0"
-    )
-) as __single_table_items_result__;
-
-select __people_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __people_identifiers__,
-lateral (
-  select
-    __people__."username" as "0",
-    __people_identifiers__.idx as "1"
-  from interfaces_and_unions.people as __people__
-  where
-    (
-      true /* authorization checks */
-    ) and (
-      __people__."person_id" = __people_identifiers__."id0"
-    )
-) as __people_result__;
+select
+  __single_table_items_2."id"::text as "0",
+  __single_table_items_2."type"::text as "1",
+  __single_table_items_2."parent_id"::text as "2",
+  __single_table_items__."type"::text as "3",
+  __people__."username" as "4"
+from interfaces_and_unions.single_table_items as __single_table_items_2
+left outer join interfaces_and_unions.single_table_items as __single_table_items__
+on (
+/* WHERE becoming ON */
+  (
+    __single_table_items__."id" = __single_table_items_2."parent_id"
+  ) and (
+    true /* authorization checks */
+  )
+)
+left outer join interfaces_and_unions.people as __people__
+on (
+/* WHERE becoming ON */
+  (
+    __people__."person_id" = __single_table_items__."author_id"
+  ) and (
+    true /* authorization checks */
+  )
+)
+where
+  (
+    __single_table_items_2."id" = $1::"int4"
+  ) and (
+    true /* authorization checks */
+  );

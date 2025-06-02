@@ -1,6 +1,6 @@
 {
   "name": "ruru",
-  "version": "2.0.0-beta.19",
+  "version": "2.0.0-beta.22",
   "description": "Grafast-flavoured GraphiQL distribution",
   "type": "commonjs",
   "main": "./dist/index.js",
@@ -20,12 +20,13 @@
     "./cli": {
       "types": "./dist/cli.d.ts",
       "node": "./dist/cli.js"
-    }
+    },
+    "./bundle": "./bundle/ruru.min.js"
   },
   "scripts": {
     "webpack": "node --loader ts-node/esm \"$(yarn bin webpack-cli)\"",
     "watch": "yarn webpack --watch --mode=development",
-    "prepack": "rm -Rf dist bundle tsconfig.tsbuildinfo tsconfig.build.tsbuildinfo && tsc -b tsconfig.build.json && cp src/.npmignore dist/ && yarn webpack --mode=production && chmod +x dist/cli-run.js"
+    "prepack": "rm -Rf dist bundle tsconfig.tsbuildinfo tsconfig.build.tsbuildinfo && yarn webpack --mode=production && tsc -b tsconfig.build.json && cp src/.npmignore dist/ && chmod +x dist/cli-run.js"
   },
   "repository": {
     "type": "git",
@@ -48,7 +49,7 @@
     "graphile-config": "workspace:^",
     "graphql": "^16.1.0-experimental-stream-defer.6",
     "http-proxy": "^1.18.1",
-    "tslib": "^2.6.2",
+    "tslib": "^2.8.1",
     "yargs": "^17.7.2"
   },
   "engines": {
@@ -74,7 +75,7 @@
     "style-loader": "^3.3.3",
     "svg-inline-loader": "^0.8.2",
     "ts-loader": "^9.4.4",
-    "typescript": "^5.2.2",
+    "typescript": "^5.8.3",
     "webpack": "^5.94.0",
     "webpack-bundle-analyzer": "^4.9.1",
     "webpack-cli": "^5.1.4"

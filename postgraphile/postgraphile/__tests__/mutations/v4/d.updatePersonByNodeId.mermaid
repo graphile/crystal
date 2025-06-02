@@ -7,70 +7,69 @@ graph TD
     classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
-
-    %% plan dependencies
-    Object22{{"Object[22∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access20{{"Access[20∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access21{{"Access[21∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
-    Access20 & Access21 --> Object22
-    Lambda16{{"Lambda[16∈0] ➊<br />ᐸdecode_Person_base64JSONᐳ"}}:::plan
-    Constant37{{"Constant[37∈0] ➊<br />ᐸ'WyJwZW9wbGUiLDFd'ᐳ"}}:::plan
-    Constant37 --> Lambda16
-    Access17{{"Access[17∈0] ➊<br />ᐸ16.1ᐳ"}}:::plan
-    Lambda16 --> Access17
-    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
-    __Value2 --> Access20
-    __Value2 --> Access21
-    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
-    Constant38{{"Constant[38∈0] ➊<br />ᐸ'Doe'ᐳ"}}:::plan
-    Constant39{{"Constant[39∈0] ➊<br />ᐸ'update2'ᐳ"}}:::plan
-    Constant40{{"Constant[40∈0] ➊<br />ᐸ'update1'ᐳ"}}:::plan
-    Constant41{{"Constant[41∈0] ➊<br />ᐸ'update3'ᐳ"}}:::plan
-    PgUpdateSingle19[["PgUpdateSingle[19∈1] ➊<br />ᐸperson(id;last_name,col_no_create,col_no_order,col_no_filter)ᐳ"]]:::sideeffectplan
-    Object22 -->|rejectNull| PgUpdateSingle19
-    Access17 & Constant38 & Constant39 & Constant40 & Constant41 --> PgUpdateSingle19
-    Object23{{"Object[23∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
-    PgUpdateSingle19 --> Object23
-    List27{{"List[27∈3] ➊<br />ᐸ25,24ᐳ"}}:::plan
-    Constant25{{"Constant[25∈3] ➊<br />ᐸ'people'ᐳ"}}:::plan
-    PgClassExpression24{{"PgClassExpression[24∈3] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    Constant25 & PgClassExpression24 --> List27
-    PgUpdateSingle19 --> PgClassExpression24
-    Lambda28{{"Lambda[28∈3] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List27 --> Lambda28
-    PgClassExpression29{{"PgClassExpression[29∈3] ➊<br />ᐸ__person__.”first_name”ᐳ"}}:::plan
-    PgUpdateSingle19 --> PgClassExpression29
-    PgClassExpression30{{"PgClassExpression[30∈3] ➊<br />ᐸ__person__.”last_name”ᐳ"}}:::plan
-    PgUpdateSingle19 --> PgClassExpression30
-    PgClassExpression31{{"PgClassExpression[31∈3] ➊<br />ᐸ__person__...no_create”ᐳ"}}:::plan
-    PgUpdateSingle19 --> PgClassExpression31
-    PgClassExpression32{{"PgClassExpression[32∈3] ➊<br />ᐸ__person__...no_update”ᐳ"}}:::plan
-    PgUpdateSingle19 --> PgClassExpression32
-    PgClassExpression33{{"PgClassExpression[33∈3] ➊<br />ᐸ__person__..._no_order”ᐳ"}}:::plan
-    PgUpdateSingle19 --> PgClassExpression33
-    PgClassExpression34{{"PgClassExpression[34∈3] ➊<br />ᐸ__person__...no_filter”ᐳ"}}:::plan
-    PgUpdateSingle19 --> PgClassExpression34
-    PgClassExpression35{{"PgClassExpression[35∈3] ➊<br />ᐸ__person__...te_update”ᐳ"}}:::plan
-    PgUpdateSingle19 --> PgClassExpression35
-    PgClassExpression36{{"PgClassExpression[36∈3] ➊<br />ᐸ__person__...er_filter”ᐳ"}}:::plan
-    PgUpdateSingle19 --> PgClassExpression36
-
-    %% define steps
-
     subgraph "Buckets for mutations/v4/d.updatePersonByNodeId"
     Bucket0("Bucket 0 (root)"):::bucket
-    classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,__Value4,Lambda16,Access17,Access20,Access21,Object22,Constant37,Constant38,Constant39,Constant40,Constant41 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 22, 17, 38, 39, 40, 41<br /><br />1: PgUpdateSingle[19]<br />2: <br />ᐳ: Object[23]"):::bucket
-    classDef bucket1 stroke:#00bfff
-    class Bucket1,PgUpdateSingle19,Object23 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 23, 19<br /><br />ROOT Object{1}ᐸ{result}ᐳ[23]"):::bucket
-    classDef bucket2 stroke:#7f007f
-    class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 19<br /><br />ROOT PgUpdateSingle{1}ᐸperson(id;last_name,col_no_create,col_no_order,col_no_filter)ᐳ[19]"):::bucket
-    classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression24,Constant25,List27,Lambda28,PgClassExpression29,PgClassExpression30,PgClassExpression31,PgClassExpression32,PgClassExpression33,PgClassExpression34,PgClassExpression35,PgClassExpression36 bucket3
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 20, 15, 21, 25<br /><br />1: PgUpdateSingle[17]<br />2: <br />ᐳ: Object[22]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 22, 17, 25<br /><br />ROOT Object{1}ᐸ{result}ᐳ[22]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 17, 25<br /><br />ROOT PgUpdateSingle{1}ᐸperson(id;)ᐳ[17]"):::bucket
+    end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
-    end
+
+    %% plan dependencies
+    __InputObject9{{"__InputObject[9∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ'Doe'ᐳ[38]<br />- Constantᐸ'update2'ᐳ[39]<br />- Constantᐸ'update1'ᐳ[40]<br />- Constantᐸ'update3'ᐳ[41]"}}:::plan
+    __InputObject6{{"__InputObject[6∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ'WyJwZW9wbGUiLDFd'ᐳ[37]"}}:::plan
+    __InputObject9 --> __InputObject6
+    Object20{{"Object[20∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access18{{"Access[18∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access19{{"Access[19∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access18 & Access19 --> Object20
+    Lambda14{{"Lambda[14∈0] ➊<br />ᐸdecode_Person_base64JSONᐳ<br />More deps:<br />- Constantᐸ'WyJwZW9wbGUiLDFd'ᐳ[37]"}}:::plan
+    Access15{{"Access[15∈0] ➊<br />ᐸ14.1ᐳ"}}:::plan
+    Lambda14 --> Access15
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
+    __Value2 --> Access18
+    __Value2 --> Access19
+    ApplyInput21{{"ApplyInput[21∈0] ➊"}}:::plan
+    __InputObject6 --> ApplyInput21
+    PgUpdateSingle17[["PgUpdateSingle[17∈1] ➊<br />ᐸperson(id;)ᐳ"]]:::sideeffectplan
+    Access15 -->|rejectNull| PgUpdateSingle17
+    Object20 & ApplyInput21 --> PgUpdateSingle17
+    Object22{{"Object[22∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgUpdateSingle17 --> Object22
+    List27{{"List[27∈3] ➊<br />ᐸ25,23ᐳ<br />More deps:<br />- Constantᐸ'people'ᐳ[25]"}}:::plan
+    PgClassExpression23{{"PgClassExpression[23∈3] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgClassExpression23 --> List27
+    Access24{{"Access[24∈3] ➊<br />ᐸ17.tᐳ"}}:::plan
+    Access24 --> PgClassExpression23
+    PgUpdateSingle17 --> Access24
+    Lambda28{{"Lambda[28∈3] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List27 --> Lambda28
+    PgClassExpression29{{"PgClassExpression[29∈3] ➊<br />ᐸ__person__.”first_name”ᐳ"}}:::plan
+    Access24 --> PgClassExpression29
+    PgClassExpression30{{"PgClassExpression[30∈3] ➊<br />ᐸ__person__.”last_name”ᐳ"}}:::plan
+    Access24 --> PgClassExpression30
+    PgClassExpression31{{"PgClassExpression[31∈3] ➊<br />ᐸ__person__...no_create”ᐳ"}}:::plan
+    Access24 --> PgClassExpression31
+    PgClassExpression32{{"PgClassExpression[32∈3] ➊<br />ᐸ__person__...no_update”ᐳ"}}:::plan
+    Access24 --> PgClassExpression32
+    PgClassExpression33{{"PgClassExpression[33∈3] ➊<br />ᐸ__person__..._no_order”ᐳ"}}:::plan
+    Access24 --> PgClassExpression33
+    PgClassExpression34{{"PgClassExpression[34∈3] ➊<br />ᐸ__person__...no_filter”ᐳ"}}:::plan
+    Access24 --> PgClassExpression34
+    PgClassExpression35{{"PgClassExpression[35∈3] ➊<br />ᐸ__person__...te_update”ᐳ"}}:::plan
+    Access24 --> PgClassExpression35
+    PgClassExpression36{{"PgClassExpression[36∈3] ➊<br />ᐸ__person__...er_filter”ᐳ"}}:::plan
+    Access24 --> PgClassExpression36
+
+    %% define steps
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value2,__InputObject6,__InputObject9,Lambda14,Access15,Access18,Access19,Object20,ApplyInput21 bucket0
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,PgUpdateSingle17,Object22 bucket1
+    classDef bucket2 stroke:#7f007f
+    class Bucket2 bucket2
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,PgClassExpression23,Access24,List27,Lambda28,PgClassExpression29,PgClassExpression30,PgClassExpression31,PgClassExpression32,PgClassExpression33,PgClassExpression34,PgClassExpression35,PgClassExpression36 bucket3
+

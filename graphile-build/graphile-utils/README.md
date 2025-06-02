@@ -31,11 +31,7 @@ And please give some love to our featured sponsors 🤩:
 
 <table><tr>
 <td align="center"><a href="https://www.the-guild.dev/"><img src="https://graphile.org/images/sponsors/theguild.png" width="90" height="90" alt="The Guild" /><br />The Guild</a> *</td>
-<td align="center"><a href="https://dovetailapp.com/"><img src="https://graphile.org/images/sponsors/dovetail.png" width="90" height="90" alt="Dovetail" /><br />Dovetail</a> *</td>
-<td align="center"><a href="https://stellate.co/"><img src="https://graphile.org/images/sponsors/Stellate.png" width="90" height="90" alt="Stellate" /><br />Stellate</a> *</td>
 <td align="center"><a href="https://gosteelhead.com/"><img src="https://graphile.org/images/sponsors/steelhead.svg" width="90" height="90" alt="Steelhead" /><br />Steelhead</a> *</td>
-</tr><tr>
-<td align="center"><a href=""><img src="https://graphile.org/images/sponsors/latchbio.jpg" width="90" height="90" alt="LatchBio" /><br />LatchBio</a> *</td>
 </tr></table>
 
 <em>\* Sponsors the entire Graphile suite</em>
@@ -72,7 +68,9 @@ const MySchemaExtensionPlugin =
   makeExtendSchemaPlugin(
     build => ({
       typeDefs: gql`...`,
-      resolvers: ...
+      objects: {...},
+      interfaces: {...},
+      unions: {...},
     })
   );
 
@@ -82,32 +80,44 @@ module.exports = MySchemaExtensionPlugin;
 e.g.:
 
 ```js
-makeExtendSchemaPlugin((build) => ({
-  typeDefs: gql`
-    type Random {
-      float: Float!
-      number(min: Int!, max: Int!): Int!
-    }
-    extend type Query {
-      random: Random
-    }
-  `,
-  resolvers: {
-    Query: {
-      random() {
-        return {};
+makeExtendSchemaPlugin((build) => {
+  const {
+    grafast: { constant },
+  } = build;
+  return {
+    typeDefs: gql`
+      type Random {
+        float: Float!
+        number(min: Int!, max: Int!): Int!
+      }
+      extend type Query {
+        random: Random
+      }
+    `,
+    objects: {
+      Query: {
+        plans: {
+          random() {
+            return constant({});
+          },
+        },
+      },
+      Random: {
+        plans: {
+          float() {
+            return lambda(null, () => Math.random());
+          },
+          number(_parent, { $min, $max }) {
+            return lambda(
+              [$min, $max],
+              ([min, max]) => min + Math.floor(Math.random() * (max - min + 1)),
+            );
+          },
+        },
       },
     },
-    Random: {
-      float() {
-        return Math.random();
-      },
-      number(_parent, { min, max }) {
-        return min + Math.floor(Math.random() * (max - min + 1));
-      },
-    },
-  },
-}));
+  };
+});
 ```
 
 ### `makeAddInflectorsPlugin`

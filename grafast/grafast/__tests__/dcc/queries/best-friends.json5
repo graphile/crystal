@@ -1,0 +1,28 @@
+{
+  character: {
+    id: 102,
+    name: 'Princess Donut',
+    bestFriend: {
+      __typename: 'ActiveCrawler',
+      id: 101,
+      name: 'Carl',
+      items: [
+        {
+          __typename: 'Consumable',
+          id: 205,
+          name: "Dolores Doesn't Splat Potion",
+        },
+        {
+          __typename: 'Equipment',
+          id: 211,
+          name: "Enchanted Anarchist's Battle Rattle",
+        },
+        {
+          __typename: 'Consumable',
+          id: 206,
+          name: "Carl's Jug O' Boom",
+        },
+      ],
+    },
+  },
+}

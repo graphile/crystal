@@ -2,12 +2,13 @@ import * as assert from "../assert.js";
 import type {
   ExecutionDetails,
   GrafastResultsList,
-  InputStep,
+  Maybe,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
-import type { ExecutableStep } from "../step.js";
-import { UnbatchedExecutableStep } from "../step.js";
+import type { Step } from "../step.js";
+import { UnbatchedStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
+import { constant, ConstantStep } from "./constant.js";
 import { each } from "./each.js";
 
 type ParametersExceptFirst<F> = F extends (arg0: any, ...rest: infer R) => any
@@ -18,17 +19,17 @@ type ParametersExceptFirst<F> = F extends (arg0: any, ...rest: infer R) => any
  * Describes what a plan needs to implement in order to be suitable for
  * supplying what the `PageInfo` type requires.
  */
-export interface PageInfoCapableStep extends ExecutableStep {
-  hasNextPage(): ExecutableStep<boolean>;
-  hasPreviousPage(): ExecutableStep<boolean>;
-  startCursor(): ExecutableStep<string | null>;
-  endCursor(): ExecutableStep<string | null>;
+export interface PageInfoCapableStep extends Step {
+  hasNextPage(): Step<boolean>;
+  hasPreviousPage(): Step<boolean>;
+  startCursor(): Step<string | null>;
+  endCursor(): Step<string | null>;
 }
 
 export function assertPageInfoCapableStep(
-  $step: ExecutableStep | PageInfoCapableStep,
+  $step: Step | PageInfoCapableStep,
 ): asserts $step is PageInfoCapableStep {
-  const $typed = $step as ExecutableStep & {
+  const $typed = $step as Step & {
     hasNextPage?: any;
     hasPreviousPage?: any;
     startCursor?: any;
@@ -49,11 +50,9 @@ export function assertPageInfoCapableStep(
  * supplying what a ConnectionStep requires.
  */
 export interface ConnectionCapableStep<
-  TItemStep extends ExecutableStep,
-  TCursorStep extends ExecutableStep,
-> extends ExecutableStep<
-    ReadonlyArray<TItemStep extends ExecutableStep<infer U> ? U : any>
-  > {
+  TItemStep extends Step,
+  TCursorStep extends Step,
+> extends Step {
   /**
    * Clone the plan; it's recommended that you add `$connection` as a
    * dependency so that you can abort execution early in the case of errors
@@ -71,13 +70,15 @@ export interface ConnectionCapableStep<
       any
     >,
   ): PageInfoCapableStep;
-  setFirst($plan: InputStep): void;
-  setLast($plan: InputStep): void;
-  setOffset($plan: InputStep): void;
+  setFirst($first: Step<Maybe<number>>): void;
+  setLast($last: Step<Maybe<number>>): void;
+  setOffset($offset: Step<Maybe<number>>): void;
 
-  parseCursor($plan: InputStep): TCursorStep | null | undefined;
-  setBefore($plan: TCursorStep): void;
-  setAfter($plan: TCursorStep): void;
+  parseCursor($cursor: Step<Maybe<string>>): TCursorStep;
+  setBefore($before: TCursorStep): void;
+  setAfter($after: TCursorStep): void;
+
+  items(): Step<ReadonlyArray<TItemStep extends Step<infer U> ? U : any>>;
 }
 
 const EMPTY_OBJECT = Object.freeze(Object.create(null));
@@ -87,12 +88,12 @@ const EMPTY_OBJECT = Object.freeze(Object.create(null));
  * indepdenent of data source.
  */
 export class ConnectionStep<
-  TItemStep extends ExecutableStep,
-  TCursorStep extends ExecutableStep,
+  TItemStep extends Step,
+  TCursorStep extends Step,
   TStep extends ConnectionCapableStep<TItemStep, TCursorStep>,
-  TEdgeDataStep extends ExecutableStep = TItemStep,
-  TNodeStep extends ExecutableStep = ExecutableStep,
-> extends UnbatchedExecutableStep<unknown> {
+  TEdgeDataStep extends Step = TItemStep,
+  TNodeStep extends Step = Step,
+> extends UnbatchedStep<unknown> {
   static $$export = {
     moduleName: "grafast",
     exportName: "ConnectionStep",
@@ -117,7 +118,7 @@ export class ConnectionStep<
   public readonly itemPlan?: ($item: TItemStep) => TNodeStep;
   public readonly cursorPlan?: (
     $item: TItemStep,
-  ) => ExecutableStep<string | null> | undefined;
+  ) => Step<string | null> | undefined;
 
   // TYPES: if subplan is `ConnectionCapableStep<EdgeCapableStep<any>>` then `nodePlan`/`cursorPlan` aren't needed; otherwise `cursorPlan` is required.
   constructor(
@@ -142,66 +143,81 @@ export class ConnectionStep<
     return String(this.subplanId);
   }
 
-  public getFirst(): InputStep | null {
-    return this._firstDepId != null
-      ? (this.getDep(this._firstDepId) as InputStep)
-      : null;
+  public getFirst(): Step<number | null | undefined> | null {
+    return this.maybeGetDep<Step<number | null | undefined>>(this._firstDepId);
   }
-  public setFirst($firstPlan: InputStep) {
+  public setFirst(first: Step<number | null | undefined> | number) {
     if (this._firstDepId != null) {
       throw new Error(`${this}->setFirst already called`);
     }
-    this._firstDepId = this.addDependency($firstPlan);
+    const $first = typeof first === "number" ? constant(first) : first;
+    this._firstDepId = this.addUnaryDependency({
+      step: $first,
+      nonUnaryMessage: () =>
+        `${this}.setFirst(...) must be passed a _unary_ step, but ${$first} is not unary. See: https://err.red/gud#connection`,
+    });
   }
-  public getLast(): InputStep | null {
-    return this._lastDepId != null
-      ? (this.getDep(this._lastDepId) as InputStep)
-      : null;
+  public getLast(): Step<number | null | undefined> | null {
+    return this.maybeGetDep<Step<number | null | undefined>>(this._lastDepId);
   }
-  public setLast($lastPlan: InputStep) {
+  public setLast(last: Step<number | null | undefined> | number) {
     if (this._lastDepId != null) {
       throw new Error(`${this}->setLast already called`);
     }
-    this._lastDepId = this.addDependency($lastPlan);
+    const $last = typeof last === "number" ? constant(last) : last;
+    this._lastDepId = this.addUnaryDependency({
+      step: $last,
+      nonUnaryMessage: () =>
+        `${this}.setLast(...) must be passed a _unary_ step, but ${$last} is not unary. See: https://err.red/gud#connection`,
+    });
   }
-  public getOffset(): InputStep | null {
-    return this._offsetDepId != null
-      ? (this.getDep(this._offsetDepId) as InputStep)
-      : null;
+  public getOffset(): Step<number | null | undefined> | null {
+    return this.maybeGetDep<Step<number | null | undefined>>(this._offsetDepId);
   }
-  public setOffset($offsetPlan: InputStep) {
+  public setOffset(offset: Step<number | null | undefined> | number) {
     if (this._offsetDepId != null) {
       throw new Error(`${this}->setOffset already called`);
     }
-    this._offsetDepId = this.addDependency($offsetPlan);
+    const $offset = typeof offset === "number" ? constant(offset) : offset;
+    this._offsetDepId = this.addUnaryDependency({
+      step: $offset,
+      nonUnaryMessage: () =>
+        `${this}.setOffset(...) must be passed a _unary_ step, but ${$offset} is not unary. See: https://err.red/gud#connection`,
+    });
   }
   public getBefore(): TCursorStep | null {
-    return this._beforeDepId != null
-      ? (this.getDep(this._beforeDepId) as TCursorStep)
-      : null;
+    return this.maybeGetDep<TCursorStep>(this._beforeDepId, true);
   }
-  public setBefore($beforePlan: InputStep) {
+  public setBefore($beforePlan: Step<string | null | undefined>) {
+    if ($beforePlan instanceof ConstantStep && $beforePlan.data == null) {
+      return;
+    }
     if (this._beforeDepId !== undefined) {
       throw new Error(`${this}->setBefore already called`);
     }
     const $parsedBeforePlan = this.getSubplan().parseCursor($beforePlan);
-    this._beforeDepId = $parsedBeforePlan
-      ? this.addDependency($parsedBeforePlan)
-      : null;
+    this._beforeDepId = this.addUnaryDependency({
+      step: $parsedBeforePlan,
+      nonUnaryMessage: () =>
+        `${this}.setBefore(...) must be passed a _unary_ step, but ${$parsedBeforePlan} (and presumably ${$beforePlan}) is not unary. See: https://err.red/gud#connection`,
+    });
   }
   public getAfter(): TCursorStep | null {
-    return this._afterDepId != null
-      ? (this.getDep(this._afterDepId) as TCursorStep)
-      : null;
+    return this.maybeGetDep<TCursorStep>(this._afterDepId, true);
   }
-  public setAfter($afterPlan: InputStep) {
+  public setAfter($afterPlan: Step<string | null | undefined>) {
+    if ($afterPlan instanceof ConstantStep && $afterPlan.data == null) {
+      return;
+    }
     if (this._afterDepId !== undefined) {
       throw new Error(`${this}->setAfter already called`);
     }
     const $parsedAfterPlan = this.getSubplan().parseCursor($afterPlan);
-    this._afterDepId = $parsedAfterPlan
-      ? this.addDependency($parsedAfterPlan)
-      : null;
+    this._afterDepId = this.addUnaryDependency({
+      step: $parsedAfterPlan,
+      nonUnaryMessage: () =>
+        `${this}.setAfter(...) must be passed a _unary_ step, but ${$parsedAfterPlan} (and presumably ${$afterPlan}) is not unary. See: https://err.red/gud#connection`,
+    });
   }
 
   /**
@@ -293,7 +309,7 @@ export class ConnectionStep<
    * to add a dependency to us, which is typically useful for adding validation
    * functions so that they are thrown "earlier", avoiding error bubbling.
    */
-  public addValidation(callback: () => ExecutableStep) {
+  public addValidation(callback: () => Step) {
     this.withMyLayerPlan(() => {
       this.addDependency(callback());
     });
@@ -310,7 +326,7 @@ export class ConnectionStep<
     }
   }
 
-  public edges(): ExecutableStep {
+  public edges(): Step {
     if (this.cursorPlan || this.itemPlan || this.edgeDataPlan) {
       return each(this.cloneSubplanWithPagination(), ($intermediate) =>
         this.wrapEdge($intermediate as any),
@@ -338,8 +354,7 @@ export class ConnectionStep<
   }
 
   public pageInfo(): PageInfoCapableStep {
-    const plan = this.getStep(this.subplanId) as TStep;
-    return plan.pageInfo(this);
+    return this.cloneSubplanWithPagination().pageInfo(this);
   }
 
   /*
@@ -364,16 +379,15 @@ export class ConnectionStep<
   }
 }
 
-export interface EdgeCapableStep<TNodeStep extends ExecutableStep>
-  extends ExecutableStep {
+export interface EdgeCapableStep<TNodeStep extends Step> extends Step {
   node(): TNodeStep;
-  cursor(): ExecutableStep<string | null>;
+  cursor(): Step<string | null>;
 }
 
-export function assertEdgeCapableStep<TNodeStep extends ExecutableStep>(
-  $step: ExecutableStep | EdgeCapableStep<TNodeStep>,
+export function assertEdgeCapableStep<TNodeStep extends Step>(
+  $step: Step | EdgeCapableStep<TNodeStep>,
 ): asserts $step is EdgeCapableStep<TNodeStep> {
-  const $typed = $step as ExecutableStep & {
+  const $typed = $step as Step & {
     node?: any;
     cursor?: any;
   };
@@ -386,13 +400,13 @@ export function assertEdgeCapableStep<TNodeStep extends ExecutableStep>(
 }
 
 export class EdgeStep<
-    TItemStep extends ExecutableStep,
-    TCursorStep extends ExecutableStep,
+    TItemStep extends Step,
+    TCursorStep extends Step,
     TStep extends ConnectionCapableStep<TItemStep, TCursorStep>,
-    TEdgeDataStep extends ExecutableStep = TItemStep,
-    TNodeStep extends ExecutableStep = ExecutableStep,
+    TEdgeDataStep extends Step = TItemStep,
+    TNodeStep extends Step = Step,
   >
-  extends UnbatchedExecutableStep
+  extends UnbatchedStep
   implements EdgeCapableStep<TNodeStep>
 {
   static $$export = {
@@ -426,9 +440,7 @@ export class EdgeStep<
     if (!skipCursor) {
       const $cursor =
         $connection.cursorPlan?.($item) ??
-        (
-          $item as ExecutableStep & { cursor?: () => ExecutableStep }
-        ).cursor?.();
+        ($item as Step & { cursor?: () => Step }).cursor?.();
       if (!$cursor) {
         throw new Error(`No cursor plan known for '${$item}'`);
       }
@@ -459,11 +471,11 @@ export class EdgeStep<
     TStep,
     TNodeStep
   > {
-    return this.getDep(this.connectionDepId) as any;
+    return this.getDep<any>(this.connectionDepId);
   }
 
   private getItemStep(): TItemStep {
-    return this.getDep(0) as any;
+    return this.getDep<any>(0);
   }
 
   public data(): TEdgeDataStep {
@@ -476,7 +488,7 @@ export class EdgeStep<
     return this.getConnectionStep().itemPlan?.($item) ?? ($item as any);
   }
 
-  cursor(): ExecutableStep<string | null> {
+  cursor(): Step<string | null> {
     this.needCursor = true;
     return this.getDep(this.cursorDepId!);
   }
@@ -515,13 +527,13 @@ export class EdgeStep<
 let warned = false;
 
 interface ConnectionConfig<
-  TItemStep extends ExecutableStep,
-  TEdgeDataStep extends ExecutableStep = TItemStep,
-  TNodeStep extends ExecutableStep = ExecutableStep,
+  TItemStep extends Step,
+  TEdgeDataStep extends Step = TItemStep,
+  TNodeStep extends Step = Step,
 > {
   nodePlan?: ($item: TItemStep) => TNodeStep;
   edgeDataPlan?: ($item: TItemStep) => TEdgeDataStep;
-  cursorPlan?: ($item: TItemStep) => ExecutableStep<string | null>;
+  cursorPlan?: ($item: TItemStep) => Step<string | null>;
 }
 
 /**
@@ -529,11 +541,11 @@ interface ConnectionConfig<
  * cursor connections.
  */
 export function connection<
-  TItemStep extends ExecutableStep,
-  TCursorStep extends ExecutableStep,
+  TItemStep extends Step,
+  TCursorStep extends Step,
   TStep extends ConnectionCapableStep<TItemStep, TCursorStep>,
-  TEdgeDataStep extends ExecutableStep = TItemStep,
-  TNodeStep extends ExecutableStep = ExecutableStep,
+  TEdgeDataStep extends Step = TItemStep,
+  TNodeStep extends Step = Step,
 >(
   step: TStep,
   config?: ConnectionConfig<TItemStep, TEdgeDataStep, TNodeStep>,
@@ -553,4 +565,16 @@ export function connection<
     });
   }
   return new ConnectionStep(step, config);
+}
+
+export type ItemsStep<
+  T extends Step<readonly any[]> | ConnectionCapableStep<any, any>,
+> = T extends ConnectionCapableStep<any, any> ? ReturnType<T["items"]> : T;
+
+export function itemsOrStep<
+  T extends Step<readonly any[]> | ConnectionCapableStep<any, any>,
+>($step: T): Step<readonly any[]> {
+  return "items" in $step && typeof $step.items === "function"
+    ? $step.items()
+    : $step;
 }

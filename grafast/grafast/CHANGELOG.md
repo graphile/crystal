@@ -1,5 +1,351 @@
 # grafast
 
+## 0.1.1-beta.21
+
+### Patch Changes
+
+- [#2305](https://github.com/graphile/crystal/pull/2305)
+  [`d34014a9a3c469154cc796086ba13719954731e5`](https://github.com/graphile/crystal/commit/d34014a9a3c469154cc796086ba13719954731e5)
+  Thanks [@benjie](https://github.com/benjie)! - Plan diagrams now reveal (via
+  `@s` code) if a step is meant to be streamed.
+
+- [#2311](https://github.com/graphile/crystal/pull/2311)
+  [`98516379ac355a0833a64e002f3717cc3a1d6473`](https://github.com/graphile/crystal/commit/98516379ac355a0833a64e002f3717cc3a1d6473)
+  Thanks [@benjie](https://github.com/benjie)! - Make `ExecutableStep::getDep`
+  generic and add helpers: `maybeGetDep` and `getDepOrConstant`.
+
+- [#2411](https://github.com/graphile/crystal/pull/2411)
+  [`f8602d05eed3247c90b87c55d7af580d1698effc`](https://github.com/graphile/crystal/commit/f8602d05eed3247c90b87c55d7af580d1698effc)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug in representation of
+  `Constant<null>` in plan JSON
+
+- [#2407](https://github.com/graphile/crystal/pull/2407)
+  [`65df25534fa3f787ba2ab7fd9547d295ff2b1288`](https://github.com/graphile/crystal/commit/65df25534fa3f787ba2ab7fd9547d295ff2b1288)
+  Thanks [@benjie](https://github.com/benjie)! - Fixes bug in `__inputObject`
+  step where `[key]: undefined` entries could be added. Entries will now only be
+  added if not undefined, to match the behavior of GraphQL.js.
+
+- [#2343](https://github.com/graphile/crystal/pull/2343)
+  [`1b3c76efd27df73eab3a5a1d221ce13de4cd6b1a`](https://github.com/graphile/crystal/commit/1b3c76efd27df73eab3a5a1d221ce13de4cd6b1a)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug in
+  operationPlan.cacheStep that didn't respect polymorphic paths.
+
+- [#2330](https://github.com/graphile/crystal/pull/2330)
+  [`3c0a925f26f10cae627a23c49c75ccd8d76b60c8`](https://github.com/graphile/crystal/commit/3c0a925f26f10cae627a23c49c75ccd8d76b60c8)
+  Thanks [@benjie](https://github.com/benjie)! - Unary steps will no longer be
+  pushed down in step diagrams. Fix types for connection().
+
+- [#2385](https://github.com/graphile/crystal/pull/2385)
+  [`fcaeb48844156e258a037f420ea1505edb50c52a`](https://github.com/graphile/crystal/commit/fcaeb48844156e258a037f420ea1505edb50c52a)
+  Thanks [@benjie](https://github.com/benjie)! - Improve rendering of mermaid
+  diagrams:
+
+  - Don't render dependencies on the `undefined` constant, because it's messy
+  - Group when there are multiple dependencies to the same step from the same
+    step, and label the line with the count instead.
+
+- [#2324](https://github.com/graphile/crystal/pull/2324)
+  [`68926abc31c32ce527327ffbb1ede4b0b7be446b`](https://github.com/graphile/crystal/commit/68926abc31c32ce527327ffbb1ede4b0b7be446b)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 ExecutionValue no longer
+  exposes .value and .entries (you need to narrow to access these). Added new
+  `.unaryValue()` that can be used to assert the value is unary and retrieve its
+  value - this should be used instead of `.at(0)` in general.
+
+- [#2356](https://github.com/graphile/crystal/pull/2356)
+  [`4b49dbd2df3b339a2ba3f1e9ff400fa1a125298b`](https://github.com/graphile/crystal/commit/4b49dbd2df3b339a2ba3f1e9ff400fa1a125298b)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 makeGrafastSchema and schema
+  export now export extensions directly rather than extensions.grafast - applies
+  to fields and arguments. All previous exports cannot be (safely) executed with
+  latest makeGrafastSchema - please regenerate exports.
+
+- [#2406](https://github.com/graphile/crystal/pull/2406)
+  [`d7950e8e28ec6106a4ce2f7fe5e35d88b10eac48`](https://github.com/graphile/crystal/commit/d7950e8e28ec6106a4ce2f7fe5e35d88b10eac48)
+  Thanks [@benjie](https://github.com/benjie)! - Fix issues around unary steps
+  and polymorphism.
+
+- [#2386](https://github.com/graphile/crystal/pull/2386)
+  [`c8f1971ea4198633ec97f72f82abf65089f71a88`](https://github.com/graphile/crystal/commit/c8f1971ea4198633ec97f72f82abf65089f71a88)
+  Thanks [@benjie](https://github.com/benjie)! - Process connection pagination
+  cursors without requiring plantime evaluation of input step values.
+
+- [#2304](https://github.com/graphile/crystal/pull/2304)
+  [`dd3d22eab73a8554715bf1111e30586251f69a88`](https://github.com/graphile/crystal/commit/dd3d22eab73a8554715bf1111e30586251f69a88)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug where streamed and
+  non-streamed steps could be deduplicated; and use a cloned subplan for
+  pageInfo calculations.
+
+- [#2315](https://github.com/graphile/crystal/pull/2315)
+  [`a120a8e43b24dfc174950cdbb69e481272a0b45e`](https://github.com/graphile/crystal/commit/a120a8e43b24dfc174950cdbb69e481272a0b45e)
+  Thanks [@benjie](https://github.com/benjie)! - Add more inspect properties to
+  inspect() and have constant() simplify 'Object: null prototype'
+
+- [#2326](https://github.com/graphile/crystal/pull/2326)
+  [`84f06eafa051e907a3050237ac6ee5aefb184652`](https://github.com/graphile/crystal/commit/84f06eafa051e907a3050237ac6ee5aefb184652)
+  Thanks [@benjie](https://github.com/benjie)! - Remove `$step.eval*()` from
+  cursor pagination pageInfo.
+
+- [#2318](https://github.com/graphile/crystal/pull/2318)
+  [`4a3aeaa77c8b8d2e39c1a9d05581d0c613b812cf`](https://github.com/graphile/crystal/commit/4a3aeaa77c8b8d2e39c1a9d05581d0c613b812cf)
+  Thanks [@benjie](https://github.com/benjie)! - Add
+  `operationPlan().withRootLayerPlan(() => ...)` method to force steps to plan
+  in root layer plan (forces them to be unary, ignores side effect steps).
+
+- [#2388](https://github.com/graphile/crystal/pull/2388)
+  [`0fc2db95d90df918cf5c59ef85f22ac78d8000d3`](https://github.com/graphile/crystal/commit/0fc2db95d90df918cf5c59ef85f22ac78d8000d3)
+  Thanks [@benjie](https://github.com/benjie)! - Mark `$step.eval*()` methods as
+  internal in preparation for removing them.
+
+- [#2402](https://github.com/graphile/crystal/pull/2402)
+  [`90e81a5deeae554a8be2dd55dcd01489860e96e6`](https://github.com/graphile/crystal/commit/90e81a5deeae554a8be2dd55dcd01489860e96e6)
+  Thanks [@benjie](https://github.com/benjie)! - Allow `mutation` operations to
+  complete synchronously (via `grafastSync`) if possible.
+
+- [#2335](https://github.com/graphile/crystal/pull/2335)
+  [`c59132eb7a93bc82493d2f1ca050db8aaea9f4d1`](https://github.com/graphile/crystal/commit/c59132eb7a93bc82493d2f1ca050db8aaea9f4d1)
+  Thanks [@benjie](https://github.com/benjie)! - Moved calculation of `@stream`
+  parameters to runtime, which has meant that stream info is no longer passed at
+  planning time - instead execute() can evaluate if it is being streamed or not
+  and make decisions based on that.
+
+- [#2377](https://github.com/graphile/crystal/pull/2377)
+  [`7c38cdeffe034c9b4f5cdd03a8f7f446bd52dcb7`](https://github.com/graphile/crystal/commit/7c38cdeffe034c9b4f5cdd03a8f7f446bd52dcb7)
+  Thanks [@benjie](https://github.com/benjie)! - Since `ModifierStep` and
+  `BaseStep` are no more; `ExecutableStep` can be renamed to simply `Step`. The
+  old name (`ExecutableStep`) is now deprecated.
+
+- [#2340](https://github.com/graphile/crystal/pull/2340)
+  [`728888b28fcd2a6fc481e0ccdfe20d41181a091f`](https://github.com/graphile/crystal/commit/728888b28fcd2a6fc481e0ccdfe20d41181a091f)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug in handling errors
+  inside lists
+
+- [#2406](https://github.com/graphile/crystal/pull/2406)
+  [`f4f39092d7a51517668384945895d3b450237cce`](https://github.com/graphile/crystal/commit/f4f39092d7a51517668384945895d3b450237cce)
+  Thanks [@benjie](https://github.com/benjie)! - During optimize phase, always
+  hoist newly created steps.
+
+- [#2326](https://github.com/graphile/crystal/pull/2326)
+  [`5cf3dc9d158891eaf324b2cd4f485d1d4bbb6b5e`](https://github.com/graphile/crystal/commit/5cf3dc9d158891eaf324b2cd4f485d1d4bbb6b5e)
+  Thanks [@benjie](https://github.com/benjie)! - Export
+  `ExecutionValue`/`BatchExecutionValue`/`UnaryExecutionValue` types.
+
+- [#2318](https://github.com/graphile/crystal/pull/2318)
+  [`83d3b533e702cc875b46ba2ca02bf3642b421be8`](https://github.com/graphile/crystal/commit/83d3b533e702cc875b46ba2ca02bf3642b421be8)
+  Thanks [@benjie](https://github.com/benjie)! - Force `constant(...)` steps to
+  exist in root layer plan, and implement caching to reduce number of constant
+  steps.
+
+- [#2404](https://github.com/graphile/crystal/pull/2404)
+  [`7001138c38e09822ad13db1018c62d2cac37941e`](https://github.com/graphile/crystal/commit/7001138c38e09822ad13db1018c62d2cac37941e)
+  Thanks [@benjie](https://github.com/benjie)! - Be stricter about usage of
+  `this.getDep(depId)` vs `this.getDepOptions(depId)`.
+
+- [#2411](https://github.com/graphile/crystal/pull/2411)
+  [`e9e7e33665e22ec397e9ead054d2e4aad3eadc8c`](https://github.com/graphile/crystal/commit/e9e7e33665e22ec397e9ead054d2e4aad3eadc8c)
+  Thanks [@benjie](https://github.com/benjie)! - When handling lists, only
+  deduplicate if a call to `.listItem()` was actually made.
+
+- [#2326](https://github.com/graphile/crystal/pull/2326)
+  [`bb6ec8d834e3e630e28316196246f514114a2296`](https://github.com/graphile/crystal/commit/bb6ec8d834e3e630e28316196246f514114a2296)
+  Thanks [@benjie](https://github.com/benjie)! - When you
+  `this.addUnaryDependency(...)` you may now specify a `nonUnaryMessage` to be
+  used if the dependency turns out to not be unary; helping to customise the
+  errors to be more useful to the consumer.
+
+- [#2423](https://github.com/graphile/crystal/pull/2423)
+  [`2b1918d053f590cdc534c8cb81f7e74e96c1bbe6`](https://github.com/graphile/crystal/commit/2b1918d053f590cdc534c8cb81f7e74e96c1bbe6)
+  Thanks [@benjie](https://github.com/benjie)! - Ensure all
+  variable/argument-related input plans remain in the root layer plan.
+
+- [#2405](https://github.com/graphile/crystal/pull/2405)
+  [`d1ecb39693a341f85762b27012ec4ea013857b0c`](https://github.com/graphile/crystal/commit/d1ecb39693a341f85762b27012ec4ea013857b0c)
+  Thanks [@benjie](https://github.com/benjie)! - Fix a missing deduplicateSteps
+  that was causing nullable boundary LayerPlan branching.
+
+- [#2355](https://github.com/graphile/crystal/pull/2355)
+  [`042ebafe11fcf7e2ecac9b131265a55dddd42a6d`](https://github.com/graphile/crystal/commit/042ebafe11fcf7e2ecac9b131265a55dddd42a6d)
+  Thanks [@benjie](https://github.com/benjie)! - Export `defaultPlanResolver`
+  and add `fieldName` to `FieldInfo`.
+
+- [#2356](https://github.com/graphile/crystal/pull/2356)
+  [`fa005eb0783c58a2476add984fbdd462e0e91dbe`](https://github.com/graphile/crystal/commit/fa005eb0783c58a2476add984fbdd462e0e91dbe)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug in makeGrafastSchema
+  that fails to build schema sometimes if a field uses a function shortcut
+  rather than object definition.
+
+- [#2411](https://github.com/graphile/crystal/pull/2411)
+  [`df0e5a0f968cf6f9ae97b68745a9a2f391324bf5`](https://github.com/graphile/crystal/commit/df0e5a0f968cf6f9ae97b68745a9a2f391324bf5)
+  Thanks [@benjie](https://github.com/benjie)! - Optimization to grafast's
+  internal execution values, which are used heavily in hot paths.
+
+- [#2335](https://github.com/graphile/crystal/pull/2335)
+  [`ef4cf75acd80e6b9c700c2b5a7ace899e565ef7f`](https://github.com/graphile/crystal/commit/ef4cf75acd80e6b9c700c2b5a7ace899e565ef7f)
+  Thanks [@benjie](https://github.com/benjie)! - stream() method has been
+  completely removed and execute() now handles both stream() and defer()
+  concerns.
+
+- [#2398](https://github.com/graphile/crystal/pull/2398)
+  [`c041fd250372c57601188b65a6411c8f440afab6`](https://github.com/graphile/crystal/commit/c041fd250372c57601188b65a6411c8f440afab6)
+  Thanks [@benjie](https://github.com/benjie)! - Since the following have been
+  removed from Grafast, throw an error if they're seen in the schema:
+
+  - `autoApplyAfterParentInputPlan`
+  - `autoApplyAfterParentApplyPlan`
+  - `autoApplyAfterParentPlan`
+  - `autoApplyAfterParentSubscribePlan`
+  - `inputPlan`
+  - `applyPlan` on input fields
+
+  Also: when Query type fails to build, throw the underlying error directly.
+
+- [#2424](https://github.com/graphile/crystal/pull/2424)
+  [`629b45aab49151810f6efc18ac18f7d735626433`](https://github.com/graphile/crystal/commit/629b45aab49151810f6efc18ac18f7d735626433)
+  Thanks [@benjie](https://github.com/benjie)! - makeGrafastSchema format now
+  allows for `apply()` functions to be directly provided for input fields and
+  enum values, plus `applyPlan()` functions for field arguments. Many places are
+  now grafast-centric again with `extensions` as an optional extra field (rather
+  than exporting `extensions` directly, which is much less friendly).
+
+- [#2384](https://github.com/graphile/crystal/pull/2384)
+  [`6d19724330d50d076aab9442660fa8abddd095cb`](https://github.com/graphile/crystal/commit/6d19724330d50d076aab9442660fa8abddd095cb)
+  Thanks [@benjie](https://github.com/benjie)! - Move postgresql argument logic
+  to runtime (from plantime) to avoid plantime eval of input values.
+
+- [#2335](https://github.com/graphile/crystal/pull/2335)
+  [`ca5bc1a834df7b894088fb8602a12f9fcff55b38`](https://github.com/graphile/crystal/commit/ca5bc1a834df7b894088fb8602a12f9fcff55b38)
+  Thanks [@benjie](https://github.com/benjie)! - New items() convention method
+  allows steps used in list positions to return a _different_ step to actually
+  return the list - useful for returning connection-capable steps in list
+  positions.
+
+- [#2376](https://github.com/graphile/crystal/pull/2376)
+  [`da6f3c04efe3d8634c0bc3fcf93ac2518de85322`](https://github.com/graphile/crystal/commit/da6f3c04efe3d8634c0bc3fcf93ac2518de85322)
+  Thanks [@benjie](https://github.com/benjie)! - Overhaul Grafast to remove more
+  input planning - inputs should be evaluated at runtime - and remove more
+  plan-time step evaluation.
+
+  `FieldArgs.get` is no more; use `FieldArgs.getRaw` or use `bakedInput()`
+  (TODO: document) to get the "baked" version of a raw input value.
+
+  Input object fields no longer have `applyPlan`/`inputPlan`, instead having the
+  runtime equivalents `apply()` and `baked()`. `FieldArgs` is no longer
+  available on input object fields, since these fields are no longer called at
+  plantime; instead, the actual value is passed.
+
+  `FieldArgs` gains `.typeAt(path)` method that details the GraphQL input type
+  at the given path.
+
+  Field arguments are no longer passed `FieldArgs`, instead they're passed a
+  (similar) `FieldArg` object representing the argument value itself.
+
+  `autoApplyAfterParentPlan` is no more - instead if an argument has `applyPlan`
+  it will be called automatically unless it was called during the field plan
+  resolver itself.
+
+  `autoApplyAfterParentSubscribePlan` is no more - instead if an argument has
+  `applySubscribePlan` it will be called automatically unless it was called
+  during the field plan resolver itself.
+
+  Field arguments no longer support `inputPlan` - use `bakedInput()` if you need
+  that.
+
+  Input fields no longer support `inputPlan`, `applyPlan`,
+  `autoApplyAfterParentInputPlan` nor `autoApplyAfterParentApplyPlan`. Instead,
+  `apply()` (which is called by `applyStep()` at runtime) has been added.
+
+  `sqlValueWithCodec(value, codec)` can be used at runtime in places where
+  `$step.placeholder($value, codec)` would have been used previously.
+  `placeholder` has been removed from all places that are now runtime - namely
+  the list of modifiers below...
+
+  The following `ModifierStep` classes have all dropped their `Step` suffix,
+  these `Modifier` classes now all run at runtime, and are thus no longer steps;
+  they're invoked as part of the new `applyInput()` (TODO: document) step:
+
+  - `ModifierStep` &rArr; `Modifier`
+  - `PgBooleanFilterStep` &rArr; `PgBooleanFilter`
+  - `PgClassFilterStep` &rArr; `PgClassFilter`
+  - `PgConditionCapableParentStep` &rArr; `PgConditionCapableParent`
+  - `PgConditionLikeStep` &rArr; `PgConditionLike`
+  - `PgConditionStepMode` &rArr; `PgConditionMode`
+  - `PgConditionStep` &rArr; `PgCondition`
+  - `PgManyFilterStep` &rArr; `PgManyFilter`
+  - `PgOrFilterStep` &rArr; `PgOrFilter`
+  - `PgTempTableStep` &rArr; `PgTempTable`
+  - `SetterCapableStep` &rArr; `SetterCapable`
+  - `SetterStep` &rArr; `Setter`
+
+  (Interestingly, other than the removal of `placeholder` and the fact they deal
+  with runtime values rather than steps now, they're very similar to what they
+  were before.)
+
+  The deprecated forms of the above have been removed.
+
+  Methods that rely on these modifier plans have been removed:
+
+  - `PgUnionAllStep.wherePlan` - use
+    `fieldArg.apply($unionAll, qb => qb.whereBuilder())` instead
+  - `PgUnionAllStep.havingPlan` - use
+    `fieldArg.apply($unionAll, qb => qb.havingBuilder())` instead
+  - Same for PgSelectStep
+
+  The following gain query builders:
+
+  - `PgInsertSingle`
+  - `PgUpdateSingle`
+  - `PgDeleteSingle`
+
+  Query builders gain `meta`, an object that can be augmented with metadata
+  about the operation (typically this relates to cursors and similar
+  functionality). This is now used to implement `clientMutationId`.
+
+  Extends query builders with additional functionality.
+
+  Many of the types have had their generics changed, TypeScript should guide you
+  if you have issues here.
+
+  `NodeIdHandler` now requires a `getIdentifiers` method that runs at runtime
+  and returns the identifiers from a decoded NodeId string.
+
+  Types around GraphQL Global Object Identification (i.e. `Node` / `id`) have
+  changed.
+
+- [#2326](https://github.com/graphile/crystal/pull/2326)
+  [`f0bc64b71914dfdd3612f4b65370401fd85b97bc`](https://github.com/graphile/crystal/commit/f0bc64b71914dfdd3612f4b65370401fd85b97bc)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 `connection()` step no
+  longer guarantees the incoming step for first/last/before/after/offset are
+  InputStep - you must NOT use `$input.eval*()` methods - instead add the values
+  as dependencies and evaluate them at runtime like any other step.
+- Updated dependencies
+  [[`00d79e6f5608affc3f36bb0ce4ca2547230174e7`](https://github.com/graphile/crystal/commit/00d79e6f5608affc3f36bb0ce4ca2547230174e7)]:
+  - graphile-config@0.0.1-beta.15
+
+## 0.1.1-beta.20
+
+### Patch Changes
+
+- [#2365](https://github.com/graphile/crystal/pull/2365)
+  [`fc9d64eb8`](https://github.com/graphile/crystal/commit/fc9d64eb8002d3b72625bc505ed76c07f4296d68)
+  Thanks [@benjie](https://github.com/benjie)! - Internal inspect method used in
+  bundles now correctly stringifies `undefined`
+
+- [#2366](https://github.com/graphile/crystal/pull/2366)
+  [`a2dbad945`](https://github.com/graphile/crystal/commit/a2dbad9457195bec797d72e4e6d45f45278f9f69)
+  Thanks [@benjie](https://github.com/benjie)! - Use Map for `cacheStep`'s
+  cache; don't want key `1` and key `"1"` to be treated as equivalent.
+
+- [#2366](https://github.com/graphile/crystal/pull/2366)
+  [`31078842a`](https://github.com/graphile/crystal/commit/31078842ad0eeaa7111491fa9eb5e3bd026fb38a)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug where `deduplicate()`
+  lifecycle method wasn't called on some steps (e.g. those with side effects, or
+  those streamed). Instead, the method is still called now but it is passed an
+  empty array.
+
+- [#2365](https://github.com/graphile/crystal/pull/2365)
+  [`5a0ec31de`](https://github.com/graphile/crystal/commit/5a0ec31deae91f1dd17a77a4bb7c1a911a27e26a)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug in operation plan
+  caching where planning errors will result in all future usages of the same
+  document resulting in the same error until server restart.
+
 ## 0.1.1-beta.19
 
 ### Patch Changes

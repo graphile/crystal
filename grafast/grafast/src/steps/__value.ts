@@ -1,5 +1,5 @@
-import type { GrafastResultsList } from "../index.js";
-import { $$noExec, ExecutableStep } from "../step.js";
+import type { GrafastResultsList, JSONValue } from "../interfaces.js";
+import { $$noExec, Step } from "../step.js";
 import type { AccessStep } from "./access.js";
 import { access } from "./access.js";
 
@@ -8,7 +8,7 @@ import { access } from "./access.js";
  * internal - we populate the value as part of the algorithm - see
  * `GetValueStepId` and `PopulateValueStep`.
  */
-export class __ValueStep<TData> extends ExecutableStep<TData> {
+export class __ValueStep<TData> extends Step<TData> {
   static $$export = {
     moduleName: "grafast",
     exportName: "__ValueStep",
@@ -16,8 +16,15 @@ export class __ValueStep<TData> extends ExecutableStep<TData> {
   isSyncAndSafe = true;
   [$$noExec] = true;
 
-  constructor() {
+  constructor(isImmutable: boolean) {
     super();
+    this._isImmutable = isImmutable;
+  }
+
+  public planJSONExtra(): undefined | Record<string, JSONValue> {
+    if (this.layerPlan.reason.type === "combined") {
+      return { combined: true };
+    }
   }
 
   toStringMeta(): string | null {

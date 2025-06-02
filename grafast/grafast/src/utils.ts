@@ -13,7 +13,6 @@ import type {
   GraphQLInputType,
   GraphQLNamedType,
   GraphQLObjectTypeConfig,
-  GraphQLOutputType,
   GraphQLSchema,
   SelectionNode,
   ValueNode,
@@ -23,7 +22,12 @@ import * as graphql from "graphql";
 import * as assert from "./assert.js";
 import type { Deferred } from "./deferred.js";
 import { isDev } from "./dev.js";
-import type { LayerPlan } from "./engine/LayerPlan.js";
+import type {
+  LayerPlan,
+  LayerPlanReasonDefer,
+  LayerPlanReasonListItem,
+  LayerPlanReasonSubscription,
+} from "./engine/LayerPlan.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import { SafeError } from "./error.js";
 import { inspect } from "./inspect.js";
@@ -32,10 +36,9 @@ import type {
   ExecutionEntryFlags,
   GrafastFieldConfig,
   GrafastInputFieldConfig,
-  InputStep,
-  OutputPlanForType,
 } from "./interfaces.js";
-import type { ExecutableStep, ModifierStep } from "./step.js";
+import type { Step } from "./step.js";
+import { constant } from "./steps/constant.js";
 
 const {
   GraphQLBoolean,
@@ -286,9 +289,7 @@ export function isPromise<T>(t: T | Promise<T>): t is Promise<T> {
 /**
  * Is "thenable".
  */
-export function isPromiseLike<T>(
-  t: T | Promise<T> | PromiseLike<T>,
-): t is PromiseLike<T> | Promise<T> {
+export function isPromiseLike<T>(t: T | PromiseLike<T>): t is PromiseLike<T> {
   return t != null && typeof (t as any).then === "function";
 }
 
@@ -321,7 +322,9 @@ export function arraysMatch<T>(
   }
   if (comparator !== undefined) {
     for (let i = 0; i < l; i++) {
-      if (!comparator(array1[i], array2[i])) {
+      const a = array1[i]!;
+      const b = array2[i]!;
+      if (a !== b && !comparator(a, b)) {
         return false;
       }
     }
@@ -335,51 +338,136 @@ export function arraysMatch<T>(
   return true;
 }
 
-export type ObjectTypeFields<
-  TContext extends Grafast.Context,
-  TParentStep extends ExecutableStep,
-> = {
-  [key: string]: GrafastFieldConfig<
-    GraphQLOutputType,
-    TContext,
-    TParentStep,
-    any,
-    any
-  >;
+/**
+ * Returns true if map1 and map2 have the same keys, and every matching entry
+ * value within them pass the `comparator` check (which defaults to `===`).
+ */
+export function mapsMatch<TKey, TVal>(
+  map1: ReadonlyMap<TKey, TVal>,
+  map2: ReadonlyMap<TKey, TVal>,
+  comparator?: (
+    k: TKey,
+    val1: TVal | undefined,
+    val2: TVal | undefined,
+  ) => boolean,
+): boolean {
+  if (map1 === map2) return true;
+  const l = map1.size;
+  if (l !== map2.size) {
+    return false;
+  }
+  const allKeys = new Set([...map1.keys(), ...map2.keys()]);
+  if (allKeys.size !== l) {
+    return false;
+  }
+  if (comparator !== undefined) {
+    for (const k of allKeys) {
+      const a = map1.get(k);
+      const b = map2.get(k);
+      if (a !== b && !comparator(k, a, b)) {
+        return false;
+      }
+    }
+  } else {
+    for (const k of allKeys) {
+      if (map1.get(k) !== map2.get(k)) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+/**
+ * Returns true if record1 and record2 are equivalent, i.e. every value within
+ * them pass the `comparator` check (which defaults to `===`).
+ *
+ * Currently keys are ignored (`record[key] = undefined` is treated the same as
+ * `record[key]` being unset), but this may not always be the case.
+ */
+export function recordsMatch<
+  TRecord extends { readonly [k: string | symbol | number]: any },
+>(
+  record1: TRecord,
+  record2: TRecord,
+  comparator?: (
+    k: keyof TRecord,
+    val1: TRecord[typeof k],
+    val2: TRecord[typeof k],
+  ) => boolean,
+): boolean {
+  if (record1 === record2) return true;
+  const k1 = Object.keys(record1) as (keyof TRecord)[];
+  const k2 = Object.keys(record2) as (keyof TRecord)[];
+  const allKeys = new Set([...k1, ...k2]);
+  if (comparator !== undefined) {
+    for (const k of allKeys) {
+      const a = record1[k];
+      const b = record2[k];
+      if (a !== b && !comparator(k, a, b)) {
+        return false;
+      }
+    }
+  } else {
+    for (const k of allKeys) {
+      if (record1[k] !== record2[k]) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+export function setsMatch(
+  s1: ReadonlySet<string> | null,
+  s2: ReadonlySet<string> | null,
+) {
+  if (s1 === s2) return true;
+  if (s1 == null) return false;
+  if (s2 == null) return false;
+  if (s1.size !== s2.size) return false;
+  for (const p of s1) {
+    if (!s2.has(p)) return false;
+  }
+  return true;
+}
+
+export type ObjectTypeFields<TParentStep extends Step> = {
+  [key: string]: GrafastFieldConfig<TParentStep, any, any>;
 };
 
 export type ObjectTypeSpec<
-  TContext extends Grafast.Context,
-  TParentStep extends ExecutableStep,
-  TFields extends ObjectTypeFields<TContext, TParentStep>,
-> = Omit<GraphQLObjectTypeConfig<any, TContext>, "fields"> & {
+  TParentStep extends Step,
+  TFields extends ObjectTypeFields<TParentStep>,
+> = Omit<GraphQLObjectTypeConfig<any, Grafast.Context>, "fields"> & {
   fields: TFields | (() => TFields);
-  assertStep?: TParentStep extends ExecutableStep
+  assertStep?: TParentStep extends Step
     ?
-        | ((step: ExecutableStep) => asserts step is TParentStep)
+        | ((step: Step) => asserts step is TParentStep)
         | { new (...args: any[]): TParentStep }
     : null;
+  planType?: ($specifier: Step) => TParentStep;
 };
 
 /**
  * Saves us having to write `extensions: {grafast: {...}}` everywhere.
  */
 export function objectSpec<
-  TContext extends Grafast.Context,
-  TParentStep extends ExecutableStep,
-  TFields extends ObjectTypeFields<TContext, TParentStep>,
+  TParentStep extends Step,
+  TFields extends ObjectTypeFields<TParentStep>,
 >(
-  spec: ObjectTypeSpec<TContext, TParentStep, TFields>,
-): GraphQLObjectTypeConfig<any, TContext> {
-  const { assertStep, ...rest } = spec;
-  const modifiedSpec: GraphQLObjectTypeConfig<any, TContext> = {
+  spec: ObjectTypeSpec<TParentStep, TFields>,
+): GraphQLObjectTypeConfig<any, Grafast.Context> {
+  const { assertStep, planType, ...rest } = spec;
+  const modifiedSpec: GraphQLObjectTypeConfig<any, Grafast.Context> = {
     ...rest,
-    ...(assertStep
+    ...(assertStep || planType
       ? {
           extensions: {
             ...spec.extensions,
             grafast: {
-              assertStep,
+              ...(assertStep ? { assertStep } : null),
+              ...(planType ? { planType } : null),
               ...spec.extensions?.grafast,
             },
           },
@@ -390,13 +478,13 @@ export function objectSpec<
         typeof spec.fields === "function" ? spec.fields() : spec.fields;
       const modifiedFields = Object.keys(fields).reduce(
         (o, key) => {
-          o[key] = objectFieldSpec<TContext, TParentStep>(
+          o[key] = objectFieldSpec<TParentStep>(
             fields[key],
             `${spec.name}.${key}`,
           );
           return o;
         },
-        {} as GraphQLFieldConfigMap<any, TContext>,
+        {} as GraphQLFieldConfigMap<any, Grafast.Context>,
       );
       return modifiedFields;
     },
@@ -405,53 +493,42 @@ export function objectSpec<
 }
 
 export type GrafastObjectType<
-  TContext extends Grafast.Context,
-  TParentStep extends ExecutableStep,
-  TFields extends ObjectTypeFields<TContext, TParentStep>,
-> = graphql.GraphQLObjectType<
-  TParentStep extends ExecutableStep<infer U> ? U : never,
-  TContext
-> & { TParentStep: TParentStep; TFields: TFields };
+  TParentStep extends Step,
+  TFields extends ObjectTypeFields<TParentStep>,
+> = graphql.GraphQLObjectType<TParentStep extends Step<infer U> ? U : never> & {
+  TParentStep: TParentStep;
+  TFields: TFields;
+};
 
 /**
  * @remarks This is a mess because the first two generics need to be specified manually, but the latter one we want inferred.
  */
-export function newObjectTypeBuilder<
-  TContext extends Grafast.Context,
-  TParentStep extends ExecutableStep,
->(
-  assertStep: TParentStep extends ExecutableStep
+export function newObjectTypeBuilder<TParentStep extends Step>(
+  assertStep: TParentStep extends Step
     ?
-        | ((step: ExecutableStep) => asserts step is TParentStep)
+        | ((step: Step) => asserts step is TParentStep)
         | { new (...args: any[]): TParentStep }
     : never,
-): <TFields extends ObjectTypeFields<TContext, TParentStep>>(
-  spec: ObjectTypeSpec<TContext, TParentStep, TFields>,
-) => GrafastObjectType<TContext, TParentStep, TFields> {
+): <TFields extends ObjectTypeFields<TParentStep>>(
+  spec: ObjectTypeSpec<TParentStep, TFields>,
+) => GrafastObjectType<TParentStep, TFields> {
   return (spec) =>
     new GraphQLObjectType(
       objectSpec({ assertStep, ...spec }),
-    ) as GrafastObjectType<TContext, TParentStep, any>;
+    ) as GrafastObjectType<TParentStep, any>;
 }
 
 /**
  * Saves us having to write `extensions: {grafast: {...}}` everywhere.
  */
 export function objectFieldSpec<
-  TContext extends Grafast.Context,
-  TSource extends ExecutableStep,
-  TResult extends ExecutableStep = ExecutableStep,
+  TSource extends Step,
   TArgs extends BaseGraphQLArguments = BaseGraphQLArguments,
+  TResult extends Step = Step,
 >(
-  grafastSpec: GrafastFieldConfig<
-    GraphQLOutputType,
-    TContext,
-    TSource,
-    TResult,
-    TArgs
-  >,
+  grafastSpec: GrafastFieldConfig<TSource, TArgs, TResult>,
   path: string,
-): GraphQLFieldConfig<any, TContext, TArgs> {
+): GraphQLFieldConfig<any, Grafast.Context, TArgs> {
   const { plan, subscribePlan, args, ...spec } = grafastSpec;
 
   assertNotAsync(plan, `${path ?? "?"}.plan`);
@@ -459,29 +536,34 @@ export function objectFieldSpec<
 
   const argsWithExtensions = args
     ? Object.keys(args).reduce((memo, argName) => {
-        const {
-          inputPlan,
-          applyPlan,
-          autoApplyAfterParentPlan,
-          autoApplyAfterParentSubscribePlan,
-          ...argSpec
-        } = args[argName];
-        assertNotAsync(inputPlan, `${path ?? "?"}(${argName}:).inputPlan`);
+        const grafastArgSpec = args[argName];
+        // TODO: remove this code
+        if (
+          grafastArgSpec.inputPlan ||
+          grafastArgSpec.autoApplyAfterParentPlan ||
+          grafastArgSpec.autoApplyAfterParentSubscribePlan
+        ) {
+          throw new Error(
+            `Argument at ${path} has inputPlan or autoApplyAfterParentPlan or autoApplyAfterParentSubscribePlan set; these properties no longer do anything and should be removed.`,
+          );
+        }
+
+        const { applyPlan, applySubscribePlan, ...argSpec } = grafastArgSpec;
         assertNotAsync(applyPlan, `${path ?? "?"}(${argName}:).applyPlan`);
+        assertNotAsync(
+          applySubscribePlan,
+          `${path ?? "?"}(${argName}:).applySubscribePlan`,
+        );
         memo[argName] = {
           ...argSpec,
-          ...(inputPlan || applyPlan
+          ...(applyPlan || applySubscribePlan
             ? {
                 extensions: {
+                  ...argSpec.extensions,
                   grafast: {
-                    ...(inputPlan ? { inputPlan } : null),
-                    ...(autoApplyAfterParentPlan
-                      ? { autoApplyAfterParentPlan }
-                      : null),
+                    ...argSpec.extensions?.grafast,
                     ...(applyPlan ? { applyPlan } : null),
-                    ...(autoApplyAfterParentSubscribePlan
-                      ? { autoApplyAfterParentSubscribePlan }
-                      : null),
+                    ...(applySubscribePlan ? { applySubscribePlan } : null),
                   },
                 },
               }
@@ -514,46 +596,30 @@ export function objectFieldSpec<
  *
  * @see {@link https://kentcdodds.com/blog/how-to-write-a-constrained-identity-function-in-typescript}
  */
-export function newGrafastFieldConfigBuilder<
-  TContext extends Grafast.Context,
-  TParentStep extends ExecutableStep,
->(): <
-  TType extends GraphQLOutputType,
-  TFieldStep extends OutputPlanForType<TType>,
-  TArgs extends BaseGraphQLArguments,
+export function newGrafastFieldConfigBuilder<TParentStep extends Step>(): <
+  TArgs extends BaseGraphQLArguments = BaseGraphQLArguments,
+  TFieldStep extends Step = Step,
 >(
-  config: GrafastFieldConfig<TType, TContext, TParentStep, TFieldStep, TArgs>,
+  config: GrafastFieldConfig<TParentStep, TArgs, TFieldStep>,
 ) => typeof config {
   return (config) => config;
 }
 
-export type GrafastInputFieldConfigMap<
-  TContext extends Grafast.Context,
-  TParentStep extends ModifierStep<any>,
-> = {
-  [key: string]: GrafastInputFieldConfig<
-    GraphQLInputType,
-    TContext,
-    TParentStep,
-    any,
-    any
-  >;
+export type GrafastInputFieldConfigMap<TParent> = {
+  [key: string]: GrafastInputFieldConfig<TParent, GraphQLInputType>;
 };
 
-export type InputObjectTypeSpec<
-  TContext extends Grafast.Context,
-  TParentStep extends ModifierStep<any>,
-  TFields extends GrafastInputFieldConfigMap<TContext, TParentStep>,
-> = Omit<GraphQLInputObjectTypeConfig, "fields"> & {
-  fields: TFields | (() => TFields);
+export type InputObjectTypeSpec<TParent> = Omit<
+  GraphQLInputObjectTypeConfig,
+  "fields"
+> & {
+  fields:
+    | GrafastInputFieldConfigMap<TParent>
+    | (() => GrafastInputFieldConfigMap<TParent>);
 };
 
-function inputObjectSpec<
-  TContext extends Grafast.Context,
-  TParentStep extends ModifierStep<any>,
-  TFields extends GrafastInputFieldConfigMap<TContext, TParentStep>,
->(
-  spec: InputObjectTypeSpec<TContext, TParentStep, TFields>,
+function inputObjectSpec<TParent>(
+  spec: InputObjectTypeSpec<TParent>,
 ): GraphQLInputObjectTypeConfig {
   const modifiedSpec: GraphQLInputObjectTypeConfig = {
     ...spec,
@@ -561,10 +627,7 @@ function inputObjectSpec<
       const fields =
         typeof spec.fields === "function" ? spec.fields() : spec.fields;
       const modifiedFields = Object.keys(fields).reduce((o, key) => {
-        o[key] = inputObjectFieldSpec<TContext, TParentStep>(
-          fields[key],
-          `${spec.name}.${key}`,
-        );
+        o[key] = inputObjectFieldSpec(fields[key], `${spec.name}.${key}`);
         return o;
       }, {} as GraphQLInputFieldConfigMap);
       return modifiedFields;
@@ -573,71 +636,49 @@ function inputObjectSpec<
   return modifiedSpec;
 }
 
-export type GrafastInputObjectType<
-  TContext extends Grafast.Context,
-  TParentStep extends ModifierStep<any>,
-  TFields extends GrafastInputFieldConfigMap<TContext, TParentStep>,
-> = graphql.GraphQLInputObjectType & {
-  TContext: TContext;
-  TParentStep: TParentStep;
-  TFields: TFields;
+export type GrafastInputObjectType<TParent> = graphql.GraphQLInputObjectType & {
+  TParent: TParent;
 };
 
-export function newInputObjectTypeBuilder<
-  TContext extends Grafast.Context,
-  TParentStep extends ModifierStep<any>,
->(): <TFields extends GrafastInputFieldConfigMap<TContext, TParentStep>>(
-  spec: InputObjectTypeSpec<TContext, TParentStep, TFields>,
-) => GrafastInputObjectType<TContext, TParentStep, TFields> {
+export function newInputObjectTypeBuilder<TParent = any>(): (
+  spec: InputObjectTypeSpec<TParent>,
+) => GrafastInputObjectType<TParent> {
   return (spec) =>
-    new GraphQLInputObjectType(inputObjectSpec(spec)) as GrafastInputObjectType<
-      TContext,
-      TParentStep,
-      any
-    >;
+    new GraphQLInputObjectType(
+      inputObjectSpec(spec),
+    ) as GrafastInputObjectType<TParent>;
 }
 
 /**
  * Saves us having to write `extensions: {grafast: {...}}` everywhere.
  */
-export function inputObjectFieldSpec<
-  TContext extends Grafast.Context,
-  TParent extends ModifierStep<any>,
-  TResult extends ModifierStep<TParent> = ModifierStep<TParent>,
-  TInput extends InputStep = InputStep,
->(
-  grafastSpec: GrafastInputFieldConfig<
-    GraphQLInputType,
-    TContext,
-    TParent,
-    TResult,
-    TInput
-  >,
+export function inputObjectFieldSpec<TParent>(
+  grafastSpec: GrafastInputFieldConfig<TParent, GraphQLInputType>,
   path: string,
 ): GraphQLInputFieldConfig {
-  const {
-    inputPlan,
-    applyPlan,
-    autoApplyAfterParentInputPlan,
-    autoApplyAfterParentApplyPlan,
-    ...spec
-  } = grafastSpec;
-  assertNotAsync(inputPlan, `${path ?? "?"}.inputPlan`);
-  assertNotAsync(applyPlan, `${path ?? "?"}.applyPlan`);
-  return inputPlan || applyPlan
+  // TODO: remove this code
+  if (
+    grafastSpec.applyPlan ||
+    grafastSpec.inputPlan ||
+    grafastSpec.autoApplyAfterParentApplyPlan ||
+    grafastSpec.autoApplyAfterParentInputPlan
+  ) {
+    throw new Error(
+      `Input field at ${path} has applyPlan or inputPlan or autoApplyAfterParentApplyPlan or autoApplyAfterParentInputPlan set; these properties no longer do anything and should be removed.`,
+    );
+  }
+
+  const { apply, ...spec } = grafastSpec;
+  assertNotAsync(apply, `${path ?? "?"}.apply`);
+  return apply
     ? {
         ...spec,
         extensions: {
+          ...spec.extensions,
           grafast: {
-            ...(inputPlan ? { inputPlan } : null),
-            ...(applyPlan ? { applyPlan } : null),
-            ...(autoApplyAfterParentInputPlan
-              ? { autoApplyAfterParentInputPlan }
-              : null),
-            ...(autoApplyAfterParentApplyPlan
-              ? { autoApplyAfterParentApplyPlan }
-              : null),
-          },
+            ...spec.extensions?.grafast,
+            apply,
+          } as Grafast.InputFieldExtensions,
         },
       }
     : spec;
@@ -650,6 +691,22 @@ declare module "graphql" {
 }
 
 const $$valueConfigByValue = Symbol("valueConfigByValue");
+export function getEnumValueConfigs(enumType: graphql.GraphQLEnumType): {
+  [outputValue: string]: GraphQLEnumValueConfig | undefined;
+} {
+  // We cache onto the enumType directly so that garbage collection can clear up after us easily.
+  if (enumType[$$valueConfigByValue] === undefined) {
+    const config = enumType.toConfig();
+    enumType[$$valueConfigByValue] = Object.values(config.values).reduce(
+      (memo, value) => {
+        memo[value.value] = value;
+        return memo;
+      },
+      Object.create(null),
+    );
+  }
+  return enumType[$$valueConfigByValue]!;
+}
 /**
  * This would be equivalent to `enumType._valueLookup.get(outputValue)` except
  * that's not a public API so we have to do a bit of heavy lifting here. Since
@@ -660,18 +717,7 @@ export function getEnumValueConfig(
   enumType: graphql.GraphQLEnumType,
   outputValue: string,
 ): GraphQLEnumValueConfig | undefined {
-  // We cache onto the enumType directly so that garbage collection can clear up after us easily.
-  if (!enumType[$$valueConfigByValue]) {
-    const config = enumType.toConfig();
-    enumType[$$valueConfigByValue] = Object.values(config.values).reduce(
-      (memo, value) => {
-        memo[value.value] = value;
-        return memo;
-      },
-      Object.create(null),
-    );
-  }
-  return enumType[$$valueConfigByValue]![outputValue];
+  return getEnumValueConfigs(enumType)[outputValue];
 }
 
 /**
@@ -739,7 +785,9 @@ export function arrayOfLengthCb(length: number, fill: () => any) {
   return arr;
 }
 
-function findVariableNamesUsedInValueNode(
+export const valueNodeToStaticValue = graphql.valueFromAST;
+
+export function findVariableNamesUsedInValueNode(
   valueNode: ValueNode,
   variableNames: Set<string>,
 ): void {
@@ -925,16 +973,19 @@ export function isTypePlanned(
  *
  * @internal
  */
-export type Sudo<T> = T extends ExecutableStep<any>
-  ? T & {
-      dependencies: ReadonlyArray<ExecutableStep>;
-      implicitSideEffectStep: ExecutableStep | null;
-      dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>;
-      dependencyOnReject: ReadonlyArray<Error | null | undefined>;
-      defaultForbiddenFlags: ExecutionEntryFlags;
-      getDepOptions: ExecutableStep["getDepOptions"];
-    }
-  : T;
+export type Sudo<T> =
+  T extends Step<any>
+    ? T & {
+        dependencies: ReadonlyArray<Step>;
+        implicitSideEffectStep: Step | null;
+        dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>;
+        dependencyOnReject: ReadonlyArray<Error | null | undefined>;
+        dependencyDataOnly: ReadonlyArray<boolean>;
+        defaultForbiddenFlags: ExecutionEntryFlags;
+        _getDepOptions: Step["_getDepOptions"];
+        _refs: Array<number>;
+      }
+    : T;
 
 /**
  * Make protected/private methods accessible.
@@ -960,10 +1011,7 @@ export function writeableArray<T>(a: ReadonlyArray<T>): Array<T> {
  * Returns `true` if the first argument depends on the second argument either
  * directly or indirectly (via a chain of dependencies).
  */
-export function stepADependsOnStepB(
-  stepA: ExecutableStep,
-  stepB: ExecutableStep,
-): boolean {
+export function stepADependsOnStepB(stepA: Step, stepB: Step): boolean {
   if (stepA === stepB) {
     throw new Error("Invalid call to stepADependsOnStepB");
   }
@@ -986,14 +1034,15 @@ export function stepADependsOnStepB(
   return false;
 }
 
+function stepAIsOrDependsOnStepB(stepA: Step, stepB: Step): boolean {
+  return stepA === stepB || stepADependsOnStepB(stepA, stepB);
+}
+
 /**
  * Returns true if stepA is allowed to depend on stepB, false otherwise. (This
  * mostly relates to heirarchy.)
  */
-export function stepAMayDependOnStepB(
-  $a: ExecutableStep,
-  $b: ExecutableStep,
-): boolean {
+export function stepAMayDependOnStepB($a: Step, $b: Step): boolean {
   if ($a.isFinalized) {
     return false;
   }
@@ -1004,6 +1053,93 @@ export function stepAMayDependOnStepB(
     return false;
   }
   return !stepADependsOnStepB($b, $a);
+}
+
+export function stepAShouldTryAndInlineIntoStepB($a: Step, $b: Step): boolean {
+  if (isDev && !stepADependsOnStepB($a, $b)) {
+    throw new Error(
+      `Shouldn't try and inline into something you're not dependent on!`,
+    );
+  }
+  if (!stepsAreInSamePhase($b, $a)) return false;
+
+  // TODO: review the rules about polymorphism here; e.g. "only if most of the
+  // polymorphic paths are covered" or something. We don't want the parent to
+  // do lots of work for lots of polymorphic paths that won't be covered, but
+  // equally we don't want to necessarily require 100% of the polymorphic
+  // branches to be matched.
+  const paths = pathsFromAncestorToTargetLayerPlan($b.layerPlan, $a.layerPlan);
+  let path: readonly LayerPlan[];
+  if (paths.length === 0) {
+    throw new Error(`No path from ${$a} back to ${$b}?`);
+  } else if (paths.length > 1) {
+    const commonPath: LayerPlan[] = [];
+    const firstPath = paths[0];
+    for (const lp of firstPath) {
+      if (paths.every((p) => p.includes(lp))) {
+        commonPath.push(lp);
+      }
+    }
+    path = commonPath;
+  } else {
+    path = paths[0];
+  }
+  for (const lp of path) {
+    if (lp.reason.type === "polymorphicPartition") {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+export function pathsFromAncestorToTargetLayerPlan(
+  ancestor: LayerPlan,
+  lp: LayerPlan,
+): readonly LayerPlan[][] {
+  if (lp === ancestor) {
+    // One path, and it's the null path - stay where you are.
+    return [[]];
+  }
+
+  if (lp.reason.type === "root") {
+    // No paths found - lp doesn't inherit from ancestor.
+    return [];
+  } else if (lp.reason.type === "combined") {
+    const childPaths = lp.reason.parentLayerPlans.flatMap((plp) =>
+      pathsFromAncestorToTargetLayerPlan(ancestor, plp),
+    );
+    for (const path of childPaths) {
+      path.push(lp);
+    }
+    return childPaths;
+  } else {
+    const childPaths = pathsFromAncestorToTargetLayerPlan(
+      ancestor,
+      lp.reason.parentLayerPlan,
+    );
+    for (const path of childPaths) {
+      path.push(lp);
+    }
+    return childPaths;
+  }
+}
+
+export function layerPlanHeirarchyContains(
+  lp: LayerPlan,
+  targetLp: LayerPlan,
+): boolean {
+  if (lp === targetLp) return true;
+  if (lp.reason.type === "root") {
+    return false;
+  } else if (lp.reason.type === "combined") {
+    return lp.reason.parentLayerPlans.some((plp) =>
+      layerPlanHeirarchyContains(plp, targetLp),
+    );
+  } else {
+    // PERF: loop would be faster than recursion
+    return layerPlanHeirarchyContains(lp.reason.parentLayerPlan, targetLp);
+  }
 }
 
 /**
@@ -1033,26 +1169,58 @@ export function stepAMayDependOnStepB(
  * approach. Once you have, you can use this function to help you, should you
  * need it.
  */
-export function stepsAreInSamePhase(
-  ancestor: ExecutableStep,
-  descendent: ExecutableStep,
-) {
-  let currentLayerPlan: LayerPlan | null = descendent.layerPlan;
-  do {
-    if (currentLayerPlan === ancestor.layerPlan) {
-      return true;
+export function stepsAreInSamePhase(ancestor: Step, descendent: Step) {
+  if (isDev && !stepADependsOnStepB(descendent, ancestor)) {
+    throw new Error(
+      `Shouldn't try and inline into something you're not dependent on!`,
+    );
+  }
+  const ancestorDepth = ancestor.layerPlan.depth;
+  const descendentDepth = descendent.layerPlan.depth;
+  if (descendentDepth < ancestorDepth) {
+    throw new Error(
+      `descendent is deeper than ancestor; did you pass ancestor/descendent the wrong way around?`,
+    );
+  }
+  const descDeferBoundary =
+    descendent.layerPlan.ancestry[descendent.layerPlan.deferBoundaryDepth];
+  if (
+    ancestor.layerPlan.ancestry[ancestor.layerPlan.deferBoundaryDepth] !==
+    descDeferBoundary
+  ) {
+    // Still possible to be okay if ancestor is the source of a streamed list item or deferred step
+    if (
+      descDeferBoundary.reason.type === "listItem" &&
+      descDeferBoundary.reason.stream != null &&
+      descendent.layerPlan.ancestry[
+        descendent.layerPlan.deferBoundaryDepth - 1
+      ] === ancestor.layerPlan
+    ) {
+      if (
+        stepAIsOrDependsOnStepB(descDeferBoundary.reason.parentStep, ancestor)
+      ) {
+        return true;
+      }
     }
+    // Nope, don't allow
+    return false;
+  }
+  for (let i = 0; i < ancestorDepth; i++) {
+    if (ancestor.layerPlan.ancestry[i] !== descendent.layerPlan.ancestry[i]) {
+      return false;
+    }
+  }
+  for (let i = ancestorDepth + 1; i < descendentDepth; i++) {
+    const currentLayerPlan = descendent.layerPlan.ancestry[i];
     const t = currentLayerPlan.reason.type;
     switch (t) {
+      case "combined": {
+        continue;
+      }
       case "subscription":
       case "defer": {
         // These indicate boundaries over which plans shouldn't be optimized
         // together (generally).
-        return false;
-      }
-      case "polymorphic": {
-        // OPTIMIZE: can optimize this so that if all polymorphicPaths match then it
-        // passes
         return false;
       }
       case "listItem": {
@@ -1067,6 +1235,8 @@ export function stepsAreInSamePhase(
       case "root":
       case "nullableBoundary":
       case "subroutine":
+      case "polymorphic":
+      case "polymorphicPartition":
       case "mutationField": {
         continue;
       }
@@ -1075,10 +1245,43 @@ export function stepsAreInSamePhase(
         throw new Error(`Unhandled layer plan type '${never}'`);
       }
     }
-  } while ((currentLayerPlan = currentLayerPlan.parentLayerPlan));
-  throw new Error(
-    `${descendent} is not dependent on ${ancestor}, perhaps you passed the arguments in the wrong order?`,
-  );
+  }
+  return true;
+}
+
+export function isPhaseTransitionLayerPlan(
+  layerPlan: LayerPlan,
+): layerPlan is
+  | LayerPlan<LayerPlanReasonListItem>
+  | LayerPlan<LayerPlanReasonDefer>
+  | LayerPlan<LayerPlanReasonSubscription> {
+  const t = layerPlan.reason.type;
+  switch (t) {
+    case "subscription":
+    case "defer": {
+      return true;
+    }
+    case "listItem": {
+      if (layerPlan.reason.stream) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+    case "polymorphic":
+    case "polymorphicPartition":
+    case "root":
+    case "nullableBoundary":
+    case "subroutine":
+    case "combined": // TODO: CHECK ME!
+    case "mutationField": {
+      return false;
+    }
+    default: {
+      const never: never = t;
+      throw new Error(`Unhandled layer plan type '${never}'`);
+    }
+  }
 }
 
 // ENHANCE: implement this!
@@ -1108,11 +1311,11 @@ export function assertNotPromise<TVal>(
 }
 
 export function hasItemPlan(
-  step: ExecutableStep & {
-    itemPlan?: ($item: ExecutableStep) => ExecutableStep;
+  step: Step & {
+    itemPlan?: ($item: Step) => Step;
   },
-): step is ExecutableStep & {
-  itemPlan: ($item: ExecutableStep) => ExecutableStep;
+): step is Step & {
+  itemPlan: ($item: Step) => Step;
 } {
   return "itemPlan" in step && typeof step.itemPlan === "function";
 }
@@ -1155,4 +1358,39 @@ export function digestKeys(keys: ReadonlyArray<string | number | symbol>) {
     }
   }
   return str;
+}
+
+/**
+ * If the directive has the argument `argName`, return a step representing that
+ * arguments value, whether that be a step representing the relevant variable
+ * or a constant step representing the hardcoded value in the document.
+ *
+ * @remarks NOT SUITABLE FOR USAGE WITH LISTS OR OBJECTS! Does not evaluate
+ * internal variable usages e.g. `[1, $b, 3]`
+ */
+export function directiveArgument<T>(
+  operationPlan: OperationPlan,
+  directive: DirectiveNode,
+  argName: string,
+  expectedKind:
+    | graphql.Kind.INT
+    | graphql.Kind.FLOAT
+    | graphql.Kind.BOOLEAN
+    | graphql.Kind.STRING,
+): Step<T> | undefined {
+  const arg = directive.arguments?.find((n) => n.name.value === argName);
+  if (!arg) return undefined;
+  const val = arg.value;
+  return val.kind === graphql.Kind.VARIABLE
+    ? operationPlan.variableValuesStep.get(val.name.value)
+    : val.kind === expectedKind
+      ? constant(
+          val.kind === Kind.INT
+            ? (parseInt(val.value, 10) as T)
+            : val.kind === Kind.FLOAT
+              ? (parseFloat(val.value) as T)
+              : // boolean, string
+                (val.value as T),
+        )
+      : undefined;
 }

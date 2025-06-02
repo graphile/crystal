@@ -1,0 +1,53 @@
+# Ref consumable-items.md
+
+query ConsumableItems {
+  item(type: Consumable, id: 206) {
+    __typename
+    id
+    ... on Created {
+      __typename
+      ... on HasContents {
+        contents(first: 3) {
+          __typename
+          id
+          name
+        }
+      }
+    }
+  }
+}
+
+query ConsumableItemsStream2 @incremental {
+  item(type: Consumable, id: 206) {
+    __typename
+    id
+    ... on Created {
+      __typename
+      ... on HasContents {
+        contents(first: 3) @stream {
+          __typename
+          id
+          name
+        }
+      }
+    }
+  }
+}
+
+query ConsumableItemsNoStream($stream: Boolean!)
+@variables(values: { stream: false }) {
+  item(type: Consumable, id: 206) {
+    __typename
+    id
+    ... on Created {
+      __typename
+      ... on HasContents {
+        contents(first: 3) @stream(if: $stream) {
+          __typename
+          id
+          name
+        }
+      }
+    }
+  }
+}

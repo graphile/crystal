@@ -44,6 +44,14 @@ const config = {
           routeBasePath: "graphile-build",
           sidebarPath: require.resolve("./sidebars.js"),
           editUrl,
+          lastVersion: "latest",
+          //includeCurrentVersion: false,
+          versions: {
+            latest: { label: "Current" },
+            4: { label: "v4 (current)", banner: "none" },
+            5: { label: "v5 (beta)", banner: "unreleased" },
+            current: { label: "Draft" },
+          },
         },
         blog: false,
         theme: {
@@ -62,6 +70,14 @@ const config = {
         routeBasePath: "graphile-build-pg",
         sidebarPath: require.resolve("./sidebars.js"),
         editUrl,
+        lastVersion: "latest",
+        //includeCurrentVersion: false,
+        versions: {
+          latest: { label: "Current" },
+          4: { label: "v4 (current)", banner: "none" },
+          5: { label: "v5 (beta)", banner: "unreleased" },
+          current: { label: "Draft" },
+        },
       },
     ],
 
@@ -109,11 +125,23 @@ const config = {
             label: "Graphile Build",
           },
           {
+            type: "docsVersionDropdown",
+            position: "left",
+            //docsPluginId: "docs",
+            dropdownActiveClassDisabled: true,
+          },
+          {
             type: "doc",
             docId: "index",
             docsPluginId: "graphile-build-pg",
             position: "left",
             label: "Graphile Build pg",
+          },
+          {
+            type: "docsVersionDropdown",
+            position: "left",
+            docsPluginId: "graphile-build-pg",
+            dropdownActiveClassDisabled: true,
           },
           {
             href: `https://github.com/${organizationName}/${projectName}`,

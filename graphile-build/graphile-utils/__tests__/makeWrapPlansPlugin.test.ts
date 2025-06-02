@@ -51,9 +51,11 @@ const makeSchemaWithSpyAndPlugins = (
               echo(message: String!): String
             }
           `,
-          plans: {
+          objects: {
             Query: {
-              echo: spy,
+              plans: {
+                echo: spy,
+              },
             },
           },
         })),
@@ -63,7 +65,7 @@ const makeSchemaWithSpyAndPlugins = (
         optionKey: "optionValue",
       },
     },
-    {},
+    {} as GraphileBuild.BuildInput,
     {},
   );
 
@@ -71,7 +73,7 @@ const makeEchoSpy = (fn?: FieldPlanResolver<any, any, any>) =>
   jest.fn(
     fn ||
       (($parent, args) => {
-        return args.get("message");
+        return args.getRaw("message");
       }),
   );
 
@@ -329,7 +331,7 @@ describe("wrapping plans matching a filter", () => {
             argValues,
           ]);
         }
-        sideEffect(args.get(), beforeFn);
+        sideEffect(args.getRaw(), beforeFn);
 
         const $result = plan();
 
@@ -343,8 +345,8 @@ describe("wrapping plans matching a filter", () => {
     const add: FieldPlanResolver<any, any, any> = (_, args) =>
       lambda(
         [
-          args.get("arg1") as ExecutableStep<number>,
-          args.get("arg2") as ExecutableStep<number>,
+          args.getRaw("arg1") as ExecutableStep<number>,
+          args.getRaw("arg2") as ExecutableStep<number>,
         ],
         ([arg1, arg2]) => arg1 + arg2,
       );
@@ -357,11 +359,13 @@ describe("wrapping plans matching a filter", () => {
             c(arg1: String = "1", arg2: String = "2"): String
           }
         `,
-        plans: {
+        objects: {
           Mutation: {
-            a: add,
-            b: add,
-            c: add,
+            plans: {
+              a: add,
+              b: add,
+              c: add,
+            },
           },
         },
       }),
@@ -378,6 +382,10 @@ describe("wrapping plans matching a filter", () => {
       `,
       contextValue: { test: true },
     })) as ExecutionResult;
+    if (result.errors) {
+      const firstError = result.errors[0];
+      console.error(firstError.originalError ?? firstError);
+    }
     expect(result.errors).toBeFalsy();
     expect(result.data.a).toBe(8);
     expect(result.data.b).toBe("1ARG2");

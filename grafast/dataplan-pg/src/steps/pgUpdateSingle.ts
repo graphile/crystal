@@ -1,17 +1,28 @@
-import type { ExecutionDetails, GrafastResultsList, SetterStep } from "grafast";
-import { ExecutableStep, exportAs, isDev, SafeError, setter } from "grafast";
+import type {
+  ExecutionDetails,
+  GrafastResultsList,
+  Maybe,
+  Setter,
+  SetterCapable,
+} from "grafast";
+import { access, exportAs, isDev, SafeError, setter, Step } from "grafast";
 import type { SQL, SQLable, SQLRawValue } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 
 import type { PgCodecAttribute } from "../codecs.js";
-import type { PgResource, PgResourceUnique } from "../index.js";
+import { sqlValueWithCodec } from "../codecs.js";
+import type { PgResource, PgResourceUnique } from "../datasource.js";
 import { inspect } from "../inspect.js";
 import type {
   GetPgResourceAttributes,
   GetPgResourceCodec,
   GetPgResourceUniques,
+  ObjectForResource,
   PgCodec,
+  PgCodecWithAttributes,
+  PgQueryBuilder,
   PlanByUniques,
+  ReadonlyArrayOrDirect,
 } from "../interfaces.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
@@ -22,11 +33,9 @@ type QueryValueDetailsBySymbol = Map<
 >;
 
 interface PgUpdatePlanFinalizeResults {
-  /** The SQL query text */
-  text: string;
-
-  /** The values to feed into the query */
-  rawSqlValues: ReadonlyArray<SQLRawValue>;
+  table: SQL;
+  returning: SQL;
+  sqlWhere: SQL;
 
   /** When we see the given symbol in the SQL values, what dependency do we replace it with? */
   queryValueDetailsBySymbol: QueryValueDetailsBySymbol;
@@ -38,7 +47,7 @@ interface PgUpdatePlanFinalizeResults {
 export class PgUpdateSingleStep<
     TResource extends PgResource<any, any, any, any, any> = PgResource,
   >
-  extends ExecutableStep<unknown[]>
+  extends Step<unknown[]>
   implements SQLable
 {
   static $$export = {
@@ -107,6 +116,8 @@ export class PgUpdateSingleStep<
    */
   private selects: Array<SQL> = [];
 
+  private applyDepIds: number[] = [];
+
   constructor(
     resource: TResource,
     getBy: PlanByUniques<
@@ -114,7 +125,7 @@ export class PgUpdateSingleStep<
       GetPgResourceUniques<TResource>
     >,
     attributes?: {
-      [key in keyof GetPgResourceAttributes<TResource>]?: ExecutableStep; // | PgTypedExecutableStep<TAttributes[key]["codec"]>
+      [key in keyof GetPgResourceAttributes<TResource>]?: Step; // | PgTypedStep<TAttributes[key]["codec"]>
     },
   ) {
     super();
@@ -167,7 +178,7 @@ export class PgUpdateSingleStep<
         if (value) {
           this.set(
             key as keyof GetPgResourceAttributes<TResource>,
-            value as ExecutableStep,
+            value as Step,
           );
         }
       });
@@ -182,7 +193,7 @@ export class PgUpdateSingleStep<
 
   set<TKey extends keyof GetPgResourceAttributes<TResource>>(
     name: TKey,
-    value: ExecutableStep, // | PgTypedExecutableStep<TAttributes[TKey]["codec"]>
+    value: Step, // | PgTypedStep<TAttributes[TKey]["codec"]>
   ): void {
     if (this.locked) {
       throw new Error("Cannot set after plan is locked.");
@@ -199,21 +210,6 @@ export class PgUpdateSingleStep<
     )[name];
     const depId = this.addDependency(value);
     this.attributes.push({ name, depId, pgCodec });
-  }
-
-  setPlan(): SetterStep<
-    {
-      [key in keyof GetPgResourceAttributes<TResource> &
-        string]: ExecutableStep;
-    },
-    this
-  > {
-    if (this.locked) {
-      throw new Error(
-        `${this}: cannot set values once plan is locked ('setPlan')`,
-      );
-    }
-    return setter(this);
   }
 
   /**
@@ -262,6 +258,10 @@ export class PgUpdateSingleStep<
     return colPlan as any;
   }
 
+  public getMeta(key: string) {
+    return access(this, ["m", key]);
+  }
+
   public record(): PgClassExpressionStep<
     GetPgResourceCodec<TResource>,
     TResource
@@ -295,6 +295,14 @@ export class PgUpdateSingleStep<
     return this.selects.push(fragment) - 1;
   }
 
+  apply(
+    $step: Step<
+      ReadonlyArrayOrDirect<Maybe<PgUpdateSingleQueryBuilderCallback>>
+    >,
+  ) {
+    this.applyDepIds.push(this.addUnaryDependency($step));
+  }
+
   /**
    * `execute` will always run as a root-level query. In future we'll implement a
    * `toSQL` method that allows embedding this plan within another SQL plan...
@@ -311,18 +319,95 @@ export class PgUpdateSingleStep<
     indexMap,
     values,
   }: ExecutionDetails): Promise<GrafastResultsList<any>> {
-    if (!this.finalizeResults) {
+    const { alias, contextId, finalizeResults, resource } = this;
+    if (!finalizeResults) {
       throw new Error("Cannot execute PgSelectStep before finalizing it.");
     }
-    const { text, rawSqlValues, queryValueDetailsBySymbol } =
-      this.finalizeResults;
-    const contextDep = values[this.contextId];
+    const { table, returning, sqlWhere, queryValueDetailsBySymbol } =
+      finalizeResults;
+    const contextDep = values[contextId];
 
+    /*
+     * NOTE: Though we'd like to do bulk updates, there's no way of us
+     * reliably linking the data back up again given users might have
+     * triggers manipulating the data so we can't match it back up even using
+     * the same getBy specs.
+     *
+     * Currently it seems that the order returned from `update ...
+     * from (select ... order by ...) returning ...` is the same order as the
+     * `order by` was, however this is not guaranteed in the documentation
+     * and as such cannot be relied upon. Further the pgsql-hackers list
+     * explicitly declined guaranteeing this behavior:
+     *
+     * https://www.postgresql.org/message-id/CAKFQuwbgdJ_xNn0YHWGR0D%2Bv%2B3mHGVqJpG_Ejt96KHoJjs6DkA%40mail.gmail.com
+     *
+     * So we have to make do with single updates, alas.
+     */
     // We must execute each mutation on its own, but we can at least do so in
     // parallel. Note we return a list of promises, each may reject or resolve
     // without causing the others to reject.
     return indexMap(async (i) => {
       const context = contextDep.at(i);
+
+      const sqlSets: SQL[] = [];
+      for (const { depId, name, pgCodec } of this.attributes) {
+        const attVal = values[depId].at(i);
+        // `null` is kept, `undefined` is skipped
+        if (attVal !== undefined) {
+          const sqlIdent = sql.identifier(name as string);
+          const sqlVal = sqlValueWithCodec(attVal, pgCodec);
+          sqlSets.push(sql`${sqlIdent} = ${sqlVal}`);
+        }
+      }
+
+      const meta = Object.create(null);
+      const queryBuilder: PgUpdateSingleQueryBuilder = {
+        alias,
+        [$$toSQL]() {
+          return alias;
+        },
+        setMeta(key, value) {
+          meta[key] = value;
+        },
+        getMetaRaw(key) {
+          return meta[key];
+        },
+        set(name, attVal) {
+          const pgCodec = resource.codec.attributes[name]?.codec;
+          if (!pgCodec) {
+            throw new Error(`Attribute ${name} not recognized on ${resource}`);
+          }
+          const sqlIdent = sql.identifier(name as string);
+          const sqlVal = sqlValueWithCodec(attVal, pgCodec);
+          sqlSets.push(sql`${sqlIdent} = ${sqlVal}`);
+        },
+        setBuilder() {
+          return setter(this);
+        },
+      };
+
+      for (const applyDepId of this.applyDepIds) {
+        const val = values[applyDepId].unaryValue();
+        if (Array.isArray(val)) {
+          val.forEach((v) => v?.(queryBuilder));
+        } else {
+          val?.(queryBuilder);
+        }
+      }
+
+      if (sqlSets.length === 0) {
+        // No attributes to update?! This isn't allowed.
+        throw new SafeError(
+          "Attempted to update a record, but no new values were specified.",
+        );
+      }
+
+      const query = sql`update ${table} set ${sql.join(
+        sqlSets,
+        ", ",
+      )} where ${sqlWhere}${returning};`;
+      const { text, values: rawSqlValues } = sql.compile(query);
+
       const sqlValues = queryValueDetailsBySymbol.size
         ? rawSqlValues.map((v) => {
             if (typeof v === "symbol") {
@@ -342,7 +427,15 @@ export class PgUpdateSingleStep<
         text,
         values: sqlValues,
       });
-      return rows[0] ?? (rowCount === 0 ? null : Object.create(null));
+      if (rowCount === 0) {
+        // TODO: should we throw?
+        return null;
+      }
+      return {
+        __proto__: null,
+        m: meta,
+        t: rows[0] ?? [],
+      };
     });
   }
 
@@ -369,83 +462,37 @@ export class PgUpdateSingleStep<
             )}`
           : sql.blank;
 
-      /*
-       * NOTE: Though we'd like to do bulk updates, there's no way of us
-       * reliably linking the data back up again given users might have
-       * triggers manipulating the data so we can't match it back up even using
-       * the same getBy specs.
-       *
-       * Currently it seems that the order returned from `update ...
-       * from (select ... order by ...) returning ...` is the same order as the
-       * `order by` was, however this is not guaranteed in the documentation
-       * and as such cannot be relied upon. Further the pgsql-hackers list
-       * explicitly declined guaranteeing this behavior:
-       *
-       * https://www.postgresql.org/message-id/CAKFQuwbgdJ_xNn0YHWGR0D%2Bv%2B3mHGVqJpG_Ejt96KHoJjs6DkA%40mail.gmail.com
-       *
-       * So we have to make do with single updates, alas.
-       */
       const getByAttributesCount = this.getBys.length;
-      const attributesCount = this.attributes.length;
-      if (attributesCount === 0) {
-        // No attributes to update?! This isn't allowed.
-        throw new SafeError(
-          "Attempted to update a record, but no new values were specified.",
-        );
-      } else if (getByAttributesCount === 0) {
+      if (getByAttributesCount === 0) {
         // No attributes specified to find the row?! This is forbidden.
         throw new SafeError(
           "Attempted to update a record, but no information on uniquely determining the record was specified.",
         );
-      } else {
-        // This is our common path
-        const sqlWhereClauses: SQL[] = [];
-        const sqlSets: SQL[] = [];
-        const queryValueDetailsBySymbol: QueryValueDetailsBySymbol = new Map();
-
-        for (let i = 0; i < getByAttributesCount; i++) {
-          const { name, depId, pgCodec } = this.getBys[i];
-          const symbol = Symbol(name as string);
-          sqlWhereClauses[i] = sql.parens(
-            sql`${sql.identifier(this.symbol, name as string)} = ${sql.value(
-              // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
-              // a value before executing the query.
-              symbol as any,
-            )}::${pgCodec.sqlType}`,
-          );
-          queryValueDetailsBySymbol.set(symbol, {
-            depId,
-            processor: pgCodec.toPg,
-          });
-        }
-
-        for (let i = 0; i < attributesCount; i++) {
-          const { name, depId, pgCodec } = this.attributes[i];
-          const symbol = Symbol(name as string);
-          sqlSets[i] = sql`${sql.identifier(name as string)} = ${sql.value(
+      }
+      const queryValueDetailsBySymbol: QueryValueDetailsBySymbol = new Map();
+      const sqlWhereClauses: SQL[] = [];
+      for (let i = 0; i < getByAttributesCount; i++) {
+        const { name, depId, pgCodec } = this.getBys[i];
+        const symbol = Symbol(name as string);
+        sqlWhereClauses[i] = sql.parens(
+          sql`${sql.identifier(this.symbol, name as string)} = ${sql.value(
             // THIS IS A DELIBERATE HACK - we will be replacing this symbol with
             // a value before executing the query.
             symbol as any,
-          )}::${pgCodec.sqlType}`;
-          queryValueDetailsBySymbol.set(symbol, {
-            depId,
-            processor: pgCodec.toPg,
-          });
-        }
-
-        const set = sql` set ${sql.join(sqlSets, ", ")}`;
-        const where = sql` where ${sql.parens(
-          sql.join(sqlWhereClauses, " and "),
-        )}`;
-        const query = sql`update ${table}${set}${where}${returning};`;
-        const { text, values: rawSqlValues } = sql.compile(query);
-
-        this.finalizeResults = {
-          text,
-          rawSqlValues,
-          queryValueDetailsBySymbol,
-        };
+          )}::${pgCodec.sqlType}`,
+        );
+        queryValueDetailsBySymbol.set(symbol, {
+          depId,
+          processor: pgCodec.toPg,
+        });
       }
+
+      this.finalizeResults = {
+        table,
+        returning,
+        sqlWhere: sql.parens(sql.join(sqlWhereClauses, " and ")),
+        queryValueDetailsBySymbol,
+      };
     }
 
     super.finalize();
@@ -467,9 +514,30 @@ export function pgUpdateSingle<
     GetPgResourceUniques<TResource>
   >,
   attributes?: {
-    [key in keyof GetPgResourceAttributes<TResource>]?: ExecutableStep; // | PgTypedExecutableStep<TAttributes[key]["codec"]>
+    [key in keyof GetPgResourceAttributes<TResource>]?: Step; // | PgTypedStep<TAttributes[key]["codec"]>
   },
 ): PgUpdateSingleStep<TResource> {
   return new PgUpdateSingleStep(resource, getBy, attributes);
 }
 exportAs("@dataplan/pg", pgUpdateSingle, "pgUpdateSingle");
+
+export interface PgUpdateSingleQueryBuilder<
+  TResource extends PgResource<
+    any,
+    PgCodecWithAttributes,
+    any,
+    any,
+    any
+  > = PgResource<any, PgCodecWithAttributes, any, any, any>,
+> extends PgQueryBuilder,
+    SetterCapable<ObjectForResource<TResource>> {
+  set<TAttributeName extends keyof ObjectForResource<TResource>>(
+    key: TAttributeName,
+    value: ObjectForResource<TResource>[TAttributeName],
+  ): void;
+  setBuilder(): Setter<ObjectForResource<TResource>, this>;
+}
+
+type PgUpdateSingleQueryBuilderCallback = (
+  qb: PgUpdateSingleQueryBuilder,
+) => void;

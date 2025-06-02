@@ -57,12 +57,37 @@ import { makeSchema } from "../src/index.js";
 import AmberPreset from "../src/presets/amber.js";
 import { makeV4Preset } from "../src/presets/v4.js";
 
+export const SwallowAllErrorsPlugin: GraphileConfig.Plugin = {
+  name: "SwallowAllErrorsPlugin",
+  schema: {
+    hooks: {
+      build(build) {
+        build.handleRecoverableError = () => {};
+        return build;
+      },
+    },
+  },
+};
+
 /**
  * We go beyond what Jest snapshots allow; so we have to manage it ourselves.
  * If UPDATE_SNAPSHOTS is set then we'll write updated snapshots, otherwise
  * we'll do the default behaviour of comparing to existing snapshots.
+ *
+ * Set UPDATE_SNAPSHOTS=1 to update all snapshots. Alternatively, set it to a
+ * comma separated list of snapshot types to update.
  */
-export const UPDATE_SNAPSHOTS = process.env.UPDATE_SNAPSHOTS === "1";
+const { UPDATE_SNAPSHOTS } = process.env;
+const updateSnapshotExtensions = UPDATE_SNAPSHOTS?.split(",")
+  .map((s) => s.trim())
+  .filter((s) => s.length > 0);
+function shouldUpdateSnapshot(filePath: string) {
+  // Never update snapshots in CI
+  if (process.env.CI) return false;
+  if (UPDATE_SNAPSHOTS === "1") return true;
+  if (!updateSnapshotExtensions) return false;
+  return updateSnapshotExtensions.some((e) => filePath.endsWith(e));
+}
 
 const EXPORT_SCHEMA_MODE = process.env.EXPORT_SCHEMA as
   | undefined
@@ -238,6 +263,8 @@ export async function runTestQuery(
     extends?: string | string[];
     pgIdentifiers?: "qualified" | "unqualified";
     search_path?: string;
+    muteWarnings?: boolean;
+    dontLogErrors?: boolean;
   },
   options: {
     callback?: (
@@ -265,6 +292,8 @@ export async function runTestQuery(
     cleanupSql,
     pgIdentifiers,
     search_path,
+    muteWarnings = true,
+    dontLogErrors = false,
   } = config;
   const { path } = options;
 
@@ -272,13 +301,13 @@ export async function runTestQuery(
   const schemas = Array.isArray(config.schema)
     ? config.schema
     : typeof config.schema === "string"
-    ? [config.schema]
-    : ["a", "b", "c"];
+      ? [config.schema]
+      : ["a", "b", "c"];
   const extendsRaw = Array.isArray(config.extends)
     ? config.extends
     : config.extends
-    ? [config.extends]
-    : [];
+      ? [config.extends]
+      : [];
   const presets = await Promise.all(
     extendsRaw.map(async (extendRaw) => {
       const [modulePath, name = "default"] = extendRaw.split(":");
@@ -294,9 +323,13 @@ export async function runTestQuery(
       return imported;
     }),
   );
+
   const preset: GraphileConfig.Preset = {
     extends: [AmberPreset, ...presets],
-    plugins: [StreamDeferPlugin],
+    plugins: [
+      StreamDeferPlugin,
+      ...(muteWarnings ? [SwallowAllErrorsPlugin] : []),
+    ],
     pgServices: [
       {
         adaptor,
@@ -317,10 +350,10 @@ export async function runTestQuery(
                 search_path,
               })
             : search_path
-            ? {
-                search_path,
-              }
-            : undefined,
+              ? {
+                  search_path,
+                }
+              : undefined,
         schemas: schemas,
         adaptorSettings: {
           connectionString,
@@ -330,10 +363,12 @@ export async function runTestQuery(
     schema: {
       pgForbidSetofFunctionsToReturnNull:
         config.setofFunctionsContainNulls === false,
+      muteWarnings,
       ...graphileBuildOptions,
     },
     gather: {
       pgIdentifiers,
+      muteWarnings,
     },
     grafast: {
       explain: ["plan"],
@@ -413,11 +448,11 @@ export async function runTestQuery(
           }
 
           const execute =
-            options.prepare ?? true
+            (options.prepare ?? true)
               ? grafastExecute
               : (args: ExecutionArgs) => graphqlExecute(args);
           const subscribe =
-            options.prepare ?? true
+            (options.prepare ?? true)
               ? grafastSubscribe
               : (args: SubscriptionArgs) => graphqlSubscribe(args);
 
@@ -547,8 +582,8 @@ export async function runTestQuery(
             const { data, errors, extensions } = JSON.parse(
               JSON.stringify(result),
             );
-            if (errors) {
-              console.error(errors[0].originalError || errors[0]);
+            if (errors && !dontLogErrors) {
+              console.error(result.errors?.[0].originalError || errors[0]);
             }
             if (options.callback) {
               throw new Error(
@@ -582,7 +617,7 @@ export async function snapshot(actual: string, filePath: string) {
   } catch (e) {
     /* noop */
   }
-  if (expected == null || UPDATE_SNAPSHOTS) {
+  if (expected == null || shouldUpdateSnapshot(filePath)) {
     if (expected !== actual) {
       console.warn(`Updated snapshot in '${filePath}'`);
       await fsp.writeFile(filePath, actual);
@@ -816,7 +851,7 @@ export const assertResultsMatch = async (
     uuid: new Map<string, number>(),
     uuidCounter: 1,
   });
-  const data2a = makeResultSnapshotSafe(data1, {
+  const data2a = makeResultSnapshotSafe(data2, {
     uuid: new Map<string, number>(),
     uuidCounter: 1,
   });

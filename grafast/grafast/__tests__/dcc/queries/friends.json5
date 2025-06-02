@@ -1,0 +1,29 @@
+{
+  crawler: {
+    id: 101,
+    name: 'Carl',
+    species: 'HUMAN',
+    friends: [
+      {
+        id: 102,
+        name: 'Princess Donut',
+      },
+      {
+        id: 103,
+        name: 'Katia',
+      },
+      {
+        id: 104,
+        name: 'Imani',
+      },
+      {
+        id: 105,
+        name: 'Elle',
+      },
+      {
+        id: 301,
+        name: 'Mordecai',
+      },
+    ],
+  },
+}

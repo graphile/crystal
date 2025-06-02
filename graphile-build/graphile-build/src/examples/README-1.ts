@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 
 import chalk from "chalk";
+import type { FieldArgs } from "grafast";
 import { lambda } from "grafast";
 import { graphql, printSchema } from "grafast/graphql";
 import { resolvePreset } from "graphile-config";
@@ -56,14 +57,20 @@ const MyRandomFieldPlugin: GraphileConfig.Plugin = {
                   },
                 },
                 plan: EXPORTABLE(
-                  (lambda, myDefaultMax, myDefaultMin) => (_$parent, args) => {
-                    return lambda(
-                      args.get("sides"),
-                      (sides = myDefaultMax) =>
-                        Math.floor(Math.random() * (sides + 1 - myDefaultMin)) +
-                        myDefaultMin,
-                    );
-                  },
+                  (lambda, myDefaultMax, myDefaultMin) =>
+                    (
+                      _$parent: any,
+                      { $sides }: FieldArgs<{ sides: number | null }>,
+                    ) => {
+                      return lambda(
+                        $sides,
+                        (sides) =>
+                          Math.floor(
+                            Math.random() *
+                              ((sides ?? myDefaultMax) + 1 - myDefaultMin),
+                          ) + myDefaultMin,
+                      );
+                    },
                   [lambda, myDefaultMax, myDefaultMin],
                 ),
               })),

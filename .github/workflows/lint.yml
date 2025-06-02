@@ -11,23 +11,25 @@ jobs:
       CI: true # Should already be set to TRUE by Github?
       TERM: xterm
       FORCE_COLOR: 1
-      NODE_VERSION: 16.14 # Should be moved to repository env variable
+      NODE_VERSION: 22.x # Should be moved to a repo envvar
       NODE_OPTIONS: "--max-old-space-size=4096" # Give eslint more space?
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Use Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "yarn"
 
       - run: yarn --immutable
-      - name: Compile eslint-plugin-graphile-export
-        run:
-          yarn workspaces foreach -ptR --from eslint-plugin-graphile-export run
-          prepack
+
+      - name: "Build"
+        run: yarn build
+
+      - name: "Prepack"
+        run: yarn workspaces foreach --parallel --topological --all run prepack
 
       - name: "Lint Code"
         run: yarn eslint .
@@ -38,9 +40,9 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Use Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "yarn"
@@ -57,13 +59,13 @@ jobs:
     env:
       TERM: xterm
       FORCE_COLOR: 1
-      NODE_VERSION: 16.14 # Should be moved to repository env variable
+      NODE_VERSION: 22.x # Should be moved to a repo envvar
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Use Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "yarn"
@@ -71,7 +73,28 @@ jobs:
       - run: yarn --immutable
 
       - name: "Build Code"
-        run: yarn prepack:all
+        run: yarn build && yarn prepack:all
 
       - name: "Run depcheck script"
         run: node scripts/benjies-depcheck.mjs
+
+  doccheck:
+    name: Documentation checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "yarn"
+
+      - run: yarn --immutable
+
+      - name: "Ensure SQL is lowercase"
+        run: node scripts/ensure-sql-is-lowercase.mjs
+
+      - name: "Ensure links don't end in /"
+        run: node scripts/ensure-no-slashes-on-internal-links.mjs

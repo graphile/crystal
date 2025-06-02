@@ -1,5 +1,5 @@
 {
-  "extends": "@tsconfig/node16/tsconfig.json",
+  "extends": "@tsconfig/node22/tsconfig.json",
   "ts-node": {
     "experimentalResolver": true
   },
@@ -12,7 +12,7 @@
     "moduleResolution": "NodeNext",
     "module": "NodeNext",
     "target": "ES2022",
-    "lib": ["ES2022"],
+    "lib": ["ES2022", "ESNext.Disposable"],
     // This has runtime performance overhead! Specifically it means a lot of
     // time is spent in 'instance_members_initializer' in V8. Disable.
     "useDefineForClassFields": false,
@@ -25,13 +25,13 @@
     "experimentalDecorators": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
-    "noFallthroughCasesInSwitch": true,
     "preserveWatchOutput": true,
 
     // We should remove this later
     "useUnknownInCatchVariables": false,
 
     // Use eslint for these "lint"-y checks
+    "noFallthroughCasesInSwitch": false,
     "noUnusedParameters": false,
     "noUnusedLocals": false
   },

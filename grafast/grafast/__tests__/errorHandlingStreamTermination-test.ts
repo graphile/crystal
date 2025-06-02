@@ -4,29 +4,29 @@ import { resolvePreset } from "graphile-config";
 import type { AsyncExecutionResult } from "graphql";
 import { it } from "mocha";
 
-import type { ExecutionDetails, PromiseOrDirect } from "../dist/index.js";
+import type {
+  ExecutionDetails,
+  ExecutionResults,
+  PromiseOrDirect,
+} from "../dist/index.js";
 import {
   constant,
-  ExecutableStep,
   grafast,
   isAsyncIterable,
   lambda,
   makeGrafastSchema,
+  Step,
 } from "../dist/index.js";
-import type { StreamDetails } from "../dist/interfaces.js";
 
 const resolvedPreset = resolvePreset({});
 const requestContext = {};
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-class SyncListCallbackStep<
-  TIn,
-  TOut extends any[],
-> extends ExecutableStep<TOut> {
+class SyncListCallbackStep<TIn, TOut extends any[]> extends Step<TOut> {
   isSyncAndSafe = false;
   constructor(
-    $dep: ExecutableStep<TIn>,
+    $dep: Step<TIn>,
     private callback: (val: TIn) => PromiseOrDirect<TOut>,
     private setStreaming: (isStreaming: boolean) => void,
   ) {
@@ -36,27 +36,31 @@ class SyncListCallbackStep<
   execute({
     indexMap,
     values: [values0],
-  }: ExecutionDetails<[TIn]>): ReadonlyArray<PromiseOrDirect<TOut>> {
-    return indexMap((i) => this.callback(values0.at(i)));
-  }
-  async stream({ indexMap, values: [values0] }: StreamDetails<[TIn]>) {
-    await sleep(0);
-    const { callback, setStreaming } = this;
-    return indexMap((i) => {
-      const entry = values0.at(i);
-      setStreaming(true);
+    stream,
+  }: ExecutionDetails<[TIn]>): ExecutionResults<TOut> {
+    if (!stream) {
+      return indexMap((i) => this.callback(values0.at(i)));
+    } else {
+      return (async () => {
+        await sleep(0);
+        const { callback, setStreaming } = this;
+        return indexMap((i) => {
+          const entry = values0.at(i);
+          setStreaming(true);
 
-      return (async function* () {
-        try {
-          const data = await callback(entry);
-          for (const item of data) {
-            yield item;
-          }
-        } finally {
-          setStreaming(false);
-        }
+          return (async function* () {
+            try {
+              const data = await callback(entry);
+              for (const item of data) {
+                yield item;
+              }
+            } finally {
+              setStreaming(false);
+            }
+          })();
+        });
       })();
-    });
+    }
   }
 }
 
@@ -75,30 +79,36 @@ const makeSchema = (setStreaming: (isStreaming: boolean) => void) =>
         list: [Thing]
       }
     `,
-    plans: {
+    objects: {
       Query: {
-        list() {
-          return constant([1, 2]);
+        plans: {
+          list() {
+            return constant([1, 2]);
+          },
         },
       },
       Thing: {
-        id($i: ExecutableStep<number>) {
-          return $i;
-        },
-        anotherList($i: ExecutableStep<number>) {
-          return new SyncListCallbackStep(
-            $i,
-            (i) => [i + 0, i + 1, i + 2],
-            setStreaming,
-          );
-        },
-        throw() {
-          return lambda(null, () => Promise.reject(new Error("ERROR")));
+        plans: {
+          id($i: Step<number>) {
+            return $i;
+          },
+          anotherList($i: Step<number>) {
+            return new SyncListCallbackStep(
+              $i,
+              (i) => [i + 0, i + 1, i + 2],
+              setStreaming,
+            );
+          },
+          throw() {
+            return lambda(null, () => Promise.reject(new Error("ERROR")));
+          },
         },
       },
       OtherThing: {
-        id($i: ExecutableStep<number>) {
-          return $i;
+        plans: {
+          id($i: Step<number>) {
+            return $i;
+          },
         },
       },
     },

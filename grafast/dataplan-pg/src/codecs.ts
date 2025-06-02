@@ -2,8 +2,8 @@ import type { JSONValue } from "grafast";
 import { exportAs } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
-import { parse as arrayParse } from "postgres-array";
 import { parse as rangeParse } from "postgres-range";
+import type { CustomInspectFunction } from "util";
 
 import type {
   PgBox,
@@ -46,6 +46,7 @@ import type {
   PgEnumCodec,
   PgEnumValue,
 } from "./interfaces.js";
+import { makeParseArrayWithTransform, parseArray } from "./parseArray.js";
 
 // PERF: `identity` can be shortcut
 const identity = <T>(value: T): T => value;
@@ -115,6 +116,9 @@ export interface PgCodecAttribute<
   identicalVia?: PgCodecAttributeVia;
   // ENHANCE: can identicalVia be plural? Is that useful? Maybe a attribute that has
   // multiple foreign key references?
+  // Answer: yes it can be plural - consider `parent.id` is identical to
+  // `child.parent_id` via the `parent` relation. This is in addition to the
+  // existing `item.id` being identical to `topic.id` used by polymorphism.
 
   /**
    * Set this true if you're using column-level select privileges and there are
@@ -180,6 +184,7 @@ function t<TFromJavaScript = any, TFromPostgres = string>(): <
       listCastFromPg,
       executor: null,
       isBinary,
+      [inspect.custom]: codecInspect,
     };
   };
 }
@@ -404,6 +409,19 @@ export type PgRecordTypeCodecSpec<
   isAnonymous?: boolean;
 };
 
+const codecInspect: CustomInspectFunction = function (this: PgCodec) {
+  const type = this.domainOfCodec
+    ? `DomainCodec<${this.domainOfCodec.name}>`
+    : this.arrayOfCodec
+      ? `ListCodec<${this.arrayOfCodec.name}[]>`
+      : this.rangeOfCodec
+        ? `RangeCodec<${this.rangeOfCodec.name}>`
+        : this.attributes
+          ? `RecordCodec`
+          : "Codec";
+  return `${type}(${this.name})`;
+};
+
 /**
  * Returns a PgCodec that represents a composite type (a type with
  * attributes).
@@ -448,6 +466,7 @@ export function recordCodec<
     description,
     extensions,
     executor,
+    [inspect.custom]: codecInspect,
   };
 }
 exportAs("@dataplan/pg", recordCodec, "recordCodec");
@@ -570,6 +589,13 @@ type CodecWithListCodec<
   >;
 };
 
+type PgCodecTFromJavaScript<
+  TInnerCodec extends PgCodec<any, any, any, any, any, any, any>,
+> =
+  TInnerCodec extends PgCodec<any, any, any, infer UFromJs, undefined, any, any>
+    ? UFromJs
+    : any;
+
 /**
  * Given a PgCodec, this returns a new PgCodec that represents a list
  * of the former.
@@ -609,9 +635,7 @@ export function listOfCodec<
   TName,
   undefined, // Array has no attributes
   string,
-  TInnerCodec extends PgCodec<any, any, any, infer UFromJs, undefined, any, any>
-    ? UFromJs[]
-    : any[],
+  readonly PgCodecTFromJavaScript<TInnerCodec>[],
   TInnerCodec,
   undefined,
   undefined
@@ -629,32 +653,29 @@ export function listOfCodec<
     typeDelim = `,`,
     name = `${innerCodec.name}[]` as TName,
   } = config ?? ({} as Record<string, never>);
+  const {
+    fromPg: innerCodecFromPg,
+    toPg: innerCodecToPg,
+    listCastFromPg: innerCodecListCastFromPg,
+    notNull: innerCodecNotNull,
+    executor,
+  } = innerCodec;
 
   const listCodec: PgCodec<
     TName,
     undefined, // Array has no attributes
     string,
-    TInnerCodec extends PgCodec<
-      any,
-      any,
-      any,
-      infer UFromJs,
-      undefined,
-      any,
-      any
-    >
-      ? UFromJs[]
-      : any[],
+    readonly PgCodecTFromJavaScript<TInnerCodec>[],
     TInnerCodec,
     undefined,
     undefined
   > = {
     name,
     sqlType: identifier,
-    fromPg: (value) =>
-      arrayParse(value)
-        .flat(100)
-        .map((v) => (v == null ? null : innerCodec.fromPg(v))) as any,
+    fromPg:
+      innerCodecFromPg === identity
+        ? parseArray
+        : makeParseArrayWithTransform(innerCodecFromPg),
     toPg: (value) => {
       let result = "{";
       for (let i = 0, l = value.length; i < l; i++) {
@@ -666,7 +687,7 @@ export function listOfCodec<
           result += "NULL";
           continue;
         }
-        const str = innerCodec.toPg(v);
+        const str = innerCodecToPg(v);
         if (str == null) {
           result += "NULL";
           continue;
@@ -690,25 +711,26 @@ export function listOfCodec<
     description,
     extensions,
     arrayOfCodec: innerCodec,
-    ...(innerCodec.listCastFromPg
+    ...(innerCodecListCastFromPg
       ? {
-          castFromPg: innerCodec.listCastFromPg,
+          castFromPg: innerCodecListCastFromPg,
           listCastFromPg(frag, guaranteedNotNull) {
             return listCastViaUnnest(
               `${name}_item`,
               frag,
               (identifier) =>
-                innerCodec.listCastFromPg!.call(
+                innerCodecListCastFromPg.call(
                   this,
                   identifier,
-                  innerCodec.notNull,
+                  innerCodecNotNull,
                 ),
               guaranteedNotNull,
             );
           },
         }
       : null),
-    executor: innerCodec.executor,
+    executor: executor,
+    [inspect.custom]: codecInspect,
   };
 
   if (!config) {
@@ -760,6 +782,7 @@ export function domainOfCodec<
     extensions,
     domainOfCodec: innerCodec.arrayOfCodec ? undefined : innerCodec,
     notNull: Boolean(notNull),
+    [inspect.custom]: codecInspect,
   };
 }
 exportAs("@dataplan/pg", domainOfCodec, "domainOfCodec");
@@ -914,6 +937,7 @@ export function rangeOfCodec<
     },
     attributes: undefined,
     executor: innerCodec.executor,
+    [inspect.custom]: codecInspect,
   };
 }
 exportAs("@dataplan/pg", rangeOfCodec, "rangeOfCodec");
@@ -967,7 +991,7 @@ const viaDateFormat = (format: string, prefix: SQL = sql.blank): Cast => {
   };
 };
 
-const parseAsInt = (n: string) => parseInt(n, 10);
+const parseAsTrustedInt = (n: string) => +n;
 const jsonParse = (s: string) => JSON.parse(s);
 const jsonStringify = (o: JSONValue) => JSON.stringify(o);
 
@@ -998,8 +1022,8 @@ export const TYPES = {
       }
     },
   }),
-  int2: t<number>()("21", "int2", { fromPg: parseAsInt }),
-  int: t<number>()("23", "int4", { fromPg: parseAsInt }),
+  int2: t<number>()("21", "int2", { fromPg: parseAsTrustedInt }),
+  int: t<number>()("23", "int4", { fromPg: parseAsTrustedInt }),
   bigint: t<string>()("20", "int8"),
   float4: t<number>()("700", "float4", { fromPg: parseFloat }),
   float: t<number>()("701", "float8", { fromPg: parseFloat }),
@@ -1257,3 +1281,9 @@ export function getInnerCodec<
   return codec as any;
 }
 exportAs("@dataplan/pg", getInnerCodec, "getInnerCodec");
+
+export function sqlValueWithCodec(value: unknown, codec: PgCodec) {
+  return sql`${sql.value(value == null ? null : codec.toPg(value))}::${
+    codec.sqlType
+  }`;
+}

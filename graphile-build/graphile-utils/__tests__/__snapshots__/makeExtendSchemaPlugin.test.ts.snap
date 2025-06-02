@@ -61,13 +61,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`TestSmartTag\`."""
-    orderBy: [TestSmartTagOrderBy!] = [NATURAL]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: TestSmartTagCondition
+
+    """The method to use when ordering \`TestSmartTag\`."""
+    orderBy: [TestSmartTagOrderBy!] = [NATURAL]
   ): TestSmartTagConnection
 
   """Reads and enables pagination through a set of \`Pet\`."""
@@ -90,13 +90,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`Pet\`."""
-    orderBy: [PetOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: PetCondition
+
+    """The method to use when ordering \`Pet\`."""
+    orderBy: [PetOrderBy!] = [PRIMARY_KEY_ASC]
   ): PetConnection
 
   """Reads and enables pagination through a set of \`User\`."""
@@ -119,13 +119,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`User\`."""
-    orderBy: [UserOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: UserCondition
+
+    """The method to use when ordering \`User\`."""
+    orderBy: [UserOrderBy!] = [PRIMARY_KEY_ASC]
   ): UserConnection
 }
 
@@ -251,13 +251,6 @@ type TestSmartTagEdge {
   node: TestSmartTag
 }
 
-"""Methods to use when ordering \`TestSmartTag\`."""
-enum TestSmartTagOrderBy {
-  NATURAL
-  EMAIL_ASC
-  EMAIL_DESC
-}
-
 """
 A condition to be used against \`TestSmartTag\` object types. All fields are
 tested for equality and combined with a logical ‘and.’
@@ -267,15 +260,11 @@ input TestSmartTagCondition {
   email: String
 }
 
-"""Methods to use when ordering \`Pet\`."""
-enum PetOrderBy {
+"""Methods to use when ordering \`TestSmartTag\`."""
+enum TestSmartTagOrderBy {
   NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ROW_ID_ASC
-  ROW_ID_DESC
-  USER_ID_ASC
-  USER_ID_DESC
+  EMAIL_ASC
+  EMAIL_DESC
 }
 
 """
@@ -287,6 +276,17 @@ input PetCondition {
 
   """Checks for equality with the object’s \`userId\` field."""
   userId: Int
+}
+
+"""Methods to use when ordering \`Pet\`."""
+enum PetOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
+  USER_ID_ASC
+  USER_ID_DESC
 }
 
 """A connection to a list of \`User\` values."""
@@ -315,6 +315,14 @@ type UserEdge {
   node: User
 }
 
+"""
+A condition to be used against \`User\` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input UserCondition {
+  """Checks for equality with the object’s \`rowId\` field."""
+  rowId: Int
+}
+
 """Methods to use when ordering \`User\`."""
 enum UserOrderBy {
   NATURAL
@@ -322,14 +330,6 @@ enum UserOrderBy {
   PRIMARY_KEY_DESC
   ROW_ID_ASC
   ROW_ID_DESC
-}
-
-"""
-A condition to be used against \`User\` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input UserCondition {
-  """Checks for equality with the object’s \`rowId\` field."""
-  rowId: Int
 }
 
 """
@@ -927,13 +927,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`TestSmartTag\`."""
-    orderBy: [TestSmartTagOrderBy!] = [NATURAL]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: TestSmartTagCondition
+
+    """The method to use when ordering \`TestSmartTag\`."""
+    orderBy: [TestSmartTagOrderBy!] = [NATURAL]
   ): TestSmartTagConnection
 
   """Reads and enables pagination through a set of \`Pet\`."""
@@ -956,13 +956,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`Pet\`."""
-    orderBy: [PetOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: PetCondition
+
+    """The method to use when ordering \`Pet\`."""
+    orderBy: [PetOrderBy!] = [PRIMARY_KEY_ASC]
   ): PetConnection
 
   """Reads and enables pagination through a set of \`User\`."""
@@ -985,13 +985,13 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`User\`."""
-    orderBy: [UserOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: UserCondition
+
+    """The method to use when ordering \`User\`."""
+    orderBy: [UserOrderBy!] = [PRIMARY_KEY_ASC]
   ): UserConnection
 }
 
@@ -1049,13 +1049,13 @@ type User implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`Pet\`."""
-    orderBy: [PetOrderBy!] = [PRIMARY_KEY_ASC]
-
     """
     A condition to be used in determining which values should be returned by the collection.
     """
     condition: PetCondition
+
+    """The method to use when ordering \`Pet\`."""
+    orderBy: [PetOrderBy!] = [PRIMARY_KEY_ASC]
   ): PetConnection
 }
 
@@ -1117,17 +1117,6 @@ type PageInfo {
   endCursor: Cursor
 }
 
-"""Methods to use when ordering \`Pet\`."""
-enum PetOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ROW_ID_ASC
-  ROW_ID_DESC
-  USER_ID_ASC
-  USER_ID_DESC
-}
-
 """
 A condition to be used against \`Pet\` object types. All fields are tested for equality and combined with a logical ‘and.’
 """
@@ -1137,6 +1126,17 @@ input PetCondition {
 
   """Checks for equality with the object’s \`userId\` field."""
   userId: Int
+}
+
+"""Methods to use when ordering \`Pet\`."""
+enum PetOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ROW_ID_ASC
+  ROW_ID_DESC
+  USER_ID_ASC
+  USER_ID_DESC
 }
 
 """A connection to a list of \`TestSmartTag\` values."""
@@ -1165,13 +1165,6 @@ type TestSmartTagEdge {
   node: TestSmartTag
 }
 
-"""Methods to use when ordering \`TestSmartTag\`."""
-enum TestSmartTagOrderBy {
-  NATURAL
-  EMAIL_ASC
-  EMAIL_DESC
-}
-
 """
 A condition to be used against \`TestSmartTag\` object types. All fields are
 tested for equality and combined with a logical ‘and.’
@@ -1179,6 +1172,13 @@ tested for equality and combined with a logical ‘and.’
 input TestSmartTagCondition {
   """Checks for equality with the object’s \`email\` field."""
   email: String
+}
+
+"""Methods to use when ordering \`TestSmartTag\`."""
+enum TestSmartTagOrderBy {
+  NATURAL
+  EMAIL_ASC
+  EMAIL_DESC
 }
 
 """A connection to a list of \`User\` values."""
@@ -1207,6 +1207,14 @@ type UserEdge {
   node: User
 }
 
+"""
+A condition to be used against \`User\` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input UserCondition {
+  """Checks for equality with the object’s \`rowId\` field."""
+  rowId: Int
+}
+
 """Methods to use when ordering \`User\`."""
 enum UserOrderBy {
   NATURAL
@@ -1214,14 +1222,6 @@ enum UserOrderBy {
   PRIMARY_KEY_DESC
   ROW_ID_ASC
   ROW_ID_DESC
-}
-
-"""
-A condition to be used against \`User\` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input UserCondition {
-  """Checks for equality with the object’s \`rowId\` field."""
-  rowId: Int
 }
 
 """

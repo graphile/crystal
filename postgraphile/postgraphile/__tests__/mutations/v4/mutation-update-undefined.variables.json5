@@ -1,0 +1,10 @@
+{
+  updateSimilarTable1ById: {
+    similarTable1: {
+      id: 3,
+      col1: 999,
+      col2: 4,
+      col3: 20,
+    },
+  },
+}

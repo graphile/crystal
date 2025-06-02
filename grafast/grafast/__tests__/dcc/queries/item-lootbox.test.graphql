@@ -1,0 +1,34 @@
+# Ref: item-lootbox.md
+
+query itemLootbox {
+  item(type: Consumable, id: 203) {
+    name
+    canBeFoundIn {
+      id
+      tier
+      category
+      possibleItems {
+        __typename
+        id
+        name
+      }
+    }
+  }
+}
+
+query itemLootboxWithVar($type: ItemType!, $id: Int!)
+@variables(values: { type: Consumable, id: 203 }) {
+  item(type: $type, id: $id) {
+    name
+    canBeFoundIn {
+      id
+      tier
+      category
+      possibleItems {
+        __typename
+        id
+        name
+      }
+    }
+  }
+}

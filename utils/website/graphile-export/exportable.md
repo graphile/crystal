@@ -8,7 +8,7 @@ made in such a way that it can work with Graphile Export. This applies both to
 the parts of the schema you write yourself, and the parts you may import from
 external libraries.
 
-Generally speaking there are 2 methods of acheiving this, used in unison:
+Generally speaking there are two methods of achieving this, used in unison:
 
 1. All non-pure functions and their non-trivial scope dependencies must be made
    exportable by wrapping in an `EXPORTABLE()` call, or be made importable via
@@ -321,11 +321,11 @@ then it's likely you're living in the past! This error happens because your
 times!
 
 The easiest solution is to use a really simple TSConfig.json such as the
-`@tsconfig/node20` default which already configures TypeScript to support this:
+`@tsconfig/node22` default which already configures TypeScript to support this:
 
 ```json title="tsconfig.json"
 {
-  "extends": "@tsconfig/node20"
+  "extends": "@tsconfig/node22"
 }
 ```
 

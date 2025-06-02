@@ -1,4 +1,5 @@
 import LRU from "@graphile/lru";
+import debugFactory from "debug";
 import type {
   DocumentNode,
   FieldNode,
@@ -12,6 +13,11 @@ import te, { stringifyJSON, stringifyString } from "tamedevil";
 
 import * as assert from "../assert.js";
 import type { Bucket } from "../bucket.js";
+import {
+  $$streamMore,
+  DEFAULT_ACCEPT_FLAGS,
+  FLAG_ERROR,
+} from "../constants.js";
 import { isDev } from "../dev.js";
 import { AccessStep, stepADependsOnStepB, stripAnsi } from "../index.js";
 import { inspect } from "../inspect.js";
@@ -20,12 +26,15 @@ import type {
   JSONValue,
   LocationDetails,
 } from "../interfaces.js";
-import { $$concreteType, $$streamMore, FLAG_ERROR } from "../interfaces.js";
-import { isPolymorphicData } from "../polymorphic.js";
-import type { ExecutableStep } from "../step.js";
+import type { Step } from "../step.js";
 import { expressionSymbol } from "../steps/access.js";
+import { pathsFromAncestorToTargetLayerPlan } from "../utils.js";
 import type { PayloadRoot } from "./executeOutputPlan.js";
 import type { LayerPlan, LayerPlanReasonListItem } from "./LayerPlan.js";
+import { hasParentLayerPlan } from "./LayerPlan.js";
+
+const debug = debugFactory("grafast:OutputPlan");
+const debugVerbose = debug.extend("verbose");
 
 const {
   executeSync,
@@ -167,12 +176,12 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
    * The step that represents the root value. How this is used depends on the
    * OutputPlanMode.
    */
-  public readonly rootStep: ExecutableStep;
+  public readonly rootStep: Step;
   /**
    * If this output plan should resolve to an error if a side effect step
    * raises an error, this is that side effect.
    */
-  public readonly sideEffectStep: ExecutableStep | null;
+  public readonly sideEffectStep: Step | null;
 
   /**
    * Appended to the root step when accessed to avoid the need for AccessSteps
@@ -232,7 +241,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
      *
      * For `introspection`, `null` it's irrelevant. Use `constant(null)` or whatever.
      */
-    rootStep: ExecutableStep,
+    rootStep: Step,
     public readonly type: TType,
     locationDetails: LocationDetails,
   ) {
@@ -284,9 +293,35 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
   }
 
   toString() {
+    let processRootString = "";
+    if (this.processRoot != null) {
+      const fnBody = this.processRoot.toString();
+      const VALUE_ARROW = "value => ";
+      if (fnBody.startsWith(VALUE_ARROW)) {
+        const sliced = fnBody.slice(VALUE_ARROW.length);
+        if (
+          sliced.startsWith("(value") &&
+          sliced.endsWith(")") &&
+          sliced.replace(/[()]/g, "").length === sliced.length - 2
+        ) {
+          processRootString = sliced.slice(6, -1);
+        } else {
+          processRootString = `:value=>${sliced}`;
+        }
+      } else {
+        processRootString = `:${fnBody}`;
+      }
+    }
     return `OutputPlan<${this.type.mode}${
       this.sideEffectStep ? `^${this.sideEffectStep.id}` : ""
-    }∈${this.layerPlan.id}!${this.rootStep.id}>`;
+    }∈${this.layerPlan.id}!${this.rootStep.id}${processRootString}>`;
+  }
+
+  // HACK: ensure output objects are ordered correctly
+  expectChild(type: GraphQLObjectType | null, key: string | null) {
+    if (this.type.mode === "root" || this.type.mode === "object") {
+      this.keys[key!] = undefined as any; // placeholder
+    }
   }
 
   addChild(
@@ -457,6 +492,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     );
     if (
       $root instanceof AccessStep &&
+      $root.isSyncAndSafe && // Make sure we're not using it for streaming!
       $root.fallback === undefined &&
       $root.implicitSideEffectStep === null &&
       (!this.sideEffectStep || !stepADependsOnStepB($root, this.sideEffectStep))
@@ -464,9 +500,13 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
       const expressionDetails:
         | [ReadonlyArray<string | number>, any]
         | undefined = ($root.unbatchedExecute! as any)[expressionSymbol];
-      if (expressionDetails !== undefined) {
-        // @ts-ignore
-        const $parent: ExecutableStep = $root.getDep(0);
+      // @ts-ignore
+      const { step: $parent, onReject, acceptFlags } = $root._getDepOptions(0);
+      if (
+        expressionDetails !== undefined &&
+        onReject == null &&
+        acceptFlags === DEFAULT_ACCEPT_FLAGS
+      ) {
         this.layerPlan.operationPlan.stepTracker.setOutputPlanRootStep(
           this,
           $parent,
@@ -492,7 +532,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
         stepADependsOnStepB($root, $sideEffect)
       ) {
         // It's marked readonly, but we override it anyway
-        (this.sideEffectStep as ExecutableStep | null) = null;
+        (this.sideEffectStep as Step | null) = null;
       }
     }
 
@@ -543,16 +583,10 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
           );
         }
         const childIsNonNull = this.childIsNonNull;
-        let directLayerPlanChild = this.child.layerPlan;
-        while (directLayerPlanChild.parentLayerPlan !== this.layerPlan) {
-          const parent = directLayerPlanChild.parentLayerPlan;
-          if (!parent) {
-            throw new Error(
-              `GrafastInternalError<d43e06d8-c533-4e7b-b3e7-af399f19c83f>: Invalid heirarchy - could not find direct layerPlan child of ${this}`,
-            );
-          }
-          directLayerPlanChild = parent;
-        }
+        const directLayerPlanChild = getDirectLayerPlanChild(
+          this.layerPlan,
+          this.child.layerPlan,
+        );
         const canStream =
           directLayerPlanChild.reason.type === "listItem" &&
           !!directLayerPlanChild.reason.stream;
@@ -588,8 +622,8 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
               spec.type === "__typename"
                 ? "__typename"
                 : spec.isNonNull
-                ? "outputPlan!"
-                : "outputPlan?",
+                  ? "outputPlan!"
+                  : "outputPlan?",
             sameBucket:
               spec.type === "__typename" ||
               spec.outputPlan.layerPlan.id === this.layerPlan.id,
@@ -645,7 +679,7 @@ export function coerceError(
     }
   } else {
     return new GraphQLError(
-      error.message,
+      error?.message ?? String(error),
       locationDetails.node,
       null,
       null,
@@ -712,75 +746,69 @@ export function getChildBucketAndIndex(
       "GrafastInternalError<83d0e3cc-7eec-4185-85b4-846540288162>: arrayIndex must be supplied iff outputPlan is an array",
     );
   }
-  if (outputPlan != null && layerPlan === bucket.layerPlan) {
-    // Same layer; straightforward
-    return [bucket, bucketIndex];
-  }
 
-  const reversePath = [layerPlan];
-  let current: LayerPlan | null = layerPlan;
-  while (!bucket.children[current.id]) {
-    current = current.parentLayerPlan;
-    if (!current) {
-      return null;
-    }
-    reversePath.push(current);
-  }
-
-  let currentBucket = bucket;
-  let currentIndex = bucketIndex;
-
-  for (let l = reversePath.length, i = l - 1; i >= 0; i--) {
-    const layerPlan = reversePath[i];
-    const child = currentBucket.children[layerPlan.id];
-    if (!child) {
-      return null;
-    }
-
-    const out = child.map.get(currentIndex);
-    if (out == null) {
-      return null;
-    }
-
-    /*
-     * TEST: I think this  '|| i !== l - 1' check is saying that an array can
-     * only occur at the furthest ancestor and everything since then must be
-     * non-array. Presumably in the case of nested arrays there would be an
-     * intermediary bucket, hence why this check is allowed, but that should be
-     * tested. Also, are there any confounding factors when it comes to steps
-     * themselves using arrays for object values - for example pgSelectSingle is
-     * represented by an array (tuple), but that doesn't make it a list so it should
-     * be fine. Use tests to validate this is all fine.
-     */
-    if (arrayIndex == null || i !== l - 1) {
-      if (Array.isArray(out)) {
-        throw new Error(
-          "GrafastInternalError<db189d32-bf8f-4e58-b55f-5c5ac3bb2381>: Was expecting an arrayIndex, but none was provided",
-        );
-      }
-      currentBucket = child.bucket;
-      currentIndex = out;
-    } else {
-      if (!Array.isArray(out)) {
-        throw new Error(
-          `GrafastInternalError<8190d09f-dc75-46ec-8162-b20ad516de41>: Cannot access array index in non-array ${inspect(
-            out,
-          )}`,
-        );
-      }
-      if (!(out.length > arrayIndex)) {
-        throw new Error(
-          `GrafastInternalError<1f596c22-368b-4d0d-94df-fb3df632b064>: Attempted to retrieve array index '${arrayIndex}' which is out of bounds of array with length '${out.length}'`,
-        );
-      }
-      currentBucket = child.bucket;
-      currentIndex = out[arrayIndex];
-    }
-  }
-  if (currentIndex == null) {
+  const paths = pathsFromAncestorToTargetLayerPlan(bucket.layerPlan, layerPlan);
+  if (paths.length === 0) {
     return null;
   }
-  return [currentBucket, currentIndex];
+
+  toNextPath: for (const path of paths) {
+    let currentBucket = bucket;
+    let currentIndex = bucketIndex;
+
+    for (let i = 0, l = path.length; i < l; i++) {
+      const layerPlan = path[i];
+      const child = currentBucket.children[layerPlan.id];
+      if (!child) {
+        continue toNextPath;
+      }
+
+      const out = child.map.get(currentIndex);
+      if (out == null) {
+        continue toNextPath;
+      }
+
+      /*
+       * TEST: I think this  '|| i !== l - 1' check is saying that an array can
+       * only occur at the furthest ancestor and everything since then must be
+       * non-array. Presumably in the case of nested arrays there would be an
+       * intermediary bucket, hence why this check is allowed, but that should be
+       * tested. Also, are there any confounding factors when it comes to steps
+       * themselves using arrays for object values - for example pgSelectSingle is
+       * represented by an array (tuple), but that doesn't make it a list so it should
+       * be fine. Use tests to validate this is all fine.
+       */
+      if (arrayIndex == null || i !== 0) {
+        if (Array.isArray(out)) {
+          throw new Error(
+            "GrafastInternalError<db189d32-bf8f-4e58-b55f-5c5ac3bb2381>: Was expecting an arrayIndex, but none was provided",
+          );
+        }
+        currentBucket = child.bucket;
+        currentIndex = out;
+      } else {
+        if (!Array.isArray(out)) {
+          throw new Error(
+            `GrafastInternalError<8190d09f-dc75-46ec-8162-b20ad516de41>: Cannot access array index in non-array ${inspect(
+              out,
+            )}`,
+          );
+        }
+        if (!(out.length > arrayIndex)) {
+          throw new Error(
+            `GrafastInternalError<1f596c22-368b-4d0d-94df-fb3df632b064>: Attempted to retrieve array index '${arrayIndex}' which is out of bounds of array with length '${out.length}'`,
+          );
+        }
+        currentBucket = child.bucket;
+        currentIndex = out[arrayIndex];
+      }
+    }
+    if (currentIndex == null) {
+      continue toNextPath;
+    }
+    return [currentBucket, currentIndex];
+  }
+  return null;
 }
 
 interface Execute {
@@ -888,6 +916,13 @@ function makeExecutor<
         }
       }
     }
+    if (bucketRootFlags & FLAG_ERROR) {
+      throw coerceError(
+        rawBucketRootValue,
+        this.locationDetails,
+        mutablePath.slice(1),
+      );
+    }
     const bucketRootValue =
       this.processRoot !== null
         ? this.processRoot(rawBucketRootValue, bucketRootFlags)
@@ -898,13 +933,6 @@ function makeExecutor<
     );
     if (earlyReturn !== undefined) {
       return earlyReturn as any;
-    }
-    if (bucketRootFlags & FLAG_ERROR) {
-      throw coerceError(
-        bucketRootValue,
-        this.locationDetails,
-        mutablePath.slice(1),
-      );
     }
     if (!skipNullHandling) {
       if (bucketRootValue == null)
@@ -1173,38 +1201,29 @@ const stringLeafExecutorString = makeExecutor<true, OutputPlanTypeLeaf>({
   },
 });
 
-// NOTE: the reference to $$concreteType here is a (temporary) optimization; it
-// should be `resolveType(bucketRootValue)` but it's not worth the function
-// call overhead. Longer term it should just be read directly from a different
-// store.
-
+// TODO: do we need this or can we skip it?
 function makePolymorphicExecutor<TAsString extends boolean>(
   asString: TAsString,
 ) {
   return makeExecutor({
     inner(bucketRootValue, root, mutablePath, bucket, bucketIndex) {
-      if (isDev) {
-        if (!isPolymorphicData(bucketRootValue)) {
-          throw coerceError(
-            new Error(
-              "GrafastInternalError<db7fcda5-dc39-4568-a7ce-ee8acb88806b>: Expected polymorphic data",
-            ),
-            this.locationDetails,
-            mutablePath.slice(1),
-          );
-        }
-      }
-      const typeName = bucketRootValue[$$concreteType];
-      const childOutputPlan = this.childByTypeName![typeName];
+      const typeName = bucketRootValue;
       if (isDev) {
         assert.ok(
           typeName,
           "GrafastInternalError<fd3f3cf0-0789-4c74-a6cd-839c808896ed>: Could not determine concreteType for object",
         );
-        assert.ok(
-          childOutputPlan,
-          `GrafastInternalError<a46999ef-41ff-4a22-bae9-fa37ff6e5f7f>: Could not determine the OutputPlan to use for '${typeName}' from '${bucket.layerPlan}'`,
+      }
+      const childOutputPlan = this.childByTypeName![typeName];
+      if (!childOutputPlan) {
+        // Search: InvalidConcreteTypeName
+        console.warn(
+          `Invalid object type name for this abstract position${this.locationDetails.parentTypeName && this.locationDetails.fieldName ? ` at ${this.locationDetails.parentTypeName}.${this.locationDetails.fieldName}` : ""}; saw %o, but expected one of ${(
+            this.type as OutputPlanTypePolymorphicObject
+          ).typeNames.join(", ")}`,
+          typeName,
         );
+        return (asString ? "null" : null) as any;
       }
 
       const directChild = bucket.children[childOutputPlan.layerPlan.id];
@@ -1223,9 +1242,20 @@ function makePolymorphicExecutor<TAsString extends boolean>(
           bucketIndex,
         );
         if (!c) {
-          throw new Error(
-            "GrafastInternalError<691509d8-31fa-4cfe-a6df-dcba21bd521f>: polymorphic executor couldn't determine child bucket",
-          );
+          // TODO: Implies that the bucket didn't run; is this a normal
+          // situation? We should be able to detect it and handle it more
+          // cleanly.
+          if (isDev) {
+            debugVerbose(
+              `GrafastInternalWarning<691509d8-31fa-4cfe-a6df-dcba21bd521f>: polymorphic executor couldn't determine child bucket. childOutputPlan=%c, childOutputPlan.layerPlan=%c, bucket=%c`,
+              childOutputPlan,
+              childOutputPlan.layerPlan,
+              bucket,
+            );
+          }
+          return (asString ? "null" : null) as TAsString extends true
+            ? string
+            : JSONValue;
         }
         const [childBucket, childBucketIndex] = c;
         return childOutputPlan[asString ? "executeString" : "execute"](
@@ -1359,15 +1389,19 @@ function makeArrayExecutor<TAsString extends boolean>(
           | AsyncIterableIterator<any>
           | undefined;
         if (stream !== undefined) {
+          const labelStepId = (
+            childOutputPlan.layerPlan as LayerPlan<LayerPlanReasonListItem>
+          ).reason.stream?.labelStepId;
           root.streams.push({
             root,
             path: mutablePath.slice(1),
             bucket,
             bucketIndex,
             outputPlan: childOutputPlan,
-            label: (
-              childOutputPlan.layerPlan as LayerPlan<LayerPlanReasonListItem>
-            ).reason.stream?.label,
+            label:
+              labelStepId != null
+                ? bucket.store.get(labelStepId)?.unaryValue()
+                : undefined,
             stream,
             startIndex: bucketRootValue.length,
           });
@@ -1751,4 +1785,46 @@ function withFastExpression(
       }
     },
   );
+}
+
+/**
+ * Finds the child of `targetParent` that has a path towards `descendent` (by
+ * walking backwards from descendent to targetParent).
+ */
+export function getDirectLayerPlanChild(
+  targetParent: LayerPlan,
+  descendent: LayerPlan,
+): LayerPlan {
+  const child = _getDirectLayerPlanChild(targetParent, descendent);
+  if (child == null) {
+    throw new Error(
+      `GrafastInternalError<d43e06d8-c533-4e7b-b3e7-af399f19c83f>: Invalid hierarchy - could not find direct layerPlan child of ${targetParent} that leads to ${descendent}`,
+    );
+  }
+  return child;
+}
+
+function _getDirectLayerPlanChild(
+  targetParent: LayerPlan,
+  descendent: LayerPlan,
+): LayerPlan | null {
+  let directLayerPlanChild = descendent;
+  let parent: LayerPlan;
+  while (
+    hasParentLayerPlan(directLayerPlanChild.reason) &&
+    (parent = directLayerPlanChild.reason.parentLayerPlan) !== targetParent
+  ) {
+    directLayerPlanChild = parent;
+  }
+  if (directLayerPlanChild.reason.type === "combined") {
+    for (const plp of directLayerPlanChild.reason.parentLayerPlans) {
+      const dlpc = _getDirectLayerPlanChild(targetParent, plp);
+      if (dlpc) return dlpc;
+    }
+    return null;
+  } else if (directLayerPlanChild.reason.type === "root") {
+    return null;
+  } else {
+    return directLayerPlanChild;
+  }
 }

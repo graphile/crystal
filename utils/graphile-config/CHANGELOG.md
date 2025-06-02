@@ -1,5 +1,13 @@
 # graphile-config
 
+## 0.0.1-beta.15
+
+### Patch Changes
+
+- [`00d79e6f5608affc3f36bb0ce4ca2547230174e7`](https://github.com/graphile/crystal/commit/00d79e6f5608affc3f36bb0ce4ca2547230174e7)
+  Thanks [@benjie](https://github.com/benjie)! - Rename parameter to
+  Middleware.register.
+
 ## 0.0.1-beta.14
 
 ### Patch Changes

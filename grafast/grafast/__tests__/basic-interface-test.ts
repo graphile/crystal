@@ -1,15 +1,10 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import { expect } from "chai";
-import type { ExecutionResult } from "graphql";
+import type { ExecutionResult, GraphQLObjectType } from "graphql";
+import { GraphQLInterfaceType } from "graphql";
 import { it } from "mocha";
 
-import {
-  constant,
-  each,
-  grafast,
-  makeGrafastSchema,
-  polymorphicBranch,
-} from "../dist/index.js";
+import { constant, grafast, makeGrafastSchema } from "../dist/index.js";
 
 const makeSchema = () =>
   makeGrafastSchema({
@@ -23,34 +18,48 @@ const makeSchema = () =>
         isReady: Boolean!
       }
 
+      type UserNotificationLogout implements UserNotification {
+        id: ID!
+        username: String!
+      }
+
       type Query {
         notifications: [UserNotification!]!
       }
     `,
-    plans: {
+    interfaces: {
+      UserNotification: {
+        resolveType(obj: any) {
+          if (obj.type === "ready") return "UserNotificationReady";
+          if (obj.type === "logout") return "UserNotificationLogout";
+        },
+      },
+    },
+    objects: {
       Query: {
-        notifications() {
-          return each(
-            constant([
+        plans: {
+          notifications() {
+            return constant([
               { type: "ready", isReady: true, id: "1" },
               { type: "ready", isReady: false, id: "2" },
-            ]),
-            ($obj) =>
-              polymorphicBranch($obj, {
-                UserNotificationReady: {
-                  match(obj: any) {
-                    return obj.type === "ready";
-                  },
-                  plan($obj) {
-                    return $obj;
-                  },
-                },
-              }),
-          );
+              { type: "logout", username: "benjie", id: "3" },
+            ]);
+          },
         },
       },
     },
   });
+
+it(`sets the relevant properties on the schema`, async () => {
+  const schema = makeSchema();
+  const UserNotification = schema.getType(
+    "UserNotification",
+  ) as GraphQLInterfaceType;
+  expect(UserNotification).to.be.instanceof(GraphQLInterfaceType);
+  expect(UserNotification.resolveType, "resolveType").to.exist;
+  //expect(UserNotification.extensions?.grafast?.planType, "planType")
+  //  .to.exist;
+});
 
 it(`works with plans`, async () => {
   const schema = makeSchema();
@@ -73,6 +82,9 @@ it(`works with plans`, async () => {
       {
         id: "2",
       },
+      {
+        id: "3",
+      },
     ],
   });
 });
@@ -88,6 +100,9 @@ it(`works with plans and __typename`, async () => {
           id
           ... on UserNotificationReady {
             isReady
+          }
+          ... on UserNotificationLogout {
+            username
           }
         }
       }
@@ -105,6 +120,11 @@ it(`works with plans and __typename`, async () => {
         __typename: "UserNotificationReady",
         id: "2",
         isReady: false,
+      },
+      {
+        __typename: "UserNotificationLogout",
+        id: "3",
+        username: "benjie",
       },
     ],
   });

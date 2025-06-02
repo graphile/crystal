@@ -1,0 +1,22 @@
+{
+  createPerson: {
+    clientMutationId: null,
+    edge1: {
+      cursor: "WyIwOGUwZDM0MmRlIiw5MDAwXQ==",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDkwMDBd",
+        name: "John Smith Jr.",
+      },
+    },
+    edge2: {
+      cursor: "WyIwOGUwZDM0MmRlIiw5MDAwXQ==",
+      node: {
+        nodeId: "WyJwZW9wbGUiLDkwMDBd",
+        name: "John Smith Jr.",
+      },
+    },
+    query: {
+      nodeId: "query",
+    },
+  },
+}

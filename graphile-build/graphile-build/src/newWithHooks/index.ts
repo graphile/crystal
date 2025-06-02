@@ -1,9 +1,4 @@
-import type {
-  BaseGraphQLArguments,
-  ExecutableStep,
-  GrafastFieldConfig,
-  OutputPlanForType,
-} from "grafast";
+import type { BaseGraphQLArguments, GrafastFieldConfig, Step } from "grafast";
 import { inputObjectFieldSpec, objectSpec } from "grafast";
 import type {
   GraphQLEnumTypeConfig,
@@ -11,7 +6,6 @@ import type {
   GraphQLInputFieldConfig,
   GraphQLInputFieldConfigMap,
   GraphQLNamedType,
-  GraphQLOutputType,
   GraphQLScalarLiteralParser,
   GraphQLScalarTypeConfig,
   GraphQLSchemaConfig,
@@ -135,10 +129,8 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
         }
 
         case GraphQLObjectType: {
-          const rawObjectSpec = inSpec as GraphileBuild.GrafastObjectTypeConfig<
-            any,
-            any
-          >;
+          const rawObjectSpec =
+            inSpec as GraphileBuild.GrafastObjectTypeConfig<any>;
           const scope = (inScope ||
             Object.create(null)) as GraphileBuild.ScopeObject;
 
@@ -151,6 +143,9 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
             name: baseName,
             interfaces: baseInterfaces,
             fields: baseFields,
+            planType,
+            extensions,
+            assertStep,
             ...restOfConfig
           } = builder.applyHooks(
             "GraphQLObjectType",
@@ -167,6 +162,22 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
 
           const finalSpec = {
             name: typeName,
+            ...(extensions || planType || assertStep
+              ? {
+                  extensions: {
+                    ...extensions,
+                    ...(planType || assertStep
+                      ? {
+                          grafast: {
+                            ...extensions?.grafast,
+                            ...(planType ? { planType } : null),
+                            ...(assertStep ? { assertStep } : null),
+                          },
+                        }
+                      : null),
+                  },
+                }
+              : undefined),
             ...restOfConfig,
             interfaces: (): GraphQLInterfaceType[] => {
               const interfacesContext: GraphileBuild.ContextObjectInterfaces = {
@@ -187,45 +198,19 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
               );
             },
             fields: () => {
-              const processedFields: GrafastFieldConfig<
-                any,
-                any,
-                any,
-                any,
-                any
-              >[] = [];
+              const processedFields: GrafastFieldConfig<any, any, any>[] = [];
               const fieldWithHooks: GraphileBuild.FieldWithHooksFunction = <
-                TType extends GraphQLOutputType,
-                TContext extends Grafast.Context,
-                TParentStep extends ExecutableStep,
-                TFieldStep extends OutputPlanForType<TType>,
+                TParentStep extends Step,
                 TArgs extends BaseGraphQLArguments,
+                TFieldStep extends Step,
               >(
                 fieldScope: GraphileBuild.ScopeObjectFieldsField,
                 fieldSpec:
-                  | GrafastFieldConfig<
-                      TType,
-                      TContext,
-                      TParentStep,
-                      TFieldStep,
-                      TArgs
-                    >
+                  | GrafastFieldConfig<TParentStep, TArgs, TFieldStep>
                   | ((
                       context: GraphileBuild.ContextObjectFieldsField,
-                    ) => GrafastFieldConfig<
-                      TType,
-                      TContext,
-                      TParentStep,
-                      TFieldStep,
-                      TArgs
-                    >),
-              ): GrafastFieldConfig<
-                TType,
-                TContext,
-                TParentStep,
-                TFieldStep,
-                TArgs
-              > => {
+                    ) => GrafastFieldConfig<TParentStep, TArgs, TFieldStep>),
+              ): GrafastFieldConfig<TParentStep, TArgs, TFieldStep> => {
                 if (!isString(fieldScope.fieldName)) {
                   throw new Error(
                     "It looks like you forgot to pass the fieldName to `fieldWithHooks`, we're sorry this is currently necessary.",
@@ -272,9 +257,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
 
                 resolvedFieldSpec.args = resolvedFieldSpec.args ?? {};
                 const argsContext: GraphileBuild.ContextObjectFieldsFieldArgs =
-                  {
-                    ...fieldContext,
-                  };
+                  { ...fieldContext };
                 const finalFieldSpec = {
                   ...resolvedFieldSpec,
                   args: builder.applyHooks(
@@ -368,7 +351,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
 
         case GraphQLInterfaceType: {
           const rawInterfaceSpec =
-            inSpec as GraphileBuild.GrafastInterfaceTypeConfig<any, any>;
+            inSpec as GraphileBuild.GrafastInterfaceTypeConfig<any>;
           const scope = (inScope ||
             Object.create(null)) as GraphileBuild.ScopeInterface;
 
@@ -380,6 +363,9 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
             name: baseName,
             fields: baseFields,
             interfaces: baseInterfaces,
+            extensions,
+            planType,
+            toSpecifier,
             ...restOfConfig
           } = builder.applyHooks(
             "GraphQLInterfaceType",
@@ -396,6 +382,22 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
 
           const finalSpec = {
             name: typeName,
+            ...(extensions || planType || toSpecifier
+              ? {
+                  extensions: {
+                    ...extensions,
+                    ...(planType || toSpecifier
+                      ? {
+                          grafast: {
+                            ...extensions?.grafast,
+                            ...(planType ? { planType } : null),
+                            ...(toSpecifier ? { toSpecifier } : null),
+                          },
+                        }
+                      : null),
+                  },
+                }
+              : undefined),
             ...restOfConfig,
             fields: () => {
               const processedFields: GraphQLFieldConfig<any, any>[] = [];
@@ -478,13 +480,15 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                       },
                     };
 
-                    finalFieldSpec.args![argName] = builder.applyHooks(
+                    const finalArgSpec = builder.applyHooks(
                       "GraphQLInterfaceType_fields_field_args_arg",
                       argSpec,
                       build,
                       argContext,
                       `|${typeName}.fields.${fieldName}.args.${argName}`,
                     );
+
+                    finalFieldSpec.args![argName] = finalArgSpec;
                   }
 
                   processedFields.push(finalFieldSpec);
@@ -555,10 +559,8 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
         }
 
         case GraphQLUnionType: {
-          const rawUnionSpec = inSpec as GraphileBuild.GrafastUnionTypeConfig<
-            any,
-            any
-          >;
+          const rawUnionSpec =
+            inSpec as GraphileBuild.GrafastUnionTypeConfig<any>;
           const scope = (inScope ||
             Object.create(null)) as GraphileBuild.ScopeUnion;
 
@@ -570,6 +572,9 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
           const {
             name: baseName,
             types: baseTypes,
+            toSpecifier,
+            planType,
+            extensions,
             ...restOfConfig
           } = builder.applyHooks(
             "GraphQLUnionType",
@@ -586,6 +591,22 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
 
           const finalSpec = {
             name: typeName,
+            ...(extensions || planType || toSpecifier
+              ? {
+                  extensions: {
+                    ...extensions,
+                    ...(planType || toSpecifier
+                      ? {
+                          grafast: {
+                            ...extensions?.grafast,
+                            ...(planType ? { planType } : null),
+                            ...(toSpecifier ? { toSpecifier } : null),
+                          },
+                        }
+                      : null),
+                  },
+                }
+              : undefined),
             ...restOfConfig,
             types: (): GraphQLObjectType[] => {
               const typesContext: GraphileBuild.ContextUnionTypes = {
@@ -858,6 +879,14 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
                     `|${typeName}|${valueName}`,
                   );
 
+                  // TODO: remove this code
+                  const ext = newValue.extensions?.grafast;
+                  if (ext && ext.applyPlan) {
+                    throw new Error(
+                      `Enum value ${typeName}.${valueName} has applyPlan set; this property no longer does anything and should be removed.`,
+                    );
+                  }
+
                   memo[valueName] = newValue;
                   return memo;
                 },
@@ -882,6 +911,5 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
 
     return Result as any;
   };
-
   return { newWithHooks };
 }

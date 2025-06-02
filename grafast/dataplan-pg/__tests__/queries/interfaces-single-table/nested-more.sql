@@ -1,65 +1,64 @@
 select
-  __people__."username" as "0",
-  (select json_agg(s) from (
-    select
-      __single_table_items__."type"::text as "0",
-      __single_table_items__."parent_id"::text as "1",
-      __single_table_items__."id"::text as "2",
-      __single_table_items__."type2"::text as "3",
-      __single_table_items__."author_id"::text as "4",
-      __single_table_items__."position"::text as "5",
-      to_char(__single_table_items__."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "6",
-      to_char(__single_table_items__."updated_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "7",
-      __single_table_items__."is_explicitly_archived"::text as "8",
-      to_char(__single_table_items__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "9"
-    from interfaces_and_unions.single_table_items as __single_table_items__
+  __people_3."username" as "0",
+  array(
+    select array[
+      __single_table_items_2."id"::text,
+      __single_table_items_2."type"::text,
+      __single_table_items_2."parent_id"::text,
+      __single_table_items_2."type2"::text,
+      __single_table_items_2."position"::text,
+      to_char(__single_table_items_2."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text),
+      to_char(__single_table_items_2."updated_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text),
+      __single_table_items_2."is_explicitly_archived"::text,
+      to_char(__single_table_items_2."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text),
+      __single_table_items__."type"::text,
+      __single_table_items__."type2"::text,
+      __single_table_items__."position"::text,
+      to_char(__single_table_items__."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text),
+      to_char(__single_table_items__."updated_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text),
+      __single_table_items__."is_explicitly_archived"::text,
+      to_char(__single_table_items__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text),
+      __people__."username",
+      __people_2."username"
+    ]::text[]
+    from interfaces_and_unions.single_table_items as __single_table_items_2
+    left outer join interfaces_and_unions.single_table_items as __single_table_items__
+    on (
+    /* WHERE becoming ON */
+      (
+        __single_table_items__."id" = __single_table_items_2."parent_id"
+      ) and (
+        true /* authorization checks */
+      )
+    )
+    left outer join interfaces_and_unions.people as __people__
+    on (
+    /* WHERE becoming ON */
+      (
+        __people__."person_id" = __single_table_items__."author_id"
+      ) and (
+        true /* authorization checks */
+      )
+    )
+    left outer join interfaces_and_unions.people as __people_2
+    on (
+    /* WHERE becoming ON */
+      (
+        __people_2."person_id" = __single_table_items_2."author_id"
+      ) and (
+        true /* authorization checks */
+      )
+    )
     where
       (
-        true /* authorization checks */
+        __single_table_items_2."author_id" = __people_3."person_id"
       ) and (
-        __people__."person_id"::"int4" = __single_table_items__."author_id"
+        true /* authorization checks */
       )
-    order by __single_table_items__."id" asc
-  ) s) as "1"
-from interfaces_and_unions.people as __people__
+    order by __single_table_items_2."id" asc
+  )::text as "1"
+from interfaces_and_unions.people as __people_3
 where (
   true /* authorization checks */
 )
-order by __people__."person_id" asc;
-
-select __single_table_items_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __single_table_items_identifiers__,
-lateral (
-  select
-    __single_table_items__."type"::text as "0",
-    __single_table_items__."type2"::text as "1",
-    __single_table_items__."author_id"::text as "2",
-    __single_table_items__."position"::text as "3",
-    to_char(__single_table_items__."created_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "4",
-    to_char(__single_table_items__."updated_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "5",
-    __single_table_items__."is_explicitly_archived"::text as "6",
-    to_char(__single_table_items__."archived_at", 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text) as "7",
-    __single_table_items_identifiers__.idx as "8"
-  from interfaces_and_unions.single_table_items as __single_table_items__
-  where
-    (
-      true /* authorization checks */
-    ) and (
-      __single_table_items__."id" = __single_table_items_identifiers__."id0"
-    )
-) as __single_table_items_result__;
-
-select __people_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"int4" as "id0" from json_array_elements($1::json) with ordinality as ids) as __people_identifiers__,
-lateral (
-  select
-    __people__."username" as "0",
-    __people_identifiers__.idx as "1"
-  from interfaces_and_unions.people as __people__
-  where
-    (
-      true /* authorization checks */
-    ) and (
-      __people__."person_id" = __people_identifiers__."id0"
-    )
-) as __people_result__;
+order by __people_3."person_id" asc;

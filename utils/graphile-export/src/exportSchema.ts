@@ -71,8 +71,8 @@ function isSQL(thing: unknown): thing is SQL {
   } else {
     // An approximation
     if (typeof sql === "object" && sql !== null) {
-      return Object.getOwnPropertySymbols(thing).some(
-        (s) => s.description === "pg-sql2-type",
+      return Object.getOwnPropertySymbols(thing).some((s) =>
+        s.description?.startsWith("pg-sql2-type"),
       );
     } else {
       return false;
@@ -145,7 +145,7 @@ function getNameForThing(
     const name =
       thingConstructorName && thingName
         ? `${thingName}${thingConstructorName}`
-        : thingName ?? thingConstructorName ?? null;
+        : (thingName ?? thingConstructorName ?? null);
     return baseNameHint || name
       ? (baseNameHint ?? "") + (baseNameHint && name ? "-" : "") + (name ?? "")
       : "value";
@@ -916,20 +916,20 @@ type ConfigForGraphQLEntity<TKey extends GraphQLEntityName> =
   TKey extends "GraphQLSchema"
     ? GraphQLSchemaConfig
     : TKey extends "GraphQLDirective"
-    ? GraphQLDirectiveConfig
-    : TKey extends "GraphQLObjectType"
-    ? GraphQLObjectTypeConfig<unknown, unknown>
-    : TKey extends "GraphQLInterfaceType"
-    ? GraphQLInterfaceTypeConfig<unknown, unknown>
-    : TKey extends "GraphQLUnionType"
-    ? GraphQLUnionTypeConfig<unknown, unknown>
-    : TKey extends "GraphQLInputObjectType"
-    ? GraphQLInputObjectTypeConfig
-    : TKey extends "GraphQLScalarType"
-    ? GraphQLScalarTypeConfig<unknown, unknown>
-    : TKey extends "GraphQLEnumType"
-    ? GraphQLEnumTypeConfig
-    : never;
+      ? GraphQLDirectiveConfig
+      : TKey extends "GraphQLObjectType"
+        ? GraphQLObjectTypeConfig<unknown, unknown>
+        : TKey extends "GraphQLInterfaceType"
+          ? GraphQLInterfaceTypeConfig<unknown, unknown>
+          : TKey extends "GraphQLUnionType"
+            ? GraphQLUnionTypeConfig<unknown, unknown>
+            : TKey extends "GraphQLInputObjectType"
+              ? GraphQLInputObjectTypeConfig
+              : TKey extends "GraphQLScalarType"
+                ? GraphQLScalarTypeConfig<unknown, unknown>
+                : TKey extends "GraphQLEnumType"
+                  ? GraphQLEnumTypeConfig
+                  : never;
 
 function declareGraphQLEntity<TKey extends GraphQLEntityName>(
   file: CodegenFile,
@@ -1036,9 +1036,15 @@ function _convertToAST(
   } else if (typeof thing === "object" && thing != null) {
     const prototype = Object.getPrototypeOf(thing);
     if (prototype !== null && prototype !== Object.prototype) {
-      throw new Error(
-        `Attempting to export an instance of a class (at ${locationHint}); you should wrap this definition in EXPORTABLE! (Class: ${thing.constructor})`,
-      );
+      if (thing.constructor) {
+        throw new Error(
+          `Attempting to export an instance of a class (at ${locationHint}); you should wrap this definition in EXPORTABLE! (Class: ${thing.constructor})`,
+        );
+      } else {
+        throw new Error(
+          `Attempting to export non-POJO object (at ${locationHint}); you should wrap this definition in EXPORTABLE! (Prototype: ${inspect(prototype)})`,
+        );
+      }
     }
     const propertyPairs: Array<
       [
@@ -1067,28 +1073,11 @@ function _convertToAST(
             ),
           ],
         );
-      } else if (propertyPairs.length === 0) {
-        return t.callExpression(
-          t.memberExpression(t.identifier("Object"), t.identifier("create")),
-          [t.nullLiteral()],
-        );
       } else {
-        const obj = t.objectExpression(
+        const obj = objectNullPrototype(
           propertyPairs.map(([key, val]) => t.objectProperty(key, val)),
         );
-        return t.callExpression(
-          t.memberExpression(t.identifier("Object"), t.identifier("assign")),
-          [
-            t.callExpression(
-              t.memberExpression(
-                t.identifier("Object"),
-                t.identifier("create"),
-              ),
-              [t.nullLiteral()],
-            ),
-            obj,
-          ],
-        );
+        return obj;
       }
     } else {
       if (hasUnsafeKeys) {
@@ -1211,33 +1200,37 @@ function objectToObjectProperties(o: {
     .map(([key, value]) => t.objectProperty(identifierOrLiteral(key), value!));
 }
 
+/** Only use when you're sure the keys are safe to use as identifiers */
+function dangerousObjectToObjectPropertiesWithIdentifierKeys(o: {
+  [key: string]: t.Expression | null;
+}): t.ObjectProperty[] {
+  return Object.entries(o)
+    .filter(([, value]) => value != null)
+    .map(([key, value]) => t.objectProperty(t.identifier(key), value!));
+}
+
 function extensions(
   file: CodegenFile,
   extensions: object | null | undefined,
   locationHint: string,
   nameHint: string,
 ): t.Expression | null {
-  if (extensions == null || Object.keys(extensions).length === 0) {
-    return null;
-  }
-  return convertToIdentifierViaAST(file, extensions, nameHint, locationHint);
+  return isNotEmpty(extensions)
+    ? convertToIdentifierViaAST(file, extensions, nameHint, locationHint)
+    : null;
 }
 
-/** Maps to `Object.assign(Object.create(null), {...})` */
+/**
+ * Maps to `{__proto__: null, ...}` which is similar to
+ * `Object.assign(Object.create(null), {...})`
+ */
 export function objectNullPrototype(
   properties: t.ObjectProperty[],
 ): t.Expression {
-  const objectCreateNull = t.callExpression(
-    t.memberExpression(t.identifier("Object"), t.identifier("create")),
-    [t.nullLiteral()],
-  );
-  if (properties.length === 0) {
-    return objectCreateNull;
-  }
-  return t.callExpression(
-    t.memberExpression(t.identifier("Object"), t.identifier("assign")),
-    [objectCreateNull, t.objectExpression(properties)],
-  );
+  return t.objectExpression([
+    t.objectProperty(t.identifier("__proto__"), t.nullLiteral()),
+    ...properties,
+  ]);
 }
 
 /*
@@ -1610,6 +1603,33 @@ function exportSchemaTypeDefs({
           ),
         );
       }
+      if (type.isTypeOf) {
+        typeProperties.push(
+          t.objectProperty(
+            t.identifier("__isTypeOf"),
+            convertToIdentifierViaAST(
+              file,
+              type.isTypeOf,
+              `${type.name}IsTypeOf`,
+              `${type.name}.extensions.isTypeOf`,
+            ),
+          ),
+        );
+      }
+
+      if (type.extensions.grafast?.planType) {
+        typeProperties.push(
+          t.objectProperty(
+            t.identifier("__planType"),
+            convertToIdentifierViaAST(
+              file,
+              type.extensions.grafast.planType,
+              `${type.name}PlanType`,
+              `${type.name}.extensions.planType`,
+            ),
+          ),
+        );
+      }
 
       for (const [fieldName, field] of Object.entries(type.toConfig().fields)) {
         // Use shorthand if there's only a `plan` and nothing else
@@ -1650,16 +1670,59 @@ function exportSchemaTypeDefs({
 
         const args = field.args
           ? Object.entries(field.args)
-              .map(([argName, arg]) => {
-                return t.objectProperty(
-                  identifierOrLiteral(argName),
-                  convertToIdentifierViaAST(
+              .map(([argName, arg]): t.ObjectProperty | null => {
+                if (arg.extensions) {
+                  const { grafast, ...rest } = arg.extensions;
+                  const extensionsAST = extensions(
                     file,
-                    arg.extensions?.grafast,
+                    rest,
                     `${type.name}.${fieldName}.${argName}`,
-                    `${type.name}.fields[${fieldName}].args[${argName}].extensions.grafast`,
-                  ),
-                );
+                    `${type.name}.fields[${fieldName}].args[${argName}].extensions`,
+                  );
+                  if (!extensionsAST) {
+                    if (!grafast) return null;
+                    const keys = Object.keys(grafast);
+                    if (keys.length === 1 && keys[0] === "applyPlan") {
+                      // Shorthand
+                      return t.objectProperty(
+                        identifierOrLiteral(argName),
+                        convertToIdentifierViaAST(
+                          file,
+                          grafast.applyPlan!,
+                          `${type.name}.${fieldName}${argName}ApplyPlan`,
+                          `${type.name}.fields[${fieldName}].args[${argName}].applyPlan`,
+                        ),
+                      );
+                    }
+                  }
+                  return t.objectProperty(
+                    identifierOrLiteral(argName),
+                    t.objectExpression([
+                      ...objectToObjectProperties({
+                        extensions: extensionsAST,
+                      }),
+
+                      ...(grafast
+                        ? Object.entries(grafast)
+                            .map(([k, v]) => {
+                              if (v == null) return null;
+                              return t.objectProperty(
+                                t.identifier(k),
+                                convertToIdentifierViaAST(
+                                  file,
+                                  grafast.applyPlan!,
+                                  `${type.name}.${fieldName}${argName}${k}`,
+                                  `${type.name}.fields[${fieldName}].args[${argName}].extensions.grafast[${k}]`,
+                                ),
+                              );
+                            })
+                            .filter(isNotNullish)
+                        : []),
+                    ]),
+                  );
+                } else {
+                  return null;
+                }
               })
               .filter(isNotNullish)
           : null;
@@ -1696,66 +1759,135 @@ function exportSchemaTypeDefs({
         );
       }
 
-      plansProperties.push(
-        t.objectProperty(
-          identifierOrLiteral(type.name),
-          t.objectExpression(typeProperties),
-        ),
-      );
+      if (typeProperties.length > 0) {
+        plansProperties.push(
+          t.objectProperty(
+            identifierOrLiteral(type.name),
+            t.objectExpression(typeProperties),
+          ),
+        );
+      }
     } else if (type instanceof GraphQLInputObjectType) {
       const typeProperties: t.ObjectProperty[] = [];
 
-      if (type.extensions?.grafast?.inputPlan) {
+      if (type.extensions?.grafast?.baked) {
         typeProperties.push(
           t.objectProperty(
-            identifierOrLiteral("__inputPlan"),
+            t.identifier("__baked"),
             convertToIdentifierViaAST(
               file,
-              type.extensions?.grafast.inputPlan,
+              type.extensions?.grafast.baked,
               `${type.name}.inputPlan`,
-              `${type.name}.extensions.grafast.inputPlan`,
+              `${type.name}.extensions.grafast.baked`,
             ),
           ),
         );
       }
 
       for (const [fieldName, field] of Object.entries(type.toConfig().fields)) {
+        if (!field.extensions) continue;
+        const { grafast, ...rest } = field.extensions;
+        const extensionsAST = extensions(
+          file,
+          rest,
+          `${type.name}_${fieldName}Extensions`,
+          `${type.name}.fields[${fieldName}].extensions`,
+        );
+        if (!extensionsAST) {
+          if (!grafast) continue;
+          const keys = Object.keys(grafast);
+          if (keys.length === 1 && keys[0] === "apply") {
+            typeProperties.push(
+              t.objectProperty(
+                identifierOrLiteral(fieldName),
+                convertToIdentifierViaAST(
+                  file,
+                  grafast.apply,
+                  `${type.name}.${fieldName}Apply`,
+                  `${type.name}.fields[${fieldName}].extensions.grafast.apply`,
+                ),
+              ),
+            );
+            continue;
+          }
+        }
+
         typeProperties.push(
           t.objectProperty(
             identifierOrLiteral(fieldName),
-            convertToIdentifierViaAST(
-              file,
-              field.extensions?.grafast,
-              `${type.name}.${fieldName}`,
-              `${type.name}.fields[${fieldName}].extensions.grafast`,
-            ),
+            t.objectExpression([
+              ...objectToObjectProperties({
+                extensions: extensionsAST,
+              }),
+
+              ...(grafast
+                ? Object.entries(grafast)
+                    .map(([k, v]) => {
+                      if (v == null) return null;
+                      return t.objectProperty(
+                        t.identifier(k),
+                        convertToIdentifierViaAST(
+                          file,
+                          v,
+                          `${type.name}.${fieldName}${k}`,
+                          `${type.name}.fields[${fieldName}].extensions.grafast[${k}]`,
+                        ),
+                      );
+                    })
+                    .filter(isNotNullish)
+                : []),
+            ]),
           ),
         );
       }
 
-      plansProperties.push(
-        t.objectProperty(
-          identifierOrLiteral(type.name),
-          t.objectExpression(typeProperties),
-        ),
-      );
+      if (typeProperties.length > 0) {
+        plansProperties.push(
+          t.objectProperty(
+            identifierOrLiteral(type.name),
+            t.objectExpression(typeProperties),
+          ),
+        );
+      }
     } else if (
       type instanceof GraphQLInterfaceType ||
       type instanceof GraphQLUnionType
     ) {
       const config = type.toConfig();
-      if (config.resolveType) {
+      if (
+        config.resolveType ||
+        config.extensions.grafast?.toSpecifier ||
+        config.extensions.grafast?.planType
+      ) {
         plansProperties.push(
           t.objectProperty(
             identifierOrLiteral(type.name),
             t.objectExpression(
-              objectToObjectProperties({
-                __resolveType: convertToIdentifierViaAST(
-                  file,
-                  type.resolveType,
-                  `${type.name}ResolveType`,
-                  `${type.name}.resolveType`,
-                ),
+              dangerousObjectToObjectPropertiesWithIdentifierKeys({
+                __resolveType: type.resolveType
+                  ? convertToIdentifierViaAST(
+                      file,
+                      type.resolveType,
+                      `${type.name}ResolveType`,
+                      `${type.name}.resolveType`,
+                    )
+                  : null,
+                __toSpecifier: type.extensions?.grafast?.toSpecifier
+                  ? convertToIdentifierViaAST(
+                      file,
+                      type.extensions?.grafast?.toSpecifier,
+                      `${type.name}ToSpecifier`,
+                      `${type.name}.toSpecifier`,
+                    )
+                  : null,
+                __planType: type.extensions?.grafast?.planType
+                  ? convertToIdentifierViaAST(
+                      file,
+                      type.extensions?.grafast?.planType,
+                      `${type.name}PlanType`,
+                      `${type.name}.planType`,
+                    )
+                  : null,
               }),
             ),
           ),
@@ -1831,25 +1963,59 @@ function exportSchemaTypeDefs({
                 `${type.name}.values[${enumValueName}].value`,
               )
             : null;
-        const applyPlanAST = enumValueConfig.extensions?.grafast?.applyPlan
-          ? convertToIdentifierViaAST(
-              file,
-              enumValueConfig.extensions.grafast.applyPlan,
-              `${type.name}_${enumValueName}ApplyPlan`,
-              `${type.name}.values[${enumValueName}].extensions.grafast.applyPlan`,
-            )
-          : null;
+        const { grafast, ...rest } = enumValueConfig.extensions ?? {};
+        const extensionsAST = extensions(
+          file,
+          rest,
+          `${type.name}_${enumValueName}Extensions`,
+          `${type.name}.values[${enumValueName}].extensions`,
+        );
+        if (!valueAST && !extensionsAST) {
+          if (!grafast) continue;
+          const keys = Object.keys(grafast);
+          if (keys.length === 1 && keys[0] === "apply") {
+            enumValues.push(
+              t.objectProperty(
+                identifierOrLiteral(enumValueName),
+                convertToIdentifierViaAST(
+                  file,
+                  grafast.apply,
+                  `${type.name}.${enumValueName}Apply`,
+                  `${type.name}.values[${enumValueName}].extensions.grafast.apply`,
+                ),
+              ),
+            );
+            continue;
+          }
+        }
+        const grafastProperties = grafast
+          ? Object.entries(grafast)
+              .map(([k, v]) => {
+                if (v == null) return null;
+                return t.objectProperty(
+                  t.identifier(k),
+                  convertToIdentifierViaAST(
+                    file,
+                    v,
+                    `${type.name}.${enumValueName}${k}`,
+                    `${type.name}.values[${enumValueName}].extensions.grafast[${k}]`,
+                  ),
+                );
+              })
+              .filter(isNotNullish)
+          : [];
 
-        if (valueAST || applyPlanAST) {
+        if (valueAST || extensionsAST || grafastProperties.length) {
           enumValues.push(
             t.objectProperty(
               identifierOrLiteral(enumValueName),
-              t.objectExpression(
-                objectToObjectProperties({
+              t.objectExpression([
+                ...objectToObjectProperties({
                   value: valueAST,
-                  applyPlan: applyPlanAST,
+                  extensions: extensionsAST,
                 }),
-              ),
+                ...grafastProperties,
+              ]),
             ),
           );
         }
@@ -2002,13 +2168,12 @@ async function lint(code: string, rawFilePath: string | URL) {
     typeof rawFilePath === "string" ? rawFilePath : rawFilePath.pathname;
   const { ESLint } = eslintModule;
   const eslint = new ESLint({
-    useEslintrc: false, // Don't use external config
-    reportUnusedDisableDirectives: "off",
+    overrideConfigFile: true, // Don't use external config
     allowInlineConfig: false, // Ignore `/* eslint-disable ... */` comments
     overrideConfig: {
-      reportUnusedDisableDirectives: false,
-      parserOptions: {
-        ecmaVersion: 2020,
+      linterOptions: { reportUnusedDisableDirectives: false },
+      languageOptions: {
+        ecmaVersion: 2022,
         sourceType: "module",
       },
       rules: {
@@ -2077,4 +2242,24 @@ export async function exportSchema(
   const formatted = await format(toFormat, toPath, options);
   await writeFile(toPath, formatted);
   await lint(formatted, toPath);
+}
+
+/**
+ * Returns `false` for nullish values and empty objects, true otherwise.
+ */
+function isNotEmpty(
+  value: undefined | null | Record<any, any>,
+): value is Record<any, any> {
+  if (value == null) return false;
+  if (typeof value !== "object") return true;
+  const proto = Object.getPrototypeOf(value);
+  if (proto !== null && proto !== Object.prototype) return true;
+  if (
+    Object.getOwnPropertyNames(value).length === 0 &&
+    Object.getOwnPropertySymbols(value).length === 0
+  ) {
+    // Empty object!
+    return false;
+  }
+  return true;
 }

@@ -15,7 +15,7 @@ A modest range of [standard step classes][standard steps] are available for you
 to use; but when these aren't enough you are encouraged to write your own (or
 pull down third party step classes from npm or similar).
 
-Step classes extend the `ExecutableStep` class, the only required method to
+Step classes extend the `Step` class, the only required method to
 define is `execute`, but you may also implement the various lifecycle methods,
 or add methods of your own to make it easier for you to write [plan
 resolvers][].
@@ -23,7 +23,7 @@ resolvers][].
 <!-- prettier-ignore -->
 ```ts
 /** XKCD-221 step class @ref https://xkcd.com/221/ */
-class GetRandomNumberStep extends ExecutableStep {
+class GetRandomNumberStep extends Step {
   execute({ count }) {
     return new Array(count).fill(4); // chosen by fair dice roll.
                                      // guaranteed to be random.
@@ -46,7 +46,7 @@ conflicts occurring.
 :::warning Don't subclass steps.
 
 Don't subclass steps, this will make things very confusing for you. Always
-inherit directly from `ExecutableStep`.
+inherit directly from `Step`.
 
 :::
 
@@ -195,25 +195,13 @@ execute method then returns the same number of results in the same order: `[3,
 
 ### stream
 
-_This method is optional._
+:::warning REMOVED!
 
-```ts
-stream(details: StreamDetails): PromiseOrDirect<GrafastResultStreamList>
-```
+`stream` is no longer its own method; it has been merged with `execute`.
 
-```ts
-interface StreamDetails extends ExecutionDetails {
-  streamOptions: {
-    initialCount: number;
-  };
-}
+Use `executionDetails.stream` to determine whether you should stream or not.
 
-type GrafastResultStreamList<T> = ReadonlyArray<
-  PromiseOrDirect<AsyncIterable<PromiseOrDirect<T>> | null>
->;
-```
-
-TODO: document stream. (It's like execute, except it returns a list of async iterators.)
+:::
 
 ### deduplicate
 
@@ -221,8 +209,8 @@ _This method is optional._
 
 ```ts
 deduplicate(
-  peers: readonly ExecutableStep[]
-): readonly ExecutableStep[]
+  peers: readonly Step[]
+): readonly Step[]
 ```
 
 After a field has been fully planned, <grafast /> will call this method on each
@@ -244,7 +232,7 @@ _This method is optional._
 
 ```ts
 deduplicatedWith(
-  replacement: ExecutableStep
+  replacement: Step
 ): void
 ```
 
@@ -284,7 +272,7 @@ _This method is optional._
 ```ts
 optimize(
   options: { stream: StepStreamOptions | null }
-): ExecutableStep
+): Step
 ```
 
 This method is called on each step during the optimize lifecycle event. It
@@ -392,7 +380,7 @@ Usage:
 ```ts
 import { access } from "grafast";
 
-class MyListStep extends ExecutableStep {
+class MyListStep extends Step {
   // ...
 
   at(index) {
@@ -419,7 +407,7 @@ string, which represents an attribute to access an object-like value.
 ```ts
 import { access } from "grafast";
 
-class MyObjectStep extends ExecutableStep {
+class MyObjectStep extends Step {
   // ...
 
   get(key) {
@@ -438,10 +426,182 @@ from steps which don't adhere to these expectations.
 
 :::
 
+### items
+
+Implement `.items()` if your step represents a collection and you want to give
+users an easy way of accessing the items of your collection (as opposed to
+metadata you may also wish to make available, such as pagination info). It
+should accept no arguments (later <!-- Benjie: see commit
+8f5ccf8592d80b0addc942951e96659292763c4d --> we might support options related
+to streaming, so do not implement arguments!) and it should expect to be called
+zero or more times.
+
+```ts
+import { access } from "grafast";
+
+class MyCollectionStep extends Step /* implements ConnectionCapableStep */ {
+  // ...
+
+  items() {
+    // Update this to access the correct property needed for the items in your
+    // collection; you may also choose to track that this was requested and
+    // thus ensure that fetches only go ahead when necessary.
+    return access(this, "items");
+  }
+}
+```
+
+:::caution
+
+If your step implements `.items()`, make sure it meets the expectations:
+i.e. it does not require any arguments.
+&ZeroWidthSpace;<grafast /> relies on this assumption; unanticipated behaviours may result
+from steps which don't adhere to these expectations.
+
+:::
+
+### apply()
+
+Implement `.apply()` if your step wants to allow for runtime modification of
+its action based on non-trivial input values - for example, if your step
+represents an SQL query it might want to allow dynamic `WHERE` or `ORDER BY`
+clauses based on input arguments to a GraphQL field. `.apply()` will accept a
+single argument, a step that represents a runtime callback function. The step
+should then call this function from `.execute()`; a common implementation might
+look like:
+
+<!-- TODO: should we move this example somewhere else, it's a bit long! -->
+
+```ts
+import { Step, ExecutionDetails, GrafastResultsList, Maybe } from "grafast";
+
+interface QueryBuilder {
+  orderBy(columnName: string, ascending?: boolean): void;
+}
+
+type Callback = (queryBuilder: QueryBuilder) => void;
+
+class MyQueryStep extends Step {
+  private applyDepIds: number[] = [];
+
+  // [...]
+  //   this.foreignKeyDepId = this.addDependency($fkey);
+  // [...]
+
+  // Handling `Step<Callback>` is enough for some use cases, but
+  // handling this combination is the most flexible.
+  apply($step: Step<Maybe<Callback | ReadonlyArray<Callback>>>) {
+    this.applyDepIds.push(this.addUnaryDependency($step));
+  }
+
+  async execute(
+    executionDetails: ExecutionDetails,
+  ): Promise<GrafastResultsList<Record<string, any>>> {
+    const { values, indexMap } = executionDetails;
+    const foreignKeyEV = values[this.foreignKeyDepId];
+
+    // Create a query builder to collect together the orderBy values
+    const orderBys: string[] = [];
+    const queryBuilder: QueryBuilder = {
+      orderBy(columnName, asc = true) {
+        orderBys.push(`${columnName} ${asc ? "ASC" : "DESC"}`);
+      },
+    };
+
+    // For each of the `apply()` callbacks, run it against the query builder
+    for (const applyDepId of this.applyDepIds) {
+      const callback = values[applyDepId].unaryValue();
+      if (Array.isArray(callback)) {
+        callback.forEach((cb) => cb(queryBuilder));
+      } else if (callback != null) {
+        callback(queryBuilder);
+      }
+    }
+
+    // Now we can use `orderBys` to build a query:
+    const query = `
+      select *
+      from my_table
+      where foreign_key = any($1)
+      order by ${orderBys}
+    `;
+
+    // Then we can fetch the data:
+    const allForeignKeys = indexMap((i) => foreignKeyEV.at(i));
+    const rows = await runQuery(query, [allForeignKeys]);
+
+    // And return the right data to go with each input value:
+    return indexMap((i) => {
+      const foreignKey = foreignKeyEV.at(i);
+      return rows.filter((r) => r.foreign_key === foreignKey);
+    });
+  }
+}
+```
+
+### toTypename()
+
+Enables a step to return a step resolving to the typename, used by the
+`defaultPlanType` polymorphic type resolver function when the GraphQL union or
+interface type does not implement the `planType` method. If not implemented,
+this default function will fall back to `get($step, '__typename')`.
+
+### toSpecifier()
+
+This function name is reserved for convenience such that `$step.toSpecifier()`
+should mean the same as `abstractType.toSpecifier($step)`. Grafast does not
+actually use this method (currently), but it can be convenient for users so
+we reserve it for specifically this use case.
+
+Importantly, Gra*fast* does not require that a specifier takes a
+particular form, it's an agreement between the steps you're using and the
+polymorphic types (unions and interfaces) that you've implemented. We strongly
+recommend it's a plain-old JavaScript object (POJO) though!
+
+```ts
+class MyStep extends Step {
+  // ...
+  toSpecifier() {
+    return object({
+      __typename: this.get("type"),
+      id: this.get("id"),
+    });
+  }
+}
+
+const Animal = new GraphQLInterfaceType({
+  name: "Animal",
+  // ... fields ...
+  toSpecifier($step) {
+    // Call .toSpecifier() if it exists, otherwise use the step directly
+    return $step.toSpecifier?.() ?? $step;
+  },
+  planType($specifier) {
+    // Extract the property that indicates the type from above
+    const $__typename = get($specifier, "__typename");
+    return { $__typename };
+  },
+});
+
+const Cat = new GraphQLObjectType({
+  name: "Cat",
+  interfaces: [Animal],
+  // ... fields ...
+  extensions: {
+    grafast: {
+      planType($specifier) {
+        const $id = get($specifier, "id");
+        return cats.get({ id: $id });
+      },
+    },
+  },
+});
+```
+
 ## Built in methods
 
 Your custom step class will have access to all the built-in methods that come
-as part of `ExecutableStep`.
+as part of `Step`.
 
 ### addDependency
 
@@ -458,7 +618,7 @@ In the [getting started][] guide we saw the constructor for the `AddStep` step
 class added two dependencies:
 
 ```ts
-class AddStep extends ExecutableStep {
+class AddStep extends Step {
   constructor($a, $b) {
     super();
     this.addDependency($a); // Returns 0

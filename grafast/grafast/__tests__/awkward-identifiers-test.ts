@@ -1,16 +1,16 @@
 import { expect } from "chai";
 import { resolvePreset } from "graphile-config";
-import { ExecutionResult, parse } from "graphql";
+import { parse } from "graphql";
 import { it } from "mocha";
 
 import {
   access,
   constant,
-  type ExecutableStep,
   execute,
   type FieldArgs,
   grafastSync,
   makeGrafastSchema,
+  type Step,
 } from "../dist/index.js";
 
 const schema = makeGrafastSchema({
@@ -26,27 +26,31 @@ const schema = makeGrafastSchema({
       o: Obj
     }
   `,
-  plans: {
+  objects: {
     Query: {
-      o() {
-        return constant(Object.create(null));
+      plans: {
+        o() {
+          return constant(Object.create(null));
+        },
       },
     },
     Obj: {
-      o($o: ExecutableStep) {
-        return $o;
-      },
-      a($o: ExecutableStep) {
-        return access($o, "a");
-      },
-      b($o: ExecutableStep) {
-        return access($o, "b");
-      },
-      echoNumber(_, { $nr }: FieldArgs) {
-        return $nr;
-      },
-      echoString(_, { $str }: FieldArgs) {
-        return $str;
+      plans: {
+        o($o: Step) {
+          return $o;
+        },
+        a($o: Step) {
+          return access($o, "a");
+        },
+        b($o: Step) {
+          return access($o, "b");
+        },
+        echoNumber(_: Step, { $nr }: FieldArgs) {
+          return $nr;
+        },
+        echoString(_: Step, { $str }: FieldArgs) {
+          return $str;
+        },
       },
     },
   },

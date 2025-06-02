@@ -1,9 +1,12 @@
-import type { JSONParseStep } from "@dataplan/json";
 import { jsonParse } from "@dataplan/json";
-import { context, lambda, listen, node } from "grafast";
+import type { ObjectPlan, Step } from "grafast";
+import { context, get, lambda, listen, node } from "grafast";
 import { EXPORTABLE, gql, makeExtendSchemaPlugin } from "graphile-utils";
 
 export const PgV4SimpleSubscriptionsPlugin = makeExtendSchemaPlugin((build) => {
+  const {
+    grafast: { get },
+  } = build;
   const nodeIdHandlerByTypeName = build.getNodeIdHandlerByTypeName?.();
   return {
     typeDefs: [
@@ -28,56 +31,60 @@ export const PgV4SimpleSubscriptionsPlugin = makeExtendSchemaPlugin((build) => {
           ]
         : []),
     ],
-    plans: {
+    objects: {
       Subscription: {
-        listen: {
-          subscribePlan: EXPORTABLE(
-            (context, jsonParse, lambda, listen) =>
-              function subscribePlan(_$root, { $topic }) {
-                const $pgSubscriber = context().get("pgSubscriber");
-                const $derivedTopic = lambda(
-                  $topic,
-                  (topic) => `postgraphile:${topic}`,
-                );
-                return listen($pgSubscriber, $derivedTopic, jsonParse);
-              },
-            [context, jsonParse, lambda, listen],
-          ),
-          plan: EXPORTABLE(
-            () =>
-              function plan($event) {
-                return $event;
-              },
-            [],
-          ),
-        },
-      },
-      ListenPayload: {
-        event: EXPORTABLE(
-          () => ($event) => {
-            return $event.get("event");
-          },
-          [],
-        ),
-        ...(nodeIdHandlerByTypeName
-          ? {
-              relatedNodeId: EXPORTABLE(
-                (nodeIdFromEvent) => ($event) => {
-                  return nodeIdFromEvent($event);
+        plans: {
+          listen: {
+            subscribePlan: EXPORTABLE(
+              (context, jsonParse, lambda, listen) =>
+                function subscribePlan(_$root, { $topic }) {
+                  const $pgSubscriber = context().get("pgSubscriber");
+                  const $derivedTopic = lambda(
+                    $topic,
+                    (topic) => `postgraphile:${topic}`,
+                  );
+                  return listen($pgSubscriber, $derivedTopic, jsonParse);
                 },
-                [nodeIdFromEvent],
-              ),
-              relatedNode: EXPORTABLE(
-                (node, nodeIdFromEvent, nodeIdHandlerByTypeName) =>
-                  ($event) => {
-                    const $nodeId = nodeIdFromEvent($event);
-                    return node(nodeIdHandlerByTypeName, $nodeId);
+              [context, jsonParse, lambda, listen],
+            ),
+            plan: EXPORTABLE(
+              () =>
+                function plan($event) {
+                  return $event;
+                },
+              [],
+            ),
+          },
+        },
+      } as ObjectPlan<Step>,
+      ListenPayload: {
+        plans: {
+          event: EXPORTABLE(
+            (get) => ($event) => {
+              return get($event, "event");
+            },
+            [get],
+          ),
+          ...(nodeIdHandlerByTypeName
+            ? {
+                relatedNodeId: EXPORTABLE(
+                  (nodeIdFromEvent) => ($event) => {
+                    return nodeIdFromEvent($event);
                   },
-                [node, nodeIdFromEvent, nodeIdHandlerByTypeName],
-              ),
-            }
-          : null),
-      },
+                  [nodeIdFromEvent],
+                ),
+                relatedNode: EXPORTABLE(
+                  (node, nodeIdFromEvent, nodeIdHandlerByTypeName) =>
+                    ($event) => {
+                      const $nodeId = nodeIdFromEvent($event);
+                      return node(nodeIdHandlerByTypeName, $nodeId);
+                    },
+                  [node, nodeIdFromEvent, nodeIdHandlerByTypeName],
+                ),
+              }
+            : null),
+        },
+      } as ObjectPlan<Step<{ event: string; __node__?: any[] }>>,
     },
   };
 }, "PgV4SimpleSubscriptionsPlugin");
@@ -95,12 +102,12 @@ const nodeObjToNodeId = EXPORTABLE(
 
 // WARNING: this function assumes that you're using the `base64JSON` NodeID codec, which was the case for PostGraphile V4. If you are not doing so, YMMV.
 const nodeIdFromEvent = EXPORTABLE(
-  (lambda, nodeObjToNodeId) =>
-    function nodeIdFromEvent($event: JSONParseStep<{ __node__?: any[] }>) {
-      const $nodeObj = $event.get("__node__");
+  (get, lambda, nodeObjToNodeId) =>
+    function nodeIdFromEvent($event: Step<{ __node__?: any[] }>) {
+      const $nodeObj = get($event, "__node__");
       const $nodeId = lambda($nodeObj, nodeObjToNodeId);
       return $nodeId;
     },
-  [lambda, nodeObjToNodeId],
+  [get, lambda, nodeObjToNodeId],
   "nodeIdFromEvent",
 );

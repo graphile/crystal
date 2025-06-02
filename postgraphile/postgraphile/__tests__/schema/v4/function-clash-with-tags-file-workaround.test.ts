@@ -7,6 +7,7 @@ import * as core from "./core.js";
 let consoleWarnSpy: ReturnType<typeof jest.spyOn>;
 beforeAll(() => {
   consoleWarnSpy = jest.spyOn(global.console, "warn");
+  consoleWarnSpy.mockReturnValue(undefined);
 });
 afterAll(() => {
   if (consoleWarnSpy) {
@@ -37,6 +38,12 @@ test(
     },
     true,
     {
+      gather: {
+        muteWarnings: false,
+      },
+      schema: {
+        muteWarnings: false,
+      },
       plugins: [
         makePgSmartTagsPlugin({
           kind: "class",

@@ -1,0 +1,90 @@
+{
+  floor(number: 3) {
+    number
+    locations {
+      ...l
+      floors {
+        number
+        locations {
+          ...l
+          floors {
+            number
+            locations {
+              ...l
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+fragment l on Location {
+  __typename
+  name
+  ... on SafeRoom {
+    hasPersonalSpace
+    manager {
+      id
+      name
+      friends {
+        id
+        name
+      }
+      ... on HasInventory {
+        items {
+          id
+          name
+        }
+      }
+    }
+    stock {
+      ... on Item {
+        id
+        __typename
+        name
+      }
+    }
+  }
+
+  ... on Club {
+    tagline
+    manager {
+      id
+      name
+      friends {
+        id
+        name
+      }
+      ... on HasInventory {
+        items {
+          id
+          name
+        }
+      }
+    }
+    security {
+      id
+      name
+      clients {
+        id
+        name
+      }
+    }
+    stock {
+      ... on Item {
+        id
+        __typename
+        name
+      }
+    }
+  }
+}
+
+# TODO Add back stock to Club and SafeRoom
+#    stock {
+#      ... on Item {
+#        id
+#        __typename
+#        name
+#      }
