@@ -1747,7 +1747,7 @@ function exportSchemaTypeDefs({
         plansProperties[fieldName] = fieldSpec;
       }
       setIfNotEmpty(typeProperties, "plans", plansProperties, true);
-      setIfNotEmpty(objectPlansProperties, type.name, typeProperties);
+      setIfNotEmpty(objectPlansProperties, type.name, typeProperties, false);
     } else if (type instanceof GraphQLInputObjectType) {
       const typeProperties = Object.create(null) as PropObj;
       const plansProperties = Object.create(null) as PropObj;
@@ -1808,7 +1808,12 @@ function exportSchemaTypeDefs({
         ]);
       }
       setIfNotEmpty(typeProperties, "plans", plansProperties, true);
-      setIfNotEmpty(inputObjectPlansProperties, type.name, typeProperties);
+      setIfNotEmpty(
+        inputObjectPlansProperties,
+        type.name,
+        typeProperties,
+        false,
+      );
     } else if (
       type instanceof GraphQLInterfaceType ||
       type instanceof GraphQLUnionType
@@ -1996,7 +2001,16 @@ function exportSchemaTypeDefs({
   };
 
   const stuff: PropObj = Object.create(null);
-  setIfNotEmpty(stuff, "objects", objectPlansProperties, true);
+  setIfNotEmpty(
+    stuff,
+    "objects",
+    objectPlansProperties,
+    [
+      schema.getQueryType()?.name,
+      schema.getMutationType()?.name,
+      schema.getSubscriptionType()?.name,
+    ].filter((n) => n != null),
+  );
   setIfNotEmpty(stuff, "interfaces", interfacePlansProperties, true);
   setIfNotEmpty(stuff, "unions", unionPlansProperties, true);
   setIfNotEmpty(stuff, "inputObjects", inputObjectPlansProperties, true);
@@ -2235,12 +2249,30 @@ function setIfNotEmpty(
   target: PropObj,
   key: string,
   value: PropObj,
-  sort = false,
+  sort: readonly string[] | boolean,
 ): void {
   if (Object.keys(value).length > 0) {
     const entries = Object.entries(value);
-    if (sort) {
+    if (typeof sort === "boolean") {
       entries.sort((a, z) => a[0].localeCompare(z[0], "und"));
+    } else if (sort) {
+      entries.sort((a, z) => {
+        const ka = a[0];
+        const kz = z[0];
+
+        // First, compare keys against the specific defined order
+        const sa = sort.indexOf(ka);
+        const sz = sort.indexOf(kz);
+        if (sa >= 0) {
+          if (sz < 0) return -1;
+          return sa - sz;
+        } else if (sz >= 0) {
+          return 1;
+        }
+
+        // Failing that, compare them alphabetically
+        return ka.localeCompare(kz, "und");
+      });
     }
     const finalProps = entries.map(([k, v]) =>
       t.objectProperty(identifierOrLiteral(k), v),
