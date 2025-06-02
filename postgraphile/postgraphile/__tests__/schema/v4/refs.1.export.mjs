@@ -1874,281 +1874,813 @@ enum BooksOrderBy {
   ISBN_ASC
   ISBN_DESC
 }`;
-export const plans = {
+export const objects = {
   Query: {
-    __assertStep() {
+    assertStep() {
       return true;
     },
-    query() {
-      return rootValue();
-    },
-    nodeId($parent) {
-      const specifier = nodeIdHandler_Query.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Query.codec.name].encode);
-    },
-    node(_$root, fieldArgs) {
-      return fieldArgs.getRaw("nodeId");
-    },
-    bookAuthorByBookIdAndPenNameId(_$root, {
-      $bookId,
-      $penNameId
-    }) {
-      return resource_book_authorsPgResource.get({
-        book_id: $bookId,
-        pen_name_id: $penNameId
-      });
-    },
-    bookEditorByBookIdAndPersonId(_$root, {
-      $bookId,
-      $personId
-    }) {
-      return resource_book_editorsPgResource.get({
-        book_id: $bookId,
-        person_id: $personId
-      });
-    },
-    personById(_$root, {
-      $id
-    }) {
-      return resource_peoplePgResource.get({
-        id: $id
-      });
-    },
-    postById(_$root, {
-      $id
-    }) {
-      return resource_postsPgResource.get({
-        id: $id
-      });
-    },
-    bookById(_$root, {
-      $id
-    }) {
-      return resource_booksPgResource.get({
-        id: $id
-      });
-    },
-    bookByIsbn(_$root, {
-      $isbn
-    }) {
-      return resource_booksPgResource.get({
-        isbn: $isbn
-      });
-    },
-    penNameById(_$root, {
-      $id
-    }) {
-      return resource_pen_namesPgResource.get({
-        id: $id
-      });
-    },
-    bookAuthor(_$parent, args) {
-      const $nodeId = args.getRaw("nodeId");
-      return nodeFetcher_BookAuthor($nodeId);
-    },
-    bookEditor(_$parent, args) {
-      const $nodeId = args.getRaw("nodeId");
-      return nodeFetcher_BookEditor($nodeId);
-    },
-    person(_$parent, args) {
-      const $nodeId = args.getRaw("nodeId");
-      return nodeFetcher_Person($nodeId);
-    },
-    post(_$parent, args) {
-      const $nodeId = args.getRaw("nodeId");
-      return nodeFetcher_Post($nodeId);
-    },
-    book(_$parent, args) {
-      const $nodeId = args.getRaw("nodeId");
-      return nodeFetcher_Book($nodeId);
-    },
-    penName(_$parent, args) {
-      const $nodeId = args.getRaw("nodeId");
-      return nodeFetcher_PenName($nodeId);
-    },
-    allBookAuthors: {
-      plan() {
-        return connection(resource_book_authorsPgResource.find());
-      },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
+    plans: {
+      allBookAuthors: {
+        plan() {
+          return connection(resource_book_authorsPgResource.find());
         },
-        last(_, $connection, val) {
-          $connection.setLast(val.getRaw());
-        },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        },
-        before(_, $connection, val) {
-          $connection.setBefore(val.getRaw());
-        },
-        after(_, $connection, val) {
-          $connection.setAfter(val.getRaw());
-        },
-        condition(_condition, $connection, arg) {
-          const $select = $connection.getSubplan();
-          arg.apply($select, qbWhereBuilder);
-        },
-        orderBy(parent, $connection, value) {
-          const $select = $connection.getSubplan();
-          value.apply($select);
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          last(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          before(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          },
+          after(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $connection, value) {
+            const $select = $connection.getSubplan();
+            value.apply($select);
+          }
         }
-      }
-    },
-    allBookEditors: {
-      plan() {
-        return connection(resource_book_editorsPgResource.find());
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
+      allBookEditors: {
+        plan() {
+          return connection(resource_book_editorsPgResource.find());
         },
-        last(_, $connection, val) {
-          $connection.setLast(val.getRaw());
-        },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        },
-        before(_, $connection, val) {
-          $connection.setBefore(val.getRaw());
-        },
-        after(_, $connection, val) {
-          $connection.setAfter(val.getRaw());
-        },
-        condition(_condition, $connection, arg) {
-          const $select = $connection.getSubplan();
-          arg.apply($select, qbWhereBuilder);
-        },
-        orderBy(parent, $connection, value) {
-          const $select = $connection.getSubplan();
-          value.apply($select);
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          last(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          before(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          },
+          after(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $connection, value) {
+            const $select = $connection.getSubplan();
+            value.apply($select);
+          }
         }
-      }
-    },
-    allPeople: {
-      plan() {
-        return connection(resource_peoplePgResource.find());
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
+      allBooks: {
+        plan() {
+          return connection(resource_booksPgResource.find());
         },
-        last(_, $connection, val) {
-          $connection.setLast(val.getRaw());
-        },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        },
-        before(_, $connection, val) {
-          $connection.setBefore(val.getRaw());
-        },
-        after(_, $connection, val) {
-          $connection.setAfter(val.getRaw());
-        },
-        condition(_condition, $connection, arg) {
-          const $select = $connection.getSubplan();
-          arg.apply($select, qbWhereBuilder);
-        },
-        orderBy(parent, $connection, value) {
-          const $select = $connection.getSubplan();
-          value.apply($select);
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          last(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          before(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          },
+          after(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $connection, value) {
+            const $select = $connection.getSubplan();
+            value.apply($select);
+          }
         }
-      }
-    },
-    allPosts: {
-      plan() {
-        return connection(resource_postsPgResource.find());
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
+      allPenNames: {
+        plan() {
+          return connection(resource_pen_namesPgResource.find());
         },
-        last(_, $connection, val) {
-          $connection.setLast(val.getRaw());
-        },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        },
-        before(_, $connection, val) {
-          $connection.setBefore(val.getRaw());
-        },
-        after(_, $connection, val) {
-          $connection.setAfter(val.getRaw());
-        },
-        condition(_condition, $connection, arg) {
-          const $select = $connection.getSubplan();
-          arg.apply($select, qbWhereBuilder);
-        },
-        orderBy(parent, $connection, value) {
-          const $select = $connection.getSubplan();
-          value.apply($select);
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          last(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          before(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          },
+          after(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $connection, value) {
+            const $select = $connection.getSubplan();
+            value.apply($select);
+          }
         }
-      }
-    },
-    allBooks: {
-      plan() {
-        return connection(resource_booksPgResource.find());
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
+      allPeople: {
+        plan() {
+          return connection(resource_peoplePgResource.find());
         },
-        last(_, $connection, val) {
-          $connection.setLast(val.getRaw());
-        },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        },
-        before(_, $connection, val) {
-          $connection.setBefore(val.getRaw());
-        },
-        after(_, $connection, val) {
-          $connection.setAfter(val.getRaw());
-        },
-        condition(_condition, $connection, arg) {
-          const $select = $connection.getSubplan();
-          arg.apply($select, qbWhereBuilder);
-        },
-        orderBy(parent, $connection, value) {
-          const $select = $connection.getSubplan();
-          value.apply($select);
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          last(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          before(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          },
+          after(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $connection, value) {
+            const $select = $connection.getSubplan();
+            value.apply($select);
+          }
         }
-      }
-    },
-    allPenNames: {
-      plan() {
-        return connection(resource_pen_namesPgResource.find());
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
+      allPosts: {
+        plan() {
+          return connection(resource_postsPgResource.find());
         },
-        last(_, $connection, val) {
-          $connection.setLast(val.getRaw());
-        },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        },
-        before(_, $connection, val) {
-          $connection.setBefore(val.getRaw());
-        },
-        after(_, $connection, val) {
-          $connection.setAfter(val.getRaw());
-        },
-        condition(_condition, $connection, arg) {
-          const $select = $connection.getSubplan();
-          arg.apply($select, qbWhereBuilder);
-        },
-        orderBy(parent, $connection, value) {
-          const $select = $connection.getSubplan();
-          value.apply($select);
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          last(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          before(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          },
+          after(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $connection, value) {
+            const $select = $connection.getSubplan();
+            value.apply($select);
+          }
         }
+      },
+      book(_$parent, args) {
+        const $nodeId = args.getRaw("nodeId");
+        return nodeFetcher_Book($nodeId);
+      },
+      bookAuthor(_$parent, args) {
+        const $nodeId = args.getRaw("nodeId");
+        return nodeFetcher_BookAuthor($nodeId);
+      },
+      bookAuthorByBookIdAndPenNameId(_$root, {
+        $bookId,
+        $penNameId
+      }) {
+        return resource_book_authorsPgResource.get({
+          book_id: $bookId,
+          pen_name_id: $penNameId
+        });
+      },
+      bookById(_$root, {
+        $id
+      }) {
+        return resource_booksPgResource.get({
+          id: $id
+        });
+      },
+      bookByIsbn(_$root, {
+        $isbn
+      }) {
+        return resource_booksPgResource.get({
+          isbn: $isbn
+        });
+      },
+      bookEditor(_$parent, args) {
+        const $nodeId = args.getRaw("nodeId");
+        return nodeFetcher_BookEditor($nodeId);
+      },
+      bookEditorByBookIdAndPersonId(_$root, {
+        $bookId,
+        $personId
+      }) {
+        return resource_book_editorsPgResource.get({
+          book_id: $bookId,
+          person_id: $personId
+        });
+      },
+      node(_$root, fieldArgs) {
+        return fieldArgs.getRaw("nodeId");
+      },
+      nodeId($parent) {
+        const specifier = nodeIdHandler_Query.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_Query.codec.name].encode);
+      },
+      penName(_$parent, args) {
+        const $nodeId = args.getRaw("nodeId");
+        return nodeFetcher_PenName($nodeId);
+      },
+      penNameById(_$root, {
+        $id
+      }) {
+        return resource_pen_namesPgResource.get({
+          id: $id
+        });
+      },
+      person(_$parent, args) {
+        const $nodeId = args.getRaw("nodeId");
+        return nodeFetcher_Person($nodeId);
+      },
+      personById(_$root, {
+        $id
+      }) {
+        return resource_peoplePgResource.get({
+          id: $id
+        });
+      },
+      post(_$parent, args) {
+        const $nodeId = args.getRaw("nodeId");
+        return nodeFetcher_Post($nodeId);
+      },
+      postById(_$root, {
+        $id
+      }) {
+        return resource_postsPgResource.get({
+          id: $id
+        });
+      },
+      query() {
+        return rootValue();
       }
     }
   },
+  Book: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      bookAuthorsByBookId: {
+        plan($record) {
+          const $records = resource_book_authorsPgResource.find({
+            book_id: $record.get("id")
+          });
+          return connection($records);
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          last(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          before(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          },
+          after(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $connection, value) {
+            const $select = $connection.getSubplan();
+            value.apply($select);
+          }
+        }
+      },
+      bookEditorsByBookId: {
+        plan($record) {
+          const $records = resource_book_editorsPgResource.find({
+            book_id: $record.get("id")
+          });
+          return connection($records);
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          last(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          before(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          },
+          after(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $connection, value) {
+            const $select = $connection.getSubplan();
+            value.apply($select);
+          }
+        }
+      },
+      editors: {
+        plan($record) {
+          const $people = resource_peoplePgResource.find();
+          let previousAlias = $people.alias;
+          const book_editorsAlias = sql.identifier(Symbol("book_editors"));
+          $people.join({
+            type: "inner",
+            from: resource_book_editorsPgResource.from,
+            alias: book_editorsAlias,
+            conditions: [sql`${previousAlias}.${sql.identifier("id")} = ${book_editorsAlias}.${sql.identifier("person_id")}`]
+          });
+          previousAlias = book_editorsAlias;
+          $people.where(sql`${previousAlias}.${sql.identifier("book_id")} = ${$people.placeholder($record.get("id"))}`);
+          return connection($people);
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          last(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          before(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          },
+          after(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $connection, value) {
+            const $select = $connection.getSubplan();
+            value.apply($select);
+          }
+        }
+      },
+      nodeId($parent) {
+        const specifier = nodeIdHandler_Book.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_Book.codec.name].encode);
+      },
+      relatedPeople: {
+        plan($record) {
+          const $people = resource_peoplePgResource.find();
+          const subquery = sql.identifier(Symbol('subquery'));
+          const selects = [];
+          selects.push(sql`select __l1__.${sql.identifier("person_id")} as "0"
+from ${resource_pen_namesPgResource.from} as __l1__
+inner join ${resource_book_authorsPgResource.from} as __l0__
+on (__l0__.${sql.identifier("pen_name_id")} = __l1__.${sql.identifier("id")})
+where __l0__.${sql.identifier("book_id")} = ${$people.placeholder($record.get("id"))}`);
+          selects.push(sql`select __l0__.${sql.identifier("person_id")} as "0"
+from ${resource_book_editorsPgResource.from} as __l0__
+where __l0__.${sql.identifier("book_id")} = ${$people.placeholder($record.get("id"))}`);
+          $people.join({
+            type: "inner",
+            from: sql`(${sql.indent(sql.join(selects.map(s => sql.indent(s)), '\n\nunion all\n\n'))})`,
+            alias: subquery,
+            conditions: [sql`${$people.alias}.${sql.identifier("id")} = ${subquery}."0"`]
+          });
+          return connection($people);
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          last(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          before(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          },
+          after(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $connection, value) {
+            const $select = $connection.getSubplan();
+            value.apply($select);
+          }
+        }
+      }
+    },
+    planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of booksUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_booksPgResource.get(spec);
+    }
+  },
+  BookAuthor: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      bookByBookId($record) {
+        return resource_booksPgResource.get({
+          id: $record.get("book_id")
+        });
+      },
+      bookId($record) {
+        return $record.get("book_id");
+      },
+      nodeId($parent) {
+        const specifier = nodeIdHandler_BookAuthor.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_BookAuthor.codec.name].encode);
+      },
+      penNameByPenNameId($record) {
+        return resource_pen_namesPgResource.get({
+          id: $record.get("pen_name_id")
+        });
+      },
+      penNameId($record) {
+        return $record.get("pen_name_id");
+      }
+    },
+    planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of book_authorsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_book_authorsPgResource.get(spec);
+    }
+  },
+  BookAuthorsConnection: {
+    assertStep: ConnectionStep,
+    plans: {
+      totalCount($connection) {
+        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+      }
+    }
+  },
+  BookAuthorsEdge: {
+    assertStep: assertEdgeCapableStep,
+    plans: {
+      cursor($edge) {
+        return $edge.cursor();
+      },
+      node($edge) {
+        return $edge.node();
+      }
+    }
+  },
+  BookEditor: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      bookByBookId($record) {
+        return resource_booksPgResource.get({
+          id: $record.get("book_id")
+        });
+      },
+      bookId($record) {
+        return $record.get("book_id");
+      },
+      nodeId($parent) {
+        const specifier = nodeIdHandler_BookEditor.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_BookEditor.codec.name].encode);
+      },
+      personByPersonId($record) {
+        return resource_peoplePgResource.get({
+          id: $record.get("person_id")
+        });
+      },
+      personId($record) {
+        return $record.get("person_id");
+      }
+    },
+    planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of book_editorsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_book_editorsPgResource.get(spec);
+    }
+  },
+  BookEditorsConnection: {
+    assertStep: ConnectionStep,
+    plans: {
+      totalCount($connection) {
+        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+      }
+    }
+  },
+  BookEditorsEdge: {
+    assertStep: assertEdgeCapableStep,
+    plans: {
+      cursor($edge) {
+        return $edge.cursor();
+      },
+      node($edge) {
+        return $edge.node();
+      }
+    }
+  },
+  BooksConnection: {
+    assertStep: ConnectionStep,
+    plans: {
+      totalCount($connection) {
+        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+      }
+    }
+  },
+  BooksEdge: {
+    assertStep: assertEdgeCapableStep,
+    plans: {
+      cursor($edge) {
+        return $edge.cursor();
+      },
+      node($edge) {
+        return $edge.node();
+      }
+    }
+  },
+  PageInfo: {
+    assertStep: assertPageInfoCapableStep,
+    plans: {
+      endCursor($pageInfo) {
+        return $pageInfo.endCursor();
+      },
+      hasNextPage($pageInfo) {
+        return $pageInfo.hasNextPage();
+      },
+      hasPreviousPage($pageInfo) {
+        return $pageInfo.hasPreviousPage();
+      },
+      startCursor($pageInfo) {
+        return $pageInfo.startCursor();
+      }
+    }
+  },
+  PenName: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      bookAuthorsByPenNameId: {
+        plan($record) {
+          const $records = resource_book_authorsPgResource.find({
+            pen_name_id: $record.get("id")
+          });
+          return connection($records);
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          last(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          before(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          },
+          after(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $connection, value) {
+            const $select = $connection.getSubplan();
+            value.apply($select);
+          }
+        }
+      },
+      nodeId($parent) {
+        const specifier = nodeIdHandler_PenName.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_PenName.codec.name].encode);
+      },
+      penName($record) {
+        return $record.get("pen_name");
+      },
+      personByPersonId($record) {
+        return resource_peoplePgResource.get({
+          id: $record.get("person_id")
+        });
+      },
+      personId($record) {
+        return $record.get("person_id");
+      }
+    },
+    planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of pen_namesUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_pen_namesPgResource.get(spec);
+    }
+  },
+  PenNamesConnection: {
+    assertStep: ConnectionStep,
+    plans: {
+      totalCount($connection) {
+        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+      }
+    }
+  },
+  PenNamesEdge: {
+    assertStep: assertEdgeCapableStep,
+    plans: {
+      cursor($edge) {
+        return $edge.cursor();
+      },
+      node($edge) {
+        return $edge.node();
+      }
+    }
+  },
+  PeopleConnection: {
+    assertStep: ConnectionStep,
+    plans: {
+      totalCount($connection) {
+        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+      }
+    }
+  },
+  PeopleEdge: {
+    assertStep: assertEdgeCapableStep,
+    plans: {
+      cursor($edge) {
+        return $edge.cursor();
+      },
+      node($edge) {
+        return $edge.node();
+      }
+    }
+  },
+  Person: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      bookEditorsByPersonId: {
+        plan($record) {
+          const $records = resource_book_editorsPgResource.find({
+            person_id: $record.get("id")
+          });
+          return connection($records);
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          last(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          before(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          },
+          after(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $connection, value) {
+            const $select = $connection.getSubplan();
+            value.apply($select);
+          }
+        }
+      },
+      nodeId($parent) {
+        const specifier = nodeIdHandler_Person.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_Person.codec.name].encode);
+      },
+      penNamesByPersonId: {
+        plan($record) {
+          const $records = resource_pen_namesPgResource.find({
+            person_id: $record.get("id")
+          });
+          return connection($records);
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          last(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          before(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          },
+          after(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $connection, value) {
+            const $select = $connection.getSubplan();
+            value.apply($select);
+          }
+        }
+      }
+    },
+    planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of peopleUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_peoplePgResource.get(spec);
+    }
+  },
+  Post: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      author($record) {
+        return resource_peoplePgResource.get({
+          id: $record.get("user_id")
+        });
+      },
+      nodeId($parent) {
+        const specifier = nodeIdHandler_Post.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_Post.codec.name].encode);
+      }
+    },
+    planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of postsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_postsPgResource.get(spec);
+    }
+  },
+  PostsConnection: {
+    assertStep: ConnectionStep,
+    plans: {
+      totalCount($connection) {
+        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+      }
+    }
+  },
+  PostsEdge: {
+    assertStep: assertEdgeCapableStep,
+    plans: {
+      cursor($edge) {
+        return $edge.cursor();
+      },
+      node($edge) {
+        return $edge.node();
+      }
+    }
+  }
+};
+export const interfaces = {
   Node: {
-    __planType($nodeId) {
+    planType($nodeId) {
       const $specifier = decodeNodeId($nodeId);
       const $__typename = lambda($specifier, findTypeNameMatch, true);
       return {
@@ -2163,220 +2695,152 @@ export const plans = {
         }
       };
     }
-  },
-  BookAuthor: {
-    __assertStep: assertPgClassSingleStep,
-    __planType($specifier) {
-      const spec = Object.create(null);
-      for (const pkCol of book_authorsUniques[0].attributes) {
-        spec[pkCol] = get2($specifier, pkCol);
-      }
-      return resource_book_authorsPgResource.get(spec);
-    },
-    nodeId($parent) {
-      const specifier = nodeIdHandler_BookAuthor.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandler_BookAuthor.codec.name].encode);
-    },
-    bookId($record) {
-      return $record.get("book_id");
-    },
-    penNameId($record) {
-      return $record.get("pen_name_id");
-    },
-    bookByBookId($record) {
-      return resource_booksPgResource.get({
-        id: $record.get("book_id")
-      });
-    },
-    penNameByPenNameId($record) {
-      return resource_pen_namesPgResource.get({
-        id: $record.get("pen_name_id")
-      });
-    }
-  },
-  Book: {
-    __assertStep: assertPgClassSingleStep,
-    __planType($specifier) {
-      const spec = Object.create(null);
-      for (const pkCol of booksUniques[0].attributes) {
-        spec[pkCol] = get2($specifier, pkCol);
-      }
-      return resource_booksPgResource.get(spec);
-    },
-    nodeId($parent) {
-      const specifier = nodeIdHandler_Book.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Book.codec.name].encode);
-    },
-    bookAuthorsByBookId: {
-      plan($record) {
-        const $records = resource_book_authorsPgResource.find({
-          book_id: $record.get("id")
+  }
+};
+export const inputObjects = {
+  BookAuthorCondition: {
+    plans: {
+      bookId($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "book_id",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
         });
-        return connection($records);
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
-        },
-        last(_, $connection, val) {
-          $connection.setLast(val.getRaw());
-        },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        },
-        before(_, $connection, val) {
-          $connection.setBefore(val.getRaw());
-        },
-        after(_, $connection, val) {
-          $connection.setAfter(val.getRaw());
-        },
-        condition(_condition, $connection, arg) {
-          const $select = $connection.getSubplan();
-          arg.apply($select, qbWhereBuilder);
-        },
-        orderBy(parent, $connection, value) {
-          const $select = $connection.getSubplan();
-          value.apply($select);
-        }
-      }
-    },
-    bookEditorsByBookId: {
-      plan($record) {
-        const $records = resource_book_editorsPgResource.find({
-          book_id: $record.get("id")
+      penNameId($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "pen_name_id",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
         });
-        return connection($records);
-      },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
-        },
-        last(_, $connection, val) {
-          $connection.setLast(val.getRaw());
-        },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        },
-        before(_, $connection, val) {
-          $connection.setBefore(val.getRaw());
-        },
-        after(_, $connection, val) {
-          $connection.setAfter(val.getRaw());
-        },
-        condition(_condition, $connection, arg) {
-          const $select = $connection.getSubplan();
-          arg.apply($select, qbWhereBuilder);
-        },
-        orderBy(parent, $connection, value) {
-          const $select = $connection.getSubplan();
-          value.apply($select);
-        }
-      }
-    },
-    relatedPeople: {
-      plan($record) {
-        const $people = resource_peoplePgResource.find();
-        const subquery = sql.identifier(Symbol('subquery'));
-        const selects = [];
-        selects.push(sql`select __l1__.${sql.identifier("person_id")} as "0"
-from ${resource_pen_namesPgResource.from} as __l1__
-inner join ${resource_book_authorsPgResource.from} as __l0__
-on (__l0__.${sql.identifier("pen_name_id")} = __l1__.${sql.identifier("id")})
-where __l0__.${sql.identifier("book_id")} = ${$people.placeholder($record.get("id"))}`);
-        selects.push(sql`select __l0__.${sql.identifier("person_id")} as "0"
-from ${resource_book_editorsPgResource.from} as __l0__
-where __l0__.${sql.identifier("book_id")} = ${$people.placeholder($record.get("id"))}`);
-        $people.join({
-          type: "inner",
-          from: sql`(${sql.indent(sql.join(selects.map(s => sql.indent(s)), '\n\nunion all\n\n'))})`,
-          alias: subquery,
-          conditions: [sql`${$people.alias}.${sql.identifier("id")} = ${subquery}."0"`]
-        });
-        return connection($people);
-      },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
-        },
-        last(_, $connection, val) {
-          $connection.setLast(val.getRaw());
-        },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        },
-        before(_, $connection, val) {
-          $connection.setBefore(val.getRaw());
-        },
-        after(_, $connection, val) {
-          $connection.setAfter(val.getRaw());
-        },
-        condition(_condition, $connection, arg) {
-          const $select = $connection.getSubplan();
-          arg.apply($select, qbWhereBuilder);
-        },
-        orderBy(parent, $connection, value) {
-          const $select = $connection.getSubplan();
-          value.apply($select);
-        }
-      }
-    },
-    editors: {
-      plan($record) {
-        const $people = resource_peoplePgResource.find();
-        let previousAlias = $people.alias;
-        const book_editorsAlias = sql.identifier(Symbol("book_editors"));
-        $people.join({
-          type: "inner",
-          from: resource_book_editorsPgResource.from,
-          alias: book_editorsAlias,
-          conditions: [sql`${previousAlias}.${sql.identifier("id")} = ${book_editorsAlias}.${sql.identifier("person_id")}`]
-        });
-        previousAlias = book_editorsAlias;
-        $people.where(sql`${previousAlias}.${sql.identifier("book_id")} = ${$people.placeholder($record.get("id"))}`);
-        return connection($people);
-      },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
-        },
-        last(_, $connection, val) {
-          $connection.setLast(val.getRaw());
-        },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        },
-        before(_, $connection, val) {
-          $connection.setBefore(val.getRaw());
-        },
-        after(_, $connection, val) {
-          $connection.setAfter(val.getRaw());
-        },
-        condition(_condition, $connection, arg) {
-          const $select = $connection.getSubplan();
-          arg.apply($select, qbWhereBuilder);
-        },
-        orderBy(parent, $connection, value) {
-          const $select = $connection.getSubplan();
-          value.apply($select);
-        }
       }
     }
   },
-  BookAuthorsConnection: {
-    __assertStep: ConnectionStep,
-    totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+  BookCondition: {
+    plans: {
+      id($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      },
+      isbn($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "isbn",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      title($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "title",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      }
     }
   },
-  BookAuthorsEdge: {
-    __assertStep: assertEdgeCapableStep,
-    cursor($edge) {
-      return $edge.cursor();
-    },
-    node($edge) {
-      return $edge.node();
+  BookEditorCondition: {
+    plans: {
+      bookId($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "book_id",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      },
+      personId($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "person_id",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      }
     }
   },
+  PenNameCondition: {
+    plans: {
+      id($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      },
+      penName($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "pen_name",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      personId($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "person_id",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      }
+    }
+  },
+  PersonCondition: {
+    plans: {
+      id($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      },
+      name($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "name",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      }
+    }
+  },
+  PostCondition: {
+    plans: {
+      id($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      }
+    }
+  }
+};
+export const scalars = {
   Cursor: {
     serialize: CursorSerialize,
     parseValue: CursorSerialize,
@@ -2386,42 +2850,9 @@ where __l0__.${sql.identifier("book_id")} = ${$people.placeholder($record.get("i
       }
       return ast.value;
     }
-  },
-  PageInfo: {
-    __assertStep: assertPageInfoCapableStep,
-    hasNextPage($pageInfo) {
-      return $pageInfo.hasNextPage();
-    },
-    hasPreviousPage($pageInfo) {
-      return $pageInfo.hasPreviousPage();
-    },
-    startCursor($pageInfo) {
-      return $pageInfo.startCursor();
-    },
-    endCursor($pageInfo) {
-      return $pageInfo.endCursor();
-    }
-  },
-  BookAuthorCondition: {
-    bookId($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "book_id",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-        }
-      });
-    },
-    penNameId($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "pen_name_id",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-        }
-      });
-    }
-  },
+  }
+};
+export const enums = {
   BookAuthorsOrderBy: {
     PRIMARY_KEY_ASC(queryBuilder) {
       book_authorsUniques[0].attributes.forEach(attributeName => {
@@ -2468,302 +2899,6 @@ where __l0__.${sql.identifier("book_id")} = ${$people.placeholder($record.get("i
       });
     }
   },
-  BookEditorsConnection: {
-    __assertStep: ConnectionStep,
-    totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-    }
-  },
-  BookEditor: {
-    __assertStep: assertPgClassSingleStep,
-    __planType($specifier) {
-      const spec = Object.create(null);
-      for (const pkCol of book_editorsUniques[0].attributes) {
-        spec[pkCol] = get2($specifier, pkCol);
-      }
-      return resource_book_editorsPgResource.get(spec);
-    },
-    nodeId($parent) {
-      const specifier = nodeIdHandler_BookEditor.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandler_BookEditor.codec.name].encode);
-    },
-    bookId($record) {
-      return $record.get("book_id");
-    },
-    personId($record) {
-      return $record.get("person_id");
-    },
-    bookByBookId($record) {
-      return resource_booksPgResource.get({
-        id: $record.get("book_id")
-      });
-    },
-    personByPersonId($record) {
-      return resource_peoplePgResource.get({
-        id: $record.get("person_id")
-      });
-    }
-  },
-  Person: {
-    __assertStep: assertPgClassSingleStep,
-    __planType($specifier) {
-      const spec = Object.create(null);
-      for (const pkCol of peopleUniques[0].attributes) {
-        spec[pkCol] = get2($specifier, pkCol);
-      }
-      return resource_peoplePgResource.get(spec);
-    },
-    nodeId($parent) {
-      const specifier = nodeIdHandler_Person.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Person.codec.name].encode);
-    },
-    penNamesByPersonId: {
-      plan($record) {
-        const $records = resource_pen_namesPgResource.find({
-          person_id: $record.get("id")
-        });
-        return connection($records);
-      },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
-        },
-        last(_, $connection, val) {
-          $connection.setLast(val.getRaw());
-        },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        },
-        before(_, $connection, val) {
-          $connection.setBefore(val.getRaw());
-        },
-        after(_, $connection, val) {
-          $connection.setAfter(val.getRaw());
-        },
-        condition(_condition, $connection, arg) {
-          const $select = $connection.getSubplan();
-          arg.apply($select, qbWhereBuilder);
-        },
-        orderBy(parent, $connection, value) {
-          const $select = $connection.getSubplan();
-          value.apply($select);
-        }
-      }
-    },
-    bookEditorsByPersonId: {
-      plan($record) {
-        const $records = resource_book_editorsPgResource.find({
-          person_id: $record.get("id")
-        });
-        return connection($records);
-      },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
-        },
-        last(_, $connection, val) {
-          $connection.setLast(val.getRaw());
-        },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        },
-        before(_, $connection, val) {
-          $connection.setBefore(val.getRaw());
-        },
-        after(_, $connection, val) {
-          $connection.setAfter(val.getRaw());
-        },
-        condition(_condition, $connection, arg) {
-          const $select = $connection.getSubplan();
-          arg.apply($select, qbWhereBuilder);
-        },
-        orderBy(parent, $connection, value) {
-          const $select = $connection.getSubplan();
-          value.apply($select);
-        }
-      }
-    }
-  },
-  PenNamesConnection: {
-    __assertStep: ConnectionStep,
-    totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-    }
-  },
-  PenName: {
-    __assertStep: assertPgClassSingleStep,
-    __planType($specifier) {
-      const spec = Object.create(null);
-      for (const pkCol of pen_namesUniques[0].attributes) {
-        spec[pkCol] = get2($specifier, pkCol);
-      }
-      return resource_pen_namesPgResource.get(spec);
-    },
-    nodeId($parent) {
-      const specifier = nodeIdHandler_PenName.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandler_PenName.codec.name].encode);
-    },
-    penName($record) {
-      return $record.get("pen_name");
-    },
-    personId($record) {
-      return $record.get("person_id");
-    },
-    personByPersonId($record) {
-      return resource_peoplePgResource.get({
-        id: $record.get("person_id")
-      });
-    },
-    bookAuthorsByPenNameId: {
-      plan($record) {
-        const $records = resource_book_authorsPgResource.find({
-          pen_name_id: $record.get("id")
-        });
-        return connection($records);
-      },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
-        },
-        last(_, $connection, val) {
-          $connection.setLast(val.getRaw());
-        },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        },
-        before(_, $connection, val) {
-          $connection.setBefore(val.getRaw());
-        },
-        after(_, $connection, val) {
-          $connection.setAfter(val.getRaw());
-        },
-        condition(_condition, $connection, arg) {
-          const $select = $connection.getSubplan();
-          arg.apply($select, qbWhereBuilder);
-        },
-        orderBy(parent, $connection, value) {
-          const $select = $connection.getSubplan();
-          value.apply($select);
-        }
-      }
-    }
-  },
-  PenNamesEdge: {
-    __assertStep: assertEdgeCapableStep,
-    cursor($edge) {
-      return $edge.cursor();
-    },
-    node($edge) {
-      return $edge.node();
-    }
-  },
-  PenNameCondition: {
-    id($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "id",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-        }
-      });
-    },
-    penName($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "pen_name",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-        }
-      });
-    },
-    personId($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "person_id",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-        }
-      });
-    }
-  },
-  PenNamesOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      pen_namesUniques[0].attributes.forEach(attributeName => {
-        queryBuilder.orderBy({
-          attribute: attributeName,
-          direction: "ASC"
-        });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      pen_namesUniques[0].attributes.forEach(attributeName => {
-        queryBuilder.orderBy({
-          attribute: attributeName,
-          direction: "DESC"
-        });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PEN_NAME_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "pen_name",
-        direction: "ASC"
-      });
-    },
-    PEN_NAME_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "pen_name",
-        direction: "DESC"
-      });
-    },
-    PERSON_ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "person_id",
-        direction: "ASC"
-      });
-    },
-    PERSON_ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "person_id",
-        direction: "DESC"
-      });
-    }
-  },
-  BookEditorCondition: {
-    bookId($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "book_id",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-        }
-      });
-    },
-    personId($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "person_id",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-        }
-      });
-    }
-  },
   BookEditorsOrderBy: {
     PRIMARY_KEY_ASC(queryBuilder) {
       book_editorsUniques[0].attributes.forEach(attributeName => {
@@ -2807,219 +2942,6 @@ where __l0__.${sql.identifier("book_id")} = ${$people.placeholder($record.get("i
       queryBuilder.orderBy({
         attribute: "person_id",
         direction: "DESC"
-      });
-    }
-  },
-  BookEditorsEdge: {
-    __assertStep: assertEdgeCapableStep,
-    cursor($edge) {
-      return $edge.cursor();
-    },
-    node($edge) {
-      return $edge.node();
-    }
-  },
-  PeopleConnection: {
-    __assertStep: ConnectionStep,
-    totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-    }
-  },
-  PeopleEdge: {
-    __assertStep: assertEdgeCapableStep,
-    cursor($edge) {
-      return $edge.cursor();
-    },
-    node($edge) {
-      return $edge.node();
-    }
-  },
-  PersonCondition: {
-    id($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "id",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-        }
-      });
-    },
-    name($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "name",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-        }
-      });
-    }
-  },
-  PeopleOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      peopleUniques[0].attributes.forEach(attributeName => {
-        queryBuilder.orderBy({
-          attribute: attributeName,
-          direction: "ASC"
-        });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      peopleUniques[0].attributes.forEach(attributeName => {
-        queryBuilder.orderBy({
-          attribute: attributeName,
-          direction: "DESC"
-        });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    NAME_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "name",
-        direction: "ASC"
-      });
-    },
-    NAME_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "name",
-        direction: "DESC"
-      });
-    }
-  },
-  Post: {
-    __assertStep: assertPgClassSingleStep,
-    __planType($specifier) {
-      const spec = Object.create(null);
-      for (const pkCol of postsUniques[0].attributes) {
-        spec[pkCol] = get2($specifier, pkCol);
-      }
-      return resource_postsPgResource.get(spec);
-    },
-    nodeId($parent) {
-      const specifier = nodeIdHandler_Post.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Post.codec.name].encode);
-    },
-    author($record) {
-      return resource_peoplePgResource.get({
-        id: $record.get("user_id")
-      });
-    }
-  },
-  PostsConnection: {
-    __assertStep: ConnectionStep,
-    totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-    }
-  },
-  PostsEdge: {
-    __assertStep: assertEdgeCapableStep,
-    cursor($edge) {
-      return $edge.cursor();
-    },
-    node($edge) {
-      return $edge.node();
-    }
-  },
-  PostCondition: {
-    id($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "id",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-        }
-      });
-    }
-  },
-  PostsOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      postsUniques[0].attributes.forEach(attributeName => {
-        queryBuilder.orderBy({
-          attribute: attributeName,
-          direction: "ASC"
-        });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      postsUniques[0].attributes.forEach(attributeName => {
-        queryBuilder.orderBy({
-          attribute: attributeName,
-          direction: "DESC"
-        });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    }
-  },
-  BooksConnection: {
-    __assertStep: ConnectionStep,
-    totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-    }
-  },
-  BooksEdge: {
-    __assertStep: assertEdgeCapableStep,
-    cursor($edge) {
-      return $edge.cursor();
-    },
-    node($edge) {
-      return $edge.node();
-    }
-  },
-  BookCondition: {
-    id($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "id",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-        }
-      });
-    },
-    title($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "title",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-        }
-      });
-    },
-    isbn($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "isbn",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-        }
       });
     }
   },
@@ -3082,9 +3004,151 @@ where __l0__.${sql.identifier("book_id")} = ${$people.placeholder($record.get("i
       });
       queryBuilder.setOrderIsUnique();
     }
+  },
+  PenNamesOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      pen_namesUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      pen_namesUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PEN_NAME_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "pen_name",
+        direction: "ASC"
+      });
+    },
+    PEN_NAME_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "pen_name",
+        direction: "DESC"
+      });
+    },
+    PERSON_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_id",
+        direction: "ASC"
+      });
+    },
+    PERSON_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_id",
+        direction: "DESC"
+      });
+    }
+  },
+  PeopleOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      peopleUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      peopleUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    NAME_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "name",
+        direction: "ASC"
+      });
+    },
+    NAME_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "name",
+        direction: "DESC"
+      });
+    }
+  },
+  PostsOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      postsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      postsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
+    }
   }
 };
 export const schema = makeGrafastSchema({
   typeDefs: typeDefs,
-  plans: plans
+  objects: objects,
+  interfaces: interfaces,
+  inputObjects: inputObjects,
+  scalars: scalars,
+  enums: enums
 });

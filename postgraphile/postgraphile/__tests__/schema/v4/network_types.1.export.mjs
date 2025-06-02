@@ -623,65 +623,323 @@ input DeleteNetworkByIdInput {
   clientMutationId: String
   id: Int!
 }`;
-export const plans = {
+export const objects = {
   Query: {
-    __assertStep() {
+    assertStep() {
       return true;
     },
-    query() {
-      return rootValue();
-    },
-    nodeId($parent) {
-      const specifier = nodeIdHandler_Query.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Query.codec.name].encode);
-    },
-    node(_$root, fieldArgs) {
-      return fieldArgs.getRaw("nodeId");
-    },
-    networkById(_$root, {
-      $id
-    }) {
-      return resource_networkPgResource.get({
-        id: $id
-      });
-    },
-    network(_$parent, args) {
-      const $nodeId = args.getRaw("nodeId");
-      return nodeFetcher_Network($nodeId);
-    },
-    allNetworks: {
-      plan() {
-        return connection(resource_networkPgResource.find());
+    plans: {
+      allNetworks: {
+        plan() {
+          return connection(resource_networkPgResource.find());
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          last(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          before(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          },
+          after(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $connection, value) {
+            const $select = $connection.getSubplan();
+            value.apply($select);
+          }
+        }
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
+      network(_$parent, args) {
+        const $nodeId = args.getRaw("nodeId");
+        return nodeFetcher_Network($nodeId);
+      },
+      networkById(_$root, {
+        $id
+      }) {
+        return resource_networkPgResource.get({
+          id: $id
+        });
+      },
+      node(_$root, fieldArgs) {
+        return fieldArgs.getRaw("nodeId");
+      },
+      nodeId($parent) {
+        const specifier = nodeIdHandler_Query.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_Query.codec.name].encode);
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  Mutation: {
+    assertStep: __ValueStep,
+    plans: {
+      createNetwork: {
+        plan(_, args) {
+          const $insert = pgInsertSingle(resource_networkPgResource, Object.create(null));
+          args.apply($insert);
+          const plan = object({
+            result: $insert
+          });
+          return plan;
         },
-        last(_, $connection, val) {
-          $connection.setLast(val.getRaw());
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deleteNetwork: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_networkPgResource, specFromArgs_Network2(args));
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
         },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deleteNetworkById: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_networkPgResource, {
+            id: args.getRaw(['input', "id"])
+          });
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
         },
-        before(_, $connection, val) {
-          $connection.setBefore(val.getRaw());
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      updateNetwork: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_networkPgResource, specFromArgs_Network(args));
+          args.apply($update);
+          return object({
+            result: $update
+          });
         },
-        after(_, $connection, val) {
-          $connection.setAfter(val.getRaw());
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      updateNetworkById: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_networkPgResource, {
+            id: args.getRaw(['input', "id"])
+          });
+          args.apply($update);
+          return object({
+            result: $update
+          });
         },
-        condition(_condition, $connection, arg) {
-          const $select = $connection.getSubplan();
-          arg.apply($select, qbWhereBuilder);
-        },
-        orderBy(parent, $connection, value) {
-          const $select = $connection.getSubplan();
-          value.apply($select);
+        args: {
+          input(_, $object) {
+            return $object;
+          }
         }
       }
     }
   },
+  CreateNetworkPayload: {
+    assertStep: assertExecutableStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $insert = $mutation.getStepForKey("result");
+        return $insert.getMeta("clientMutationId");
+      },
+      network($object) {
+        return $object.get("result");
+      },
+      networkEdge($mutation, fieldArgs) {
+        const $result = $mutation.getStepForKey("result", true);
+        if (!$result) {
+          return constant(null);
+        }
+        const $select = (() => {
+          if ($result instanceof PgDeleteSingleStep) {
+            return pgSelectFromRecord($result.resource, $result.record());
+          } else {
+            const spec = networkUniques[0].attributes.reduce((memo, attributeName) => {
+              memo[attributeName] = $result.get(attributeName);
+              return memo;
+            }, Object.create(null));
+            return resource_networkPgResource.find(spec);
+          }
+        })();
+        fieldArgs.apply($select, "orderBy");
+        const $connection = connection($select);
+        // NOTE: you must not use `$single = $select.single()`
+        // here because doing so will mark the row as unique, and
+        // then the ordering logic (and thus cursor) will differ.
+        const $single = $select.row(first($select));
+        return new EdgeStep($connection, $single);
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  DeleteNetworkPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $result = $mutation.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      deletedNetworkId($object) {
+        const $record = $object.getStepForKey("result");
+        const specifier = nodeIdHandler_Network.plan($record);
+        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+      },
+      network($object) {
+        return $object.get("result");
+      },
+      networkEdge($mutation, fieldArgs) {
+        const $result = $mutation.getStepForKey("result", true);
+        if (!$result) {
+          return constant(null);
+        }
+        const $select = (() => {
+          if ($result instanceof PgDeleteSingleStep) {
+            return pgSelectFromRecord($result.resource, $result.record());
+          } else {
+            const spec = networkUniques[0].attributes.reduce((memo, attributeName) => {
+              memo[attributeName] = $result.get(attributeName);
+              return memo;
+            }, Object.create(null));
+            return resource_networkPgResource.find(spec);
+          }
+        })();
+        fieldArgs.apply($select, "orderBy");
+        const $connection = connection($select);
+        // NOTE: you must not use `$single = $select.single()`
+        // here because doing so will mark the row as unique, and
+        // then the ordering logic (and thus cursor) will differ.
+        const $single = $select.row(first($select));
+        return new EdgeStep($connection, $single);
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  Network: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      nodeId($parent) {
+        const specifier = nodeIdHandler_Network.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_Network.codec.name].encode);
+      }
+    },
+    planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of networkUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_networkPgResource.get(spec);
+    }
+  },
+  NetworksConnection: {
+    assertStep: ConnectionStep,
+    plans: {
+      totalCount($connection) {
+        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+      }
+    }
+  },
+  NetworksEdge: {
+    assertStep: assertEdgeCapableStep,
+    plans: {
+      cursor($edge) {
+        return $edge.cursor();
+      },
+      node($edge) {
+        return $edge.node();
+      }
+    }
+  },
+  PageInfo: {
+    assertStep: assertPageInfoCapableStep,
+    plans: {
+      endCursor($pageInfo) {
+        return $pageInfo.endCursor();
+      },
+      hasNextPage($pageInfo) {
+        return $pageInfo.hasNextPage();
+      },
+      hasPreviousPage($pageInfo) {
+        return $pageInfo.hasPreviousPage();
+      },
+      startCursor($pageInfo) {
+        return $pageInfo.startCursor();
+      }
+    }
+  },
+  UpdateNetworkPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $result = $mutation.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      network($object) {
+        return $object.get("result");
+      },
+      networkEdge($mutation, fieldArgs) {
+        const $result = $mutation.getStepForKey("result", true);
+        if (!$result) {
+          return constant(null);
+        }
+        const $select = (() => {
+          if ($result instanceof PgDeleteSingleStep) {
+            return pgSelectFromRecord($result.resource, $result.record());
+          } else {
+            const spec = networkUniques[0].attributes.reduce((memo, attributeName) => {
+              memo[attributeName] = $result.get(attributeName);
+              return memo;
+            }, Object.create(null));
+            return resource_networkPgResource.find(spec);
+          }
+        })();
+        fieldArgs.apply($select, "orderBy");
+        const $connection = connection($select);
+        // NOTE: you must not use `$single = $select.single()`
+        // here because doing so will mark the row as unique, and
+        // then the ordering logic (and thus cursor) will differ.
+        const $single = $select.row(first($select));
+        return new EdgeStep($connection, $single);
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  }
+};
+export const interfaces = {
   Node: {
-    __planType($nodeId) {
+    planType($nodeId) {
       const $specifier = decodeNodeId($nodeId);
       const $__typename = lambda($specifier, findTypeNameMatch, true);
       return {
@@ -696,19 +954,167 @@ export const plans = {
         }
       };
     }
-  },
-  Network: {
-    __assertStep: assertPgClassSingleStep,
-    __planType($specifier) {
-      const spec = Object.create(null);
-      for (const pkCol of networkUniques[0].attributes) {
-        spec[pkCol] = get2($specifier, pkCol);
+  }
+};
+export const inputObjects = {
+  CreateNetworkInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      network(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
       }
-      return resource_networkPgResource.get(spec);
-    },
-    nodeId($parent) {
-      const specifier = nodeIdHandler_Network.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Network.codec.name].encode);
+    }
+  },
+  DeleteNetworkByIdInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  DeleteNetworkInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  NetworkCondition: {
+    plans: {
+      cidr($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "cidr",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.cidr)}`;
+          }
+        });
+      },
+      id($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      },
+      inet($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "inet",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.inet)}`;
+          }
+        });
+      },
+      macaddr($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "macaddr",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.macaddr)}`;
+          }
+        });
+      }
+    }
+  },
+  NetworkInput: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      cidr(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("cidr", bakedInputRuntime(schema, field.type, val));
+      },
+      id(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      },
+      inet(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("inet", bakedInputRuntime(schema, field.type, val));
+      },
+      macaddr(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("macaddr", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
+  NetworkPatch: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      cidr(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("cidr", bakedInputRuntime(schema, field.type, val));
+      },
+      id(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      },
+      inet(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("inet", bakedInputRuntime(schema, field.type, val));
+      },
+      macaddr(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("macaddr", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
+  UpdateNetworkByIdInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      networkPatch(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  UpdateNetworkInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      networkPatch(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  }
+};
+export const scalars = {
+  Cursor: {
+    serialize: InternetAddressSerialize,
+    parseValue: InternetAddressSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
     }
   },
   InternetAddress: {
@@ -720,85 +1126,9 @@ export const plans = {
       }
       return ast.value;
     }
-  },
-  NetworksConnection: {
-    __assertStep: ConnectionStep,
-    totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-    }
-  },
-  NetworksEdge: {
-    __assertStep: assertEdgeCapableStep,
-    cursor($edge) {
-      return $edge.cursor();
-    },
-    node($edge) {
-      return $edge.node();
-    }
-  },
-  Cursor: {
-    serialize: InternetAddressSerialize,
-    parseValue: InternetAddressSerialize,
-    parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
-      }
-      return ast.value;
-    }
-  },
-  PageInfo: {
-    __assertStep: assertPageInfoCapableStep,
-    hasNextPage($pageInfo) {
-      return $pageInfo.hasNextPage();
-    },
-    hasPreviousPage($pageInfo) {
-      return $pageInfo.hasPreviousPage();
-    },
-    startCursor($pageInfo) {
-      return $pageInfo.startCursor();
-    },
-    endCursor($pageInfo) {
-      return $pageInfo.endCursor();
-    }
-  },
-  NetworkCondition: {
-    id($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "id",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-        }
-      });
-    },
-    inet($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "inet",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.inet)}`;
-        }
-      });
-    },
-    cidr($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "cidr",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.cidr)}`;
-        }
-      });
-    },
-    macaddr($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "macaddr",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.macaddr)}`;
-        }
-      });
-    }
-  },
+  }
+};
+export const enums = {
   NetworksOrderBy: {
     PRIMARY_KEY_ASC(queryBuilder) {
       networkUniques[0].attributes.forEach(attributeName => {
@@ -868,297 +1198,13 @@ export const plans = {
         direction: "DESC"
       });
     }
-  },
-  Mutation: {
-    __assertStep: __ValueStep,
-    createNetwork: {
-      plan(_, args) {
-        const $insert = pgInsertSingle(resource_networkPgResource, Object.create(null));
-        args.apply($insert);
-        const plan = object({
-          result: $insert
-        });
-        return plan;
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    updateNetwork: {
-      plan(_$root, args) {
-        const $update = pgUpdateSingle(resource_networkPgResource, specFromArgs_Network(args));
-        args.apply($update);
-        return object({
-          result: $update
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    updateNetworkById: {
-      plan(_$root, args) {
-        const $update = pgUpdateSingle(resource_networkPgResource, {
-          id: args.getRaw(['input', "id"])
-        });
-        args.apply($update);
-        return object({
-          result: $update
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    deleteNetwork: {
-      plan(_$root, args) {
-        const $delete = pgDeleteSingle(resource_networkPgResource, specFromArgs_Network2(args));
-        args.apply($delete);
-        return object({
-          result: $delete
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    deleteNetworkById: {
-      plan(_$root, args) {
-        const $delete = pgDeleteSingle(resource_networkPgResource, {
-          id: args.getRaw(['input', "id"])
-        });
-        args.apply($delete);
-        return object({
-          result: $delete
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    }
-  },
-  CreateNetworkPayload: {
-    __assertStep: assertExecutableStep,
-    clientMutationId($mutation) {
-      const $insert = $mutation.getStepForKey("result");
-      return $insert.getMeta("clientMutationId");
-    },
-    network($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    },
-    networkEdge($mutation, fieldArgs) {
-      const $result = $mutation.getStepForKey("result", true);
-      if (!$result) {
-        return constant(null);
-      }
-      const $select = (() => {
-        if ($result instanceof PgDeleteSingleStep) {
-          return pgSelectFromRecord($result.resource, $result.record());
-        } else {
-          const spec = networkUniques[0].attributes.reduce((memo, attributeName) => {
-            memo[attributeName] = $result.get(attributeName);
-            return memo;
-          }, Object.create(null));
-          return resource_networkPgResource.find(spec);
-        }
-      })();
-      fieldArgs.apply($select, "orderBy");
-      const $connection = connection($select);
-      // NOTE: you must not use `$single = $select.single()`
-      // here because doing so will mark the row as unique, and
-      // then the ordering logic (and thus cursor) will differ.
-      const $single = $select.row(first($select));
-      return new EdgeStep($connection, $single);
-    }
-  },
-  CreateNetworkInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    network(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  NetworkInput: {
-    __baked: createObjectAndApplyChildren,
-    id(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("id", bakedInputRuntime(schema, field.type, val));
-    },
-    inet(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("inet", bakedInputRuntime(schema, field.type, val));
-    },
-    cidr(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("cidr", bakedInputRuntime(schema, field.type, val));
-    },
-    macaddr(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("macaddr", bakedInputRuntime(schema, field.type, val));
-    }
-  },
-  UpdateNetworkPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($mutation) {
-      const $result = $mutation.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    network($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    },
-    networkEdge($mutation, fieldArgs) {
-      const $result = $mutation.getStepForKey("result", true);
-      if (!$result) {
-        return constant(null);
-      }
-      const $select = (() => {
-        if ($result instanceof PgDeleteSingleStep) {
-          return pgSelectFromRecord($result.resource, $result.record());
-        } else {
-          const spec = networkUniques[0].attributes.reduce((memo, attributeName) => {
-            memo[attributeName] = $result.get(attributeName);
-            return memo;
-          }, Object.create(null));
-          return resource_networkPgResource.find(spec);
-        }
-      })();
-      fieldArgs.apply($select, "orderBy");
-      const $connection = connection($select);
-      // NOTE: you must not use `$single = $select.single()`
-      // here because doing so will mark the row as unique, and
-      // then the ordering logic (and thus cursor) will differ.
-      const $single = $select.row(first($select));
-      return new EdgeStep($connection, $single);
-    }
-  },
-  UpdateNetworkInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    networkPatch(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  NetworkPatch: {
-    __baked: createObjectAndApplyChildren,
-    id(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("id", bakedInputRuntime(schema, field.type, val));
-    },
-    inet(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("inet", bakedInputRuntime(schema, field.type, val));
-    },
-    cidr(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("cidr", bakedInputRuntime(schema, field.type, val));
-    },
-    macaddr(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("macaddr", bakedInputRuntime(schema, field.type, val));
-    }
-  },
-  UpdateNetworkByIdInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    networkPatch(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  DeleteNetworkPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($mutation) {
-      const $result = $mutation.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    network($object) {
-      return $object.get("result");
-    },
-    deletedNetworkId($object) {
-      const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandler_Network.plan($record);
-      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
-    },
-    query() {
-      return rootValue();
-    },
-    networkEdge($mutation, fieldArgs) {
-      const $result = $mutation.getStepForKey("result", true);
-      if (!$result) {
-        return constant(null);
-      }
-      const $select = (() => {
-        if ($result instanceof PgDeleteSingleStep) {
-          return pgSelectFromRecord($result.resource, $result.record());
-        } else {
-          const spec = networkUniques[0].attributes.reduce((memo, attributeName) => {
-            memo[attributeName] = $result.get(attributeName);
-            return memo;
-          }, Object.create(null));
-          return resource_networkPgResource.find(spec);
-        }
-      })();
-      fieldArgs.apply($select, "orderBy");
-      const $connection = connection($select);
-      // NOTE: you must not use `$single = $select.single()`
-      // here because doing so will mark the row as unique, and
-      // then the ordering logic (and thus cursor) will differ.
-      const $single = $select.row(first($select));
-      return new EdgeStep($connection, $single);
-    }
-  },
-  DeleteNetworkInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  DeleteNetworkByIdInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
   }
 };
 export const schema = makeGrafastSchema({
   typeDefs: typeDefs,
-  plans: plans
+  objects: objects,
+  interfaces: interfaces,
+  inputObjects: inputObjects,
+  scalars: scalars,
+  enums: enums
 });

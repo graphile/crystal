@@ -1111,108 +1111,656 @@ input DeleteMeasurementByTimestampAndKeyInput {
   timestamp: Datetime!
   key: String!
 }`;
-export const plans = {
+export const objects = {
   Query: {
-    __assertStep() {
+    assertStep() {
       return true;
     },
-    query() {
-      return rootValue();
-    },
-    nodeId($parent) {
-      const specifier = nodeIdHandler_Query.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Query.codec.name].encode);
-    },
-    node(_$root, fieldArgs) {
-      return fieldArgs.getRaw("nodeId");
-    },
-    userById(_$root, {
-      $id
-    }) {
-      return resource_usersPgResource.get({
-        id: $id
-      });
-    },
-    measurementByTimestampAndKey(_$root, {
-      $timestamp,
-      $key
-    }) {
-      return resource_measurementsPgResource.get({
-        timestamp: $timestamp,
-        key: $key
-      });
-    },
-    user(_$parent, args) {
-      const $nodeId = args.getRaw("nodeId");
-      return nodeFetcher_User($nodeId);
-    },
-    measurement(_$parent, args) {
-      const $nodeId = args.getRaw("nodeId");
-      return nodeFetcher_Measurement($nodeId);
-    },
-    allUsers: {
-      plan() {
-        return connection(resource_usersPgResource.find());
-      },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
+    plans: {
+      allMeasurements: {
+        plan() {
+          return connection(resource_measurementsPgResource.find());
         },
-        last(_, $connection, val) {
-          $connection.setLast(val.getRaw());
-        },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        },
-        before(_, $connection, val) {
-          $connection.setBefore(val.getRaw());
-        },
-        after(_, $connection, val) {
-          $connection.setAfter(val.getRaw());
-        },
-        condition(_condition, $connection, arg) {
-          const $select = $connection.getSubplan();
-          arg.apply($select, qbWhereBuilder);
-        },
-        orderBy(parent, $connection, value) {
-          const $select = $connection.getSubplan();
-          value.apply($select);
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          last(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          before(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          },
+          after(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $connection, value) {
+            const $select = $connection.getSubplan();
+            value.apply($select);
+          }
         }
-      }
-    },
-    allMeasurements: {
-      plan() {
-        return connection(resource_measurementsPgResource.find());
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
+      allUsers: {
+        plan() {
+          return connection(resource_usersPgResource.find());
         },
-        last(_, $connection, val) {
-          $connection.setLast(val.getRaw());
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          last(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          before(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          },
+          after(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $connection, value) {
+            const $select = $connection.getSubplan();
+            value.apply($select);
+          }
+        }
+      },
+      measurement(_$parent, args) {
+        const $nodeId = args.getRaw("nodeId");
+        return nodeFetcher_Measurement($nodeId);
+      },
+      measurementByTimestampAndKey(_$root, {
+        $timestamp,
+        $key
+      }) {
+        return resource_measurementsPgResource.get({
+          timestamp: $timestamp,
+          key: $key
+        });
+      },
+      node(_$root, fieldArgs) {
+        return fieldArgs.getRaw("nodeId");
+      },
+      nodeId($parent) {
+        const specifier = nodeIdHandler_Query.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_Query.codec.name].encode);
+      },
+      query() {
+        return rootValue();
+      },
+      user(_$parent, args) {
+        const $nodeId = args.getRaw("nodeId");
+        return nodeFetcher_User($nodeId);
+      },
+      userById(_$root, {
+        $id
+      }) {
+        return resource_usersPgResource.get({
+          id: $id
+        });
+      }
+    }
+  },
+  Mutation: {
+    assertStep: __ValueStep,
+    plans: {
+      createMeasurement: {
+        plan(_, args) {
+          const $insert = pgInsertSingle(resource_measurementsPgResource, Object.create(null));
+          args.apply($insert);
+          const plan = object({
+            result: $insert
+          });
+          return plan;
         },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      createUser: {
+        plan(_, args) {
+          const $insert = pgInsertSingle(resource_usersPgResource, Object.create(null));
+          args.apply($insert);
+          const plan = object({
+            result: $insert
+          });
+          return plan;
         },
-        before(_, $connection, val) {
-          $connection.setBefore(val.getRaw());
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deleteMeasurement: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_measurementsPgResource, specFromArgs_Measurement2(args));
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
         },
-        after(_, $connection, val) {
-          $connection.setAfter(val.getRaw());
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deleteMeasurementByTimestampAndKey: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_measurementsPgResource, {
+            timestamp: args.getRaw(['input', "timestamp"]),
+            key: args.getRaw(['input', "key"])
+          });
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
         },
-        condition(_condition, $connection, arg) {
-          const $select = $connection.getSubplan();
-          arg.apply($select, qbWhereBuilder);
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deleteUser: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_usersPgResource, specFromArgs_User2(args));
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
         },
-        orderBy(parent, $connection, value) {
-          const $select = $connection.getSubplan();
-          value.apply($select);
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deleteUserById: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_usersPgResource, {
+            id: args.getRaw(['input', "id"])
+          });
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      updateMeasurement: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_measurementsPgResource, specFromArgs_Measurement(args));
+          args.apply($update);
+          return object({
+            result: $update
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      updateMeasurementByTimestampAndKey: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_measurementsPgResource, {
+            timestamp: args.getRaw(['input', "timestamp"]),
+            key: args.getRaw(['input', "key"])
+          });
+          args.apply($update);
+          return object({
+            result: $update
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      updateUser: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_usersPgResource, specFromArgs_User(args));
+          args.apply($update);
+          return object({
+            result: $update
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      updateUserById: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_usersPgResource, {
+            id: args.getRaw(['input', "id"])
+          });
+          args.apply($update);
+          return object({
+            result: $update
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
         }
       }
     }
   },
+  CreateMeasurementPayload: {
+    assertStep: assertExecutableStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $insert = $mutation.getStepForKey("result");
+        return $insert.getMeta("clientMutationId");
+      },
+      measurement($object) {
+        return $object.get("result");
+      },
+      measurementEdge($mutation, fieldArgs) {
+        const $result = $mutation.getStepForKey("result", true);
+        if (!$result) {
+          return constant(null);
+        }
+        const $select = (() => {
+          if ($result instanceof PgDeleteSingleStep) {
+            return pgSelectFromRecord($result.resource, $result.record());
+          } else {
+            const spec = measurementsUniques[0].attributes.reduce((memo, attributeName) => {
+              memo[attributeName] = $result.get(attributeName);
+              return memo;
+            }, Object.create(null));
+            return resource_measurementsPgResource.find(spec);
+          }
+        })();
+        fieldArgs.apply($select, "orderBy");
+        const $connection = connection($select);
+        // NOTE: you must not use `$single = $select.single()`
+        // here because doing so will mark the row as unique, and
+        // then the ordering logic (and thus cursor) will differ.
+        const $single = $select.row(first($select));
+        return new EdgeStep($connection, $single);
+      },
+      query() {
+        return rootValue();
+      },
+      userByUserId($record) {
+        return resource_usersPgResource.get({
+          id: $record.get("result").get("user_id")
+        });
+      }
+    }
+  },
+  CreateUserPayload: {
+    assertStep: assertExecutableStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $insert = $mutation.getStepForKey("result");
+        return $insert.getMeta("clientMutationId");
+      },
+      query() {
+        return rootValue();
+      },
+      user($object) {
+        return $object.get("result");
+      },
+      userEdge($mutation, fieldArgs) {
+        const $result = $mutation.getStepForKey("result", true);
+        if (!$result) {
+          return constant(null);
+        }
+        const $select = (() => {
+          if ($result instanceof PgDeleteSingleStep) {
+            return pgSelectFromRecord($result.resource, $result.record());
+          } else {
+            const spec = usersUniques[0].attributes.reduce((memo, attributeName) => {
+              memo[attributeName] = $result.get(attributeName);
+              return memo;
+            }, Object.create(null));
+            return resource_usersPgResource.find(spec);
+          }
+        })();
+        fieldArgs.apply($select, "orderBy");
+        const $connection = connection($select);
+        // NOTE: you must not use `$single = $select.single()`
+        // here because doing so will mark the row as unique, and
+        // then the ordering logic (and thus cursor) will differ.
+        const $single = $select.row(first($select));
+        return new EdgeStep($connection, $single);
+      }
+    }
+  },
+  DeleteMeasurementPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $result = $mutation.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      deletedMeasurementId($object) {
+        const $record = $object.getStepForKey("result");
+        const specifier = nodeIdHandler_Measurement.plan($record);
+        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+      },
+      measurement($object) {
+        return $object.get("result");
+      },
+      measurementEdge($mutation, fieldArgs) {
+        const $result = $mutation.getStepForKey("result", true);
+        if (!$result) {
+          return constant(null);
+        }
+        const $select = (() => {
+          if ($result instanceof PgDeleteSingleStep) {
+            return pgSelectFromRecord($result.resource, $result.record());
+          } else {
+            const spec = measurementsUniques[0].attributes.reduce((memo, attributeName) => {
+              memo[attributeName] = $result.get(attributeName);
+              return memo;
+            }, Object.create(null));
+            return resource_measurementsPgResource.find(spec);
+          }
+        })();
+        fieldArgs.apply($select, "orderBy");
+        const $connection = connection($select);
+        // NOTE: you must not use `$single = $select.single()`
+        // here because doing so will mark the row as unique, and
+        // then the ordering logic (and thus cursor) will differ.
+        const $single = $select.row(first($select));
+        return new EdgeStep($connection, $single);
+      },
+      query() {
+        return rootValue();
+      },
+      userByUserId($record) {
+        return resource_usersPgResource.get({
+          id: $record.get("result").get("user_id")
+        });
+      }
+    }
+  },
+  DeleteUserPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $result = $mutation.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      deletedUserId($object) {
+        const $record = $object.getStepForKey("result");
+        const specifier = nodeIdHandler_User.plan($record);
+        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+      },
+      query() {
+        return rootValue();
+      },
+      user($object) {
+        return $object.get("result");
+      },
+      userEdge($mutation, fieldArgs) {
+        const $result = $mutation.getStepForKey("result", true);
+        if (!$result) {
+          return constant(null);
+        }
+        const $select = (() => {
+          if ($result instanceof PgDeleteSingleStep) {
+            return pgSelectFromRecord($result.resource, $result.record());
+          } else {
+            const spec = usersUniques[0].attributes.reduce((memo, attributeName) => {
+              memo[attributeName] = $result.get(attributeName);
+              return memo;
+            }, Object.create(null));
+            return resource_usersPgResource.find(spec);
+          }
+        })();
+        fieldArgs.apply($select, "orderBy");
+        const $connection = connection($select);
+        // NOTE: you must not use `$single = $select.single()`
+        // here because doing so will mark the row as unique, and
+        // then the ordering logic (and thus cursor) will differ.
+        const $single = $select.row(first($select));
+        return new EdgeStep($connection, $single);
+      }
+    }
+  },
+  Measurement: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      nodeId($parent) {
+        const specifier = nodeIdHandler_Measurement.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_Measurement.codec.name].encode);
+      },
+      userByUserId($record) {
+        return resource_usersPgResource.get({
+          id: $record.get("user_id")
+        });
+      },
+      userId($record) {
+        return $record.get("user_id");
+      }
+    },
+    planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of measurementsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_measurementsPgResource.get(spec);
+    }
+  },
+  MeasurementsConnection: {
+    assertStep: ConnectionStep,
+    plans: {
+      totalCount($connection) {
+        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+      }
+    }
+  },
+  MeasurementsEdge: {
+    assertStep: assertEdgeCapableStep,
+    plans: {
+      cursor($edge) {
+        return $edge.cursor();
+      },
+      node($edge) {
+        return $edge.node();
+      }
+    }
+  },
+  PageInfo: {
+    assertStep: assertPageInfoCapableStep,
+    plans: {
+      endCursor($pageInfo) {
+        return $pageInfo.endCursor();
+      },
+      hasNextPage($pageInfo) {
+        return $pageInfo.hasNextPage();
+      },
+      hasPreviousPage($pageInfo) {
+        return $pageInfo.hasPreviousPage();
+      },
+      startCursor($pageInfo) {
+        return $pageInfo.startCursor();
+      }
+    }
+  },
+  UpdateMeasurementPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $result = $mutation.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      measurement($object) {
+        return $object.get("result");
+      },
+      measurementEdge($mutation, fieldArgs) {
+        const $result = $mutation.getStepForKey("result", true);
+        if (!$result) {
+          return constant(null);
+        }
+        const $select = (() => {
+          if ($result instanceof PgDeleteSingleStep) {
+            return pgSelectFromRecord($result.resource, $result.record());
+          } else {
+            const spec = measurementsUniques[0].attributes.reduce((memo, attributeName) => {
+              memo[attributeName] = $result.get(attributeName);
+              return memo;
+            }, Object.create(null));
+            return resource_measurementsPgResource.find(spec);
+          }
+        })();
+        fieldArgs.apply($select, "orderBy");
+        const $connection = connection($select);
+        // NOTE: you must not use `$single = $select.single()`
+        // here because doing so will mark the row as unique, and
+        // then the ordering logic (and thus cursor) will differ.
+        const $single = $select.row(first($select));
+        return new EdgeStep($connection, $single);
+      },
+      query() {
+        return rootValue();
+      },
+      userByUserId($record) {
+        return resource_usersPgResource.get({
+          id: $record.get("result").get("user_id")
+        });
+      }
+    }
+  },
+  UpdateUserPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $result = $mutation.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      query() {
+        return rootValue();
+      },
+      user($object) {
+        return $object.get("result");
+      },
+      userEdge($mutation, fieldArgs) {
+        const $result = $mutation.getStepForKey("result", true);
+        if (!$result) {
+          return constant(null);
+        }
+        const $select = (() => {
+          if ($result instanceof PgDeleteSingleStep) {
+            return pgSelectFromRecord($result.resource, $result.record());
+          } else {
+            const spec = usersUniques[0].attributes.reduce((memo, attributeName) => {
+              memo[attributeName] = $result.get(attributeName);
+              return memo;
+            }, Object.create(null));
+            return resource_usersPgResource.find(spec);
+          }
+        })();
+        fieldArgs.apply($select, "orderBy");
+        const $connection = connection($select);
+        // NOTE: you must not use `$single = $select.single()`
+        // here because doing so will mark the row as unique, and
+        // then the ordering logic (and thus cursor) will differ.
+        const $single = $select.row(first($select));
+        return new EdgeStep($connection, $single);
+      }
+    }
+  },
+  User: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      measurementsByUserId: {
+        plan($record) {
+          const $records = resource_measurementsPgResource.find({
+            user_id: $record.get("id")
+          });
+          return connection($records);
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          last(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          before(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          },
+          after(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $connection, value) {
+            const $select = $connection.getSubplan();
+            value.apply($select);
+          }
+        }
+      },
+      nodeId($parent) {
+        const specifier = nodeIdHandler_User.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_User.codec.name].encode);
+      }
+    },
+    planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of usersUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_usersPgResource.get(spec);
+    }
+  },
+  UsersConnection: {
+    assertStep: ConnectionStep,
+    plans: {
+      totalCount($connection) {
+        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+      }
+    }
+  },
+  UsersEdge: {
+    assertStep: assertEdgeCapableStep,
+    plans: {
+      cursor($edge) {
+        return $edge.cursor();
+      },
+      node($edge) {
+        return $edge.node();
+      }
+    }
+  }
+};
+export const interfaces = {
   Node: {
-    __planType($nodeId) {
+    planType($nodeId) {
       const $specifier = decodeNodeId($nodeId);
       const $__typename = lambda($specifier, findTypeNameMatch, true);
       return {
@@ -1227,80 +1775,273 @@ export const plans = {
         }
       };
     }
-  },
-  User: {
-    __assertStep: assertPgClassSingleStep,
-    __planType($specifier) {
-      const spec = Object.create(null);
-      for (const pkCol of usersUniques[0].attributes) {
-        spec[pkCol] = get2($specifier, pkCol);
-      }
-      return resource_usersPgResource.get(spec);
-    },
-    nodeId($parent) {
-      const specifier = nodeIdHandler_User.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandler_User.codec.name].encode);
-    },
-    measurementsByUserId: {
-      plan($record) {
-        const $records = resource_measurementsPgResource.find({
-          user_id: $record.get("id")
-        });
-        return connection($records);
+  }
+};
+export const inputObjects = {
+  CreateMeasurementInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
-        },
-        last(_, $connection, val) {
-          $connection.setLast(val.getRaw());
-        },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        },
-        before(_, $connection, val) {
-          $connection.setBefore(val.getRaw());
-        },
-        after(_, $connection, val) {
-          $connection.setAfter(val.getRaw());
-        },
-        condition(_condition, $connection, arg) {
-          const $select = $connection.getSubplan();
-          arg.apply($select, qbWhereBuilder);
-        },
-        orderBy(parent, $connection, value) {
-          const $select = $connection.getSubplan();
-          value.apply($select);
+      measurement(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
         }
       }
     }
   },
-  MeasurementsConnection: {
-    __assertStep: ConnectionStep,
-    totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+  CreateUserInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      user(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
     }
   },
-  Measurement: {
-    __assertStep: assertPgClassSingleStep,
-    __planType($specifier) {
-      const spec = Object.create(null);
-      for (const pkCol of measurementsUniques[0].attributes) {
-        spec[pkCol] = get2($specifier, pkCol);
+  DeleteMeasurementByTimestampAndKeyInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
-      return resource_measurementsPgResource.get(spec);
-    },
-    nodeId($parent) {
-      const specifier = nodeIdHandler_Measurement.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Measurement.codec.name].encode);
-    },
-    userId($record) {
-      return $record.get("user_id");
-    },
-    userByUserId($record) {
-      return resource_usersPgResource.get({
-        id: $record.get("user_id")
-      });
+    }
+  },
+  DeleteMeasurementInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  DeleteUserByIdInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  DeleteUserInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  MeasurementCondition: {
+    plans: {
+      key($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "key",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      timestamp($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "timestamp",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
+          }
+        });
+      },
+      userId($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "user_id",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      },
+      value($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "value",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.float)}`;
+          }
+        });
+      }
+    }
+  },
+  MeasurementInput: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      key(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("key", bakedInputRuntime(schema, field.type, val));
+      },
+      timestamp(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("timestamp", bakedInputRuntime(schema, field.type, val));
+      },
+      userId(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("user_id", bakedInputRuntime(schema, field.type, val));
+      },
+      value(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("value", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
+  MeasurementPatch: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      key(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("key", bakedInputRuntime(schema, field.type, val));
+      },
+      timestamp(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("timestamp", bakedInputRuntime(schema, field.type, val));
+      },
+      userId(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("user_id", bakedInputRuntime(schema, field.type, val));
+      },
+      value(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("value", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
+  UpdateMeasurementByTimestampAndKeyInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      measurementPatch(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  UpdateMeasurementInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      measurementPatch(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  UpdateUserByIdInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      userPatch(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  UpdateUserInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      userPatch(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  UserCondition: {
+    plans: {
+      id($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      },
+      name($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "name",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      }
+    }
+  },
+  UserInput: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      id(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      },
+      name(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("name", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
+  UserPatch: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      id(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      },
+      name(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("name", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  }
+};
+export const scalars = {
+  Cursor: {
+    serialize: DatetimeSerialize,
+    parseValue: DatetimeSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
     }
   },
   Datetime: {
@@ -1312,79 +2053,9 @@ export const plans = {
       }
       return ast.value;
     }
-  },
-  MeasurementsEdge: {
-    __assertStep: assertEdgeCapableStep,
-    cursor($edge) {
-      return $edge.cursor();
-    },
-    node($edge) {
-      return $edge.node();
-    }
-  },
-  Cursor: {
-    serialize: DatetimeSerialize,
-    parseValue: DatetimeSerialize,
-    parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
-      }
-      return ast.value;
-    }
-  },
-  PageInfo: {
-    __assertStep: assertPageInfoCapableStep,
-    hasNextPage($pageInfo) {
-      return $pageInfo.hasNextPage();
-    },
-    hasPreviousPage($pageInfo) {
-      return $pageInfo.hasPreviousPage();
-    },
-    startCursor($pageInfo) {
-      return $pageInfo.startCursor();
-    },
-    endCursor($pageInfo) {
-      return $pageInfo.endCursor();
-    }
-  },
-  MeasurementCondition: {
-    timestamp($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "timestamp",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
-        }
-      });
-    },
-    key($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "key",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-        }
-      });
-    },
-    value($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "value",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.float)}`;
-        }
-      });
-    },
-    userId($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "user_id",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-        }
-      });
-    }
-  },
+  }
+};
+export const enums = {
   MeasurementsOrderBy: {
     PRIMARY_KEY_ASC(queryBuilder) {
       measurementsUniques[0].attributes.forEach(attributeName => {
@@ -1455,41 +2126,6 @@ export const plans = {
       });
     }
   },
-  UsersConnection: {
-    __assertStep: ConnectionStep,
-    totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-    }
-  },
-  UsersEdge: {
-    __assertStep: assertEdgeCapableStep,
-    cursor($edge) {
-      return $edge.cursor();
-    },
-    node($edge) {
-      return $edge.node();
-    }
-  },
-  UserCondition: {
-    id($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "id",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-        }
-      });
-    },
-    name($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "name",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-        }
-      });
-    }
-  },
   UsersOrderBy: {
     PRIMARY_KEY_ASC(queryBuilder) {
       usersUniques[0].attributes.forEach(attributeName => {
@@ -1535,575 +2171,13 @@ export const plans = {
         direction: "DESC"
       });
     }
-  },
-  Mutation: {
-    __assertStep: __ValueStep,
-    createUser: {
-      plan(_, args) {
-        const $insert = pgInsertSingle(resource_usersPgResource, Object.create(null));
-        args.apply($insert);
-        const plan = object({
-          result: $insert
-        });
-        return plan;
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    createMeasurement: {
-      plan(_, args) {
-        const $insert = pgInsertSingle(resource_measurementsPgResource, Object.create(null));
-        args.apply($insert);
-        const plan = object({
-          result: $insert
-        });
-        return plan;
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    updateUser: {
-      plan(_$root, args) {
-        const $update = pgUpdateSingle(resource_usersPgResource, specFromArgs_User(args));
-        args.apply($update);
-        return object({
-          result: $update
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    updateUserById: {
-      plan(_$root, args) {
-        const $update = pgUpdateSingle(resource_usersPgResource, {
-          id: args.getRaw(['input', "id"])
-        });
-        args.apply($update);
-        return object({
-          result: $update
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    updateMeasurement: {
-      plan(_$root, args) {
-        const $update = pgUpdateSingle(resource_measurementsPgResource, specFromArgs_Measurement(args));
-        args.apply($update);
-        return object({
-          result: $update
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    updateMeasurementByTimestampAndKey: {
-      plan(_$root, args) {
-        const $update = pgUpdateSingle(resource_measurementsPgResource, {
-          timestamp: args.getRaw(['input', "timestamp"]),
-          key: args.getRaw(['input', "key"])
-        });
-        args.apply($update);
-        return object({
-          result: $update
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    deleteUser: {
-      plan(_$root, args) {
-        const $delete = pgDeleteSingle(resource_usersPgResource, specFromArgs_User2(args));
-        args.apply($delete);
-        return object({
-          result: $delete
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    deleteUserById: {
-      plan(_$root, args) {
-        const $delete = pgDeleteSingle(resource_usersPgResource, {
-          id: args.getRaw(['input', "id"])
-        });
-        args.apply($delete);
-        return object({
-          result: $delete
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    deleteMeasurement: {
-      plan(_$root, args) {
-        const $delete = pgDeleteSingle(resource_measurementsPgResource, specFromArgs_Measurement2(args));
-        args.apply($delete);
-        return object({
-          result: $delete
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    deleteMeasurementByTimestampAndKey: {
-      plan(_$root, args) {
-        const $delete = pgDeleteSingle(resource_measurementsPgResource, {
-          timestamp: args.getRaw(['input', "timestamp"]),
-          key: args.getRaw(['input', "key"])
-        });
-        args.apply($delete);
-        return object({
-          result: $delete
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    }
-  },
-  CreateUserPayload: {
-    __assertStep: assertExecutableStep,
-    clientMutationId($mutation) {
-      const $insert = $mutation.getStepForKey("result");
-      return $insert.getMeta("clientMutationId");
-    },
-    user($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    },
-    userEdge($mutation, fieldArgs) {
-      const $result = $mutation.getStepForKey("result", true);
-      if (!$result) {
-        return constant(null);
-      }
-      const $select = (() => {
-        if ($result instanceof PgDeleteSingleStep) {
-          return pgSelectFromRecord($result.resource, $result.record());
-        } else {
-          const spec = usersUniques[0].attributes.reduce((memo, attributeName) => {
-            memo[attributeName] = $result.get(attributeName);
-            return memo;
-          }, Object.create(null));
-          return resource_usersPgResource.find(spec);
-        }
-      })();
-      fieldArgs.apply($select, "orderBy");
-      const $connection = connection($select);
-      // NOTE: you must not use `$single = $select.single()`
-      // here because doing so will mark the row as unique, and
-      // then the ordering logic (and thus cursor) will differ.
-      const $single = $select.row(first($select));
-      return new EdgeStep($connection, $single);
-    }
-  },
-  CreateUserInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    user(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  UserInput: {
-    __baked: createObjectAndApplyChildren,
-    id(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("id", bakedInputRuntime(schema, field.type, val));
-    },
-    name(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("name", bakedInputRuntime(schema, field.type, val));
-    }
-  },
-  CreateMeasurementPayload: {
-    __assertStep: assertExecutableStep,
-    clientMutationId($mutation) {
-      const $insert = $mutation.getStepForKey("result");
-      return $insert.getMeta("clientMutationId");
-    },
-    measurement($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    },
-    measurementEdge($mutation, fieldArgs) {
-      const $result = $mutation.getStepForKey("result", true);
-      if (!$result) {
-        return constant(null);
-      }
-      const $select = (() => {
-        if ($result instanceof PgDeleteSingleStep) {
-          return pgSelectFromRecord($result.resource, $result.record());
-        } else {
-          const spec = measurementsUniques[0].attributes.reduce((memo, attributeName) => {
-            memo[attributeName] = $result.get(attributeName);
-            return memo;
-          }, Object.create(null));
-          return resource_measurementsPgResource.find(spec);
-        }
-      })();
-      fieldArgs.apply($select, "orderBy");
-      const $connection = connection($select);
-      // NOTE: you must not use `$single = $select.single()`
-      // here because doing so will mark the row as unique, and
-      // then the ordering logic (and thus cursor) will differ.
-      const $single = $select.row(first($select));
-      return new EdgeStep($connection, $single);
-    },
-    userByUserId($record) {
-      return resource_usersPgResource.get({
-        id: $record.get("result").get("user_id")
-      });
-    }
-  },
-  CreateMeasurementInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    measurement(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  MeasurementInput: {
-    __baked: createObjectAndApplyChildren,
-    timestamp(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("timestamp", bakedInputRuntime(schema, field.type, val));
-    },
-    key(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("key", bakedInputRuntime(schema, field.type, val));
-    },
-    value(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("value", bakedInputRuntime(schema, field.type, val));
-    },
-    userId(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("user_id", bakedInputRuntime(schema, field.type, val));
-    }
-  },
-  UpdateUserPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($mutation) {
-      const $result = $mutation.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    user($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    },
-    userEdge($mutation, fieldArgs) {
-      const $result = $mutation.getStepForKey("result", true);
-      if (!$result) {
-        return constant(null);
-      }
-      const $select = (() => {
-        if ($result instanceof PgDeleteSingleStep) {
-          return pgSelectFromRecord($result.resource, $result.record());
-        } else {
-          const spec = usersUniques[0].attributes.reduce((memo, attributeName) => {
-            memo[attributeName] = $result.get(attributeName);
-            return memo;
-          }, Object.create(null));
-          return resource_usersPgResource.find(spec);
-        }
-      })();
-      fieldArgs.apply($select, "orderBy");
-      const $connection = connection($select);
-      // NOTE: you must not use `$single = $select.single()`
-      // here because doing so will mark the row as unique, and
-      // then the ordering logic (and thus cursor) will differ.
-      const $single = $select.row(first($select));
-      return new EdgeStep($connection, $single);
-    }
-  },
-  UpdateUserInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    userPatch(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  UserPatch: {
-    __baked: createObjectAndApplyChildren,
-    id(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("id", bakedInputRuntime(schema, field.type, val));
-    },
-    name(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("name", bakedInputRuntime(schema, field.type, val));
-    }
-  },
-  UpdateUserByIdInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    userPatch(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  UpdateMeasurementPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($mutation) {
-      const $result = $mutation.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    measurement($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    },
-    measurementEdge($mutation, fieldArgs) {
-      const $result = $mutation.getStepForKey("result", true);
-      if (!$result) {
-        return constant(null);
-      }
-      const $select = (() => {
-        if ($result instanceof PgDeleteSingleStep) {
-          return pgSelectFromRecord($result.resource, $result.record());
-        } else {
-          const spec = measurementsUniques[0].attributes.reduce((memo, attributeName) => {
-            memo[attributeName] = $result.get(attributeName);
-            return memo;
-          }, Object.create(null));
-          return resource_measurementsPgResource.find(spec);
-        }
-      })();
-      fieldArgs.apply($select, "orderBy");
-      const $connection = connection($select);
-      // NOTE: you must not use `$single = $select.single()`
-      // here because doing so will mark the row as unique, and
-      // then the ordering logic (and thus cursor) will differ.
-      const $single = $select.row(first($select));
-      return new EdgeStep($connection, $single);
-    },
-    userByUserId($record) {
-      return resource_usersPgResource.get({
-        id: $record.get("result").get("user_id")
-      });
-    }
-  },
-  UpdateMeasurementInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    measurementPatch(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  MeasurementPatch: {
-    __baked: createObjectAndApplyChildren,
-    timestamp(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("timestamp", bakedInputRuntime(schema, field.type, val));
-    },
-    key(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("key", bakedInputRuntime(schema, field.type, val));
-    },
-    value(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("value", bakedInputRuntime(schema, field.type, val));
-    },
-    userId(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("user_id", bakedInputRuntime(schema, field.type, val));
-    }
-  },
-  UpdateMeasurementByTimestampAndKeyInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    measurementPatch(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  DeleteUserPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($mutation) {
-      const $result = $mutation.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    user($object) {
-      return $object.get("result");
-    },
-    deletedUserId($object) {
-      const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandler_User.plan($record);
-      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
-    },
-    query() {
-      return rootValue();
-    },
-    userEdge($mutation, fieldArgs) {
-      const $result = $mutation.getStepForKey("result", true);
-      if (!$result) {
-        return constant(null);
-      }
-      const $select = (() => {
-        if ($result instanceof PgDeleteSingleStep) {
-          return pgSelectFromRecord($result.resource, $result.record());
-        } else {
-          const spec = usersUniques[0].attributes.reduce((memo, attributeName) => {
-            memo[attributeName] = $result.get(attributeName);
-            return memo;
-          }, Object.create(null));
-          return resource_usersPgResource.find(spec);
-        }
-      })();
-      fieldArgs.apply($select, "orderBy");
-      const $connection = connection($select);
-      // NOTE: you must not use `$single = $select.single()`
-      // here because doing so will mark the row as unique, and
-      // then the ordering logic (and thus cursor) will differ.
-      const $single = $select.row(first($select));
-      return new EdgeStep($connection, $single);
-    }
-  },
-  DeleteUserInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  DeleteUserByIdInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  DeleteMeasurementPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($mutation) {
-      const $result = $mutation.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    measurement($object) {
-      return $object.get("result");
-    },
-    deletedMeasurementId($object) {
-      const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandler_Measurement.plan($record);
-      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
-    },
-    query() {
-      return rootValue();
-    },
-    measurementEdge($mutation, fieldArgs) {
-      const $result = $mutation.getStepForKey("result", true);
-      if (!$result) {
-        return constant(null);
-      }
-      const $select = (() => {
-        if ($result instanceof PgDeleteSingleStep) {
-          return pgSelectFromRecord($result.resource, $result.record());
-        } else {
-          const spec = measurementsUniques[0].attributes.reduce((memo, attributeName) => {
-            memo[attributeName] = $result.get(attributeName);
-            return memo;
-          }, Object.create(null));
-          return resource_measurementsPgResource.find(spec);
-        }
-      })();
-      fieldArgs.apply($select, "orderBy");
-      const $connection = connection($select);
-      // NOTE: you must not use `$single = $select.single()`
-      // here because doing so will mark the row as unique, and
-      // then the ordering logic (and thus cursor) will differ.
-      const $single = $select.row(first($select));
-      return new EdgeStep($connection, $single);
-    },
-    userByUserId($record) {
-      return resource_usersPgResource.get({
-        id: $record.get("result").get("user_id")
-      });
-    }
-  },
-  DeleteMeasurementInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  DeleteMeasurementByTimestampAndKeyInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
   }
 };
 export const schema = makeGrafastSchema({
   typeDefs: typeDefs,
-  plans: plans
+  objects: objects,
+  interfaces: interfaces,
+  inputObjects: inputObjects,
+  scalars: scalars,
+  enums: enums
 });
