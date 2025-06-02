@@ -25,8 +25,8 @@ class DelegateStep extends Step {
     $secondary: Step,
   ) {
     super();
-    this.addDataDependency($primary);
-    this.addDataDependency($secondary);
+    this.addStrongDependency($primary);
+    this.addStrongDependency($secondary);
   }
   get(attr: string) {
     if (this.delegatedAttributes.includes(attr)) {

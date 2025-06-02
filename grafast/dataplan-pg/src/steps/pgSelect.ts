@@ -1688,7 +1688,7 @@ export class PgSelectStep<
         // Either dep is a static input plan (which isn't dependent on anything
         // else) or otherPlan is deeper than dep; either way we can use the dep
         // directly within otherPlan.
-        const newPlanIndex = $target.addDataDependency(depOptions);
+        const newPlanIndex = $target.addStrongDependency(depOptions);
         $target.placeholders.push({
           dependencyIndex: newPlanIndex,
           codec,
@@ -1723,7 +1723,7 @@ export class PgSelectStep<
       const depOptions = this.getDepOptions(dependencyIndex);
       const $dep = depOptions.step;
       if (stepAMayDependOnStepB($target, $dep)) {
-        const newPlanIndex = $target.addDataDependency(depOptions);
+        const newPlanIndex = $target.addStrongDependency(depOptions);
         $target.deferreds.push({
           dependencyIndex: newPlanIndex,
           symbol,
