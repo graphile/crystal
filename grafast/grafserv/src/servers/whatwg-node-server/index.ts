@@ -10,37 +10,30 @@ import type {
 import type { OptionsFromConfig } from "../../options.js";
 import { httpError } from "../../utils.js";
 
-export function getBodyFromRequest(
+export async function getBodyFromRequest(
   req: Request /* IncomingMessage */,
   maxLength: number,
 ): Promise<GrafservBody> {
-  return new Promise(async (resolve, reject) => {
-    const chunks: Buffer[] = [];
-    let len = 0;
-    const handleDataCb = (chunk: Uint8Array<ArrayBufferLike>) => {
-      chunks.push(Buffer.from(chunk));
-      len += chunk.length;
+  const reader = req.body?.getReader();
+  if (!reader) {
+    return { type: "buffer", buffer: Buffer.from([]) };
+  }
+
+  const chunks: Buffer[] = [];
+  let len = 0;
+  while (true) {
+    const { done, value } = await reader.read();
+    if (value) {
+      chunks.push(Buffer.from(value));
+      len += value.length;
       if (len > maxLength) {
-        reject(httpError(413, "Too much data"));
-      }
-    };
-    const doneCb = () => {
-      resolve({ type: "buffer", buffer: Buffer.concat(chunks) });
-    };
-    const reader = req.body?.getReader();
-    if (!reader) {
-      return doneCb();
-    }
-    while (true) {
-      const { done, value } = await reader?.read();
-      if (value) {
-        handleDataCb(value);
-      }
-      if (done) {
-        return doneCb();
+        throw httpError(413, "Too much data");
       }
     }
-  });
+    if (done) {
+      return { type: "buffer", buffer: Buffer.concat(chunks, len) };
+    }
+  }
 }
 
 declare global {

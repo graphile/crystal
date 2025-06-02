@@ -41,18 +41,20 @@ export async function makeExampleServer(
   let serv: GrafservBase;
   let server: ReturnType<typeof createServer>;
   switch (type) {
-    case "whatwg":
+    case "whatwg": {
       const servWhatwg = grafservWhatwg({ schema, preset });
       server = createServer(servWhatwg.createHandler());
       serv = servWhatwg;
       break;
+    }
     case "node":
-    default:
+    default: {
       const servNode = grafservNode({ schema, preset });
       server = createServer();
       servNode.addTo(server);
       serv = servNode;
       break;
+    }
   }
   const promise = new Promise<void>((resolve, reject) => {
     server.on("listening", () => {
