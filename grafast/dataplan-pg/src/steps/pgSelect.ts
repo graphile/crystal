@@ -2346,7 +2346,7 @@ class PgFromExpressionStep extends UnbatchedStep<SQL> {
     this.digests = digests.map((digest) => {
       if (digest.step) {
         const { step, ...rest } = digest;
-        const depId = this.addDataDependency(digest.step);
+        const depId = this.addStrongDependency(digest.step);
         return { ...rest, depId };
       } else {
         return digest;
