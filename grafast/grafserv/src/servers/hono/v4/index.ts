@@ -17,6 +17,7 @@ import type {
   RequestDigest,
   Result,
 } from "../../../interfaces.js";
+import { noop } from "../../../utils.js";
 
 declare global {
   namespace Grafast {
@@ -57,7 +58,7 @@ function getDigest(ctx: Ctx): RequestDigest {
     },
   };
 }
-
+const utf8TextDecoder = new TextDecoder("utf-8");
 export class HonoGrafserv extends GrafservBase {
   constructor(
     config: GrafservConfig,
@@ -93,7 +94,17 @@ export class HonoGrafserv extends GrafservBase {
         );
         isOpened = true;
       };
-
+      const badData = (ws: WSContext, e: unknown) => {
+        console.error(`Didn't understand the data`, e);
+        try {
+          ws.close(1003, "Unsupported data");
+        } catch (e) {
+          console.error(
+            `Failed to close websocket, maybe it's already closed`,
+            e,
+          );
+        }
+      };
       return {
         onOpen(evt, ws) {
           initGraphqlServer(ws);
@@ -104,7 +115,35 @@ export class HonoGrafserv extends GrafservBase {
           if (!isOpened) {
             initGraphqlServer(ws);
           }
-          onMessage?.(evt.data);
+          const { data } = evt;
+          if (typeof data === "string") {
+            onMessage?.(data);
+          } else if (data instanceof ArrayBuffer || ArrayBuffer.isView(data)) {
+            let text: string;
+            try {
+              text = utf8TextDecoder.decode(
+                data instanceof ArrayBuffer ? data : data.buffer,
+              );
+            } catch (e) {
+              badData(ws, e);
+              return;
+            }
+            onMessage?.(text);
+          } else if (data instanceof Blob) {
+            (async () => {
+              let text: string;
+              try {
+                const arrayBuffer = await data.arrayBuffer();
+                text = utf8TextDecoder.decode(arrayBuffer);
+              } catch (e) {
+                badData(ws, e);
+                return;
+              }
+              onMessage?.(text);
+            })().catch(noop);
+          } else {
+            console.warn("Unexpected WebSocket data type", typeof data);
+          }
         },
         onClose(evt) {
           onClose?.(evt.code, evt.reason);

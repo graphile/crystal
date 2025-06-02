@@ -42,6 +42,10 @@
       "types": "./dist/servers/hono/v4/index.d.ts",
       "default": "./dist/servers/hono/v4/index.js"
     },
+    "./whatwg-node__server/v4": {
+      "types": "./dist/servers/whatwg-node__server/v0/index.d.ts",
+      "default": "./dist/servers/whatwg-node__server/v0/index.js"
+    },
     "./ruru": {
       "types": "./fwd/ruru/index.d.ts",
       "node": "./fwd/ruru/index.js",
@@ -94,6 +98,7 @@
   },
   "peerDependencies": {
     "@envelop/core": "^5.0.0",
+    "@whatwg-node/server": "^0.9.64",
     "grafast": "workspace:^",
     "graphile-config": "workspace:^",
     "graphql": "^16.1.0-experimental-stream-defer.6",
@@ -103,6 +108,9 @@
   },
   "peerDependenciesMeta": {
     "@envelop/core": {
+      "optional": true
+    },
+    "@whatwg-node/server": {
       "optional": true
     },
     "h3": {
@@ -124,6 +132,7 @@
     "@types/koa": "^2.13.8",
     "@types/koa-bodyparser": "^4.3.10",
     "@whatwg-node/fetch": "^0.9.10",
+    "@whatwg-node/server": "^0.9.64",
     "express": "^4.20.0",
     "fastify": "^4.29.1",
     "grafast": "workspace:^",

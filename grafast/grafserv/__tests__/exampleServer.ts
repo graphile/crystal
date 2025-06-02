@@ -4,7 +4,8 @@ import type { AddressInfo } from "node:net";
 import { constant, error, makeGrafastSchema } from "grafast";
 import { resolvePreset } from "graphile-config";
 
-import { grafserv } from "../src/servers/node/index.js";
+import { grafserv as grafservNode } from "../src/servers/node/index.js";
+import { grafserv as grafservWhatwg } from "../src/servers/whatwg-node__server/v0/index.js";
 
 export async function makeExampleServer(
   preset: GraphileConfig.Preset = {
@@ -14,6 +15,7 @@ export async function makeExampleServer(
       dangerouslyAllowAllCORSRequests: true,
     },
   },
+  type?: "node" | "whatwg",
 ) {
   const resolvedPreset = resolvePreset(preset);
   const schema = makeGrafastSchema({
@@ -35,7 +37,10 @@ export async function makeExampleServer(
     },
   });
 
-  const serv = grafserv({ schema, preset });
+  const serv =
+    type === "whatwg"
+      ? grafservWhatwg({ schema, preset })
+      : grafservNode({ schema, preset });
   const server = createServer();
   serv.addTo(server);
   const promise = new Promise<void>((resolve, reject) => {
@@ -63,7 +68,14 @@ export async function makeExampleServer(
 }
 
 if (require.main === module) {
-  const serverPromise = makeExampleServer();
+  const type = process.argv[2];
+  if (type !== undefined && type !== "node" && type !== "whatwg") {
+    throw new Error(`Unsupported type ${type}`);
+  }
+  if (type === "whatwg") {
+    console.log("Running whatwg");
+  }
+  const serverPromise = makeExampleServer(undefined, type);
   serverPromise.then(
     (server) => {
       console.log(server.url);
