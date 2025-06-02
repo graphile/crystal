@@ -40,11 +40,9 @@ export async function getBodyFromRequest(
 }
 
 declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Grafast {
     interface RequestContext {
-      whatwg: {
-        version: string;
+      whatwgv1: {
         request: Request;
       };
     }
@@ -75,8 +73,7 @@ export class WhatwgGrafserv extends GrafservBase {
         return getBodyFromRequest(request, dynamicOptions.maxRequestLength);
       },
       requestContext: {
-        whatwg: {
-          version: "whatwgv1",
+        whatwgv1: {
           request,
         },
       },
@@ -141,7 +138,6 @@ export class WhatwgGrafserv extends GrafservBase {
   }
 
   createHandler() {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
     return createServerAdapter(async (request: Request): Promise<Response> => {
       const dynamicOptions = this.dynamicOptions;
       return this.grafservResponseToWhatwg(
