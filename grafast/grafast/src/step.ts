@@ -419,6 +419,8 @@ export /* abstract */ class Step<TData = any> {
    * @internal
    */
   public _assertAccessAllowed(depId: number): void {
+    const phase = this.operationPlan.phase;
+    if (phase !== "optimize" && phase !== "plan") return;
     const step = this.dependencies[depId];
     const dataOnly = this.dependencyDataOnly[depId];
     if (dataOnly) {
