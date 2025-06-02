@@ -179,7 +179,27 @@ export class __TrackedValueStep<
   /**
    * Get the named property of an object.
    */
+
   get<TAttribute extends keyof TData & string>(
+    attrName: TAttribute,
+  ): __TrackedValueStepWithDollars<
+    TData[TAttribute],
+    TInputType extends GraphQLInputObjectType
+      ? ReturnType<TInputType["getFields"]>[TAttribute]["type"]
+      : undefined
+  > {
+    if (this._isImmutable) {
+      return this.operationPlan.cacheImmutableStep(
+        `__TrackedValue${this.id}.get`,
+        attrName,
+        () => this._get(attrName),
+      );
+    } else {
+      return this._get(attrName);
+    }
+  }
+
+  private _get<TAttribute extends keyof TData & string>(
     attrName: TAttribute,
   ): __TrackedValueStepWithDollars<
     TData[TAttribute],
@@ -266,6 +286,27 @@ export class __TrackedValueStep<
    * Get the entry at the given index in an array.
    */
   at<TIndex extends keyof TData & number>(
+    index: TIndex,
+  ): __TrackedValueStepWithDollars<
+    TData[TIndex],
+    TInputType extends GraphQLList<infer U>
+      ? U & GraphQLInputType
+      : TInputType extends GraphQLNonNull<GraphQLList<infer U>>
+        ? U & GraphQLInputType
+        : undefined
+  > {
+    if (this._isImmutable) {
+      return this.operationPlan.cacheImmutableStep(
+        `__TrackedValue${this.id}.at`,
+        index,
+        () => this._at(index),
+      );
+    } else {
+      return this._at(index);
+    }
+  }
+
+  private _at<TIndex extends keyof TData & number>(
     index: TIndex,
   ): __TrackedValueStepWithDollars<
     TData[TIndex],
