@@ -16,7 +16,7 @@ export async function makeExampleServer(
       dangerouslyAllowAllCORSRequests: true,
     },
   },
-  type?: 'node' | 'whatwg'
+  type?: "node" | "whatwg",
 ) {
   const resolvedPreset = resolvePreset(preset);
   const schema = makeGrafastSchema({
@@ -38,20 +38,20 @@ export async function makeExampleServer(
     },
   });
 
-  let serv: GrafservBase
-  let server: ReturnType<typeof createServer>
+  let serv: GrafservBase;
+  let server: ReturnType<typeof createServer>;
   switch (type) {
-    case 'whatwg':
-      const servWhatwg = grafservWhatwg({schema, preset})
+    case "whatwg":
+      const servWhatwg = grafservWhatwg({ schema, preset });
       server = createServer(servWhatwg.createHandler());
-      serv = servWhatwg
+      serv = servWhatwg;
       break;
-    case 'node':
+    case "node":
     default:
       const servNode = grafservNode({ schema, preset });
       server = createServer();
       servNode.addTo(server);
-      serv = servNode
+      serv = servNode;
       break;
   }
   const promise = new Promise<void>((resolve, reject) => {

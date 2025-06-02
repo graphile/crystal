@@ -1,4 +1,4 @@
-import { createServerAdapter } from '@whatwg-node/server'
+import { createServerAdapter } from "@whatwg-node/server";
 
 import { GrafservBase } from "../../core/base.js";
 import type {
@@ -7,8 +7,8 @@ import type {
   RequestDigest,
   Result,
 } from "../../interfaces.js";
-import type { OptionsFromConfig } from '../../options.js';
-import { httpError } from '../../utils.js';
+import type { OptionsFromConfig } from "../../options.js";
+import { httpError } from "../../utils.js";
 
 export function getBodyFromRequest(
   req: Request /* IncomingMessage */,
@@ -27,17 +27,17 @@ export function getBodyFromRequest(
     const doneCb = () => {
       resolve({ type: "buffer", buffer: Buffer.concat(chunks) });
     };
-    const reader = req.body?.getReader()
+    const reader = req.body?.getReader();
     if (!reader) {
-      return doneCb()
+      return doneCb();
     }
     while (true) {
-      const {done, value} = await reader?.read()
+      const { done, value } = await reader?.read();
       if (value) {
-        handleDataCb(value)
+        handleDataCb(value);
       }
       if (done) {
-        return doneCb()
+        return doneCb();
       }
     }
   });
@@ -47,10 +47,10 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Grafast {
     interface RequestContext {
-        whatwg: {
-            version:string
-            request: Request
-        }
+      whatwg: {
+        version: string;
+        request: Request;
+      };
     }
   }
 }
@@ -59,27 +59,30 @@ declare global {
 export class WhatwgGrafserv extends GrafservBase {
   protected whatwgRequestToGrafserv(
     dynamicOptions: OptionsFromConfig,
-    request: Request
+    request: Request,
   ): RequestDigest {
     const url = new URL(request.url);
     return {
       httpVersionMajor: 1,
       httpVersionMinor: 1,
-      isSecure: url.protocol === 'https:',
-      method:  request.method,
+      isSecure: url.protocol === "https:",
+      method: request.method,
       path: url.pathname,
       headers: this.processHeaders(request.headers),
       getQueryParams() {
-        return Object.fromEntries(url.searchParams.entries()) as Record<string, string>;
+        return Object.fromEntries(url.searchParams.entries()) as Record<
+          string,
+          string
+        >;
       },
       async getBody() {
-        return getBodyFromRequest(request, dynamicOptions.maxRequestLength)
+        return getBodyFromRequest(request, dynamicOptions.maxRequestLength);
       },
       requestContext: {
         whatwg: {
-          version:'whatwgv1',
-          request
-        }
+          version: "whatwgv1",
+          request,
+        },
       },
       preferJSON: true,
     };
@@ -87,41 +90,56 @@ export class WhatwgGrafserv extends GrafservBase {
 
   protected processHeaders(headers: Headers): Record<string, string> {
     const headerDigest: Record<string, string> = Object.create(null);
-    headers.forEach((v,k)=> {
-      headerDigest[k]= v
-    })
-    return headerDigest
+    headers.forEach((v, k) => {
+      headerDigest[k] = v;
+    });
+    return headerDigest;
   }
 
   protected grafservResponseToWhatwg(response: Result | null): Response {
     if (response === null) {
-      return new Response("¯\\_(ツ)_/¯", {status: 404, headers: new Headers({"Content-Type": "text/plain"})})
+      return new Response("¯\\_(ツ)_/¯", {
+        status: 404,
+        headers: new Headers({ "Content-Type": "text/plain" }),
+      });
     }
 
     switch (response.type) {
       case "error": {
         const { statusCode, headers, error } = response;
-        const respHeaders = new Headers(headers)
-        respHeaders.append("Content-Type", "text/plain")
-        return new Response(error.message, {status: statusCode, headers:respHeaders})
+        const respHeaders = new Headers(headers);
+        respHeaders.append("Content-Type", "text/plain");
+        return new Response(error.message, {
+          status: statusCode,
+          headers: respHeaders,
+        });
       }
 
       case "buffer": {
         const { statusCode, headers, buffer } = response;
-        const respHeaders = new Headers(headers)
-        return new Response(buffer, {status: statusCode, headers:respHeaders})
+        const respHeaders = new Headers(headers);
+        return new Response(buffer, {
+          status: statusCode,
+          headers: respHeaders,
+        });
       }
 
       case "json": {
         const { statusCode, headers, json } = response;
-        const respHeaders = new Headers(headers)
-        return new Response(JSON.stringify(json), {status: statusCode, headers:respHeaders})
+        const respHeaders = new Headers(headers);
+        return new Response(JSON.stringify(json), {
+          status: statusCode,
+          headers: respHeaders,
+        });
       }
 
       default: {
         console.log("Unhandled:");
         console.dir(response);
-        return new Response("Server hasn't implemented this yet", {status: 501, headers: new Headers({"Content-Type": "text/plain"})})
+        return new Response("Server hasn't implemented this yet", {
+          status: 501,
+          headers: new Headers({ "Content-Type": "text/plain" }),
+        });
       }
     }
   }
@@ -136,13 +154,10 @@ export class WhatwgGrafserv extends GrafservBase {
           this.whatwgRequestToGrafserv(dynamicOptions, request),
         ),
       );
-    })
+    });
   }
 
-  protected processWhatwgRequest(
-    _request: Request,
-    request: RequestDigest,
-  ) {
+  protected processWhatwgRequest(_request: Request, request: RequestDigest) {
     return this.processRequest(request);
   }
 }
