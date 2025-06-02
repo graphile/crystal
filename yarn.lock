@@ -8514,7 +8514,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@whatwg-node/fetch@npm:^0.10.0, @whatwg-node/fetch@npm:^0.10.4":
+"@whatwg-node/fetch@npm:^0.10.0, @whatwg-node/fetch@npm:^0.10.4, @whatwg-node/fetch@npm:^0.10.5":
   version: 0.10.8
   resolution: "@whatwg-node/fetch@npm:0.10.8"
   dependencies:
@@ -8558,12 +8558,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@whatwg-node/promise-helpers@npm:^1.0.0, @whatwg-node/promise-helpers@npm:^1.2.1, @whatwg-node/promise-helpers@npm:^1.2.4, @whatwg-node/promise-helpers@npm:^1.3.0, @whatwg-node/promise-helpers@npm:^1.3.2":
+"@whatwg-node/promise-helpers@npm:^1.0.0, @whatwg-node/promise-helpers@npm:^1.2.1, @whatwg-node/promise-helpers@npm:^1.2.2, @whatwg-node/promise-helpers@npm:^1.2.4, @whatwg-node/promise-helpers@npm:^1.3.0, @whatwg-node/promise-helpers@npm:^1.3.2":
   version: 1.3.2
   resolution: "@whatwg-node/promise-helpers@npm:1.3.2"
   dependencies:
     tslib: "npm:^2.6.3"
   checksum: 10/22513e7075d2e6e067399f6b3065a1f280d77aab2cc8699fe5bf9496a76ea7ede2cf4d46fad6f033d0ad686f974c52f85335c3dcddd656d1c8700636713f94a9
+  languageName: node
+  linkType: hard
+
+"@whatwg-node/server@npm:^0.9.64":
+  version: 0.9.71
+  resolution: "@whatwg-node/server@npm:0.9.71"
+  dependencies:
+    "@whatwg-node/disposablestack": "npm:^0.0.6"
+    "@whatwg-node/fetch": "npm:^0.10.5"
+    "@whatwg-node/promise-helpers": "npm:^1.2.2"
+    tslib: "npm:^2.6.3"
+  checksum: 10/c649310ba19d8ebbc8a9a23d22d19d8bf568332711f6513c36f0d60e93d0c2ef6714e7cb5612baea8f87ab0eb8269ecce9b4e59dca713fb35529aca9a7760ac3
   languageName: node
   linkType: hard
 
@@ -14347,6 +14359,7 @@ __metadata:
     "@types/koa": "npm:^2.13.8"
     "@types/koa-bodyparser": "npm:^4.3.10"
     "@whatwg-node/fetch": "npm:^0.9.10"
+    "@whatwg-node/server": "npm:^0.9.64"
     debug: "npm:^4.3.4"
     eventemitter3: "npm:^5.0.1"
     express: "npm:^4.20.0"
@@ -14369,6 +14382,7 @@ __metadata:
     ws: "npm:^8.12.1"
   peerDependencies:
     "@envelop/core": ^5.0.0
+    "@whatwg-node/server": ^0.9.64
     grafast: "workspace:^"
     graphile-config: "workspace:^"
     graphql: ^16.1.0-experimental-stream-defer.6
@@ -14377,6 +14391,8 @@ __metadata:
     ws: ^8.12.1
   peerDependenciesMeta:
     "@envelop/core":
+      optional: true
+    "@whatwg-node/server":
       optional: true
     h3:
       optional: true
