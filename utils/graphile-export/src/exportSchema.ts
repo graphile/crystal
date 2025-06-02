@@ -1593,7 +1593,10 @@ function exportSchemaTypeDefs({
   customTypes.forEach((type) => {
     if (type instanceof GraphQLObjectType) {
       const typeProperties: t.ObjectProperty[] = [];
-      const plansProperties: t.ObjectProperty[] = [];
+      const plansProperties = Object.create(null) as Record<
+        string,
+        t.Expression
+      >;
 
       if (type.extensions.grafast?.assertStep) {
         typeProperties.push(
@@ -1759,18 +1762,9 @@ function exportSchemaTypeDefs({
                 args: argsAST,
               }),
             );
-        plansProperties.push(
-          t.objectProperty(identifierOrLiteral(fieldName), fieldSpec),
-        );
+        plansProperties[fieldName] = fieldSpec;
       }
-      if (plansProperties.length > 0) {
-        typeProperties.push(
-          t.objectProperty(
-            t.identifier("plans"),
-            t.objectExpression(plansProperties),
-          ),
-        );
-      }
+      sortAndAddFieldsToTypeIfNotEmpty(typeProperties, plansProperties);
 
       if (typeProperties.length > 0) {
         objectPlansProperties.push(
@@ -1782,7 +1776,10 @@ function exportSchemaTypeDefs({
       }
     } else if (type instanceof GraphQLInputObjectType) {
       const typeProperties: t.ObjectProperty[] = [];
-      const plansProperties: t.ObjectProperty[] = [];
+      const plansProperties = Object.create(null) as Record<
+        string,
+        t.Expression
+      >;
 
       if (type.extensions?.grafast?.baked) {
         typeProperties.push(
@@ -1811,57 +1808,40 @@ function exportSchemaTypeDefs({
           if (!grafast) continue;
           const keys = Object.keys(grafast);
           if (keys.length === 1 && keys[0] === "apply") {
-            plansProperties.push(
-              t.objectProperty(
-                identifierOrLiteral(fieldName),
-                convertToIdentifierViaAST(
-                  file,
-                  grafast.apply,
-                  `${type.name}.${fieldName}Apply`,
-                  `${type.name}.fields[${fieldName}].extensions.grafast.apply`,
-                ),
-              ),
+            plansProperties[fieldName] = convertToIdentifierViaAST(
+              file,
+              grafast.apply,
+              `${type.name}.${fieldName}Apply`,
+              `${type.name}.fields[${fieldName}].extensions.grafast.apply`,
             );
             continue;
           }
         }
 
-        plansProperties.push(
-          t.objectProperty(
-            identifierOrLiteral(fieldName),
-            t.objectExpression([
-              ...objectToObjectProperties({
-                extensions: extensionsAST,
-              }),
+        plansProperties[fieldName] = t.objectExpression([
+          ...objectToObjectProperties({
+            extensions: extensionsAST,
+          }),
 
-              ...(grafast
-                ? Object.entries(grafast)
-                    .map(([k, v]) => {
-                      if (v == null) return null;
-                      return t.objectProperty(
-                        t.identifier(k),
-                        convertToIdentifierViaAST(
-                          file,
-                          v,
-                          `${type.name}.${fieldName}${k}`,
-                          `${type.name}.fields[${fieldName}].extensions.grafast[${k}]`,
-                        ),
-                      );
-                    })
-                    .filter(isNotNullish)
-                : []),
-            ]),
-          ),
-        );
+          ...(grafast
+            ? Object.entries(grafast)
+                .map(([k, v]) => {
+                  if (v == null) return null;
+                  return t.objectProperty(
+                    t.identifier(k),
+                    convertToIdentifierViaAST(
+                      file,
+                      v,
+                      `${type.name}.${fieldName}${k}`,
+                      `${type.name}.fields[${fieldName}].extensions.grafast[${k}]`,
+                    ),
+                  );
+                })
+                .filter(isNotNullish)
+            : []),
+        ]);
       }
-      if (plansProperties.length > 0) {
-        typeProperties.push(
-          t.objectProperty(
-            t.identifier("plans"),
-            t.objectExpression(plansProperties),
-          ),
-        );
-      }
+      sortAndAddFieldsToTypeIfNotEmpty(typeProperties, plansProperties);
 
       if (typeProperties.length > 0) {
         inputObjectPlansProperties.push(
@@ -2308,4 +2288,18 @@ function isNotEmpty(
     return false;
   }
   return true;
+}
+
+function sortAndAddFieldsToTypeIfNotEmpty(
+  typeProperties: t.ObjectProperty[],
+  plansProperties: Record<string, t.Expression>,
+): void {
+  if (Object.keys(plansProperties).length > 0) {
+    const finalProps = Object.entries(plansProperties)
+      .sort((a, z) => a[0].localeCompare(z[0], "und"))
+      .map(([k, v]) => t.objectProperty(identifierOrLiteral(k), v));
+    typeProperties.push(
+      t.objectProperty(t.identifier("plans"), t.objectExpression(finalProps)),
+    );
+  }
 }
