@@ -425,7 +425,7 @@ export /* abstract */ class Step<TData = any> {
     const dataOnly = this.dependencyDataOnly[depId];
     if (dataOnly) {
       throw new Error(
-        `Dependency ${depId} (${step}) was declared as "data only", you are not permitted to communicate with it.`,
+        `Dependency ${depId} (${step}) of ${this} was declared as "data only", so retrieval is forbidden.`,
       );
     }
   }
@@ -630,16 +630,14 @@ ${printDeps(step, 1)}
     }
     return this.operationPlan.stepTracker.addStepDependency(this, options);
   }
-  /**
-   * @deprecated Please use `.addDataDependency($step)` or
-   * `.addStrongDependency($step)` instead. The behavior of `addDependency`
-   * will change in a future release to mean "data" dependency.
-   */
   protected addDependency(stepOrOptions: Step | AddDependencyOptions): number {
-    const options: AddDependencyOptions =
-      stepOrOptions instanceof Step
-        ? { dataOnly: false, skipDeduplication: false, step: stepOrOptions }
-        : { dataOnly: false, skipDeduplication: false, ...stepOrOptions };
+    const options: AddDependencyOptions = {
+      dataOnly: false,
+      skipDeduplication: false,
+      ...(stepOrOptions instanceof Step
+        ? { step: stepOrOptions }
+        : stepOrOptions),
+    };
     return this._addDependency(options);
   }
   protected addDataDependency(
@@ -653,15 +651,16 @@ ${printDeps(step, 1)}
       ...opts,
     });
   }
+  // Currently identical to addDependency
   protected addStrongDependency(
     stepOrOptions: Step | AddDependencyOptions,
   ): number {
-    const opts =
-      stepOrOptions instanceof Step ? { step: stepOrOptions } : stepOrOptions;
     return this._addDependency({
       dataOnly: false,
       skipDeduplication: false,
-      ...opts,
+      ...(stepOrOptions instanceof Step
+        ? { step: stepOrOptions }
+        : stepOrOptions),
     });
   }
 
