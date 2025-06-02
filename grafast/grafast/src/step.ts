@@ -196,6 +196,15 @@ export /* abstract */ class Step<TData = any> {
   protected readonly dependencyOnReject: ReadonlyArray<
     Error | null | undefined
   >;
+  /**
+   * In future we'll be able to merge "data only" dependencies somehow. For now
+   * we want people to use the right method so we encourage data only as the
+   * default and also forbid `getDep` on data only deps (no talking to your
+   * data only dependencies!)
+   *
+   * @internal
+   */
+  protected readonly dependencyDataOnly: ReadonlyArray<boolean>;
 
   /**
    * Just for mermaid
@@ -349,6 +358,7 @@ export /* abstract */ class Step<TData = any> {
     this.dependencies = [];
     this.dependencyForbiddenFlags = [];
     this.dependencyOnReject = [];
+    this.dependencyDataOnly = [];
     this.dependents = [];
     this.isOptimized = false;
     this.allowMultipleOptimizations = false;
@@ -396,12 +406,33 @@ export /* abstract */ class Step<TData = any> {
   protected getDepOptions<TStep extends Step = Step>(
     depId: number,
   ): DependencyOptions<TStep> {
+    this._assertAccessAllowed(depId);
+    return this._getDepOptions(depId);
+  }
+  protected _getDepOptions<TStep extends Step = Step>(
+    depId: number,
+  ): DependencyOptions<TStep> {
     const step = this.dependencies[depId] as TStep;
     const forbiddenFlags = this.dependencyForbiddenFlags[depId];
     const onReject = this.dependencyOnReject[depId];
-    const dataOnly = false;
+    const dataOnly = this.dependencyDataOnly[depId];
     const acceptFlags = ALL_FLAGS & ~forbiddenFlags;
     return { step, acceptFlags, onReject, dataOnly };
+  }
+
+  /**
+   * @internal
+   */
+  public _assertAccessAllowed(depId: number): void {
+    const phase = this.operationPlan.phase;
+    if (phase !== "optimize" && phase !== "plan") return;
+    const step = this.dependencies[depId];
+    const dataOnly = this.dependencyDataOnly[depId];
+    if (dataOnly) {
+      throw new Error(
+        `Dependency ${depId} (${step}) of ${this} was declared as "data only", so retrieval is forbidden.`,
+      );
+    }
   }
 
   protected getDep<TStep extends Step = Step>(
@@ -604,16 +635,14 @@ ${printDeps(step, 1)}
     }
     return this.operationPlan.stepTracker.addStepDependency(this, options);
   }
-  /**
-   * @deprecated Please use `.addDataDependency($step)` or
-   * `.addStrongDependency($step)` instead. The behavior of `addDependency`
-   * will change in a future release to mean "data" dependency.
-   */
   protected addDependency(stepOrOptions: Step | AddDependencyOptions): number {
-    const options: AddDependencyOptions =
-      stepOrOptions instanceof Step
-        ? { dataOnly: false, skipDeduplication: false, step: stepOrOptions }
-        : { dataOnly: false, skipDeduplication: false, ...stepOrOptions };
+    const options: AddDependencyOptions = {
+      dataOnly: false,
+      skipDeduplication: false,
+      ...(stepOrOptions instanceof Step
+        ? { step: stepOrOptions }
+        : stepOrOptions),
+    };
     return this._addDependency(options);
   }
   protected addDataDependency(
@@ -627,15 +656,16 @@ ${printDeps(step, 1)}
       ...opts,
     });
   }
+  // Currently identical to addDependency
   protected addStrongDependency(
     stepOrOptions: Step | AddDependencyOptions,
   ): number {
-    const opts =
-      stepOrOptions instanceof Step ? { step: stepOrOptions } : stepOrOptions;
     return this._addDependency({
       dataOnly: false,
       skipDeduplication: false,
-      ...opts,
+      ...(stepOrOptions instanceof Step
+        ? { step: stepOrOptions }
+        : stepOrOptions),
     });
   }
 

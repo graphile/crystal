@@ -118,7 +118,7 @@ export abstract class PgStmtBaseStep<T>
     }
 
     const $evalledStep = applyTransforms($step);
-    const dependencyIndex = this.addDataDependency($evalledStep);
+    const dependencyIndex = this.addStrongDependency($evalledStep);
     const symbol = Symbol(`placeholder-${$step.id}`);
     this.placeholders.push({
       symbol,

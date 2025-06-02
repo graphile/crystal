@@ -24,7 +24,7 @@ export class FirstStep<TData> extends UnbatchedStep<TData> {
       | ConnectionCapableStep<Step<TData>, any>,
   ) {
     super();
-    this.addDataDependency(itemsOrStep(parentPlan));
+    this.addStrongDependency(itemsOrStep(parentPlan));
   }
 
   [$$deepDepSkip](): Step {

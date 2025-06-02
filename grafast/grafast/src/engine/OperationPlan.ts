@@ -3265,6 +3265,7 @@ export class OperationPlan {
       dependencies: deps,
       dependencyForbiddenFlags: flags,
       dependencyOnReject: onReject,
+      dependencyDataOnly: dataOnly,
       layerPlan: layerPlan,
       constructor: stepConstructor,
       peerKey,
@@ -3333,13 +3334,15 @@ export class OperationPlan {
           layerPlan: peerLayerPlan,
           dependencyForbiddenFlags: peerFlags,
           dependencyOnReject: peerOnReject,
+          dependencyDataOnly: peerDataOnly,
         } = possiblyPeer;
         if (
           peerLayerPlan.depth >= minDepth &&
           possiblyPeer.dependencies.length === dependencyCount &&
           isPeerLayerPlan(peerLayerPlan, ancestry[peerLayerPlan.depth]) &&
           peerFlags[dependencyIndex] === flags[dependencyIndex] &&
-          peerOnReject[dependencyIndex] === onReject[dependencyIndex]
+          peerOnReject[dependencyIndex] === onReject[dependencyIndex] &&
+          peerDataOnly[dependencyIndex] === dataOnly[dependencyIndex]
         ) {
           if (allPeers === null) {
             allPeers = [possiblyPeer];
@@ -3399,13 +3402,15 @@ export class OperationPlan {
               layerPlan: peerLayerPlan,
               dependencyForbiddenFlags: peerFlags,
               dependencyOnReject: peerOnReject,
+              dependencyDataOnly: peerDataOnly,
               dependencies: peerDependencies,
             } = possiblyPeer;
             if (
               peerDependencies.length === dependencyCount &&
               isPeerLayerPlan(peerLayerPlan, ancestry[peerLayerPlan.depth]) &&
               peerFlags[dependencyIndex] === flags[dependencyIndex] &&
-              peerOnReject[dependencyIndex] === onReject[dependencyIndex]
+              peerOnReject[dependencyIndex] === onReject[dependencyIndex] &&
+              peerDataOnly[dependencyIndex] === dataOnly[dependencyIndex]
             ) {
               possiblePeers.push(possiblyPeer);
             }
@@ -4220,7 +4225,7 @@ export class OperationPlan {
           const { step, dependencyIndex } = dependent;
           const $dependent = sudo(step);
           const inlineDetails = $flag.inline(
-            $dependent.getDepOptions(dependencyIndex),
+            $dependent._getDepOptions(dependencyIndex),
           );
           if (inlineDetails === null) {
             continue flagLoop;
@@ -4237,10 +4242,16 @@ export class OperationPlan {
           const {
             $dependent,
             dependencyIndex,
-            inlineDetails: { onReject, acceptFlags = DEFAULT_ACCEPT_FLAGS },
+            inlineDetails: {
+              onReject,
+              acceptFlags = DEFAULT_ACCEPT_FLAGS,
+              dataOnly = false,
+            },
           } = todo;
           writeableArray($dependent.dependencyOnReject)[dependencyIndex] =
             onReject;
+          writeableArray($dependent.dependencyDataOnly)[dependencyIndex] =
+            dataOnly;
           writeableArray($dependent.dependencyForbiddenFlags)[dependencyIndex] =
             ALL_FLAGS & ~acceptFlags;
         }
@@ -4933,6 +4944,7 @@ export class OperationPlan {
         dependencyOnReject: sstep.dependencyOnReject.map((or) =>
           or ? String(or) : or,
         ),
+        dependencyDataOnly: sstep.dependencyDataOnly.slice(),
         polymorphicPaths: step.polymorphicPaths
           ? [...step.polymorphicPaths]
           : undefined,
