@@ -7,8 +7,7 @@ import type {
   RequestDigest,
   Result,
 } from "../../interfaces.js";
-
-import { OptionsFromConfig } from '../../options.js';
+import type { OptionsFromConfig } from '../../options.js';
 import { httpError } from '../../utils.js';
 
 export function getBodyFromRequest(
