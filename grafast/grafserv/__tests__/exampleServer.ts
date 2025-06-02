@@ -1,18 +1,11 @@
-import { createServer, Server } from "node:http";
+import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
 
 import { constant, error, makeGrafastSchema } from "grafast";
 import { resolvePreset } from "graphile-config";
 
-import { GrafservBase } from "../src/index.js";
-import {
-  grafserv as grafservNode,
-  NodeGrafserv,
-} from "../src/servers/node/index.js";
-import {
-  grafserv as grafservWhatwg,
-  WhatwgGrafserv,
-} from "../src/servers/whatwg-node-server";
+import { grafserv as grafservNode } from "../src/servers/node/index.js";
+import { grafserv as grafservWhatwg } from "../src/servers/whatwg-node-server";
 
 export async function makeExampleServer(
   preset: GraphileConfig.Preset = {
