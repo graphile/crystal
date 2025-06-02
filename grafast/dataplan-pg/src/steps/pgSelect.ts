@@ -677,7 +677,7 @@ export class PgSelectStep<
       }
     }
 
-    this.contextId = this.addDataDependency(
+    this.contextId = this.addUnaryDependency(
       inContext ?? resource.executor.context(),
     );
 
@@ -1084,11 +1084,10 @@ export class PgSelectStep<
     if (first === 0 || last === 0) {
       return arrayOfLength(count, NO_ROWS);
     }
-    const contextDep = values[this.contextId];
+    const context = values[this.contextId].unaryValue();
 
     if (stream == null) {
       const specs = indexMap<PgExecutorInput<any>>((i) => {
-        const context = contextDep.at(i);
         return {
           // The context is how we'd handle different connections with different claims
           context,
@@ -1141,7 +1140,6 @@ export class PgSelectStep<
       let specs: readonly PgExecutorInput<any>[] | null = null;
       if (text) {
         specs = indexMap((i) => {
-          const context = contextDep.at(i);
           return {
             // The context is how we'd handle different connections with different claims
             context,
@@ -1167,8 +1165,6 @@ export class PgSelectStep<
         : null;
 
       const streamSpecs = indexMap<PgExecutorInput<any>>((i) => {
-        const context = contextDep.at(i);
-
         return {
           // The context is how we'd handle different connections with different claims
           context,

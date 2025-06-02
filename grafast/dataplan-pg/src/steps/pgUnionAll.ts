@@ -614,7 +614,7 @@ export class PgUnionAllStep<
       for (const member of members) {
         if (!this.executor) {
           this.executor = member.resource.executor;
-          this.contextId = this.addDataDependency(this.executor.context());
+          this.contextId = this.addUnaryDependency(this.executor.context());
         }
         const { path = [] } = member;
         const conditions: SQL[] = [];
@@ -1025,13 +1025,12 @@ on (${sql.indent(
       return indexMap(() => NO_ROWS);
     }
 
-    const contextDep = values[this.contextId];
-    if (contextDep === undefined) {
+    const context = values[this.contextId]?.unaryValue();
+    if (context === undefined) {
       throw new Error("We have no context dependency?");
     }
 
     const specs = indexMap<PgExecutorInput<any>>((i) => {
-      const context = contextDep.at(i);
       return {
         // The context is how we'd handle different connections with different claims
         context,
