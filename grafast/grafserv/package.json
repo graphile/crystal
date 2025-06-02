@@ -42,6 +42,10 @@
       "types": "./dist/servers/hono/v4/index.d.ts",
       "default": "./dist/servers/hono/v4/index.js"
     },
+    "./whatwg-node__server/v4": {
+      "types": "./dist/servers/whatwg-node__server/v0/index.d.ts",
+      "default": "./dist/servers/whatwg-node__server/v0/index.js"
+    },
     "./ruru": {
       "types": "./fwd/ruru/index.d.ts",
       "node": "./fwd/ruru/index.js",
