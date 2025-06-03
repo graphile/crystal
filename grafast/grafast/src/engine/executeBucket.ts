@@ -313,11 +313,50 @@ export function executeBucket(
         ) {
           // PERF: we've already calculated this once; can we reference that again here?
           const stream = evaluateStream(bucket, finishedStep);
+
+          if (!stream && !valueIsAsyncIterable && Array.isArray(value)) {
+            // Fast mode
+            const valueCount = value.length;
+            /** We only create a duplicate array if the source array contains promises */
+            let replacement: Array<any> | null = null;
+            for (let i = 0; i < valueCount; i++) {
+              const item = value[i];
+              if (isPromiseLike(item)) {
+                if (replacement === null) {
+                  // Copy up to here!
+                  replacement = value.slice(0, i);
+                }
+                replacement[i] = null;
+                const index = i;
+                const promise = item.then(
+                  (v) => void (replacement![index] = v),
+                  (e) => void (replacement![index] = flagError(e)),
+                );
+                if (!promises) {
+                  promises = [promise];
+                } else {
+                  promises.push(promise);
+                }
+              } else if (replacement !== null) {
+                replacement[i] = item;
+              }
+            }
+            const list = replacement === null ? value : replacement;
+            bucket.setResult(finishedStep, resultIndex, list, flags);
+            return;
+          }
+
           const initialCount = stream?.initialCount ?? Infinity;
 
-          const iterator = valueIsAsyncIterable
-            ? (value as AsyncIterable<any>)[Symbol.asyncIterator]()
-            : (value as Iterable<any>)[Symbol.iterator]();
+          let iterator: Iterator<any, any, any> | AsyncIterator<any, any, any>;
+          try {
+            iterator = valueIsAsyncIterable
+              ? (value as AsyncIterable<any>)[Symbol.asyncIterator]()
+              : (value as Iterable<any>)[Symbol.iterator]();
+          } catch (e) {
+            bucket.setResult(finishedStep, resultIndex, e, flags | FLAG_ERROR);
+            return;
+          }
 
           // Here we track the iterator via the bucket, this allows us to
           // ensure that the iterator is terminated even if the stream is never
