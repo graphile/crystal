@@ -1200,15 +1200,6 @@ function objectToObjectProperties(o: {
     .map(([key, value]) => t.objectProperty(identifierOrLiteral(key), value!));
 }
 
-/** Only use when you're sure the keys are safe to use as identifiers */
-function dangerousObjectToObjectPropertiesWithIdentifierKeys(o: {
-  [key: string]: t.Expression | null;
-}): t.ObjectProperty[] {
-  return Object.entries(o)
-    .filter(([, value]) => value != null)
-    .map(([key, value]) => t.objectProperty(t.identifier(key), value!));
-}
-
 function extensions(
   file: CodegenFile,
   extensions: object | null | undefined,
@@ -1573,7 +1564,12 @@ function exportSchemaTypeDefs({
   file,
 }: SchemaExportDetails) {
   const typeDefsExportName = file.makeVariable("typeDefs");
-  const plansExportName = file.makeVariable("plans");
+  const objectPlansProperties: PropObj = Object.create(null);
+  const interfacePlansProperties: PropObj = Object.create(null);
+  const unionPlansProperties: PropObj = Object.create(null);
+  const inputObjectPlansProperties: PropObj = Object.create(null);
+  const scalarPlansProperties: PropObj = Object.create(null);
+  const enumPlansProperties: PropObj = Object.create(null);
   const schemaExportName = file.makeVariable("schema");
 
   const typeDefsString = printSchema(schema);
@@ -1585,49 +1581,34 @@ function exportSchemaTypeDefs({
     { type: "CommentBlock", value: " GraphQL " } as any,
   ];
 
-  const plansProperties: t.ObjectProperty[] = [];
   customTypes.forEach((type) => {
     if (type instanceof GraphQLObjectType) {
-      const typeProperties: t.ObjectProperty[] = [];
+      const typeProperties = Object.create(null) as PropObj;
+      const plansProperties = Object.create(null) as PropObj;
 
       if (type.extensions.grafast?.assertStep) {
-        typeProperties.push(
-          t.objectProperty(
-            t.identifier("__assertStep"),
-            convertToIdentifierViaAST(
-              file,
-              type.extensions.grafast.assertStep,
-              `${type.name}AssertStep`,
-              `${type.name}.extensions.assertStep`,
-            ),
-          ),
+        typeProperties.assertStep = convertToIdentifierViaAST(
+          file,
+          type.extensions.grafast.assertStep,
+          `${type.name}AssertStep`,
+          `${type.name}.extensions.assertStep`,
         );
       }
       if (type.isTypeOf) {
-        typeProperties.push(
-          t.objectProperty(
-            t.identifier("__isTypeOf"),
-            convertToIdentifierViaAST(
-              file,
-              type.isTypeOf,
-              `${type.name}IsTypeOf`,
-              `${type.name}.extensions.isTypeOf`,
-            ),
-          ),
+        typeProperties.isTypeOf = convertToIdentifierViaAST(
+          file,
+          type.isTypeOf,
+          `${type.name}IsTypeOf`,
+          `${type.name}.extensions.isTypeOf`,
         );
       }
 
       if (type.extensions.grafast?.planType) {
-        typeProperties.push(
-          t.objectProperty(
-            t.identifier("__planType"),
-            convertToIdentifierViaAST(
-              file,
-              type.extensions.grafast.planType,
-              `${type.name}PlanType`,
-              `${type.name}.extensions.planType`,
-            ),
-          ),
+        typeProperties.planType = convertToIdentifierViaAST(
+          file,
+          type.extensions.grafast.planType,
+          `${type.name}PlanType`,
+          `${type.name}.extensions.planType`,
         );
       }
 
@@ -1754,33 +1735,20 @@ function exportSchemaTypeDefs({
                 args: argsAST,
               }),
             );
-        typeProperties.push(
-          t.objectProperty(identifierOrLiteral(fieldName), fieldSpec),
-        );
+        plansProperties[fieldName] = fieldSpec;
       }
-
-      if (typeProperties.length > 0) {
-        plansProperties.push(
-          t.objectProperty(
-            identifierOrLiteral(type.name),
-            t.objectExpression(typeProperties),
-          ),
-        );
-      }
+      setIfNotEmpty(typeProperties, "plans", plansProperties, true);
+      setIfNotEmpty(objectPlansProperties, type.name, typeProperties, false);
     } else if (type instanceof GraphQLInputObjectType) {
-      const typeProperties: t.ObjectProperty[] = [];
+      const typeProperties = Object.create(null) as PropObj;
+      const plansProperties = Object.create(null) as PropObj;
 
       if (type.extensions?.grafast?.baked) {
-        typeProperties.push(
-          t.objectProperty(
-            t.identifier("__baked"),
-            convertToIdentifierViaAST(
-              file,
-              type.extensions?.grafast.baked,
-              `${type.name}.inputPlan`,
-              `${type.name}.extensions.grafast.baked`,
-            ),
-          ),
+        typeProperties.baked = convertToIdentifierViaAST(
+          file,
+          type.extensions?.grafast.baked,
+          `${type.name}.inputPlan`,
+          `${type.name}.extensions.grafast.baked`,
         );
       }
 
@@ -1797,58 +1765,46 @@ function exportSchemaTypeDefs({
           if (!grafast) continue;
           const keys = Object.keys(grafast);
           if (keys.length === 1 && keys[0] === "apply") {
-            typeProperties.push(
-              t.objectProperty(
-                identifierOrLiteral(fieldName),
-                convertToIdentifierViaAST(
-                  file,
-                  grafast.apply,
-                  `${type.name}.${fieldName}Apply`,
-                  `${type.name}.fields[${fieldName}].extensions.grafast.apply`,
-                ),
-              ),
+            plansProperties[fieldName] = convertToIdentifierViaAST(
+              file,
+              grafast.apply,
+              `${type.name}.${fieldName}Apply`,
+              `${type.name}.fields[${fieldName}].extensions.grafast.apply`,
             );
             continue;
           }
         }
 
-        typeProperties.push(
-          t.objectProperty(
-            identifierOrLiteral(fieldName),
-            t.objectExpression([
-              ...objectToObjectProperties({
-                extensions: extensionsAST,
-              }),
+        plansProperties[fieldName] = t.objectExpression([
+          ...objectToObjectProperties({
+            extensions: extensionsAST,
+          }),
 
-              ...(grafast
-                ? Object.entries(grafast)
-                    .map(([k, v]) => {
-                      if (v == null) return null;
-                      return t.objectProperty(
-                        t.identifier(k),
-                        convertToIdentifierViaAST(
-                          file,
-                          v,
-                          `${type.name}.${fieldName}${k}`,
-                          `${type.name}.fields[${fieldName}].extensions.grafast[${k}]`,
-                        ),
-                      );
-                    })
-                    .filter(isNotNullish)
-                : []),
-            ]),
-          ),
-        );
+          ...(grafast
+            ? Object.entries(grafast)
+                .map(([k, v]) => {
+                  if (v == null) return null;
+                  return t.objectProperty(
+                    t.identifier(k),
+                    convertToIdentifierViaAST(
+                      file,
+                      v,
+                      `${type.name}.${fieldName}${k}`,
+                      `${type.name}.fields[${fieldName}].extensions.grafast[${k}]`,
+                    ),
+                  );
+                })
+                .filter(isNotNullish)
+            : []),
+        ]);
       }
-
-      if (typeProperties.length > 0) {
-        plansProperties.push(
-          t.objectProperty(
-            identifierOrLiteral(type.name),
-            t.objectExpression(typeProperties),
-          ),
-        );
-      }
+      setIfNotEmpty(typeProperties, "plans", plansProperties, true);
+      setIfNotEmpty(
+        inputObjectPlansProperties,
+        type.name,
+        typeProperties,
+        false,
+      );
     } else if (
       type instanceof GraphQLInterfaceType ||
       type instanceof GraphQLUnionType
@@ -1859,38 +1815,37 @@ function exportSchemaTypeDefs({
         config.extensions.grafast?.toSpecifier ||
         config.extensions.grafast?.planType
       ) {
-        plansProperties.push(
-          t.objectProperty(
-            identifierOrLiteral(type.name),
-            t.objectExpression(
-              dangerousObjectToObjectPropertiesWithIdentifierKeys({
-                __resolveType: type.resolveType
-                  ? convertToIdentifierViaAST(
-                      file,
-                      type.resolveType,
-                      `${type.name}ResolveType`,
-                      `${type.name}.resolveType`,
-                    )
-                  : null,
-                __toSpecifier: type.extensions?.grafast?.toSpecifier
-                  ? convertToIdentifierViaAST(
-                      file,
-                      type.extensions?.grafast?.toSpecifier,
-                      `${type.name}ToSpecifier`,
-                      `${type.name}.toSpecifier`,
-                    )
-                  : null,
-                __planType: type.extensions?.grafast?.planType
-                  ? convertToIdentifierViaAST(
-                      file,
-                      type.extensions?.grafast?.planType,
-                      `${type.name}PlanType`,
-                      `${type.name}.planType`,
-                    )
-                  : null,
-              }),
-            ),
-          ),
+        const target =
+          type instanceof GraphQLInterfaceType
+            ? interfacePlansProperties
+            : unionPlansProperties;
+        target[type.name] = t.objectExpression(
+          objectToObjectProperties({
+            resolveType: type.resolveType
+              ? convertToIdentifierViaAST(
+                  file,
+                  type.resolveType,
+                  `${type.name}ResolveType`,
+                  `${type.name}.resolveType`,
+                )
+              : null,
+            toSpecifier: type.extensions?.grafast?.toSpecifier
+              ? convertToIdentifierViaAST(
+                  file,
+                  type.extensions?.grafast?.toSpecifier,
+                  `${type.name}ToSpecifier`,
+                  `${type.name}.toSpecifier`,
+                )
+              : null,
+            planType: type.extensions?.grafast?.planType
+              ? convertToIdentifierViaAST(
+                  file,
+                  type.extensions?.grafast?.planType,
+                  `${type.name}PlanType`,
+                  `${type.name}.planType`,
+                )
+              : null,
+          }),
         );
       }
     } else if (type instanceof GraphQLScalarType) {
@@ -1909,42 +1864,37 @@ function exportSchemaTypeDefs({
         type.parseValue !== GraphQLScalarType.prototype.parseValue ||
         type.parseLiteral !== GraphQLScalarType.prototype.parseLiteral
       ) {
-        plansProperties.push(
-          t.objectProperty(
-            identifierOrLiteral(type.name),
-            t.objectExpression(
-              objectToObjectProperties({
-                serialize:
-                  type.serialize !== GraphQLScalarType.prototype.serialize
-                    ? convertToIdentifierViaAST(
-                        file,
-                        type.serialize,
-                        `${type.name}Serialize`,
-                        `${type.name}.serialize`,
-                      )
-                    : null,
-                parseValue:
-                  type.parseValue !== GraphQLScalarType.prototype.parseValue
-                    ? convertToIdentifierViaAST(
-                        file,
-                        type.parseValue,
-                        `${type.name}ParseValue`,
-                        `${type.name}.parseValue`,
-                      )
-                    : null,
-                parseLiteral:
-                  type.parseLiteral !== GraphQLScalarType.prototype.parseLiteral
-                    ? convertToIdentifierViaAST(
-                        file,
-                        type.parseLiteral,
-                        `${type.name}ParseLiteral`,
-                        `${type.name}.parseLiteral`,
-                      )
-                    : null,
-                plan: planAST,
-              }),
-            ),
-          ),
+        scalarPlansProperties[type.name] = t.objectExpression(
+          objectToObjectProperties({
+            serialize:
+              type.serialize !== GraphQLScalarType.prototype.serialize
+                ? convertToIdentifierViaAST(
+                    file,
+                    type.serialize,
+                    `${type.name}Serialize`,
+                    `${type.name}.serialize`,
+                  )
+                : null,
+            parseValue:
+              type.parseValue !== GraphQLScalarType.prototype.parseValue
+                ? convertToIdentifierViaAST(
+                    file,
+                    type.parseValue,
+                    `${type.name}ParseValue`,
+                    `${type.name}.parseValue`,
+                  )
+                : null,
+            parseLiteral:
+              type.parseLiteral !== GraphQLScalarType.prototype.parseLiteral
+                ? convertToIdentifierViaAST(
+                    file,
+                    type.parseLiteral,
+                    `${type.name}ParseLiteral`,
+                    `${type.name}.parseLiteral`,
+                  )
+                : null,
+            plan: planAST,
+          }),
         );
       }
     } else if (type instanceof GraphQLEnumType) {
@@ -2022,12 +1972,7 @@ function exportSchemaTypeDefs({
       }
 
       if (enumValues.length > 0) {
-        plansProperties.push(
-          t.objectProperty(
-            identifierOrLiteral(type.name),
-            t.objectExpression(enumValues),
-          ),
-        );
+        enumPlansProperties[type.name] = t.objectExpression(enumValues);
       }
     } else {
       const never: never = type;
@@ -2040,26 +1985,52 @@ function exportSchemaTypeDefs({
       t.variableDeclarator(typeDefsExportName, graphqlAST),
     ]),
   );
-  const plans = t.exportNamedDeclaration(
-    t.variableDeclaration("const", [
-      t.variableDeclarator(
-        plansExportName,
-        t.objectExpression(plansProperties),
-      ),
-    ]),
-  );
-
   file.addStatements(typeDefs);
-  file.addStatements(plans);
+
+  const typeDefsEtc: Record<string, t.Identifier> = {
+    typeDefs: typeDefsExportName,
+  };
+
+  const stuff: PropObj = Object.create(null);
+  setIfNotEmpty(
+    stuff,
+    "objects",
+    objectPlansProperties,
+    [
+      schema.getQueryType()?.name,
+      schema.getMutationType()?.name,
+      schema.getSubscriptionType()?.name,
+    ].filter((n) => n != null),
+  );
+  setIfNotEmpty(stuff, "interfaces", interfacePlansProperties, true);
+  setIfNotEmpty(stuff, "unions", unionPlansProperties, true);
+  setIfNotEmpty(stuff, "inputObjects", inputObjectPlansProperties, true);
+  setIfNotEmpty(stuff, "scalars", scalarPlansProperties, true);
+  setIfNotEmpty(stuff, "enums", enumPlansProperties, true);
+
+  const todos: Array<() => void> = [];
+  for (const [key, props] of Object.entries(stuff)) {
+    const exportName = file.makeVariable(key);
+    // Do this afterwards so all the variables are reserved first.
+    todos.push(() => {
+      const plans = t.exportNamedDeclaration(
+        t.variableDeclaration("const", [
+          t.variableDeclarator(exportName, props),
+        ]),
+      );
+      file.addStatements(plans);
+      typeDefsEtc[key] = exportName;
+    });
+  }
+  // Now all variables are declared, we can populate them
+  for (const todo of todos) {
+    todo();
+  }
+
   const makeGrafastSchemaAST = file.import("grafast", "makeGrafastSchema");
 
   const schemaAST = t.callExpression(makeGrafastSchemaAST, [
-    t.objectExpression(
-      objectToObjectProperties({
-        typeDefs: typeDefsExportName,
-        plans: plansExportName,
-      }),
-    ),
+    t.objectExpression(objectToObjectProperties(typeDefsEtc)),
   ]);
   file.addStatements(
     t.exportNamedDeclaration(
@@ -2262,4 +2233,41 @@ function isNotEmpty(
     return false;
   }
   return true;
+}
+type PropObj = Record<string, t.Expression>;
+
+function setIfNotEmpty(
+  target: PropObj,
+  key: string,
+  value: PropObj,
+  sort: readonly string[] | boolean,
+): void {
+  if (Object.keys(value).length > 0) {
+    const entries = Object.entries(value);
+    if (typeof sort === "boolean") {
+      entries.sort((a, z) => a[0].localeCompare(z[0], "und"));
+    } else if (sort) {
+      entries.sort((a, z) => {
+        const ka = a[0];
+        const kz = z[0];
+
+        // First, compare keys against the specific defined order
+        const sa = sort.indexOf(ka);
+        const sz = sort.indexOf(kz);
+        if (sa >= 0) {
+          if (sz < 0) return -1;
+          return sa - sz;
+        } else if (sz >= 0) {
+          return 1;
+        }
+
+        // Failing that, compare them alphabetically
+        return ka.localeCompare(kz, "und");
+      });
+    }
+    const finalProps = entries.map(([k, v]) =>
+      t.objectProperty(identifierOrLiteral(k), v),
+    );
+    target[key] = t.objectExpression(finalProps);
+  }
 }
