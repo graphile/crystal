@@ -1,7 +1,11 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import { expect } from "chai";
 import { resolvePreset } from "graphile-config";
-import type { AsyncExecutionResult, ExecutionResult } from "graphql";
+import {
+  type AsyncExecutionResult,
+  type ExecutionResult,
+  GraphQLError,
+} from "graphql";
 import { it } from "mocha";
 
 import type {
@@ -77,6 +81,8 @@ const schema = makeGrafastSchema({
     }
     type Query {
       list: [Thing!]
+      listContainingErrors: [Int]
+      asyncListContainingErrors: [Int]
       sideEffectListCheck(arr: [String]!): Int
     }
   `,
@@ -85,6 +91,41 @@ const schema = makeGrafastSchema({
       plans: {
         list() {
           return constant([1, 2]);
+        },
+        listContainingErrors() {
+          return lambda(null, () => [
+            1,
+            2,
+            Promise.reject(new GraphQLError("Test 3")),
+            4,
+            5,
+            Promise.reject(new GraphQLError("Test 6")),
+            7,
+          ]);
+        },
+        asyncListContainingErrors() {
+          return lambda(null, () => {
+            // If we tried to do this with an async generator function, it
+            // would terminate after item 3, so instead we've written our own
+            // async iterable.
+            let i = 0;
+            return {
+              [Symbol.asyncIterator]() {
+                return this;
+              },
+              async next() {
+                i++;
+                if (i >= 8) {
+                  return { done: true, value: undefined };
+                }
+                const value =
+                  i === 3 || i === 6
+                    ? Promise.reject(new GraphQLError(`Test ${i}`))
+                    : i;
+                return { done: false, value };
+              },
+            };
+          });
         },
         sideEffectListCheck(_: Step, fieldArgs: FieldArgs) {
           const $mol = context().get("mol");
@@ -207,6 +248,92 @@ it(
     expect(result.errors).to.be.undefined;
     expect(result.data).to.deep.equal({
       sideEffectListCheck: 2,
+    });
+  }),
+);
+
+it(
+  "allows for errors inside of lists",
+  throwOnUnhandledRejections(async () => {
+    const source = /* GraphQL */ `
+      query MyQuery {
+        listContainingErrors
+      }
+    `;
+    const result = (await grafast({
+      schema,
+      source,
+      requestContext,
+      resolvedPreset,
+    })) as ExecutionResult;
+    expect(result.errors).to.have.length(2);
+    expect(result.errors!.map((e) => e.toJSON())).to.deep.equal([
+      {
+        message: "Test 3",
+        path: ["listContainingErrors", 2],
+        locations: [
+          {
+            line: 3,
+            column: 9,
+          },
+        ],
+      },
+      {
+        message: "Test 6",
+        path: ["listContainingErrors", 5],
+        locations: [
+          {
+            line: 3,
+            column: 9,
+          },
+        ],
+      },
+    ]);
+    expect(result.data).to.deep.equal({
+      listContainingErrors: [1, 2, null, 4, 5, null, 7],
+    });
+  }),
+);
+
+it(
+  "allows for errors inside of async iterables",
+  throwOnUnhandledRejections(async () => {
+    const source = /* GraphQL */ `
+      query MyQuery {
+        asyncListContainingErrors
+      }
+    `;
+    const result = (await grafast({
+      schema,
+      source,
+      requestContext,
+      resolvedPreset,
+    })) as ExecutionResult;
+    expect(result.errors).to.have.length(2);
+    expect(result.errors!.map((e) => e.toJSON())).to.deep.equal([
+      {
+        message: "Test 3",
+        path: ["asyncListContainingErrors", 2],
+        locations: [
+          {
+            line: 3,
+            column: 9,
+          },
+        ],
+      },
+      {
+        message: "Test 6",
+        path: ["asyncListContainingErrors", 5],
+        locations: [
+          {
+            line: 3,
+            column: 9,
+          },
+        ],
+      },
+    ]);
+    expect(result.data).to.deep.equal({
+      asyncListContainingErrors: [1, 2, null, 4, 5, null, 7],
     });
   }),
 );
