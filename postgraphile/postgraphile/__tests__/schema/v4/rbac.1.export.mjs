@@ -11344,210 +11344,1180 @@ input DeletePersonByEmailInput {
   clientMutationId: String
   email: Email!
 }`;
-export const plans = {
+export const objects = {
   Query: {
-    __assertStep() {
+    assertStep() {
       return true;
     },
-    query() {
-      return rootValue();
-    },
-    nodeId($parent) {
-      const specifier = nodeIdHandler_Query.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Query.codec.name].encode);
-    },
-    node(_$root, fieldArgs) {
-      return fieldArgs.getRaw("nodeId");
-    },
-    personSecretByPersonId(_$root, {
-      $personId
-    }) {
-      return resource_person_secretPgResource.get({
-        person_id: $personId
-      });
-    },
-    leftArmById(_$root, {
-      $id
-    }) {
-      return resource_left_armPgResource.get({
-        id: $id
-      });
-    },
-    leftArmByPersonId(_$root, {
-      $personId
-    }) {
-      return resource_left_armPgResource.get({
-        person_id: $personId
-      });
-    },
-    postById(_$root, {
-      $id
-    }) {
-      return resource_postPgResource.get({
-        id: $id
-      });
-    },
-    personById(_$root, {
-      $id
-    }) {
-      return resource_personPgResource.get({
-        id: $id
-      });
-    },
-    personByEmail(_$root, {
-      $email
-    }) {
-      return resource_personPgResource.get({
-        email: $email
-      });
-    },
-    currentUserId($root, args, _info) {
-      const selectArgs = makeArgs_current_user_id(args);
-      return resource_current_user_idPgResource.execute(selectArgs);
-    },
-    returnTableWithoutGrants($root, args, _info) {
-      const selectArgs = makeArgs_current_user_id(args);
-      return resource_return_table_without_grantsPgResource.execute(selectArgs);
-    },
-    personSecret(_$parent, args) {
-      const $nodeId = args.getRaw("nodeId");
-      return nodeFetcher_PersonSecret($nodeId);
-    },
-    leftArm(_$parent, args) {
-      const $nodeId = args.getRaw("nodeId");
-      return nodeFetcher_LeftArm($nodeId);
-    },
-    post(_$parent, args) {
-      const $nodeId = args.getRaw("nodeId");
-      return nodeFetcher_Post($nodeId);
-    },
-    person(_$parent, args) {
-      const $nodeId = args.getRaw("nodeId");
-      return nodeFetcher_Person($nodeId);
-    },
-    allPersonSecrets: {
-      plan() {
-        return connection(resource_person_secretPgResource.find());
-      },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
+    plans: {
+      allLeftArms: {
+        plan() {
+          return connection(resource_left_armPgResource.find());
         },
-        last(_, $connection, val) {
-          $connection.setLast(val.getRaw());
-        },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        },
-        before(_, $connection, val) {
-          $connection.setBefore(val.getRaw());
-        },
-        after(_, $connection, val) {
-          $connection.setAfter(val.getRaw());
-        },
-        condition(_condition, $connection, arg) {
-          const $select = $connection.getSubplan();
-          arg.apply($select, qbWhereBuilder);
-        },
-        orderBy(parent, $connection, value) {
-          const $select = $connection.getSubplan();
-          value.apply($select);
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          last(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          before(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          },
+          after(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $connection, value) {
+            const $select = $connection.getSubplan();
+            value.apply($select);
+          }
         }
-      }
-    },
-    allLeftArms: {
-      plan() {
-        return connection(resource_left_armPgResource.find());
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
+      allPeople: {
+        plan() {
+          return connection(resource_personPgResource.find());
         },
-        last(_, $connection, val) {
-          $connection.setLast(val.getRaw());
-        },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        },
-        before(_, $connection, val) {
-          $connection.setBefore(val.getRaw());
-        },
-        after(_, $connection, val) {
-          $connection.setAfter(val.getRaw());
-        },
-        condition(_condition, $connection, arg) {
-          const $select = $connection.getSubplan();
-          arg.apply($select, qbWhereBuilder);
-        },
-        orderBy(parent, $connection, value) {
-          const $select = $connection.getSubplan();
-          value.apply($select);
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          last(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          before(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          },
+          after(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $connection, value) {
+            const $select = $connection.getSubplan();
+            value.apply($select);
+          }
         }
-      }
-    },
-    allPosts: {
-      plan() {
-        return connection(resource_postPgResource.find());
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
+      allPersonSecrets: {
+        plan() {
+          return connection(resource_person_secretPgResource.find());
         },
-        last(_, $connection, val) {
-          $connection.setLast(val.getRaw());
-        },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        },
-        before(_, $connection, val) {
-          $connection.setBefore(val.getRaw());
-        },
-        after(_, $connection, val) {
-          $connection.setAfter(val.getRaw());
-        },
-        condition(_condition, $connection, arg) {
-          const $select = $connection.getSubplan();
-          arg.apply($select, qbWhereBuilder);
-        },
-        orderBy(parent, $connection, value) {
-          const $select = $connection.getSubplan();
-          value.apply($select);
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          last(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          before(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          },
+          after(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $connection, value) {
+            const $select = $connection.getSubplan();
+            value.apply($select);
+          }
         }
-      }
-    },
-    allPeople: {
-      plan() {
-        return connection(resource_personPgResource.find());
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
+      allPosts: {
+        plan() {
+          return connection(resource_postPgResource.find());
         },
-        last(_, $connection, val) {
-          $connection.setLast(val.getRaw());
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          last(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          before(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          },
+          after(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $connection, value) {
+            const $select = $connection.getSubplan();
+            value.apply($select);
+          }
+        }
+      },
+      currentUserId($root, args, _info) {
+        const selectArgs = makeArgs_current_user_id(args);
+        return resource_current_user_idPgResource.execute(selectArgs);
+      },
+      leftArm(_$parent, args) {
+        const $nodeId = args.getRaw("nodeId");
+        return nodeFetcher_LeftArm($nodeId);
+      },
+      leftArmById(_$root, {
+        $id
+      }) {
+        return resource_left_armPgResource.get({
+          id: $id
+        });
+      },
+      leftArmByPersonId(_$root, {
+        $personId
+      }) {
+        return resource_left_armPgResource.get({
+          person_id: $personId
+        });
+      },
+      node(_$root, fieldArgs) {
+        return fieldArgs.getRaw("nodeId");
+      },
+      nodeId($parent) {
+        const specifier = nodeIdHandler_Query.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_Query.codec.name].encode);
+      },
+      person(_$parent, args) {
+        const $nodeId = args.getRaw("nodeId");
+        return nodeFetcher_Person($nodeId);
+      },
+      personByEmail(_$root, {
+        $email
+      }) {
+        return resource_personPgResource.get({
+          email: $email
+        });
+      },
+      personById(_$root, {
+        $id
+      }) {
+        return resource_personPgResource.get({
+          id: $id
+        });
+      },
+      personSecret(_$parent, args) {
+        const $nodeId = args.getRaw("nodeId");
+        return nodeFetcher_PersonSecret($nodeId);
+      },
+      personSecretByPersonId(_$root, {
+        $personId
+      }) {
+        return resource_person_secretPgResource.get({
+          person_id: $personId
+        });
+      },
+      post(_$parent, args) {
+        const $nodeId = args.getRaw("nodeId");
+        return nodeFetcher_Post($nodeId);
+      },
+      postById(_$root, {
+        $id
+      }) {
+        return resource_postPgResource.get({
+          id: $id
+        });
+      },
+      query() {
+        return rootValue();
+      },
+      returnTableWithoutGrants($root, args, _info) {
+        const selectArgs = makeArgs_current_user_id(args);
+        return resource_return_table_without_grantsPgResource.execute(selectArgs);
+      }
+    }
+  },
+  Mutation: {
+    assertStep: __ValueStep,
+    plans: {
+      createLeftArm: {
+        plan(_, args) {
+          const $insert = pgInsertSingle(resource_left_armPgResource, Object.create(null));
+          args.apply($insert);
+          const plan = object({
+            result: $insert
+          });
+          return plan;
         },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      createPerson: {
+        plan(_, args) {
+          const $insert = pgInsertSingle(resource_personPgResource, Object.create(null));
+          args.apply($insert);
+          const plan = object({
+            result: $insert
+          });
+          return plan;
         },
-        before(_, $connection, val) {
-          $connection.setBefore(val.getRaw());
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      createPersonSecret: {
+        plan(_, args) {
+          const $insert = pgInsertSingle(resource_person_secretPgResource, Object.create(null));
+          args.apply($insert);
+          const plan = object({
+            result: $insert
+          });
+          return plan;
         },
-        after(_, $connection, val) {
-          $connection.setAfter(val.getRaw());
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deleteLeftArm: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_left_armPgResource, specFromArgs_LeftArm2(args));
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
         },
-        condition(_condition, $connection, arg) {
-          const $select = $connection.getSubplan();
-          arg.apply($select, qbWhereBuilder);
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deleteLeftArmById: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_left_armPgResource, {
+            id: args.getRaw(['input', "id"])
+          });
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
         },
-        orderBy(parent, $connection, value) {
-          const $select = $connection.getSubplan();
-          value.apply($select);
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deleteLeftArmByPersonId: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_left_armPgResource, {
+            person_id: args.getRaw(['input', "personId"])
+          });
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deletePerson: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_personPgResource, specFromArgs_Person2(args));
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deletePersonByEmail: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_personPgResource, {
+            email: args.getRaw(['input', "email"])
+          });
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deletePersonById: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_personPgResource, {
+            id: args.getRaw(['input', "id"])
+          });
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deletePersonSecret: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_person_secretPgResource, specFromArgs_PersonSecret(args));
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deletePersonSecretByPersonId: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_person_secretPgResource, {
+            person_id: args.getRaw(['input', "personId"])
+          });
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      leftArmIdentity: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_left_arm_identity(args, ["input"]);
+          const $result = resource_left_arm_identityPgResource.execute(selectArgs, "mutation");
+          return object({
+            result: $result
+          });
+        },
+        args: {
+          input(_, $object, arg) {
+            // We might have any number of step types here; we need
+            // to get back to the underlying pgSelect.
+            const $result = $object.getStepForKey("result");
+            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+            if ($pgSelect instanceof PgSelectStep) {
+              // Mostly so `clientMutationId` works!
+              arg.apply($pgSelect);
+            } else {
+              throw new Error(`Could not determine PgSelectStep for ${$result}`);
+            }
+          }
+        }
+      },
+      updateLeftArm: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_left_armPgResource, specFromArgs_LeftArm(args));
+          args.apply($update);
+          return object({
+            result: $update
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      updateLeftArmById: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_left_armPgResource, {
+            id: args.getRaw(['input', "id"])
+          });
+          args.apply($update);
+          return object({
+            result: $update
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      updateLeftArmByPersonId: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_left_armPgResource, {
+            person_id: args.getRaw(['input', "personId"])
+          });
+          args.apply($update);
+          return object({
+            result: $update
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      updatePerson: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_personPgResource, specFromArgs_Person(args));
+          args.apply($update);
+          return object({
+            result: $update
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      updatePersonByEmail: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_personPgResource, {
+            email: args.getRaw(['input', "email"])
+          });
+          args.apply($update);
+          return object({
+            result: $update
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      updatePersonById: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_personPgResource, {
+            id: args.getRaw(['input', "id"])
+          });
+          args.apply($update);
+          return object({
+            result: $update
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
         }
       }
     }
   },
+  CompoundKey: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      personByPersonId1($record) {
+        return resource_personPgResource.get({
+          id: $record.get("person_id_1")
+        });
+      },
+      personByPersonId2($record) {
+        return resource_personPgResource.get({
+          id: $record.get("person_id_2")
+        });
+      },
+      personId1($record) {
+        return $record.get("person_id_1");
+      },
+      personId2($record) {
+        return $record.get("person_id_2");
+      }
+    },
+    planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of compound_keyUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_compound_keyPgResource.get(spec);
+    }
+  },
+  CreateLeftArmPayload: {
+    assertStep: assertExecutableStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $insert = $mutation.getStepForKey("result");
+        return $insert.getMeta("clientMutationId");
+      },
+      leftArm($object) {
+        return $object.get("result");
+      },
+      leftArmEdge($mutation, fieldArgs) {
+        const $result = $mutation.getStepForKey("result", true);
+        if (!$result) {
+          return constant(null);
+        }
+        const $select = (() => {
+          if ($result instanceof PgDeleteSingleStep) {
+            return pgSelectFromRecord($result.resource, $result.record());
+          } else {
+            const spec = left_armUniques[0].attributes.reduce((memo, attributeName) => {
+              memo[attributeName] = $result.get(attributeName);
+              return memo;
+            }, Object.create(null));
+            return resource_left_armPgResource.find(spec);
+          }
+        })();
+        fieldArgs.apply($select, "orderBy");
+        const $connection = connection($select);
+        // NOTE: you must not use `$single = $select.single()`
+        // here because doing so will mark the row as unique, and
+        // then the ordering logic (and thus cursor) will differ.
+        const $single = $select.row(first($select));
+        return new EdgeStep($connection, $single);
+      },
+      personByPersonId($record) {
+        return resource_personPgResource.get({
+          id: $record.get("result").get("person_id")
+        });
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  CreatePersonPayload: {
+    assertStep: assertExecutableStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $insert = $mutation.getStepForKey("result");
+        return $insert.getMeta("clientMutationId");
+      },
+      person($object) {
+        return $object.get("result");
+      },
+      personEdge($mutation, fieldArgs) {
+        const $result = $mutation.getStepForKey("result", true);
+        if (!$result) {
+          return constant(null);
+        }
+        const $select = (() => {
+          if ($result instanceof PgDeleteSingleStep) {
+            return pgSelectFromRecord($result.resource, $result.record());
+          } else {
+            const spec = personUniques[0].attributes.reduce((memo, attributeName) => {
+              memo[attributeName] = $result.get(attributeName);
+              return memo;
+            }, Object.create(null));
+            return resource_personPgResource.find(spec);
+          }
+        })();
+        fieldArgs.apply($select, "orderBy");
+        const $connection = connection($select);
+        // NOTE: you must not use `$single = $select.single()`
+        // here because doing so will mark the row as unique, and
+        // then the ordering logic (and thus cursor) will differ.
+        const $single = $select.row(first($select));
+        return new EdgeStep($connection, $single);
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  CreatePersonSecretPayload: {
+    assertStep: assertExecutableStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $insert = $mutation.getStepForKey("result");
+        return $insert.getMeta("clientMutationId");
+      },
+      personByPersonId($record) {
+        return resource_personPgResource.get({
+          id: $record.get("result").get("person_id")
+        });
+      },
+      personSecret($object) {
+        return $object.get("result");
+      },
+      personSecretEdge($mutation, fieldArgs) {
+        const $result = $mutation.getStepForKey("result", true);
+        if (!$result) {
+          return constant(null);
+        }
+        const $select = (() => {
+          if ($result instanceof PgDeleteSingleStep) {
+            return pgSelectFromRecord($result.resource, $result.record());
+          } else {
+            const spec = person_secretUniques[0].attributes.reduce((memo, attributeName) => {
+              memo[attributeName] = $result.get(attributeName);
+              return memo;
+            }, Object.create(null));
+            return resource_person_secretPgResource.find(spec);
+          }
+        })();
+        fieldArgs.apply($select, "orderBy");
+        const $connection = connection($select);
+        // NOTE: you must not use `$single = $select.single()`
+        // here because doing so will mark the row as unique, and
+        // then the ordering logic (and thus cursor) will differ.
+        const $single = $select.row(first($select));
+        return new EdgeStep($connection, $single);
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  DeleteLeftArmPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $result = $mutation.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      deletedLeftArmId($object) {
+        const $record = $object.getStepForKey("result");
+        const specifier = nodeIdHandler_LeftArm.plan($record);
+        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+      },
+      leftArm($object) {
+        return $object.get("result");
+      },
+      leftArmEdge($mutation, fieldArgs) {
+        const $result = $mutation.getStepForKey("result", true);
+        if (!$result) {
+          return constant(null);
+        }
+        const $select = (() => {
+          if ($result instanceof PgDeleteSingleStep) {
+            return pgSelectFromRecord($result.resource, $result.record());
+          } else {
+            const spec = left_armUniques[0].attributes.reduce((memo, attributeName) => {
+              memo[attributeName] = $result.get(attributeName);
+              return memo;
+            }, Object.create(null));
+            return resource_left_armPgResource.find(spec);
+          }
+        })();
+        fieldArgs.apply($select, "orderBy");
+        const $connection = connection($select);
+        // NOTE: you must not use `$single = $select.single()`
+        // here because doing so will mark the row as unique, and
+        // then the ordering logic (and thus cursor) will differ.
+        const $single = $select.row(first($select));
+        return new EdgeStep($connection, $single);
+      },
+      personByPersonId($record) {
+        return resource_personPgResource.get({
+          id: $record.get("result").get("person_id")
+        });
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  DeletePersonPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $result = $mutation.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      deletedPersonId($object) {
+        const $record = $object.getStepForKey("result");
+        const specifier = nodeIdHandler_Person.plan($record);
+        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+      },
+      person($object) {
+        return $object.get("result");
+      },
+      personEdge($mutation, fieldArgs) {
+        const $result = $mutation.getStepForKey("result", true);
+        if (!$result) {
+          return constant(null);
+        }
+        const $select = (() => {
+          if ($result instanceof PgDeleteSingleStep) {
+            return pgSelectFromRecord($result.resource, $result.record());
+          } else {
+            const spec = personUniques[0].attributes.reduce((memo, attributeName) => {
+              memo[attributeName] = $result.get(attributeName);
+              return memo;
+            }, Object.create(null));
+            return resource_personPgResource.find(spec);
+          }
+        })();
+        fieldArgs.apply($select, "orderBy");
+        const $connection = connection($select);
+        // NOTE: you must not use `$single = $select.single()`
+        // here because doing so will mark the row as unique, and
+        // then the ordering logic (and thus cursor) will differ.
+        const $single = $select.row(first($select));
+        return new EdgeStep($connection, $single);
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  DeletePersonSecretPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $result = $mutation.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      deletedPersonSecretId($object) {
+        const $record = $object.getStepForKey("result");
+        const specifier = nodeIdHandler_PersonSecret.plan($record);
+        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+      },
+      personByPersonId($record) {
+        return resource_personPgResource.get({
+          id: $record.get("result").get("person_id")
+        });
+      },
+      personSecret($object) {
+        return $object.get("result");
+      },
+      personSecretEdge($mutation, fieldArgs) {
+        const $result = $mutation.getStepForKey("result", true);
+        if (!$result) {
+          return constant(null);
+        }
+        const $select = (() => {
+          if ($result instanceof PgDeleteSingleStep) {
+            return pgSelectFromRecord($result.resource, $result.record());
+          } else {
+            const spec = person_secretUniques[0].attributes.reduce((memo, attributeName) => {
+              memo[attributeName] = $result.get(attributeName);
+              return memo;
+            }, Object.create(null));
+            return resource_person_secretPgResource.find(spec);
+          }
+        })();
+        fieldArgs.apply($select, "orderBy");
+        const $connection = connection($select);
+        // NOTE: you must not use `$single = $select.single()`
+        // here because doing so will mark the row as unique, and
+        // then the ordering logic (and thus cursor) will differ.
+        const $single = $select.row(first($select));
+        return new EdgeStep($connection, $single);
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  LeftArm: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      lengthInMetres($record) {
+        return $record.get("length_in_metres");
+      },
+      nodeId($parent) {
+        const specifier = nodeIdHandler_LeftArm.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_LeftArm.codec.name].encode);
+      },
+      personByPersonId($record) {
+        return resource_personPgResource.get({
+          id: $record.get("person_id")
+        });
+      },
+      personId($record) {
+        return $record.get("person_id");
+      }
+    },
+    planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of left_armUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_left_armPgResource.get(spec);
+    }
+  },
+  LeftArmIdentityPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($object) {
+        const $result = $object.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      leftArm($object) {
+        return $object.get("result");
+      },
+      leftArmEdge($mutation, fieldArgs) {
+        const $result = $mutation.getStepForKey("result", true);
+        if (!$result) {
+          return constant(null);
+        }
+        const $select = (() => {
+          if ($result instanceof PgDeleteSingleStep) {
+            return pgSelectFromRecord($result.resource, $result.record());
+          } else {
+            const spec = left_armUniques[0].attributes.reduce((memo, attributeName) => {
+              memo[attributeName] = $result.get(attributeName);
+              return memo;
+            }, Object.create(null));
+            return resource_left_armPgResource.find(spec);
+          }
+        })();
+        fieldArgs.apply($select, "orderBy");
+        const $connection = connection($select);
+        // NOTE: you must not use `$single = $select.single()`
+        // here because doing so will mark the row as unique, and
+        // then the ordering logic (and thus cursor) will differ.
+        const $single = $select.row(first($select));
+        return new EdgeStep($connection, $single);
+      },
+      personByPersonId($record) {
+        return resource_personPgResource.get({
+          id: $record.get("result").get("person_id")
+        });
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  LeftArmsConnection: {
+    assertStep: ConnectionStep,
+    plans: {
+      totalCount($connection) {
+        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+      }
+    }
+  },
+  LeftArmsEdge: {
+    assertStep: assertEdgeCapableStep,
+    plans: {
+      cursor($edge) {
+        return $edge.cursor();
+      },
+      node($edge) {
+        return $edge.node();
+      }
+    }
+  },
+  PageInfo: {
+    assertStep: assertPageInfoCapableStep,
+    plans: {
+      endCursor($pageInfo) {
+        return $pageInfo.endCursor();
+      },
+      hasNextPage($pageInfo) {
+        return $pageInfo.hasNextPage();
+      },
+      hasPreviousPage($pageInfo) {
+        return $pageInfo.hasPreviousPage();
+      },
+      startCursor($pageInfo) {
+        return $pageInfo.startCursor();
+      }
+    }
+  },
+  PeopleConnection: {
+    assertStep: ConnectionStep,
+    plans: {
+      totalCount($connection) {
+        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+      }
+    }
+  },
+  PeopleEdge: {
+    assertStep: assertEdgeCapableStep,
+    plans: {
+      cursor($edge) {
+        return $edge.cursor();
+      },
+      node($edge) {
+        return $edge.node();
+      }
+    }
+  },
+  Person: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      createdAt($record) {
+        return $record.get("created_at");
+      },
+      lastLoginFromIp($record) {
+        return $record.get("last_login_from_ip");
+      },
+      lastLoginFromSubnet($record) {
+        return $record.get("last_login_from_subnet");
+      },
+      leftArmByPersonId($record) {
+        return resource_left_armPgResource.get({
+          person_id: $record.get("id")
+        });
+      },
+      name($record) {
+        return $record.get("person_full_name");
+      },
+      nodeId($parent) {
+        const specifier = nodeIdHandler_Person.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_Person.codec.name].encode);
+      },
+      personSecretByPersonId($record) {
+        return resource_person_secretPgResource.get({
+          person_id: $record.get("id")
+        });
+      },
+      postsByAuthorId: {
+        plan($record) {
+          const $records = resource_postPgResource.find({
+            author_id: $record.get("id")
+          });
+          return connection($records);
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          last(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          before(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          },
+          after(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $connection, value) {
+            const $select = $connection.getSubplan();
+            value.apply($select);
+          }
+        }
+      },
+      site($record) {
+        const $plan = $record.get("site");
+        const $select = pgSelectSingleFromRecord(resource_frmcdc_wrappedUrlPgResource, $plan);
+        $select.getClassStep().setTrusted();
+        return $select;
+      },
+      userMac($record) {
+        return $record.get("user_mac");
+      }
+    },
+    planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of personUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_personPgResource.get(spec);
+    }
+  },
+  PersonSecret: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      nodeId($parent) {
+        const specifier = nodeIdHandler_PersonSecret.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_PersonSecret.codec.name].encode);
+      },
+      personByPersonId($record) {
+        return resource_personPgResource.get({
+          id: $record.get("person_id")
+        });
+      },
+      personId($record) {
+        return $record.get("person_id");
+      },
+      secret($record) {
+        return $record.get("sekrit");
+      }
+    },
+    planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of person_secretUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_person_secretPgResource.get(spec);
+    }
+  },
+  PersonSecretsConnection: {
+    assertStep: ConnectionStep,
+    plans: {
+      totalCount($connection) {
+        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+      }
+    }
+  },
+  PersonSecretsEdge: {
+    assertStep: assertEdgeCapableStep,
+    plans: {
+      cursor($edge) {
+        return $edge.cursor();
+      },
+      node($edge) {
+        return $edge.node();
+      }
+    }
+  },
+  Post: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      authorId($record) {
+        return $record.get("author_id");
+      },
+      nodeId($parent) {
+        const specifier = nodeIdHandler_Post.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_Post.codec.name].encode);
+      },
+      personByAuthorId($record) {
+        return resource_personPgResource.get({
+          id: $record.get("author_id")
+        });
+      }
+    },
+    planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of postUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_postPgResource.get(spec);
+    }
+  },
+  PostsConnection: {
+    assertStep: ConnectionStep,
+    plans: {
+      totalCount($connection) {
+        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+      }
+    }
+  },
+  PostsEdge: {
+    assertStep: assertEdgeCapableStep,
+    plans: {
+      cursor($edge) {
+        return $edge.cursor();
+      },
+      node($edge) {
+        return $edge.node();
+      }
+    }
+  },
+  UpdateLeftArmPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $result = $mutation.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      leftArm($object) {
+        return $object.get("result");
+      },
+      leftArmEdge($mutation, fieldArgs) {
+        const $result = $mutation.getStepForKey("result", true);
+        if (!$result) {
+          return constant(null);
+        }
+        const $select = (() => {
+          if ($result instanceof PgDeleteSingleStep) {
+            return pgSelectFromRecord($result.resource, $result.record());
+          } else {
+            const spec = left_armUniques[0].attributes.reduce((memo, attributeName) => {
+              memo[attributeName] = $result.get(attributeName);
+              return memo;
+            }, Object.create(null));
+            return resource_left_armPgResource.find(spec);
+          }
+        })();
+        fieldArgs.apply($select, "orderBy");
+        const $connection = connection($select);
+        // NOTE: you must not use `$single = $select.single()`
+        // here because doing so will mark the row as unique, and
+        // then the ordering logic (and thus cursor) will differ.
+        const $single = $select.row(first($select));
+        return new EdgeStep($connection, $single);
+      },
+      personByPersonId($record) {
+        return resource_personPgResource.get({
+          id: $record.get("result").get("person_id")
+        });
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  UpdatePersonPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $result = $mutation.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      person($object) {
+        return $object.get("result");
+      },
+      personEdge($mutation, fieldArgs) {
+        const $result = $mutation.getStepForKey("result", true);
+        if (!$result) {
+          return constant(null);
+        }
+        const $select = (() => {
+          if ($result instanceof PgDeleteSingleStep) {
+            return pgSelectFromRecord($result.resource, $result.record());
+          } else {
+            const spec = personUniques[0].attributes.reduce((memo, attributeName) => {
+              memo[attributeName] = $result.get(attributeName);
+              return memo;
+            }, Object.create(null));
+            return resource_personPgResource.find(spec);
+          }
+        })();
+        fieldArgs.apply($select, "orderBy");
+        const $connection = connection($select);
+        // NOTE: you must not use `$single = $select.single()`
+        // here because doing so will mark the row as unique, and
+        // then the ordering logic (and thus cursor) will differ.
+        const $single = $select.row(first($select));
+        return new EdgeStep($connection, $single);
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  WrappedUrl: {
+    assertStep: assertPgClassSingleStep
+  }
+};
+export const interfaces = {
   Node: {
-    __planType($nodeId) {
+    planType($nodeId) {
       const $specifier = decodeNodeId($nodeId);
       const $__typename = lambda($specifier, findTypeNameMatch, true);
       return {
@@ -11562,108 +12532,568 @@ export const plans = {
         }
       };
     }
-  },
-  PersonSecret: {
-    __assertStep: assertPgClassSingleStep,
-    __planType($specifier) {
-      const spec = Object.create(null);
-      for (const pkCol of person_secretUniques[0].attributes) {
-        spec[pkCol] = get2($specifier, pkCol);
-      }
-      return resource_person_secretPgResource.get(spec);
-    },
-    nodeId($parent) {
-      const specifier = nodeIdHandler_PersonSecret.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandler_PersonSecret.codec.name].encode);
-    },
-    personId($record) {
-      return $record.get("person_id");
-    },
-    secret($record) {
-      return $record.get("sekrit");
-    },
-    personByPersonId($record) {
-      return resource_personPgResource.get({
-        id: $record.get("person_id")
-      });
-    }
-  },
-  Person: {
-    __assertStep: assertPgClassSingleStep,
-    __planType($specifier) {
-      const spec = Object.create(null);
-      for (const pkCol of personUniques[0].attributes) {
-        spec[pkCol] = get2($specifier, pkCol);
-      }
-      return resource_personPgResource.get(spec);
-    },
-    nodeId($parent) {
-      const specifier = nodeIdHandler_Person.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Person.codec.name].encode);
-    },
-    name($record) {
-      return $record.get("person_full_name");
-    },
-    site($record) {
-      const $plan = $record.get("site");
-      const $select = pgSelectSingleFromRecord(resource_frmcdc_wrappedUrlPgResource, $plan);
-      $select.getClassStep().setTrusted();
-      return $select;
-    },
-    lastLoginFromIp($record) {
-      return $record.get("last_login_from_ip");
-    },
-    lastLoginFromSubnet($record) {
-      return $record.get("last_login_from_subnet");
-    },
-    userMac($record) {
-      return $record.get("user_mac");
-    },
-    createdAt($record) {
-      return $record.get("created_at");
-    },
-    postsByAuthorId: {
-      plan($record) {
-        const $records = resource_postPgResource.find({
-          author_id: $record.get("id")
-        });
-        return connection($records);
+  }
+};
+export const inputObjects = {
+  CreateLeftArmInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
-        },
-        last(_, $connection, val) {
-          $connection.setLast(val.getRaw());
-        },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        },
-        before(_, $connection, val) {
-          $connection.setBefore(val.getRaw());
-        },
-        after(_, $connection, val) {
-          $connection.setAfter(val.getRaw());
-        },
-        condition(_condition, $connection, arg) {
-          const $select = $connection.getSubplan();
-          arg.apply($select, qbWhereBuilder);
-        },
-        orderBy(parent, $connection, value) {
-          const $select = $connection.getSubplan();
-          value.apply($select);
+      leftArm(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
         }
       }
-    },
-    personSecretByPersonId($record) {
-      return resource_person_secretPgResource.get({
-        person_id: $record.get("id")
-      });
-    },
-    leftArmByPersonId($record) {
-      return resource_left_armPgResource.get({
-        person_id: $record.get("id")
-      });
+    }
+  },
+  CreatePersonInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      person(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  CreatePersonSecretInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      personSecret(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  DeleteLeftArmByIdInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  DeleteLeftArmByPersonIdInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  DeleteLeftArmInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  DeletePersonByEmailInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  DeletePersonByIdInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  DeletePersonInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  DeletePersonSecretByPersonIdInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  DeletePersonSecretInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  LeftArmBaseInput: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      id(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      },
+      lengthInMetres(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("length_in_metres", bakedInputRuntime(schema, field.type, val));
+      },
+      mood(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("mood", bakedInputRuntime(schema, field.type, val));
+      },
+      personId(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("person_id", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
+  LeftArmCondition: {
+    plans: {
+      id($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      },
+      lengthInMetres($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "length_in_metres",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.float)}`;
+          }
+        });
+      },
+      mood($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "mood",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      personId($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "person_id",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      }
+    }
+  },
+  LeftArmIdentityInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  LeftArmInput: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      lengthInMetres(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("length_in_metres", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
+  LeftArmPatch: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      mood(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("mood", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
+  PersonCondition: {
+    plans: {
+      about($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "about",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      aliases($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "aliases",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, textArrayCodec)}`;
+          }
+        });
+      },
+      computedOut($condition, val) {
+        if (val === undefined) return;
+        if (typeof pgFieldSource_person_computed_outPgResource.from !== "function") {
+          throw new Error("Invalid computed attribute 'from'");
+        }
+        const expression = sql`${pgFieldSource_person_computed_outPgResource.from({
+          placeholder: $condition.alias
+        })}`;
+        $condition.where(val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, pgFieldSource_person_computed_outPgResource.codec)}`);
+      },
+      config($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "config",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.hstore)}`;
+          }
+        });
+      },
+      createdAt($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "created_at",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamp)}`;
+          }
+        });
+      },
+      email($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "email",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, emailCodec)}`;
+          }
+        });
+      },
+      id($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      },
+      lastLoginFromIp($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "last_login_from_ip",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.inet)}`;
+          }
+        });
+      },
+      lastLoginFromSubnet($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "last_login_from_subnet",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.cidr)}`;
+          }
+        });
+      },
+      name($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "person_full_name",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
+          }
+        });
+      },
+      site($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "site",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, wrappedUrlCodec)}`;
+          }
+        });
+      },
+      userMac($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "user_mac",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.macaddr)}`;
+          }
+        });
+      }
+    }
+  },
+  PersonInput: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      about(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("about", bakedInputRuntime(schema, field.type, val));
+      },
+      aliases(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("aliases", bakedInputRuntime(schema, field.type, val));
+      },
+      email(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("email", bakedInputRuntime(schema, field.type, val));
+      },
+      name(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("person_full_name", bakedInputRuntime(schema, field.type, val));
+      },
+      site(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("site", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
+  PersonPatch: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      about(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("about", bakedInputRuntime(schema, field.type, val));
+      },
+      aliases(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("aliases", bakedInputRuntime(schema, field.type, val));
+      },
+      email(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("email", bakedInputRuntime(schema, field.type, val));
+      },
+      name(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("person_full_name", bakedInputRuntime(schema, field.type, val));
+      },
+      site(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("site", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
+  PersonSecretCondition: {
+    plans: {
+      personId($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "person_id",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      },
+      secret($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "sekrit",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      }
+    }
+  },
+  PersonSecretInput: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      secret(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("sekrit", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
+  PostCondition: {
+    plans: {
+      authorId($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "author_id",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      },
+      body($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "body",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      computedWithOptionalArg($condition, val) {
+        if (val === undefined) return;
+        if (typeof pgFieldSource_post_computed_with_optional_argPgResource.from !== "function") {
+          throw new Error("Invalid computed attribute 'from'");
+        }
+        const expression = sql`${pgFieldSource_post_computed_with_optional_argPgResource.from({
+          placeholder: $condition.alias
+        })}`;
+        $condition.where(val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, pgFieldSource_post_computed_with_optional_argPgResource.codec)}`);
+      },
+      headline($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "headline",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      id($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      }
+    }
+  },
+  UpdateLeftArmByIdInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      leftArmPatch(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  UpdateLeftArmByPersonIdInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      leftArmPatch(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  UpdateLeftArmInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      leftArmPatch(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  UpdatePersonByEmailInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      personPatch(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  UpdatePersonByIdInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      personPatch(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  UpdatePersonInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      personPatch(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  WrappedUrlInput: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      url(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("url", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  }
+};
+export const scalars = {
+  Cursor: {
+    serialize: InternetAddressSerialize,
+    parseValue: InternetAddressSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
+  Datetime: {
+    serialize: InternetAddressSerialize,
+    parseValue: InternetAddressSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"Datetime" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
     }
   },
   Email: {
@@ -11671,13 +13101,15 @@ export const plans = {
     parseValue: GraphQLString.parseValue,
     parseLiteral: GraphQLString.parseLiteral
   },
-  WrappedUrl: {
-    __assertStep: assertPgClassSingleStep
-  },
-  NotNullUrl: {
-    serialize: GraphQLString.serialize,
-    parseValue: GraphQLString.parseValue,
-    parseLiteral: GraphQLString.parseLiteral
+  InternetAddress: {
+    serialize: InternetAddressSerialize,
+    parseValue: InternetAddressSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"InternetAddress" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
   },
   KeyValueHash: {
     serialize(value) {
@@ -11718,417 +13150,13 @@ export const plans = {
       }
     }
   },
-  InternetAddress: {
-    serialize: InternetAddressSerialize,
-    parseValue: InternetAddressSerialize,
-    parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"InternetAddress" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
-      }
-      return ast.value;
-    }
-  },
-  Datetime: {
-    serialize: InternetAddressSerialize,
-    parseValue: InternetAddressSerialize,
-    parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"Datetime" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
-      }
-      return ast.value;
-    }
-  },
-  PostsConnection: {
-    __assertStep: ConnectionStep,
-    totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-    }
-  },
-  Post: {
-    __assertStep: assertPgClassSingleStep,
-    __planType($specifier) {
-      const spec = Object.create(null);
-      for (const pkCol of postUniques[0].attributes) {
-        spec[pkCol] = get2($specifier, pkCol);
-      }
-      return resource_postPgResource.get(spec);
-    },
-    nodeId($parent) {
-      const specifier = nodeIdHandler_Post.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Post.codec.name].encode);
-    },
-    authorId($record) {
-      return $record.get("author_id");
-    },
-    personByAuthorId($record) {
-      return resource_personPgResource.get({
-        id: $record.get("author_id")
-      });
-    }
-  },
-  PostsEdge: {
-    __assertStep: assertEdgeCapableStep,
-    cursor($edge) {
-      return $edge.cursor();
-    },
-    node($edge) {
-      return $edge.node();
-    }
-  },
-  Cursor: {
-    serialize: InternetAddressSerialize,
-    parseValue: InternetAddressSerialize,
-    parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
-      }
-      return ast.value;
-    }
-  },
-  PageInfo: {
-    __assertStep: assertPageInfoCapableStep,
-    hasNextPage($pageInfo) {
-      return $pageInfo.hasNextPage();
-    },
-    hasPreviousPage($pageInfo) {
-      return $pageInfo.hasPreviousPage();
-    },
-    startCursor($pageInfo) {
-      return $pageInfo.startCursor();
-    },
-    endCursor($pageInfo) {
-      return $pageInfo.endCursor();
-    }
-  },
-  PostCondition: {
-    id($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "id",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-        }
-      });
-    },
-    headline($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "headline",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-        }
-      });
-    },
-    body($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "body",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-        }
-      });
-    },
-    authorId($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "author_id",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-        }
-      });
-    },
-    computedWithOptionalArg($condition, val) {
-      if (val === undefined) return;
-      if (typeof pgFieldSource_post_computed_with_optional_argPgResource.from !== "function") {
-        throw new Error("Invalid computed attribute 'from'");
-      }
-      const expression = sql`${pgFieldSource_post_computed_with_optional_argPgResource.from({
-        placeholder: $condition.alias
-      })}`;
-      $condition.where(val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, pgFieldSource_post_computed_with_optional_argPgResource.codec)}`);
-    }
-  },
-  PostsOrderBy: {
-    COMPUTED_WITH_OPTIONAL_ARG_ASC(queryBuilder) {
-      if (typeof pgFieldSource_post_computed_with_optional_argPgResource.from !== "function") {
-        throw new Error("Invalid computed attribute 'from'");
-      }
-      const expression = sql`${pgFieldSource_post_computed_with_optional_argPgResource.from({
-        placeholder: queryBuilder.alias
-      })}`;
-      queryBuilder.orderBy({
-        codec: pgFieldSource_post_computed_with_optional_argPgResource.codec,
-        fragment: expression,
-        direction: "asc".toUpperCase()
-      });
-    },
-    COMPUTED_WITH_OPTIONAL_ARG_DESC(queryBuilder) {
-      if (typeof pgFieldSource_post_computed_with_optional_argPgResource.from !== "function") {
-        throw new Error("Invalid computed attribute 'from'");
-      }
-      const expression = sql`${pgFieldSource_post_computed_with_optional_argPgResource.from({
-        placeholder: queryBuilder.alias
-      })}`;
-      queryBuilder.orderBy({
-        codec: pgFieldSource_post_computed_with_optional_argPgResource.codec,
-        fragment: expression,
-        direction: "desc".toUpperCase()
-      });
-    },
-    PRIMARY_KEY_ASC(queryBuilder) {
-      postUniques[0].attributes.forEach(attributeName => {
-        queryBuilder.orderBy({
-          attribute: attributeName,
-          direction: "ASC"
-        });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      postUniques[0].attributes.forEach(attributeName => {
-        queryBuilder.orderBy({
-          attribute: attributeName,
-          direction: "DESC"
-        });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    HEADLINE_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "headline",
-        direction: "ASC"
-      });
-    },
-    HEADLINE_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "headline",
-        direction: "DESC"
-      });
-    },
-    BODY_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "body",
-        direction: "ASC"
-      });
-    },
-    BODY_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "body",
-        direction: "DESC"
-      });
-    },
-    AUTHOR_ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "author_id",
-        direction: "ASC"
-      });
-    },
-    AUTHOR_ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "author_id",
-        direction: "DESC"
-      });
-    }
-  },
-  LeftArm: {
-    __assertStep: assertPgClassSingleStep,
-    __planType($specifier) {
-      const spec = Object.create(null);
-      for (const pkCol of left_armUniques[0].attributes) {
-        spec[pkCol] = get2($specifier, pkCol);
-      }
-      return resource_left_armPgResource.get(spec);
-    },
-    nodeId($parent) {
-      const specifier = nodeIdHandler_LeftArm.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandler_LeftArm.codec.name].encode);
-    },
-    personId($record) {
-      return $record.get("person_id");
-    },
-    lengthInMetres($record) {
-      return $record.get("length_in_metres");
-    },
-    personByPersonId($record) {
-      return resource_personPgResource.get({
-        id: $record.get("person_id")
-      });
-    }
-  },
-  CompoundKey: {
-    __assertStep: assertPgClassSingleStep,
-    __planType($specifier) {
-      const spec = Object.create(null);
-      for (const pkCol of compound_keyUniques[0].attributes) {
-        spec[pkCol] = get2($specifier, pkCol);
-      }
-      return resource_compound_keyPgResource.get(spec);
-    },
-    personId2($record) {
-      return $record.get("person_id_2");
-    },
-    personId1($record) {
-      return $record.get("person_id_1");
-    },
-    personByPersonId1($record) {
-      return resource_personPgResource.get({
-        id: $record.get("person_id_1")
-      });
-    },
-    personByPersonId2($record) {
-      return resource_personPgResource.get({
-        id: $record.get("person_id_2")
-      });
-    }
-  },
-  PersonSecretsConnection: {
-    __assertStep: ConnectionStep,
-    totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-    }
-  },
-  PersonSecretsEdge: {
-    __assertStep: assertEdgeCapableStep,
-    cursor($edge) {
-      return $edge.cursor();
-    },
-    node($edge) {
-      return $edge.node();
-    }
-  },
-  PersonSecretCondition: {
-    personId($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "person_id",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-        }
-      });
-    },
-    secret($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "sekrit",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-        }
-      });
-    }
-  },
-  PersonSecretsOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      person_secretUniques[0].attributes.forEach(attributeName => {
-        queryBuilder.orderBy({
-          attribute: attributeName,
-          direction: "ASC"
-        });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      person_secretUniques[0].attributes.forEach(attributeName => {
-        queryBuilder.orderBy({
-          attribute: attributeName,
-          direction: "DESC"
-        });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PERSON_ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "person_id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PERSON_ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "person_id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    SECRET_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "sekrit",
-        direction: "ASC"
-      });
-    },
-    SECRET_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "sekrit",
-        direction: "DESC"
-      });
-    }
-  },
-  LeftArmsConnection: {
-    __assertStep: ConnectionStep,
-    totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-    }
-  },
-  LeftArmsEdge: {
-    __assertStep: assertEdgeCapableStep,
-    cursor($edge) {
-      return $edge.cursor();
-    },
-    node($edge) {
-      return $edge.node();
-    }
-  },
-  LeftArmCondition: {
-    id($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "id",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-        }
-      });
-    },
-    personId($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "person_id",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-        }
-      });
-    },
-    lengthInMetres($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "length_in_metres",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.float)}`;
-        }
-      });
-    },
-    mood($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "mood",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-        }
-      });
-    }
-  },
+  NotNullUrl: {
+    serialize: GraphQLString.serialize,
+    parseValue: GraphQLString.parseValue,
+    parseLiteral: GraphQLString.parseLiteral
+  }
+};
+export const enums = {
   LeftArmsOrderBy: {
     PRIMARY_KEY_ASC(queryBuilder) {
       left_armUniques[0].attributes.forEach(attributeName => {
@@ -12199,141 +13227,6 @@ export const plans = {
         attribute: "mood",
         direction: "DESC"
       });
-    }
-  },
-  PeopleConnection: {
-    __assertStep: ConnectionStep,
-    totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-    }
-  },
-  PeopleEdge: {
-    __assertStep: assertEdgeCapableStep,
-    cursor($edge) {
-      return $edge.cursor();
-    },
-    node($edge) {
-      return $edge.node();
-    }
-  },
-  PersonCondition: {
-    id($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "id",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-        }
-      });
-    },
-    name($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "person_full_name",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
-        }
-      });
-    },
-    aliases($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "aliases",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, textArrayCodec)}`;
-        }
-      });
-    },
-    about($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "about",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-        }
-      });
-    },
-    email($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "email",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, emailCodec)}`;
-        }
-      });
-    },
-    site($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "site",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, wrappedUrlCodec)}`;
-        }
-      });
-    },
-    config($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "config",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.hstore)}`;
-        }
-      });
-    },
-    lastLoginFromIp($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "last_login_from_ip",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.inet)}`;
-        }
-      });
-    },
-    lastLoginFromSubnet($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "last_login_from_subnet",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.cidr)}`;
-        }
-      });
-    },
-    userMac($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "user_mac",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.macaddr)}`;
-        }
-      });
-    },
-    createdAt($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "created_at",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamp)}`;
-        }
-      });
-    },
-    computedOut($condition, val) {
-      if (val === undefined) return;
-      if (typeof pgFieldSource_person_computed_outPgResource.from !== "function") {
-        throw new Error("Invalid computed attribute 'from'");
-      }
-      const expression = sql`${pgFieldSource_person_computed_outPgResource.from({
-        placeholder: $condition.alias
-      })}`;
-      $condition.where(val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, pgFieldSource_person_computed_outPgResource.codec)}`);
-    }
-  },
-  WrappedUrlInput: {
-    __baked: createObjectAndApplyChildren,
-    url(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("url", bakedInputRuntime(schema, field.type, val));
     }
   },
   PeopleOrderBy: {
@@ -12532,927 +13425,154 @@ export const plans = {
       });
     }
   },
-  Mutation: {
-    __assertStep: __ValueStep,
-    leftArmIdentity: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_left_arm_identity(args, ["input"]);
-        const $result = resource_left_arm_identityPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
+  PersonSecretsOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      person_secretUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
         });
-      },
-      args: {
-        input(_, $object, arg) {
-          // We might have any number of step types here; we need
-          // to get back to the underlying pgSelect.
-          const $result = $object.getStepForKey("result");
-          const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-          const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-          if ($pgSelect instanceof PgSelectStep) {
-            // Mostly so `clientMutationId` works!
-            arg.apply($pgSelect);
-          } else {
-            throw new Error(`Could not determine PgSelectStep for ${$result}`);
-          }
-        }
-      }
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    createPersonSecret: {
-      plan(_, args) {
-        const $insert = pgInsertSingle(resource_person_secretPgResource, Object.create(null));
-        args.apply($insert);
-        const plan = object({
-          result: $insert
+    PRIMARY_KEY_DESC(queryBuilder) {
+      person_secretUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
         });
-        return plan;
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    createLeftArm: {
-      plan(_, args) {
-        const $insert = pgInsertSingle(resource_left_armPgResource, Object.create(null));
-        args.apply($insert);
-        const plan = object({
-          result: $insert
-        });
-        return plan;
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
+    PERSON_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    createPerson: {
-      plan(_, args) {
-        const $insert = pgInsertSingle(resource_personPgResource, Object.create(null));
-        args.apply($insert);
-        const plan = object({
-          result: $insert
-        });
-        return plan;
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
+    PERSON_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    updateLeftArm: {
-      plan(_$root, args) {
-        const $update = pgUpdateSingle(resource_left_armPgResource, specFromArgs_LeftArm(args));
-        args.apply($update);
-        return object({
-          result: $update
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
+    SECRET_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "sekrit",
+        direction: "ASC"
+      });
     },
-    updateLeftArmById: {
-      plan(_$root, args) {
-        const $update = pgUpdateSingle(resource_left_armPgResource, {
-          id: args.getRaw(['input', "id"])
-        });
-        args.apply($update);
-        return object({
-          result: $update
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    updateLeftArmByPersonId: {
-      plan(_$root, args) {
-        const $update = pgUpdateSingle(resource_left_armPgResource, {
-          person_id: args.getRaw(['input', "personId"])
-        });
-        args.apply($update);
-        return object({
-          result: $update
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    updatePerson: {
-      plan(_$root, args) {
-        const $update = pgUpdateSingle(resource_personPgResource, specFromArgs_Person(args));
-        args.apply($update);
-        return object({
-          result: $update
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    updatePersonById: {
-      plan(_$root, args) {
-        const $update = pgUpdateSingle(resource_personPgResource, {
-          id: args.getRaw(['input', "id"])
-        });
-        args.apply($update);
-        return object({
-          result: $update
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    updatePersonByEmail: {
-      plan(_$root, args) {
-        const $update = pgUpdateSingle(resource_personPgResource, {
-          email: args.getRaw(['input', "email"])
-        });
-        args.apply($update);
-        return object({
-          result: $update
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    deletePersonSecret: {
-      plan(_$root, args) {
-        const $delete = pgDeleteSingle(resource_person_secretPgResource, specFromArgs_PersonSecret(args));
-        args.apply($delete);
-        return object({
-          result: $delete
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    deletePersonSecretByPersonId: {
-      plan(_$root, args) {
-        const $delete = pgDeleteSingle(resource_person_secretPgResource, {
-          person_id: args.getRaw(['input', "personId"])
-        });
-        args.apply($delete);
-        return object({
-          result: $delete
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    deleteLeftArm: {
-      plan(_$root, args) {
-        const $delete = pgDeleteSingle(resource_left_armPgResource, specFromArgs_LeftArm2(args));
-        args.apply($delete);
-        return object({
-          result: $delete
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    deleteLeftArmById: {
-      plan(_$root, args) {
-        const $delete = pgDeleteSingle(resource_left_armPgResource, {
-          id: args.getRaw(['input', "id"])
-        });
-        args.apply($delete);
-        return object({
-          result: $delete
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    deleteLeftArmByPersonId: {
-      plan(_$root, args) {
-        const $delete = pgDeleteSingle(resource_left_armPgResource, {
-          person_id: args.getRaw(['input', "personId"])
-        });
-        args.apply($delete);
-        return object({
-          result: $delete
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    deletePerson: {
-      plan(_$root, args) {
-        const $delete = pgDeleteSingle(resource_personPgResource, specFromArgs_Person2(args));
-        args.apply($delete);
-        return object({
-          result: $delete
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    deletePersonById: {
-      plan(_$root, args) {
-        const $delete = pgDeleteSingle(resource_personPgResource, {
-          id: args.getRaw(['input', "id"])
-        });
-        args.apply($delete);
-        return object({
-          result: $delete
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    deletePersonByEmail: {
-      plan(_$root, args) {
-        const $delete = pgDeleteSingle(resource_personPgResource, {
-          email: args.getRaw(['input', "email"])
-        });
-        args.apply($delete);
-        return object({
-          result: $delete
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    }
-  },
-  LeftArmIdentityPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($object) {
-      const $result = $object.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    leftArm($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    },
-    leftArmEdge($mutation, fieldArgs) {
-      const $result = $mutation.getStepForKey("result", true);
-      if (!$result) {
-        return constant(null);
-      }
-      const $select = (() => {
-        if ($result instanceof PgDeleteSingleStep) {
-          return pgSelectFromRecord($result.resource, $result.record());
-        } else {
-          const spec = left_armUniques[0].attributes.reduce((memo, attributeName) => {
-            memo[attributeName] = $result.get(attributeName);
-            return memo;
-          }, Object.create(null));
-          return resource_left_armPgResource.find(spec);
-        }
-      })();
-      fieldArgs.apply($select, "orderBy");
-      const $connection = connection($select);
-      // NOTE: you must not use `$single = $select.single()`
-      // here because doing so will mark the row as unique, and
-      // then the ordering logic (and thus cursor) will differ.
-      const $single = $select.row(first($select));
-      return new EdgeStep($connection, $single);
-    },
-    personByPersonId($record) {
-      return resource_personPgResource.get({
-        id: $record.get("result").get("person_id")
+    SECRET_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "sekrit",
+        direction: "DESC"
       });
     }
   },
-  LeftArmIdentityInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  LeftArmBaseInput: {
-    __baked: createObjectAndApplyChildren,
-    id(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("id", bakedInputRuntime(schema, field.type, val));
-    },
-    personId(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("person_id", bakedInputRuntime(schema, field.type, val));
-    },
-    lengthInMetres(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("length_in_metres", bakedInputRuntime(schema, field.type, val));
-    },
-    mood(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("mood", bakedInputRuntime(schema, field.type, val));
-    }
-  },
-  CreatePersonSecretPayload: {
-    __assertStep: assertExecutableStep,
-    clientMutationId($mutation) {
-      const $insert = $mutation.getStepForKey("result");
-      return $insert.getMeta("clientMutationId");
-    },
-    personSecret($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    },
-    personSecretEdge($mutation, fieldArgs) {
-      const $result = $mutation.getStepForKey("result", true);
-      if (!$result) {
-        return constant(null);
+  PostsOrderBy: {
+    COMPUTED_WITH_OPTIONAL_ARG_ASC(queryBuilder) {
+      if (typeof pgFieldSource_post_computed_with_optional_argPgResource.from !== "function") {
+        throw new Error("Invalid computed attribute 'from'");
       }
-      const $select = (() => {
-        if ($result instanceof PgDeleteSingleStep) {
-          return pgSelectFromRecord($result.resource, $result.record());
-        } else {
-          const spec = person_secretUniques[0].attributes.reduce((memo, attributeName) => {
-            memo[attributeName] = $result.get(attributeName);
-            return memo;
-          }, Object.create(null));
-          return resource_person_secretPgResource.find(spec);
-        }
-      })();
-      fieldArgs.apply($select, "orderBy");
-      const $connection = connection($select);
-      // NOTE: you must not use `$single = $select.single()`
-      // here because doing so will mark the row as unique, and
-      // then the ordering logic (and thus cursor) will differ.
-      const $single = $select.row(first($select));
-      return new EdgeStep($connection, $single);
-    },
-    personByPersonId($record) {
-      return resource_personPgResource.get({
-        id: $record.get("result").get("person_id")
+      const expression = sql`${pgFieldSource_post_computed_with_optional_argPgResource.from({
+        placeholder: queryBuilder.alias
+      })}`;
+      queryBuilder.orderBy({
+        codec: pgFieldSource_post_computed_with_optional_argPgResource.codec,
+        fragment: expression,
+        direction: "asc".toUpperCase()
       });
-    }
-  },
-  CreatePersonSecretInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
     },
-    personSecret(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
+    COMPUTED_WITH_OPTIONAL_ARG_DESC(queryBuilder) {
+      if (typeof pgFieldSource_post_computed_with_optional_argPgResource.from !== "function") {
+        throw new Error("Invalid computed attribute 'from'");
       }
-    }
-  },
-  PersonSecretInput: {
-    __baked: createObjectAndApplyChildren,
-    secret(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("sekrit", bakedInputRuntime(schema, field.type, val));
-    }
-  },
-  CreateLeftArmPayload: {
-    __assertStep: assertExecutableStep,
-    clientMutationId($mutation) {
-      const $insert = $mutation.getStepForKey("result");
-      return $insert.getMeta("clientMutationId");
-    },
-    leftArm($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    },
-    leftArmEdge($mutation, fieldArgs) {
-      const $result = $mutation.getStepForKey("result", true);
-      if (!$result) {
-        return constant(null);
-      }
-      const $select = (() => {
-        if ($result instanceof PgDeleteSingleStep) {
-          return pgSelectFromRecord($result.resource, $result.record());
-        } else {
-          const spec = left_armUniques[0].attributes.reduce((memo, attributeName) => {
-            memo[attributeName] = $result.get(attributeName);
-            return memo;
-          }, Object.create(null));
-          return resource_left_armPgResource.find(spec);
-        }
-      })();
-      fieldArgs.apply($select, "orderBy");
-      const $connection = connection($select);
-      // NOTE: you must not use `$single = $select.single()`
-      // here because doing so will mark the row as unique, and
-      // then the ordering logic (and thus cursor) will differ.
-      const $single = $select.row(first($select));
-      return new EdgeStep($connection, $single);
-    },
-    personByPersonId($record) {
-      return resource_personPgResource.get({
-        id: $record.get("result").get("person_id")
+      const expression = sql`${pgFieldSource_post_computed_with_optional_argPgResource.from({
+        placeholder: queryBuilder.alias
+      })}`;
+      queryBuilder.orderBy({
+        codec: pgFieldSource_post_computed_with_optional_argPgResource.codec,
+        fragment: expression,
+        direction: "desc".toUpperCase()
       });
-    }
-  },
-  CreateLeftArmInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
     },
-    leftArm(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  LeftArmInput: {
-    __baked: createObjectAndApplyChildren,
-    lengthInMetres(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("length_in_metres", bakedInputRuntime(schema, field.type, val));
-    }
-  },
-  CreatePersonPayload: {
-    __assertStep: assertExecutableStep,
-    clientMutationId($mutation) {
-      const $insert = $mutation.getStepForKey("result");
-      return $insert.getMeta("clientMutationId");
-    },
-    person($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    },
-    personEdge($mutation, fieldArgs) {
-      const $result = $mutation.getStepForKey("result", true);
-      if (!$result) {
-        return constant(null);
-      }
-      const $select = (() => {
-        if ($result instanceof PgDeleteSingleStep) {
-          return pgSelectFromRecord($result.resource, $result.record());
-        } else {
-          const spec = personUniques[0].attributes.reduce((memo, attributeName) => {
-            memo[attributeName] = $result.get(attributeName);
-            return memo;
-          }, Object.create(null));
-          return resource_personPgResource.find(spec);
-        }
-      })();
-      fieldArgs.apply($select, "orderBy");
-      const $connection = connection($select);
-      // NOTE: you must not use `$single = $select.single()`
-      // here because doing so will mark the row as unique, and
-      // then the ordering logic (and thus cursor) will differ.
-      const $single = $select.row(first($select));
-      return new EdgeStep($connection, $single);
-    }
-  },
-  CreatePersonInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    person(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  PersonInput: {
-    __baked: createObjectAndApplyChildren,
-    name(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("person_full_name", bakedInputRuntime(schema, field.type, val));
-    },
-    aliases(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("aliases", bakedInputRuntime(schema, field.type, val));
-    },
-    about(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("about", bakedInputRuntime(schema, field.type, val));
-    },
-    email(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("email", bakedInputRuntime(schema, field.type, val));
-    },
-    site(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("site", bakedInputRuntime(schema, field.type, val));
-    }
-  },
-  UpdateLeftArmPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($mutation) {
-      const $result = $mutation.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    leftArm($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    },
-    leftArmEdge($mutation, fieldArgs) {
-      const $result = $mutation.getStepForKey("result", true);
-      if (!$result) {
-        return constant(null);
-      }
-      const $select = (() => {
-        if ($result instanceof PgDeleteSingleStep) {
-          return pgSelectFromRecord($result.resource, $result.record());
-        } else {
-          const spec = left_armUniques[0].attributes.reduce((memo, attributeName) => {
-            memo[attributeName] = $result.get(attributeName);
-            return memo;
-          }, Object.create(null));
-          return resource_left_armPgResource.find(spec);
-        }
-      })();
-      fieldArgs.apply($select, "orderBy");
-      const $connection = connection($select);
-      // NOTE: you must not use `$single = $select.single()`
-      // here because doing so will mark the row as unique, and
-      // then the ordering logic (and thus cursor) will differ.
-      const $single = $select.row(first($select));
-      return new EdgeStep($connection, $single);
-    },
-    personByPersonId($record) {
-      return resource_personPgResource.get({
-        id: $record.get("result").get("person_id")
+    PRIMARY_KEY_ASC(queryBuilder) {
+      postUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
       });
-    }
-  },
-  UpdateLeftArmInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
+      queryBuilder.setOrderIsUnique();
     },
-    leftArmPatch(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  LeftArmPatch: {
-    __baked: createObjectAndApplyChildren,
-    mood(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("mood", bakedInputRuntime(schema, field.type, val));
-    }
-  },
-  UpdateLeftArmByIdInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    leftArmPatch(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  UpdateLeftArmByPersonIdInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    leftArmPatch(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  UpdatePersonPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($mutation) {
-      const $result = $mutation.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    person($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    },
-    personEdge($mutation, fieldArgs) {
-      const $result = $mutation.getStepForKey("result", true);
-      if (!$result) {
-        return constant(null);
-      }
-      const $select = (() => {
-        if ($result instanceof PgDeleteSingleStep) {
-          return pgSelectFromRecord($result.resource, $result.record());
-        } else {
-          const spec = personUniques[0].attributes.reduce((memo, attributeName) => {
-            memo[attributeName] = $result.get(attributeName);
-            return memo;
-          }, Object.create(null));
-          return resource_personPgResource.find(spec);
-        }
-      })();
-      fieldArgs.apply($select, "orderBy");
-      const $connection = connection($select);
-      // NOTE: you must not use `$single = $select.single()`
-      // here because doing so will mark the row as unique, and
-      // then the ordering logic (and thus cursor) will differ.
-      const $single = $select.row(first($select));
-      return new EdgeStep($connection, $single);
-    }
-  },
-  UpdatePersonInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    personPatch(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  PersonPatch: {
-    __baked: createObjectAndApplyChildren,
-    name(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("person_full_name", bakedInputRuntime(schema, field.type, val));
-    },
-    aliases(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("aliases", bakedInputRuntime(schema, field.type, val));
-    },
-    about(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("about", bakedInputRuntime(schema, field.type, val));
-    },
-    email(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("email", bakedInputRuntime(schema, field.type, val));
-    },
-    site(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("site", bakedInputRuntime(schema, field.type, val));
-    }
-  },
-  UpdatePersonByIdInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    personPatch(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  UpdatePersonByEmailInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    personPatch(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  DeletePersonSecretPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($mutation) {
-      const $result = $mutation.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    personSecret($object) {
-      return $object.get("result");
-    },
-    deletedPersonSecretId($object) {
-      const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandler_PersonSecret.plan($record);
-      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
-    },
-    query() {
-      return rootValue();
-    },
-    personSecretEdge($mutation, fieldArgs) {
-      const $result = $mutation.getStepForKey("result", true);
-      if (!$result) {
-        return constant(null);
-      }
-      const $select = (() => {
-        if ($result instanceof PgDeleteSingleStep) {
-          return pgSelectFromRecord($result.resource, $result.record());
-        } else {
-          const spec = person_secretUniques[0].attributes.reduce((memo, attributeName) => {
-            memo[attributeName] = $result.get(attributeName);
-            return memo;
-          }, Object.create(null));
-          return resource_person_secretPgResource.find(spec);
-        }
-      })();
-      fieldArgs.apply($select, "orderBy");
-      const $connection = connection($select);
-      // NOTE: you must not use `$single = $select.single()`
-      // here because doing so will mark the row as unique, and
-      // then the ordering logic (and thus cursor) will differ.
-      const $single = $select.row(first($select));
-      return new EdgeStep($connection, $single);
-    },
-    personByPersonId($record) {
-      return resource_personPgResource.get({
-        id: $record.get("result").get("person_id")
+    PRIMARY_KEY_DESC(queryBuilder) {
+      postUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
       });
-    }
-  },
-  DeletePersonSecretInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  DeletePersonSecretByPersonIdInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  DeleteLeftArmPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($mutation) {
-      const $result = $mutation.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
+      queryBuilder.setOrderIsUnique();
     },
-    leftArm($object) {
-      return $object.get("result");
-    },
-    deletedLeftArmId($object) {
-      const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandler_LeftArm.plan($record);
-      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
-    },
-    query() {
-      return rootValue();
-    },
-    leftArmEdge($mutation, fieldArgs) {
-      const $result = $mutation.getStepForKey("result", true);
-      if (!$result) {
-        return constant(null);
-      }
-      const $select = (() => {
-        if ($result instanceof PgDeleteSingleStep) {
-          return pgSelectFromRecord($result.resource, $result.record());
-        } else {
-          const spec = left_armUniques[0].attributes.reduce((memo, attributeName) => {
-            memo[attributeName] = $result.get(attributeName);
-            return memo;
-          }, Object.create(null));
-          return resource_left_armPgResource.find(spec);
-        }
-      })();
-      fieldArgs.apply($select, "orderBy");
-      const $connection = connection($select);
-      // NOTE: you must not use `$single = $select.single()`
-      // here because doing so will mark the row as unique, and
-      // then the ordering logic (and thus cursor) will differ.
-      const $single = $select.row(first($select));
-      return new EdgeStep($connection, $single);
-    },
-    personByPersonId($record) {
-      return resource_personPgResource.get({
-        id: $record.get("result").get("person_id")
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
       });
-    }
-  },
-  DeleteLeftArmInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  DeleteLeftArmByIdInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  DeleteLeftArmByPersonIdInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  DeletePersonPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($mutation) {
-      const $result = $mutation.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
+      queryBuilder.setOrderIsUnique();
     },
-    person($object) {
-      return $object.get("result");
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
     },
-    deletedPersonId($object) {
-      const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandler_Person.plan($record);
-      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+    HEADLINE_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "headline",
+        direction: "ASC"
+      });
     },
-    query() {
-      return rootValue();
+    HEADLINE_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "headline",
+        direction: "DESC"
+      });
     },
-    personEdge($mutation, fieldArgs) {
-      const $result = $mutation.getStepForKey("result", true);
-      if (!$result) {
-        return constant(null);
-      }
-      const $select = (() => {
-        if ($result instanceof PgDeleteSingleStep) {
-          return pgSelectFromRecord($result.resource, $result.record());
-        } else {
-          const spec = personUniques[0].attributes.reduce((memo, attributeName) => {
-            memo[attributeName] = $result.get(attributeName);
-            return memo;
-          }, Object.create(null));
-          return resource_personPgResource.find(spec);
-        }
-      })();
-      fieldArgs.apply($select, "orderBy");
-      const $connection = connection($select);
-      // NOTE: you must not use `$single = $select.single()`
-      // here because doing so will mark the row as unique, and
-      // then the ordering logic (and thus cursor) will differ.
-      const $single = $select.row(first($select));
-      return new EdgeStep($connection, $single);
-    }
-  },
-  DeletePersonInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  DeletePersonByIdInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  DeletePersonByEmailInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
+    BODY_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "body",
+        direction: "ASC"
+      });
+    },
+    BODY_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "body",
+        direction: "DESC"
+      });
+    },
+    AUTHOR_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "author_id",
+        direction: "ASC"
+      });
+    },
+    AUTHOR_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "author_id",
+        direction: "DESC"
+      });
     }
   }
 };
 export const schema = makeGrafastSchema({
   typeDefs: typeDefs,
-  plans: plans
+  objects: objects,
+  interfaces: interfaces,
+  inputObjects: inputObjects,
+  scalars: scalars,
+  enums: enums
 });

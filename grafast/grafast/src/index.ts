@@ -748,7 +748,7 @@ declare global {
        * Plantime. `$stepOrSpecifier` is either a step returned from a field or
        * list position with an abstract type, or a `__ValueStep` that
        * represents the combined values of such steps (to prevent unbounded
-       * plan branching). `__planType` must then construct a step that
+       * plan branching). `planType` must then construct a step that
        * represents the `__typename` related to this given specifier (or `null`
        * if no match can be found) and a `planForType` method which, when
        * called, should return the step for the given type.
@@ -772,7 +772,7 @@ declare global {
        * Plantime. `$stepOrSpecifier` is either a step returned from a field or
        * list position with an abstract type, or a `__ValueStep` that
        * represents the combined values of such steps (to prevent unbounded
-       * plan branching). `__planType` must then construct a step that
+       * plan branching). `planType` must then construct a step that
        * represents the `__typename` related to this given specifier (or `null`
        * if no match can be found) and a `planForType` method which, when
        * called, should return the step for the given type.

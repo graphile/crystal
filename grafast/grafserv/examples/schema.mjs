@@ -26,22 +26,24 @@ const schema = makeGrafastSchema({
       fastifyThing: String
     }
   `,
-  plans: {
+  objects: {
     Query: {
-      add(_, { $a, $b }) {
-        return lambda([$a, $b], ([a, b]) => a + b);
-      },
-      userId() {
-        return context().get("user_id");
-      },
-      expressThing() {
-        return context().get("expressThing");
-      },
-      koaThing() {
-        return context().get("koaThing");
-      },
-      fastifyThing() {
-        return context().get("fastifyThing");
+      plans: {
+        add(_, { $a, $b }) {
+          return lambda([$a, $b], ([a, b]) => a + b);
+        },
+        userId() {
+          return context().get("user_id");
+        },
+        expressThing() {
+          return context().get("expressThing");
+        },
+        koaThing() {
+          return context().get("koaThing");
+        },
+        fastifyThing() {
+          return context().get("fastifyThing");
+        },
       },
     },
   },

@@ -25,13 +25,15 @@ export async function makeExampleServer(
         throwAnError: String
       }
     `,
-    plans: {
+    objects: {
       Query: {
-        hello() {
-          return constant("world");
-        },
-        throwAnError() {
-          return error(new Error("You asked for an error... Here it is."));
+        plans: {
+          hello() {
+            return constant("world");
+          },
+          throwAnError() {
+            return error(new Error("You asked for an error... Here it is."));
+          },
         },
       },
     },

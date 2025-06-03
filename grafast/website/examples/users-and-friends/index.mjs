@@ -113,47 +113,53 @@ const resolvers = {
   },
 };
 
-const planResolvers = {
+const objects = {
   Query: {
-    currentUser() {
-      return userById(context().get("currentUserId"));
-    },
-    postsByAuthorId(_, { $id }) {
-      const spec = specFromNodeId(handlers.User, $id);
-      // This will be null if the ID is null or invalid
-      const $userIdOrNull = spec.id;
-      // Inhibit the ID if the spec returns null but the $id was non-null
-      const $validUserIdOrNull = inhibitOnNull($userIdOrNull, {
-        if: condition("not null", $id),
-      });
-      // Fetch the posts (if not inhibited)
-      const $posts = postsByAuthorId($validUserIdOrNull);
-      return trap($posts, TRAP_INHIBITED, {
-        valueForInhibited: "EMPTY_LIST",
-      });
+    plans: {
+      currentUser() {
+        return userById(context().get("currentUserId"));
+      },
+      postsByAuthorId(_, { $id }) {
+        const spec = specFromNodeId(handlers.User, $id);
+        // This will be null if the ID is null or invalid
+        const $userIdOrNull = spec.id;
+        // Inhibit the ID if the spec returns null but the $id was non-null
+        const $validUserIdOrNull = inhibitOnNull($userIdOrNull, {
+          if: condition("not null", $id),
+        });
+        // Fetch the posts (if not inhibited)
+        const $posts = postsByAuthorId($validUserIdOrNull);
+        return trap($posts, TRAP_INHIBITED, {
+          valueForInhibited: "EMPTY_LIST",
+        });
+      },
     },
   },
   User: {
-    id($user) {
-      return nodeIdFromNode(handlers.User, $user);
-    },
-    name($user) {
-      return $user.get("full_name");
-    },
-    friends($user) {
-      const $friendships = friendshipsByUserId($user.get("id"));
-      const $friends = each($friendships, ($friendship) =>
-        userById($friendship.get("friend_id")),
-      );
-      return $friends;
+    plans: {
+      id($user) {
+        return nodeIdFromNode(handlers.User, $user);
+      },
+      name($user) {
+        return $user.get("full_name");
+      },
+      friends($user) {
+        const $friendships = friendshipsByUserId($user.get("id"));
+        const $friends = each($friendships, ($friendship) =>
+          userById($friendship.get("friend_id")),
+        );
+        return $friends;
+      },
     },
   },
   Post: {
-    id($post) {
-      return nodeIdFromNode(handlers.Post, $post);
-    },
-    author($post) {
-      return userById($post.get("author_id"));
+    plans: {
+      id($post) {
+        return nodeIdFromNode(handlers.Post, $post);
+      },
+      author($post) {
+        return userById($post.get("author_id"));
+      },
     },
   },
 };
@@ -175,7 +181,7 @@ const makeGraphQLSchema = () => {
 const schemaDL = makeGraphQLSchema();
 const schemaGF = makeGrafastSchema({
   typeDefs,
-  plans: planResolvers,
+  objects,
   enableDeferStream: false,
 });
 // console.log(printSchema(schemaDL));

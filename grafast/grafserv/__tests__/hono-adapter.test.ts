@@ -25,20 +25,24 @@ const schema = makeGrafastSchema({
       subscriptionTest: String!
     }
   `,
-  plans: {
+  objects: {
     Query: {
-      hello() {
-        return constant("world");
-      },
-      throwAnError() {
-        return error(new Error("You asked for an error... Here it is."));
+      plans: {
+        hello() {
+          return constant("world");
+        },
+        throwAnError() {
+          return error(new Error("You asked for an error... Here it is."));
+        },
       },
     },
     Subscription: {
-      subscriptionTest: {
-        subscribe: async function* () {
-          yield { subscriptionTest: "test1" };
-          yield { subscriptionTest: "test2" };
+      plans: {
+        subscriptionTest: {
+          subscribe: async function* () {
+            yield { subscriptionTest: "test1" };
+            yield { subscriptionTest: "test2" };
+          },
         },
       },
     },

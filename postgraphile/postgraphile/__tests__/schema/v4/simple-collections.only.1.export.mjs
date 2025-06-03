@@ -10111,515 +10111,3452 @@ input DeletePersonByEmailInput {
   clientMutationId: String
   email: Email!
 }`;
-export const plans = {
+export const objects = {
   Query: {
-    __assertStep() {
+    assertStep() {
       return true;
     },
-    query() {
-      return rootValue();
-    },
-    nodeId($parent) {
-      const specifier = nodeIdHandler_Query.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Query.codec.name].encode);
-    },
-    node(_$root, fieldArgs) {
-      return fieldArgs.getRaw("nodeId");
-    },
-    myTableById(_$root, {
-      $id
-    }) {
-      return resource_my_tablePgResource.get({
-        id: $id
-      });
-    },
-    personSecretByPersonId(_$root, {
-      $personId
-    }) {
-      return resource_person_secretPgResource.get({
-        person_id: $personId
-      });
-    },
-    compoundKeyByPersonId1AndPersonId2(_$root, {
-      $personId1,
-      $personId2
-    }) {
-      return resource_compound_keyPgResource.get({
-        person_id_1: $personId1,
-        person_id_2: $personId2
-      });
-    },
-    nullTestRecordById(_$root, {
-      $id
-    }) {
-      return resource_null_test_recordPgResource.get({
-        id: $id
-      });
-    },
-    leftArmById(_$root, {
-      $id
-    }) {
-      return resource_left_armPgResource.get({
-        id: $id
-      });
-    },
-    leftArmByPersonId(_$root, {
-      $personId
-    }) {
-      return resource_left_armPgResource.get({
-        person_id: $personId
-      });
-    },
-    issue756ById(_$root, {
-      $id
-    }) {
-      return resource_issue756PgResource.get({
-        id: $id
-      });
-    },
-    personById(_$root, {
-      $id
-    }) {
-      return resource_personPgResource.get({
-        id: $id
-      });
-    },
-    personByEmail(_$root, {
-      $email
-    }) {
-      return resource_personPgResource.get({
-        email: $email
-      });
-    },
-    currentUserId($root, args, _info) {
-      const selectArgs = makeArgs_person_computed_out(args);
-      return resource_current_user_idPgResource.execute(selectArgs);
-    },
-    funcOut($root, args, _info) {
-      const selectArgs = makeArgs_person_computed_out(args);
-      return resource_func_outPgResource.execute(selectArgs);
-    },
-    funcOutSetofList: {
-      plan($root, args, _info) {
+    plans: {
+      allCompoundKeysList: {
+        plan() {
+          return resource_compound_keyPgResource.find();
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          condition(_condition, $select, arg) {
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $select, value) {
+            value.apply($select);
+          }
+        }
+      },
+      allEdgeCasesList: {
+        plan() {
+          return resource_edge_casePgResource.find();
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          condition(_condition, $select, arg) {
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $select, value) {
+            value.apply($select);
+          }
+        }
+      },
+      allIssue756SList: {
+        plan() {
+          return resource_issue756PgResource.find();
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          condition(_condition, $select, arg) {
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $select, value) {
+            value.apply($select);
+          }
+        }
+      },
+      allLeftArmsList: {
+        plan() {
+          return resource_left_armPgResource.find();
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          condition(_condition, $select, arg) {
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $select, value) {
+            value.apply($select);
+          }
+        }
+      },
+      allMyTablesList: {
+        plan() {
+          return resource_my_tablePgResource.find();
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          condition(_condition, $select, arg) {
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $select, value) {
+            value.apply($select);
+          }
+        }
+      },
+      allNullTestRecordsList: {
+        plan() {
+          return resource_null_test_recordPgResource.find();
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          condition(_condition, $select, arg) {
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $select, value) {
+            value.apply($select);
+          }
+        }
+      },
+      allPeopleList: {
+        plan() {
+          return resource_personPgResource.find();
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          condition(_condition, $select, arg) {
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $select, value) {
+            value.apply($select);
+          }
+        }
+      },
+      allPersonSecretsList: {
+        plan() {
+          return resource_person_secretPgResource.find();
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          condition(_condition, $select, arg) {
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $select, value) {
+            value.apply($select);
+          }
+        }
+      },
+      badlyBehavedFunctionList: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_person_computed_out(args);
+          return resource_badly_behaved_functionPgResource.execute(selectArgs);
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
+        }
+      },
+      compoundKey(_$parent, args) {
+        const $nodeId = args.getRaw("nodeId");
+        return nodeFetcher_CompoundKey($nodeId);
+      },
+      compoundKeyByPersonId1AndPersonId2(_$root, {
+        $personId1,
+        $personId2
+      }) {
+        return resource_compound_keyPgResource.get({
+          person_id_1: $personId1,
+          person_id_2: $personId2
+        });
+      },
+      compoundTypeSetQueryList: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_person_computed_out(args);
+          return resource_compound_type_set_queryPgResource.execute(selectArgs);
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
+        }
+      },
+      currentUserId($root, args, _info) {
         const selectArgs = makeArgs_person_computed_out(args);
-        return resource_func_out_setofPgResource.execute(selectArgs);
+        return resource_current_user_idPgResource.execute(selectArgs);
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
-        },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        }
-      }
-    },
-    funcOutUnnamed($root, args, _info) {
-      const selectArgs = makeArgs_person_computed_out(args);
-      return resource_func_out_unnamedPgResource.execute(selectArgs);
-    },
-    noArgsQuery($root, args, _info) {
-      const selectArgs = makeArgs_person_computed_out(args);
-      return resource_no_args_queryPgResource.execute(selectArgs);
-    },
-    funcInOut($root, args, _info) {
-      const selectArgs = makeArgs_func_in_out(args);
-      return resource_func_in_outPgResource.execute(selectArgs);
-    },
-    funcReturnsTableOneColList: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_func_returns_table_one_col(args);
-        return resource_func_returns_table_one_colPgResource.execute(selectArgs);
+      funcInInout($root, args, _info) {
+        const selectArgs = makeArgs_func_in_inout(args);
+        return resource_func_in_inoutPgResource.execute(selectArgs);
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
-        },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        }
-      }
-    },
-    jsonIdentity($root, args, _info) {
-      const selectArgs = makeArgs_json_identity(args);
-      return resource_json_identityPgResource.execute(selectArgs);
-    },
-    jsonbIdentity($root, args, _info) {
-      const selectArgs = makeArgs_jsonb_identity(args);
-      return resource_jsonb_identityPgResource.execute(selectArgs);
-    },
-    funcInInout($root, args, _info) {
-      const selectArgs = makeArgs_func_in_inout(args);
-      return resource_func_in_inoutPgResource.execute(selectArgs);
-    },
-    funcOutOut($root, args, _info) {
-      const selectArgs = makeArgs_person_computed_out(args);
-      return resource_func_out_outPgResource.execute(selectArgs);
-    },
-    funcOutOutSetofList: {
-      plan($root, args, _info) {
+      funcInOut($root, args, _info) {
+        const selectArgs = makeArgs_func_in_out(args);
+        return resource_func_in_outPgResource.execute(selectArgs);
+      },
+      funcOut($root, args, _info) {
         const selectArgs = makeArgs_person_computed_out(args);
-        return resource_func_out_out_setofPgResource.execute(selectArgs);
+        return resource_func_outPgResource.execute(selectArgs);
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
-        },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        }
-      }
-    },
-    funcOutOutUnnamed($root, args, _info) {
-      const selectArgs = makeArgs_person_computed_out(args);
-      return resource_func_out_out_unnamedPgResource.execute(selectArgs);
-    },
-    funcOutUnnamedOutOutUnnamed($root, args, _info) {
-      const selectArgs = makeArgs_person_computed_out(args);
-      return resource_func_out_unnamed_out_out_unnamedPgResource.execute(selectArgs);
-    },
-    intSetQueryList: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_int_set_query(args);
-        return resource_int_set_queryPgResource.execute(selectArgs);
+      funcOutComplex($root, args, _info) {
+        const selectArgs = makeArgs_func_out_complex(args);
+        return resource_func_out_complexPgResource.execute(selectArgs);
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
+      funcOutComplexSetofList: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_func_out_complex_setof(args);
+          return resource_func_out_complex_setofPgResource.execute(selectArgs);
         },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         }
-      }
-    },
-    funcReturnsTableMultiColList: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_func_returns_table_multi_col(args);
-        return resource_func_returns_table_multi_colPgResource.execute(selectArgs);
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
-        },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        }
-      }
-    },
-    searchTestSummariesList: {
-      plan($root, args, _info) {
+      funcOutOut($root, args, _info) {
         const selectArgs = makeArgs_person_computed_out(args);
-        return resource_search_test_summariesPgResource.execute(selectArgs);
+        return resource_func_out_outPgResource.execute(selectArgs);
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
+      funcOutOutCompoundType($root, args, _info) {
+        const selectArgs = makeArgs_func_out_out_compound_type(args);
+        return resource_func_out_out_compound_typePgResource.execute(selectArgs);
+      },
+      funcOutOutSetofList: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_person_computed_out(args);
+          return resource_func_out_out_setofPgResource.execute(selectArgs);
         },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         }
-      }
-    },
-    returnTableWithoutGrants($root, args, _info) {
-      const selectArgs = makeArgs_person_computed_out(args);
-      return resource_return_table_without_grantsPgResource.execute(selectArgs);
-    },
-    typesQuery($root, args, _info) {
-      const selectArgs = makeArgs_types_query(args);
-      return resource_types_queryPgResource.execute(selectArgs);
-    },
-    funcOutOutCompoundType($root, args, _info) {
-      const selectArgs = makeArgs_func_out_out_compound_type(args);
-      return resource_func_out_out_compound_typePgResource.execute(selectArgs);
-    },
-    queryOutputTwoRows($root, args, _info) {
-      const selectArgs = makeArgs_query_output_two_rows(args);
-      return resource_query_output_two_rowsPgResource.execute(selectArgs);
-    },
-    compoundTypeSetQueryList: {
-      plan($root, args, _info) {
+      },
+      funcOutOutUnnamed($root, args, _info) {
         const selectArgs = makeArgs_person_computed_out(args);
-        return resource_compound_type_set_queryPgResource.execute(selectArgs);
+        return resource_func_out_out_unnamedPgResource.execute(selectArgs);
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
+      funcOutSetofList: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_person_computed_out(args);
+          return resource_func_out_setofPgResource.execute(selectArgs);
         },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         }
-      }
-    },
-    tableQuery($root, args, _info) {
-      const selectArgs = makeArgs_table_query(args);
-      return resource_table_queryPgResource.execute(selectArgs);
-    },
-    funcOutComplex($root, args, _info) {
-      const selectArgs = makeArgs_func_out_complex(args);
-      return resource_func_out_complexPgResource.execute(selectArgs);
-    },
-    funcOutComplexSetofList: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_func_out_complex_setof(args);
-        return resource_func_out_complex_setofPgResource.execute(selectArgs);
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
-        },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        }
-      }
-    },
-    badlyBehavedFunctionList: {
-      plan($root, args, _info) {
+      funcOutTable($root, args, _info) {
         const selectArgs = makeArgs_person_computed_out(args);
-        return resource_badly_behaved_functionPgResource.execute(selectArgs);
+        return resource_func_out_tablePgResource.execute(selectArgs);
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
+      funcOutTableSetofList: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_person_computed_out(args);
+          return resource_func_out_table_setofPgResource.execute(selectArgs);
         },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         }
-      }
-    },
-    funcOutTable($root, args, _info) {
-      const selectArgs = makeArgs_person_computed_out(args);
-      return resource_func_out_tablePgResource.execute(selectArgs);
-    },
-    funcOutTableSetofList: {
-      plan($root, args, _info) {
+      },
+      funcOutUnnamed($root, args, _info) {
         const selectArgs = makeArgs_person_computed_out(args);
-        return resource_func_out_table_setofPgResource.execute(selectArgs);
+        return resource_func_out_unnamedPgResource.execute(selectArgs);
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
-        },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        }
-      }
-    },
-    tableSetQueryList: {
-      plan($root, args, _info) {
+      funcOutUnnamedOutOutUnnamed($root, args, _info) {
         const selectArgs = makeArgs_person_computed_out(args);
-        return resource_table_set_queryPgResource.execute(selectArgs);
+        return resource_func_out_unnamed_out_out_unnamedPgResource.execute(selectArgs);
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
+      funcReturnsTableMultiColList: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_func_returns_table_multi_col(args);
+          return resource_func_returns_table_multi_colPgResource.execute(selectArgs);
         },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        },
-        condition(_condition, $select, arg) {
-          arg.apply($select, qbWhereBuilder);
-        },
-        orderBy(parent, $select, value) {
-          value.apply($select);
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         }
-      }
-    },
-    tableSetQueryPlpgsqlList: {
-      plan($root, args, _info) {
+      },
+      funcReturnsTableOneColList: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_func_returns_table_one_col(args);
+          return resource_func_returns_table_one_colPgResource.execute(selectArgs);
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
+        }
+      },
+      intSetQueryList: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_int_set_query(args);
+          return resource_int_set_queryPgResource.execute(selectArgs);
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
+        }
+      },
+      issue756(_$parent, args) {
+        const $nodeId = args.getRaw("nodeId");
+        return nodeFetcher_Issue756($nodeId);
+      },
+      issue756ById(_$root, {
+        $id
+      }) {
+        return resource_issue756PgResource.get({
+          id: $id
+        });
+      },
+      jsonbIdentity($root, args, _info) {
+        const selectArgs = makeArgs_jsonb_identity(args);
+        return resource_jsonb_identityPgResource.execute(selectArgs);
+      },
+      jsonIdentity($root, args, _info) {
+        const selectArgs = makeArgs_json_identity(args);
+        return resource_json_identityPgResource.execute(selectArgs);
+      },
+      leftArm(_$parent, args) {
+        const $nodeId = args.getRaw("nodeId");
+        return nodeFetcher_LeftArm($nodeId);
+      },
+      leftArmById(_$root, {
+        $id
+      }) {
+        return resource_left_armPgResource.get({
+          id: $id
+        });
+      },
+      leftArmByPersonId(_$root, {
+        $personId
+      }) {
+        return resource_left_armPgResource.get({
+          person_id: $personId
+        });
+      },
+      myTable(_$parent, args) {
+        const $nodeId = args.getRaw("nodeId");
+        return nodeFetcher_MyTable($nodeId);
+      },
+      myTableById(_$root, {
+        $id
+      }) {
+        return resource_my_tablePgResource.get({
+          id: $id
+        });
+      },
+      noArgsQuery($root, args, _info) {
         const selectArgs = makeArgs_person_computed_out(args);
-        return resource_table_set_query_plpgsqlPgResource.execute(selectArgs);
+        return resource_no_args_queryPgResource.execute(selectArgs);
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
+      node(_$root, fieldArgs) {
+        return fieldArgs.getRaw("nodeId");
+      },
+      nodeId($parent) {
+        const specifier = nodeIdHandler_Query.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_Query.codec.name].encode);
+      },
+      nullTestRecord(_$parent, args) {
+        const $nodeId = args.getRaw("nodeId");
+        return nodeFetcher_NullTestRecord($nodeId);
+      },
+      nullTestRecordById(_$root, {
+        $id
+      }) {
+        return resource_null_test_recordPgResource.get({
+          id: $id
+        });
+      },
+      person(_$parent, args) {
+        const $nodeId = args.getRaw("nodeId");
+        return nodeFetcher_Person($nodeId);
+      },
+      personByEmail(_$root, {
+        $email
+      }) {
+        return resource_personPgResource.get({
+          email: $email
+        });
+      },
+      personById(_$root, {
+        $id
+      }) {
+        return resource_personPgResource.get({
+          id: $id
+        });
+      },
+      personSecret(_$parent, args) {
+        const $nodeId = args.getRaw("nodeId");
+        return nodeFetcher_PersonSecret($nodeId);
+      },
+      personSecretByPersonId(_$root, {
+        $personId
+      }) {
+        return resource_person_secretPgResource.get({
+          person_id: $personId
+        });
+      },
+      query() {
+        return rootValue();
+      },
+      queryOutputTwoRows($root, args, _info) {
+        const selectArgs = makeArgs_query_output_two_rows(args);
+        return resource_query_output_two_rowsPgResource.execute(selectArgs);
+      },
+      returnTableWithoutGrants($root, args, _info) {
+        const selectArgs = makeArgs_person_computed_out(args);
+        return resource_return_table_without_grantsPgResource.execute(selectArgs);
+      },
+      searchTestSummariesList: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_person_computed_out(args);
+          return resource_search_test_summariesPgResource.execute(selectArgs);
         },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         }
-      }
-    },
-    myTable(_$parent, args) {
-      const $nodeId = args.getRaw("nodeId");
-      return nodeFetcher_MyTable($nodeId);
-    },
-    personSecret(_$parent, args) {
-      const $nodeId = args.getRaw("nodeId");
-      return nodeFetcher_PersonSecret($nodeId);
-    },
-    compoundKey(_$parent, args) {
-      const $nodeId = args.getRaw("nodeId");
-      return nodeFetcher_CompoundKey($nodeId);
-    },
-    nullTestRecord(_$parent, args) {
-      const $nodeId = args.getRaw("nodeId");
-      return nodeFetcher_NullTestRecord($nodeId);
-    },
-    leftArm(_$parent, args) {
-      const $nodeId = args.getRaw("nodeId");
-      return nodeFetcher_LeftArm($nodeId);
-    },
-    issue756(_$parent, args) {
-      const $nodeId = args.getRaw("nodeId");
-      return nodeFetcher_Issue756($nodeId);
-    },
-    person(_$parent, args) {
-      const $nodeId = args.getRaw("nodeId");
-      return nodeFetcher_Person($nodeId);
-    },
-    allMyTablesList: {
-      plan() {
-        return resource_my_tablePgResource.find();
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
+      tableQuery($root, args, _info) {
+        const selectArgs = makeArgs_table_query(args);
+        return resource_table_queryPgResource.execute(selectArgs);
+      },
+      tableSetQueryList: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_person_computed_out(args);
+          return resource_table_set_queryPgResource.execute(selectArgs);
         },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        },
-        condition(_condition, $select, arg) {
-          arg.apply($select, qbWhereBuilder);
-        },
-        orderBy(parent, $select, value) {
-          value.apply($select);
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          condition(_condition, $select, arg) {
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $select, value) {
+            value.apply($select);
+          }
         }
-      }
-    },
-    allPersonSecretsList: {
-      plan() {
-        return resource_person_secretPgResource.find();
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
+      tableSetQueryPlpgsqlList: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_person_computed_out(args);
+          return resource_table_set_query_plpgsqlPgResource.execute(selectArgs);
         },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        },
-        condition(_condition, $select, arg) {
-          arg.apply($select, qbWhereBuilder);
-        },
-        orderBy(parent, $select, value) {
-          value.apply($select);
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         }
-      }
-    },
-    allCompoundKeysList: {
-      plan() {
-        return resource_compound_keyPgResource.find();
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
+      typesQuery($root, args, _info) {
+        const selectArgs = makeArgs_types_query(args);
+        return resource_types_queryPgResource.execute(selectArgs);
+      }
+    }
+  },
+  Mutation: {
+    assertStep: __ValueStep,
+    plans: {
+      createCompoundKey: {
+        plan(_, args) {
+          const $insert = pgInsertSingle(resource_compound_keyPgResource, Object.create(null));
+          args.apply($insert);
+          const plan = object({
+            result: $insert
+          });
+          return plan;
         },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        },
-        condition(_condition, $select, arg) {
-          arg.apply($select, qbWhereBuilder);
-        },
-        orderBy(parent, $select, value) {
-          value.apply($select);
+        args: {
+          input(_, $object) {
+            return $object;
+          }
         }
-      }
-    },
-    allNullTestRecordsList: {
-      plan() {
-        return resource_null_test_recordPgResource.find();
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
+      createEdgeCase: {
+        plan(_, args) {
+          const $insert = pgInsertSingle(resource_edge_casePgResource, Object.create(null));
+          args.apply($insert);
+          const plan = object({
+            result: $insert
+          });
+          return plan;
         },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        },
-        condition(_condition, $select, arg) {
-          arg.apply($select, qbWhereBuilder);
-        },
-        orderBy(parent, $select, value) {
-          value.apply($select);
+        args: {
+          input(_, $object) {
+            return $object;
+          }
         }
-      }
-    },
-    allEdgeCasesList: {
-      plan() {
-        return resource_edge_casePgResource.find();
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
+      createIssue756: {
+        plan(_, args) {
+          const $insert = pgInsertSingle(resource_issue756PgResource, Object.create(null));
+          args.apply($insert);
+          const plan = object({
+            result: $insert
+          });
+          return plan;
         },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        },
-        condition(_condition, $select, arg) {
-          arg.apply($select, qbWhereBuilder);
-        },
-        orderBy(parent, $select, value) {
-          value.apply($select);
+        args: {
+          input(_, $object) {
+            return $object;
+          }
         }
-      }
-    },
-    allLeftArmsList: {
-      plan() {
-        return resource_left_armPgResource.find();
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
+      createLeftArm: {
+        plan(_, args) {
+          const $insert = pgInsertSingle(resource_left_armPgResource, Object.create(null));
+          args.apply($insert);
+          const plan = object({
+            result: $insert
+          });
+          return plan;
         },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        },
-        condition(_condition, $select, arg) {
-          arg.apply($select, qbWhereBuilder);
-        },
-        orderBy(parent, $select, value) {
-          value.apply($select);
+        args: {
+          input(_, $object) {
+            return $object;
+          }
         }
-      }
-    },
-    allIssue756SList: {
-      plan() {
-        return resource_issue756PgResource.find();
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
+      createMyTable: {
+        plan(_, args) {
+          const $insert = pgInsertSingle(resource_my_tablePgResource, Object.create(null));
+          args.apply($insert);
+          const plan = object({
+            result: $insert
+          });
+          return plan;
         },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        },
-        condition(_condition, $select, arg) {
-          arg.apply($select, qbWhereBuilder);
-        },
-        orderBy(parent, $select, value) {
-          value.apply($select);
+        args: {
+          input(_, $object) {
+            return $object;
+          }
         }
-      }
-    },
-    allPeopleList: {
-      plan() {
-        return resource_personPgResource.find();
       },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
+      createNullTestRecord: {
+        plan(_, args) {
+          const $insert = pgInsertSingle(resource_null_test_recordPgResource, Object.create(null));
+          args.apply($insert);
+          const plan = object({
+            result: $insert
+          });
+          return plan;
         },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      createPerson: {
+        plan(_, args) {
+          const $insert = pgInsertSingle(resource_personPgResource, Object.create(null));
+          args.apply($insert);
+          const plan = object({
+            result: $insert
+          });
+          return plan;
         },
-        condition(_condition, $select, arg) {
-          arg.apply($select, qbWhereBuilder);
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      createPersonSecret: {
+        plan(_, args) {
+          const $insert = pgInsertSingle(resource_person_secretPgResource, Object.create(null));
+          args.apply($insert);
+          const plan = object({
+            result: $insert
+          });
+          return plan;
         },
-        orderBy(parent, $select, value) {
-          value.apply($select);
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deleteCompoundKey: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_compound_keyPgResource, specFromArgs_CompoundKey2(args));
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deleteCompoundKeyByPersonId1AndPersonId2: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_compound_keyPgResource, {
+            person_id_1: args.getRaw(['input', "personId1"]),
+            person_id_2: args.getRaw(['input', "personId2"])
+          });
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deleteIssue756: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_issue756PgResource, specFromArgs_Issue7562(args));
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deleteIssue756ById: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_issue756PgResource, {
+            id: args.getRaw(['input', "id"])
+          });
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deleteLeftArm: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_left_armPgResource, specFromArgs_LeftArm2(args));
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deleteLeftArmById: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_left_armPgResource, {
+            id: args.getRaw(['input', "id"])
+          });
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deleteLeftArmByPersonId: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_left_armPgResource, {
+            person_id: args.getRaw(['input', "personId"])
+          });
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deleteMyTable: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_my_tablePgResource, specFromArgs_MyTable2(args));
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deleteMyTableById: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_my_tablePgResource, {
+            id: args.getRaw(['input', "id"])
+          });
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deleteNullTestRecord: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_null_test_recordPgResource, specFromArgs_NullTestRecord2(args));
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deleteNullTestRecordById: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_null_test_recordPgResource, {
+            id: args.getRaw(['input', "id"])
+          });
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deletePerson: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_personPgResource, specFromArgs_Person2(args));
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deletePersonByEmail: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_personPgResource, {
+            email: args.getRaw(['input', "email"])
+          });
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deletePersonById: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_personPgResource, {
+            id: args.getRaw(['input', "id"])
+          });
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deletePersonSecret: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_person_secretPgResource, specFromArgs_PersonSecret2(args));
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deletePersonSecretByPersonId: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_person_secretPgResource, {
+            person_id: args.getRaw(['input', "personId"])
+          });
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      intSetMutation: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_int_set_mutation(args, ["input"]);
+          const $result = resource_int_set_mutationPgResource.execute(selectArgs, "mutation");
+          return object({
+            result: $result
+          });
+        },
+        args: {
+          input(_, $object, arg) {
+            // We might have any number of step types here; we need
+            // to get back to the underlying pgSelect.
+            const $result = $object.getStepForKey("result");
+            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+            if ($pgSelect instanceof PgSelectStep) {
+              // Mostly so `clientMutationId` works!
+              arg.apply($pgSelect);
+            } else {
+              throw new Error(`Could not determine PgSelectStep for ${$result}`);
+            }
+          }
+        }
+      },
+      issue756Mutation: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
+          const $result = resource_issue756_mutationPgResource.execute(selectArgs, "mutation");
+          return object({
+            result: $result
+          });
+        },
+        args: {
+          input(_, $object, arg) {
+            // We might have any number of step types here; we need
+            // to get back to the underlying pgSelect.
+            const $result = $object.getStepForKey("result");
+            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+            if ($pgSelect instanceof PgSelectStep) {
+              // Mostly so `clientMutationId` works!
+              arg.apply($pgSelect);
+            } else {
+              throw new Error(`Could not determine PgSelectStep for ${$result}`);
+            }
+          }
+        }
+      },
+      issue756SetMutation: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
+          const $result = resource_issue756_set_mutationPgResource.execute(selectArgs, "mutation");
+          return object({
+            result: $result
+          });
+        },
+        args: {
+          input(_, $object, arg) {
+            // We might have any number of step types here; we need
+            // to get back to the underlying pgSelect.
+            const $result = $object.getStepForKey("result");
+            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+            if ($pgSelect instanceof PgSelectStep) {
+              // Mostly so `clientMutationId` works!
+              arg.apply($pgSelect);
+            } else {
+              throw new Error(`Could not determine PgSelectStep for ${$result}`);
+            }
+          }
+        }
+      },
+      jsonbIdentityMutation: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_jsonb_identity_mutation(args, ["input"]);
+          const $result = resource_jsonb_identity_mutationPgResource.execute(selectArgs, "mutation");
+          return object({
+            result: $result
+          });
+        },
+        args: {
+          input(_, $object, arg) {
+            // We might have any number of step types here; we need
+            // to get back to the underlying pgSelect.
+            const $result = $object.getStepForKey("result");
+            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+            if ($pgSelect instanceof PgSelectStep) {
+              // Mostly so `clientMutationId` works!
+              arg.apply($pgSelect);
+            } else {
+              throw new Error(`Could not determine PgSelectStep for ${$result}`);
+            }
+          }
+        }
+      },
+      jsonbIdentityMutationPlpgsql: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_jsonb_identity_mutation_plpgsql(args, ["input"]);
+          const $result = resource_jsonb_identity_mutation_plpgsqlPgResource.execute(selectArgs, "mutation");
+          return object({
+            result: $result
+          });
+        },
+        args: {
+          input(_, $object, arg) {
+            // We might have any number of step types here; we need
+            // to get back to the underlying pgSelect.
+            const $result = $object.getStepForKey("result");
+            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+            if ($pgSelect instanceof PgSelectStep) {
+              // Mostly so `clientMutationId` works!
+              arg.apply($pgSelect);
+            } else {
+              throw new Error(`Could not determine PgSelectStep for ${$result}`);
+            }
+          }
+        }
+      },
+      jsonbIdentityMutationPlpgsqlWithDefault: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_jsonb_identity_mutation_plpgsql_with_default(args, ["input"]);
+          const $result = resource_jsonb_identity_mutation_plpgsql_with_defaultPgResource.execute(selectArgs, "mutation");
+          return object({
+            result: $result
+          });
+        },
+        args: {
+          input(_, $object, arg) {
+            // We might have any number of step types here; we need
+            // to get back to the underlying pgSelect.
+            const $result = $object.getStepForKey("result");
+            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+            if ($pgSelect instanceof PgSelectStep) {
+              // Mostly so `clientMutationId` works!
+              arg.apply($pgSelect);
+            } else {
+              throw new Error(`Could not determine PgSelectStep for ${$result}`);
+            }
+          }
+        }
+      },
+      jsonIdentityMutation: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_json_identity_mutation(args, ["input"]);
+          const $result = resource_json_identity_mutationPgResource.execute(selectArgs, "mutation");
+          return object({
+            result: $result
+          });
+        },
+        args: {
+          input(_, $object, arg) {
+            // We might have any number of step types here; we need
+            // to get back to the underlying pgSelect.
+            const $result = $object.getStepForKey("result");
+            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+            if ($pgSelect instanceof PgSelectStep) {
+              // Mostly so `clientMutationId` works!
+              arg.apply($pgSelect);
+            } else {
+              throw new Error(`Could not determine PgSelectStep for ${$result}`);
+            }
+          }
+        }
+      },
+      leftArmIdentity: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_left_arm_identity(args, ["input"]);
+          const $result = resource_left_arm_identityPgResource.execute(selectArgs, "mutation");
+          return object({
+            result: $result
+          });
+        },
+        args: {
+          input(_, $object, arg) {
+            // We might have any number of step types here; we need
+            // to get back to the underlying pgSelect.
+            const $result = $object.getStepForKey("result");
+            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+            if ($pgSelect instanceof PgSelectStep) {
+              // Mostly so `clientMutationId` works!
+              arg.apply($pgSelect);
+            } else {
+              throw new Error(`Could not determine PgSelectStep for ${$result}`);
+            }
+          }
+        }
+      },
+      listOfCompoundTypesMutation: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_list_of_compound_types_mutation(args, ["input"]);
+          const $result = resource_list_of_compound_types_mutationPgResource.execute(selectArgs, "mutation");
+          return object({
+            result: $result
+          });
+        },
+        args: {
+          input(_, $object, arg) {
+            // We might have any number of step types here; we need
+            // to get back to the underlying pgSelect.
+            const $result = $object.getStepForKey("result");
+            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+            if ($pgSelect instanceof PgSelectStep) {
+              // Mostly so `clientMutationId` works!
+              arg.apply($pgSelect);
+            } else {
+              throw new Error(`Could not determine PgSelectStep for ${$result}`);
+            }
+          }
+        }
+      },
+      mutationInInout: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_mutation_in_inout(args, ["input"]);
+          const $result = resource_mutation_in_inoutPgResource.execute(selectArgs, "mutation");
+          return object({
+            result: $result
+          });
+        },
+        args: {
+          input(_, $object, arg) {
+            // We might have any number of step types here; we need
+            // to get back to the underlying pgSelect.
+            const $result = $object.getStepForKey("result");
+            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+            if ($pgSelect instanceof PgSelectStep) {
+              // Mostly so `clientMutationId` works!
+              arg.apply($pgSelect);
+            } else {
+              throw new Error(`Could not determine PgSelectStep for ${$result}`);
+            }
+          }
+        }
+      },
+      mutationInOut: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_mutation_in_out(args, ["input"]);
+          const $result = resource_mutation_in_outPgResource.execute(selectArgs, "mutation");
+          return object({
+            result: $result
+          });
+        },
+        args: {
+          input(_, $object, arg) {
+            // We might have any number of step types here; we need
+            // to get back to the underlying pgSelect.
+            const $result = $object.getStepForKey("result");
+            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+            if ($pgSelect instanceof PgSelectStep) {
+              // Mostly so `clientMutationId` works!
+              arg.apply($pgSelect);
+            } else {
+              throw new Error(`Could not determine PgSelectStep for ${$result}`);
+            }
+          }
+        }
+      },
+      mutationOut: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
+          const $result = resource_mutation_outPgResource.execute(selectArgs, "mutation");
+          return object({
+            result: $result
+          });
+        },
+        args: {
+          input(_, $object, arg) {
+            // We might have any number of step types here; we need
+            // to get back to the underlying pgSelect.
+            const $result = $object.getStepForKey("result");
+            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+            if ($pgSelect instanceof PgSelectStep) {
+              // Mostly so `clientMutationId` works!
+              arg.apply($pgSelect);
+            } else {
+              throw new Error(`Could not determine PgSelectStep for ${$result}`);
+            }
+          }
+        }
+      },
+      mutationOutComplex: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_mutation_out_complex(args, ["input"]);
+          const $result = resource_mutation_out_complexPgResource.execute(selectArgs, "mutation");
+          return object({
+            result: $result
+          });
+        },
+        args: {
+          input(_, $object, arg) {
+            // We might have any number of step types here; we need
+            // to get back to the underlying pgSelect.
+            const $result = $object.getStepForKey("result");
+            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+            if ($pgSelect instanceof PgSelectStep) {
+              // Mostly so `clientMutationId` works!
+              arg.apply($pgSelect);
+            } else {
+              throw new Error(`Could not determine PgSelectStep for ${$result}`);
+            }
+          }
+        }
+      },
+      mutationOutComplexSetof: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_mutation_out_complex_setof(args, ["input"]);
+          const $result = resource_mutation_out_complex_setofPgResource.execute(selectArgs, "mutation");
+          return object({
+            result: $result
+          });
+        },
+        args: {
+          input(_, $object, arg) {
+            // We might have any number of step types here; we need
+            // to get back to the underlying pgSelect.
+            const $result = $object.getStepForKey("result");
+            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+            if ($pgSelect instanceof PgSelectStep) {
+              // Mostly so `clientMutationId` works!
+              arg.apply($pgSelect);
+            } else {
+              throw new Error(`Could not determine PgSelectStep for ${$result}`);
+            }
+          }
+        }
+      },
+      mutationOutOut: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
+          const $result = resource_mutation_out_outPgResource.execute(selectArgs, "mutation");
+          return object({
+            result: $result
+          });
+        },
+        args: {
+          input(_, $object, arg) {
+            // We might have any number of step types here; we need
+            // to get back to the underlying pgSelect.
+            const $result = $object.getStepForKey("result");
+            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+            if ($pgSelect instanceof PgSelectStep) {
+              // Mostly so `clientMutationId` works!
+              arg.apply($pgSelect);
+            } else {
+              throw new Error(`Could not determine PgSelectStep for ${$result}`);
+            }
+          }
+        }
+      },
+      mutationOutOutCompoundType: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_mutation_out_out_compound_type(args, ["input"]);
+          const $result = resource_mutation_out_out_compound_typePgResource.execute(selectArgs, "mutation");
+          return object({
+            result: $result
+          });
+        },
+        args: {
+          input(_, $object, arg) {
+            // We might have any number of step types here; we need
+            // to get back to the underlying pgSelect.
+            const $result = $object.getStepForKey("result");
+            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+            if ($pgSelect instanceof PgSelectStep) {
+              // Mostly so `clientMutationId` works!
+              arg.apply($pgSelect);
+            } else {
+              throw new Error(`Could not determine PgSelectStep for ${$result}`);
+            }
+          }
+        }
+      },
+      mutationOutOutSetof: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
+          const $result = resource_mutation_out_out_setofPgResource.execute(selectArgs, "mutation");
+          return object({
+            result: $result
+          });
+        },
+        args: {
+          input(_, $object, arg) {
+            // We might have any number of step types here; we need
+            // to get back to the underlying pgSelect.
+            const $result = $object.getStepForKey("result");
+            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+            if ($pgSelect instanceof PgSelectStep) {
+              // Mostly so `clientMutationId` works!
+              arg.apply($pgSelect);
+            } else {
+              throw new Error(`Could not determine PgSelectStep for ${$result}`);
+            }
+          }
+        }
+      },
+      mutationOutOutUnnamed: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
+          const $result = resource_mutation_out_out_unnamedPgResource.execute(selectArgs, "mutation");
+          return object({
+            result: $result
+          });
+        },
+        args: {
+          input(_, $object, arg) {
+            // We might have any number of step types here; we need
+            // to get back to the underlying pgSelect.
+            const $result = $object.getStepForKey("result");
+            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+            if ($pgSelect instanceof PgSelectStep) {
+              // Mostly so `clientMutationId` works!
+              arg.apply($pgSelect);
+            } else {
+              throw new Error(`Could not determine PgSelectStep for ${$result}`);
+            }
+          }
+        }
+      },
+      mutationOutSetof: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
+          const $result = resource_mutation_out_setofPgResource.execute(selectArgs, "mutation");
+          return object({
+            result: $result
+          });
+        },
+        args: {
+          input(_, $object, arg) {
+            // We might have any number of step types here; we need
+            // to get back to the underlying pgSelect.
+            const $result = $object.getStepForKey("result");
+            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+            if ($pgSelect instanceof PgSelectStep) {
+              // Mostly so `clientMutationId` works!
+              arg.apply($pgSelect);
+            } else {
+              throw new Error(`Could not determine PgSelectStep for ${$result}`);
+            }
+          }
+        }
+      },
+      mutationOutTable: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
+          const $result = resource_mutation_out_tablePgResource.execute(selectArgs, "mutation");
+          return object({
+            result: $result
+          });
+        },
+        args: {
+          input(_, $object, arg) {
+            // We might have any number of step types here; we need
+            // to get back to the underlying pgSelect.
+            const $result = $object.getStepForKey("result");
+            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+            if ($pgSelect instanceof PgSelectStep) {
+              // Mostly so `clientMutationId` works!
+              arg.apply($pgSelect);
+            } else {
+              throw new Error(`Could not determine PgSelectStep for ${$result}`);
+            }
+          }
+        }
+      },
+      mutationOutTableSetof: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
+          const $result = resource_mutation_out_table_setofPgResource.execute(selectArgs, "mutation");
+          return object({
+            result: $result
+          });
+        },
+        args: {
+          input(_, $object, arg) {
+            // We might have any number of step types here; we need
+            // to get back to the underlying pgSelect.
+            const $result = $object.getStepForKey("result");
+            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+            if ($pgSelect instanceof PgSelectStep) {
+              // Mostly so `clientMutationId` works!
+              arg.apply($pgSelect);
+            } else {
+              throw new Error(`Could not determine PgSelectStep for ${$result}`);
+            }
+          }
+        }
+      },
+      mutationOutUnnamed: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
+          const $result = resource_mutation_out_unnamedPgResource.execute(selectArgs, "mutation");
+          return object({
+            result: $result
+          });
+        },
+        args: {
+          input(_, $object, arg) {
+            // We might have any number of step types here; we need
+            // to get back to the underlying pgSelect.
+            const $result = $object.getStepForKey("result");
+            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+            if ($pgSelect instanceof PgSelectStep) {
+              // Mostly so `clientMutationId` works!
+              arg.apply($pgSelect);
+            } else {
+              throw new Error(`Could not determine PgSelectStep for ${$result}`);
+            }
+          }
+        }
+      },
+      mutationOutUnnamedOutOutUnnamed: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
+          const $result = resource_mutation_out_unnamed_out_out_unnamedPgResource.execute(selectArgs, "mutation");
+          return object({
+            result: $result
+          });
+        },
+        args: {
+          input(_, $object, arg) {
+            // We might have any number of step types here; we need
+            // to get back to the underlying pgSelect.
+            const $result = $object.getStepForKey("result");
+            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+            if ($pgSelect instanceof PgSelectStep) {
+              // Mostly so `clientMutationId` works!
+              arg.apply($pgSelect);
+            } else {
+              throw new Error(`Could not determine PgSelectStep for ${$result}`);
+            }
+          }
+        }
+      },
+      mutationReturnsTableMultiCol: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_mutation_returns_table_multi_col(args, ["input"]);
+          const $result = resource_mutation_returns_table_multi_colPgResource.execute(selectArgs, "mutation");
+          return object({
+            result: $result
+          });
+        },
+        args: {
+          input(_, $object, arg) {
+            // We might have any number of step types here; we need
+            // to get back to the underlying pgSelect.
+            const $result = $object.getStepForKey("result");
+            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+            if ($pgSelect instanceof PgSelectStep) {
+              // Mostly so `clientMutationId` works!
+              arg.apply($pgSelect);
+            } else {
+              throw new Error(`Could not determine PgSelectStep for ${$result}`);
+            }
+          }
+        }
+      },
+      mutationReturnsTableOneCol: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_mutation_returns_table_one_col(args, ["input"]);
+          const $result = resource_mutation_returns_table_one_colPgResource.execute(selectArgs, "mutation");
+          return object({
+            result: $result
+          });
+        },
+        args: {
+          input(_, $object, arg) {
+            // We might have any number of step types here; we need
+            // to get back to the underlying pgSelect.
+            const $result = $object.getStepForKey("result");
+            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+            if ($pgSelect instanceof PgSelectStep) {
+              // Mostly so `clientMutationId` works!
+              arg.apply($pgSelect);
+            } else {
+              throw new Error(`Could not determine PgSelectStep for ${$result}`);
+            }
+          }
+        }
+      },
+      noArgsMutation: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
+          const $result = resource_no_args_mutationPgResource.execute(selectArgs, "mutation");
+          return object({
+            result: $result
+          });
+        },
+        args: {
+          input(_, $object, arg) {
+            // We might have any number of step types here; we need
+            // to get back to the underlying pgSelect.
+            const $result = $object.getStepForKey("result");
+            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+            if ($pgSelect instanceof PgSelectStep) {
+              // Mostly so `clientMutationId` works!
+              arg.apply($pgSelect);
+            } else {
+              throw new Error(`Could not determine PgSelectStep for ${$result}`);
+            }
+          }
+        }
+      },
+      tableMutation: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_table_mutation(args, ["input"]);
+          const $result = resource_table_mutationPgResource.execute(selectArgs, "mutation");
+          return object({
+            result: $result
+          });
+        },
+        args: {
+          input(_, $object, arg) {
+            // We might have any number of step types here; we need
+            // to get back to the underlying pgSelect.
+            const $result = $object.getStepForKey("result");
+            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+            if ($pgSelect instanceof PgSelectStep) {
+              // Mostly so `clientMutationId` works!
+              arg.apply($pgSelect);
+            } else {
+              throw new Error(`Could not determine PgSelectStep for ${$result}`);
+            }
+          }
+        }
+      },
+      tableSetMutation: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_person_computed_out(args, ["input"]);
+          const $result = resource_table_set_mutationPgResource.execute(selectArgs, "mutation");
+          return object({
+            result: $result
+          });
+        },
+        args: {
+          input(_, $object, arg) {
+            // We might have any number of step types here; we need
+            // to get back to the underlying pgSelect.
+            const $result = $object.getStepForKey("result");
+            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+            if ($pgSelect instanceof PgSelectStep) {
+              // Mostly so `clientMutationId` works!
+              arg.apply($pgSelect);
+            } else {
+              throw new Error(`Could not determine PgSelectStep for ${$result}`);
+            }
+          }
+        }
+      },
+      typesMutation: {
+        plan($root, args, _info) {
+          const selectArgs = makeArgs_types_mutation(args, ["input"]);
+          const $result = resource_types_mutationPgResource.execute(selectArgs, "mutation");
+          return object({
+            result: $result
+          });
+        },
+        args: {
+          input(_, $object, arg) {
+            // We might have any number of step types here; we need
+            // to get back to the underlying pgSelect.
+            const $result = $object.getStepForKey("result");
+            const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
+            const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
+            if ($pgSelect instanceof PgSelectStep) {
+              // Mostly so `clientMutationId` works!
+              arg.apply($pgSelect);
+            } else {
+              throw new Error(`Could not determine PgSelectStep for ${$result}`);
+            }
+          }
+        }
+      },
+      updateCompoundKey: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_compound_keyPgResource, specFromArgs_CompoundKey(args));
+          args.apply($update);
+          return object({
+            result: $update
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      updateCompoundKeyByPersonId1AndPersonId2: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_compound_keyPgResource, {
+            person_id_1: args.getRaw(['input', "personId1"]),
+            person_id_2: args.getRaw(['input', "personId2"])
+          });
+          args.apply($update);
+          return object({
+            result: $update
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      updateIssue756: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_issue756PgResource, specFromArgs_Issue756(args));
+          args.apply($update);
+          return object({
+            result: $update
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      updateIssue756ById: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_issue756PgResource, {
+            id: args.getRaw(['input', "id"])
+          });
+          args.apply($update);
+          return object({
+            result: $update
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      updateLeftArm: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_left_armPgResource, specFromArgs_LeftArm(args));
+          args.apply($update);
+          return object({
+            result: $update
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      updateLeftArmById: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_left_armPgResource, {
+            id: args.getRaw(['input', "id"])
+          });
+          args.apply($update);
+          return object({
+            result: $update
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      updateLeftArmByPersonId: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_left_armPgResource, {
+            person_id: args.getRaw(['input', "personId"])
+          });
+          args.apply($update);
+          return object({
+            result: $update
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      updateMyTable: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_my_tablePgResource, specFromArgs_MyTable(args));
+          args.apply($update);
+          return object({
+            result: $update
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      updateMyTableById: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_my_tablePgResource, {
+            id: args.getRaw(['input', "id"])
+          });
+          args.apply($update);
+          return object({
+            result: $update
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      updateNullTestRecord: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_null_test_recordPgResource, specFromArgs_NullTestRecord(args));
+          args.apply($update);
+          return object({
+            result: $update
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      updateNullTestRecordById: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_null_test_recordPgResource, {
+            id: args.getRaw(['input', "id"])
+          });
+          args.apply($update);
+          return object({
+            result: $update
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      updatePerson: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_personPgResource, specFromArgs_Person(args));
+          args.apply($update);
+          return object({
+            result: $update
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      updatePersonByEmail: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_personPgResource, {
+            email: args.getRaw(['input', "email"])
+          });
+          args.apply($update);
+          return object({
+            result: $update
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      updatePersonById: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_personPgResource, {
+            id: args.getRaw(['input', "id"])
+          });
+          args.apply($update);
+          return object({
+            result: $update
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      updatePersonSecret: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_person_secretPgResource, specFromArgs_PersonSecret(args));
+          args.apply($update);
+          return object({
+            result: $update
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      updatePersonSecretByPersonId: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_person_secretPgResource, {
+            person_id: args.getRaw(['input', "personId"])
+          });
+          args.apply($update);
+          return object({
+            result: $update
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
         }
       }
     }
   },
+  CompoundKey: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      nodeId($parent) {
+        const specifier = nodeIdHandler_CompoundKey.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_CompoundKey.codec.name].encode);
+      },
+      personByPersonId1($record) {
+        return resource_personPgResource.get({
+          id: $record.get("person_id_1")
+        });
+      },
+      personByPersonId2($record) {
+        return resource_personPgResource.get({
+          id: $record.get("person_id_2")
+        });
+      },
+      personId1($record) {
+        return $record.get("person_id_1");
+      },
+      personId2($record) {
+        return $record.get("person_id_2");
+      }
+    },
+    planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of compound_keyUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_compound_keyPgResource.get(spec);
+    }
+  },
+  CompoundType: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      computedField($in, args, _info) {
+        const {
+          $row,
+          selectArgs
+        } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args), true);
+        const from = pgFromExpression($row, resource_compound_type_computed_fieldPgResource.from, resource_compound_type_computed_fieldPgResource.parameters, selectArgs);
+        return pgClassExpression($row, resource_compound_type_computed_fieldPgResource.codec, undefined)`${from}`;
+      },
+      fooBar($record) {
+        return $record.get("foo_bar");
+      }
+    }
+  },
+  Comptype: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      isOptimised($record) {
+        return $record.get("is_optimised");
+      }
+    }
+  },
+  CreateCompoundKeyPayload: {
+    assertStep: assertExecutableStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $insert = $mutation.getStepForKey("result");
+        return $insert.getMeta("clientMutationId");
+      },
+      compoundKey($object) {
+        return $object.get("result");
+      },
+      personByPersonId1($record) {
+        return resource_personPgResource.get({
+          id: $record.get("result").get("person_id_1")
+        });
+      },
+      personByPersonId2($record) {
+        return resource_personPgResource.get({
+          id: $record.get("result").get("person_id_2")
+        });
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  CreateEdgeCasePayload: {
+    assertStep: assertExecutableStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $insert = $mutation.getStepForKey("result");
+        return $insert.getMeta("clientMutationId");
+      },
+      edgeCase($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  CreateIssue756Payload: {
+    assertStep: assertExecutableStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $insert = $mutation.getStepForKey("result");
+        return $insert.getMeta("clientMutationId");
+      },
+      issue756($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  CreateLeftArmPayload: {
+    assertStep: assertExecutableStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $insert = $mutation.getStepForKey("result");
+        return $insert.getMeta("clientMutationId");
+      },
+      leftArm($object) {
+        return $object.get("result");
+      },
+      personByPersonId($record) {
+        return resource_personPgResource.get({
+          id: $record.get("result").get("person_id")
+        });
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  CreateMyTablePayload: {
+    assertStep: assertExecutableStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $insert = $mutation.getStepForKey("result");
+        return $insert.getMeta("clientMutationId");
+      },
+      myTable($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  CreateNullTestRecordPayload: {
+    assertStep: assertExecutableStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $insert = $mutation.getStepForKey("result");
+        return $insert.getMeta("clientMutationId");
+      },
+      nullTestRecord($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  CreatePersonPayload: {
+    assertStep: assertExecutableStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $insert = $mutation.getStepForKey("result");
+        return $insert.getMeta("clientMutationId");
+      },
+      person($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  CreatePersonSecretPayload: {
+    assertStep: assertExecutableStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $insert = $mutation.getStepForKey("result");
+        return $insert.getMeta("clientMutationId");
+      },
+      personByPersonId($record) {
+        return resource_personPgResource.get({
+          id: $record.get("result").get("person_id")
+        });
+      },
+      personSecret($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  DeleteCompoundKeyPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $result = $mutation.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      compoundKey($object) {
+        return $object.get("result");
+      },
+      deletedCompoundKeyId($object) {
+        const $record = $object.getStepForKey("result");
+        const specifier = nodeIdHandler_CompoundKey.plan($record);
+        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+      },
+      personByPersonId1($record) {
+        return resource_personPgResource.get({
+          id: $record.get("result").get("person_id_1")
+        });
+      },
+      personByPersonId2($record) {
+        return resource_personPgResource.get({
+          id: $record.get("result").get("person_id_2")
+        });
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  DeleteIssue756Payload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $result = $mutation.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      deletedIssue756Id($object) {
+        const $record = $object.getStepForKey("result");
+        const specifier = nodeIdHandler_Issue756.plan($record);
+        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+      },
+      issue756($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  DeleteLeftArmPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $result = $mutation.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      deletedLeftArmId($object) {
+        const $record = $object.getStepForKey("result");
+        const specifier = nodeIdHandler_LeftArm.plan($record);
+        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+      },
+      leftArm($object) {
+        return $object.get("result");
+      },
+      personByPersonId($record) {
+        return resource_personPgResource.get({
+          id: $record.get("result").get("person_id")
+        });
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  DeleteMyTablePayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $result = $mutation.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      deletedMyTableId($object) {
+        const $record = $object.getStepForKey("result");
+        const specifier = nodeIdHandler_MyTable.plan($record);
+        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+      },
+      myTable($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  DeleteNullTestRecordPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $result = $mutation.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      deletedNullTestRecordId($object) {
+        const $record = $object.getStepForKey("result");
+        const specifier = nodeIdHandler_NullTestRecord.plan($record);
+        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+      },
+      nullTestRecord($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  DeletePersonPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $result = $mutation.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      deletedPersonId($object) {
+        const $record = $object.getStepForKey("result");
+        const specifier = nodeIdHandler_Person.plan($record);
+        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+      },
+      person($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  DeletePersonSecretPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $result = $mutation.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      deletedPersonSecretId($object) {
+        const $record = $object.getStepForKey("result");
+        const specifier = nodeIdHandler_PersonSecret.plan($record);
+        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+      },
+      personByPersonId($record) {
+        return resource_personPgResource.get({
+          id: $record.get("result").get("person_id")
+        });
+      },
+      personSecret($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  EdgeCase: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      computed($in, args, _info) {
+        const {
+          $row,
+          selectArgs
+        } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args), true);
+        const from = pgFromExpression($row, resource_edge_case_computedPgResource.from, resource_edge_case_computedPgResource.parameters, selectArgs);
+        return pgClassExpression($row, resource_edge_case_computedPgResource.codec, undefined)`${from}`;
+      },
+      notNullHasDefault($record) {
+        return $record.get("not_null_has_default");
+      },
+      rowId($record) {
+        return $record.get("row_id");
+      },
+      wontCastEasy($record) {
+        return $record.get("wont_cast_easy");
+      }
+    }
+  },
+  FuncOutComplexRecord: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      y($record) {
+        const $plan = $record.get("y");
+        const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
+        $select.getClassStep().setTrusted();
+        return $select;
+      },
+      z($record) {
+        const $plan = $record.get("z");
+        const $select = pgSelectSingleFromRecord(resource_personPgResource, $plan);
+        $select.getClassStep().setTrusted();
+        return $select;
+      }
+    }
+  },
+  FuncOutComplexSetofRecord: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      y($record) {
+        const $plan = $record.get("y");
+        const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
+        $select.getClassStep().setTrusted();
+        return $select;
+      },
+      z($record) {
+        const $plan = $record.get("z");
+        const $select = pgSelectSingleFromRecord(resource_personPgResource, $plan);
+        $select.getClassStep().setTrusted();
+        return $select;
+      }
+    }
+  },
+  FuncOutOutCompoundTypeRecord: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      o2($record) {
+        const $plan = $record.get("o2");
+        const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
+        $select.getClassStep().setTrusted();
+        return $select;
+      }
+    }
+  },
+  FuncOutOutRecord: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      firstOut($record) {
+        return $record.get("first_out");
+      },
+      secondOut($record) {
+        return $record.get("second_out");
+      }
+    }
+  },
+  FuncOutOutSetofRecord: {
+    assertStep: assertPgClassSingleStep
+  },
+  FuncOutOutUnnamedRecord: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      arg1($record) {
+        return $record.get("column1");
+      },
+      arg2($record) {
+        return $record.get("column2");
+      }
+    }
+  },
+  FuncOutUnnamedOutOutUnnamedRecord: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      arg1($record) {
+        return $record.get("column1");
+      },
+      arg3($record) {
+        return $record.get("column3");
+      }
+    }
+  },
+  FuncReturnsTableMultiColRecord: {
+    assertStep: assertPgClassSingleStep
+  },
+  Interval: {
+    assertStep: assertExecutableStep
+  },
+  IntSetMutationPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($object) {
+        const $result = $object.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      integers($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  Issue756: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      nodeId($parent) {
+        const specifier = nodeIdHandler_Issue756.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_Issue756.codec.name].encode);
+      }
+    },
+    planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of issue756Uniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_issue756PgResource.get(spec);
+    }
+  },
+  Issue756MutationPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($object) {
+        const $result = $object.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      issue756($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  Issue756SetMutationPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($object) {
+        const $result = $object.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      issue756S($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  JsonbIdentityMutationPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($object) {
+        const $result = $object.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      json($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  JsonbIdentityMutationPlpgsqlPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($object) {
+        const $result = $object.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      json($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  JsonbIdentityMutationPlpgsqlWithDefaultPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($object) {
+        const $result = $object.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      json($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  JsonIdentityMutationPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($object) {
+        const $result = $object.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      json($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  LeftArm: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      lengthInMetres($record) {
+        return $record.get("length_in_metres");
+      },
+      nodeId($parent) {
+        const specifier = nodeIdHandler_LeftArm.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_LeftArm.codec.name].encode);
+      },
+      personByPersonId($record) {
+        return resource_personPgResource.get({
+          id: $record.get("person_id")
+        });
+      },
+      personId($record) {
+        return $record.get("person_id");
+      }
+    },
+    planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of left_armUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_left_armPgResource.get(spec);
+    }
+  },
+  LeftArmIdentityPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($object) {
+        const $result = $object.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      leftArm($object) {
+        return $object.get("result");
+      },
+      personByPersonId($record) {
+        return resource_personPgResource.get({
+          id: $record.get("result").get("person_id")
+        });
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  ListOfCompoundTypesMutationPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($object) {
+        const $result = $object.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      compoundTypes($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  MutationInInoutPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($object) {
+        const $result = $object.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      ino($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  MutationInOutPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($object) {
+        const $result = $object.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      o($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  MutationOutComplexPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($object) {
+        const $result = $object.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      query() {
+        return rootValue();
+      },
+      result($object) {
+        return $object.get("result");
+      }
+    }
+  },
+  MutationOutComplexRecord: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      y($record) {
+        const $plan = $record.get("y");
+        const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
+        $select.getClassStep().setTrusted();
+        return $select;
+      },
+      z($record) {
+        const $plan = $record.get("z");
+        const $select = pgSelectSingleFromRecord(resource_personPgResource, $plan);
+        $select.getClassStep().setTrusted();
+        return $select;
+      }
+    }
+  },
+  MutationOutComplexSetofPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($object) {
+        const $result = $object.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      query() {
+        return rootValue();
+      },
+      results($object) {
+        return $object.get("result");
+      }
+    }
+  },
+  MutationOutComplexSetofRecord: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      y($record) {
+        const $plan = $record.get("y");
+        const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
+        $select.getClassStep().setTrusted();
+        return $select;
+      },
+      z($record) {
+        const $plan = $record.get("z");
+        const $select = pgSelectSingleFromRecord(resource_personPgResource, $plan);
+        $select.getClassStep().setTrusted();
+        return $select;
+      }
+    }
+  },
+  MutationOutOutCompoundTypePayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($object) {
+        const $result = $object.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      query() {
+        return rootValue();
+      },
+      result($object) {
+        return $object.get("result");
+      }
+    }
+  },
+  MutationOutOutCompoundTypeRecord: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      o2($record) {
+        const $plan = $record.get("o2");
+        const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
+        $select.getClassStep().setTrusted();
+        return $select;
+      }
+    }
+  },
+  MutationOutOutPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($object) {
+        const $result = $object.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      query() {
+        return rootValue();
+      },
+      result($object) {
+        return $object.get("result");
+      }
+    }
+  },
+  MutationOutOutRecord: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      firstOut($record) {
+        return $record.get("first_out");
+      },
+      secondOut($record) {
+        return $record.get("second_out");
+      }
+    }
+  },
+  MutationOutOutSetofPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($object) {
+        const $result = $object.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      query() {
+        return rootValue();
+      },
+      results($object) {
+        return $object.get("result");
+      }
+    }
+  },
+  MutationOutOutSetofRecord: {
+    assertStep: assertPgClassSingleStep
+  },
+  MutationOutOutUnnamedPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($object) {
+        const $result = $object.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      query() {
+        return rootValue();
+      },
+      result($object) {
+        return $object.get("result");
+      }
+    }
+  },
+  MutationOutOutUnnamedRecord: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      arg1($record) {
+        return $record.get("column1");
+      },
+      arg2($record) {
+        return $record.get("column2");
+      }
+    }
+  },
+  MutationOutPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($object) {
+        const $result = $object.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      o($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  MutationOutSetofPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($object) {
+        const $result = $object.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      os($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  MutationOutTablePayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($object) {
+        const $result = $object.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      person($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  MutationOutTableSetofPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($object) {
+        const $result = $object.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      people($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  MutationOutUnnamedOutOutUnnamedPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($object) {
+        const $result = $object.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      query() {
+        return rootValue();
+      },
+      result($object) {
+        return $object.get("result");
+      }
+    }
+  },
+  MutationOutUnnamedOutOutUnnamedRecord: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      arg1($record) {
+        return $record.get("column1");
+      },
+      arg3($record) {
+        return $record.get("column3");
+      }
+    }
+  },
+  MutationOutUnnamedPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($object) {
+        const $result = $object.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      integer($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  MutationReturnsTableMultiColPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($object) {
+        const $result = $object.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      query() {
+        return rootValue();
+      },
+      results($object) {
+        return $object.get("result");
+      }
+    }
+  },
+  MutationReturnsTableMultiColRecord: {
+    assertStep: assertPgClassSingleStep
+  },
+  MutationReturnsTableOneColPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($object) {
+        const $result = $object.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      col1S($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  MyTable: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      jsonData($record) {
+        return $record.get("json_data");
+      },
+      nodeId($parent) {
+        const specifier = nodeIdHandler_MyTable.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_MyTable.codec.name].encode);
+      }
+    },
+    planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of my_tableUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_my_tablePgResource.get(spec);
+    }
+  },
+  NestedCompoundType: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      a($record) {
+        const $plan = $record.get("a");
+        const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
+        $select.getClassStep().setTrusted();
+        return $select;
+      },
+      b($record) {
+        const $plan = $record.get("b");
+        const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
+        $select.getClassStep().setTrusted();
+        return $select;
+      },
+      bazBuz($record) {
+        return $record.get("baz_buz");
+      }
+    }
+  },
+  NoArgsMutationPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($object) {
+        const $result = $object.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      integer($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  NullTestRecord: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      nodeId($parent) {
+        const specifier = nodeIdHandler_NullTestRecord.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_NullTestRecord.codec.name].encode);
+      },
+      nonNullText($record) {
+        return $record.get("non_null_text");
+      },
+      nullableInt($record) {
+        return $record.get("nullable_int");
+      },
+      nullableText($record) {
+        return $record.get("nullable_text");
+      }
+    },
+    planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of null_test_recordUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_null_test_recordPgResource.get(spec);
+    }
+  },
+  Person: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      compoundKeysByPersonId1List: {
+        plan($record) {
+          return resource_compound_keyPgResource.find({
+            person_id_1: $record.get("id")
+          });
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          condition(_condition, $select, arg) {
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $select, value) {
+            value.apply($select);
+          }
+        }
+      },
+      compoundKeysByPersonId2List: {
+        plan($record) {
+          return resource_compound_keyPgResource.find({
+            person_id_2: $record.get("id")
+          });
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          condition(_condition, $select, arg) {
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $select, value) {
+            value.apply($select);
+          }
+        }
+      },
+      computedComplex($in, args, _info) {
+        const {
+          selectArgs
+        } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_complex(args));
+        return resource_person_computed_complexPgResource.execute(selectArgs);
+      },
+      computedFirstArgInout($in, args, _info) {
+        const {
+          selectArgs
+        } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args));
+        return resource_person_computed_first_arg_inoutPgResource.execute(selectArgs);
+      },
+      computedFirstArgInoutOut($in, args, _info) {
+        const {
+          selectArgs
+        } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args));
+        return resource_person_computed_first_arg_inout_outPgResource.execute(selectArgs);
+      },
+      computedInout($in, args, _info) {
+        const {
+          $row,
+          selectArgs
+        } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_inout(args), true);
+        const from = pgFromExpression($row, resource_person_computed_inoutPgResource.from, resource_person_computed_inoutPgResource.parameters, selectArgs);
+        return pgClassExpression($row, resource_person_computed_inoutPgResource.codec, undefined)`${from}`;
+      },
+      computedInoutOut($in, args, _info) {
+        const {
+          selectArgs
+        } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_inout_out(args));
+        return resource_person_computed_inout_outPgResource.execute(selectArgs);
+      },
+      computedOut($in, args, _info) {
+        const {
+          $row,
+          selectArgs
+        } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args), true);
+        const from = pgFromExpression($row, resource_person_computed_outPgResource.from, resource_person_computed_outPgResource.parameters, selectArgs);
+        return pgClassExpression($row, resource_person_computed_outPgResource.codec, undefined)`${from}`;
+      },
+      computedOutOut($in, args, _info) {
+        const {
+          selectArgs
+        } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args));
+        return resource_person_computed_out_outPgResource.execute(selectArgs);
+      },
+      createdAt($record) {
+        return $record.get("created_at");
+      },
+      exists($in, args, _info) {
+        const {
+          $row,
+          selectArgs
+        } = pgFunctionArgumentsFromArgs($in, makeArgs_person_exists(args), true);
+        const from = pgFromExpression($row, resource_person_existsPgResource.from, resource_person_existsPgResource.parameters, selectArgs);
+        return pgClassExpression($row, resource_person_existsPgResource.codec, undefined)`${from}`;
+      },
+      firstName($in, args, _info) {
+        const {
+          $row,
+          selectArgs
+        } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args), true);
+        const from = pgFromExpression($row, resource_person_first_namePgResource.from, resource_person_first_namePgResource.parameters, selectArgs);
+        return pgClassExpression($row, resource_person_first_namePgResource.codec, undefined)`${from}`;
+      },
+      firstPost($in, args, _info) {
+        const {
+          selectArgs
+        } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args));
+        return resource_person_first_postPgResource.execute(selectArgs);
+      },
+      friendsList: {
+        plan($in, args, _info) {
+          const {
+            selectArgs
+          } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args));
+          return resource_person_friendsPgResource.execute(selectArgs);
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          orderBy(parent, $select, value) {
+            value.apply($select);
+          }
+        }
+      },
+      lastLoginFromIp($record) {
+        return $record.get("last_login_from_ip");
+      },
+      lastLoginFromSubnet($record) {
+        return $record.get("last_login_from_subnet");
+      },
+      leftArmByPersonId($record) {
+        return resource_left_armPgResource.get({
+          person_id: $record.get("id")
+        });
+      },
+      name($record) {
+        return $record.get("person_full_name");
+      },
+      nodeId($parent) {
+        const specifier = nodeIdHandler_Person.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_Person.codec.name].encode);
+      },
+      optionalMissingMiddle1($in, args, _info) {
+        const {
+          $row,
+          selectArgs
+        } = pgFunctionArgumentsFromArgs($in, makeArgs_person_optional_missing_middle_1(args), true);
+        const from = pgFromExpression($row, resource_person_optional_missing_middle_1PgResource.from, resource_person_optional_missing_middle_1PgResource.parameters, selectArgs);
+        return pgClassExpression($row, resource_person_optional_missing_middle_1PgResource.codec, undefined)`${from}`;
+      },
+      optionalMissingMiddle2($in, args, _info) {
+        const {
+          $row,
+          selectArgs
+        } = pgFunctionArgumentsFromArgs($in, makeArgs_person_optional_missing_middle_2(args), true);
+        const from = pgFromExpression($row, resource_person_optional_missing_middle_2PgResource.from, resource_person_optional_missing_middle_2PgResource.parameters, selectArgs);
+        return pgClassExpression($row, resource_person_optional_missing_middle_2PgResource.codec, undefined)`${from}`;
+      },
+      optionalMissingMiddle3($in, args, _info) {
+        const {
+          $row,
+          selectArgs
+        } = pgFunctionArgumentsFromArgs($in, makeArgs_person_optional_missing_middle_3(args), true);
+        const from = pgFromExpression($row, resource_person_optional_missing_middle_3PgResource.from, resource_person_optional_missing_middle_3PgResource.parameters, selectArgs);
+        return pgClassExpression($row, resource_person_optional_missing_middle_3PgResource.codec, undefined)`${from}`;
+      },
+      optionalMissingMiddle4($in, args, _info) {
+        const {
+          $row,
+          selectArgs
+        } = pgFunctionArgumentsFromArgs($in, makeArgs_person_optional_missing_middle_4(args), true);
+        const from = pgFromExpression($row, resource_person_optional_missing_middle_4PgResource.from, resource_person_optional_missing_middle_4PgResource.parameters, selectArgs);
+        return pgClassExpression($row, resource_person_optional_missing_middle_4PgResource.codec, undefined)`${from}`;
+      },
+      optionalMissingMiddle5($in, args, _info) {
+        const {
+          $row,
+          selectArgs
+        } = pgFunctionArgumentsFromArgs($in, makeArgs_person_optional_missing_middle_5(args), true);
+        const from = pgFromExpression($row, resource_person_optional_missing_middle_5PgResource.from, resource_person_optional_missing_middle_5PgResource.parameters, selectArgs);
+        return pgClassExpression($row, resource_person_optional_missing_middle_5PgResource.codec, undefined)`${from}`;
+      },
+      personSecretByPersonId($record) {
+        return resource_person_secretPgResource.get({
+          person_id: $record.get("id")
+        });
+      },
+      site($record) {
+        const $plan = $record.get("site");
+        const $select = pgSelectSingleFromRecord(resource_frmcdc_wrappedUrlPgResource, $plan);
+        $select.getClassStep().setTrusted();
+        return $select;
+      },
+      typeFunction($in, args, _info) {
+        const {
+          selectArgs
+        } = pgFunctionArgumentsFromArgs($in, makeArgs_person_type_function(args));
+        return resource_person_type_functionPgResource.execute(selectArgs);
+      },
+      typeFunctionConnectionList: {
+        plan($in, args, _info) {
+          const {
+            selectArgs
+          } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args));
+          return resource_person_type_function_connectionPgResource.execute(selectArgs);
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
+        }
+      },
+      typeFunctionList($in, args, _info) {
+        const {
+          selectArgs
+        } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args));
+        return resource_person_type_function_listPgResource.execute(selectArgs);
+      },
+      userMac($record) {
+        return $record.get("user_mac");
+      }
+    },
+    planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of personUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_personPgResource.get(spec);
+    }
+  },
+  PersonComputedComplexRecord: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      y($record) {
+        const $plan = $record.get("y");
+        const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
+        $select.getClassStep().setTrusted();
+        return $select;
+      },
+      z($record) {
+        const $plan = $record.get("z");
+        const $select = pgSelectSingleFromRecord(resource_personPgResource, $plan);
+        $select.getClassStep().setTrusted();
+        return $select;
+      }
+    }
+  },
+  PersonComputedFirstArgInoutOutRecord: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      person($record) {
+        const $plan = $record.get("person");
+        const $select = pgSelectSingleFromRecord(resource_personPgResource, $plan);
+        $select.getClassStep().setTrusted();
+        return $select;
+      }
+    }
+  },
+  PersonComputedInoutOutRecord: {
+    assertStep: assertPgClassSingleStep
+  },
+  PersonComputedOutOutRecord: {
+    assertStep: assertPgClassSingleStep
+  },
+  PersonSecret: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      nodeId($parent) {
+        const specifier = nodeIdHandler_PersonSecret.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_PersonSecret.codec.name].encode);
+      },
+      personByPersonId($record) {
+        return resource_personPgResource.get({
+          id: $record.get("person_id")
+        });
+      },
+      personId($record) {
+        return $record.get("person_id");
+      },
+      secret($record) {
+        return $record.get("sekrit");
+      }
+    },
+    planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of person_secretUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_person_secretPgResource.get(spec);
+    }
+  },
+  Post: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      authorId($record) {
+        return $record.get("author_id");
+      },
+      comptypes($record) {
+        const $val = $record.get("comptypes");
+        const $select = pgSelectFromRecords(resource_frmcdc_comptypePgResource, $val);
+        $select.setTrusted();
+        return $select;
+      }
+    }
+  },
+  QueryOutputTwoRowsRecord: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      leftArm($record) {
+        const $plan = $record.get("left_arm");
+        const $select = pgSelectSingleFromRecord(resource_left_armPgResource, $plan);
+        $select.getClassStep().setTrusted();
+        return $select;
+      },
+      post($record) {
+        const $plan = $record.get("post");
+        const $select = pgSelectSingleFromRecord(resource_frmcdc_postPgResource, $plan);
+        $select.getClassStep().setTrusted();
+        return $select;
+      }
+    }
+  },
+  SearchTestSummariesRecord: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      totalDuration($record) {
+        return $record.get("total_duration");
+      }
+    }
+  },
+  TableMutationPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($object) {
+        const $result = $object.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      post($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  TableSetMutationPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($object) {
+        const $result = $object.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      people($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  Type: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      anIntRange($record) {
+        return $record.get("an_int_range");
+      },
+      byteaArray($record) {
+        return $record.get("bytea_array");
+      },
+      compoundType($record) {
+        const $plan = $record.get("compound_type");
+        const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
+        $select.coalesceToEmptyObject();
+        $select.getClassStep().setTrusted();
+        return $select;
+      },
+      enumArray($record) {
+        return $record.get("enum_array");
+      },
+      int8ArrayDomain($record) {
+        return $record.get("int8_array_domain");
+      },
+      intervalArray($record) {
+        return $record.get("interval_array");
+      },
+      ltreeArray($record) {
+        return $record.get("ltree_array");
+      },
+      nestedCompoundType($record) {
+        const $plan = $record.get("nested_compound_type");
+        const $select = pgSelectSingleFromRecord(resource_frmcdc_nestedCompoundTypePgResource, $plan);
+        $select.coalesceToEmptyObject();
+        $select.getClassStep().setTrusted();
+        return $select;
+      },
+      nullableCompoundType($record) {
+        const $plan = $record.get("nullable_compound_type");
+        const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
+        $select.getClassStep().setTrusted();
+        return $select;
+      },
+      nullableNestedCompoundType($record) {
+        const $plan = $record.get("nullable_nested_compound_type");
+        const $select = pgSelectSingleFromRecord(resource_frmcdc_nestedCompoundTypePgResource, $plan);
+        $select.getClassStep().setTrusted();
+        return $select;
+      },
+      nullableRange($record) {
+        return $record.get("nullable_range");
+      },
+      textArray($record) {
+        return $record.get("text_array");
+      },
+      textArrayDomain($record) {
+        return $record.get("text_array_domain");
+      }
+    }
+  },
+  TypesMutationPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      boolean($object) {
+        return $object.get("result");
+      },
+      clientMutationId($object) {
+        const $result = $object.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  UpdateCompoundKeyPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $result = $mutation.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      compoundKey($object) {
+        return $object.get("result");
+      },
+      personByPersonId1($record) {
+        return resource_personPgResource.get({
+          id: $record.get("result").get("person_id_1")
+        });
+      },
+      personByPersonId2($record) {
+        return resource_personPgResource.get({
+          id: $record.get("result").get("person_id_2")
+        });
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  UpdateIssue756Payload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $result = $mutation.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      issue756($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  UpdateLeftArmPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $result = $mutation.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      leftArm($object) {
+        return $object.get("result");
+      },
+      personByPersonId($record) {
+        return resource_personPgResource.get({
+          id: $record.get("result").get("person_id")
+        });
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  UpdateMyTablePayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $result = $mutation.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      myTable($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  UpdateNullTestRecordPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $result = $mutation.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      nullTestRecord($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  UpdatePersonPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $result = $mutation.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      person($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  UpdatePersonSecretPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $result = $mutation.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      personByPersonId($record) {
+        return resource_personPgResource.get({
+          id: $record.get("result").get("person_id")
+        });
+      },
+      personSecret($object) {
+        return $object.get("result");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  WrappedUrl: {
+    assertStep: assertPgClassSingleStep
+  }
+};
+export const interfaces = {
   Node: {
-    __planType($nodeId) {
+    planType($nodeId) {
       const $specifier = decodeNodeId($nodeId);
       const $__typename = lambda($specifier, findTypeNameMatch, true);
       return {
@@ -10634,22 +13571,1543 @@ export const plans = {
         }
       };
     }
-  },
-  MyTable: {
-    __assertStep: assertPgClassSingleStep,
-    __planType($specifier) {
-      const spec = Object.create(null);
-      for (const pkCol of my_tableUniques[0].attributes) {
-        spec[pkCol] = get2($specifier, pkCol);
+  }
+};
+export const inputObjects = {
+  CompoundKeyCondition: {
+    plans: {
+      extra($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "extra",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
+          }
+        });
+      },
+      personId1($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "person_id_1",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      },
+      personId2($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "person_id_2",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
-      return resource_my_tablePgResource.get(spec);
+    }
+  },
+  CompoundKeyInput: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      extra(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("extra", bakedInputRuntime(schema, field.type, val));
+      },
+      personId1(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("person_id_1", bakedInputRuntime(schema, field.type, val));
+      },
+      personId2(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("person_id_2", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
+  CompoundKeyPatch: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      extra(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("extra", bakedInputRuntime(schema, field.type, val));
+      },
+      personId1(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("person_id_1", bakedInputRuntime(schema, field.type, val));
+      },
+      personId2(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("person_id_2", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
+  CompoundTypeInput: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      a(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("a", bakedInputRuntime(schema, field.type, val));
+      },
+      b(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("b", bakedInputRuntime(schema, field.type, val));
+      },
+      c(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("c", bakedInputRuntime(schema, field.type, val));
+      },
+      d(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("d", bakedInputRuntime(schema, field.type, val));
+      },
+      e(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("e", bakedInputRuntime(schema, field.type, val));
+      },
+      f(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("f", bakedInputRuntime(schema, field.type, val));
+      },
+      fooBar(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("foo_bar", bakedInputRuntime(schema, field.type, val));
+      },
+      g(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("g", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
+  CreateCompoundKeyInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      compoundKey(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  CreateEdgeCaseInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      edgeCase(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  CreateIssue756Input: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      issue756(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  CreateLeftArmInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      leftArm(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  CreateMyTableInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      myTable(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  CreateNullTestRecordInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      nullTestRecord(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  CreatePersonInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      person(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  CreatePersonSecretInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      personSecret(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  DeleteCompoundKeyByPersonId1AndPersonId2Input: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  DeleteCompoundKeyInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  DeleteIssue756ByIdInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  DeleteIssue756Input: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  DeleteLeftArmByIdInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  DeleteLeftArmByPersonIdInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  DeleteLeftArmInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  DeleteMyTableByIdInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  DeleteMyTableInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  DeleteNullTestRecordByIdInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  DeleteNullTestRecordInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  DeletePersonByEmailInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  DeletePersonByIdInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  DeletePersonInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  DeletePersonSecretByPersonIdInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  DeletePersonSecretInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  EdgeCaseCondition: {
+    plans: {
+      notNullHasDefault($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "not_null_has_default",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
+          }
+        });
+      },
+      rowId($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "row_id",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      },
+      wontCastEasy($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "wont_cast_easy",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int2)}`;
+          }
+        });
+      }
+    }
+  },
+  EdgeCaseInput: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      notNullHasDefault(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("not_null_has_default", bakedInputRuntime(schema, field.type, val));
+      },
+      rowId(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("row_id", bakedInputRuntime(schema, field.type, val));
+      },
+      wontCastEasy(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("wont_cast_easy", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
+  IntSetMutationInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  Issue756Condition: {
+    plans: {
+      id($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      },
+      ts($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "ts",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, notNullTimestampCodec)}`;
+          }
+        });
+      }
+    }
+  },
+  Issue756Input: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      id(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      },
+      ts(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("ts", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
+  Issue756MutationInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  Issue756Patch: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      id(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      },
+      ts(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("ts", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
+  Issue756SetMutationInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  JsonbIdentityMutationInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  JsonbIdentityMutationPlpgsqlInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  JsonbIdentityMutationPlpgsqlWithDefaultInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  JsonIdentityMutationInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  LeftArmBaseInput: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      id(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      },
+      lengthInMetres(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("length_in_metres", bakedInputRuntime(schema, field.type, val));
+      },
+      mood(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("mood", bakedInputRuntime(schema, field.type, val));
+      },
+      personId(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("person_id", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
+  LeftArmCondition: {
+    plans: {
+      id($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      },
+      lengthInMetres($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "length_in_metres",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.float)}`;
+          }
+        });
+      },
+      mood($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "mood",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      personId($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "person_id",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      }
+    }
+  },
+  LeftArmIdentityInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  LeftArmInput: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      id(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      },
+      lengthInMetres(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("length_in_metres", bakedInputRuntime(schema, field.type, val));
+      },
+      mood(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("mood", bakedInputRuntime(schema, field.type, val));
+      },
+      personId(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("person_id", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
+  LeftArmPatch: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      id(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      },
+      lengthInMetres(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("length_in_metres", bakedInputRuntime(schema, field.type, val));
+      },
+      mood(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("mood", bakedInputRuntime(schema, field.type, val));
+      },
+      personId(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("person_id", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
+  ListOfCompoundTypesMutationInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  MutationInInoutInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  MutationInOutInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  MutationOutComplexInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  MutationOutComplexSetofInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  MutationOutInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  MutationOutOutCompoundTypeInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  MutationOutOutInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  MutationOutOutSetofInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  MutationOutOutUnnamedInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  MutationOutSetofInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  MutationOutTableInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  MutationOutTableSetofInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  MutationOutUnnamedInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  MutationOutUnnamedOutOutUnnamedInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  MutationReturnsTableMultiColInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  MutationReturnsTableOneColInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  MyTableCondition: {
+    plans: {
+      id($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      },
+      jsonData($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "json_data",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.jsonb)}`;
+          }
+        });
+      }
+    }
+  },
+  MyTableInput: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      id(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      },
+      jsonData(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("json_data", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
+  MyTablePatch: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      id(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      },
+      jsonData(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("json_data", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
+  NoArgsMutationInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  NullTestRecordCondition: {
+    plans: {
+      id($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      },
+      nonNullText($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "non_null_text",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      nullableInt($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "nullable_int",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      },
+      nullableText($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "nullable_text",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      }
+    }
+  },
+  NullTestRecordInput: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      id(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      },
+      nonNullText(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("non_null_text", bakedInputRuntime(schema, field.type, val));
+      },
+      nullableInt(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("nullable_int", bakedInputRuntime(schema, field.type, val));
+      },
+      nullableText(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("nullable_text", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
+  NullTestRecordPatch: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      id(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      },
+      nonNullText(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("non_null_text", bakedInputRuntime(schema, field.type, val));
+      },
+      nullableInt(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("nullable_int", bakedInputRuntime(schema, field.type, val));
+      },
+      nullableText(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("nullable_text", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
+  PersonCondition: {
+    plans: {
+      about($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "about",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      aliases($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "aliases",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, textArrayCodec)}`;
+          }
+        });
+      },
+      computedOut($condition, val) {
+        if (val === undefined) return;
+        if (typeof resource_person_computed_outPgResource.from !== "function") {
+          throw new Error("Invalid computed attribute 'from'");
+        }
+        const expression = sql`${resource_person_computed_outPgResource.from({
+          placeholder: $condition.alias
+        })}`;
+        $condition.where(val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, resource_person_computed_outPgResource.codec)}`);
+      },
+      config($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "config",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.hstore)}`;
+          }
+        });
+      },
+      createdAt($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "created_at",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamp)}`;
+          }
+        });
+      },
+      email($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "email",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, emailCodec)}`;
+          }
+        });
+      },
+      id($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "id",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      },
+      lastLoginFromIp($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "last_login_from_ip",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.inet)}`;
+          }
+        });
+      },
+      lastLoginFromSubnet($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "last_login_from_subnet",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.cidr)}`;
+          }
+        });
+      },
+      name($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "person_full_name",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
+          }
+        });
+      },
+      site($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "site",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, wrappedUrlCodec)}`;
+          }
+        });
+      },
+      userMac($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "user_mac",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.macaddr)}`;
+          }
+        });
+      }
+    }
+  },
+  PersonInput: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      about(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("about", bakedInputRuntime(schema, field.type, val));
+      },
+      aliases(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("aliases", bakedInputRuntime(schema, field.type, val));
+      },
+      config(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("config", bakedInputRuntime(schema, field.type, val));
+      },
+      createdAt(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("created_at", bakedInputRuntime(schema, field.type, val));
+      },
+      email(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("email", bakedInputRuntime(schema, field.type, val));
+      },
+      id(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      },
+      lastLoginFromIp(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("last_login_from_ip", bakedInputRuntime(schema, field.type, val));
+      },
+      lastLoginFromSubnet(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("last_login_from_subnet", bakedInputRuntime(schema, field.type, val));
+      },
+      name(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("person_full_name", bakedInputRuntime(schema, field.type, val));
+      },
+      site(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("site", bakedInputRuntime(schema, field.type, val));
+      },
+      userMac(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("user_mac", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
+  PersonPatch: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      about(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("about", bakedInputRuntime(schema, field.type, val));
+      },
+      aliases(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("aliases", bakedInputRuntime(schema, field.type, val));
+      },
+      config(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("config", bakedInputRuntime(schema, field.type, val));
+      },
+      createdAt(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("created_at", bakedInputRuntime(schema, field.type, val));
+      },
+      email(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("email", bakedInputRuntime(schema, field.type, val));
+      },
+      id(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("id", bakedInputRuntime(schema, field.type, val));
+      },
+      lastLoginFromIp(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("last_login_from_ip", bakedInputRuntime(schema, field.type, val));
+      },
+      lastLoginFromSubnet(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("last_login_from_subnet", bakedInputRuntime(schema, field.type, val));
+      },
+      name(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("person_full_name", bakedInputRuntime(schema, field.type, val));
+      },
+      site(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("site", bakedInputRuntime(schema, field.type, val));
+      },
+      userMac(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("user_mac", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
+  PersonSecretCondition: {
+    plans: {
+      personId($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "person_id",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      },
+      secret($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "sekrit",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      }
+    }
+  },
+  PersonSecretInput: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      personId(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("person_id", bakedInputRuntime(schema, field.type, val));
+      },
+      secret(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("sekrit", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
+  PersonSecretPatch: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      personId(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("person_id", bakedInputRuntime(schema, field.type, val));
+      },
+      secret(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("sekrit", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
+  TableMutationInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  TableSetMutationInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  TypesMutationInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  UpdateCompoundKeyByPersonId1AndPersonId2Input: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      compoundKeyPatch(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  UpdateCompoundKeyInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      compoundKeyPatch(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  UpdateIssue756ByIdInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      issue756Patch(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  UpdateIssue756Input: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      issue756Patch(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  UpdateLeftArmByIdInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      leftArmPatch(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  UpdateLeftArmByPersonIdInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      leftArmPatch(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  UpdateLeftArmInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      leftArmPatch(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  UpdateMyTableByIdInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      myTablePatch(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  UpdateMyTableInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      myTablePatch(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  UpdateNullTestRecordByIdInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      nullTestRecordPatch(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  UpdateNullTestRecordInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      nullTestRecordPatch(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  UpdatePersonByEmailInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      personPatch(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  UpdatePersonByIdInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      personPatch(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  UpdatePersonInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      personPatch(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  UpdatePersonSecretByPersonIdInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      personSecretPatch(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  UpdatePersonSecretInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      personSecretPatch(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  WrappedUrlInput: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      url(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("url", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  }
+};
+export const scalars = {
+  AnInt: {
+    serialize: GraphQLInt.serialize,
+    parseValue: GraphQLInt.parseValue,
+    parseLiteral: GraphQLInt.parseLiteral
+  },
+  AnotherInt: {
+    serialize: GraphQLInt.serialize,
+    parseValue: GraphQLInt.parseValue,
+    parseLiteral: GraphQLInt.parseLiteral
+  },
+  Base64EncodedBinary: {
+    serialize(data) {
+      if (Buffer.isBuffer(data)) {
+        return data.toString("base64");
+      } else {
+        throw new Error(`Base64EncodeBinary can only be used with Node.js buffers.`);
+      }
     },
-    nodeId($parent) {
-      const specifier = nodeIdHandler_MyTable.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandler_MyTable.codec.name].encode);
+    parseValue(data) {
+      if (typeof data === "string") {
+        return Buffer.from(data, "base64");
+      } else {
+        throw new GraphQLError("Base64EncodedBinary can only parse string values.");
+      }
     },
-    jsonData($record) {
-      return $record.get("json_data");
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        // TODO: add name to this error
+        throw new GraphQLError("Base64EncodedBinary can only parse string values");
+      }
+      return Buffer.from(ast.value, "base64");
+    }
+  },
+  BigFloat: {
+    serialize: UUIDSerialize,
+    parseValue: UUIDSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"BigFloat" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
+  BigInt: {
+    serialize: UUIDSerialize,
+    parseValue: UUIDSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"BigInt" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
+  Date: {
+    serialize: UUIDSerialize,
+    parseValue: UUIDSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"Date" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
+  Datetime: {
+    serialize: UUIDSerialize,
+    parseValue: UUIDSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"Datetime" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
+  Email: {
+    serialize: GraphQLString.serialize,
+    parseValue: GraphQLString.parseValue,
+    parseLiteral: GraphQLString.parseLiteral
+  },
+  InternetAddress: {
+    serialize: UUIDSerialize,
+    parseValue: UUIDSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"InternetAddress" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
     }
   },
   JSON: {
@@ -10667,331 +15125,157 @@ export const plans = {
       }
     }
   },
-  PersonSecret: {
-    __assertStep: assertPgClassSingleStep,
-    __planType($specifier) {
-      const spec = Object.create(null);
-      for (const pkCol of person_secretUniques[0].attributes) {
-        spec[pkCol] = get2($specifier, pkCol);
+  KeyValueHash: {
+    serialize(value) {
+      return value;
+    },
+    parseValue(obj) {
+      if (isValidHstoreObject(obj)) {
+        return obj;
       }
-      return resource_person_secretPgResource.get(spec);
+      throw new GraphQLError(`This is not a valid ${"KeyValueHash"} object, it must be a key/value hash where keys and values are both strings (or null).`);
     },
-    nodeId($parent) {
-      const specifier = nodeIdHandler_PersonSecret.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandler_PersonSecret.codec.name].encode);
-    },
-    personId($record) {
-      return $record.get("person_id");
-    },
-    secret($record) {
-      return $record.get("sekrit");
-    },
-    personByPersonId($record) {
-      return resource_personPgResource.get({
-        id: $record.get("person_id")
-      });
-    }
-  },
-  Person: {
-    __assertStep: assertPgClassSingleStep,
-    __planType($specifier) {
-      const spec = Object.create(null);
-      for (const pkCol of personUniques[0].attributes) {
-        spec[pkCol] = get2($specifier, pkCol);
-      }
-      return resource_personPgResource.get(spec);
-    },
-    nodeId($parent) {
-      const specifier = nodeIdHandler_Person.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Person.codec.name].encode);
-    },
-    computedOut($in, args, _info) {
-      const {
-        $row,
-        selectArgs
-      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args), true);
-      const from = pgFromExpression($row, resource_person_computed_outPgResource.from, resource_person_computed_outPgResource.parameters, selectArgs);
-      return pgClassExpression($row, resource_person_computed_outPgResource.codec, undefined)`${from}`;
-    },
-    firstName($in, args, _info) {
-      const {
-        $row,
-        selectArgs
-      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args), true);
-      const from = pgFromExpression($row, resource_person_first_namePgResource.from, resource_person_first_namePgResource.parameters, selectArgs);
-      return pgClassExpression($row, resource_person_first_namePgResource.codec, undefined)`${from}`;
-    },
-    computedOutOut($in, args, _info) {
-      const {
-        selectArgs
-      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args));
-      return resource_person_computed_out_outPgResource.execute(selectArgs);
-    },
-    computedInout($in, args, _info) {
-      const {
-        $row,
-        selectArgs
-      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_inout(args), true);
-      const from = pgFromExpression($row, resource_person_computed_inoutPgResource.from, resource_person_computed_inoutPgResource.parameters, selectArgs);
-      return pgClassExpression($row, resource_person_computed_inoutPgResource.codec, undefined)`${from}`;
-    },
-    computedInoutOut($in, args, _info) {
-      const {
-        selectArgs
-      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_inout_out(args));
-      return resource_person_computed_inout_outPgResource.execute(selectArgs);
-    },
-    exists($in, args, _info) {
-      const {
-        $row,
-        selectArgs
-      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_exists(args), true);
-      const from = pgFromExpression($row, resource_person_existsPgResource.from, resource_person_existsPgResource.parameters, selectArgs);
-      return pgClassExpression($row, resource_person_existsPgResource.codec, undefined)`${from}`;
-    },
-    computedFirstArgInoutOut($in, args, _info) {
-      const {
-        selectArgs
-      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args));
-      return resource_person_computed_first_arg_inout_outPgResource.execute(selectArgs);
-    },
-    optionalMissingMiddle1($in, args, _info) {
-      const {
-        $row,
-        selectArgs
-      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_optional_missing_middle_1(args), true);
-      const from = pgFromExpression($row, resource_person_optional_missing_middle_1PgResource.from, resource_person_optional_missing_middle_1PgResource.parameters, selectArgs);
-      return pgClassExpression($row, resource_person_optional_missing_middle_1PgResource.codec, undefined)`${from}`;
-    },
-    optionalMissingMiddle2($in, args, _info) {
-      const {
-        $row,
-        selectArgs
-      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_optional_missing_middle_2(args), true);
-      const from = pgFromExpression($row, resource_person_optional_missing_middle_2PgResource.from, resource_person_optional_missing_middle_2PgResource.parameters, selectArgs);
-      return pgClassExpression($row, resource_person_optional_missing_middle_2PgResource.codec, undefined)`${from}`;
-    },
-    optionalMissingMiddle3($in, args, _info) {
-      const {
-        $row,
-        selectArgs
-      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_optional_missing_middle_3(args), true);
-      const from = pgFromExpression($row, resource_person_optional_missing_middle_3PgResource.from, resource_person_optional_missing_middle_3PgResource.parameters, selectArgs);
-      return pgClassExpression($row, resource_person_optional_missing_middle_3PgResource.codec, undefined)`${from}`;
-    },
-    optionalMissingMiddle4($in, args, _info) {
-      const {
-        $row,
-        selectArgs
-      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_optional_missing_middle_4(args), true);
-      const from = pgFromExpression($row, resource_person_optional_missing_middle_4PgResource.from, resource_person_optional_missing_middle_4PgResource.parameters, selectArgs);
-      return pgClassExpression($row, resource_person_optional_missing_middle_4PgResource.codec, undefined)`${from}`;
-    },
-    optionalMissingMiddle5($in, args, _info) {
-      const {
-        $row,
-        selectArgs
-      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_optional_missing_middle_5(args), true);
-      const from = pgFromExpression($row, resource_person_optional_missing_middle_5PgResource.from, resource_person_optional_missing_middle_5PgResource.parameters, selectArgs);
-      return pgClassExpression($row, resource_person_optional_missing_middle_5PgResource.codec, undefined)`${from}`;
-    },
-    computedComplex($in, args, _info) {
-      const {
-        selectArgs
-      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_complex(args));
-      return resource_person_computed_complexPgResource.execute(selectArgs);
-    },
-    firstPost($in, args, _info) {
-      const {
-        selectArgs
-      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args));
-      return resource_person_first_postPgResource.execute(selectArgs);
-    },
-    computedFirstArgInout($in, args, _info) {
-      const {
-        selectArgs
-      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args));
-      return resource_person_computed_first_arg_inoutPgResource.execute(selectArgs);
-    },
-    friendsList: {
-      plan($in, args, _info) {
-        const {
-          selectArgs
-        } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args));
-        return resource_person_friendsPgResource.execute(selectArgs);
-      },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
-        },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        },
-        orderBy(parent, $select, value) {
-          value.apply($select);
-        }
-      }
-    },
-    typeFunctionConnectionList: {
-      plan($in, args, _info) {
-        const {
-          selectArgs
-        } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args));
-        return resource_person_type_function_connectionPgResource.execute(selectArgs);
-      },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
-        },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        }
-      }
-    },
-    typeFunction($in, args, _info) {
-      const {
-        selectArgs
-      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_type_function(args));
-      return resource_person_type_functionPgResource.execute(selectArgs);
-    },
-    typeFunctionList($in, args, _info) {
-      const {
-        selectArgs
-      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args));
-      return resource_person_type_function_listPgResource.execute(selectArgs);
-    },
-    name($record) {
-      return $record.get("person_full_name");
-    },
-    site($record) {
-      const $plan = $record.get("site");
-      const $select = pgSelectSingleFromRecord(resource_frmcdc_wrappedUrlPgResource, $plan);
-      $select.getClassStep().setTrusted();
-      return $select;
-    },
-    lastLoginFromIp($record) {
-      return $record.get("last_login_from_ip");
-    },
-    lastLoginFromSubnet($record) {
-      return $record.get("last_login_from_subnet");
-    },
-    userMac($record) {
-      return $record.get("user_mac");
-    },
-    createdAt($record) {
-      return $record.get("created_at");
-    },
-    personSecretByPersonId($record) {
-      return resource_person_secretPgResource.get({
-        person_id: $record.get("id")
-      });
-    },
-    leftArmByPersonId($record) {
-      return resource_left_armPgResource.get({
-        person_id: $record.get("id")
-      });
-    },
-    compoundKeysByPersonId1List: {
-      plan($record) {
-        return resource_compound_keyPgResource.find({
-          person_id_1: $record.get("id")
-        });
-      },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
-        },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        },
-        condition(_condition, $select, arg) {
-          arg.apply($select, qbWhereBuilder);
-        },
-        orderBy(parent, $select, value) {
-          value.apply($select);
-        }
-      }
-    },
-    compoundKeysByPersonId2List: {
-      plan($record) {
-        return resource_compound_keyPgResource.find({
-          person_id_2: $record.get("id")
-        });
-      },
-      args: {
-        first(_, $connection, arg) {
-          $connection.setFirst(arg.getRaw());
-        },
-        offset(_, $connection, val) {
-          $connection.setOffset(val.getRaw());
-        },
-        condition(_condition, $select, arg) {
-          arg.apply($select, qbWhereBuilder);
-        },
-        orderBy(parent, $select, value) {
-          value.apply($select);
-        }
+    parseLiteral(ast, variables) {
+      switch (ast.kind) {
+        case Kind.OBJECT:
+          {
+            const value = ast.fields.reduce((memo, field) => {
+              memo[field.name.value] = parseValueLiteral(field.value, variables);
+              return memo;
+            }, Object.create(null));
+            if (!isValidHstoreObject(value)) {
+              return undefined;
+            }
+            return value;
+          }
+        case Kind.NULL:
+          return null;
+        case Kind.VARIABLE:
+          {
+            const name = ast.name.value;
+            const value = variables ? variables[name] : undefined;
+            if (!isValidHstoreObject(value)) {
+              return undefined;
+            }
+            return value;
+          }
+        default:
+          return undefined;
       }
     }
   },
-  PersonComputedOutOutRecord: {
-    __assertStep: assertPgClassSingleStep
+  LTree: {
+    serialize(x) {
+      return x;
+    },
+    parseValue: LTreeParseValue,
+    parseLiteral(node, variables) {
+      return LTreeParseValue(valueFromASTUntyped(node, variables));
+    }
   },
-  PersonComputedInoutOutRecord: {
-    __assertStep: assertPgClassSingleStep
+  NotNullTimestamp: {
+    serialize: UUIDSerialize,
+    parseValue: UUIDSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"Datetime" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
   },
-  Email: {
+  NotNullUrl: {
     serialize: GraphQLString.serialize,
     parseValue: GraphQLString.parseValue,
     parseLiteral: GraphQLString.parseLiteral
   },
-  PersonComputedFirstArgInoutOutRecord: {
-    __assertStep: assertPgClassSingleStep,
-    person($record) {
-      const $plan = $record.get("person");
-      const $select = pgSelectSingleFromRecord(resource_personPgResource, $plan);
-      $select.getClassStep().setTrusted();
-      return $select;
+  RegClass: {
+    serialize: UUIDSerialize,
+    parseValue: UUIDSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"RegClass" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
     }
   },
-  PersonComputedComplexRecord: {
-    __assertStep: assertPgClassSingleStep,
-    y($record) {
-      const $plan = $record.get("y");
-      const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
-      $select.getClassStep().setTrusted();
-      return $select;
-    },
-    z($record) {
-      const $plan = $record.get("z");
-      const $select = pgSelectSingleFromRecord(resource_personPgResource, $plan);
-      $select.getClassStep().setTrusted();
-      return $select;
+  RegConfig: {
+    serialize: UUIDSerialize,
+    parseValue: UUIDSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"RegConfig" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
     }
   },
-  CompoundType: {
-    __assertStep: assertPgClassSingleStep,
-    computedField($in, args, _info) {
-      const {
-        $row,
-        selectArgs
-      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args), true);
-      const from = pgFromExpression($row, resource_compound_type_computed_fieldPgResource.from, resource_compound_type_computed_fieldPgResource.parameters, selectArgs);
-      return pgClassExpression($row, resource_compound_type_computed_fieldPgResource.codec, undefined)`${from}`;
-    },
-    fooBar($record) {
-      return $record.get("foo_bar");
+  RegDictionary: {
+    serialize: UUIDSerialize,
+    parseValue: UUIDSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"RegDictionary" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
     }
   },
-  Color: {
-    RED: {
-      value: "red"
-    },
-    GREEN: {
-      value: "green"
-    },
-    BLUE: {
-      value: "blue"
+  RegOper: {
+    serialize: UUIDSerialize,
+    parseValue: UUIDSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"RegOper" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
+  RegOperator: {
+    serialize: UUIDSerialize,
+    parseValue: UUIDSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"RegOperator" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
+  RegProc: {
+    serialize: UUIDSerialize,
+    parseValue: UUIDSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"RegProc" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
+  RegProcedure: {
+    serialize: UUIDSerialize,
+    parseValue: UUIDSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"RegProcedure" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
+  RegType: {
+    serialize: UUIDSerialize,
+    parseValue: UUIDSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"RegType" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
+  Time: {
+    serialize: UUIDSerialize,
+    parseValue: UUIDSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"Time" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
     }
   },
   UUID: {
@@ -11006,38 +15290,9 @@ export const plans = {
       }
       return coerce(ast.value);
     }
-  },
-  EnumCaps: {
-    _0_BAR: {
-      value: "0_BAR"
-    }
-  },
-  EnumWithEmptyString: {
-    _EMPTY_: {
-      value: ""
-    },
-    ONE: {
-      value: "one"
-    },
-    TWO: {
-      value: "two"
-    }
-  },
-  Interval: {
-    __assertStep: assertExecutableStep
-  },
-  Post: {
-    __assertStep: assertPgClassSingleStep,
-    authorId($record) {
-      return $record.get("author_id");
-    },
-    comptypes($record) {
-      const $val = $record.get("comptypes");
-      const $select = pgSelectFromRecords(resource_frmcdc_comptypePgResource, $val);
-      $select.setTrusted();
-      return $select;
-    }
-  },
+  }
+};
+export const enums = {
   AnEnum: {
     AWAITING: {
       value: "awaiting"
@@ -11094,20 +15349,387 @@ export const plans = {
       value: "$"
     }
   },
-  Comptype: {
-    __assertStep: assertPgClassSingleStep,
-    isOptimised($record) {
-      return $record.get("is_optimised");
+  Color: {
+    RED: {
+      value: "red"
+    },
+    GREEN: {
+      value: "green"
+    },
+    BLUE: {
+      value: "blue"
     }
   },
-  Datetime: {
-    serialize: UUIDSerialize,
-    parseValue: UUIDSerialize,
-    parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"Datetime" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+  CompoundKeysOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      compound_keyUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      compound_keyUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PERSON_ID_2_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_id_2",
+        direction: "ASC"
+      });
+    },
+    PERSON_ID_2_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_id_2",
+        direction: "DESC"
+      });
+    },
+    PERSON_ID_1_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_id_1",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PERSON_ID_1_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_id_1",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    EXTRA_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "extra",
+        direction: "ASC"
+      });
+    },
+    EXTRA_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "extra",
+        direction: "DESC"
+      });
+    }
+  },
+  EdgeCasesOrderBy: {
+    COMPUTED_ASC(queryBuilder) {
+      if (typeof resource_edge_case_computedPgResource.from !== "function") {
+        throw new Error("Invalid computed attribute 'from'");
       }
-      return ast.value;
+      const expression = sql`${resource_edge_case_computedPgResource.from({
+        placeholder: queryBuilder.alias
+      })}`;
+      queryBuilder.orderBy({
+        codec: resource_edge_case_computedPgResource.codec,
+        fragment: expression,
+        direction: "asc".toUpperCase()
+      });
+    },
+    COMPUTED_DESC(queryBuilder) {
+      if (typeof resource_edge_case_computedPgResource.from !== "function") {
+        throw new Error("Invalid computed attribute 'from'");
+      }
+      const expression = sql`${resource_edge_case_computedPgResource.from({
+        placeholder: queryBuilder.alias
+      })}`;
+      queryBuilder.orderBy({
+        codec: resource_edge_case_computedPgResource.codec,
+        fragment: expression,
+        direction: "desc".toUpperCase()
+      });
+    },
+    NOT_NULL_HAS_DEFAULT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "not_null_has_default",
+        direction: "ASC"
+      });
+    },
+    NOT_NULL_HAS_DEFAULT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "not_null_has_default",
+        direction: "DESC"
+      });
+    },
+    WONT_CAST_EASY_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "wont_cast_easy",
+        direction: "ASC"
+      });
+    },
+    WONT_CAST_EASY_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "wont_cast_easy",
+        direction: "DESC"
+      });
+    },
+    ROW_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "row_id",
+        direction: "ASC"
+      });
+    },
+    ROW_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "row_id",
+        direction: "DESC"
+      });
+    }
+  },
+  EnumCaps: {
+    _0_BAR: {
+      value: "0_BAR"
+    }
+  },
+  EnumWithEmptyString: {
+    _EMPTY_: {
+      value: ""
+    },
+    ONE: {
+      value: "one"
+    },
+    TWO: {
+      value: "two"
+    }
+  },
+  Issue756SOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      issue756Uniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      issue756Uniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    TS_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "ts",
+        direction: "ASC"
+      });
+    },
+    TS_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "ts",
+        direction: "DESC"
+      });
+    }
+  },
+  LeftArmsOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      left_armUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      left_armUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PERSON_ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PERSON_ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "person_id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    LENGTH_IN_METRES_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "length_in_metres",
+        direction: "ASC"
+      });
+    },
+    LENGTH_IN_METRES_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "length_in_metres",
+        direction: "DESC"
+      });
+    },
+    MOOD_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "mood",
+        direction: "ASC"
+      });
+    },
+    MOOD_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "mood",
+        direction: "DESC"
+      });
+    }
+  },
+  MyTablesOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      my_tableUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      my_tableUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    JSON_DATA_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "json_data",
+        direction: "ASC"
+      });
+    },
+    JSON_DATA_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "json_data",
+        direction: "DESC"
+      });
+    }
+  },
+  NullTestRecordsOrderBy: {
+    PRIMARY_KEY_ASC(queryBuilder) {
+      null_test_recordUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "ASC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    PRIMARY_KEY_DESC(queryBuilder) {
+      null_test_recordUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.orderBy({
+          attribute: attributeName,
+          direction: "DESC"
+        });
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "ASC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    ID_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "id",
+        direction: "DESC"
+      });
+      queryBuilder.setOrderIsUnique();
+    },
+    NULLABLE_TEXT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "nullable_text",
+        direction: "ASC"
+      });
+    },
+    NULLABLE_TEXT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "nullable_text",
+        direction: "DESC"
+      });
+    },
+    NULLABLE_INT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "nullable_int",
+        direction: "ASC"
+      });
+    },
+    NULLABLE_INT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "nullable_int",
+        direction: "DESC"
+      });
+    },
+    NON_NULL_TEXT_ASC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "non_null_text",
+        direction: "ASC"
+      });
+    },
+    NON_NULL_TEXT_DESC(queryBuilder) {
+      queryBuilder.orderBy({
+        attribute: "non_null_text",
+        direction: "DESC"
+      });
     }
   },
   PeopleOrderBy: {
@@ -11306,787 +15928,6 @@ export const plans = {
       });
     }
   },
-  Type: {
-    __assertStep: assertPgClassSingleStep,
-    enumArray($record) {
-      return $record.get("enum_array");
-    },
-    textArray($record) {
-      return $record.get("text_array");
-    },
-    nullableRange($record) {
-      return $record.get("nullable_range");
-    },
-    anIntRange($record) {
-      return $record.get("an_int_range");
-    },
-    intervalArray($record) {
-      return $record.get("interval_array");
-    },
-    compoundType($record) {
-      const $plan = $record.get("compound_type");
-      const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
-      $select.coalesceToEmptyObject();
-      $select.getClassStep().setTrusted();
-      return $select;
-    },
-    nestedCompoundType($record) {
-      const $plan = $record.get("nested_compound_type");
-      const $select = pgSelectSingleFromRecord(resource_frmcdc_nestedCompoundTypePgResource, $plan);
-      $select.coalesceToEmptyObject();
-      $select.getClassStep().setTrusted();
-      return $select;
-    },
-    nullableCompoundType($record) {
-      const $plan = $record.get("nullable_compound_type");
-      const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
-      $select.getClassStep().setTrusted();
-      return $select;
-    },
-    nullableNestedCompoundType($record) {
-      const $plan = $record.get("nullable_nested_compound_type");
-      const $select = pgSelectSingleFromRecord(resource_frmcdc_nestedCompoundTypePgResource, $plan);
-      $select.getClassStep().setTrusted();
-      return $select;
-    },
-    textArrayDomain($record) {
-      return $record.get("text_array_domain");
-    },
-    int8ArrayDomain($record) {
-      return $record.get("int8_array_domain");
-    },
-    byteaArray($record) {
-      return $record.get("bytea_array");
-    },
-    ltreeArray($record) {
-      return $record.get("ltree_array");
-    }
-  },
-  BigInt: {
-    serialize: UUIDSerialize,
-    parseValue: UUIDSerialize,
-    parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"BigInt" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
-      }
-      return ast.value;
-    }
-  },
-  BigFloat: {
-    serialize: UUIDSerialize,
-    parseValue: UUIDSerialize,
-    parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"BigFloat" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
-      }
-      return ast.value;
-    }
-  },
-  AnInt: {
-    serialize: GraphQLInt.serialize,
-    parseValue: GraphQLInt.parseValue,
-    parseLiteral: GraphQLInt.parseLiteral
-  },
-  AnotherInt: {
-    serialize: GraphQLInt.serialize,
-    parseValue: GraphQLInt.parseValue,
-    parseLiteral: GraphQLInt.parseLiteral
-  },
-  Date: {
-    serialize: UUIDSerialize,
-    parseValue: UUIDSerialize,
-    parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"Date" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
-      }
-      return ast.value;
-    }
-  },
-  Time: {
-    serialize: UUIDSerialize,
-    parseValue: UUIDSerialize,
-    parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"Time" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
-      }
-      return ast.value;
-    }
-  },
-  NestedCompoundType: {
-    __assertStep: assertPgClassSingleStep,
-    a($record) {
-      const $plan = $record.get("a");
-      const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
-      $select.getClassStep().setTrusted();
-      return $select;
-    },
-    b($record) {
-      const $plan = $record.get("b");
-      const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
-      $select.getClassStep().setTrusted();
-      return $select;
-    },
-    bazBuz($record) {
-      return $record.get("baz_buz");
-    }
-  },
-  InternetAddress: {
-    serialize: UUIDSerialize,
-    parseValue: UUIDSerialize,
-    parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"InternetAddress" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
-      }
-      return ast.value;
-    }
-  },
-  RegProc: {
-    serialize: UUIDSerialize,
-    parseValue: UUIDSerialize,
-    parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"RegProc" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
-      }
-      return ast.value;
-    }
-  },
-  RegProcedure: {
-    serialize: UUIDSerialize,
-    parseValue: UUIDSerialize,
-    parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"RegProcedure" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
-      }
-      return ast.value;
-    }
-  },
-  RegOper: {
-    serialize: UUIDSerialize,
-    parseValue: UUIDSerialize,
-    parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"RegOper" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
-      }
-      return ast.value;
-    }
-  },
-  RegOperator: {
-    serialize: UUIDSerialize,
-    parseValue: UUIDSerialize,
-    parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"RegOperator" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
-      }
-      return ast.value;
-    }
-  },
-  RegClass: {
-    serialize: UUIDSerialize,
-    parseValue: UUIDSerialize,
-    parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"RegClass" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
-      }
-      return ast.value;
-    }
-  },
-  RegType: {
-    serialize: UUIDSerialize,
-    parseValue: UUIDSerialize,
-    parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"RegType" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
-      }
-      return ast.value;
-    }
-  },
-  RegConfig: {
-    serialize: UUIDSerialize,
-    parseValue: UUIDSerialize,
-    parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"RegConfig" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
-      }
-      return ast.value;
-    }
-  },
-  RegDictionary: {
-    serialize: UUIDSerialize,
-    parseValue: UUIDSerialize,
-    parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"RegDictionary" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
-      }
-      return ast.value;
-    }
-  },
-  Base64EncodedBinary: {
-    serialize(data) {
-      if (Buffer.isBuffer(data)) {
-        return data.toString("base64");
-      } else {
-        throw new Error(`Base64EncodeBinary can only be used with Node.js buffers.`);
-      }
-    },
-    parseValue(data) {
-      if (typeof data === "string") {
-        return Buffer.from(data, "base64");
-      } else {
-        throw new GraphQLError("Base64EncodedBinary can only parse string values.");
-      }
-    },
-    parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        // TODO: add name to this error
-        throw new GraphQLError("Base64EncodedBinary can only parse string values");
-      }
-      return Buffer.from(ast.value, "base64");
-    }
-  },
-  LTree: {
-    serialize(x) {
-      return x;
-    },
-    parseValue: LTreeParseValue,
-    parseLiteral(node, variables) {
-      return LTreeParseValue(valueFromASTUntyped(node, variables));
-    }
-  },
-  WrappedUrl: {
-    __assertStep: assertPgClassSingleStep
-  },
-  NotNullUrl: {
-    serialize: GraphQLString.serialize,
-    parseValue: GraphQLString.parseValue,
-    parseLiteral: GraphQLString.parseLiteral
-  },
-  KeyValueHash: {
-    serialize(value) {
-      return value;
-    },
-    parseValue(obj) {
-      if (isValidHstoreObject(obj)) {
-        return obj;
-      }
-      throw new GraphQLError(`This is not a valid ${"KeyValueHash"} object, it must be a key/value hash where keys and values are both strings (or null).`);
-    },
-    parseLiteral(ast, variables) {
-      switch (ast.kind) {
-        case Kind.OBJECT:
-          {
-            const value = ast.fields.reduce((memo, field) => {
-              memo[field.name.value] = parseValueLiteral(field.value, variables);
-              return memo;
-            }, Object.create(null));
-            if (!isValidHstoreObject(value)) {
-              return undefined;
-            }
-            return value;
-          }
-        case Kind.NULL:
-          return null;
-        case Kind.VARIABLE:
-          {
-            const name = ast.name.value;
-            const value = variables ? variables[name] : undefined;
-            if (!isValidHstoreObject(value)) {
-              return undefined;
-            }
-            return value;
-          }
-        default:
-          return undefined;
-      }
-    }
-  },
-  LeftArm: {
-    __assertStep: assertPgClassSingleStep,
-    __planType($specifier) {
-      const spec = Object.create(null);
-      for (const pkCol of left_armUniques[0].attributes) {
-        spec[pkCol] = get2($specifier, pkCol);
-      }
-      return resource_left_armPgResource.get(spec);
-    },
-    nodeId($parent) {
-      const specifier = nodeIdHandler_LeftArm.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandler_LeftArm.codec.name].encode);
-    },
-    personId($record) {
-      return $record.get("person_id");
-    },
-    lengthInMetres($record) {
-      return $record.get("length_in_metres");
-    },
-    personByPersonId($record) {
-      return resource_personPgResource.get({
-        id: $record.get("person_id")
-      });
-    }
-  },
-  CompoundKey: {
-    __assertStep: assertPgClassSingleStep,
-    __planType($specifier) {
-      const spec = Object.create(null);
-      for (const pkCol of compound_keyUniques[0].attributes) {
-        spec[pkCol] = get2($specifier, pkCol);
-      }
-      return resource_compound_keyPgResource.get(spec);
-    },
-    nodeId($parent) {
-      const specifier = nodeIdHandler_CompoundKey.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandler_CompoundKey.codec.name].encode);
-    },
-    personId2($record) {
-      return $record.get("person_id_2");
-    },
-    personId1($record) {
-      return $record.get("person_id_1");
-    },
-    personByPersonId1($record) {
-      return resource_personPgResource.get({
-        id: $record.get("person_id_1")
-      });
-    },
-    personByPersonId2($record) {
-      return resource_personPgResource.get({
-        id: $record.get("person_id_2")
-      });
-    }
-  },
-  CompoundKeyCondition: {
-    personId2($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "person_id_2",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-        }
-      });
-    },
-    personId1($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "person_id_1",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-        }
-      });
-    },
-    extra($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "extra",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
-        }
-      });
-    }
-  },
-  CompoundKeysOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      compound_keyUniques[0].attributes.forEach(attributeName => {
-        queryBuilder.orderBy({
-          attribute: attributeName,
-          direction: "ASC"
-        });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      compound_keyUniques[0].attributes.forEach(attributeName => {
-        queryBuilder.orderBy({
-          attribute: attributeName,
-          direction: "DESC"
-        });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PERSON_ID_2_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "person_id_2",
-        direction: "ASC"
-      });
-    },
-    PERSON_ID_2_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "person_id_2",
-        direction: "DESC"
-      });
-    },
-    PERSON_ID_1_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "person_id_1",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PERSON_ID_1_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "person_id_1",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    EXTRA_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "extra",
-        direction: "ASC"
-      });
-    },
-    EXTRA_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "extra",
-        direction: "DESC"
-      });
-    }
-  },
-  NullTestRecord: {
-    __assertStep: assertPgClassSingleStep,
-    __planType($specifier) {
-      const spec = Object.create(null);
-      for (const pkCol of null_test_recordUniques[0].attributes) {
-        spec[pkCol] = get2($specifier, pkCol);
-      }
-      return resource_null_test_recordPgResource.get(spec);
-    },
-    nodeId($parent) {
-      const specifier = nodeIdHandler_NullTestRecord.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandler_NullTestRecord.codec.name].encode);
-    },
-    nullableText($record) {
-      return $record.get("nullable_text");
-    },
-    nullableInt($record) {
-      return $record.get("nullable_int");
-    },
-    nonNullText($record) {
-      return $record.get("non_null_text");
-    }
-  },
-  Issue756: {
-    __assertStep: assertPgClassSingleStep,
-    __planType($specifier) {
-      const spec = Object.create(null);
-      for (const pkCol of issue756Uniques[0].attributes) {
-        spec[pkCol] = get2($specifier, pkCol);
-      }
-      return resource_issue756PgResource.get(spec);
-    },
-    nodeId($parent) {
-      const specifier = nodeIdHandler_Issue756.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandler_Issue756.codec.name].encode);
-    }
-  },
-  NotNullTimestamp: {
-    serialize: UUIDSerialize,
-    parseValue: UUIDSerialize,
-    parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"Datetime" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
-      }
-      return ast.value;
-    }
-  },
-  FuncOutOutRecord: {
-    __assertStep: assertPgClassSingleStep,
-    firstOut($record) {
-      return $record.get("first_out");
-    },
-    secondOut($record) {
-      return $record.get("second_out");
-    }
-  },
-  FuncOutOutSetofRecord: {
-    __assertStep: assertPgClassSingleStep
-  },
-  FuncOutOutUnnamedRecord: {
-    __assertStep: assertPgClassSingleStep,
-    arg1($record) {
-      return $record.get("column1");
-    },
-    arg2($record) {
-      return $record.get("column2");
-    }
-  },
-  FuncOutUnnamedOutOutUnnamedRecord: {
-    __assertStep: assertPgClassSingleStep,
-    arg1($record) {
-      return $record.get("column1");
-    },
-    arg3($record) {
-      return $record.get("column3");
-    }
-  },
-  FuncReturnsTableMultiColRecord: {
-    __assertStep: assertPgClassSingleStep
-  },
-  SearchTestSummariesRecord: {
-    __assertStep: assertPgClassSingleStep,
-    totalDuration($record) {
-      return $record.get("total_duration");
-    }
-  },
-  FuncOutOutCompoundTypeRecord: {
-    __assertStep: assertPgClassSingleStep,
-    o2($record) {
-      const $plan = $record.get("o2");
-      const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
-      $select.getClassStep().setTrusted();
-      return $select;
-    }
-  },
-  QueryOutputTwoRowsRecord: {
-    __assertStep: assertPgClassSingleStep,
-    leftArm($record) {
-      const $plan = $record.get("left_arm");
-      const $select = pgSelectSingleFromRecord(resource_left_armPgResource, $plan);
-      $select.getClassStep().setTrusted();
-      return $select;
-    },
-    post($record) {
-      const $plan = $record.get("post");
-      const $select = pgSelectSingleFromRecord(resource_frmcdc_postPgResource, $plan);
-      $select.getClassStep().setTrusted();
-      return $select;
-    }
-  },
-  FuncOutComplexRecord: {
-    __assertStep: assertPgClassSingleStep,
-    y($record) {
-      const $plan = $record.get("y");
-      const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
-      $select.getClassStep().setTrusted();
-      return $select;
-    },
-    z($record) {
-      const $plan = $record.get("z");
-      const $select = pgSelectSingleFromRecord(resource_personPgResource, $plan);
-      $select.getClassStep().setTrusted();
-      return $select;
-    }
-  },
-  FuncOutComplexSetofRecord: {
-    __assertStep: assertPgClassSingleStep,
-    y($record) {
-      const $plan = $record.get("y");
-      const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
-      $select.getClassStep().setTrusted();
-      return $select;
-    },
-    z($record) {
-      const $plan = $record.get("z");
-      const $select = pgSelectSingleFromRecord(resource_personPgResource, $plan);
-      $select.getClassStep().setTrusted();
-      return $select;
-    }
-  },
-  PersonCondition: {
-    id($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "id",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-        }
-      });
-    },
-    name($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "person_full_name",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
-        }
-      });
-    },
-    aliases($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "aliases",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, textArrayCodec)}`;
-        }
-      });
-    },
-    about($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "about",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-        }
-      });
-    },
-    email($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "email",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, emailCodec)}`;
-        }
-      });
-    },
-    site($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "site",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, wrappedUrlCodec)}`;
-        }
-      });
-    },
-    config($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "config",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.hstore)}`;
-        }
-      });
-    },
-    lastLoginFromIp($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "last_login_from_ip",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.inet)}`;
-        }
-      });
-    },
-    lastLoginFromSubnet($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "last_login_from_subnet",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.cidr)}`;
-        }
-      });
-    },
-    userMac($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "user_mac",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.macaddr)}`;
-        }
-      });
-    },
-    createdAt($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "created_at",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamp)}`;
-        }
-      });
-    },
-    computedOut($condition, val) {
-      if (val === undefined) return;
-      if (typeof resource_person_computed_outPgResource.from !== "function") {
-        throw new Error("Invalid computed attribute 'from'");
-      }
-      const expression = sql`${resource_person_computed_outPgResource.from({
-        placeholder: $condition.alias
-      })}`;
-      $condition.where(val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, resource_person_computed_outPgResource.codec)}`);
-    }
-  },
-  WrappedUrlInput: {
-    __baked: createObjectAndApplyChildren,
-    url(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("url", bakedInputRuntime(schema, field.type, val));
-    }
-  },
-  MyTableCondition: {
-    id($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "id",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-        }
-      });
-    },
-    jsonData($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "json_data",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.jsonb)}`;
-        }
-      });
-    }
-  },
-  MyTablesOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      my_tableUniques[0].attributes.forEach(attributeName => {
-        queryBuilder.orderBy({
-          attribute: attributeName,
-          direction: "ASC"
-        });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      my_tableUniques[0].attributes.forEach(attributeName => {
-        queryBuilder.orderBy({
-          attribute: attributeName,
-          direction: "DESC"
-        });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    JSON_DATA_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "json_data",
-        direction: "ASC"
-      });
-    },
-    JSON_DATA_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "json_data",
-        direction: "DESC"
-      });
-    }
-  },
-  PersonSecretCondition: {
-    personId($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "person_id",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-        }
-      });
-    },
-    secret($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "sekrit",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-        }
-      });
-    }
-  },
   PersonSecretsOrderBy: {
     PRIMARY_KEY_ASC(queryBuilder) {
       person_secretUniques[0].attributes.forEach(attributeName => {
@@ -12132,3488 +15973,13 @@ export const plans = {
         direction: "DESC"
       });
     }
-  },
-  NullTestRecordCondition: {
-    id($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "id",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-        }
-      });
-    },
-    nullableText($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "nullable_text",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-        }
-      });
-    },
-    nullableInt($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "nullable_int",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-        }
-      });
-    },
-    nonNullText($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "non_null_text",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-        }
-      });
-    }
-  },
-  NullTestRecordsOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      null_test_recordUniques[0].attributes.forEach(attributeName => {
-        queryBuilder.orderBy({
-          attribute: attributeName,
-          direction: "ASC"
-        });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      null_test_recordUniques[0].attributes.forEach(attributeName => {
-        queryBuilder.orderBy({
-          attribute: attributeName,
-          direction: "DESC"
-        });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    NULLABLE_TEXT_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "nullable_text",
-        direction: "ASC"
-      });
-    },
-    NULLABLE_TEXT_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "nullable_text",
-        direction: "DESC"
-      });
-    },
-    NULLABLE_INT_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "nullable_int",
-        direction: "ASC"
-      });
-    },
-    NULLABLE_INT_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "nullable_int",
-        direction: "DESC"
-      });
-    },
-    NON_NULL_TEXT_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "non_null_text",
-        direction: "ASC"
-      });
-    },
-    NON_NULL_TEXT_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "non_null_text",
-        direction: "DESC"
-      });
-    }
-  },
-  EdgeCase: {
-    __assertStep: assertPgClassSingleStep,
-    computed($in, args, _info) {
-      const {
-        $row,
-        selectArgs
-      } = pgFunctionArgumentsFromArgs($in, makeArgs_person_computed_out(args), true);
-      const from = pgFromExpression($row, resource_edge_case_computedPgResource.from, resource_edge_case_computedPgResource.parameters, selectArgs);
-      return pgClassExpression($row, resource_edge_case_computedPgResource.codec, undefined)`${from}`;
-    },
-    notNullHasDefault($record) {
-      return $record.get("not_null_has_default");
-    },
-    wontCastEasy($record) {
-      return $record.get("wont_cast_easy");
-    },
-    rowId($record) {
-      return $record.get("row_id");
-    }
-  },
-  EdgeCaseCondition: {
-    notNullHasDefault($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "not_null_has_default",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
-        }
-      });
-    },
-    wontCastEasy($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "wont_cast_easy",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int2)}`;
-        }
-      });
-    },
-    rowId($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "row_id",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-        }
-      });
-    }
-  },
-  EdgeCasesOrderBy: {
-    COMPUTED_ASC(queryBuilder) {
-      if (typeof resource_edge_case_computedPgResource.from !== "function") {
-        throw new Error("Invalid computed attribute 'from'");
-      }
-      const expression = sql`${resource_edge_case_computedPgResource.from({
-        placeholder: queryBuilder.alias
-      })}`;
-      queryBuilder.orderBy({
-        codec: resource_edge_case_computedPgResource.codec,
-        fragment: expression,
-        direction: "asc".toUpperCase()
-      });
-    },
-    COMPUTED_DESC(queryBuilder) {
-      if (typeof resource_edge_case_computedPgResource.from !== "function") {
-        throw new Error("Invalid computed attribute 'from'");
-      }
-      const expression = sql`${resource_edge_case_computedPgResource.from({
-        placeholder: queryBuilder.alias
-      })}`;
-      queryBuilder.orderBy({
-        codec: resource_edge_case_computedPgResource.codec,
-        fragment: expression,
-        direction: "desc".toUpperCase()
-      });
-    },
-    NOT_NULL_HAS_DEFAULT_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "not_null_has_default",
-        direction: "ASC"
-      });
-    },
-    NOT_NULL_HAS_DEFAULT_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "not_null_has_default",
-        direction: "DESC"
-      });
-    },
-    WONT_CAST_EASY_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "wont_cast_easy",
-        direction: "ASC"
-      });
-    },
-    WONT_CAST_EASY_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "wont_cast_easy",
-        direction: "DESC"
-      });
-    },
-    ROW_ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "row_id",
-        direction: "ASC"
-      });
-    },
-    ROW_ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "row_id",
-        direction: "DESC"
-      });
-    }
-  },
-  LeftArmCondition: {
-    id($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "id",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-        }
-      });
-    },
-    personId($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "person_id",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-        }
-      });
-    },
-    lengthInMetres($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "length_in_metres",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.float)}`;
-        }
-      });
-    },
-    mood($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "mood",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-        }
-      });
-    }
-  },
-  LeftArmsOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      left_armUniques[0].attributes.forEach(attributeName => {
-        queryBuilder.orderBy({
-          attribute: attributeName,
-          direction: "ASC"
-        });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      left_armUniques[0].attributes.forEach(attributeName => {
-        queryBuilder.orderBy({
-          attribute: attributeName,
-          direction: "DESC"
-        });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PERSON_ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "person_id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PERSON_ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "person_id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    LENGTH_IN_METRES_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "length_in_metres",
-        direction: "ASC"
-      });
-    },
-    LENGTH_IN_METRES_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "length_in_metres",
-        direction: "DESC"
-      });
-    },
-    MOOD_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "mood",
-        direction: "ASC"
-      });
-    },
-    MOOD_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "mood",
-        direction: "DESC"
-      });
-    }
-  },
-  Issue756Condition: {
-    id($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "id",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-        }
-      });
-    },
-    ts($condition, val) {
-      $condition.where({
-        type: "attribute",
-        attribute: "ts",
-        callback(expression) {
-          return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, notNullTimestampCodec)}`;
-        }
-      });
-    }
-  },
-  Issue756SOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      issue756Uniques[0].attributes.forEach(attributeName => {
-        queryBuilder.orderBy({
-          attribute: attributeName,
-          direction: "ASC"
-        });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      issue756Uniques[0].attributes.forEach(attributeName => {
-        queryBuilder.orderBy({
-          attribute: attributeName,
-          direction: "DESC"
-        });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    TS_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "ts",
-        direction: "ASC"
-      });
-    },
-    TS_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "ts",
-        direction: "DESC"
-      });
-    }
-  },
-  Mutation: {
-    __assertStep: __ValueStep,
-    mutationOut: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
-        const $result = resource_mutation_outPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input(_, $object, arg) {
-          // We might have any number of step types here; we need
-          // to get back to the underlying pgSelect.
-          const $result = $object.getStepForKey("result");
-          const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-          const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-          if ($pgSelect instanceof PgSelectStep) {
-            // Mostly so `clientMutationId` works!
-            arg.apply($pgSelect);
-          } else {
-            throw new Error(`Could not determine PgSelectStep for ${$result}`);
-          }
-        }
-      }
-    },
-    mutationOutSetof: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
-        const $result = resource_mutation_out_setofPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input(_, $object, arg) {
-          // We might have any number of step types here; we need
-          // to get back to the underlying pgSelect.
-          const $result = $object.getStepForKey("result");
-          const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-          const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-          if ($pgSelect instanceof PgSelectStep) {
-            // Mostly so `clientMutationId` works!
-            arg.apply($pgSelect);
-          } else {
-            throw new Error(`Could not determine PgSelectStep for ${$result}`);
-          }
-        }
-      }
-    },
-    mutationOutUnnamed: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
-        const $result = resource_mutation_out_unnamedPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input(_, $object, arg) {
-          // We might have any number of step types here; we need
-          // to get back to the underlying pgSelect.
-          const $result = $object.getStepForKey("result");
-          const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-          const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-          if ($pgSelect instanceof PgSelectStep) {
-            // Mostly so `clientMutationId` works!
-            arg.apply($pgSelect);
-          } else {
-            throw new Error(`Could not determine PgSelectStep for ${$result}`);
-          }
-        }
-      }
-    },
-    noArgsMutation: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
-        const $result = resource_no_args_mutationPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input(_, $object, arg) {
-          // We might have any number of step types here; we need
-          // to get back to the underlying pgSelect.
-          const $result = $object.getStepForKey("result");
-          const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-          const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-          if ($pgSelect instanceof PgSelectStep) {
-            // Mostly so `clientMutationId` works!
-            arg.apply($pgSelect);
-          } else {
-            throw new Error(`Could not determine PgSelectStep for ${$result}`);
-          }
-        }
-      }
-    },
-    mutationInOut: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_mutation_in_out(args, ["input"]);
-        const $result = resource_mutation_in_outPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input(_, $object, arg) {
-          // We might have any number of step types here; we need
-          // to get back to the underlying pgSelect.
-          const $result = $object.getStepForKey("result");
-          const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-          const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-          if ($pgSelect instanceof PgSelectStep) {
-            // Mostly so `clientMutationId` works!
-            arg.apply($pgSelect);
-          } else {
-            throw new Error(`Could not determine PgSelectStep for ${$result}`);
-          }
-        }
-      }
-    },
-    mutationReturnsTableOneCol: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_mutation_returns_table_one_col(args, ["input"]);
-        const $result = resource_mutation_returns_table_one_colPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input(_, $object, arg) {
-          // We might have any number of step types here; we need
-          // to get back to the underlying pgSelect.
-          const $result = $object.getStepForKey("result");
-          const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-          const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-          if ($pgSelect instanceof PgSelectStep) {
-            // Mostly so `clientMutationId` works!
-            arg.apply($pgSelect);
-          } else {
-            throw new Error(`Could not determine PgSelectStep for ${$result}`);
-          }
-        }
-      }
-    },
-    jsonIdentityMutation: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_json_identity_mutation(args, ["input"]);
-        const $result = resource_json_identity_mutationPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input(_, $object, arg) {
-          // We might have any number of step types here; we need
-          // to get back to the underlying pgSelect.
-          const $result = $object.getStepForKey("result");
-          const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-          const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-          if ($pgSelect instanceof PgSelectStep) {
-            // Mostly so `clientMutationId` works!
-            arg.apply($pgSelect);
-          } else {
-            throw new Error(`Could not determine PgSelectStep for ${$result}`);
-          }
-        }
-      }
-    },
-    jsonbIdentityMutation: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_jsonb_identity_mutation(args, ["input"]);
-        const $result = resource_jsonb_identity_mutationPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input(_, $object, arg) {
-          // We might have any number of step types here; we need
-          // to get back to the underlying pgSelect.
-          const $result = $object.getStepForKey("result");
-          const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-          const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-          if ($pgSelect instanceof PgSelectStep) {
-            // Mostly so `clientMutationId` works!
-            arg.apply($pgSelect);
-          } else {
-            throw new Error(`Could not determine PgSelectStep for ${$result}`);
-          }
-        }
-      }
-    },
-    jsonbIdentityMutationPlpgsql: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_jsonb_identity_mutation_plpgsql(args, ["input"]);
-        const $result = resource_jsonb_identity_mutation_plpgsqlPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input(_, $object, arg) {
-          // We might have any number of step types here; we need
-          // to get back to the underlying pgSelect.
-          const $result = $object.getStepForKey("result");
-          const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-          const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-          if ($pgSelect instanceof PgSelectStep) {
-            // Mostly so `clientMutationId` works!
-            arg.apply($pgSelect);
-          } else {
-            throw new Error(`Could not determine PgSelectStep for ${$result}`);
-          }
-        }
-      }
-    },
-    jsonbIdentityMutationPlpgsqlWithDefault: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_jsonb_identity_mutation_plpgsql_with_default(args, ["input"]);
-        const $result = resource_jsonb_identity_mutation_plpgsql_with_defaultPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input(_, $object, arg) {
-          // We might have any number of step types here; we need
-          // to get back to the underlying pgSelect.
-          const $result = $object.getStepForKey("result");
-          const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-          const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-          if ($pgSelect instanceof PgSelectStep) {
-            // Mostly so `clientMutationId` works!
-            arg.apply($pgSelect);
-          } else {
-            throw new Error(`Could not determine PgSelectStep for ${$result}`);
-          }
-        }
-      }
-    },
-    mutationInInout: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_mutation_in_inout(args, ["input"]);
-        const $result = resource_mutation_in_inoutPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input(_, $object, arg) {
-          // We might have any number of step types here; we need
-          // to get back to the underlying pgSelect.
-          const $result = $object.getStepForKey("result");
-          const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-          const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-          if ($pgSelect instanceof PgSelectStep) {
-            // Mostly so `clientMutationId` works!
-            arg.apply($pgSelect);
-          } else {
-            throw new Error(`Could not determine PgSelectStep for ${$result}`);
-          }
-        }
-      }
-    },
-    mutationOutOut: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
-        const $result = resource_mutation_out_outPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input(_, $object, arg) {
-          // We might have any number of step types here; we need
-          // to get back to the underlying pgSelect.
-          const $result = $object.getStepForKey("result");
-          const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-          const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-          if ($pgSelect instanceof PgSelectStep) {
-            // Mostly so `clientMutationId` works!
-            arg.apply($pgSelect);
-          } else {
-            throw new Error(`Could not determine PgSelectStep for ${$result}`);
-          }
-        }
-      }
-    },
-    mutationOutOutSetof: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
-        const $result = resource_mutation_out_out_setofPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input(_, $object, arg) {
-          // We might have any number of step types here; we need
-          // to get back to the underlying pgSelect.
-          const $result = $object.getStepForKey("result");
-          const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-          const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-          if ($pgSelect instanceof PgSelectStep) {
-            // Mostly so `clientMutationId` works!
-            arg.apply($pgSelect);
-          } else {
-            throw new Error(`Could not determine PgSelectStep for ${$result}`);
-          }
-        }
-      }
-    },
-    mutationOutOutUnnamed: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
-        const $result = resource_mutation_out_out_unnamedPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input(_, $object, arg) {
-          // We might have any number of step types here; we need
-          // to get back to the underlying pgSelect.
-          const $result = $object.getStepForKey("result");
-          const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-          const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-          if ($pgSelect instanceof PgSelectStep) {
-            // Mostly so `clientMutationId` works!
-            arg.apply($pgSelect);
-          } else {
-            throw new Error(`Could not determine PgSelectStep for ${$result}`);
-          }
-        }
-      }
-    },
-    intSetMutation: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_int_set_mutation(args, ["input"]);
-        const $result = resource_int_set_mutationPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input(_, $object, arg) {
-          // We might have any number of step types here; we need
-          // to get back to the underlying pgSelect.
-          const $result = $object.getStepForKey("result");
-          const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-          const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-          if ($pgSelect instanceof PgSelectStep) {
-            // Mostly so `clientMutationId` works!
-            arg.apply($pgSelect);
-          } else {
-            throw new Error(`Could not determine PgSelectStep for ${$result}`);
-          }
-        }
-      }
-    },
-    mutationOutUnnamedOutOutUnnamed: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
-        const $result = resource_mutation_out_unnamed_out_out_unnamedPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input(_, $object, arg) {
-          // We might have any number of step types here; we need
-          // to get back to the underlying pgSelect.
-          const $result = $object.getStepForKey("result");
-          const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-          const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-          if ($pgSelect instanceof PgSelectStep) {
-            // Mostly so `clientMutationId` works!
-            arg.apply($pgSelect);
-          } else {
-            throw new Error(`Could not determine PgSelectStep for ${$result}`);
-          }
-        }
-      }
-    },
-    mutationReturnsTableMultiCol: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_mutation_returns_table_multi_col(args, ["input"]);
-        const $result = resource_mutation_returns_table_multi_colPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input(_, $object, arg) {
-          // We might have any number of step types here; we need
-          // to get back to the underlying pgSelect.
-          const $result = $object.getStepForKey("result");
-          const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-          const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-          if ($pgSelect instanceof PgSelectStep) {
-            // Mostly so `clientMutationId` works!
-            arg.apply($pgSelect);
-          } else {
-            throw new Error(`Could not determine PgSelectStep for ${$result}`);
-          }
-        }
-      }
-    },
-    leftArmIdentity: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_left_arm_identity(args, ["input"]);
-        const $result = resource_left_arm_identityPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input(_, $object, arg) {
-          // We might have any number of step types here; we need
-          // to get back to the underlying pgSelect.
-          const $result = $object.getStepForKey("result");
-          const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-          const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-          if ($pgSelect instanceof PgSelectStep) {
-            // Mostly so `clientMutationId` works!
-            arg.apply($pgSelect);
-          } else {
-            throw new Error(`Could not determine PgSelectStep for ${$result}`);
-          }
-        }
-      }
-    },
-    issue756Mutation: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
-        const $result = resource_issue756_mutationPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input(_, $object, arg) {
-          // We might have any number of step types here; we need
-          // to get back to the underlying pgSelect.
-          const $result = $object.getStepForKey("result");
-          const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-          const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-          if ($pgSelect instanceof PgSelectStep) {
-            // Mostly so `clientMutationId` works!
-            arg.apply($pgSelect);
-          } else {
-            throw new Error(`Could not determine PgSelectStep for ${$result}`);
-          }
-        }
-      }
-    },
-    issue756SetMutation: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
-        const $result = resource_issue756_set_mutationPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input(_, $object, arg) {
-          // We might have any number of step types here; we need
-          // to get back to the underlying pgSelect.
-          const $result = $object.getStepForKey("result");
-          const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-          const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-          if ($pgSelect instanceof PgSelectStep) {
-            // Mostly so `clientMutationId` works!
-            arg.apply($pgSelect);
-          } else {
-            throw new Error(`Could not determine PgSelectStep for ${$result}`);
-          }
-        }
-      }
-    },
-    typesMutation: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_types_mutation(args, ["input"]);
-        const $result = resource_types_mutationPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input(_, $object, arg) {
-          // We might have any number of step types here; we need
-          // to get back to the underlying pgSelect.
-          const $result = $object.getStepForKey("result");
-          const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-          const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-          if ($pgSelect instanceof PgSelectStep) {
-            // Mostly so `clientMutationId` works!
-            arg.apply($pgSelect);
-          } else {
-            throw new Error(`Could not determine PgSelectStep for ${$result}`);
-          }
-        }
-      }
-    },
-    mutationOutOutCompoundType: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_mutation_out_out_compound_type(args, ["input"]);
-        const $result = resource_mutation_out_out_compound_typePgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input(_, $object, arg) {
-          // We might have any number of step types here; we need
-          // to get back to the underlying pgSelect.
-          const $result = $object.getStepForKey("result");
-          const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-          const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-          if ($pgSelect instanceof PgSelectStep) {
-            // Mostly so `clientMutationId` works!
-            arg.apply($pgSelect);
-          } else {
-            throw new Error(`Could not determine PgSelectStep for ${$result}`);
-          }
-        }
-      }
-    },
-    tableMutation: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_table_mutation(args, ["input"]);
-        const $result = resource_table_mutationPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input(_, $object, arg) {
-          // We might have any number of step types here; we need
-          // to get back to the underlying pgSelect.
-          const $result = $object.getStepForKey("result");
-          const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-          const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-          if ($pgSelect instanceof PgSelectStep) {
-            // Mostly so `clientMutationId` works!
-            arg.apply($pgSelect);
-          } else {
-            throw new Error(`Could not determine PgSelectStep for ${$result}`);
-          }
-        }
-      }
-    },
-    listOfCompoundTypesMutation: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_list_of_compound_types_mutation(args, ["input"]);
-        const $result = resource_list_of_compound_types_mutationPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input(_, $object, arg) {
-          // We might have any number of step types here; we need
-          // to get back to the underlying pgSelect.
-          const $result = $object.getStepForKey("result");
-          const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-          const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-          if ($pgSelect instanceof PgSelectStep) {
-            // Mostly so `clientMutationId` works!
-            arg.apply($pgSelect);
-          } else {
-            throw new Error(`Could not determine PgSelectStep for ${$result}`);
-          }
-        }
-      }
-    },
-    mutationOutComplex: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_mutation_out_complex(args, ["input"]);
-        const $result = resource_mutation_out_complexPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input(_, $object, arg) {
-          // We might have any number of step types here; we need
-          // to get back to the underlying pgSelect.
-          const $result = $object.getStepForKey("result");
-          const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-          const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-          if ($pgSelect instanceof PgSelectStep) {
-            // Mostly so `clientMutationId` works!
-            arg.apply($pgSelect);
-          } else {
-            throw new Error(`Could not determine PgSelectStep for ${$result}`);
-          }
-        }
-      }
-    },
-    mutationOutComplexSetof: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_mutation_out_complex_setof(args, ["input"]);
-        const $result = resource_mutation_out_complex_setofPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input(_, $object, arg) {
-          // We might have any number of step types here; we need
-          // to get back to the underlying pgSelect.
-          const $result = $object.getStepForKey("result");
-          const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-          const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-          if ($pgSelect instanceof PgSelectStep) {
-            // Mostly so `clientMutationId` works!
-            arg.apply($pgSelect);
-          } else {
-            throw new Error(`Could not determine PgSelectStep for ${$result}`);
-          }
-        }
-      }
-    },
-    mutationOutTable: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
-        const $result = resource_mutation_out_tablePgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input(_, $object, arg) {
-          // We might have any number of step types here; we need
-          // to get back to the underlying pgSelect.
-          const $result = $object.getStepForKey("result");
-          const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-          const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-          if ($pgSelect instanceof PgSelectStep) {
-            // Mostly so `clientMutationId` works!
-            arg.apply($pgSelect);
-          } else {
-            throw new Error(`Could not determine PgSelectStep for ${$result}`);
-          }
-        }
-      }
-    },
-    mutationOutTableSetof: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
-        const $result = resource_mutation_out_table_setofPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input(_, $object, arg) {
-          // We might have any number of step types here; we need
-          // to get back to the underlying pgSelect.
-          const $result = $object.getStepForKey("result");
-          const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-          const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-          if ($pgSelect instanceof PgSelectStep) {
-            // Mostly so `clientMutationId` works!
-            arg.apply($pgSelect);
-          } else {
-            throw new Error(`Could not determine PgSelectStep for ${$result}`);
-          }
-        }
-      }
-    },
-    tableSetMutation: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs_person_computed_out(args, ["input"]);
-        const $result = resource_table_set_mutationPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input(_, $object, arg) {
-          // We might have any number of step types here; we need
-          // to get back to the underlying pgSelect.
-          const $result = $object.getStepForKey("result");
-          const $parent = "getParentStep" in $result ? $result.getParentStep() : $result;
-          const $pgSelect = "getClassStep" in $parent ? $parent.getClassStep() : $parent;
-          if ($pgSelect instanceof PgSelectStep) {
-            // Mostly so `clientMutationId` works!
-            arg.apply($pgSelect);
-          } else {
-            throw new Error(`Could not determine PgSelectStep for ${$result}`);
-          }
-        }
-      }
-    },
-    createMyTable: {
-      plan(_, args) {
-        const $insert = pgInsertSingle(resource_my_tablePgResource, Object.create(null));
-        args.apply($insert);
-        const plan = object({
-          result: $insert
-        });
-        return plan;
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    createPersonSecret: {
-      plan(_, args) {
-        const $insert = pgInsertSingle(resource_person_secretPgResource, Object.create(null));
-        args.apply($insert);
-        const plan = object({
-          result: $insert
-        });
-        return plan;
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    createCompoundKey: {
-      plan(_, args) {
-        const $insert = pgInsertSingle(resource_compound_keyPgResource, Object.create(null));
-        args.apply($insert);
-        const plan = object({
-          result: $insert
-        });
-        return plan;
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    createNullTestRecord: {
-      plan(_, args) {
-        const $insert = pgInsertSingle(resource_null_test_recordPgResource, Object.create(null));
-        args.apply($insert);
-        const plan = object({
-          result: $insert
-        });
-        return plan;
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    createEdgeCase: {
-      plan(_, args) {
-        const $insert = pgInsertSingle(resource_edge_casePgResource, Object.create(null));
-        args.apply($insert);
-        const plan = object({
-          result: $insert
-        });
-        return plan;
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    createLeftArm: {
-      plan(_, args) {
-        const $insert = pgInsertSingle(resource_left_armPgResource, Object.create(null));
-        args.apply($insert);
-        const plan = object({
-          result: $insert
-        });
-        return plan;
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    createIssue756: {
-      plan(_, args) {
-        const $insert = pgInsertSingle(resource_issue756PgResource, Object.create(null));
-        args.apply($insert);
-        const plan = object({
-          result: $insert
-        });
-        return plan;
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    createPerson: {
-      plan(_, args) {
-        const $insert = pgInsertSingle(resource_personPgResource, Object.create(null));
-        args.apply($insert);
-        const plan = object({
-          result: $insert
-        });
-        return plan;
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    updateMyTable: {
-      plan(_$root, args) {
-        const $update = pgUpdateSingle(resource_my_tablePgResource, specFromArgs_MyTable(args));
-        args.apply($update);
-        return object({
-          result: $update
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    updateMyTableById: {
-      plan(_$root, args) {
-        const $update = pgUpdateSingle(resource_my_tablePgResource, {
-          id: args.getRaw(['input', "id"])
-        });
-        args.apply($update);
-        return object({
-          result: $update
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    updatePersonSecret: {
-      plan(_$root, args) {
-        const $update = pgUpdateSingle(resource_person_secretPgResource, specFromArgs_PersonSecret(args));
-        args.apply($update);
-        return object({
-          result: $update
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    updatePersonSecretByPersonId: {
-      plan(_$root, args) {
-        const $update = pgUpdateSingle(resource_person_secretPgResource, {
-          person_id: args.getRaw(['input', "personId"])
-        });
-        args.apply($update);
-        return object({
-          result: $update
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    updateCompoundKey: {
-      plan(_$root, args) {
-        const $update = pgUpdateSingle(resource_compound_keyPgResource, specFromArgs_CompoundKey(args));
-        args.apply($update);
-        return object({
-          result: $update
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    updateCompoundKeyByPersonId1AndPersonId2: {
-      plan(_$root, args) {
-        const $update = pgUpdateSingle(resource_compound_keyPgResource, {
-          person_id_1: args.getRaw(['input', "personId1"]),
-          person_id_2: args.getRaw(['input', "personId2"])
-        });
-        args.apply($update);
-        return object({
-          result: $update
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    updateNullTestRecord: {
-      plan(_$root, args) {
-        const $update = pgUpdateSingle(resource_null_test_recordPgResource, specFromArgs_NullTestRecord(args));
-        args.apply($update);
-        return object({
-          result: $update
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    updateNullTestRecordById: {
-      plan(_$root, args) {
-        const $update = pgUpdateSingle(resource_null_test_recordPgResource, {
-          id: args.getRaw(['input', "id"])
-        });
-        args.apply($update);
-        return object({
-          result: $update
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    updateLeftArm: {
-      plan(_$root, args) {
-        const $update = pgUpdateSingle(resource_left_armPgResource, specFromArgs_LeftArm(args));
-        args.apply($update);
-        return object({
-          result: $update
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    updateLeftArmById: {
-      plan(_$root, args) {
-        const $update = pgUpdateSingle(resource_left_armPgResource, {
-          id: args.getRaw(['input', "id"])
-        });
-        args.apply($update);
-        return object({
-          result: $update
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    updateLeftArmByPersonId: {
-      plan(_$root, args) {
-        const $update = pgUpdateSingle(resource_left_armPgResource, {
-          person_id: args.getRaw(['input', "personId"])
-        });
-        args.apply($update);
-        return object({
-          result: $update
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    updateIssue756: {
-      plan(_$root, args) {
-        const $update = pgUpdateSingle(resource_issue756PgResource, specFromArgs_Issue756(args));
-        args.apply($update);
-        return object({
-          result: $update
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    updateIssue756ById: {
-      plan(_$root, args) {
-        const $update = pgUpdateSingle(resource_issue756PgResource, {
-          id: args.getRaw(['input', "id"])
-        });
-        args.apply($update);
-        return object({
-          result: $update
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    updatePerson: {
-      plan(_$root, args) {
-        const $update = pgUpdateSingle(resource_personPgResource, specFromArgs_Person(args));
-        args.apply($update);
-        return object({
-          result: $update
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    updatePersonById: {
-      plan(_$root, args) {
-        const $update = pgUpdateSingle(resource_personPgResource, {
-          id: args.getRaw(['input', "id"])
-        });
-        args.apply($update);
-        return object({
-          result: $update
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    updatePersonByEmail: {
-      plan(_$root, args) {
-        const $update = pgUpdateSingle(resource_personPgResource, {
-          email: args.getRaw(['input', "email"])
-        });
-        args.apply($update);
-        return object({
-          result: $update
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    deleteMyTable: {
-      plan(_$root, args) {
-        const $delete = pgDeleteSingle(resource_my_tablePgResource, specFromArgs_MyTable2(args));
-        args.apply($delete);
-        return object({
-          result: $delete
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    deleteMyTableById: {
-      plan(_$root, args) {
-        const $delete = pgDeleteSingle(resource_my_tablePgResource, {
-          id: args.getRaw(['input', "id"])
-        });
-        args.apply($delete);
-        return object({
-          result: $delete
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    deletePersonSecret: {
-      plan(_$root, args) {
-        const $delete = pgDeleteSingle(resource_person_secretPgResource, specFromArgs_PersonSecret2(args));
-        args.apply($delete);
-        return object({
-          result: $delete
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    deletePersonSecretByPersonId: {
-      plan(_$root, args) {
-        const $delete = pgDeleteSingle(resource_person_secretPgResource, {
-          person_id: args.getRaw(['input', "personId"])
-        });
-        args.apply($delete);
-        return object({
-          result: $delete
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    deleteCompoundKey: {
-      plan(_$root, args) {
-        const $delete = pgDeleteSingle(resource_compound_keyPgResource, specFromArgs_CompoundKey2(args));
-        args.apply($delete);
-        return object({
-          result: $delete
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    deleteCompoundKeyByPersonId1AndPersonId2: {
-      plan(_$root, args) {
-        const $delete = pgDeleteSingle(resource_compound_keyPgResource, {
-          person_id_1: args.getRaw(['input', "personId1"]),
-          person_id_2: args.getRaw(['input', "personId2"])
-        });
-        args.apply($delete);
-        return object({
-          result: $delete
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    deleteNullTestRecord: {
-      plan(_$root, args) {
-        const $delete = pgDeleteSingle(resource_null_test_recordPgResource, specFromArgs_NullTestRecord2(args));
-        args.apply($delete);
-        return object({
-          result: $delete
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    deleteNullTestRecordById: {
-      plan(_$root, args) {
-        const $delete = pgDeleteSingle(resource_null_test_recordPgResource, {
-          id: args.getRaw(['input', "id"])
-        });
-        args.apply($delete);
-        return object({
-          result: $delete
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    deleteLeftArm: {
-      plan(_$root, args) {
-        const $delete = pgDeleteSingle(resource_left_armPgResource, specFromArgs_LeftArm2(args));
-        args.apply($delete);
-        return object({
-          result: $delete
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    deleteLeftArmById: {
-      plan(_$root, args) {
-        const $delete = pgDeleteSingle(resource_left_armPgResource, {
-          id: args.getRaw(['input', "id"])
-        });
-        args.apply($delete);
-        return object({
-          result: $delete
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    deleteLeftArmByPersonId: {
-      plan(_$root, args) {
-        const $delete = pgDeleteSingle(resource_left_armPgResource, {
-          person_id: args.getRaw(['input', "personId"])
-        });
-        args.apply($delete);
-        return object({
-          result: $delete
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    deleteIssue756: {
-      plan(_$root, args) {
-        const $delete = pgDeleteSingle(resource_issue756PgResource, specFromArgs_Issue7562(args));
-        args.apply($delete);
-        return object({
-          result: $delete
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    deleteIssue756ById: {
-      plan(_$root, args) {
-        const $delete = pgDeleteSingle(resource_issue756PgResource, {
-          id: args.getRaw(['input', "id"])
-        });
-        args.apply($delete);
-        return object({
-          result: $delete
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    deletePerson: {
-      plan(_$root, args) {
-        const $delete = pgDeleteSingle(resource_personPgResource, specFromArgs_Person2(args));
-        args.apply($delete);
-        return object({
-          result: $delete
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    deletePersonById: {
-      plan(_$root, args) {
-        const $delete = pgDeleteSingle(resource_personPgResource, {
-          id: args.getRaw(['input', "id"])
-        });
-        args.apply($delete);
-        return object({
-          result: $delete
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    },
-    deletePersonByEmail: {
-      plan(_$root, args) {
-        const $delete = pgDeleteSingle(resource_personPgResource, {
-          email: args.getRaw(['input', "email"])
-        });
-        args.apply($delete);
-        return object({
-          result: $delete
-        });
-      },
-      args: {
-        input(_, $object) {
-          return $object;
-        }
-      }
-    }
-  },
-  MutationOutPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($object) {
-      const $result = $object.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    o($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  MutationOutInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  MutationOutSetofPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($object) {
-      const $result = $object.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    os($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  MutationOutSetofInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  MutationOutUnnamedPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($object) {
-      const $result = $object.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    integer($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  MutationOutUnnamedInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  NoArgsMutationPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($object) {
-      const $result = $object.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    integer($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  NoArgsMutationInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  MutationInOutPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($object) {
-      const $result = $object.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    o($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  MutationInOutInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  MutationReturnsTableOneColPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($object) {
-      const $result = $object.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    col1S($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  MutationReturnsTableOneColInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  JsonIdentityMutationPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($object) {
-      const $result = $object.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    json($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  JsonIdentityMutationInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  JsonbIdentityMutationPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($object) {
-      const $result = $object.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    json($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  JsonbIdentityMutationInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  JsonbIdentityMutationPlpgsqlPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($object) {
-      const $result = $object.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    json($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  JsonbIdentityMutationPlpgsqlInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  JsonbIdentityMutationPlpgsqlWithDefaultPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($object) {
-      const $result = $object.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    json($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  JsonbIdentityMutationPlpgsqlWithDefaultInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  MutationInInoutPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($object) {
-      const $result = $object.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    ino($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  MutationInInoutInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  MutationOutOutPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($object) {
-      const $result = $object.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    result($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  MutationOutOutRecord: {
-    __assertStep: assertPgClassSingleStep,
-    firstOut($record) {
-      return $record.get("first_out");
-    },
-    secondOut($record) {
-      return $record.get("second_out");
-    }
-  },
-  MutationOutOutInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  MutationOutOutSetofPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($object) {
-      const $result = $object.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    results($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  MutationOutOutSetofRecord: {
-    __assertStep: assertPgClassSingleStep
-  },
-  MutationOutOutSetofInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  MutationOutOutUnnamedPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($object) {
-      const $result = $object.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    result($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  MutationOutOutUnnamedRecord: {
-    __assertStep: assertPgClassSingleStep,
-    arg1($record) {
-      return $record.get("column1");
-    },
-    arg2($record) {
-      return $record.get("column2");
-    }
-  },
-  MutationOutOutUnnamedInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  IntSetMutationPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($object) {
-      const $result = $object.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    integers($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  IntSetMutationInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  MutationOutUnnamedOutOutUnnamedPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($object) {
-      const $result = $object.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    result($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  MutationOutUnnamedOutOutUnnamedRecord: {
-    __assertStep: assertPgClassSingleStep,
-    arg1($record) {
-      return $record.get("column1");
-    },
-    arg3($record) {
-      return $record.get("column3");
-    }
-  },
-  MutationOutUnnamedOutOutUnnamedInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  MutationReturnsTableMultiColPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($object) {
-      const $result = $object.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    results($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  MutationReturnsTableMultiColRecord: {
-    __assertStep: assertPgClassSingleStep
-  },
-  MutationReturnsTableMultiColInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  LeftArmIdentityPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($object) {
-      const $result = $object.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    leftArm($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    },
-    personByPersonId($record) {
-      return resource_personPgResource.get({
-        id: $record.get("result").get("person_id")
-      });
-    }
-  },
-  LeftArmIdentityInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  LeftArmBaseInput: {
-    __baked: createObjectAndApplyChildren,
-    id(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("id", bakedInputRuntime(schema, field.type, val));
-    },
-    personId(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("person_id", bakedInputRuntime(schema, field.type, val));
-    },
-    lengthInMetres(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("length_in_metres", bakedInputRuntime(schema, field.type, val));
-    },
-    mood(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("mood", bakedInputRuntime(schema, field.type, val));
-    }
-  },
-  Issue756MutationPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($object) {
-      const $result = $object.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    issue756($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  Issue756MutationInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  Issue756SetMutationPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($object) {
-      const $result = $object.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    issue756S($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  Issue756SetMutationInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  TypesMutationPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($object) {
-      const $result = $object.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    boolean($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  TypesMutationInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  MutationOutOutCompoundTypePayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($object) {
-      const $result = $object.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    result($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  MutationOutOutCompoundTypeRecord: {
-    __assertStep: assertPgClassSingleStep,
-    o2($record) {
-      const $plan = $record.get("o2");
-      const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
-      $select.getClassStep().setTrusted();
-      return $select;
-    }
-  },
-  MutationOutOutCompoundTypeInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  TableMutationPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($object) {
-      const $result = $object.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    post($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  TableMutationInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  ListOfCompoundTypesMutationPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($object) {
-      const $result = $object.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    compoundTypes($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  ListOfCompoundTypesMutationInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  CompoundTypeInput: {
-    __baked: createObjectAndApplyChildren,
-    a(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("a", bakedInputRuntime(schema, field.type, val));
-    },
-    b(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("b", bakedInputRuntime(schema, field.type, val));
-    },
-    c(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("c", bakedInputRuntime(schema, field.type, val));
-    },
-    d(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("d", bakedInputRuntime(schema, field.type, val));
-    },
-    e(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("e", bakedInputRuntime(schema, field.type, val));
-    },
-    f(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("f", bakedInputRuntime(schema, field.type, val));
-    },
-    g(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("g", bakedInputRuntime(schema, field.type, val));
-    },
-    fooBar(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("foo_bar", bakedInputRuntime(schema, field.type, val));
-    }
-  },
-  MutationOutComplexPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($object) {
-      const $result = $object.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    result($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  MutationOutComplexRecord: {
-    __assertStep: assertPgClassSingleStep,
-    y($record) {
-      const $plan = $record.get("y");
-      const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
-      $select.getClassStep().setTrusted();
-      return $select;
-    },
-    z($record) {
-      const $plan = $record.get("z");
-      const $select = pgSelectSingleFromRecord(resource_personPgResource, $plan);
-      $select.getClassStep().setTrusted();
-      return $select;
-    }
-  },
-  MutationOutComplexInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  MutationOutComplexSetofPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($object) {
-      const $result = $object.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    results($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  MutationOutComplexSetofRecord: {
-    __assertStep: assertPgClassSingleStep,
-    y($record) {
-      const $plan = $record.get("y");
-      const $select = pgSelectSingleFromRecord(resource_frmcdc_compoundTypePgResource, $plan);
-      $select.getClassStep().setTrusted();
-      return $select;
-    },
-    z($record) {
-      const $plan = $record.get("z");
-      const $select = pgSelectSingleFromRecord(resource_personPgResource, $plan);
-      $select.getClassStep().setTrusted();
-      return $select;
-    }
-  },
-  MutationOutComplexSetofInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  MutationOutTablePayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($object) {
-      const $result = $object.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    person($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  MutationOutTableInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  MutationOutTableSetofPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($object) {
-      const $result = $object.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    people($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  MutationOutTableSetofInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  TableSetMutationPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($object) {
-      const $result = $object.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    people($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  TableSetMutationInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  CreateMyTablePayload: {
-    __assertStep: assertExecutableStep,
-    clientMutationId($mutation) {
-      const $insert = $mutation.getStepForKey("result");
-      return $insert.getMeta("clientMutationId");
-    },
-    myTable($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  CreateMyTableInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    myTable(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  MyTableInput: {
-    __baked: createObjectAndApplyChildren,
-    id(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("id", bakedInputRuntime(schema, field.type, val));
-    },
-    jsonData(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("json_data", bakedInputRuntime(schema, field.type, val));
-    }
-  },
-  CreatePersonSecretPayload: {
-    __assertStep: assertExecutableStep,
-    clientMutationId($mutation) {
-      const $insert = $mutation.getStepForKey("result");
-      return $insert.getMeta("clientMutationId");
-    },
-    personSecret($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    },
-    personByPersonId($record) {
-      return resource_personPgResource.get({
-        id: $record.get("result").get("person_id")
-      });
-    }
-  },
-  CreatePersonSecretInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    personSecret(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  PersonSecretInput: {
-    __baked: createObjectAndApplyChildren,
-    personId(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("person_id", bakedInputRuntime(schema, field.type, val));
-    },
-    secret(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("sekrit", bakedInputRuntime(schema, field.type, val));
-    }
-  },
-  CreateCompoundKeyPayload: {
-    __assertStep: assertExecutableStep,
-    clientMutationId($mutation) {
-      const $insert = $mutation.getStepForKey("result");
-      return $insert.getMeta("clientMutationId");
-    },
-    compoundKey($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    },
-    personByPersonId1($record) {
-      return resource_personPgResource.get({
-        id: $record.get("result").get("person_id_1")
-      });
-    },
-    personByPersonId2($record) {
-      return resource_personPgResource.get({
-        id: $record.get("result").get("person_id_2")
-      });
-    }
-  },
-  CreateCompoundKeyInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    compoundKey(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  CompoundKeyInput: {
-    __baked: createObjectAndApplyChildren,
-    personId2(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("person_id_2", bakedInputRuntime(schema, field.type, val));
-    },
-    personId1(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("person_id_1", bakedInputRuntime(schema, field.type, val));
-    },
-    extra(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("extra", bakedInputRuntime(schema, field.type, val));
-    }
-  },
-  CreateNullTestRecordPayload: {
-    __assertStep: assertExecutableStep,
-    clientMutationId($mutation) {
-      const $insert = $mutation.getStepForKey("result");
-      return $insert.getMeta("clientMutationId");
-    },
-    nullTestRecord($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  CreateNullTestRecordInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    nullTestRecord(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  NullTestRecordInput: {
-    __baked: createObjectAndApplyChildren,
-    id(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("id", bakedInputRuntime(schema, field.type, val));
-    },
-    nullableText(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("nullable_text", bakedInputRuntime(schema, field.type, val));
-    },
-    nullableInt(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("nullable_int", bakedInputRuntime(schema, field.type, val));
-    },
-    nonNullText(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("non_null_text", bakedInputRuntime(schema, field.type, val));
-    }
-  },
-  CreateEdgeCasePayload: {
-    __assertStep: assertExecutableStep,
-    clientMutationId($mutation) {
-      const $insert = $mutation.getStepForKey("result");
-      return $insert.getMeta("clientMutationId");
-    },
-    edgeCase($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  CreateEdgeCaseInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    edgeCase(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  EdgeCaseInput: {
-    __baked: createObjectAndApplyChildren,
-    notNullHasDefault(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("not_null_has_default", bakedInputRuntime(schema, field.type, val));
-    },
-    wontCastEasy(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("wont_cast_easy", bakedInputRuntime(schema, field.type, val));
-    },
-    rowId(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("row_id", bakedInputRuntime(schema, field.type, val));
-    }
-  },
-  CreateLeftArmPayload: {
-    __assertStep: assertExecutableStep,
-    clientMutationId($mutation) {
-      const $insert = $mutation.getStepForKey("result");
-      return $insert.getMeta("clientMutationId");
-    },
-    leftArm($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    },
-    personByPersonId($record) {
-      return resource_personPgResource.get({
-        id: $record.get("result").get("person_id")
-      });
-    }
-  },
-  CreateLeftArmInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    leftArm(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  LeftArmInput: {
-    __baked: createObjectAndApplyChildren,
-    id(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("id", bakedInputRuntime(schema, field.type, val));
-    },
-    personId(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("person_id", bakedInputRuntime(schema, field.type, val));
-    },
-    lengthInMetres(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("length_in_metres", bakedInputRuntime(schema, field.type, val));
-    },
-    mood(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("mood", bakedInputRuntime(schema, field.type, val));
-    }
-  },
-  CreateIssue756Payload: {
-    __assertStep: assertExecutableStep,
-    clientMutationId($mutation) {
-      const $insert = $mutation.getStepForKey("result");
-      return $insert.getMeta("clientMutationId");
-    },
-    issue756($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  CreateIssue756Input: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    issue756(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  Issue756Input: {
-    __baked: createObjectAndApplyChildren,
-    id(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("id", bakedInputRuntime(schema, field.type, val));
-    },
-    ts(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("ts", bakedInputRuntime(schema, field.type, val));
-    }
-  },
-  CreatePersonPayload: {
-    __assertStep: assertExecutableStep,
-    clientMutationId($mutation) {
-      const $insert = $mutation.getStepForKey("result");
-      return $insert.getMeta("clientMutationId");
-    },
-    person($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  CreatePersonInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    person(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  PersonInput: {
-    __baked: createObjectAndApplyChildren,
-    id(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("id", bakedInputRuntime(schema, field.type, val));
-    },
-    name(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("person_full_name", bakedInputRuntime(schema, field.type, val));
-    },
-    aliases(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("aliases", bakedInputRuntime(schema, field.type, val));
-    },
-    about(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("about", bakedInputRuntime(schema, field.type, val));
-    },
-    email(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("email", bakedInputRuntime(schema, field.type, val));
-    },
-    site(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("site", bakedInputRuntime(schema, field.type, val));
-    },
-    config(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("config", bakedInputRuntime(schema, field.type, val));
-    },
-    lastLoginFromIp(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("last_login_from_ip", bakedInputRuntime(schema, field.type, val));
-    },
-    lastLoginFromSubnet(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("last_login_from_subnet", bakedInputRuntime(schema, field.type, val));
-    },
-    userMac(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("user_mac", bakedInputRuntime(schema, field.type, val));
-    },
-    createdAt(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("created_at", bakedInputRuntime(schema, field.type, val));
-    }
-  },
-  UpdateMyTablePayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($mutation) {
-      const $result = $mutation.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    myTable($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  UpdateMyTableInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    myTablePatch(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  MyTablePatch: {
-    __baked: createObjectAndApplyChildren,
-    id(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("id", bakedInputRuntime(schema, field.type, val));
-    },
-    jsonData(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("json_data", bakedInputRuntime(schema, field.type, val));
-    }
-  },
-  UpdateMyTableByIdInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    myTablePatch(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  UpdatePersonSecretPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($mutation) {
-      const $result = $mutation.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    personSecret($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    },
-    personByPersonId($record) {
-      return resource_personPgResource.get({
-        id: $record.get("result").get("person_id")
-      });
-    }
-  },
-  UpdatePersonSecretInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    personSecretPatch(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  PersonSecretPatch: {
-    __baked: createObjectAndApplyChildren,
-    personId(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("person_id", bakedInputRuntime(schema, field.type, val));
-    },
-    secret(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("sekrit", bakedInputRuntime(schema, field.type, val));
-    }
-  },
-  UpdatePersonSecretByPersonIdInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    personSecretPatch(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  UpdateCompoundKeyPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($mutation) {
-      const $result = $mutation.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    compoundKey($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    },
-    personByPersonId1($record) {
-      return resource_personPgResource.get({
-        id: $record.get("result").get("person_id_1")
-      });
-    },
-    personByPersonId2($record) {
-      return resource_personPgResource.get({
-        id: $record.get("result").get("person_id_2")
-      });
-    }
-  },
-  UpdateCompoundKeyInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    compoundKeyPatch(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  CompoundKeyPatch: {
-    __baked: createObjectAndApplyChildren,
-    personId2(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("person_id_2", bakedInputRuntime(schema, field.type, val));
-    },
-    personId1(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("person_id_1", bakedInputRuntime(schema, field.type, val));
-    },
-    extra(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("extra", bakedInputRuntime(schema, field.type, val));
-    }
-  },
-  UpdateCompoundKeyByPersonId1AndPersonId2Input: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    compoundKeyPatch(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  UpdateNullTestRecordPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($mutation) {
-      const $result = $mutation.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    nullTestRecord($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  UpdateNullTestRecordInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    nullTestRecordPatch(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  NullTestRecordPatch: {
-    __baked: createObjectAndApplyChildren,
-    id(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("id", bakedInputRuntime(schema, field.type, val));
-    },
-    nullableText(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("nullable_text", bakedInputRuntime(schema, field.type, val));
-    },
-    nullableInt(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("nullable_int", bakedInputRuntime(schema, field.type, val));
-    },
-    nonNullText(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("non_null_text", bakedInputRuntime(schema, field.type, val));
-    }
-  },
-  UpdateNullTestRecordByIdInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    nullTestRecordPatch(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  UpdateLeftArmPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($mutation) {
-      const $result = $mutation.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    leftArm($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    },
-    personByPersonId($record) {
-      return resource_personPgResource.get({
-        id: $record.get("result").get("person_id")
-      });
-    }
-  },
-  UpdateLeftArmInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    leftArmPatch(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  LeftArmPatch: {
-    __baked: createObjectAndApplyChildren,
-    id(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("id", bakedInputRuntime(schema, field.type, val));
-    },
-    personId(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("person_id", bakedInputRuntime(schema, field.type, val));
-    },
-    lengthInMetres(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("length_in_metres", bakedInputRuntime(schema, field.type, val));
-    },
-    mood(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("mood", bakedInputRuntime(schema, field.type, val));
-    }
-  },
-  UpdateLeftArmByIdInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    leftArmPatch(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  UpdateLeftArmByPersonIdInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    leftArmPatch(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  UpdateIssue756Payload: {
-    __assertStep: ObjectStep,
-    clientMutationId($mutation) {
-      const $result = $mutation.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    issue756($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  UpdateIssue756Input: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    issue756Patch(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  Issue756Patch: {
-    __baked: createObjectAndApplyChildren,
-    id(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("id", bakedInputRuntime(schema, field.type, val));
-    },
-    ts(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("ts", bakedInputRuntime(schema, field.type, val));
-    }
-  },
-  UpdateIssue756ByIdInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    issue756Patch(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  UpdatePersonPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($mutation) {
-      const $result = $mutation.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    person($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  UpdatePersonInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    personPatch(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  PersonPatch: {
-    __baked: createObjectAndApplyChildren,
-    id(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("id", bakedInputRuntime(schema, field.type, val));
-    },
-    name(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("person_full_name", bakedInputRuntime(schema, field.type, val));
-    },
-    aliases(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("aliases", bakedInputRuntime(schema, field.type, val));
-    },
-    about(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("about", bakedInputRuntime(schema, field.type, val));
-    },
-    email(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("email", bakedInputRuntime(schema, field.type, val));
-    },
-    site(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("site", bakedInputRuntime(schema, field.type, val));
-    },
-    config(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("config", bakedInputRuntime(schema, field.type, val));
-    },
-    lastLoginFromIp(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("last_login_from_ip", bakedInputRuntime(schema, field.type, val));
-    },
-    lastLoginFromSubnet(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("last_login_from_subnet", bakedInputRuntime(schema, field.type, val));
-    },
-    userMac(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("user_mac", bakedInputRuntime(schema, field.type, val));
-    },
-    createdAt(obj, val, {
-      field,
-      schema
-    }) {
-      obj.set("created_at", bakedInputRuntime(schema, field.type, val));
-    }
-  },
-  UpdatePersonByIdInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    personPatch(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  UpdatePersonByEmailInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    },
-    personPatch(qb, arg) {
-      if (arg != null) {
-        return qb.setBuilder();
-      }
-    }
-  },
-  DeleteMyTablePayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($mutation) {
-      const $result = $mutation.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    myTable($object) {
-      return $object.get("result");
-    },
-    deletedMyTableId($object) {
-      const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandler_MyTable.plan($record);
-      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  DeleteMyTableInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  DeleteMyTableByIdInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  DeletePersonSecretPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($mutation) {
-      const $result = $mutation.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    personSecret($object) {
-      return $object.get("result");
-    },
-    deletedPersonSecretId($object) {
-      const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandler_PersonSecret.plan($record);
-      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
-    },
-    query() {
-      return rootValue();
-    },
-    personByPersonId($record) {
-      return resource_personPgResource.get({
-        id: $record.get("result").get("person_id")
-      });
-    }
-  },
-  DeletePersonSecretInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  DeletePersonSecretByPersonIdInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  DeleteCompoundKeyPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($mutation) {
-      const $result = $mutation.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    compoundKey($object) {
-      return $object.get("result");
-    },
-    deletedCompoundKeyId($object) {
-      const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandler_CompoundKey.plan($record);
-      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
-    },
-    query() {
-      return rootValue();
-    },
-    personByPersonId1($record) {
-      return resource_personPgResource.get({
-        id: $record.get("result").get("person_id_1")
-      });
-    },
-    personByPersonId2($record) {
-      return resource_personPgResource.get({
-        id: $record.get("result").get("person_id_2")
-      });
-    }
-  },
-  DeleteCompoundKeyInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  DeleteCompoundKeyByPersonId1AndPersonId2Input: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  DeleteNullTestRecordPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($mutation) {
-      const $result = $mutation.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    nullTestRecord($object) {
-      return $object.get("result");
-    },
-    deletedNullTestRecordId($object) {
-      const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandler_NullTestRecord.plan($record);
-      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  DeleteNullTestRecordInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  DeleteNullTestRecordByIdInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  DeleteLeftArmPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($mutation) {
-      const $result = $mutation.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    leftArm($object) {
-      return $object.get("result");
-    },
-    deletedLeftArmId($object) {
-      const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandler_LeftArm.plan($record);
-      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
-    },
-    query() {
-      return rootValue();
-    },
-    personByPersonId($record) {
-      return resource_personPgResource.get({
-        id: $record.get("result").get("person_id")
-      });
-    }
-  },
-  DeleteLeftArmInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  DeleteLeftArmByIdInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  DeleteLeftArmByPersonIdInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  DeleteIssue756Payload: {
-    __assertStep: ObjectStep,
-    clientMutationId($mutation) {
-      const $result = $mutation.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    issue756($object) {
-      return $object.get("result");
-    },
-    deletedIssue756Id($object) {
-      const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandler_Issue756.plan($record);
-      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  DeleteIssue756Input: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  DeleteIssue756ByIdInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  DeletePersonPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($mutation) {
-      const $result = $mutation.getStepForKey("result");
-      return $result.getMeta("clientMutationId");
-    },
-    person($object) {
-      return $object.get("result");
-    },
-    deletedPersonId($object) {
-      const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandler_Person.plan($record);
-      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
-    },
-    query() {
-      return rootValue();
-    }
-  },
-  DeletePersonInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  DeletePersonByIdInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
-  },
-  DeletePersonByEmailInput: {
-    clientMutationId(qb, val) {
-      qb.setMeta("clientMutationId", val);
-    }
   }
 };
 export const schema = makeGrafastSchema({
   typeDefs: typeDefs,
-  plans: plans
+  objects: objects,
+  interfaces: interfaces,
+  inputObjects: inputObjects,
+  scalars: scalars,
+  enums: enums
 });
