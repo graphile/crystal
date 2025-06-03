@@ -9,6 +9,7 @@ import {
   FORBIDDEN_BY_NULLABLE_BOUNDARY_FLAGS,
   NO_FLAGS,
 } from "../constants.js";
+import { isFlaggedValue } from "../error.js";
 import { inspect } from "../inspect.js";
 import type { ExecutionValue, UnaryExecutionValue } from "../interfaces.js";
 import type { Step, UnbatchedStep } from "../step";
@@ -779,9 +780,16 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             for (let j = 0, l = list.length; j < l; j++) {
               const newIndex = size++;
               newIndexes.push(newIndex);
-              const val = list[j];
-              // TODO: are these the right flags?
-              ev._setResult(newIndex, val, val == null ? FLAG_NULL : NO_FLAGS);
+              let val = list[j];
+              let flags = NO_FLAGS;
+              if (isFlaggedValue(val)) {
+                flags = val.flags;
+                val = val.value;
+              }
+              if (val == null) {
+                flags = flags | FLAG_NULL;
+              }
+              ev._setResult(newIndex, val, flags);
 
               polymorphicPathList[newIndex] =
                 parentBucket.polymorphicPathList[originalIndex];
