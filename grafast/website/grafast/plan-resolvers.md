@@ -108,9 +108,9 @@ export const schema = new GraphQLSchema({
 
 If you are using `makeGrafastSchema` then the field plan resolver for the field
 `fieldName` on the object type `typeName` would be indicated via the
-`plans[typeName][fieldName]` property:
+`objects[typeName].plans[fieldName]` property:
 
-```ts {11-13}
+```ts {12-14}
 import { makeGrafastSchema, constant } from "grafast";
 
 export const schema = makeGrafastSchema({
@@ -119,10 +119,12 @@ export const schema = makeGrafastSchema({
       meaningOfLife: Int
     }
   `,
-  plans: {
+  objects: {
     Query: {
-      meaningOfLife() {
-        return constant(42);
+      plans: {
+        meaningOfLife() {
+          return constant(42);
+        },
       },
     },
   },
@@ -187,17 +189,19 @@ const schema = makeGrafastSchema({
       a: Int
     }
   `,
-  plans: {
+  objects: {
     MyObject: {
-      __assertStep: ObjectStep,
+      assertStep: ObjectStep,
       /* Or:
-        __assertStep($step) {
+        assertStep($step) {
           if ($step instanceof ObjectStep) return;
           throw new Error(`Type 'MyObject' expects a step of type ObjectStep; instead received a step of type '${$step.constructor.name}'`);
         }
        */
-      a($obj: ObjectStep) {
-        return $obj.get("a");
+      plans: {
+        a($obj: ObjectStep) {
+          return $obj.get("a");
+        },
       },
     },
   },

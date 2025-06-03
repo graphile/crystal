@@ -120,7 +120,7 @@ of its `planType` method, which the schema author supplies.
 
 ### `planType`
 
-If you use `makeGrafastSchema()` then you can specify `__planType` on the
+If you use `makeGrafastSchema()` then you can specify `planType` on the
 interface or union type:
 
 ```ts
@@ -132,18 +132,20 @@ const schema = makeGrafastSchema({
     }
     union Entity = Animal | Alien
   `,
-  plans: {
+  interfaces: {
     Animal: {
-      __planType($specifier) {
+      planType($specifier) {
         /* ... */
       },
-      // Also: __toSpecifier($step)
+      // Also: toSpecifier($step)
     },
+  },
+  unions: {
     Entity: {
-      __planType($specifier) {
+      planType($specifier) {
         /* ... */
       },
-      // Also: __toSpecifier($step)
+      // Also: toSpecifier($step)
     },
   },
 });
@@ -374,13 +376,13 @@ const schema = makeGrafastSchema({
       #...
     }
   `,
-  plans: {
+  interfaces: {
     Animal: {
-      __toSpecifier($step) {
+      toSpecifier($step) {
         // A simple data object with just the ID, perfect for accumulating
         return object({ id: get($step, "id") });
       },
-      __planType($obj) {
+      planType($obj) {
         // Extract the ID
         const $id = get($obj, "id");
         // Fetch the record (same for all types)

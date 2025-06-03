@@ -141,10 +141,12 @@ const makeSchemaWithNoImplementations = () =>
         notifications: [UserNotification!]!
       }
     `,
-    plans: {
+    objects: {
       Query: {
-        notifications() {
-          return constant([]);
+        plans: {
+          notifications() {
+            return constant([]);
+          },
         },
       },
     },
