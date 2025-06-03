@@ -3,6 +3,8 @@ title: "Abstract types & polymorphism"
 sidebar_position: 11
 ---
 
+import Mermaid from "@theme/Mermaid";
+
 # Abstract types and polymorphism
 
 GraphQL supports two abstract types suitable for usage in output: interfaces and
@@ -14,14 +16,14 @@ GraphQL to describe positions where data polymorphism can occur.
 
 Gra*fast* supports GraphQL interfaces and unions, both through traditional
 GraphQL.js resolvers and through plan resolvers. Resolvers work the same
-(basically) as they do in GraphQL.js so we won't dig into them here, but let's
+(basically) as they do in GraphQL.js so we won’t dig into them here, but let’s
 look into how Gra*fast* supports abstract types via plan resolvers (which
 enables greater efficiency!).
 
 ## Polymorphic positions
 
-To make it easier to talk about planning a polymorphic GraphQL query, let's
-define the term "polymorphic position" to refer to a position in our GraphQL
+To make it easier to talk about planning a polymorphic GraphQL query, let’s
+define the term “polymorphic position” to refer to a position in our GraphQL
 operation whose return type is an abstract type (an interface or union).
 
 Imagine you have a GraphQL schema such as:
@@ -89,38 +91,66 @@ Operations may have any number (0 or higher) of polymorphic positions.
 
 ## Planning polymorphism
 
-Planning a polymorphic position is a collaboration between the field's plan
-resolver and the abstract type's `planType` method, which describes how to
+Planning a polymorphic position is a collaboration between the field’s plan
+resolver and the abstract type’s `planType` method, which describes how to
 resolve abstract values into their concrete type and associated data.
 
 The plan returned by a field plan resolver representing the value to use
-for a polymorphic position is called a "specifier". It's called a specifier
+for a polymorphic position is called a “specifier”. It’s called a specifier
 because it does not actually have to be the value itself (though it can be!),
 it can just be a description of that item sufficient for your abstract
 type to know how to fetch it.
 
 Gra*fast* recognizes that sometimes you need to fetch things to figure out what
 type they are, and sometimes you need to know what type they are in order to
-fetch them (and sometimes it's a little of both).
+fetch them (and sometimes it’s a little of both).
 
-For example you might have an "animals" table in your database that details if
+For example you might have an “animals” table in your database that details if
 an individual record is a cat, dog, fish, budgie or similar. In this case you
-need to fetch the record in order to determine the type of the value. We'll call
-this "fetch-to-type", and for it we can have the specifier be the record's
-primary key, which we'll call `id`.
+need to fetch the record in order to determine the type of the value. We’ll call
+this “fetch-to-type”, and for it we can have the specifier be the record’s
+primary key, which we’ll call `id`.
 
-An opposing example would be a GraphQL Node ID, here a string such as `User:1`
+An opposing example would be a GraphQL Node ID: here a string such as `User:1`
 (but typically Base64 encoded) indicates the type up front, along with an
-identifier, and you use this type to determine how to fetch the record. We'll
-call this "type-to-fetch", and for it the specifier is this string we mentioned:
+identifier, and you use this type to determine how to fetch the record. We’ll
+call this “type-to-fetch”, and the specifier is this string we mentioned:
 `User:1`.
+
+<figure>
+  <Mermaid
+    chart={`
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
+  graph TD
+subgraph NodeID["Node ID: &ldquo;type-to-fetch&rdquo;"]
+v["$nodeId<br>(e.g. User:1 or Organization:2)"]
+v-->|isUser?| GetUser[["Fetch user by id"]]
+v-->|isOrganization?| GetOrg[["Fetch organization by id"]]
+GetUser --> User
+GetOrg --> Organization
+end
+subgraph Vets["Shared storage: &ldquo;fetch-to-type&rdquo;"]
+v2["$animalId<br>(e.g. 1, 2, 3)"]
+v2-->Animal[["Fetch animal by id"]]
+Animal-->|isCat?| Cat
+Animal-->|isDog?| Dog
+end
+`}
+  />
+  <figcaption>
+    The difference in using “fetch-to-type” and “type-to-fetch”: In
+    “fetch-to-type”, the record must be fetched before the type can be known; in
+    “type-to-fetch”, the type is known up-front and the way the record is
+    fetched depends on that.
+  </figcaption>
+</figure>
 
 The specifier that a given abstract type requires is based on the expectations
 of its `planType` method, which the schema author supplies.
 
 ### `planType`
 
-If you use `makeGrafastSchema()` then you can specify `__planType` on the
+If you use `makeGrafastSchema()` then you can specify `planType` on the
 interface or union type:
 
 ```ts
@@ -149,7 +179,7 @@ const schema = makeGrafastSchema({
 });
 ```
 
-If you're using GraphQL.js or another construction mechanism then the method
+If you’re using GraphQL.js or another construction mechanism then the method
 actually lives inside extensions:
 
 ```ts
@@ -182,8 +212,8 @@ const Entity = new GraphQLUnionType({
 ```
 
 However you add it, `planType` accepts two parameters: the specifier step, and
-an `info` object you can find out more about in "Advanced" below. The function
-must return a `AbstractTypePlanner` object, which is an object with two
+an `info` object, which you can find out more about in [“Advanced”](#advanced) below. The function
+must return an `AbstractTypePlanner` object, which is an object with two
 entries:
 
 - `$__typename` (required): a step representing the name of the resolved
@@ -193,7 +223,7 @@ entries:
   `null` if creating such a step is not possible). If
   unspecified, the `$specifier` step will be used for all object types.
 
-In our "fetch-to-type" example from before, `planType` might look like this:
+In our fetch-to-type example from before, `planType` might look like this:
 
 ```ts
 function planType($specifier: Step<number>): AbstractTypePlanner {
@@ -221,7 +251,7 @@ function animalTypeNameFromType(type: string) {
 }
 ```
 
-However, in our "type-to-fetch" example, `planType` would perform more logic
+However, in our type-to-fetch example, `planType` would perform more logic
 inside the `planForType` method, and needs less work to find the type name:
 
 ```ts
@@ -272,10 +302,10 @@ continue planning for each type from there.
 Walking all possible object types is a simple approach, but it can inflate the
 time spent planning an operation, especially for highly polymorphic operations.
 We minimize this cost by fanning in before fanning out (see the below infobox),
-but there's space for more optimization: at some point, Gra*fast* might add
+but there’s space for more optimization: at some point, Gra*fast* might add
 support for on-demand polymorphic planning.
 
-With on-demand polymorphic planning, each "polymorphic branch" of the plan will
+With on-demand polymorphic planning, each “polymorphic branch” of the plan will
 only be planned the first time that an object of that type is met at runtime.
 This on-demand polymorphic planning strategy should significantly decrease
 initial planning time for highly polymorphic operations, and may result in many
@@ -286,84 +316,83 @@ deployment of Gra*fast* needs, please get in touch.
 
 :::info Grafast avoids exponential branching
 
-Note the "type-to-fetch" example causes the operation plan to branch: `User` and
+Note the type-to-fetch example causes the operation plan to branch: `User` and
 `Organization` each have different steps, and so we split them into separate
 `polymorphicPartition` layer plans.
 
 Excessive branching complicates both planning and execution and could lead to
-denial of service. Gra*fast* made the fundamental choice to "fan in" before
-"fanning out" in polymorphism to avoid expontential branching and that choice
-has had a significant impact on the shape of the APIs we make available.
+denial of service. Gra*fast* made the fundamental choice to “fan in” before
+“fanning out” in polymorphism to avoid exponential branching, and that choice
+has had a significant impact on the shape of the APIs it makes available.
 
 If planned naively, nested polymorphic positions could lead to significant
-branching. Imagine a polymorphic type such as `Item` that can represent `P`
-different concrete object types, and imagine that `Item` contains a relationship
-to another `Item` (e.g. `parentItem: Item`). Now imagine a GraphQL request that
-queries this `D` levels deep:
-
-<!-- prettier-ignore -->
-```graphql
-query ItemAndAncestors($id: ID!) {
-  item(id: $id) {
-    ...ItemDetails
-    parentItem {
-      ...ItemDetails
-      parentItem {
-        ...ItemDetails
-        # and so on, D levels deep
-      }
-    }
-  }
-}
-
-fragment ItemDetails on Item {
-  id
-  ... on FooItem { foo }
-  ... on BarItem { bar }
-  ... on BazItem { baz }
-  # And so on, P types wide
-}
-```
-
-If we were to plan this naively, recursing through each different type at each
-level, there would be up to `P^D` different branches - the complexity would
+branching. If each polymorphic position could represent `P` different types and we queried
+`D` levels deep then recursing through each different type at each
+level would produce up to `P^D` different branches — the complexity would
 scale exponentially with query depth. This is good news for an attacker, and bad
 news for our server bills.
 
-Gra*fast* prevents this from happening by forcing polymorphism to "fan in"
-before it "fans out" again, so for ten types (`P=10`) and five levels (`D=10`)
+Gra*fast* prevents this from happening by forcing polymorphism to “fan in”
+before it “fans out” again:
+
+<figure>
+  <Mermaid
+    chart={`
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
+graph TD
+  v["$nodeId<br>(e.g. 'User:1' or 'Organization:2')"]
+  v-->|isUser?| GetUser[["Fetch user by id"]]
+  v-->|isOrganization?| GetOrg[["Fetch organization by id"]]
+  GetUser --> UserPets[/"getPetIds"\\]
+  GetOrg --> OrgPets[/"getServiceAnimalIds"\\]
+  UserPets & OrgPets -.-x Combined@{shape: docs, label: "Combined ids"}
+  Combined-->Animal[["Fetch animal by id"]]
+  Animal--> Cat
+  Animal--> Dog
+`}
+  />
+  
+  <figcaption>
+    <code>getPetIds</code> and <code>getServiceAnimals</code> “fan in” to one combined node in order
+    to then fetch all of the Animals by their IDs. Once the IDs are fetched, the nodes “fan out” to the different
+    Animal types.
+  </figcaption>
+
+</figure>
+
+So for ten types (`P=10`) and five levels (`D=10`)
 instead of having up to 10,000,000,000 (`P^D`) branches; Grafast scales linearly
-with depth meaning there's only up to 100 (`P*D`) branches.
+with depth meaning there’s only up to 100 (`P*D`) branches.
 
 :::
 
 ### Advanced
 
 If you want to be hyper-optimal, you may not want to always return a specifier
-from your field plan resolvers - you may want to return and use a step that
-already represents the relevant data and you already needed for some reason.
+from your field plan resolvers — you may want to return and use a step that
+already represents the relevant data that you already needed for some reason.
 However, if this field is queried through multiple polymorphic paths Gra*fast*
-will want to perform "fan in" to prevent excessive branching. To do so it will
+will perform “fan in” to prevent excessive branching. To do so, it will
 take the step returned from each of the relevant field plan resolvers and if
-there's more than one, it will do the first of these that yields results:
+there’s more than one, it will do the first of these that yields results:
 
-1. it will call the abstract type's `toSpecifier($step)` method, if present, passing the step; or
-2. it will call the step's `$step.toRecord()` method, if present; or
-3. it will use `$step`'s data directly.
+1. it will call the abstract type’s `toSpecifier($step)` method, if present, passing the step; or
+2. it will call the step’s `$step.toRecord()` method, if present; or
+3. it will use `$step`’s data directly.
 
-Whichever of these it does, it will create a "combined data" step representing
+Whichever of these it does, it will create a “combined data” step representing
 **just the data** from these steps, yielded via the above options. This combined
 step will then be input to `planType` as the specifier.
 
-For consistency, we also call `toSpecifier($step)` (if present) when there's
-only one step - this ensures the "specifier" step passed in to `planType` contains
-consistent data whether there's one step or many. However, if there was just one
-step then we also make available the original step via the `info` argument
+For consistency, Gra*fast* will also call `toSpecifier($step)` (if present) when there’s
+only one step - this ensures the “specifier” step passed in to `planType` contains
+consistent data whether there’s one step or many. However, if there was just one
+step then it’ll also make available the original step via the `info` argument
 (`info.$original`); you may use this if you want to be extra efficient somehow.
 
 As shown in the [planType](#plantype) examples above, `toSpecifier` also goes in
-the union or interface type's extensions (`extensions.grafast.toSpecifier`); how
-you would populate this depends on the framework you're using; here's an example
+the union or interface type’s extensions (`extensions.grafast.toSpecifier`); how
+you would populate this depends on the framework you’re using; here’s an example
 using `makeGrafastSchema`:
 
 ```ts
@@ -405,11 +434,11 @@ const schema = makeGrafastSchema({
 
 ## Caveats
 
-Though we limit the impact of abstract types, they are still quite expensive
+Though Gra*fast* limits the impact of abstract types, they are still quite expensive
 compared to regular types (a field returning an abstract type that could be N
 different concrete types can be similarly complex to having N fields that return
 concrete types). As such, to protect your servers from malicious queries we
 recommend that you implement trusted documents if you can, and if not that you
-apply an abstract type depth limit to avoid polymorphism's branching becoming an
-attack vector for your schema. We also make available planning timeouts, but
+apply an abstract type depth limit to avoid polymorphism’s branching becoming an
+attack vector for your schema. Gra*fast* also makes available planning timeouts, but
 these should be your fallback defence rather than your primary defence.
