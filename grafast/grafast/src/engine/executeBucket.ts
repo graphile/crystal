@@ -13,7 +13,7 @@ import {
   NO_FLAGS,
 } from "../constants.js";
 import { isDev } from "../dev.js";
-import { isFlaggedValue, SafeError } from "../error.js";
+import { flagError, isFlaggedValue, SafeError } from "../error.js";
 import { inspect } from "../inspect.js";
 import type {
   BatchExecutionValue,
@@ -355,7 +355,16 @@ export function executeBucket(
                   if (resolvedResult.done) {
                     break;
                   }
-                  arr.push(await resolvedResult.value);
+                  try {
+                    const v = resolvedResult.value;
+                    if (isPromiseLike(v)) {
+                      arr.push(await v);
+                    } else {
+                      arr.push(v);
+                    }
+                  } catch (e) {
+                    arr.push(flagError(e));
+                  }
                   if (++valuesSeen >= initialCount) {
                     // This is safe to do in the `while` since we checked
                     // the `0` entries condition in the optimization
