@@ -351,12 +351,16 @@ export function executeBucket(
                   | Promise<IteratorResult<any, any>>
                   | IteratorResult<any, any>;
                 while ((resultPromise = iterator.next())) {
-                  const resolvedResult = await resultPromise;
-                  if (resolvedResult.done) {
-                    break;
-                  }
                   try {
-                    arr.push(await resolvedResult.value);
+                    const resolvedResult = await resultPromise;
+                    if (resolvedResult.done) {
+                      break;
+                    }
+                    try {
+                      arr.push(await resolvedResult.value);
+                    } catch (e) {
+                      arr.push(flagError(e));
+                    }
                   } catch (e) {
                     arr.push(flagError(e));
                   }
