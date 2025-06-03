@@ -343,13 +343,20 @@ export function executeBucket(
             }
             const list = replacement === null ? value : replacement;
             bucket.setResult(finishedStep, resultIndex, list, flags);
+            return;
           }
 
           const initialCount = stream?.initialCount ?? Infinity;
 
-          const iterator = valueIsAsyncIterable
-            ? (value as AsyncIterable<any>)[Symbol.asyncIterator]()
-            : (value as Iterable<any>)[Symbol.iterator]();
+          let iterator: Iterator<any, any, any> | AsyncIterator<any, any, any>;
+          try {
+            iterator = valueIsAsyncIterable
+              ? (value as AsyncIterable<any>)[Symbol.asyncIterator]()
+              : (value as Iterable<any>)[Symbol.iterator]();
+          } catch (e) {
+            bucket.setResult(finishedStep, resultIndex, e, flags | FLAG_ERROR);
+            return;
+          }
 
           // Here we track the iterator via the bucket, this allows us to
           // ensure that the iterator is terminated even if the stream is never
