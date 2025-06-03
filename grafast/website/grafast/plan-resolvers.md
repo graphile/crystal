@@ -177,7 +177,7 @@ const MyObject = new GraphQLObjectType({
 
 When defined via `makeGrafastSchema` we cannot call the property `assertStep`
 directly as it might conflict with a field name, so instead we use
-`__assertStep`, knowing that GraphQL forbids fields to start with `__` (two
+`assertStep`, knowing that GraphQL forbids fields to start with `__` (two
 underscores) since those names are reserved for introspection:
 
 ```ts {11-17}
@@ -213,8 +213,8 @@ const schema = makeGrafastSchema({
 Generally adding a step assertion is optional; however when there's a union or
 interface type all types within it must agree whether a step is expected or
 not. If you want to require steps everywhere but you don't care for a particular
-type what the step actually is, you can use `__assertStep: ExecutableStep` or
-`__assertStep: () => true`.
+type what the step actually is, you can use `assertStep: ExecutableStep` or
+`assertStep: () => true`.
 
 :::
 
