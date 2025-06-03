@@ -137,16 +137,20 @@ const itemTypeNameFromType = (type: string) =>
 
 const singleTableSchema = makeGrafastSchema({
   typeDefs,
-  plans: {
+  objects: {
     Query: {
-      item(_, { $id }) {
-        // The `Item` type expects the specifier to simply be the item ID
-        return $id;
+      plans: {
+        item(_, { $id }) {
+          // The `Item` type expects the specifier to simply be the item ID
+          return $id;
+        },
       },
     },
+  },
+  interfaces: {
     // Our abstract (interface) type
     Item: {
-      __planType($id: Step<number>) {
+      planType($id: Step<number>) {
         // Load the item
         const $item = singleTableItems.get({ id: $id });
         // Get its type (e.g. CHECKLIST_ITEM)
@@ -276,15 +280,19 @@ regular row selection, but the `planType` is a tiny bit more complex:
 
 const relationalSchema = makeGrafastSchema({
   typeDefs,
-  plans: {
+  objects: {
     Query: {
-      item(_, { $id }) {
-        // The `Item` type expects the specifier to simply be the item ID
-        return $id;
+      plans: {
+        item(_, { $id }) {
+          // The `Item` type expects the specifier to simply be the item ID
+          return $id;
+        },
       },
     },
+  },
+  interfaces: {
     Item: {
-      __planType($id: Step<number>) {
+      planType($id: Step<number>) {
         // Load the base item
         const $item = relationalItems.get({ id: $id });
         // Get its type (e.g. CHECKLIST_ITEM)
