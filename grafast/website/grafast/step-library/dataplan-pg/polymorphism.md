@@ -395,12 +395,16 @@ This type could then be used as the return result for functions or as the type
 for a column to indicate a polymorphic relationship.
 
 ```ts
-const plans = {
+const objects = {
   PersonBookmark: {
-    bookmarkedEntity($bookmark) {
-      return $bookmark.get("bookmarked_entity");
+    plans: {
+      bookmarkedEntity($bookmark) {
+        return $bookmark.get("bookmarked_entity");
+      },
     },
   },
+};
+const unions = {
   Entity: {
     planType($specifier) {
       const $personId = $specifier.get("person_id");
@@ -476,26 +480,30 @@ represents. Planning this would be very similar to the above:
 We can plan this using a `pgUnionAll`:
 
 ```ts
-const plans = {
+const objects = {
   Person: {
-    favourites($person) {
-      const $favourites = personFavouritesResource.find({
-        person_id: $person.get("id"),
-      });
-      // Convert the $favourites collection into a set of specifiers for our
-      // Entity polymorphic type.
-      return each($favourites, ($favourite) =>
-        object({
-          person_id: $favourite.get("liked_person_id"),
-          post_id: $favourite.get("liked_post_id"),
-          comment_id: $favourite.get("liked_comment_id"),
-        }),
-      );
+    plans: {
+      favourites($person) {
+        const $favourites = personFavouritesResource.find({
+          person_id: $person.get("id"),
+        });
+        // Convert the $favourites collection into a set of specifiers for our
+        // Entity polymorphic type.
+        return each($favourites, ($favourite) =>
+          object({
+            person_id: $favourite.get("liked_person_id"),
+            post_id: $favourite.get("liked_post_id"),
+            comment_id: $favourite.get("liked_comment_id"),
+          }),
+        );
+      },
     },
   },
+};
+const unions = {
   Entity: {
-    // The same __planType as the previous example
-    __planType($specifier) {
+    // The same planType as the previous example
+    planType($specifier) {
       const $personId = $specifier.get("person_id");
       const $postId = $specifier.get("post_id");
       const $commentId = $specifier.get("comment_id");
@@ -536,19 +544,23 @@ If you have two completely different tables (let's say `users` and
 you could use [pgUnionAll](./pgUnionAll.md) to plan them.
 
 ```ts
-const plans = {
+const objects = {
   Query: {
-    allPeopleAndOrganizations() {
-      return pgUnionAll({
-        resourceByTypeName: {
-          Person: personResource,
-          Organization: organizationResource,
-        },
-      });
+    plans: {
+      allPeopleAndOrganizations() {
+        return pgUnionAll({
+          resourceByTypeName: {
+            Person: personResource,
+            Organization: organizationResource,
+          },
+        });
+      },
     },
   },
+};
+const unions = {
   PersonOrOrganization: {
-    __planType($spec) {
+    planType($spec) {
       // PgUnionAllSingleStep has a `toSpecifier` method, so we know the object
       // will already have the right shape.
       const $__typename = get($spec, "__typename");
