@@ -356,7 +356,12 @@ export function executeBucket(
                     break;
                   }
                   try {
-                    arr.push(await resolvedResult.value);
+                    const v = resolvedResult.value;
+                    if (isPromiseLike(v)) {
+                      arr.push(await v);
+                    } else {
+                      arr.push(v);
+                    }
                   } catch (e) {
                     arr.push(flagError(e));
                   }
