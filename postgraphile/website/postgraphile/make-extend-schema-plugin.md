@@ -176,12 +176,12 @@ PostGraphile a database table resource should be represented by a
 similar would mean the step doesn’t have the expected helper methods and
 downstream fields may fail to plan because their expectations are broken.
 
-Object types’ `plans` entries may define an `__assertStep` property to indicate
+Object types’ `plans` entries may define an `assertStep` property to indicate
 the type of step the object type’s fields’ resolvers will be expecting; this is
 equivalent to `typeConfig.extensions.grafast.assertStep` when defining a object
 type programmatically.
 
-The value for `__assertStep` can either be a step class itself (e.g.
+The value for `assertStep` can either be a step class itself (e.g.
 `PgSelectSingleStep`) or
 it can be an “assertion function” that throws an error if the passed step is
 not of the right type, e.g.:
