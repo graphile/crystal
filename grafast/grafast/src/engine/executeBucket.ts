@@ -313,6 +313,40 @@ export function executeBucket(
         ) {
           // PERF: we've already calculated this once; can we reference that again here?
           const stream = evaluateStream(bucket, finishedStep);
+
+          if (!stream && !valueIsAsyncIterable) {
+            // Fast mode
+            try {
+              let valuesSeen = 0;
+              const arr: Array<any> = [];
+              bucket.setResult(finishedStep, resultIndex, arr, flags);
+              for (const result of value as Iterable<any>) {
+                const index = valuesSeen++;
+                if (isPromiseLike(result)) {
+                  arr[index] = null;
+                  const promise = result.then(
+                    (v) => void (arr[index] = v),
+                    (e) => void (arr[index] = flagError(e)),
+                  );
+                  if (!promises) {
+                    promises = [promise];
+                  } else {
+                    promises.push(promise);
+                  }
+                } else {
+                  arr[index] = result;
+                }
+              }
+            } catch (e) {
+              bucket.setResult(
+                finishedStep,
+                resultIndex,
+                e,
+                flags | FLAG_ERROR,
+              );
+            }
+          }
+
           const initialCount = stream?.initialCount ?? Infinity;
 
           const iterator = valueIsAsyncIterable
