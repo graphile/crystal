@@ -782,12 +782,14 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
               newIndexes.push(newIndex);
               let val = list[j];
               let flags = NO_FLAGS;
-              if (isFlaggedValue(val)) {
-                flags = val.flags;
-                val = val.value;
-              }
               if (val == null) {
                 flags = flags | FLAG_NULL;
+              } else if (typeof val === "object" && isFlaggedValue(val)) {
+                flags = val.flags;
+                val = val.value;
+                if (val == null) {
+                  flags = flags | FLAG_NULL;
+                }
               }
               ev._setResult(newIndex, val, flags);
 
