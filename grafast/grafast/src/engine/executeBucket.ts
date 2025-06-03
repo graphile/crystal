@@ -314,37 +314,35 @@ export function executeBucket(
           // PERF: we've already calculated this once; can we reference that again here?
           const stream = evaluateStream(bucket, finishedStep);
 
-          if (!stream && !valueIsAsyncIterable) {
+          if (!stream && !valueIsAsyncIterable && Array.isArray(value)) {
             // Fast mode
-            try {
-              let valuesSeen = 0;
-              const arr: Array<any> = [];
-              bucket.setResult(finishedStep, resultIndex, arr, flags);
-              for (const result of value as Iterable<any>) {
-                const index = valuesSeen++;
-                if (isPromiseLike(result)) {
-                  arr[index] = null;
-                  const promise = result.then(
-                    (v) => void (arr[index] = v),
-                    (e) => void (arr[index] = flagError(e)),
-                  );
-                  if (!promises) {
-                    promises = [promise];
-                  } else {
-                    promises.push(promise);
-                  }
-                } else {
-                  arr[index] = result;
+            const valueCount = value.length;
+            /** We only create a duplicate array if the source array contains promises */
+            let replacement: Array<any> | null = null;
+            for (let i = 0; i < valueCount; i++) {
+              const item = value[i];
+              if (isPromiseLike(item)) {
+                if (replacement === null) {
+                  // Copy up to here!
+                  replacement = value.slice(0, i);
                 }
+                replacement[i] = null;
+                const index = i;
+                const promise = item.then(
+                  (v) => void (replacement![index] = v),
+                  (e) => void (replacement![index] = flagError(e)),
+                );
+                if (!promises) {
+                  promises = [promise];
+                } else {
+                  promises.push(promise);
+                }
+              } else if (replacement !== null) {
+                replacement[i] = item;
               }
-            } catch (e) {
-              bucket.setResult(
-                finishedStep,
-                resultIndex,
-                e,
-                flags | FLAG_ERROR,
-              );
             }
+            const list = replacement === null ? value : replacement;
+            bucket.setResult(finishedStep, resultIndex, list, flags);
           }
 
           const initialCount = stream?.initialCount ?? Infinity;
