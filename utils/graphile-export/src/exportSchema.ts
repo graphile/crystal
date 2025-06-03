@@ -1200,15 +1200,6 @@ function objectToObjectProperties(o: {
     .map(([key, value]) => t.objectProperty(identifierOrLiteral(key), value!));
 }
 
-/** Only use when you're sure the keys are safe to use as identifiers */
-function dangerousObjectToObjectPropertiesWithIdentifierKeys(o: {
-  [key: string]: t.Expression | null;
-}): t.ObjectProperty[] {
-  return Object.entries(o)
-    .filter(([, value]) => value != null)
-    .map(([key, value]) => t.objectProperty(t.identifier(key), value!));
-}
-
 function extensions(
   file: CodegenFile,
   extensions: object | null | undefined,
