@@ -1,11 +1,5 @@
-#!/usr/bin/env zx
-
-/* global $, cd, fs */
-
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
-
-import "zx/globals";
-
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import path from "node:path";
 
 import { createFsFromVolume, Volume } from "memfs";
@@ -59,10 +53,12 @@ const source = memfs.readFileSync(`/dist/${bundleFilename}`, "utf8") as string;
 
 // Shadow globals (like `process`) and eval
 const module = await (async () => {
+  /* eslint-disable @typescript-eslint/no-unused-vars */
   const global = undefined;
   const process = undefined;
   const require = undefined;
   const self = Object.create(null);
+  /* eslint-enable @typescript-eslint/no-unused-vars */
 
   const exports: Record<string, any> = {};
   const module = { exports };
