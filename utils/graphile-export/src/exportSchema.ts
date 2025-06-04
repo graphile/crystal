@@ -1899,7 +1899,8 @@ function exportSchemaTypeDefs({
       }
     } else if (type instanceof GraphQLEnumType) {
       const config = type.toConfig();
-      const enumValues: t.ObjectProperty[] = [];
+      const typeProperties = Object.create(null) as PropObj;
+      const enumValueProperties = Object.create(null) as PropObj;
       for (const [enumValueName, enumValueConfig] of Object.entries(
         config.values,
       )) {
@@ -1924,16 +1925,11 @@ function exportSchemaTypeDefs({
           if (!grafast) continue;
           const keys = Object.keys(grafast);
           if (keys.length === 1 && keys[0] === "apply") {
-            enumValues.push(
-              t.objectProperty(
-                identifierOrLiteral(enumValueName),
-                convertToIdentifierViaAST(
-                  file,
-                  grafast.apply,
-                  `${type.name}.${enumValueName}Apply`,
-                  `${type.name}.values[${enumValueName}].extensions.grafast.apply`,
-                ),
-              ),
+            enumValueProperties[enumValueName] = convertToIdentifierViaAST(
+              file,
+              grafast.apply,
+              `${type.name}.${enumValueName}Apply`,
+              `${type.name}.values[${enumValueName}].extensions.grafast.apply`,
             );
             continue;
           }
@@ -1956,24 +1952,18 @@ function exportSchemaTypeDefs({
           : [];
 
         if (valueAST || extensionsAST || grafastProperties.length) {
-          enumValues.push(
-            t.objectProperty(
-              identifierOrLiteral(enumValueName),
-              t.objectExpression([
-                ...objectToObjectProperties({
-                  value: valueAST,
-                  extensions: extensionsAST,
-                }),
-                ...grafastProperties,
-              ]),
-            ),
-          );
+          enumValueProperties[enumValueName] = t.objectExpression([
+            ...objectToObjectProperties({
+              value: valueAST,
+              extensions: extensionsAST,
+            }),
+            ...grafastProperties,
+          ]);
         }
       }
 
-      if (enumValues.length > 0) {
-        enumPlansProperties[type.name] = t.objectExpression(enumValues);
-      }
+      setIfNotEmpty(typeProperties, "values", enumValueProperties, true);
+      setIfNotEmpty(enumPlansProperties, type.name, typeProperties, false);
     } else {
       const never: never = type;
       console.warn(`Unhandled type ${never}`);
