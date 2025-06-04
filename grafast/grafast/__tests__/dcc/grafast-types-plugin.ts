@@ -115,7 +115,7 @@ class GrafastGenerator {
       values?: {
 ${type
   .getValues()
-  .map((v) => `        ${v.name}?: EnumValueConfig;`)
+  .map((v) => `        ${v.name}?: EnumValueInput;`)
   .join("\n")}
       }
     };`);
@@ -161,7 +161,7 @@ ${Object.entries(type.getFields())
       [
         "// Generated GraphQL SDK (auto-generated – do not edit)",
         "",
-        `import type { EnumPlan, EnumValueConfig, FieldPlan, InputFieldPlan, GrafastSchemaConfig, InputObjectPlan, InterfacePlan, ObjectPlan, ScalarPlan, Step, UnionPlan } from '${this.config.grafastModule ?? "grafast"}';`,
+        `import type { EnumPlan, EnumValueInput, FieldPlan, InputFieldPlan, GrafastSchemaConfig, InputObjectPlan, InterfacePlan, ObjectPlan, ScalarPlan, Step, UnionPlan } from '${this.config.grafastModule ?? "grafast"}';`,
         `import { makeGrafastSchema } from '${this.config.grafastModule ?? "grafast"}';`,
         this.config.overridesFile
           ? `import type { Overrides } from '${this.config.overridesFile ?? "./grafastTypeOverrides.ts"}';`

@@ -346,7 +346,7 @@ export type UtilityItem = Item & {
 
 // Generated GraphQL SDK (auto-generated – do not edit)
 
-import type { EnumPlan, EnumValueConfig, FieldPlan, InputFieldPlan, GrafastSchemaConfig, InputObjectPlan, InterfacePlan, ObjectPlan, ScalarPlan, Step, UnionPlan } from '../../dist/index.js';
+import type { EnumPlan, EnumValueInput, FieldPlan, InputFieldPlan, GrafastSchemaConfig, InputObjectPlan, InterfacePlan, ObjectPlan, ScalarPlan, Step, UnionPlan } from '../../dist/index.js';
 import { makeGrafastSchema } from '../../dist/index.js';
 import type { Overrides } from './dcc-type-overrides.ts';
 
@@ -586,22 +586,22 @@ export interface TypedGrafastSchemaSpec extends Omit<GrafastSchemaConfig, 'objec
   enums?: {
     ItemType?: Omit<EnumPlan, 'values'> & {
       values?: {
-        Consumable?: EnumValueConfig;
-        Equipment?: EnumValueConfig;
-        MiscItem?: EnumValueConfig;
-        UtilityItem?: EnumValueConfig;
+        Consumable?: EnumValueInput;
+        Equipment?: EnumValueInput;
+        MiscItem?: EnumValueInput;
+        UtilityItem?: EnumValueInput;
       }
     };
     Species?: Omit<EnumPlan, 'values'> & {
       values?: {
-        BOPCA?: EnumValueConfig;
-        CAT?: EnumValueConfig;
-        CHANGELING?: EnumValueConfig;
-        CROCODILIAN?: EnumValueConfig;
-        GONDII?: EnumValueConfig;
-        HALF_ELF?: EnumValueConfig;
-        HUMAN?: EnumValueConfig;
-        ROCK_MONSTER?: EnumValueConfig;
+        BOPCA?: EnumValueInput;
+        CAT?: EnumValueInput;
+        CHANGELING?: EnumValueInput;
+        CROCODILIAN?: EnumValueInput;
+        GONDII?: EnumValueInput;
+        HALF_ELF?: EnumValueInput;
+        HUMAN?: EnumValueInput;
+        ROCK_MONSTER?: EnumValueInput;
       }
     };
   }
