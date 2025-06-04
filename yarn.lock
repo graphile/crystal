@@ -14622,6 +14622,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"graphql-codegen-grafast@workspace:grafast/codegen-plugin":
+  version: 0.0.0-use.local
+  resolution: "graphql-codegen-grafast@workspace:grafast/codegen-plugin"
+  dependencies:
+    "@graphql-codegen/plugin-helpers": "npm:^5.1.0"
+  peerDependencies:
+    graphql: ^16.1.0-experimental-stream-defer.6
+  languageName: unknown
+  linkType: soft
+
 "graphql-config@npm:^3.0.2":
   version: 3.4.1
   resolution: "graphql-config@npm:3.4.1"
