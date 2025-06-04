@@ -17,6 +17,11 @@ import {
 } from "../utils.js";
 import { access } from "./access.js";
 
+const nextTick: (cb: () => void) => void =
+  typeof process !== "undefined" && typeof process.nextTick === "function"
+    ? (cb) => process.nextTick(cb)
+    : (cb) => setTimeout(cb, 0);
+
 export interface LoadOptions<
   TItem,
   TParams extends Record<string, any>,
@@ -417,7 +422,7 @@ export class LoadStep<
         meta.loadBatchesByLoad.set(this.load, loadBatches);
         // Guaranteed by the metaKey to be equivalent for all entries sharing the same `meta`. Note equivalent is not identical; key order may change.
         const loadOptions = this.loadOptions!;
-        process.nextTick(() => {
+        nextTick(() => {
           // Don't allow adding anything else to the batch
           meta.loadBatchesByLoad!.delete(this.load);
           executeBatches(loadBatches!, this.load, {
