@@ -50,6 +50,12 @@ export default function PlaygroundInner() {
 with (Grafast) {
   ${code};
   const result = {};
+  if (typeof typeDefs !== 'undefined') {
+    result.typeDefs = typeDefs;
+  }
+  if (typeof enableDeferStream !== 'undefined') {
+    result.enableDeferStream = enableDeferStream;
+  }
   if (typeof plans !== 'undefined') {
     result.plans = plans;
   }
@@ -77,8 +83,8 @@ with (Grafast) {
       )(Grafast);
       return makeGrafastSchema({
         typeDefs,
-        ...config,
         enableDeferStream: false,
+        ...config,
       });
     } catch (e) {
       return e;
