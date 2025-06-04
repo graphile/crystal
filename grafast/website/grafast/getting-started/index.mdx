@@ -93,12 +93,14 @@ of resulting values.
 ```ts
 const { lambda } = require("grafast");
 
-const plans = {
+const objects = {
   Query: {
-    addTwoNumbers(_, fieldArgs) {
-      const $a = fieldArgs.get("a");
-      const $b = fieldArgs.get("b");
-      return lambda([$a, $b], ([a, b]) => a + b);
+    plans: {
+      addTwoNumbers(_, fieldArgs) {
+        const $a = fieldArgs.get("a");
+        const $b = fieldArgs.get("b");
+        return lambda([$a, $b], ([a, b]) => a + b);
+      },
     },
   },
 };
@@ -130,7 +132,7 @@ const { makeGrafastSchema } = require("grafast");
 
 const schema = makeGrafastSchema({
   typeDefs,
-  plans,
+  objects,
 });
 ```
 
@@ -233,13 +235,15 @@ negligible.
 Now we can use this function to add our numbers, rather than the lambda plan:
 
 ```diff
- const plans = {
+ const objects = {
    Query: {
-     addTwoNumbers(_, args) {
-       const $a = args.get("a");
-       const $b = args.get("b");
--      return lambda([$a, $b], ([a, b]) => a + b);
-+      return add($a, $b);
+     plan: {
+       addTwoNumbers(_, args) {
+         const $a = args.get("a");
+         const $b = args.get("b");
+-        return lambda([$a, $b], ([a, b]) => a + b);
++        return add($a, $b);
+       },
      },
    },
  };

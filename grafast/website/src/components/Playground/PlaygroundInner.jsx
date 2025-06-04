@@ -28,10 +28,12 @@ type Query {
 }
 `;
 const INITIAL_CODE = `\
-const plans = {
+const objects = {
   Query: {
-    addTwoNumbers(_, { $a, $b }) {
-      return lambda([$a, $b], ([a, b]) => a + b, true);
+    plans: {
+      addTwoNumbers(_, { $a, $b }) {
+        return lambda([$a, $b], ([a, b]) => a + b, true);
+      },
     },
   },
 };
@@ -42,18 +44,40 @@ export default function PlaygroundInner() {
   const [code, setCode] = useState(INITIAL_CODE);
   const schema = useMemo(() => {
     try {
-      const plans = new Function(
+      const config = new Function(
         "Grafast",
         `\
 with (Grafast) {
   ${code};
-  return plans;
+  const result = {};
+  if (typeof plans !== 'undefined') {
+    result.plans = plans;
+  }
+  if (typeof objects !== 'undefined') {
+    result.objects = objects;
+  }
+  if (typeof interfaces !== 'undefined') {
+    result.interfaces = interfaces;
+  }
+  if (typeof unions !== 'undefined') {
+    result.unions = unions;
+  }
+  if (typeof inputObjects !== 'undefined') {
+    result.inputObjects = inputObjects;
+  }
+  if (typeof scalars !== 'undefined') {
+    result.scalars = scalars;
+  }
+  if (typeof enums !== 'undefined') {
+    result.enums = enums;
+  }
+  return result;
 }
 `,
       )(Grafast);
       return makeGrafastSchema({
         typeDefs,
-        plans,
+        ...config,
         enableDeferStream: false,
       });
     } catch (e) {

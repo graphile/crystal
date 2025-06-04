@@ -6,19 +6,21 @@ const typeDefs = /* GraphQL */ `
   }
 `;
 
-const plans = {
+const objects = {
   Query: {
-    addTwoNumbers(_, args) {
-      const $a = args.get("a");
-      const $b = args.get("b");
-      return lambda([$a, $b], ([a, b]) => a + b, true);
+    plans: {
+      addTwoNumbers(_, args) {
+        const $a = args.get("a");
+        const $b = args.get("b");
+        return lambda([$a, $b], ([a, b]) => a + b, true);
+      },
     },
   },
 };
 
 const schema = makeGrafastSchema({
   typeDefs,
-  plans,
+  objects,
 });
 
 const result = grafastSync({

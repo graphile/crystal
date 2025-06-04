@@ -431,13 +431,15 @@ Here's an example:
 const typeName = "User";
 const handler = build.getNodeIdHandler(typeName);
 
-const plans = {
+const objects = {
   Mutation: {
-    updateUser(parent, fieldArgs) {
-      const spec = specFromNodeId(handler, fieldArgs.$id);
-      const plan = object({ result: pgUpdateSingle(userSource, spec) });
-      fieldArgs.apply(plan);
-      return plan;
+    plans: {
+      updateUser(parent, fieldArgs) {
+        const spec = specFromNodeId(handler, fieldArgs.$id);
+        const plan = object({ result: pgUpdateSingle(userSource, spec) });
+        fieldArgs.apply(plan);
+        return plan;
+      },
     },
   },
 };

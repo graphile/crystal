@@ -51,16 +51,20 @@ Imagine you're loading the users within a given organization:
 You might have plan resolvers such as:
 
 ```ts
-const plans = {
+const objects = {
   Query: {
-    usersByOrganizationId(_, { $id }) {
-      return loadMany($id, batchGetUsersByOrganizationId);
+    plans: {
+      usersByOrganizationId(_, { $id }) {
+        return loadMany($id, batchGetUsersByOrganizationId);
+      },
     },
   },
   User: {
-    organization($user) {
-      const $orgId = $user.get("organization_id");
-      return loadOne($orgId, batchGetOrganizationById);
+    plans: {
+      organization($user) {
+        const $orgId = $user.get("organization_id");
+        return loadOne($orgId, batchGetOrganizationById);
+      },
     },
   },
 };
@@ -83,18 +87,22 @@ However, we can indicate that the output of the `loadMany` step's records'
 `organization_id` property (`$user.get("organization_id")`) is equivalent to its input
 (`$id`):
 
-```diff {4-5}
- const plans = {
+```diff {5-6}
+ const objects = {
    Query: {
-     usersByOrganizationId(_, { $id }) {
--      return loadMany($id, batchGetUsersByOrganizationId);
-+      return loadMany($id, 'organization_id', batchGetUsersByOrganizationId);
+     plans: {
+       usersByOrganizationId(_, { $id }) {
+-        return loadMany($id, batchGetUsersByOrganizationId);
++        return loadMany($id, 'organization_id', batchGetUsersByOrganizationId);
+       },
      },
    },
    User: {
-     organization($user) {
-       const $orgId = $user.get("organization_id");
-       return loadOne($orgId, batchGetOrganizationById);
+     plans: {
+       organization($user) {
+         const $orgId = $user.get("organization_id");
+         return loadOne($orgId, batchGetOrganizationById);
+       },
      },
    },
  };

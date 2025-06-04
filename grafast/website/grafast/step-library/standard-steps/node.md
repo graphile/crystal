@@ -152,23 +152,25 @@ const typeDefs = /* GraphQL */ `
   }
 `;
 
-const plans = {
+const objects = {
   Mutation: {
-    updateUser(parent, { $id }) {
-      // Turn the $id into a specifier:
-      const spec = specFromNodeId(userHandler, $id);
+    plans: {
+      updateUser(parent, { $id }) {
+        // Turn the $id into a specifier:
+        const spec = specFromNodeId(userHandler, $id);
 
-      // Now use this specifier to plan an update for this user:
-      const $result = pgUpdateSingle(userSource, spec);
+        // Now use this specifier to plan an update for this user:
+        const $result = pgUpdateSingle(userSource, spec);
 
-      // Leave space in our result so we can add more properties later:
-      const $payload = object({ result: $result });
+        // Leave space in our result so we can add more properties later:
+        const $payload = object({ result: $result });
 
-      // Apply all the plans from the 'patch' argument (omitted for brevity):
-      fieldArgs.apply($payload);
+        // Apply all the plans from the 'patch' argument (omitted for brevity):
+        fieldArgs.apply($payload);
 
-      // Return the payload plan:
-      return $payload;
+        // Return the payload plan:
+        return $payload;
+      },
     },
   },
 };
@@ -186,10 +188,12 @@ const typeDefs = /* GraphQL */ `
   }
 `;
 
-const planResolvers = {
+const objects = {
   User: {
-    id($user) {
-      return nodeIdFromNode(handlers.User, $user);
+    plans: {
+      id($user) {
+        return nodeIdFromNode(handlers.User, $user);
+      },
     },
   },
 };

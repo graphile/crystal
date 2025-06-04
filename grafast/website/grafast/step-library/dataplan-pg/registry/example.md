@@ -142,28 +142,34 @@ const typeDefs = /* GraphQL */ `
   }
 `;
 
-const plans = {
+const objects = {
   Query: {
-    forumById(_, { $id }) {
-      return forums.get({ id: $id });
+    plans: {
+      forumById(_, { $id }) {
+        return forums.get({ id: $id });
+      },
     },
   },
   Forum: {
-    messages($forum) {
-      return messages.find({ forum_id: $forum.get("id") });
-      // OR: return $forum.manyRelation("messages");
+    plans: {
+      messages($forum) {
+        return messages.find({ forum_id: $forum.get("id") });
+        // OR: return $forum.manyRelation("messages");
+      },
     },
   },
   Message: {
-    forum($message) {
-      return forums.get({ id: $message.get("forum_id") });
-      // OR: return $message.singleRelation("forum");
+    plans: {
+      forum($message) {
+        return forums.get({ id: $message.get("forum_id") });
+        // OR: return $message.singleRelation("forum");
+      },
     },
   },
 };
 
 import { makeGrafastSchema } from "grafast";
-const schema = makeGrafastSchema({ typeDefs, plans });
+const schema = makeGrafastSchema({ typeDefs, objects });
 ```
 
 :::note
