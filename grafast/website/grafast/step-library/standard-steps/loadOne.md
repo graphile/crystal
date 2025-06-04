@@ -49,17 +49,21 @@ Imagine you're loading a user and their organization:
 You might have plan resolvers such as:
 
 ```ts
-const plans = {
+const objects = {
   Query: {
-    currentUser() {
-      const $currentUserId = context().get("userId");
-      return loadOne($currentUserId, batchGetUserById);
+    plans: {
+      currentUser() {
+        const $currentUserId = context().get("userId");
+        return loadOne($currentUserId, batchGetUserById);
+      },
     },
   },
   User: {
-    friends($user) {
-      const $userId = $user.get("id");
-      return loadMany($userId, batchGetFriendsByUserId);
+    plans: {
+      friends($user) {
+        const $userId = $user.get("id");
+        return loadMany($userId, batchGetFriendsByUserId);
+      },
     },
   },
 };
@@ -81,19 +85,23 @@ stateDiagram
 However, we can indicate that the output of the `loadOne` step's `id` property
 (`$user.get("id")`) is equivalent to its input (`context().get("userId")`):
 
-```diff {5-6}
- const plans = {
+```diff {6-7}
+ const objects = {
    Query: {
-     currentUser() {
-       const $currentUserId = context().get("userId");
--      return loadOne($currentUserId, batchGetUserById);
-+      return loadOne($currentUserId, 'id', batchGetUserById);
+     plans: {
+       currentUser() {
+         const $currentUserId = context().get("userId");
+-        return loadOne($currentUserId, batchGetUserById);
++        return loadOne($currentUserId, 'id', batchGetUserById);
+       },
      },
    },
    User: {
-     friends($user) {
-       const $userId = $user.get("id");
-       return loadMany($userId, batchGetFriendsByUserId);
+     plans: {
+       friends($user) {
+         const $userId = $user.get("id");
+         return loadMany($userId, batchGetFriendsByUserId);
+       },
      },
    },
  };

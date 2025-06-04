@@ -39,15 +39,18 @@ const typeDefs = gql`
     usernames: [String!]
   }
 `;
-const plans = {
+const objects = {
   Organization: {
-    usernames($org) {
-      const $users = users.find({ organization_id: $org.get("id") });
-      // No need to transform here:
-      return each($users, ($user) => $user.get("username"));
+    plans: {
+      usernames($org) {
+        const $users = users.find({ organization_id: $org.get("id") });
+        // No need to transform here:
+        return each($users, ($user) => $user.get("username"));
+      },
     },
   },
 };
+const schema = makeGrafastSchema({ typeDefs, objects });
 ```
 
 ## Type

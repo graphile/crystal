@@ -281,16 +281,18 @@ security. Call this if you wish to bypass this behavior, for example if you know
 that the conditions would pass because the parent was visible.
 
 ```ts
-const plans = {
+const objects = {
   Forum: {
-    posts($forum) {
-      const $posts = postsResource.find({ forum_id: $forum.get("id") });
+    plans: {
+      posts($forum) {
+        const $posts = postsResource.find({ forum_id: $forum.get("id") });
 
-      // If we can see the forum, then we can see all the posts inside the
-      // forum, so don't bother adding the access conditions:
-      $posts.setTrusted();
+        // If we can see the forum, then we can see all the posts inside the
+        // forum, so don't bother adding the access conditions:
+        $posts.setTrusted();
 
-      return $posts;
+        return $posts;
+      },
     },
   },
 };
@@ -354,16 +356,18 @@ Returns a PgClassExpressionStep representing the entire table, useful for debugg
 Here's a debugging example, we log out the full record to make sure it's the one we wanted:
 
 ```ts
-const plans = {
+const objects = {
   Query: {
-    getUserById(_, { $id }) {
-      const $user = usersResource.get({ id: $id });
+    plans: {
+      getUserById(_, { $id }) {
+        const $user = usersResource.get({ id: $id });
 
-      // Get the full user object as a record and log it for debugging:
-      const $record = $user.record();
-      sideEffect($record, (user) => console.dir(user));
+        // Get the full user object as a record and log it for debugging:
+        const $record = $user.record();
+        sideEffect($record, (user) => console.dir(user));
 
-      return $user;
+        return $user;
+      },
     },
   },
 };
