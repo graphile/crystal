@@ -3205,215 +3205,227 @@ export const scalars = {
 };
 export const enums = {
   EnumTheFirst: {
-    A1: {
-      value: "a1"
-    },
-    A2: {
-      value: "a2"
-    },
-    A3: {
-      value: "a3"
-    },
-    A4: {
-      value: "a4"
+    values: {
+      A1: {
+        value: "a1"
+      },
+      A2: {
+        value: "a2"
+      },
+      A3: {
+        value: "a3"
+      },
+      A4: {
+        value: "a4"
+      }
     }
   },
   EnumTheSecond: {
-    B1: {
-      value: "b1"
-    },
-    B2: {
-      value: "b2"
-    },
-    B3: {
-      value: "b3"
-    },
-    B4: {
-      value: "b4"
+    values: {
+      B1: {
+        value: "b1"
+      },
+      B2: {
+        value: "b2"
+      },
+      B3: {
+        value: "b3"
+      },
+      B4: {
+        value: "b4"
+      }
     }
   },
   LetterDescriptionsOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      letter_descriptionsUniques[0].attributes.forEach(attributeName => {
+    values: {
+      DESCRIPTION_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "description",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      letter_descriptionsUniques[0].attributes.forEach(attributeName => {
+      },
+      DESCRIPTION_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "description",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    LETTER_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "letter",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    LETTER_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "letter",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    LETTER_VIA_VIEW_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "letter_via_view",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    LETTER_VIA_VIEW_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "letter_via_view",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    DESCRIPTION_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "description",
-        direction: "ASC"
-      });
-    },
-    DESCRIPTION_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "description",
-        direction: "DESC"
-      });
+      },
+      ID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "id",
+          direction: "ASC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "id",
+          direction: "DESC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      LETTER_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "letter",
+          direction: "ASC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      LETTER_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "letter",
+          direction: "DESC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      LETTER_VIA_VIEW_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "letter_via_view",
+          direction: "ASC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      LETTER_VIA_VIEW_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "letter_via_view",
+          direction: "DESC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        letter_descriptionsUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        letter_descriptionsUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      }
     }
   },
   LotsOfEnumsEnum3: {
-    C1: {
-      value: "c1"
-    },
-    C2: {
-      value: "c2"
-    },
-    C3: {
-      value: "c3"
-    },
-    C4: {
-      value: "c4"
+    values: {
+      C1: {
+        value: "c1"
+      },
+      C2: {
+        value: "c2"
+      },
+      C3: {
+        value: "c3"
+      },
+      C4: {
+        value: "c4"
+      }
     }
   },
   ReferencingTablesOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      referencing_tableUniques[0].attributes.forEach(attributeName => {
+    values: {
+      ENUM_1_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "enum_1",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      referencing_tableUniques[0].attributes.forEach(attributeName => {
+      },
+      ENUM_1_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "enum_1",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ENUM_1_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "enum_1",
-        direction: "ASC"
-      });
-    },
-    ENUM_1_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "enum_1",
-        direction: "DESC"
-      });
-    },
-    ENUM_2_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "enum_2",
-        direction: "ASC"
-      });
-    },
-    ENUM_2_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "enum_2",
-        direction: "DESC"
-      });
-    },
-    ENUM_3_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "enum_3",
-        direction: "ASC"
-      });
-    },
-    ENUM_3_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "enum_3",
-        direction: "DESC"
-      });
-    },
-    SIMPLE_ENUM_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "simple_enum",
-        direction: "ASC"
-      });
-    },
-    SIMPLE_ENUM_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "simple_enum",
-        direction: "DESC"
-      });
+      },
+      ENUM_2_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "enum_2",
+          direction: "ASC"
+        });
+      },
+      ENUM_2_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "enum_2",
+          direction: "DESC"
+        });
+      },
+      ENUM_3_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "enum_3",
+          direction: "ASC"
+        });
+      },
+      ENUM_3_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "enum_3",
+          direction: "DESC"
+        });
+      },
+      ID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "id",
+          direction: "ASC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "id",
+          direction: "DESC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        referencing_tableUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        referencing_tableUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      SIMPLE_ENUM_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "simple_enum",
+          direction: "ASC"
+        });
+      },
+      SIMPLE_ENUM_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "simple_enum",
+          direction: "DESC"
+        });
+      }
     }
   },
   SimpleEnum: {
-    FOO: {
-      value: "Foo"
-    },
-    BAR: {
-      value: "Bar"
-    },
-    BAZ: {
-      value: "Baz"
-    },
-    QUX: {
-      value: "Qux"
+    values: {
+      BAR: {
+        value: "Bar"
+      },
+      BAZ: {
+        value: "Baz"
+      },
+      FOO: {
+        value: "Foo"
+      },
+      QUX: {
+        value: "Qux"
+      }
     }
   }
 };

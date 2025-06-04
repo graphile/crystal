@@ -576,61 +576,63 @@ export const scalars = {
 };
 export const enums = {
   EmployeesOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      employeeUniques[0].attributes.forEach(attributeName => {
+    values: {
+      FIRST_NAME_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "first_name",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      employeeUniques[0].attributes.forEach(attributeName => {
+      },
+      FIRST_NAME_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "first_name",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    FIRST_NAME_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "first_name",
-        direction: "ASC"
-      });
-    },
-    FIRST_NAME_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "first_name",
-        direction: "DESC"
-      });
-    },
-    LAST_NAME_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "last_name",
-        direction: "ASC"
-      });
-    },
-    LAST_NAME_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "last_name",
-        direction: "DESC"
-      });
+      },
+      ID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "id",
+          direction: "ASC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "id",
+          direction: "DESC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      LAST_NAME_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "last_name",
+          direction: "ASC"
+        });
+      },
+      LAST_NAME_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "last_name",
+          direction: "DESC"
+        });
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        employeeUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        employeeUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      }
     }
   }
 };

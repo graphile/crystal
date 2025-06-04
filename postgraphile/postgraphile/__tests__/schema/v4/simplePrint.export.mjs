@@ -36785,1864 +36785,1922 @@ export const scalars = {
 };
 export const enums = {
   AnEnum: {
-    AWAITING: {
-      value: "awaiting"
-    },
-    REJECTED: {
-      value: "rejected"
-    },
-    PUBLISHED: {
-      value: "published"
-    },
-    ASTERISK: {
-      value: "*"
-    },
-    ASTERISK_ASTERISK: {
-      value: "**"
-    },
-    ASTERISK_ASTERISK_ASTERISK: {
-      value: "***"
-    },
-    FOO_ASTERISK: {
-      value: "foo*"
-    },
-    FOO_ASTERISK_: {
-      value: "foo*_"
-    },
-    _FOO_ASTERISK: {
-      value: "_foo*"
-    },
-    ASTERISK_BAR: {
-      value: "*bar"
-    },
-    ASTERISK_BAR_: {
-      value: "*bar_"
-    },
-    _ASTERISK_BAR_: {
-      value: "_*bar_"
-    },
-    ASTERISK_BAZ_ASTERISK: {
-      value: "*baz*"
-    },
-    _ASTERISK_BAZ_ASTERISK_: {
-      value: "_*baz*_"
-    },
-    PERCENT: {
-      value: "%"
-    },
-    GREATER_THAN_OR_EQUAL: {
-      value: ">="
-    },
-    LIKE: {
-      value: "~~"
-    },
-    DOLLAR: {
-      value: "$"
+    values: {
+      _ASTERISK_BAR_: {
+        value: "_*bar_"
+      },
+      _ASTERISK_BAZ_ASTERISK_: {
+        value: "_*baz*_"
+      },
+      _FOO_ASTERISK: {
+        value: "_foo*"
+      },
+      ASTERISK: {
+        value: "*"
+      },
+      ASTERISK_ASTERISK: {
+        value: "**"
+      },
+      ASTERISK_ASTERISK_ASTERISK: {
+        value: "***"
+      },
+      ASTERISK_BAR: {
+        value: "*bar"
+      },
+      ASTERISK_BAR_: {
+        value: "*bar_"
+      },
+      ASTERISK_BAZ_ASTERISK: {
+        value: "*baz*"
+      },
+      AWAITING: {
+        value: "awaiting"
+      },
+      DOLLAR: {
+        value: "$"
+      },
+      FOO_ASTERISK: {
+        value: "foo*"
+      },
+      FOO_ASTERISK_: {
+        value: "foo*_"
+      },
+      GREATER_THAN_OR_EQUAL: {
+        value: ">="
+      },
+      LIKE: {
+        value: "~~"
+      },
+      PERCENT: {
+        value: "%"
+      },
+      PUBLISHED: {
+        value: "published"
+      },
+      REJECTED: {
+        value: "rejected"
+      }
     }
   },
   Color: {
-    RED: {
-      value: "red"
-    },
-    GREEN: {
-      value: "green"
-    },
-    BLUE: {
-      value: "blue"
+    values: {
+      BLUE: {
+        value: "blue"
+      },
+      GREEN: {
+        value: "green"
+      },
+      RED: {
+        value: "red"
+      }
     }
   },
   CompoundKeysOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      compound_keyUniques[0].attributes.forEach(attributeName => {
+    values: {
+      EXTRA_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "extra",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      compound_keyUniques[0].attributes.forEach(attributeName => {
+      },
+      EXTRA_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "extra",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PERSON_ID_2_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "person_id_2",
-        direction: "ASC"
-      });
-    },
-    PERSON_ID_2_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "person_id_2",
-        direction: "DESC"
-      });
-    },
-    PERSON_ID_1_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "person_id_1",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PERSON_ID_1_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "person_id_1",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    EXTRA_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "extra",
-        direction: "ASC"
-      });
-    },
-    EXTRA_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "extra",
-        direction: "DESC"
-      });
+      },
+      PERSON_ID_1_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "person_id_1",
+          direction: "ASC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PERSON_ID_1_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "person_id_1",
+          direction: "DESC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PERSON_ID_2_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "person_id_2",
+          direction: "ASC"
+        });
+      },
+      PERSON_ID_2_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "person_id_2",
+          direction: "DESC"
+        });
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        compound_keyUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        compound_keyUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      }
     }
   },
   DefaultValuesOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      default_valueUniques[0].attributes.forEach(attributeName => {
+    values: {
+      ID_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      default_valueUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    NULL_VALUE_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "null_value",
-        direction: "ASC"
-      });
-    },
-    NULL_VALUE_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "null_value",
-        direction: "DESC"
-      });
+        queryBuilder.setOrderIsUnique();
+      },
+      NULL_VALUE_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "null_value",
+          direction: "ASC"
+        });
+      },
+      NULL_VALUE_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "null_value",
+          direction: "DESC"
+        });
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        default_valueUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        default_valueUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      }
     }
   },
   EdgeCasesOrderBy: {
-    COMPUTED_ASC(queryBuilder) {
-      if (typeof resource_edge_case_computedPgResource.from !== "function") {
-        throw new Error("Invalid computed attribute 'from'");
+    values: {
+      COMPUTED_ASC(queryBuilder) {
+        if (typeof resource_edge_case_computedPgResource.from !== "function") {
+          throw new Error("Invalid computed attribute 'from'");
+        }
+        const expression = sql`${resource_edge_case_computedPgResource.from({
+          placeholder: queryBuilder.alias
+        })}`;
+        queryBuilder.orderBy({
+          codec: resource_edge_case_computedPgResource.codec,
+          fragment: expression,
+          direction: "asc".toUpperCase()
+        });
+      },
+      COMPUTED_DESC(queryBuilder) {
+        if (typeof resource_edge_case_computedPgResource.from !== "function") {
+          throw new Error("Invalid computed attribute 'from'");
+        }
+        const expression = sql`${resource_edge_case_computedPgResource.from({
+          placeholder: queryBuilder.alias
+        })}`;
+        queryBuilder.orderBy({
+          codec: resource_edge_case_computedPgResource.codec,
+          fragment: expression,
+          direction: "desc".toUpperCase()
+        });
+      },
+      NOT_NULL_HAS_DEFAULT_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "not_null_has_default",
+          direction: "ASC"
+        });
+      },
+      NOT_NULL_HAS_DEFAULT_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "not_null_has_default",
+          direction: "DESC"
+        });
+      },
+      ROW_ID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "row_id",
+          direction: "ASC"
+        });
+      },
+      ROW_ID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "row_id",
+          direction: "DESC"
+        });
+      },
+      WONT_CAST_EASY_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "wont_cast_easy",
+          direction: "ASC"
+        });
+      },
+      WONT_CAST_EASY_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "wont_cast_easy",
+          direction: "DESC"
+        });
       }
-      const expression = sql`${resource_edge_case_computedPgResource.from({
-        placeholder: queryBuilder.alias
-      })}`;
-      queryBuilder.orderBy({
-        codec: resource_edge_case_computedPgResource.codec,
-        fragment: expression,
-        direction: "asc".toUpperCase()
-      });
-    },
-    COMPUTED_DESC(queryBuilder) {
-      if (typeof resource_edge_case_computedPgResource.from !== "function") {
-        throw new Error("Invalid computed attribute 'from'");
-      }
-      const expression = sql`${resource_edge_case_computedPgResource.from({
-        placeholder: queryBuilder.alias
-      })}`;
-      queryBuilder.orderBy({
-        codec: resource_edge_case_computedPgResource.codec,
-        fragment: expression,
-        direction: "desc".toUpperCase()
-      });
-    },
-    NOT_NULL_HAS_DEFAULT_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "not_null_has_default",
-        direction: "ASC"
-      });
-    },
-    NOT_NULL_HAS_DEFAULT_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "not_null_has_default",
-        direction: "DESC"
-      });
-    },
-    WONT_CAST_EASY_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "wont_cast_easy",
-        direction: "ASC"
-      });
-    },
-    WONT_CAST_EASY_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "wont_cast_easy",
-        direction: "DESC"
-      });
-    },
-    ROW_ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "row_id",
-        direction: "ASC"
-      });
-    },
-    ROW_ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "row_id",
-        direction: "DESC"
-      });
     }
   },
   EnumCaps: {
-    _0_BAR: {
-      value: "0_BAR"
+    values: {
+      _0_BAR: {
+        value: "0_BAR"
+      }
     }
   },
   EnumWithEmptyString: {
-    _EMPTY_: {
-      value: ""
-    },
-    ONE: {
-      value: "one"
-    },
-    TWO: {
-      value: "two"
+    values: {
+      _EMPTY_: {
+        value: ""
+      },
+      ONE: {
+        value: "one"
+      },
+      TWO: {
+        value: "two"
+      }
     }
   },
   ForeignKeysOrderBy: {
-    PERSON_ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "person_id",
-        direction: "ASC"
-      });
-    },
-    PERSON_ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "person_id",
-        direction: "DESC"
-      });
-    },
-    COMPOUND_KEY_1_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "compound_key_1",
-        direction: "ASC"
-      });
-    },
-    COMPOUND_KEY_1_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "compound_key_1",
-        direction: "DESC"
-      });
-    },
-    COMPOUND_KEY_2_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "compound_key_2",
-        direction: "ASC"
-      });
-    },
-    COMPOUND_KEY_2_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "compound_key_2",
-        direction: "DESC"
-      });
+    values: {
+      COMPOUND_KEY_1_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "compound_key_1",
+          direction: "ASC"
+        });
+      },
+      COMPOUND_KEY_1_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "compound_key_1",
+          direction: "DESC"
+        });
+      },
+      COMPOUND_KEY_2_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "compound_key_2",
+          direction: "ASC"
+        });
+      },
+      COMPOUND_KEY_2_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "compound_key_2",
+          direction: "DESC"
+        });
+      },
+      PERSON_ID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "person_id",
+          direction: "ASC"
+        });
+      },
+      PERSON_ID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "person_id",
+          direction: "DESC"
+        });
+      }
     }
   },
   InputsOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      inputsUniques[0].attributes.forEach(attributeName => {
+    values: {
+      ID_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      inputsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        inputsUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        inputsUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      }
     }
   },
   Issue756SOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      issue756Uniques[0].attributes.forEach(attributeName => {
+    values: {
+      ID_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      issue756Uniques[0].attributes.forEach(attributeName => {
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    TS_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "ts",
-        direction: "ASC"
-      });
-    },
-    TS_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "ts",
-        direction: "DESC"
-      });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        issue756Uniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        issue756Uniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      TS_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "ts",
+          direction: "ASC"
+        });
+      },
+      TS_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "ts",
+          direction: "DESC"
+        });
+      }
     }
   },
   LeftArmsOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      left_armUniques[0].attributes.forEach(attributeName => {
+    values: {
+      ID_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      left_armUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PERSON_ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "person_id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PERSON_ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "person_id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    LENGTH_IN_METRES_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "length_in_metres",
-        direction: "ASC"
-      });
-    },
-    LENGTH_IN_METRES_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "length_in_metres",
-        direction: "DESC"
-      });
-    },
-    MOOD_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "mood",
-        direction: "ASC"
-      });
-    },
-    MOOD_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "mood",
-        direction: "DESC"
-      });
+        queryBuilder.setOrderIsUnique();
+      },
+      LENGTH_IN_METRES_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "length_in_metres",
+          direction: "ASC"
+        });
+      },
+      LENGTH_IN_METRES_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "length_in_metres",
+          direction: "DESC"
+        });
+      },
+      MOOD_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "mood",
+          direction: "ASC"
+        });
+      },
+      MOOD_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "mood",
+          direction: "DESC"
+        });
+      },
+      PERSON_ID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "person_id",
+          direction: "ASC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PERSON_ID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "person_id",
+          direction: "DESC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        left_armUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        left_armUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      }
     }
   },
   ListsOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      listsUniques[0].attributes.forEach(attributeName => {
+    values: {
+      ID_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      listsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        listsUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        listsUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      }
     }
   },
   MyTablesOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      my_tableUniques[0].attributes.forEach(attributeName => {
+    values: {
+      ID_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      my_tableUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    JSON_DATA_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "json_data",
-        direction: "ASC"
-      });
-    },
-    JSON_DATA_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "json_data",
-        direction: "DESC"
-      });
+        queryBuilder.setOrderIsUnique();
+      },
+      JSON_DATA_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "json_data",
+          direction: "ASC"
+        });
+      },
+      JSON_DATA_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "json_data",
+          direction: "DESC"
+        });
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        my_tableUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        my_tableUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      }
     }
   },
   NonUpdatableViewsOrderBy: {
-    COLUMN_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "?column?",
-        direction: "ASC"
-      });
-    },
-    COLUMN_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "?column?",
-        direction: "DESC"
-      });
+    values: {
+      COLUMN_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "?column?",
+          direction: "ASC"
+        });
+      },
+      COLUMN_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "?column?",
+          direction: "DESC"
+        });
+      }
     }
   },
   NoPrimaryKeysOrderBy: {
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    STR_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "str",
-        direction: "ASC"
-      });
-    },
-    STR_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "str",
-        direction: "DESC"
-      });
+    values: {
+      ID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "id",
+          direction: "ASC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "id",
+          direction: "DESC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      STR_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "str",
+          direction: "ASC"
+        });
+      },
+      STR_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "str",
+          direction: "DESC"
+        });
+      }
     }
   },
   NullTestRecordsOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      null_test_recordUniques[0].attributes.forEach(attributeName => {
+    values: {
+      ID_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      null_test_recordUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    NULLABLE_TEXT_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "nullable_text",
-        direction: "ASC"
-      });
-    },
-    NULLABLE_TEXT_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "nullable_text",
-        direction: "DESC"
-      });
-    },
-    NULLABLE_INT_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "nullable_int",
-        direction: "ASC"
-      });
-    },
-    NULLABLE_INT_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "nullable_int",
-        direction: "DESC"
-      });
-    },
-    NON_NULL_TEXT_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "non_null_text",
-        direction: "ASC"
-      });
-    },
-    NON_NULL_TEXT_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "non_null_text",
-        direction: "DESC"
-      });
+        queryBuilder.setOrderIsUnique();
+      },
+      NON_NULL_TEXT_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "non_null_text",
+          direction: "ASC"
+        });
+      },
+      NON_NULL_TEXT_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "non_null_text",
+          direction: "DESC"
+        });
+      },
+      NULLABLE_INT_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "nullable_int",
+          direction: "ASC"
+        });
+      },
+      NULLABLE_INT_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "nullable_int",
+          direction: "DESC"
+        });
+      },
+      NULLABLE_TEXT_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "nullable_text",
+          direction: "ASC"
+        });
+      },
+      NULLABLE_TEXT_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "nullable_text",
+          direction: "DESC"
+        });
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        null_test_recordUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        null_test_recordUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      }
     }
   },
   PatchesOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      patchsUniques[0].attributes.forEach(attributeName => {
+    values: {
+      ID_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      patchsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        patchsUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        patchsUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      }
     }
   },
   PeopleOrderBy: {
-    COMPUTED_OUT_ASC(queryBuilder) {
-      if (typeof resource_person_computed_outPgResource.from !== "function") {
-        throw new Error("Invalid computed attribute 'from'");
-      }
-      const expression = sql`${resource_person_computed_outPgResource.from({
-        placeholder: queryBuilder.alias
-      })}`;
-      queryBuilder.orderBy({
-        codec: resource_person_computed_outPgResource.codec,
-        fragment: expression,
-        direction: "asc".toUpperCase()
-      });
-    },
-    COMPUTED_OUT_DESC(queryBuilder) {
-      if (typeof resource_person_computed_outPgResource.from !== "function") {
-        throw new Error("Invalid computed attribute 'from'");
-      }
-      const expression = sql`${resource_person_computed_outPgResource.from({
-        placeholder: queryBuilder.alias
-      })}`;
-      queryBuilder.orderBy({
-        codec: resource_person_computed_outPgResource.codec,
-        fragment: expression,
-        direction: "desc".toUpperCase()
-      });
-    },
-    FIRST_NAME_ASC(queryBuilder) {
-      if (typeof resource_person_first_namePgResource.from !== "function") {
-        throw new Error("Invalid computed attribute 'from'");
-      }
-      const expression = sql`${resource_person_first_namePgResource.from({
-        placeholder: queryBuilder.alias
-      })}`;
-      queryBuilder.orderBy({
-        codec: resource_person_first_namePgResource.codec,
-        fragment: expression,
-        direction: "asc".toUpperCase()
-      });
-    },
-    FIRST_NAME_DESC(queryBuilder) {
-      if (typeof resource_person_first_namePgResource.from !== "function") {
-        throw new Error("Invalid computed attribute 'from'");
-      }
-      const expression = sql`${resource_person_first_namePgResource.from({
-        placeholder: queryBuilder.alias
-      })}`;
-      queryBuilder.orderBy({
-        codec: resource_person_first_namePgResource.codec,
-        fragment: expression,
-        direction: "desc".toUpperCase()
-      });
-    },
-    PRIMARY_KEY_ASC(queryBuilder) {
-      personUniques[0].attributes.forEach(attributeName => {
+    values: {
+      ABOUT_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "about",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      personUniques[0].attributes.forEach(attributeName => {
+      },
+      ABOUT_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "about",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    NAME_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "person_full_name",
-        direction: "ASC"
-      });
-    },
-    NAME_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "person_full_name",
-        direction: "DESC"
-      });
-    },
-    ABOUT_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "about",
-        direction: "ASC"
-      });
-    },
-    ABOUT_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "about",
-        direction: "DESC"
-      });
-    },
-    EMAIL_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "email",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    EMAIL_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "email",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    SITE_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "site",
-        direction: "ASC"
-      });
-    },
-    SITE_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "site",
-        direction: "DESC"
-      });
-    },
-    CONFIG_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "config",
-        direction: "ASC"
-      });
-    },
-    CONFIG_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "config",
-        direction: "DESC"
-      });
-    },
-    LAST_LOGIN_FROM_IP_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "last_login_from_ip",
-        direction: "ASC"
-      });
-    },
-    LAST_LOGIN_FROM_IP_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "last_login_from_ip",
-        direction: "DESC"
-      });
-    },
-    LAST_LOGIN_FROM_SUBNET_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "last_login_from_subnet",
-        direction: "ASC"
-      });
-    },
-    LAST_LOGIN_FROM_SUBNET_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "last_login_from_subnet",
-        direction: "DESC"
-      });
-    },
-    USER_MAC_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "user_mac",
-        direction: "ASC"
-      });
-    },
-    USER_MAC_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "user_mac",
-        direction: "DESC"
-      });
-    },
-    CREATED_AT_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "created_at",
-        direction: "ASC"
-      });
-    },
-    CREATED_AT_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "created_at",
-        direction: "DESC"
-      });
+      },
+      COMPUTED_OUT_ASC(queryBuilder) {
+        if (typeof resource_person_computed_outPgResource.from !== "function") {
+          throw new Error("Invalid computed attribute 'from'");
+        }
+        const expression = sql`${resource_person_computed_outPgResource.from({
+          placeholder: queryBuilder.alias
+        })}`;
+        queryBuilder.orderBy({
+          codec: resource_person_computed_outPgResource.codec,
+          fragment: expression,
+          direction: "asc".toUpperCase()
+        });
+      },
+      COMPUTED_OUT_DESC(queryBuilder) {
+        if (typeof resource_person_computed_outPgResource.from !== "function") {
+          throw new Error("Invalid computed attribute 'from'");
+        }
+        const expression = sql`${resource_person_computed_outPgResource.from({
+          placeholder: queryBuilder.alias
+        })}`;
+        queryBuilder.orderBy({
+          codec: resource_person_computed_outPgResource.codec,
+          fragment: expression,
+          direction: "desc".toUpperCase()
+        });
+      },
+      CONFIG_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "config",
+          direction: "ASC"
+        });
+      },
+      CONFIG_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "config",
+          direction: "DESC"
+        });
+      },
+      CREATED_AT_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "created_at",
+          direction: "ASC"
+        });
+      },
+      CREATED_AT_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "created_at",
+          direction: "DESC"
+        });
+      },
+      EMAIL_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "email",
+          direction: "ASC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      EMAIL_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "email",
+          direction: "DESC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      FIRST_NAME_ASC(queryBuilder) {
+        if (typeof resource_person_first_namePgResource.from !== "function") {
+          throw new Error("Invalid computed attribute 'from'");
+        }
+        const expression = sql`${resource_person_first_namePgResource.from({
+          placeholder: queryBuilder.alias
+        })}`;
+        queryBuilder.orderBy({
+          codec: resource_person_first_namePgResource.codec,
+          fragment: expression,
+          direction: "asc".toUpperCase()
+        });
+      },
+      FIRST_NAME_DESC(queryBuilder) {
+        if (typeof resource_person_first_namePgResource.from !== "function") {
+          throw new Error("Invalid computed attribute 'from'");
+        }
+        const expression = sql`${resource_person_first_namePgResource.from({
+          placeholder: queryBuilder.alias
+        })}`;
+        queryBuilder.orderBy({
+          codec: resource_person_first_namePgResource.codec,
+          fragment: expression,
+          direction: "desc".toUpperCase()
+        });
+      },
+      ID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "id",
+          direction: "ASC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "id",
+          direction: "DESC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      LAST_LOGIN_FROM_IP_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "last_login_from_ip",
+          direction: "ASC"
+        });
+      },
+      LAST_LOGIN_FROM_IP_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "last_login_from_ip",
+          direction: "DESC"
+        });
+      },
+      LAST_LOGIN_FROM_SUBNET_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "last_login_from_subnet",
+          direction: "ASC"
+        });
+      },
+      LAST_LOGIN_FROM_SUBNET_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "last_login_from_subnet",
+          direction: "DESC"
+        });
+      },
+      NAME_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "person_full_name",
+          direction: "ASC"
+        });
+      },
+      NAME_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "person_full_name",
+          direction: "DESC"
+        });
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        personUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        personUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      SITE_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "site",
+          direction: "ASC"
+        });
+      },
+      SITE_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "site",
+          direction: "DESC"
+        });
+      },
+      USER_MAC_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "user_mac",
+          direction: "ASC"
+        });
+      },
+      USER_MAC_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "user_mac",
+          direction: "DESC"
+        });
+      }
     }
   },
   PersonSecretsOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      person_secretUniques[0].attributes.forEach(attributeName => {
+    values: {
+      PERSON_ID_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "person_id",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      person_secretUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.setOrderIsUnique();
+      },
+      PERSON_ID_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "person_id",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PERSON_ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "person_id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PERSON_ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "person_id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    SECRET_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "sekrit",
-        direction: "ASC"
-      });
-    },
-    SECRET_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "sekrit",
-        direction: "DESC"
-      });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        person_secretUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        person_secretUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      SECRET_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "sekrit",
+          direction: "ASC"
+        });
+      },
+      SECRET_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "sekrit",
+          direction: "DESC"
+        });
+      }
     }
   },
   PostsOrderBy: {
-    COMPUTED_WITH_OPTIONAL_ARG_ASC(queryBuilder) {
-      if (typeof resource_post_computed_with_optional_argPgResource.from !== "function") {
-        throw new Error("Invalid computed attribute 'from'");
-      }
-      const expression = sql`${resource_post_computed_with_optional_argPgResource.from({
-        placeholder: queryBuilder.alias
-      })}`;
-      queryBuilder.orderBy({
-        codec: resource_post_computed_with_optional_argPgResource.codec,
-        fragment: expression,
-        direction: "asc".toUpperCase()
-      });
-    },
-    COMPUTED_WITH_OPTIONAL_ARG_DESC(queryBuilder) {
-      if (typeof resource_post_computed_with_optional_argPgResource.from !== "function") {
-        throw new Error("Invalid computed attribute 'from'");
-      }
-      const expression = sql`${resource_post_computed_with_optional_argPgResource.from({
-        placeholder: queryBuilder.alias
-      })}`;
-      queryBuilder.orderBy({
-        codec: resource_post_computed_with_optional_argPgResource.codec,
-        fragment: expression,
-        direction: "desc".toUpperCase()
-      });
-    },
-    PRIMARY_KEY_ASC(queryBuilder) {
-      postUniques[0].attributes.forEach(attributeName => {
+    values: {
+      AUTHOR_ID_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "author_id",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      postUniques[0].attributes.forEach(attributeName => {
+      },
+      AUTHOR_ID_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "author_id",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    HEADLINE_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "headline",
-        direction: "ASC"
-      });
-    },
-    HEADLINE_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "headline",
-        direction: "DESC"
-      });
-    },
-    BODY_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "body",
-        direction: "ASC"
-      });
-    },
-    BODY_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "body",
-        direction: "DESC"
-      });
-    },
-    AUTHOR_ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "author_id",
-        direction: "ASC"
-      });
-    },
-    AUTHOR_ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "author_id",
-        direction: "DESC"
-      });
+      },
+      BODY_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "body",
+          direction: "ASC"
+        });
+      },
+      BODY_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "body",
+          direction: "DESC"
+        });
+      },
+      COMPUTED_WITH_OPTIONAL_ARG_ASC(queryBuilder) {
+        if (typeof resource_post_computed_with_optional_argPgResource.from !== "function") {
+          throw new Error("Invalid computed attribute 'from'");
+        }
+        const expression = sql`${resource_post_computed_with_optional_argPgResource.from({
+          placeholder: queryBuilder.alias
+        })}`;
+        queryBuilder.orderBy({
+          codec: resource_post_computed_with_optional_argPgResource.codec,
+          fragment: expression,
+          direction: "asc".toUpperCase()
+        });
+      },
+      COMPUTED_WITH_OPTIONAL_ARG_DESC(queryBuilder) {
+        if (typeof resource_post_computed_with_optional_argPgResource.from !== "function") {
+          throw new Error("Invalid computed attribute 'from'");
+        }
+        const expression = sql`${resource_post_computed_with_optional_argPgResource.from({
+          placeholder: queryBuilder.alias
+        })}`;
+        queryBuilder.orderBy({
+          codec: resource_post_computed_with_optional_argPgResource.codec,
+          fragment: expression,
+          direction: "desc".toUpperCase()
+        });
+      },
+      HEADLINE_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "headline",
+          direction: "ASC"
+        });
+      },
+      HEADLINE_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "headline",
+          direction: "DESC"
+        });
+      },
+      ID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "id",
+          direction: "ASC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "id",
+          direction: "DESC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        postUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        postUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      }
     }
   },
   ReservedInputRecordsOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      reserved_inputUniques[0].attributes.forEach(attributeName => {
+    values: {
+      ID_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      reserved_inputUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        reserved_inputUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        reserved_inputUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      }
     }
   },
   ReservedPatchRecordsOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      reservedPatchsUniques[0].attributes.forEach(attributeName => {
+    values: {
+      ID_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      reservedPatchsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        reservedPatchsUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        reservedPatchsUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      }
     }
   },
   ReservedsOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      reservedUniques[0].attributes.forEach(attributeName => {
+    values: {
+      ID_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      reservedUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        reservedUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        reservedUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      }
     }
   },
   SimilarTable1SOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      similar_table_1Uniques[0].attributes.forEach(attributeName => {
+    values: {
+      COL1_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "col1",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      similar_table_1Uniques[0].attributes.forEach(attributeName => {
+      },
+      COL1_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "col1",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    COL1_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "col1",
-        direction: "ASC"
-      });
-    },
-    COL1_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "col1",
-        direction: "DESC"
-      });
-    },
-    COL2_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "col2",
-        direction: "ASC"
-      });
-    },
-    COL2_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "col2",
-        direction: "DESC"
-      });
-    },
-    COL3_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "col3",
-        direction: "ASC"
-      });
-    },
-    COL3_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "col3",
-        direction: "DESC"
-      });
+      },
+      COL2_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col2",
+          direction: "ASC"
+        });
+      },
+      COL2_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col2",
+          direction: "DESC"
+        });
+      },
+      COL3_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col3",
+          direction: "ASC"
+        });
+      },
+      COL3_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col3",
+          direction: "DESC"
+        });
+      },
+      ID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "id",
+          direction: "ASC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "id",
+          direction: "DESC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        similar_table_1Uniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        similar_table_1Uniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      }
     }
   },
   SimilarTable2SOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      similar_table_2Uniques[0].attributes.forEach(attributeName => {
+    values: {
+      COL3_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "col3",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      similar_table_2Uniques[0].attributes.forEach(attributeName => {
+      },
+      COL3_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "col3",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    COL3_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "col3",
-        direction: "ASC"
-      });
-    },
-    COL3_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "col3",
-        direction: "DESC"
-      });
-    },
-    COL4_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "col4",
-        direction: "ASC"
-      });
-    },
-    COL4_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "col4",
-        direction: "DESC"
-      });
-    },
-    COL5_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "col5",
-        direction: "ASC"
-      });
-    },
-    COL5_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "col5",
-        direction: "DESC"
-      });
+      },
+      COL4_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col4",
+          direction: "ASC"
+        });
+      },
+      COL4_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col4",
+          direction: "DESC"
+        });
+      },
+      COL5_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col5",
+          direction: "ASC"
+        });
+      },
+      COL5_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col5",
+          direction: "DESC"
+        });
+      },
+      ID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "id",
+          direction: "ASC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "id",
+          direction: "DESC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        similar_table_2Uniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        similar_table_2Uniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      }
     }
   },
   TestviewsOrderBy: {
-    TESTVIEWID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "testviewid",
-        direction: "ASC"
-      });
-    },
-    TESTVIEWID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "testviewid",
-        direction: "DESC"
-      });
-    },
-    COL1_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "col1",
-        direction: "ASC"
-      });
-    },
-    COL1_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "col1",
-        direction: "DESC"
-      });
-    },
-    COL2_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "col2",
-        direction: "ASC"
-      });
-    },
-    COL2_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "col2",
-        direction: "DESC"
-      });
+    values: {
+      COL1_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col1",
+          direction: "ASC"
+        });
+      },
+      COL1_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col1",
+          direction: "DESC"
+        });
+      },
+      COL2_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col2",
+          direction: "ASC"
+        });
+      },
+      COL2_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col2",
+          direction: "DESC"
+        });
+      },
+      TESTVIEWID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "testviewid",
+          direction: "ASC"
+        });
+      },
+      TESTVIEWID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "testviewid",
+          direction: "DESC"
+        });
+      }
     }
   },
   TypesOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      typesUniques[0].attributes.forEach(attributeName => {
+    values: {
+      BIGINT_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "bigint",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      typesUniques[0].attributes.forEach(attributeName => {
+      },
+      BIGINT_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "bigint",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    SMALLINT_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "smallint",
-        direction: "ASC"
-      });
-    },
-    SMALLINT_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "smallint",
-        direction: "DESC"
-      });
-    },
-    BIGINT_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "bigint",
-        direction: "ASC"
-      });
-    },
-    BIGINT_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "bigint",
-        direction: "DESC"
-      });
-    },
-    NUMERIC_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "numeric",
-        direction: "ASC"
-      });
-    },
-    NUMERIC_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "numeric",
-        direction: "DESC"
-      });
-    },
-    DECIMAL_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "decimal",
-        direction: "ASC"
-      });
-    },
-    DECIMAL_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "decimal",
-        direction: "DESC"
-      });
-    },
-    BOOLEAN_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "boolean",
-        direction: "ASC"
-      });
-    },
-    BOOLEAN_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "boolean",
-        direction: "DESC"
-      });
-    },
-    VARCHAR_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "varchar",
-        direction: "ASC"
-      });
-    },
-    VARCHAR_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "varchar",
-        direction: "DESC"
-      });
-    },
-    ENUM_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "enum",
-        direction: "ASC"
-      });
-    },
-    ENUM_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "enum",
-        direction: "DESC"
-      });
-    },
-    DOMAIN_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "domain",
-        direction: "ASC"
-      });
-    },
-    DOMAIN_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "domain",
-        direction: "DESC"
-      });
-    },
-    DOMAIN2_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "domain2",
-        direction: "ASC"
-      });
-    },
-    DOMAIN2_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "domain2",
-        direction: "DESC"
-      });
-    },
-    JSON_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "json",
-        direction: "ASC"
-      });
-    },
-    JSON_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "json",
-        direction: "DESC"
-      });
-    },
-    JSONB_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "jsonb",
-        direction: "ASC"
-      });
-    },
-    JSONB_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "jsonb",
-        direction: "DESC"
-      });
-    },
-    TIMESTAMP_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "timestamp",
-        direction: "ASC"
-      });
-    },
-    TIMESTAMP_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "timestamp",
-        direction: "DESC"
-      });
-    },
-    TIMESTAMPTZ_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "timestamptz",
-        direction: "ASC"
-      });
-    },
-    TIMESTAMPTZ_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "timestamptz",
-        direction: "DESC"
-      });
-    },
-    DATE_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "date",
-        direction: "ASC"
-      });
-    },
-    DATE_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "date",
-        direction: "DESC"
-      });
-    },
-    TIME_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "time",
-        direction: "ASC"
-      });
-    },
-    TIME_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "time",
-        direction: "DESC"
-      });
-    },
-    TIMETZ_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "timetz",
-        direction: "ASC"
-      });
-    },
-    TIMETZ_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "timetz",
-        direction: "DESC"
-      });
-    },
-    INTERVAL_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "interval",
-        direction: "ASC"
-      });
-    },
-    INTERVAL_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "interval",
-        direction: "DESC"
-      });
-    },
-    MONEY_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "money",
-        direction: "ASC"
-      });
-    },
-    MONEY_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "money",
-        direction: "DESC"
-      });
-    },
-    COMPOUND_TYPE_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "compound_type",
-        direction: "ASC"
-      });
-    },
-    COMPOUND_TYPE_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "compound_type",
-        direction: "DESC"
-      });
-    },
-    NESTED_COMPOUND_TYPE_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "nested_compound_type",
-        direction: "ASC"
-      });
-    },
-    NESTED_COMPOUND_TYPE_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "nested_compound_type",
-        direction: "DESC"
-      });
-    },
-    NULLABLE_COMPOUND_TYPE_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "nullable_compound_type",
-        direction: "ASC"
-      });
-    },
-    NULLABLE_COMPOUND_TYPE_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "nullable_compound_type",
-        direction: "DESC"
-      });
-    },
-    NULLABLE_NESTED_COMPOUND_TYPE_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "nullable_nested_compound_type",
-        direction: "ASC"
-      });
-    },
-    NULLABLE_NESTED_COMPOUND_TYPE_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "nullable_nested_compound_type",
-        direction: "DESC"
-      });
-    },
-    POINT_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "point",
-        direction: "ASC"
-      });
-    },
-    POINT_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "point",
-        direction: "DESC"
-      });
-    },
-    NULLABLE_POINT_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "nullablePoint",
-        direction: "ASC"
-      });
-    },
-    NULLABLE_POINT_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "nullablePoint",
-        direction: "DESC"
-      });
-    },
-    INET_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "inet",
-        direction: "ASC"
-      });
-    },
-    INET_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "inet",
-        direction: "DESC"
-      });
-    },
-    CIDR_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "cidr",
-        direction: "ASC"
-      });
-    },
-    CIDR_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "cidr",
-        direction: "DESC"
-      });
-    },
-    MACADDR_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "macaddr",
-        direction: "ASC"
-      });
-    },
-    MACADDR_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "macaddr",
-        direction: "DESC"
-      });
-    },
-    REGPROC_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "regproc",
-        direction: "ASC"
-      });
-    },
-    REGPROC_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "regproc",
-        direction: "DESC"
-      });
-    },
-    REGPROCEDURE_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "regprocedure",
-        direction: "ASC"
-      });
-    },
-    REGPROCEDURE_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "regprocedure",
-        direction: "DESC"
-      });
-    },
-    REGOPER_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "regoper",
-        direction: "ASC"
-      });
-    },
-    REGOPER_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "regoper",
-        direction: "DESC"
-      });
-    },
-    REGOPERATOR_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "regoperator",
-        direction: "ASC"
-      });
-    },
-    REGOPERATOR_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "regoperator",
-        direction: "DESC"
-      });
-    },
-    REGCLASS_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "regclass",
-        direction: "ASC"
-      });
-    },
-    REGCLASS_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "regclass",
-        direction: "DESC"
-      });
-    },
-    REGTYPE_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "regtype",
-        direction: "ASC"
-      });
-    },
-    REGTYPE_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "regtype",
-        direction: "DESC"
-      });
-    },
-    REGCONFIG_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "regconfig",
-        direction: "ASC"
-      });
-    },
-    REGCONFIG_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "regconfig",
-        direction: "DESC"
-      });
-    },
-    REGDICTIONARY_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "regdictionary",
-        direction: "ASC"
-      });
-    },
-    REGDICTIONARY_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "regdictionary",
-        direction: "DESC"
-      });
-    },
-    LTREE_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "ltree",
-        direction: "ASC"
-      });
-    },
-    LTREE_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "ltree",
-        direction: "DESC"
-      });
+      },
+      BOOLEAN_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "boolean",
+          direction: "ASC"
+        });
+      },
+      BOOLEAN_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "boolean",
+          direction: "DESC"
+        });
+      },
+      CIDR_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "cidr",
+          direction: "ASC"
+        });
+      },
+      CIDR_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "cidr",
+          direction: "DESC"
+        });
+      },
+      COMPOUND_TYPE_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "compound_type",
+          direction: "ASC"
+        });
+      },
+      COMPOUND_TYPE_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "compound_type",
+          direction: "DESC"
+        });
+      },
+      DATE_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "date",
+          direction: "ASC"
+        });
+      },
+      DATE_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "date",
+          direction: "DESC"
+        });
+      },
+      DECIMAL_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "decimal",
+          direction: "ASC"
+        });
+      },
+      DECIMAL_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "decimal",
+          direction: "DESC"
+        });
+      },
+      DOMAIN_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "domain",
+          direction: "ASC"
+        });
+      },
+      DOMAIN_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "domain",
+          direction: "DESC"
+        });
+      },
+      DOMAIN2_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "domain2",
+          direction: "ASC"
+        });
+      },
+      DOMAIN2_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "domain2",
+          direction: "DESC"
+        });
+      },
+      ENUM_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "enum",
+          direction: "ASC"
+        });
+      },
+      ENUM_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "enum",
+          direction: "DESC"
+        });
+      },
+      ID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "id",
+          direction: "ASC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "id",
+          direction: "DESC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      INET_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "inet",
+          direction: "ASC"
+        });
+      },
+      INET_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "inet",
+          direction: "DESC"
+        });
+      },
+      INTERVAL_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "interval",
+          direction: "ASC"
+        });
+      },
+      INTERVAL_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "interval",
+          direction: "DESC"
+        });
+      },
+      JSON_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "json",
+          direction: "ASC"
+        });
+      },
+      JSON_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "json",
+          direction: "DESC"
+        });
+      },
+      JSONB_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "jsonb",
+          direction: "ASC"
+        });
+      },
+      JSONB_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "jsonb",
+          direction: "DESC"
+        });
+      },
+      LTREE_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "ltree",
+          direction: "ASC"
+        });
+      },
+      LTREE_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "ltree",
+          direction: "DESC"
+        });
+      },
+      MACADDR_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "macaddr",
+          direction: "ASC"
+        });
+      },
+      MACADDR_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "macaddr",
+          direction: "DESC"
+        });
+      },
+      MONEY_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "money",
+          direction: "ASC"
+        });
+      },
+      MONEY_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "money",
+          direction: "DESC"
+        });
+      },
+      NESTED_COMPOUND_TYPE_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "nested_compound_type",
+          direction: "ASC"
+        });
+      },
+      NESTED_COMPOUND_TYPE_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "nested_compound_type",
+          direction: "DESC"
+        });
+      },
+      NULLABLE_COMPOUND_TYPE_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "nullable_compound_type",
+          direction: "ASC"
+        });
+      },
+      NULLABLE_COMPOUND_TYPE_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "nullable_compound_type",
+          direction: "DESC"
+        });
+      },
+      NULLABLE_NESTED_COMPOUND_TYPE_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "nullable_nested_compound_type",
+          direction: "ASC"
+        });
+      },
+      NULLABLE_NESTED_COMPOUND_TYPE_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "nullable_nested_compound_type",
+          direction: "DESC"
+        });
+      },
+      NULLABLE_POINT_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "nullablePoint",
+          direction: "ASC"
+        });
+      },
+      NULLABLE_POINT_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "nullablePoint",
+          direction: "DESC"
+        });
+      },
+      NUMERIC_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "numeric",
+          direction: "ASC"
+        });
+      },
+      NUMERIC_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "numeric",
+          direction: "DESC"
+        });
+      },
+      POINT_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "point",
+          direction: "ASC"
+        });
+      },
+      POINT_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "point",
+          direction: "DESC"
+        });
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        typesUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        typesUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      REGCLASS_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "regclass",
+          direction: "ASC"
+        });
+      },
+      REGCLASS_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "regclass",
+          direction: "DESC"
+        });
+      },
+      REGCONFIG_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "regconfig",
+          direction: "ASC"
+        });
+      },
+      REGCONFIG_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "regconfig",
+          direction: "DESC"
+        });
+      },
+      REGDICTIONARY_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "regdictionary",
+          direction: "ASC"
+        });
+      },
+      REGDICTIONARY_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "regdictionary",
+          direction: "DESC"
+        });
+      },
+      REGOPER_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "regoper",
+          direction: "ASC"
+        });
+      },
+      REGOPER_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "regoper",
+          direction: "DESC"
+        });
+      },
+      REGOPERATOR_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "regoperator",
+          direction: "ASC"
+        });
+      },
+      REGOPERATOR_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "regoperator",
+          direction: "DESC"
+        });
+      },
+      REGPROC_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "regproc",
+          direction: "ASC"
+        });
+      },
+      REGPROC_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "regproc",
+          direction: "DESC"
+        });
+      },
+      REGPROCEDURE_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "regprocedure",
+          direction: "ASC"
+        });
+      },
+      REGPROCEDURE_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "regprocedure",
+          direction: "DESC"
+        });
+      },
+      REGTYPE_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "regtype",
+          direction: "ASC"
+        });
+      },
+      REGTYPE_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "regtype",
+          direction: "DESC"
+        });
+      },
+      SMALLINT_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "smallint",
+          direction: "ASC"
+        });
+      },
+      SMALLINT_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "smallint",
+          direction: "DESC"
+        });
+      },
+      TIME_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "time",
+          direction: "ASC"
+        });
+      },
+      TIME_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "time",
+          direction: "DESC"
+        });
+      },
+      TIMESTAMP_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "timestamp",
+          direction: "ASC"
+        });
+      },
+      TIMESTAMP_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "timestamp",
+          direction: "DESC"
+        });
+      },
+      TIMESTAMPTZ_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "timestamptz",
+          direction: "ASC"
+        });
+      },
+      TIMESTAMPTZ_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "timestamptz",
+          direction: "DESC"
+        });
+      },
+      TIMETZ_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "timetz",
+          direction: "ASC"
+        });
+      },
+      TIMETZ_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "timetz",
+          direction: "DESC"
+        });
+      },
+      VARCHAR_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "varchar",
+          direction: "ASC"
+        });
+      },
+      VARCHAR_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "varchar",
+          direction: "DESC"
+        });
+      }
     }
   },
   UpdatableViewsOrderBy: {
-    X_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "x",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    X_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "x",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    NAME_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "name",
-        direction: "ASC"
-      });
-    },
-    NAME_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "name",
-        direction: "DESC"
-      });
-    },
-    DESCRIPTION_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "description",
-        direction: "ASC"
-      });
-    },
-    DESCRIPTION_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "description",
-        direction: "DESC"
-      });
-    },
-    CONSTANT_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "constant",
-        direction: "ASC"
-      });
-    },
-    CONSTANT_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "constant",
-        direction: "DESC"
-      });
+    values: {
+      CONSTANT_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "constant",
+          direction: "ASC"
+        });
+      },
+      CONSTANT_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "constant",
+          direction: "DESC"
+        });
+      },
+      DESCRIPTION_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "description",
+          direction: "ASC"
+        });
+      },
+      DESCRIPTION_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "description",
+          direction: "DESC"
+        });
+      },
+      NAME_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "name",
+          direction: "ASC"
+        });
+      },
+      NAME_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "name",
+          direction: "DESC"
+        });
+      },
+      X_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "x",
+          direction: "ASC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      X_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "x",
+          direction: "DESC"
+        });
+        queryBuilder.setOrderIsUnique();
+      }
     }
   },
   ViewTablesOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      view_tableUniques[0].attributes.forEach(attributeName => {
+    values: {
+      COL1_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "col1",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      view_tableUniques[0].attributes.forEach(attributeName => {
+      },
+      COL1_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "col1",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    COL1_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "col1",
-        direction: "ASC"
-      });
-    },
-    COL1_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "col1",
-        direction: "DESC"
-      });
-    },
-    COL2_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "col2",
-        direction: "ASC"
-      });
-    },
-    COL2_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "col2",
-        direction: "DESC"
-      });
+      },
+      COL2_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col2",
+          direction: "ASC"
+        });
+      },
+      COL2_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col2",
+          direction: "DESC"
+        });
+      },
+      ID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "id",
+          direction: "ASC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "id",
+          direction: "DESC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        view_tableUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        view_tableUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      }
     }
   }
 };

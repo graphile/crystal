@@ -1401,133 +1401,135 @@ export const scalars = {
 };
 export const enums = {
   GeomsOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      geomUniques[0].attributes.forEach(attributeName => {
+    values: {
+      BOX_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "box",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      geomUniques[0].attributes.forEach(attributeName => {
+      },
+      BOX_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "box",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    POINT_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "point",
-        direction: "ASC"
-      });
-    },
-    POINT_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "point",
-        direction: "DESC"
-      });
-    },
-    LINE_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "line",
-        direction: "ASC"
-      });
-    },
-    LINE_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "line",
-        direction: "DESC"
-      });
-    },
-    LSEG_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "lseg",
-        direction: "ASC"
-      });
-    },
-    LSEG_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "lseg",
-        direction: "DESC"
-      });
-    },
-    BOX_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "box",
-        direction: "ASC"
-      });
-    },
-    BOX_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "box",
-        direction: "DESC"
-      });
-    },
-    OPEN_PATH_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "open_path",
-        direction: "ASC"
-      });
-    },
-    OPEN_PATH_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "open_path",
-        direction: "DESC"
-      });
-    },
-    CLOSED_PATH_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "closed_path",
-        direction: "ASC"
-      });
-    },
-    CLOSED_PATH_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "closed_path",
-        direction: "DESC"
-      });
-    },
-    POLYGON_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "polygon",
-        direction: "ASC"
-      });
-    },
-    POLYGON_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "polygon",
-        direction: "DESC"
-      });
-    },
-    CIRCLE_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "circle",
-        direction: "ASC"
-      });
-    },
-    CIRCLE_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "circle",
-        direction: "DESC"
-      });
+      },
+      CIRCLE_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "circle",
+          direction: "ASC"
+        });
+      },
+      CIRCLE_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "circle",
+          direction: "DESC"
+        });
+      },
+      CLOSED_PATH_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "closed_path",
+          direction: "ASC"
+        });
+      },
+      CLOSED_PATH_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "closed_path",
+          direction: "DESC"
+        });
+      },
+      ID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "id",
+          direction: "ASC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "id",
+          direction: "DESC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      LINE_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "line",
+          direction: "ASC"
+        });
+      },
+      LINE_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "line",
+          direction: "DESC"
+        });
+      },
+      LSEG_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "lseg",
+          direction: "ASC"
+        });
+      },
+      LSEG_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "lseg",
+          direction: "DESC"
+        });
+      },
+      OPEN_PATH_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "open_path",
+          direction: "ASC"
+        });
+      },
+      OPEN_PATH_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "open_path",
+          direction: "DESC"
+        });
+      },
+      POINT_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "point",
+          direction: "ASC"
+        });
+      },
+      POINT_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "point",
+          direction: "DESC"
+        });
+      },
+      POLYGON_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "polygon",
+          direction: "ASC"
+        });
+      },
+      POLYGON_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "polygon",
+          direction: "DESC"
+        });
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        geomUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        geomUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      }
     }
   }
 };
