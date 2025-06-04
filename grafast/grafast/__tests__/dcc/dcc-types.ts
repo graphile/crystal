@@ -346,7 +346,7 @@ export type UtilityItem = Item & {
 
 // Generated GraphQL SDK (auto-generated – do not edit)
 
-import type { EnumPlan, FieldPlan, InputFieldPlan, GrafastSchemaConfig, InputObjectPlan, InterfacePlan, ObjectPlan, ScalarPlan, Step, UnionPlan } from '../../dist/index.js';
+import type { EnumPlan, EnumValueConfig, FieldPlan, InputFieldPlan, GrafastSchemaConfig, InputObjectPlan, InterfacePlan, ObjectPlan, ScalarPlan, Step, UnionPlan } from '../../dist/index.js';
 import { makeGrafastSchema } from '../../dist/index.js';
 import type { Overrides } from './dcc-type-overrides.ts';
 
@@ -584,8 +584,26 @@ export interface TypedGrafastSchemaSpec extends Omit<GrafastSchemaConfig, 'objec
     _RawJSON?: ScalarPlan;
   }
   enums?: {
-    ItemType?: EnumPlan;
-    Species?: EnumPlan;
+    ItemType?: Omit<EnumPlan, 'values'> & {
+      values?: {
+        Consumable?: EnumValueConfig;
+        Equipment?: EnumValueConfig;
+        MiscItem?: EnumValueConfig;
+        UtilityItem?: EnumValueConfig;
+      }
+    };
+    Species?: Omit<EnumPlan, 'values'> & {
+      values?: {
+        BOPCA?: EnumValueConfig;
+        CAT?: EnumValueConfig;
+        CHANGELING?: EnumValueConfig;
+        CROCODILIAN?: EnumValueConfig;
+        GONDII?: EnumValueConfig;
+        HALF_ELF?: EnumValueConfig;
+        HUMAN?: EnumValueConfig;
+        ROCK_MONSTER?: EnumValueConfig;
+      }
+    };
   }
 };
 

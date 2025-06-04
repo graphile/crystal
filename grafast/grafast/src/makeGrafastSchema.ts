@@ -185,14 +185,15 @@ export interface EnumValueConfig
  * The values/configs for the entries in a GraphQL enum type.
  */
 export type EnumPlan = {
-  values: {
+  values?: {
     // The internal value for the enum
     [enumValueName: string]:
       | EnumValueApplyResolver
       | EnumValueConfig
       | string
       | number
-      | boolean;
+      | boolean
+      | undefined;
   };
 };
 
