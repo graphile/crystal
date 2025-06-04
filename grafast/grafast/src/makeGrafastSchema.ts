@@ -185,13 +185,15 @@ export interface EnumValueConfig
  * The values/configs for the entries in a GraphQL enum type.
  */
 export type EnumPlan = {
-  // The internal value for the enum
-  [enumValueName: string]:
-    | EnumValueApplyResolver
-    | EnumValueConfig
-    | string
-    | number
-    | boolean;
+  values: {
+    // The internal value for the enum
+    [enumValueName: string]:
+      | EnumValueApplyResolver
+      | EnumValueConfig
+      | string
+      | number
+      | boolean;
+  };
 };
 
 /**
@@ -307,7 +309,16 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
     }
 
     for (const [typeName, spec] of Object.entries(enums ?? {})) {
-      plans[typeName] = spec;
+      const o = {} as Record<string, any>;
+      plans[typeName] = o as any;
+
+      const { values = {}, ...rest } = spec;
+      for (const [key, val] of Object.entries(rest)) {
+        o[`__${key}`] = val;
+      }
+      for (const [key, val] of Object.entries(values)) {
+        o[key] = val;
+      }
     }
   }
 

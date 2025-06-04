@@ -8,13 +8,15 @@ In order to make the libraries more type safe, `makeGrafastSchema` (from
 `grafast`) and `makeExtendSchemaPlugin` (from `postgraphile/utils`) have
 deprecated the `typeDefs`/`plans` pattern since `plans` (like `resolvers` in the
 traditional format) ended up being a mish-mash of lots of different types and
-`__`-prefixed fields for special cases. Instead the configuration should be
-split into `typeDefs` with `objects`, `interfaces`, `unions`, `inputObjects`,
-`scalars` and `enums`; and object and input object fields should be specified
-via the `plans` entry within the type to avoid conflicts with
-`resolveType`/`isTypeOf`/`planType`/`scope` and similar type-level (rather than
-field-level) properties. This also means these type-level fields no longer have
-the `__` prefix.
+`__`-prefixed fields for special cases.
+
+Instead the configuration should be split into `typeDefs` with `objects`,
+`interfaces`, `unions`, `inputObjects`, `scalars` and `enums`; and object and
+input object fields should be specified via the `plans` entry within the type to
+avoid conflicts with `resolveType`/`isTypeOf`/`planType`/`scope` and similar
+type-level (rather than field-level) properties. Similarly, enum values should
+be added under a `values` property. This also means these type-level fields no
+longer have the `__` prefix.
 
 Migration is quite straightforward:
 
@@ -31,6 +33,10 @@ Migration is quite straightforward:
    in the new `objects` and `inputObjects` maps: create a `plans: { ... }` entry
    inside the type and move all fields (anything not prefixed with `__`) inside
    this new (nested) property.
+1. **Move enum values into nested `values: {...}` object**. For each type
+   defined in the new `enums` map: create a `values: { ... }` entry inside the
+   type and move all values (anything not prefixed with `__`) inside this new
+   (nested) property.
 1. **Remove `__` prefixes**. For each type across
    `objects`/`interfaces`/`unions`/`interfaceObjects`/`scalars` and `enums`:
    remove the `__` prefix from any methods/properties.
@@ -63,9 +69,11 @@ Example:
 +},
 +enums: {
    MyEnum: {
-     ONE
-     TWO
-     THREE
++    values: {
+       ONE: {value: 1},
+       TWO: {value: 2},
+       THREE: {value: 3},
++    }
    }
  },
 ```

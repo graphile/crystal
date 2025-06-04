@@ -326,7 +326,16 @@ export function makeExtendSchemaPlugin(
             }
 
             for (const [typeName, spec] of Object.entries(enums ?? {})) {
-              plans[typeName] = spec;
+              const o = {} as Record<string, any>;
+              plans[typeName] = o as any;
+
+              const { values = {}, ...rest } = spec;
+              for (const [key, val] of Object.entries(rest)) {
+                o[`__${key}`] = val;
+              }
+              for (const [key, val] of Object.entries(values)) {
+                o[key] = val;
+              }
             }
           }
 

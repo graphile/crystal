@@ -110,9 +110,11 @@ const myPlugin = makeExtendSchemaPlugin(() => ({
   `,
   enums: {
     AnimalType: {
-      CAT: "cat",
-      DOG: "dog",
-      FISH: "fish",
+      values: {
+        CAT: "cat",
+        DOG: "dog",
+        FISH: "fish",
+      },
     },
   },
   objects: {
