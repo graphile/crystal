@@ -104,12 +104,16 @@ if (!("data" in response) && !("errors" in response)) {
 }
 const { data, errors } = response;
 
-if (errors) {
+if (errors || !data) {
   console.error("❌ Test failed with errors", errors);
   process.exit(2);
 }
 
-if (data?.hello === "world") {
+if (
+  Array.isArray(data.hello) &&
+  data.hello.length === 3 &&
+  data.hello.every((v, i) => v === i + 1)
+) {
   console.log("✅ Test passed");
 } else {
   console.error("❌ Test failed", data);
