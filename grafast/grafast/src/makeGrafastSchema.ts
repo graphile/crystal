@@ -181,19 +181,20 @@ export interface EnumValueConfig
   apply?: EnumValueApplyResolver;
 }
 
+export type EnumValueInput =
+  | EnumValueApplyResolver
+  | EnumValueConfig
+  | string
+  | number
+  | boolean;
+
 /**
  * The values/configs for the entries in a GraphQL enum type.
  */
 export type EnumPlan = {
   values?: {
     // The internal value for the enum
-    [enumValueName: string]:
-      | EnumValueApplyResolver
-      | EnumValueConfig
-      | string
-      | number
-      | boolean
-      | undefined;
+    [enumValueName: string]: EnumValueInput | undefined;
   };
 };
 
