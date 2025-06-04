@@ -2057,119 +2057,123 @@ export const scalars = {
 };
 export const enums = {
   MeasurementsOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      measurementsUniques[0].attributes.forEach(attributeName => {
+    values: {
+      KEY_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "key",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      measurementsUniques[0].attributes.forEach(attributeName => {
+      },
+      KEY_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "key",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    TIMESTAMP_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "timestamp",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    TIMESTAMP_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "timestamp",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    KEY_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "key",
-        direction: "ASC"
-      });
-    },
-    KEY_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "key",
-        direction: "DESC"
-      });
-    },
-    VALUE_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "value",
-        direction: "ASC"
-      });
-    },
-    VALUE_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "value",
-        direction: "DESC"
-      });
-    },
-    USER_ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "user_id",
-        direction: "ASC"
-      });
-    },
-    USER_ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "user_id",
-        direction: "DESC"
-      });
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        measurementsUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        measurementsUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      TIMESTAMP_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "timestamp",
+          direction: "ASC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      TIMESTAMP_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "timestamp",
+          direction: "DESC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      USER_ID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "user_id",
+          direction: "ASC"
+        });
+      },
+      USER_ID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "user_id",
+          direction: "DESC"
+        });
+      },
+      VALUE_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "value",
+          direction: "ASC"
+        });
+      },
+      VALUE_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "value",
+          direction: "DESC"
+        });
+      }
     }
   },
   UsersOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      usersUniques[0].attributes.forEach(attributeName => {
+    values: {
+      ID_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      usersUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    NAME_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "name",
-        direction: "ASC"
-      });
-    },
-    NAME_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "name",
-        direction: "DESC"
-      });
+        queryBuilder.setOrderIsUnique();
+      },
+      NAME_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "name",
+          direction: "ASC"
+        });
+      },
+      NAME_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "name",
+          direction: "DESC"
+        });
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        usersUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        usersUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      }
     }
   }
 };

@@ -275,14 +275,16 @@ export const makeBaseArgs = () => {
     `,
     enums: {
       Species: {
-        HUMAN: { value: "Human" },
-        CAT: { value: "Cat" },
-        CROCODILIAN: { value: "Crocodilian" },
-        CHANGELING: { value: "Changeling" },
-        ROCK_MONSTER: { value: "Rock Monster" },
-        HALF_ELF: { value: "Half Elf" },
-        GONDII: { value: "Gondii" },
-        BOPCA: { value: "Bopca Protector" },
+        values: {
+          HUMAN: { value: "Human" },
+          CAT: { value: "Cat" },
+          CROCODILIAN: { value: "Crocodilian" },
+          CHANGELING: { value: "Changeling" },
+          ROCK_MONSTER: { value: "Rock Monster" },
+          HALF_ELF: { value: "Half Elf" },
+          GONDII: { value: "Gondii" },
+          BOPCA: { value: "Bopca Protector" },
+        },
       },
     },
     objects: {

@@ -1130,73 +1130,75 @@ export const scalars = {
 };
 export const enums = {
   NetworksOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      networkUniques[0].attributes.forEach(attributeName => {
+    values: {
+      CIDR_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "cidr",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      networkUniques[0].attributes.forEach(attributeName => {
+      },
+      CIDR_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "cidr",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    INET_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "inet",
-        direction: "ASC"
-      });
-    },
-    INET_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "inet",
-        direction: "DESC"
-      });
-    },
-    CIDR_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "cidr",
-        direction: "ASC"
-      });
-    },
-    CIDR_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "cidr",
-        direction: "DESC"
-      });
-    },
-    MACADDR_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "macaddr",
-        direction: "ASC"
-      });
-    },
-    MACADDR_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "macaddr",
-        direction: "DESC"
-      });
+      },
+      ID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "id",
+          direction: "ASC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "id",
+          direction: "DESC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      INET_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "inet",
+          direction: "ASC"
+        });
+      },
+      INET_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "inet",
+          direction: "DESC"
+        });
+      },
+      MACADDR_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "macaddr",
+          direction: "ASC"
+        });
+      },
+      MACADDR_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "macaddr",
+          direction: "DESC"
+        });
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        networkUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        networkUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      }
     }
   }
 };

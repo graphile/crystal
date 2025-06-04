@@ -13158,413 +13158,421 @@ export const scalars = {
 };
 export const enums = {
   LeftArmsOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      left_armUniques[0].attributes.forEach(attributeName => {
+    values: {
+      ID_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      left_armUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PERSON_ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "person_id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PERSON_ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "person_id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    LENGTH_IN_METRES_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "length_in_metres",
-        direction: "ASC"
-      });
-    },
-    LENGTH_IN_METRES_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "length_in_metres",
-        direction: "DESC"
-      });
-    },
-    MOOD_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "mood",
-        direction: "ASC"
-      });
-    },
-    MOOD_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "mood",
-        direction: "DESC"
-      });
+        queryBuilder.setOrderIsUnique();
+      },
+      LENGTH_IN_METRES_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "length_in_metres",
+          direction: "ASC"
+        });
+      },
+      LENGTH_IN_METRES_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "length_in_metres",
+          direction: "DESC"
+        });
+      },
+      MOOD_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "mood",
+          direction: "ASC"
+        });
+      },
+      MOOD_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "mood",
+          direction: "DESC"
+        });
+      },
+      PERSON_ID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "person_id",
+          direction: "ASC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PERSON_ID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "person_id",
+          direction: "DESC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        left_armUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        left_armUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      }
     }
   },
   PeopleOrderBy: {
-    COMPUTED_OUT_ASC(queryBuilder) {
-      if (typeof pgFieldSource_person_computed_outPgResource.from !== "function") {
-        throw new Error("Invalid computed attribute 'from'");
-      }
-      const expression = sql`${pgFieldSource_person_computed_outPgResource.from({
-        placeholder: queryBuilder.alias
-      })}`;
-      queryBuilder.orderBy({
-        codec: pgFieldSource_person_computed_outPgResource.codec,
-        fragment: expression,
-        direction: "asc".toUpperCase()
-      });
-    },
-    COMPUTED_OUT_DESC(queryBuilder) {
-      if (typeof pgFieldSource_person_computed_outPgResource.from !== "function") {
-        throw new Error("Invalid computed attribute 'from'");
-      }
-      const expression = sql`${pgFieldSource_person_computed_outPgResource.from({
-        placeholder: queryBuilder.alias
-      })}`;
-      queryBuilder.orderBy({
-        codec: pgFieldSource_person_computed_outPgResource.codec,
-        fragment: expression,
-        direction: "desc".toUpperCase()
-      });
-    },
-    FIRST_NAME_ASC(queryBuilder) {
-      if (typeof pgFieldSource_person_first_namePgResource.from !== "function") {
-        throw new Error("Invalid computed attribute 'from'");
-      }
-      const expression = sql`${pgFieldSource_person_first_namePgResource.from({
-        placeholder: queryBuilder.alias
-      })}`;
-      queryBuilder.orderBy({
-        codec: pgFieldSource_person_first_namePgResource.codec,
-        fragment: expression,
-        direction: "asc".toUpperCase()
-      });
-    },
-    FIRST_NAME_DESC(queryBuilder) {
-      if (typeof pgFieldSource_person_first_namePgResource.from !== "function") {
-        throw new Error("Invalid computed attribute 'from'");
-      }
-      const expression = sql`${pgFieldSource_person_first_namePgResource.from({
-        placeholder: queryBuilder.alias
-      })}`;
-      queryBuilder.orderBy({
-        codec: pgFieldSource_person_first_namePgResource.codec,
-        fragment: expression,
-        direction: "desc".toUpperCase()
-      });
-    },
-    PRIMARY_KEY_ASC(queryBuilder) {
-      personUniques[0].attributes.forEach(attributeName => {
+    values: {
+      ABOUT_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "about",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      personUniques[0].attributes.forEach(attributeName => {
+      },
+      ABOUT_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "about",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    NAME_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "person_full_name",
-        direction: "ASC"
-      });
-    },
-    NAME_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "person_full_name",
-        direction: "DESC"
-      });
-    },
-    ABOUT_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "about",
-        direction: "ASC"
-      });
-    },
-    ABOUT_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "about",
-        direction: "DESC"
-      });
-    },
-    EMAIL_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "email",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    EMAIL_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "email",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    SITE_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "site",
-        direction: "ASC"
-      });
-    },
-    SITE_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "site",
-        direction: "DESC"
-      });
-    },
-    CONFIG_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "config",
-        direction: "ASC"
-      });
-    },
-    CONFIG_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "config",
-        direction: "DESC"
-      });
-    },
-    LAST_LOGIN_FROM_IP_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "last_login_from_ip",
-        direction: "ASC"
-      });
-    },
-    LAST_LOGIN_FROM_IP_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "last_login_from_ip",
-        direction: "DESC"
-      });
-    },
-    LAST_LOGIN_FROM_SUBNET_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "last_login_from_subnet",
-        direction: "ASC"
-      });
-    },
-    LAST_LOGIN_FROM_SUBNET_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "last_login_from_subnet",
-        direction: "DESC"
-      });
-    },
-    USER_MAC_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "user_mac",
-        direction: "ASC"
-      });
-    },
-    USER_MAC_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "user_mac",
-        direction: "DESC"
-      });
-    },
-    CREATED_AT_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "created_at",
-        direction: "ASC"
-      });
-    },
-    CREATED_AT_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "created_at",
-        direction: "DESC"
-      });
+      },
+      COMPUTED_OUT_ASC(queryBuilder) {
+        if (typeof pgFieldSource_person_computed_outPgResource.from !== "function") {
+          throw new Error("Invalid computed attribute 'from'");
+        }
+        const expression = sql`${pgFieldSource_person_computed_outPgResource.from({
+          placeholder: queryBuilder.alias
+        })}`;
+        queryBuilder.orderBy({
+          codec: pgFieldSource_person_computed_outPgResource.codec,
+          fragment: expression,
+          direction: "asc".toUpperCase()
+        });
+      },
+      COMPUTED_OUT_DESC(queryBuilder) {
+        if (typeof pgFieldSource_person_computed_outPgResource.from !== "function") {
+          throw new Error("Invalid computed attribute 'from'");
+        }
+        const expression = sql`${pgFieldSource_person_computed_outPgResource.from({
+          placeholder: queryBuilder.alias
+        })}`;
+        queryBuilder.orderBy({
+          codec: pgFieldSource_person_computed_outPgResource.codec,
+          fragment: expression,
+          direction: "desc".toUpperCase()
+        });
+      },
+      CONFIG_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "config",
+          direction: "ASC"
+        });
+      },
+      CONFIG_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "config",
+          direction: "DESC"
+        });
+      },
+      CREATED_AT_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "created_at",
+          direction: "ASC"
+        });
+      },
+      CREATED_AT_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "created_at",
+          direction: "DESC"
+        });
+      },
+      EMAIL_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "email",
+          direction: "ASC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      EMAIL_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "email",
+          direction: "DESC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      FIRST_NAME_ASC(queryBuilder) {
+        if (typeof pgFieldSource_person_first_namePgResource.from !== "function") {
+          throw new Error("Invalid computed attribute 'from'");
+        }
+        const expression = sql`${pgFieldSource_person_first_namePgResource.from({
+          placeholder: queryBuilder.alias
+        })}`;
+        queryBuilder.orderBy({
+          codec: pgFieldSource_person_first_namePgResource.codec,
+          fragment: expression,
+          direction: "asc".toUpperCase()
+        });
+      },
+      FIRST_NAME_DESC(queryBuilder) {
+        if (typeof pgFieldSource_person_first_namePgResource.from !== "function") {
+          throw new Error("Invalid computed attribute 'from'");
+        }
+        const expression = sql`${pgFieldSource_person_first_namePgResource.from({
+          placeholder: queryBuilder.alias
+        })}`;
+        queryBuilder.orderBy({
+          codec: pgFieldSource_person_first_namePgResource.codec,
+          fragment: expression,
+          direction: "desc".toUpperCase()
+        });
+      },
+      ID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "id",
+          direction: "ASC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "id",
+          direction: "DESC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      LAST_LOGIN_FROM_IP_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "last_login_from_ip",
+          direction: "ASC"
+        });
+      },
+      LAST_LOGIN_FROM_IP_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "last_login_from_ip",
+          direction: "DESC"
+        });
+      },
+      LAST_LOGIN_FROM_SUBNET_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "last_login_from_subnet",
+          direction: "ASC"
+        });
+      },
+      LAST_LOGIN_FROM_SUBNET_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "last_login_from_subnet",
+          direction: "DESC"
+        });
+      },
+      NAME_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "person_full_name",
+          direction: "ASC"
+        });
+      },
+      NAME_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "person_full_name",
+          direction: "DESC"
+        });
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        personUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        personUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      SITE_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "site",
+          direction: "ASC"
+        });
+      },
+      SITE_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "site",
+          direction: "DESC"
+        });
+      },
+      USER_MAC_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "user_mac",
+          direction: "ASC"
+        });
+      },
+      USER_MAC_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "user_mac",
+          direction: "DESC"
+        });
+      }
     }
   },
   PersonSecretsOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      person_secretUniques[0].attributes.forEach(attributeName => {
+    values: {
+      PERSON_ID_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "person_id",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      person_secretUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.setOrderIsUnique();
+      },
+      PERSON_ID_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "person_id",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PERSON_ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "person_id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PERSON_ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "person_id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    SECRET_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "sekrit",
-        direction: "ASC"
-      });
-    },
-    SECRET_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "sekrit",
-        direction: "DESC"
-      });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        person_secretUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        person_secretUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      SECRET_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "sekrit",
+          direction: "ASC"
+        });
+      },
+      SECRET_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "sekrit",
+          direction: "DESC"
+        });
+      }
     }
   },
   PostsOrderBy: {
-    COMPUTED_WITH_OPTIONAL_ARG_ASC(queryBuilder) {
-      if (typeof pgFieldSource_post_computed_with_optional_argPgResource.from !== "function") {
-        throw new Error("Invalid computed attribute 'from'");
-      }
-      const expression = sql`${pgFieldSource_post_computed_with_optional_argPgResource.from({
-        placeholder: queryBuilder.alias
-      })}`;
-      queryBuilder.orderBy({
-        codec: pgFieldSource_post_computed_with_optional_argPgResource.codec,
-        fragment: expression,
-        direction: "asc".toUpperCase()
-      });
-    },
-    COMPUTED_WITH_OPTIONAL_ARG_DESC(queryBuilder) {
-      if (typeof pgFieldSource_post_computed_with_optional_argPgResource.from !== "function") {
-        throw new Error("Invalid computed attribute 'from'");
-      }
-      const expression = sql`${pgFieldSource_post_computed_with_optional_argPgResource.from({
-        placeholder: queryBuilder.alias
-      })}`;
-      queryBuilder.orderBy({
-        codec: pgFieldSource_post_computed_with_optional_argPgResource.codec,
-        fragment: expression,
-        direction: "desc".toUpperCase()
-      });
-    },
-    PRIMARY_KEY_ASC(queryBuilder) {
-      postUniques[0].attributes.forEach(attributeName => {
+    values: {
+      AUTHOR_ID_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "author_id",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      postUniques[0].attributes.forEach(attributeName => {
+      },
+      AUTHOR_ID_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "author_id",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    HEADLINE_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "headline",
-        direction: "ASC"
-      });
-    },
-    HEADLINE_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "headline",
-        direction: "DESC"
-      });
-    },
-    BODY_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "body",
-        direction: "ASC"
-      });
-    },
-    BODY_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "body",
-        direction: "DESC"
-      });
-    },
-    AUTHOR_ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "author_id",
-        direction: "ASC"
-      });
-    },
-    AUTHOR_ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "author_id",
-        direction: "DESC"
-      });
+      },
+      BODY_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "body",
+          direction: "ASC"
+        });
+      },
+      BODY_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "body",
+          direction: "DESC"
+        });
+      },
+      COMPUTED_WITH_OPTIONAL_ARG_ASC(queryBuilder) {
+        if (typeof pgFieldSource_post_computed_with_optional_argPgResource.from !== "function") {
+          throw new Error("Invalid computed attribute 'from'");
+        }
+        const expression = sql`${pgFieldSource_post_computed_with_optional_argPgResource.from({
+          placeholder: queryBuilder.alias
+        })}`;
+        queryBuilder.orderBy({
+          codec: pgFieldSource_post_computed_with_optional_argPgResource.codec,
+          fragment: expression,
+          direction: "asc".toUpperCase()
+        });
+      },
+      COMPUTED_WITH_OPTIONAL_ARG_DESC(queryBuilder) {
+        if (typeof pgFieldSource_post_computed_with_optional_argPgResource.from !== "function") {
+          throw new Error("Invalid computed attribute 'from'");
+        }
+        const expression = sql`${pgFieldSource_post_computed_with_optional_argPgResource.from({
+          placeholder: queryBuilder.alias
+        })}`;
+        queryBuilder.orderBy({
+          codec: pgFieldSource_post_computed_with_optional_argPgResource.codec,
+          fragment: expression,
+          direction: "desc".toUpperCase()
+        });
+      },
+      HEADLINE_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "headline",
+          direction: "ASC"
+        });
+      },
+      HEADLINE_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "headline",
+          direction: "DESC"
+        });
+      },
+      ID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "id",
+          direction: "ASC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "id",
+          direction: "DESC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        postUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        postUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      }
     }
   }
 };

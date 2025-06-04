@@ -6896,435 +6896,449 @@ export const scalars = {
 };
 export const enums = {
   BuildingsOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      buildingsUniques[0].attributes.forEach(attributeName => {
+    values: {
+      FLOORS_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "floors",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      buildingsUniques[0].attributes.forEach(attributeName => {
+      },
+      FLOORS_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "floors",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PROPERTY_ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "property_id",
-        direction: "ASC"
-      });
-    },
-    PROPERTY_ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "property_id",
-        direction: "DESC"
-      });
-    },
-    NAME_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "name",
-        direction: "ASC"
-      });
-    },
-    NAME_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "name",
-        direction: "DESC"
-      });
-    },
-    FLOORS_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "floors",
-        direction: "ASC"
-      });
-    },
-    FLOORS_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "floors",
-        direction: "DESC"
-      });
-    },
-    IS_PRIMARY_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "is_primary",
-        direction: "ASC"
-      });
-    },
-    IS_PRIMARY_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "is_primary",
-        direction: "DESC"
-      });
+      },
+      ID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "id",
+          direction: "ASC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "id",
+          direction: "DESC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      IS_PRIMARY_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "is_primary",
+          direction: "ASC"
+        });
+      },
+      IS_PRIMARY_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "is_primary",
+          direction: "DESC"
+        });
+      },
+      NAME_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "name",
+          direction: "ASC"
+        });
+      },
+      NAME_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "name",
+          direction: "DESC"
+        });
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        buildingsUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        buildingsUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PROPERTY_ID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "property_id",
+          direction: "ASC"
+        });
+      },
+      PROPERTY_ID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "property_id",
+          direction: "DESC"
+        });
+      }
     }
   },
   HousesOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      housesUniques[0].attributes.forEach(attributeName => {
+    values: {
+      BUILDING_ID_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "building_id",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      housesUniques[0].attributes.forEach(attributeName => {
+      },
+      BUILDING_ID_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "building_id",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    BUILDING_NAME_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "building_name",
-        direction: "ASC"
-      });
-    },
-    BUILDING_NAME_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "building_name",
-        direction: "DESC"
-      });
-    },
-    PROPERTY_NAME_OR_NUMBER_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "property_name_or_number",
-        direction: "ASC"
-      });
-    },
-    PROPERTY_NAME_OR_NUMBER_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "property_name_or_number",
-        direction: "DESC"
-      });
-    },
-    STREET_NAME_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "street_name",
-        direction: "ASC"
-      });
-    },
-    STREET_NAME_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "street_name",
-        direction: "DESC"
-      });
-    },
-    STREET_ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "street_id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    STREET_ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "street_id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    BUILDING_ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "building_id",
-        direction: "ASC"
-      });
-    },
-    BUILDING_ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "building_id",
-        direction: "DESC"
-      });
-    },
-    PROPERTY_ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "property_id",
-        direction: "ASC"
-      });
-    },
-    PROPERTY_ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "property_id",
-        direction: "DESC"
-      });
-    },
-    FLOORS_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "floors",
-        direction: "ASC"
-      });
-    },
-    FLOORS_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "floors",
-        direction: "DESC"
-      });
+      },
+      BUILDING_NAME_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "building_name",
+          direction: "ASC"
+        });
+      },
+      BUILDING_NAME_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "building_name",
+          direction: "DESC"
+        });
+      },
+      FLOORS_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "floors",
+          direction: "ASC"
+        });
+      },
+      FLOORS_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "floors",
+          direction: "DESC"
+        });
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        housesUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        housesUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PROPERTY_ID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "property_id",
+          direction: "ASC"
+        });
+      },
+      PROPERTY_ID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "property_id",
+          direction: "DESC"
+        });
+      },
+      PROPERTY_NAME_OR_NUMBER_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "property_name_or_number",
+          direction: "ASC"
+        });
+      },
+      PROPERTY_NAME_OR_NUMBER_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "property_name_or_number",
+          direction: "DESC"
+        });
+      },
+      STREET_ID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "street_id",
+          direction: "ASC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      STREET_ID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "street_id",
+          direction: "DESC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      STREET_NAME_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "street_name",
+          direction: "ASC"
+        });
+      },
+      STREET_NAME_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "street_name",
+          direction: "DESC"
+        });
+      }
     }
   },
   OffersOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      offersUniques[0].attributes.forEach(attributeName => {
+    values: {
+      ID_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      offersUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    POST_ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "post_id",
-        direction: "ASC"
-      });
-    },
-    POST_ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "post_id",
-        direction: "DESC"
-      });
+        queryBuilder.setOrderIsUnique();
+      },
+      POST_ID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "post_id",
+          direction: "ASC"
+        });
+      },
+      POST_ID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "post_id",
+          direction: "DESC"
+        });
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        offersUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        offersUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      }
     }
   },
   PostsOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      postsUniques[0].attributes.forEach(attributeName => {
+    values: {
+      ID_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      postsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        postsUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        postsUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      }
     }
   },
   PropertiesOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      propertiesUniques[0].attributes.forEach(attributeName => {
+    values: {
+      ID_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      propertiesUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    STREET_ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "street_id",
-        direction: "ASC"
-      });
-    },
-    STREET_ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "street_id",
-        direction: "DESC"
-      });
-    },
-    NAME_OR_NUMBER_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "name_or_number",
-        direction: "ASC"
-      });
-    },
-    NAME_OR_NUMBER_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "name_or_number",
-        direction: "DESC"
-      });
+        queryBuilder.setOrderIsUnique();
+      },
+      NAME_OR_NUMBER_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "name_or_number",
+          direction: "ASC"
+        });
+      },
+      NAME_OR_NUMBER_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "name_or_number",
+          direction: "DESC"
+        });
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        propertiesUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        propertiesUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      STREET_ID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "street_id",
+          direction: "ASC"
+        });
+      },
+      STREET_ID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "street_id",
+          direction: "DESC"
+        });
+      }
     }
   },
   StreetPropertiesOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      street_propertyUniques[0].attributes.forEach(attributeName => {
+    values: {
+      CURRENT_OWNER_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "current_owner",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      street_propertyUniques[0].attributes.forEach(attributeName => {
+      },
+      CURRENT_OWNER_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "current_owner",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    STR_ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "str_id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    STR_ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "str_id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PROP_ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "prop_id",
-        direction: "ASC"
-      });
-    },
-    PROP_ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "prop_id",
-        direction: "DESC"
-      });
-    },
-    CURRENT_OWNER_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "current_owner",
-        direction: "ASC"
-      });
-    },
-    CURRENT_OWNER_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "current_owner",
-        direction: "DESC"
-      });
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        street_propertyUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        street_propertyUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PROP_ID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "prop_id",
+          direction: "ASC"
+        });
+      },
+      PROP_ID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "prop_id",
+          direction: "DESC"
+        });
+      },
+      STR_ID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "str_id",
+          direction: "ASC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      STR_ID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "str_id",
+          direction: "DESC"
+        });
+        queryBuilder.setOrderIsUnique();
+      }
     }
   },
   StreetsOrderBy: {
-    PRIMARY_KEY_ASC(queryBuilder) {
-      streetsUniques[0].attributes.forEach(attributeName => {
+    values: {
+      ID_ASC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "ASC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    PRIMARY_KEY_DESC(queryBuilder) {
-      streetsUniques[0].attributes.forEach(attributeName => {
+        queryBuilder.setOrderIsUnique();
+      },
+      ID_DESC(queryBuilder) {
         queryBuilder.orderBy({
-          attribute: attributeName,
+          attribute: "id",
           direction: "DESC"
         });
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    ID_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "id",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    NAME_ASC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "name",
-        direction: "ASC"
-      });
-      queryBuilder.setOrderIsUnique();
-    },
-    NAME_DESC(queryBuilder) {
-      queryBuilder.orderBy({
-        attribute: "name",
-        direction: "DESC"
-      });
-      queryBuilder.setOrderIsUnique();
+        queryBuilder.setOrderIsUnique();
+      },
+      NAME_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "name",
+          direction: "ASC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      NAME_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "name",
+          direction: "DESC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        streetsUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        streetsUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      }
     }
   }
 };
