@@ -8,49 +8,54 @@ import "zx/globals";
 
 import path from "node:path";
 
+import { createFsFromVolume, Volume } from "memfs";
 import webpack from "webpack";
 
-const bundleFile = "./scripts/testbundle-output.js";
-await new Promise<void>((resolve, reject) => {
-  webpack(
-    {
-      mode: "production",
-      entry: path.resolve("./scripts/testbundle-entry.js"),
-      output: {
-        filename: path.basename(bundleFile),
-        path: path.dirname(path.resolve(bundleFile)),
-        publicPath: "",
-        chunkLoading: false,
-        library: {
-          type: "commonjs2",
-        },
-      },
-      target: ["web"],
-      resolve: {
-        fallback: {
-          process: false,
-          fs: false,
-          path: false,
-          os: false,
-          util: false,
-          crypto: false,
-        },
-      },
-      externals: [],
+const bundleFilename = "bundle.js";
+
+const compiler = webpack({
+  mode: "production",
+  entry: path.resolve("./scripts/testbundle-entry.js"),
+  output: {
+    filename: bundleFilename,
+    path: "/dist", // virtual path for memfs
+    publicPath: "",
+    chunkLoading: false,
+    library: {
+      type: "commonjs2",
     },
-    (err, stats) => {
-      if (err || stats?.hasErrors()) {
-        console.error(stats?.toString({ colors: true }));
-        reject(err || new Error("Webpack build failed"));
-      } else {
-        resolve();
-      }
+  },
+  target: ["web"],
+  resolve: {
+    fallback: {
+      process: false,
+      fs: false,
+      path: false,
+      os: false,
+      util: false,
+      crypto: false,
     },
-  );
+  },
+  externals: [],
 });
 
-// TODO: avoid writing bundle to file
-const source = await fs.readFile(bundleFile, "utf8");
+const memfs = createFsFromVolume(new Volume());
+(memfs as any).join = path.join; // Required by Webpack
+// Use memfs as the output filesystem
+compiler.outputFileSystem = memfs;
+
+await new Promise<void>((resolve, reject) => {
+  compiler.run((err, stats) => {
+    if (err || stats?.hasErrors()) {
+      console.error(stats?.toString({ colors: true }));
+      reject(err || new Error("Webpack build failed"));
+    } else {
+      resolve();
+    }
+  });
+});
+
+const source = memfs.readFileSync(`/dist/${bundleFilename}`, "utf8") as string;
 
 // Shadow globals (like `process`) and eval
 const module = await (async () => {
