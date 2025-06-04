@@ -18,7 +18,7 @@ import {
 import { access } from "./access.js";
 
 const nextTick: (cb: () => void) => void =
-  typeof process !== "undefined"
+  typeof process !== "undefined" && typeof process.nextTick === "function"
     ? (cb) => process.nextTick(cb)
     : (cb) => setTimeout(cb, 0);
 
