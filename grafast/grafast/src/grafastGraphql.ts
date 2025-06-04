@@ -34,28 +34,25 @@ const defaultQueryCacheMaxSize = Math.max(
 );
 
 // If we can use crypto to create a hash, great. Otherwise just use the string.
-let calculateQueryHash: (queryString: string) => string = (str) => str;
-import("crypto").then(
-  ({ createHash }) => {
-    // Webpack nonsense
-    if (!createHash) return;
-    let lastString: string;
-    let lastHash: string;
-    if (typeof createHash !== "function") {
-      throw new Error("Failed to load createHash");
+let calculateQueryHash: (queryString: string) => string;
+try {
+  let lastString: string;
+  let lastHash: string;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const createHash = require("crypto").createHash;
+  if (typeof createHash !== "function") {
+    throw new Error("Failed to load createHash");
+  }
+  calculateQueryHash = (queryString: string): string => {
+    if (queryString !== lastString) {
+      lastString = queryString;
+      lastHash = createHash("sha1").update(queryString).digest("base64");
     }
-    calculateQueryHash = (queryString: string): string => {
-      if (queryString !== lastString) {
-        lastString = queryString;
-        lastHash = createHash("sha1").update(queryString).digest("base64");
-      }
-      return lastHash;
-    };
-  },
-  () => {
-    // Ignore
-  },
-);
+    return lastHash;
+  };
+} catch {
+  calculateQueryHash = (str) => str;
+}
 
 const parseAndValidate = (
   gqlSchema: GraphQLSchema,
