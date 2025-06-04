@@ -86,10 +86,16 @@ function makeWsUrl(url: string): string {
   }
 }
 
-function hideProperty(obj: Record<string, any>, property: string) {
+function hideProperty(
+  obj: Record<string, any>,
+  property: string,
+  justDelete: boolean,
+) {
   const value = obj[property];
   delete obj[property];
-  Object.defineProperty(obj, property, { value, enumerable: false });
+  if (!justDelete) {
+    Object.defineProperty(obj, property, { value, enumerable: false });
+  }
 }
 
 export const useFetcher = (
@@ -168,6 +174,7 @@ export const useFetcher = (
         | AsyncExecutionResult
         | null
         | undefined,
+      deleteExplain = false,
     ):
       | ExecutionResult
       | AsyncExecutionResult[]
@@ -178,7 +185,9 @@ export const useFetcher = (
         return inResult;
       }
       if (Array.isArray(inResult)) {
-        return inResult.map(processPayload) as AsyncExecutionResult[];
+        return inResult.map((r) =>
+          processPayload(r, deleteExplain),
+        ) as AsyncExecutionResult[];
       }
       // Mutable result
       const result = {
@@ -206,9 +215,9 @@ export const useFetcher = (
         // Hide it if not verbose
         if (!verbose) {
           if (Object.keys(result.extensions).length === 1) {
-            hideProperty(result, "extensions");
+            hideProperty(result, "extensions", deleteExplain);
           } else {
-            hideProperty(result.extensions, "explain");
+            hideProperty(result.extensions, "explain", deleteExplain);
           }
         }
       } else if (legacy) {
@@ -251,11 +260,11 @@ export const useFetcher = (
             const n = iterator.next(...args);
             if (isPromise(n)) {
               return n.then(({ done, value }: any) => {
-                return { done, value: processPayload(value) };
+                return { done, value: processPayload(value, true) };
               });
             } else {
               const { done, value } = n as unknown as Awaited<typeof n>;
-              return { done, value: processPayload(value) };
+              return { done, value: processPayload(value, true) };
             }
           },
           [Symbol.asyncIterator]() {

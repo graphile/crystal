@@ -11,7 +11,7 @@ import "ruru-components/ruru.css";
 import CodeMirror from "@uiw/react-codemirror";
 import * as Grafast from "grafast";
 import { grafast, makeGrafastSchema } from "grafast";
-import { GraphQLError } from "graphql";
+import { parse, GraphQLError } from "graphql";
 import React, { useCallback, useMemo, useState } from "react";
 import { Ruru } from "ruru-components";
 
@@ -85,6 +85,9 @@ with (Grafast) {
         typeDefs,
         enableDeferStream: false,
         ...config,
+        ...(typeof config.typeDefs === "string"
+          ? { typeDefs: parse(config.typeDefs) }
+          : null),
       });
     } catch (e) {
       return e;
