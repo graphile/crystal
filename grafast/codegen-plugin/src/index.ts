@@ -1,10 +1,12 @@
 import type { PluginFunction, Types } from "@graphql-codegen/plugin-helpers";
 import type {
+  GraphQLInputType,
   GraphQLNamedType,
   GraphQLOutputType,
   GraphQLSchema,
 } from "graphql";
 import {
+  getNullableType,
   isEnumType,
   isInputObjectType,
   isInterfaceType,
@@ -141,6 +143,20 @@ ${Object.entries(type.getFields())
     return lines;
   }
 
+  private getInputType(t: GraphQLInputType): string {
+    const nn = isNonNullType(t);
+    const nullable = getNullableType(t);
+    const inner = isListType(nullable)
+      ? `ReadonlyArray<${this.getInputType(nullable.ofType)}>`
+      : isScalarType(nullable)
+        ? `Scalars['${nullable.name}']`
+        : nullable.name;
+    if (nn) {
+      return inner;
+    } else {
+      return `Maybe<${inner}>`;
+    }
+  }
   private getInputObjectPlans(): string[] {
     const lines: string[] = [];
     for (const type of this.types) {
@@ -148,10 +164,13 @@ ${Object.entries(type.getFields())
       lines.push(`    ${type.name}?: Omit<InputObjectPlan, 'plans'> & {
       plans?: {
 ${Object.entries(type.getFields())
-  .map(([fieldName, val]) => `        ${fieldName}?: InputFieldPlan<any, any>;`)
+  .map(
+    ([fieldName, field]) =>
+      `        ${fieldName}?: InputFieldPlan<any, ${this.getInputType(field.type)}>;`,
+  )
   .join("\n")}
       }
-};`);
+    };`);
     }
     return lines;
   }
