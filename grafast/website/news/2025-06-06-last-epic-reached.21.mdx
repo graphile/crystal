@@ -14,7 +14,6 @@ tags: [0.1]
 ---
 
 import styles from "@site/src/css/common.module.css";
-import Mermaid from "@theme/Mermaid";
 
 <p className={styles.intro}>
 
@@ -194,9 +193,24 @@ Other changes:
   methods). Useful for optimization; but use with great caution. Currently
   undocumented due to experimental nature.
 
+### Improved type-safety
+
+- `each()` now reflects the type of the list item even if it’s not a “list
+  capable” step
+- `loadOne()`/`loadMany()` can now track the underlying nullability of the
+  callback
+
+🚨 This will potentially break your plan types quite a bit. In particular, the
+`LoadOneCallback` and `LoadManyCallback` types now have 5 (not 4) generic
+parameters, the new one is inserted in the middle (after the second parameter)
+and indicates the true return type of the callback (ignoring promises) — e.g.
+`Maybe<ReadonlyArray<Maybe<ItemType>>>` for `LoadManyCallback`. They have
+sensible defaults if you only specify the first two generics.
+
 ### And more besides...
 
-In reaching this Epic milestone, we found and fixed a number of other issues both
+In reaching this Epic milestone, we have <strong>bumped the minimum version of node.js to
+Node 22</strong> (the latest LTS); we have also found and fixed a number of other issues both
 in Gra*fast* and the wider Graphile suite, you can see a full list at
 [graphile.org](htts://graphile.org/news/20250606-last-epic-reached/#grafast-features).
 
