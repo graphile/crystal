@@ -1,0 +1,201 @@
+---
+title: "Last Epic reached!"
+description:
+  "Polymorphism re-overhauled for greater efficiency and ergonomics. This is the
+  last breaking change to plan resolvers we are expecting before becoming
+  stable."
+slug: 2025-06-06-last-epic-reached
+authors:
+  - name: Benjie
+    title: Inventor of Grafast
+    url: https://github.com/Benjie
+    image_url: https://github.com/Benjie.png
+tags: [0.1]
+---
+
+import styles from "@site/src/css/common.module.css";
+
+<p className={styles.intro}>
+
+In the first Gra<em>fast</em> Working Group, we outlined 4 <em>major</em> issues in Gra<em>fast</em>
+that needed to be addressed before we could think about general release. The fourth, and final,
+Epic has now been reached!
+
+- ✅ Global dependencies — solved via “unary” steps
+- ✅ Early exit — solved via “flags”
+- ✅ Eradicating eval
+- ✅ **Polymorphism — this release!**
+
+</p>
+
+Gra*fast* is the cutting-edge GraphQL planning and execution engine which PostGraphile
+uses, allowing it to build much more efficient SQL queries than PostGraphile V4 could
+achieve, whilst also significantly expanding the capabilities of the system - not to
+mention solving some longstanding issues!
+
+### Polymorphism Epic Achieved
+
+In previous versions of Gra*fast* there was the possibility of exponential plan
+branching due to the naive method of resolution of abstract types.
+
+By moving the responsibility of polymorphic resolution from field plan resolvers
+into the abstract types themselves, we’ve centralized this logic, simplified
+field plan resolvers, and unlocked more optimization opportunities and greater
+execution efficiency. Polymorphic branches in one layer are now merged into a
+single “combined” step before planning the next level of polymorphism.
+
+<figure>
+
+[![A plan diagram showing the old way polymorphism was handled. The nodes can branch exponentially.](../static/img/news/2025-06-06-combine-step-light-mode.png#light-mode-only)](../static/img/news/2025-06-06-combine-step-light-mode.png)
+[![A plan diagram showing the new way, the branches are combined back together before moving to the next layer of resolution.](../static/img/news/2025-06-06-combine-step-dark-mode.png#dark-mode-only)](../static/img/news/2025-06-06-combine-step-dark-mode.png)
+
+<figcaption>
+  On the right is the new handling of polymorphic resolution.{" "}
+  <code>getPetIds</code> and <code>getServiceAnimals</code> both fetch an{" "}
+  <code>Animal</code> ID and so they are combined together in order to fetch all
+  of the required Animals by their IDs. Once the IDs are fetched, the nodes can
+  branch out to the different Animal types.
+</figcaption>
+
+</figure>
+
+Users of PostGraphile’s polymorphism should not need to take any action to
+benefit from these changes and may notice that their SQL queries are now
+slightly smaller and in general fewer requests to the database are required.
+
+### TypeDefs / plans overhaul
+
+In order to make the libraries more type safe, `makeGrafastSchema` (from
+`grafast`) and `makeExtendSchemaPlugin` (from `postgraphile/utils`) have
+deprecated the `typeDefs`/`plans` pattern since `plans` (like `resolvers` in the
+traditional format) ended up being a mish-mash of lots of different types and
+`__`-prefixed fields for special cases.
+
+Going forwards, the configuration should be split into `typeDefs` with
+`objects`, `interfaces`, `unions`, `inputObjects`, `scalars` and `enums`.
+Type-level properties such as `resolveType`/`isTypeOf`/`planType`/`scope`/etc
+should now be presented without their `__` prefix; to avoid conflicts with
+type-level properties, object and input object fields should be specified inside
+a new `plans` property and enum values within the new `values` property.
+
+Migration is quite straightforward:
+
+1. **Add new top-level properties**. Add `objects`, `interfaces`, `unions`,
+   `inputObjects`, `scalars`, and `enums` as top level properties alongside
+   `typeDefs` and `plans`. Each should be an empty object. You can skip any
+   where you’re not defining types of that kind.
+
+1. **Split definitions based on type kind**. For each type defined in `plans`
+   move it into the appropriate new property based on the keyword used to define
+   the type in the `typeDefs` (`type` &rarr; `objects`, `interface` &rarr;
+   `interfaces`, `union` &rarr; `unions`, `input object` &rarr; `inputObjects`,
+   `scalar` &rarr; `scalars`, `enum` &rarr; `enums`).
+
+1. **Move field plans into nested `plans: {...}` object**. For each type defined
+   in the new `objects` and `inputObjects` maps: create a `plans: { ... }` entry
+   inside the type and move all fields (anything not prefixed with `__`) inside
+   this new (nested) property.
+
+1. **Move enum values into nested `values: {...}` object**. For each type
+   defined in the new `enums` map: create a `values: { ... }` entry inside the
+   type and move all values (anything not prefixed with `__`) inside this new
+   (nested) property.
+
+1. **Remove `__` prefixes**. For each type across
+   `objects`/`interfaces`/`unions`/`interfaceObjects`/`scalars` and `enums`:
+   remove the `__` prefix from any methods/properties.
+
+Example:
+
+```diff
+ typeDefs: ...,
+-plans: {
++objects: {
+   User: {
+-    __isTypeOf(v) {
++    isTypeOf(v) {
+       return v.username != null;
+     },
+    plans: {
+       fieldName($source, fieldArgs) {
+         // ...
+       },
++    },
+   },
++},
++interfaces: {,
+   MyInterface: {
+-    __resolveType($specifier) {
++    resolveType($specifier) {
+       // ...
+     }
+   }
++},
++enums: {
+   MyEnum: {
+     ONE
+     TWO
+     THREE
+   }
+ },
+```
+
+Other changes:
+
+- `ObjectPlans`/`GrafastPlans`/`FieldPlans`/`InputObjectPlans`/`ScalarPlans` all
+  changed to singular
+- `InterfaceOrUnionPlans` split to `InterfacePlan`/`UnionPlan` (identical
+  currently)
+- Shape of `ObjectPlan`/`InterfacePlan`/`UnionPlan` has changed;
+  `DeprecatedObjectPlan`/etc exist for back-compatibility
+- `FieldArgs` can now accept an input shape indicating the args and their types
+- `FieldPlanResolver<TArgs, TParentStep, TResultStep>` has switched the order of
+  the first two generic parameters:
+  `FieldPlanResolver<TParentStep, TArgs, TResultStep>` — this is to reflect the
+  order of the arguments to the function. Also null has been removed from the
+  generics.
+- Various generics (including `GrafastFieldConfig`) that used to take a GraphQL
+  type instance as a generic parameter no longer do — you need to use external
+  code generation because TypeScript cannot handle the dynamic creation.
+- `GrafastFieldConfig` last two generics swapped order.
+- `GrafastArgumentConfig` generics completely changed
+
+### New Features
+
+#### Steps
+
+- Coalesce: Accepts a number of steps and represents the first one of them that
+  isn’t nullish
+
+#### Step Classes
+
+- Experimental support for adding “references” to other steps at plan-time only
+  (via `refId = this.addRef($step)` and reciprocal `$step = this.getRef(refId)`
+  methods). Useful for optimization; but use with great caution. Currently
+  undocumented due to experimental nature.
+
+### And more besides...
+
+In reaching this Epic milestone, we found and fixed a number of other issues both
+in Gra*fast* and the wider Graphile suite, you can see a full list at
+[graphile.org](htts://graphile.org/news/20250606-last-epic-reached/#grafast-features).
+
+## Thank you Sponsors
+
+PostGraphile is crowd-funded open-source software, it relies on
+crowd-sourced funding from individuals and companies to keep advancing.
+
+If your company benefits from PostGraphile, Gra*fast* or the wider Graphile
+suite, you should consider asking them to fund our work. By significantly
+reducing the amount of work needed to achieve business goals and reducing
+running costs, Graphile’s software results in huge time and money savings for
+users. We encourage companies to contribute a portion of these savings back,
+enabling the projects to advance more rapidly, and result in even greater
+savings for your company.
+[Find out more about sponsorship on graphile.org](https://graphile.org/sponsor/).
+
+<figure>
+
+![Thank you](../static/img/news/thank-you.svg)
+
+</figure>
