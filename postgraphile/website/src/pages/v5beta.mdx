@@ -19,15 +19,15 @@ import clsx from "clsx";
 
 <div className={v5betaStyles.progressContainerStatusPage}>
   <div className={v5betaStyles.progressBackground}>
-    <div className={v5betaStyles.progressForeground} style={{ width: "80%" }}>
-      <div className={v5betaStyles.progressLabel}>80%</div>
+    <div className={v5betaStyles.progressForeground} style={{ width: "90%" }}>
+      <div className={v5betaStyles.progressLabel}>90%</div>
     </div>
   </div>
 </div>
 
 The V5 pre-alpha phase completed after 38 releases.<br />
 The V5 alpha phase completed after 20 releases.<br />
-**➡️ The PostGraphile V5 beta phase is roughly 80% complete. ⬅️**<br />
+**➡️ The PostGraphile V5 beta phase is roughly 90% complete. ⬅️**<br />
 
 </div>
 </div>
@@ -55,6 +55,22 @@ should experience particularly smooth sailing!
 - [V5 Documentation](/postgraphile/5)
 - [V4 &rarr; V5 migration guide](/postgraphile/5/migrating-from-v4)
 
+## Epics
+
+With the help of the community, we identified four major issues in our new
+planning engine, Gra*fast*. These issues relate to ergonomics, edge cases, or efficiency;
+they all require changes to user code (“plan resolvers”), so addressing
+them before release is vital.
+
+Since fixing these issues requires fundamental changes to the way the system
+works &mdash; re-architectures that often take many months to complete &mdash; we call them
+“Epics”. All four are now complete, hurrah!
+
+- ✅ Global dependencies (solved via “unary” steps that represent exactly one value)
+- ✅ Early exit (solved via value “flags” tracking when a value should inhibit dependents)
+- ✅ Stop branching due to planning of nested input values (aka [remove `$step.eval*()`](https://github.com/graphile/crystal/issues/2060))
+- ✅ Avoid excessive polymorphic branching (achieved June 2025)
+
 ## How to help
 
 To aid us in reaching the release candidate stage faster, you can:
@@ -66,22 +82,6 @@ To aid us in reaching the release candidate stage faster, you can:
 - Contribute to documentation and examples
 - Help address issues in the [V5 Project Board](https://github.com/orgs/graphile/projects/3)
 - [Sponsor us](https://graphile.org/sponsor) &mdash; **you rely on our software, we rely on your financial support**
-
-## Epics
-
-With the help of the community, we identified four major issues in our new
-planning engine, Gra*fast*. These issues relate to ergonomics, edge cases, or efficiency;
-they all require changes to user code (“plan resolvers”), so addressing
-them before release is vital.
-
-Since fixing these issues requires fundamental changes to the way the system
-works &mdash; re-architectures that often take many months to complete &mdash; we call them
-“epics”. The first three are now complete, hurrah!
-
-- ✅ Global dependencies (solved via “unary” steps that represent exactly one value)
-- ✅ Early exit (solved via value “flags” tracking when a value should inhibit dependents)
-- ✅ Stop branching due to planning of nested input values (aka [remove `$step.eval*()`](https://github.com/graphile/crystal/issues/2060))
-- 🔜 Avoid excessive polymorphic branching (work is currently underway)
 
 </div>
 
@@ -114,6 +114,18 @@ Everyone else can see some detail in the PostGraphile [changelog](https://github
 </thead>
 
 <tbody>
+
+<tr>
+  <td>2025-06-06</td>
+  <td>beta.41</td>
+  <td>
+    Polymorphism epic achieved (
+    <a href="https://www.graphile.org/news/20250606-last-epic-reached/">
+      read more
+    </a>
+    )
+  </td>
+</tr>
 
 <tr>
   <td>2025-03-25</td>
