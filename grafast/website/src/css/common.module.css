@@ -57,3 +57,8 @@
 code {
   font-style: normal;
 }
+
+[data-theme="light"] img[src$="#dark-mode-only"],
+[data-theme="dark"] img[src$="#light-mode-only"] {
+  display: none;
+}
