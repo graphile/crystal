@@ -7,9 +7,13 @@ description:
 slug: 2025-06-06-last-epic-reached
 authors:
   - name: Benjie
-    title: Inventor of Grafast
+    title: PostGraphile Maintainer
     url: https://github.com/Benjie
     image_url: https://github.com/Benjie.png
+  - name: Jem
+    title: "“I wear many hats!”"
+    url: https://bsky.app/profile/jem.graphile.org
+    image_url: https://github.com/jemgillam.png
 tags: [0.1]
 ---
 
@@ -65,8 +69,7 @@ slightly smaller and in general fewer requests to the database are required.
 
 ### TypeDefs / plans overhaul
 
-In order to make the libraries more type safe, `makeGrafastSchema` (from
-`grafast`) and `makeExtendSchemaPlugin` (from `postgraphile/utils`) have
+In order to make the libraries more type safe, `makeExtendSchemaPlugin` has
 deprecated the `typeDefs`/`plans` pattern since `plans` (like `resolvers` in the
 traditional format) ended up being a mish-mash of lots of different types and
 `__`-prefixed fields for special cases.
@@ -140,44 +143,11 @@ Example:
  },
 ```
 
-Other changes:
-
-- `ObjectPlans`/`GrafastPlans`/`FieldPlans`/`InputObjectPlans`/`ScalarPlans` all
-  changed to singular
-- `InterfaceOrUnionPlans` split to `InterfacePlan`/`UnionPlan` (identical
-  currently)
-- Shape of `ObjectPlan`/`InterfacePlan`/`UnionPlan` has changed;
-  `DeprecatedObjectPlan`/etc exist for back-compatibility
-- `FieldArgs` can now accept an input shape indicating the args and their types
-- `FieldPlanResolver<TArgs, TParentStep, TResultStep>` has switched the order of
-  the first two generic parameters:
-  `FieldPlanResolver<TParentStep, TArgs, TResultStep>` — this is to reflect the
-  order of the arguments to the function. Also null has been removed from the
-  generics.
-- Various generics (including `GrafastFieldConfig`) that used to take a GraphQL
-  type instance as a generic parameter no longer do — you need to use external
-  code generation because TypeScript cannot handle the dynamic creation.
-- `GrafastFieldConfig` last two generics swapped order.
-- `GrafastArgumentConfig` generics completely changed
-
-### New Features
-
-#### Steps
-
-- Coalesce: Accepts a number of steps and represents the first one of them that
-  isn’t nullish
-
-#### Step Classes
-
-- Experimental support for adding “references” to other steps at plan-time only
-  (via `refId = this.addRef($step)` and reciprocal `$step = this.getRef(refId)`
-  methods). Useful for optimization; but use with great caution. Currently
-  undocumented due to experimental nature.
-
 ### And more besides...
 
-In reaching this Epic milestone, we found and fixed a number of other issues both
-in Gra*fast* and the wider Graphile suite, you can see a full list at
+In reaching this Epic milestone, we have <strong>bumped the minimum version of node.js to
+Node 22</strong> (the latest LTS); we have also found and fixed a number of other issues both
+in PostGraphile and the wider Graphile suite, you can see a full list at
 [graphile.org](htts://graphile.org/news/20250606-last-epic-reached/#grafast-features).
 
 ## Thank you Sponsors
