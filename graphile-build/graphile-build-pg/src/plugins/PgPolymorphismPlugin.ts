@@ -1158,6 +1158,8 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                     ),
                   };
                 } else if (polymorphism.mode === "relational") {
+                  //const typeCount = Object.keys(polymorphism.types).length;
+                  //const disablePartitioning = typeCount < 6
                   const disablePartitioning = Boolean(
                     codec.extensions?.tags?.disablePartitioning,
                   );
