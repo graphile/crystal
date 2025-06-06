@@ -1,9 +1,8 @@
 ---
-title: "Grafast beta: last Epic reached!"
+title: "Grafast beta: last epic reached!"
 description:
-  "Polymorphism re-overhauled for greater efficiency and ergonomics. This is the
-  last breaking change to plan resolvers we are expecting before becoming
-  stable."
+  "Polymorphism overhauled for greater efficiency and ergonomics. This is the
+  last breaking change to plan resolvers we are expecting for v1."
 slug: 2025-06-06-last-epic-reached
 authors:
   - name: Benjie
@@ -23,7 +22,7 @@ import styles from "@site/src/css/common.module.css";
 
 In the first Gra<em>fast</em> Working Group, we outlined 4 <em>major</em> issues in Gra<em>fast</em>
 that needed to be addressed before we could think about general release. The fourth, and final,
-Epic has now been reached!
+epic has now been solved!
 
 - ✅ Global dependencies — solved via “unary” steps
 - ✅ Early exit — solved via “flags”
@@ -32,26 +31,26 @@ Epic has now been reached!
 
 In previous versions of Gra*fast* there was the possibility of exponential plan
 branching due to the naive method of resolution of abstract types — a known
-issue raised in the first Gra*fast* working group as one of four “Epics” to be
-solved before v1.0. This release of `grafast@0.1.1-beta.22` fixes this final Epic through
+issue raised in the first Gra*fast* working group as one of four “epics” to be
+solved before v1.0. This release of `grafast@0.1.1-beta.22` fixes this final epic through
 a complete overhaul of the polymorphism system. Let’s take a look!
 
 </p>
 
-### Polymorphism Epic Achieved
+### Polymorphism epic achieved
 
 By moving the responsibility of polymorphic resolution from field plan resolvers
 into the abstract types themselves, we’ve centralized this logic, simplified
 field plan resolvers, and unlocked more optimization opportunities and greater
 execution efficiency. We no longer have the concept of “polymorphic capable”
-steps: any step may now be used for polymorphism. The abstract types now gain a
+steps: any step may now be used for polymorphism. Abstract types now gain a
 `planType` method responsible for taking a “specifier” from the field plan
-resolver and determining how to resolve its concrete object type and the
-associated step.
+resolver and returning a step representing the name of its concrete object type
+along with subplans for each possible object type.
 
-To solve the problem of exponential branching, we merge the previous polymorphic
-branch into a single “combined” step before planning the next level of
-polymorphism.
+To solve the problem of exponential branching, we merge the new specifier steps
+from all previous polymorphic branches into a single “combined” step before
+planning the next level of polymorphism.
 
 <figure>
 
@@ -71,35 +70,41 @@ polymorphism.
 <!-- truncate-->
 
 For the few of you who have been brave enough to hand write polymorphic plan
-resolvers: first of all, thank you for trying our new system! Hand written
+resolvers: first of all, thank you for trying it out! Hand written
 polymorphic plan resolvers will need to be updated to match the new paradigm,
 this will involve moving the polymorphic resolution from field plan resolvers
-into the new `planType` method on the relevant abstract type and adjusting the
-logic to fit the new pattern. Steps such as `polymorphicBranch`,
+into the new `planType` method on the relevant abstract type (interface or union)
+and adjusting the logic to fit the new pattern. Steps such as `polymorphicBranch`,
 `pgPolymorphism`, and other polymorphism related steps no longer exist as they
 are no longer supported in this new paradigm. For guidance on how to write the
 `planType` method, see
 [the updated polymorphism docs](../grafast/polymorphism) and please reach
 out to us on Discord — we’d love to help you get migrated.
 
-Fortunately, this is the last change to hand written plan resolvers that we
-expect to make before the v1.0 release (other than some improvements around
-TypeScript types).
+Excitingly, this is the last change to hand written plan resolvers that we
+expect to make for the v1.0 release (other than some improvements around
+TypeScript types), so we're getting close to release candidate stage!
 
 ### TypeDefs / plans overhaul
 
 In order to make the libraries more type safe, `makeGrafastSchema` (from
 `grafast`) and `makeExtendSchemaPlugin` (from `postgraphile/utils`) have
 deprecated the `typeDefs`/`plans` pattern since `plans` (like `resolvers` in the
-traditional format) ended up being a mish-mash of lots of different types and
-`__`-prefixed fields for special cases.
+traditional format) ended up being a mish-mash of lots of different types
+(objects, scalars, enums, etc) and `__`-prefixed fields (`__resolveType`,
+`__isTypeOf`, etc) for methods on the type itself.
 
 Going forwards, the configuration should be split into `typeDefs` with
-`objects`, `interfaces`, `unions`, `inputObjects`, `scalars` and `enums`.
-Type-level properties such as `resolveType`/`isTypeOf`/`planType`/`scope`/etc
-should now be presented without their `__` prefix; to avoid conflicts with
-type-level properties, object and input object fields should be specified inside
-a new `plans` property and enum values within the new `values` property.
+`objects`, `interfaces`, `unions`, `inputObjects`, `scalars` and `enums` as
+appropriate. Type-level properties such as
+`resolveType`/`isTypeOf`/`planType`/`scope`/etc are no longer prefixed with `__`
+and, to avoid conflicts with these type-level properties, object and input
+object fields should be specified inside a new `plans` property and enum values
+within the new `values` property.
+
+**The old pattern will still work** (this is not a breaking change), but we
+recommend moving to the new shape and will use it for all of our examples in the
+documentation from now on.
 
 Migration is quite straightforward:
 
@@ -109,20 +114,20 @@ Migration is quite straightforward:
    where you’re not defining types of that kind.
 
 1. **Split definitions based on type kind**. For each type defined in `plans`
-   move it into the appropriate new property based on the keyword used to define
-   the type in the `typeDefs` (`type` &rarr; `objects`, `interface` &rarr;
-   `interfaces`, `union` &rarr; `unions`, `input object` &rarr; `inputObjects`,
-   `scalar` &rarr; `scalars`, `enum` &rarr; `enums`).
+   move it into the appropriate new object (based on keyword defining the type;
+   i.e. `type` &rarr; `objects`, `interface` &rarr; `interfaces`, `union` &rarr;
+   `unions`, `input object` &rarr; `inputObjects`, `scalar` &rarr; `scalars`,
+   `enum` &rarr; `enums`).
 
 1. **Move field plans into nested `plans: {...}` object**. For each type defined
-   in the new `objects` and `inputObjects` maps: create a `plans: { ... }` entry
-   inside the type and move all fields (anything not prefixed with `__`) inside
-   this new (nested) property.
+   in the new `objects` and `inputObjects` objects: create a `plans: { ... }`
+   entry inside the type and move all fields (anything not prefixed with `__`)
+   inside this new (nested) property.
 
 1. **Move enum values into nested `values: {...}` object**. For each type
-   defined in the new `enums` map: create a `values: { ... }` entry inside the
-   type and move all values (anything not prefixed with `__`) inside this new
-   (nested) property.
+   defined in the new `enums` object: create a `values: { ... }` entry inside
+   the type and move all values (anything not prefixed with `__`) inside this
+   new (nested) property.
 
 1. **Remove `__` prefixes**. For each type across
    `objects`/`interfaces`/`unions`/`interfaceObjects`/`scalars` and `enums`:
@@ -183,14 +188,14 @@ Other changes:
 - `GrafastFieldConfig` last two generics swapped order.
 - `GrafastArgumentConfig` generics completely changed
 
-### New Features
+### New features
 
 #### Steps
 
 - Coalesce: Accepts a number of steps and represents the first one of them that
   isn’t nullish
 
-#### Step Classes
+#### Step classes
 
 - Experimental support for adding “references” to other steps at plan-time only
   (via `refId = this.addRef($step)` and reciprocal `$step = this.getRef(refId)`
