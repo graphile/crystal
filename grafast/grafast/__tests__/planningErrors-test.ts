@@ -63,22 +63,17 @@ const schema = makeGrafastSchema({
           throw new GraphQLError("Direct error");
         },
         errorAtDepth1() {
-          let a = 1;
           return each(
             constant([
               [1, 2],
               [3, 4],
             ]),
             ($i) => {
-              if (--a === 0) {
-                throw new GraphQLError("Error at depth 1");
-              }
-              return each($i, ($j) => $j);
+              throw new GraphQLError("Error at depth 1");
             },
           );
         },
         errorAtDepth2() {
-          let a = 2;
           return each(
             constant([
               [1, 2],
@@ -86,10 +81,7 @@ const schema = makeGrafastSchema({
             ]),
             ($i) =>
               each($i, ($j) => {
-                if (--a === 0) {
-                  throw new GraphQLError("Error at depth 2");
-                }
-                return $j;
+                throw new GraphQLError("Error at depth 2");
               }),
           );
         },
@@ -182,6 +174,65 @@ it("catches field error at field level", async () => {
     __typename: "Query",
     thing: {
       error: null,
+    },
+  });
+});
+
+it("catches field error at list level", async () => {
+  const source = /* GraphQL */ `
+    {
+      __typename
+      thing {
+        errorAtDepth1
+      }
+    }
+  `;
+  const result = (await grafast({
+    schema,
+    source,
+    requestContext,
+    resolvedPreset,
+  })) as ExecutionResult;
+  expect(result.errors).to.have.length(2);
+  expect(result.errors![1]).to.deep.contain({
+    message: "Error at depth 1",
+    path: ["thing", "errorAtDepth1", 1],
+  });
+  expect(result.data).to.deep.equal({
+    __typename: "Query",
+    thing: {
+      errorAtDepth1: [null, null],
+    },
+  });
+});
+
+it("catches field error at nested list level", async () => {
+  const source = /* GraphQL */ `
+    {
+      __typename
+      thing {
+        errorAtDepth2
+      }
+    }
+  `;
+  const result = (await grafast({
+    schema,
+    source,
+    requestContext,
+    resolvedPreset,
+  })) as ExecutionResult;
+  expect(result.errors).to.have.length(4);
+  expect(result.errors![2]).to.deep.contain({
+    message: "Error at depth 2",
+    path: ["thing", "errorAtDepth2", 1, 0],
+  });
+  expect(result.data).to.deep.equal({
+    __typename: "Query",
+    thing: {
+      errorAtDepth2: [
+        [null, null],
+        [null, null],
+      ],
     },
   });
 });
