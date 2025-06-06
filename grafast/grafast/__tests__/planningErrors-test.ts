@@ -11,6 +11,7 @@ import {
   grafast,
   lambda,
   makeGrafastSchema,
+  Step,
 } from "../dist/index.js";
 
 const resolvedPreset = resolvePreset({});
@@ -117,8 +118,10 @@ const schema = makeGrafastSchema({
         },
       },
     },
+  },
+  interfaces: {
     Poly: {
-      planType($poly) {
+      planType($poly: Step<Poly>) {
         const $__typename = lambda($poly, getTypeNameFromPoly);
         return {
           $__typename,
