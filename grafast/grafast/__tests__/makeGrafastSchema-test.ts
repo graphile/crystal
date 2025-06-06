@@ -32,3 +32,40 @@ it("can create a schema with an input", async () => {
   expect(result.errors).to.be.undefined;
   expect(result.data?.a).to.eq('{"str":"hello!"}');
 });
+
+it("can inform you that you put a type in the wrong place (interfaces -> inputObjects)", async () => {
+  expect(() =>
+    makeGrafastSchema({
+      interfaces: {
+        A: {},
+      },
+      typeDefs: /* GraphQL */ `
+        type Query {
+          a: Int
+        }
+        input A {
+          str: String
+        }
+      `,
+    }),
+  ).to.throw(
+    "You defined 'A' under 'interfaces', but it is an input object type so it should be defined under 'inputObjects'.",
+  );
+});
+
+it("can inform you that you defined a type that isn't in the schema", async () => {
+  expect(() =>
+    makeGrafastSchema({
+      interfaces: {
+        A: {},
+      },
+      typeDefs: /* GraphQL */ `
+        type Query {
+          a: Int
+        }
+      `,
+    }),
+  ).to.throw(
+    "You detailed 'interfaces.A', but the 'A' type does not exist in the schema.",
+  );
+});

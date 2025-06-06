@@ -249,81 +249,6 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
     enableDeferStream = false,
   } = details;
 
-  let plans: GrafastPlans;
-  if (rawPlans) {
-    if (objects || unions || interfaces || inputObjects || scalars || enums) {
-      throw new Error(
-        `plans is deprecated and may not be specified alongside newer approaches`,
-      );
-    }
-    plans = rawPlans;
-  } else {
-    // Hackily convert the new format into the old format. We'll do away with
-    // this in future, but for now it's the easiest way to ensure compatibility
-    plans = {};
-
-    for (const [typeName, spec] of Object.entries(objects ?? {})) {
-      const o = {} as Record<string, any>;
-      plans[typeName] = o as any;
-
-      const { plans: planResolvers = {}, ...rest } = spec;
-      for (const [key, val] of Object.entries(rest)) {
-        o[`__${key}`] = val;
-      }
-      for (const [key, val] of Object.entries(planResolvers)) {
-        o[key] = val;
-      }
-    }
-
-    for (const [typeName, spec] of Object.entries(inputObjects ?? {})) {
-      const o = {} as Record<string, any>;
-      plans[typeName] = o as any;
-
-      const { plans: planResolvers = {}, ...rest } = spec;
-      for (const [key, val] of Object.entries(rest)) {
-        o[`__${key}`] = val;
-      }
-      for (const [key, val] of Object.entries(planResolvers)) {
-        o[key] = val;
-      }
-    }
-
-    for (const [typeName, spec] of Object.entries(unions ?? {})) {
-      const o = {} as Record<string, any>;
-      plans[typeName] = o as any;
-
-      for (const [key, val] of Object.entries(spec)) {
-        o[`__${key}`] = val;
-      }
-    }
-
-    for (const [typeName, spec] of Object.entries(interfaces ?? {})) {
-      const o = {} as Record<string, any>;
-      plans[typeName] = o as any;
-
-      for (const [key, val] of Object.entries(spec)) {
-        o[`__${key}`] = val;
-      }
-    }
-
-    for (const [typeName, spec] of Object.entries(scalars ?? {})) {
-      plans[typeName] = spec;
-    }
-
-    for (const [typeName, spec] of Object.entries(enums ?? {})) {
-      const o = {} as Record<string, any>;
-      plans[typeName] = o as any;
-
-      const { values = {}, ...rest } = spec;
-      for (const [key, val] of Object.entries(rest)) {
-        o[`__${key}`] = val;
-      }
-      for (const [key, val] of Object.entries(values)) {
-        o[key] = val;
-      }
-    }
-  }
-
   const document: graphql.DocumentNode =
     typeof typeDefs === "string"
       ? parse(typeDefs)
@@ -342,6 +267,127 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
   const astSchema = buildASTSchema(document, {
     enableDeferStream,
   });
+
+  let plans: GrafastPlans;
+  if (rawPlans) {
+    if (objects || unions || interfaces || inputObjects || scalars || enums) {
+      throw new Error(
+        `plans is deprecated and may not be specified alongside newer approaches`,
+      );
+    }
+    plans = rawPlans;
+  } else {
+    // Hackily convert the new format into the old format. We'll do away with
+    // this in future, but for now it's the easiest way to ensure compatibility
+    plans = {};
+
+    const assertLocation = (
+      typeName: string,
+      expectedLocation:
+        | "objects"
+        | "unions"
+        | "interfaces"
+        | "inputObjects"
+        | "scalars"
+        | "enums",
+    ) => {
+      const t = astSchema.getType(typeName);
+      if (!t) {
+        throw new Error(
+          `You detailed '${expectedLocation}.${typeName}', but the 'A' type does not exist in the schema.`,
+        );
+      }
+      const [description, attr] = (() => {
+        if (isObjectType(t)) {
+          return ["an object type", "objects"] as const;
+        } else if (isInterfaceType(t)) {
+          return ["an interface type", "interfaces"] as const;
+        } else if (isUnionType(t)) {
+          return ["a union type", "unions"] as const;
+        } else if (isInputObjectType(t)) {
+          return ["an input object type", "inputObjects"] as const;
+        } else if (isScalarType(t)) {
+          return ["a scalar type", "scalars"] as const;
+        } else if (isEnumType(t)) {
+          return ["an enum type", "enums"] as const;
+        } else {
+          throw new Error(`Type ${t} not understood`);
+        }
+      })();
+      if (expectedLocation !== attr) {
+        throw new Error(
+          `You defined '${t}' under '${expectedLocation}', but it is ${description} so it should be defined under '${attr}'.`,
+        );
+      }
+    };
+    for (const [typeName, spec] of Object.entries(objects ?? {})) {
+      assertLocation(typeName, "objects");
+      const o = {} as Record<string, any>;
+      plans[typeName] = o as any;
+
+      const { plans: planResolvers = {}, ...rest } = spec;
+      for (const [key, val] of Object.entries(rest)) {
+        o[`__${key}`] = val;
+      }
+      for (const [key, val] of Object.entries(planResolvers)) {
+        o[key] = val;
+      }
+    }
+
+    for (const [typeName, spec] of Object.entries(inputObjects ?? {})) {
+      assertLocation(typeName, "inputObjects");
+      const o = {} as Record<string, any>;
+      plans[typeName] = o as any;
+
+      const { plans: planResolvers = {}, ...rest } = spec;
+      for (const [key, val] of Object.entries(rest)) {
+        o[`__${key}`] = val;
+      }
+      for (const [key, val] of Object.entries(planResolvers)) {
+        o[key] = val;
+      }
+    }
+
+    for (const [typeName, spec] of Object.entries(unions ?? {})) {
+      assertLocation(typeName, "unions");
+      const o = {} as Record<string, any>;
+      plans[typeName] = o as any;
+
+      for (const [key, val] of Object.entries(spec)) {
+        o[`__${key}`] = val;
+      }
+    }
+
+    for (const [typeName, spec] of Object.entries(interfaces ?? {})) {
+      assertLocation(typeName, "interfaces");
+      const o = {} as Record<string, any>;
+      plans[typeName] = o as any;
+
+      for (const [key, val] of Object.entries(spec)) {
+        o[`__${key}`] = val;
+      }
+    }
+
+    for (const [typeName, spec] of Object.entries(scalars ?? {})) {
+      assertLocation(typeName, "scalars");
+      plans[typeName] = spec;
+    }
+
+    for (const [typeName, spec] of Object.entries(enums ?? {})) {
+      assertLocation(typeName, "enums");
+      const o = {} as Record<string, any>;
+      plans[typeName] = o as any;
+
+      const { values = {}, ...rest } = spec;
+      for (const [key, val] of Object.entries(rest)) {
+        o[`__${key}`] = val;
+      }
+      for (const [key, val] of Object.entries(values)) {
+        o[key] = val;
+      }
+    }
+  }
+
   const schemaConfig = astSchema.toConfig() as graphql.GraphQLSchemaConfig & {
     types: Array<graphql.GraphQLNamedType>;
   };
