@@ -138,6 +138,7 @@ it("can inform you that a field plan exists for an enum", async () => {
     makeGrafastSchema({
       enums: {
         A: {
+          // @ts-expect-error
           plans: {
             str() {
               return constant("");
