@@ -1500,6 +1500,7 @@ create table polymorphic.relational_checklist_items (
 -- `type:type` is the default
 comment on table polymorphic.relational_items is $$
   @interface mode:relational
+  @disablePartitioning
   @type TOPIC references:relational_topics
   @type POST references:relational_posts
   @type DIVIDER references:relational_dividers

@@ -10693,7 +10693,8 @@ export const interfaces = {
             throw new Error(`${this} Could not find matching name for relational polymorphic '${type.name}'`);
           }
           return $base.singleRelation(spec.relationName);
-        }
+        },
+        disablePartitioning: false
       };
     }
   }

@@ -1158,6 +1158,11 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                     ),
                   };
                 } else if (polymorphism.mode === "relational") {
+                  //const typeCount = Object.keys(polymorphism.types).length;
+                  //const disablePartitioning = typeCount < 6
+                  const disablePartitioning = Boolean(
+                    codec.extensions?.tags?.disablePartitioning,
+                  );
                   grafastExtensions = {
                     toSpecifier: EXPORTABLE(
                       (PgSelectSingleStep, get, object, pk, resource) =>
@@ -1208,6 +1213,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                     planType: EXPORTABLE(
                       (
                         PgSelectSingleStep,
+                        disablePartitioning,
                         get,
                         lambda,
                         pk,
@@ -1282,10 +1288,12 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                               }
                               return $base.singleRelation(spec.relationName);
                             },
+                            disablePartitioning,
                           };
                         },
                       [
                         PgSelectSingleStep,
+                        disablePartitioning,
                         get,
                         lambda,
                         pk,

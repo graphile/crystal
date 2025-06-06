@@ -2165,6 +2165,7 @@ const spec_relationalItems = {
     tags: {
       __proto__: null,
       interface: "mode:relational",
+      disablePartitioning: true,
       type: ["TOPIC references:relational_topics", "POST references:relational_posts", "DIVIDER references:relational_dividers", "CHECKLIST references:relational_checklists", "CHECKLIST_ITEM references:relational_checklist_items"]
     }
   },
@@ -3233,6 +3234,7 @@ const registryConfig_pgResources_relational_items_relational_items = {
     isDeletable: true,
     tags: {
       interface: "mode:relational",
+      disablePartitioning: true,
       type: spec_relationalItems.extensions.tags.type
     }
   }
@@ -19588,7 +19590,8 @@ export const interfaces = {
             throw new Error(`${this} Could not find matching name for relational polymorphic '${type.name}'`);
           }
           return $base.singleRelation(spec.relationName);
-        }
+        },
+        disablePartitioning: true
       };
     }
   },

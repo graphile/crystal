@@ -1729,10 +1729,12 @@ export class OperationPlan {
 
   private mutateTodos(todo: Todo) {
     for (const [_planningPath, batch] of todo) {
+      /** For polymorphicResolveType */
       const polymorphicResolveTypeEntriesByPolyType = new Map<
         GraphQLUnionType | GraphQLInterfaceType,
         Array<PolymorphicResolveTypeDetails>
       >();
+      /** For polymorphicPlanObjectType */
       const planFieldReturnTypeEntriesByStepByLayerPlan = new Map<
         LayerPlan,
         Map<Step, Array<PolymorphicPlanObjectTypeDetails>>
@@ -1755,10 +1757,11 @@ export class OperationPlan {
           }
           let list = polymorphicResolveTypeEntriesByPolyType.get(polyType);
           if (!list) {
-            list = [];
+            list = [args];
             polymorphicResolveTypeEntriesByPolyType.set(polyType, list);
+          } else {
+            list.push(args);
           }
-          list.push(args);
         } else if (method == this.polymorphicPlanObjectType) {
           const args = rawArgs as PolymorphicPlanObjectTypeDetails;
           const lp = args.layerPlan;
@@ -2053,6 +2056,8 @@ export class OperationPlan {
             locationDetails,
           });
           detailsRecord.stepForType = stepForType;
+          detailsRecord.disablePartitioning =
+            polymorphicTypePlanner.disablePartitioning;
         }
       }
 
@@ -2063,7 +2068,10 @@ export class OperationPlan {
         if (planFieldReturnTypeEntriesByStep.size <= 1) {
           continue;
         }
-        for (const [step, entries] of planFieldReturnTypeEntriesByStep) {
+        for (const [step, rawEntries] of planFieldReturnTypeEntriesByStep) {
+          // Only partition those that have not disabled partitioning
+          const entries = rawEntries.filter((e) => !e.disablePartitioning);
+
           // We already know the planningPath lines up.
           // We know all `entries` resolved to the same `step`.
           // We know all `entries` come from the same layer plan.
@@ -2502,6 +2510,7 @@ export class OperationPlan {
       isNonNull,
       resolverEmulation,
       stepForType,
+      disablePartitioning = false,
     } = details;
     if (!stepForType) {
       throw new Error(
@@ -2554,6 +2563,7 @@ export class OperationPlan {
           locationDetails,
           isNonNull,
           resolverEmulation,
+          disablePartitioning,
         });
       } finally {
         layerPlan.latestSideEffectStep = $sideEffect;
