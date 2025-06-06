@@ -281,16 +281,30 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
     // this in future, but for now it's the easiest way to ensure compatibility
     plans = {};
 
-    const assertLocation = (
-      typeName: string,
-      expectedLocation:
+    const assertLocation = <
+      TExpected extends
         | "objects"
         | "unions"
         | "interfaces"
         | "inputObjects"
         | "scalars"
         | "enums",
-    ) => {
+    >(
+      typeName: string,
+      expectedLocation: TExpected,
+    ): TExpected extends "objects"
+      ? graphql.GraphQLObjectType
+      : TExpected extends "unions"
+        ? graphql.GraphQLUnionType
+        : TExpected extends "interface"
+          ? graphql.GraphQLInterfaceType
+          : TExpected extends "inputObjects"
+            ? graphql.GraphQLInputObjectType
+            : TExpected extends "scalars"
+              ? graphql.GraphQLScalarType
+              : TExpected extends "enums"
+                ? graphql.GraphQLEnumType
+                : never => {
       const t = astSchema.getType(typeName);
       if (!t) {
         throw new Error(
@@ -319,9 +333,10 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
           `You defined '${t}' under '${expectedLocation}', but it is ${description} so it should be defined under '${attr}'.`,
         );
       }
+      return t as any;
     };
     for (const [typeName, spec] of Object.entries(objects ?? {})) {
-      assertLocation(typeName, "objects");
+      const t = assertLocation(typeName, "objects");
       const o = {} as Record<string, any>;
       plans[typeName] = o as any;
 
@@ -330,12 +345,15 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
         o[`__${key}`] = val;
       }
       for (const [key, val] of Object.entries(planResolvers)) {
+        if (!t.getFields()[key]) {
+          throw new Error(`${t} has no field '${key}'`);
+        }
         o[key] = val;
       }
     }
 
     for (const [typeName, spec] of Object.entries(inputObjects ?? {})) {
-      assertLocation(typeName, "inputObjects");
+      const t = assertLocation(typeName, "inputObjects");
       const o = {} as Record<string, any>;
       plans[typeName] = o as any;
 
@@ -344,6 +362,9 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
         o[`__${key}`] = val;
       }
       for (const [key, val] of Object.entries(planResolvers)) {
+        if (!t.getFields()[key]) {
+          throw new Error(`${t} has no input field '${key}'`);
+        }
         o[key] = val;
       }
     }
@@ -374,7 +395,7 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
     }
 
     for (const [typeName, spec] of Object.entries(enums ?? {})) {
-      assertLocation(typeName, "enums");
+      const t = assertLocation(typeName, "enums");
       const o = {} as Record<string, any>;
       plans[typeName] = o as any;
 
@@ -383,6 +404,9 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
         o[`__${key}`] = val;
       }
       for (const [key, val] of Object.entries(values)) {
+        if (!t.getValues().find((v) => v.name === key)) {
+          throw new Error(`${t} has no value '${key}'`);
+        }
         o[key] = val;
       }
     }
