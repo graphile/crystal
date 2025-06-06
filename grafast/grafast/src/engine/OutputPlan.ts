@@ -401,7 +401,8 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
           "GrafastInternalError<b29285da-fb07-4943-9038-708edc785041>: polymorphic OutputPlan child must be an outputPlan",
         );
         assert.ok(
-          child.outputPlan.type.mode === "object",
+          child.outputPlan.type.mode === "object" ||
+            child.outputPlan.type.mode === "null",
           "GrafastInternalError<203469c6-4bfa-4cd1-ae82-cc5d0132ca16>: polymorphic OutputPlan child must be an object outputPlan",
         );
       }
