@@ -1397,6 +1397,7 @@ export class OperationPlan {
         // May have changed due to deduplicate
         step = this.stepTracker.getStepById(step.id);
         if (haltTree) {
+          // Very similar to this.handlePlanningError. Should probably use it in future.
           const isNonNull = isNonNullType(fieldType);
           outputPlan.addChild(objectType, responseKey, {
             type: "outputPlan",
@@ -2483,25 +2484,53 @@ export class OperationPlan {
         listDepth: listDepth + 1,
         streamDetails: null,
       });
-    } catch (e) {
-      const step = this.withRootLayerPlan(() => error(e));
-      const innerNullableFieldType = getNullableType(nullableFieldType.ofType);
-      const isNonNull = innerNullableFieldType !== nullableFieldType.ofType;
-      listOutputPlan.addChild(null, null, {
-        type: "outputPlan",
-        outputPlan: new OutputPlan(
-          $__item.layerPlan,
-          step,
-          OUTPUT_PLAN_TYPE_NULL,
-          locationDetails,
-        ),
-        isNonNull,
+    } catch (err) {
+      this.handlePlanningError({
+        outputPlan: listOutputPlan,
+        layerPlan: $__item.layerPlan,
+        objectType: null,
+        responseKey: null,
+        positionType: nullableFieldType.ofType,
         locationDetails,
+        err,
       });
-      return;
     } finally {
       $__item.layerPlan.latestSideEffectStep = $sideEffect;
     }
+  }
+
+  handlePlanningError(details: {
+    outputPlan: OutputPlan;
+    layerPlan: LayerPlan;
+    objectType: GraphQLObjectType | null;
+    responseKey: string | null;
+    positionType: GraphQLOutputType;
+    locationDetails: LocationDetails;
+    err: Error;
+  }) {
+    const {
+      outputPlan,
+      layerPlan,
+      objectType,
+      responseKey,
+      positionType,
+      locationDetails,
+      err,
+    } = details;
+    const step = this.withRootLayerPlan(() => error(err));
+    const nullableFieldType = getNullableType(positionType);
+    const isNonNull = nullableFieldType !== positionType;
+    outputPlan.addChild(objectType, responseKey, {
+      type: "outputPlan",
+      outputPlan: new OutputPlan(
+        layerPlan,
+        step,
+        OUTPUT_PLAN_TYPE_NULL,
+        locationDetails,
+      ),
+      isNonNull,
+      locationDetails,
+    });
   }
 
   /** @internal */
