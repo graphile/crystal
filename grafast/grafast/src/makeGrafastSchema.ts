@@ -308,7 +308,7 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
       const t = astSchema.getType(typeName);
       if (!t) {
         throw new Error(
-          `You detailed '${expectedLocation}.${typeName}', but the 'A' type does not exist in the schema.`,
+          `You detailed '${expectedLocation}.${typeName}', but the '${typeName}' type does not exist in the schema.`,
         );
       }
       const [description, attr] = (() => {
