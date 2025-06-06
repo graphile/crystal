@@ -346,7 +346,7 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
       }
       for (const [key, val] of Object.entries(planResolvers)) {
         if (!t.getFields()[key]) {
-          throw new Error(`${t} has no field '${key}'`);
+          throw new Error(`Object type '${t}' has no field '${key}'.`);
         }
         o[key] = val;
       }
@@ -363,7 +363,9 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
       }
       for (const [key, val] of Object.entries(planResolvers)) {
         if (!t.getFields()[key]) {
-          throw new Error(`${t} has no input field '${key}'`);
+          throw new Error(
+            `Input object type '${t}' has no input field '${key}'.`,
+          );
         }
         o[key] = val;
       }
@@ -405,7 +407,7 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
       }
       for (const [key, val] of Object.entries(values)) {
         if (!t.getValues().find((v) => v.name === key)) {
-          throw new Error(`${t} has no value '${key}'`);
+          throw new Error(`Enum type '${t}' has no value '${key}'.`);
         }
         o[key] = val;
       }
