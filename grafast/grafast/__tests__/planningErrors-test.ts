@@ -163,7 +163,7 @@ it("resolves the list correctly", async () => {
   });
 });
 
-it("catches field error at field level", async () => {
+it("catches planning error at field level", async () => {
   const source = /* GraphQL */ `
     {
       __typename
@@ -191,7 +191,7 @@ it("catches field error at field level", async () => {
   });
 });
 
-it("catches field error at list level", async () => {
+it("catches planning error at list level", async () => {
   const source = /* GraphQL */ `
     {
       __typename
@@ -219,7 +219,7 @@ it("catches field error at list level", async () => {
   });
 });
 
-it("catches field error at nested list level", async () => {
+it("catches planning error at nested list level", async () => {
   const source = /* GraphQL */ `
     {
       __typename
@@ -250,7 +250,7 @@ it("catches field error at nested list level", async () => {
   });
 });
 
-it("raises field error from non-nullable nested list level", async () => {
+it("raises planning error from non-nullable nested list level", async () => {
   const source = /* GraphQL */ `
     {
       __typename
