@@ -207,7 +207,7 @@ the ones you might care about:
 - `graphile-build:SchemaBuilder` - this hook is useful for understanding the
   order in which hooks execute, and how hook executions can nest - a must for
   people getting started with graphile-build plugins
-- `@dataplan/pg:PgExecutor:verbose` - details of the SQL queries being executed, their inputs, and their results
+- `@dataplan/pg:PgExecutor` - details of the SQL queries being executed, their inputs, and their results
 - `@dataplan/pg:PgExecutor:explain` - as above, but also their EXPLAIN results
 
 To enable these DEBUG modes, join them with commas when setting a DEBUG envvar,

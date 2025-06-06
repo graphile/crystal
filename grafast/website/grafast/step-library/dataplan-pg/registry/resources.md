@@ -35,8 +35,8 @@ could not be found).
 PgExecutor is also responsible for things like caching.
 
 See the SQL queries that are being executed with the
-`DEBUG="@dataplan/pg:PgExecutor:verbose"` envvar. (Or replace `:verbose` with
-`:explain` if you want to see even more information.)
+`DEBUG="@dataplan/pg:PgExecutor"` envvar. (Append `:explain` if you want to see
+even more information.)
 
 A PgExecutor is constructed with an options object containing two properties:
 
