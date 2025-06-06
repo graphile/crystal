@@ -35,6 +35,7 @@ const schema = makeGrafastSchema({
       error: [[Int]]
       errorAtDepth1: [[Int]]
       errorAtDepth2: [[Int]]
+      errorAtDepth2NN: [[Int!]]
     }
     type OtherThing implements Poly {
       id: Int
@@ -74,6 +75,18 @@ const schema = makeGrafastSchema({
           );
         },
         errorAtDepth2() {
+          return each(
+            constant([
+              [1, 2],
+              [3, 4],
+            ]),
+            ($i) =>
+              each($i, ($j) => {
+                throw new GraphQLError("Error at depth 2");
+              }),
+          );
+        },
+        errorAtDepth2NN() {
           return each(
             constant([
               [1, 2],
@@ -233,6 +246,34 @@ it("catches field error at nested list level", async () => {
         [null, null],
         [null, null],
       ],
+    },
+  });
+});
+
+it("raises field error from non-nullable nested list level", async () => {
+  const source = /* GraphQL */ `
+    {
+      __typename
+      thing {
+        errorAtDepth2NN
+      }
+    }
+  `;
+  const result = (await grafast({
+    schema,
+    source,
+    requestContext,
+    resolvedPreset,
+  })) as ExecutionResult;
+  expect(result.errors).to.have.length(2);
+  expect(result.errors![1]).to.deep.contain({
+    message: "Error at depth 2",
+    path: ["thing", "errorAtDepth2NN", 1, 0],
+  });
+  expect(result.data).to.deep.equal({
+    __typename: "Query",
+    thing: {
+      errorAtDepth2NN: [null, null],
     },
   });
 });
