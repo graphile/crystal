@@ -32,7 +32,7 @@ const schema = makeGrafastSchema({
     type Thing implements Poly {
       id: Int
       safe: [[Int]]
-      direct: [[Int]]
+      error: [[Int]]
       errorAtDepth1: [[Int]]
       errorAtDepth2: [[Int]]
     }
@@ -51,21 +51,46 @@ const schema = makeGrafastSchema({
     Thing: {
       plans: {
         safe() {
-          return each(constant([[1]]), ($i) => each($i, ($j) => $j));
+          return each(
+            constant([
+              [1, 2],
+              [3, 4],
+            ]),
+            ($i) => each($i, ($j) => $j),
+          );
         },
-        direct() {
+        error() {
           throw new GraphQLError("Direct error");
         },
         errorAtDepth1() {
-          return each(constant([[1]]), () => {
-            throw new GraphQLError("Error at depth 1");
-          });
+          let a = 1;
+          return each(
+            constant([
+              [1, 2],
+              [3, 4],
+            ]),
+            ($i) => {
+              if (--a === 0) {
+                throw new GraphQLError("Error at depth 1");
+              }
+              return each($i, ($j) => $j);
+            },
+          );
         },
         errorAtDepth2() {
-          return each(constant([[1]]), ($i) =>
-            each($i, () => {
-              throw new GraphQLError("Error at depth 2");
-            }),
+          let a = 2;
+          return each(
+            constant([
+              [1, 2],
+              [3, 4],
+            ]),
+            ($i) =>
+              each($i, ($j) => {
+                if (--a === 0) {
+                  throw new GraphQLError("Error at depth 2");
+                }
+                return $j;
+              }),
           );
         },
       },
@@ -106,6 +131,7 @@ function getTypeNameFromPoly(poly: Poly) {
 it("resolves the list correctly", async () => {
   const source = /* GraphQL */ `
     {
+      __typename
       thing {
         safe
       }
@@ -122,8 +148,40 @@ it("resolves the list correctly", async () => {
   }
   expect(result.errors).to.be.undefined;
   expect(result.data).to.deep.equal({
+    __typename: "Query",
     thing: {
-      safe: [[1]],
+      safe: [
+        [1, 2],
+        [3, 4],
+      ],
+    },
+  });
+});
+
+it("catches field error at field level", async () => {
+  const source = /* GraphQL */ `
+    {
+      __typename
+      thing {
+        error
+      }
+    }
+  `;
+  const result = (await grafast({
+    schema,
+    source,
+    requestContext,
+    resolvedPreset,
+  })) as ExecutionResult;
+  expect(result.errors).to.have.length(1);
+  expect(result.errors![0]).to.deep.contain({
+    message: "Direct error",
+    path: ["thing", "error"],
+  });
+  expect(result.data).to.deep.equal({
+    __typename: "Query",
+    thing: {
+      error: null,
     },
   });
 });
