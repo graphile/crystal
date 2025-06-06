@@ -89,6 +89,7 @@ declare global {
       interface: string;
       name: string;
       unionMember: string | string[];
+      disablePartitioning: true;
     }
 
     interface PgSmartTagsDict {

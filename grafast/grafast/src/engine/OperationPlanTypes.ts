@@ -90,6 +90,7 @@ export interface PolymorphicResolveTypeDetails
 
   // Populated by mutateTodos
   stepForType?: ReadonlyMap<GraphQLObjectType, Step>;
+  disablePartitioning?: boolean;
 }
 
 export interface PolymorphicPlanObjectTypeDetails
@@ -98,4 +99,5 @@ export interface PolymorphicPlanObjectTypeDetails
   fieldNodes: readonly FieldNode[];
   locationDetails: LocationDetails;
   isNonNull: boolean;
+  disablePartitioning: boolean;
 }

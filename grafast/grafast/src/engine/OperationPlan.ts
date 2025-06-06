@@ -2056,6 +2056,8 @@ export class OperationPlan {
             locationDetails,
           });
           detailsRecord.stepForType = stepForType;
+          detailsRecord.disablePartitioning =
+            polymorphicTypePlanner.disablePartitioning;
         }
       }
 
@@ -2066,7 +2068,10 @@ export class OperationPlan {
         if (planFieldReturnTypeEntriesByStep.size <= 1) {
           continue;
         }
-        for (const [step, entries] of planFieldReturnTypeEntriesByStep) {
+        for (const [step, rawEntries] of planFieldReturnTypeEntriesByStep) {
+          // Only partition those that have not disabled partitioning
+          const entries = rawEntries.filter((e) => !e.disablePartitioning);
+
           // We already know the planningPath lines up.
           // We know all `entries` resolved to the same `step`.
           // We know all `entries` come from the same layer plan.
@@ -2505,6 +2510,7 @@ export class OperationPlan {
       isNonNull,
       resolverEmulation,
       stepForType,
+      disablePartitioning = false,
     } = details;
     if (!stepForType) {
       throw new Error(
@@ -2557,6 +2563,7 @@ export class OperationPlan {
           locationDetails,
           isNonNull,
           resolverEmulation,
+          disablePartitioning,
         });
       } finally {
         layerPlan.latestSideEffectStep = $sideEffect;

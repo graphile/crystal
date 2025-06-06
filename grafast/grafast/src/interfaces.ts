@@ -831,8 +831,21 @@ export interface AbstractTypePlanner {
    * the given `$specifier`, or `null` if no such type could be determined.
    */
   $__typename: Step<string | null>;
+
   /**
    * If not provided, will call `t.planType($specifier)`
    */
   planForType?(t: GraphQLObjectType): Step | null;
+
+  /**
+   * If your abstract type returns a different step for each type but you still
+   * want these steps to exist in the same layer plan (for example, so that
+   * they may optimize together and/or related steps may deduplicate) then set
+   * this to true. Doing so could result in performance degradation due to
+   * having to run every subsequent step in the layer plan with filtering, so
+   * be sure.
+   *
+   * @experimental
+   */
+  disablePartitioning?: boolean;
 }
