@@ -2483,6 +2483,22 @@ export class OperationPlan {
         listDepth: listDepth + 1,
         streamDetails: null,
       });
+    } catch (e) {
+      const step = this.withRootLayerPlan(() => error(e));
+      const innerNullableFieldType = getNullableType(nullableFieldType.ofType);
+      const isNonNull = innerNullableFieldType !== nullableFieldType.ofType;
+      listOutputPlan.addChild(null, null, {
+        type: "outputPlan",
+        outputPlan: new OutputPlan(
+          $__item.layerPlan,
+          step,
+          OUTPUT_PLAN_TYPE_NULL,
+          locationDetails,
+        ),
+        isNonNull,
+        locationDetails,
+      });
+      return;
     } finally {
       $__item.layerPlan.latestSideEffectStep = $sideEffect;
     }
