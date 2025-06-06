@@ -402,6 +402,11 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
       plans[typeName] = o as any;
 
       const { values = {}, ...rest } = spec;
+      if ("plans" in rest) {
+        throw new Error(
+          `Enum type '${t}' cannot have field plans, please use 'values'.`,
+        );
+      }
       for (const [key, val] of Object.entries(rest)) {
         o[`__${key}`] = val;
       }

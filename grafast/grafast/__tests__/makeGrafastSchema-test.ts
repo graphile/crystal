@@ -94,3 +94,133 @@ it("can inform you that the field doesn't exist", async () => {
     }),
   ).to.throw("Object type 'A' has no field 'string'.");
 });
+
+it("can inform you that you used 'objects' for an interface", async () => {
+  expect(() =>
+    makeGrafastSchema({
+      objects: {
+        A: {},
+      },
+      typeDefs: /* GraphQL */ `
+        type Query {
+          a: A
+        }
+        interface A {
+          str: String
+        }
+      `,
+    }),
+  ).to.throw(
+    "You defined 'A' under 'objects', but it is an interface type so it should be defined under 'interfaces'.",
+  );
+});
+
+it("can inform you that you used 'enums' for a scalar", async () => {
+  expect(() =>
+    makeGrafastSchema({
+      enums: {
+        A: {},
+      },
+      typeDefs: /* GraphQL */ `
+        type Query {
+          a: A
+        }
+        scalar A
+      `,
+    }),
+  ).to.throw(
+    "You defined 'A' under 'enums', but it is a scalar type so it should be defined under 'scalars'.",
+  );
+});
+
+it("can inform you that a field plan exists for an enum", async () => {
+  expect(() =>
+    makeGrafastSchema({
+      enums: {
+        A: {
+          plans: {
+            str() {
+              return constant("");
+            },
+          },
+        },
+      },
+      typeDefs: /* GraphQL */ `
+        type Query {
+          a: A
+        }
+        enum A {
+          ONE
+        }
+      `,
+    }),
+  ).to.throw("Enum type 'A' cannot have field plans, please use 'values'.");
+});
+
+it("can inform you that you used 'objects' for a union", async () => {
+  expect(() =>
+    makeGrafastSchema({
+      objects: {
+        A: {},
+      },
+      typeDefs: /* GraphQL */ `
+        type Query {
+          a: A
+        }
+        union A = B | C
+        type B {
+          str: String
+        }
+        type C {
+          str: String
+        }
+      `,
+    }),
+  ).to.throw(
+    "You defined 'A' under 'objects', but it is a union type so it should be defined under 'unions'.",
+  );
+});
+
+it("can inform you that you used 'objects' for an input object", async () => {
+  expect(() =>
+    makeGrafastSchema({
+      objects: {
+        A: {},
+      },
+      typeDefs: /* GraphQL */ `
+        type Query {
+          a(arg: A): Int
+        }
+        input A {
+          str: String
+        }
+      `,
+    }),
+  ).to.throw(
+    "You defined 'A' under 'objects', but it is an input object type so it should be defined under 'inputObjects'.",
+  );
+});
+
+it("can inform you that inputObject field doesn't exist", async () => {
+  expect(() =>
+    makeGrafastSchema({
+      inputObjects: {
+        A: {
+          plans: {
+            notAField() {
+              return constant(123);
+            },
+          },
+        },
+      },
+      typeDefs: /* GraphQL */ `
+        type Query {
+          a(arg: A): Int
+        }
+        input A {
+          str: String
+        }
+      `,
+    }),
+  ).to.throw("Input object type 'A' has no input field 'notAField'.");
+});
