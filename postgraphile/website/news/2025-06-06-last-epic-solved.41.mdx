@@ -1,10 +1,9 @@
 ---
-title: "Last Epic reached!"
+title: "Last epic solved!"
 description:
-  "Polymorphism re-overhauled for greater efficiency and ergonomics. This is the
-  last breaking change to plan resolvers we are expecting before becoming
-  stable."
-slug: 2025-06-06-last-epic-reached
+  "Polymorphism overhauled for greater efficiency and ergonomics. This is the
+  last breaking change to plan resolvers we are expecting for v1."
+slug: 2025-06-06-last-epic-solved
 authors:
   - name: Benjie
     title: PostGraphile Maintainer
@@ -23,7 +22,7 @@ import styles from "@site/src/css/common.module.css";
 
 In the first Gra<em>fast</em> Working Group, we outlined 4 <em>major</em> issues in Gra<em>fast</em>
 that needed to be addressed before we could think about general release. The fourth, and final,
-Epic has now been reached!
+epic has now been solved!
 
 - ✅ Global dependencies — solved via “unary” steps
 - ✅ Early exit — solved via “flags”
@@ -37,7 +36,7 @@ uses, allowing it to build much more efficient SQL queries than PostGraphile V4 
 achieve, whilst also significantly expanding the capabilities of the system - not to
 mention solving some longstanding issues!
 
-### Polymorphism Epic Achieved
+### Polymorphism epic achieved
 
 In previous versions of Gra*fast* there was the possibility of exponential plan
 branching due to the naive method of resolution of abstract types.
@@ -65,23 +64,30 @@ single “combined” step before planning the next level of polymorphism.
 
 <!-- truncate-->
 
-Users of PostGraphile’s polymorphism should not need to take any action to
-benefit from these changes and may notice that their SQL queries are now
-slightly smaller and in general fewer requests to the database are required.
+Users of PostGraphile’s Postgres-based polymorphism should not need to take any action to
+benefit from these changes, and may notice that their SQL queries are now
+slightly smaller.
 
 ### TypeDefs / plans overhaul
 
-In order to make the libraries more type safe, `makeExtendSchemaPlugin` has
+In order to make the libraries more type safe, `makeGrafastSchema` (from
+`grafast`) and `makeExtendSchemaPlugin` (from `postgraphile/utils`) have
 deprecated the `typeDefs`/`plans` pattern since `plans` (like `resolvers` in the
-traditional format) ended up being a mish-mash of lots of different types and
-`__`-prefixed fields for special cases.
+traditional format) ended up being a mish-mash of lots of different types
+(objects, scalars, enums, etc) and `__`-prefixed fields (`__resolveType`,
+`__isTypeOf`, etc) for methods on the type itself.
 
 Going forwards, the configuration should be split into `typeDefs` with
-`objects`, `interfaces`, `unions`, `inputObjects`, `scalars` and `enums`.
-Type-level properties such as `resolveType`/`isTypeOf`/`planType`/`scope`/etc
-should now be presented without their `__` prefix; to avoid conflicts with
-type-level properties, object and input object fields should be specified inside
-a new `plans` property and enum values within the new `values` property.
+`objects`, `interfaces`, `unions`, `inputObjects`, `scalars` and `enums` as
+appropriate. Type-level properties such as
+`resolveType`/`isTypeOf`/`planType`/`scope`/etc are no longer prefixed with `__`
+and, to avoid conflicts with these type-level properties, object and input
+object fields should be specified inside a new `plans` property and enum values
+within the new `values` property.
+
+**The old pattern will still work** (this is not a breaking change), but we
+recommend moving to the new shape and will use it for all of our examples in the
+documentation from now on.
 
 Migration is quite straightforward:
 
@@ -91,20 +97,20 @@ Migration is quite straightforward:
    where you’re not defining types of that kind.
 
 1. **Split definitions based on type kind**. For each type defined in `plans`
-   move it into the appropriate new property based on the keyword used to define
-   the type in the `typeDefs` (`type` &rarr; `objects`, `interface` &rarr;
-   `interfaces`, `union` &rarr; `unions`, `input object` &rarr; `inputObjects`,
-   `scalar` &rarr; `scalars`, `enum` &rarr; `enums`).
+   move it into the appropriate new object (based on keyword defining the type;
+   i.e. `type` &rarr; `objects`, `interface` &rarr; `interfaces`, `union` &rarr;
+   `unions`, `input object` &rarr; `inputObjects`, `scalar` &rarr; `scalars`,
+   `enum` &rarr; `enums`).
 
 1. **Move field plans into nested `plans: {...}` object**. For each type defined
-   in the new `objects` and `inputObjects` maps: create a `plans: { ... }` entry
-   inside the type and move all fields (anything not prefixed with `__`) inside
-   this new (nested) property.
+   in the new `objects` and `inputObjects` objects: create a `plans: { ... }`
+   entry inside the type and move all fields (anything not prefixed with `__`)
+   inside this new (nested) property.
 
 1. **Move enum values into nested `values: {...}` object**. For each type
-   defined in the new `enums` map: create a `values: { ... }` entry inside the
-   type and move all values (anything not prefixed with `__`) inside this new
-   (nested) property.
+   defined in the new `enums` object: create a `values: { ... }` entry inside
+   the type and move all values (anything not prefixed with `__`) inside this
+   new (nested) property.
 
 1. **Remove `__` prefixes**. For each type across
    `objects`/`interfaces`/`unions`/`interfaceObjects`/`scalars` and `enums`:
