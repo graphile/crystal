@@ -1941,15 +1941,23 @@ export class OperationPlan {
           resolverEmulation,
           $original,
         };
-        const polymorphicTypePlanner = withGlobalLayerPlan(
-          commonLayerPlan,
-          combinedPolymorphicPaths,
-          planningPath,
-          planType,
-          null,
-          commonStep,
-          info,
-        );
+        let polymorphicTypePlanner: AbstractTypePlanner;
+        try {
+          polymorphicTypePlanner = withGlobalLayerPlan(
+            commonLayerPlan,
+            combinedPolymorphicPaths,
+            planningPath,
+            planType,
+            null,
+            commonStep,
+            info,
+          );
+        } catch (err) {
+          const $error = this.withRootLayerPlan(() => error(err));
+          polymorphicTypePlanner = {
+            $__typename: $error,
+          };
+        }
         const stepForType = new Map<GraphQLObjectType, Step | Error>();
         const allTypeNames = allPossibleObjectTypes.map((t) => t.name);
         const basePaths = [...(combinedPolymorphicPaths ?? [""])];

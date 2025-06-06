@@ -29,7 +29,7 @@ const OTHER_THING = {
 
 const schema = makeGrafastSchema({
   typeDefs: /* GraphQL */ `
-    type Thing implements Poly {
+    type Thing implements Poly & Poly2 {
       id: Int
       safe: [[Int]]
       error: [[Int]]
@@ -37,15 +37,19 @@ const schema = makeGrafastSchema({
       errorAtDepth2: [[Int]]
       errorAtDepth2NN: [[Int!]]
     }
-    type OtherThing implements Poly {
+    type OtherThing implements Poly & Poly2 {
       id: Int
     }
     interface Poly {
       id: Int
     }
+    interface Poly2 {
+      id: Int
+    }
     type Query {
       thing: Thing
       poly: [Poly]
+      poly2: [Poly2]
     }
   `,
   objects: {
@@ -108,6 +112,9 @@ const schema = makeGrafastSchema({
         poly() {
           return constant([THING, OTHER_THING]);
         },
+        poly2() {
+          return constant([THING, OTHER_THING]);
+        },
       },
     },
     Poly: {
@@ -123,6 +130,11 @@ const schema = makeGrafastSchema({
             }
           },
         };
+      },
+    },
+    Poly2: {
+      planType($poly) {
+        throw new GraphQLError("Poly2 error");
       },
     },
   },
@@ -278,7 +290,36 @@ it("raises planning error from non-nullable nested list level", async () => {
   });
 });
 
-it("raises planning error from bad poly plan", async () => {
+it("raises planning error from bad poly planType", async () => {
+  const source = /* GraphQL */ `
+    {
+      __typename
+      poly2 {
+        id
+        ... on Thing {
+          safe
+        }
+      }
+    }
+  `;
+  const result = (await grafast({
+    schema,
+    source,
+    requestContext,
+    resolvedPreset,
+  })) as ExecutionResult;
+  expect(result.errors).to.have.length(2);
+  expect(result.errors![1]).to.deep.contain({
+    message: "Poly2 error",
+    path: ["poly2", 1],
+  });
+  expect(result.data).to.deep.equal({
+    __typename: "Query",
+    poly2: [null, null],
+  });
+});
+
+it("raises planning error from bad poly planForType", async () => {
   const source = /* GraphQL */ `
     {
       __typename
