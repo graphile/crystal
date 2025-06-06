@@ -257,88 +257,6 @@ export function makeExtendSchemaPlugin(
                 ) as ExtensionDefinition)
             : generator;
 
-          let plans: Plans;
-          if (rawPlans) {
-            if (
-              objects ||
-              unions ||
-              interfaces ||
-              inputObjects ||
-              scalars ||
-              enums
-            ) {
-              throw new Error(
-                `plans is deprecated and may not be specified alongside newer approaches`,
-              );
-            }
-            plans = rawPlans;
-          } else {
-            // Hackily convert the new format into the old format. We'll do away with
-            // this in future, but for now it's the easiest way to ensure compatibility
-            plans = {};
-
-            for (const [typeName, spec] of Object.entries(objects ?? {})) {
-              const o = {} as Record<string, any>;
-              plans[typeName] = o as any;
-
-              const { plans: fieldPlans = {}, ...rest } = spec;
-              for (const [key, val] of Object.entries(rest)) {
-                o[`__${key}`] = val;
-              }
-              for (const [key, val] of Object.entries(fieldPlans)) {
-                o[key] = val;
-              }
-            }
-
-            for (const [typeName, spec] of Object.entries(inputObjects ?? {})) {
-              const o = {} as Record<string, any>;
-              plans[typeName] = o as any;
-
-              const { plans: fieldPlans = {}, ...rest } = spec;
-              for (const [key, val] of Object.entries(rest)) {
-                o[`__${key}`] = val;
-              }
-              for (const [key, val] of Object.entries(fieldPlans)) {
-                o[key] = val;
-              }
-            }
-
-            for (const [typeName, spec] of Object.entries(unions ?? {})) {
-              const o = {} as Record<string, any>;
-              plans[typeName] = o as any;
-
-              for (const [key, val] of Object.entries(spec)) {
-                o[`__${key}`] = val;
-              }
-            }
-
-            for (const [typeName, spec] of Object.entries(interfaces ?? {})) {
-              const o = {} as Record<string, any>;
-              plans[typeName] = o as any;
-
-              for (const [key, val] of Object.entries(spec)) {
-                o[`__${key}`] = val;
-              }
-            }
-
-            for (const [typeName, spec] of Object.entries(scalars ?? {})) {
-              plans[typeName] = spec;
-            }
-
-            for (const [typeName, spec] of Object.entries(enums ?? {})) {
-              const o = {} as Record<string, any>;
-              plans[typeName] = o as any;
-
-              const { values = {}, ...rest } = spec;
-              for (const [key, val] of Object.entries(rest)) {
-                o[`__${key}`] = val;
-              }
-              for (const [key, val] of Object.entries(values)) {
-                o[key] = val;
-              }
-            }
-          }
-
           if (typeDefs == null) {
             throw new Error(
               "The first argument to makeExtendSchemaPlugin must be an object containing a `typeDefs` field.",
@@ -441,6 +359,212 @@ export function makeExtendSchemaPlugin(
               );
             }
           });
+
+          let plans: Plans;
+          if (rawPlans) {
+            if (
+              objects ||
+              unions ||
+              interfaces ||
+              inputObjects ||
+              scalars ||
+              enums
+            ) {
+              throw new Error(
+                `plans is deprecated and may not be specified alongside newer approaches`,
+              );
+            }
+            plans = rawPlans;
+          } else {
+            // Hackily convert the new format into the old format. We'll do away with
+            // this in future, but for now it's the easiest way to ensure compatibility
+            plans = {};
+            const definitionNodes = document.definitions.filter(
+              (d) =>
+                d.kind === Kind.OBJECT_TYPE_DEFINITION ||
+                d.kind === Kind.INTERFACE_TYPE_DEFINITION ||
+                d.kind === Kind.UNION_TYPE_DEFINITION ||
+                d.kind === Kind.INPUT_OBJECT_TYPE_DEFINITION ||
+                d.kind === Kind.ENUM_TYPE_DEFINITION ||
+                d.kind === Kind.SCALAR_TYPE_DEFINITION ||
+                d.kind === Kind.OBJECT_TYPE_EXTENSION ||
+                d.kind === Kind.INTERFACE_TYPE_EXTENSION ||
+                d.kind === Kind.UNION_TYPE_EXTENSION ||
+                d.kind === Kind.INPUT_OBJECT_TYPE_EXTENSION ||
+                d.kind === Kind.ENUM_TYPE_EXTENSION ||
+                d.kind === Kind.SCALAR_TYPE_EXTENSION,
+            );
+
+            const assertLocation = <
+              TExpected extends
+                | "objects"
+                | "unions"
+                | "interfaces"
+                | "inputObjects"
+                | "scalars"
+                | "enums",
+            >(
+              typeName: string,
+              expectedLocation: TExpected,
+            ): ReadonlyArray<string> => {
+              const nodes = definitionNodes.filter(
+                (n) => n.name.value === typeName,
+              );
+              const node = nodes[0];
+              if (!node) {
+                throw new Error(
+                  `You detailed '${expectedLocation}.${typeName}', but the '${typeName}' type is not defined or extended in your 'typeDefs'.`,
+                );
+              }
+              const [description, attr, names = []] = (() => {
+                if (
+                  node.kind === Kind.OBJECT_TYPE_EXTENSION ||
+                  node.kind === Kind.OBJECT_TYPE_DEFINITION
+                ) {
+                  return [
+                    "an object type",
+                    "objects",
+                    (nodes as Array<typeof node>)
+                      .flatMap((n) => n.fields?.map((f) => f.name.value))
+                      .filter(isNotNullish),
+                  ] as const;
+                } else if (
+                  node.kind === Kind.INTERFACE_TYPE_EXTENSION ||
+                  node.kind === Kind.INTERFACE_TYPE_DEFINITION
+                ) {
+                  return ["an interface type", "interfaces"] as const;
+                } else if (
+                  node.kind === Kind.UNION_TYPE_EXTENSION ||
+                  node.kind === Kind.UNION_TYPE_DEFINITION
+                ) {
+                  return ["a union type", "unions"] as const;
+                } else if (
+                  node.kind === Kind.INPUT_OBJECT_TYPE_EXTENSION ||
+                  node.kind === Kind.INPUT_OBJECT_TYPE_DEFINITION
+                ) {
+                  return [
+                    "an input object type",
+                    "inputObjects",
+                    (nodes as Array<typeof node>)
+                      .flatMap((n) => n.fields?.map((f) => f.name.value))
+                      .filter(isNotNullish),
+                  ] as const;
+                } else if (
+                  node.kind === Kind.SCALAR_TYPE_EXTENSION ||
+                  node.kind === Kind.SCALAR_TYPE_DEFINITION
+                ) {
+                  return ["a scalar type", "scalars"] as const;
+                } else if (
+                  node.kind === Kind.ENUM_TYPE_EXTENSION ||
+                  node.kind === Kind.ENUM_TYPE_DEFINITION
+                ) {
+                  return [
+                    "an enum type",
+                    "enums",
+                    (nodes as Array<typeof node>)
+                      .flatMap((n) => n.values?.map((f) => f.name.value))
+                      .filter(isNotNullish),
+                  ] as const;
+                } else {
+                  throw new Error(`Type ${typeName} not understood`);
+                }
+              })();
+              if (expectedLocation !== attr) {
+                throw new Error(
+                  `You defined '${typeName}' under '${expectedLocation}', but it is ${description} so it should be defined under '${attr}'.`,
+                );
+              }
+              return names;
+            };
+
+            for (const [typeName, spec] of Object.entries(objects ?? {})) {
+              const fields = assertLocation(typeName, "objects");
+              const o = {} as Record<string, any>;
+              plans[typeName] = o as any;
+
+              const { plans: planResolvers = {}, ...rest } = spec;
+              for (const [key, val] of Object.entries(rest)) {
+                o[`__${key}`] = val;
+              }
+              for (const [key, val] of Object.entries(planResolvers)) {
+                if (!fields.includes(key)) {
+                  throw new Error(
+                    `Object type '${typeName}' field '${key}' was not defined in this plugin.`,
+                  );
+                }
+                o[key] = val;
+              }
+            }
+
+            for (const [typeName, spec] of Object.entries(inputObjects ?? {})) {
+              const fields = assertLocation(typeName, "inputObjects");
+              const o = {} as Record<string, any>;
+              plans[typeName] = o as any;
+
+              const { plans: planResolvers = {}, ...rest } = spec;
+              for (const [key, val] of Object.entries(rest)) {
+                o[`__${key}`] = val;
+              }
+              for (const [key, val] of Object.entries(planResolvers)) {
+                if (!fields.includes(key)) {
+                  throw new Error(
+                    `Input object type '${typeName}' field '${key}' was not defined in this plugin.`,
+                  );
+                }
+                o[key] = val;
+              }
+            }
+
+            for (const [typeName, spec] of Object.entries(unions ?? {})) {
+              assertLocation(typeName, "unions");
+              const o = {} as Record<string, any>;
+              plans[typeName] = o as any;
+
+              for (const [key, val] of Object.entries(spec)) {
+                o[`__${key}`] = val;
+              }
+            }
+
+            for (const [typeName, spec] of Object.entries(interfaces ?? {})) {
+              assertLocation(typeName, "interfaces");
+              const o = {} as Record<string, any>;
+              plans[typeName] = o as any;
+
+              for (const [key, val] of Object.entries(spec)) {
+                o[`__${key}`] = val;
+              }
+            }
+
+            for (const [typeName, spec] of Object.entries(scalars ?? {})) {
+              assertLocation(typeName, "scalars");
+              plans[typeName] = spec;
+            }
+
+            for (const [typeName, spec] of Object.entries(enums ?? {})) {
+              const enumValues = assertLocation(typeName, "enums");
+              const o = {} as Record<string, any>;
+              plans[typeName] = o as any;
+
+              const { values = {}, ...rest } = spec;
+              if ("plans" in rest) {
+                throw new Error(
+                  `Enum type '${typeName}' cannot have field plans, please use 'values'.`,
+                );
+              }
+              for (const [key, val] of Object.entries(rest)) {
+                o[`__${key}`] = val;
+              }
+              for (const [key, val] of Object.entries(values)) {
+                if (!enumValues.includes(key)) {
+                  throw new Error(
+                    `Enum type '${typeName}' value '${key}' was not defined in this plugin.`,
+                  );
+                }
+                o[key] = val;
+              }
+            }
+          }
+
           build.makeExtendSchemaPlugin![uniquePluginName] = {
             typeExtensions,
             newTypes,
@@ -1356,4 +1480,8 @@ function scopeFromDirectives(
       .map((d) => d.args)
       .reduce((memo, a) => Object.assign(memo, a), Object.create(null)),
   };
+}
+
+function isNotNullish<T>(v: Maybe<T>): v is T {
+  return v != null;
 }
