@@ -200,7 +200,7 @@ export class PgExecutor<const TName extends string = string, TSettings = any> {
             JSON.stringify(firstResult[key], null, 2)
           : explainResult.rows.map((r) => r[key]).join("\n");
     }
-    if (debugVerbose.enabled || debugExplain.enabled) {
+    if (debug.enabled || debugVerbose.enabled || debugExplain.enabled) {
       const duration = (Number((end - start) / 10000n) / 100).toFixed(2) + "ms";
       const rows = queryResult?.rows;
       const rowResults =
@@ -221,7 +221,11 @@ export class PgExecutor<const TName extends string = string, TSettings = any> {
               .join("\n  ") +
             "\n]"
           : inspect(queryResult?.rows, { colors: true, depth: 6 });
-      (debugExplain.enabled ? debugExplain : debugVerbose)(
+      (debugExplain.enabled
+        ? debugExplain
+        : debug.enabled
+          ? debug
+          : debugVerbose)(
         `\
 
 
