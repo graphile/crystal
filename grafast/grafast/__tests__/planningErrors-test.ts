@@ -277,3 +277,41 @@ it("raises planning error from non-nullable nested list level", async () => {
     },
   });
 });
+
+it("raises planning error from bad poly plan", async () => {
+  const source = /* GraphQL */ `
+    {
+      __typename
+      poly {
+        id
+        ... on Thing {
+          safe
+        }
+      }
+    }
+  `;
+  const result = (await grafast({
+    schema,
+    source,
+    requestContext,
+    resolvedPreset,
+  })) as ExecutionResult;
+  expect(result.errors).to.have.length(1);
+  expect(result.errors![0]).to.deep.contain({
+    message: "Error in polymorphism plan",
+    path: ["poly", 1],
+  });
+  expect(result.data).to.deep.equal({
+    __typename: "Query",
+    poly: [
+      {
+        id: 1,
+        safe: [
+          [1, 2],
+          [3, 4],
+        ],
+      },
+      null,
+    ],
+  });
+});

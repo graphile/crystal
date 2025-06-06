@@ -1950,7 +1950,7 @@ export class OperationPlan {
           commonStep,
           info,
         );
-        const stepForType = new Map<GraphQLObjectType, Step>();
+        const stepForType = new Map<GraphQLObjectType, Step | Error>();
         const allTypeNames = allPossibleObjectTypes.map((t) => t.name);
         const basePaths = [...(combinedPolymorphicPaths ?? [""])];
         const polymorphicLayerPlan = new LayerPlan(this, {
@@ -1971,53 +1971,57 @@ export class OperationPlan {
           const polymorphicPaths = new Set(
             basePaths.map((p) => `${p}>${type.name}`),
           );
-          const $stepForType =
-            (polymorphicTypePlanner.planForType
-              ? withGlobalLayerPlan(
-                  polymorphicLayerPlan,
-                  polymorphicPaths,
-                  planningPath + "?",
-                  polymorphicTypePlanner.planForType,
-                  polymorphicTypePlanner,
-                  type,
-                )
-              : type.extensions?.grafast?.planType
+          try {
+            const $stepForType =
+              (polymorphicTypePlanner.planForType
                 ? withGlobalLayerPlan(
                     polymorphicLayerPlan,
                     polymorphicPaths,
                     planningPath + "?",
-                    type.extensions.grafast.planType,
-                    type.extensions.grafast,
-                    commonStep,
+                    polymorphicTypePlanner.planForType,
+                    polymorphicTypePlanner,
+                    type,
                   )
-                : commonStep) ??
-            withGlobalLayerPlan(
-              polymorphicLayerPlan,
-              polymorphicPaths,
-              planningPath + "?",
-              constant,
-              null,
-              $$inhibit,
-            );
-          stepForType.set(type, $stepForType);
-          if (isDev) {
-            // Check that this plan is compatible with every poly path
-            if ($stepForType.polymorphicPaths === null) {
-              // All good, valid in all paths
-            } else {
-              const missedPaths = [...polymorphicPaths].filter(
-                (p) => !stepIsValidInPolyPath($stepForType, p),
+                : type.extensions?.grafast?.planType
+                  ? withGlobalLayerPlan(
+                      polymorphicLayerPlan,
+                      polymorphicPaths,
+                      planningPath + "?",
+                      type.extensions.grafast.planType,
+                      type.extensions.grafast,
+                      commonStep,
+                    )
+                  : commonStep) ??
+              withGlobalLayerPlan(
+                polymorphicLayerPlan,
+                polymorphicPaths,
+                planningPath + "?",
+                constant,
+                null,
+                $$inhibit,
               );
-              if (missedPaths.length > 0) {
-                throw new Error(
-                  `When planning ${graphqlType}'s planForType for ${
-                    type.name
-                  }, returned step ${
-                    $stepForType
-                  } is not valid in ${missedPaths.length} out of ${polymorphicPaths.size} expected paths; missed paths: ${missedPaths}`,
+            stepForType.set(type, $stepForType);
+            if (isDev) {
+              // Check that this plan is compatible with every poly path
+              if ($stepForType.polymorphicPaths === null) {
+                // All good, valid in all paths
+              } else {
+                const missedPaths = [...polymorphicPaths].filter(
+                  (p) => !stepIsValidInPolyPath($stepForType, p),
                 );
+                if (missedPaths.length > 0) {
+                  throw new Error(
+                    `When planning ${graphqlType}'s planForType for ${
+                      type.name
+                    }, returned step ${
+                      $stepForType
+                    } is not valid in ${missedPaths.length} out of ${polymorphicPaths.size} expected paths; missed paths: ${missedPaths}`,
+                  );
+                }
               }
             }
+          } catch (e) {
+            stepForType.set(type, e);
           }
         }
 
@@ -2577,12 +2581,26 @@ export class OperationPlan {
           newPolymorphicPaths.add(newPolymorphicPath);
         }
 
-        let $root = stepForType.get(type);
-        if ($root == null) {
-          console.warn(
-            `${details.positionType}'s planType().planForType(${type}) returned ${$root}`,
-          );
-          $root = this.withRootLayerPlan(() => constant(null));
+        const $root = stepForType.get(type);
+        try {
+          if ($root == null) {
+            throw new Error(
+              `${details.positionType}'s planType().planForType(${type}) returned ${$root}`,
+            );
+          } else if (!($root instanceof Step)) {
+            throw $root;
+          }
+        } catch (err) {
+          this.handlePlanningError({
+            outputPlan: polymorphicOutputPlan,
+            layerPlan: layerPlan,
+            objectType: type,
+            responseKey: null,
+            positionType: type,
+            locationDetails,
+            err,
+          });
+          return;
         }
 
         // find all selections compatible with `type`
