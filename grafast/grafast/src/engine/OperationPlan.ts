@@ -1729,10 +1729,12 @@ export class OperationPlan {
 
   private mutateTodos(todo: Todo) {
     for (const [_planningPath, batch] of todo) {
+      /** For polymorphicResolveType */
       const polymorphicResolveTypeEntriesByPolyType = new Map<
         GraphQLUnionType | GraphQLInterfaceType,
         Array<PolymorphicResolveTypeDetails>
       >();
+      /** For polymorphicPlanObjectType */
       const planFieldReturnTypeEntriesByStepByLayerPlan = new Map<
         LayerPlan,
         Map<Step, Array<PolymorphicPlanObjectTypeDetails>>
@@ -1755,10 +1757,11 @@ export class OperationPlan {
           }
           let list = polymorphicResolveTypeEntriesByPolyType.get(polyType);
           if (!list) {
-            list = [];
+            list = [args];
             polymorphicResolveTypeEntriesByPolyType.set(polyType, list);
+          } else {
+            list.push(args);
           }
-          list.push(args);
         } else if (method == this.polymorphicPlanObjectType) {
           const args = rawArgs as PolymorphicPlanObjectTypeDetails;
           const lp = args.layerPlan;
