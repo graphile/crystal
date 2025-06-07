@@ -13,7 +13,7 @@ import {
   createTestDatabase,
   dropTestDatabase,
 } from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.js";
-import { extendSchema,gql } from "../src/index.js";
+import { extendSchema, gql } from "../src/index.js";
 
 let pgPool: Pool | null = null;
 let connectionString = "";
