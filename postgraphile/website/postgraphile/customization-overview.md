@@ -208,7 +208,7 @@ new fields.
 
 If you want to augment something that PostGraphile already does, for example to
 perform an action after a mutation completes, or automatically filter out
-certain results from a record set, then `makeWrapPlansPlugin` is worth
+certain results from a record set, then `wrapPlans` is worth
 investigating.
 
 If the nullability in your schema is coming out wrong,

@@ -172,7 +172,7 @@ remove individual fields. This is just to demonstrate how a plugin to do this
 might work, [smart comments](./smart-comments) are likely a better approach.
 
 ```ts
-function makeRemoveFieldPlugin(
+function removeField(
   objectName: string,
   fieldName: string,
 ): GraphileConfig.Plugin {
@@ -193,5 +193,5 @@ function makeRemoveFieldPlugin(
   };
 }
 
-export const RemoveFooDotBarPlugin = makeRemoveFieldPlugin("Foo", "bar");
+export const RemoveFooDotBarPlugin = removeField("Foo", "bar");
 ```

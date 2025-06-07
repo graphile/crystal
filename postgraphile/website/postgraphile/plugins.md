@@ -21,7 +21,7 @@ Currently these scopes are undocumented, so here's some examples
 ## Customizing Ruru's title:
 
 ```ts
-function makeRuruTitlePlugin(title: string): GraphileConfig.Plugin {
+function ruruTitle(title: string): GraphileConfig.Plugin {
   return {
     name: "RuruTitlePlugin",
     version: "0.0.0",

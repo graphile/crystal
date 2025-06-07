@@ -68,7 +68,7 @@ function escapeHTML(rawText: string): string {
   );
 }
 
-function makeRuruTitlePlugin(title: string): GraphileConfig.Plugin {
+function ruruTitle(title: string): GraphileConfig.Plugin {
   return {
     name: "RuruTitlePlugin",
     version: "0.0.0",
@@ -161,7 +161,7 @@ const preset: GraphileConfig.Preset = {
     }),
     // PrimaryKeyMutationsOnlyPlugin,
     PersistedPlugin,
-    makeRuruTitlePlugin("<New title text here!>"),
+    ruruTitle("<New title text here!>"),
     ExportSchemaPlugin,
   ],
   extends: [
