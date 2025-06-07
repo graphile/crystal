@@ -194,7 +194,7 @@ declare global {
   }
 }
 
-export function makeExtendSchemaPlugin(
+export function extendSchema(
   generator:
     | ExtensionDefinition
     | ((build: GraphileBuild.Build) => ExtensionDefinition),
@@ -1485,3 +1485,6 @@ function scopeFromDirectives(
 function isNotNullish<T>(v: Maybe<T>): v is T {
   return v != null;
 }
+
+/** @deprecated Renamed to 'extendSchema' */
+export const makeExtendSchemaPlugin = extendSchema;

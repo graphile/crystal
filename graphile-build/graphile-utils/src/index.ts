@@ -12,6 +12,7 @@ export {
   OrderByAscDescOptions,
 } from "./makeAddPgTableOrderByPlugin.js";
 export {
+  changeNullability,
   ChangeNullabilityRules,
   ChangeNullabilityTypeRules,
   makeChangeNullabilityPlugin,
@@ -20,6 +21,7 @@ export {
 } from "./makeChangeNullabilityPlugin.js";
 export {
   EnumResolver,
+  extendSchema,
   ExtensionDefinition,
   makeExtendSchemaPlugin,
   ObjectPlan,
@@ -28,12 +30,18 @@ export {
   Resolvers,
 } from "./makeExtendSchemaPlugin.js";
 export {
+  jsonPgSmartTags,
   makeJSONPgSmartTagsPlugin,
   makePgSmartTagsFromFilePlugin,
   makePgSmartTagsPlugin,
+  pgSmartTags,
+  pgSmartTagsFromFile,
   TagsFilePlugin,
 } from "./makePgSmartTagsPlugin.js";
-export { makeProcessSchemaPlugin } from "./makeProcessSchemaPlugin.js";
+export {
+  makeProcessSchemaPlugin,
+  processSchema,
+} from "./makeProcessSchemaPlugin.js";
 export {
   makeWrapPlansPlugin,
   PlanWrapperFilter,
@@ -42,6 +50,7 @@ export {
   PlanWrapperRule,
   PlanWrapperRules,
   PlanWrapperRulesGenerator,
+  wrapPlans,
 } from "./makeWrapPlansPlugin.js";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
