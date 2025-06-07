@@ -1,5 +1,284 @@
 # grafast
 
+## 0.1.1-beta.22
+
+### Patch Changes
+
+- [#2440](https://github.com/graphile/crystal/pull/2440)
+  [`0e36cb9077c76710d2e407830323f86c5038126e`](https://github.com/graphile/crystal/commit/0e36cb9077c76710d2e407830323f86c5038126e)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug in deduplication that
+  only compared flags on first dependency.
+
+- [#2550](https://github.com/graphile/crystal/pull/2550)
+  [`c0c3f48fa9f60cb9a4436ea135979b779ecc71ec`](https://github.com/graphile/crystal/commit/c0c3f48fa9f60cb9a4436ea135979b779ecc71ec)
+  Thanks [@benjie](https://github.com/benjie)! - `EnumValueInput` type.
+
+- [#2493](https://github.com/graphile/crystal/pull/2493)
+  [`cef9a37f846b4af105ac20960530d65c9f44afa9`](https://github.com/graphile/crystal/commit/cef9a37f846b4af105ac20960530d65c9f44afa9)
+  Thanks [@benjie](https://github.com/benjie)! - Internal refactoring
+
+- [#2510](https://github.com/graphile/crystal/pull/2510)
+  [`56ce94a847c6a4094643665cbf5d3712f56140b6`](https://github.com/graphile/crystal/commit/56ce94a847c6a4094643665cbf5d3712f56140b6)
+  Thanks [@benjie](https://github.com/benjie)! - Batches calls to plan resolvers
+  to ensure we're not calling them more often than needed (reducing dependence
+  on deduplicate to clean up our steps - especially during polymorphism)
+
+- [#2444](https://github.com/graphile/crystal/pull/2444)
+  [`192a27e08763ea26607344a2ea6c7f5c595cc2a3`](https://github.com/graphile/crystal/commit/192a27e08763ea26607344a2ea6c7f5c595cc2a3)
+  Thanks [@benjie](https://github.com/benjie)! - Upgrade to Mermaid 11, and
+  reduce verbosity of polymorphism in plan diagrams.
+
+- [#2433](https://github.com/graphile/crystal/pull/2433)
+  [`6ef6abce15936a896156d5316020df55cf7d18e3`](https://github.com/graphile/crystal/commit/6ef6abce15936a896156d5316020df55cf7d18e3)
+  Thanks [@benjie](https://github.com/benjie)! - Add
+  `ctx.ws?.normalizedConnectionParams` which can be treated as headers (i.e. has
+  lower-cased keys).
+
+- [#2503](https://github.com/graphile/crystal/pull/2503)
+  [`0239c2d519300a72f545e0db7c371adae4ade2a9`](https://github.com/graphile/crystal/commit/0239c2d519300a72f545e0db7c371adae4ade2a9)
+  Thanks [@benjie](https://github.com/benjie)! - Implement deduplication of
+  loadOne/loadMany steps
+
+- [#2509](https://github.com/graphile/crystal/pull/2509)
+  [`0ea439d33ccef7f8d01ac5f54893ab2bbf1cbd4d`](https://github.com/graphile/crystal/commit/0ea439d33ccef7f8d01ac5f54893ab2bbf1cbd4d)
+  Thanks [@benjie](https://github.com/benjie)! - Planning field inputs now uses
+  a cache so planning time should reduce marginally and step ids will be less
+  inflated.
+
+- [#2529](https://github.com/graphile/crystal/pull/2529)
+  [`8034614d1078b1bd177b6e7fcc949420614e3245`](https://github.com/graphile/crystal/commit/8034614d1078b1bd177b6e7fcc949420614e3245)
+  Thanks [@benjie](https://github.com/benjie)! - Fix a number of edge-case
+  issues relating to incremental delivery:
+
+  - If a `@stream`'d step was `isSyncAndSafe` then the stream code wouldn't
+    fire. Fixed by forcing all `@stream`'d steps to have
+    `.isSyncAndSafe = false`.
+  - If a `@stream`'d step was an `AccessStep` then the output plan would skip
+    over it using the optimized expression, thus reading data from the wrong
+    place. AccessSteps are now only skipped by OutputPlan if they are
+    `isSyncAndSafe`.
+  - Fixed a bug in our iterable where an error would not correctly surface
+    errors to consumers.
+
+- [#2482](https://github.com/graphile/crystal/pull/2482)
+  [`459e1869a2ec58925b2bac5458af487c52a8ca37`](https://github.com/graphile/crystal/commit/459e1869a2ec58925b2bac5458af487c52a8ca37)
+  Thanks [@benjie](https://github.com/benjie)! - Minimum version of Node.js
+  bumped to Node 22 (the latest LTS).
+
+- [#2478](https://github.com/graphile/crystal/pull/2478)
+  [`c350e49e372ec12a4cbf04fb6b4260e01832d12b`](https://github.com/graphile/crystal/commit/c350e49e372ec12a4cbf04fb6b4260e01832d12b)
+  Thanks [@benjie](https://github.com/benjie)! - Add
+  `const refId = this.addRef($other);` and `const $other = this.getRef(refId);`
+  APIs to steps, to allow referencing ancestor steps at plan-time only. Useful
+  for optimization.
+
+- [#2507](https://github.com/graphile/crystal/pull/2507)
+  [`3176ea3e57d626b39613a73117ef97627370ec83`](https://github.com/graphile/crystal/commit/3176ea3e57d626b39613a73117ef97627370ec83)
+  Thanks [@benjie](https://github.com/benjie)! - BREAKING CHANGE: plan JSON now
+  has layer plans as a list rather than a tree, to account for combination layer
+  plans that have many parents.
+
+- [#2480](https://github.com/graphile/crystal/pull/2480)
+  [`46a42f5547c041289aa98657ebc6815f4b6c8539`](https://github.com/graphile/crystal/commit/46a42f5547c041289aa98657ebc6815f4b6c8539)
+  Thanks [@benjie](https://github.com/benjie)! - Incorporate polymorphic paths
+  into cache key.
+
+- [#2512](https://github.com/graphile/crystal/pull/2512)
+  [`be3f174c5aae8fe78a240e1bc4e1de7f18644b43`](https://github.com/graphile/crystal/commit/be3f174c5aae8fe78a240e1bc4e1de7f18644b43)
+  Thanks [@benjie](https://github.com/benjie)! - Removes a lot of cruft from
+  plan diagrams by hiding certain over-used global dependencies.
+
+- [#2527](https://github.com/graphile/crystal/pull/2527)
+  [`576fb8bad56cb940ab444574d752e914d462018a`](https://github.com/graphile/crystal/commit/576fb8bad56cb940ab444574d752e914d462018a)
+  Thanks [@{](https://github.com/{)! - In order to make the libraries more type
+  safe, `makeGrafastSchema` (from `grafast`) and `makeExtendSchemaPlugin` (from
+  `postgraphile/utils`) have deprecated the `typeDefs`/`plans` pattern since
+  `plans` (like `resolvers` in the traditional format) ended up being a
+  mish-mash of lots of different types and `__`-prefixed fields for special
+  cases.
+
+  Instead the configuration should be split into `typeDefs` with `objects`,
+  `interfaces`, `unions`, `inputObjects`, `scalars` and `enums`; and object and
+  input object fields should be specified via the `plans` entry within the type
+  to avoid conflicts with `resolveType`/`isTypeOf`/`planType`/`scope` and
+  similar type-level (rather than field-level) properties. Similarly, enum
+  values should be added under a `values` property. This also means these
+  type-level fields no longer have the `__` prefix.
+
+  Migration is quite straightforward:
+
+  1. **Add new top-level properties**. Add `objects`, `interfaces`, `unions`,
+     `inputObjects`, `scalars`, and `enums` as top level properties alongside
+     `typeDefs` and `plans`. Each should be an empty object. You can skip any
+     where you're not defining types of that kind.
+  1. **Split definitions based on type kind**. For each type defined in `plans`
+     move it into the appropriate new property based on the keyword used to
+     define the type in the `typeDefs` (`type` &rarr; `objects`, `interface`
+     &rarr; `interfaces`, `union` &rarr; `unions`, `input object` &rarr;
+     `inputObjects`, `scalar` &rarr; `scalars`, `enum` &rarr; `enums`).
+  1. **Move field plans into nested `plans: {...}` object**. For each type
+     defined in the new `objects` and `inputObjects` maps: create a
+     `plans: { ... }` entry inside the type and move all fields (anything not
+     prefixed with `__`) inside this new (nested) property.
+  1. **Move enum values into nested `values: {...}` object**. For each type
+     defined in the new `enums` map: create a `values: { ... }` entry inside the
+     type and move all values (anything not prefixed with `__`) inside this new
+     (nested) property.
+  1. **Remove `__` prefixes**. For each type across
+     `objects`/`interfaces`/`unions`/`interfaceObjects`/`scalars` and `enums`:
+     remove the `__` prefix from any methods/properties.
+
+  Example:
+
+  ```diff
+   typeDefs: ...,
+  -plans: {
+  +objects: {
+
+  -    __isTypeOf(v) {
+  +    isTypeOf(v) {
+         return v.username != null;
+       },
+  +    plans: {
+         fieldName($source, fieldArgs) {
+           // ...
+         },
+  +    },
+     },
+  +},
+  +interfaces: {,
+     MyInterface: {
+  -    __resolveType($specifier) {
+  +    resolveType($specifier) {
+         // ...
+       }
+     }
+  +},
+  +enums: {
+     MyEnum: {
+  +    values: {
+         ONE: {value: 1},
+         TWO: {value: 2},
+         THREE: {value: 3},
+  +    }
+     }
+   },
+  ```
+
+  Other changes:
+
+  - `ObjectPlans`/`GrafastPlans`/`FieldPlans`/`InputObjectPlans`/`ScalarPlans`
+    all changed to signular
+  - `InterfaceOrUnionPlans` split to `InterfacePlan`/`UnionPlan` (identical
+    currently)
+  - Shape of `ObjectPlan`/`InterfacePlan`/`UnionPlan` has changed;
+    `DeprecatedObjectPlan`/etc exist for backcompat
+  - `FieldArgs` can now accept an input shape indicating the args and their
+    types
+  - `FieldPlanResolver<TArgs, TParentStep, TResultStep>` has switched the order
+    of the first two generic parameters:
+    `FieldPlanResolver<TParentStep, TArgs, TResultStep>` - this is to reflect
+    the order of the arguments to the function. Also null has been removed from
+    the generics.
+  - Various generics (including `GrafastFieldConfig`) that used to take a
+    GraphQL type instance as a generic parameter no longer do - you need to use
+    external code generation because TypeScript cannot handle the dynamic
+    creation.
+  - `GrafastFieldConfig` last two generics swapped order.
+  - `GrafastArgumentConfig` generics completely changed
+
+- [#2436](https://github.com/graphile/crystal/pull/2436)
+  [`9f459101fa4428aa4bac71531e75f99e33da8e17`](https://github.com/graphile/crystal/commit/9f459101fa4428aa4bac71531e75f99e33da8e17)
+  Thanks [@benjie](https://github.com/benjie)! - Don't call `applyPlan` on
+  arguments if the value is not specified (not even a variable) and there's no
+  default value.
+
+- [#2439](https://github.com/graphile/crystal/pull/2439)
+  [`921665df8babe2651ab3b5886ab68bb518f2125b`](https://github.com/graphile/crystal/commit/921665df8babe2651ab3b5886ab68bb518f2125b)
+  Thanks [@benjie](https://github.com/benjie)! - Fix an issue in plan
+  finalization causing unary side effect steps in polymorphic positions (not
+  supported!) to bleed into other polymorphic paths. Technically we don't
+  support side effects outside of mutation fields, but they can be useful for
+  debugging so we don't deliberately break them.
+
+- [#2541](https://github.com/graphile/crystal/pull/2541)
+  [`78bb1a615754d772a5fda000e96073c91fa9eba7`](https://github.com/graphile/crystal/commit/78bb1a615754d772a5fda000e96073c91fa9eba7)
+  Thanks [@benjie](https://github.com/benjie)! - Enable users to return errors
+  inside of lists (e.g. in `loadMany()`) should they wish to.
+
+- [#2518](https://github.com/graphile/crystal/pull/2518)
+  [`ab0bcda5fc3c136eea09493a7d9ed4542975858e`](https://github.com/graphile/crystal/commit/ab0bcda5fc3c136eea09493a7d9ed4542975858e)
+  Thanks [@benjie](https://github.com/benjie)! - Fixes bug where undefined
+  values might not be flagged with FLAG_NULL
+
+- [#2517](https://github.com/graphile/crystal/pull/2517)
+  [`455f4811d37ad8fff91183c7a88621bcf9d79acf`](https://github.com/graphile/crystal/commit/455f4811d37ad8fff91183c7a88621bcf9d79acf)
+  Thanks [@benjie](https://github.com/benjie)! - Various of our steps weren't as
+  crisp on types as they could be. This makes them a lot stricter:
+
+  - `coalesce()` now yields `null` if it fails
+  - `each()` now reflects the type of the list item even if it's not a "list
+    capable" step
+  - `loadOne()`/`loadMany()` can now track the underlying nullability of the
+    callback (can differentiate `Maybe<ReadonlyArrray<Maybe<Thing>>>` from
+    `ReadonlyArray<Maybe<Thing>>` from `ReadonlyArray<Thing> | null` etc)
+  - `pgSelectFromRecord` (for `@dataplan/pg` users) no longer requires a mutable
+    array
+
+  🚨 This will potentially break your plan types quite a bit. In particular, the
+  `LoadOneCallback` and `LoadManyCallback` types now have 5 (not 4) generic
+  parameters, the new one is inserted in the middle (after the second parameter)
+  and indicates the true return type of the callback (ignoring promises) - e.g.
+  `Maybe<ReadonlyArray<Maybe<ItemType>>>` for `LoadManyCallback`. They have
+  sensible defaults if you only specify the first two generics.
+
+- [#2548](https://github.com/graphile/crystal/pull/2548)
+  [`45adaff886e7cd72b864150927be6c0cb4a7dfe8`](https://github.com/graphile/crystal/commit/45adaff886e7cd72b864150927be6c0cb4a7dfe8)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 Complete overhaul of
+  polymorphism:
+
+  - Centralized the responsibility of polymorphic resolution from field plan
+    resolvers into abstract types.
+  - Eliminated the concept of "polymorphic capable" steps: any step may now be
+    used for polymorphism.
+  - Steps such as `polymorphicBranch`, `pgPolymorphism`, and other polymorphism
+    related steps no longer exist as they are no longer supported in this new
+    paradigm.
+  - Abstract types gain a `planType` method: passed a `$specifier` step from the
+    field plan resolver, and returns an `AbstractTypePlanner` object which
+    returns a `$__typename` step indicating the concrete object type name for
+    this `$specifier` along with an (optional) `planForType(objectType)` method
+    to plan how to turn the `$specifier` into a step suitable for usage by the
+    given object type (assuming the `$__typename` matches).
+  - No more exponential branching: we now merge the previous polymorphic branch
+    into a single `$specifier` step before planning the next level of
+    polymorphism.
+
+  PostGraphile Postgres-level polymorphism users are unaffected (all changes
+  have been done for you); SQL queries are now slightly smaller, and in general
+  there may be fewer requests to the DB.
+
+  If you've written your own plan resolvers by hand, first: thanks for being
+  brave! Second, sorry... You're going to have to rewrite them. Hopefully the
+  result will be a net reduction in complexity though &mdash; you can move
+  repetative polymorphism handling code from the field plan resolvers themselves
+  to the new `planType` method on the abstract type. It's hard to explain all
+  the possible ways of re-writing these plans, so read the docs about the new
+  pattern first and, if you still need help, please do reach out
+  [on Discord](https://discord.gg/graphile)!
+
+  This is the last breaking change to hand written plan resolvers that we expect
+  to make before the v1.0 release (other than some improvements around
+  TypeScript types) and marks the completion of the fourth and final epic that
+  was outlined in the first Grafast Working Group. With this change, we're much
+  closer to moving to release candidate status!
+
+- Updated dependencies
+  [[`459e1869a2ec58925b2bac5458af487c52a8ca37`](https://github.com/graphile/crystal/commit/459e1869a2ec58925b2bac5458af487c52a8ca37)]:
+  - graphile-config@0.0.1-beta.16
+  - @graphile/lru@5.0.0-beta.4
+  - tamedevil@0.0.0-beta.8
+
 ## 0.1.1-beta.21
 
 ### Patch Changes

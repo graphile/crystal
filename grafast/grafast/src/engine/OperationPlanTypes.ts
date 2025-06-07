@@ -89,7 +89,7 @@ export interface PolymorphicResolveTypeDetails
   isNonNull: boolean;
 
   // Populated by mutateTodos
-  stepForType?: ReadonlyMap<GraphQLObjectType, Step>;
+  stepForType?: ReadonlyMap<GraphQLObjectType, Step | Error>;
 }
 
 export interface PolymorphicPlanObjectTypeDetails

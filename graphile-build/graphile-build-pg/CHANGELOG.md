@@ -1,5 +1,92 @@
 # graphile-build-pg
 
+## 5.0.0-beta.39
+
+### Patch Changes
+
+- [#2436](https://github.com/graphile/crystal/pull/2436)
+  [`142e39f26ce329f09bee0b5427f1ddc5103e610e`](https://github.com/graphile/crystal/commit/142e39f26ce329f09bee0b5427f1ddc5103e610e)
+  Thanks [@benjie](https://github.com/benjie)! - Don't apply the limitToTypes
+  step if the argument wasn't specified.
+
+- [#2525](https://github.com/graphile/crystal/pull/2525)
+  [`09d95319be3e25e023dfbab9d1542dfe06f65355`](https://github.com/graphile/crystal/commit/09d95319be3e25e023dfbab9d1542dfe06f65355)
+  Thanks [@benjie](https://github.com/benjie)! - Plan computed column inputs
+  (particularly Node IDs) in the root layer plan, allowing for greater plan
+  deduplication and more efficient SQL generation.
+
+- [#2482](https://github.com/graphile/crystal/pull/2482)
+  [`459e1869a2ec58925b2bac5458af487c52a8ca37`](https://github.com/graphile/crystal/commit/459e1869a2ec58925b2bac5458af487c52a8ca37)
+  Thanks [@benjie](https://github.com/benjie)! - Minimum version of Node.js
+  bumped to Node 22 (the latest LTS).
+
+- [#2521](https://github.com/graphile/crystal/pull/2521)
+  [`c43ed67b9d3acbadb172ee88ba9c2a4d32528a25`](https://github.com/graphile/crystal/commit/c43ed67b9d3acbadb172ee88ba9c2a4d32528a25)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug in nullable nodeID
+  handling for computed column arguments with the Relay preset that was causing
+  the entire select to be inhibited on null/undefined.
+
+- [#2517](https://github.com/graphile/crystal/pull/2517)
+  [`455f4811d37ad8fff91183c7a88621bcf9d79acf`](https://github.com/graphile/crystal/commit/455f4811d37ad8fff91183c7a88621bcf9d79acf)
+  Thanks [@benjie](https://github.com/benjie)! - Various of our steps weren't as
+  crisp on types as they could be. This makes them a lot stricter:
+
+  - `coalesce()` now yields `null` if it fails
+  - `each()` now reflects the type of the list item even if it's not a "list
+    capable" step
+  - `loadOne()`/`loadMany()` can now track the underlying nullability of the
+    callback (can differentiate `Maybe<ReadonlyArrray<Maybe<Thing>>>` from
+    `ReadonlyArray<Maybe<Thing>>` from `ReadonlyArray<Thing> | null` etc)
+  - `pgSelectFromRecord` (for `@dataplan/pg` users) no longer requires a mutable
+    array
+
+  🚨 This will potentially break your plan types quite a bit. In particular, the
+  `LoadOneCallback` and `LoadManyCallback` types now have 5 (not 4) generic
+  parameters, the new one is inserted in the middle (after the second parameter)
+  and indicates the true return type of the callback (ignoring promises) - e.g.
+  `Maybe<ReadonlyArray<Maybe<ItemType>>>` for `LoadManyCallback`. They have
+  sensible defaults if you only specify the first two generics.
+
+- [#2523](https://github.com/graphile/crystal/pull/2523)
+  [`b05d57b932ea00d10715dcab9f79d443408881fc`](https://github.com/graphile/crystal/commit/b05d57b932ea00d10715dcab9f79d443408881fc)
+  Thanks [@Dacjan](https://github.com/Dacjan)! - Fix bug with `@ref ... plural`
+  smart tag where multiple `@refVia` are present but the target type is not
+  abstract.
+- Updated dependencies
+  [[`0e36cb9077c76710d2e407830323f86c5038126e`](https://github.com/graphile/crystal/commit/0e36cb9077c76710d2e407830323f86c5038126e),
+  [`5a26196eff8fd1956d73e0b8fdf5cfcb7f01b7d3`](https://github.com/graphile/crystal/commit/5a26196eff8fd1956d73e0b8fdf5cfcb7f01b7d3),
+  [`c0c3f48fa9f60cb9a4436ea135979b779ecc71ec`](https://github.com/graphile/crystal/commit/c0c3f48fa9f60cb9a4436ea135979b779ecc71ec),
+  [`cef9a37f846b4af105ac20960530d65c9f44afa9`](https://github.com/graphile/crystal/commit/cef9a37f846b4af105ac20960530d65c9f44afa9),
+  [`56ce94a847c6a4094643665cbf5d3712f56140b6`](https://github.com/graphile/crystal/commit/56ce94a847c6a4094643665cbf5d3712f56140b6),
+  [`070467c4ea693a2516fc8006bebb88b1ab96fb26`](https://github.com/graphile/crystal/commit/070467c4ea693a2516fc8006bebb88b1ab96fb26),
+  [`192a27e08763ea26607344a2ea6c7f5c595cc2a3`](https://github.com/graphile/crystal/commit/192a27e08763ea26607344a2ea6c7f5c595cc2a3),
+  [`6ef6abce15936a896156d5316020df55cf7d18e3`](https://github.com/graphile/crystal/commit/6ef6abce15936a896156d5316020df55cf7d18e3),
+  [`0239c2d519300a72f545e0db7c371adae4ade2a9`](https://github.com/graphile/crystal/commit/0239c2d519300a72f545e0db7c371adae4ade2a9),
+  [`0ea439d33ccef7f8d01ac5f54893ab2bbf1cbd4d`](https://github.com/graphile/crystal/commit/0ea439d33ccef7f8d01ac5f54893ab2bbf1cbd4d),
+  [`8034614d1078b1bd177b6e7fcc949420614e3245`](https://github.com/graphile/crystal/commit/8034614d1078b1bd177b6e7fcc949420614e3245),
+  [`a830770e775a65ce1d09fa767f38e84f5c0e5139`](https://github.com/graphile/crystal/commit/a830770e775a65ce1d09fa767f38e84f5c0e5139),
+  [`459e1869a2ec58925b2bac5458af487c52a8ca37`](https://github.com/graphile/crystal/commit/459e1869a2ec58925b2bac5458af487c52a8ca37),
+  [`c350e49e372ec12a4cbf04fb6b4260e01832d12b`](https://github.com/graphile/crystal/commit/c350e49e372ec12a4cbf04fb6b4260e01832d12b),
+  [`3176ea3e57d626b39613a73117ef97627370ec83`](https://github.com/graphile/crystal/commit/3176ea3e57d626b39613a73117ef97627370ec83),
+  [`46a42f5547c041289aa98657ebc6815f4b6c8539`](https://github.com/graphile/crystal/commit/46a42f5547c041289aa98657ebc6815f4b6c8539),
+  [`a87bbd76f1a8b60fd86de65922746d830cc160b4`](https://github.com/graphile/crystal/commit/a87bbd76f1a8b60fd86de65922746d830cc160b4),
+  [`be3f174c5aae8fe78a240e1bc4e1de7f18644b43`](https://github.com/graphile/crystal/commit/be3f174c5aae8fe78a240e1bc4e1de7f18644b43),
+  [`576fb8bad56cb940ab444574d752e914d462018a`](https://github.com/graphile/crystal/commit/576fb8bad56cb940ab444574d752e914d462018a),
+  [`9f459101fa4428aa4bac71531e75f99e33da8e17`](https://github.com/graphile/crystal/commit/9f459101fa4428aa4bac71531e75f99e33da8e17),
+  [`921665df8babe2651ab3b5886ab68bb518f2125b`](https://github.com/graphile/crystal/commit/921665df8babe2651ab3b5886ab68bb518f2125b),
+  [`78bb1a615754d772a5fda000e96073c91fa9eba7`](https://github.com/graphile/crystal/commit/78bb1a615754d772a5fda000e96073c91fa9eba7),
+  [`c9cd0cc72a4db4b02b2bdf770161c9346cb4b174`](https://github.com/graphile/crystal/commit/c9cd0cc72a4db4b02b2bdf770161c9346cb4b174),
+  [`ab0bcda5fc3c136eea09493a7d9ed4542975858e`](https://github.com/graphile/crystal/commit/ab0bcda5fc3c136eea09493a7d9ed4542975858e),
+  [`455f4811d37ad8fff91183c7a88621bcf9d79acf`](https://github.com/graphile/crystal/commit/455f4811d37ad8fff91183c7a88621bcf9d79acf),
+  [`45adaff886e7cd72b864150927be6c0cb4a7dfe8`](https://github.com/graphile/crystal/commit/45adaff886e7cd72b864150927be6c0cb4a7dfe8)]:
+  - grafast@0.1.1-beta.22
+  - pg-sql2@5.0.0-beta.9
+  - @dataplan/pg@0.0.1-beta.33
+  - graphile-build@5.0.0-beta.34
+  - graphile-config@0.0.1-beta.16
+  - pg-introspection@0.0.1-beta.11
+  - tamedevil@0.0.0-beta.8
+
 ## 5.0.0-beta.38
 
 ### Patch Changes

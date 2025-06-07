@@ -1,5 +1,14 @@
 # jest-serializer-graphql-schema
 
+## 5.0.0-beta.4
+
+### Patch Changes
+
+- [#2482](https://github.com/graphile/crystal/pull/2482)
+  [`459e1869a2ec58925b2bac5458af487c52a8ca37`](https://github.com/graphile/crystal/commit/459e1869a2ec58925b2bac5458af487c52a8ca37)
+  Thanks [@benjie](https://github.com/benjie)! - Minimum version of Node.js
+  bumped to Node 22 (the latest LTS).
+
 ## 5.0.0-beta.3
 
 ### Patch Changes

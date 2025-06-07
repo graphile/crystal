@@ -1,5 +1,27 @@
 # graphile
 
+## 5.0.0-beta.41
+
+### Patch Changes
+
+- [#2482](https://github.com/graphile/crystal/pull/2482)
+  [`459e1869a2ec58925b2bac5458af487c52a8ca37`](https://github.com/graphile/crystal/commit/459e1869a2ec58925b2bac5458af487c52a8ca37)
+  Thanks [@benjie](https://github.com/benjie)! - Minimum version of Node.js
+  bumped to Node 22 (the latest LTS).
+
+- Updated dependencies
+  [[`192a27e08763ea26607344a2ea6c7f5c595cc2a3`](https://github.com/graphile/crystal/commit/192a27e08763ea26607344a2ea6c7f5c595cc2a3),
+  [`09d95319be3e25e023dfbab9d1542dfe06f65355`](https://github.com/graphile/crystal/commit/09d95319be3e25e023dfbab9d1542dfe06f65355),
+  [`a830770e775a65ce1d09fa767f38e84f5c0e5139`](https://github.com/graphile/crystal/commit/a830770e775a65ce1d09fa767f38e84f5c0e5139),
+  [`459e1869a2ec58925b2bac5458af487c52a8ca37`](https://github.com/graphile/crystal/commit/459e1869a2ec58925b2bac5458af487c52a8ca37),
+  [`c43ed67b9d3acbadb172ee88ba9c2a4d32528a25`](https://github.com/graphile/crystal/commit/c43ed67b9d3acbadb172ee88ba9c2a4d32528a25),
+  [`576fb8bad56cb940ab444574d752e914d462018a`](https://github.com/graphile/crystal/commit/576fb8bad56cb940ab444574d752e914d462018a),
+  [`45adaff886e7cd72b864150927be6c0cb4a7dfe8`](https://github.com/graphile/crystal/commit/45adaff886e7cd72b864150927be6c0cb4a7dfe8),
+  [`b05d57b932ea00d10715dcab9f79d443408881fc`](https://github.com/graphile/crystal/commit/b05d57b932ea00d10715dcab9f79d443408881fc)]:
+  - postgraphile@5.0.0-beta.41
+  - graphile-build@5.0.0-beta.34
+  - graphile-config@0.0.1-beta.16
+
 ## 5.0.0-beta.40
 
 ### Patch Changes

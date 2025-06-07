@@ -1,5 +1,148 @@
 # graphile-utils
 
+## 5.0.0-beta.39
+
+### Patch Changes
+
+- [#2482](https://github.com/graphile/crystal/pull/2482)
+  [`459e1869a2ec58925b2bac5458af487c52a8ca37`](https://github.com/graphile/crystal/commit/459e1869a2ec58925b2bac5458af487c52a8ca37)
+  Thanks [@benjie](https://github.com/benjie)! - Minimum version of Node.js
+  bumped to Node 22 (the latest LTS).
+
+- [#2527](https://github.com/graphile/crystal/pull/2527)
+  [`576fb8bad56cb940ab444574d752e914d462018a`](https://github.com/graphile/crystal/commit/576fb8bad56cb940ab444574d752e914d462018a)
+  Thanks [@{](https://github.com/{)! - In order to make the libraries more type
+  safe, `makeGrafastSchema` (from `grafast`) and `makeExtendSchemaPlugin` (from
+  `postgraphile/utils`) have deprecated the `typeDefs`/`plans` pattern since
+  `plans` (like `resolvers` in the traditional format) ended up being a
+  mish-mash of lots of different types and `__`-prefixed fields for special
+  cases.
+
+  Instead the configuration should be split into `typeDefs` with `objects`,
+  `interfaces`, `unions`, `inputObjects`, `scalars` and `enums`; and object and
+  input object fields should be specified via the `plans` entry within the type
+  to avoid conflicts with `resolveType`/`isTypeOf`/`planType`/`scope` and
+  similar type-level (rather than field-level) properties. Similarly, enum
+  values should be added under a `values` property. This also means these
+  type-level fields no longer have the `__` prefix.
+
+  Migration is quite straightforward:
+
+  1. **Add new top-level properties**. Add `objects`, `interfaces`, `unions`,
+     `inputObjects`, `scalars`, and `enums` as top level properties alongside
+     `typeDefs` and `plans`. Each should be an empty object. You can skip any
+     where you're not defining types of that kind.
+  1. **Split definitions based on type kind**. For each type defined in `plans`
+     move it into the appropriate new property based on the keyword used to
+     define the type in the `typeDefs` (`type` &rarr; `objects`, `interface`
+     &rarr; `interfaces`, `union` &rarr; `unions`, `input object` &rarr;
+     `inputObjects`, `scalar` &rarr; `scalars`, `enum` &rarr; `enums`).
+  1. **Move field plans into nested `plans: {...}` object**. For each type
+     defined in the new `objects` and `inputObjects` maps: create a
+     `plans: { ... }` entry inside the type and move all fields (anything not
+     prefixed with `__`) inside this new (nested) property.
+  1. **Move enum values into nested `values: {...}` object**. For each type
+     defined in the new `enums` map: create a `values: { ... }` entry inside the
+     type and move all values (anything not prefixed with `__`) inside this new
+     (nested) property.
+  1. **Remove `__` prefixes**. For each type across
+     `objects`/`interfaces`/`unions`/`interfaceObjects`/`scalars` and `enums`:
+     remove the `__` prefix from any methods/properties.
+
+  Example:
+
+  ```diff
+   typeDefs: ...,
+  -plans: {
+  +objects: {
+
+  -    __isTypeOf(v) {
+  +    isTypeOf(v) {
+         return v.username != null;
+       },
+  +    plans: {
+         fieldName($source, fieldArgs) {
+           // ...
+         },
+  +    },
+     },
+  +},
+  +interfaces: {,
+     MyInterface: {
+  -    __resolveType($specifier) {
+  +    resolveType($specifier) {
+         // ...
+       }
+     }
+  +},
+  +enums: {
+     MyEnum: {
+  +    values: {
+         ONE: {value: 1},
+         TWO: {value: 2},
+         THREE: {value: 3},
+  +    }
+     }
+   },
+  ```
+
+  Other changes:
+
+  - `ObjectPlans`/`GrafastPlans`/`FieldPlans`/`InputObjectPlans`/`ScalarPlans`
+    all changed to signular
+  - `InterfaceOrUnionPlans` split to `InterfacePlan`/`UnionPlan` (identical
+    currently)
+  - Shape of `ObjectPlan`/`InterfacePlan`/`UnionPlan` has changed;
+    `DeprecatedObjectPlan`/etc exist for backcompat
+  - `FieldArgs` can now accept an input shape indicating the args and their
+    types
+  - `FieldPlanResolver<TArgs, TParentStep, TResultStep>` has switched the order
+    of the first two generic parameters:
+    `FieldPlanResolver<TParentStep, TArgs, TResultStep>` - this is to reflect
+    the order of the arguments to the function. Also null has been removed from
+    the generics.
+  - Various generics (including `GrafastFieldConfig`) that used to take a
+    GraphQL type instance as a generic parameter no longer do - you need to use
+    external code generation because TypeScript cannot handle the dynamic
+    creation.
+  - `GrafastFieldConfig` last two generics swapped order.
+  - `GrafastArgumentConfig` generics completely changed
+
+- Updated dependencies
+  [[`0e36cb9077c76710d2e407830323f86c5038126e`](https://github.com/graphile/crystal/commit/0e36cb9077c76710d2e407830323f86c5038126e),
+  [`c0c3f48fa9f60cb9a4436ea135979b779ecc71ec`](https://github.com/graphile/crystal/commit/c0c3f48fa9f60cb9a4436ea135979b779ecc71ec),
+  [`cef9a37f846b4af105ac20960530d65c9f44afa9`](https://github.com/graphile/crystal/commit/cef9a37f846b4af105ac20960530d65c9f44afa9),
+  [`56ce94a847c6a4094643665cbf5d3712f56140b6`](https://github.com/graphile/crystal/commit/56ce94a847c6a4094643665cbf5d3712f56140b6),
+  [`070467c4ea693a2516fc8006bebb88b1ab96fb26`](https://github.com/graphile/crystal/commit/070467c4ea693a2516fc8006bebb88b1ab96fb26),
+  [`192a27e08763ea26607344a2ea6c7f5c595cc2a3`](https://github.com/graphile/crystal/commit/192a27e08763ea26607344a2ea6c7f5c595cc2a3),
+  [`142e39f26ce329f09bee0b5427f1ddc5103e610e`](https://github.com/graphile/crystal/commit/142e39f26ce329f09bee0b5427f1ddc5103e610e),
+  [`6ef6abce15936a896156d5316020df55cf7d18e3`](https://github.com/graphile/crystal/commit/6ef6abce15936a896156d5316020df55cf7d18e3),
+  [`0239c2d519300a72f545e0db7c371adae4ade2a9`](https://github.com/graphile/crystal/commit/0239c2d519300a72f545e0db7c371adae4ade2a9),
+  [`09d95319be3e25e023dfbab9d1542dfe06f65355`](https://github.com/graphile/crystal/commit/09d95319be3e25e023dfbab9d1542dfe06f65355),
+  [`0ea439d33ccef7f8d01ac5f54893ab2bbf1cbd4d`](https://github.com/graphile/crystal/commit/0ea439d33ccef7f8d01ac5f54893ab2bbf1cbd4d),
+  [`8034614d1078b1bd177b6e7fcc949420614e3245`](https://github.com/graphile/crystal/commit/8034614d1078b1bd177b6e7fcc949420614e3245),
+  [`a830770e775a65ce1d09fa767f38e84f5c0e5139`](https://github.com/graphile/crystal/commit/a830770e775a65ce1d09fa767f38e84f5c0e5139),
+  [`459e1869a2ec58925b2bac5458af487c52a8ca37`](https://github.com/graphile/crystal/commit/459e1869a2ec58925b2bac5458af487c52a8ca37),
+  [`c350e49e372ec12a4cbf04fb6b4260e01832d12b`](https://github.com/graphile/crystal/commit/c350e49e372ec12a4cbf04fb6b4260e01832d12b),
+  [`3176ea3e57d626b39613a73117ef97627370ec83`](https://github.com/graphile/crystal/commit/3176ea3e57d626b39613a73117ef97627370ec83),
+  [`46a42f5547c041289aa98657ebc6815f4b6c8539`](https://github.com/graphile/crystal/commit/46a42f5547c041289aa98657ebc6815f4b6c8539),
+  [`be3f174c5aae8fe78a240e1bc4e1de7f18644b43`](https://github.com/graphile/crystal/commit/be3f174c5aae8fe78a240e1bc4e1de7f18644b43),
+  [`c43ed67b9d3acbadb172ee88ba9c2a4d32528a25`](https://github.com/graphile/crystal/commit/c43ed67b9d3acbadb172ee88ba9c2a4d32528a25),
+  [`576fb8bad56cb940ab444574d752e914d462018a`](https://github.com/graphile/crystal/commit/576fb8bad56cb940ab444574d752e914d462018a),
+  [`9f459101fa4428aa4bac71531e75f99e33da8e17`](https://github.com/graphile/crystal/commit/9f459101fa4428aa4bac71531e75f99e33da8e17),
+  [`921665df8babe2651ab3b5886ab68bb518f2125b`](https://github.com/graphile/crystal/commit/921665df8babe2651ab3b5886ab68bb518f2125b),
+  [`78bb1a615754d772a5fda000e96073c91fa9eba7`](https://github.com/graphile/crystal/commit/78bb1a615754d772a5fda000e96073c91fa9eba7),
+  [`ab0bcda5fc3c136eea09493a7d9ed4542975858e`](https://github.com/graphile/crystal/commit/ab0bcda5fc3c136eea09493a7d9ed4542975858e),
+  [`455f4811d37ad8fff91183c7a88621bcf9d79acf`](https://github.com/graphile/crystal/commit/455f4811d37ad8fff91183c7a88621bcf9d79acf),
+  [`45adaff886e7cd72b864150927be6c0cb4a7dfe8`](https://github.com/graphile/crystal/commit/45adaff886e7cd72b864150927be6c0cb4a7dfe8),
+  [`b05d57b932ea00d10715dcab9f79d443408881fc`](https://github.com/graphile/crystal/commit/b05d57b932ea00d10715dcab9f79d443408881fc)]:
+  - grafast@0.1.1-beta.22
+  - @dataplan/pg@0.0.1-beta.33
+  - graphile-build-pg@5.0.0-beta.39
+  - graphile-build@5.0.0-beta.34
+  - graphile-config@0.0.1-beta.16
+  - tamedevil@0.0.0-beta.8
+
 ## 5.0.0-beta.38
 
 ### Patch Changes

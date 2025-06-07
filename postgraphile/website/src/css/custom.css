@@ -129,3 +129,8 @@ figure figcaption {
   padding: 0;
   max-width: initial;
 }
+
+[data-theme="light"] img[src$="#dark-mode-only"],
+[data-theme="dark"] img[src$="#light-mode-only"] {
+  display: none;
+}

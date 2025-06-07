@@ -76,10 +76,12 @@ export const MyPlugin = makeExtendSchemaPlugin((build) => {
       }
     `,
 
-    plans: {
+    objects: {
       Query: {
-        meaningOfLife() {
-          return constant(42);
+        plans: {
+          meaningOfLife() {
+            return constant(42);
+          },
         },
       },
     },
@@ -174,12 +176,12 @@ PostGraphile a database table resource should be represented by a
 similar would mean the step doesn’t have the expected helper methods and
 downstream fields may fail to plan because their expectations are broken.
 
-Object types’ `plans` entries may define an `__assertStep` property to indicate
+Object types’ `plans` entries may define an `assertStep` property to indicate
 the type of step the object type’s fields’ resolvers will be expecting; this is
 equivalent to `typeConfig.extensions.grafast.assertStep` when defining a object
 type programmatically.
 
-The value for `__assertStep` can either be a step class itself (e.g.
+The value for `assertStep` can either be a step class itself (e.g.
 `PgSelectSingleStep`) or
 it can be an “assertion function” that throws an error if the passed step is
 not of the right type, e.g.:
@@ -193,7 +195,7 @@ const schema = makeExtendSchemaPlugin({
       id: Int
     }
   `,
-  plans: {
+  objects: {
     MyObject: {
       assertStep($step) {
         if ($step instanceof PgSelectSingleStep) return true;
@@ -204,8 +206,10 @@ const schema = makeExtendSchemaPlugin({
             `or PgUpdateSingleStep; but found step of type '${$step.constructor.name}'.`,
         );
       },
-      a($obj: PgSelectSingleStep | PgInsertSingleStep | PgUpdateSingleStep) {
-        return $obj.get("id");
+      plans: {
+        a($obj: PgSelectSingleStep | PgInsertSingleStep | PgUpdateSingleStep) {
+          return $obj.get("id");
+        },
       },
     },
   },
@@ -241,22 +245,23 @@ const schema = makeExtendSchemaPlugin((build) => {
         id: Int
       }
     `,
-    plans: {
+    objects: {
       MyObject: {
         // Graphile Build "scope" for the object type 'MyObject'
-        __scope: {
+        scope: {
           pgTypeResource: users,
         },
+        plans: {
+          id: {
+            // The Graphile Build "scope" for the 'MyObject.id' field
+            scope: {
+              pgFieldAttribute: users.codec.attributes.id,
+            },
 
-        id: {
-          // The Graphile Build "scope" for the 'MyObject.id' field
-          scope: {
-            pgFieldAttribute: users.codec.attributes.id,
-          },
-
-          // The plan resolver for the 'MyObject.id' field
-          plan($obj) {
-            return $obj.get("id");
+            // The plan resolver for the 'MyObject.id' field
+            plan($obj) {
+              return $obj.get("id");
+            },
           },
         },
       },
@@ -361,14 +366,16 @@ export const MyChannelsPlugin = makeExtendSchemaPlugin((build) => {
         myChannels: [Channel]
       }
     `,
-    plans: {
+    objects: {
       Query: {
-        myChannels() {
-          const $userId = context().get("userId");
-          const $user = users.get({ id: $userId });
-          const $orgId = $user.get("organization_id");
-          const $channels = channels.find({ organization_id: $orgId });
-          return $channels;
+        plans: {
+          myChannels() {
+            const $userId = context().get("userId");
+            const $user = users.get({ id: $userId });
+            const $orgId = $user.get("organization_id");
+            const $channels = channels.find({ organization_id: $orgId });
+            return $channels;
+          },
         },
       },
     },
@@ -484,38 +491,40 @@ export const MyChannelsPlugin = makeExtendSchemaPlugin((build) => {
         myChannels: [Channel]
       }
     `,
-    plans: {
+    objects: {
       Query: {
-        myChannels() {
-          const $userId = context().get("userId");
-          // highlight-start
-          const $orgId = withPgClient(
-            executor,
-            $userId,
-            async (
-              // The PgClient instance, with all of the "claims" (if any) already set:
-              pgClient,
-              // This is the runtime data that the `$userId` step represented
-              userId,
-            ) => {
-              if (!userId) return null;
+        plans: {
+          myChannels() {
+            const $userId = context().get("userId");
+            // highlight-start
+            const $orgId = withPgClient(
+              executor,
+              $userId,
+              async (
+                // The PgClient instance, with all of the "claims" (if any) already set:
+                pgClient,
+                // This is the runtime data that the `$userId` step represented
+                userId,
+              ) => {
+                if (!userId) return null;
 
-              // Here we're using the standard `pgClient.query` function that
-              // all adaptors must provide, but if you're using an adaptor
-              // related to your ORM of choice, you could likely use its
-              // various methods to retrieve this value instead.
-              const result = await pgClient.query<{ id: number }>({
-                text: `select id from get_organization_for_user_id($1)`,
-                values: [userId],
-              });
+                // Here we're using the standard `pgClient.query` function that
+                // all adaptors must provide, but if you're using an adaptor
+                // related to your ORM of choice, you could likely use its
+                // various methods to retrieve this value instead.
+                const result = await pgClient.query<{ id: number }>({
+                  text: `select id from get_organization_for_user_id($1)`,
+                  values: [userId],
+                });
 
-              // Return the 'id' value from the first (and only) row, if it exists:
-              return result.rows[0]?.id;
-            },
-          );
-          // highlight-end
-          const $channels = channels.find({ organization_id: $orgId });
-          return $channels;
+                // Return the 'id' value from the first (and only) row, if it exists:
+                return result.rows[0]?.id;
+              },
+            );
+            // highlight-end
+            const $channels = channels.find({ organization_id: $orgId });
+            return $channels;
+          },
         },
       },
     },
@@ -590,13 +599,15 @@ export const MyForeignExchangePlugin = makeExtendSchemaPlugin((build) => {
         priceInAuCents: Int!
       }
     `,
-    plans: {
+    objects: {
       Product: {
-        priceInAuCents($product) {
-          // highlight-next-line
-          const $cents = $product.get("price_in_us_cents");
-          // highlight-next-line
-          return loadOne($cents, convertUsdToAud);
+        plans: {
+          priceInAuCents($product) {
+            // highlight-next-line
+            const $cents = $product.get("price_in_us_cents");
+            // highlight-next-line
+            return loadOne($cents, convertUsdToAud);
+          },
         },
       },
     },
@@ -623,15 +634,17 @@ export const MyProductReviewsPlugin = makeExtendSchemaPlugin((build) => {
         reviews: ReviewConnection
       }
     `,
-    plans: {
+    objects: {
       Product: {
-        reviews($product) {
-          const $productId = $product.get("id");
-          const $reviews = reviews.find();
-          $reviews.where(sql`${$reviews}.product_id = ${$productId}`);
+        plans: {
+          reviews($product) {
+            const $productId = $product.get("id");
+            const $reviews = reviews.find();
+            $reviews.where(sql`${$reviews}.product_id = ${$productId}`);
 
-          // highlight-next-line
-          return connection($reviews);
+            // highlight-next-line
+            return connection($reviews);
+          },
         },
       },
     },
@@ -671,63 +684,67 @@ export const MyRegisterUserMutationPlugin = makeExtendSchemaPlugin((build) => {
         registerUser(input: RegisterUserInput!): RegisterUserPayload
       }
     `,
-    plans: {
+    objects: {
       Mutation: {
-        registerUser(_, fieldArgs) {
-          const $input = fieldArgs.getRaw("input");
-          const $user = withPgClientTransaction(
-            executor,
-            $input,
-            async (pgClient, input) => {
-              // Our custom logic to register the user:
-              const {
-                rows: [user],
-              } = await pgClient.query({
-                text: `
+        plans: {
+          registerUser(_, fieldArgs) {
+            const $input = fieldArgs.getRaw("input");
+            const $user = withPgClientTransaction(
+              executor,
+              $input,
+              async (pgClient, input) => {
+                // Our custom logic to register the user:
+                const {
+                  rows: [user],
+                } = await pgClient.query({
+                  text: `
                   INSERT INTO app_public.users (name, email, bio)
                   VALUES ($1, $2, $3)
                   RETURNING *`,
-                values: [input.name, input.email, input.bio],
-              });
+                  values: [input.name, input.email, input.bio],
+                });
 
-              // Send the email. If this fails then the error will be caught
-              // and the transaction rolled back; it will be as if the user
-              // never registered
-              await mockSendEmail(
-                input.email,
-                "Welcome to my site",
-                `You're user ${user.id} - thanks for being awesome`,
-              );
+                // Send the email. If this fails then the error will be caught
+                // and the transaction rolled back; it will be as if the user
+                // never registered
+                await mockSendEmail(
+                  input.email,
+                  "Welcome to my site",
+                  `You're user ${user.id} - thanks for being awesome`,
+                );
 
-              // Return the newly created user
-              return user;
-            },
-          );
+                // Return the newly created user
+                return user;
+              },
+            );
 
-          // To allow for future expansion (and for the `clientMutationId`
-          // field to work), we'll return an object step containing our data:
-          return object({ user: $user });
+            // To allow for future expansion (and for the `clientMutationId`
+            // field to work), we'll return an object step containing our data:
+            return object({ user: $user });
+          },
         },
       },
 
       // The payload also needs plans detailing how to resolve its fields:
       RegisterUserPayload: {
-        user($data) {
-          const $user = $data.get("user");
-          // It would be tempting to return $user here, but the step class
-          // is not compatible with the auto-generated `User` type, so
-          // errors will occur. We must ensure that we return a compatible
-          // step, so we will retrieve the relevant record from the database:
+        plans: {
+          user($data) {
+            const $user = $data.get("user");
+            // It would be tempting to return $user here, but the step class
+            // is not compatible with the auto-generated `User` type, so
+            // errors will occur. We must ensure that we return a compatible
+            // step, so we will retrieve the relevant record from the database:
 
-          // Get the '.id' property from $user:
-          const $userId = access($user, "id");
+            // Get the '.id' property from $user:
+            const $userId = access($user, "id");
 
-          // Return a step representing this row in the database.
-          return users.get({ id: $userId });
-        },
-        query($user) {
-          // Anything truthy should work for the `query: Query` field.
-          return constant(true);
+            // Return a step representing this row in the database.
+            return users.get({ id: $userId });
+          },
+          query($user) {
+            // Anything truthy should work for the `query: Query` field.
+            return constant(true);
+          },
         },
       },
     },
@@ -771,46 +788,48 @@ const DeleteItemByNodeIdPlugin = makeExtendSchemaPlugin((build) => {
       }
     `,
 
-    plans: {
+    objects: {
       Mutation: {
-        deleteItem(_, fieldArgs) {
-          // jwtClaims is decrypted jwt token data
-          const $jwtClaims = context().get("jwtClaims");
+        plans: {
+          deleteItem(_, fieldArgs) {
+            // jwtClaims is decrypted jwt token data
+            const $jwtClaims = context().get("jwtClaims");
 
-          // Read the input.id value from the arguments
-          const $nodeId = fieldArgs.getRaw(["input", "id"]);
+            // Read the input.id value from the arguments
+            const $nodeId = fieldArgs.getRaw(["input", "id"]);
 
-          // Decode the node ID, to something like: `{ id: $someStep }`
-          const spec = specFromNodeId(handler, $nodeId);
-          const $itemId = spec.id;
+            // Decode the node ID, to something like: `{ id: $someStep }`
+            const spec = specFromNodeId(handler, $nodeId);
+            const $itemId = spec.id;
 
-          const $success = withPgClientTransaction(
-            executor,
-            // Passing a `list` step allows us to pass more than one dependency
-            // through to our callback:
-            list([$jwtClaims, $itemId]),
-            async (pgClient, [jwtClaims, itemId]) => {
-              if (!itemId || !jwtClaims?.user_id) {
-                return false;
-              }
-              const {
-                rows: [row],
-              } = await pgClient.query(
-                ` UPDATE app_public.items
+            const $success = withPgClientTransaction(
+              executor,
+              // Passing a `list` step allows us to pass more than one dependency
+              // through to our callback:
+              list([$jwtClaims, $itemId]),
+              async (pgClient, [jwtClaims, itemId]) => {
+                if (!itemId || !jwtClaims?.user_id) {
+                  return false;
+                }
+                const {
+                  rows: [row],
+                } = await pgClient.query(
+                  ` UPDATE app_public.items
                   SET is_archived = true
                   WHERE id = $1
                   AND user_id = $2
                   RETURNING *;`,
-                [itemId, jwtClaims.user_id],
-              );
-              return !!row;
-            },
-          );
+                  [itemId, jwtClaims.user_id],
+                );
+                return !!row;
+              },
+            );
 
-          // Since we're returning this data in the same shape as the payload
-          // and the payload's fields don't need specific step classes, we don't
-          // need to implement plan resolvers on the payload.
-          return object({ success: $success });
+            // Since we're returning this data in the same shape as the payload
+            // and the payload's fields don't need specific step classes, we don't
+            // need to implement plan resolvers on the payload.
+            return object({ success: $success });
+          },
         },
       },
     },
@@ -824,9 +843,7 @@ This is a full example of adding a custom `registerUser` mutation whose payload
 contains a union of a successful result or two expected error types. It uses a
 transaction to perform the mutation, and catches errors that happen in that
 transaction (in which case the transaction will be rolled back) and if they are
-the known, supported, errors then it will return the given error type. It uses
-the `polymorphicBranch` logic to determine which of the event occurred, and
-thus which type to return.
+the known, supported, errors then it will return the given error type.
 
 ```ts
 import { withPgClient } from "@dataplan/pg";
@@ -837,7 +854,6 @@ import {
   object,
   ExecutableStep,
   access,
-  polymorphicBranch,
   list,
 } from "postgraphile/grafast";
 import { DatabaseError } from "pg";
@@ -874,111 +890,120 @@ export const RegisterUserPlugin = makeExtendSchemaPlugin((build) => {
         email: String!
       }
     `,
-    plans: {
+    objects: {
       Mutation: {
-        registerUser(_, { $input: { $username, $email } }) {
-          const $result = withPgClient(
-            executor,
-            list([$username, $email]),
-            async (pgClient, [username, email]) => {
-              try {
-                return await pgClient.withTransaction(async (pgClient) => {
-                  const {
-                    rows: [user],
-                  } = await pgClient.query<{
-                    id: string;
-                    username: string;
-                  }>({
-                    text: `
+        plans: {
+          registerUser(_, { $input: { $username, $email } }) {
+            const $result = withPgClient(
+              executor,
+              list([$username, $email]),
+              async (pgClient, [username, email]) => {
+                try {
+                  return await pgClient.withTransaction(async (pgClient) => {
+                    const {
+                      rows: [user],
+                    } = await pgClient.query<{
+                      id: string;
+                      username: string;
+                    }>({
+                      text: `
                       insert into app_public.users (username)
                       values ($1)
                       returning *`,
-                    values: [username],
-                  });
+                      values: [username],
+                    });
 
-                  await pgClient.query({
-                    text: `
+                    await pgClient.query({
+                      text: `
                       insert into app_public.user_emails(user_id, email)
                       values ($1, $2)`,
-                    values: [user.id, email],
+                      values: [user.id, email],
+                    });
+
+                    await sendEmail(email, "Welcome!");
+
+                    return { id: user.id };
                   });
-
-                  await sendEmail(email, "Welcome!");
-
-                  return { id: user.id };
-                });
-              } catch (e) {
-                if (e instanceof DatabaseError && e.code === "23505") {
-                  if (e.constraint === "unique_user_username") {
-                    return {
-                      __typename: "UsernameConflict",
-                      message: `The username '${username}' is already in use`,
-                      username,
-                    };
-                  } else if (e.constraint === "unique_user_email") {
-                    return {
-                      __typename: "EmailAddressConflict",
-                      message: `The email address '${email}' is already in use`,
-                      email,
-                    };
+                } catch (e) {
+                  if (e instanceof DatabaseError && e.code === "23505") {
+                    if (e.constraint === "unique_user_username") {
+                      return {
+                        __typename: "UsernameConflict",
+                        message: `The username '${username}' is already in use`,
+                        username,
+                      };
+                    } else if (e.constraint === "unique_user_email") {
+                      return {
+                        __typename: "EmailAddressConflict",
+                        message: `The email address '${email}' is already in use`,
+                        email,
+                      };
+                    }
                   }
+                  throw e;
                 }
-                throw e;
-              }
-            },
-          );
+              },
+            );
 
-          return object({ result: $result });
+            return object({ result: $result });
+          },
         },
       },
 
       RegisterUserPayload: {
-        __assertStep: ObjectStep,
-        result($data: ObjectStep) {
-          const $result = $data.get("result");
-          return polymorphicBranch($result, {
-            UsernameConflict: {
-              // This is a `UsernameConflict` if the object has a `__typename` property.
-              match(obj) {
-                return obj.__typename === "UsernameConflict";
-              },
-              // In this case, we can just return the object itself as the step
-              // representing this polymorphic branch.
-              plan($obj) {
-                return $obj;
-              },
-            },
-            EmailAddressConflict: {
-              // If `match` is not specified, it defaults to checking
-              // `obj.__typename === 'EmailAddressConfict'`.
-              // If `plan` is not specified, it defaults to `($obj) => $obj`.
-            },
-            User: {
-              match(obj) {
-                return obj.id != null;
-              },
-              // In this case, we need to get the record from the database
-              // associated with the given user id.
-              plan($obj) {
-                const $id = access($obj, "id");
-                return users.get({ id: $id });
-              },
-            },
-          });
-        },
-        query() {
-          // The `Query` type just needs any truthy value.
-          return constant(true);
+        assertStep: ObjectStep,
+        plans: {
+          query() {
+            // The `Query` type just needs any truthy value.
+            return constant(true);
+          },
         },
       },
 
       UsernameConflict: {
         // Since User expects a step, our types must also expect a step. We
         // don't care what the step is though.
-        __assertStep: ExecutableStep,
+        assertStep: ExecutableStep,
       },
       EmailAddressConflict: {
-        __assertStep: ExecutableStep,
+        assertStep: ExecutableStep,
+      },
+    },
+    unions: {
+      // Planning our polymorphic type
+      RegisterUserResult: {
+        planType($obj) {
+          // Determine the type
+          const $__typename = lambda($obj, (obj) => {
+            // If it has typename, use that
+            if (obj.__typename) return obj.__typename;
+            // Otherwise, if it has an id it must be a user
+            if (obj.id != null) return "User";
+            // Otherwise, no idea!
+            throw new Error(`Could not determine type`);
+          });
+          return {
+            $__typename,
+            planForType(t) {
+              switch (t.name) {
+                case "UsernameConflict":
+                case "EmailAddressConflict":
+                  // These types just use their objects directly
+                  return $obj;
+
+                case "User": {
+                  // In this case, we need to get the record from the database
+                  // associated with the given user id.
+                  const $id = get($obj, "id");
+                  return users.get({ id: $id });
+                }
+                default: {
+                  throw new Error(`Don't know how to plan ${t}`);
+                }
+              }
+            },
+          };
+        },
       },
     },
   };

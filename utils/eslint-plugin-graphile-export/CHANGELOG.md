@@ -1,5 +1,19 @@
 # eslint-plugin-graphile-export
 
+## 0.0.2-beta.7
+
+### Patch Changes
+
+- [#2481](https://github.com/graphile/crystal/pull/2481)
+  [`8c1dc528e3c03e2c2855adb7273319412f841c14`](https://github.com/graphile/crystal/commit/8c1dc528e3c03e2c2855adb7273319412f841c14)
+  Thanks [@kzlar](https://github.com/kzlar)! - 🚨 Now uses a flat config for
+  compatibility with ESLint v9.
+
+- [#2482](https://github.com/graphile/crystal/pull/2482)
+  [`459e1869a2ec58925b2bac5458af487c52a8ca37`](https://github.com/graphile/crystal/commit/459e1869a2ec58925b2bac5458af487c52a8ca37)
+  Thanks [@benjie](https://github.com/benjie)! - Minimum version of Node.js
+  bumped to Node 22 (the latest LTS).
+
 ## 0.0.2-beta.6
 
 ### Patch Changes

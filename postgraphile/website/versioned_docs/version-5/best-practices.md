@@ -66,7 +66,7 @@ grant update on users to graphql_role;
 ```
 
 Column-level SELECT grants
-[cause a lot of issues](./requirements#dont-use-column-based-select-grants)
+[cause a lot of issues](./requirements#your-postgresql-database)
 not just for PostGraphile:
 
 - Cannot `select * from`
