@@ -40,7 +40,8 @@
     "access": "public"
   },
   "devDependencies": {
-    "@graphql-codegen/plugin-helpers": "^5.1.0"
+    "@graphql-codegen/plugin-helpers": "^5.1.0",
+    "typescript": "^5.8.3"
   },
   "peerDependencies": {
     "graphql": "^16.1.0-experimental-stream-defer.6"

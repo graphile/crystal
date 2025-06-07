@@ -14627,6 +14627,7 @@ __metadata:
   resolution: "graphql-codegen-grafast@workspace:grafast/codegen-plugin"
   dependencies:
     "@graphql-codegen/plugin-helpers": "npm:^5.1.0"
+    typescript: "npm:^5.8.3"
   peerDependencies:
     graphql: ^16.1.0-experimental-stream-defer.6
   languageName: unknown
