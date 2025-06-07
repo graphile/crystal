@@ -3,8 +3,12 @@ import type { BaseGraphQLArguments, Step } from "grafast";
 export { EXPORTABLE } from "./exportable.js";
 export { gql } from "./gql.js";
 export { makeAddInflectorsPlugin } from "./makeAddInflectorsPlugin.js";
-export { makeAddPgTableConditionPlugin } from "./makeAddPgTableConditionPlugin.js";
 export {
+  addPgTableCondition,
+  makeAddPgTableConditionPlugin,
+} from "./makeAddPgTableConditionPlugin.js";
+export {
+  addPgTableOrderBy,
   makeAddPgTableOrderByPlugin,
   MakeAddPgTableOrderByPluginOrders,
   NullsSortMethod,
