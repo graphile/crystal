@@ -1,5 +1,63 @@
 # grafserv
 
+## 0.1.1-beta.25
+
+### Patch Changes
+
+- [#2444](https://github.com/graphile/crystal/pull/2444)
+  [`192a27e08763ea26607344a2ea6c7f5c595cc2a3`](https://github.com/graphile/crystal/commit/192a27e08763ea26607344a2ea6c7f5c595cc2a3)
+  Thanks [@benjie](https://github.com/benjie)! - Upgrade to Mermaid 11, and
+  reduce verbosity of polymorphism in plan diagrams.
+
+- [#2433](https://github.com/graphile/crystal/pull/2433)
+  [`6ef6abce15936a896156d5316020df55cf7d18e3`](https://github.com/graphile/crystal/commit/6ef6abce15936a896156d5316020df55cf7d18e3)
+  Thanks [@benjie](https://github.com/benjie)! - Add
+  `ctx.ws?.normalizedConnectionParams` which can be treated as headers (i.e. has
+  lower-cased keys).
+
+- [#2437](https://github.com/graphile/crystal/pull/2437)
+  [`873b24dc70cea68e236e5dcf5bc7ff8f46fa43fe`](https://github.com/graphile/crystal/commit/873b24dc70cea68e236e5dcf5bc7ff8f46fa43fe)
+  Thanks [@benjie](https://github.com/benjie)! - Naked GraphQL errors (such as
+  those you'd see from coercion) are now treated as safe to output.
+
+- [#2288](https://github.com/graphile/crystal/pull/2288)
+  [`eb771be5e8b06a0cd53476cb36495e7e1aca56b7`](https://github.com/graphile/crystal/commit/eb771be5e8b06a0cd53476cb36495e7e1aca56b7)
+  Thanks [@kzlar](https://github.com/kzlar)! - Add `@whatwg-node/server` HTTP
+  adaptor, thanks to @kzlar 🎉
+
+- [#2482](https://github.com/graphile/crystal/pull/2482)
+  [`459e1869a2ec58925b2bac5458af487c52a8ca37`](https://github.com/graphile/crystal/commit/459e1869a2ec58925b2bac5458af487c52a8ca37)
+  Thanks [@benjie](https://github.com/benjie)! - Minimum version of Node.js
+  bumped to Node 22 (the latest LTS).
+
+- Updated dependencies
+  [[`0e36cb9077c76710d2e407830323f86c5038126e`](https://github.com/graphile/crystal/commit/0e36cb9077c76710d2e407830323f86c5038126e),
+  [`c0c3f48fa9f60cb9a4436ea135979b779ecc71ec`](https://github.com/graphile/crystal/commit/c0c3f48fa9f60cb9a4436ea135979b779ecc71ec),
+  [`cef9a37f846b4af105ac20960530d65c9f44afa9`](https://github.com/graphile/crystal/commit/cef9a37f846b4af105ac20960530d65c9f44afa9),
+  [`56ce94a847c6a4094643665cbf5d3712f56140b6`](https://github.com/graphile/crystal/commit/56ce94a847c6a4094643665cbf5d3712f56140b6),
+  [`192a27e08763ea26607344a2ea6c7f5c595cc2a3`](https://github.com/graphile/crystal/commit/192a27e08763ea26607344a2ea6c7f5c595cc2a3),
+  [`6ef6abce15936a896156d5316020df55cf7d18e3`](https://github.com/graphile/crystal/commit/6ef6abce15936a896156d5316020df55cf7d18e3),
+  [`0239c2d519300a72f545e0db7c371adae4ade2a9`](https://github.com/graphile/crystal/commit/0239c2d519300a72f545e0db7c371adae4ade2a9),
+  [`0ea439d33ccef7f8d01ac5f54893ab2bbf1cbd4d`](https://github.com/graphile/crystal/commit/0ea439d33ccef7f8d01ac5f54893ab2bbf1cbd4d),
+  [`997c49648b62a93e5b915c65c49cdad1654bef3e`](https://github.com/graphile/crystal/commit/997c49648b62a93e5b915c65c49cdad1654bef3e),
+  [`8034614d1078b1bd177b6e7fcc949420614e3245`](https://github.com/graphile/crystal/commit/8034614d1078b1bd177b6e7fcc949420614e3245),
+  [`459e1869a2ec58925b2bac5458af487c52a8ca37`](https://github.com/graphile/crystal/commit/459e1869a2ec58925b2bac5458af487c52a8ca37),
+  [`c350e49e372ec12a4cbf04fb6b4260e01832d12b`](https://github.com/graphile/crystal/commit/c350e49e372ec12a4cbf04fb6b4260e01832d12b),
+  [`3176ea3e57d626b39613a73117ef97627370ec83`](https://github.com/graphile/crystal/commit/3176ea3e57d626b39613a73117ef97627370ec83),
+  [`46a42f5547c041289aa98657ebc6815f4b6c8539`](https://github.com/graphile/crystal/commit/46a42f5547c041289aa98657ebc6815f4b6c8539),
+  [`be3f174c5aae8fe78a240e1bc4e1de7f18644b43`](https://github.com/graphile/crystal/commit/be3f174c5aae8fe78a240e1bc4e1de7f18644b43),
+  [`576fb8bad56cb940ab444574d752e914d462018a`](https://github.com/graphile/crystal/commit/576fb8bad56cb940ab444574d752e914d462018a),
+  [`9f459101fa4428aa4bac71531e75f99e33da8e17`](https://github.com/graphile/crystal/commit/9f459101fa4428aa4bac71531e75f99e33da8e17),
+  [`921665df8babe2651ab3b5886ab68bb518f2125b`](https://github.com/graphile/crystal/commit/921665df8babe2651ab3b5886ab68bb518f2125b),
+  [`78bb1a615754d772a5fda000e96073c91fa9eba7`](https://github.com/graphile/crystal/commit/78bb1a615754d772a5fda000e96073c91fa9eba7),
+  [`ab0bcda5fc3c136eea09493a7d9ed4542975858e`](https://github.com/graphile/crystal/commit/ab0bcda5fc3c136eea09493a7d9ed4542975858e),
+  [`455f4811d37ad8fff91183c7a88621bcf9d79acf`](https://github.com/graphile/crystal/commit/455f4811d37ad8fff91183c7a88621bcf9d79acf),
+  [`45adaff886e7cd72b864150927be6c0cb4a7dfe8`](https://github.com/graphile/crystal/commit/45adaff886e7cd72b864150927be6c0cb4a7dfe8)]:
+  - grafast@0.1.1-beta.22
+  - ruru@2.0.0-beta.23
+  - graphile-config@0.0.1-beta.16
+  - @graphile/lru@5.0.0-beta.4
+
 ## 0.1.1-beta.24
 
 ### Patch Changes

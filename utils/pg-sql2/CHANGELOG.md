@@ -1,5 +1,32 @@
 # pg-sql2
 
+## 5.0.0-beta.9
+
+### Patch Changes
+
+- [#2434](https://github.com/graphile/crystal/pull/2434)
+  [`5a26196eff8fd1956d73e0b8fdf5cfcb7f01b7d3`](https://github.com/graphile/crystal/commit/5a26196eff8fd1956d73e0b8fdf5cfcb7f01b7d3)
+  Thanks [@benjie](https://github.com/benjie)! - `util.inspect(someSql)` will
+  now output a much nicer string
+
+- [#2482](https://github.com/graphile/crystal/pull/2482)
+  [`459e1869a2ec58925b2bac5458af487c52a8ca37`](https://github.com/graphile/crystal/commit/459e1869a2ec58925b2bac5458af487c52a8ca37)
+  Thanks [@benjie](https://github.com/benjie)! - Minimum version of Node.js
+  bumped to Node 22 (the latest LTS).
+
+- [#2450](https://github.com/graphile/crystal/pull/2450)
+  [`a87bbd76f1a8b60fd86de65922746d830cc160b4`](https://github.com/graphile/crystal/commit/a87bbd76f1a8b60fd86de65922746d830cc160b4)
+  Thanks [@benjie](https://github.com/benjie)! - Type-only tweak
+
+- [#2525](https://github.com/graphile/crystal/pull/2525)
+  [`c9cd0cc72a4db4b02b2bdf770161c9346cb4b174`](https://github.com/graphile/crystal/commit/c9cd0cc72a4db4b02b2bdf770161c9346cb4b174)
+  Thanks [@benjie](https://github.com/benjie)! - `sql.getIdentifierSymbol(node)`
+  method added to extract a symbol from an identifier node (if a node is an
+  identifier node, otherwise return `null`).
+- Updated dependencies
+  [[`459e1869a2ec58925b2bac5458af487c52a8ca37`](https://github.com/graphile/crystal/commit/459e1869a2ec58925b2bac5458af487c52a8ca37)]:
+  - @graphile/lru@5.0.0-beta.4
+
 ## 5.0.0-beta.8
 
 ### Patch Changes

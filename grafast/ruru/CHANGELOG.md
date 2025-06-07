@@ -1,5 +1,22 @@
 # ruru
 
+## 2.0.0-beta.23
+
+### Patch Changes
+
+- [#2444](https://github.com/graphile/crystal/pull/2444)
+  [`192a27e08763ea26607344a2ea6c7f5c595cc2a3`](https://github.com/graphile/crystal/commit/192a27e08763ea26607344a2ea6c7f5c595cc2a3)
+  Thanks [@benjie](https://github.com/benjie)! - Upgrade to Mermaid 11, and
+  reduce verbosity of polymorphism in plan diagrams.
+
+- [#2546](https://github.com/graphile/crystal/pull/2546)
+  [`997c49648b62a93e5b915c65c49cdad1654bef3e`](https://github.com/graphile/crystal/commit/997c49648b62a93e5b915c65c49cdad1654bef3e)
+  Thanks [@benjie](https://github.com/benjie)! - Fix issue where ruru wasn't
+  hiding explain output in incremental delivery results.
+- Updated dependencies
+  [[`459e1869a2ec58925b2bac5458af487c52a8ca37`](https://github.com/graphile/crystal/commit/459e1869a2ec58925b2bac5458af487c52a8ca37)]:
+  - graphile-config@0.0.1-beta.16
+
 ## 2.0.0-beta.22
 
 ### Patch Changes
