@@ -19,7 +19,7 @@ to understand error messages:
 - A `relation` is a uni-directional link from a codec (e.g. a table _type_) to a resource (e.g. a table itself)
 
 However, once you want to start writing your own plans, for example via
-[`makeExtendSchemaPlugin`](./make-extend-schema-plugin.md), understanding the
+[`extendSchema`](./extend-schema.md), understanding the
 registry becomes more important.
 
 ## Codecs

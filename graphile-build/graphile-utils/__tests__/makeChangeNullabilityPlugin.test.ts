@@ -16,11 +16,7 @@ import {
 } from "graphile-build";
 
 import type { NullabilitySpecString } from "../src/index.js";
-import {
-  gql,
-  makeChangeNullabilityPlugin,
-  makeExtendSchemaPlugin,
-} from "../src/index.js";
+import { changeNullability, extendSchema, gql } from "../src/index.js";
 
 const makeSchema = (plugins: GraphileConfig.Plugin[]) =>
   buildSchema(
@@ -30,7 +26,7 @@ const makeSchema = (plugins: GraphileConfig.Plugin[]) =>
         MutationPlugin,
         SubscriptionPlugin,
         CommonTypesPlugin,
-        makeExtendSchemaPlugin((_build) => ({
+        extendSchema((_build) => ({
           typeDefs: gql`
             interface EchoCapable {
               echo(message: [[String]!]): [[String]!]
@@ -93,7 +89,7 @@ describe("object, interface and input", () => {
   ];
   it.each(wrappers)("handles '%s' correctly", async (spec, expectation) => {
     const schema = makeSchema([
-      makeChangeNullabilityPlugin({
+      changeNullability({
         Query: {
           echo: {
             type: spec,

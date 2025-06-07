@@ -3,11 +3,7 @@ import type { PgSelectSingleStep } from "@dataplan/pg";
 import { TYPES } from "@dataplan/pg";
 import PersistedPlugin from "@grafserv/persisted";
 import { EXPORTABLE, exportSchema } from "graphile-export";
-import {
-  gql,
-  makeExtendSchemaPlugin,
-  makeWrapPlansPlugin,
-} from "graphile-utils";
+import { extendSchema, wrapPlans } from "graphile-utils";
 import * as jsonwebtoken from "jsonwebtoken";
 import type {} from "postgraphile";
 import { jsonParse } from "postgraphile/@dataplan/json";
@@ -89,7 +85,7 @@ function escapeHTML(rawText: string): string {
   );
 }
 
-function makeRuruTitlePlugin(title: string): GraphileConfig.Plugin {
+function ruruTitle(title: string): GraphileConfig.Plugin {
   return {
     name: "RuruTitlePlugin",
     version: "0.0.0",
@@ -224,10 +220,10 @@ const NonNullRelationsPlugin: GraphileConfig.Plugin = {
   },
 };
 
-const LeftArmPlugin = makeExtendSchemaPlugin((build) => {
+const LeftArmPlugin = extendSchema((build) => {
   const { left_arm } = build.input.pgRegistry.pgResources;
   return {
-    typeDefs: gql`
+    typeDefs: /* GraphQL */ `
       extend type Person {
         allArms: PersonRelatedArmConnection
       }
@@ -303,8 +299,8 @@ const testResolver = EXPORTABLE(
   [context, sideEffect],
 );
 
-const TestSideEffectCancellingPlugin = makeExtendSchemaPlugin({
-  typeDefs: gql/* GraphQL */ `
+const TestSideEffectCancellingPlugin = extendSchema({
+  typeDefs: /* GraphQL */ `
     extend type Query {
       testSideEffectCancelling: Int
     }
@@ -349,10 +345,10 @@ const AddToResponseExtensionsPropertyPlugin: GraphileConfig.Plugin = {
 const preset: GraphileConfig.Preset = {
   plugins: [
     StreamDeferPlugin,
-    makeExtendSchemaPlugin((build) => {
+    extendSchema((build) => {
       const { sql } = build;
       return {
-        typeDefs: gql`
+        typeDefs: /* GraphQL */ `
           extend type Person {
             greet(
               greeting: String! = "Hello" @deprecated(reason: "TESTING")
@@ -413,7 +409,7 @@ const preset: GraphileConfig.Preset = {
         },
       };
     }),
-    makeWrapPlansPlugin({
+    wrapPlans({
       Query: {
         wrapMe(plan) {
           return plan();
@@ -425,8 +421,8 @@ const preset: GraphileConfig.Preset = {
         },
       },
     }),
-    makeExtendSchemaPlugin({
-      typeDefs: gql`
+    extendSchema({
+      typeDefs: /* GraphQL */ `
         extend type Query {
           mol: Int
         }
@@ -482,8 +478,8 @@ const preset: GraphileConfig.Preset = {
         },
       },
     }),
-    makeExtendSchemaPlugin({
-      typeDefs: gql`
+    extendSchema({
+      typeDefs: /* GraphQL */ `
         extend type Subscription {
           error: Int
         }
@@ -508,7 +504,7 @@ const preset: GraphileConfig.Preset = {
     }),
     // PrimaryKeyMutationsOnlyPlugin,
     PersistedPlugin,
-    makeRuruTitlePlugin("<New title text here!>"),
+    ruruTitle("<New title text here!>"),
     ExportSchemaPlugin,
     NonNullRelationsPlugin,
     RuruQueryParamsPlugin,

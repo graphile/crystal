@@ -3,8 +3,12 @@ import type { BaseGraphQLArguments, Step } from "grafast";
 export { EXPORTABLE } from "./exportable.js";
 export { gql } from "./gql.js";
 export { makeAddInflectorsPlugin } from "./makeAddInflectorsPlugin.js";
-export { makeAddPgTableConditionPlugin } from "./makeAddPgTableConditionPlugin.js";
 export {
+  addPgTableCondition,
+  makeAddPgTableConditionPlugin,
+} from "./makeAddPgTableConditionPlugin.js";
+export {
+  addPgTableOrderBy,
   makeAddPgTableOrderByPlugin,
   MakeAddPgTableOrderByPluginOrders,
   NullsSortMethod,
@@ -12,6 +16,7 @@ export {
   OrderByAscDescOptions,
 } from "./makeAddPgTableOrderByPlugin.js";
 export {
+  changeNullability,
   ChangeNullabilityRules,
   ChangeNullabilityTypeRules,
   makeChangeNullabilityPlugin,
@@ -20,6 +25,7 @@ export {
 } from "./makeChangeNullabilityPlugin.js";
 export {
   EnumResolver,
+  extendSchema,
   ExtensionDefinition,
   makeExtendSchemaPlugin,
   ObjectPlan,
@@ -28,12 +34,18 @@ export {
   Resolvers,
 } from "./makeExtendSchemaPlugin.js";
 export {
+  jsonPgSmartTags,
   makeJSONPgSmartTagsPlugin,
   makePgSmartTagsFromFilePlugin,
   makePgSmartTagsPlugin,
+  pgSmartTags,
+  pgSmartTagsFromFile,
   TagsFilePlugin,
 } from "./makePgSmartTagsPlugin.js";
-export { makeProcessSchemaPlugin } from "./makeProcessSchemaPlugin.js";
+export {
+  makeProcessSchemaPlugin,
+  processSchema,
+} from "./makeProcessSchemaPlugin.js";
 export {
   makeWrapPlansPlugin,
   PlanWrapperFilter,
@@ -42,6 +54,7 @@ export {
   PlanWrapperRule,
   PlanWrapperRules,
   PlanWrapperRulesGenerator,
+  wrapPlans,
 } from "./makeWrapPlansPlugin.js";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
