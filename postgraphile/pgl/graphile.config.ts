@@ -1,7 +1,7 @@
 /* eslint-disable import/no-unresolved */
 import PersistedPlugin from "@grafserv/persisted";
 import { EXPORTABLE, exportSchema } from "graphile-export";
-import { gql, makeExtendSchemaPlugin } from "graphile-utils";
+import { extendSchema, gql } from "graphile-utils";
 import type {} from "pgl";
 import { jsonParse } from "pgl/@dataplan/json";
 import { makePgService } from "pgl/adaptors/pg";
@@ -108,7 +108,7 @@ const ExportSchemaPlugin: GraphileConfig.Plugin = {
 const preset: GraphileConfig.Preset = {
   plugins: [
     StreamDeferPlugin,
-    makeExtendSchemaPlugin({
+    extendSchema({
       typeDefs: gql`
         extend type Query {
           mol: Int

@@ -76,16 +76,16 @@ comment on table animal_type is E'@enum\n@enumName TypeOfAnimal';
 
 The name must conform to the GraphQL `Name` restrictions.
 
-### With makeExtendSchemaPlugin
+### With extendSchema
 
 Use the standard `enum` GraphQL interface definition language (IDL/SDL) to
 define your enum:
 
 ```js
 import { constant } from "postgraphile/grafast";
-import { gql, makeExtendSchemaPlugin } from "postgraphile/utils";
+import { gql, extendSchema } from "postgraphile/utils";
 
-const myPlugin = makeExtendSchemaPlugin(() => ({
+const myPlugin = extendSchema(() => ({
   typeDefs: gql`
     enum AnimalType {
       """

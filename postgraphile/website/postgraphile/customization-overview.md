@@ -200,7 +200,7 @@ extending and augmenting the GraphQL schema you may want to use one of our
 [plugin factories](./extending#writing-plugins) which abstract away the
 boilerplate so that you cah achieve your goals more rapidly.
 
-`makeExtendSchemaPlugin` is the main factory you’ll want for adding fields and
+`extendSchema` is the main factory you’ll want for adding fields and
 types to your GraphQL schema; it allows you to use GraphQL SDL to describe your
 types (e.g. `extend type Query { random: Int }`) along with Grafast plans (or
 even traditional GraphQL resolvers) to provide the execution logic for these
@@ -271,7 +271,7 @@ Options for creating new root-level query fields include:
 
 - create a database table, view or materialized view
 - create a [custom query function](./custom-queries)
-- use a [plugin](./extending), e.g. via [`makeExtendSchemaPlugin`](./make-extend-schema-plugin)
+- use a [plugin](./extending), e.g. via [`extendSchema`](./extend-schema)
 
 ### Adding a field to a table-like type
 
@@ -285,8 +285,7 @@ work with certain subsets of these types though.)
   between types
 - create a [computed column function](./computed-columns) (which can return
   scalars, records, or even sets of records)
-- use a [plugin](./extending), e.g. via
-  [`makeExtendSchemaPlugin`](./make-extend-schema-plugin)
+- use a [plugin](./extending), e.g. via [`extendSchema`](./extend-schema)
 
 ### Adding a field to a function-derived type
 
@@ -295,8 +294,7 @@ functions to `returns setof named_type` than `returns table(...)` — but should
 choose to use anonymous types anyway, adding a field to these can be achieved by:
 
 - alter the function to return additional values
-- use a [plugin](./extending), e.g. via
-  [`makeExtendSchemaPlugin`](./make-extend-schema-plugin)
+- use a [plugin](./extending), e.g. via [`extendSchema`](./extend-schema)
 
 ### Adding a mutation field
 
@@ -304,8 +302,7 @@ Options for adding new mutations include:
 
 - add new tables to create CRUD mutations for altering their data
 - add a [custom mutation](./custom-mutations) function
-- use a [plugin](./extending), e.g. via
-  [`makeExtendSchemaPlugin`](./make-extend-schema-plugin)
+- use a [plugin](./extending), e.g. via [`extendSchema`](./extend-schema)
 
 ### Renaming a field
 

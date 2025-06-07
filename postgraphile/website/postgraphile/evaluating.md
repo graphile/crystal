@@ -56,7 +56,7 @@ First of all, PostGraphile’s out of the box behavior is not necessarily meant
 to be the be-all and end-all of your API. PostGraphile was created to allow you
 to focus on your product and not the API. If you need to integrate external
 systems, there are easy to use ways to extend your schema (e.g.
-[`makeExtendSchemaPlugin`](./make-extend-schema-plugin)). If you want to
+[`extendSchema`](./extend-schema)). If you want to
 exclude things from your schema, we have a powerful [behavior
 system](./behavior) you can use to accomplish that using global preferences and
 local overrides, or you can simply [remove things from the
