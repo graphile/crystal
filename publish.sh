@@ -28,6 +28,7 @@ PACKAGES=(
   #"$BUILD_DIR/graphile__simplify-inflection.tgz"
   #"$BUILD_DIR/grafserv__persisted.tgz"
   #"$BUILD_DIR/graphile.tgz"
+  #"$BUILD_DIR/graphql-codegen-grafast.tgz"
 )
 
 

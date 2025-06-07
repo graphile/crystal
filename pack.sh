@@ -176,5 +176,12 @@ yarn pack -o package.tgz
 mv package.tgz ../../builds/graphile.tgz
 cd -
 
+# graphql-codegen-grafast
+cd grafast/codegen-plugin
+rm -f *.tgz
+yarn pack -o package.tgz
+mv package.tgz ../../builds/graphql-codegen-grafast.tgz
+cd -
+
 echo "All packages packed into 'builds/'"
 echo "Now publish them with './publish.sh'"
