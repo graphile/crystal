@@ -212,7 +212,7 @@ certain results from a record set, then `makeWrapPlansPlugin` is worth
 investigating.
 
 If the nullability in your schema is coming out wrong,
-`makeChangeNullabilityPlugin` lets you change the “nullability” of a field,
+`changeNullability` lets you change the “nullability” of a field,
 e.g. marking it as nullable or non-nullable
 
 There are many others; but if they don’t fit your needs then you can read more
