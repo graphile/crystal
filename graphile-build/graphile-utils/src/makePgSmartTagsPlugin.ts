@@ -335,7 +335,7 @@ export function pgSmartTags(
             // Let people know if their rules don't match; it's probably a mistake.
             if (hits === 0) {
               console.warn(
-                `WARNING: there were no matches for ect(
+                `WARNING: there were no matches for makePgSmartTagsPlugin rule ${idx} - ${inspect(
                   rawRules[idx],
                 )}`,
               );
