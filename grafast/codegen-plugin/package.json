@@ -1,0 +1,45 @@
+{
+  "name": "graphql-codegen-grafast",
+  "version": "0.0.1-beta.0",
+  "description": "A GraphQL code generator plugin for Grafast schemas",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "node": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/graphile/crystal.git"
+  },
+  "keywords": [
+    "graphql",
+    "codegen",
+    "grafast",
+    "crystal",
+    "graphile"
+  ],
+  "author": "Benjie Gillam <code@benjiegillam.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/graphile/crystal/issues"
+  },
+  "homepage": "https://grafast.org",
+  "engines": {
+    "node": ">=22"
+  },
+  "files": [
+    "fwd",
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@graphql-codegen/plugin-helpers": "^5.1.0"
+  },
+  "peerDependencies": {
+    "graphql": "^16.1.0-experimental-stream-defer.6"
+  }
+}

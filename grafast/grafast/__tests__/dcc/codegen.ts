@@ -5,7 +5,7 @@ const config: CodegenConfig = {
   ignoreNoDocuments: true,
   generates: {
     "./dcc-types.ts": {
-      plugins: ["typescript", "./grafast-types-plugin.ts"],
+      plugins: ["typescript", "grafast"],
       config: {
         grafastModule: "../../dist/index.js",
         overridesFile: "./dcc-type-overrides.ts",
