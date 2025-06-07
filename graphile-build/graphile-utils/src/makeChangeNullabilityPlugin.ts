@@ -118,7 +118,7 @@ function doIt(
   return inType;
 }
 
-export function makeChangeNullabilityPlugin(
+export function changeNullability(
   rules: ChangeNullabilityRules,
 ): GraphileConfig.Plugin {
   const expectedMatches = Object.entries(rules).flatMap(
@@ -242,7 +242,7 @@ export function makeChangeNullabilityPlugin(
         finalize(schema) {
           if (pendingMatches.size > 0) {
             throw new Error(
-              `The following entries in your makeChangeNullabilityPlugin didn't match anything in your GraphQL schema; please check your spelling: ${[
+              `The following entries in your changeNullability(...) didn't match anything in your GraphQL schema; please check your spelling: ${[
                 ...pendingMatches,
               ].join(", ")}`,
             );
@@ -253,3 +253,6 @@ export function makeChangeNullabilityPlugin(
     },
   };
 }
+
+/** @deprecated renamed to changeNullability */
+export const makeChangeNullabilityPlugin = changeNullability;
