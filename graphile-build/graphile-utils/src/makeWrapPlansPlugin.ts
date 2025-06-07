@@ -48,14 +48,14 @@ export type PlanWrapperFilterRule<T> = (
 
 let counter = 0;
 
-export function makeWrapPlansPlugin(
+export function wrapPlans(
   rulesOrGenerator: PlanWrapperRules | PlanWrapperRulesGenerator,
 ): GraphileConfig.Plugin;
-export function makeWrapPlansPlugin<T>(
+export function wrapPlans<T>(
   filter: PlanWrapperFilter<T>,
   rule: PlanWrapperFilterRule<T>,
 ): GraphileConfig.Plugin;
-export function makeWrapPlansPlugin<T>(
+export function wrapPlans<T>(
   rulesOrGeneratorOrFilter:
     | PlanWrapperRules
     | PlanWrapperRulesGenerator
@@ -64,7 +64,7 @@ export function makeWrapPlansPlugin<T>(
 ): GraphileConfig.Plugin {
   if (rule && typeof rule !== "function") {
     throw new Error(
-      "Invalid call signature for makeWrapPlansPlugin, expected second argument to be a function",
+      "Invalid call signature for wrapPlans, expected second argument to be a function",
     );
   }
   const name = `WrapPlansPlugin_${++counter}`;
@@ -127,9 +127,7 @@ export function makeWrapPlansPlugin<T>(
             planWrapperOrSpec = typeRules[fieldName];
           } else {
             // Should not happen
-            throw new Error(
-              "Bad call signature for function makeWrapPlansPlugin",
-            );
+            throw new Error("Bad call signature for function wrapPlans");
           }
           if (!planWrapperOrSpec) {
             return field;
@@ -214,3 +212,6 @@ export function makeWrapPlansPlugin<T>(
     },
   };
 }
+
+/** @deprecated Renamed to wrapPlans */
+export const makeWrapPlansPlugin = wrapPlans;

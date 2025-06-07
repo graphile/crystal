@@ -81,7 +81,7 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
   const { kind, match: incomingMatch, ...rest } = rule;
   if (!Object.prototype.hasOwnProperty.call(meaningByKind, kind)) {
     throw new Error(
-      `makePgSmartTagsPlugin rule has invalid kind '${kind}'; valid kinds are: ${validKinds}`,
+      `pgSmartTags rule has invalid kind '${kind}'; valid kinds are: ${validKinds}`,
     );
   }
 
@@ -200,7 +200,7 @@ function compileRule<TKind extends PgSmartTagSupportedKinds>(
       }
     } else {
       throw new Error(
-        "makePgSmartTagsPlugin rule 'match' is neither a string nor a function",
+        "pgSmartTags rule 'match' is neither a string nor a function",
       );
     }
   };
@@ -253,7 +253,7 @@ async function resolveRules(
 }
 
 let counter = 0;
-export function makePgSmartTagsPlugin(
+export function pgSmartTags(
   initialRules: ThunkOrDirect<
     PromiseOrDirect<PgSmartTagRule | PgSmartTagRule[] | null>
   >,
@@ -335,7 +335,7 @@ export function makePgSmartTagsPlugin(
             // Let people know if their rules don't match; it's probably a mistake.
             if (hits === 0) {
               console.warn(
-                `WARNING: there were no matches for makePgSmartTagsPlugin rule ${idx} - ${inspect(
+                `WARNING: there were no matches for ect(
                   rawRules[idx],
                 )}`,
               );
@@ -356,7 +356,7 @@ export function makePgSmartTagsPlugin(
                   },
                   (e) => {
                     console.error(
-                      `Error occurred during makePgSmartTagsPlugin watch mode: `,
+                      `Error occurred during pgSmartTags watch mode: `,
                       e,
                     );
                   },
@@ -449,7 +449,7 @@ export function pgSmartTagRulesFromJSON(
   ): void {
     if (kind !== "class") {
       throw new Error(
-        `makeJSONPgSmartTagsPlugin: '${key}' is only valid on a class; you tried to set it on a '${kind}' at 'config.${kind}.${identifier}.${key}'`,
+        `jsonPgSmartTags: '${key}' is only valid on a class; you tried to set it on a '${kind}' at 'config.${kind}.${identifier}.${key}'`,
       );
     }
     const path = `config.${kind}.${identifier}.${key}`;
@@ -476,7 +476,7 @@ export function pgSmartTagRulesFromJSON(
       } = entitySpec;
       if (Object.keys(entityRest).length > 0) {
         console.warn(
-          `WARNING: makeJSONPgSmartTagsPlugin '${key}' only supports 'tags' and 'description' currently, you have also set '${Object.keys(
+          `WARNING: jsonPgSmartTags '${key}' only supports 'tags' and 'description' currently, you have also set '${Object.keys(
             entityRest,
           ).join(
             "', '",
@@ -495,7 +495,7 @@ export function pgSmartTagRulesFromJSON(
   for (const rawKind of Object.keys(specByIdentifierByKind)) {
     if (!Object.prototype.hasOwnProperty.call(meaningByKind, rawKind)) {
       throw new Error(
-        `makeJSONPgSmartTagsPlugin JSON rule has invalid kind '${rawKind}'; valid kinds are: ${validKinds}`,
+        `jsonPgSmartTags JSON rule has invalid kind '${rawKind}'; valid kinds are: ${validKinds}`,
       );
     }
     const kind: PgSmartTagSupportedKinds = rawKind as any;
@@ -506,7 +506,7 @@ export function pgSmartTagRulesFromJSON(
         const { tags, description, attribute, constraint, ...rest } = spec;
         if (Object.keys(rest).length > 0) {
           console.warn(
-            `WARNING: makeJSONPgSmartTagsPlugin identifier spec only supports 'tags', 'description', 'attribute' and 'constraint' currently, you have also set '${Object.keys(
+            `WARNING: jsonPgSmartTags identifier spec only supports 'tags', 'description', 'attribute' and 'constraint' currently, you have also set '${Object.keys(
               rest,
             ).join("', '")}' at 'config.${kind}.${identifier}'`,
           );
@@ -540,7 +540,7 @@ export type SubscribeToJSONPgSmartTagsUpdatesCallback = (
   cb: UpdateJSONPgSmartTagsCallback | null,
 ) => void | Promise<void>;
 
-export function makeJSONPgSmartTagsPlugin(
+export function jsonPgSmartTags(
   jsonOrThunk: ThunkOrDirect<PromiseOrDirect<JSONPgSmartTags | null>>,
   subscribeToJSONUpdatesCallback?: SubscribeToJSONPgSmartTagsUpdatesCallback | null,
   details?: { name?: string; description?: string; version?: string },
@@ -566,7 +566,7 @@ export function makeJSONPgSmartTagsPlugin(
         }
       : null;
 
-  return makePgSmartTagsPlugin(
+  return pgSmartTags(
     async () => {
       const json = await (typeof jsonOrThunk === "function"
         ? jsonOrThunk()
@@ -578,7 +578,7 @@ export function makeJSONPgSmartTagsPlugin(
   );
 }
 
-export const makePgSmartTagsFromFilePlugin = (
+export const pgSmartTagsFromFile = (
   tagsFile = process.cwd() + "/postgraphile.tags.json5",
   name?: keyof GraphileConfig.Plugins,
 ): GraphileConfig.Plugin => {
@@ -594,7 +594,7 @@ export const makePgSmartTagsFromFilePlugin = (
     );
   }
   let tagsListener: null | ((current: Stats, previous: Stats) => void) = null;
-  const plugin = makeJSONPgSmartTagsPlugin(
+  const plugin = jsonPgSmartTags(
     async () => {
       const contents = await readFile(tagsFile, "utf8");
       return JSON5.parse(contents) as JSONPgSmartTags;
@@ -636,10 +636,7 @@ export const makePgSmartTagsFromFilePlugin = (
   return plugin;
 };
 
-export const TagsFilePlugin = makePgSmartTagsFromFilePlugin(
-  undefined,
-  "TagsFilePlugin",
-);
+export const TagsFilePlugin = pgSmartTagsFromFile(undefined, "TagsFilePlugin");
 
 declare global {
   namespace GraphileConfig {
@@ -648,3 +645,10 @@ declare global {
     }
   }
 }
+
+/** @deprecated Renamed to 'pgSmartTags' */
+export const makePgSmartTagsPlugin = pgSmartTags;
+/** @deprecated Renamed to 'pgSmartTagsFromFile' */
+export const makePgSmartTagsFromFilePlugin = pgSmartTagsFromFile;
+/** @deprecated Renamed to 'jsonPgSmartTags' */
+export const makeJSONPgSmartTagsPlugin = jsonPgSmartTags;
