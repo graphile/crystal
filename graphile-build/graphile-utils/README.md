@@ -38,7 +38,7 @@ And please give some love to our featured sponsors 🤩:
 
 ### `extendSchema`
 
-Docs: https://postgraphile.org/postgraphile/next/make-extend-schema-plugin
+Docs: https://postgraphile.org/postgraphile/next/extend-schema
 
 Enables you to add additonal types or extend existing types within your Graphile
 Engine GraphQL schema.
@@ -125,20 +125,20 @@ extendSchema({ typeDefs: gql`...${embed(...)}...` });
 
 ### `changeNullability`
 
-Docs: https://postgraphile.org/postgraphile/next/make-change-nullability-plugin
+Docs: https://postgraphile.org/postgraphile/next/change-nullability
 
 Use this plugin to override the nullability of fields in your GraphQL schema.
 
 ### `processSchema`
 
-Docs: https://postgraphile.org/postgraphile/next/make-process-schema-plugin
+Docs: https://postgraphile.org/postgraphile/next/process-schema
 
 Enables you to process the schema after it's built, e.g. print it to a file,
 augment it with a third party library (e.g. graphql-shield), etc.
 
 ### `wrapPlans`
 
-Docs: https://postgraphile.org/postgraphile/next/make-wrap-plans-plugin
+Docs: https://postgraphile.org/postgraphile/next/wrap-plans
 
 Enables you to wrap the field plan resolvers in the generated Grafast schema,
 allowing you to augment the way in which existing fields operate.
