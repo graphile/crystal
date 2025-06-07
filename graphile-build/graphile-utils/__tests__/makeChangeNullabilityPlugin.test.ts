@@ -17,9 +17,9 @@ import {
 
 import type { NullabilitySpecString } from "../src/index.js";
 import {
+  extendSchema,
   gql,
   makeChangeNullabilityPlugin,
-  makeExtendSchemaPlugin,
 } from "../src/index.js";
 
 const makeSchema = (plugins: GraphileConfig.Plugin[]) =>
@@ -30,7 +30,7 @@ const makeSchema = (plugins: GraphileConfig.Plugin[]) =>
         MutationPlugin,
         SubscriptionPlugin,
         CommonTypesPlugin,
-        makeExtendSchemaPlugin((_build) => ({
+        extendSchema((_build) => ({
           typeDefs: gql`
             interface EchoCapable {
               echo(message: [[String]!]): [[String]!]

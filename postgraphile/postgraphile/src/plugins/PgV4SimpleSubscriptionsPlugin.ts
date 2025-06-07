@@ -1,9 +1,9 @@
 import { jsonParse } from "@dataplan/json";
 import type { ObjectPlan, Step } from "grafast";
 import { context, get, lambda, listen, node } from "grafast";
-import { EXPORTABLE, gql, makeExtendSchemaPlugin } from "graphile-utils";
+import { EXPORTABLE, extendSchema, gql } from "graphile-utils";
 
-export const PgV4SimpleSubscriptionsPlugin = makeExtendSchemaPlugin((build) => {
+export const PgV4SimpleSubscriptionsPlugin = extendSchema((build) => {
   const {
     grafast: { get },
   } = build;

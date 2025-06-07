@@ -1,5 +1,3 @@
-# V5: NOT YET FULLY IMPLEMENTED
-
 # graphile-utils
 
 <span class="badge-patreon"><a href="https://patreon.com/benjie" title="Support Graphile development on Patreon"><img src="https://img.shields.io/badge/sponsor-via%20Patreon-orange.svg" alt="Patreon sponsor button" /></a></span>
@@ -38,20 +36,7 @@ And please give some love to our featured sponsors 🤩:
 
 <!-- SPONSORS_END -->
 
-### `gql`
-
-Similar to the default export from `graphql-tag`, this export can be used to
-form tagged template literals that are useful when building schema extensions.
-`gql` in `graphile-utils` differs from `graphql-tag` in a number of ways, most
-notably: it can use interpolation to generate dynamically named fields and
-types, and it can embed raw values using the `embed` helper.
-
-### `embed`
-
-Used to wrap a value to be included in a `gql` AST, e.g. for use in GraphQL
-directives.
-
-### `makeExtendSchemaPlugin`
+### `extendSchema`
 
 Docs: https://postgraphile.org/postgraphile/next/make-extend-schema-plugin
 
@@ -59,15 +44,12 @@ Enables you to add additonal types or extend existing types within your Graphile
 Engine GraphQL schema.
 
 ```js
-const {
-  makeExtendSchemaPlugin,
-  gql,
-} = require('graphile-utils');
+const { extendSchema } = require('graphile-utils');
 
 const MySchemaExtensionPlugin =
-  makeExtendSchemaPlugin(
+  extendSchema(
     build => ({
-      typeDefs: gql`...`,
+      typeDefs: `...`,
       objects: {...},
       interfaces: {...},
       unions: {...},
@@ -80,12 +62,12 @@ module.exports = MySchemaExtensionPlugin;
 e.g.:
 
 ```js
-makeExtendSchemaPlugin((build) => {
+extendSchema((build) => {
   const {
     grafast: { constant },
   } = build;
   return {
-    typeDefs: gql`
+    typeDefs: `
       type Random {
         float: Float!
         number(min: Int!, max: Int!): Int!
@@ -120,34 +102,46 @@ makeExtendSchemaPlugin((build) => {
 });
 ```
 
-### `makeAddInflectorsPlugin`
+#### `gql`
 
-Docs: https://postgraphile.org/postgraphile/next/make-add-inflectors-plugin
+Similar to the default export from `graphql-tag`, this export can be used to
+form tagged template literals that are useful when building schema extensions.
+`gql` in `graphile-utils` differs from `graphql-tag` in a number of ways, most
+notably: it can use interpolation to generate dynamically named fields and
+types, and it can embed raw values using the `embed` helper.
 
-If you don't like the default naming conventions that come with a Graphile
-Engine GraphQL schema then it's easy for you to override them using the
-inflector.
+```ts
+extendSchema({ typeDefs: gql`...` });
+```
 
-### `makeChangeNullabilityPlugin`
+#### `embed`
+
+Used to wrap a value to be included in a `gql` AST, e.g. for use in GraphQL
+directives.
+
+```ts
+extendSchema({ typeDefs: gql`...${embed(...)}...` });
+```
+
+### `changeNullability`
 
 Docs: https://postgraphile.org/postgraphile/next/make-change-nullability-plugin
 
 Use this plugin to override the nullability of fields in your GraphQL schema.
 
-### `makeProcessSchemaPlugin`
+### `processSchema`
 
 Docs: https://postgraphile.org/postgraphile/next/make-process-schema-plugin
 
 Enables you to process the schema after it's built, e.g. print it to a file,
 augment it with a third party library (e.g. graphql-shield), etc.
 
-### `makeWrapResolversPlugin`
+### `wrapPlans`
 
-Docs: https://www.graphile.org/postgraphile/make-wrap-resolvers-plugin/
+Docs: https://postgraphile.org/postgraphile/next/make-wrap-plans-plugin
 
-Enables you to wrap the field resolvers in the generated GraphQL API, allowing
-you to take an action before or after the resolver, or even modify the resolver
-result.
+Enables you to wrap the field plan resolvers in the generated Grafast schema,
+allowing you to augment the way in which existing fields operate.
 
 ## Developing
 
