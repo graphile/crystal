@@ -1,19 +1,19 @@
 ---
-title: "Last epic solved!"
+title: "Grafast beta: last epic solved!"
 description:
   "Polymorphism overhauled for greater efficiency and ergonomics. This is the
   last breaking change to plan resolvers we are expecting for v1."
-slug: 2025-06-06-last-epic-solved
+slug: 2025-06-07-last-epic-solved
 authors:
   - name: Benjie
-    title: PostGraphile Maintainer
-    url: https://github.com/Benjie
+    title: Inventor of Grafast
+    url: https://benjie.dev
     image_url: https://github.com/Benjie.png
   - name: Jem
     title: "“I wear many hats!”"
     url: https://bsky.app/profile/jem.graphile.org
     image_url: https://github.com/jemgillam.png
-tags: [Beta]
+tags: [0.1]
 ---
 
 import styles from "@site/src/css/common.module.css";
@@ -29,23 +29,28 @@ epic has now been solved!
 - ✅ Eradicating eval
 - ✅ **Polymorphism — this release!**
 
+In previous versions of Gra*fast* there was the possibility of exponential plan
+branching due to the naive method of resolution of abstract types — a known
+issue raised in the first Gra*fast* working group as one of four “epics” to be
+solved before v1.0. This release of `grafast@0.1.1-beta.22` fixes this final epic through
+a complete overhaul of the polymorphism system. Let’s take a look!
+
 </p>
 
-Gra*fast* is the cutting-edge GraphQL planning and execution engine which PostGraphile
-uses, allowing it to build much more efficient SQL queries than PostGraphile V4 could
-achieve, whilst also significantly expanding the capabilities of the system - not to
-mention solving some longstanding issues!
-
 ### Polymorphism epic achieved
-
-In previous versions of Gra*fast* there was the possibility of exponential plan
-branching due to the naive method of resolution of abstract types.
 
 By moving the responsibility of polymorphic resolution from field plan resolvers
 into the abstract types themselves, we’ve centralized this logic, simplified
 field plan resolvers, and unlocked more optimization opportunities and greater
-execution efficiency. Polymorphic branches in one layer are now merged into a
-single “combined” step before planning the next level of polymorphism.
+execution efficiency. We no longer have the concept of “polymorphic capable”
+steps: any step may now be used for polymorphism. Abstract types now gain a
+`planType` method responsible for taking a “specifier” from the field plan
+resolver and returning a step representing the name of its concrete object type
+along with subplans for each possible object type.
+
+To solve the problem of exponential branching, we merge the new specifier steps
+from all previous polymorphic branches into a single “combined” step before
+planning the next level of polymorphism.
 
 <figure>
 
@@ -64,9 +69,21 @@ single “combined” step before planning the next level of polymorphism.
 
 <!-- truncate-->
 
-Users of PostGraphile’s Postgres-based polymorphism should not need to take any action to
-benefit from these changes, and may notice that their SQL queries are now
-slightly smaller.
+For the few of you who have been brave enough to hand write polymorphic plan
+resolvers: first of all, thank you for trying it out! Hand written
+polymorphic plan resolvers will need to be updated to match the new paradigm,
+this will involve moving the polymorphic resolution from field plan resolvers
+into the new `planType` method on the relevant abstract type (interface or union)
+and adjusting the logic to fit the new pattern. Steps such as `polymorphicBranch`,
+`pgPolymorphism`, and other polymorphism related steps no longer exist as they
+are no longer supported in this new paradigm. For guidance on how to write the
+`planType` method, see
+[the updated polymorphism docs](../grafast/polymorphism) and please reach
+out to us on Discord — we’d love to help you get migrated.
+
+Excitingly, this is the last change to hand written plan resolvers that we
+expect to make for the v1.0 release (other than some improvements around
+TypeScript types), so we're getting close to release candidate stage!
 
 ### TypeDefs / plans overhaul
 
@@ -156,19 +173,67 @@ _(Aside: we pasted the
 of these instructions into ChatGPT and it managed to convert a number of plugins
 perfectly! YMMV.)_
 
+Other changes:
+
+- `ObjectPlans`/`GrafastPlans`/`FieldPlans`/`InputObjectPlans`/`ScalarPlans` all
+  changed to singular
+- `InterfaceOrUnionPlans` split to `InterfacePlan`/`UnionPlan` (identical
+  currently)
+- Shape of `ObjectPlan`/`InterfacePlan`/`UnionPlan` has changed;
+  `DeprecatedObjectPlan`/etc exist for back-compatibility
+- `FieldArgs` can now accept an input shape indicating the args and their types
+- `FieldPlanResolver<TArgs, TParentStep, TResultStep>` has switched the order of
+  the first two generic parameters:
+  `FieldPlanResolver<TParentStep, TArgs, TResultStep>` — this is to reflect the
+  order of the arguments to the function. Also null has been removed from the
+  generics.
+- Various generics (including `GrafastFieldConfig`) that used to take a GraphQL
+  type instance as a generic parameter no longer do — you need to use external
+  code generation because TypeScript cannot handle the dynamic creation.
+- `GrafastFieldConfig` last two generics swapped order.
+- `GrafastArgumentConfig` generics completely changed
+
+### New features
+
+#### Steps
+
+- `coalesce()`: Accepts a number of steps and represents the first value from
+  them that isn’t `null` or `undefined`
+
+#### Step classes
+
+- Experimental support for adding “references” to other steps at plan-time only
+  (via `refId = this.addRef($step)` and reciprocal `$step = this.getRef(refId)`
+  methods). Useful for optimization; but use with great caution. Currently
+  undocumented due to experimental nature.
+
+### Improved type-safety
+
+- `each()` now reflects the type of the list item even if it’s not a “list
+  capable” step
+- `loadOne()`/`loadMany()` can now track the underlying nullability of the
+  callback
+
+🚨 This will potentially break your plan types quite a bit. In particular, the
+`LoadOneCallback` and `LoadManyCallback` types now have 5 (not 4) generic
+parameters, the new one is inserted in the middle (after the second parameter)
+and indicates the true return type of the callback (ignoring promises) — e.g.
+`Maybe<ReadonlyArray<Maybe<ItemType>>>` for `LoadManyCallback`. They have
+sensible defaults if you only specify the first two generics.
+
 ### And more besides...
 
 In reaching this epic milestone, we have <strong>bumped the minimum version of node.js to
 Node 22</strong> (the latest LTS); we have also found and fixed a number of other issues both
-in PostGraphile and the wider Graphile suite, you can see a full list at
+in Gra*fast* and the wider Graphile suite, you can see a full list at
 [graphile.org](htts://graphile.org/news/20250606-last-epic-reached).
 
 ## Thank you Sponsors
 
-PostGraphile is crowd-funded open-source software, it relies on
+Gra*fast* is crowd-funded open-source software, it relies on
 crowd-sourced funding from individuals and companies to keep advancing.
 
-If your company benefits from PostGraphile, Gra*fast* or the wider Graphile
+If your company benefits from Gra*fast*, PostGraphile or the wider Graphile
 suite, you should consider asking them to fund our work. By significantly
 reducing the amount of work needed to achieve business goals and reducing
 running costs, Graphile’s software results in huge time and money savings for
