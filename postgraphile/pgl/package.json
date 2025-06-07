@@ -109,6 +109,16 @@
       "node": "./fwd/grafserv/h3/v1/index.js",
       "default": "./fwd/grafserv/h3/v1/index.js"
     },
+    "./grafserv/hono/v4": {
+      "types": "./fwd/grafserv/hono/v4/index.d.ts",
+      "node": "./fwd/grafserv/hono/v4/index.js",
+      "default": "./fwd/grafserv/hono/v4/index.js"
+    },
+    "./grafserv/whatwg-node__server/v4": {
+      "types": "./fwd/grafserv/whatwg-node__server/v4/index.d.ts",
+      "node": "./fwd/grafserv/whatwg-node__server/v4/index.js",
+      "default": "./fwd/grafserv/whatwg-node__server/v4/index.js"
+    },
     "./grafserv/ruru": {
       "types": "./fwd/grafserv/ruru/index.d.ts",
       "node": "./fwd/grafserv/ruru/index.js",
@@ -123,6 +133,11 @@
       "types": "./fwd/grafserv/ruru/cli/index.d.ts",
       "node": "./fwd/grafserv/ruru/cli/index.js",
       "default": "./fwd/grafserv/ruru/cli/index.js"
+    },
+    "./grafserv/ruru/bundle": {
+      "types": "./fwd/grafserv/ruru/bundle/index.d.ts",
+      "node": "./fwd/grafserv/ruru/bundle/index.js",
+      "default": "./fwd/grafserv/ruru/bundle/index.js"
     },
     "./graphile-build": {
       "types": "./fwd/graphile-build/index.d.ts",
