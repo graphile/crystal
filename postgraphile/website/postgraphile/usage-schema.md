@@ -212,7 +212,7 @@ automatically reflect the correct types thanks to graphql-codegen:
 
 ```ts
 import type { DocumentNode, ExecutionResult } from "postgraphile/graphql";
-import type { TypedDocumentNode } from "@graphql-typed-document-node/core";
+import type { TypedDocumentNode, VariablesOf } from "@graphql-typed-document-node/core";
 import { postgraphile } from "postgraphile";
 import { execute, hookArgs } from "postgraphile/grafast";
 import { validate } from "postgraphile/graphql";
@@ -223,7 +223,7 @@ const pgl = postgraphile(preset);
 export async function executeDocument<TData = any, TVariables = any>(
   requestContext: Partial<Grafast.RequestContext>,
   document: DocumentNode | TypedDocumentNode<TData, TVariables>,
-  variableValues?: Record<string, unknown> | null,
+  variableValues?: VariablesOf<TypedDocumentNode<TData, TVariables>> | null,
   operationName?: string,
 ): Promise<ExecutionResult<TData, TVariables>> {
   const { schema, resolvedPreset } = await pgl.getSchemaResult();
@@ -242,7 +242,7 @@ export async function executeDocument<TData = any, TVariables = any>(
     operationName,
     resolvedPreset,
     requestContext,
-  });
+  } as any);
 
   // Execute the request using Grafast:
   const result = await execute(args);
