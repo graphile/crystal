@@ -220,10 +220,10 @@ import preset from "./graphile.config.js";
 
 const pgl = postgraphile(preset);
 
-export async function executeDocument<TData = any, TVariables = any>(
+export async function executeDocument<TDoc extends TypedDocumentNode<TData, TVariables>, TData = any, TVariables = any>(
   requestContext: Partial<Grafast.RequestContext>,
-  document: DocumentNode | TypedDocumentNode<TData, TVariables>,
-  variableValues?: VariablesOf<TypedDocumentNode<TData, TVariables>> | null,
+  document: TDoc,
+  variableValues?: VariablesOf<typeof document>,
   operationName?: string,
 ): Promise<ExecutionResult<TData, TVariables>> {
   const { schema, resolvedPreset } = await pgl.getSchemaResult();
@@ -251,3 +251,12 @@ export async function executeDocument<TData = any, TVariables = any>(
   return result as ExecutionResult<TData, TVariables>;
 }
 ```
+
+If you prefer to use the newer [ `gql.tada` ](https://gql-tada.0no.co/guides/typed-documents) over `@graphql-typed-document-node/core`, then simply replace `TypedDocumentNode` with the `TadaDocumentNode` type, and replace the `VariablesOf` type from `@graphql-typed-document-node/core` with the type by the same name from `gql.tada`.
+
+E.g.
+
+```ts
+export type { FragmentOf, ResultOf, VariablesOf, TadaDocumentNode } from 'gql.tada';
+```
+
