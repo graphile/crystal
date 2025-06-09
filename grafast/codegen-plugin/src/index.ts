@@ -1,4 +1,5 @@
 import type { PluginFunction, Types } from "@graphql-codegen/plugin-helpers";
+import { convertFactory } from "@graphql-codegen/visitor-plugin-common";
 import type {
   GraphQLInputType,
   GraphQLNamedType,
@@ -22,6 +23,8 @@ export interface GrafastTypesPluginConfig {
   grafastModule?: string;
   overridesFile?: string;
 }
+
+const convertName = convertFactory({});
 
 class GrafastGenerator {
   private schema: GraphQLSchema;
@@ -134,7 +137,7 @@ ${type
 ${Object.entries(type.getFields())
   .map(
     ([fieldName, fieldSpec]) =>
-      `        ${fieldName}?: FieldPlan<${this.source(type)}, ${fieldSpec.args.length > 0 ? `${type.name}${fieldName[0].toUpperCase() + fieldName.substring(1)}Args` : `NoArguments`}, ${this.expect(fieldSpec.type)}>;`,
+      `        ${fieldName}?: FieldPlan<${this.source(type)}, ${fieldSpec.args.length > 0 ? `${type.name}${convertName(fieldName)}Args` : `NoArguments`}, ${this.expect(fieldSpec.type)}>;`,
   )
   .join("\n")}
       }
@@ -150,7 +153,7 @@ ${Object.entries(type.getFields())
       ? `ReadonlyArray<${this.getInputType(nullable.ofType)}>`
       : isScalarType(nullable)
         ? `Scalars['${nullable.name}']`
-        : nullable.name;
+        : convertName(nullable.name);
     if (nn) {
       return inner;
     } else {
