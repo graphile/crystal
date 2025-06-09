@@ -212,7 +212,7 @@ automatically reflect the correct types thanks to graphql-codegen:
 
 ```ts
 import type { DocumentNode, ExecutionResult } from "postgraphile/graphql";
-import type { TypedDocumentNode, VariablesOf } from "@graphql-typed-document-node/core";
+import type { TypedDocumentNode, VariablesOf, ResultOf } from "@graphql-typed-document-node/core";
 import { postgraphile } from "postgraphile";
 import { execute, hookArgs } from "postgraphile/grafast";
 import { validate } from "postgraphile/graphql";
@@ -225,7 +225,7 @@ export async function executeDocument<TDoc extends TypedDocumentNode<TData, TVar
   document: TDoc,
   variableValues?: VariablesOf<typeof document>,
   operationName?: string,
-): Promise<ExecutionResult<TData, TVariables>> {
+): Promise<ExecutionResult<ResultOf<typeof document>, TVariables>> {
   const { schema, resolvedPreset } = await pgl.getSchemaResult();
 
   // Validate the GraphQL document against the schema:
@@ -248,11 +248,11 @@ export async function executeDocument<TDoc extends TypedDocumentNode<TData, TVar
   const result = await execute(args);
 
   // Cast the result to the types implied by the TypedDocumentNode:
-  return result as ExecutionResult<TData, TVariables>;
+  return result as ExecutionResult<ResultOf<typeof document>, TVariables>;
 }
 ```
 
-If you prefer to use the newer [ `gql.tada` ](https://gql-tada.0no.co/guides/typed-documents) over `@graphql-typed-document-node/core`, then simply replace `TypedDocumentNode` with the `TadaDocumentNode` type, and replace the `VariablesOf` type from `@graphql-typed-document-node/core` with the type by the same name from `gql.tada`.
+If you prefer to use the newer [ `gql.tada` ](https://gql-tada.0no.co/guides/typed-documents) over `@graphql-typed-document-node/core`, then simply replace `TypedDocumentNode` with the `TadaDocumentNode` type, and replace the `VariablesOf`, `ResultOf` type from `@graphql-typed-document-node/core` with the type by the same name from `gql.tada`.
 
 E.g.
 
