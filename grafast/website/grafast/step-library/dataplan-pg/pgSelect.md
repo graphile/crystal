@@ -161,7 +161,7 @@ const tbl = $users.alias;
 $users.where(sql`${tbl}.username = 'Benjie'`);
 ```
 
-### $pgSelect.placeholder($step, codec)
+<!-- ### $pgSelect.placeholder($step, codec)
 
 Placeholder accepts an arbitrary step and a codec representing what its SQL
 type should be (optional if the step already contains details of the codec) and
@@ -174,6 +174,27 @@ const tbl = $users.alias;
 
 const $username = fieldArgs.getRaw("username");
 const frag = $users.placeholder($username, TYPES.citext);
+
+$users.where(sql`${tbl}.username = ${frag}`);
+```
+
+-->
+
+### $pgSelect.sqlValueWithCodec(value, codec)
+
+sqlValueWithCodec accepts an arbitrary SQL value and a codec representing what its SQL
+type should be and
+returns an SQL expression that allows the value of the step to be referenced
+inside an SQL query.
+
+TODO: Check this example:
+
+```ts
+const $users = usersResource.find();
+const tbl = $users.alias;
+
+const $username = fieldArgs.getRaw("username");
+const frag = $users.sqlValueWithCodec($username, TYPES.citext);
 
 $users.where(sql`${tbl}.username = ${frag}`);
 ```
@@ -340,9 +361,9 @@ const $user = usersResource.find({ id: constant(1) });
 const $usernameLength = $user.select(sql`length(username)`, TYPES.int);
 ```
 
-### $pgSelectSingle.placeholder($step, codec)
+### $pgSelectSingle.sqlValueWithCodec($step, codec)
 
-Identical to `$pgSelect.placeholder($step, codec)` on the underlying `pgSelect` step.
+Identical to `$pgSelect.sqlValueWithCodec(value, codec)` on the underlying `pgSelect` step.
 
 ### $pgSelectSingle.singleRelation(relationName)
 

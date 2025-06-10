@@ -103,6 +103,8 @@ pagination.
 
 ## Example
 
+TODO: Update example to use `sqlValueWithCodec` instead of `placeholder`
+
 ```ts
 const $vulnerabilities = pgUnionAll({
   executor: firstPartyVulnerabilitiesResource.executor,
