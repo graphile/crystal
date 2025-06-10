@@ -63,14 +63,8 @@ Adds `condition` to the list of conditions. Cannot be used in "having" mode.
 
 Adds `condition` to the list of conditions. Cannot be used unless in "having" mode.
 
-<!--
- ## $pgCondition.placeholder($step, codec)
+## sqlValueWithCodec(value, codec)
 
-Equivalent to `$pgSelect.placeholder($step, codec)`
-
-Becomes something like the below:
--->
-
-## $pgCondition.sqlValueWithCodec(value, codec)
-
-Equivalent to $pgSelect.sqlValueWithCodec(value, codec)
+Converts `value` (arbitrary value) according to the rules of `codec` (a
+PostgreSQL codec indicating the expected type) and returns an SQL expression
+suitable to be embedded in a larger query.
