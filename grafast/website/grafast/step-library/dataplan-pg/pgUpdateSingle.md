@@ -29,6 +29,14 @@ $updatedUser.set("bio", $bio);
 
 ## $pgUpdateSingle.setPlan()
 
+:::warning OUT OF DATE
+
+This method no longer exists! There's a runtime equivalent now via `.apply()`.
+
+Help documenting this is welcome!
+
+:::
+
 Returns a `Setter` (a "Modifier" class, rather than a Step)
 that can be useful when combined with `applyPlan` plan resolvers in arguments
 and input fields to build up the attributes to set on the updated row bit by
