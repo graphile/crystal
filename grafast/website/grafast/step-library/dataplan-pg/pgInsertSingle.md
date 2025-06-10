@@ -23,6 +23,14 @@ $insertedUser.set("bio", $bio);
 
 ## $pgInsertSingle.setPlan()
 
+:::warning OUT OF DATE
+
+This method no longer exists! There's a runtime equivalent now via `.apply()`.
+
+Help documenting this is welcome!
+
+:::
+
 <!-- TODO: I think the explanation below still needs a bit of an update -->
 
 Returns a `Setter` (a Modifier, rather than an Step)
