@@ -375,7 +375,7 @@ const $usernameLength = $user.select(sql`length(username)`, TYPES.int);
 
 ### $pgSelectSingle.placeholder($step, codec)
 
-Identical to `$pgSelect.placeholder(value, codec)` on the underlying `pgSelect` step.
+Identical to `$pgSelect.placeholder($step, codec)` on the underlying `pgSelect` step.
 
 ### $pgSelectSingle.singleRelation(relationName)
 
