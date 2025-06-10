@@ -150,6 +150,11 @@ you don't do this then we might (if unique order is required, for example for
 cursor pagination) add the primary key or similar unique constraint to the
 ordering in order to make it stable.
 
+<!--
+TODO: where() has been removed https://github.com/graphile/crystal/blob/main/postgraphile/postgraphile/CHANGELOG.md#500-beta39
+What to use instead?
+Other methods which have been impacted?
+
 ### $pgSelect.where(condition)
 
 Adds a `WHERE` clause to the query, can be called multiple times and the
@@ -160,6 +165,7 @@ const $users = usersResource.find();
 const tbl = $users.alias;
 $users.where(sql`${tbl}.username = 'Benjie'`);
 ```
+-->
 
 ### $pgSelect.placeholder($step, codec)
 

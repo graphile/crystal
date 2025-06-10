@@ -60,6 +60,16 @@ matches the entry in the union.
 
 ## Applying conditions
 
+:::warning
+
+The following documentation may be out of date as of PostGraphile 5.0.0.beta.40 &amp;
+Grafast 0.1.1.beta.21 (March 2025). `ModifierStep` classes are now simply `Modifier` classes
+and are now used at runtime instead of planning time. This has an effect on pgUnionAll, in
+particular: instead of `PgUnionAllStep.wherePlan` - use `fieldArg.apply($unionAll, qb => qb.whereBuilder())`
+and instead of `PgUnionAllStep.havingPlan` - use `fieldArg.apply($unionAll, qb => qb.havingBuilder())`
+
+:::
+
 Conditions can be applied to the resulting step via the `.where()` method,
 which accepts an object containing the following keys:
 
