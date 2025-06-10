@@ -32,7 +32,7 @@ bit.
 
 ## $pgInsertSingle.get(attr)
 
-Returns a PgClassExpression representing the given attribute from the
+Returns a PgClassExpressionStep representing the given attribute from the
 inserted row. This is achieved by selecting the value using the
 `INSERT INTO ... RETURNING ...` syntax.
 
@@ -42,4 +42,4 @@ const $id = $insertedUser.get("id");
 
 ## $pgInsertSingle.record()
 
-Returns a PgClassExpression representing the full record that was inserted.
+Returns a PgClassExpressionStep representing the full record that was inserted.

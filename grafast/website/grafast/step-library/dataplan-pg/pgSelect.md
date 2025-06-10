@@ -161,7 +161,7 @@ const tbl = $users.alias;
 $users.where(sql`${tbl}.username = 'Benjie'`);
 ```
 
-<!-- ### $pgSelect.placeholder($step, codec)
+### $pgSelect.placeholder($step, codec)
 
 Placeholder accepts an arbitrary step and a codec representing what its SQL
 type should be (optional if the step already contains details of the codec) and
@@ -178,25 +178,37 @@ const frag = $users.placeholder($username, TYPES.citext);
 $users.where(sql`${tbl}.username = ${frag}`);
 ```
 
--->
 
-### $pgSelect.sqlValueWithCodec(value, codec)
+### sqlValueWithCodec(value, codec)
 
-sqlValueWithCodec accepts an arbitrary SQL value and a codec representing what its SQL
-type should be and
-returns an SQL expression that allows the value of the step to be referenced
-inside an SQL query.
-
-TODO: Check this example:
+`sqlValueWithCodec` is a runtime function that accepts an arbitrary value and a
+codec representing its database type and returns a `pg-sql2` expression for that
+value properly encoded so that it can be inserted into a `pg-sql2` query.
 
 ```ts
-const $users = usersResource.find();
-const tbl = $users.alias;
-
-const $username = fieldArgs.getRaw("username");
-const frag = $users.sqlValueWithCodec($username, TYPES.citext);
-
-$users.where(sql`${tbl}.username = ${frag}`);
+  typeDefs: /* GraphQL */`
+    extend input MyTableCondition {
+      featured: Boolean
+    }
+  `,
+  inputObjects: {
+    MyTableCondition: {
+      plans: {
+        featured(pgCondition, value) {
+          if (value === null) {
+            pgCondition.where(sql`${pgCondition}.featured is null`);
+          } else {
+            pgCondition.where(
+              sql`${pgCondition}.featured = ${sqlValueWithCodec(
+                value,
+                TYPES.boolean,
+              )}`,
+            );
+          }
+        },
+      }
+    }
+  }
 ```
 
 ### $pgSelect.singleRelation(relationName)
@@ -361,9 +373,9 @@ const $user = usersResource.find({ id: constant(1) });
 const $usernameLength = $user.select(sql`length(username)`, TYPES.int);
 ```
 
-### $pgSelectSingle.sqlValueWithCodec($step, codec)
+### $pgSelectSingle.placeholder($step, codec)
 
-Identical to `$pgSelect.sqlValueWithCodec(value, codec)` on the underlying `pgSelect` step.
+Identical to `$pgSelect.placeholder(value, codec)` on the underlying `pgSelect` step.
 
 ### $pgSelectSingle.singleRelation(relationName)
 

@@ -141,11 +141,9 @@ const forumCodec = recordCodec({
 ### Example
 
 For example, in this hypothetical E-commerce scenario, `listOfCodec` is used
-in combination with the `$pgSelect.sqlValueWithCodec()` method to return a SQL
+in combination with the `$pgSelect.placeholder()` method to return a SQL
 expression that allows the transformed list of `$orderIds` to be referenced
 inside the step for selecting the associated order items.
-
-TODO: Update example to use `sqlValueWithCodec` instead of `placeholder`:
 
 ```ts
 const $orders = orders.find({

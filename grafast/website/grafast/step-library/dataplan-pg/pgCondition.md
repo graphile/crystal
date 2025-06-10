@@ -1,6 +1,24 @@
 # pgCondition
 
-<!-- TODO This explanation is out of date, pgSelect doesn't have wherePlan or havingPlan -->
+:::warning OUT OF DATE
+
+This documentation page is out of date! We've not had time to update it
+correctly yet, but here's an incredibly quick and poor overview... (Please do
+send a PR to update this page if you want to help!)
+
+A PgCondition instance is a "modifier" typically acquired from a runtime query
+builder via the `queryBuilder.whereBuilder()` (for `WHERE` clause) or
+`queryBuilder.havingBuilder()` (for `HAVING` clause), or from another
+PgCondition instance. It's used to build up complex conditions on a layer by
+layer basis, which is useful for "filter" plugins.
+
+A query builder is something that you manipulate at runtime (not plantime) but
+you need to register your synchronous callback for it at plantime, e.g. via
+`$pgSelect.apply($myCb)` where `$myCb` is a step representing a callback
+function, for example
+`const $myCb = lambda($foo, (foo) => queryBuilder => { doSomethingWith(queryBuilder, foo) })`.
+
+:::
 
 This "Modifier" class (**not** a Step) is commonly acquired from
 `$pgSelect.wherePlan()`, `$pgSelect.havingPlan()`, or similar methods. It's

@@ -36,7 +36,7 @@ bit.
 
 ## $pgUpdateSingle.get(attr)
 
-Returns a PgClassExpression representing the given attribute from the
+Returns a PgClassExpressionStep representing the given attribute from the
 updated row. This is achieved by selecting the value using the
 `UPDATE ... RETURNING ...` syntax.
 
@@ -46,4 +46,4 @@ const $updatedAt = $updatedUser.get("updated_at");
 
 ## $pgUpdateSingle.record()
 
-Returns a PgClassExpression representing the full record that was updated.
+Returns a PgClassExpressionStep representing the full record that was updated.

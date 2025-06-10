@@ -11,7 +11,7 @@ const $deletedUser = pgDeleteSingle(usersResource, {
 
 ## $pgDeleteSingle.get(attr)
 
-Returns a PgClassExpression representing the given attribute from the
+Returns a PgClassExpressionStep representing the given attribute from the
 deleted row. This is achieved by selecting the value using the
 `DELETE FROM ... WHERE ... RETURNING ...` syntax.
 
@@ -21,4 +21,4 @@ const $username = $deletedUser.get("username");
 
 ## $pgDeleteSingle.record()
 
-Returns a PgClassExpression representing the full record that was deleted.
+Returns a PgClassExpressionStep representing the full record that was deleted.
