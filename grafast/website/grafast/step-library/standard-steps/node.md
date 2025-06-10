@@ -10,7 +10,7 @@ Returns a polymorphic-capable step representing the record this `$id` represents
 Usage:
 
 ```ts
-const $nodeIdString = fieldArgs.get("id");
+const $nodeIdString = fieldArgs.getRaw("id");
 const $node = node(handlers, $nodeIdString);
 ```
 
@@ -19,7 +19,7 @@ const $node = node(handlers, $nodeIdString);
 A node identifier is a string that uniquely identifies an entity in the GraphQL
 schema for the lifetime of that entity.
 
-A codec is responsible for parsing and deparsing this string. There are many
+A codec is responsible for parsing and de-parsing this string. There are many
 different ways of encoding node identifiers, so we allow for many different
 codecs.
 
