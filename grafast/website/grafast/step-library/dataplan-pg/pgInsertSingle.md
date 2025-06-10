@@ -23,14 +23,16 @@ $insertedUser.set("bio", $bio);
 
 ## $pgInsertSingle.setPlan()
 
-Returns a `SetterStep` (a "modifier step", rather than an `ExecutableStep`)
+<!-- TODO: I think the explanation below still needs a bit of an update -->
+
+Returns a `Setter` (a Modifier, rather than an Step)
 that can be useful when combined with `applyPlan` plan resolvers in arguments
 and input fields to build up the attributes to set on the inserted row bit by
 bit.
 
 ## $pgInsertSingle.get(attr)
 
-Returns a PgClassExpressionStep representing the given attribute from the
+Returns a PgClassExpression representing the given attribute from the
 inserted row. This is achieved by selecting the value using the
 `INSERT INTO ... RETURNING ...` syntax.
 
@@ -40,4 +42,4 @@ const $id = $insertedUser.get("id");
 
 ## $pgInsertSingle.record()
 
-Returns a PgClassExpressionStep representing the full record that was inserted.
+Returns a PgClassExpression representing the full record that was inserted.
