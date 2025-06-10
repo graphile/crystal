@@ -1,5 +1,7 @@
 # pgCondition
 
+<!-- TODO This explanation is out of date, pgSelect doesn't have wherePlan or havingPlan -->
+
 This "Modifier" class (**not** a Step) is commonly acquired from
 `$pgSelect.wherePlan()`, `$pgSelect.havingPlan()`, or similar methods. It's
 useful for building up a condition (`WHERE` or `HAVING` clause) bit by bit, and is used at runtime.
