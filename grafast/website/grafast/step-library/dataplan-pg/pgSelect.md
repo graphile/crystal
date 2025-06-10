@@ -150,11 +150,6 @@ you don't do this then we might (if unique order is required, for example for
 cursor pagination) add the primary key or similar unique constraint to the
 ordering in order to make it stable.
 
-<!--
-TODO: where() has been removed https://github.com/graphile/crystal/blob/main/postgraphile/postgraphile/CHANGELOG.md#500-beta39
-What to use instead?
-Other methods which have been impacted?
-
 ### $pgSelect.where(condition)
 
 Adds a `WHERE` clause to the query, can be called multiple times and the
@@ -165,7 +160,6 @@ const $users = usersResource.find();
 const tbl = $users.alias;
 $users.where(sql`${tbl}.username = 'Benjie'`);
 ```
--->
 
 ### $pgSelect.placeholder($step, codec)
 
@@ -211,13 +205,17 @@ If the relationship is not unique then an error will be thrown.
 
 :::
 
+<!-- TODO: wherePlan() has been removed https://github.com/graphile/crystal/blob/main/postgraphile/postgraphile/CHANGELOG.md#500-beta39
+
 ### $pgSelect.wherePlan()
 
-Instead of adding conditions directly, this advanced method returns a
-`PgConditionStep` (a "modifier step") which allows the condition to be built up
+Instead of adding conditions directly, this advanced method returns
+`PgCondition` (a "modifier" class) which allows the condition to be built up
 in a different way. This is particularly useful if you are building deep
 filtering arguments, using the `applyPlan` plan resolver on arguments and input
 fields.
+
+-->
 
 ### $pgSelect.setFirst($n)
 
@@ -255,11 +253,14 @@ query and only supports the SQL fragment condition form.
 
 TODO: THIS METHOD IS UNTESTED!
 
+<!-- Removed
 ### $pgSelect.havingPlan()
 
 Like `$pgSelect.wherePlan()` but for the `HAVING` clause.
 
 TODO: THIS METHOD IS UNTESTED!
+
+-->
 
 ### $pgSelect.setUnique()
 
