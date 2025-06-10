@@ -178,7 +178,6 @@ const frag = $users.placeholder($username, TYPES.citext);
 $users.where(sql`${tbl}.username = ${frag}`);
 ```
 
-
 ### sqlValueWithCodec(value, codec)
 
 `sqlValueWithCodec` is a runtime function that accepts an arbitrary value and a
