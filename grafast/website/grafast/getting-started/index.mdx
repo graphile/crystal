@@ -97,8 +97,8 @@ const objects = {
   Query: {
     plans: {
       addTwoNumbers(_, fieldArgs) {
-        const $a = fieldArgs.get("a");
-        const $b = fieldArgs.get("b");
+        const $a = fieldArgs.getRaw("a");
+        const $b = fieldArgs.getRaw("b");
         return lambda([$a, $b], ([a, b]) => a + b);
       },
     },

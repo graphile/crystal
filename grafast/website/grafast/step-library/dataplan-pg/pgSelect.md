@@ -172,7 +172,7 @@ inside an SQL query.
 const $users = usersResource.find();
 const tbl = $users.alias;
 
-const $username = fieldArgs.get("username");
+const $username = fieldArgs.getRaw("username");
 const frag = $users.placeholder($username, TYPES.citext);
 
 $users.where(sql`${tbl}.username = ${frag}`);
