@@ -54,6 +54,20 @@ deal with these changes (if any action is necessary).
 
 :::
 
+### Not using TypeScript?
+
+You do not need to use TypeScript to use PostGraphile, but without it you will
+find editors such as VSCode will highlight your import paths with error
+notifications. To stop this, you can add the following to your `package.json`:
+
+```
+{
+  "compilerOptions": {
+    "moduleResolution": "node16"
+  }
+}
+```
+
 ## My first plan
 
 Let's build a simple GraphQL schema powered by <grafast /> plans and query it.
