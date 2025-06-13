@@ -1047,6 +1047,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             xml: inflection.builtin("XML"),
             json: inflection.builtin("JSON"),
             jsonb: inflection.builtin("JSON"),
+            jsonpath: inflection.builtin("JSONPath"),
             timestamp: inflection.builtin("Datetime"),
             timestamptz: inflection.builtin("Datetime"),
             date: inflection.builtin("Date"),
