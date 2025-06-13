@@ -1042,6 +1042,7 @@ export const TYPES = {
     fromPg: jsonParse,
     toPg: jsonStringify,
   }),
+  jsonpath: t()("4072", "jsonpath", verbatim),
   xml: t<string>()("142", "xml"),
   citext: t<string>()(undefined, "citext", verbatim),
   uuid: t<string>()("2950", "uuid", verbatim),
@@ -1173,6 +1174,8 @@ export function getCodecByPgCatalogTypeName(pgCatalogTypeName: string) {
       return TYPES.json;
     case "jsonb":
       return TYPES.jsonb;
+    case "jsonpath":
+      return TYPES.jsonpath;
 
     case "bit":
       return TYPES.bit;
