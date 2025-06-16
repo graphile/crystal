@@ -98,7 +98,7 @@
     "graphql": "16.1.0-experimental-stream-defer.6"
   },
   "dependencies": {
-    "@changesets/changelog-github": "^0.4.8",
+    "@changesets/changelog-github": "^0.5.1",
     "@changesets/cli": "^2.29.4"
   }
 }
