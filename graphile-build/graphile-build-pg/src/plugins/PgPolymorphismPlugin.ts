@@ -1158,29 +1158,63 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                     ),
                   };
                 } else if (polymorphism.mode === "relational") {
+                  const childTuples: Array<
+                    [codecName: string, resource: PgResource]
+                  > = [];
+                  for (const spec of Object.values(polymorphism.types)) {
+                    const { remoteResource } = resource.getRelation(
+                      spec.relationName,
+                    );
+                    childTuples.push([
+                      remoteResource.codec.name,
+                      remoteResource,
+                    ]);
+                  }
+                  const resourceByCodecName: Record<string, PgResource> =
+                    EXPORTABLE(
+                      (childTuples) => Object.fromEntries(childTuples),
+                      [childTuples],
+                    );
+
                   grafastExtensions = {
                     toSpecifier: EXPORTABLE(
-                      (PgSelectSingleStep, get, object, pk, resource) =>
+                      (
+                        PgSelectSingleStep,
+                        get,
+                        object,
+                        pk,
+                        resource,
+                        resourceByCodecName,
+                      ) =>
                         (step: Step) => {
                           if (
                             step instanceof PgSelectSingleStep &&
-                            step.resource !== resource
+                            // NOTE: don't compare `resource` directly since it
+                            // could be a function.
+                            step.resource.codec !== resource.codec
                           ) {
                             // Assume it's a child; return description of base
+                            const tableResource =
+                              resourceByCodecName[step.resource.codec.name];
+                            if (!tableResource) {
+                              throw new Error(
+                                `Expected a relational record for ${resource.name}, but could not determine the related polymorphic table resource to use for '${step.resource.codec.name}'!`,
+                              );
+                            }
                             // PERF: ideally we'd use relationship
                             // traversal instead, this would both be
                             // shorter and also cacheable.
                             const stepPk = (
-                              step.resource.uniques as PgResourceUnique[]
+                              tableResource.uniques as PgResourceUnique[]
                             ).find((u) => u.isPrimary)?.attributes;
                             if (!stepPk) {
                               throw new Error(
-                                `Expected a relational record for ${resource.name}, but found one for ${step.resource.name} which has no primary key!`,
+                                `Expected a relational record for ${resource.name}, but found one for ${tableResource.name} which has no primary key!`,
                               );
                             }
                             if (stepPk.length !== pk.length) {
                               throw new Error(
-                                `Expected a relational record for ${resource.name}, but found one for ${step.resource.name} which has a primary key with a different number of columns!`,
+                                `Expected a relational record for ${resource.name}, but found one for ${tableResource.name} which has a primary key with a different number of columns!`,
                               );
                             }
                             return object(
@@ -1203,7 +1237,14 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                             );
                           }
                         },
-                      [PgSelectSingleStep, get, object, pk, resource],
+                      [
+                        PgSelectSingleStep,
+                        get,
+                        object,
+                        pk,
+                        resource,
+                        resourceByCodecName,
+                      ],
                     ),
                     planType: EXPORTABLE(
                       (
