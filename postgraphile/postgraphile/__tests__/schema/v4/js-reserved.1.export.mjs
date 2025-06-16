@@ -1937,6 +1937,7 @@ function findTypeNameMatch(specifier) {
   }
   return null;
 }
+const relational_items_pkColumnsByRelatedCodecName = Object.fromEntries([["relationalTopics", pkCols], ["relationalStatus", relational_statusUniques[0].attributes]]);
 const RelationalItem_typeNameFromType = ((interfaceTypeName, polymorphism) => {
   function typeNameFromType(typeVal) {
     if (typeof typeVal !== "string") return null;
@@ -10636,19 +10637,16 @@ export const interfaces = {
   },
   RelationalItem: {
     toSpecifier(step) {
-      if (step instanceof PgSelectSingleStep && step.resource !== relational_items_relational_itemsPgResource) {
+      if (step instanceof PgSelectSingleStep &&
+      // NOTE: don't compare `resource` directly since it
+      // could be a function.
+      step.resource.codec !== relational_items_relational_itemsPgResource.codec) {
         // Assume it's a child; return description of base
-        // PERF: ideally we'd use relationship
-        // traversal instead, this would both be
-        // shorter and also cacheable.
-        const stepPk = step.resource.uniques.find(u => u.isPrimary)?.attributes;
-        if (!stepPk) {
-          throw new Error(`Expected a relational record for ${relational_items_relational_itemsPgResource.name}, but found one for ${step.resource.name} which has no primary key!`);
+        const pkColumns = relational_items_pkColumnsByRelatedCodecName[step.resource.codec.name];
+        if (!pkColumns) {
+          throw new Error(`Expected a relational record for ${relational_items_relational_itemsPgResource.name}, but '${step.resource.codec.name}' does not seem to be related!`);
         }
-        if (stepPk.length !== relational_itemsUniques[0].attributes.length) {
-          throw new Error(`Expected a relational record for ${relational_items_relational_itemsPgResource.name}, but found one for ${step.resource.name} which has a primary key with a different number of columns!`);
-        }
-        return object(Object.fromEntries(relational_itemsUniques[0].attributes.map((attrName, idx) => [attrName, get2(step, stepPk[idx])])));
+        return object(Object.fromEntries(relational_itemsUniques[0].attributes.map((attrName, idx) => [attrName, get2(step, pkColumns[idx])])));
       } else {
         // Assume it is or describes the base:
         return object(Object.fromEntries(relational_itemsUniques[0].attributes.map(attrName => [attrName, get2(step, attrName)])));

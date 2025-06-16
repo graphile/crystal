@@ -1521,6 +1521,42 @@ $$ LANGUAGE sql VOLATILE;
 
 comment on function polymorphic.custom_delete_relational_item(polymorphic.relational_items) is E'@arg0variant nodeId';
 
+create function polymorphic.all_relational_items_fn()
+returns setof polymorphic.relational_items
+as $$
+  select *
+  from polymorphic.relational_items
+  order by id asc;
+$$ language sql stable;
+
+create function polymorphic.relational_item_by_id_fn(id int)
+returns polymorphic.relational_items
+as $$
+  select *
+  from polymorphic.relational_items
+  where relational_items.id = relational_item_by_id_fn.id;
+$$ language sql stable;
+
+create function polymorphic.relational_topic_by_id_fn(id int)
+returns polymorphic.relational_topics
+as $$
+  select *
+  from polymorphic.relational_topics
+  where relational_topics.topic_item_id = relational_topic_by_id_fn.id;
+$$ language sql stable;
+
+create function polymorphic.relational_topics_parent_fn(t polymorphic.relational_topics)
+returns polymorphic.relational_items
+as $$
+  select *
+  from polymorphic.relational_items p
+  where p.id = (
+    select i.parent_id
+    from polymorphic.relational_items i
+    where i.id = t.topic_item_id
+  );
+$$ language sql stable;
+
 ----------------------------------------
 
 create type polymorphic.applications as (
