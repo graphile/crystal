@@ -185,12 +185,10 @@ export const RuruInner: FC<{
                 <ToolbarMenu
                   label="Options"
                   button={
-                    <ToolbarButton label="Options">
-                      <SettingsIcon
-                        className="graphiql-toolbar-icon"
-                        aria-hidden="true"
-                      />
-                    </ToolbarButton>
+                    <SettingsIcon
+                      className="graphiql-toolbar-icon"
+                      aria-hidden="true"
+                    />
                   }
                 >
                   <ToolbarMenu.Item
