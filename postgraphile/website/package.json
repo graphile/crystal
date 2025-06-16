@@ -16,24 +16,24 @@
     "posttest": "yarn build"
   },
   "dependencies": {
-    "@docusaurus/core": "2.4.1",
-    "@docusaurus/preset-classic": "2.4.1",
-    "@docusaurus/remark-plugin-npm2yarn": "^2.4.1",
-    "@docusaurus/theme-mermaid": "^2.4.1",
-    "@fortawesome/fontawesome-svg-core": "^6.5.1",
-    "@fortawesome/free-brands-svg-icons": "^6.5.1",
-    "@fortawesome/free-regular-svg-icons": "^6.5.1",
-    "@fortawesome/free-solid-svg-icons": "^6.5.1",
-    "@fortawesome/react-fontawesome": "^0.2.0",
+    "@docusaurus/core": "2.4.3",
+    "@docusaurus/preset-classic": "2.4.3",
+    "@docusaurus/remark-plugin-npm2yarn": "^2.4.3",
+    "@docusaurus/theme-mermaid": "^2.4.3",
+    "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/free-brands-svg-icons": "^6.7.2",
+    "@fortawesome/free-regular-svg-icons": "^6.7.2",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@fortawesome/react-fontawesome": "^0.2.2",
     "@mdx-js/react": "^1.6.22",
-    "clsx": "^2.0.0",
-    "postcss-nested": "^6.0.1",
-    "prism-react-renderer": "^2.0.6",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "clsx": "^2.1.1",
+    "postcss-nested": "^6.2.0",
+    "prism-react-renderer": "^2.4.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "2.4.1"
+    "@docusaurus/module-type-aliases": "2.4.3"
   },
   "browserslist": {
     "production": [

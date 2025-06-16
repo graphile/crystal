@@ -39,8 +39,8 @@
     "dist"
   ],
   "devDependencies": {
-    "@types/jest": "^29.5.4",
-    "jest": "^29.6.4",
+    "@types/jest": "^29.5.14",
+    "jest": "^29.7.0",
     "jest-serializer-simple": "workspace:^",
     "typescript": "^5.8.3"
   }
