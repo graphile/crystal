@@ -45,7 +45,7 @@
     "@babel/template": "^7.27.2",
     "@babel/traverse": "^7.27.4",
     "@babel/types": "^7.27.6",
-    "@types/node": "^20.19.1",
+    "@types/node": "^22.15.32",
     "prettier": "^3.5.3",
     "tslib": "^2.8.1"
   },

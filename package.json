@@ -47,7 +47,7 @@
     "@tsconfig/node22": "^22.0.2",
     "@types/jest": "^30.0.0",
     "@types/mock-fs": "4.13.4",
-    "@types/node": "^20.19.1",
+    "@types/node": "^22.15.32",
     "@types/rimraf": "^4.0.5",
     "@types/ws": "^8.18.1",
     "@typescript-eslint/parser": "^8.34.0",

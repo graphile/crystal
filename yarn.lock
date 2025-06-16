@@ -2361,7 +2361,7 @@ __metadata:
     "@types/jest": "npm:^30.0.0"
     "@types/json5": "npm:^2.2.0"
     "@types/license-checker-webpack-plugin": "npm:^0.2.5"
-    "@types/node": "npm:^20.19.1"
+    "@types/node": "npm:^22.15.32"
     "@types/nodemon": "npm:3.1.1"
     chalk: "npm:^4.1.2"
     debug: "npm:^4.4.1"
@@ -3478,7 +3478,7 @@ __metadata:
   resolution: "@graphile/lru@workspace:utils/lru"
   dependencies:
     "@types/jest": "npm:^30.0.0"
-    "@types/node": "npm:^20.19.1"
+    "@types/node": "npm:^22.15.32"
     jest: "npm:^30.0.0"
     ts-node: "npm:^10.9.2"
     tslib: "npm:^2.8.1"
@@ -3490,7 +3490,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@graphile/simplify-inflection@workspace:graphile-build/graphile-simplify-inflection"
   dependencies:
-    "@types/node": "npm:^20.19.1"
+    "@types/node": "npm:^22.15.32"
     postgraphile: "workspace:^"
     typescript: "npm:^5.8.3"
   languageName: unknown
@@ -7323,15 +7323,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:20.19.1, @types/node@npm:^20.19.1":
-  version: 20.19.1
-  resolution: "@types/node@npm:20.19.1"
-  dependencies:
-    undici-types: "npm:~6.21.0"
-  checksum: 10/2369a96a832a6e8111d2b996c56fb1b78b27fad0879de3e344ae2835697464e001d6fe813a11902348fc7dc63b9510000f3d2cd4bedadf2d3fce7b7bb7903444
-  languageName: node
-  linkType: hard
-
 "@types/node@npm:^12.7.1":
   version: 12.20.55
   resolution: "@types/node@npm:12.20.55"
@@ -7343,6 +7334,15 @@ __metadata:
   version: 17.0.45
   resolution: "@types/node@npm:17.0.45"
   checksum: 10/b45fff7270b5e81be19ef91a66b764a8b21473a97a8d211218a52e3426b79ad48f371819ab9153370756b33ba284e5c875463de4d2cf48a472e9098d7f09e8a2
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^22.15.32":
+  version: 22.15.32
+  resolution: "@types/node@npm:22.15.32"
+  dependencies:
+    undici-types: "npm:~6.21.0"
+  checksum: 10/10b4c106d0c512a1d35ec08142bd7fb5cf2e1df93fc5627b3c69dd843dec4be07a47f1fa7ede232ad84762d75a372ea35028b79ee1e753b6f2adecd0b2cb2f71
   languageName: node
   linkType: hard
 
@@ -13922,7 +13922,7 @@ __metadata:
     "@types/lodash": "npm:^4.17.17"
     "@types/mermaid": "npm:^9.2.0"
     "@types/mocha": "npm:^10.0.10"
-    "@types/node": "npm:^20.19.1"
+    "@types/node": "npm:^22.15.32"
     "@types/nodemon": "npm:3.1.1"
     chai: "npm:^5.2.0"
     chalk: "npm:^4.1.2"
@@ -14030,7 +14030,7 @@ __metadata:
     "@types/express": "npm:^4.17.23"
     "@types/jest": "npm:^30.0.0"
     "@types/jsonwebtoken": "npm:^9.0.10"
-    "@types/node": "npm:^20.19.1"
+    "@types/node": "npm:^22.15.32"
     chalk: "npm:^4.1.2"
     debug: "npm:^4.4.1"
     express: "npm:^4.21.2"
@@ -14073,7 +14073,7 @@ __metadata:
   dependencies:
     "@types/debug": "npm:^4.1.12"
     "@types/jest": "npm:^30.0.0"
-    "@types/node": "npm:^20.19.1"
+    "@types/node": "npm:^22.15.32"
     "@types/pluralize": "npm:^0.0.30"
     "@types/semver": "npm:^7.7.0"
     chalk: "npm:^4.1.2"
@@ -14103,7 +14103,7 @@ __metadata:
     "@types/debug": "npm:^4.1.12"
     "@types/interpret": "npm:^1.1.3"
     "@types/mocha": "npm:^10.0.10"
-    "@types/node": "npm:^20.19.1"
+    "@types/node": "npm:^22.15.32"
     "@types/semver": "npm:^7.7.0"
     chai: "npm:^5.2.0"
     chalk: "npm:^4.1.2"
@@ -14130,7 +14130,7 @@ __metadata:
     "@types/babel__generator": "npm:^7.27.0"
     "@types/babel__template": "npm:^7.4.4"
     "@types/jest": "npm:^30.0.0"
-    "@types/node": "npm:^20.19.1"
+    "@types/node": "npm:^22.15.32"
     "@types/prettier": "npm:^3.0.0"
     jest: "npm:^30.0.0"
     prettier: "npm:^3.5.3"
@@ -14185,7 +14185,7 @@ __metadata:
   resolution: "graphile@workspace:utils/graphile"
   dependencies:
     "@types/jest": "npm:^30.0.0"
-    "@types/node": "npm:^20.19.1"
+    "@types/node": "npm:^22.15.32"
     "@typescript/vfs": "npm:^1.6.1"
     chalk: "npm:^4.1.2"
     graphile-config: "workspace:^"
@@ -19135,7 +19135,7 @@ __metadata:
   dependencies:
     "@types/debug": "npm:4.1.12"
     "@types/jest": "npm:^30.0.0"
-    "@types/node": "npm:20.19.1"
+    "@types/node": "npm:^22.15.32"
     jest: "npm:^30.0.0"
     ts-node: "npm:^10.9.2"
     tslib: "npm:^2.8.1"
@@ -19166,7 +19166,7 @@ __metadata:
     "@graphile/lru": "workspace:^"
     "@types/debug": "npm:4.1.12"
     "@types/jest": "npm:^30.0.0"
-    "@types/node": "npm:20.19.1"
+    "@types/node": "npm:^22.15.32"
     jest: "npm:^30.0.0"
     markdown-doctest: "npm:^1.1.0"
     ts-node: "npm:^10.9.2"
@@ -19221,7 +19221,7 @@ __metadata:
     "@types/express": "npm:^4.17.23"
     "@types/jest": "npm:^30.0.0"
     "@types/jsonwebtoken": "npm:^9.0.10"
-    "@types/node": "npm:^20.19.1"
+    "@types/node": "npm:^22.15.32"
     "@types/nodemon": "npm:3.1.1"
     "@types/pg": "npm:^8.15.4"
     debug: "npm:^4.4.1"
@@ -19977,7 +19977,7 @@ __metadata:
     "@types/express": "npm:^4.17.23"
     "@types/jest": "npm:^30.0.0"
     "@types/jsonwebtoken": "npm:^9.0.10"
-    "@types/node": "npm:^20.19.1"
+    "@types/node": "npm:^22.15.32"
     "@types/nodemon": "npm:3.1.1"
     "@types/pg": "npm:^8.15.4"
     debug: "npm:^4.4.1"
@@ -21327,7 +21327,7 @@ __metadata:
     "@tsconfig/node22": "npm:^22.0.2"
     "@types/jest": "npm:^30.0.0"
     "@types/mock-fs": "npm:4.13.4"
-    "@types/node": "npm:^20.19.1"
+    "@types/node": "npm:^22.15.32"
     "@types/rimraf": "npm:^4.0.5"
     "@types/ws": "npm:^8.18.1"
     "@typescript-eslint/parser": "npm:^8.34.0"
@@ -21424,7 +21424,7 @@ __metadata:
     "@types/codemirror": "npm:^5.60.16"
     "@types/debug": "npm:^4.1.12"
     "@types/jest": "npm:^30.0.0"
-    "@types/node": "npm:^20.19.1"
+    "@types/node": "npm:^22.15.32"
     "@types/nodemon": "npm:3.1.1"
     "@types/react": "npm:^18.3.23"
     "@types/react-dom": "npm:^18.3.7"
@@ -22984,7 +22984,7 @@ __metadata:
     "@graphile/lru": "workspace:^"
     "@types/debug": "npm:4.1.12"
     "@types/jest": "npm:^30.0.0"
-    "@types/node": "npm:20.19.1"
+    "@types/node": "npm:^22.15.32"
     jest: "npm:^30.0.0"
     markdown-doctest: "npm:^1.1.0"
     ts-node: "npm:^10.9.2"

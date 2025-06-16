@@ -515,7 +515,7 @@ end up with a `package.json` file that looks something like:
    "devDependencies": {
      "@tsconfig/node22": "^22.0.0",
      "@types/express": "^5.0.0",
-     "@types/node": "^20.11.24",
+     "@types/node": "^22.15.32",
      "typescript": "^5.7.3"
    }
  }

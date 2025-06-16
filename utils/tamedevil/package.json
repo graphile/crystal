@@ -37,7 +37,7 @@
   "devDependencies": {
     "@types/debug": "4.1.12",
     "@types/jest": "^30.0.0",
-    "@types/node": "20.19.1",
+    "@types/node": "^22.15.32",
     "jest": "^30.0.0",
     "markdown-doctest": "^1.1.0",
     "ts-node": "^10.9.2",
