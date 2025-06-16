@@ -1189,6 +1189,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   > = EXPORTABLE(
                     (childTuples) => Object.fromEntries(childTuples),
                     [childTuples],
+                    `${resource.name}_pkColumnsByRelatedCodecName`,
                   );
 
                   grafastExtensions = {
