@@ -3015,6 +3015,7 @@ const registryConfig_pgResources_relational_posts_relational_posts = {
     tags: {}
   }
 };
+const relational_topic_by_id_fnFunctionIdentifer = sql.identifier("polymorphic", "relational_topic_by_id_fn");
 const first_party_vulnerabilities_cvss_score_intFunctionIdentifer = sql.identifier("polymorphic", "first_party_vulnerabilities_cvss_score_int");
 const third_party_vulnerabilities_cvss_score_intFunctionIdentifer = sql.identifier("polymorphic", "third_party_vulnerabilities_cvss_score_int");
 const first_party_vulnerabilitiesUniques = [{
@@ -3237,6 +3238,9 @@ const registryConfig_pgResources_relational_items_relational_items = {
     }
   }
 };
+const all_relational_items_fnFunctionIdentifer = sql.identifier("polymorphic", "all_relational_items_fn");
+const relational_item_by_id_fnFunctionIdentifer = sql.identifier("polymorphic", "relational_item_by_id_fn");
+const relational_topics_parent_fnFunctionIdentifer = sql.identifier("polymorphic", "relational_topics_parent_fn");
 const registryConfig = {
   pgExecutors: {
     __proto__: null,
@@ -3299,6 +3303,32 @@ const registryConfig = {
     single_table_item_relations: registryConfig_pgResources_single_table_item_relations_single_table_item_relations,
     log_entries: registryConfig_pgResources_log_entries_log_entries,
     relational_posts: registryConfig_pgResources_relational_posts_relational_posts,
+    relational_topic_by_id_fn: PgResource.functionResourceOptions(registryConfig_pgResources_relational_topics_relational_topics, {
+      name: "relational_topic_by_id_fn",
+      identifier: "main.polymorphic.relational_topic_by_id_fn(int4)",
+      from(...args) {
+        return sql`${relational_topic_by_id_fnFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "id",
+        required: true,
+        notNull: false,
+        codec: TYPES.int
+      }],
+      returnsArray: false,
+      returnsSetof: false,
+      isMutation: false,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "relational_topic_by_id_fn"
+        },
+        tags: {}
+      },
+      description: undefined
+    }),
     first_party_vulnerabilities_cvss_score_int: {
       executor,
       name: "first_party_vulnerabilities_cvss_score_int",
@@ -3498,7 +3528,80 @@ const registryConfig = {
       },
       description: undefined
     }),
-    relational_items: registryConfig_pgResources_relational_items_relational_items
+    relational_items: registryConfig_pgResources_relational_items_relational_items,
+    all_relational_items_fn: PgResource.functionResourceOptions(registryConfig_pgResources_relational_items_relational_items, {
+      name: "all_relational_items_fn",
+      identifier: "main.polymorphic.all_relational_items_fn()",
+      from(...args) {
+        return sql`${all_relational_items_fnFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      returnsArray: false,
+      returnsSetof: true,
+      isMutation: false,
+      hasImplicitOrder: true,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "all_relational_items_fn"
+        },
+        tags: {}
+      },
+      description: undefined
+    }),
+    relational_item_by_id_fn: PgResource.functionResourceOptions(registryConfig_pgResources_relational_items_relational_items, {
+      name: "relational_item_by_id_fn",
+      identifier: "main.polymorphic.relational_item_by_id_fn(int4)",
+      from(...args) {
+        return sql`${relational_item_by_id_fnFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "id",
+        required: true,
+        notNull: false,
+        codec: TYPES.int
+      }],
+      returnsArray: false,
+      returnsSetof: false,
+      isMutation: false,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "relational_item_by_id_fn"
+        },
+        tags: {}
+      },
+      description: undefined
+    }),
+    relational_topics_parent_fn: PgResource.functionResourceOptions(registryConfig_pgResources_relational_items_relational_items, {
+      name: "relational_topics_parent_fn",
+      identifier: "main.polymorphic.relational_topics_parent_fn(polymorphic.relational_topics)",
+      from(...args) {
+        return sql`${relational_topics_parent_fnFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "t",
+        required: true,
+        notNull: false,
+        codec: relationalTopicsCodec
+      }],
+      returnsArray: false,
+      returnsSetof: false,
+      isMutation: false,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "relational_topics_parent_fn"
+        },
+        tags: {}
+      },
+      description: undefined
+    })
   },
   pgRelations: {
     __proto__: null,
@@ -4705,6 +4808,7 @@ const resourceByTypeName3 = {
   Organization: otherSource_organizationsPgResource,
   Person: otherSource_peoplePgResource
 };
+const relational_items_pkColumnsByRelatedCodecName = Object.fromEntries([["relationalTopics", relational_topicsUniques[0].attributes], ["relationalPosts", relational_postsUniques[0].attributes], ["relationalDividers", relational_dividersUniques[0].attributes], ["relationalChecklists", relational_checklistsUniques[0].attributes], ["relationalChecklistItems", relational_checklist_itemsUniques[0].attributes]]);
 const RelationalItem_typeNameFromType = ((interfaceTypeName, polymorphism) => {
   function typeNameFromType(typeVal) {
     if (typeof typeVal !== "string") return null;
@@ -4729,16 +4833,12 @@ const resourceByTypeName5 = {
 };
 const otherSource_prioritiesPgResource = registry.pgResources["priorities"];
 const resource_relational_topicsPgResource = registry.pgResources["relational_topics"];
+const resource_relational_topics_parent_fnPgResource = registry.pgResources["relational_topics_parent_fn"];
 const resource_relational_postsPgResource = registry.pgResources["relational_posts"];
 const resource_relational_dividersPgResource = registry.pgResources["relational_dividers"];
 const resource_relational_checklistsPgResource = registry.pgResources["relational_checklists"];
 const resource_relational_checklist_itemsPgResource = registry.pgResources["relational_checklist_items"];
-const resource_all_single_tablesPgResource = registry.pgResources["all_single_tables"];
-const getSelectPlanFromParentAndArgs = ($root, args, _info) => {
-  const selectArgs = makeArgs_first_party_vulnerabilities_cvss_score_int(args);
-  return resource_all_single_tablesPgResource.execute(selectArgs);
-};
-const argDetailsSimple_get_single_table_topic_by_id = [{
+const argDetailsSimple_relational_topic_by_id_fn = [{
   graphqlArgName: "id",
   postgresArgName: "id",
   pgCodec: TYPES.int,
@@ -4762,8 +4862,36 @@ function makeArg(path, args, details) {
     name: postgresArgName ?? undefined
   };
 }
+const makeArgs_relational_topic_by_id_fn = (args, path = []) => argDetailsSimple_relational_topic_by_id_fn.map(details => makeArg(path, args, details));
+const resource_relational_topic_by_id_fnPgResource = registry.pgResources["relational_topic_by_id_fn"];
+const resource_all_single_tablesPgResource = registry.pgResources["all_single_tables"];
+const getSelectPlanFromParentAndArgs = ($root, args, _info) => {
+  const selectArgs = makeArgs_first_party_vulnerabilities_cvss_score_int(args);
+  return resource_all_single_tablesPgResource.execute(selectArgs);
+};
+const argDetailsSimple_get_single_table_topic_by_id = [{
+  graphqlArgName: "id",
+  postgresArgName: "id",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}];
 const makeArgs_get_single_table_topic_by_id = (args, path = []) => argDetailsSimple_get_single_table_topic_by_id.map(details => makeArg(path, args, details));
 const resource_get_single_table_topic_by_idPgResource = registry.pgResources["get_single_table_topic_by_id"];
+const resource_all_relational_items_fnPgResource = registry.pgResources["all_relational_items_fn"];
+const getSelectPlanFromParentAndArgs2 = ($root, args, _info) => {
+  const selectArgs = makeArgs_first_party_vulnerabilities_cvss_score_int(args);
+  return resource_all_relational_items_fnPgResource.execute(selectArgs);
+};
+const argDetailsSimple_relational_item_by_id_fn = [{
+  graphqlArgName: "id",
+  postgresArgName: "id",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}];
+const makeArgs_relational_item_by_id_fn = (args, path = []) => argDetailsSimple_relational_item_by_id_fn.map(details => makeArg(path, args, details));
+const resource_relational_item_by_id_fnPgResource = registry.pgResources["relational_item_by_id_fn"];
 const members3 = [{
   resource: resourceByTypeName_FirstPartyVulnerability_first_party_vulnerabilitiesPgResource,
   typeName: "FirstPartyVulnerability"
@@ -7451,6 +7579,7 @@ type SingleTableChecklistItem implements SingleTableItem {
 }
 
 type RelationalTopic implements RelationalItem {
+  parentFn: RelationalItem
   title: String!
   id: Int!
   type: ItemType!
@@ -8494,6 +8623,7 @@ type Query {
 
   """Get a single \`RelationalPost\`."""
   relationalPostByPostItemId(postItemId: Int!): RelationalPost
+  relationalTopicByIdFn(id: Int): RelationalTopic
 
   """Reads and enables pagination through a set of \`SingleTableItem\`."""
   allSingleTables(
@@ -8516,6 +8646,28 @@ type Query {
     after: Cursor
   ): SingleTableItemsConnection
   getSingleTableTopicById(id: Int): SingleTableTopic
+
+  """Reads and enables pagination through a set of \`RelationalItem\`."""
+  allRelationalItemsFn(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): RelationalItemsConnection
+  relationalItemByIdFn(id: Int): RelationalItem
   allVulnerabilities(
     """Only read the first \`n\` values of the set."""
     first: Int
@@ -10279,6 +10431,33 @@ export const objects = {
           }
         }
       },
+      allRelationalItemsFn: {
+        plan($parent, args, info) {
+          const $select = getSelectPlanFromParentAndArgs2($parent, args, info);
+          return connection($select, {
+            cursorPlan($item) {
+              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
+            }
+          });
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          last(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          before(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          },
+          after(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
+        }
+      },
       allRelationalPosts: {
         plan() {
           return connection(resource_relational_postsPgResource.find());
@@ -10607,6 +10786,10 @@ export const objects = {
           divider_item_id: $dividerItemId
         });
       },
+      relationalItemByIdFn($root, args, _info) {
+        const selectArgs = makeArgs_relational_item_by_id_fn(args);
+        return resource_relational_item_by_id_fnPgResource.execute(selectArgs);
+      },
       relationalItemRelationById(_$root, {
         $id
       }) {
@@ -10638,6 +10821,10 @@ export const objects = {
         return resource_relational_postsPgResource.get({
           post_item_id: $postItemId
         });
+      },
+      relationalTopicByIdFn($root, args, _info) {
+        const selectArgs = makeArgs_relational_topic_by_id_fn(args);
+        return resource_relational_topic_by_id_fnPgResource.execute(selectArgs);
       },
       relationalTopicByTopicItemId(_$root, {
         $topicItemId
@@ -12764,6 +12951,12 @@ export const objects = {
       isExplicitlyArchived($record) {
         return $record.get("is_explicitly_archived");
       },
+      parentFn($in, args, _info) {
+        const {
+          selectArgs
+        } = pgFunctionArgumentsFromArgs($in, makeArgs_first_party_vulnerabilities_cvss_score_int(args));
+        return resource_relational_topics_parent_fnPgResource.execute(selectArgs);
+      },
       parentId($record) {
         return $record.get("parent_id");
       },
@@ -14461,19 +14654,16 @@ export const interfaces = {
   },
   RelationalItem: {
     toSpecifier(step) {
-      if (step instanceof PgSelectSingleStep && step.resource !== otherSource_relational_itemsPgResource) {
+      if (step instanceof PgSelectSingleStep &&
+      // NOTE: don't compare `resource` directly since it
+      // could be a function.
+      step.resource.codec !== otherSource_relational_itemsPgResource.codec) {
         // Assume it's a child; return description of base
-        // PERF: ideally we'd use relationship
-        // traversal instead, this would both be
-        // shorter and also cacheable.
-        const stepPk = step.resource.uniques.find(u => u.isPrimary)?.attributes;
-        if (!stepPk) {
-          throw new Error(`Expected a relational record for ${otherSource_relational_itemsPgResource.name}, but found one for ${step.resource.name} which has no primary key!`);
+        const pkColumns = relational_items_pkColumnsByRelatedCodecName[step.resource.codec.name];
+        if (!pkColumns) {
+          throw new Error(`Expected a relational record for ${otherSource_relational_itemsPgResource.name}, but '${step.resource.codec.name}' does not seem to be related!`);
         }
-        if (stepPk.length !== relational_itemsUniques[0].attributes.length) {
-          throw new Error(`Expected a relational record for ${otherSource_relational_itemsPgResource.name}, but found one for ${step.resource.name} which has a primary key with a different number of columns!`);
-        }
-        return object(Object.fromEntries(relational_itemsUniques[0].attributes.map((attrName, idx) => [attrName, get2(step, stepPk[idx])])));
+        return object(Object.fromEntries(relational_itemsUniques[0].attributes.map((attrName, idx) => [attrName, get2(step, pkColumns[idx])])));
       } else {
         // Assume it is or describes the base:
         return object(Object.fromEntries(relational_itemsUniques[0].attributes.map(attrName => [attrName, get2(step, attrName)])));

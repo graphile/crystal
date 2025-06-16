@@ -3287,6 +3287,27 @@ type Query implements Node {
     orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemsConnection
 
+  """Reads and enables pagination through a set of `RelationalItem`."""
+  allRelationalItemsFn(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): RelationalItemsConnection
+
   """Reads and enables pagination through a set of `RelationalPost`."""
   allRelationalPosts(
     """Read all values in the set after (below) this cursor."""
@@ -3676,6 +3697,7 @@ type Query implements Node {
 
   """Get a single `RelationalDivider`."""
   relationalDividerByDividerItemId(dividerItemId: Int!): RelationalDivider
+  relationalItemByIdFn(id: Int): RelationalItem
 
   """
   Reads a single `RelationalItemRelation` using its globally unique `ID`.
@@ -3724,6 +3746,7 @@ type Query implements Node {
     """
     nodeId: ID!
   ): RelationalTopic
+  relationalTopicByIdFn(id: Int): RelationalTopic
 
   """Get a single `RelationalTopic`."""
   relationalTopicByTopicItemId(topicItemId: Int!): RelationalTopic
@@ -5383,6 +5406,7 @@ type RelationalTopic implements Node & RelationalItem {
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
   nodeId: ID!
+  parentFn: RelationalItem
   parentId: Int
 
   """Reads a single `Person` that is related to this `RelationalTopic`."""
