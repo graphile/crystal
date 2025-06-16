@@ -132,20 +132,6 @@
         },
       },
       {
-        id: 15,
-        type: "POST",
-        parentId: 2,
-        title: "Just a test",
-        postDescription: null,
-        relationalItemByParentId: {
-          id: 2,
-          type: "TOPIC",
-          parentId: null,
-          title: "Temporary test topic",
-          parentFn: null,
-        },
-      },
-      {
         id: 11,
         type: "TOPIC",
         parentId: 10,
@@ -165,18 +151,6 @@
             type: "TOPIC",
             title: "PostGraphile version 5",
           },
-        },
-      },
-      {
-        id: 16,
-        type: "CHECKLIST",
-        parentId: 4,
-        relationalItemByParentId: {
-          id: 4,
-          type: "POST",
-          parentId: 1,
-          title: "Better planning",
-          postDescription: null,
         },
       },
       {
@@ -231,6 +205,32 @@
             type: "TOPIC",
             title: "Notes",
           },
+        },
+      },
+      {
+        id: 15,
+        type: "POST",
+        parentId: 2,
+        title: "Just a test",
+        postDescription: null,
+        relationalItemByParentId: {
+          id: 2,
+          type: "TOPIC",
+          parentId: null,
+          title: "Temporary test topic",
+          parentFn: null,
+        },
+      },
+      {
+        id: 16,
+        type: "CHECKLIST",
+        parentId: 4,
+        relationalItemByParentId: {
+          id: 4,
+          type: "POST",
+          parentId: 1,
+          title: "Better planning",
+          postDescription: null,
         },
       },
       {
