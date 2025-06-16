@@ -17,25 +17,25 @@
     "test": "cd examples/users-and-friends && node index.mjs"
   },
   "dependencies": {
-    "@docusaurus/core": "2.4.1",
-    "@docusaurus/preset-classic": "2.4.1",
-    "@docusaurus/remark-plugin-npm2yarn": "^2.4.1",
+    "@docusaurus/core": "2.4.3",
+    "@docusaurus/preset-classic": "2.4.3",
+    "@docusaurus/remark-plugin-npm2yarn": "^2.4.3",
     "@mdx-js/react": "^1.6.22",
-    "@uiw/react-codemirror": "^4.21.12",
-    "clsx": "^2.0.0",
+    "@uiw/react-codemirror": "^4.23.13",
+    "clsx": "^2.1.1",
     "codemirror": "^5.65.19",
-    "codemirror-graphql": "^2.2.0",
+    "codemirror-graphql": "^2.2.2",
     "grafast": "workspace:^",
-    "prism-react-renderer": "^2.0.6",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "prism-react-renderer": "^2.4.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-error-boundary": "^4.1.2"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "2.4.1",
-    "dataloader": "^2.2.2",
+    "@docusaurus/module-type-aliases": "2.4.3",
+    "dataloader": "^2.2.3",
     "mermaid": "^11.6.0",
-    "sqlite3": "^5.1.6"
+    "sqlite3": "^5.1.7"
   },
   "browserslist": {
     "production": [
