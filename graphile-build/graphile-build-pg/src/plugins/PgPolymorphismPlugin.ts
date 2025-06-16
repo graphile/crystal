@@ -1159,22 +1159,37 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   };
                 } else if (polymorphism.mode === "relational") {
                   const childTuples: Array<
-                    [codecName: string, resource: PgResource]
+                    [codecName: string, pk: ReadonlyArray<string>]
                   > = [];
                   for (const spec of Object.values(polymorphism.types)) {
                     const { remoteResource } = resource.getRelation(
                       spec.relationName,
                     );
+                    const remotePk = (
+                      remoteResource.uniques as PgResourceUnique[]
+                    ).find((u) => u.isPrimary);
+                    if (!remotePk) {
+                      throw new Error(
+                        `${remoteResource.name} is polymorphic under ${resource.name} but lacks a primary key!`,
+                      );
+                    }
+                    if (remotePk.attributes.length !== pk.length) {
+                      throw new Error(
+                        `${remoteResource.name} is meant to be a polymorphic related table for ${resource.name}, but the primary key has a different number of columns!`,
+                      );
+                    }
                     childTuples.push([
                       remoteResource.codec.name,
-                      remoteResource,
+                      remotePk.attributes,
                     ]);
                   }
-                  const resourceByCodecName: Record<string, PgResource> =
-                    EXPORTABLE(
-                      (childTuples) => Object.fromEntries(childTuples),
-                      [childTuples],
-                    );
+                  const pkColumnsByCodecName: Record<
+                    string,
+                    ReadonlyArray<string>
+                  > = EXPORTABLE(
+                    (childTuples) => Object.fromEntries(childTuples),
+                    [childTuples],
+                  );
 
                   grafastExtensions = {
                     toSpecifier: EXPORTABLE(
@@ -1183,8 +1198,8 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                         get,
                         object,
                         pk,
+                        pkColumnsByCodecName,
                         resource,
-                        resourceByCodecName,
                       ) =>
                         (step: Step) => {
                           if (
@@ -1194,34 +1209,18 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                             step.resource.codec !== resource.codec
                           ) {
                             // Assume it's a child; return description of base
-                            const tableResource =
-                              resourceByCodecName[step.resource.codec.name];
-                            if (!tableResource) {
+                            const pkColumns =
+                              pkColumnsByCodecName[step.resource.codec.name];
+                            if (!pkColumns) {
                               throw new Error(
-                                `Expected a relational record for ${resource.name}, but could not determine the related polymorphic table resource to use for '${step.resource.codec.name}'!`,
-                              );
-                            }
-                            // PERF: ideally we'd use relationship
-                            // traversal instead, this would both be
-                            // shorter and also cacheable.
-                            const stepPk = (
-                              tableResource.uniques as PgResourceUnique[]
-                            ).find((u) => u.isPrimary)?.attributes;
-                            if (!stepPk) {
-                              throw new Error(
-                                `Expected a relational record for ${resource.name}, but found one for ${tableResource.name} which has no primary key!`,
-                              );
-                            }
-                            if (stepPk.length !== pk.length) {
-                              throw new Error(
-                                `Expected a relational record for ${resource.name}, but found one for ${tableResource.name} which has a primary key with a different number of columns!`,
+                                `Expected a relational record for ${resource.name}, but '${step.resource.codec.name}' does not seem to be related!`,
                               );
                             }
                             return object(
                               Object.fromEntries(
                                 pk.map((attrName, idx) => [
                                   attrName,
-                                  get(step, stepPk[idx]),
+                                  get(step, pkColumns[idx]),
                                 ]),
                               ),
                             );
@@ -1242,8 +1241,8 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                         get,
                         object,
                         pk,
+                        pkColumnsByCodecName,
                         resource,
-                        resourceByCodecName,
                       ],
                     ),
                     planType: EXPORTABLE(
