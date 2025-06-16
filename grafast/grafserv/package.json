@@ -94,7 +94,7 @@
     "debug": "^4.4.1",
     "eventemitter3": "^5.0.1",
     "graphile-config": "workspace:^",
-    "graphql-ws": "^5.16.2",
+    "graphql-ws": "^6.0.5",
     "ruru": "workspace:^",
     "tslib": "^2.8.1"
   },
