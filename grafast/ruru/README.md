@@ -62,6 +62,24 @@ Options:
 <!-- Required below here -->
 <div id="ruru-root"></div>
 <link href="https://unpkg.com/graphiql/graphiql.min.css" rel="stylesheet" />
+<script type="module">
+  /* Set up monaco workers */
+  import createJSONWorker from "https://esm.sh/monaco-editor/esm/vs/language/json/json.worker.js?worker";
+  import createGraphQLWorker from "https://esm.sh/monaco-graphql/esm/graphql.worker.js?worker";
+  import createEditorWorker from "https://esm.sh/monaco-editor/esm/vs/editor/editor.worker.js?worker";
+
+  globalThis.MonacoEnvironment = {
+    getWorker(_workerId, label) {
+      switch (label) {
+        case "json":
+          return createJSONWorker();
+        case "graphql":
+          return createGraphQLWorker();
+      }
+      return createEditorWorker();
+    },
+  };
+</script>
 <script crossorigin src="https://unpkg.com/ruru/bundle/ruru.min.js"></script>
 <script>
   const { React, createRoot, Ruru } = RuruBundle;
@@ -76,11 +94,36 @@ Options:
 
 ## Usage - library
 
-```js
+Set up the Monaco editor workers with:
+
+```html
+<script type="module">
+  /* Set up monaco workers */
+  import createJSONWorker from "https://esm.sh/monaco-editor/esm/vs/language/json/json.worker.js?worker";
+  import createGraphQLWorker from "https://esm.sh/monaco-graphql/esm/graphql.worker.js?worker";
+  import createEditorWorker from "https://esm.sh/monaco-editor/esm/vs/editor/editor.worker.js?worker";
+
+  globalThis.MonacoEnvironment = {
+    getWorker(_workerId, label) {
+      switch (label) {
+        case "json":
+          return createJSONWorker();
+        case "graphql":
+          return createGraphQLWorker();
+      }
+      return createEditorWorker();
+    },
+  };
+</script>
+```
+
+and render Ruru via:
+
+```jsx
 import "graphiql/style.css";
 import "@graphiql/plugin-explorer/style.css";
 import "ruru-components/ruru.css";
-import "graphiql/setup-workers/webpack";
+// import "graphiql/setup-workers/webpack";
 
 import { Ruru } from "ruru-components";
 

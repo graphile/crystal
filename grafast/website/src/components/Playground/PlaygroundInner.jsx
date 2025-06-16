@@ -13,7 +13,24 @@ import * as Grafast from "grafast";
 import { grafast, makeGrafastSchema } from "grafast";
 import { parse, GraphQLError } from "graphql";
 import React, { useCallback, useMemo, useState } from "react";
-import "graphiql/setup-workers/webpack";
+
+import createJSONWorker from "https://esm.sh/monaco-editor/esm/vs/language/json/json.worker.js?worker";
+import createGraphQLWorker from "https://esm.sh/monaco-graphql/esm/graphql.worker.js?worker";
+import createEditorWorker from "https://esm.sh/monaco-editor/esm/vs/editor/editor.worker.js?worker";
+
+globalThis.MonacoEnvironment = {
+  getWorker(_workerId, label) {
+    switch (label) {
+      case "json":
+        return createJSONWorker();
+      case "graphql":
+        return createGraphQLWorker();
+    }
+    return createEditorWorker();
+  },
+};
+
+// import "graphiql/setup-workers/webpack";
 import { Ruru } from "ruru-components";
 
 import styles from "./styles.module.css";

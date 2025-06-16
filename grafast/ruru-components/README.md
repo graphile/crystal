@@ -12,7 +12,28 @@ documentation.
 
 For other usage patterns, please see the main [ruru][] package.
 
-```js
+```html
+<script type="module">
+  /* Set up monaco workers */
+  import createJSONWorker from "https://esm.sh/monaco-editor/esm/vs/language/json/json.worker.js?worker";
+  import createGraphQLWorker from "https://esm.sh/monaco-graphql/esm/graphql.worker.js?worker";
+  import createEditorWorker from "https://esm.sh/monaco-editor/esm/vs/editor/editor.worker.js?worker";
+
+  globalThis.MonacoEnvironment = {
+    getWorker(_workerId, label) {
+      switch (label) {
+        case "json":
+          return createJSONWorker();
+        case "graphql":
+          return createGraphQLWorker();
+      }
+      return createEditorWorker();
+    },
+  };
+</script>
+```
+
+```jsx
 import "graphiql/style.css";
 import "@graphiql/plugin-explorer/style.css";
 import "ruru-components/ruru.css";
