@@ -1,5 +1,14 @@
 # eslint-plugin-graphile-export
 
+## 0.0.2-beta.8
+
+### Patch Changes
+
+- [#2574](https://github.com/graphile/crystal/pull/2574)
+  [`ec25997a6a2557cde9aaa9e27eb202ad945b6015`](https://github.com/graphile/crystal/commit/ec25997a6a2557cde9aaa9e27eb202ad945b6015)
+  Thanks [@benjie](https://github.com/benjie)! - Fix dependency ranges to allow
+  ESLint 9
+
 ## 0.0.2-beta.7
 
 ### Patch Changes
