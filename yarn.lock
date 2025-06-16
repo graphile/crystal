@@ -21757,6 +21757,7 @@ __metadata:
     "@eslint/compat": "npm:^1.2.9"
     "@eslint/eslintrc": "npm:^3.3.1"
     "@eslint/js": "npm:^9.26.0"
+    "@graphql-codegen/visitor-plugin-common": "npm:^5.8.0"
     "@hono/node-ws": "npm:^1.0.5"
     "@knodes/typedoc-plugin-monorepo-readmes": "npm:^0.23.1"
     "@knodes/typedoc-plugin-pages": "npm:^0.23.4"
