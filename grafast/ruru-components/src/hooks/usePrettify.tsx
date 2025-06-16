@@ -1,4 +1,4 @@
-import { useEditorContext, usePrettifyEditors } from "@graphiql/react";
+import { useEditorState, useGraphiQLActions } from "@graphiql/react";
 import { useCallback } from "react";
 
 declare global {
@@ -13,21 +13,16 @@ declare global {
  * prettify.
  */
 export const usePrettify = () => {
-  const editorContext = useEditorContext();
-  const fallbackPrettify = usePrettifyEditors();
+  const [queryText, setQueryText] = useEditorState("query");
+  const { prettifyEditors: fallbackPrettify } = useGraphiQLActions();
   return useCallback(() => {
-    const queryEditor = editorContext?.queryEditor;
-    if (!queryEditor) {
-      return;
-    }
     if (
-      queryEditor &&
       typeof window.prettier !== "undefined" &&
       typeof window.prettierPlugins !== "undefined"
     ) {
       // TODO: window.prettier.formatWithCursor
-      queryEditor.setValue(
-        window.prettier.format(queryEditor.getValue(), {
+      setQueryText(
+        window.prettier.format(queryText, {
           parser: "graphql",
           plugins: window.prettierPlugins,
         }),
@@ -35,5 +30,5 @@ export const usePrettify = () => {
     } else {
       fallbackPrettify();
     }
-  }, [editorContext?.queryEditor, fallbackPrettify]);
+  }, [fallbackPrettify]);
 };
