@@ -94,14 +94,17 @@ const config: Configuration = {
       {
         test: /\.css$/,
         use: ["style-loader", "css-loader"],
+        sideEffects: true,
       },
       {
         test: /\.svg$/,
         use: [{ loader: "svg-inline-loader" }],
+        sideEffects: true,
       },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/,
         use: ["file-loader"],
+        sideEffects: true,
       },
     ],
   },
@@ -115,6 +118,10 @@ const config: Configuration = {
     }),
     new OutputDataToSrcPlugin(),
   ],
+  optimization: {
+    splitChunks: false,
+    runtimeChunk: false,
+  },
   //stats: "detailed",
 };
 
