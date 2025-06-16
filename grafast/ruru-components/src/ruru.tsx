@@ -182,7 +182,6 @@ export const RuruInner: FC<{
                     aria-hidden="true"
                   />
                 </ToolbarButton>
-                {/*
                 <ToolbarMenu
                   label="Options"
                   button={
@@ -222,7 +221,6 @@ export const RuruInner: FC<{
                     </span>
                   </ToolbarMenu.Item>
                 </ToolbarMenu>
-                */}
               </>
             )}
           </GraphiQL.Toolbar>
