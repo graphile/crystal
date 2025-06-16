@@ -13,6 +13,7 @@ import * as Grafast from "grafast";
 import { grafast, makeGrafastSchema } from "grafast";
 import { parse, GraphQLError } from "graphql";
 import React, { useCallback, useMemo, useState } from "react";
+import "graphiql/setup-workers/webpack";
 import { Ruru } from "ruru-components";
 
 import styles from "./styles.module.css";

@@ -1,6 +1,7 @@
 import "graphiql/style.css";
 import "@graphiql/plugin-explorer/style.css";
 import "ruru-components/ruru.css";
+import "graphiql/setup-workers/webpack";
 
 import * as React from "react";
 import { createRoot } from "react-dom/client";

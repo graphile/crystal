@@ -7,6 +7,7 @@ import {
   SettingsIcon,
   ToolbarButton,
   ToolbarMenu,
+  useGraphiQL,
   useGraphiQLActions,
 } from "@graphiql/react";
 
@@ -181,6 +182,7 @@ export const RuruInner: FC<{
                     aria-hidden="true"
                   />
                 </ToolbarButton>
+                {/*
                 <ToolbarMenu
                   label="Options"
                   button={
@@ -220,6 +222,7 @@ export const RuruInner: FC<{
                     </span>
                   </ToolbarMenu.Item>
                 </ToolbarMenu>
+                */}
               </>
             )}
           </GraphiQL.Toolbar>
