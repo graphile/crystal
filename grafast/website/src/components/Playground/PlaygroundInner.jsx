@@ -4,8 +4,8 @@ import "codemirror/mode/javascript/javascript";
 import "codemirror-graphql/hint";
 import "codemirror-graphql/lint";
 import "codemirror-graphql/mode";
-import "graphiql/graphiql.css";
-import "@graphiql/plugin-explorer/dist/style.css";
+import "graphiql/style.css";
+import "@graphiql/plugin-explorer/style.css";
 import "ruru-components/ruru.css";
 
 import CodeMirror from "@uiw/react-codemirror";
@@ -13,6 +13,24 @@ import * as Grafast from "grafast";
 import { grafast, makeGrafastSchema } from "grafast";
 import { parse, GraphQLError } from "graphql";
 import React, { useCallback, useMemo, useState } from "react";
+
+import createJSONWorker from "https://esm.sh/monaco-editor/esm/vs/language/json/json.worker.js?worker";
+import createGraphQLWorker from "https://esm.sh/monaco-graphql/esm/graphql.worker.js?worker";
+import createEditorWorker from "https://esm.sh/monaco-editor/esm/vs/editor/editor.worker.js?worker";
+
+globalThis.MonacoEnvironment = {
+  getWorker(_workerId, label) {
+    switch (label) {
+      case "json":
+        return createJSONWorker();
+      case "graphql":
+        return createGraphQLWorker();
+    }
+    return createEditorWorker();
+  },
+};
+
+// import "graphiql/setup-workers/webpack";
 import { Ruru } from "ruru-components";
 
 import styles from "./styles.module.css";

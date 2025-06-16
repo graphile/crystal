@@ -8,8 +8,12 @@ import type {
   FormattedExecutionResult,
 } from "grafast/graphql";
 import * as graphql from "grafast/graphql";
-import type { ServerOptions, SubscribePayload } from "graphql-ws";
-import type { Extra } from "graphql-ws/lib/use/ws";
+import type {
+  OperationResult,
+  ServerOptions,
+  SubscribePayload,
+} from "graphql-ws";
+import type { Extra } from "graphql-ws/use/ws";
 
 import type { GrafservBase } from "./index.js";
 import type {
@@ -315,28 +319,30 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
     }
   }
   return {
-    onSubscribe(ctx, message) {
+    onSubscribe(ctx, id, payload) {
       const event: OnSubscribeEvent = {
         resolvedPreset: instance.resolvedPreset,
         ctx,
-        message,
+        message: {
+          id,
+          payload,
+        },
       };
       return instance.middleware != null
         ? instance.middleware.run("onSubscribe", event, onSubscribeWithEvent)
         : onSubscribeWithEvent(event);
     },
     // TODO: validate that this actually does mask every error
-    // @ts-expect-error See: https://github.com/enisdenjo/graphql-ws/pull/599
-    onError(_ctx, _message, errors) {
+    onError(_ctx, _id, _payload, errors) {
       return errors.map(instance.dynamicOptions.maskError);
     },
     async execute(args: ExecutionArgs) {
       const eargs = args as ExtendedExecutionArgs;
-      return eargs.execute(eargs);
+      return eargs.execute(eargs) as OperationResult;
     },
     async subscribe(args: ExecutionArgs) {
       const eargs = args as ExtendedExecutionArgs;
-      return eargs.subscribe(eargs);
+      return eargs.subscribe(eargs) as OperationResult;
     },
   };
 }

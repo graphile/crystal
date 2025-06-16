@@ -45,7 +45,7 @@
     "@babel/template": "^7.27.2",
     "@babel/traverse": "^7.27.4",
     "@babel/types": "^7.27.6",
-    "@types/node": "^20.19.1",
+    "@types/node": "^22.15.32",
     "prettier": "^3.5.3",
     "tslib": "^2.8.1"
   },
@@ -71,9 +71,9 @@
   "devDependencies": {
     "@types/babel__generator": "^7.27.0",
     "@types/babel__template": "^7.4.4",
-    "@types/jest": "^29.5.14",
+    "@types/jest": "^30.0.0",
     "@types/prettier": "^3.0.0",
-    "jest": "^29.7.0",
+    "jest": "^30.0.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   }

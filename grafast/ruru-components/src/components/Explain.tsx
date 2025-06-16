@@ -1,7 +1,7 @@
 import { planToMermaid } from "grafast/mermaid";
 import type { RenderResult } from "mermaid";
 import type { FC } from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
 import type { ExplainHelpers } from "../hooks/useExplain.js";
@@ -66,11 +66,7 @@ export const ExplainMain: FC<{
   const expand = useCallback(() => {
     setExpanded(true);
   }, []);
-  const nodeRef = useRef<HTMLDivElement>();
-  if (!nodeRef.current) {
-    nodeRef.current = document.createElement("div");
-  }
-  const node = nodeRef.current;
+  const node = useMemo(() => document.createElement("div"), []);
   useEffect(() => {
     document.body.appendChild(node);
     return () => {

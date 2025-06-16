@@ -6,7 +6,7 @@ import type {
   FastifyRequest,
   RouteHandlerMethod,
 } from "fastify";
-import { makeHandler } from "graphql-ws/lib/use/@fastify/websocket";
+import { makeHandler } from "graphql-ws/use/@fastify/websocket";
 
 import {
   convertHandlerResultToResult,
