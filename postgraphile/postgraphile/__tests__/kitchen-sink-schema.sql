@@ -1525,7 +1525,8 @@ create function polymorphic.all_relational_items_fn()
 returns setof polymorphic.relational_items
 as $$
   select *
-  from polymorphic.relational_items;
+  from polymorphic.relational_items
+  order by id asc;
 $$ language sql stable;
 
 create function polymorphic.relational_item_by_id_fn(id int)
