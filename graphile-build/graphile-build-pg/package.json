@@ -45,7 +45,7 @@
   },
   "homepage": "https://graphile.org/graphile-build/",
   "dependencies": {
-    "@types/node": "^20.19.1",
+    "@types/node": "^22.15.32",
     "debug": "^4.4.1",
     "graphile-config": "workspace:^",
     "jsonwebtoken": "^9.0.2",
