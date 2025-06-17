@@ -18,7 +18,7 @@ process all possible data that will be seen at runtime.
 
 At operation planning time, each time a field is referenced that field's plan
 resolver will be called and the result will be combined into the operation
-plan. When calling the field's resolver, <grafast /> will pass the "parent
+plan. When calling the field's resolver, <Grafast /> will pass the "parent
 step" and a "field args" object. The plan resolver may create as many
 intermediate steps as it likes, but it must return exactly one step that
 represents the result of the field.
