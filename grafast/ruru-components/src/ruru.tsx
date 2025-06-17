@@ -9,7 +9,7 @@ import {
   ToolbarMenu,
   useCopyQuery,
   useMergeQuery,
-  useSchemaContext,
+  useSchemaStore,
 } from "@graphiql/react";
 import type { GraphiQLProps } from "graphiql";
 import { GraphiQL, GraphiQLInterface, GraphiQLProvider } from "graphiql";
@@ -114,8 +114,8 @@ export const RuruInner: FC<{
   const prettify = usePrettify();
   const mergeQuery = useMergeQuery();
   const copyQuery = useCopyQuery();
-  const schemaContext = useSchemaContext({ nonNull: true });
-  useGraphQLChangeStream(props, schemaContext.introspect, streamEndpoint);
+  const introspect = useSchemaStore((s) => s.introspect);
+  useGraphQLChangeStream(props, introspect, streamEndpoint);
 
   return (
     <div
