@@ -37,7 +37,7 @@
   },
   "devDependencies": {
     "@types/glob": "^8.1.0",
-    "glob": "^10.4.5",
+    "glob": "^11.0.3",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
