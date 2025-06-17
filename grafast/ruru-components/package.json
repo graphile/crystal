@@ -39,7 +39,7 @@
   "homepage": "https://grafast.org/ruru/",
   "dependencies": {
     "@graphiql/plugin-explorer": "^3.2.6",
-    "@graphiql/react": "^0.28.2",
+    "@graphiql/react": "^0.29.0",
     "@graphiql/toolkit": "^0.11.3",
     "@types/node": "^20.19.1",
     "grafast": "workspace:^",
