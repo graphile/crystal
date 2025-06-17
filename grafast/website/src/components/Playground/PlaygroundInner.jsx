@@ -4,7 +4,7 @@ import "codemirror/mode/javascript/javascript";
 import "codemirror-graphql/hint";
 import "codemirror-graphql/lint";
 import "codemirror-graphql/mode";
-import "graphiql/graphiql.css";
+import "graphiql/style.css";
 import "@graphiql/plugin-explorer/dist/style.css";
 import "ruru-components/ruru.css";
 

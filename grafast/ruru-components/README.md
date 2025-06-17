@@ -14,7 +14,7 @@ For other usage patterns, please see the main [ruru][] package.
 
 ```js
 import { Ruru } from "ruru-components";
-import "graphiql/graphiql.css";
+import "graphiql/style.css";
 import "@graphiql/plugin-explorer/dist/style.css";
 import "ruru-components/ruru.css";
 
