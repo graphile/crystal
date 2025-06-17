@@ -36,7 +36,7 @@
   },
   "homepage": "https://graphile.org/graphile-build/",
   "dependencies": {
-    "@types/node": "^20.19.1",
+    "@types/node": "^22.15.32",
     "@types/pluralize": "^0.0.30",
     "@types/semver": "^7.7.0",
     "chalk": "^4.1.2",
