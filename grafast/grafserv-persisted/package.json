@@ -59,7 +59,7 @@
     "grafast": "workspace:^",
     "grafserv": "workspace:^",
     "graphile-config": "workspace:^",
-    "jest": "^29.7.0",
+    "jest": "^30.0.0",
     "jest-serializer-graphql-schema": "workspace:^",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
