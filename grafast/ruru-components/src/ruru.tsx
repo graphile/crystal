@@ -153,74 +153,84 @@ export const RuruInner: FC<{
             </a>
           </GraphiQL.Logo>
           <GraphiQL.Toolbar>
-            <ToolbarButton
-              onClick={prettify}
-              label="Prettify Query (Shift-Ctrl-P)"
-            >
-              <PrettifyIcon
-                className="graphiql-toolbar-icon"
-                aria-hidden="true"
-              />
-            </ToolbarButton>
-            <ToolbarButton
-              onSelect={mergeQuery}
-              label="Merge Query (Shift-Ctrl-M)"
-            >
-              <MergeIcon className="graphiql-toolbar-icon" aria-hidden="true" />
-            </ToolbarButton>
-            <ToolbarButton
-              onClick={copyQuery}
-              label="Copy query (Shift-Ctrl-C)"
-            >
-              <CopyIcon className="graphiql-toolbar-icon" aria-hidden="true" />
-            </ToolbarButton>
-            <ToolbarMenu
-              label="Options"
-              button={
-                <div
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
+            {() => (
+              <>
+                <ToolbarButton
+                  onClick={prettify}
+                  label="Prettify Query (Shift-Ctrl-P)"
                 >
-                  <SettingsIcon
+                  <PrettifyIcon
                     className="graphiql-toolbar-icon"
                     aria-hidden="true"
                   />
-                </div>
-              }
-            >
-              <ToolbarMenu.Item
-                title="View the SQL statements that this query invokes"
-                onSelect={() => storage.toggle("explain")}
-              >
-                <span>
-                  {storage.get("explain") === "true" ? check : nocheck}
-                  Explain (if supported)
-                </span>
-              </ToolbarMenu.Item>
-              <ToolbarMenu.Item
-                title="Don't hide explain from results"
-                onSelect={() => storage.toggle("verbose")}
-              >
-                <span>
-                  {storage.get("verbose") === "true" ? check : nocheck}
-                  Verbose
-                </span>
-              </ToolbarMenu.Item>
-              <ToolbarMenu.Item
-                title="Should we persist the headers to localStorage? Header editor is next to variable editor at the bottom."
-                onSelect={() => storage.toggle("saveHeaders")}
-              >
-                <span>
-                  {storage.get("saveHeaders") === "true" ? check : nocheck}
-                  Save headers
-                </span>
-              </ToolbarMenu.Item>
-            </ToolbarMenu>
+                </ToolbarButton>
+                <ToolbarButton
+                  onSelect={mergeQuery}
+                  label="Merge Query (Shift-Ctrl-M)"
+                >
+                  <MergeIcon
+                    className="graphiql-toolbar-icon"
+                    aria-hidden="true"
+                  />
+                </ToolbarButton>
+                <ToolbarButton
+                  onClick={copyQuery}
+                  label="Copy query (Shift-Ctrl-C)"
+                >
+                  <CopyIcon
+                    className="graphiql-toolbar-icon"
+                    aria-hidden="true"
+                  />
+                </ToolbarButton>
+                <ToolbarMenu
+                  label="Options"
+                  button={
+                    <div
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <SettingsIcon
+                        className="graphiql-toolbar-icon"
+                        aria-hidden="true"
+                      />
+                    </div>
+                  }
+                >
+                  <ToolbarMenu.Item
+                    title="View the SQL statements that this query invokes"
+                    onSelect={() => storage.toggle("explain")}
+                  >
+                    <span>
+                      {storage.get("explain") === "true" ? check : nocheck}
+                      Explain (if supported)
+                    </span>
+                  </ToolbarMenu.Item>
+                  <ToolbarMenu.Item
+                    title="Don't hide explain from results"
+                    onSelect={() => storage.toggle("verbose")}
+                  >
+                    <span>
+                      {storage.get("verbose") === "true" ? check : nocheck}
+                      Verbose
+                    </span>
+                  </ToolbarMenu.Item>
+                  <ToolbarMenu.Item
+                    title="Should we persist the headers to localStorage? Header editor is next to variable editor at the bottom."
+                    onSelect={() => storage.toggle("saveHeaders")}
+                  >
+                    <span>
+                      {storage.get("saveHeaders") === "true" ? check : nocheck}
+                      Save headers
+                    </span>
+                  </ToolbarMenu.Item>
+                </ToolbarMenu>
+              </>
+            )}
           </GraphiQL.Toolbar>
           <GraphiQL.Footer>
             <RuruFooter />
