@@ -94,6 +94,7 @@ const config: Configuration = {
       {
         test: /\.css$/,
         use: ["style-loader", "css-loader"],
+        sideEffects: true,
       },
       {
         test: /\.svg$/,
@@ -115,6 +116,10 @@ const config: Configuration = {
     }),
     new OutputDataToSrcPlugin(),
   ],
+  optimization: {
+    splitChunks: false,
+    runtimeChunk: false,
+  },
   //stats: "detailed",
 };
 
