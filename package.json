@@ -69,7 +69,7 @@
     "glob": "^11.0.3",
     "globals": "^16.2.0",
     "graphql": "16.1.0-experimental-stream-defer.6",
-    "graphql-ws": "^5.16.2",
+    "graphql-ws": "^6.0.5",
     "jest": "^30.0.0",
     "mock-fs": "^5.5.0",
     "pg": "^8.16.0",

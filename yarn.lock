@@ -13947,7 +13947,7 @@ __metadata:
     grafast: "workspace:^"
     graphile-config: "workspace:^"
     graphql-http: "npm:^1.22.4"
-    graphql-ws: "npm:^5.16.2"
+    graphql-ws: "npm:^6.0.5"
     h3: "npm:^1.15.3"
     hono: "npm:^4.7.11"
     jest: "npm:^30.0.0"
@@ -14013,7 +14013,7 @@ __metadata:
     graphile-export: "workspace:^"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     graphql-helix: "npm:^1.13.0"
-    graphql-ws: "npm:^5.16.2"
+    graphql-ws: "npm:^6.0.5"
     jest: "npm:^30.0.0"
     jsonwebtoken: "npm:^9.0.2"
     pg: "npm:^8.16.0"
@@ -14325,16 +14325,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graphql-ws@npm:^5.16.2":
-  version: 5.16.2
-  resolution: "graphql-ws@npm:5.16.2"
-  peerDependencies:
-    graphql: ">=0.11 <=16"
-  checksum: 10/6647bfe640b467f27aaf5ee044c1d114fe266e82cda4ebbb4368d5a4e98df5d2de9d6be70d28eb5e821d87fbf8964c3a8a18abf87c76d4f148800fd8e0488c3d
-  languageName: node
-  linkType: hard
-
-"graphql-ws@npm:^6.0.3":
+"graphql-ws@npm:^6.0.3, graphql-ws@npm:^6.0.5":
   version: 6.0.5
   resolution: "graphql-ws@npm:6.0.5"
   peerDependencies:
@@ -21311,7 +21302,7 @@ __metadata:
     glob: "npm:^11.0.3"
     globals: "npm:^16.2.0"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
-    graphql-ws: "npm:^5.16.2"
+    graphql-ws: "npm:^6.0.5"
     jest: "npm:^30.0.0"
     mock-fs: "npm:^5.5.0"
     pg: "npm:^8.16.0"
@@ -21393,7 +21384,7 @@ __metadata:
     grafast: "workspace:^"
     graphiql: "npm:^3.9.0"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
-    graphql-ws: "npm:^5.16.2"
+    graphql-ws: "npm:^6.0.5"
     jest: "npm:^30.0.0"
     nodemon: "npm:^3.1.10"
     react: "npm:^18.3.1"
