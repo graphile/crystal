@@ -13,7 +13,7 @@ npm install --save graphile-build graphql
 
 ### Building your Schema
 
-The [`buildSchema`](./schema-builder#buildSchema) method will
+The [`buildSchema`](./schema-builder#buildschema) method will
 (asynchronously) build a GraphQL schema from a list of plugins. We ship a number
 of [default plugins](./default-plugins) that are sufficient to
 create a simple schema, like so:
