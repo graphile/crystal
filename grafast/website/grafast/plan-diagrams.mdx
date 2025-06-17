@@ -4,17 +4,7 @@ sidebar_position: 10
 ---
 
 import Mermaid from "@theme/Mermaid";
-const init = `\
-%%{init: {'themeVariables': { 'fontSize': '16px'}}}%%
-flowchart TD
-    classDef path fill:#eee,stroke:#000,color:#000
-    classDef plan fill:#fff,stroke-width:1px,color:#000
-    classDef itemplan fill:#fff,stroke-width:2px,color:#000
-    classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
-    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
-    classDef bucket0 stroke:#696969
-    classDef bucket2 stroke:#7f007f
-`;
+import init from "./mermaid-init.mermaid?raw";
 import mermaidPlan from "../examples/users-and-friends/plan.mermaid?raw";
 
 # Plan diagrams

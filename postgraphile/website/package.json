@@ -16,16 +16,16 @@
     "posttest": "yarn build"
   },
   "dependencies": {
-    "@docusaurus/core": "2.4.3",
-    "@docusaurus/preset-classic": "2.4.3",
-    "@docusaurus/remark-plugin-npm2yarn": "^2.4.3",
-    "@docusaurus/theme-mermaid": "^2.4.3",
+    "@docusaurus/core": "3.8.1",
+    "@docusaurus/preset-classic": "3.8.1",
+    "@docusaurus/remark-plugin-npm2yarn": "^3.8.1",
+    "@docusaurus/theme-mermaid": "^3.8.1",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
     "@fortawesome/free-brands-svg-icons": "^6.7.2",
     "@fortawesome/free-regular-svg-icons": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
-    "@mdx-js/react": "^1.6.22",
+    "@mdx-js/react": "^3.1.0",
     "clsx": "^2.1.1",
     "postcss-nested": "^6.2.0",
     "prism-react-renderer": "^2.4.1",
@@ -33,7 +33,7 @@
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "2.4.3"
+    "@docusaurus/module-type-aliases": "3.8.1"
   },
   "browserslist": {
     "production": [
