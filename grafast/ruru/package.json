@@ -68,16 +68,16 @@
     "@types/http-proxy": "^1.17.16",
     "@types/webpack-bundle-analyzer": "^4.7.0",
     "@types/yargs": "^17.0.33",
-    "css-loader": "^6.11.0",
+    "css-loader": "^7.1.2",
     "file-loader": "^6.2.0",
     "graphql": "16.1.0-experimental-stream-defer.6",
     "ruru-components": "workspace:^",
-    "style-loader": "^3.3.4",
+    "style-loader": "^4.0.0",
     "svg-inline-loader": "^0.8.2",
     "ts-loader": "^9.5.2",
     "typescript": "^5.8.3",
     "webpack": "^5.99.9",
     "webpack-bundle-analyzer": "^4.10.2",
-    "webpack-cli": "^5.1.4"
+    "webpack-cli": "^6.0.1"
   }
 }
