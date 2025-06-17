@@ -37,7 +37,7 @@ import {
   processRequest,
   sendResult,
 } from "graphql-helix";
-import { useServer } from "graphql-ws/lib/use/ws";
+import { useServer } from "graphql-ws/use/ws";
 import * as jsonwebtoken from "jsonwebtoken";
 import { Pool } from "pg";
 import * as ws from "ws";
@@ -297,7 +297,7 @@ pool.on("error", (e) => {
       {
         execute: (args: any) => args.rootValue.execute(args),
         subscribe: (args: any) => args.rootValue.subscribe(args),
-        onSubscribe: async (ctx, msg) => {
+        onSubscribe: async (ctx, id, payload) => {
           const {
             parse,
             validate,
@@ -316,9 +316,9 @@ pool.on("error", (e) => {
 
           const args = {
             schema,
-            operationName: msg.payload.operationName,
-            document: parse(msg.payload.query),
-            variableValues: msg.payload.variables,
+            operationName: payload.operationName,
+            document: parse(payload.query),
+            variableValues: payload.variables,
             contextValue: await contextFactory(),
             rootValue: {
               execute,

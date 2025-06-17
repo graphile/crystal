@@ -29,7 +29,7 @@ declare global {
         readonly res: ServerResponse;
       };
       ws: {
-        // 'socket' and 'request' come from `import type { Extra } from "graphql-ws/lib/use/ws";`
+        // 'socket' and 'request' come from `import type { Extra } from "graphql-ws/use/ws";`
         /**
          * The actual socket connection between the server and the client.
          */
