@@ -1042,7 +1042,7 @@ export const TYPES = {
     fromPg: jsonParse,
     toPg: jsonStringify,
   }),
-  jsonpath: t()("4072", "jsonpath", verbatim),
+  jsonpath: t()("4072", "jsonpath"),
   xml: t<string>()("142", "xml"),
   citext: t<string>()(undefined, "citext", verbatim),
   uuid: t<string>()("2950", "uuid", verbatim),
