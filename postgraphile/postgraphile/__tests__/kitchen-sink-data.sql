@@ -59,7 +59,7 @@ delete from polymorphic.organizations cascade;
 
 delete from js_reserved.relational_status cascade;
 delete from js_reserved.relational_topics cascade;
-delete from js_reserved.relational_items cascade; 
+delete from js_reserved.relational_items cascade;
 delete from js_reserved.machine cascade;
 delete from js_reserved.building cascade;
 
@@ -171,6 +171,7 @@ insert into b.types values (
   '{"a":1,"b":2,"c":3,"d":{"e":4,"f":5,"g":[6,7,8,"x",false,null]}}',
   '{"1":"a","2":"b","3":"c","4":{"5":"d","6":"e","7":["f","g","h",42,true,null]}}',
   null,
+  null,
   numrange(-10, 52),
   daterange('1998-07-12', '2016-10-07'),
   '[20, 53]',
@@ -220,6 +221,7 @@ insert into b.types values (
   array['hey', 'i', 'just', 'met', 'you'],
   '{"a":1,"b":2,"c":3,"d":{"e":4,"f":5,"g":[6,7,8,"x",false,null]}}',
   '{"1":"a","2":"b","3":"c","4":{"5":"d","6":"e","7":["f","g","h",42,true,null]}}',
+  '$.items[*].id',
   null,
   numrange(-10, 52),
   daterange('1998-07-12', '2016-10-07'),
@@ -241,13 +243,13 @@ insert into b.types values (
   '192.168.0.0',
   '192.168.0.0/24',
   'feed.dead.beef',
-  'b.guid_fn', 
-  'b.guid_fn(b.guid)', 
+  'b.guid_fn',
+  'b.guid_fn(b.guid)',
   '>>=',
-  '*(integer,integer)', 
-  'b.types', 
-  'int', 
-  'english', 
+  '*(integer,integer)',
+  'b.types',
+  'int',
+  'english',
   'simple',
   ARRAY['1 year', '2 months', '3 days']::text[],
   ARRAY[1, 2, 2098288669218571760],
@@ -532,13 +534,13 @@ insert into polymorphic.log_entries (id, person_id, organization_id, text) value
   (12, null, 8, 'Hello-o! Are you still there?'),
   (13, 8, null, 'I''d like to introduce my wife'),
   (14, 8, null, 'I''m moving to America');
-  
+
 insert into polymorphic.priorities (id, title) values
   (1, 'High'),
   (2, 'Medium'),
   (3, 'Low');
 
-insert into polymorphic.single_table_items 
+insert into polymorphic.single_table_items
   (id, type,             parent_id, author_id, position, created_at,             updated_at,             is_explicitly_archived, archived_at,            color,   title, description, note, priority_id) values
   (1,  'TOPIC',          null,      2,         0,        '2020-01-28T11:00:00Z', '2021-07-30T14:24:00Z', false,                  null,                   null,    'PostGraphile version 5', null, null, null),
   (2,  'TOPIC',          null,      1,         0,        '2020-03-26T13:00:00Z', '2020-03-26T14:00:00Z', true,                   '2020-03-26T14:00:00Z', null,    'Temporary test topic', null, null, null),
@@ -802,13 +804,13 @@ alter sequence js_reserved.machine_id_seq restart with 1;
 
 insert into js_reserved.building
   (constructor,  name) values
-  ('Cable',      'Copper Plant'), 
+  ('Cable',      'Copper Plant'),
   ('Concrete',   'Limestone Quarry'),
   ('Iron Plate', 'Iron Mine');
 
 insert into js_reserved.machine
   (constructor,  input) values
-  ('Cable',      'Wire'), 
+  ('Cable',      'Wire'),
   ('Concrete',   'Limestone'),
   ('Iron Plate', 'Iron Ingot');
 
