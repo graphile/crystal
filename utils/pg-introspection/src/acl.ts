@@ -141,7 +141,7 @@ const parseIdentifier = (str: string): string =>
 export function parseAcl(aclString: string): AclObject {
   // https://www.postgresql.org/docs/current/ddl-priv.html#PRIVILEGE-ABBREVS-TABLE
 
-  const matches = aclString.match(/^([^=]*)=([rwadDxtXUCcTm*]*)\/([^=]+)$/);
+  const matches = aclString.match(/^([^=]*)=((?:[rwadDxtXUCcTm]\*?)*)\/([^=]+)$/);
 
   if (!matches) {
     throw new Error(`Could not parse ACL string '${aclString}'`);
@@ -152,31 +152,31 @@ export function parseAcl(aclString: string): AclObject {
   const granter = parseIdentifier(rawGranter);
 
   const select = permissions.includes("r");
-  const selectGrant = permissions.includes("r*");
+  const selectGrant = select && permissions.includes("r*");
   const update = permissions.includes("w");
-  const updateGrant = permissions.includes("w*");
+  const updateGrant = update && permissions.includes("w*");
   const insert = permissions.includes("a");
-  const insertGrant = permissions.includes("a*");
+  const insertGrant = insert && permissions.includes("a*");
   const del = permissions.includes("d");
-  const deleteGrant = permissions.includes("d*");
+  const deleteGrant = del && permissions.includes("d*");
   const truncate = permissions.includes("D");
-  const truncateGrant = permissions.includes("D*");
+  const truncateGrant = truncate && permissions.includes("D*");
   const references = permissions.includes("x");
-  const referencesGrant = permissions.includes("x*");
+  const referencesGrant = references && permissions.includes("x*");
   const trigger = permissions.includes("t");
-  const triggerGrant = permissions.includes("t*");
+  const triggerGrant = trigger && permissions.includes("t*");
   const execute = permissions.includes("X");
-  const executeGrant = permissions.includes("X*");
+  const executeGrant = execute && permissions.includes("X*");
   const usage = permissions.includes("U");
-  const usageGrant = permissions.includes("U*");
+  const usageGrant = usage && permissions.includes("U*");
   const create = permissions.includes("C");
-  const createGrant = permissions.includes("C*");
+  const createGrant = create && permissions.includes("C*");
   const connect = permissions.includes("c");
-  const connectGrant = permissions.includes("c*");
+  const connectGrant = connect && permissions.includes("c*");
   const temporary = permissions.includes("T");
-  const temporaryGrant = permissions.includes("T*");
+  const temporaryGrant = temporary && permissions.includes("T*");
   const maintain = permissions.includes("m");
-  const maintainGrant = permissions.includes("m*");
+  const maintainGrant = maintain && permissions.includes("m*");
 
   const acl = {
     role: role || "public",
