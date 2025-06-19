@@ -4,7 +4,7 @@ import type {} from "graphile-config";
 let counter = 0;
 
 type ProcessSchemaFunction = (schema: GraphQLSchema) => GraphQLSchema;
-export function makeProcessSchemaPlugin(
+export function processSchema(
   callback: ProcessSchemaFunction,
 ): GraphileConfig.Plugin {
   return {
@@ -19,3 +19,6 @@ export function makeProcessSchemaPlugin(
     },
   };
 }
+
+/** @deprecated use processSchema */
+export const makeProcessSchemaPlugin = processSchema;

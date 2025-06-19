@@ -25,17 +25,17 @@ have familiarity with that before attempting to write your own plugins.
 
 A common request is to add additional root-level fields to your schema, for
 example to integrate external services. The easiest way to do this is to
-[use `makeExtendSchemaPlugin`](./make-extend-schema-plugin) to generate a
+[use `extendSchema`](./extend-schema) to generate a
 plugin that will extend your schema (this can be used to add fields anywhere,
 not just at the root-level):
 
 ```ts title="add-http-bin-plugin.js"
-import { makeExtendSchemaPlugin, gql } from "postgraphile/utils";
+import { extendSchema } from "postgraphile/utils";
 import { loadOne } from "postgraphile/grafast";
 import fetch from "node-fetch";
 
-export default makeExtendSchemaPlugin({
-  typeDefs: gql`
+export default extendSchema({
+  typeDefs: /* GraphQL */ `
     extend type Query {
       httpBinHeaders: JSON
     }
@@ -172,7 +172,7 @@ remove individual fields. This is just to demonstrate how a plugin to do this
 might work, [smart comments](./smart-comments) are likely a better approach.
 
 ```ts
-function makeRemoveFieldPlugin(
+function removeField(
   objectName: string,
   fieldName: string,
 ): GraphileConfig.Plugin {
@@ -193,5 +193,5 @@ function makeRemoveFieldPlugin(
   };
 }
 
-export const RemoveFooDotBarPlugin = makeRemoveFieldPlugin("Foo", "bar");
+export const RemoveFooDotBarPlugin = removeField("Foo", "bar");
 ```

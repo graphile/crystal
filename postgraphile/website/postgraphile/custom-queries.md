@@ -116,7 +116,7 @@ as part of this.
 ### Extending schema in JS
 
 If you prefer adding to your schema on the JavaScript side, you can use
-[`makeExtendSchemaPlugin`](./make-extend-schema-plugin).
+[`extendSchema`](./extend-schema).
 
 <!--
 ### GraphQL Schema Stitching

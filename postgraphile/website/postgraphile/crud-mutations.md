@@ -35,7 +35,7 @@ article.
 
 PostGraphile gives you a lot of ways to define your own mutations (from
 [database functions](./custom-mutations), to [schema
-extensions](./make-extend-schema-plugin), to [custom plugins](./extending)),
+extensions](./extend-schema), to [custom plugins](./extending)),
 so you can pick whichever pattern you and your team are most comfortable with.
 
 :::note PostGraphile brings more than just handling CRUD mutations
