@@ -2941,6 +2941,15 @@ const spec_bTypes = {
         tags: {}
       }
     },
+    jsonpath: {
+      description: undefined,
+      codec: TYPES.jsonpath,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
     nullable_range: {
       description: undefined,
       codec: pgCatalogNumrangeCodec,
@@ -4018,6 +4027,7 @@ const registry = makeRegistry({
     bTypes: bTypesCodec,
     anInt: anIntCodec,
     bAnotherInt: bAnotherIntCodec,
+    jsonpath: TYPES.jsonpath,
     pgCatalogNumrange: pgCatalogNumrangeCodec,
     pgCatalogDaterange: pgCatalogDaterangeCodec,
     anIntRange: anIntRangeCodec,
@@ -12231,6 +12241,7 @@ type BType {
   textArray: [String]!
   json: JSON!
   jsonb: JSON!
+  jsonpath: JSONPath
   nullableRange: BigFloatRange
   numrange: BigFloatRange!
   daterange: DateRange!
@@ -12294,6 +12305,9 @@ scalar BAnotherInt
 Represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
 scalar JSON
+
+"""A string representing an SQL/JSONPath expression"""
+scalar JSONPath
 
 """A range of \`BigFloat\`."""
 type BigFloatRange {
@@ -12465,6 +12479,9 @@ input BTypeCondition {
   """Checks for equality with the object’s \`jsonb\` field."""
   jsonb: JSON
 
+  """Checks for equality with the object’s \`jsonpath\` field."""
+  jsonpath: JSONPath
+
   """Checks for equality with the object’s \`timestamp\` field."""
   timestamp: Datetime
 
@@ -12564,6 +12581,8 @@ enum BTypeOrderBy {
   JSON_DESC
   JSONB_ASC
   JSONB_DESC
+  JSONPATH_ASC
+  JSONPATH_DESC
   TIMESTAMP_ASC
   TIMESTAMP_DESC
   TIMESTAMPTZ_ASC
@@ -17891,6 +17910,7 @@ input BTypeInput {
   textArray: [String]!
   json: JSON!
   jsonb: JSON!
+  jsonpath: JSONPath
   nullableRange: BigFloatRangeInput
   numrange: BigFloatRangeInput!
   daterange: DateRangeInput!
@@ -19029,6 +19049,7 @@ input BTypePatch {
   textArray: [String]
   json: JSON
   jsonb: JSON
+  jsonpath: JSONPath
   nullableRange: BigFloatRangeInput
   numrange: BigFloatRangeInput
   daterange: DateRangeInput
@@ -29524,6 +29545,15 @@ export const inputObjects = {
           }
         });
       },
+      jsonpath($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "jsonpath",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.jsonpath)}`;
+          }
+        });
+      },
       ltree($condition, val) {
         $condition.where({
           type: "attribute",
@@ -29859,6 +29889,12 @@ export const inputObjects = {
       }) {
         obj.set("jsonb", bakedInputRuntime(schema, field.type, val));
       },
+      jsonpath(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("jsonpath", bakedInputRuntime(schema, field.type, val));
+      },
       ltree(obj, val, {
         field,
         schema
@@ -30157,6 +30193,12 @@ export const inputObjects = {
         schema
       }) {
         obj.set("jsonb", bakedInputRuntime(schema, field.type, val));
+      },
+      jsonpath(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("jsonpath", bakedInputRuntime(schema, field.type, val));
       },
       ltree(obj, val, {
         field,
@@ -33253,6 +33295,16 @@ export const scalars = {
       return parseLiteralToObject;
     })()
   },
+  JSONPath: {
+    serialize: UUIDSerialize,
+    parseValue: UUIDSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"JSONPath" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
   KeyValueHash: {
     serialize(value) {
       return value;
@@ -33658,6 +33710,18 @@ export const enums = {
       JSONB_DESC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "jsonb",
+          direction: "DESC"
+        });
+      },
+      JSONPATH_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "jsonpath",
+          direction: "ASC"
+        });
+      },
+      JSONPATH_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "jsonpath",
           direction: "DESC"
         });
       },
