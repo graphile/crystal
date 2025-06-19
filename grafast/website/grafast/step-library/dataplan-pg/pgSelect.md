@@ -172,10 +172,42 @@ inside an SQL query.
 const $users = usersResource.find();
 const tbl = $users.alias;
 
-const $username = fieldArgs.get("username");
+const $username = fieldArgs.getRaw("username");
 const frag = $users.placeholder($username, TYPES.citext);
 
 $users.where(sql`${tbl}.username = ${frag}`);
+```
+
+### sqlValueWithCodec(value, codec)
+
+`sqlValueWithCodec` is a runtime function that accepts an arbitrary value and a
+codec representing its database type and returns a `pg-sql2` expression for that
+value properly encoded so that it can be inserted into a `pg-sql2` query.
+
+```ts
+  typeDefs: /* GraphQL */`
+    extend input MyTableCondition {
+      featured: Boolean
+    }
+  `,
+  inputObjects: {
+    MyTableCondition: {
+      plans: {
+        featured(pgCondition, value) {
+          if (value === null) {
+            pgCondition.where(sql`${pgCondition}.featured is null`);
+          } else {
+            pgCondition.where(
+              sql`${pgCondition}.featured = ${sqlValueWithCodec(
+                value,
+                TYPES.boolean,
+              )}`,
+            );
+          }
+        },
+      }
+    }
+  }
 ```
 
 ### $pgSelect.singleRelation(relationName)
@@ -205,13 +237,17 @@ If the relationship is not unique then an error will be thrown.
 
 :::
 
+<!-- TODO: wherePlan() has been removed https://github.com/graphile/crystal/blob/main/postgraphile/postgraphile/CHANGELOG.md#500-beta39
+
 ### $pgSelect.wherePlan()
 
-Instead of adding conditions directly, this advanced method returns a
-`PgConditionStep` (a "modifier step") which allows the condition to be built up
+Instead of adding conditions directly, this advanced method returns
+`PgCondition` (a "modifier" class) which allows the condition to be built up
 in a different way. This is particularly useful if you are building deep
 filtering arguments, using the `applyPlan` plan resolver on arguments and input
 fields.
+
+-->
 
 ### $pgSelect.setFirst($n)
 
@@ -249,11 +285,14 @@ query and only supports the SQL fragment condition form.
 
 TODO: THIS METHOD IS UNTESTED!
 
+<!-- Removed
 ### $pgSelect.havingPlan()
 
 Like `$pgSelect.wherePlan()` but for the `HAVING` clause.
 
 TODO: THIS METHOD IS UNTESTED!
+
+-->
 
 ### $pgSelect.setUnique()
 
