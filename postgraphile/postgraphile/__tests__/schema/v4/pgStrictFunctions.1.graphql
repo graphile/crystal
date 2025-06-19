@@ -3274,6 +3274,9 @@ A JavaScript object encoded in the JSON format as specified by [ECMA-404](http:/
 """
 scalar JSON
 
+"""A string representing an SQL/JSONPath expression"""
+scalar JSONPath
+
 """All input for the `jsonIdentityMutation` mutation."""
 input JsonIdentityMutationInput {
   """
@@ -8653,6 +8656,7 @@ type Type implements Node {
   intervalArray: [Interval]!
   json: JSON!
   jsonb: JSON!
+  jsonpath: JSONPath
   ltree: LTree
   ltreeArray: [LTree]
   macaddr: String
@@ -8754,6 +8758,9 @@ input TypeCondition {
 
   """Checks for equality with the object’s `jsonb` field."""
   jsonb: JSON
+
+  """Checks for equality with the object’s `jsonpath` field."""
+  jsonpath: JSONPath
 
   """Checks for equality with the object’s `ltree` field."""
   ltree: LTree
@@ -8950,6 +8957,7 @@ input TypeInput {
   intervalArray: [IntervalInput]!
   json: JSON!
   jsonb: JSON!
+  jsonpath: JSONPath
   ltree: LTree
   ltreeArray: [LTree]
   macaddr: String
@@ -9003,6 +9011,7 @@ input TypePatch {
   intervalArray: [IntervalInput]
   json: JSON
   jsonb: JSON
+  jsonpath: JSONPath
   ltree: LTree
   ltreeArray: [LTree]
   macaddr: String
@@ -9119,6 +9128,8 @@ enum TypesOrderBy {
   INTERVAL_DESC
   JSONB_ASC
   JSONB_DESC
+  JSONPATH_ASC
+  JSONPATH_DESC
   JSON_ASC
   JSON_DESC
   LTREE_ASC
