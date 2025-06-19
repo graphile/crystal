@@ -1,0 +1,188 @@
+{
+  "$schema": "https://floss.fund/schema/v1.0.0/funding.schema.json#",
+  "version": "v1.0.0",
+  "entity": {
+    "type": "individual",
+    "role": "maintainer",
+    "name": "Benjie Gillam",
+    "email": "code@benjiegillam.com",
+    "phone": "",
+    "description": "Community-funded open source developer and maintainer of the Graphile suite from the UK. GraphQL Technical Steering Committee member, GraphQL trainer and consultant.\n\nMaintainer of PostGraphile, Grafast, and the broader Graphile ecosystem - critical infrastructure projects used by thousands of companies worldwide. These projects enable developers to rapidly develop high-performance, stable GraphQL APIs backed by PostgreSQL. The Graphile suite significantly reduces development time and costs for businesses building modern web applications.\n\nCurrently seeking funding to accelerate PostGraphile V5 final release, expand documentation, and ensure long-term sustainability of this critical open source infrastructure.",
+    "webpageUrl": {
+      "url": "https://www.graphile.org",
+      "wellKnown": ""
+    }
+  },
+  "projects": [
+    {
+      "guid": "grafast",
+      "name": "Grafast",
+      "description": "A cutting-edge planning and execution engine for GraphQL.js - use this as a drop-in replacement for the execute method from GraphQL.js. By moving from traditional resolvers to Grafast 'plan resolvers' you'll be able to leverage the declarative nature of GraphQL requests to execute your business logic in the most efficient way, leading to reduced server load and happier customers.\n\nGrafast enables greater performance and efficiency via deeper integration into your existing Node.js or remote business logic, no matter the shape of your GraphQL schema.",
+      "webpageUrl": {
+        "url": "https://grafast.org"
+      },
+      "repositoryUrl": {
+        "url": "https://github.com/graphile/crystal/tree/main/grafast/grafast",
+        "wellKnown": ""
+      },
+      "licenses": ["spdx:MIT"],
+      "tags": ["graphql", "performance", "planning-engine", "nodejs", "execution"]
+    },
+    {
+      "guid": "postgraphile",
+      "name": "PostGraphile",
+      "description": "An incredibly low-effort way to build a well structured and high-performance GraphQL API backed primarily by a PostgreSQL database. Main focuses are performance, automatic best-practices and customizability/extensibility.\n\nUse this if you have a PostgreSQL database and you want to use it as the 'source of truth' for an auto-generated GraphQL API (which you can still make significant changes to). PostGraphile V5 is currently in open beta.",
+      "webpageUrl": {
+        "url": "https://postgraphile.org"
+      },
+      "repositoryUrl": {
+        "url": "https://github.com/graphile/crystal/tree/main/postgraphile/postgraphile",
+        "wellKnown": ""
+      },
+      "licenses": ["spdx:MIT"],
+      "tags": ["graphql", "postgresql", "api", "database", "auto-generation"]
+    },
+    {
+      "guid": "dataplan-pg",
+      "name": "@dataplan/pg",
+      "description": "Plan classes for interacting with PostgreSQL within the Grafast planning and execution engine. Provides powerful PostgreSQL integration for building efficient GraphQL resolvers.",
+      "webpageUrl": {
+        "url": "https://grafast.org/grafast/step-library/dataplan-pg/"
+      },
+      "repositoryUrl": {
+        "url": "https://github.com/graphile/crystal/tree/main/grafast/dataplan-pg",
+        "wellKnown": ""
+      },
+      "licenses": ["spdx:MIT"],
+      "tags": ["postgresql", "dataplan", "grafast", "database-integration"]
+    },
+    {
+      "guid": "graphile-build",
+      "name": "Graphile Build",
+      "description": "A system for building a GraphQL.js schema from 'plugins', particularly useful for auto-generated GraphQL APIs (e.g. PostGraphile uses this) but also useful for hand-rolled schemas that have a lot of modular but widely-used concerns such as connections, naming, etc.",
+      "webpageUrl": {
+        "url": "https://www.graphile.org/graphile-build/"
+      },
+      "repositoryUrl": {
+        "url": "https://github.com/graphile/crystal/tree/main/graphile-build/graphile-build",
+        "wellKnown": ""
+      },
+      "licenses": ["spdx:MIT"],
+      "tags": ["graphql", "schema-building", "plugins", "extensible"]
+    },
+    {
+      "guid": "pg-introspection",
+      "name": "pg-introspection",
+      "description": "A strongly typed introspection library for PostgreSQL, generated from the PostgreSQL documentation to provide up-to-date details of each introspection field. Essential for building database-aware GraphQL tooling.",
+      "webpageUrl": {
+        "url": "https://www.graphile.org"
+      },
+      "repositoryUrl": {
+        "url": "https://github.com/graphile/crystal/tree/main/utils/pg-introspection",
+        "wellKnown": ""
+      },
+      "licenses": ["spdx:MIT"],
+      "tags": ["postgresql", "introspection", "strongly-typed", "database"]
+    },
+    {
+      "guid": "pg-sql2",
+      "name": "pg-sql2",
+      "description": "A library for building highly dynamic SQL-injection-proof PostgreSQL queries using tagged template literals. Enables safe and efficient SQL generation for complex database operations.",
+      "webpageUrl": {
+        "url": "https://www.graphile.org"
+      },
+      "repositoryUrl": {
+        "url": "https://github.com/graphile/crystal/tree/main/utils/pg-sql2",
+        "wellKnown": ""
+      },
+      "licenses": ["spdx:MIT"],
+      "tags": ["postgresql", "sql", "security", "query-builder", "template-literals"]
+    }
+  ],
+  "funding": {
+    "channels": [
+      {
+        "guid": "floss-fund-contact",
+        "type": "other",
+        "address": "",
+        "description": "For FLOSS Fund grant applications and other institutional funding, please contact code@benjiegillam.com with your specific requirements and timeline."
+      },
+      {
+        "guid": "direct-transfer",
+        "type": "bank",
+        "address": "",
+        "description": "Direct bank transfers accepted for grants and larger funding commitments. Contact code@benjiegillam.com for banking details and invoicing."
+      },
+      {
+        "guid": "github-sponsors",
+        "type": "payment-provider",
+        "address": "https://github.com/sponsors/benjie",
+        "description": "For ongoing monthly sponsorship support. GitHub Sponsors waives all fees and provides sponsor perks including PostGraphile Pro access."
+      }
+    ],
+    "plans": [
+      {
+        "guid": "v5-completion-grant",
+        "status": "active",
+        "name": "PostGraphile V5 Completion Grant",
+        "description": "Fund the final push to complete PostGraphile V5.0.0 stable release. This grant will cover 3-4 months of dedicated development time to finalize remaining features, optimize generated SQL performance, complete comprehensive testing, and polish documentation. V5 represents 3+ years of research and development and will provide massive performance improvements for the entire GraphQL/PostgreSQL ecosystem.",
+        "amount": 50000,
+        "currency": "USD",
+        "frequency": "one-time",
+        "channels": ["floss-fund-contact", "direct-transfer"]
+      },
+      {
+        "guid": "ecosystem-sustainability",
+        "status": "active",
+        "name": "Ecosystem Sustainability Grant",
+        "description": "Ensure long-term sustainability of the Graphile ecosystem that thousands of companies depend on daily. Funding will support ongoing maintenance, security updates, community support, and incremental improvements across the entire Crystal monorepo (Grafast, PostGraphile, dataplan libraries, build tools, etc.) for 12 months.",
+        "amount": 75000,
+        "currency": "USD",
+        "frequency": "one-time",
+        "channels": ["floss-fund-contact", "direct-transfer"]
+      },
+      {
+        "guid": "documentation-expansion",
+        "status": "active",
+        "name": "Documentation & Learning Resources",
+        "description": "Comprehensive documentation overhaul and creation of learning resources for the Graphile ecosystem. This includes interactive tutorials, video courses, migration guides, best practices documentation, and API reference improvements. Better documentation reduces onboarding friction and increases adoption of these critical tools.",
+        "amount": 25000,
+        "currency": "USD",
+        "frequency": "one-time",
+        "channels": ["floss-fund-contact", "direct-transfer"]
+      },
+      {
+        "guid": "performance-optimization",
+        "status": "active",
+        "name": "Performance Research & Optimization",
+        "description": "Deep performance analysis and optimization of the Grafast planning engine and PostGraphile query generation. This includes profiling real-world usage patterns, optimizing SQL generation algorithms, and implementing advanced caching strategies. Results will benefit all users with faster GraphQL execution.",
+        "amount": 40000,
+        "currency": "USD",
+        "frequency": "one-time",
+        "channels": ["floss-fund-contact", "direct-transfer"]
+      },
+      {
+        "guid": "tooling-infrastructure",
+        "status": "active",
+        "name": "Developer Tooling & Infrastructure",
+        "description": "Enhance the development experience around Graphile tools with better debugging capabilities, improved error messages, enhanced IDE integration, and development tools. Also includes improvements to CI/CD infrastructure, automated testing, and release processes.",
+        "amount": 30000,
+        "currency": "USD",
+        "frequency": "one-time",
+        "channels": ["floss-fund-contact", "direct-transfer"]
+      },
+      {
+        "guid": "flexible-grant",
+        "status": "active",
+        "name": "Flexible Development Grant",
+        "description": "Open-ended grant to address the most pressing needs as they arise. Could be allocated toward any combination of: critical bug fixes, security updates, community feature requests, ecosystem integrations, or emerging technology compatibility. Provides flexibility to respond to community needs.",
+        "amount": 0,
+        "currency": "USD",
+        "frequency": "one-time",
+        "channels": ["floss-fund-contact", "direct-transfer"]
+      }
+    ],
+    "history": [
+    ]
+  }
+}
