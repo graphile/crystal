@@ -1,4 +1,4 @@
-import type { FC } from "react";
+import type { FC, JSX } from "react";
 import { useCallback, useMemo, useState } from "react";
 
 export const FormatSQL: FC<{ sql: string }> = ({ sql }) => {
