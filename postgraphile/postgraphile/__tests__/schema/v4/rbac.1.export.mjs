@@ -3307,6 +3307,18 @@ const spec_types = {
         canUpdate: false
       }
     },
+    jsonpath: {
+      description: undefined,
+      codec: TYPES.jsonpath,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {},
+        canSelect: false,
+        canInsert: false,
+        canUpdate: false
+      }
+    },
     nullable_range: {
       description: undefined,
       codec: numrangeCodec,
@@ -4393,6 +4405,7 @@ const registry = makeRegistry({
     types: typesCodec,
     anInt: anIntCodec,
     anotherInt: anotherIntCodec,
+    jsonpath: TYPES.jsonpath,
     numrange: numrangeCodec,
     daterange: daterangeCodec,
     anIntRange: anIntRangeCodec,

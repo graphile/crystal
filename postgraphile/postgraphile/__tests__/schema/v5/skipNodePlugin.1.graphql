@@ -714,6 +714,7 @@ type BType {
   intervalArray: [Interval]!
   json: JSON!
   jsonb: JSON!
+  jsonpath: JSONPath
   ltree: LTree
   ltreeArray: [LTree]
   macaddr: MacAddress
@@ -790,6 +791,9 @@ input BTypeCondition {
 
   """Checks for equality with the object’s `jsonb` field."""
   jsonb: JSON
+
+  """Checks for equality with the object’s `jsonpath` field."""
+  jsonpath: JSONPath
 
   """Checks for equality with the object’s `ltree` field."""
   ltree: LTree
@@ -982,6 +986,7 @@ input BTypeInput {
   intervalArray: [IntervalInput]!
   json: JSON!
   jsonb: JSON!
+  jsonpath: JSONPath
   ltree: LTree
   ltreeArray: [LTree]
   macaddr: MacAddress
@@ -1037,6 +1042,8 @@ enum BTypeOrderBy {
   INTERVAL_DESC
   JSONB_ASC
   JSONB_DESC
+  JSONPATH_ASC
+  JSONPATH_DESC
   JSON_ASC
   JSON_DESC
   LTREE_ASC
@@ -1110,6 +1117,7 @@ input BTypePatch {
   intervalArray: [IntervalInput]
   json: JSON
   jsonb: JSON
+  jsonpath: JSONPath
   ltree: LTree
   ltreeArray: [LTree]
   macaddr: MacAddress
@@ -5181,6 +5189,9 @@ input IntervalInput {
 Represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
 """
 scalar JSON
+
+"""A string representing an SQL/JSONPath expression"""
+scalar JSONPath
 
 """
 A set of key/value pairs, keys are strings, values may be a string or null. Exposed as a JSON object.
