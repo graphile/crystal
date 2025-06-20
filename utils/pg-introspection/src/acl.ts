@@ -198,80 +198,67 @@ export type ResolvedPermissions = Omit<AclObject, "role" | "granter">;
 const parseIdentifier = (str: string): string =>
   str.startsWith('"') ? str.replace(/"("?)/g, "$1") : str;
 
+// https://www.postgresql.org/docs/current/ddl-priv.html#PRIVILEGE-ABBREVS-TABLE
+const ACL_MAP = {
+  r: 'select',
+  w: 'update',
+  a: 'insert',
+  d: 'delete',
+  D: 'truncate',
+  x: 'references',
+  t: 'trigger',
+  X: 'execute',
+  U: 'usage',
+  C: 'create',
+  c: 'connect',
+  T: 'temporary',
+  m: 'maintain',
+};
+const NO_PERMISSIONS: AclObject = Object.values(ACL_MAP).reduce((acc, val) => {
+  acc[val] = acc[val + "Grant"] = false;
+  return acc;
+}, { role: "public", granter: "" });
+
 /**
  * Accepts an ACL string such as `foo=arwdDxt/bar` and converts it into
  * a parsed AclObject.
  */
 export function parseAcl(aclString: string): AclObject {
-  // https://www.postgresql.org/docs/current/ddl-priv.html#PRIVILEGE-ABBREVS-TABLE
-
-  const matches = aclString.match(/^([^=]*)=([rwadDxtXUCcTm*]*)\/([^=]+)$/);
-
-  if (!matches) {
+  const acl = Object.assign({}, NO_PERMISSIONS);
+  const roleEndIndex = aclString.indexOf("=");
+  if (roleEndIndex === -1) {
     throw new Error(`Could not parse ACL string '${aclString}'`);
+  } else if (roleEndIndex > 0) {
+    acl.role = parseIdentifier(aclString.substring(0, roleEndIndex));
   }
-
-  const [, rawRole, permissions, rawGranter] = matches;
-  const role = parseIdentifier(rawRole);
-  const granter = parseIdentifier(rawGranter);
-
-  const select = permissions.includes("r");
-  const selectGrant = permissions.includes("r*");
-  const update = permissions.includes("w");
-  const updateGrant = permissions.includes("w*");
-  const insert = permissions.includes("a");
-  const insertGrant = permissions.includes("a*");
-  const del = permissions.includes("d");
-  const deleteGrant = permissions.includes("d*");
-  const truncate = permissions.includes("D");
-  const truncateGrant = permissions.includes("D*");
-  const references = permissions.includes("x");
-  const referencesGrant = permissions.includes("x*");
-  const trigger = permissions.includes("t");
-  const triggerGrant = permissions.includes("t*");
-  const execute = permissions.includes("X");
-  const executeGrant = permissions.includes("X*");
-  const usage = permissions.includes("U");
-  const usageGrant = permissions.includes("U*");
-  const create = permissions.includes("C");
-  const createGrant = permissions.includes("C*");
-  const connect = permissions.includes("c");
-  const connectGrant = permissions.includes("c*");
-  const temporary = permissions.includes("T");
-  const temporaryGrant = permissions.includes("T*");
-  const maintain = permissions.includes("m");
-  const maintainGrant = permissions.includes("m*");
-
-  const acl = {
-    role: role || "public",
-    granter,
-    select,
-    selectGrant,
-    update,
-    updateGrant,
-    insert,
-    insertGrant,
-    delete: del,
-    deleteGrant,
-    truncate,
-    truncateGrant,
-    references,
-    referencesGrant,
-    trigger,
-    triggerGrant,
-    execute,
-    executeGrant,
-    usage,
-    usageGrant,
-    create,
-    createGrant,
-    connect,
-    connectGrant,
-    temporary,
-    temporaryGrant,
-    maintain,
-    maintainGrant,
-  };
+  const aclLength = aclString.length;
+  const lastGrantableTokenIndex = aclLength - 1;
+  let currentPerm: string;
+  let i = roleEndIndex + 1; // skip past the "="
+  // Process the ACL tokens
+  while (i < aclString.length) {
+    const nextChar = aclString[i];
+    if (nextChar === "/") {
+      // granter begins
+      i++;   // skip past the "/" delimiter
+      break; // we're done with ACL tokens
+    }
+    currentPerm = ACL_MAP[nextChar];
+    if (currentPerm === undefined) {
+      throw new Error(`Could not parse ACL string '${aclString}'`);
+    }
+    acl[currentPerm] = true;
+    if (i < lastGrantableTokenIndex && aclString[i + 1] === '*') {
+      // permission + grant
+      i++; // skip past the "*" character
+      acl[currentPerm + "Grant"] = true;
+    }
+    i++;
+  } // end token processing
+  if (i < aclLength) {
+    // we have a granter at the end of the ACL string
+    acl.granter = parseIdentifier(aclString.substring(i));
+  }
   return acl;
 }
 
