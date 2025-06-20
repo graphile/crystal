@@ -705,7 +705,7 @@ function getDependency(
     node.parent.object === node &&
     "name" in node.parent.property &&
     node.parent.property.name !== "current" &&
-    !node.parent.computed &&
+    !("computed" in node.parent && node.parent.computed) &&
     !(
       node.parent.parent != null &&
       (node.parent.parent.type === "CallExpression" ||

@@ -1,5 +1,19 @@
 # graphile-export
 
+## 0.0.2-beta.28
+
+### Patch Changes
+
+- [#2576](https://github.com/graphile/crystal/pull/2576)
+  [`8dd9bb3701b8d01ece4349161e7ce065c21487a6`](https://github.com/graphile/crystal/commit/8dd9bb3701b8d01ece4349161e7ce065c21487a6)
+  Thanks [@benjie](https://github.com/benjie)! - Provide option to allow
+  disabling optimize (to reduce memory pressure).
+
+- [#2574](https://github.com/graphile/crystal/pull/2574)
+  [`ec25997a6a2557cde9aaa9e27eb202ad945b6015`](https://github.com/graphile/crystal/commit/ec25997a6a2557cde9aaa9e27eb202ad945b6015)
+  Thanks [@benjie](https://github.com/benjie)! - Fix dependency ranges to allow
+  ESLint 9
+
 ## 0.0.2-beta.27
 
 ### Patch Changes

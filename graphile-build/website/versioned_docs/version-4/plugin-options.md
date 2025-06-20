@@ -5,7 +5,7 @@ title: Options
 # Plugin Options
 
 The second argument to
-[`buildSchema` and `getBuilder`](./graphile-build#the-graphile-build-module)
+[`buildSchema` and `getBuilder`](./graphile-build)
 is an **`options`** object with arbitrary properties which is made available to
 every plugin as its second argument.
 

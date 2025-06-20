@@ -2075,13 +2075,13 @@ export async function exportSchemaAsString(
     exportSchemaGraphQLJS(schemaExportDetails);
   }
 
-  return exportFile(file);
+  return exportFile(file, options);
 }
 
-function exportFile(file: CodegenFile) {
+function exportFile(file: CodegenFile, { disableOptimize }: ExportOptions) {
   const ast = file.toAST();
 
-  const optimizedAst = optimize(ast);
+  const optimizedAst = disableOptimize ? ast : optimize(ast);
 
   const { code } = reallyGenerate(optimizedAst, {});
   return { code };
@@ -2106,7 +2106,7 @@ export async function exportValueAsString(
     ),
   );
 
-  return exportFile(file);
+  return exportFile(file, options);
 }
 
 async function loadESLint() {

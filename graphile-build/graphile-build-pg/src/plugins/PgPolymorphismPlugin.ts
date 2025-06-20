@@ -1158,36 +1158,70 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                     ),
                   };
                 } else if (polymorphism.mode === "relational") {
+                  const childTuples: Array<
+                    [codecName: string, pk: ReadonlyArray<string>]
+                  > = [];
+                  for (const spec of Object.values(polymorphism.types)) {
+                    const { remoteResource } = resource.getRelation(
+                      spec.relationName,
+                    );
+                    const remotePk = (
+                      remoteResource.uniques as PgResourceUnique[]
+                    ).find((u) => u.isPrimary);
+                    if (!remotePk) {
+                      throw new Error(
+                        `${remoteResource.name} is polymorphic under ${resource.name} but lacks a primary key!`,
+                      );
+                    }
+                    if (remotePk.attributes.length !== pk.length) {
+                      throw new Error(
+                        `${remoteResource.name} is meant to be a polymorphic related table for ${resource.name}, but the primary key has a different number of columns!`,
+                      );
+                    }
+                    childTuples.push([
+                      remoteResource.codec.name,
+                      remotePk.attributes,
+                    ]);
+                  }
+                  const pkColumnsByCodecName: Record<
+                    string,
+                    ReadonlyArray<string>
+                  > = EXPORTABLE(
+                    (childTuples) => Object.fromEntries(childTuples),
+                    [childTuples],
+                    `${resource.name}_pkColumnsByRelatedCodecName`,
+                  );
+
                   grafastExtensions = {
                     toSpecifier: EXPORTABLE(
-                      (PgSelectSingleStep, get, object, pk, resource) =>
+                      (
+                        PgSelectSingleStep,
+                        get,
+                        object,
+                        pk,
+                        pkColumnsByCodecName,
+                        resource,
+                      ) =>
                         (step: Step) => {
                           if (
                             step instanceof PgSelectSingleStep &&
-                            step.resource !== resource
+                            // NOTE: don't compare `resource` directly since it
+                            // could be a function.
+                            step.resource.codec !== resource.codec
                           ) {
                             // Assume it's a child; return description of base
-                            // PERF: ideally we'd use relationship
-                            // traversal instead, this would both be
-                            // shorter and also cacheable.
-                            const stepPk = (
-                              step.resource.uniques as PgResourceUnique[]
-                            ).find((u) => u.isPrimary)?.attributes;
-                            if (!stepPk) {
+                            const pkColumns =
+                              pkColumnsByCodecName[step.resource.codec.name];
+                            if (!pkColumns) {
                               throw new Error(
-                                `Expected a relational record for ${resource.name}, but found one for ${step.resource.name} which has no primary key!`,
-                              );
-                            }
-                            if (stepPk.length !== pk.length) {
-                              throw new Error(
-                                `Expected a relational record for ${resource.name}, but found one for ${step.resource.name} which has a primary key with a different number of columns!`,
+                                `Expected a relational record for ${resource.name}, but '${step.resource.codec.name}' does not seem to be related!`,
                               );
                             }
                             return object(
                               Object.fromEntries(
                                 pk.map((attrName, idx) => [
                                   attrName,
-                                  get(step, stepPk[idx]),
+                                  get(step, pkColumns[idx]),
                                 ]),
                               ),
                             );
@@ -1203,7 +1237,14 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                             );
                           }
                         },
-                      [PgSelectSingleStep, get, object, pk, resource],
+                      [
+                        PgSelectSingleStep,
+                        get,
+                        object,
+                        pk,
+                        pkColumnsByCodecName,
+                        resource,
+                      ],
                     ),
                     planType: EXPORTABLE(
                       (

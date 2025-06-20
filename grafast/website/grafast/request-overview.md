@@ -6,7 +6,7 @@ sidebar_position: 8
 
 :::caution
 
-The following deliberately over-simplifies the inner workings of <grafast /> by
+The following deliberately over-simplifies the inner workings of <Grafast /> by
 focussing on single-payload GraphQL requests rather than those that return
 streams. The aim is to give you a general feel for how the system works.
 
@@ -27,7 +27,7 @@ cache the parsing of the document.
 
 ## Getting the operation plan
 
-When <grafast /> sees an operation for the first time, it builds an [operation
+When <Grafast /> sees an operation for the first time, it builds an [operation
 plan][]. Whilst building the operation plan, it may have also determined
 particular constraints that a future request must satisfy in order to use this
 same operation plan; for example if the request contained `@skip(if: $variable)`
@@ -44,7 +44,7 @@ previous paragraph).
 
 ## Execute operation plan
 
-&ZeroWidthSpace;<grafast /> will populate the relevant system steps in the plan
+&ZeroWidthSpace;<Grafast /> will populate the relevant system steps in the plan
 with the variables, context value, root value, etc and will then execute the
 execution plan, the execution flowing down through the execution plan's step graph,
 executing each step exactly once (and sometimes in parallel with other steps)
@@ -55,7 +55,7 @@ corresponding list of data that its dependents may themselves consume.
 
 Once the execution plan has executed to completion, the values gathered are ran
 through the output plan to produce the output. Typically this is a JSON object,
-however for an optimization <grafast /> may optionally output stringified JSON
+however for an optimization <Grafast /> may optionally output stringified JSON
 instead without ever building the intermediary JavaScript objects.
 
 :::note
@@ -70,7 +70,7 @@ steps take place for each element of the stream(s).
 
 ## Returning data to user
 
-This can be the same as in a graphql-js project, but <grafast /> also supports
+This can be the same as in a graphql-js project, but <Grafast /> also supports
 an optimized strategy for stringifying the result should you need to do so
 (e.g. if you are serving the request over HTTP). For this reason, we recommend
 that you use `stringifyPayload` rather than `JSON.stringify` on the results

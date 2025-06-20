@@ -1,4 +1,4 @@
-import type { FC } from "react";
+import type { FC, JSX } from "react";
 import { useCallback, useMemo, useRef } from "react";
 
 export const Copy: FC<{

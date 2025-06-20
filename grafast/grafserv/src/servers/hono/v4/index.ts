@@ -303,6 +303,10 @@ export class HonoGrafserv extends GrafservBase {
 
   private setResponseHeaders(ctx: Ctx, headers: Record<string, string>) {
     for (const key in headers) {
+      if (key.toLowerCase() === "content-length") {
+        // H4 takes care of setting Content-Length for us
+        continue;
+      }
       ctx.header(key, headers[key]);
     }
   }

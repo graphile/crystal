@@ -11,7 +11,7 @@ remove one though - simply omit it from the list of plugins you pass to
 
 It's possible to build an even more minimal schema without Relay `Node`
 specification support by omitting the
-[`NodePlugin`](./default-plugins#NodePlugin) plugin:
+[`NodePlugin`](./default-plugins#nodeplugin) plugin:
 
 <!-- source: examples/emptier-schema.js -->
 

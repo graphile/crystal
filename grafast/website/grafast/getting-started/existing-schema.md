@@ -5,14 +5,14 @@ sidebar_position: 3
 # Using with existing schema
 
 If you already have a GraphQL.js schema and you're looking to migrate to
-<grafast /> then it's not necessary to translate everything into <grafast />
+<Grafast /> then it's not necessary to translate everything into <Grafast />
 plan resolvers from the get-go, instead <grafast/> includes emulation of
 GraphQL.js behaviors that allows it to run an existing GraphQL.js schema
 directly in many cases (or with small modification in other cases).
 
 ## Requirements
 
-To run an existing GraphQL.js schema with <grafast /> you must ensure that the
+To run an existing GraphQL.js schema with <Grafast /> you must ensure that the
 following hold:
 
 - Your resolvers are built into your schema as is the norm (not passed via
@@ -67,13 +67,13 @@ Without further intervention, using `execute` directly makes it likely you'll
 be planning each request every time, rather than reusing operation plans. To
 solve this, you should cache the parsing of the GraphQL request so that when
 the same document is seen again the exact same parsed document AST will be
-passed to <grafast />. You can either handle this yourself, use the `grafast`
+passed to <Grafast />. You can either handle this yourself, use the `grafast`
 function instead, or use a server/framework that does this for you; see
 [Servers][].
 
 ## Replacing resolvers with plans
 
-&ZeroWidthSpace;<grafast /> automatically supports resolvers (with the
+&ZeroWidthSpace;<Grafast /> automatically supports resolvers (with the
 "Requirements" mentioned above) to help maintain compatibility with legacy
 schemas, but if you're ready to get the next level of performance you can
 replace the resolver with a plan on a field-by-field basis in a schema.

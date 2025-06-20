@@ -9,7 +9,7 @@ import type {
   GraphQLSchema,
   ValidationRule,
 } from "grafast/graphql";
-import type { Context, SubscribeMessage } from "graphql-ws";
+import type { Context, ID, SubscribePayload } from "graphql-ws";
 import type { RuruHTMLParts } from "ruru/server";
 
 import type { GrafservBase } from ".";
@@ -89,7 +89,10 @@ export interface RuruHTMLPartsEvent {
 export interface OnSubscribeEvent {
   resolvedPreset: GraphileConfig.ResolvedPreset;
   ctx: Context<Record<string, unknown> | undefined, unknown>;
-  message: SubscribeMessage;
+  message: {
+    readonly id: ID;
+    readonly payload: SubscribePayload;
+  };
 }
 
 export interface GrafservBodyBuffer {

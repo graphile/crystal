@@ -1,0 +1,72 @@
+## expect(errors).toBeFalsy()
+#> schema: ["polymorphic"]
+#> simpleCollections: "both"
+
+query {
+  allRelationalItemsFn {
+    nodes {
+      ...I
+      relationalItemByParentId {
+        ...I
+      }
+    }
+  }
+  item: relationalItemByIdFn(id: 16) {
+    # Checklist, parent: 4 (post)
+    ...I
+  }
+  nxItem: relationalItemByIdFn(id: -1) {
+    # Null, does not exist
+    ...I
+  }
+  nxTopic: relationalTopicByIdFn(id: -1) {
+    # Null, does not exist
+    ...I
+  }
+  notATopic: relationalTopicByIdFn(id: 16) {
+    # Null, since this is a checklist not a topic
+    ...I
+  }
+  topic: relationalTopicByIdFn(id: 11) {
+    # 11, parent: 10
+    ...I
+  }
+}
+
+fragment I on RelationalItem {
+  id
+  type
+  parentId
+  ... on RelationalTopic {
+    title
+  }
+  ... on RelationalPost {
+    title
+    postDescription: description
+  }
+  ... on RelationalChecklistItem {
+    checklistItemDescription: description
+  }
+  ... on RelationalDivider {
+    color
+  }
+  ... on RelationalTopic {
+    parentFn {
+      id
+      type
+      ... on RelationalTopic {
+        title
+      }
+      ... on RelationalPost {
+        title
+        postDescription: description
+      }
+      ... on RelationalChecklistItem {
+        checklistItemDescription: description
+      }
+      ... on RelationalDivider {
+        color
+      }
+    }
+  }
+}

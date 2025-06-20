@@ -108,7 +108,13 @@ declare global {
       pgGetBehavior: typeof getBehavior;
 
       /**
-       * Get a table-like resource for the given codec, assuming exactly one exists.
+       * Get a table-like resource (does not accept parameters) for the given
+       * codec, assuming exactly one exists.
+       *
+       * You always want strict to be true (the default) except in extremely
+       * rare circumstances. Strict requires that the table returned is not a
+       * "virtual" table, nor a "unique" resource (one that only contains a
+       * single row).
        */
       pgTableResource<TCodec extends PgCodecWithAttributes>(
         codec: TCodec,

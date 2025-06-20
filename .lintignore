@@ -32,3 +32,6 @@ _LOCAL/
 .docusaurus/
 /*/website/build/
 contrib/
+
+# MDXv3 isn't supported by prettier right now
+*.mdx

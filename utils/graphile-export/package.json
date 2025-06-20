@@ -1,6 +1,6 @@
 {
   "name": "graphile-export",
-  "version": "0.0.2-beta.27",
+  "version": "0.0.2-beta.28",
   "description": "Export in-memory generated GraphQL schemas to JS files when built with our helpers.",
   "type": "commonjs",
   "main": "./dist/index.js",
@@ -40,20 +40,20 @@
   },
   "homepage": "https://graphile.org/",
   "dependencies": {
-    "@babel/generator": "^7.25.6",
-    "@babel/parser": "^7.25.6",
-    "@babel/template": "^7.25.0",
-    "@babel/traverse": "^7.25.6",
-    "@babel/types": "^7.25.6",
-    "@types/node": "^20.17.30",
-    "prettier": "^3.0.3",
+    "@babel/generator": "^7.27.5",
+    "@babel/parser": "^7.27.5",
+    "@babel/template": "^7.27.2",
+    "@babel/traverse": "^7.27.4",
+    "@babel/types": "^7.27.6",
+    "@types/node": "^22.15.32",
+    "prettier": "^3.5.3",
     "tslib": "^2.8.1"
   },
   "engines": {
     "node": ">=16"
   },
   "peerDependencies": {
-    "eslint": "^8.48.0",
+    "eslint": "^8.48.0 || ^9.26.0",
     "grafast": "workspace:^",
     "pg-sql2": "workspace:^5.0.0-beta.9"
   },
@@ -69,12 +69,12 @@
     "dist"
   ],
   "devDependencies": {
-    "@types/babel__generator": "^7.6.8",
+    "@types/babel__generator": "^7.27.0",
     "@types/babel__template": "^7.4.4",
-    "@types/jest": "^29.5.4",
+    "@types/jest": "^30.0.0",
     "@types/prettier": "^3.0.0",
-    "jest": "^29.6.4",
-    "ts-node": "^10.9.1",
+    "jest": "^30.0.0",
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   }
 }

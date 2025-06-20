@@ -3995,6 +3995,21 @@ type Query {
     orderBy: [RelationalItemOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalItemConnection
 
+  """Reads and enables pagination through a set of `RelationalItem`."""
+  allRelationalItemsFn(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): RelationalItemConnection
+
   """Reads and enables pagination through a set of `RelationalPost`."""
   allRelationalPosts(
     """Read all values in the set after (below) this cursor."""
@@ -4301,6 +4316,7 @@ type Query {
 
   """Get a single `RelationalDivider`."""
   relationalDividerByDividerItemId(dividerItemId: Int!): RelationalDivider
+  relationalItemByIdFn(id: Int): RelationalItem
 
   """Get a single `RelationalItemRelation`."""
   relationalItemRelationByParentIdAndChildId(childId: Int!, parentId: Int!): RelationalItemRelation
@@ -4313,6 +4329,7 @@ type Query {
 
   """Get a single `RelationalPost`."""
   relationalPostByPostItemId(postItemId: Int!): RelationalPost
+  relationalTopicByIdFn(id: Int): RelationalTopic
 
   """Get a single `RelationalTopic`."""
   relationalTopicByTopicItemId(topicItemId: Int!): RelationalTopic
@@ -5859,6 +5876,7 @@ type RelationalTopic implements RelationalItem {
   authorId: Int!
   createdAt: Datetime!
   isExplicitlyArchived: Boolean!
+  parentFn: RelationalItem
   parentId: Int
 
   """Reads a single `Person` that is related to this `RelationalTopic`."""

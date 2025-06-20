@@ -1,7 +1,7 @@
 # Step library
 
 A step class is a JavaScript class that extends `ExecutableStep` with an
-`execute` method. It may, optionally, implement other <grafast /> lifecycle
+`execute` method. It may, optionally, implement other <Grafast /> lifecycle
 methods, and add other accessors and similar that child field plans may call.
 For more information see [step classes](../step-classes).
 
@@ -20,7 +20,7 @@ See [step classes](../step-classes) for information on writing your own step
 classes.
 
 The `@dataplan/*` modules contain step classes for particular specialised use
-cases. These are not part of <grafast /> itself, but serve as a welcome
+cases. These are not part of <Grafast /> itself, but serve as a welcome
 companion to it. The list of supported optimized sources is expected to grow
 over time - if you'd like to collaborate on building step classes for a
 particular use case please get in touch. You may also find that members of the

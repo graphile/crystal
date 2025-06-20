@@ -15,14 +15,14 @@ cheatsheets.
 
 :::
 
-When <grafast /> sees an operation for the first time, it builds an _operation
+When <Grafast /> sees an operation for the first time, it builds an _operation
 plan_, which is the combination of an [**execution plan**](#execution-plan) and
 an [**output plan**](#output-plan). To do so, it walks the selection sets
 calling the user-provided `plan` method for each field to determine the _steps_
 that need to be executed for that field. That series of steps, which we'll call
 the _field plan_, is then woven with all the other field plans in the
 operation, to form a directed acyclic graph we call the _execution plan_.
-Whilst doing this, <grafast /> keeps track of which fields returned which
+Whilst doing this, <Grafast /> keeps track of which fields returned which
 steps, and uses this information to form the _output plan_. Finally the
 _execution plan_ is optimized and finalized and the _output plan_ is finalized,
 then they are ready for execution.
@@ -67,7 +67,7 @@ in the underlying stream.
 
 ## Constraints
 
-Whilst <grafast /> is building the operation plan, it may also determined
+Whilst <Grafast /> is building the operation plan, it may also determined
 particular constraints that govern whether the operation plan may be used for a
 future request or not. For example, if the request contains
 `@skip(if: $variable)` then a different operation plan would be needed depending
@@ -77,7 +77,7 @@ $foo is a list" is preferred over "variable
 $foo is the list [1,2,3]" - to
 maximize reuse.
 
-When an operation is seen a future time, <grafast /> first looks for an existing
+When an operation is seen a future time, <Grafast /> first looks for an existing
 operation plan whose constraints fit the request before falling back to creating
 a new operation plan.
 
@@ -85,7 +85,7 @@ a new operation plan.
 
 ### Deduplicate
 
-Once a field is fully planned, <grafast /> will _deduplicate_ the new steps it
+Once a field is fully planned, <Grafast /> will _deduplicate_ the new steps it
 has produced, attempting to replace them with existing "peer" steps that already
 existed. These "peer" steps will have been constructed via the same step class,
 and will have the same dependencies. By deduplicating at this stage (before
@@ -99,7 +99,7 @@ plans).
 Once every selection set has been fully visited and every field has been
 planned, the execution plan is complete.
 
-&ZeroWidthSpace;<grafast /> then walks through the output plans, their required steps and those
+&ZeroWidthSpace;<Grafast /> then walks through the output plans, their required steps and those
 steps dependencies (and their dependencies and so on), marking them as active.
 Any step that is not active is "unreachable" and thus is no longer needed,
 therefore it can be be removed from the execution plan.
@@ -111,7 +111,7 @@ effects.
 ### Optimize
 
 Once the execution plan is complete and the unnecessary steps have been tree
-shaken away, <grafast /> optimizes the plan by calling the `optimize` lifecycle
+shaken away, <Grafast /> optimizes the plan by calling the `optimize` lifecycle
 method on each step that supports it. This gives each step a chance to replace
 themselves with more optimal forms by inspecting and interacting with their
 ancestors.
@@ -132,12 +132,12 @@ acyclic graph. Since plans should only talk to their ancestors (and not their
 descendents) during optimize, this ensures that their dependencies remain what
 the class expects until after it is optimized.
 
-Once optimization is complete, <grafast /> tree shakes again to remove any
+Once optimization is complete, <Grafast /> tree shakes again to remove any
 unnecessary steps from the execution plan.
 
 ### Finalize
 
-&ZeroWidthSpace;<grafast /> then finalizes the plan by calling the `finalize` method on steps
+&ZeroWidthSpace;<Grafast /> then finalizes the plan by calling the `finalize` method on steps
 that support it. This gives each step a chance to do work that need only be done
 once, for example:
 
