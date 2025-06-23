@@ -60,6 +60,15 @@ function fixESMShenanigans(requiredModule: any): any {
   return requiredModule;
 }
 
+function isESMError(e: unknown) {
+  return (
+    typeof e === "object" &&
+    e != null &&
+    "code" in e &&
+    (e.code === "ERR_REQUIRE_ESM" || e.code === "ERR_REQUIRE_ASYNC_MODULE")
+  );
+}
+
 async function loadDefaultExport(resolvedPath: string, extension: string) {
   // Attempt to import using native TypeScript support if appropriate
   if (process.features.typescript && /\.[cm]?tsx?$/.test(extension)) {
@@ -68,7 +77,7 @@ async function loadDefaultExport(resolvedPath: string, extension: string) {
       // still use `require()`
       return fixESMShenanigans(require(resolvedPath));
     } catch (e) {
-      if (e.code === "ERR_REQUIRE_ESM") {
+      if (isESMError(e)) {
         // This is the most likely result, since TypeScript uses ESM syntax.
         try {
           return (await import(pathToFileURL(resolvedPath).href)).default;
@@ -91,7 +100,7 @@ async function loadDefaultExport(resolvedPath: string, extension: string) {
   try {
     return fixESMShenanigans(require(resolvedPath));
   } catch (e) {
-    if (e.code === "ERR_REQUIRE_ESM") {
+    if (isESMError(e)) {
       // It's an ESModule, so `require()` won't work. Let's use `import()`!
       return (await import(pathToFileURL(resolvedPath).href)).default;
     } else {
