@@ -44,30 +44,30 @@ Enables you to add additonal types or extend existing types within your Graphile
 Engine GraphQL schema.
 
 ```js
-const { extendSchema } = require('graphile-utils');
+import { extendSchema } from 'graphile-utils';
 
 const MySchemaExtensionPlugin =
   extendSchema(
     build => ({
-      typeDefs: `...`,
+      typeDefs: /* GraphQL */ `...`,
       objects: {...},
       interfaces: {...},
       unions: {...},
     })
   );
 
-module.exports = MySchemaExtensionPlugin;
+export default MySchemaExtensionPlugin;
 ```
 
 e.g.:
 
 ```js
-extendSchema((build) => {
+export default extendSchema((build) => {
   const {
     grafast: { constant },
   } = build;
   return {
-    typeDefs: `
+    typeDefs: /* GraphQL */ `
       type Random {
         float: Float!
         number(min: Int!, max: Int!): Int!
