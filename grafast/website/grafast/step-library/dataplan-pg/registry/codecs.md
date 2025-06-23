@@ -6,7 +6,7 @@ sidebar_position: 1
 
 A `PgCodec` ("codec") represents a type (data type) in the database. There are
 loads of built in codecs for dealing with the built-in types in Postgres made
-available via the [`TYPES` export](#TYPES), but you can also create your own
+available via the [`TYPES` export](#types), but you can also create your own
 codecs for other types using the various helpers.
 
 Every codec has a `name`, which is a handy identifier for you to use to
