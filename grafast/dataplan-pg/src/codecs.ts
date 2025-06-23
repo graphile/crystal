@@ -178,6 +178,7 @@ function t<TFromJavaScript = any, TFromPostgres = string>(): <
       fromPg,
       toPg,
       isBinary,
+      isEnum,
       isSimple = false,
     } = options;
     return {
@@ -191,6 +192,7 @@ function t<TFromJavaScript = any, TFromPostgres = string>(): <
       listCastFromPg,
       executor: null,
       isBinary,
+      isEnum,
       isSimple,
       [inspect.custom]: codecInspect,
     };
@@ -590,6 +592,8 @@ export function enumCodec<
     description,
     extensions,
     executor: null,
+    isSimple: true,
+    isEnum: true,
   };
 }
 exportAs("@dataplan/pg", enumCodec, "enumCodec");
@@ -985,6 +989,7 @@ type CodecOptions<TFromJavaScript = any, TFromPostgres = string> = {
   toPg?: PgEncode<TFromJavaScript>;
   fromPg?: PgDecode<TFromJavaScript, TFromPostgres>;
   isBinary?: boolean;
+  isEnum?: boolean;
   /**
    * True if this type is a conceptually primitive type (e.g. `int`/`float`)
    * rather than a conceptually non-primitive type such as `json` or `point`

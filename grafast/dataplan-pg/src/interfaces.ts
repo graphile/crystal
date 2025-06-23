@@ -199,6 +199,11 @@ export interface PgCodec<
   isBinary?: boolean;
 
   /**
+   * True if this type is an enum type
+   */
+  isEnum?: boolean;
+
+  /**
    * True if this type is a conceptually primitive type (e.g. `int`/`float`)
    * rather than a conceptually non-primitive type such as `json` or `point`
    * which are effectively structured and have no implicit order.
@@ -324,6 +329,7 @@ export interface PgEnumCodec<
     undefined
   > {
   values: PgEnumValue<TValue>[];
+  isEnum: true;
 }
 
 /**

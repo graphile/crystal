@@ -372,6 +372,10 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
                 // Never filter, not in condition plugin nor any other
                 behaviors.add(`-attribute:filterBy`);
                 behaviors.add(`-attribute:orderBy`);
+              } else if (codec.isEnum) {
+                // Unlikely to be useful for ordering, but filtering makes
+                // sense
+                behaviors.add(`-attribute:orderBy`);
               } else if (!codec.isSimple) {
                 // Unlikely to be useful for filtering/ordering
                 behaviors.add(`-attribute:filterBy`);

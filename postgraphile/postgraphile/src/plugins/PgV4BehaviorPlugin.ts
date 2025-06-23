@@ -84,7 +84,7 @@ export const PgV4BehaviorPlugin: GraphileConfig.Plugin = {
           before: ["inferred", "override"],
           after: ["PgAttributesPlugin"],
           callback(behavior, [codec, _attributeName]) {
-            if (codec.isSimple === false) {
+            if (codec.isEnum || codec.isSimple === false) {
               // Restore orderBy/filterBy non-simple attributes
               return [behavior, "attribute:orderBy", "attribute:filterBy"];
             }
