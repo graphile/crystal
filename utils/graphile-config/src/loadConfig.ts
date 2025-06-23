@@ -60,12 +60,22 @@ function fixESMShenanigans(requiredModule: any): any {
   return requiredModule;
 }
 
-async function tryLoad(resolvedPath: string, extension: string) {
+async function loadDefaultExport(resolvedPath: string, extension: string) {
   // Attempt to import using native TypeScript support if appropriate
-  if (process.features.typescript && /\.m?tsx?$/.test(extension)) {
+  if (process.features.typescript && /\.[cm]?tsx?$/.test(extension)) {
     try {
-      return (await import(pathToFileURL(resolvedPath).href)).default;
-    } catch {
+      // Node has `require(esm)` support, but also for a `.cjsx` file it should
+      // still use `require()`
+      return fixESMShenanigans(require(resolvedPath));
+    } catch (e) {
+      if (e.code === "ERR_REQUIRE_ESM") {
+        // This is the most likely result, since TypeScript uses ESM syntax.
+        try {
+          return (await import(pathToFileURL(resolvedPath).href)).default;
+        } catch {
+          // Nevermind; try a loader
+        }
+      }
       // Nevermind; try a loader
     }
   }
@@ -102,7 +112,7 @@ export async function loadConfig(
     for (const extension of extensions) {
       if (resolvedPath.endsWith(extension)) {
         try {
-          return await tryLoad(resolvedPath, extension);
+          return await loadDefaultExport(resolvedPath, extension);
         } catch {
           // Multiple extensions might match - e.g. both `.swc.tsx` and `.tsx`;
           // continue to the next one.
@@ -121,7 +131,7 @@ export async function loadConfig(
       if (await exists(resolvedPath)) {
         // This file exists; whatever happens, we will try this file only.
         try {
-          return await tryLoad(resolvedPath, extension);
+          return await loadDefaultExport(resolvedPath, extension);
         } catch {
           // Fallback to direct import
           return (await import(pathToFileURL(resolvedPath).href)).default;
