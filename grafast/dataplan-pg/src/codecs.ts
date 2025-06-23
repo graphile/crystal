@@ -1069,7 +1069,7 @@ const stripSubnet32 = {
     return value.replace(/\/(32|128)$/, "");
   },
 };
-
+const reg = { hasNaturalOrdering: false };
 /**
  * Built in PostgreSQL types that we support; note the keys are the "ergonomic"
  * names (like 'bigint'), but the values use the underlying PostgreSQL true
@@ -1110,6 +1110,8 @@ export const TYPES = {
   jsonb: t<JSONValue, string>()("3802", "jsonb", {
     fromPg: jsonParse,
     toPg: jsonStringify,
+    // We could totally add the following if someone wanted it:
+    // hasNaturalEquality: true,
   }),
   jsonpath: t()("4072", "jsonpath"),
   xml: t<string>()("142", "xml"),
@@ -1137,16 +1139,16 @@ export const TYPES = {
     viaDateFormat("HH24:MI:SS.USTZH:TZM", sql`date '1970-01-01' + `),
   ),
   inet: s<string>()("869", "inet", stripSubnet32),
-  regproc: s<string>()("24", "regproc"),
-  regprocedure: s<string>()("2202", "regprocedure"),
-  regoper: s<string>()("2203", "regoper"),
-  regoperator: s<string>()("2204", "regoperator"),
-  regclass: s<string>()("2205", "regclass"),
-  regtype: s<string>()("2206", "regtype"),
-  regrole: s<string>()("4096", "regrole"),
-  regnamespace: s<string>()("4089", "regnamespace"),
-  regconfig: s<string>()("3734", "regconfig"),
-  regdictionary: s<string>()("3769", "regdictionary"),
+  regproc: s<string>()("24", "regproc", reg),
+  regprocedure: s<string>()("2202", "regprocedure", reg),
+  regoper: s<string>()("2203", "regoper", reg),
+  regoperator: s<string>()("2204", "regoperator", reg),
+  regclass: s<string>()("2205", "regclass", reg),
+  regtype: s<string>()("2206", "regtype", reg),
+  regrole: s<string>()("4096", "regrole", reg),
+  regnamespace: s<string>()("4089", "regnamespace", reg),
+  regconfig: s<string>()("3734", "regconfig", reg),
+  regdictionary: s<string>()("3769", "regdictionary", reg),
   cidr: s<string>()("650", "cidr"),
   macaddr: s<string>()("829", "macaddr"),
   macaddr8: s<string>()("774", "macaddr8"),
@@ -1165,11 +1167,16 @@ export const TYPES = {
   point: t<PgPoint>()("600", "point", {
     fromPg: parsePoint,
     toPg: stringifyPoint,
+    hasNaturalEquality: true,
   }),
   line: t<PgLine>()("628", "line", { fromPg: parseLine, toPg: stringifyLine }),
   lseg: t<PgLseg>()("601", "lseg", { fromPg: parseLseg, toPg: stringifyLseg }),
   box: t<PgBox>()("603", "box", { fromPg: parseBox, toPg: stringifyBox }),
-  path: t<PgPath>()("602", "path", { fromPg: parsePath, toPg: stringifyPath }),
+  path: t<PgPath>()("602", "path", {
+    fromPg: parsePath,
+    toPg: stringifyPath,
+    hasNaturalEquality: true,
+  }),
   polygon: t<PgPolygon>()("604", "polygon", {
     fromPg: parsePolygon,
     toPg: stringifyPolygon,
