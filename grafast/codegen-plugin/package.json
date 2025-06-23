@@ -39,6 +39,9 @@
   "publishConfig": {
     "access": "public"
   },
+  "dependencies": {
+    "@graphql-codegen/visitor-plugin-common": "^5.8.0"
+  },
   "devDependencies": {
     "@graphql-codegen/plugin-helpers": "^5.1.1",
     "typescript": "^5.8.3"
