@@ -1,4 +1,5 @@
 import type { PluginFunction, Types } from "@graphql-codegen/plugin-helpers";
+import type { NamingConvention } from "@graphql-codegen/visitor-plugin-common";
 import { convertFactory } from "@graphql-codegen/visitor-plugin-common";
 import type {
   GraphQLInputType,
@@ -22,14 +23,14 @@ import {
 export interface GrafastTypesPluginConfig {
   grafastModule?: string;
   overridesFile?: string;
+  namingConvention?: NamingConvention;
 }
-
-const convertName = convertFactory({});
 
 class GrafastGenerator {
   private schema: GraphQLSchema;
   private config: GrafastTypesPluginConfig;
   private types: ReadonlyArray<GraphQLNamedType>;
+  private convertName: ReturnType<typeof convertFactory>;
 
   constructor(
     schema: GraphQLSchema,
@@ -43,6 +44,9 @@ class GrafastGenerator {
       .types.filter(
         (t) => !t.name.startsWith("__") && !isSpecifiedScalarType(t),
       );
+    this.convertName = convertFactory({
+      namingConvention: config.namingConvention,
+    });
   }
 
   private _get(
@@ -137,7 +141,7 @@ ${type
 ${Object.entries(type.getFields())
   .map(
     ([fieldName, fieldSpec]) =>
-      `        ${fieldName}?: FieldPlan<${this.source(type)}, ${fieldSpec.args.length > 0 ? `${type.name}${convertName(fieldName)}Args` : `NoArguments`}, ${this.expect(fieldSpec.type)}>;`,
+      `        ${fieldName}?: FieldPlan<${this.source(type)}, ${fieldSpec.args.length > 0 ? `${type.name}${this.convertName(fieldName)}Args` : `NoArguments`}, ${this.expect(fieldSpec.type)}>;`,
   )
   .join("\n")}
       }
@@ -153,7 +157,7 @@ ${Object.entries(type.getFields())
       ? `ReadonlyArray<${this.getInputType(nullable.ofType)}>`
       : isScalarType(nullable)
         ? `Scalars['${nullable.name}']`
-        : convertName(nullable.name);
+        : this.convertName(nullable.name);
     if (nn) {
       return inner;
     } else {
