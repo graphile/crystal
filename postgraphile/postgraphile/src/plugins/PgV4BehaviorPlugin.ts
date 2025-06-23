@@ -78,6 +78,20 @@ export const PgV4BehaviorPlugin: GraphileConfig.Plugin = {
           return newBehavior;
         },
       },
+      pgCodecAttribute: {
+        inferred: {
+          provides: ["default"],
+          before: ["inferred", "override"],
+          after: ["PgAttributesPlugin"],
+          callback(behavior, [codec, _attributeName]) {
+            if (codec.isSimple === false) {
+              // Restore orderBy/filterBy non-simple attributes
+              return [behavior, "attribute:orderBy", "attribute:filterBy"];
+            }
+            return behavior;
+          },
+        },
+      },
     },
   },
 };

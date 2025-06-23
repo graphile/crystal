@@ -199,6 +199,13 @@ export interface PgCodec<
   isBinary?: boolean;
 
   /**
+   * True if this type is a conceptually primitive type (e.g. `int`/`float`)
+   * rather than a conceptually non-primitive type such as `json` or `point`
+   * which are effectively structured and have no implicit order.
+   */
+  isSimple?: boolean;
+
+  /**
    * If this is a composite type, the attributes it supports.
    */
   attributes: TAttributes;
