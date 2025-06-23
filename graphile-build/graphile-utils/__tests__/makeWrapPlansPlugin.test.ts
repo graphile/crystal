@@ -25,11 +25,7 @@ import type {
   PlanWrapperFilterRule,
   PlanWrapperFn,
 } from "../src/index.js";
-import {
-  gql,
-  makeExtendSchemaPlugin,
-  makeWrapPlansPlugin,
-} from "../src/index.js";
+import { extendSchema, gql, makeWrapPlansPlugin } from "../src/index.js";
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -45,7 +41,7 @@ const makeSchemaWithSpyAndPlugins = (
         MutationPlugin,
         SubscriptionPlugin,
         MutationPayloadQueryPlugin,
-        makeExtendSchemaPlugin((_build) => ({
+        extendSchema((_build) => ({
           typeDefs: gql`
             extend type Query {
               echo(message: String!): String
@@ -351,7 +347,7 @@ describe("wrapping plans matching a filter", () => {
         ([arg1, arg2]) => arg1 + arg2,
       );
     const schema = makeSchemaWithSpyAndPlugins(null, [
-      makeExtendSchemaPlugin({
+      extendSchema({
         typeDefs: gql`
           extend type Mutation {
             a(arg1: Int = 1, arg2: Int = 2): Int

@@ -12,7 +12,7 @@ import {
   createTestDatabase,
   dropTestDatabase,
 } from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.js";
-import { EXPORTABLE, gql, makeExtendSchemaPlugin } from "../src/index.js";
+import { EXPORTABLE, extendSchema, gql } from "../src/index.js";
 
 let pgPool: Pool | null = null;
 let connectionString = "";
@@ -40,7 +40,7 @@ afterAll(async () => {
   }
 });
 
-const ExtendPlugin = makeExtendSchemaPlugin({
+const ExtendPlugin = extendSchema({
   typeDefs: gql`
     scalar Scalar1
     scalar Scalar2
@@ -140,7 +140,7 @@ it("infers scope", async () => {
   const preset: GraphileConfig.Preset = {
     extends: [PostGraphileAmberPreset],
     plugins: [
-      makeExtendSchemaPlugin({
+      extendSchema({
         typeDefs: gql`
           extend type User {
             favouritePets: PetConnection
@@ -166,7 +166,7 @@ it("enables overriding scope", async () => {
   const preset: GraphileConfig.Preset = {
     extends: [PostGraphileAmberPreset],
     plugins: [
-      makeExtendSchemaPlugin({
+      extendSchema({
         typeDefs: gql`
           extend type User {
             favouritePets: PetConnection
@@ -204,7 +204,7 @@ it("supports unary steps in loadOne", async () => {
   const preset: GraphileConfig.Preset = {
     extends: [PostGraphileAmberPreset],
     plugins: [
-      makeExtendSchemaPlugin((build) => {
+      extendSchema((build) => {
         const { loadOne } = build.grafast;
         const { main } = build.input.pgRegistry.pgExecutors;
         return {
@@ -294,7 +294,7 @@ it("supports arbitrary sql queries, does not dedup unrelated queries", async () 
   const preset: GraphileConfig.Preset = {
     extends: [PostGraphileAmberPreset],
     plugins: [
-      makeExtendSchemaPlugin((build) => {
+      extendSchema((build) => {
         const { users } = build.input.pgRegistry.pgResources;
         const { sql } = build;
         return {

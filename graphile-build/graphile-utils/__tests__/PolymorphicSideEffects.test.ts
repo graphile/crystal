@@ -13,7 +13,7 @@ import {
   createTestDatabase,
   dropTestDatabase,
 } from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.js";
-import { gql, makeExtendSchemaPlugin } from "../src/index.js";
+import { extendSchema, gql } from "../src/index.js";
 
 let pgPool: Pool | null = null;
 let connectionString = "";
@@ -54,7 +54,7 @@ afterAll(async () => {
  * the right to remove side effect support from non-mutation fields in a
  * future minor release.
  */
-const AchinthaSideEffectsPlugin = makeExtendSchemaPlugin((build) => {
+const AchinthaSideEffectsPlugin = extendSchema((build) => {
   const {
     input: {
       pgRegistry: {

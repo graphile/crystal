@@ -18,7 +18,7 @@ export interface MakeAddPgTableOrderByPluginOrders {
 
 const counterByName = new Map<string, number>();
 
-export function makeAddPgTableOrderByPlugin(
+export function addPgTableOrderBy(
   match: {
     serviceName?: string;
     schemaName: string;
@@ -27,10 +27,10 @@ export function makeAddPgTableOrderByPlugin(
   ordersGenerator: (
     build: GraphileBuild.Build,
   ) => MakeAddPgTableOrderByPluginOrders,
-  hint = `Adding orders with makeAddPgTableOrderByPlugin to "${match.schemaName}"."${match.tableName}"`,
+  hint = `Adding orders with addPgTableOrderBy to "${match.schemaName}"."${match.tableName}"`,
 ): GraphileConfig.Plugin {
   const { serviceName = "main", schemaName, tableName } = match;
-  const baseDisplayName = `makeAddPgTableOrderByPlugin_${schemaName}_${tableName}`;
+  const baseDisplayName = `addPgTableOrderBy_${schemaName}_${tableName}`;
   let counter = counterByName.get(baseDisplayName);
   if (!counter) {
     counter = 0;
@@ -254,3 +254,6 @@ export function orderByAscDesc(
   };
   return orders;
 }
+
+/** @deprecated renamed to addPgTableOrderBy */
+export const makeAddPgTableOrderByPlugin = addPgTableOrderBy;

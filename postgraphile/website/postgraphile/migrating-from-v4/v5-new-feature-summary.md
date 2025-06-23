@@ -102,7 +102,7 @@ See ["Exporting your schema"](../exporting-schema.md) for more information.
 <details>
 <summary>
 
-makeExtendSchemaPlugin now massively improved
+makeExtendSchemaPlugin renamed to extendSchema and massively improved
 
 </summary>
 

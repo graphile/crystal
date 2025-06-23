@@ -19,7 +19,7 @@ up if you’re doing this on thousands of rows. PostgreSQL can [sometimes inline
 your SQL functions](https://wiki.postgresql.org/wiki/Inlining_of_SQL_functions)
 for great performance, but if this fails and you’re seeing performance issues
 you might want to investigate using
-[`makeExtendSchemaPlugin`](./make-extend-schema-plugin) instead.
+[`extendSchema`](./extend-schema) instead.
 
 :::
 

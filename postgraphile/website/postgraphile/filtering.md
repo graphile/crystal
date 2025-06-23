@@ -21,10 +21,10 @@ to force it remove it.
 You can extend PostGraphile’s schema with more advance filtering capabilities by
 adding fields using [custom queries](./custom-queries),
 [computed columns](./computed-columns) or by using
-[makeExtendSchemaPlugin](./make-extend-schema-plugin).
+[extendSchema](./extend-schema).
 
 To add a condition to an existing condition another option is the
-[`makeAddPgTableConditionPlugin`](./make-add-pg-table-condition-plugin). You
+[`addPgTableCondition`](./add-pg-table-condition). You
 can also augment PostGraphile’s existing connections using custom [Graphile
 Engine plugins](./extending-raw), such as the following:
 

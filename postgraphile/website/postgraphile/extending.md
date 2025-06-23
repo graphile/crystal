@@ -39,15 +39,15 @@ const FullNameToNamePlugin = {
 We’ve created a number of plugin helpers for common tasks:
 
 - To add new fields and types,
-  [see `makeExtendSchemaPlugin`](./make-extend-schema-plugin)
+  [see `extendSchema`](./extend-schema)
 - To change how fields and types are automatically named,
   [see “Overriding inflection”](./inflection#overriding-inflection)
 - To change how fields are planned,
-  [see `makeWrapPlansPlugin`](./make-wrap-plans-plugin)
+  [see `wrapPlans`](./wrap-plans)
 - To make certain fields nullable or non-nullable,
-  [see `makeChangeNullabilityPlugin`](./make-change-nullability-plugin)
+  [see `changeNullability`](./change-nullability)
 - To process the generated schema,
-  [see `makeProcessSchemaPlugin`](./make-process-schema-plugin)
+  [see `processSchema`](./process-schema)
 
 For everything else, you can
 [write raw Graphile Build plugins](./extending-raw).
