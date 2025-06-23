@@ -1,5 +1,33 @@
 # grafserv
 
+## 0.1.1-beta.26
+
+### Patch Changes
+
+- [#2577](https://github.com/graphile/crystal/pull/2577)
+  [`0c6b1f1`](https://github.com/graphile/crystal/commit/0c6b1f1e188f6e2913832adfed9ca76dfdc25c47)
+  Thanks [@benjie](https://github.com/benjie)! - Update dependencies
+
+- [#2577](https://github.com/graphile/crystal/pull/2577)
+  [`1f4544d`](https://github.com/graphile/crystal/commit/1f4544d011a1442688c4e34b677f7123f3ae6927)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug in Hono adaptor where
+  Content-Type header might be set more than once.
+
+- [#2583](https://github.com/graphile/crystal/pull/2583)
+  [`faee38b`](https://github.com/graphile/crystal/commit/faee38bbff0421bbccfaa77c0dffa5c2d44e2b92)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 Upgrade to graphql-ws v6
+
+- Updated dependencies
+  [[`00b3b8b`](https://github.com/graphile/crystal/commit/00b3b8baea55f0f8cb90c769baf63b408a593182),
+  [`0c6b1f1`](https://github.com/graphile/crystal/commit/0c6b1f1e188f6e2913832adfed9ca76dfdc25c47),
+  [`826f2cb`](https://github.com/graphile/crystal/commit/826f2cbff651273098d6b0d8c343aefeacfb5a14),
+  [`5311f9c`](https://github.com/graphile/crystal/commit/5311f9c8206fb3287b6aae6c4e7668ae920a4441),
+  [`e0cdabe`](https://github.com/graphile/crystal/commit/e0cdabe25c8894da550546c93bc03b895585544c),
+  [`faee38b`](https://github.com/graphile/crystal/commit/faee38bbff0421bbccfaa77c0dffa5c2d44e2b92)]:
+  - ruru@2.0.0-beta.24
+  - graphile-config@0.0.1-beta.17
+  - grafast@0.1.1-beta.23
+
 ## 0.1.1-beta.25
 
 ### Patch Changes

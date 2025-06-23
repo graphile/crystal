@@ -1,5 +1,13 @@
 # eslint-plugin-graphile-export
 
+## 0.0.2-beta.9
+
+### Patch Changes
+
+- [#2585](https://github.com/graphile/crystal/pull/2585)
+  [`63ab0fd`](https://github.com/graphile/crystal/commit/63ab0fd14a0eedd873267408c17f55f8046c304a)
+  Thanks [@benjie](https://github.com/benjie)! - Minor tweak for updated deps.
+
 ## 0.0.2-beta.8
 
 ### Patch Changes

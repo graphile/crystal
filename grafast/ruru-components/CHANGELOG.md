@@ -1,5 +1,37 @@
 # ruru-components
 
+## 2.0.0-beta.32
+
+### Patch Changes
+
+- [#2584](https://github.com/graphile/crystal/pull/2584)
+  [`00b3b8b`](https://github.com/graphile/crystal/commit/00b3b8baea55f0f8cb90c769baf63b408a593182)
+  Thanks [@benjie](https://github.com/benjie)! - Upgrade to GraphiQL v4. 🚨
+  Change `graphiql/graphiql.css` to `graphiql/style.css` and
+  `@graphiql/plugin-explorer/dist/style.css` to
+  `@graphiql/plugin-explorer/style.css`
+
+- [#2577](https://github.com/graphile/crystal/pull/2577)
+  [`0c6b1f1`](https://github.com/graphile/crystal/commit/0c6b1f1e188f6e2913832adfed9ca76dfdc25c47)
+  Thanks [@benjie](https://github.com/benjie)! - Update dependencies
+
+- [#2582](https://github.com/graphile/crystal/pull/2582)
+  [`826f2cb`](https://github.com/graphile/crystal/commit/826f2cbff651273098d6b0d8c343aefeacfb5a14)
+  Thanks [@benjie](https://github.com/benjie)! - Fix button-in-button warning
+  from ToolbarMenu
+
+- [#2585](https://github.com/graphile/crystal/pull/2585)
+  [`5311f9c`](https://github.com/graphile/crystal/commit/5311f9c8206fb3287b6aae6c4e7668ae920a4441)
+  Thanks [@benjie](https://github.com/benjie)! - Upgrade to React 19
+
+- [#2583](https://github.com/graphile/crystal/pull/2583)
+  [`faee38b`](https://github.com/graphile/crystal/commit/faee38bbff0421bbccfaa77c0dffa5c2d44e2b92)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 Upgrade to graphql-ws v6
+
+- Updated dependencies
+  [[`0c6b1f1`](https://github.com/graphile/crystal/commit/0c6b1f1e188f6e2913832adfed9ca76dfdc25c47)]:
+  - grafast@0.1.1-beta.23
+
 ## 2.0.0-beta.31
 
 ### Patch Changes
