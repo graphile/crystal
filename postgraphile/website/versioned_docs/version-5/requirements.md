@@ -97,9 +97,9 @@ deal with these changes (if any action is necessary).
 
 You do not need to use TypeScript to use PostGraphile, but without it you will
 find editors such as VSCode will highlight your import paths with error
-notifications. To stop this, you can add the following to your `package.json`:
+notifications. To stop this, you can add the following to `jsconfig.json`:
 
-```
+```json title="jsconfig.json"
 {
   "compilerOptions": {
     "moduleResolution": "node16"
