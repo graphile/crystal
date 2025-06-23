@@ -217,7 +217,7 @@ const ACL_MAP = {
 const NO_PERMISSIONS: AclObject = Object.values(ACL_MAP).reduce((acc, val) => {
   acc[val] = acc[`${val}Grant`] = false;
   return acc;
-}, { role: "public", granter: "" });
+}, { role: "public", granter: "" } as Partial<AclObject>) as AclObject;
 
 /**
  * Accepts an ACL string such as `foo=arwdDxt/bar` and converts it into
