@@ -215,7 +215,7 @@ const ACL_MAP = {
   m: 'maintain',
 } as const;
 const NO_PERMISSIONS: AclObject = Object.values(ACL_MAP).reduce((acc, val) => {
-  acc[val] = acc[val + "Grant"] = false;
+  acc[val] = acc[`${val}Grant`] = false;
   return acc;
 }, { role: "public", granter: "" });
 
