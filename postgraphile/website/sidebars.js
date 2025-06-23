@@ -119,7 +119,7 @@ const sidebars = {
         id: "extending",
       },
       items: [
-        "add-inflectors",
+        "adding-and-replacing-inflectors",
         "change-nullability",
         "extend-schema",
         "process-schema",
