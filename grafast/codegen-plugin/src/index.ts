@@ -141,7 +141,7 @@ ${type
 ${Object.entries(type.getFields())
   .map(
     ([fieldName, fieldSpec]) =>
-      `        ${fieldName}?: FieldPlan<${this.source(type)}, ${fieldSpec.args.length > 0 ? this.convertName(fieldName, { prefix: type.name, suffix: "Args" }) : `NoArguments`}, ${this.expect(fieldSpec.type)}>;`,
+      `        ${fieldName}?: FieldPlan<${this.source(type)}, ${fieldSpec.args.length > 0 ? `${type.name}${this.convertName(fieldName)}Args` : `NoArguments`}, ${this.expect(fieldSpec.type)}>;`,
   )
   .join("\n")}
       }
