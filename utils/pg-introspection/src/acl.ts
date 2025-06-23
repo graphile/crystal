@@ -213,7 +213,7 @@ const ACL_MAP = {
   c: 'connect',
   T: 'temporary',
   m: 'maintain',
-};
+} as const;
 const NO_PERMISSIONS: AclObject = Object.values(ACL_MAP).reduce((acc, val) => {
   acc[val] = acc[val + "Grant"] = false;
   return acc;
@@ -224,7 +224,7 @@ const NO_PERMISSIONS: AclObject = Object.values(ACL_MAP).reduce((acc, val) => {
  * a parsed AclObject.
  */
 export function parseAcl(aclString: string): AclObject {
-  const acl = Object.assign({}, NO_PERMISSIONS);
+  const acl: AclObject = { ...NO_PERMISSIONS };
   const roleEndIndex = aclString.indexOf("=");
   if (roleEndIndex === -1) {
     throw new Error(`Could not parse ACL string '${aclString}'`);
@@ -233,7 +233,6 @@ export function parseAcl(aclString: string): AclObject {
   }
   const aclLength = aclString.length;
   const lastGrantableTokenIndex = aclLength - 1;
-  let currentPerm: string;
   let i = roleEndIndex + 1; // skip past the "="
   // Process the ACL tokens
   while (i < aclString.length) {
@@ -243,7 +242,7 @@ export function parseAcl(aclString: string): AclObject {
       i++;   // skip past the "/" delimiter
       break; // we're done with ACL tokens
     }
-    currentPerm = ACL_MAP[nextChar];
+    const currentPerm = ACL_MAP[nextChar as keyof typeof ACL_MAP];
     if (currentPerm === undefined) {
       throw new Error(`Could not parse ACL string '${aclString}'`);
     }
@@ -251,7 +250,7 @@ export function parseAcl(aclString: string): AclObject {
     if (i < lastGrantableTokenIndex && aclString[i + 1] === '*') {
       // permission + grant
       i++; // skip past the "*" character
-      acl[currentPerm + "Grant"] = true;
+      acl[`${currentPerm}Grant`] = true;
     }
     i++;
   } // end token processing
