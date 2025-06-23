@@ -204,11 +204,27 @@ export interface PgCodec<
   isEnum?: boolean;
 
   /**
-   * True if this type is a conceptually primitive type (e.g. `int`/`float`)
-   * rather than a conceptually non-primitive type such as `json` or `point`
-   * which are effectively structured and have no implicit order.
+   * True if doing an equality check for this value would have intuitive
+   * results for a human. E.g. `3.0` and `3.0000` when encoded as `float` are
+   * the same as a human would expect, so `float` has natural equality. On the
+   * other hand Postgres sees the `json` `{"a":1}` as different to `{ "a": 1
+   * }`), whereas a human would see these as the same JSON objects, so `json`
+   * does not have natural equality.
+   *
+   * Typically true primitives will set this true.
    */
-  isSimple?: boolean;
+  hasNaturalEquality?: boolean;
+
+  /**
+   * True if this type has a natural ordering that would be intuitive for a human.
+   * For example numbers and text have natural ordering, whereas `{"a":1}` and
+   * `{ "a": 2 }` are not so obvious. Similarly, a `point` could be ordered in many
+   * ways relative to another point (x-first, then y; y-first, then x; distance
+   * from origin first, then angle; etc) so do not have natural order.
+   *
+   * Typically true primitives will set this true.
+   */
+  hasNaturalOrdering?: boolean;
 
   /**
    * If this is a composite type, the attributes it supports.

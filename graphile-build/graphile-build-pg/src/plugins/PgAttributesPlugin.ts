@@ -376,11 +376,13 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
                 // Unlikely to be useful for ordering, but filtering makes
                 // sense
                 behaviors.add(`-attribute:orderBy`);
-              } else if (!codec.isSimple) {
-                // Unlikely to be useful for filtering/ordering
-                behaviors.add(`-attribute:filterBy`);
-                behaviors.add(`-attribute:orderBy`);
               } else {
+                if (codec.hasNaturalEquality === false) {
+                  behaviors.add(`-attribute:filterBy`);
+                }
+                if (codec.hasNaturalOrdering === false) {
+                  behaviors.add(`-attribute:orderBy`);
+                }
                 // Done
               }
             }
