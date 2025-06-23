@@ -111,8 +111,7 @@ const objects = {
   Query: {
     plans: {
       addTwoNumbers(_, fieldArgs) {
-        const $a = fieldArgs.get("a");
-        const $b = fieldArgs.get("b");
+        const { $a, $b } = fieldArgs;
         return lambda([$a, $b], ([a, b]) => a + b);
       },
     },

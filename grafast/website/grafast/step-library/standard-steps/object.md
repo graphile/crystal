@@ -8,7 +8,7 @@ Usage:
 ```ts
 const $fetchOptions = object({
   userId: $user.get("id"),
-  first: fieldArgs.get("first"),
+  first: fieldArgs.getRaw("first"),
   includeArchived: constant(true),
 });
 ```
