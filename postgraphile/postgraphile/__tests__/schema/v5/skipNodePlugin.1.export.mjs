@@ -12473,15 +12473,6 @@ input BTypeCondition {
   """Checks for equality with the object’s \`domain2\` field."""
   domain2: BAnotherInt
 
-  """Checks for equality with the object’s \`json\` field."""
-  json: JSON
-
-  """Checks for equality with the object’s \`jsonb\` field."""
-  jsonb: JSON
-
-  """Checks for equality with the object’s \`jsonpath\` field."""
-  jsonpath: JSONPath
-
   """Checks for equality with the object’s \`timestamp\` field."""
   timestamp: Datetime
 
@@ -12571,18 +12562,10 @@ enum BTypeOrderBy {
   BOOLEAN_DESC
   VARCHAR_ASC
   VARCHAR_DESC
-  ENUM_ASC
-  ENUM_DESC
   DOMAIN_ASC
   DOMAIN_DESC
   DOMAIN2_ASC
   DOMAIN2_DESC
-  JSON_ASC
-  JSON_DESC
-  JSONB_ASC
-  JSONB_DESC
-  JSONPATH_ASC
-  JSONPATH_DESC
   TIMESTAMP_ASC
   TIMESTAMP_DESC
   TIMESTAMPTZ_ASC
@@ -12597,32 +12580,12 @@ enum BTypeOrderBy {
   INTERVAL_DESC
   MONEY_ASC
   MONEY_DESC
-  POINT_ASC
-  POINT_DESC
-  NULLABLE_POINT_ASC
-  NULLABLE_POINT_DESC
   INET_ASC
   INET_DESC
   CIDR_ASC
   CIDR_DESC
   MACADDR_ASC
   MACADDR_DESC
-  REGPROC_ASC
-  REGPROC_DESC
-  REGPROCEDURE_ASC
-  REGPROCEDURE_DESC
-  REGOPER_ASC
-  REGOPER_DESC
-  REGOPERATOR_ASC
-  REGOPERATOR_DESC
-  REGCLASS_ASC
-  REGCLASS_DESC
-  REGTYPE_ASC
-  REGTYPE_DESC
-  REGCONFIG_ASC
-  REGCONFIG_DESC
-  REGDICTIONARY_ASC
-  REGDICTIONARY_DESC
   LTREE_ASC
   LTREE_DESC
 }
@@ -13765,9 +13728,6 @@ for equality and combined with a logical ‘and.’
 input CMyTableCondition {
   """Checks for equality with the object’s \`rowId\` field."""
   rowId: Int
-
-  """Checks for equality with the object’s \`jsonData\` field."""
-  jsonData: JSON
 }
 
 """Methods to use when ordering \`CMyTable\`."""
@@ -13777,8 +13737,6 @@ enum CMyTableOrderBy {
   PRIMARY_KEY_DESC
   ROW_ID_ASC
   ROW_ID_DESC
-  JSON_DATA_ASC
-  JSON_DATA_DESC
 }
 
 """A connection to a list of \`CPersonSecret\` values."""
@@ -14313,9 +14271,6 @@ input CPersonCondition {
   """Checks for equality with the object’s \`email\` field."""
   email: BEmail
 
-  """Checks for equality with the object’s \`config\` field."""
-  config: KeyValueHash
-
   """Checks for equality with the object’s \`lastLoginFromIp\` field."""
   lastLoginFromIp: InternetAddress
 
@@ -14342,8 +14297,6 @@ enum CPersonOrderBy {
   ABOUT_DESC
   EMAIL_ASC
   EMAIL_DESC
-  CONFIG_ASC
-  CONFIG_DESC
   LAST_LOGIN_FROM_IP_ASC
   LAST_LOGIN_FROM_IP_DESC
   LAST_LOGIN_FROM_SUBNET_ASC
@@ -29527,33 +29480,6 @@ export const inputObjects = {
           }
         });
       },
-      json($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "json",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.json)}`;
-          }
-        });
-      },
-      jsonb($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "jsonb",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.jsonb)}`;
-          }
-        });
-      },
-      jsonpath($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "jsonpath",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.jsonpath)}`;
-          }
-        });
-      },
       ltree($condition, val) {
         $condition.where({
           type: "attribute",
@@ -31000,15 +30926,6 @@ export const inputObjects = {
   },
   CMyTableCondition: {
     plans: {
-      jsonData($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "json_data",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.jsonb)}`;
-          }
-        });
-      },
       rowId($condition, val) {
         $condition.where({
           type: "attribute",
@@ -31184,15 +31101,6 @@ export const inputObjects = {
           attribute: "about",
           callback(expression) {
             return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
-      },
-      config($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "config",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.hstore)}`;
           }
         });
       },
@@ -33653,18 +33561,6 @@ export const enums = {
           direction: "DESC"
         });
       },
-      ENUM_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "enum",
-          direction: "ASC"
-        });
-      },
-      ENUM_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "enum",
-          direction: "DESC"
-        });
-      },
       INET_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "inet",
@@ -33686,42 +33582,6 @@ export const enums = {
       INTERVAL_DESC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "interval",
-          direction: "DESC"
-        });
-      },
-      JSON_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "json",
-          direction: "ASC"
-        });
-      },
-      JSON_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "json",
-          direction: "DESC"
-        });
-      },
-      JSONB_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "jsonb",
-          direction: "ASC"
-        });
-      },
-      JSONB_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "jsonb",
-          direction: "DESC"
-        });
-      },
-      JSONPATH_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "jsonpath",
-          direction: "ASC"
-        });
-      },
-      JSONPATH_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "jsonpath",
           direction: "DESC"
         });
       },
@@ -33761,18 +33621,6 @@ export const enums = {
           direction: "DESC"
         });
       },
-      NULLABLE_POINT_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "nullablePoint",
-          direction: "ASC"
-        });
-      },
-      NULLABLE_POINT_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "nullablePoint",
-          direction: "DESC"
-        });
-      },
       NUMERIC_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "numeric",
@@ -33782,18 +33630,6 @@ export const enums = {
       NUMERIC_DESC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "numeric",
-          direction: "DESC"
-        });
-      },
-      POINT_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "point",
-          direction: "ASC"
-        });
-      },
-      POINT_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "point",
           direction: "DESC"
         });
       },
@@ -33814,102 +33650,6 @@ export const enums = {
           });
         });
         queryBuilder.setOrderIsUnique();
-      },
-      REGCLASS_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "regclass",
-          direction: "ASC"
-        });
-      },
-      REGCLASS_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "regclass",
-          direction: "DESC"
-        });
-      },
-      REGCONFIG_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "regconfig",
-          direction: "ASC"
-        });
-      },
-      REGCONFIG_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "regconfig",
-          direction: "DESC"
-        });
-      },
-      REGDICTIONARY_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "regdictionary",
-          direction: "ASC"
-        });
-      },
-      REGDICTIONARY_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "regdictionary",
-          direction: "DESC"
-        });
-      },
-      REGOPER_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "regoper",
-          direction: "ASC"
-        });
-      },
-      REGOPER_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "regoper",
-          direction: "DESC"
-        });
-      },
-      REGOPERATOR_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "regoperator",
-          direction: "ASC"
-        });
-      },
-      REGOPERATOR_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "regoperator",
-          direction: "DESC"
-        });
-      },
-      REGPROC_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "regproc",
-          direction: "ASC"
-        });
-      },
-      REGPROC_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "regproc",
-          direction: "DESC"
-        });
-      },
-      REGPROCEDURE_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "regprocedure",
-          direction: "ASC"
-        });
-      },
-      REGPROCEDURE_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "regprocedure",
-          direction: "DESC"
-        });
-      },
-      REGTYPE_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "regtype",
-          direction: "ASC"
-        });
-      },
-      REGTYPE_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "regtype",
-          direction: "DESC"
-        });
       },
       ROW_ID_ASC(queryBuilder) {
         queryBuilder.orderBy({
@@ -34275,18 +34015,6 @@ export const enums = {
   },
   CMyTableOrderBy: {
     values: {
-      JSON_DATA_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "json_data",
-          direction: "ASC"
-        });
-      },
-      JSON_DATA_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "json_data",
-          direction: "DESC"
-        });
-      },
       PRIMARY_KEY_ASC(queryBuilder) {
         c_my_tableUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
@@ -34404,18 +34132,6 @@ export const enums = {
       ABOUT_DESC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "about",
-          direction: "DESC"
-        });
-      },
-      CONFIG_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "config",
-          direction: "ASC"
-        });
-      },
-      CONFIG_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "config",
           direction: "DESC"
         });
       },
