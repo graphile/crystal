@@ -60,6 +60,46 @@ function fixESMShenanigans(requiredModule: any): any {
   return requiredModule;
 }
 
+async function loadDefaultExport(resolvedPath: string, extension: string) {
+  // Attempt to import using native TypeScript support if appropriate
+  if (process.features.typescript && /\.[cm]?tsx?$/.test(extension)) {
+    try {
+      // Node has `require(esm)` support, but also for a `.cjsx` file it should
+      // still use `require()`
+      return fixESMShenanigans(require(resolvedPath));
+    } catch (e) {
+      if (e.code === "ERR_REQUIRE_ESM") {
+        // This is the most likely result, since TypeScript uses ESM syntax.
+        try {
+          return (await import(pathToFileURL(resolvedPath).href)).default;
+        } catch {
+          // Nevermind; try a loader
+        }
+      }
+      // Nevermind; try a loader
+    }
+  }
+
+  // No luck? Let's try loading the loaders
+  try {
+    registerLoader(jsVariants[extension]);
+  } catch (e) {
+    console.error(`No loader could be loaded for ${extension} files: ${e}`);
+  }
+
+  // And now lets attempt to import
+  try {
+    return fixESMShenanigans(require(resolvedPath));
+  } catch (e) {
+    if (e.code === "ERR_REQUIRE_ESM") {
+      // It's an ESModule, so `require()` won't work. Let's use `import()`!
+      return (await import(pathToFileURL(resolvedPath).href)).default;
+    } else {
+      throw e;
+    }
+  }
+}
+
 export async function loadConfig(
   configPath?: string | null,
 ): Promise<GraphileConfig.Preset | null> {
@@ -68,14 +108,14 @@ export async function loadConfig(
 
     const resolvedPath = resolve(process.cwd(), configPath);
 
-    // First try one of the supported loaders
+    // First try one of the supported loaders.
     for (const extension of extensions) {
       if (resolvedPath.endsWith(extension)) {
-        registerLoader(jsVariants[extension]);
         try {
-          return fixESMShenanigans(require(resolvedPath));
+          return await loadDefaultExport(resolvedPath, extension);
         } catch {
-          /* continue to the next one */
+          // Multiple extensions might match - e.g. both `.swc.tsx` and `.tsx`;
+          // continue to the next one.
         }
       }
     }
@@ -89,15 +129,12 @@ export async function loadConfig(
     for (const extension of extensions) {
       const resolvedPath = basePath + extension;
       if (await exists(resolvedPath)) {
-        registerLoader(jsVariants[extension]);
+        // This file exists; whatever happens, we will try this file only.
         try {
-          return fixESMShenanigans(require(resolvedPath));
-        } catch (e) {
-          if (e.code === "ERR_REQUIRE_ESM") {
-            return (await import(pathToFileURL(resolvedPath).href)).default;
-          } else {
-            throw e;
-          }
+          return await loadDefaultExport(resolvedPath, extension);
+        } catch {
+          // Fallback to direct import
+          return (await import(pathToFileURL(resolvedPath).href)).default;
         }
       }
     }
