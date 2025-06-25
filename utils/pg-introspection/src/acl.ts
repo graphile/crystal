@@ -65,6 +65,12 @@ const ACL_ALL_RIGHTS_TABLESPACE = ACL_CREATE;
 const ACL_ALL_RIGHTS_TYPE = ACL_USAGE;
 
 /**
+ * Used for ordering permissions the same as Postgres
+ * @see {@link https://github.com/postgres/postgres/blob/a0e7e9799c71abdfdebf16219903e1e2d08687cd/src/include/utils/acl.h#L154}
+ */
+const ACL_ALL_RIGHTS_STR = `arwdDxtXUCTcsAm`;
+
+/**
  * A fake 'pg_roles' record representing the 'public' meta-role.
  */
 export const PUBLIC_ROLE: PgRoles = Object.freeze({
@@ -200,7 +206,8 @@ const parseIdentifier = (str: string): string =>
 
 // https://www.postgresql.org/docs/current/ddl-priv.html#PRIVILEGE-ABBREVS-TABLE
 const ACL_MAP = {
-  // Order is significant, do not reorder these keys
+  // This is the order defined in the Postgres docs; however on serialize it
+  // will be in the same order as ACL_ALL_RIGHTS_STR
   [ACL_SELECT]: "select",
   [ACL_UPDATE]: "update",
   [ACL_INSERT]: "insert",
@@ -216,10 +223,20 @@ const ACL_MAP = {
   [ACL_MAINTAIN]: "maintain",
 } as const;
 Object.setPrototypeOf(ACL_MAP, null);
+
 type AclCharacter = keyof typeof ACL_MAP;
-const ACL_MAP_ENTRIES = Object.entries(ACL_MAP) as ReadonlyArray<
+
+const ACL_MAP_ENTRIES = Object.entries(ACL_MAP).sort((a, z) => {
+  // Sort them according to `ACL_ALL_RIGHTS_STR`
+  const ai = ACL_ALL_RIGHTS_STR.indexOf(a[0]);
+  if (ai < 0) throw new Error(`${a[0]} not found in ACL_ALL_RIGHTS_STR`);
+  const zi = ACL_ALL_RIGHTS_STR.indexOf(z[0]);
+  if (zi < 0) throw new Error(`${z[0]} not found in ACL_ALL_RIGHTS_STR`);
+  return ai - zi;
+}) as ReadonlyArray<
   { [K in AclCharacter]: [K, (typeof ACL_MAP)[K]] }[AclCharacter]
 >;
+
 const NO_PERMISSIONS: AclObject = ACL_MAP_ENTRIES.reduce(
   (acc, [_char, perm]) => {
     acc[perm] = false;
