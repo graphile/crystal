@@ -239,26 +239,26 @@ export function parseAcl(aclString: string): AclObject {
     const nextChar = aclString[i];
     if (nextChar === "/") {
       // granter begins
-      i++;   // skip past the "/" delimiter
-      break; // we're done with ACL tokens
+      i++; // skip past the "/" delimiter
+      if (i === aclLength) {
+        throw new Error(`ACL string should have a granter after the /`);
+      }
+      acl.granter = parseIdentifier(aclString.substring(i));
+      return acl;
     }
     const currentPerm = ACL_MAP[nextChar as keyof typeof ACL_MAP];
     if (currentPerm === undefined) {
       throw new Error(`Could not parse ACL string '${aclString}'`);
     }
     acl[currentPerm] = true;
-    if (i < lastGrantableTokenIndex && aclString[i + 1] === '*') {
+    if (i < lastGrantableTokenIndex && aclString[i + 1] === "*") {
       // permission + grant
       i++; // skip past the "*" character
       acl[`${currentPerm}Grant`] = true;
     }
     i++;
   } // end token processing
-  if (i < aclLength) {
-    // we have a granter at the end of the ACL string
-    acl.granter = parseIdentifier(aclString.substring(i));
-  }
-  return acl;
+  throw new Error(`Invalid or unsupported ACL string - no granter?`);
 }
 
 /**
