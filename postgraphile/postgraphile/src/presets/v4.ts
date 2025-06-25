@@ -1,4 +1,4 @@
-import "graphile-config";
+import "../index.js";
 
 import type { GraphQLError, GraphQLFormattedError } from "grafast/graphql";
 import { formatError as defaultFormatError } from "grafast/graphql";
