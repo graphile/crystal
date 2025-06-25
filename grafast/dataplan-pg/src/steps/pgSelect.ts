@@ -2603,7 +2603,11 @@ export function getFragmentAndCodecFromOrder(
     const isNullable = !col.notNull && !colCodec.notNull;
     let colFrag: SQL;
     if (colVia) {
-      throw new Error(`May not order by 'via'`);
+      // TODO: consider solving this with a subquery.
+      // colFrag = sql`(select ${newAlias}.${sql.identifier(order.attribute)} from ${relatedTable} ${newAlias} where ${joinConditions})`;
+      throw new Error(
+        `May not order by attribute that has 'via', please use expression instead`,
+      );
     } else {
       colFrag = sql`${alias}.${sql.identifier(order.attribute)}`;
     }
