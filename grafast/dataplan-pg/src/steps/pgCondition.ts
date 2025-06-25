@@ -90,9 +90,11 @@ export class PgCondition<
   }
 
   /**
-   * Use with extreme caution! It may not be safe to walk this tree backwards,
-   * you might end up getting a parent that's from an unrelated resource to the
-   * one you think you're dealing with.
+   * Manipulating an ancestor may have unintended consequences. Please exercise
+   * extreme caution, and think through all possible side effects. In
+   * particular, you don't necessarily know what the ancestor is going to be,
+   * so it might not be safe to attempt to manipulate it in the way you have
+   * planned.
    */
   public dangerouslyGetParent() {
     return this.parent;
