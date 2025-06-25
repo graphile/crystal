@@ -419,7 +419,7 @@ export function parseAcls(
       return acl;
     })();
 
-  const acls = aclStrings.map((aclString) => parseAcl(aclString));
+  const acls = aclStrings.map(parseAcl);
   return acls;
 }
 
