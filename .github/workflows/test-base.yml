@@ -11,11 +11,6 @@ on:
         description: Command to execute, usually test or posttest
         type: string
         required: true
-      args:
-        description: Optional command arguments
-        type: string
-        default: ""
-        required: false
 
 jobs:
   build:
@@ -92,4 +87,4 @@ jobs:
         run: yarn workspaces foreach --verbose --parallel --topological --recursive --from '${{ inputs.package }}' run prepack
 
       - name: "Test Project"
-        run: yarn run pretest && yarn workspaces foreach --verbose --parallel --worktree --jobs 2 --from '${{ inputs.package }}' run ${{ inputs.testcommand }} ${{ inputs.args }}
+        run: yarn run pretest && yarn workspaces foreach --verbose --parallel --worktree --jobs 2 --from '${{ inputs.package }}' run ${{ inputs.testcommand }}
