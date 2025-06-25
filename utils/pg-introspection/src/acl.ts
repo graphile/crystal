@@ -215,6 +215,7 @@ const ACL_MAP = {
   [ACL_CREATE_TEMP]: "temporary",
   [ACL_MAINTAIN]: "maintain",
 } as const;
+Object.setPrototypeOf(ACL_MAP, null);
 type AclCharacter = keyof typeof ACL_MAP;
 const ACL_MAP_ENTRIES = Object.entries(ACL_MAP) as ReadonlyArray<
   { [K in AclCharacter]: [K, (typeof ACL_MAP)[K]] }[AclCharacter]
@@ -263,7 +264,7 @@ export function parseAcl(aclString: string): AclObject {
       // Success!
       return acl;
     }
-    const currentPerm = ACL_MAP[char as keyof typeof ACL_MAP];
+    const currentPerm = ACL_MAP[char as AclCharacter];
     if (currentPerm === undefined) {
       throw new Error(
         `Could not parse ACL string '${aclString}' - unsupported permission '${char}'`,
