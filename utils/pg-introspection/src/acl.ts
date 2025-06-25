@@ -200,6 +200,7 @@ const parseIdentifier = (str: string): string =>
 
 // https://www.postgresql.org/docs/current/ddl-priv.html#PRIVILEGE-ABBREVS-TABLE
 const ACL_MAP = {
+  // Order is significant, do not reorder these keys
   r: "select",
   w: "update",
   a: "insert",
@@ -282,44 +283,10 @@ export function parseAcl(aclString: string): AclObject {
 export function serializeAcl(acl: AclObject) {
   let permissions = (acl.role === "public" ? "" : acl.role) + "=";
 
-  if (acl.selectGrant) permissions += "r*";
-  else if (acl.select) permissions += "r";
-
-  if (acl.updateGrant) permissions += "w*";
-  else if (acl.update) permissions += "w";
-
-  if (acl.insertGrant) permissions += "a*";
-  else if (acl.insert) permissions += "a";
-
-  if (acl.deleteGrant) permissions += "d*";
-  else if (acl.delete) permissions += "d";
-
-  if (acl.truncateGrant) permissions += "D*";
-  else if (acl.truncate) permissions += "D";
-
-  if (acl.referencesGrant) permissions += "x*";
-  else if (acl.references) permissions += "x";
-
-  if (acl.triggerGrant) permissions += "t*";
-  else if (acl.trigger) permissions += "t";
-
-  if (acl.executeGrant) permissions += "X*";
-  else if (acl.execute) permissions += "X";
-
-  if (acl.usageGrant) permissions += "U*";
-  else if (acl.usage) permissions += "U";
-
-  if (acl.createGrant) permissions += "C*";
-  else if (acl.create) permissions += "C";
-
-  if (acl.connectGrant) permissions += "c*";
-  else if (acl.connect) permissions += "c";
-
-  if (acl.temporaryGrant) permissions += "T*";
-  else if (acl.temporary) permissions += "T";
-
-  if (acl.maintainGrant) permissions += "m*";
-  else if (acl.maintain) permissions += "m";
+  for (const [char, perm] of Object.entries(ACL_MAP)) {
+    if (acl[`${perm}Grant`]) permissions += char + "*";
+    else if (acl[perm]) permissions += char;
+  }
 
   permissions += `/${acl.granter}`;
 
