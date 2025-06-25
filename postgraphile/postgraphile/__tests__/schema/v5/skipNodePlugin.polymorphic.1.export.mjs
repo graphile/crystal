@@ -23779,76 +23779,60 @@ export const inputObjects = {
   RelationalChecklistCondition: {
     plans: {
       archivedAt($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "archived_at",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemId");
+        const expression = sql`${alias}.${sql.identifier("archived_at")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
+        $condition.where(condition);
       },
       authorId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "author_id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemId");
+        const expression = sql`${alias}.${sql.identifier("author_id")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        $condition.where(condition);
       },
       createdAt($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "created_at",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemId");
+        const expression = sql`${alias}.${sql.identifier("created_at")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
+        $condition.where(condition);
       },
       isExplicitlyArchived($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "is_explicitly_archived",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemId");
+        const expression = sql`${alias}.${sql.identifier("is_explicitly_archived")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
+        $condition.where(condition);
       },
       parentId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "parent_id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemId");
+        const expression = sql`${alias}.${sql.identifier("parent_id")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        $condition.where(condition);
       },
       position($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "position",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.bigint)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemId");
+        const expression = sql`${alias}.${sql.identifier("position")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.bigint)}`;
+        $condition.where(condition);
       },
       rootTopicId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "root_topic_id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemId");
+        const expression = sql`${alias}.${sql.identifier("root_topic_id")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        $condition.where(condition);
       },
       rowId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemId");
+        const expression = sql`${alias}.${sql.identifier("id")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        $condition.where(condition);
       },
       title($condition, val) {
         $condition.where({
@@ -23860,53 +23844,43 @@ export const inputObjects = {
         });
       },
       type($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "type",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemId");
+        const expression = sql`${alias}.${sql.identifier("type")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
+        $condition.where(condition);
       },
       updatedAt($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "updated_at",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemId");
+        const expression = sql`${alias}.${sql.identifier("updated_at")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
+        $condition.where(condition);
       }
     }
   },
   RelationalChecklistItemCondition: {
     plans: {
       archivedAt($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "archived_at",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemItemId");
+        const expression = sql`${alias}.${sql.identifier("archived_at")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
+        $condition.where(condition);
       },
       authorId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "author_id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemItemId");
+        const expression = sql`${alias}.${sql.identifier("author_id")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        $condition.where(condition);
       },
       createdAt($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "created_at",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemItemId");
+        const expression = sql`${alias}.${sql.identifier("created_at")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
+        $condition.where(condition);
       },
       description($condition, val) {
         $condition.where({
@@ -23918,13 +23892,11 @@ export const inputObjects = {
         });
       },
       isExplicitlyArchived($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "is_explicitly_archived",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemItemId");
+        const expression = sql`${alias}.${sql.identifier("is_explicitly_archived")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
+        $condition.where(condition);
       },
       note($condition, val) {
         $condition.where({
@@ -23936,80 +23908,64 @@ export const inputObjects = {
         });
       },
       parentId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "parent_id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemItemId");
+        const expression = sql`${alias}.${sql.identifier("parent_id")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        $condition.where(condition);
       },
       position($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "position",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.bigint)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemItemId");
+        const expression = sql`${alias}.${sql.identifier("position")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.bigint)}`;
+        $condition.where(condition);
       },
       rootTopicId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "root_topic_id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemItemId");
+        const expression = sql`${alias}.${sql.identifier("root_topic_id")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        $condition.where(condition);
       },
       rowId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemItemId");
+        const expression = sql`${alias}.${sql.identifier("id")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        $condition.where(condition);
       },
       type($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "type",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemItemId");
+        const expression = sql`${alias}.${sql.identifier("type")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
+        $condition.where(condition);
       },
       updatedAt($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "updated_at",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemItemId");
+        const expression = sql`${alias}.${sql.identifier("updated_at")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
+        $condition.where(condition);
       }
     }
   },
   RelationalDividerCondition: {
     plans: {
       archivedAt($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "archived_at",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyDividerItemId");
+        const expression = sql`${alias}.${sql.identifier("archived_at")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
+        $condition.where(condition);
       },
       authorId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "author_id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyDividerItemId");
+        const expression = sql`${alias}.${sql.identifier("author_id")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        $condition.where(condition);
       },
       color($condition, val) {
         $condition.where({
@@ -24021,58 +23977,46 @@ export const inputObjects = {
         });
       },
       createdAt($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "created_at",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyDividerItemId");
+        const expression = sql`${alias}.${sql.identifier("created_at")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
+        $condition.where(condition);
       },
       isExplicitlyArchived($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "is_explicitly_archived",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyDividerItemId");
+        const expression = sql`${alias}.${sql.identifier("is_explicitly_archived")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
+        $condition.where(condition);
       },
       parentId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "parent_id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyDividerItemId");
+        const expression = sql`${alias}.${sql.identifier("parent_id")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        $condition.where(condition);
       },
       position($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "position",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.bigint)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyDividerItemId");
+        const expression = sql`${alias}.${sql.identifier("position")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.bigint)}`;
+        $condition.where(condition);
       },
       rootTopicId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "root_topic_id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyDividerItemId");
+        const expression = sql`${alias}.${sql.identifier("root_topic_id")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        $condition.where(condition);
       },
       rowId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyDividerItemId");
+        const expression = sql`${alias}.${sql.identifier("id")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        $condition.where(condition);
       },
       title($condition, val) {
         $condition.where({
@@ -24084,22 +24028,18 @@ export const inputObjects = {
         });
       },
       type($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "type",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyDividerItemId");
+        const expression = sql`${alias}.${sql.identifier("type")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
+        $condition.where(condition);
       },
       updatedAt($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "updated_at",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyDividerItemId");
+        const expression = sql`${alias}.${sql.identifier("updated_at")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
+        $condition.where(condition);
       }
     }
   },
@@ -24333,31 +24273,25 @@ export const inputObjects = {
   RelationalPostCondition: {
     plans: {
       archivedAt($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "archived_at",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyPostItemId");
+        const expression = sql`${alias}.${sql.identifier("archived_at")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
+        $condition.where(condition);
       },
       authorId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "author_id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyPostItemId");
+        const expression = sql`${alias}.${sql.identifier("author_id")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        $condition.where(condition);
       },
       createdAt($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "created_at",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyPostItemId");
+        const expression = sql`${alias}.${sql.identifier("created_at")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
+        $condition.where(condition);
       },
       description($condition, val) {
         $condition.where({
@@ -24369,13 +24303,11 @@ export const inputObjects = {
         });
       },
       isExplicitlyArchived($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "is_explicitly_archived",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyPostItemId");
+        const expression = sql`${alias}.${sql.identifier("is_explicitly_archived")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
+        $condition.where(condition);
       },
       note($condition, val) {
         $condition.where({
@@ -24387,40 +24319,32 @@ export const inputObjects = {
         });
       },
       parentId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "parent_id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyPostItemId");
+        const expression = sql`${alias}.${sql.identifier("parent_id")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        $condition.where(condition);
       },
       position($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "position",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.bigint)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyPostItemId");
+        const expression = sql`${alias}.${sql.identifier("position")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.bigint)}`;
+        $condition.where(condition);
       },
       rootTopicId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "root_topic_id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyPostItemId");
+        const expression = sql`${alias}.${sql.identifier("root_topic_id")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        $condition.where(condition);
       },
       rowId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyPostItemId");
+        const expression = sql`${alias}.${sql.identifier("id")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        $condition.where(condition);
       },
       title($condition, val) {
         $condition.where({
@@ -24432,98 +24356,78 @@ export const inputObjects = {
         });
       },
       type($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "type",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyPostItemId");
+        const expression = sql`${alias}.${sql.identifier("type")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
+        $condition.where(condition);
       },
       updatedAt($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "updated_at",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyPostItemId");
+        const expression = sql`${alias}.${sql.identifier("updated_at")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
+        $condition.where(condition);
       }
     }
   },
   RelationalTopicCondition: {
     plans: {
       archivedAt($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "archived_at",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyTopicItemId");
+        const expression = sql`${alias}.${sql.identifier("archived_at")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
+        $condition.where(condition);
       },
       authorId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "author_id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyTopicItemId");
+        const expression = sql`${alias}.${sql.identifier("author_id")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        $condition.where(condition);
       },
       createdAt($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "created_at",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyTopicItemId");
+        const expression = sql`${alias}.${sql.identifier("created_at")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
+        $condition.where(condition);
       },
       isExplicitlyArchived($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "is_explicitly_archived",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyTopicItemId");
+        const expression = sql`${alias}.${sql.identifier("is_explicitly_archived")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.boolean)}`;
+        $condition.where(condition);
       },
       parentId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "parent_id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyTopicItemId");
+        const expression = sql`${alias}.${sql.identifier("parent_id")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        $condition.where(condition);
       },
       position($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "position",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.bigint)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyTopicItemId");
+        const expression = sql`${alias}.${sql.identifier("position")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.bigint)}`;
+        $condition.where(condition);
       },
       rootTopicId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "root_topic_id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyTopicItemId");
+        const expression = sql`${alias}.${sql.identifier("root_topic_id")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        $condition.where(condition);
       },
       rowId($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "id",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyTopicItemId");
+        const expression = sql`${alias}.${sql.identifier("id")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+        $condition.where(condition);
       },
       title($condition, val) {
         $condition.where({
@@ -24535,22 +24439,18 @@ export const inputObjects = {
         });
       },
       type($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "type",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyTopicItemId");
+        const expression = sql`${alias}.${sql.identifier("type")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
+        $condition.where(condition);
       },
       updatedAt($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "updated_at",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyTopicItemId");
+        const expression = sql`${alias}.${sql.identifier("updated_at")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.timestamptz)}`;
+        $condition.where(condition);
       }
     }
   },
@@ -25925,8 +25825,10 @@ export const enums = {
   RelationalChecklistItemOrderBy: {
     values: {
       ARCHIVED_AT_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemItemId");
         queryBuilder.orderBy({
-          attribute: "archived_at",
+          fragment: sql`${alias}.${sql.identifier("archived_at")}`,
+          codec: TYPES.timestamptz,
           direction: "ASC"
         });
       },
@@ -25937,8 +25839,10 @@ export const enums = {
         });
       },
       AUTHOR_ID_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemItemId");
         queryBuilder.orderBy({
-          attribute: "author_id",
+          fragment: sql`${alias}.${sql.identifier("author_id")}`,
+          codec: TYPES.int,
           direction: "ASC"
         });
       },
@@ -25949,8 +25853,10 @@ export const enums = {
         });
       },
       CREATED_AT_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemItemId");
         queryBuilder.orderBy({
-          attribute: "created_at",
+          fragment: sql`${alias}.${sql.identifier("created_at")}`,
+          codec: TYPES.timestamptz,
           direction: "ASC"
         });
       },
@@ -25973,8 +25879,10 @@ export const enums = {
         });
       },
       IS_EXPLICITLY_ARCHIVED_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemItemId");
         queryBuilder.orderBy({
-          attribute: "is_explicitly_archived",
+          fragment: sql`${alias}.${sql.identifier("is_explicitly_archived")}`,
+          codec: TYPES.boolean,
           direction: "ASC"
         });
       },
@@ -25997,8 +25905,10 @@ export const enums = {
         });
       },
       PARENT_ID_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemItemId");
         queryBuilder.orderBy({
-          attribute: "parent_id",
+          fragment: sql`${alias}.${sql.identifier("parent_id")}`,
+          codec: TYPES.int,
           direction: "ASC"
         });
       },
@@ -26009,8 +25919,10 @@ export const enums = {
         });
       },
       POSITION_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemItemId");
         queryBuilder.orderBy({
-          attribute: "position",
+          fragment: sql`${alias}.${sql.identifier("position")}`,
+          codec: TYPES.bigint,
           direction: "ASC"
         });
       },
@@ -26039,8 +25951,10 @@ export const enums = {
         queryBuilder.setOrderIsUnique();
       },
       ROOT_TOPIC_ID_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemItemId");
         queryBuilder.orderBy({
-          attribute: "root_topic_id",
+          fragment: sql`${alias}.${sql.identifier("root_topic_id")}`,
+          codec: TYPES.int,
           direction: "ASC"
         });
       },
@@ -26051,8 +25965,10 @@ export const enums = {
         });
       },
       ROW_ID_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemItemId");
         queryBuilder.orderBy({
-          attribute: "id",
+          fragment: sql`${alias}.${sql.identifier("id")}`,
+          codec: TYPES.int,
           direction: "ASC"
         });
       },
@@ -26063,8 +25979,10 @@ export const enums = {
         });
       },
       TYPE_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemItemId");
         queryBuilder.orderBy({
-          attribute: "type",
+          fragment: sql`${alias}.${sql.identifier("type")}`,
+          codec: itemTypeCodec,
           direction: "ASC"
         });
       },
@@ -26075,8 +25993,10 @@ export const enums = {
         });
       },
       UPDATED_AT_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemItemId");
         queryBuilder.orderBy({
-          attribute: "updated_at",
+          fragment: sql`${alias}.${sql.identifier("updated_at")}`,
+          codec: TYPES.timestamptz,
           direction: "ASC"
         });
       },
@@ -26091,8 +26011,10 @@ export const enums = {
   RelationalChecklistOrderBy: {
     values: {
       ARCHIVED_AT_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemId");
         queryBuilder.orderBy({
-          attribute: "archived_at",
+          fragment: sql`${alias}.${sql.identifier("archived_at")}`,
+          codec: TYPES.timestamptz,
           direction: "ASC"
         });
       },
@@ -26103,8 +26025,10 @@ export const enums = {
         });
       },
       AUTHOR_ID_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemId");
         queryBuilder.orderBy({
-          attribute: "author_id",
+          fragment: sql`${alias}.${sql.identifier("author_id")}`,
+          codec: TYPES.int,
           direction: "ASC"
         });
       },
@@ -26115,8 +26039,10 @@ export const enums = {
         });
       },
       CREATED_AT_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemId");
         queryBuilder.orderBy({
-          attribute: "created_at",
+          fragment: sql`${alias}.${sql.identifier("created_at")}`,
+          codec: TYPES.timestamptz,
           direction: "ASC"
         });
       },
@@ -26127,8 +26053,10 @@ export const enums = {
         });
       },
       IS_EXPLICITLY_ARCHIVED_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemId");
         queryBuilder.orderBy({
-          attribute: "is_explicitly_archived",
+          fragment: sql`${alias}.${sql.identifier("is_explicitly_archived")}`,
+          codec: TYPES.boolean,
           direction: "ASC"
         });
       },
@@ -26139,8 +26067,10 @@ export const enums = {
         });
       },
       PARENT_ID_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemId");
         queryBuilder.orderBy({
-          attribute: "parent_id",
+          fragment: sql`${alias}.${sql.identifier("parent_id")}`,
+          codec: TYPES.int,
           direction: "ASC"
         });
       },
@@ -26151,8 +26081,10 @@ export const enums = {
         });
       },
       POSITION_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemId");
         queryBuilder.orderBy({
-          attribute: "position",
+          fragment: sql`${alias}.${sql.identifier("position")}`,
+          codec: TYPES.bigint,
           direction: "ASC"
         });
       },
@@ -26181,8 +26113,10 @@ export const enums = {
         queryBuilder.setOrderIsUnique();
       },
       ROOT_TOPIC_ID_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemId");
         queryBuilder.orderBy({
-          attribute: "root_topic_id",
+          fragment: sql`${alias}.${sql.identifier("root_topic_id")}`,
+          codec: TYPES.int,
           direction: "ASC"
         });
       },
@@ -26193,8 +26127,10 @@ export const enums = {
         });
       },
       ROW_ID_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemId");
         queryBuilder.orderBy({
-          attribute: "id",
+          fragment: sql`${alias}.${sql.identifier("id")}`,
+          codec: TYPES.int,
           direction: "ASC"
         });
       },
@@ -26217,8 +26153,10 @@ export const enums = {
         });
       },
       TYPE_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemId");
         queryBuilder.orderBy({
-          attribute: "type",
+          fragment: sql`${alias}.${sql.identifier("type")}`,
+          codec: itemTypeCodec,
           direction: "ASC"
         });
       },
@@ -26229,8 +26167,10 @@ export const enums = {
         });
       },
       UPDATED_AT_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemId");
         queryBuilder.orderBy({
-          attribute: "updated_at",
+          fragment: sql`${alias}.${sql.identifier("updated_at")}`,
+          codec: TYPES.timestamptz,
           direction: "ASC"
         });
       },
@@ -26245,8 +26185,10 @@ export const enums = {
   RelationalDividerOrderBy: {
     values: {
       ARCHIVED_AT_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyDividerItemId");
         queryBuilder.orderBy({
-          attribute: "archived_at",
+          fragment: sql`${alias}.${sql.identifier("archived_at")}`,
+          codec: TYPES.timestamptz,
           direction: "ASC"
         });
       },
@@ -26257,8 +26199,10 @@ export const enums = {
         });
       },
       AUTHOR_ID_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyDividerItemId");
         queryBuilder.orderBy({
-          attribute: "author_id",
+          fragment: sql`${alias}.${sql.identifier("author_id")}`,
+          codec: TYPES.int,
           direction: "ASC"
         });
       },
@@ -26281,8 +26225,10 @@ export const enums = {
         });
       },
       CREATED_AT_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyDividerItemId");
         queryBuilder.orderBy({
-          attribute: "created_at",
+          fragment: sql`${alias}.${sql.identifier("created_at")}`,
+          codec: TYPES.timestamptz,
           direction: "ASC"
         });
       },
@@ -26293,8 +26239,10 @@ export const enums = {
         });
       },
       IS_EXPLICITLY_ARCHIVED_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyDividerItemId");
         queryBuilder.orderBy({
-          attribute: "is_explicitly_archived",
+          fragment: sql`${alias}.${sql.identifier("is_explicitly_archived")}`,
+          codec: TYPES.boolean,
           direction: "ASC"
         });
       },
@@ -26305,8 +26253,10 @@ export const enums = {
         });
       },
       PARENT_ID_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyDividerItemId");
         queryBuilder.orderBy({
-          attribute: "parent_id",
+          fragment: sql`${alias}.${sql.identifier("parent_id")}`,
+          codec: TYPES.int,
           direction: "ASC"
         });
       },
@@ -26317,8 +26267,10 @@ export const enums = {
         });
       },
       POSITION_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyDividerItemId");
         queryBuilder.orderBy({
-          attribute: "position",
+          fragment: sql`${alias}.${sql.identifier("position")}`,
+          codec: TYPES.bigint,
           direction: "ASC"
         });
       },
@@ -26347,8 +26299,10 @@ export const enums = {
         queryBuilder.setOrderIsUnique();
       },
       ROOT_TOPIC_ID_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyDividerItemId");
         queryBuilder.orderBy({
-          attribute: "root_topic_id",
+          fragment: sql`${alias}.${sql.identifier("root_topic_id")}`,
+          codec: TYPES.int,
           direction: "ASC"
         });
       },
@@ -26359,8 +26313,10 @@ export const enums = {
         });
       },
       ROW_ID_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyDividerItemId");
         queryBuilder.orderBy({
-          attribute: "id",
+          fragment: sql`${alias}.${sql.identifier("id")}`,
+          codec: TYPES.int,
           direction: "ASC"
         });
       },
@@ -26383,8 +26339,10 @@ export const enums = {
         });
       },
       TYPE_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyDividerItemId");
         queryBuilder.orderBy({
-          attribute: "type",
+          fragment: sql`${alias}.${sql.identifier("type")}`,
+          codec: itemTypeCodec,
           direction: "ASC"
         });
       },
@@ -26395,8 +26353,10 @@ export const enums = {
         });
       },
       UPDATED_AT_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyDividerItemId");
         queryBuilder.orderBy({
-          attribute: "updated_at",
+          fragment: sql`${alias}.${sql.identifier("updated_at")}`,
+          codec: TYPES.timestamptz,
           direction: "ASC"
         });
       },
@@ -26665,8 +26625,10 @@ export const enums = {
   RelationalPostOrderBy: {
     values: {
       ARCHIVED_AT_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyPostItemId");
         queryBuilder.orderBy({
-          attribute: "archived_at",
+          fragment: sql`${alias}.${sql.identifier("archived_at")}`,
+          codec: TYPES.timestamptz,
           direction: "ASC"
         });
       },
@@ -26677,8 +26639,10 @@ export const enums = {
         });
       },
       AUTHOR_ID_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyPostItemId");
         queryBuilder.orderBy({
-          attribute: "author_id",
+          fragment: sql`${alias}.${sql.identifier("author_id")}`,
+          codec: TYPES.int,
           direction: "ASC"
         });
       },
@@ -26689,8 +26653,10 @@ export const enums = {
         });
       },
       CREATED_AT_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyPostItemId");
         queryBuilder.orderBy({
-          attribute: "created_at",
+          fragment: sql`${alias}.${sql.identifier("created_at")}`,
+          codec: TYPES.timestamptz,
           direction: "ASC"
         });
       },
@@ -26713,8 +26679,10 @@ export const enums = {
         });
       },
       IS_EXPLICITLY_ARCHIVED_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyPostItemId");
         queryBuilder.orderBy({
-          attribute: "is_explicitly_archived",
+          fragment: sql`${alias}.${sql.identifier("is_explicitly_archived")}`,
+          codec: TYPES.boolean,
           direction: "ASC"
         });
       },
@@ -26737,8 +26705,10 @@ export const enums = {
         });
       },
       PARENT_ID_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyPostItemId");
         queryBuilder.orderBy({
-          attribute: "parent_id",
+          fragment: sql`${alias}.${sql.identifier("parent_id")}`,
+          codec: TYPES.int,
           direction: "ASC"
         });
       },
@@ -26749,8 +26719,10 @@ export const enums = {
         });
       },
       POSITION_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyPostItemId");
         queryBuilder.orderBy({
-          attribute: "position",
+          fragment: sql`${alias}.${sql.identifier("position")}`,
+          codec: TYPES.bigint,
           direction: "ASC"
         });
       },
@@ -26779,8 +26751,10 @@ export const enums = {
         queryBuilder.setOrderIsUnique();
       },
       ROOT_TOPIC_ID_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyPostItemId");
         queryBuilder.orderBy({
-          attribute: "root_topic_id",
+          fragment: sql`${alias}.${sql.identifier("root_topic_id")}`,
+          codec: TYPES.int,
           direction: "ASC"
         });
       },
@@ -26791,8 +26765,10 @@ export const enums = {
         });
       },
       ROW_ID_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyPostItemId");
         queryBuilder.orderBy({
-          attribute: "id",
+          fragment: sql`${alias}.${sql.identifier("id")}`,
+          codec: TYPES.int,
           direction: "ASC"
         });
       },
@@ -26815,8 +26791,10 @@ export const enums = {
         });
       },
       TYPE_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyPostItemId");
         queryBuilder.orderBy({
-          attribute: "type",
+          fragment: sql`${alias}.${sql.identifier("type")}`,
+          codec: itemTypeCodec,
           direction: "ASC"
         });
       },
@@ -26827,8 +26805,10 @@ export const enums = {
         });
       },
       UPDATED_AT_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyPostItemId");
         queryBuilder.orderBy({
-          attribute: "updated_at",
+          fragment: sql`${alias}.${sql.identifier("updated_at")}`,
+          codec: TYPES.timestamptz,
           direction: "ASC"
         });
       },
@@ -26843,8 +26823,10 @@ export const enums = {
   RelationalTopicOrderBy: {
     values: {
       ARCHIVED_AT_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyTopicItemId");
         queryBuilder.orderBy({
-          attribute: "archived_at",
+          fragment: sql`${alias}.${sql.identifier("archived_at")}`,
+          codec: TYPES.timestamptz,
           direction: "ASC"
         });
       },
@@ -26855,8 +26837,10 @@ export const enums = {
         });
       },
       AUTHOR_ID_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyTopicItemId");
         queryBuilder.orderBy({
-          attribute: "author_id",
+          fragment: sql`${alias}.${sql.identifier("author_id")}`,
+          codec: TYPES.int,
           direction: "ASC"
         });
       },
@@ -26867,8 +26851,10 @@ export const enums = {
         });
       },
       CREATED_AT_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyTopicItemId");
         queryBuilder.orderBy({
-          attribute: "created_at",
+          fragment: sql`${alias}.${sql.identifier("created_at")}`,
+          codec: TYPES.timestamptz,
           direction: "ASC"
         });
       },
@@ -26879,8 +26865,10 @@ export const enums = {
         });
       },
       IS_EXPLICITLY_ARCHIVED_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyTopicItemId");
         queryBuilder.orderBy({
-          attribute: "is_explicitly_archived",
+          fragment: sql`${alias}.${sql.identifier("is_explicitly_archived")}`,
+          codec: TYPES.boolean,
           direction: "ASC"
         });
       },
@@ -26891,8 +26879,10 @@ export const enums = {
         });
       },
       PARENT_ID_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyTopicItemId");
         queryBuilder.orderBy({
-          attribute: "parent_id",
+          fragment: sql`${alias}.${sql.identifier("parent_id")}`,
+          codec: TYPES.int,
           direction: "ASC"
         });
       },
@@ -26903,8 +26893,10 @@ export const enums = {
         });
       },
       POSITION_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyTopicItemId");
         queryBuilder.orderBy({
-          attribute: "position",
+          fragment: sql`${alias}.${sql.identifier("position")}`,
+          codec: TYPES.bigint,
           direction: "ASC"
         });
       },
@@ -26933,8 +26925,10 @@ export const enums = {
         queryBuilder.setOrderIsUnique();
       },
       ROOT_TOPIC_ID_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyTopicItemId");
         queryBuilder.orderBy({
-          attribute: "root_topic_id",
+          fragment: sql`${alias}.${sql.identifier("root_topic_id")}`,
+          codec: TYPES.int,
           direction: "ASC"
         });
       },
@@ -26945,8 +26939,10 @@ export const enums = {
         });
       },
       ROW_ID_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyTopicItemId");
         queryBuilder.orderBy({
-          attribute: "id",
+          fragment: sql`${alias}.${sql.identifier("id")}`,
+          codec: TYPES.int,
           direction: "ASC"
         });
       },
@@ -26969,8 +26965,10 @@ export const enums = {
         });
       },
       TYPE_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyTopicItemId");
         queryBuilder.orderBy({
-          attribute: "type",
+          fragment: sql`${alias}.${sql.identifier("type")}`,
+          codec: itemTypeCodec,
           direction: "ASC"
         });
       },
@@ -26981,8 +26979,10 @@ export const enums = {
         });
       },
       UPDATED_AT_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyTopicItemId");
         queryBuilder.orderBy({
-          attribute: "updated_at",
+          fragment: sql`${alias}.${sql.identifier("updated_at")}`,
+          codec: TYPES.timestamptz,
           direction: "ASC"
         });
       },

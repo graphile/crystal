@@ -11705,13 +11705,11 @@ export const inputObjects = {
   RelationalStatusCondition: {
     plans: {
       constructor($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "constructor",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyId");
+        const expression = sql`${alias}.${sql.identifier("constructor")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+        $condition.where(condition);
       },
       description($condition, val) {
         $condition.where({
@@ -11741,26 +11739,22 @@ export const inputObjects = {
         });
       },
       type($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "type",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyId");
+        const expression = sql`${alias}.${sql.identifier("type")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
+        $condition.where(condition);
       }
     }
   },
   RelationalTopicCondition: {
     plans: {
       constructor($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "constructor",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyId");
+        const expression = sql`${alias}.${sql.identifier("constructor")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+        $condition.where(condition);
       },
       id($condition, val) {
         $condition.where({
@@ -11781,13 +11775,11 @@ export const inputObjects = {
         });
       },
       type($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "type",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
-          }
-        });
+        const queryBuilder = $condition.dangerouslyGetParent();
+        const alias = queryBuilder.singleRelation("relationalItemsByMyId");
+        const expression = sql`${alias}.${sql.identifier("type")}`;
+        const condition = val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, itemTypeCodec)}`;
+        $condition.where(condition);
       }
     }
   },
@@ -12951,8 +12943,10 @@ export const enums = {
   RelationalStatusesOrderBy: {
     values: {
       CONSTRUCTOR_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyId");
         queryBuilder.orderBy({
-          attribute: "constructor",
+          fragment: sql`${alias}.${sql.identifier("constructor")}`,
+          codec: TYPES.text,
           direction: "ASC"
         });
       },
@@ -13019,8 +13013,10 @@ export const enums = {
         queryBuilder.setOrderIsUnique();
       },
       TYPE_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyId");
         queryBuilder.orderBy({
-          attribute: "type",
+          fragment: sql`${alias}.${sql.identifier("type")}`,
+          codec: itemTypeCodec,
           direction: "ASC"
         });
       },
@@ -13035,8 +13031,10 @@ export const enums = {
   RelationalTopicsOrderBy: {
     values: {
       CONSTRUCTOR_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyId");
         queryBuilder.orderBy({
-          attribute: "constructor",
+          fragment: sql`${alias}.${sql.identifier("constructor")}`,
+          codec: TYPES.text,
           direction: "ASC"
         });
       },
@@ -13091,8 +13089,10 @@ export const enums = {
         });
       },
       TYPE_ASC(queryBuilder) {
+        const alias = queryBuilder.singleRelation("relationalItemsByMyId");
         queryBuilder.orderBy({
-          attribute: "type",
+          fragment: sql`${alias}.${sql.identifier("type")}`,
+          codec: itemTypeCodec,
           direction: "ASC"
         });
       },
