@@ -563,13 +563,12 @@ export class PgResource<
     const attributeName = typeof via === "string" ? attr : via.attribute;
 
     // Check
-    const rawRelation = this.getRelation(relationName) as unknown as
-      | PgCodecRelation
-      | undefined;
-    if (!rawRelation) {
+    const relation = this.getRelation(
+      relationName,
+    ) as unknown as PgCodecRelation;
+    if (!relation) {
       throw new Error(`Unknown relation '${relationName}' in ${this}`);
     }
-    const relation = rawRelation;
     if (!relation.remoteResource.codec.attributes![attributeName]) {
       throw new Error(
         `${this} relation '${relationName}' does not have attribute '${attributeName}'`,
