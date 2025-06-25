@@ -1,5 +1,69 @@
 import type { Introspection, PgEntity, PgRoles } from "./introspection.js";
 
+export const OBJECT_COLUMN = "OBJECT_COLUMN";
+export const OBJECT_TABLE = "OBJECT_TABLE";
+export const OBJECT_SEQUENCE = "OBJECT_SEQUENCE";
+export const OBJECT_DATABASE = "OBJECT_DATABASE";
+export const OBJECT_FUNCTION = "OBJECT_FUNCTION";
+export const OBJECT_LANGUAGE = "OBJECT_LANGUAGE";
+export const OBJECT_LARGEOBJECT = "OBJECT_LARGEOBJECT";
+export const OBJECT_SCHEMA = "OBJECT_SCHEMA";
+export const OBJECT_TABLESPACE = "OBJECT_TABLESPACE";
+export const OBJECT_FDW = "OBJECT_FDW";
+export const OBJECT_FOREIGN_SERVER = "OBJECT_FOREIGN_SERVER";
+export const OBJECT_DOMAIN = "OBJECT_DOMAIN";
+export const OBJECT_TYPE = "OBJECT_TYPE";
+
+// https://github.com/postgres/postgres/blob/4908c5872059c409aa647bcde758dfeffe07996e/src/include/nodes/parsenodes.h#L2094-L2148
+export type AclDefaultObjectType =
+  | typeof OBJECT_COLUMN
+  | typeof OBJECT_TABLE
+  | typeof OBJECT_SEQUENCE
+  | typeof OBJECT_DATABASE
+  | typeof OBJECT_FUNCTION
+  | typeof OBJECT_LANGUAGE
+  | typeof OBJECT_LARGEOBJECT
+  | typeof OBJECT_SCHEMA
+  | typeof OBJECT_TABLESPACE
+  | typeof OBJECT_FDW
+  | typeof OBJECT_FOREIGN_SERVER
+  | typeof OBJECT_DOMAIN
+  | typeof OBJECT_TYPE;
+
+// https://github.com/postgres/postgres/blob/4908c5872059c409aa647bcde758dfeffe07996e/src/include/nodes/parsenodes.h#L76-L89
+// https://www.postgresql.org/docs/current/ddl-priv.html#PRIVILEGE-ABBREVS-TABLE
+const ACL_SELECT = "r";
+const ACL_INSERT = "a";
+const ACL_UPDATE = "w";
+const ACL_DELETE = "d";
+const ACL_TRUNCATE = "D";
+const ACL_REFERENCES = "x";
+const ACL_TRIGGER = "t";
+const ACL_CREATE = "C";
+const ACL_CONNECT = "c";
+const ACL_CREATE_TEMP = "T";
+const ACL_MAINTAIN = "m";
+const ACL_EXECUTE = "X";
+const ACL_USAGE = "U";
+// const ACL_SET = "s";
+// const ACL_ALTER_SYSTEM = "A";
+
+/** @see {@link https://github.com/postgres/postgres/blob/4908c5872059c409aa647bcde758dfeffe07996e/src/include/nodes/parsenodes.h#L91} */
+const ACL_NO_RIGHTS = "";
+
+/** @see {@link https://github.com/postgres/postgres/blob/4908c5872059c409aa647bcde758dfeffe07996e/src/include/utils/acl.h#L159} */
+const ACL_ALL_RIGHTS_RELATION = `${ACL_INSERT}${ACL_SELECT}${ACL_UPDATE}${ACL_DELETE}${ACL_TRUNCATE}${ACL_REFERENCES}${ACL_TRIGGER}${ACL_MAINTAIN}`;
+const ACL_ALL_RIGHTS_SEQUENCE = `${ACL_USAGE}${ACL_SELECT}${ACL_UPDATE}`;
+const ACL_ALL_RIGHTS_DATABASE = `${ACL_CREATE}${ACL_CREATE_TEMP}${ACL_CONNECT}`;
+const ACL_ALL_RIGHTS_FDW = ACL_USAGE;
+const ACL_ALL_RIGHTS_FOREIGN_SERVER = ACL_USAGE;
+const ACL_ALL_RIGHTS_FUNCTION = ACL_EXECUTE;
+const ACL_ALL_RIGHTS_LANGUAGE = ACL_USAGE;
+const ACL_ALL_RIGHTS_LARGEOBJECT = `${ACL_SELECT}${ACL_UPDATE}`;
+const ACL_ALL_RIGHTS_SCHEMA = `${ACL_USAGE}${ACL_CREATE}`;
+const ACL_ALL_RIGHTS_TABLESPACE = ACL_CREATE;
+const ACL_ALL_RIGHTS_TYPE = ACL_USAGE;
+
 /**
  * A fake 'pg_roles' record representing the 'public' meta-role.
  */
@@ -263,70 +327,6 @@ export function serializeAcl(acl: AclObject) {
 }
 
 export const emptyAclObject = parseAcl("=/postgres");
-
-export const OBJECT_COLUMN = "OBJECT_COLUMN";
-export const OBJECT_TABLE = "OBJECT_TABLE";
-export const OBJECT_SEQUENCE = "OBJECT_SEQUENCE";
-export const OBJECT_DATABASE = "OBJECT_DATABASE";
-export const OBJECT_FUNCTION = "OBJECT_FUNCTION";
-export const OBJECT_LANGUAGE = "OBJECT_LANGUAGE";
-export const OBJECT_LARGEOBJECT = "OBJECT_LARGEOBJECT";
-export const OBJECT_SCHEMA = "OBJECT_SCHEMA";
-export const OBJECT_TABLESPACE = "OBJECT_TABLESPACE";
-export const OBJECT_FDW = "OBJECT_FDW";
-export const OBJECT_FOREIGN_SERVER = "OBJECT_FOREIGN_SERVER";
-export const OBJECT_DOMAIN = "OBJECT_DOMAIN";
-export const OBJECT_TYPE = "OBJECT_TYPE";
-
-// https://github.com/postgres/postgres/blob/4908c5872059c409aa647bcde758dfeffe07996e/src/include/nodes/parsenodes.h#L2094-L2148
-export type AclDefaultObjectType =
-  | typeof OBJECT_COLUMN
-  | typeof OBJECT_TABLE
-  | typeof OBJECT_SEQUENCE
-  | typeof OBJECT_DATABASE
-  | typeof OBJECT_FUNCTION
-  | typeof OBJECT_LANGUAGE
-  | typeof OBJECT_LARGEOBJECT
-  | typeof OBJECT_SCHEMA
-  | typeof OBJECT_TABLESPACE
-  | typeof OBJECT_FDW
-  | typeof OBJECT_FOREIGN_SERVER
-  | typeof OBJECT_DOMAIN
-  | typeof OBJECT_TYPE;
-
-// https://github.com/postgres/postgres/blob/4908c5872059c409aa647bcde758dfeffe07996e/src/include/nodes/parsenodes.h#L76-L89
-// https://www.postgresql.org/docs/current/ddl-priv.html#PRIVILEGE-ABBREVS-TABLE
-const ACL_SELECT = "r";
-const ACL_INSERT = "a";
-const ACL_UPDATE = "w";
-const ACL_DELETE = "d";
-const ACL_TRUNCATE = "D";
-const ACL_REFERENCES = "x";
-const ACL_TRIGGER = "t";
-const ACL_CREATE = "C";
-const ACL_CONNECT = "c";
-const ACL_CREATE_TEMP = "T";
-const ACL_MAINTAIN = "m";
-const ACL_EXECUTE = "X";
-const ACL_USAGE = "U";
-// const ACL_SET = "s";
-// const ACL_ALTER_SYSTEM = "A";
-
-/** @see {@link https://github.com/postgres/postgres/blob/4908c5872059c409aa647bcde758dfeffe07996e/src/include/nodes/parsenodes.h#L91} */
-const ACL_NO_RIGHTS = "";
-
-/** @see {@link https://github.com/postgres/postgres/blob/4908c5872059c409aa647bcde758dfeffe07996e/src/include/utils/acl.h#L159} */
-const ACL_ALL_RIGHTS_RELATION = `${ACL_INSERT}${ACL_SELECT}${ACL_UPDATE}${ACL_DELETE}${ACL_TRUNCATE}${ACL_REFERENCES}${ACL_TRIGGER}${ACL_MAINTAIN}`;
-const ACL_ALL_RIGHTS_SEQUENCE = `${ACL_USAGE}${ACL_SELECT}${ACL_UPDATE}`;
-const ACL_ALL_RIGHTS_DATABASE = `${ACL_CREATE}${ACL_CREATE_TEMP}${ACL_CONNECT}`;
-const ACL_ALL_RIGHTS_FDW = ACL_USAGE;
-const ACL_ALL_RIGHTS_FOREIGN_SERVER = ACL_USAGE;
-const ACL_ALL_RIGHTS_FUNCTION = ACL_EXECUTE;
-const ACL_ALL_RIGHTS_LANGUAGE = ACL_USAGE;
-const ACL_ALL_RIGHTS_LARGEOBJECT = `${ACL_SELECT}${ACL_UPDATE}`;
-const ACL_ALL_RIGHTS_SCHEMA = `${ACL_USAGE}${ACL_CREATE}`;
-const ACL_ALL_RIGHTS_TABLESPACE = ACL_CREATE;
-const ACL_ALL_RIGHTS_TYPE = ACL_USAGE;
 
 /**
  * Returns a list of AclObject by parsing the given input ACL strings. If no
