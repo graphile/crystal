@@ -200,24 +200,27 @@ const parseIdentifier = (str: string): string =>
 
 // https://www.postgresql.org/docs/current/ddl-priv.html#PRIVILEGE-ABBREVS-TABLE
 const ACL_MAP = {
-  r: 'select',
-  w: 'update',
-  a: 'insert',
-  d: 'delete',
-  D: 'truncate',
-  x: 'references',
-  t: 'trigger',
-  X: 'execute',
-  U: 'usage',
-  C: 'create',
-  c: 'connect',
-  T: 'temporary',
-  m: 'maintain',
+  r: "select",
+  w: "update",
+  a: "insert",
+  d: "delete",
+  D: "truncate",
+  x: "references",
+  t: "trigger",
+  X: "execute",
+  U: "usage",
+  C: "create",
+  c: "connect",
+  T: "temporary",
+  m: "maintain",
 } as const;
-const NO_PERMISSIONS: AclObject = Object.values(ACL_MAP).reduce((acc, val) => {
-  acc[val] = acc[`${val}Grant`] = false;
-  return acc;
-}, { role: "public", granter: "" } as Partial<AclObject>) as AclObject;
+const NO_PERMISSIONS: AclObject = Object.values(ACL_MAP).reduce(
+  (acc, val) => {
+    acc[val] = acc[`${val}Grant`] = false;
+    return acc;
+  },
+  { role: "public", granter: "" } as Partial<AclObject>,
+) as AclObject;
 
 /**
  * Accepts an ACL string such as `foo=arwdDxt/bar` and converts it into
