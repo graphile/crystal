@@ -19,9 +19,7 @@ This following plugin replaces the `builtin` inflector with one that returns
 
 ```ts
 // Import types for TypeScript, no need in JS
-import "graphile-config";
-import "graphile-build";
-import "graphile-build-pg";
+import "postgraphile";
 
 export const ReplaceInflectorPlugin: GraphileConfig.Plugin = {
   // Unique name for your plugin:
@@ -88,9 +86,7 @@ make other plugins aware of the new inflector:
 
 ```ts
 // Import types for TypeScript, no need in JS
-import "graphile-config";
-import "graphile-build";
-import "graphile-build-pg";
+import "postgraphile";
 
 declare global {
   namespace GraphileBuild {

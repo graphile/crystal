@@ -50,6 +50,7 @@ without the overhead of requiring TypeScript.
 Here’s an example preset which only extends the “Amber” preset:
 
 ```js title="graphile.config.mjs"
+// @ts-check
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 
 /** @type {GraphileConfig.Preset} */
@@ -60,13 +61,9 @@ const preset = {
 export default preset;
 ```
 
-You could also have created this in TypeScript, in which case you might add a
-couple of `import` statements to the top in order to ensure that the relevant
-TypeScript types exist.
+Or in TypeScript:
 
-```ts title="graphile.config.ts"
-import "graphile-config";
-import "postgraphile";
+```ts title="graphile.config.mts"
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 
 const preset: GraphileConfig.Preset = {
@@ -76,9 +73,11 @@ const preset: GraphileConfig.Preset = {
 export default preset;
 ```
 
-Similarly, you can create your config as a `.js`, `.cjs`, `.mts` or `.cts` file;
+Similarly, you can create your config as a `.js`, `.cjs`, `.ts` or `.cts` file;
 the PostGraphile CLI will pick up all of these automatically assuming that you
-have TypeScript installed locally.
+have TypeScript installed locally and are running Node 24 or higher. (For Node
+22.6+ you'll need to be running with the `node --experimental-strip-types` flag,
+or have `tsx`, `ts-node`, or similar installed locally.)
 
 ## General structure
 
@@ -105,9 +104,7 @@ registers the `grafast` scope; Grafserv registers the `grafserv` scope; and
 
 We highly recommend using TypeScript for dealing with your preset so that you
 get auto-completion for the options available in each scope; you can also use
-the `graphile config options` command detailed below. It may be necessary to
-add `import "postgraphile"` at the top of the configuration file so that
-TypeScript imports all the available scopes.
+the `graphile config options` command detailed below.
 
 :::tip The Schema Build Process
 
@@ -124,8 +121,7 @@ The schema build process in PostGraphile is:
 
 ### Simple example
 
-```ts title="graphile.config.ts"
-import "postgraphile"; // To import the TypeScript types
+```ts title="graphile.config.mts"
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 import { makePgService } from "postgraphile/adaptors/pg";
 
@@ -138,10 +134,7 @@ const preset: GraphileConfig.Preset = {
 
 ### Larger example
 
-```ts title="graphile.config.ts"
-// Only needed for TypeScript types support
-import "postgraphile";
-
+```ts title="graphile.config.mts"
 // The standard base preset to use, includes the main PostGraphile features
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 
