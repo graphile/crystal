@@ -132,6 +132,12 @@ describe("successful ACL parsing", () => {
       granter: "a.b@example.com",
       role: "b",
     });
+    assert.deepEqual(parseAcl("b=r/a.b@example.com"), {
+      ...baseAcl,
+      select: true,
+      granter: "a.b@example.com",
+      role: "b",
+    });
   });
 });
 
