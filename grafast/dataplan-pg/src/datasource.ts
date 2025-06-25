@@ -559,27 +559,20 @@ export class PgResource<
     if (!via) {
       throw new Error("No via to resolve");
     }
-    let relationName: string;
-    let attributeName: string;
-    if (typeof via === "string") {
-      relationName = via;
-      attributeName = attr;
-    } else {
-      relationName = via.relation;
-      attributeName = via.attribute;
-    }
+    const relationName = typeof via === "string" ? via : via.relation;
+    const attributeName = typeof via === "string" ? attr : via.attribute;
 
     // Check
     const rawRelation = this.getRelation(relationName) as unknown as
       | PgCodecRelation
       | undefined;
     if (!rawRelation) {
-      throw new Error(`Unknown relation '${via}' in ${this}`);
+      throw new Error(`Unknown relation '${relationName}' in ${this}`);
     }
     const relation = rawRelation;
-    if (!relation.remoteResource.codec.attributes![attr]) {
+    if (!relation.remoteResource.codec.attributes![attributeName]) {
       throw new Error(
-        `${this} relation '${via}' does not have attribute '${attr}'`,
+        `${this} relation '${relationName}' does not have attribute '${attributeName}'`,
       );
     }
     const attribute = relation.remoteResource.codec.attributes![attributeName];
