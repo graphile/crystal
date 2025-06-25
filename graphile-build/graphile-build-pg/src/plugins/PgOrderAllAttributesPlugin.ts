@@ -49,7 +49,7 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
   schema: {
     hooks: {
       GraphQLEnumType_values(values, build, context) {
-        const { extend, inflection, options } = build;
+        const { extend, inflection, options, sql } = build;
         const {
           scope: {
             isPgRowSortEnum,
@@ -95,7 +95,7 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
         return extend(
           values,
           Object.entries(attributes).reduce(
-            (memo, [attributeName, _attribute]) => {
+            (memo, [attributeName, attribute]) => {
               const fieldBehaviorScope = `attribute:orderBy`;
               if (
                 !build.behavior.pgCodecAttributeMatches(
@@ -119,36 +119,82 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
                 attributeName,
                 variant: "desc",
               });
+              let apply: PgSelectQueryBuilderCallback;
+              if (attribute.via) {
+                // TODO: assert that this won't be a PgUnionAllQueryBuilder at runtime
+                const resource = build.pgTableResource(pgCodec);
+                if (!resource) {
+                  throw new Error(
+                    `Could not determine resource for codec ${pgCodec.name}`,
+                  );
+                }
+                const {
+                  relationName,
+                  attributeName: targetAttributeName,
+                  attribute: { codec: targetCodec },
+                } = resource.resolveVia(attribute.via, attributeName);
+
+                apply = EXPORTABLE(
+                  (
+                    isUnique,
+                    pgOrderByNullsLast,
+                    relationName,
+                    sql,
+                    targetAttributeName,
+                    targetCodec,
+                  ) =>
+                    ((queryBuilder: PgSelectQueryBuilder): void => {
+                      const alias = queryBuilder.singleRelation(relationName);
+                      queryBuilder.orderBy({
+                        fragment: sql`${alias}.${sql.identifier(targetAttributeName)}`,
+                        codec: targetCodec,
+                        direction: "ASC",
+                        ...(pgOrderByNullsLast != null
+                          ? { nulls: pgOrderByNullsLast ? "LAST" : "FIRST" }
+                          : null),
+                      });
+                      if (isUnique) {
+                        queryBuilder.setOrderIsUnique();
+                      }
+                    }) as PgSelectQueryBuilderCallback,
+                  [
+                    isUnique,
+                    pgOrderByNullsLast,
+                    relationName,
+                    sql,
+                    targetAttributeName,
+                    targetCodec,
+                  ],
+                );
+              } else {
+                apply = EXPORTABLE(
+                  (attributeName, isUnique, pgOrderByNullsLast) =>
+                    ((
+                      queryBuilder:
+                        | PgSelectQueryBuilder
+                        | PgUnionAllQueryBuilder,
+                    ): void => {
+                      queryBuilder.orderBy({
+                        attribute: attributeName,
+                        direction: "ASC",
+                        ...(pgOrderByNullsLast != null
+                          ? { nulls: pgOrderByNullsLast ? "LAST" : "FIRST" }
+                          : null),
+                      });
+                      if (isUnique) {
+                        queryBuilder.setOrderIsUnique();
+                      }
+                    }) as PgSelectQueryBuilderCallback,
+                  [attributeName, isUnique, pgOrderByNullsLast],
+                );
+              }
               memo = extend(
                 memo,
                 {
                   [ascFieldName]: {
                     extensions: {
                       grafast: {
-                        apply: EXPORTABLE(
-                          (attributeName, isUnique, pgOrderByNullsLast) =>
-                            ((
-                              queryBuilder:
-                                | PgSelectQueryBuilder
-                                | PgUnionAllQueryBuilder,
-                            ): void => {
-                              queryBuilder.orderBy({
-                                attribute: attributeName,
-                                direction: "ASC",
-                                ...(pgOrderByNullsLast != null
-                                  ? {
-                                      nulls: pgOrderByNullsLast
-                                        ? "LAST"
-                                        : "FIRST",
-                                    }
-                                  : null),
-                              });
-                              if (isUnique) {
-                                queryBuilder.setOrderIsUnique();
-                              }
-                            }) as PgSelectQueryBuilderCallback,
-                          [attributeName, isUnique, pgOrderByNullsLast],
-                        ),
+                        apply,
                       },
                     },
                   },

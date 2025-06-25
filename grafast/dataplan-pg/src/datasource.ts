@@ -13,6 +13,7 @@ import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
 import type {
+  PgCodecAttribute,
   PgCodecAttributes,
   PgCodecAttributeVia,
   PgCodecAttributeViaExplicit,
@@ -550,27 +551,45 @@ export class PgResource<
   public resolveVia(
     via: PgCodecAttributeVia,
     attr: string,
-  ): PgCodecAttributeViaExplicit {
+  ): {
+    relationName: string;
+    attributeName: string;
+    relation: PgCodecRelation;
+    attribute: PgCodecAttribute;
+  } {
     if (!via) {
       throw new Error("No via to resolve");
     }
+    let relationName: string;
+    let attributeName: string;
     if (typeof via === "string") {
-      // Check
-      const relation = this.getRelation(via) as unknown as
-        | PgCodecRelation
-        | undefined;
-      if (!relation) {
-        throw new Error(`Unknown relation '${via}' in ${this}`);
-      }
-      if (!relation.remoteResource.codec.attributes![attr]) {
-        throw new Error(
-          `${this} relation '${via}' does not have attribute '${attr}'`,
-        );
-      }
-      return { relation: via, attribute: attr };
+      relationName = via;
+      attributeName = attr;
     } else {
-      return via;
+      relationName = via.relation;
+      attributeName = via.attribute;
     }
+
+    // Check
+    const rawRelation = this.getRelation(relationName) as unknown as
+      | PgCodecRelation
+      | undefined;
+    if (!rawRelation) {
+      throw new Error(`Unknown relation '${via}' in ${this}`);
+    }
+    const relation = rawRelation;
+    if (!relation.remoteResource.codec.attributes![attr]) {
+      throw new Error(
+        `${this} relation '${via}' does not have attribute '${attr}'`,
+      );
+    }
+    const attribute = relation.remoteResource.codec.attributes![attributeName];
+    return {
+      relationName,
+      attributeName,
+      relation,
+      attribute,
+    };
   }
 
   // PERF: this needs optimization.
