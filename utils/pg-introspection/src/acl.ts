@@ -227,41 +227,52 @@ const NO_PERMISSIONS: AclObject = Object.values(ACL_MAP).reduce(
  * a parsed AclObject.
  */
 export function parseAcl(aclString: string): AclObject {
-  const acl: AclObject = { ...NO_PERMISSIONS };
-  const roleEndIndex = aclString.indexOf("=");
-  if (roleEndIndex === -1) {
-    throw new Error(`Could not parse ACL string '${aclString}'`);
-  } else if (roleEndIndex > 0) {
-    acl.role = parseIdentifier(aclString.substring(0, roleEndIndex));
-  }
   const aclLength = aclString.length;
-  const lastGrantableTokenIndex = aclLength - 1;
-  let i = roleEndIndex + 1; // skip past the "="
+  if (aclLength < 3) {
+    // Shortest ACL string might be e.g. `=/a`
+    throw new Error("Invalid ACL string: too few characters");
+  }
+  const acl: AclObject = { ...NO_PERMISSIONS };
+  /** Where the name of the role ends */
+  const equalsSignIndex = aclString.indexOf("=");
+  if (equalsSignIndex === -1) {
+    throw new Error(
+      `Could not parse ACL string '${aclString}' - no '=' symbol`,
+    );
+  } else if (equalsSignIndex > 0) {
+    acl.role = parseIdentifier(aclString.substring(0, equalsSignIndex));
+  }
+  const lastCharacterIndex = aclLength - 1;
+  let i = equalsSignIndex; // Start at the "="
   // Process the ACL tokens
-  while (i < aclString.length) {
-    const nextChar = aclString[i];
-    if (nextChar === "/") {
+  while (++i < aclString.length) {
+    const char = aclString[i];
+    if (char === "/") {
       // granter begins
-      i++; // skip past the "/" delimiter
-      if (i === aclLength) {
+      // skip past the "/" delimiter
+      if (++i === aclLength) {
         throw new Error(`ACL string should have a granter after the /`);
       }
       acl.granter = parseIdentifier(aclString.substring(i));
+      // Success!
       return acl;
     }
-    const currentPerm = ACL_MAP[nextChar as keyof typeof ACL_MAP];
+    const currentPerm = ACL_MAP[char as keyof typeof ACL_MAP];
     if (currentPerm === undefined) {
-      throw new Error(`Could not parse ACL string '${aclString}'`);
+      throw new Error(
+        `Could not parse ACL string '${aclString}' - unsupported permission '${char}'`,
+      );
     }
     acl[currentPerm] = true;
-    if (i < lastGrantableTokenIndex && aclString[i + 1] === "*") {
+    if (i < lastCharacterIndex && aclString[i + 1] === "*") {
       // permission + grant
       i++; // skip past the "*" character
       acl[`${currentPerm}Grant`] = true;
     }
-    i++;
   } // end token processing
-  throw new Error(`Invalid or unsupported ACL string - no granter?`);
+  throw new Error(
+    `Invalid or unsupported ACL string '${aclString}' - no '/' character?`,
+  );
 }
 
 /**
