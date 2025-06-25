@@ -8,6 +8,7 @@ query {
       id
       type
       createdAt
+      archivedAt
     }
   }
   justId: allRelationalTopics(orderBy: [CREATED_AT_ASC]) {

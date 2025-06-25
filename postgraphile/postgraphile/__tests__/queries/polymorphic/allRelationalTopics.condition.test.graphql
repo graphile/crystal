@@ -3,14 +3,15 @@
 #> simpleCollections: "both"
 
 query {
-  withDetails: allRelationalTopics(condition: { updatedAt: null }) {
+  withDetails: allRelationalTopics(condition: { archivedAt: null }) {
     nodes {
       id
       type
       createdAt
+      archivedAt
     }
   }
-  justId: allRelationalTopics(condition: { updatedAt: null }) {
+  justId: allRelationalTopics(condition: { archivedAt: null }) {
     nodes {
       id
     }

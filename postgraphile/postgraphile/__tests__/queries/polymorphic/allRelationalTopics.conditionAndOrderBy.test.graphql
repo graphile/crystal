@@ -4,17 +4,18 @@
 
 query {
   withDetails: allRelationalTopics(
-    condition: { updatedAt: null }
+    condition: { archivedAt: null }
     orderBy: [CREATED_AT_ASC]
   ) {
     nodes {
       id
       type
       createdAt
+      archivedAt
     }
   }
   justId: allRelationalTopics(
-    condition: { updatedAt: null }
+    condition: { archivedAt: null }
     orderBy: [CREATED_AT_ASC]
   ) {
     nodes {
