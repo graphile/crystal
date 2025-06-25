@@ -215,9 +215,14 @@ const ACL_MAP = {
   T: "temporary",
   m: "maintain",
 } as const;
-const NO_PERMISSIONS: AclObject = Object.values(ACL_MAP).reduce(
-  (acc, val) => {
-    acc[val] = acc[`${val}Grant`] = false;
+type AclCharacter = keyof typeof ACL_MAP;
+const ACL_MAP_ENTRIES = Object.entries(ACL_MAP) as ReadonlyArray<
+  { [K in AclCharacter]: [K, (typeof ACL_MAP)[K]] }[AclCharacter]
+>;
+const NO_PERMISSIONS: AclObject = ACL_MAP_ENTRIES.reduce(
+  (acc, [_char, perm]) => {
+    acc[perm] = false;
+    acc[`${perm}Grant`] = false;
     return acc;
   },
   { role: "public", granter: "" } as Partial<AclObject>,
@@ -283,7 +288,7 @@ export function parseAcl(aclString: string): AclObject {
 export function serializeAcl(acl: AclObject) {
   let permissions = (acl.role === "public" ? "" : acl.role) + "=";
 
-  for (const [char, perm] of Object.entries(ACL_MAP)) {
+  for (const [char, perm] of ACL_MAP_ENTRIES) {
     if (acl[`${perm}Grant`]) permissions += char + "*";
     else if (acl[perm]) permissions += char;
   }
