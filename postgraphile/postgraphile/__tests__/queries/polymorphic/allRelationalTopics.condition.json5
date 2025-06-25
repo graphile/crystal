@@ -1,0 +1,37 @@
+{
+  withDetails: {
+    nodes: [
+      {
+        id: 1,
+        type: "TOPIC",
+        createdAt: "2020-01-28T07:00:00.000000-04:00",
+        archivedAt: null,
+      },
+      {
+        id: 10,
+        type: "TOPIC",
+        createdAt: "2020-01-28T07:07:00.000000-04:00",
+        archivedAt: null,
+      },
+      {
+        id: 11,
+        type: "TOPIC",
+        createdAt: "2020-01-28T07:08:00.000000-04:00",
+        archivedAt: null,
+      },
+    ],
+  },
+  justId: {
+    nodes: [
+      {
+        id: 1,
+      },
+      {
+        id: 10,
+      },
+      {
+        id: 11,
+      },
+    ],
+  },
+}

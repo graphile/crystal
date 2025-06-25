@@ -2578,15 +2578,16 @@ export function getFragmentAndCodecFromOrder(
   codecOrCodecs: PgCodec | PgCodec[],
 ): [fragment: SQL, codec: PgCodec, isNullable?: boolean] {
   if (order.attribute != null) {
-    const colFrag = sql`${alias}.${sql.identifier(order.attribute)}`;
     const isArray = Array.isArray(codecOrCodecs);
     const col = (isArray ? codecOrCodecs[0] : codecOrCodecs).attributes![
       order.attribute
     ];
+    const colVia = col.via;
     const colCodec = col.codec;
     if (isArray) {
       for (const codec of codecOrCodecs) {
-        if (codec.attributes![order.attribute].codec !== colCodec) {
+        const attr = codec.attributes![order.attribute];
+        if (attr.codec !== colCodec || attr.via !== colVia) {
           throw new Error(
             `Order by attribute '${
               order.attribute
@@ -2600,6 +2601,16 @@ export function getFragmentAndCodecFromOrder(
       }
     }
     const isNullable = !col.notNull && !colCodec.notNull;
+    let colFrag: SQL;
+    if (colVia) {
+      // TODO: consider solving this with a subquery.
+      // colFrag = sql`(select ${newAlias}.${sql.identifier(order.attribute)} from ${relatedTable} ${newAlias} where ${joinConditions})`;
+      throw new Error(
+        `May not order by attribute that has 'via', please use expression instead`,
+      );
+    } else {
+      colFrag = sql`${alias}.${sql.identifier(order.attribute)}`;
+    }
     return order.callback
       ? order.callback(colFrag, colCodec, isNullable)
       : [colFrag, colCodec, isNullable];
