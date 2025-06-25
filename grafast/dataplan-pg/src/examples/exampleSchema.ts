@@ -266,7 +266,7 @@ export function makeExampleSchema(
           author_id: col({
             notNull: true,
             codec: TYPES.uuid,
-            identicalVia: { relation: "author", attribute: "person_id" },
+            identicalVia: { relation: "author", attribute: "id" },
           }),
           forum_id: col({
             notNull: true,
@@ -494,7 +494,7 @@ export function makeExampleSchema(
           person_id: col({
             codec: TYPES.int,
             notNull: true,
-            identicalVia: { relation: "person", attribute: "id" },
+            identicalVia: { relation: "person", attribute: "person_id" },
           }),
           bookmarked_entity: col({
             codec: unionEntityCodec,
@@ -572,7 +572,7 @@ export function makeExampleSchema(
           post_id: col({
             codec: TYPES.int,
             notNull: true,
-            identicalVia: { relation: "post", attribute: "id" },
+            identicalVia: { relation: "post", attribute: "post_id" },
           }),
           body: col({ codec: TYPES.text, notNull: true }),
         },
