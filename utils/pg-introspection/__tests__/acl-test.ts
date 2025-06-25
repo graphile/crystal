@@ -117,10 +117,22 @@ describe("successful ACL parsing", () => {
 });
 
 describe("broken ACL handling", () => {
-  it("throws on empty string", () => {});
-  it("throws on missing =", () => {});
-  it("throws on missing /", () => {});
-  it("throws on terminal / (no granter)", () => {});
-  it("throws on unknown character", () => {});
-  it("throws on two * in a row", () => {});
+  it("throws on empty string", () => {
+    assert.throws(() => parseAcl(""), /too few characters/);
+  });
+  it("throws on missing =", () => {
+    assert.throws(() => parseAcl("publicrwadD/a"), /no '='/);
+  });
+  it("throws on missing /", () => {
+    assert.throws(() => parseAcl("public=rwadD"), /no '\/'/);
+  });
+  it("throws on terminal / (no granter)", () => {
+    assert.throws(() => parseAcl("public=rwadD/"), /should have a granter/);
+  });
+  it("throws on unknown character", () => {
+    assert.throws(() => parseAcl("=rZ/a"), /unsupported permission 'Z'/);
+  });
+  it("throws on two * in a row", () => {
+    assert.throws(() => parseAcl("=r**a"), /unsupported permission '*'/);
+  });
 });
