@@ -89,6 +89,17 @@ export class PgCondition<
     }
   }
 
+  /**
+   * Manipulating an ancestor may have unintended consequences. Please exercise
+   * extreme caution, and think through all possible side effects. In
+   * particular, you don't necessarily know what the ancestor is going to be,
+   * so it might not be safe to attempt to manipulate it in the way you have
+   * planned.
+   */
+  public dangerouslyGetParent() {
+    return this.parent;
+  }
+
   public toStringMeta(): string {
     return `${(this.parent as any).id}/${this.resolvedMode.mode}`;
   }
@@ -224,6 +235,8 @@ export function pgWhereConditionSpecListToSQL(
     } else {
       switch (c.type) {
         case "attribute": {
+          // TODO: attributes with `via` should either be rejected or should
+          // result in subquery.
           const frag = c.callback(sql`${alias}.${sql.identifier(c.attribute)}`);
           mappedConditions.push(sql.indent(transform(frag)));
           continue;

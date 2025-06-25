@@ -55,8 +55,7 @@ where
   );
 
 select
-  __posts__."post_id"::text as "0",
-  __posts__."body" as "1"
+  __posts__."body" as "0"
 from interfaces_and_unions.posts as __posts__
 where
   (

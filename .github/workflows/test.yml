@@ -9,7 +9,6 @@ jobs:
     with:
       package: "@dataplan/pg"
       testcommand: "test"
-      args: "--ci"
 
   postgraphile_jest:
     name: PostGraphile jest tests
@@ -17,7 +16,6 @@ jobs:
     with:
       package: "postgraphile"
       testcommand: "test:jest"
-      args: "--ci"
 
   postgraphile_schema_exports:
     name: PostGraphile schema export tests
@@ -25,7 +23,6 @@ jobs:
     with:
       package: "postgraphile"
       testcommand: "test:schema-exports"
-      args: "--ci"
 
   postgraphile_export_typeDefs:
     name: PostGraphile tests (exported as typeDefs)
@@ -33,7 +30,6 @@ jobs:
     with:
       package: "postgraphile"
       testcommand: "test:operations-exports:typeDefs"
-      args: "--ci"
 
   postgraphile_export_graphqljs:
     name: PostGraphile tests (exported as graphql-js)
@@ -41,7 +37,6 @@ jobs:
     with:
       package: "postgraphile"
       testcommand: "test:operations-exports:graphql-js"
-      args: "--ci"
 
   small_packages:
     name: Small package tests
@@ -49,4 +44,3 @@ jobs:
     with:
       package: "{pg-sql2,tamedevil,@grafserv/persisted,@graphile/lru,@graphile/simplify-inflection,@localrepo/grafast-bench,@localrepo/grafast-website,grafast,graphile,graphile-config,graphile-utils,jest-serializer-graphql-schema,pg-introspection,grafserv}"
       testcommand: "test"
-      args: "--ci"

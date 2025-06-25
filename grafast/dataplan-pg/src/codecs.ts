@@ -55,6 +55,7 @@ export type PgCodecAttributeViaExplicit = {
   relation: string;
   attribute: string;
 };
+
 export type PgCodecAttributeVia = string | PgCodecAttributeViaExplicit;
 
 /** @deprecated Use DataplanPg.PgCodecAttributeExtensions instead */

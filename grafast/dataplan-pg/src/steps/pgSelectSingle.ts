@@ -207,30 +207,30 @@ export class PgSelectSingleStep<
     }
 
     if (resourceAttribute?.via) {
-      const { relation, attribute } = this.resource.resolveVia(
+      const { relationName, attributeName } = this.resource.resolveVia(
         resourceAttribute.via,
         attr as string,
       );
-      return this.singleRelation(relation as any).get(attribute) as any;
+      return this.singleRelation(relationName as any).get(attributeName) as any;
     }
 
     if (resourceAttribute?.identicalVia) {
-      const { relation, attribute } = this.resource.resolveVia(
+      const { relationName, attributeName } = this.resource.resolveVia(
         resourceAttribute.identicalVia,
         attr as string,
       );
 
-      const $existingPlan = this.existingSingleRelation(relation as any);
+      const $existingPlan = this.existingSingleRelation(relationName as any);
       if ($existingPlan) {
         // Relation exists already; load it from there for efficiency
-        return $existingPlan.get(attribute) as any;
+        return $existingPlan.get(attributeName) as any;
       } else {
         // Load it from ourself instead
       }
     }
 
     if (this.fromRelation) {
-      const { refId, relationName } = this.fromRelation;
+      const { refId, relationName: fromRelationName } = this.fromRelation;
       const $fromPlan = this.getRef(refId);
       if ($fromPlan instanceof PgSelectSingleStep) {
         const matchingAttribute = (
@@ -239,11 +239,9 @@ export class PgSelectSingleStep<
           >
         ).find(([name, col]) => {
           if (col.identicalVia) {
-            const { relation, attribute } = $fromPlan.resource.resolveVia(
-              col.identicalVia,
-              name,
-            );
-            if (attribute === attr && relation === relationName) {
+            const { relationName, attributeName } =
+              $fromPlan.resource.resolveVia(col.identicalVia, name);
+            if (attributeName === attr && relationName === fromRelationName) {
               return true;
             }
           }

@@ -42,9 +42,9 @@ where
 
 select
   __comments__."comment_id"::text as "0",
-  __comments__."body" as "1",
-  __people__."username" as "2",
-  __posts__."post_id"::text as "3",
+  __comments__."post_id"::text as "1",
+  __comments__."body" as "2",
+  __people__."username" as "3",
   __posts__."body" as "4"
 from interfaces_and_unions.comments as __comments__
 left outer join interfaces_and_unions.people as __people__
