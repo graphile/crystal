@@ -59,6 +59,14 @@
     "graphile-config": "workspace:^",
     "graphql": "^16.1.0-experimental-stream-defer.6"
   },
+  "peerDependenciesMeta": {
+    "graphile-config": {
+      "optional": true
+    },
+    "graphql": {
+      "optional": true
+    }
+  },
   "files": [
     "dist",
     "bundle",
