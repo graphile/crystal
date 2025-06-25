@@ -2050,6 +2050,15 @@ const typesCodec = recordCodec({
         tags: {}
       }
     },
+    jsonpath: {
+      description: undefined,
+      codec: TYPES.jsonpath,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
     nullable_range: {
       description: undefined,
       codec: numrangeCodec,
@@ -2811,6 +2820,7 @@ const registry = makeRegistry({
     colorArray: colorArrayCodec,
     anInt: anIntCodec,
     anotherInt: anotherIntCodec,
+    jsonpath: TYPES.jsonpath,
     numrange: numrangeCodec,
     daterange: daterangeCodec,
     date: TYPES.date,
@@ -7622,6 +7632,7 @@ type Type {
   textArray: [String]!
   json: JSON!
   jsonb: JSON!
+  jsonpath: JSONPath
   nullableRange: BigFloatRange
   numrange: BigFloatRange!
   daterange: DateRange!
@@ -7674,6 +7685,9 @@ scalar BigFloat
 scalar AnInt
 
 scalar AnotherInt
+
+"""A string representing an SQL/JSONPath expression"""
+scalar JSONPath
 
 """A range of \`BigFloat\`."""
 type BigFloatRange {
@@ -17392,6 +17406,16 @@ export const scalars = {
       } else {
         return undefined;
       }
+    }
+  },
+  JSONPath: {
+    serialize: UUIDSerialize,
+    parseValue: UUIDSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"JSONPath" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
     }
   },
   KeyValueHash: {
