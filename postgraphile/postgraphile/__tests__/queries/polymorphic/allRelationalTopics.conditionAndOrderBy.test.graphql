@@ -1,0 +1,24 @@
+## expect(errors).toBeFalsy()
+#> schema: ["polymorphic"]
+#> simpleCollections: "both"
+
+query {
+  withDetails: allRelationalTopics(
+    condition: { updatedAt: null }
+    orderBy: [CREATED_AT_ASC]
+  ) {
+    nodes {
+      id
+      type
+      createdAt
+    }
+  }
+  justId: allRelationalTopics(
+    condition: { updatedAt: null }
+    orderBy: [CREATED_AT_ASC]
+  ) {
+    nodes {
+      id
+    }
+  }
+}
