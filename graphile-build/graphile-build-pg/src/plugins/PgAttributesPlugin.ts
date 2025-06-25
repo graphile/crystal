@@ -610,7 +610,14 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
                     attribute: { codec: targetCodec },
                   } = resource.resolveVia(attribute.via, attributeName);
                   apply = EXPORTABLE(
-                    (relationName, sql, sqlValueWithCodec, targetAttributeName, targetCodec) => function plan(
+                    (
+                      relationName,
+                      sql,
+                      sqlValueWithCodec,
+                      targetAttributeName,
+                      targetCodec,
+                    ) =>
+                      function plan(
                         $condition: PgCondition<PgSelectQueryBuilder>,
                         val: unknown,
                       ) {
@@ -626,7 +633,13 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
                               )}`;
                         $condition.where(condition);
                       },
-                    [relationName, sql, sqlValueWithCodec, targetAttributeName, targetCodec],
+                    [
+                      relationName,
+                      sql,
+                      sqlValueWithCodec,
+                      targetAttributeName,
+                      targetCodec,
+                    ],
                   );
                 } else {
                   apply = EXPORTABLE(
