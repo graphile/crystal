@@ -231,7 +231,7 @@ describe("ACL serialization", () => {
   it("serializes quote-y role and granter", () => {
     const acl: AclObject = {
       ...baseAcl,
-      role: `"fo"o"`,
+      role: `fo"o`,
       granter: `pos"tgres`,
     };
     assert.equal(serializeAcl(acl), `"fo""o"=/"pos""tgres"`);

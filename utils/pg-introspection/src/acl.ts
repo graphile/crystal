@@ -201,8 +201,18 @@ export type ResolvedPermissions = Omit<AclObject, "role" | "granter">;
  * 'foo' becomes 'foo'
  * '"foo""mcbrew"' becomes 'foo"mcbrew'
  */
-const parseIdentifier = (str: string): string =>
-  str.startsWith('"') ? str.replace(/"("?)/g, "$1") : str;
+const parseIdentifier = (str: string): string => {
+  if (str.startsWith('"')) {
+    if (!str.endsWith('"')) {
+      throw new Error(
+        `Invalid identifier - if it starts with '"' it must also end with '"'`,
+      );
+    }
+    return str.substring(1, str.length - 1).replace(/""/g, '"');
+  } else {
+    return str;
+  }
+};
 
 // https://www.postgresql.org/docs/current/ddl-priv.html#PRIVILEGE-ABBREVS-TABLE
 const ACL_MAP = {
@@ -299,19 +309,27 @@ export function parseAcl(aclString: string): AclObject {
   );
 }
 
+function escapeRole(role: string) {
+  if (role.indexOf('"') !== -1) {
+    return `"${role.replace(/"/g, '""')}"`;
+  } else {
+    return role;
+  }
+}
+
 /**
  * Takes an `AclObject` and converts it back into a Postgres ACL string such as
  * `foo=arwdDxt/bar`
  */
 export function serializeAcl(acl: AclObject) {
-  let permissions = (acl.role === "public" ? "" : acl.role) + "=";
+  let permissions = (acl.role === "public" ? "" : escapeRole(acl.role)) + "=";
 
   for (const [char, perm] of ACL_MAP_ENTRIES) {
     if (acl[`${perm}Grant`]) permissions += char + "*";
     else if (acl[perm]) permissions += char;
   }
 
-  permissions += `/${acl.granter}`;
+  permissions += `/${escapeRole(acl.granter)}`;
 
   return permissions;
 }
