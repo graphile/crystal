@@ -114,6 +114,25 @@ describe("successful ACL parsing", () => {
       role: "b",
     } as AclObject);
   });
+  it("parses mixed acl", () => {
+    assert.deepEqual(parseAcl("=r*wd/a"), {
+      ...baseAcl,
+      select: true,
+      selectGrant: true,
+      update: true,
+      delete: true,
+      granter: "a",
+      role: "public",
+    });
+  });
+  it("accepts granter with special characters", () => {
+    assert.deepEqual(parseAcl("b=r/a.b@example.com"), {
+      ...baseAcl,
+      select: true,
+      granter: "a.b@example.com",
+      role: "b",
+    });
+  });
 });
 
 describe("broken ACL handling", () => {
@@ -133,6 +152,9 @@ describe("broken ACL handling", () => {
     assert.throws(() => parseAcl("=rZ/a"), /unsupported permission 'Z'/);
   });
   it("throws on two * in a row", () => {
-    assert.throws(() => parseAcl("=r**a"), /unsupported permission '*'/);
+    assert.throws(() => parseAcl("=r**a"), /unsupported permission '\*'/);
+  });
+  it("throws on asterisk at beginning", () => {
+    assert.throws(() => parseAcl("=*r/a"), /unsupported permission '\*'/);
   });
 });
