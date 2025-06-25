@@ -16,7 +16,6 @@ import type {
   PgCodecAttribute,
   PgCodecAttributes,
   PgCodecAttributeVia,
-  PgCodecAttributeViaExplicit,
 } from "./codecs.js";
 import { TYPES } from "./codecs.js";
 import type {
