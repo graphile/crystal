@@ -2583,6 +2583,9 @@ export function getFragmentAndCodecFromOrder(
     const col = (isArray ? codecOrCodecs[0] : codecOrCodecs).attributes![
       order.attribute
     ];
+    if (col.via) {
+      throw new Error(`May not order by 'via'`);
+    }
     const colCodec = col.codec;
     if (isArray) {
       for (const codec of codecOrCodecs) {

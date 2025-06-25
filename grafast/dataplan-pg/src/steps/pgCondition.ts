@@ -233,6 +233,8 @@ export function pgWhereConditionSpecListToSQL(
     } else {
       switch (c.type) {
         case "attribute": {
+          // TODO: attributes with `via` should either be rejected or should
+          // result in subquery.
           const frag = c.callback(sql`${alias}.${sql.identifier(c.attribute)}`);
           mappedConditions.push(sql.indent(transform(frag)));
           continue;
