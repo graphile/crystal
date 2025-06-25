@@ -207,9 +207,9 @@ export interface PgCodec<
    * True if doing an equality check for this value would have intuitive
    * results for a human. E.g. `3.0` and `3.0000` when encoded as `float` are
    * the same as a human would expect, so `float` has natural equality. On the
-   * other hand Postgres sees the `json` `{"a":1}` as different to `{ "a": 1
-   * }`), whereas a human would see these as the same JSON objects, so `json`
-   * does not have natural equality.
+   * other hand Postgres sees the `json` `{"a":1}` as different to
+   * `{ "a": 1 }`), whereas a human would see these as the same JSON objects,
+   * so `json` does not have natural equality.
    *
    * Typically true primitives will set this true.
    */
