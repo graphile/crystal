@@ -201,19 +201,19 @@ const parseIdentifier = (str: string): string =>
 // https://www.postgresql.org/docs/current/ddl-priv.html#PRIVILEGE-ABBREVS-TABLE
 const ACL_MAP = {
   // Order is significant, do not reorder these keys
-  r: "select",
-  w: "update",
-  a: "insert",
-  d: "delete",
-  D: "truncate",
-  x: "references",
-  t: "trigger",
-  X: "execute",
-  U: "usage",
-  C: "create",
-  c: "connect",
-  T: "temporary",
-  m: "maintain",
+  [ACL_SELECT]: "select",
+  [ACL_UPDATE]: "update",
+  [ACL_INSERT]: "insert",
+  [ACL_DELETE]: "delete",
+  [ACL_TRUNCATE]: "truncate",
+  [ACL_REFERENCES]: "references",
+  [ACL_TRIGGER]: "trigger",
+  [ACL_EXECUTE]: "execute",
+  [ACL_USAGE]: "usage",
+  [ACL_CREATE]: "create",
+  [ACL_CONNECT]: "connect",
+  [ACL_CREATE_TEMP]: "temporary",
+  [ACL_MAINTAIN]: "maintain",
 } as const;
 type AclCharacter = keyof typeof ACL_MAP;
 const ACL_MAP_ENTRIES = Object.entries(ACL_MAP) as ReadonlyArray<
