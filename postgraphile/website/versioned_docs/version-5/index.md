@@ -14,6 +14,13 @@ yarn add postgraphile-plugin-connection-filter@beta
 
 :::
 
+:::caution while using `pnpm`
+
+Due to the nature of `npm` and `yarn`, dependencies of postgraphile are included as both dependencies and peerDependencies.
+This is interpreted as a conflict in `pnpm`, and the peer dependencies must be installed explicity to resolve the conflict.
+
+:::
+
 :::tip Migration Guide
 
 Coming from PostGraphile Version 4? Check out the
