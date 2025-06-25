@@ -251,7 +251,7 @@ export function parseAcl(aclString: string): AclObject {
   const lastCharacterIndex = aclLength - 1;
   let i = equalsSignIndex; // Start at the "="
   // Process the ACL tokens
-  while (++i < aclString.length) {
+  while (++i < aclLength) {
     const char = aclString[i];
     if (char === "/") {
       // granter begins
