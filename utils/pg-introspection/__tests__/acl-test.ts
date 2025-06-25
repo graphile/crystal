@@ -1,7 +1,7 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
 
-import { type AclObject, parseAcl } from "../dist/acl.js";
+import { type AclObject, parseAcl, serializeAcl } from "../dist/acl.js";
 
 const allBase = {
   select: true,
@@ -81,7 +81,7 @@ describe("successful ACL parsing", () => {
     } as AclObject);
   });
   it("parses massive acl", () => {
-    assert.deepEqual(parseAcl("=rwadDxtXUCcTm/a"), {
+    assert.deepEqual(parseAcl("=arwdDxtXUCTcm/a"), {
       ...baseAcl,
       ...allBase,
       granter: "a",
@@ -89,7 +89,7 @@ describe("successful ACL parsing", () => {
     } as AclObject);
   });
   it("parses massive acl with role", () => {
-    assert.deepEqual(parseAcl("b=rwadDxtXUCcTm/a"), {
+    assert.deepEqual(parseAcl("b=arwdDxtXUCTcm/a"), {
       ...baseAcl,
       ...allBase,
       granter: "a",
@@ -97,7 +97,7 @@ describe("successful ACL parsing", () => {
     } as AclObject);
   });
   it("parses massive acl with grants", () => {
-    assert.deepEqual(parseAcl("=r*w*a*d*D*x*t*X*U*C*c*T*m*/a"), {
+    assert.deepEqual(parseAcl("=a*r*w*d*D*x*t*X*U*C*T*c*m*/a"), {
       ...baseAcl,
       ...allBase,
       ...allGrants,
@@ -106,7 +106,7 @@ describe("successful ACL parsing", () => {
     } as AclObject);
   });
   it("parses massive acl with grants and role", () => {
-    assert.deepEqual(parseAcl("b=r*w*a*d*D*x*t*X*U*C*c*T*m*/a"), {
+    assert.deepEqual(parseAcl("b=a*r*w*d*D*x*t*X*U*C*T*c*m*/a"), {
       ...baseAcl,
       ...allBase,
       ...allGrants,
@@ -126,7 +126,7 @@ describe("successful ACL parsing", () => {
     });
   });
   it("accepts granter with special characters", () => {
-    assert.deepEqual(parseAcl("b=r/a.b@example.com"), {
+    assert.deepEqual(parseAcl('b=r/"a.b@example.com"'), {
       ...baseAcl,
       select: true,
       granter: "a.b@example.com",
@@ -156,5 +156,85 @@ describe("broken ACL handling", () => {
   });
   it("throws on asterisk at beginning", () => {
     assert.throws(() => parseAcl("=*r/a"), /unsupported permission '\*'/);
+  });
+});
+
+describe("ACL serialization", () => {
+  it("serializes tiny acl", () => {
+    const acl: AclObject = {
+      ...baseAcl,
+      granter: "a",
+      role: "public",
+    };
+    assert.equal(serializeAcl(acl), "=/a");
+  });
+
+  it("serializes tiny acl with role", () => {
+    const acl: AclObject = {
+      ...baseAcl,
+      granter: "a",
+      role: "b",
+    };
+    assert.equal(serializeAcl(acl), "b=/a");
+  });
+
+  it("serializes all base permissions", () => {
+    const acl: AclObject = {
+      ...baseAcl,
+      ...allBase,
+      granter: "a",
+      role: "public",
+    };
+    assert.equal(serializeAcl(acl), "=arwdDxtXUCTcm/a");
+  });
+
+  it("serializes all permissions with grants", () => {
+    const acl: AclObject = {
+      ...baseAcl,
+      ...allBase,
+      ...allGrants,
+      granter: "a",
+      role: "public",
+    };
+    assert.equal(serializeAcl(acl), "=a*r*w*d*D*x*t*X*U*C*T*c*m*/a");
+  });
+
+  it("serializes all permissions with grants and role", () => {
+    const acl: AclObject = {
+      ...baseAcl,
+      ...allBase,
+      ...allGrants,
+      granter: "bob",
+      role: "alice",
+    };
+    assert.equal(serializeAcl(acl), "alice=a*r*w*d*D*x*t*X*U*C*T*c*m*/bob");
+  });
+
+  it("round-trips parseAcl -> serializeAcl", () => {
+    const str = "alice=a*r*w*d*x*/bob";
+    assert.equal(serializeAcl(parseAcl(str)), str);
+  });
+
+  it("round-trips serializeAcl -> parseAcl", () => {
+    const acl: AclObject = {
+      ...baseAcl,
+      role: "my_role",
+      granter: "some_granter",
+      select: true,
+      update: true,
+      delete: true,
+      updateGrant: true,
+    };
+    assert.deepEqual(parseAcl(serializeAcl(acl)), acl);
+  });
+
+  it("serializes quote-y role and granter", () => {
+    const acl: AclObject = {
+      ...baseAcl,
+      role: `"fo"o"`,
+      granter: `pos"tgres`,
+    };
+    assert.equal(serializeAcl(acl), `"fo""o"=/"pos""tgres"`);
+    assert.deepEqual(parseAcl(serializeAcl(acl)), acl);
   });
 });
