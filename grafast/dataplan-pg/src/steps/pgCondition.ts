@@ -89,6 +89,15 @@ export class PgCondition<
     }
   }
 
+  /**
+   * Use with extreme caution! It may not be safe to walk this tree backwards,
+   * you might end up getting a parent that's from an unrelated resource to the
+   * one you think you're dealing with.
+   */
+  public dangerouslyGetParent() {
+    return this.parent;
+  }
+
   public toStringMeta(): string {
     return `${(this.parent as any).id}/${this.resolvedMode.mode}`;
   }
