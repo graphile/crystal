@@ -274,6 +274,9 @@ const config = {
 
   markdown: {
     mermaid: true,
+    mdx1Compat: {
+      comments: true,
+    },
   },
   themes: ["@docusaurus/theme-mermaid"],
   trailingSlash: undefined,
