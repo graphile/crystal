@@ -241,6 +241,12 @@ const config = {
     }),
   trailingSlash: undefined,
   clientModules: [require.resolve("./docusaurus.client.js")],
+  markdown: {
+    mdx1Compat: {
+      comments: true,
+      admonitions: true,
+    },
+  },
 };
 
 module.exports = config;
