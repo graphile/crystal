@@ -276,6 +276,7 @@ const config = {
     mermaid: true,
     mdx1Compat: {
       comments: true,
+      admonitions: true,
     },
   },
   themes: ["@docusaurus/theme-mermaid"],

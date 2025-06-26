@@ -290,6 +290,7 @@ const config = {
   markdown: {
     mdx1Compat: {
       comments: true,
+      admonitions: true,
     },
   },
 };
