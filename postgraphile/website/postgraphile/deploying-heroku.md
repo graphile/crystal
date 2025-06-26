@@ -65,7 +65,7 @@ project.
 First, you need to create a `Procfile` file in the root of your repo, telling
 Heroku what to run:
 
-```
+```shell
 web: yarn start
 ```
 
@@ -118,6 +118,6 @@ job queue and sending emails, see the
 
 To delete the Heroku app:
 
-```
+```shell
 heroku apps:destroy -a myappname
 ```

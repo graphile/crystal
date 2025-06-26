@@ -126,7 +126,7 @@ Some of the features we offer:
 The easiest way to get started is with the [CLI interface](./usage-cli); if you
 have `npx` installed you can try it out with:
 
-```
+```shell
 npx pgl@beta -P pgl/amber -e -c 'postgres:///mydb'
 ```
 

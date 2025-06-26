@@ -249,7 +249,15 @@ const config = {
       prism: {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
-        additionalLanguages: ["docker", "ini", "json5", "plsql"],
+        additionalLanguages: [
+          "bash",
+          "diff",
+          "docker",
+          "ini",
+          "json5",
+          "plsql",
+          "sql",
+        ],
       },
       algolia: {
         // The application ID provided by Algolia

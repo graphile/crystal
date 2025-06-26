@@ -333,7 +333,7 @@ URL in a browser will show a user interface where a GraphQL query can be
 entered. The following query is valid against any GraphQL schema and tells you
 the fields that are available to be queried at the `Query` root:
 
-```gql
+```graphql
 query {
   __schema {
     queryType {
@@ -552,7 +552,7 @@ directly using Node's native type stripping feature. This will start a server
 at `http://localhost:5050`, opening the url in a browser will show a user
 interface where a GraphQL query can be entered, for example
 
-```gql
+```graphql
 query {
   __schema {
     queryType {
