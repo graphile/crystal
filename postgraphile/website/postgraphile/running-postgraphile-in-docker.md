@@ -44,24 +44,24 @@ Add the Docker repository to your Linux repository. Execute the following
 commands in a terminal window.
 
 ```shell
-$ sudo apt-get update
-$ sudo apt-get install apt-transport-https ca-certificates curl software-properties-common
-$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-$ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+sudo apt-get update
+sudo apt-get install apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 ```
 
 Install Docker Community Edition.
 
 ```shell
-$ sudo apt-get update
-$ sudo apt-get install docker-ce
+sudo apt-get update
+sudo apt-get install docker-ce
 ```
 
 Add your user to the docker group to setup its permissions. **Make sure to
 restart your machine after executing this command.**
 
 ```shell
-$ sudo usermod -a -G docker <username>
+sudo usermod -a -G docker <username>
 ```
 
 Test your Docker installation. Executing the following command will
@@ -69,14 +69,14 @@ automatically download the `hello-world` Docker image if it does not exist and
 run it.
 
 ```shell
-$ docker run hello-world
+docker run hello-world
 ```
 
 Remove the `hello-world` image once you're done.
 
 ```shell
-$ docker image ls
-$ docker rmi -f hello-world
+docker image ls
+docker rmi -f hello-world
 ```
 
 #### Docker Compose
@@ -88,7 +88,7 @@ become very long and unreadable due to the high number of arguments. Execute the
 following command in a terminal window.
 
 ```shell
-$ sudo apt install docker-compose
+sudo apt install docker-compose
 ```
 
 ### Install Docker on Windows Pro
@@ -368,14 +368,14 @@ of the repository.
 
 ```shell
 # Build images for all services in docker-compose.yml
-$ docker-compose build
+docker-compose build
 
 # You can also build images one by one
 # For instance you can build the database image like this
-$ docker-compose build db
+docker-compose build db
 
 # And build the graphql image like this
-$ docker-compose build graphql
+docker-compose build graphql
 ```
 
 ### Run Containers
@@ -393,16 +393,16 @@ The Docker Volume is automatically named as `<your_repository_name>_db`.
 
 ```shell
 # Run containers for all services in docker-compose.yml
-$ docker-compose up
+docker-compose up
 
 # Run containers as daemon (in background)
-$ docker-compose up -d
+docker-compose up -d
 
 # Run only the database container as daemon
-$ docker-compose up -d db
+docker-compose up -d db
 
 # Run only the GraphQL container as daemon
-$ docker-compose up -d graphql
+docker-compose up -d graphql
 ```
 
 Each container can be accessed at the following addresses:
@@ -429,19 +429,19 @@ rebuild it.
 
 ```shell
 # Stop running containers
-$ docker-compose down
+docker-compose down
 
 # List Docker volumes
-$ docker volume ls
+docker volume ls
 
 # Delete volume
-$ docker volume rm <your_repository_name>_db
+docker volume rm <your_repository_name>_db
 
 # Delete database image to force rebuild
-$ docker rmi db
+docker rmi db
 
 # Run containers (will automatically rebuild the image)
-$ docker-compose up
+docker-compose up
 ```
 
 ## Add Custom Plugin
@@ -571,13 +571,13 @@ Finally rebuild and rerun the GraphQL container.
 
 ```shell
 # Shut down containers
-$ docker-compose down
+docker-compose down
 
 # Rebuild the GraphQL container
-$ docker-compose build graphql
+docker-compose build graphql
 
 # Rerun containers
-$ docker-compose up
+docker-compose up
 ```
 
 If you execute a `createUser` mutation like in the example provided below, you

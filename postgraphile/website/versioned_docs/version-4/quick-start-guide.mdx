@@ -78,8 +78,8 @@ If you want to connect to a different database within PostgreSQL, just add the
 database name to the end of the connection string:
 
 ```bash
-$ psql postgres:///testdb # Connects to the `testdb` database on your local machine
-$ psql "postgres://user:password@somehost:2345/somedb"  # Connects to the `somedb` database at `postgres://somehost:2345` using login with `user` and `password`
+psql postgres:///testdb # Connects to the `testdb` database on your local machine
+psql "postgres://user:password@somehost:2345/somedb"  # Connects to the `somedb` database at `postgres://somehost:2345` using login with `user` and `password`
 ```
 
 Read the documentation on
@@ -91,7 +91,7 @@ to learn more about alternative formats (including using a password).
 Next, create a database. You can do this by using the terminal:
 
 ```
-$ createdb mydb
+createdb mydb
 ```
 
 This will create a PostgreSQL database called "mydb". You can read more about
@@ -111,13 +111,12 @@ Type "help" for help.
 Run the following query to make sure things are working smoothly:
 
 ```
-=# select 1 + 1 as two;
+select 1 + 1 as two;
  two
 -----
    2
 (1 row)
 
-=#
 ```
 
 ### Install PostGraphile
@@ -126,7 +125,7 @@ It is easy to install PostGraphile with
 [npm](https://docs.npmjs.com/getting-started/installing-node):
 
 ```
-$ npm install -g postgraphile
+npm install -g postgraphile
 ```
 
 :::note
@@ -144,19 +143,19 @@ database name added:
 
 ```bash
 # Connect to the `mydb` database within the local PostgreSQL server
-$ postgraphile -c "postgres:///mydb"
+postgraphile -c "postgres:///mydb"
 
 # Connect to a database that requires SSL/TLS
-$ postgraphile -c "postgres://securehost:5432/db?ssl=true"
+postgraphile -c "postgres://securehost:5432/db?ssl=true"
 
 # Connect to the `somedb` database within the PostgreSQL at somehost port 2345
-$ postgraphile -c "postgres://somehost:2345/somedb"
+postgraphile -c "postgres://somehost:2345/somedb"
 ```
 
 You can also run PostGraphile with the watch flag:
 
 ```bash
-$ postgraphile -c "postgres:///mydb" --watch
+postgraphile -c "postgres:///mydb" --watch
 ```
 
 With the `--watch` flag, PostGraphile will automatically update your GraphQL API
