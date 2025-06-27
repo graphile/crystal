@@ -2,15 +2,7 @@
 title: PostGraphile V5 alpha is here!
 description: PostGraphile Version 5 is now ready to run in some production environments!
 slug: 2023-04-26-version-5-alpha
-authors:
-  - name: Benjie
-    title: PostGraphile Maintainer
-    url: https://github.com/Benjie
-    image_url: https://github.com/Benjie.png
-  - name: Jem
-    title: "“I wear many hats”"
-    url: https://bsky.app/profile/jem.graphile.org
-    image_url: https://github.com/jemgillam.png
+authors: [benjie, jem]
 tags: [Alpha]
 hide_table_of_contents: false
 ---
