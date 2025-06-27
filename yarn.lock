@@ -5234,6 +5234,7 @@ __metadata:
     "@mdx-js/react": "npm:^3.1.0"
     "@types/react": "npm:^19.1.8"
     clsx: "npm:^2.1.1"
+    postcss: "npm:^8.5.6"
     postcss-nested: "npm:^6.2.0"
     prism-react-renderer: "npm:^2.4.1"
     react: "npm:^19.1.0"
@@ -20731,7 +20732,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:^8.4.21, postcss@npm:^8.4.24, postcss@npm:^8.4.33, postcss@npm:^8.4.47, postcss@npm:^8.5.4":
+"postcss@npm:^8.4.21, postcss@npm:^8.4.24, postcss@npm:^8.4.33, postcss@npm:^8.4.47, postcss@npm:^8.5.4, postcss@npm:^8.5.6":
   version: 8.5.6
   resolution: "postcss@npm:8.5.6"
   dependencies:
