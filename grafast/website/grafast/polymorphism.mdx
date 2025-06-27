@@ -117,6 +117,8 @@ identifier, and you use this type to determine how to fetch the record. We’ll
 call this “type-to-fetch”, and the specifier is this string we mentioned:
 `User:1`.
 
+{
+
 <figure>
   <Mermaid
     chart={`
@@ -144,6 +146,7 @@ end
     fetched depends on that.
   </figcaption>
 </figure>
+}
 
 The specifier that a given abstract type requires is based on the expectations
 of its `planType` method, which the schema author supplies.
