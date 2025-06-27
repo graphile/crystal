@@ -34,7 +34,8 @@ mutation {
         domain2: 1
         textArray: ["Hi"]
         json: "{\"json\":true}"
-        jsonb: "{\"jsonb\":true}"
+        jsonb: "{\"jsonb\":true}",
+        jsonpath: "$.path",
         numrange: {
           start: { value: "1", inclusive: true }
           end: { value: "7", inclusive: true }
@@ -104,6 +105,7 @@ mutation {
         textArray: ["Hi"]
         json: "{\"json\":true}"
         jsonb: "{\"jsonb\":true}"
+        jsonpath: "$.path"
         numrange: {
           start: { value: "1", inclusive: true }
           end: { value: "7", inclusive: true }
@@ -171,6 +173,7 @@ fragment type on Type {
   textArray
   json
   jsonb
+  jsonpath
   nullableRange {
     start {
       value

@@ -118,6 +118,9 @@
     "@whatwg-node/server": {
       "optional": true
     },
+    "graphile-config": {
+      "optional": true
+    },
     "h3": {
       "optional": true
     },

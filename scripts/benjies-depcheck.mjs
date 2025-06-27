@@ -142,10 +142,11 @@ for (const packagePath of packages) {
 
 // Now check peerDependencies.
 // For each package A that depends or peerDepends on another package B, A must provide B's peerDependencies
+// For each package A that has both a dependency and peerDependency on package B, B must be an optional peer dependency
 for (const module of Object.values(all)) {
   const {
     name,
-    packageJson: { dependencies, peerDependencies },
+    packageJson: { dependencies, peerDependencies, peerDependenciesMeta },
   } = module;
   const check = (dependencies, isPeer) => {
     // Peer deps don't need their peer's other peerDeps
@@ -153,6 +154,13 @@ for (const module of Object.values(all)) {
       return;
     }
     for (const depModuleName in dependencies) {
+      if (!isPeer && peerDependencies?.[depModuleName]) {
+        if (peerDependenciesMeta?.[depModuleName]?.optional !== true) {
+          fails.push(
+            `${name} has dual dependency (direct and peer) on ${depModuleName}; this must be marked as an optional peer dependency.`,
+          );
+        }
+      }
       const dep = all[depModuleName];
       if (dep) {
         const depPeerDeps = dep.packageJson.peerDependencies;
