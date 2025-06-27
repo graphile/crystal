@@ -1,0 +1,20 @@
+benjie:
+  name: Benjie
+  title: PostGraphile Maintainer
+  url: https://github.com/Benjie
+  image_url: https://github.com/Benjie.png
+  socials:
+    github: benjie
+    bluesky: benjie.dev
+    linkedin: benjiegillam
+    website: https://benjie.dev
+
+jem:
+  name: Jem
+  title: "“I wear many hats”"
+  url: https://bsky.app/profile/jem.graphile.org
+  image_url: https://github.com/jemgillam.png
+  socials:
+    github: jemgillam
+    bluesky: jem.graphile.org
+    linkedin: jem-gillam-92063b14
