@@ -8620,7 +8620,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"accepts@npm:^1.3.5, accepts@npm:^1.3.7, accepts@npm:~1.3.4, accepts@npm:~1.3.8":
+"accepts@npm:^1.3.5, accepts@npm:~1.3.4, accepts@npm:~1.3.8":
   version: 1.3.8
   resolution: "accepts@npm:1.3.8"
   dependencies:
@@ -13081,20 +13081,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"express-graphql@npm:^0.12.0":
-  version: 0.12.0
-  resolution: "express-graphql@npm:0.12.0"
-  dependencies:
-    accepts: "npm:^1.3.7"
-    content-type: "npm:^1.0.4"
-    http-errors: "npm:1.8.0"
-    raw-body: "npm:^2.4.1"
-  peerDependencies:
-    graphql: ^14.7.0 || ^15.3.0
-  checksum: 10/da0ddccc4446ac80f9e85d949dfba6ca2bfccb320668f4dcf0df3fa46c1b0f21aa99f470d64e6dd70fd2a13bfbeeee2c82d0f0bb55a110bb2eac4ea5b9f0127c
-  languageName: node
-  linkType: hard
-
 "express@npm:^4.17.3, express@npm:^4.21.2":
   version: 4.21.2
   resolution: "express@npm:4.21.2"
@@ -14271,7 +14257,6 @@ __metadata:
     chalk: "npm:^4.1.2"
     debug: "npm:^4.4.1"
     express: "npm:^4.21.2"
-    express-graphql: "npm:^0.12.0"
     fastify: "npm:^4.29.1"
     fastify-static: "npm:^4.7.0"
     grafserv: "workspace:^"
@@ -15102,19 +15087,6 @@ __metadata:
   version: 1.2.7
   resolution: "http-deceiver@npm:1.2.7"
   checksum: 10/9ae293b0acbfad6ed45d52c1f85f58ab062465872fd9079c80d78c6527634002d73c2a9d8c0296cc12d178a0b689bb5291d9979aad3ce71ab17a7517588adbf7
-  languageName: node
-  linkType: hard
-
-"http-errors@npm:1.8.0":
-  version: 1.8.0
-  resolution: "http-errors@npm:1.8.0"
-  dependencies:
-    depd: "npm:~1.1.2"
-    inherits: "npm:2.0.4"
-    setprototypeof: "npm:1.2.0"
-    statuses: "npm:>= 1.5.0 < 2"
-    toidentifier: "npm:1.0.0"
-  checksum: 10/eec06bf53369432ad98eb296604f961dd0405fce7f01f7159186ab44f732fb538007428d043472554af689d06892b7764defe61ec7134a64827f91ff72f18057
   languageName: node
   linkType: hard
 
@@ -21768,7 +21740,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"raw-body@npm:2.5.2, raw-body@npm:^2.3.3, raw-body@npm:^2.4.1":
+"raw-body@npm:2.5.2, raw-body@npm:^2.3.3":
   version: 2.5.2
   resolution: "raw-body@npm:2.5.2"
   dependencies:
@@ -24540,13 +24512,6 @@ __metadata:
   version: 1.0.6
   resolution: "toggle-selection@npm:1.0.6"
   checksum: 10/9a0ed0ecbaac72b4944888dacd79fe0a55eeea76120a4c7e46b3bb3d85b24f086e90560bb22f5a965654a25ab43d79ec47dfdb3f1850ba740b14c5a50abc7040
-  languageName: node
-  linkType: hard
-
-"toidentifier@npm:1.0.0":
-  version: 1.0.0
-  resolution: "toidentifier@npm:1.0.0"
-  checksum: 10/199e6bfca1531d49b3506cff02353d53ec987c9ee10ee272ca6484ed97f1fc10fb77c6c009079ca16d5c5be4a10378178c3cacdb41ce9ec954c3297c74c6053e
   languageName: node
   linkType: hard
 
