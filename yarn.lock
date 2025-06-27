@@ -2635,7 +2635,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@dataplan/json@workspace:*, @dataplan/json@workspace:grafast/dataplan-json":
+"@dataplan/json@workspace:*, @dataplan/json@workspace:^, @dataplan/json@workspace:grafast/dataplan-json":
   version: 0.0.0-use.local
   resolution: "@dataplan/json@workspace:grafast/dataplan-json"
   dependencies:
@@ -2650,10 +2650,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dataplan/pg@workspace:*, @dataplan/pg@workspace:grafast/dataplan-pg":
+"@dataplan/pg@workspace:*, @dataplan/pg@workspace:^, @dataplan/pg@workspace:grafast/dataplan-pg":
   version: 0.0.0-use.local
   resolution: "@dataplan/pg@workspace:grafast/dataplan-pg"
   dependencies:
+    "@dataplan/json": "workspace:^"
     "@graphile/lru": "workspace:^"
     "@mermaid-js/mermaid-cli": "npm:^11.4.3"
     "@types/jest": "npm:^30.0.0"
@@ -2694,6 +2695,8 @@ __metadata:
     pg: ^8.7.1
     pg-sql2: "workspace:^"
   peerDependenciesMeta:
+    "@dataplan/json":
+      optional: true
     graphile-config:
       optional: true
     pg:
@@ -13902,6 +13905,7 @@ __metadata:
     "@types/semver": "npm:^7.7.0"
     chalk: "npm:^4.1.2"
     debug: "npm:^4.4.1"
+    grafast: "workspace:^"
     graphile-config: "workspace:^"
     graphile-export: "workspace:^"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
@@ -13982,15 +13986,20 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "graphile-utils@workspace:graphile-build/graphile-utils"
   dependencies:
+    "@dataplan/pg": "workspace:^"
     "@types/node": "npm:^24.0.4"
     debug: "npm:^4.4.1"
+    grafast: "workspace:^"
     graphile-build: "workspace:^"
     graphile-build-pg: "workspace:^"
+    graphile-config: "workspace:^"
+    graphql: "npm:^16.1.0-experimental-stream-defer.6"
     jest: "npm:^30.0.0"
     jest-serializer-graphql-schema: "workspace:^"
     json5: "npm:^2.2.3"
     nodemon: "npm:^3.1.10"
     postgraphile: "workspace:^"
+    tamedevil: "workspace:^"
     ts-node: "npm:^10.9.2"
     tslib: "npm:^2.8.1"
     typescript: "npm:^5.8.3"

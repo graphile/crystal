@@ -62,13 +62,18 @@
     }
   },
   "devDependencies": {
+    "@dataplan/pg": "workspace:^",
     "@types/node": "^24.0.4",
+    "grafast": "workspace:^",
     "graphile-build": "workspace:^",
     "graphile-build-pg": "workspace:^",
+    "graphile-config": "workspace:^",
+    "graphql": "^16.1.0-experimental-stream-defer.6",
     "jest": "^30.0.0",
     "jest-serializer-graphql-schema": "workspace:^",
     "nodemon": "^3.1.10",
     "postgraphile": "workspace:^",
+    "tamedevil": "workspace:^",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
