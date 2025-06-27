@@ -2697,6 +2697,8 @@ __metadata:
   peerDependenciesMeta:
     "@dataplan/json":
       optional: true
+    grafast:
+      optional: true
     graphile-config:
       optional: true
     pg:
