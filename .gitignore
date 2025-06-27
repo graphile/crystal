@@ -27,6 +27,8 @@ grafast/grafast/__tests__/dcc/**/*.mermaid
 !.yarn/releases/*
 !.yarn/plugins
 !.yarn/plugins/*
+!.yarn/patches
+!.yarn/patches/*
 .pnp.*
 
 # Generated documentation

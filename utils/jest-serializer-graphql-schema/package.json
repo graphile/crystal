@@ -31,6 +31,7 @@
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
+    "@types/node": "^24.0.4",
     "graphql": "16.1.0-experimental-stream-defer.6",
     "jest": "^30.0.0",
     "pretty-format": "^30.0.0",

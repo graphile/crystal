@@ -1,19 +1,13 @@
-import "codemirror/keymap/sublime";
-import "codemirror/theme/monokai.css";
-import "codemirror/mode/javascript/javascript";
-import "codemirror-graphql/hint";
-import "codemirror-graphql/lint";
-import "codemirror-graphql/mode";
-import "graphiql/style.css";
-import "@graphiql/plugin-explorer/style.css";
-import "ruru-components/ruru.css";
-
 import CodeMirror from "@uiw/react-codemirror";
+import { javascript } from "@codemirror/lang-javascript";
+import { graphql } from "cm6-graphql";
 import * as Grafast from "grafast";
 import { grafast, makeGrafastSchema } from "grafast";
 import { parse, GraphQLError } from "graphql";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState, useEffect } from "react";
 import { Ruru } from "ruru-components";
+import { useColorMode } from "@docusaurus/theme-common";
+import { githubLight, githubDark } from "@uiw/codemirror-theme-github";
 
 import styles from "./styles.module.css";
 
@@ -122,10 +116,25 @@ with (Grafast) {
     },
     [schema],
   );
+  const { colorMode } = useColorMode();
+
+  // Hack around GraphiQL forcedTheme bug
+  const [firstRender, setFirstRender] = useState(true);
+  useEffect(() => {
+    if (firstRender) {
+      setTimeout(() => void setFirstRender(false), 0);
+    }
+  }, [firstRender]);
+
   return (
     <div className={styles.container}>
       <div className={styles.ruru}>
-        <Ruru fetcher={fetcher} defaultQuery={INITIAL_QUERY} />
+        <Ruru
+          fetcher={fetcher}
+          defaultQuery={INITIAL_QUERY}
+          defaultTheme={colorMode}
+          forcedTheme={firstRender ? "light" : colorMode}
+        />
       </div>
       <div className={styles.editors}>
         <div className={styles.editor}>
@@ -142,19 +151,21 @@ with (Grafast) {
 }
 
 const Editor = ({ value, onValueChange, lang }) => {
-  const options = useMemo(() => {
-    return {
-      theme: "monokai",
-      keyMap: "sublime",
-      mode: lang,
-    };
-  }, [lang]);
+  const { colorMode } = useColorMode();
+  const extensions = useMemo(() => {
+    const base = [colorMode === "dark" ? githubDark : githubLight];
+    if (lang === "js") return [...base, javascript({ jsx: true })];
+    if (lang === "graphql") return [...base, graphql()];
+    return base;
+  }, [colorMode, lang]);
+
   return (
     <CodeMirror
-      lazyLoadMode={false}
       value={value}
+      height="200px"
+      extensions={extensions}
       onChange={onValueChange}
-      options={options}
+      theme={colorMode}
     />
   );
 };

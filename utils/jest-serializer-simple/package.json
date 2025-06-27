@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
+    "@types/node": "^24.0.4",
     "jest": "^30.0.0",
     "pretty-format": "^30.0.0",
     "ts-node": "^10.9.2",
