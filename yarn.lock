@@ -13799,6 +13799,7 @@ __metadata:
     fastify: "npm:^4.29.1"
     grafast: "workspace:^"
     graphile-config: "workspace:^"
+    graphql: "npm:^16.1.0-experimental-stream-defer.6"
     graphql-http: "npm:^1.22.4"
     graphql-ws: "npm:^6.0.5"
     h3: "npm:^1.15.3"
@@ -13862,6 +13863,7 @@ __metadata:
     express: "npm:^4.21.2"
     fastify: "npm:^4.29.1"
     fastify-static: "npm:^4.7.0"
+    grafast: "workspace:^"
     grafserv: "workspace:^"
     graphile-config: "workspace:^"
     graphile-export: "workspace:^"
@@ -13872,6 +13874,7 @@ __metadata:
     jsonwebtoken: "npm:^9.0.2"
     pg: "npm:^8.16.0"
     pg-introspection: "workspace:^"
+    pg-sql2: "workspace:^"
     ruru: "workspace:^"
     ts-node: "npm:^10.9.2"
     tslib: "npm:^2.8.1"
@@ -13890,6 +13893,8 @@ __metadata:
     graphile-config:
       optional: true
     pg:
+      optional: true
+    pg-sql2:
       optional: true
   languageName: unknown
   linkType: soft

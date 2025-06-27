@@ -50,6 +50,7 @@
     "graphile-config": "workspace:^",
     "jsonwebtoken": "^9.0.2",
     "pg-introspection": "workspace:^",
+    "pg-sql2": "workspace:^",
     "tslib": "^2.8.1"
   },
   "peerDependencies": {
@@ -67,6 +68,9 @@
       "optional": true
     },
     "pg": {
+      "optional": true
+    },
+    "pg-sql2": {
       "optional": true
     }
   },
@@ -90,6 +94,7 @@
     "express": "^4.21.2",
     "fastify": "^4.29.1",
     "fastify-static": "^4.7.0",
+    "grafast": "workspace:^",
     "grafserv": "workspace:^",
     "graphile-export": "workspace:^",
     "graphql": "16.1.0-experimental-stream-defer.6",
