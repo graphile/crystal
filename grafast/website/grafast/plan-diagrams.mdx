@@ -95,7 +95,7 @@ those steps in parallel since they are independent of each other.
 ### `ᐳ:`
 
 Immediately following a numbered line, there may be a line that begins with
-"ᐳ:". This indicates the "synchronous and safe" unbatched steps that will be
+`ᐳ:`. This indicates the "synchronous and safe" unbatched steps that will be
 executed immediately after the numbered line - this is an optimization that
 means the system doesn't need to loop multiple times to satisfy these needs.
 
@@ -198,7 +198,7 @@ ${init}
 
 ### Implicit side effect dependency
 
-If a step is implicitly dependent on a side effect due to occuring after the
+If a step is implicitly dependent on a side effect due to occurring after the
 side effect, a dotted line ending in a circle will join the nodes to indicate
 the step is implicitly dependent on the previous step:
 
