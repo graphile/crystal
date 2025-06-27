@@ -59,7 +59,7 @@ There's a few critical things to keep in mind:
 To speed up builds, we recommend you pay attention to your `.dockerignore` file;
 here's an example to get you started:
 
-```ini
+```ignore
 # .dockerignore
 .env
 .git
