@@ -33,7 +33,8 @@
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "3.8.1"
+    "@docusaurus/module-type-aliases": "3.8.1",
+    "@types/react": "^19.1.8"
   },
   "browserslist": {
     "production": [

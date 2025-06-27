@@ -42,6 +42,7 @@
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "^3.8.1",
+    "@types/react": "^19.1.8",
     "dataloader": "^2.2.3",
     "mermaid": "^11.6.0",
     "sqlite3": "^5.1.7"
