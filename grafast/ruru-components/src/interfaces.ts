@@ -27,6 +27,8 @@ export interface RuruProps {
   subscriptionEndpoint?: string;
 
   editorTheme?: GraphiQLProps["editorTheme"];
+  forcedTheme?: GraphiQLProps["forcedTheme"];
+  defaultTheme?: GraphiQLProps["defaultTheme"];
 
   /**
    * The list of debug tools available to the user.
