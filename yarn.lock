@@ -3829,11 +3829,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@graphiql/plugin-doc-explorer@npm:^0.3.0-rc.3":
-  version: 0.3.0-rc.3
-  resolution: "@graphiql/plugin-doc-explorer@npm:0.3.0-rc.3"
+"@graphiql/plugin-doc-explorer@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "@graphiql/plugin-doc-explorer@npm:0.3.0"
   dependencies:
-    "@graphiql/react": "npm:^0.35.0-rc.3"
+    "@graphiql/react": "npm:^0.35.0"
     "@headlessui/react": "npm:^2.2"
     react-compiler-runtime: "npm:19.1.0-rc.1"
     zustand: "npm:^5"
@@ -3841,13 +3841,13 @@ __metadata:
     graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
     react: ^18 || ^19
     react-dom: ^18 || ^19
-  checksum: 10/878e2dc5fb874cfee110bbbccd34eb4300824cf30494f22324d7f99064531c4bd9310eff9efe226e886c4c4cdd0674e16e77ce531e615cfc9b802af59d186dac
+  checksum: 10/3061721ccf63c6fe676d8b0243848a2bfac27b76019cf7a1e475d7a21f0fa9683f1e4c141ba62fdbee3691d09af8d794e6e46262988bb48a6e2eb1929575c0fa
   languageName: node
   linkType: hard
 
 "@graphiql/plugin-explorer@npm:^5.0.0-rc.3":
-  version: 5.0.0-rc.3
-  resolution: "@graphiql/plugin-explorer@npm:5.0.0-rc.3"
+  version: 5.0.0
+  resolution: "@graphiql/plugin-explorer@npm:5.0.0"
   dependencies:
     graphiql-explorer: "npm:^0.9.0"
   peerDependencies:
@@ -3855,28 +3855,28 @@ __metadata:
     graphql: ^15.5.0 || ^16.0.0 || ^17.0.0-alpha.2
     react: ^18 || ^19
     react-dom: ^18 || ^19
-  checksum: 10/384812edb533566f198c5497cb4902c5e90dda145d3ccfc3277d62881bf383bdb7f291b5c75839ea63f8586fb02bd5a919ac53e1ae955ee4c7cb8e7cfd8279aa
+  checksum: 10/9b6a0eefbec1a0ed3ccaf2781742e6b83a4f659e03a85ccb7ef8718190da047df89cc3eb8cd3440bf10c3db3ad80c056655544b6cceb3500a9da94975aa5cdde
   languageName: node
   linkType: hard
 
-"@graphiql/plugin-history@npm:^0.3.0-rc.1":
-  version: 0.3.0-rc.2
-  resolution: "@graphiql/plugin-history@npm:0.3.0-rc.2"
+"@graphiql/plugin-history@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "@graphiql/plugin-history@npm:0.3.0"
   dependencies:
-    "@graphiql/react": "npm:^0.35.0-rc.4"
+    "@graphiql/react": "npm:^0.35.0"
     "@graphiql/toolkit": "npm:^0.11.3"
     react-compiler-runtime: "npm:19.1.0-rc.1"
     zustand: "npm:^5"
   peerDependencies:
     react: ^18 || ^19
     react-dom: ^18 || ^19
-  checksum: 10/ff9ebc54262e7542e7d9a47ef1e8f60a8c81a95aae3f871b7b030aa4baf6d816bc16b3e30f78d8e73475ee4896be9f093df4de4d484667b4a7a7f02adfd98a26
+  checksum: 10/57bd4cd045914168c093ced3a1e78c0053dce564521b86d59d0aca9b019e7fc6f36eea1e4ad535de733a18e74dacb932616217cfbd31b1f3b1a060576b86773f
   languageName: node
   linkType: hard
 
-"@graphiql/react@npm:^0.35.0-rc.3, @graphiql/react@npm:^0.35.0-rc.4, @graphiql/react@npm:^0.35.0-rc.6":
-  version: 0.35.0-rc.6
-  resolution: "@graphiql/react@npm:0.35.0-rc.6"
+"@graphiql/react@npm:^0.35.0, @graphiql/react@npm:^0.35.0-rc.6":
+  version: 0.35.1
+  resolution: "@graphiql/react@npm:0.35.1"
   dependencies:
     "@graphiql/toolkit": "npm:^0.11.3"
     "@radix-ui/react-dialog": "npm:^1.1"
@@ -3890,7 +3890,7 @@ __metadata:
     jsonc-parser: "npm:^3.3.1"
     markdown-it: "npm:^14.1.0"
     monaco-editor: "npm:^0.52.2"
-    monaco-graphql: "npm:^1.7.1-rc.0"
+    monaco-graphql: "npm:^1.7.1"
     prettier: "npm:^3.5.3"
     react-compiler-runtime: "npm:19.1.0-rc.1"
     set-value: "npm:^4.1.0"
@@ -3899,7 +3899,7 @@ __metadata:
     graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
     react: ^18 || ^19
     react-dom: ^18 || ^19
-  checksum: 10/3984e8d7a8724141eb71df15663a3172bf761aab0d98c66b6199045926f6e485928367486f7f2aa944701721f1470488e1019d00e43dece22ee8c76ca014d550
+  checksum: 10/f1ee727edc426a0827d8a86d9ab7bac200fa2a2233f0800453598bb1aaf27ee21b6dd049a8b5a6cbab9845644ab875628e534d023bf785cff51f06e64fa5f6d0
   languageName: node
   linkType: hard
 
@@ -13224,11 +13224,11 @@ __metadata:
   linkType: hard
 
 "framer-motion@npm:^12.12":
-  version: 12.18.1
-  resolution: "framer-motion@npm:12.18.1"
+  version: 12.19.2
+  resolution: "framer-motion@npm:12.19.2"
   dependencies:
-    motion-dom: "npm:^12.18.1"
-    motion-utils: "npm:^12.18.1"
+    motion-dom: "npm:^12.19.0"
+    motion-utils: "npm:^12.19.0"
     tslib: "npm:^2.4.0"
   peerDependencies:
     "@emotion/is-prop-valid": "*"
@@ -13241,7 +13241,7 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: 10/97ce2df93f86cae23ecb5ce8346b7474e7acf8d32e29efb402268123b3b1f9d2144d998f41529830040307293108e47bee93d0e1fd12bbad5f709f15083db10b
+  checksum: 10/5841acf026eae3b53435a917708304090c7a47ebe63b221adeb376b7cc134598c87c4a9e0229ffa46c03197ccbeb71b1fffbd2d20bdf5d4031a70409ed5ca119
   languageName: node
   linkType: hard
 
@@ -14029,18 +14029,18 @@ __metadata:
   linkType: hard
 
 "graphiql@npm:^5.0.0-rc.4":
-  version: 5.0.0-rc.4
-  resolution: "graphiql@npm:5.0.0-rc.4"
+  version: 5.0.0
+  resolution: "graphiql@npm:5.0.0"
   dependencies:
-    "@graphiql/plugin-doc-explorer": "npm:^0.3.0-rc.3"
-    "@graphiql/plugin-history": "npm:^0.3.0-rc.1"
-    "@graphiql/react": "npm:^0.35.0-rc.6"
+    "@graphiql/plugin-doc-explorer": "npm:^0.3.0"
+    "@graphiql/plugin-history": "npm:^0.3.0"
+    "@graphiql/react": "npm:^0.35.0"
     react-compiler-runtime: "npm:19.1.0-rc.1"
   peerDependencies:
     graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
     react: ^18 || ^19
     react-dom: ^18 || ^19
-  checksum: 10/75020206b752f5c0ee78c7a557353127110ac8c544d7f826ef3026734fb5a3d0543fe5aca9c4fd689dc71fba7f9ff3aee49035b7955091e7759fa864dc357745
+  checksum: 10/6c521bf3f754f683690fbb10ace6b22695d42f6bbbcbc3148e804f12ab3d9a528a72c5d17a1728a345dfb431688c6b26c1a66314163c39b2fec5da22679112b1
   languageName: node
   linkType: hard
 
@@ -18478,9 +18478,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"monaco-graphql@npm:^1.7.1-rc.0":
-  version: 1.7.1-rc.0
-  resolution: "monaco-graphql@npm:1.7.1-rc.0"
+"monaco-graphql@npm:^1.7.1":
+  version: 1.7.1
+  resolution: "monaco-graphql@npm:1.7.1"
   dependencies:
     graphql-language-service: "npm:^5.4.0"
     picomatch-browser: "npm:^2.2.6"
@@ -18488,23 +18488,23 @@ __metadata:
     graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
     monaco-editor: ">= 0.20.0 < 1"
     prettier: ^2.8.0 || ^3.0.0
-  checksum: 10/caacb0dfa08881e8cdb21f81ceeea859eaaa5236dfeee05079f654aa1837b5ce00fb1c39ec73d2295d73a1cc9d581debcc733ebed03fb3e386a89425e69e1338
+  checksum: 10/3c6673680fbf16f274c4c3490fee4e1f1f3d659dd4d1257c3620455b362d262a78335737c1240b919fb84127180384100f4fd3ed7cf76ea50112e2b521fa48fc
   languageName: node
   linkType: hard
 
-"motion-dom@npm:^12.18.1":
-  version: 12.18.1
-  resolution: "motion-dom@npm:12.18.1"
+"motion-dom@npm:^12.19.0":
+  version: 12.19.0
+  resolution: "motion-dom@npm:12.19.0"
   dependencies:
-    motion-utils: "npm:^12.18.1"
-  checksum: 10/8323bc61aa4bf232b3284da2407789fe41d0009959236c7bb38cd079db3820043aeb6aa5bec53f8a9574e653b282eff007be031d12ff3cfc8e1595adf66e3a97
+    motion-utils: "npm:^12.19.0"
+  checksum: 10/52aa28dc43fd727bebdbea64717e4dec8e7cb5ab0e001b465ee25526378fdbbd8bdd2b35004069192469872cb55c7b63f435df71ac8315a32fada9d7885576c6
   languageName: node
   linkType: hard
 
-"motion-utils@npm:^12.18.1":
-  version: 12.18.1
-  resolution: "motion-utils@npm:12.18.1"
-  checksum: 10/d3c68a5bf7561009b476df3b8d101b034d42fc9af16bacde004261f7303e3044758080ddf79decf67da733d32b284876b899d603bf0f31f5f19366f728006438
+"motion-utils@npm:^12.19.0":
+  version: 12.19.0
+  resolution: "motion-utils@npm:12.19.0"
+  checksum: 10/a6fe6b329bf4e2070bb95788218f36f0d7ea6cc3098e6ea2646ed68d5be88d25fa30e55284463ace78d19a5e19714875a7b70055bd86ae6e52a5fdee08438470
   languageName: node
   linkType: hard
 
@@ -23790,21 +23790,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"terser@npm:^5.10.0, terser@npm:^5.31.1":
-  version: 5.42.0
-  resolution: "terser@npm:5.42.0"
-  dependencies:
-    "@jridgewell/source-map": "npm:^0.3.3"
-    acorn: "npm:^8.14.0"
-    commander: "npm:^2.20.0"
-    source-map-support: "npm:~0.5.20"
-  bin:
-    terser: bin/terser
-  checksum: 10/c2375f84c36dd908699c0c46ed38b47efc0eaaf824dbd579f55f776b7d65168a162c10adbb0638bd0d4517e05a578af038a5d3d25a5acd033c6652fa6d100be9
-  languageName: node
-  linkType: hard
-
-"terser@npm:^5.15.1":
+"terser@npm:^5.10.0, terser@npm:^5.15.1, terser@npm:^5.31.1":
   version: 5.43.0
   resolution: "terser@npm:5.43.0"
   dependencies:
