@@ -13,7 +13,7 @@ mermaid.initialize({
 
 let counter = 0;
 const Mermaid = ({ chart }) => {
-  const key = useMemo(() => `mermaid-${++counter}`);
+  const key = useMemo(() => `mermaid-${++counter}`, []);
   const render = useCallback(
     (el) => {
       if (!el) return;
