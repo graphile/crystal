@@ -1,5 +1,4 @@
-import "graphile-config";
-import "graphile-build-pg";
+import "../index.js";
 
 import type { PgCodecRelation } from "@dataplan/pg";
 

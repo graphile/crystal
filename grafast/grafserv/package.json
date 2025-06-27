@@ -118,6 +118,9 @@
     "@whatwg-node/server": {
       "optional": true
     },
+    "graphile-config": {
+      "optional": true
+    },
     "h3": {
       "optional": true
     },
@@ -130,17 +133,20 @@
   },
   "devDependencies": {
     "@envelop/core": "^5.2.3",
-    "@fastify/websocket": "^8.3.1",
+    "@fastify/websocket": "^11.1.0",
     "@hono/node-server": "^1.14.4",
+    "@hono/node-ws": "^1.1.7",
     "@types/aws-lambda": "^8.10.150",
     "@types/express": "^4.17.23",
     "@types/koa": "^2.15.0",
     "@types/koa-bodyparser": "^4.3.12",
+    "@types/node": "^24.0.4",
     "@whatwg-node/fetch": "^0.10.8",
     "@whatwg-node/server": "^0.10.10",
     "express": "^4.21.2",
     "fastify": "^4.29.1",
     "grafast": "workspace:^",
+    "graphql": "^16.1.0-experimental-stream-defer.6",
     "graphql-http": "^1.22.4",
     "h3": "^1.15.3",
     "hono": "^4.7.11",

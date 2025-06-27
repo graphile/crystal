@@ -17,14 +17,23 @@
     "test": "cd examples/users-and-friends && node index.mjs"
   },
   "dependencies": {
+    "@codemirror/autocomplete": "^6.18.6",
+    "@codemirror/commands": "^6.8.1",
+    "@codemirror/lang-javascript": "^6.2.4",
+    "@codemirror/language": "^6.11.1",
+    "@codemirror/lint": "^6.8.5",
+    "@codemirror/state": "^6.5.2",
+    "@codemirror/view": "^6.37.2",
     "@docusaurus/core": "^3.8.1",
     "@docusaurus/preset-classic": "^3.8.1",
     "@docusaurus/remark-plugin-npm2yarn": "^3.8.1",
+    "@docusaurus/theme-common": "^3.8.1",
     "@mdx-js/react": "^3.1.0",
-    "@uiw/react-codemirror": "^4.23.13",
+    "@uiw/codemirror-theme-github": "^4.23.14",
+    "@uiw/react-codemirror": "^4.23.14",
     "clsx": "^2.1.1",
-    "codemirror": "^5.65.19",
-    "codemirror-graphql": "^2.2.2",
+    "cm6-graphql": "^0.2.1",
+    "codemirror": "^6.0.2",
     "grafast": "workspace:^",
     "prism-react-renderer": "^2.4.1",
     "react": "^19.1.0",
@@ -33,7 +42,11 @@
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "^3.8.1",
+    "@docusaurus/plugin-content-docs": "^3.8.1",
+    "@lezer/highlight": "^1.2.1",
+    "@types/react": "^19.1.8",
     "dataloader": "^2.2.3",
+    "graphql": "^16.1.0-experimental-stream-defer.6",
     "mermaid": "^11.6.0",
     "sqlite3": "^5.1.7"
   },
@@ -50,6 +63,6 @@
     ]
   },
   "engines": {
-    "node": ">=18.0"
+    "node": ">=22"
   }
 }

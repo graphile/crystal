@@ -49,11 +49,13 @@
   },
   "homepage": "https://grafast.org/grafast/step-library/dataplan-pg/",
   "dependencies": {
+    "@dataplan/json": "workspace:^",
     "@graphile/lru": "workspace:^",
     "@types/node": "^22.15.32",
     "chalk": "^4.1.2",
     "debug": "^4.4.1",
     "eventemitter3": "^5.0.1",
+    "grafast": "workspace:^",
     "pg-sql2": "workspace:^",
     "postgres-array": "~3.0.4",
     "postgres-range": "^1.1.4",
@@ -70,10 +72,19 @@
     "pg-sql2": "workspace:^"
   },
   "peerDependenciesMeta": {
+    "@dataplan/json": {
+      "optional": true
+    },
+    "grafast": {
+      "optional": true
+    },
     "graphile-config": {
       "optional": true
     },
     "pg": {
+      "optional": true
+    },
+    "pg-sql2": {
       "optional": true
     }
   },

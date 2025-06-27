@@ -1,5 +1,75 @@
 import type { Introspection, PgEntity, PgRoles } from "./introspection.js";
 
+export const OBJECT_COLUMN = "OBJECT_COLUMN";
+export const OBJECT_TABLE = "OBJECT_TABLE";
+export const OBJECT_SEQUENCE = "OBJECT_SEQUENCE";
+export const OBJECT_DATABASE = "OBJECT_DATABASE";
+export const OBJECT_FUNCTION = "OBJECT_FUNCTION";
+export const OBJECT_LANGUAGE = "OBJECT_LANGUAGE";
+export const OBJECT_LARGEOBJECT = "OBJECT_LARGEOBJECT";
+export const OBJECT_SCHEMA = "OBJECT_SCHEMA";
+export const OBJECT_TABLESPACE = "OBJECT_TABLESPACE";
+export const OBJECT_FDW = "OBJECT_FDW";
+export const OBJECT_FOREIGN_SERVER = "OBJECT_FOREIGN_SERVER";
+export const OBJECT_DOMAIN = "OBJECT_DOMAIN";
+export const OBJECT_TYPE = "OBJECT_TYPE";
+
+// https://github.com/postgres/postgres/blob/4908c5872059c409aa647bcde758dfeffe07996e/src/include/nodes/parsenodes.h#L2094-L2148
+export type AclDefaultObjectType =
+  | typeof OBJECT_COLUMN
+  | typeof OBJECT_TABLE
+  | typeof OBJECT_SEQUENCE
+  | typeof OBJECT_DATABASE
+  | typeof OBJECT_FUNCTION
+  | typeof OBJECT_LANGUAGE
+  | typeof OBJECT_LARGEOBJECT
+  | typeof OBJECT_SCHEMA
+  | typeof OBJECT_TABLESPACE
+  | typeof OBJECT_FDW
+  | typeof OBJECT_FOREIGN_SERVER
+  | typeof OBJECT_DOMAIN
+  | typeof OBJECT_TYPE;
+
+// https://github.com/postgres/postgres/blob/4908c5872059c409aa647bcde758dfeffe07996e/src/include/nodes/parsenodes.h#L76-L89
+// https://www.postgresql.org/docs/current/ddl-priv.html#PRIVILEGE-ABBREVS-TABLE
+const ACL_SELECT = "r";
+const ACL_INSERT = "a";
+const ACL_UPDATE = "w";
+const ACL_DELETE = "d";
+const ACL_TRUNCATE = "D";
+const ACL_REFERENCES = "x";
+const ACL_TRIGGER = "t";
+const ACL_CREATE = "C";
+const ACL_CONNECT = "c";
+const ACL_CREATE_TEMP = "T";
+const ACL_MAINTAIN = "m";
+const ACL_EXECUTE = "X";
+const ACL_USAGE = "U";
+// const ACL_SET = "s";
+// const ACL_ALTER_SYSTEM = "A";
+
+/** @see {@link https://github.com/postgres/postgres/blob/4908c5872059c409aa647bcde758dfeffe07996e/src/include/nodes/parsenodes.h#L91} */
+const ACL_NO_RIGHTS = "";
+
+/** @see {@link https://github.com/postgres/postgres/blob/4908c5872059c409aa647bcde758dfeffe07996e/src/include/utils/acl.h#L159} */
+const ACL_ALL_RIGHTS_RELATION = `${ACL_INSERT}${ACL_SELECT}${ACL_UPDATE}${ACL_DELETE}${ACL_TRUNCATE}${ACL_REFERENCES}${ACL_TRIGGER}${ACL_MAINTAIN}`;
+const ACL_ALL_RIGHTS_SEQUENCE = `${ACL_USAGE}${ACL_SELECT}${ACL_UPDATE}`;
+const ACL_ALL_RIGHTS_DATABASE = `${ACL_CREATE}${ACL_CREATE_TEMP}${ACL_CONNECT}`;
+const ACL_ALL_RIGHTS_FDW = ACL_USAGE;
+const ACL_ALL_RIGHTS_FOREIGN_SERVER = ACL_USAGE;
+const ACL_ALL_RIGHTS_FUNCTION = ACL_EXECUTE;
+const ACL_ALL_RIGHTS_LANGUAGE = ACL_USAGE;
+const ACL_ALL_RIGHTS_LARGEOBJECT = `${ACL_SELECT}${ACL_UPDATE}`;
+const ACL_ALL_RIGHTS_SCHEMA = `${ACL_USAGE}${ACL_CREATE}`;
+const ACL_ALL_RIGHTS_TABLESPACE = ACL_CREATE;
+const ACL_ALL_RIGHTS_TYPE = ACL_USAGE;
+
+/**
+ * Used for ordering permissions the same as Postgres
+ * @see {@link https://github.com/postgres/postgres/blob/a0e7e9799c71abdfdebf16219903e1e2d08687cd/src/include/utils/acl.h#L154}
+ */
+const ACL_ALL_RIGHTS_STR = `arwdDxtXUCTcsAm`;
+
 /**
  * A fake 'pg_roles' record representing the 'public' meta-role.
  */
@@ -131,84 +201,120 @@ export type ResolvedPermissions = Omit<AclObject, "role" | "granter">;
  * 'foo' becomes 'foo'
  * '"foo""mcbrew"' becomes 'foo"mcbrew'
  */
-const parseIdentifier = (str: string): string =>
-  str.startsWith('"') ? str.replace(/"("?)/g, "$1") : str;
+const parseIdentifier = (str: string): string => {
+  if (str.startsWith('"')) {
+    if (!str.endsWith('"')) {
+      throw new Error(
+        `Invalid identifier - if it starts with '"' it must also end with '"'`,
+      );
+    }
+    return str.substring(1, str.length - 1).replace(/""/g, '"');
+  } else {
+    return str;
+  }
+};
+
+// https://www.postgresql.org/docs/current/ddl-priv.html#PRIVILEGE-ABBREVS-TABLE
+const ACL_MAP = {
+  // This is the order defined in the Postgres docs; however on serialize it
+  // will be in the same order as ACL_ALL_RIGHTS_STR
+  [ACL_SELECT]: "select",
+  [ACL_UPDATE]: "update",
+  [ACL_INSERT]: "insert",
+  [ACL_DELETE]: "delete",
+  [ACL_TRUNCATE]: "truncate",
+  [ACL_REFERENCES]: "references",
+  [ACL_TRIGGER]: "trigger",
+  [ACL_EXECUTE]: "execute",
+  [ACL_USAGE]: "usage",
+  [ACL_CREATE]: "create",
+  [ACL_CONNECT]: "connect",
+  [ACL_CREATE_TEMP]: "temporary",
+  [ACL_MAINTAIN]: "maintain",
+} as const;
+Object.setPrototypeOf(ACL_MAP, null);
+
+type AclCharacter = keyof typeof ACL_MAP;
+
+const ACL_MAP_ENTRIES = Object.entries(ACL_MAP).sort((a, z) => {
+  // Sort them according to `ACL_ALL_RIGHTS_STR`
+  const ai = ACL_ALL_RIGHTS_STR.indexOf(a[0]);
+  if (ai < 0) throw new Error(`${a[0]} not found in ACL_ALL_RIGHTS_STR`);
+  const zi = ACL_ALL_RIGHTS_STR.indexOf(z[0]);
+  if (zi < 0) throw new Error(`${z[0]} not found in ACL_ALL_RIGHTS_STR`);
+  return ai - zi;
+}) as ReadonlyArray<
+  { [K in AclCharacter]: [K, (typeof ACL_MAP)[K]] }[AclCharacter]
+>;
+
+const NO_PERMISSIONS: AclObject = ACL_MAP_ENTRIES.reduce(
+  (acc, [_char, perm]) => {
+    acc[perm] = false;
+    acc[`${perm}Grant`] = false;
+    return acc;
+  },
+  { role: "public", granter: "" } as Partial<AclObject>,
+) as AclObject;
 
 /**
  * Accepts an ACL string such as `foo=arwdDxt/bar` and converts it into
  * a parsed AclObject.
  */
 export function parseAcl(aclString: string): AclObject {
-  // https://www.postgresql.org/docs/current/ddl-priv.html#PRIVILEGE-ABBREVS-TABLE
-
-  const matches = aclString.match(/^([^=]*)=([rwadDxtXUCcTm*]*)\/([^=]+)$/);
-
-  if (!matches) {
-    throw new Error(`Could not parse ACL string '${aclString}'`);
+  const aclLength = aclString.length;
+  if (aclLength < 3) {
+    // Shortest ACL string might be e.g. `=/a`
+    throw new Error("Invalid ACL string: too few characters");
   }
+  const acl: AclObject = { ...NO_PERMISSIONS };
+  /** Where the name of the role ends */
+  const equalsSignIndex = aclString.indexOf("=");
+  if (equalsSignIndex === -1) {
+    throw new Error(
+      `Could not parse ACL string '${aclString}' - no '=' symbol`,
+    );
+  } else if (equalsSignIndex > 0) {
+    acl.role = parseIdentifier(aclString.substring(0, equalsSignIndex));
+  }
+  const lastCharacterIndex = aclLength - 1;
+  let i = equalsSignIndex; // Start at the "="
+  // Process the ACL tokens
+  while (++i < aclLength) {
+    const char = aclString[i];
+    if (char === "/") {
+      // granter begins
+      // skip past the "/" delimiter
+      if (++i === aclLength) {
+        throw new Error(`ACL string should have a granter after the /`);
+      }
+      acl.granter = parseIdentifier(aclString.substring(i));
+      // Success!
+      return acl;
+    }
+    const currentPerm = ACL_MAP[char as AclCharacter];
+    if (currentPerm === undefined) {
+      throw new Error(
+        `Could not parse ACL string '${aclString}' - unsupported permission '${char}'`,
+      );
+    }
+    acl[currentPerm] = true;
+    if (i < lastCharacterIndex && aclString[i + 1] === "*") {
+      // permission + grant
+      i++; // skip past the "*" character
+      acl[`${currentPerm}Grant`] = true;
+    }
+  } // end token processing
+  throw new Error(
+    `Invalid or unsupported ACL string '${aclString}' - no '/' character?`,
+  );
+}
 
-  const [, rawRole, permissions, rawGranter] = matches;
-  const role = parseIdentifier(rawRole);
-  const granter = parseIdentifier(rawGranter);
-
-  const select = permissions.includes("r");
-  const selectGrant = permissions.includes("r*");
-  const update = permissions.includes("w");
-  const updateGrant = permissions.includes("w*");
-  const insert = permissions.includes("a");
-  const insertGrant = permissions.includes("a*");
-  const del = permissions.includes("d");
-  const deleteGrant = permissions.includes("d*");
-  const truncate = permissions.includes("D");
-  const truncateGrant = permissions.includes("D*");
-  const references = permissions.includes("x");
-  const referencesGrant = permissions.includes("x*");
-  const trigger = permissions.includes("t");
-  const triggerGrant = permissions.includes("t*");
-  const execute = permissions.includes("X");
-  const executeGrant = permissions.includes("X*");
-  const usage = permissions.includes("U");
-  const usageGrant = permissions.includes("U*");
-  const create = permissions.includes("C");
-  const createGrant = permissions.includes("C*");
-  const connect = permissions.includes("c");
-  const connectGrant = permissions.includes("c*");
-  const temporary = permissions.includes("T");
-  const temporaryGrant = permissions.includes("T*");
-  const maintain = permissions.includes("m");
-  const maintainGrant = permissions.includes("m*");
-
-  const acl = {
-    role: role || "public",
-    granter,
-    select,
-    selectGrant,
-    update,
-    updateGrant,
-    insert,
-    insertGrant,
-    delete: del,
-    deleteGrant,
-    truncate,
-    truncateGrant,
-    references,
-    referencesGrant,
-    trigger,
-    triggerGrant,
-    execute,
-    executeGrant,
-    usage,
-    usageGrant,
-    create,
-    createGrant,
-    connect,
-    connectGrant,
-    temporary,
-    temporaryGrant,
-    maintain,
-    maintainGrant,
-  };
-  return acl;
+function escapeRole(role: string) {
+  if (role.indexOf('"') !== -1) {
+    return `"${role.replace(/"/g, '""')}"`;
+  } else {
+    return role;
+  }
 }
 
 /**
@@ -216,117 +322,19 @@ export function parseAcl(aclString: string): AclObject {
  * `foo=arwdDxt/bar`
  */
 export function serializeAcl(acl: AclObject) {
-  let permissions = (acl.role === "public" ? "" : acl.role) + "=";
+  let permissions = (acl.role === "public" ? "" : escapeRole(acl.role)) + "=";
 
-  if (acl.selectGrant) permissions += "r*";
-  else if (acl.select) permissions += "r";
+  for (const [char, perm] of ACL_MAP_ENTRIES) {
+    if (acl[`${perm}Grant`]) permissions += char + "*";
+    else if (acl[perm]) permissions += char;
+  }
 
-  if (acl.updateGrant) permissions += "w*";
-  else if (acl.update) permissions += "w";
-
-  if (acl.insertGrant) permissions += "a*";
-  else if (acl.insert) permissions += "a";
-
-  if (acl.deleteGrant) permissions += "d*";
-  else if (acl.delete) permissions += "d";
-
-  if (acl.truncateGrant) permissions += "D*";
-  else if (acl.truncate) permissions += "D";
-
-  if (acl.referencesGrant) permissions += "x*";
-  else if (acl.references) permissions += "x";
-
-  if (acl.triggerGrant) permissions += "t*";
-  else if (acl.trigger) permissions += "t";
-
-  if (acl.executeGrant) permissions += "X*";
-  else if (acl.execute) permissions += "X";
-
-  if (acl.usageGrant) permissions += "U*";
-  else if (acl.usage) permissions += "U";
-
-  if (acl.createGrant) permissions += "C*";
-  else if (acl.create) permissions += "C";
-
-  if (acl.connectGrant) permissions += "c*";
-  else if (acl.connect) permissions += "c";
-
-  if (acl.temporaryGrant) permissions += "T*";
-  else if (acl.temporary) permissions += "T";
-
-  if (acl.maintainGrant) permissions += "m*";
-  else if (acl.maintain) permissions += "m";
-
-  permissions += `/${acl.granter}`;
+  permissions += `/${escapeRole(acl.granter)}`;
 
   return permissions;
 }
 
 export const emptyAclObject = parseAcl("=/postgres");
-
-export const OBJECT_COLUMN = "OBJECT_COLUMN";
-export const OBJECT_TABLE = "OBJECT_TABLE";
-export const OBJECT_SEQUENCE = "OBJECT_SEQUENCE";
-export const OBJECT_DATABASE = "OBJECT_DATABASE";
-export const OBJECT_FUNCTION = "OBJECT_FUNCTION";
-export const OBJECT_LANGUAGE = "OBJECT_LANGUAGE";
-export const OBJECT_LARGEOBJECT = "OBJECT_LARGEOBJECT";
-export const OBJECT_SCHEMA = "OBJECT_SCHEMA";
-export const OBJECT_TABLESPACE = "OBJECT_TABLESPACE";
-export const OBJECT_FDW = "OBJECT_FDW";
-export const OBJECT_FOREIGN_SERVER = "OBJECT_FOREIGN_SERVER";
-export const OBJECT_DOMAIN = "OBJECT_DOMAIN";
-export const OBJECT_TYPE = "OBJECT_TYPE";
-
-// https://github.com/postgres/postgres/blob/4908c5872059c409aa647bcde758dfeffe07996e/src/include/nodes/parsenodes.h#L2094-L2148
-export type AclDefaultObjectType =
-  | typeof OBJECT_COLUMN
-  | typeof OBJECT_TABLE
-  | typeof OBJECT_SEQUENCE
-  | typeof OBJECT_DATABASE
-  | typeof OBJECT_FUNCTION
-  | typeof OBJECT_LANGUAGE
-  | typeof OBJECT_LARGEOBJECT
-  | typeof OBJECT_SCHEMA
-  | typeof OBJECT_TABLESPACE
-  | typeof OBJECT_FDW
-  | typeof OBJECT_FOREIGN_SERVER
-  | typeof OBJECT_DOMAIN
-  | typeof OBJECT_TYPE;
-
-// https://github.com/postgres/postgres/blob/4908c5872059c409aa647bcde758dfeffe07996e/src/include/nodes/parsenodes.h#L76-L89
-// https://www.postgresql.org/docs/current/ddl-priv.html#PRIVILEGE-ABBREVS-TABLE
-const ACL_SELECT = "r";
-const ACL_INSERT = "a";
-const ACL_UPDATE = "w";
-const ACL_DELETE = "d";
-const ACL_TRUNCATE = "D";
-const ACL_REFERENCES = "x";
-const ACL_TRIGGER = "t";
-const ACL_CREATE = "C";
-const ACL_CONNECT = "c";
-const ACL_CREATE_TEMP = "T";
-const ACL_MAINTAIN = "m";
-const ACL_EXECUTE = "X";
-const ACL_USAGE = "U";
-// const ACL_SET = "s";
-// const ACL_ALTER_SYSTEM = "A";
-
-/** @see {@link https://github.com/postgres/postgres/blob/4908c5872059c409aa647bcde758dfeffe07996e/src/include/nodes/parsenodes.h#L91} */
-const ACL_NO_RIGHTS = "";
-
-/** @see {@link https://github.com/postgres/postgres/blob/4908c5872059c409aa647bcde758dfeffe07996e/src/include/utils/acl.h#L159} */
-const ACL_ALL_RIGHTS_RELATION = `${ACL_INSERT}${ACL_SELECT}${ACL_UPDATE}${ACL_DELETE}${ACL_TRUNCATE}${ACL_REFERENCES}${ACL_TRIGGER}${ACL_MAINTAIN}`;
-const ACL_ALL_RIGHTS_SEQUENCE = `${ACL_USAGE}${ACL_SELECT}${ACL_UPDATE}`;
-const ACL_ALL_RIGHTS_DATABASE = `${ACL_CREATE}${ACL_CREATE_TEMP}${ACL_CONNECT}`;
-const ACL_ALL_RIGHTS_FDW = ACL_USAGE;
-const ACL_ALL_RIGHTS_FOREIGN_SERVER = ACL_USAGE;
-const ACL_ALL_RIGHTS_FUNCTION = ACL_EXECUTE;
-const ACL_ALL_RIGHTS_LANGUAGE = ACL_USAGE;
-const ACL_ALL_RIGHTS_LARGEOBJECT = `${ACL_SELECT}${ACL_UPDATE}`;
-const ACL_ALL_RIGHTS_SCHEMA = `${ACL_USAGE}${ACL_CREATE}`;
-const ACL_ALL_RIGHTS_TABLESPACE = ACL_CREATE;
-const ACL_ALL_RIGHTS_TYPE = ACL_USAGE;
 
 /**
  * Returns a list of AclObject by parsing the given input ACL strings. If no
@@ -419,7 +427,7 @@ export function parseAcls(
       return acl;
     })();
 
-  const acls = aclStrings.map((aclString) => parseAcl(aclString));
+  const acls = aclStrings.map(parseAcl);
   return acls;
 }
 

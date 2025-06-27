@@ -287,6 +287,7 @@ create table b.types (
   "text_array" text[] not null,
   "json" json not null,
   "jsonb" jsonb not null,
+  "jsonpath" jsonpath,
   "nullable_range" numrange,
   "numrange" numrange not null,
   "daterange" daterange not null,

@@ -48,7 +48,8 @@
   "peerDependencies": {
     "grafast": "workspace:^",
     "grafserv": "workspace:^",
-    "graphile-config": "workspace:^"
+    "graphile-config": "workspace:^",
+    "graphql": "^16.1.0-experimental-stream-defer.6"
   },
   "peerDependenciesMeta": {
     "graphile-config": {
@@ -56,9 +57,11 @@
     }
   },
   "devDependencies": {
+    "@types/node": "^24.0.4",
     "grafast": "workspace:^",
     "grafserv": "workspace:^",
     "graphile-config": "workspace:^",
+    "graphql": "^16.1.0-experimental-stream-defer.6",
     "jest": "^30.0.0",
     "jest-serializer-graphql-schema": "workspace:^",
     "ts-node": "^10.9.2",

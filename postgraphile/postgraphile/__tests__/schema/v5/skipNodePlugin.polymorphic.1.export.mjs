@@ -7337,8 +7337,6 @@ enum SingleTableItemOrderBy {
   PRIMARY_KEY_DESC
   ROW_ID_ASC
   ROW_ID_DESC
-  TYPE_ASC
-  TYPE_DESC
   PARENT_ID_ASC
   PARENT_ID_DESC
   ROOT_TOPIC_ID_ASC
@@ -7652,8 +7650,6 @@ enum RelationalItemOrderBy {
   PRIMARY_KEY_DESC
   ROW_ID_ASC
   ROW_ID_DESC
-  TYPE_ASC
-  TYPE_DESC
   PARENT_ID_ASC
   PARENT_ID_DESC
   ROOT_TOPIC_ID_ASC
@@ -10749,8 +10745,6 @@ enum RelationalChecklistOrderBy {
   TITLE_DESC
   ROW_ID_ASC
   ROW_ID_DESC
-  TYPE_ASC
-  TYPE_DESC
   PARENT_ID_ASC
   PARENT_ID_DESC
   ROOT_TOPIC_ID_ASC
@@ -10845,8 +10839,6 @@ enum RelationalTopicOrderBy {
   TITLE_DESC
   ROW_ID_ASC
   ROW_ID_DESC
-  TYPE_ASC
-  TYPE_DESC
   PARENT_ID_ASC
   PARENT_ID_DESC
   ROOT_TOPIC_ID_ASC
@@ -10946,8 +10938,6 @@ enum RelationalChecklistItemOrderBy {
   NOTE_DESC
   ROW_ID_ASC
   ROW_ID_DESC
-  TYPE_ASC
-  TYPE_DESC
   PARENT_ID_ASC
   PARENT_ID_DESC
   ROOT_TOPIC_ID_ASC
@@ -11047,8 +11037,6 @@ enum RelationalDividerOrderBy {
   COLOR_DESC
   ROW_ID_ASC
   ROW_ID_DESC
-  TYPE_ASC
-  TYPE_DESC
   PARENT_ID_ASC
   PARENT_ID_DESC
   ROOT_TOPIC_ID_ASC
@@ -11151,8 +11139,6 @@ enum RelationalPostOrderBy {
   NOTE_DESC
   ROW_ID_ASC
   ROW_ID_DESC
-  TYPE_ASC
-  TYPE_DESC
   PARENT_ID_ASC
   PARENT_ID_DESC
   ROOT_TOPIC_ID_ASC
@@ -25978,20 +25964,6 @@ export const enums = {
           direction: "DESC"
         });
       },
-      TYPE_ASC(queryBuilder) {
-        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemItemId");
-        queryBuilder.orderBy({
-          fragment: sql`${alias}.${sql.identifier("type")}`,
-          codec: itemTypeCodec,
-          direction: "ASC"
-        });
-      },
-      TYPE_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "type",
-          direction: "DESC"
-        });
-      },
       UPDATED_AT_ASC(queryBuilder) {
         const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemItemId");
         queryBuilder.orderBy({
@@ -26149,20 +26121,6 @@ export const enums = {
       TITLE_DESC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "title",
-          direction: "DESC"
-        });
-      },
-      TYPE_ASC(queryBuilder) {
-        const alias = queryBuilder.singleRelation("relationalItemsByMyChecklistItemId");
-        queryBuilder.orderBy({
-          fragment: sql`${alias}.${sql.identifier("type")}`,
-          codec: itemTypeCodec,
-          direction: "ASC"
-        });
-      },
-      TYPE_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "type",
           direction: "DESC"
         });
       },
@@ -26338,20 +26296,6 @@ export const enums = {
           direction: "DESC"
         });
       },
-      TYPE_ASC(queryBuilder) {
-        const alias = queryBuilder.singleRelation("relationalItemsByMyDividerItemId");
-        queryBuilder.orderBy({
-          fragment: sql`${alias}.${sql.identifier("type")}`,
-          codec: itemTypeCodec,
-          direction: "ASC"
-        });
-      },
-      TYPE_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "type",
-          direction: "DESC"
-        });
-      },
       UPDATED_AT_ASC(queryBuilder) {
         const alias = queryBuilder.singleRelation("relationalItemsByMyDividerItemId");
         queryBuilder.orderBy({
@@ -26485,18 +26429,6 @@ export const enums = {
           direction: "DESC"
         });
         queryBuilder.setOrderIsUnique();
-      },
-      TYPE_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "type",
-          direction: "ASC"
-        });
-      },
-      TYPE_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "type",
-          direction: "DESC"
-        });
       },
       UPDATED_AT_ASC(queryBuilder) {
         queryBuilder.orderBy({
@@ -26790,20 +26722,6 @@ export const enums = {
           direction: "DESC"
         });
       },
-      TYPE_ASC(queryBuilder) {
-        const alias = queryBuilder.singleRelation("relationalItemsByMyPostItemId");
-        queryBuilder.orderBy({
-          fragment: sql`${alias}.${sql.identifier("type")}`,
-          codec: itemTypeCodec,
-          direction: "ASC"
-        });
-      },
-      TYPE_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "type",
-          direction: "DESC"
-        });
-      },
       UPDATED_AT_ASC(queryBuilder) {
         const alias = queryBuilder.singleRelation("relationalItemsByMyPostItemId");
         queryBuilder.orderBy({
@@ -26964,20 +26882,6 @@ export const enums = {
           direction: "DESC"
         });
       },
-      TYPE_ASC(queryBuilder) {
-        const alias = queryBuilder.singleRelation("relationalItemsByMyTopicItemId");
-        queryBuilder.orderBy({
-          fragment: sql`${alias}.${sql.identifier("type")}`,
-          codec: itemTypeCodec,
-          direction: "ASC"
-        });
-      },
-      TYPE_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "type",
-          direction: "DESC"
-        });
-      },
       UPDATED_AT_ASC(queryBuilder) {
         const alias = queryBuilder.singleRelation("relationalItemsByMyTopicItemId");
         queryBuilder.orderBy({
@@ -27111,18 +27015,6 @@ export const enums = {
           direction: "DESC"
         });
         queryBuilder.setOrderIsUnique();
-      },
-      TYPE_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "type",
-          direction: "ASC"
-        });
-      },
-      TYPE_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "type",
-          direction: "DESC"
-        });
       },
       UPDATED_AT_ASC(queryBuilder) {
         queryBuilder.orderBy({

@@ -82,6 +82,8 @@ export const Ruru: FC<RuruProps> = (props) => {
         <RuruInner
           storage={storage}
           editorTheme={props.editorTheme}
+          defaultTheme={props.defaultTheme}
+          forcedTheme={props.forcedTheme}
           error={error}
           setError={setError}
           onEditQuery={props.onEditQuery}
@@ -95,6 +97,8 @@ export const Ruru: FC<RuruProps> = (props) => {
 
 export const RuruInner: FC<{
   editorTheme?: string;
+  forcedTheme?: GraphiQLProps["forcedTheme"];
+  defaultTheme?: GraphiQLProps["defaultTheme"];
   storage: RuruStorage;
   error: Error | null;
   setError: React.Dispatch<React.SetStateAction<Error | null>>;
@@ -105,6 +109,8 @@ export const RuruInner: FC<{
   const {
     storage,
     editorTheme,
+    forcedTheme,
+    defaultTheme,
     error,
     setError,
     onEditQuery,
@@ -138,6 +144,8 @@ export const RuruInner: FC<{
         }}
       >
         <GraphiQLInterface
+          defaultTheme={defaultTheme}
+          forcedTheme={forcedTheme}
           editorTheme={editorTheme ?? "graphiql"}
           onEditQuery={onEditQuery}
           onEditVariables={onEditVariables}
