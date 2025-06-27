@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "test": "node dist/index.js",
+    "test": "node --experimental-strip-types --test",
     "prepack": "tsc -b"
   },
   "repository": {

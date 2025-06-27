@@ -113,6 +113,22 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
           doConnection("BitString");
 
           build.registerScalarType(
+            inflection.builtin("JSONPath"),
+            {},
+            () =>
+              stringTypeSpec(
+                build.wrapDescription(
+                  "A string representing an SQL/JSONPath expression",
+                  "type",
+                ),
+                undefined,
+                inflection.builtin("JSONPath"),
+              ),
+            "graphile-build-pg built-in (JSONPath)",
+          );
+          doConnection("JSONPath");
+
+          build.registerScalarType(
             inflection.builtin("InternetAddress"),
             {},
             () =>
