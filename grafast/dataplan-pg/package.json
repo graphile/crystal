@@ -54,6 +54,7 @@
     "chalk": "^4.1.2",
     "debug": "^4.4.1",
     "eventemitter3": "^5.0.1",
+    "grafast": "workspace:^",
     "pg-sql2": "workspace:^",
     "postgres-array": "~3.0.4",
     "postgres-range": "^1.1.4",

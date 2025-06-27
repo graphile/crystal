@@ -44,6 +44,7 @@
   },
   "devDependencies": {
     "@graphql-codegen/plugin-helpers": "^5.1.1",
+    "graphql": "^16.1.0-experimental-stream-defer.6",
     "typescript": "^5.8.3"
   },
   "peerDependencies": {
