@@ -750,6 +750,9 @@ A JavaScript object encoded in the JSON format as specified by [ECMA-404](http:/
 """
 scalar JSON
 
+"""A string representing an SQL/JSONPath expression"""
+scalar JSONPath
+
 """All input for the `jsonIdentityMutation` mutation."""
 input JsonIdentityMutationInput {
   """
@@ -2883,6 +2886,7 @@ type Type {
   intervalArray: [Interval]!
   json: JSON!
   jsonb: JSON!
+  jsonpath: JSONPath
   ltree: LTree
   ltreeArray: [LTree]
   macaddr: String
