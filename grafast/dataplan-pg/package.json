@@ -75,6 +75,9 @@
     "@dataplan/json": {
       "optional": true
     },
+    "grafast": {
+      "optional": true
+    },
     "graphile-config": {
       "optional": true
     },
