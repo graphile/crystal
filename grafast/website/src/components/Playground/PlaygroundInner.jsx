@@ -1,19 +1,13 @@
-import "codemirror/keymap/sublime";
-import "codemirror/theme/monokai.css";
-import "codemirror/mode/javascript/javascript";
-import "codemirror-graphql/hint";
-import "codemirror-graphql/lint";
-import "codemirror-graphql/mode";
-import "graphiql/style.css";
-import "@graphiql/plugin-explorer/style.css";
-import "ruru-components/ruru.css";
-
 import CodeMirror from "@uiw/react-codemirror";
+import { javascript } from "@codemirror/lang-javascript";
+import { graphql } from "cm6-graphql";
 import * as Grafast from "grafast";
 import { grafast, makeGrafastSchema } from "grafast";
 import { parse, GraphQLError } from "graphql";
 import React, { useCallback, useMemo, useState } from "react";
 import { Ruru } from "ruru-components";
+import { useColorMode } from "@docusaurus/theme-common";
+import { githubLight, githubDark } from "@uiw/codemirror-theme-github";
 
 import styles from "./styles.module.css";
 
@@ -142,19 +136,22 @@ with (Grafast) {
 }
 
 const Editor = ({ value, onValueChange, lang }) => {
-  const options = useMemo(() => {
-    return {
-      theme: "monokai",
-      keyMap: "sublime",
-      mode: lang,
-    };
-  }, [lang]);
+  const { colorMode } = useColorMode();
+  const extensions = useMemo(() => {
+    console.log({ colorMode });
+    const base = [colorMode === "dark" ? githubDark : githubLight];
+    if (lang === "js") return [...base, javascript({ jsx: true })];
+    if (lang === "graphql") return [...base, graphql()];
+    return base;
+  }, [colorMode, lang]);
+
   return (
     <CodeMirror
-      lazyLoadMode={false}
       value={value}
+      height="200px"
+      extensions={extensions}
       onChange={onValueChange}
-      options={options}
+      theme={colorMode}
     />
   );
 };
