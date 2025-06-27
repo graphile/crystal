@@ -4,7 +4,7 @@ import { graphql } from "cm6-graphql";
 import * as Grafast from "grafast";
 import { grafast, makeGrafastSchema } from "grafast";
 import { parse, GraphQLError } from "graphql";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState, useEffect } from "react";
 import { Ruru } from "ruru-components";
 import { useColorMode } from "@docusaurus/theme-common";
 import { githubLight, githubDark } from "@uiw/codemirror-theme-github";
@@ -116,10 +116,26 @@ with (Grafast) {
     },
     [schema],
   );
+  const { colorMode } = useColorMode();
+
+  // Hack around GraphiQL forcedTheme bug
+  const [firstRender, setFirstRender] = useState(true);
+  useEffect(() => {
+    if (firstRender) {
+      setTimeout(() => void setFirstRender(false), 0);
+    }
+  }, [firstRender]);
+
+  console.log({ PlaygroundInnerColorMode: colorMode });
   return (
     <div className={styles.container}>
       <div className={styles.ruru}>
-        <Ruru fetcher={fetcher} defaultQuery={INITIAL_QUERY} />
+        <Ruru
+          fetcher={fetcher}
+          defaultQuery={INITIAL_QUERY}
+          defaultTheme={colorMode}
+          forcedTheme={firstRender ? "light" : colorMode}
+        />
       </div>
       <div className={styles.editors}>
         <div className={styles.editor}>
