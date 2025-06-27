@@ -5444,8 +5444,8 @@ __metadata:
     "@mdx-js/react": "npm:^3.1.0"
     "@uiw/react-codemirror": "npm:^4.23.13"
     clsx: "npm:^2.1.1"
-    codemirror: "npm:^5.65.19"
-    codemirror-graphql: "npm:^2.2.2"
+    codemirror: "npm:^6.0.2"
+    codemirror-graphql: "npm:^2.2.3"
     dataloader: "npm:^2.2.3"
     grafast: "workspace:^"
     mermaid: "npm:^11.6.0"
@@ -10219,9 +10219,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"codemirror-graphql@npm:^2.2.1, codemirror-graphql@npm:^2.2.2":
-  version: 2.2.2
-  resolution: "codemirror-graphql@npm:2.2.2"
+"codemirror-graphql@npm:^2.2.1, codemirror-graphql@npm:^2.2.3":
+  version: 2.2.3
+  resolution: "codemirror-graphql@npm:2.2.3"
   dependencies:
     "@types/codemirror": "npm:^0.0.90"
     graphql-language-service: "npm:5.4.0"
@@ -10229,20 +10229,20 @@ __metadata:
     "@codemirror/language": 6.0.0
     codemirror: ^5.65.3
     graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
-  checksum: 10/91376251edc9e831f3b42ebe1374a94bda6d7290c4abda51d5d4187d1ff49c6922dfaff76af4505a48024639a1b3e01b0e37d98a6d061b4625e3da9e92fa6fc2
+  checksum: 10/40037e11f87eef1d6e52cc4f0e79d667dd92b1400b3f00abfea170f6758690045fa9d1890b8e5f4515ab83dd436d57f179ec409986eb923fd2ebfa0000832542
   languageName: node
   linkType: hard
 
-"codemirror@npm:^5.65.19, codemirror@npm:^5.65.3":
+"codemirror@npm:^5.65.3":
   version: 5.65.19
   resolution: "codemirror@npm:5.65.19"
   checksum: 10/52d9746d577d591e2d875fb542a7cd48e822b03e58905854bfcf852c2fcc673086c2cd05e72964b24d894452a82f28d35c535adf43d38559aa339a1b299efb2c
   languageName: node
   linkType: hard
 
-"codemirror@npm:^6.0.0":
-  version: 6.0.1
-  resolution: "codemirror@npm:6.0.1"
+"codemirror@npm:^6.0.0, codemirror@npm:^6.0.2":
+  version: 6.0.2
+  resolution: "codemirror@npm:6.0.2"
   dependencies:
     "@codemirror/autocomplete": "npm:^6.0.0"
     "@codemirror/commands": "npm:^6.0.0"
@@ -10251,7 +10251,7 @@ __metadata:
     "@codemirror/search": "npm:^6.0.0"
     "@codemirror/state": "npm:^6.0.0"
     "@codemirror/view": "npm:^6.0.0"
-  checksum: 10/4f858cde1cf8ce4670de9df4a64f4990bb8abdb8e13d3e437f278c40c86d841ef505aa1e5dc798582109ceaac8577a3bb4a1f026c0e5ce730465c89652ee6036
+  checksum: 10/bd73c9ebbd8cb709a697fa4e2484c188c44aafce4b4d2a342807a5648c6be5bd5876f0caac47db0c1181f1ec8d86e38bd2b6efe51b971bf240fd3382bef0b371
   languageName: node
   linkType: hard
 
