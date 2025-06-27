@@ -82,6 +82,12 @@
   "peerDependenciesMeta": {
     "@envelop/core": {
       "optional": true
+    },
+    "graphql": {
+      "optional": true
+    },
+    "tamedevil": {
+      "optional": true
     }
   },
   "files": [

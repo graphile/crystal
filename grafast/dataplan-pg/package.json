@@ -75,6 +75,9 @@
     },
     "pg": {
       "optional": true
+    },
+    "pg-sql2": {
+      "optional": true
     }
   },
   "files": [
