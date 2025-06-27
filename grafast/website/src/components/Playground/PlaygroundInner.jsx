@@ -126,7 +126,6 @@ with (Grafast) {
     }
   }, [firstRender]);
 
-  console.log({ PlaygroundInnerColorMode: colorMode });
   return (
     <div className={styles.container}>
       <div className={styles.ruru}>
@@ -154,7 +153,6 @@ with (Grafast) {
 const Editor = ({ value, onValueChange, lang }) => {
   const { colorMode } = useColorMode();
   const extensions = useMemo(() => {
-    console.log({ colorMode });
     const base = [colorMode === "dark" ? githubDark : githubLight];
     if (lang === "js") return [...base, javascript({ jsx: true })];
     if (lang === "graphql") return [...base, graphql()];
