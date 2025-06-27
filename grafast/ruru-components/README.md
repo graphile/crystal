@@ -34,6 +34,7 @@ For other usage patterns, please see the main [ruru][] package.
 ```
 
 ```jsx
+import { Ruru } from "ruru-components";
 import "graphiql/style.css";
 import "@graphiql/plugin-explorer/style.css";
 import "ruru-components/ruru.css";

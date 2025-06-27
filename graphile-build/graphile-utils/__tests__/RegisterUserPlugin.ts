@@ -12,11 +12,11 @@ import {
 import type { GraphQLObjectType } from "graphql";
 import { DatabaseError } from "pg";
 
-import { gql, makeExtendSchemaPlugin } from "../src/index.js";
+import { extendSchema, gql } from "../src/index.js";
 
-// Changes to this file should be reflected in `postgraphile/website/postgraphile/make-extend-schema-plugin.md`
+// Changes to this file should be reflected in `postgraphile/website/postgraphile/extend-schema.md`
 
-export const RegisterUserPlugin = makeExtendSchemaPlugin((build) => {
+export const RegisterUserPlugin = extendSchema((build) => {
   const {
     grafast: { lambda },
   } = build;

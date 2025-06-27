@@ -93,6 +93,20 @@ making breaking changes when their benefits outweigh the costs (as determined
 by our maintainer), and we do our best to detail in the release notes how to
 deal with these changes (if any action is necessary).
 
+#### Not using TypeScript?
+
+You do not need to use TypeScript to use PostGraphile, but without it you will
+find editors such as VSCode will highlight your import paths with error
+notifications. To stop this, you can add the following to `jsconfig.json`:
+
+```json title="jsconfig.json"
+{
+  "compilerOptions": {
+    "moduleResolution": "node16"
+  }
+}
+```
+
 ### PostgreSQL: use latest
 
 For best results we recommend you use the latest stable release of PostgreSQL

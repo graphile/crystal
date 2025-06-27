@@ -17,7 +17,12 @@ import {
   pgSelectSingleFromRecord,
   sqlValueWithCodec,
 } from "@dataplan/pg";
-import type { GrafastFieldConfig, Setter, Step } from "grafast";
+import type {
+  GrafastFieldConfig,
+  InputObjectFieldApplyResolver,
+  Setter,
+  Step,
+} from "grafast";
 import { bakedInputRuntime, each } from "grafast";
 import type { GraphQLFieldConfigMap, GraphQLOutputType } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
@@ -372,7 +377,17 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
                 // Never filter, not in condition plugin nor any other
                 behaviors.add(`-attribute:filterBy`);
                 behaviors.add(`-attribute:orderBy`);
+              } else if (codec.isEnum) {
+                // Unlikely to be useful for ordering, but filtering makes
+                // sense
+                behaviors.add(`-attribute:orderBy`);
               } else {
+                if (codec.hasNaturalEquality === false) {
+                  behaviors.add(`-attribute:filterBy`);
+                }
+                if (codec.hasNaturalOrdering === false) {
+                  behaviors.add(`-attribute:orderBy`);
+                }
                 // Done
               }
             }
@@ -590,6 +605,90 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
                   `Expected ${attributeType} to be an input type`,
                 );
               }
+              let apply: InputObjectFieldApplyResolver;
+              if (isPgCondition) {
+                if (attribute.via) {
+                  const resource = build.pgTableResource(pgCodec);
+                  if (!resource) {
+                    throw new Error(
+                      `Could not determine resource for codec ${pgCodec.name}`,
+                    );
+                  }
+                  const {
+                    relationName,
+                    attributeName: targetAttributeName,
+                    attribute: { codec: targetCodec },
+                  } = resource.resolveVia(attribute.via, attributeName);
+                  apply = EXPORTABLE(
+                    (
+                      relationName,
+                      sql,
+                      sqlValueWithCodec,
+                      targetAttributeName,
+                      targetCodec,
+                    ) =>
+                      function plan(
+                        $condition: PgCondition<PgSelectQueryBuilder>,
+                        val: unknown,
+                      ) {
+                        const queryBuilder = $condition.dangerouslyGetParent();
+                        const alias = queryBuilder.singleRelation(relationName);
+                        const expression = sql`${alias}.${sql.identifier(targetAttributeName)}`;
+                        const condition =
+                          val === null
+                            ? sql`${expression} is null`
+                            : sql`${expression} = ${sqlValueWithCodec(
+                                val,
+                                targetCodec,
+                              )}`;
+                        $condition.where(condition);
+                      },
+                    [
+                      relationName,
+                      sql,
+                      sqlValueWithCodec,
+                      targetAttributeName,
+                      targetCodec,
+                    ],
+                  );
+                } else {
+                  apply = EXPORTABLE(
+                    (attributeCodec, attributeName, sql, sqlValueWithCodec) =>
+                      function plan(
+                        $condition: PgCondition<PgSelectQueryBuilder>,
+                        val: unknown,
+                      ) {
+                        $condition.where({
+                          type: "attribute",
+                          attribute: attributeName,
+                          callback: (expression) =>
+                            val === null
+                              ? sql`${expression} is null`
+                              : sql`${expression} = ${sqlValueWithCodec(
+                                  val,
+                                  attributeCodec,
+                                )}`,
+                        });
+                      },
+                    [attributeCodec, attributeName, sql, sqlValueWithCodec],
+                  );
+                }
+              } else {
+                apply = EXPORTABLE(
+                  (attributeName, bakedInputRuntime) =>
+                    function plan(
+                      obj: Setter,
+                      val: unknown,
+                      { field, schema },
+                    ) {
+                      obj.set(
+                        attributeName,
+                        bakedInputRuntime(schema, field.type, val),
+                      );
+                    },
+                  [attributeName, bakedInputRuntime],
+                );
+              }
               return extend(
                 memo,
                 {
@@ -618,51 +717,7 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
                           Boolean(attribute.extensions?.tags?.hasDefault),
                         attributeType,
                       ),
-                      apply: isPgCondition
-                        ? EXPORTABLE(
-                            (
-                              attributeCodec,
-                              attributeName,
-                              sql,
-                              sqlValueWithCodec,
-                            ) =>
-                              function plan(
-                                $condition: PgCondition<PgSelectQueryBuilder>,
-                                val: unknown,
-                              ) {
-                                $condition.where({
-                                  type: "attribute",
-                                  attribute: attributeName,
-                                  callback: (expression) =>
-                                    val === null
-                                      ? sql`${expression} is null`
-                                      : sql`${expression} = ${sqlValueWithCodec(
-                                          val,
-                                          attributeCodec,
-                                        )}`,
-                                });
-                              },
-                            [
-                              attributeCodec,
-                              attributeName,
-                              sql,
-                              sqlValueWithCodec,
-                            ],
-                          )
-                        : EXPORTABLE(
-                            (attributeName, bakedInputRuntime) =>
-                              function plan(
-                                obj: Setter,
-                                val: unknown,
-                                { field, schema },
-                              ) {
-                                obj.set(
-                                  attributeName,
-                                  bakedInputRuntime(schema, field.type, val),
-                                );
-                              },
-                            [attributeName, bakedInputRuntime],
-                          ),
+                      apply,
                     },
                   ),
                 },

@@ -55,6 +55,7 @@ export type PgCodecAttributeViaExplicit = {
   relation: string;
   attribute: string;
 };
+
 export type PgCodecAttributeVia = string | PgCodecAttributeViaExplicit;
 
 /** @deprecated Use DataplanPg.PgCodecAttributeExtensions instead */
@@ -161,7 +162,7 @@ function t<TFromJavaScript = any, TFromPostgres = string>(): <
 >(
   oid: string | undefined,
   type: TName,
-  options?: Cast<TFromJavaScript, TFromPostgres>,
+  options?: CodecOptions<TFromJavaScript, TFromPostgres>,
 ) => PgCodec<
   TName,
   undefined,
@@ -172,7 +173,16 @@ function t<TFromJavaScript = any, TFromPostgres = string>(): <
   undefined
 > {
   return (oid, type, options = {}) => {
-    const { castFromPg, listCastFromPg, fromPg, toPg, isBinary } = options;
+    const {
+      castFromPg,
+      listCastFromPg,
+      fromPg,
+      toPg,
+      isBinary,
+      isEnum,
+      hasNaturalOrdering = false,
+      hasNaturalEquality = false,
+    } = options;
     return {
       name: type,
       sqlType: sql.identifier(...type.split(".")),
@@ -184,9 +194,39 @@ function t<TFromJavaScript = any, TFromPostgres = string>(): <
       listCastFromPg,
       executor: null,
       isBinary,
+      isEnum,
+      hasNaturalOrdering,
+      hasNaturalEquality,
       [inspect.custom]: codecInspect,
     };
   };
+}
+
+/**
+ * As `t`, but for simple types (primitives, i.e. things that make sense to be
+ * sorted/ordered)
+ */
+function s<TFromJavaScript = any, TFromPostgres = string>(): <
+  const TName extends string,
+>(
+  oid: string | undefined,
+  type: TName,
+  options?: CodecOptions<TFromJavaScript, TFromPostgres>,
+) => PgCodec<
+  TName,
+  undefined,
+  TFromPostgres,
+  TFromJavaScript,
+  undefined,
+  undefined,
+  undefined
+> {
+  return (oid, type, options) =>
+    t<TFromJavaScript, TFromPostgres>()(oid, type, {
+      hasNaturalOrdering: true,
+      hasNaturalEquality: true,
+      ...options,
+    });
 }
 
 /**
@@ -556,6 +596,9 @@ export function enumCodec<
     description,
     extensions,
     executor: null,
+    hasNaturalOrdering: false,
+    hasNaturalEquality: true,
+    isEnum: true,
   };
 }
 exportAs("@dataplan/pg", enumCodec, "enumCodec");
@@ -945,26 +988,50 @@ exportAs("@dataplan/pg", rangeOfCodec, "rangeOfCodec");
 /**
  * Helper type for common casting methods.
  */
-type Cast<TFromJavaScript = any, TFromPostgres = string> = {
+type CodecOptions<TFromJavaScript = any, TFromPostgres = string> = {
   castFromPg?(frag: SQL, guaranteedNotNull?: boolean): SQL;
   listCastFromPg?(frag: SQL, guaranteedNotNull?: boolean): SQL;
   toPg?: PgEncode<TFromJavaScript>;
   fromPg?: PgDecode<TFromJavaScript, TFromPostgres>;
   isBinary?: boolean;
+  isEnum?: boolean;
+
+  /**
+   * True if doing an equality check for this value would have intuitive
+   * results for a human. E.g. `3.0` and `3.0000` when encoded as `float` are
+   * the same as a human would expect, so `float` has natural equality. On the
+   * other hand Postgres sees the `json` `{"a":1}` as different to
+   * `{ "a": 1 }`), whereas a human would see these as the same JSON objects,
+   * so `json` does not have natural equality.
+   *
+   * Typically true primitives will set this true.
+   */
+  hasNaturalEquality?: boolean;
+
+  /**
+   * True if this type has a natural ordering that would be intuitive for a human.
+   * For example numbers and text have natural ordering, whereas `{"a":1}` and
+   * `{ "a": 2 }` are not so obvious. Similarly, a `point` could be ordered in many
+   * ways relative to another point (x-first, then y; y-first, then x; distance
+   * from origin first, then angle; etc) so do not have natural order.
+   *
+   * Typically true primitives will set this true.
+   */
+  hasNaturalOrdering?: boolean;
 };
 
 /**
  * When we can use the raw representation directly, typically suitable for
  * text, varchar, char, etc
  */
-const verbatim: Cast = {
+const verbatim: CodecOptions = {
   castFromPg: (frag: SQL): SQL => frag,
 };
 
 /**
  * Casts to something else before casting to text; e.g. `${expression}::numeric::text`
  */
-const castVia = (via: SQL): Cast => ({
+const castVia = (via: SQL): CodecOptions => ({
   castFromPg(frag) {
     return sql`${sql.parens(frag)}::${via}::text`;
   },
@@ -978,7 +1045,10 @@ const viaNumeric = castVia(sql`numeric`);
 /**
  * Casts using to_char to format dates; also handles arrays via unnest.
  */
-const viaDateFormat = (format: string, prefix: SQL = sql.blank): Cast => {
+const viaDateFormat = (
+  format: string,
+  prefix: SQL = sql.blank,
+): CodecOptions => {
   const sqlFormat = sql.literal(format);
   function castFromPg(frag: SQL) {
     return sql`to_char(${prefix}${frag}, ${sqlFormat}::text)`;
@@ -1000,7 +1070,7 @@ const stripSubnet32 = {
     return value.replace(/\/(32|128)$/, "");
   },
 };
-
+const reg = { hasNaturalOrdering: false };
 /**
  * Built in PostgreSQL types that we support; note the keys are the "ergonomic"
  * names (like 'bigint'), but the values use the underlying PostgreSQL true
@@ -1008,7 +1078,7 @@ const stripSubnet32 = {
  */
 export const TYPES = {
   void: t<void>()("2278", "void"), // void: 2278
-  boolean: t<boolean>()("16", "bool", {
+  boolean: s<boolean>()("16", "bool", {
     fromPg: (value) => value[0] === "t",
     toPg: (v) => {
       if (v === true) {
@@ -1022,18 +1092,18 @@ export const TYPES = {
       }
     },
   }),
-  int2: t<number>()("21", "int2", { fromPg: parseAsTrustedInt }),
-  int: t<number>()("23", "int4", { fromPg: parseAsTrustedInt }),
-  bigint: t<string>()("20", "int8"),
-  float4: t<number>()("700", "float4", { fromPg: parseFloat }),
-  float: t<number>()("701", "float8", { fromPg: parseFloat }),
-  money: t<string>()("790", "money", viaNumeric),
-  numeric: t<string>()("1700", "numeric"),
-  char: t<string>()("18", "char", verbatim),
-  bpchar: t<string>()("1042", "bpchar", verbatim),
-  varchar: t<string>()("1043", "varchar", verbatim),
-  text: t<string>()("25", "text", verbatim),
-  name: t<string>()("19", "name", verbatim),
+  int2: s<number>()("21", "int2", { fromPg: parseAsTrustedInt }),
+  int: s<number>()("23", "int4", { fromPg: parseAsTrustedInt }),
+  bigint: s<string>()("20", "int8"),
+  float4: s<number>()("700", "float4", { fromPg: parseFloat }),
+  float: s<number>()("701", "float8", { fromPg: parseFloat }),
+  money: s<string>()("790", "money", viaNumeric),
+  numeric: s<string>()("1700", "numeric"),
+  char: s<string>()("18", "char", verbatim),
+  bpchar: s<string>()("1042", "bpchar", verbatim),
+  varchar: s<string>()("1043", "varchar", verbatim),
+  text: s<string>()("25", "text", verbatim),
+  name: s<string>()("19", "name", verbatim),
   json: t<JSONValue, string>()("114", "json", {
     fromPg: jsonParse,
     toPg: jsonStringify,
@@ -1041,46 +1111,49 @@ export const TYPES = {
   jsonb: t<JSONValue, string>()("3802", "jsonb", {
     fromPg: jsonParse,
     toPg: jsonStringify,
+    // We could totally add the following if someone wanted it:
+    // hasNaturalEquality: true,
   }),
+  jsonpath: t()("4072", "jsonpath"),
   xml: t<string>()("142", "xml"),
-  citext: t<string>()(undefined, "citext", verbatim),
-  uuid: t<string>()("2950", "uuid", verbatim),
-  timestamp: t<string>()(
+  citext: s<string>()(undefined, "citext", verbatim),
+  uuid: s<string>()("2950", "uuid", verbatim),
+  timestamp: s<string>()(
     "1114",
     "timestamp",
     viaDateFormat('YYYY-MM-DD"T"HH24:MI:SS.US'),
   ),
-  timestamptz: t<string>()(
+  timestamptz: s<string>()(
     "1184",
     "timestamptz",
     viaDateFormat('YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'),
   ),
-  date: t<string>()("1082", "date", viaDateFormat("YYYY-MM-DD")),
-  time: t<string>()(
+  date: s<string>()("1082", "date", viaDateFormat("YYYY-MM-DD")),
+  time: s<string>()(
     "1083",
     "time",
     viaDateFormat("HH24:MI:SS.US", sql`date '1970-01-01' + `),
   ),
-  timetz: t<string>()(
+  timetz: s<string>()(
     "1266",
     "timetz",
     viaDateFormat("HH24:MI:SS.USTZH:TZM", sql`date '1970-01-01' + `),
   ),
-  inet: t<string>()("869", "inet", stripSubnet32),
-  regproc: t<string>()("24", "regproc"),
-  regprocedure: t<string>()("2202", "regprocedure"),
-  regoper: t<string>()("2203", "regoper"),
-  regoperator: t<string>()("2204", "regoperator"),
-  regclass: t<string>()("2205", "regclass"),
-  regtype: t<string>()("2206", "regtype"),
-  regrole: t<string>()("4096", "regrole"),
-  regnamespace: t<string>()("4089", "regnamespace"),
-  regconfig: t<string>()("3734", "regconfig"),
-  regdictionary: t<string>()("3769", "regdictionary"),
-  cidr: t<string>()("650", "cidr"),
-  macaddr: t<string>()("829", "macaddr"),
-  macaddr8: t<string>()("774", "macaddr8"),
-  interval: t<PgInterval, string>()("1186", "interval", {
+  inet: s<string>()("869", "inet", stripSubnet32),
+  regproc: s<string>()("24", "regproc", reg),
+  regprocedure: s<string>()("2202", "regprocedure", reg),
+  regoper: s<string>()("2203", "regoper", reg),
+  regoperator: s<string>()("2204", "regoperator", reg),
+  regclass: s<string>()("2205", "regclass", reg),
+  regtype: s<string>()("2206", "regtype", reg),
+  regrole: s<string>()("4096", "regrole", reg),
+  regnamespace: s<string>()("4089", "regnamespace", reg),
+  regconfig: s<string>()("3734", "regconfig", reg),
+  regdictionary: s<string>()("3769", "regdictionary", reg),
+  cidr: s<string>()("650", "cidr"),
+  macaddr: s<string>()("829", "macaddr"),
+  macaddr8: s<string>()("774", "macaddr8"),
+  interval: s<PgInterval, string>()("1186", "interval", {
     ...viaDateFormat(`YYYY_MM_DD_HH24_MI_SS.US`),
     fromPg(value: string): PgInterval {
       const parts = value.split("_").map(parseFloat);
@@ -1090,16 +1163,21 @@ export const TYPES = {
     },
     toPg: stringifyInterval,
   }),
-  bit: t<string>()("1560", "bit"),
-  varbit: t<string>()("1562", "varbit"),
+  bit: s<string>()("1560", "bit", { hasNaturalOrdering: false }),
+  varbit: s<string>()("1562", "varbit", { hasNaturalOrdering: false }),
   point: t<PgPoint>()("600", "point", {
     fromPg: parsePoint,
     toPg: stringifyPoint,
+    hasNaturalEquality: true,
   }),
   line: t<PgLine>()("628", "line", { fromPg: parseLine, toPg: stringifyLine }),
   lseg: t<PgLseg>()("601", "lseg", { fromPg: parseLseg, toPg: stringifyLseg }),
   box: t<PgBox>()("603", "box", { fromPg: parseBox, toPg: stringifyBox }),
-  path: t<PgPath>()("602", "path", { fromPg: parsePath, toPg: stringifyPath }),
+  path: t<PgPath>()("602", "path", {
+    fromPg: parsePath,
+    toPg: stringifyPath,
+    hasNaturalEquality: true,
+  }),
   polygon: t<PgPolygon>()("604", "polygon", {
     fromPg: parsePolygon,
     toPg: stringifyPolygon,
@@ -1173,6 +1251,8 @@ export function getCodecByPgCatalogTypeName(pgCatalogTypeName: string) {
       return TYPES.json;
     case "jsonb":
       return TYPES.jsonb;
+    case "jsonpath":
+      return TYPES.jsonpath;
 
     case "bit":
       return TYPES.bit;

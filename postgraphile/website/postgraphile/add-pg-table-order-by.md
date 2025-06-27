@@ -1,5 +1,5 @@
 ---
-title: makeAddPgTableOrderByPlugin
+title: addPgTableOrderBy
 ---
 
 PostGraphile adds `orderBy` arguments to various of the table collection fields
@@ -34,14 +34,11 @@ of their latest post (posts are stored in `app_public.posts`) you might create a
 plugin like this:
 
 ```ts
-import {
-  makeAddPgTableOrderByPlugin,
-  orderByAscDesc,
-} from "postgraphile/utils";
+import { addPgTableOrderBy, orderByAscDesc } from "postgraphile/utils";
 import { TYPES } from "postgraphile/@dataplan/pg";
 
 /* TODO: test this plugin works! */
-export default makeAddPgTableOrderByPlugin(
+export default addPgTableOrderBy(
   { schemaName: "app_public", tableName: "forums" },
   ({ sql }) => {
     const sqlIdentifier = sql.identifier(Symbol("lastPostInForum"));
@@ -87,12 +84,12 @@ query ForumsOrderedByMostRecentPost {
 
 ## Function signature
 
-### `makeAddPgTableOrderByPlugin`
+### `addPgTableOrderBy`
 
-The signature of the `makeAddPgTableOrderByPlugin` function is:
+The signature of the `addPgTableOrderBy` function is:
 
 ```ts
-function makeAddPgTableOrderByPlugin(
+function addPgTableOrderBy(
   match: {
     serviceName?: string;
     schemaName: string;

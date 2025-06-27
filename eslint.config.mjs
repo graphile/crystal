@@ -1,11 +1,11 @@
 // @ts-check
 import babelParser from "@babel/eslint-parser";
 import js from "@eslint/js";
+import graphql from "@graphql-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
 import { defineConfig, globalIgnores } from "eslint/config";
 import prettier from "eslint-config-prettier";
 import graphileExport from "eslint-plugin-graphile-export";
-import graphql from "eslint-plugin-graphql";
 import importPlugin from "eslint-plugin-import";
 import jest from "eslint-plugin-jest";
 import react from "eslint-plugin-react";
@@ -65,7 +65,7 @@ const config = {
 
   plugins: {
     jest,
-    graphql,
+    "@graphql-eslint": graphql,
     tsdoc,
     "simple-import-sort": simpleImportSort,
     react,

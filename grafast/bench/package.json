@@ -1,6 +1,6 @@
 {
   "name": "@localrepo/grafast-bench",
-  "version": "0.0.1-beta.31",
+  "version": "0.0.1-beta.32",
   "private": true,
   "description": "Grafast benchmarks",
   "type": "commonjs",
@@ -37,6 +37,7 @@
   },
   "devDependencies": {
     "@types/glob": "^8.1.0",
+    "@types/node": "^24.0.4",
     "glob": "^11.0.3",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",

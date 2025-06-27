@@ -5,7 +5,7 @@ title: PostgreSQL Schema Design
 import TOCInline from "@theme/TOCInline";
 import styles from "@site/src/css/common.module.css";
 
-<p className={styles.intro}>
+<div className={styles.intro}>
 
 The Postgres database is rich with features well beyond that of any other
 database. However, most developers do not know the extent to which they can
@@ -33,7 +33,7 @@ should be useful for anyone designing a Postgres schema.
 If you haven't installed PostGraphile already, you can follow our
 [Quick Start Guide](./quick-start-guide) to get PostGraphile up and running.
 
-</p>
+</div>
 
 # Table of Contents
 
@@ -1058,7 +1058,7 @@ PostGraphile.
 
 There are two main parts to our function body. The first is:
 
-```plpgsql
+```sql
 select a.* into account
 from forum_example_private.person_account as a
 where a.email = $1;
@@ -1074,7 +1074,7 @@ successfully find a person with that email, we store it in the `account`
 variable. If we do not find anything, `account` will be null. The second part of
 our function is:
 
-```plpgsql
+```sql
 if account.password_hash = crypt(password, account.password_hash) then
   return ('forum_example_person', account.person_id)::forum_example.jwt_token;
 else

@@ -131,7 +131,7 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
               pgCodecByPolymorphicUnionModeTypeName[polymorphicTypeName];
             if (!interfaceCodec) {
               console.warn(
-                `A number of resources claim to implement '${polymorphicTypeName}', but we couldn't find the definition for that type so we won't add a root field for it. (Perhaps you implemented it in makeExtendSchemaPlugin?) Affected resources: ${spec.resources
+                `A number of resources claim to implement '${polymorphicTypeName}', but we couldn't find the definition for that type so we won't add a root field for it. (Perhaps you implemented it in an extendSchema plugin?) Affected resources: ${spec.resources
                   .map((r) => r.name)
                   .join(", ")}`,
               );

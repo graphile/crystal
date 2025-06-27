@@ -1,6 +1,6 @@
 {
   "name": "jest-serializer-simple",
-  "version": "5.0.0-beta.4",
+  "version": "5.0.0-beta.5",
   "description": "Jest serializer that gives really simple formatting",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
+    "@types/node": "^24.0.4",
     "jest": "^30.0.0",
     "pretty-format": "^30.0.0",
     "ts-node": "^10.9.2",

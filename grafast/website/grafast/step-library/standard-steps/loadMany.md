@@ -227,7 +227,7 @@ A unary step is a step that only ever represents one value, e.g. simple derivati
 
 In addition to the forms seen in "Basic usage" above, you can pass a second
 step to `loadMany`. This second step must be a [**unary
-step**](../../step-classes.md#addUnaryDependency), meaning that it must represent
+step**](../../step-classes.md#addunarydependency), meaning that it must represent
 exactly one value across the entire request (not a batch of values like most
 steps).
 

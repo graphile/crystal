@@ -1,5 +1,13 @@
 # jest-serializer-simple
 
+## 5.0.0-beta.5
+
+### Patch Changes
+
+- [#2577](https://github.com/graphile/crystal/pull/2577)
+  [`0c6b1f1`](https://github.com/graphile/crystal/commit/0c6b1f1e188f6e2913832adfed9ca76dfdc25c47)
+  Thanks [@benjie](https://github.com/benjie)! - Update dependencies
+
 ## 5.0.0-beta.4
 
 ### Patch Changes

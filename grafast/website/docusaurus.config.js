@@ -2,8 +2,9 @@
 // Note: type annotations allow type checking and IDEs autocompletion
 
 const TerserPlugin = require("terser-webpack-plugin");
-const lightCodeTheme = require("prism-react-renderer").themes.github;
-const darkCodeTheme = require("prism-react-renderer").themes.dracula;
+const { themes } = require("prism-react-renderer");
+const lightCodeTheme = themes.github;
+const darkCodeTheme = themes.dracula;
 
 const organizationName = "graphile";
 const projectName = "crystal";
@@ -263,7 +264,7 @@ const config = {
       prism: {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
-        additionalLanguages: ["http"],
+        additionalLanguages: ["bash", "diff", "http", "json", "sql"],
       },
       algolia: {
         // The application ID provided by Algolia
@@ -287,6 +288,12 @@ const config = {
     }),
   trailingSlash: undefined,
   clientModules: [require.resolve("./docusaurus.client.js")],
+  markdown: {
+    mdx1Compat: {
+      comments: true,
+      admonitions: true,
+    },
+  },
 };
 
 module.exports = config;

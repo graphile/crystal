@@ -152,7 +152,7 @@ return indexMap((i) => 42);
 
 You might wonder why the `values` input is a tuple of execution values, rather
 than a list of tuples. The reason comes down to efficiency, by using a tuple of
-execution values, <grafast /> only needs to build one new array (the tuple),
+execution values, <Grafast /> only needs to build one new array (the tuple),
 and into that array it can insert the results from previously executed steps
 unmodified. Were it to provide a list of tuples instead then it would need to
 build N+1 new arrays, where N was the number of values being processed, which
@@ -186,7 +186,7 @@ numbers together. It's `execute` method looked like this:
   }
 ```
 
-Imagine at runtime <grafast /> needed to execute this operation for three
+Imagine at runtime <Grafast /> needed to execute this operation for three
 (`count = 3`) pairs of values: `[1, 2]`, `[3, 4]` and `[5, 6]`. The values for
 `$a` accessible through `aDep.get(i)` would be `1`, `3` and `5`; and the values
 for `$b` accessible through `bDep.get(i)` would be `2`, `4` and `6`. The
@@ -213,7 +213,7 @@ deduplicate(
 ): readonly Step[]
 ```
 
-After a field has been fully planned, <grafast /> will call this method on each
+After a field has been fully planned, <Grafast /> will call this method on each
 new step when more than one step exists in the draft execution plan with the
 same step class and the same dependencies. These "peers" (including the step
 itself) will be passed in to the deduplicate method, and this method should
@@ -236,7 +236,7 @@ deduplicatedWith(
 ): void
 ```
 
-If <grafast /> determines that this specific step instance should be replaced
+If <Grafast /> determines that this specific step instance should be replaced
 by one of its peers (thanks to the results from `deduplicate` above), <grafast
 /> will call `deduplicatedWith` on the step that is being replaced, passing the
 step that it is being replaced with as the first argument. This gives your step
@@ -254,8 +254,8 @@ Lets further imagine that we've optimised our SQL handling step classes such
 that both `$select1` and `$select2` return `[$select1, $select2]` from their
 `deduplicate` method (because they can "cheaply" be made equivalent).
 
-Assuming <grafast /> chooses to keep `$select1` and
-"deduplicate" (get rid of) `$select2`, <grafast /> would then call
+Assuming <Grafast /> chooses to keep `$select1` and
+"deduplicate" (get rid of) `$select2`, <Grafast /> would then call
 `$select2.deduplicateWith($select1)`. This would give `$select2` a chance to
 inform `$select1` that in order to be completely equivalent, it must also
 select `avatar_url`.
@@ -280,7 +280,7 @@ gives the step a chance to request that its ancestors do additional work,
 and/or replace itself with another step (new or old). If it does not want
 to be replaced, it can simply return itself: `return this;`.
 
-This one method unlocks a significant proportion of <grafast />'s efficiency
+This one method unlocks a significant proportion of <Grafast />'s efficiency
 improvements. Here are some common use cases that it can be used for:
 
 #### Optimize: inlining
@@ -394,7 +394,7 @@ class MyListStep extends Step {
 
 If your step implements `.at()`, make sure it meets the expectations:
 ie it correctly accepts a single argument an integer.
-&ZeroWidthSpace;<grafast /> relies on this assumption; unanticipated behaviours may result
+&ZeroWidthSpace;<Grafast /> relies on this assumption; unanticipated behaviours may result
 from steps which don't adhere to these expectations.
 
 :::
@@ -421,7 +421,7 @@ class MyObjectStep extends Step {
 
 If your step implements `.get()`, make sure it meets the expectations:
 i.e. it correctly accepts a single argument of a string.
-&ZeroWidthSpace;<grafast /> relies on this assumption; unanticipated behaviours may result
+&ZeroWidthSpace;<Grafast /> relies on this assumption; unanticipated behaviours may result
 from steps which don't adhere to these expectations.
 
 :::
@@ -455,7 +455,7 @@ class MyCollectionStep extends Step /* implements ConnectionCapableStep */ {
 
 If your step implements `.items()`, make sure it meets the expectations:
 i.e. it does not require any arguments.
-&ZeroWidthSpace;<grafast /> relies on this assumption; unanticipated behaviours may result
+&ZeroWidthSpace;<Grafast /> relies on this assumption; unanticipated behaviours may result
 from steps which don't adhere to these expectations.
 
 :::
@@ -661,7 +661,7 @@ given `$step` is not unary, so you should be very careful using it. If in
 doubt, use `this.addDependency($step)` instead.
 
 The system steps which represent request–level data (e.g. context, variable and
-argument values) are always unary steps, and &ZeroWidthSpace;<grafast /> will
+argument values) are always unary steps, and &ZeroWidthSpace;<Grafast /> will
 automatically determine which other steps are also unary steps.
 
 It's generally intended for `addUnaryDependency` to be used for arguments and
@@ -711,12 +711,12 @@ that would occur between the triangular brackets).
 
 ### id
 
-Every step is assigned a unique id by <grafast />. This id may be a string, number,
+Every step is assigned a unique id by <Grafast />. This id may be a string, number,
 or symbol - treat it as opaque.
 
 :::note
 
-Currently this value is a `number`, but <grafast /> may change it to be a string or
+Currently this value is a `number`, but <Grafast /> may change it to be a string or
 symbol in a minor release so you should not rely on its data type. You may,
 however, rely on `String(id)` being unique across an operation plan.
 

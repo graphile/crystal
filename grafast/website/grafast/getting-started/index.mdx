@@ -6,7 +6,7 @@ sidebar_position: 2
 
 ## Installation
 
-&ZeroWidthSpace;<grafast /> is an alternative _execution_ layer for GraphQL; we still need GraphQL.js
+&ZeroWidthSpace;<Grafast /> is an alternative _execution_ layer for GraphQL; we still need GraphQL.js
 for building the schema, and parsing and validating requests. So the first thing
 you need to do to get started is to install `grafast` and `graphql`:
 
@@ -17,11 +17,11 @@ npm install --save grafast@beta graphql
 :::note
 
 We intend to write up a specification so that other languages may implement
-the <grafast /> execution strategy, but for now <grafast /> is JavaScript/TypeScript only.
+the <Grafast /> execution strategy, but for now <Grafast /> is JavaScript/TypeScript only.
 
 :::
 
-If you have an existing GraphQL.js schema, you can run it through <grafast /> ─ see
+If you have an existing GraphQL.js schema, you can run it through <Grafast /> ─ see
 [using with an existing schema](./existing-schema).
 
 ## TypeScript v5.0.0+ (optional)
@@ -29,7 +29,7 @@ If you have an existing GraphQL.js schema, you can run it through <grafast /> �
 We recommend that you use TypeScript for the best experience - auto-completion,
 inline documentation, etc.
 
-You do not need to use TypeScript to use <grafast />, but if you do then you
+You do not need to use TypeScript to use <Grafast />, but if you do then you
 must use a version from TypeScript v5.0.0 upward and configure it to support
 the `exports` property in `package.json`, you can do so by adding this to your
 TypeScript configuration:
@@ -54,21 +54,35 @@ deal with these changes (if any action is necessary).
 
 :::
 
+### Not using TypeScript?
+
+You do not need to use TypeScript to use PostGraphile, but without it you will
+find editors such as VSCode will highlight your import paths with error
+notifications. To stop this, you can add the following to `jsconfig.json`:
+
+```json title="jsconfig.json"
+{
+  "compilerOptions": {
+    "moduleResolution": "node16"
+  }
+}
+```
+
 ## My first plan
 
-Let's build a simple GraphQL schema powered by <grafast /> plans and query it.
+Let's build a simple GraphQL schema powered by <Grafast /> plans and query it.
 
 :::info
 
 There are many ways to build a GraphQL schema, we're going to use the "schema
-first" approach in this example, but there's no reason that a <grafast /> schema
+first" approach in this example, but there's no reason that a <Grafast /> schema
 couldn't be produced "code first" or "database first" or any other approach.
 
 :::
 
 :::tip
 
-We have a [playground](/playground) you can use for experimenting with <grafast />
+We have a [playground](/playground) you can use for experimenting with <Grafast />
 without having to install any software.
 
 :::
@@ -97,8 +111,7 @@ const objects = {
   Query: {
     plans: {
       addTwoNumbers(_, fieldArgs) {
-        const $a = fieldArgs.get("a");
-        const $b = fieldArgs.get("b");
+        const { $a, $b } = fieldArgs;
         return lambda([$a, $b], ([a, b]) => a + b);
       },
     },
@@ -109,7 +122,7 @@ const objects = {
 :::tip
 
 `lambda` is a bit of an escape hatch ─ it enables one-by-one processing of
-values rather than the batched processing that <grafast /> prefers for efficiency.
+values rather than the batched processing that <Grafast /> prefers for efficiency.
 It can be handy as a utility function when batching would confer no benefit,
 but in general you should pick a [more suitable step][step library].
 
@@ -177,7 +190,7 @@ We could then [serve this schema over HTTP][servers] using a server such as
 ## My first step class
 
 The building blocks of an operation plan are "steps." Steps are instances of
-"step classes," and <grafast /> makes available a modest range of [standard steps][]
+"step classes," and <Grafast /> makes available a modest range of [standard steps][]
 that you can use; but when these aren't enough you can write your own.
 Step classes extend the `Step` class. The only required method to
 define is `execute`, however most steps will also have a `constructor` in which
@@ -249,7 +262,7 @@ Now we can use this function to add our numbers, rather than the lambda plan:
  };
 ```
 
-You may well be able to write an entire <grafast /> schema using off-the-shelf step
+You may well be able to write an entire <Grafast /> schema using off-the-shelf step
 classes, but it's worth being aware of how step classes work in case you want to
 push your optimizations further. [Read more about step classes][step classes],
 or continue through the documentation.
@@ -261,5 +274,5 @@ or continue through the documentation.
 [step library]: ../step-library
 [standard steps]: ../step-library/standard-steps
 [step classes]: ../step-classes
-[field args]: ../plan-resolvers#field-arguments-fieldargs
+[field args]: ../plan-resolvers#field-arguments
 [grafserv]: /grafserv

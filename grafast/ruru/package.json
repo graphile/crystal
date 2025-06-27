@@ -1,6 +1,6 @@
 {
   "name": "ruru",
-  "version": "2.0.0-beta.23",
+  "version": "2.0.0-beta.24",
   "description": "Grafast-flavoured GraphiQL distribution",
   "type": "commonjs",
   "main": "./dist/index.js",
@@ -58,6 +58,14 @@
   "peerDependencies": {
     "graphile-config": "workspace:^",
     "graphql": "^16.1.0-experimental-stream-defer.6"
+  },
+  "peerDependenciesMeta": {
+    "graphile-config": {
+      "optional": true
+    },
+    "graphql": {
+      "optional": true
+    }
   },
   "files": [
     "dist",

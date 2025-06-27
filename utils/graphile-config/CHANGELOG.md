@@ -1,5 +1,19 @@
 # graphile-config
 
+## 0.0.1-beta.17
+
+### Patch Changes
+
+- [#2577](https://github.com/graphile/crystal/pull/2577)
+  [`0c6b1f1`](https://github.com/graphile/crystal/commit/0c6b1f1e188f6e2913832adfed9ca76dfdc25c47)
+  Thanks [@benjie](https://github.com/benjie)! - Update dependencies
+
+- [#2588](https://github.com/graphile/crystal/pull/2588)
+  [`e0cdabe`](https://github.com/graphile/crystal/commit/e0cdabe25c8894da550546c93bc03b895585544c)
+  Thanks [@benjie](https://github.com/benjie)! - Add support for
+  `--experimental-strip-types` to `graphile-config`'s loading of config files.
+  No need for `ts-node`/`tsx` now.
+
 ## 0.0.1-beta.16
 
 ### Patch Changes

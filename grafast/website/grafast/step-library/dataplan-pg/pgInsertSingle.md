@@ -23,7 +23,17 @@ $insertedUser.set("bio", $bio);
 
 ## $pgInsertSingle.setPlan()
 
-Returns a `SetterStep` (a "modifier step", rather than an `ExecutableStep`)
+:::warning OUT OF DATE
+
+This method no longer exists! There's a runtime equivalent now via `.apply()`.
+
+Help documenting this is welcome!
+
+:::
+
+<!-- TODO: I think the explanation below still needs a bit of an update -->
+
+Returns a `Setter` (a Modifier, rather than an Step)
 that can be useful when combined with `applyPlan` plan resolvers in arguments
 and input fields to build up the attributes to set on the inserted row bit by
 bit.

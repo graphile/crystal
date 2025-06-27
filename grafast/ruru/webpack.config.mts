@@ -1,8 +1,13 @@
 import { writeFileSync } from "node:fs";
+import { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import type { Compiler, Configuration, Resolver } from "webpack";
 import webpack from "webpack";
 // import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const JSX_REGEXP = /\.jsx?$/;
 const NODE_MODULES_REGEXP = /[/\\]node_modules(?:[/\\]|$)/;

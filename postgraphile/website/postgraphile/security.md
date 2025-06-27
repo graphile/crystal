@@ -137,7 +137,7 @@ Which would give you an `authenticate` mutation with which you can extract the
 
 JWTs are sent via the best practice `Authorization` header:
 
-```
+```ini
 Authorization: Bearer JWT_TOKEN_HERE
 ```
 

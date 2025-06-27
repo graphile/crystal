@@ -6,7 +6,7 @@ import styles from "@site/src/css/common.module.css";
 
 # GraphQL Subscriptions
 
-<p className={styles.intro}>
+<div className={styles.intro}>
 
 Subscriptions notify you when an event occurs on the server side. PostGraphile
 supports subscriptions out of the box (assuming you are using it with a
@@ -14,7 +14,7 @@ supported webserver), but you are responsible for adding subscription fields to
 your schema — without any subscription fields, the `subscription` operation is
 not possible.
 
-</p>
+</div>
 
 ## Websockets
 
@@ -41,7 +41,7 @@ is changed from `http` or `https` to `ws` or `wss` respectively.
 ## Adding subscription fields
 
 The easiest way to add subscription fields is by using
-[`makeExtendSchemaPlugin`](./make-extend-schema-plugin) to extend the
+[`extendSchema`](./extend-schema) to extend the
 `Subscription` type and add your field. Your subscription fields will typically
 leverage the Gra*fast*
 [`listen()`](https://grafast.org/grafast/step-library/standard-steps/listen)
@@ -100,11 +100,11 @@ does no further processing. The data then flows down to the
 that they care about and use them to provide the relevant data to the user.
 
 ```ts
-import { makeExtendSchemaPlugin } from "postgraphile/utils";
+import { extendSchema } from "postgraphile/utils";
 import { context, lambda, listen } from "postgraphile/grafast";
 import { jsonParse } from "postgraphile/@dataplan/json";
 
-const MySubscriptionPlugin = makeExtendSchemaPlugin((build) => {
+const MySubscriptionPlugin = extendSchema((build) => {
   const { messages } = build.input.pgRegistry.pgResources;
   return {
     typeDefs: /* GraphQL */ `

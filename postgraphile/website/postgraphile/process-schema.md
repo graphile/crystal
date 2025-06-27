@@ -1,5 +1,5 @@
 ---
-title: makeProcessSchemaPlugin
+title: processSchema
 ---
 
 This plugin enables a way of processing the schema after it’s built.
@@ -18,7 +18,7 @@ Use cases include:
 ## Signature
 
 ```ts
-function makeProcessSchemaPlugin(
+function processSchema(
   process: (schema: GraphQLSchema) => GraphQLSchema,
 ): GraphileConfig.Plugin;
 ```
@@ -49,10 +49,10 @@ compatible with Gra*fast* plans.
 ## Example: exporting the schema as exportable code
 
 ```ts
-import { makeProcessSchemaPlugin } from "postgraphile/utils";
+import { processSchema } from "postgraphile/utils";
 import { exportSchema } from "graphile-export";
 
-const ExportSchemaPlugin = makeProcessSchemaPlugin((schema) => {
+const ExportSchemaPlugin = processSchema((schema) => {
   exportSchema(schema, `${process.cwd()}/exported-schema.mjs`, {
     mode: "typeDefs",
   }).catch((e) => {

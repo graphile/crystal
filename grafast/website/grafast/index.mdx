@@ -7,7 +7,7 @@ toc_max_heading_level: 4
 import Mermaid from "@theme/Mermaid";
 import mermaidPlan from "../examples/users-and-friends/plan-simplified.mermaid?raw";
 
-# <grafast /> introduction
+# <Grafast /> introduction
 
 :::info
 
@@ -34,23 +34,23 @@ most egregious performance issue that a naive GraphQL schema may face — there
 are others such as server–side over–fetching and under–fetching and related
 issues that can really build up as your schemas and operations get more complex.
 
-&ZeroWidthSpace;<grafast /> was designed from the ground up to eliminate these issues and more
+&ZeroWidthSpace;<Grafast /> was designed from the ground up to eliminate these issues and more
 whilst maintaining pleasant APIs for developers to use. To do this, in addition
-to supporting resolvers for legacy fields, <grafast /> favors a planning
+to supporting resolvers for legacy fields, <Grafast /> favors a planning
 strategy that takes a holistic approach to understanding the incoming operation,
 and unlocks the potential for significant optimizations not previously
 achievable without a herculean effort.
 
-Please note that <grafast /> is not tied to any particular storage or business
-logic layer — any valid GraphQL schema could be implemented with <grafast />,
-and a <grafast /> schema can query any data source, service, or business logic
+Please note that <Grafast /> is not tied to any particular storage or business
+logic layer — any valid GraphQL schema could be implemented with <Grafast />,
+and a <Grafast /> schema can query any data source, service, or business logic
 that Node.js can query.
 
 :::info
 
-Currently <grafast /> is implemented in TypeScript, but we're working on a
-specification with hopes to extend <grafast />'s execution approach to other
-programming languages. If you're interested in implementing <grafast />'s
+Currently <Grafast /> is implemented in TypeScript, but we're working on a
+specification with hopes to extend <Grafast />'s execution approach to other
+programming languages. If you're interested in implementing <Grafast />'s
 execution algorithm in a language other than JavaScript, please get in touch!
 
 :::
@@ -60,7 +60,7 @@ execution algorithm in a language other than JavaScript, please get in touch!
 _This is just an overview, for full documentation see
 [Plan Resolvers](./plan-resolvers)._
 
-In a traditional GraphQL schema each field has a resolver. In a <grafast />
+In a traditional GraphQL schema each field has a resolver. In a <Grafast />
 schema, though resolvers are still supported, you are encouraged to instead use
 [**plan&nbsp;resolvers**](/grafast/plan-resolvers). These plan resolvers are
 generally small functions, like regular resolvers should be, but instead of
@@ -108,7 +108,7 @@ const resolvers = {
 };
 ```
 
-In <grafast />, we use [**plan resolvers**](/grafast/plan-resolvers) instead,
+In <Grafast />, we use [**plan resolvers**](/grafast/plan-resolvers) instead,
 which might look something like:
 
 ```ts
@@ -133,8 +133,8 @@ const planResolvers = {
 };
 ```
 
-As you can see, the shape of the logic is quite similar, but the <grafast />
-plan resolvers are synchronous. <grafast /> operates in two phases: planning
+As you can see, the shape of the logic is quite similar, but the <Grafast />
+plan resolvers are synchronous. <Grafast /> operates in two phases: planning
 (synchronous) and execution (asynchronous); plan resolvers are called during
 the planning phase.
 
@@ -157,23 +157,23 @@ with each item made available later.
 
 :::tip The dollar convention
 
-By convention, when a variable represents a <grafast /> step, the variable will
+By convention, when a variable represents a <Grafast /> step, the variable will
 be named starting with a `$` (dollar symbol).
 
 :::
 
 ## Steps
 
-Steps are the basic building blocks of a <grafast /> plan; they are instances
+Steps are the basic building blocks of a <Grafast /> plan; they are instances
 of a step class, constructed via the function calls in the plan resolver. Step
 classes describe how to perform a specific action and help plan how to perform
-the action more efficiently via the **lifecycle methods**. <grafast /> provides
+the action more efficiently via the **lifecycle methods**. <Grafast /> provides
 optimized built–in steps for common needs; it's common that you can get started
 using just these, but as you go about optimizing your schema further it's
 expected that you will build your own step classes, in the same way that you'd
 build DataLoaders in a resolver–based GraphQL API.
 
-If we were to make a request to the above <grafast /> schema with the following
+If we were to make a request to the above <Grafast /> schema with the following
 query:
 
 ```graphql
@@ -187,7 +187,7 @@ query:
 }
 ```
 
-&ZeroWidthSpace;<grafast /> would build an [**operation
+&ZeroWidthSpace;<Grafast /> would build an [**operation
 plan**](/grafast/operation-plan) for the operation. For the above query, a
 [**plan diagram**](/grafast/plan-diagrams) representing the execution portion
 of this operation plan is:
@@ -200,21 +200,21 @@ arrows show how the data flows between these steps.
 :::tip Plans can be reused for multiple requests
 
 When the same operation is seen again its existing plan can (generally) be
-reused; this is why, to get the very best performance from <grafast />, you
+reused; this is why, to get the very best performance from <Grafast />, you
 should use static GraphQL documents and pass variables at run–time.
 
 :::
 
 ### Batched execution
 
-The main concern of most steps is execution. In <grafast /> all execution is
+The main concern of most steps is execution. In <Grafast /> all execution is
 batched, so each of the nodes in the operation plan will execute at most once
 during a GraphQL query or mutation. This is one of the major differences when
 compared to traditional GraphQL execution; with traditional resolvers
 processing happens in a layer–by–layer, item–by–item approach, requiring
 workarounds such as `DataLoader` to help reduce instances of the N+1 problem.
 
-When it comes time to execute an operation plan, <grafast /> will automatically
+When it comes time to execute an operation plan, <Grafast /> will automatically
 populate the steps whose names begin with `__` (e.g. the context and variable
 values) and then will begin the process of executing each step
 once all of its dependencies are ready, continuing until all steps are
@@ -242,7 +242,7 @@ a DataLoader before.
 When a plan starts executing it always starts with a batch size (`count`) of 1;
 but many things may affect this batch size for later steps — for example when
 processing the items in a list, the batch must grow to contain each item (via
-the `__Item` step). <grafast /> handles all of these complexities for you
+the `__Item` step). <Grafast /> handles all of these complexities for you
 internally, so you don't generally need to think about them.
 
 #### Unary steps
@@ -250,7 +250,7 @@ internally, so you don't generally need to think about them.
 A "unary step" is a regular step which the system has determined will always
 represent exactly one value. The system steps which represent request–level
 data (e.g. context, variable and argument values) are always unary steps,
-and&nbsp;<grafast /> will automatically determine which other steps are also
+and&nbsp;<Grafast /> will automatically determine which other steps are also
 unary steps.
 
 Sometimes you'll want to ensure that one or more of the steps your step class
@@ -361,7 +361,7 @@ SQL — it would be safer to use an `escapeIdentifier()` call around these.)
 The [**execution plan**](/grafast/operation-plan#execution-plan) diagram you
 saw above is the final form of the plan, there were many intermediate states
 that it will have gone through in order to reach this most optimal form, made
-possible by <grafast />'s lifecycle methods.
+possible by <Grafast />'s lifecycle methods.
 
 :::info
 
@@ -376,12 +376,12 @@ For a fully working implementation of the above schema, please see the
 _This is just an overview, for full documentation see [lifecycle][lifecycle]._
 
 All plan lifecycle methods are optional, and due to the always–batched nature
-of <grafast /> plans you can get good performance without using any of them
+of <Grafast /> plans you can get good performance without using any of them
 (performance generally on a par with reliable usage of DataLoader). However, if
 you leverage lifecycle methods your performance can go from "good" to
 :sparkles:**_amazing_**:rocket:.
 
-One of the great things about <grafast />'s design is that you don't need to
+One of the great things about <Grafast />'s design is that you don't need to
 build these optimizations from the start; you can implement them at a later
 stage, making your schema faster without requiring changes to your business
 logic _or_ your plan resolvers!
@@ -435,17 +435,17 @@ object might build an optimized function to do so.
 
 ## Further optimizations
 
-&ZeroWidthSpace;<grafast /> doesn't just help your schema to execute fewer and more efficient
+&ZeroWidthSpace;<Grafast /> doesn't just help your schema to execute fewer and more efficient
 steps, it also optimizes how your data is output once it has been determined.
 This means that even without making a single change to your existing GraphQL
-schema (i.e. without adopting plans), running it though <grafast /> rather than
+schema (i.e. without adopting plans), running it though <Grafast /> rather than
 graphql-js should result in a modest speedup, especially if you need to output
 your result as a string (e.g. over a network socket/HTTP).
 
 ## Convinced?
 
 If you're not convinced, please do reach out via the [Graphile Discord][] with
-your queries, we'd love to make improvements to both this page, and <grafast />
+your queries, we'd love to make improvements to both this page, and <Grafast />
 itself!
 
 If you are convinced, why not continue on with the navigation button below...
