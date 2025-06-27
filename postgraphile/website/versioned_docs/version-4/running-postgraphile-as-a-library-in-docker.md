@@ -37,8 +37,8 @@ Update the file `.env` to add the `PORT` and `DATABASE_URL` which will be used
 by PostGraphile to connect to the PostgreSQL database. Note the `DATABASE_URL`
 follows the syntax `postgres://<user>:<password>@db:5432/<db_name>`.
 
-```
-[...]ini
+```ini
+[...]
 # GRAPHQL
 # Parameters used by graphql container
 DATABASE_URL=postgres://postgres:change_me@db:5432/forum_example
@@ -172,14 +172,14 @@ of the repository.
 
 ```shell
 # Build images for all services in docker-compose.yml
-$ docker-compose build
+docker-compose build
 
 # You can also build images one by one
 # For instance you can build the database image like this
-$ docker-compose build db
+docker-compose build db
 
 # And build the graphql image like this
-$ docker-compose build graphql
+docker-compose build graphql
 ```
 
 ### Run Containers
@@ -192,16 +192,16 @@ the database. The Docker Volume is automatically named as
 
 ```shell
 # Run containers for all services in docker-compose.yml
-$ docker-compose up
+docker-compose up
 
 # Run containers as daemon (in background)
-$ docker-compose up -d
+docker-compose up -d
 
 # Run only the database container as daemon
-$ docker-compose up -d db
+docker-compose up -d db
 
 # Run only the GraphQL container as daemon
-$ docker-compose up -d graphql
+docker-compose up -d graphql
 ```
 
 Each container can be accessed at the following addresses. Note if you run
@@ -223,17 +223,17 @@ rebuild it.
 
 ```shell
 # Stop running containers
-$ docker-compose down
+docker-compose down
 
 # List Docker volumes
-$ docker volume ls
+docker volume ls
 
 # Delete volume
-$ docker volume rm <your_repository_name>_db
+docker volume rm <your_repository_name>_db
 
 # Delete database image to force rebuild
-$ docker rmi db
+docker rmi db
 
 # Run containers (will automatically rebuild the image)
-$ docker-compose up
+docker-compose up
 ```
