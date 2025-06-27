@@ -8,7 +8,7 @@ title: Introduction
 
 This software is in beta, please be sure to use the `@beta` tag when installing any of the related modules, for example:
 
-```sh
+```shell
 yarn add postgraphile-plugin-connection-filter@beta
 ```
 

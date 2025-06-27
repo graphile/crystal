@@ -285,7 +285,7 @@ At this stage, the repository should look like this:
 Update the file `.env` to add the `DATABASE_URL` which will be used by
 PostGraphile to connect to the PostgreSQL database.
 
-```
+```ini
 [...]
 # GRAPHQL
 # Parameters used by graphql container
@@ -366,7 +366,7 @@ At this stage, the repository should look like this:
 You can build the Docker images by executing the following command from the root
 of the repository.
 
-```
+```shell
 # Build images for all services in docker-compose.yml
 $ docker-compose build
 
@@ -391,7 +391,7 @@ The Docker Volume is automatically named as `<your_repository_name>_db`.
 
 :::
 
-```
+```shell
 # Run containers for all services in docker-compose.yml
 $ docker-compose up
 
