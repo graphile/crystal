@@ -2,7 +2,7 @@
 title: PostgreSQL Schema Design
 ---
 
-import TOCInline from '@theme/TOCInline';
+import TOCInline from "@theme/TOCInline";
 import styles from "@site/src/css/common.module.css";
 
 <div className={styles.intro}>
@@ -138,7 +138,7 @@ command are fairly easy to learn and understand. Creating tables is the easiest,
 but also the most fundamental part of your schema design.
 
 :::note
-We prefer singular identifers like `forum_example.person` over
+We prefer singular identifiers like `forum_example.person` over
 `forum_example.people` because when you create a table, it is like you are
 creating a class in an object-oriented language. Classes have singular names
 like “Person” while collections will often have plural names like “People.”
@@ -983,7 +983,7 @@ This code will select a single account from
 here is just another way to write the `email` argument. If we had wrote
 `email = email` or even `a.email = email`, Postgres would not have known which
 email we were referring to, so instead we just used a substitute for the `email`
-argument which depends on its placement in the identifer `$1`. If we
+argument which depends on its placement in the identifier `$1`. If we
 successfully find a person with that email, we store it in the `account`
 variable. If we do not find anything, `account` will be null. The second part of
 our function is:
