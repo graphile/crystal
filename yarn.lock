@@ -3760,6 +3760,7 @@ __metadata:
   resolution: "@grafserv/persisted@workspace:grafast/grafserv-persisted"
   dependencies:
     "@graphile/lru": "workspace:^"
+    "@types/node": "npm:^24.0.4"
     grafast: "workspace:^"
     grafserv: "workspace:^"
     graphile-config: "workspace:^"
@@ -3783,6 +3784,7 @@ __metadata:
   resolution: "@graphile/lds@workspace:utils/lds"
   dependencies:
     "@types/jest": "npm:^30.0.0"
+    "@types/node": "npm:^24.0.4"
     "@types/pg": "npm:^8.15.4"
     "@types/ws": "npm:^8.18.1"
     jest: "npm:^30.0.0"
@@ -5145,6 +5147,7 @@ __metadata:
   resolution: "@localrepo/grafast-bench@workspace:grafast/bench"
   dependencies:
     "@types/glob": "npm:^8.1.0"
+    "@types/node": "npm:^24.0.4"
     glob: "npm:^11.0.3"
     grafast: "workspace:^"
     graphile-config: "workspace:^"
@@ -7306,12 +7309,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*":
-  version: 24.0.3
-  resolution: "@types/node@npm:24.0.3"
+"@types/node@npm:*, @types/node@npm:^24.0.4":
+  version: 24.0.4
+  resolution: "@types/node@npm:24.0.4"
   dependencies:
     undici-types: "npm:~7.8.0"
-  checksum: 10/6cce0afa9b0ff7f8eab7cb0339909c1e4ef480b824b8de5adc9cee05dac63ee3d8c7a46e1f95f13ecc94e84608118741f9949527a92fbf3f0e1f7714b37a7b61
+  checksum: 10/81cd63dfeea7b7cd0d13a6435c3aa38de48da1eb59a5572f3528396dd5a8d9ff6811d947a2a6856d38e3b813ac26207abb1b44eb98848f78553a8fb4b2886e37
   languageName: node
   linkType: hard
 
@@ -12219,6 +12222,7 @@ __metadata:
     "@types/eslint": "npm:^9.6.1"
     "@types/estree": "npm:^1.0.8"
     "@types/jest": "npm:^30.0.0"
+    "@types/node": "npm:^24.0.4"
     jest: "npm:^30.0.0"
     ts-node: "npm:^10.9.2"
     tslib: "npm:^2.8.1"
@@ -13767,6 +13771,7 @@ __metadata:
     "@types/express": "npm:^4.17.23"
     "@types/koa": "npm:^2.15.0"
     "@types/koa-bodyparser": "npm:^4.3.12"
+    "@types/node": "npm:^24.0.4"
     "@whatwg-node/fetch": "npm:^0.10.8"
     "@whatwg-node/server": "npm:^0.10.10"
     debug: "npm:^4.4.1"
@@ -13961,6 +13966,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "graphile-utils@workspace:graphile-build/graphile-utils"
   dependencies:
+    "@types/node": "npm:^24.0.4"
     debug: "npm:^4.4.1"
     graphile-build: "workspace:^"
     graphile-build-pg: "workspace:^"
@@ -16104,6 +16110,7 @@ __metadata:
   resolution: "jest-serializer-graphql-schema@workspace:utils/jest-serializer-graphql-schema"
   dependencies:
     "@types/jest": "npm:^30.0.0"
+    "@types/node": "npm:^24.0.4"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     jest: "npm:^30.0.0"
     pretty-format: "npm:^30.0.0"
@@ -16121,6 +16128,7 @@ __metadata:
   dependencies:
     "@types/jest": "npm:^30.0.0"
     "@types/json5": "npm:^2.2.0"
+    "@types/node": "npm:^24.0.4"
     jest: "npm:^30.0.0"
     json5: "npm:^2.2.3"
     prettier: "npm:^3.5.3"

@@ -62,6 +62,7 @@
     }
   },
   "devDependencies": {
+    "@types/node": "^24.0.4",
     "graphile-build": "workspace:^",
     "graphile-build-pg": "workspace:^",
     "jest": "^30.0.0",
