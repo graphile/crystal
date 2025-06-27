@@ -192,11 +192,12 @@ export const RuruInner: FC<{
                 <ToolbarMenu
                   label="Options"
                   button={
-                    // TODO: wrap this in a button again!
-                    <SettingsIcon
-                      className="graphiql-toolbar-icon"
-                      aria-hidden="true"
-                    />
+                    <ToolbarButton label="Options">
+                      <SettingsIcon
+                        className="graphiql-toolbar-icon"
+                        aria-hidden="true"
+                      />
+                    </ToolbarButton>
                   }
                 >
                   <ToolbarMenu.Item
