@@ -148,7 +148,7 @@ example by storing emails into a `user_emails` table.
 
 :::
 
-:::warning
+:::danger
 
 Though the above example may mask the `email` field when fetched directly, there
 are side channel attacks that someone could use to determine someones email -

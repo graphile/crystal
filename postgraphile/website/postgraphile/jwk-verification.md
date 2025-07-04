@@ -4,7 +4,7 @@ title: JWK Verification (e.g. Auth0)
 
 # PostGraphile JWT/JWK Verification Quickstart
 
-:::caution
+:::warning
 
 This documentation is copied from Version 4 and has not been updated to Version
 5 yet; it may not be valid.

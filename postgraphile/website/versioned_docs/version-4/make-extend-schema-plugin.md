@@ -747,7 +747,7 @@ Notes:
 
 **This section applies to PostGraphile v4.4.6+**
 
-:::caution bug
+:::danger bug
 
 It seems `@pgQuery` only supports _scalars_ (not _enums_) right now:
 https://github.com/graphile/postgraphile/issues/1601**

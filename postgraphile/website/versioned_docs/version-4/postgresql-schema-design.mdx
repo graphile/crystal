@@ -588,7 +588,7 @@ comment on column forum_example_private.person_account.email is 'The email addre
 comment on column forum_example_private.person_account.password_hash is 'An opaque hash of the person’s password.';
 ```
 
-:::warning
+:::danger
 Never store passwords in plaintext! The `password_hash` column
 will contain the user’s password _after_ it has gone through a secure hashing
 algorithm like [Bcrypt](https://codahale.com/how-to-safely-store-a-password/).
@@ -717,7 +717,7 @@ we said users would never be able to insert into
 `forum_example_private.person_account` because it uses the privileges of the
 definer.
 
-:::warning exercise caution when using security definer
+:::danger Exercise caution when using security definer
 Make sure that when you create a function with `security definer`
 there are no ‘holes’ a user could use to see or mutate more data than they are
 not allowed to. Since the above is a simple function, we are fine. If you
@@ -802,7 +802,7 @@ create role forum_example_person;
 grant forum_example_person to forum_example_postgraphile;
 ```
 
-:::caution warning
+:::warning
 The `forum_example_postgraphile` role will have all of the
 permissions of the roles granted to it. So it can do everything
 `forum_example_anonymous` can do and everything `forum_example_person` can do.
@@ -1018,8 +1018,10 @@ they were originally defined. Since we defined `role`, `person_id` and `exp`,
 this JWT will have a `role` of `forum_example_person`, a `person_id` of
 `account.person_id`, and an `exp` that is two days from now.
 
-:::warning warning
+:::warning
+
 Be careful about logging around this function too.
+
 :::
 
 Now that we know how to get JWTs for our users, let’s use the JWTs.

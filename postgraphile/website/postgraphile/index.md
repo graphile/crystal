@@ -4,7 +4,7 @@ title: Introduction
 
 # PostGraphile Introduction
 
-:::caution Use the `@beta` tag
+:::warning Use the `@beta` tag
 
 This software is in beta, please be sure to use the `@beta` tag when installing any of the related modules, for example:
 

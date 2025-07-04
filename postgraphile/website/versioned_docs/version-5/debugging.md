@@ -131,7 +131,7 @@ export default {
 };
 ```
 
-:::warning Disable Explain in production!
+:::danger Disable Explain in production!
 
 Explain should be disabled in production since it could leak information about
 the internals of your schema that would be useful to an attacker.
