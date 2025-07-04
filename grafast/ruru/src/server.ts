@@ -35,6 +35,24 @@ const baseElements = `\
 <div id="ruru-root"></div>`;
 const baseBodyScripts = `\
 <script type="module"> import merm from 'https://cdn.jsdelivr.net/npm/mermaid@11.6.0/+esm'; window.mermaid = merm </script>
+<script type="module">
+/* Set up monaco workers */
+import createJSONWorker from "https://esm.sh/monaco-editor/esm/vs/language/json/json.worker.js?worker"
+import createGraphQLWorker from "https://esm.sh/monaco-graphql/esm/graphql.worker.js?worker"
+import createEditorWorker from "https://esm.sh/monaco-editor/esm/vs/editor/editor.worker.js?worker"
+
+globalThis.MonacoEnvironment = {
+  getWorker(_workerId, label) {
+    switch (label) {
+      case "json":
+        return createJSONWorker()
+      case "graphql":
+        return createGraphQLWorker()
+    }
+    return createEditorWorker()
+  }
+}
+</script>
 <script>/*! For license information, see https://unpkg.com/ruru@${version}/bundle/ruru.min.js.LICENSE.txt */
 ${escapeJS(graphiQLContent)}</script>`;
 const baseBodyInitScript = `\

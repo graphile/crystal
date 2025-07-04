@@ -1,18 +1,17 @@
 import { explorerPlugin as makeExplorerPlugin } from "@graphiql/plugin-explorer";
 import {
   CopyIcon,
-  GraphiQLProvider as GP2,
+  GraphiQLProvider,
   MergeIcon,
   PrettifyIcon,
   SettingsIcon,
   ToolbarButton,
   ToolbarMenu,
-  useCopyQuery,
-  useMergeQuery,
-  useSchemaStore,
+  useGraphiQL,
+  useGraphiQLActions,
 } from "@graphiql/react";
 import type { GraphiQLProps } from "graphiql";
-import { GraphiQL, GraphiQLInterface, GraphiQLProvider } from "graphiql";
+import { GraphiQL } from "graphiql";
 import type { FC } from "react";
 import { useCallback, useState } from "react";
 
@@ -27,10 +26,6 @@ import type { RuruStorage } from "./hooks/useStorage.js";
 import { useStorage } from "./hooks/useStorage.js";
 import type { RuruProps } from "./interfaces.js";
 import { EXPLAIN_PLUGIN } from "./plugins/explain.js";
-
-if (GP2 !== GraphiQLProvider) {
-  throw new Error("PACKAGE MANAGEMENT ERROR! The providers don't match up!");
-}
 
 const checkCss = { width: "1.5rem", display: "inline-block" };
 const check = <span style={checkCss}>✔</span>;
@@ -89,6 +84,7 @@ export const Ruru: FC<RuruProps> = (props) => {
           onEditQuery={props.onEditQuery}
           onEditVariables={props.onEditVariables}
           streamEndpoint={streamEndpoint}
+          fetcher={fetcher}
         />
       </GraphiQLProvider>
     </ExplainContext.Provider>
@@ -96,7 +92,7 @@ export const Ruru: FC<RuruProps> = (props) => {
 };
 
 export const RuruInner: FC<{
-  editorTheme?: string;
+  editorTheme?: GraphiQLProps["editorTheme"];
   forcedTheme?: GraphiQLProps["forcedTheme"];
   defaultTheme?: GraphiQLProps["defaultTheme"];
   storage: RuruStorage;
@@ -105,6 +101,7 @@ export const RuruInner: FC<{
   onEditQuery?: GraphiQLProps["onEditQuery"];
   onEditVariables?: GraphiQLProps["onEditVariables"];
   streamEndpoint: string | null;
+  fetcher: GraphiQLProps["fetcher"];
 }> = (props) => {
   const {
     storage,
@@ -116,11 +113,12 @@ export const RuruInner: FC<{
     onEditQuery,
     onEditVariables,
     streamEndpoint,
+    fetcher,
   } = props;
   const prettify = usePrettify();
-  const mergeQuery = useMergeQuery();
-  const copyQuery = useCopyQuery();
-  const introspect = useSchemaStore((s) => s.introspect);
+  const { copyQuery, mergeQuery, setSchemaReference, introspect } =
+    useGraphiQLActions();
+  setSchemaReference;
   useGraphQLChangeStream(props, introspect, streamEndpoint);
 
   return (
@@ -143,12 +141,13 @@ export const RuruInner: FC<{
           position: "relative",
         }}
       >
-        <GraphiQLInterface
+        <GraphiQL
           defaultTheme={defaultTheme}
           forcedTheme={forcedTheme}
-          editorTheme={editorTheme ?? "graphiql"}
+          editorTheme={editorTheme}
           onEditQuery={onEditQuery}
           onEditVariables={onEditVariables}
+          fetcher={fetcher}
         >
           <GraphiQL.Logo>
             <a
@@ -193,20 +192,12 @@ export const RuruInner: FC<{
                 <ToolbarMenu
                   label="Options"
                   button={
-                    <div
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
+                    <ToolbarButton label="Options">
                       <SettingsIcon
                         className="graphiql-toolbar-icon"
                         aria-hidden="true"
                       />
-                    </div>
+                    </ToolbarButton>
                   }
                 >
                   <ToolbarMenu.Item
@@ -240,10 +231,11 @@ export const RuruInner: FC<{
               </>
             )}
           </GraphiQL.Toolbar>
+
           <GraphiQL.Footer>
             <RuruFooter />
           </GraphiQL.Footer>
-        </GraphiQLInterface>
+        </GraphiQL>
       </div>
       {error ? (
         <ErrorPopup error={error} onClose={() => setError(null)} />

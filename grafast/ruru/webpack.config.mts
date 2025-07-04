@@ -104,10 +104,12 @@ const config: Configuration = {
       {
         test: /\.svg$/,
         use: [{ loader: "svg-inline-loader" }],
+        sideEffects: true,
       },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/,
         use: ["file-loader"],
+        sideEffects: true,
       },
     ],
   },
