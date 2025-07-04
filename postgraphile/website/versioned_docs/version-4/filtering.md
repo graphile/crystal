@@ -26,7 +26,7 @@ You can also augment PostGraphile's existing connections using custom
 
 ### Filter Plugin
 
-:::warning BEWARE
+:::warning[BEWARE]
 
 Adding powerful generic filtering capabilities to your GraphQL
 API is strongly discouraged, not just by Benjie (the maintainer of

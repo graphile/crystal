@@ -55,7 +55,7 @@ We recommend that you extend from the `@tsconfig/node18` preset; you can disable
 }
 ```
 
-:::tip It's okay to make this TypeScript config loose for V4
+:::tip[It's okay to make this TypeScript config loose for V4]
 
 The main thing is to make it so we're using TypeScript syntax, that TypeScript
 compiles, and that our tests run the compiled code. Once we've ported to V5
@@ -121,13 +121,13 @@ yarn add --dev \
 }
 ```
 
-:::info `postgraphile-core` is no more
+:::info[`postgraphile-core` is no more]
 
 Huh... that rhymed. But yeah, just use `postgraphile` instead.
 
 :::
 
-:::tip Use subpaths instead of explicit modules where possible
+:::tip[Use subpaths instead of explicit modules where possible]
 
 It's really annoying when you end up with version conflicts, so in V5 we've
 made it easy for you to consistently install one version of the package and

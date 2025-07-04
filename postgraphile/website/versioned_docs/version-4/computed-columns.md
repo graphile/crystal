@@ -11,7 +11,7 @@ scalar, record, [enum](./enums),
 list or a set. Sets (denoted by `RETURNS SETOF ...`) are exposed
 as [connections](./connections).
 
-:::tip Performance Note
+:::tip[Performance Note]
 
 We inline these function calls into the original `SELECT`
 statement, so there's no N+1 issues - it's very efficient.
@@ -81,7 +81,7 @@ This `person.person_full_name` syntax makes the function `person_full_name`
 appear as if it were a column of `person` even though no such column exists,
 hence our name for it: computed column function.
 
-:::note Computed columns can also return sets
+:::note[Computed columns can also return sets]
 
 If your function, for example `person_favorite_posts(person)`, returns a set
 then PostGraphile will automatically wrap this selection in a subquery

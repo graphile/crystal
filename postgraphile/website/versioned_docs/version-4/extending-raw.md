@@ -238,7 +238,7 @@ module.exports = function CreateLinkWrapPlugin(builder) {
 
 ### Removing things from the schema
 
-:::danger warning
+:::danger[Warning]
 
 Removing things from your GraphQL schema this way may have
 unintended consequences - especially if you add back a field or type with the

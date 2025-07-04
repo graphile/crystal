@@ -10,7 +10,7 @@ it can accept arguments that influence its result, and may return either a
 scalar, record, list or a set. Sets (denoted by `RETURNS SETOF ...`) are exposed
 as [connections](./connections) or lists, depending on the behavior configuration.
 
-:::tip Performance Note
+:::tip[Performance Note]
 
 We inline these function calls into the original `SELECT` statement for
 efficiency, so no additional SQL queries need to be issued to the database.
@@ -86,7 +86,7 @@ This `person.person_full_name` syntax makes the function `person_full_name`
 appear as if it were a column of `person` even though no such column exists,
 hence our name for it: computed column function.
 
-:::note Computed columns can also return sets
+:::note[Computed columns can also return sets]
 
 If your function, for example `person_favorite_posts(person)`, returns a set
 then PostGraphile will automatically wrap this selection in a subquery

@@ -4,10 +4,12 @@ title: makeAddPgTableOrderByPlugin
 
 # makeAddPgTableOrderByPlugin (graphile-utils v4.4.5+)
 
-:::warning warning
+:::warning
+
 This plugin generator doesn't currently have any tests, so it's
 status is **experimental**. If you can spare the time to write some tests (or
 [sponsor me to do so](https://graphile.org/sponsor)) then we can promote it to stable.
+
 :::
 
 PostGraphile adds `orderBy` arguments to various of the table collection fields

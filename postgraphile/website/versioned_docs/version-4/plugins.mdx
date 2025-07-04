@@ -5,14 +5,18 @@ title: Server Plugins
 import Pro from "@site/src/components/Pro";
 import Spon from "@site/src/components/Spon";
 
-:::warning Stability
+:::warning[Stability]
+
 Experimental, may change in **semver minor** versions.
+
 :::
 
 :::note
+
 This page relates to changing how the PostGraphile HTTP server and CLI
 work. If you're instead looking to change the generated GraphQL schema (e.g. to
 add fields or types), see [Schema Plugins](./extending).
+
 :::
 
 In addition to the [Graphile Engine plugin system](./extending) which builds
@@ -59,7 +63,7 @@ set GRAPHILE_LICENSE="license_key_from_graphile_store" & postgraphile -c postgre
 $env:GRAPHILE_LICENSE="license_key_from_graphile_store"; postgraphile -c postgres://...
 ```
 
-:::danger important
+:::danger[Important]
 
 These plugins do not "phone home" so you'll need to update your
 license at least once every 9 months. You can check the expiry date of your
@@ -153,7 +157,7 @@ app.use(postGraphileMiddleware);
 
 ### Writing your own plugins
 
-:::warning important
+:::warning[Important]
 
 Here be dragons. This interface is experimental, and
 documentation on it is far from complete. To use this interface you are expected

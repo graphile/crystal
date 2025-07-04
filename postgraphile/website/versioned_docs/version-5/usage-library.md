@@ -452,7 +452,7 @@ import preset from "./graphile.config.ts";
 export const pgl = postgraphile(preset);
 ```
 
-:::note Import from `.ts` along with `rewriteRelativeImportExtensions`
+:::note[Import from `.ts` along with `rewriteRelativeImportExtensions`]
 
 With Node's new `--experimental-strip-types` flag, TypeScript syntax is removed
 so that the TS can be executed directly as if it were JS. However, the files
@@ -566,7 +566,7 @@ query {
 }
 ```
 
-:::danger Errors running `npm start`?
+:::danger[Errors running `npm start`?]
 
 If you get errors when running `npm start` it might be because you are not
 running a sufficiently up to date version of Node.js, lacking the type

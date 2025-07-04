@@ -28,7 +28,7 @@ called with the generated schema and must either return the same schema (e.g. if
 you’re doing a read-only operation, or mutating the schema directly) or return
 an alternative schema (typically a derivative).
 
-:::info How to do this asynchronously
+:::info[How to do this asynchronously]
 
 The callback to this plugin operates synchronously. If you need to do
 asynchronous work then be sure to handle any errors that may occur, and note
@@ -37,7 +37,7 @@ this plugin (and thus the schema being used by your server).
 
 :::
 
-:::warning Compatibility with third parties
+:::warning[Compatibility with third parties]
 
 Because PostGraphile schemas use Gra*fast* plan resolvers, third party tooling
 that manipulate traditional resolvers are likely to break the schema, and not
