@@ -58,7 +58,7 @@ export const ReplaceInflectorPlugin: GraphileConfig.Plugin = {
 };
 ```
 
-:::info The first two arguments are already supplied
+:::info[The first two arguments are already supplied]
 
 The first two arguments to your replace inflector definition are supplied by the
 Graphile Build system and hidden from calling code, so only arguments from the
@@ -152,7 +152,7 @@ export const MyNewInflectorPlugin: GraphileConfig.Plugin = {
 };
 ```
 
-:::info The first argument is already supplied
+:::info[The first argument is already supplied]
 
 The first argument to your add inflector definition is supplied by the Graphile
 Build system and hidden from calling code, so only arguments from the second

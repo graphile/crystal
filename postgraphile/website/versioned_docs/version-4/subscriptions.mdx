@@ -13,7 +13,9 @@ Subscriptions notify you when an event occurs on the server side.
 </div>
 
 :::note
+
 This feature requires PostGraphile v4.4.0 or higher.
+
 :::
 
 ## Introduction
@@ -373,7 +375,9 @@ directly to test your application.
 ### Topic prefix
 
 :::note
+
 This section only applies to "simple subscriptions."
+
 :::
 
 All topics requested from GraphQL are automatically prefixed with
@@ -383,7 +387,7 @@ All topics requested from GraphQL are automatically prefixed with
   remember to add it to the topic when you perform `NOTIFY` otherwise
   subscribers will not see the messages.
 
-:::tip footnote
+:::tip[footnote]
 
 \* The prefix is applied by default, but you can override it via
 `pgSubscriptionPrefix` setting in the `graphileBuildOptions` object; e.g.
@@ -391,6 +395,7 @@ All topics requested from GraphQL are automatically prefixed with
 
 Note further that this setting only applies to simple subscriptions; custom
 subscriptions have no automatic prefix.
+
 :::
 
 For example a user may perform the following subscription:
@@ -486,6 +491,7 @@ This solution is still taking shape, so it's not yet certain how
 other fields on the NOTIFY message JSON will be exposed via GraphQL. You are
 advised to treat the content of this message JSON as if it's visible to the
 user, as at some point it may be.
+
 :::
 
 :::note
@@ -493,6 +499,7 @@ user, as at some point it may be.
 In PostgreSQL the channel is an "identifier" which by default is
 limited to 63 characters. Subtracting the `postgraphile:` prefix leaves 50
 characters for your topic name.
+
 :::
 
 ### Subscription security
@@ -500,6 +507,7 @@ characters for your topic name.
 :::note
 
 This section only applies to "simple subscriptions."
+
 :::
 
 By default, any user may subscribe to any topic, whether logged in or not, and
@@ -563,6 +571,7 @@ terminated.
 :::note
 
 This section only applies to "simple subscriptions."
+
 :::
 
 You might want to make the topic a combination of things, for example the
@@ -577,6 +586,7 @@ that will be published to in the event the user is kicked from the channel, e.g.
 :::note
 
 This section only applies to "simple subscriptions."
+
 :::
 
 First, set up a `.postgraphilerc.js` containing the following:

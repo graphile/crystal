@@ -228,7 +228,7 @@ function, passing through the `searchText` argument.
  });
 ```
 
-:::tip This pattern is deprecated
+:::tip[This pattern is deprecated]
 
 We've demonstrated this pattern to show the easiest way to migrate, but the
 `typeDefs/plans` pattern is deprecated because it's hard to make it type safe.

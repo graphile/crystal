@@ -4,10 +4,12 @@ title: makeAddPgTableConditionPlugin
 
 # makeAddPgTableConditionPlugin (graphile-utils v4.4.5+)
 
-:::warning warning
+:::warning
+
 This plugin generator doesn't currently have any tests, so its
 status is **experimental**. If you can spare the time to write some tests (or
 [sponsor me to do so](https://graphile.org/sponsor)) then we can promote it to stable.
+
 :::
 
 PostGraphile adds `condition` arguments to various of the table collection
@@ -136,16 +138,20 @@ query ForumsContainingPostsByUser1 {
 ```
 
 :::note
+
 `sqlTableAlias` represents the `app_public.forums` table in the example
 above (i.e. the schemaName.tableName table); if you don't use it in your
 implementation then there's a good chance your plugin is incorrect.
+
 :::
 
 :::note
+
 For more complex values, you may need to invoke
 `build.gql2pg(value, databaseType)` instead of `sql.value(value)` in order to
 convert the GraphQL value to the equivalent SQL value. If you should need this,
 reach out on [our Discord chat](https://discord.gg/graphile) for advice.
+
 :::
 
 ## Example with ordering
@@ -161,9 +167,11 @@ number of purposes: filtering and ordering by full text search results,
 filtering and ordering by proximity, etc.
 
 :::note
+
 Prior to `graphile-utils` v4.9.1 (unreleased at time of writing), a plugin
 like this should be loaded via `--prepend-plugins` (or `prependPlugins` in the
 library mode) because otherwise the default ordering plugin dominates the order.
+
 :::
 
 ```js

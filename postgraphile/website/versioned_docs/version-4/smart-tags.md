@@ -269,11 +269,12 @@ table!):
 
 </div>
 
-:::warning warning
+:::warning
 
 This functionality is not intended for implementing permissions,
 it's for removing things from your API that you don't need. You should back
 these up with database permissions if needed.
+
 :::
 
 Multiple actions can be listed using commas (no spaces!), as in the following

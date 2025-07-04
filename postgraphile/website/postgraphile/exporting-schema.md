@@ -48,7 +48,7 @@ executable schema. You’ll notice that this schema does not import
 graphile-build, graphile-build-pg, etc — it just imports what it needs from
 `graphql`, `grafast` and similar runtime modules.
 
-:::warning For a schema to be exported, all plugins must support exporting
+:::warning[For a schema to be exported, all plugins must support exporting]
 
 Not all PostGraphile plugins support exporting the schema, if you use plugins
 that don’t support exporting then your exported schema is likely to have
@@ -57,7 +57,7 @@ your exported schema before relying on it.
 
 :::
 
-:::warning Test your exported schema thoroughly
+:::warning[Test your exported schema thoroughly]
 
 Exporting a GraphQL schema is error-prone, so you should test your exported
 schema thoroughly. The main failure mode for exported schemas is runtime errors
@@ -74,7 +74,7 @@ graphile-export does its own internal consistency checks.
 
 :::
 
-:::tip Use your exported schema in dev and CI too
+:::tip[Use your exported schema in dev and CI too]
 
 If you will be exporting your GraphQL schema we **highly recommend** that you
 adopt the exported schema into every facet of your development lifecycle: you
@@ -85,7 +85,7 @@ export.
 
 :::
 
-:::tip Use eslint-plugin-graphile-export when writing plugins
+:::tip[Use `eslint-plugin-graphile-export` when writing plugins]
 
 We **highly recommend** that plugin authors (both for internal project plugins
 and plugins distributed via `npm`) consult the
@@ -100,7 +100,7 @@ codebase can be reverted.)
 
 :::
 
-:::tip Run code validation against exported code
+:::tip[Run code validation against exported code]
 
 You may get value from running ESLint, TypeScript, and/or other code validation
 tooling against the exported code to ensure there are no undefined variable
@@ -123,7 +123,7 @@ server.listen(5555);
 console.log("Listening on http://localhost:5555/");
 ```
 
-:::note Only import what you need!
+:::note[Only import what you need!]
 
 You’ll notice that we import the `node` grafserv adaptor, our exported schema,
 and our preset, but no other PostGraphile-specific imports. The schema export

@@ -63,7 +63,7 @@ export default makeAddPgTableOrderByPlugin(
 );
 ```
 
-:::tip Easily create `orderBy` variants
+:::tip[Easily create `orderBy` variants]
 
 We used the `orderByAscDesc` helper to easily create the `_ASC` and
 `_DESC` variants without needing redundant code.
@@ -125,7 +125,7 @@ be used to apply the ordering to the parent PgSelectStep via
 unique via `$select.setOrderIsUnique()`, which will mean that the primary key
 will not need to be added to the order by clause.
 
-:::tip Use helpers
+:::tip[Use helpers]
 
 Note that you wouldn’t typically build the `MakeAddPgTableOrderByPluginOrders`
 yourself, instead you would use the `orderByAscDesc` helper.
@@ -218,7 +218,7 @@ movie with no ratings is not exactly what one thinks of when one hears
 this orderBy plugin should still show the movies without any reviews, but just
 put them at the end of the list.
 
-:::warning Be explicit about nullability
+:::warning[Be explicit about nullability]
 
 If your column or expression is nullable, you must either specify `nullable:
 true` or pass a value for `nulls`; if you don’t do this then PostGraphile will

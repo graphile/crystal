@@ -30,7 +30,7 @@ Engine plugins](./extending-raw), such as the following:
 
 #### Filter Plugin
 
-:::warning Generic filtering capabilities could be a mistake
+:::warning[Generic filtering capabilities could be a mistake]
 
 Adding powerful generic filtering capabilities to your GraphQL
 API is strongly discouraged, not just by Benjie (the maintainer of
