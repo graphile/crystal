@@ -32,7 +32,7 @@ are forbidden.
 
 :::
 
-:::warning
+:::danger[pgSelect with side-effects must be marked as such]
 
 If you are using a pgSelect in a mutation plan resolver, and that pgSelect has
 side effects (e.g. calls a `VOLATILE` database function), then ensure that the

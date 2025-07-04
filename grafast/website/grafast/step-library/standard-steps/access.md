@@ -4,7 +4,7 @@ Creates a step representing a (potentially nested) property from the result of a
 source step _without informing the step you're accessing it_. In general, you
 should prefer [`get()`](./get).
 
-:::warning
+:::danger[Prefer `get()` to `access()`]
 
 Many steps require that you use `.get()` or `.at()` in order to function
 properly, for example if you don't call `.get('attribute_name')` on a [`loadOne()`
@@ -34,7 +34,7 @@ const $firstPatchUserId = access($args.get("input"), [
 ]);
 ```
 
-:::warning
+:::danger
 
 This could lead to unexpected results (which could introduce security issues) if
 it is not used carefully; only use it on JSON-like data, preferably where the

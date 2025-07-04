@@ -302,7 +302,7 @@ TODO: expand this section with examples of why you might do these things.
 
 ## ~~Automatic application of `applyPlan` plan resolvers~~
 
-:::warning
+:::danger
 
 ~~This section is now _wrong_. We changed this behavior, and now you need to add
 `autoApplyAfterParentApplyPlan` or similar in order to trigger your field to

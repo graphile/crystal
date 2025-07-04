@@ -59,7 +59,7 @@ set GRAPHILE_LICENSE="license_key_from_graphile_store" & postgraphile -c postgre
 $env:GRAPHILE_LICENSE="license_key_from_graphile_store"; postgraphile -c postgres://...
 ```
 
-:::caution important
+:::danger important
 
 These plugins do not "phone home" so you'll need to update your
 license at least once every 9 months. You can check the expiry date of your
@@ -153,7 +153,7 @@ app.use(postGraphileMiddleware);
 
 ### Writing your own plugins
 
-:::caution important
+:::warning important
 
 Here be dragons. This interface is experimental, and
 documentation on it is far from complete. To use this interface you are expected
