@@ -29,7 +29,7 @@ $updatedUser.set("bio", $bio);
 
 ## $pgUpdateSingle.setPlan()
 
-:::warning OUT OF DATE
+:::danger OUT OF DATE
 
 This method no longer exists! There's a runtime equivalent now via `.apply()`.
 

@@ -26,7 +26,7 @@ const $derivatives = each($list, ($item) =>
 return $derivatives;
 ```
 
-:::warning Remember: `applyTransforms()` if passing to another step
+:::tip Remember: `applyTransforms()` if passing to another step
 
 If you aren't returning the result of `each()` from a plan resolver, but are
 instead feeding it into another step, you will likely need to perform

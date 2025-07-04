@@ -4,9 +4,9 @@ Sometimes you want to use your PostgreSQL client directly, e.g. to run
 arbitrary SQL, or use your specific database client's helper methods; that's
 what `withPgClient` is there to help you with.
 
-:::warning
+:::danger
 
-Like `lambda`, `withPgClient` is an escape hatch and does not use batching.
+Like `lambda`, `withPgClient` is an escape hatch and does not use batching. It is only intended for use in top-level mutations where batch size is always one.When desired elsewhere, consider using `pgSelect` or `loadOne` instead. In future, we intend to add a batched version of these functions.
 
 :::
 

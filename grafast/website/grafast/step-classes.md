@@ -43,7 +43,7 @@ conflicts occurring.
 
 :::
 
-:::warning Don't subclass steps.
+:::danger Don't subclass steps.
 
 Don't subclass steps, this will make things very confusing for you. Always
 inherit directly from `Step`.
@@ -135,7 +135,7 @@ i'th entry in this list corresponds to the `dep.at(i)` value for each `dep` in
 the "values tuple". The result of `execute` may or may not be a promise, and
 each entry in the resulting list may or may not be a promise.
 
-:::warning If your step has no dependencies
+:::danger If your step has no dependencies
 
 If the step has no dependencies then `values` will be a 0-tuple (an empty
 tuple), but that doesn't mean the batch is empty or has size one, `count` may
@@ -195,7 +195,7 @@ execute method then returns the same number of results in the same order: `[3,
 
 ### stream
 
-:::warning REMOVED!
+:::info REMOVED!
 
 `stream` is no longer its own method; it has been merged with `execute`.
 
@@ -331,7 +331,7 @@ done just once. A step that deals with a database might precompile its SQL, a
 step that transforms an object might build an optimized function to do so, there
 are so many other actions that this step can be used for.
 
-:::warning
+:::danger
 
 It is critical that the step calls `super.finalize()` at the end of the
 `finalize()` step:
@@ -390,7 +390,7 @@ class MyListStep extends Step {
 }
 ```
 
-:::caution
+:::warning
 
 If your step implements `.at()`, make sure it meets the expectations:
 ie it correctly accepts a single argument an integer.
@@ -417,7 +417,7 @@ class MyObjectStep extends Step {
 }
 ```
 
-:::caution
+:::warning
 
 If your step implements `.get()`, make sure it meets the expectations:
 i.e. it correctly accepts a single argument of a string.
@@ -451,7 +451,7 @@ class MyCollectionStep extends Step /* implements ConnectionCapableStep */ {
 }
 ```
 
-:::caution
+:::warning
 
 If your step implements `.items()`, make sure it meets the expectations:
 i.e. it does not require any arguments.
@@ -626,7 +626,7 @@ class AddStep extends Step {
   }
 ```
 
-:::warning Steps are ethemeral, never store a reference to a step.
+:::danger Steps are ephemeral, never store a reference to a step.
 
 You must never store a reference to another step directly (or indirectly) in
 your step class. Steps come and go at quite a rate during planning - being
@@ -654,7 +654,7 @@ useful when a parameter to a remote service request needs to be the same for
 all entries in the batch; typically this will be the case for ordering,
 pagination and access control.
 
-:::warning Use with caution.
+:::warning Only for use with steps which will always be unary
 
 `this.addUnaryDependency($step)` will raise an error during planning if the
 given `$step` is not unary, so you should be very careful using it. If in
@@ -731,7 +731,7 @@ any output.
 
 ### isSyncAndSafe
 
-:::warning
+:::danger
 
 This is a very dangerous optimization, only use it if you're 100% sure you know
 what you are doing!
@@ -766,7 +766,7 @@ This is set `true` after the step has been optimized.
 
 Set this true if your plan's optimize method can be called a second time.
 
-:::warning Your dependencies may change classes!
+:::danger Your dependencies may change classes!
 
 In this situation it's likely that your dependencies (or their dependencies)
 will not be what you expect them to be (e.g. a `PgSelectSingleStep` might
