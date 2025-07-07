@@ -1,6 +1,5 @@
 import type { GraphiQLProps } from "graphiql";
 
-import { graphiQLContent } from "./bundleData.js";
 import type { RuruConfig } from "./interfaces.js";
 import { version } from "./version.js";
 export { RuruConfig } from "./interfaces.js";
@@ -36,28 +35,24 @@ const baseElements = `\
 const baseBodyScripts = `\
 <script type="module"> import merm from 'https://cdn.jsdelivr.net/npm/mermaid@11.6.0/+esm'; window.mermaid = merm </script>
 <script type="module">
-/* Set up monaco workers */
-import createJSONWorker from "https://esm.sh/monaco-editor/esm/vs/language/json/json.worker.js?worker"
-import createGraphQLWorker from "https://esm.sh/monaco-graphql/esm/graphql.worker.js?worker"
-import createEditorWorker from "https://esm.sh/monaco-editor/esm/vs/editor/editor.worker.js?worker"
-
+// Setup Monaco Editor workers
+function worker(file) {
+  return new Worker(new URL(RURU_CONFIG.staticPath + file, import.meta.url), { type: "module" });
+}
 globalThis.MonacoEnvironment = {
   getWorker(_workerId, label) {
     switch (label) {
-      case "json":
-        return createJSONWorker()
-      case "graphql":
-        return createGraphQLWorker()
+      case "json": return worker('jsonWorker.js');
+      case "graphql": return worker('graphqlWorker.js');
+      default: return worker('editorWorker.js');
     }
-    return createEditorWorker()
   }
 }
 </script>
-<script>/*! For license information, see https://unpkg.com/ruru@${version}/bundle/ruru.min.js.LICENSE.txt */
-${escapeJS(graphiQLContent)}</script>`;
+`;
 const baseBodyInitScript = `\
-<script>
-  const { React, createRoot, Ruru } = RuruBundle;
+<script type="module">
+  const { React, createRoot, Ruru } = await import(RURU_CONFIG.staticPath + 'ruru.js');
   const tree = React.createElement(Ruru, RURU_CONFIG);
   const container = document.getElementById("ruru-root");
   const root = createRoot(container);
@@ -72,6 +67,13 @@ const baseBodyInitScript = `\
 interface RuruEventSourceInit extends EventSourceInit, Record<string, any> {}
 
 export interface RuruServerConfig {
+  /**
+   * Ruru's static assets must be served for Ruru to work. Pass the URL to the
+   * root of this folder; it must end in a slash. Defaults to
+   * `https://unpkg.com/ruru@${version}/static/`
+   */
+  staticPath?: string;
+
   /**
    * The URL to the GraphQL endpoint.
    */
@@ -168,6 +170,11 @@ export function ruruHTML(
   config: RuruServerConfig,
   htmlParts = defaultHTMLParts,
 ) {
+  const finalConfig = {
+    ...config,
+    staticPath:
+      config.staticPath ?? `https://unpkg.com/ruru@${version}/static/`,
+  };
   const {
     metaTags,
     titleTag,
@@ -185,7 +192,7 @@ export function ruruHTML(
 ${metaTags}
 ${titleTag}
 ${styleTags}
-<script>const RURU_CONFIG = ${escapeJS(JSON.stringify(config))};</script>
+<script>const RURU_CONFIG = ${escapeJS(JSON.stringify(finalConfig))};</script>
 ${headerScripts}
 </head>
 <body>

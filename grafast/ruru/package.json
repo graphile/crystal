@@ -69,8 +69,7 @@
   },
   "files": [
     "dist",
-    "bundle",
-    "index.js"
+    "static"
   ],
   "devDependencies": {
     "@types/http-proxy": "^1.17.16",

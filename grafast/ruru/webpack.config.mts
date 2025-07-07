@@ -63,20 +63,23 @@ class OutputDataToSrcPlugin {
     compiler.hooks.emit.tap("OutputDataToSrcPlugin", (compilation) => {
       const output: string[] = [];
       output.push("/* eslint-disable */");
-      output.push("export const bundleData = {");
+      output.push(
+        "export const bundleData: Record<string, string | Buffer> = {",
+      );
       const entries = Object.entries(compilation.assets);
       entries.sort((a, z) => (a[0] < z[0] ? -1 : a[0] > z[0] ? 1 : 0));
       for (const [filename, asset] of entries) {
         const source = asset.source();
-        if (/\.([mc]?[jt]sx?|json|css|svg)$/.test(filename)) {
+        const key = JSON.stringify(filename);
+        if (/\.([mc]?[jt]sx?|json|css|svg|txt|map)$/.test(filename)) {
           const content = backtickEscape(source.toString("utf8").trim());
-          output.push(`  ${JSON.stringify(filename)}: \`\n${content}\`,`);
+          output.push(`  ${key}: \`${content}\`,`);
         } else {
           const buf = Buffer.isBuffer(source)
             ? source
             : Buffer.from(source as string);
           const base64 = buf.toString("base64");
-          output.push(`  ${filename}: Buffer.from("${base64}", "base64"),`);
+          output.push(`  ${key}: Buffer.from("${base64}", "base64"),`);
         }
       }
       output.push("};");
@@ -86,6 +89,7 @@ class OutputDataToSrcPlugin {
 }
 
 const config: Configuration = {
+  mode: "production",
   entry: {
     ruru: "./src/bundle.mtsx",
     jsonWorker: "monaco-editor/esm/vs/language/json/json.worker.js",
@@ -93,12 +97,16 @@ const config: Configuration = {
     editorWorker: "monaco-editor/esm/vs/editor/editor.worker.js",
   },
   output: {
-    path: `${__dirname}/bundle`,
+    path: `${__dirname}/static`,
     filename: "[name].js",
     module: true,
     chunkFormat: "module",
     chunkLoading: "import",
+    library: {
+      type: "module",
+    },
   },
+  devtool: "source-map",
   experiments: {
     outputModule: true,
   },
@@ -125,7 +133,10 @@ const config: Configuration = {
       },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/,
-        use: ["file-loader"],
+        type: "asset/resource",
+        generator: {
+          filename: "[hash][ext]",
+        },
         sideEffects: true,
       },
     ],
