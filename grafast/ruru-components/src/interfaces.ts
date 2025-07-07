@@ -44,22 +44,22 @@ export interface RuruProps {
   defaultQuery?: string;
 
   /**
-   * @deprecated Use `query` instead
+   * The query to prepopulate the editor with.
    */
   initialQuery?: string;
 
   /**
-   * @deprecated Use `variables` instead
+   * The variables to prepopulate the editor with.
    */
   initialVariables?: string;
 
   /**
-   * The query to prepopulate the editor with.
+   * @deprecated Use `initialQuery` instead
    */
   query?: string;
 
   /**
-   * The variables to prepopulate the editor with.
+   * @deprecated Use `initialVariables` instead
    */
   variables?: string;
 

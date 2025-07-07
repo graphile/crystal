@@ -69,8 +69,8 @@ export const Ruru: FC<RuruProps> = (props) => {
         schemaDescription={true}
         fetcher={fetcher}
         defaultQuery={defaultQuery}
-        query={props.query ?? props.initialQuery}
-        variables={props.variables ?? props.initialVariables}
+        initialQuery={props.query ?? props.initialQuery}
+        initialVariables={props.variables ?? props.initialVariables}
         plugins={plugins}
         shouldPersistHeaders={saveHeaders}
       >
@@ -190,7 +190,6 @@ export const RuruInner: FC<{
                   />
                 </ToolbarButton>
                 <ToolbarMenu
-                  label="Options"
                   button={
                     <ToolbarButton label="Options">
                       <SettingsIcon
