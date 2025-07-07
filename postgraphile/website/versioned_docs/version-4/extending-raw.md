@@ -238,17 +238,21 @@ module.exports = function CreateLinkWrapPlugin(builder) {
 
 ### Removing things from the schema
 
-:::warning warning
+:::danger[Warning]
+
 Removing things from your GraphQL schema this way may have
 unintended consequences - especially if you add back a field or type with the
 same name as that which you removed. It's advised that rather than removing
 things, you instead avoid them being generated in the first place.
+
 :::
 
 :::tip
+
 **If you're looking for an easy way to prevent certain tables, fields, functions
 or relations being added to your GraphQL schema, check out
 [smart comments](./smart-comments).**
+
 :::
 
 If you want to remove a class of things from the schema then you can remove the

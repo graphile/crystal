@@ -95,7 +95,7 @@ middleware functions call `next()`, the next registered middleware is run. Once
 there are no more registered middleware functions for that action, `next()` will
 perform the underlying action that the library defines.
 
-:::warning Here be dragons
+:::danger Here be dragons
 
 When you write a middleware, you are explicitly choosing to change the way in
 which a library functions&mdash;your modified behaviour may not be compatible

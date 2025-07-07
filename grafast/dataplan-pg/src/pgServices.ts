@@ -84,7 +84,7 @@ export function getWithPgClientFromPgService<
         cachedValue.retainers--;
 
         // To allow for other promises to resolve and add/remove from the retaininers, check after a tick
-        setTimeout(
+        const tid = setTimeout(
           () => {
             if (cachedValue.retainers === 0 && !released) {
               released = true;
@@ -97,6 +97,7 @@ export function getWithPgClientFromPgService<
           },
           isTest ? 500 : 5000,
         );
+        tid.unref?.(); // Don't block process exit
       };
       withPgClientDetailsByConfigCache.set(config, cachedValue);
       return cachedValue;

@@ -4,7 +4,7 @@ title: Introduction
 
 # PostGraphile Introduction
 
-:::caution Use the `@beta` tag
+:::warning[Use the `@beta` tag]
 
 This software is in beta, please be sure to use the `@beta` tag when installing any of the related modules, for example:
 
@@ -14,7 +14,7 @@ yarn add postgraphile-plugin-connection-filter@beta
 
 :::
 
-:::tip Migration Guide
+:::tip[Migration Guide]
 
 Coming from PostGraphile Version 4? Check out the
 [migration guide](./migrating-from-v4/index.mdx)!
@@ -43,7 +43,7 @@ may not be for you, PostGraphile has an [‘export’ feature](./exporting-schem
 so your generated API can be exported as executable JavaScript code which you
 can then maintain yourself ─ there's no lock-in.
 
-:::tip PostGraphile is not always a 1-to-1 map of the database
+:::tip[PostGraphile is not always a 1-to-1 map of the database]
 
 PostGraphile doesn't have to be (and _generally_ should not be) a “1-to-1 map”
 of your database.

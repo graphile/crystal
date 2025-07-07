@@ -622,7 +622,7 @@ table!):
 
 </div>
 
-:::warning Don't rely on @omit for permissions
+:::warning[Don't rely on @omit for permissions]
 
 This functionality is not intended for implementing permissions,
 it's for removing things from your API that you don't need. You should back

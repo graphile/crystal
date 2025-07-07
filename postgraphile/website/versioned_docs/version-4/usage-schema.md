@@ -578,7 +578,7 @@ export const MyPlugin = makeExtendSchemaPlugin((build: Build) => {
 });
 ```
 
-:::tip Tips and tricks
+:::tip[Tips and tricks]
 
 This VS code extension was not super stable as of the time of writing. It
 would crash sometimes if it thought to find conflicting definitions. This

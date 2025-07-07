@@ -30,7 +30,7 @@ Well written business logic in the database will often be significantly more
 performant then writing the business logic in the application layer. This is
 because PostgreSQL is finely tuned for data intensive uses.
 
-:::info Take care to adapt your coding pattern to the new paradigm-shift
+:::info[Take care to adapt your coding pattern to the new paradigm-shift]
 
 It’s _very easy_ to have very poor performance in the database if
 you try and move your procedural programming language knowledge over without
@@ -374,7 +374,7 @@ Certain VOLATILE functions will be exposed by PostGraphile as
 If your function does not modify any data or state, you should declare it as
 `STABLE`.
 
-:::info When to use `IMMUTABLE`
+:::info[When to use `IMMUTABLE`]
 
 If your function depends only on its arguments and does not fetch
 data from other sources, nor is it dependent on configuration variables, then

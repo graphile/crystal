@@ -293,8 +293,10 @@ DATABASE_URL=postgres://postgres:change_me@db:5432/forum_example
 ```
 
 :::note
+
 The `DATABASE_URL` follows the syntax
 `postgres://<user>:<password>@db:5432/<db_name>`.
+
 :::
 
 ### Create PostGraphile Dockerfile

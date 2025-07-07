@@ -253,6 +253,7 @@ const config = {
           "bash",
           "diff",
           "docker",
+          "ignore",
           "ini",
           "json5",
           "plsql",

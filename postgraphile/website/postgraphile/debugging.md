@@ -104,7 +104,7 @@ export default {
 };
 ```
 
-:::tip Use the `originalError` property
+:::tip[Use the `originalError` property]
 
 GraphQLError instances have an `error.originalError` property that can be used
 to retrieve the underlying error, this typically contains more actionable
@@ -131,7 +131,7 @@ export default {
 };
 ```
 
-:::warning Disable Explain in production!
+:::warning[Disable Explain in production!]
 
 Explain should be disabled in production since it could leak information about
 the internals of your schema that would be useful to an attacker.

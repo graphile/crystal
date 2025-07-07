@@ -21,7 +21,7 @@ The PostGraphile base presets are named after crystals; the first base preset
 available is `postgraphile/presets/amber`, so you’ll almost definitely want
 that.
 
-:::caution Avoid naming conflicts!
+:::warning[Avoid naming conflicts!]
 
 Please don’t name your own presets after crystals, or we may end up having
 confusion!
@@ -106,7 +106,7 @@ We highly recommend using TypeScript for dealing with your preset so that you
 get auto-completion for the options available in each scope; you can also use
 the `graphile config options` command detailed below.
 
-:::tip The Schema Build Process
+:::tip[The Schema Build Process]
 
 The schema build process in PostGraphile is:
 
@@ -234,7 +234,7 @@ find out what options are available to you:
 graphile config options
 ```
 
-:::info The graphile CLI is a development aid
+:::info[The graphile CLI is a development aid]
 
 The `graphile` CLI is a development aid only, and is not needed at runtime or
 in production (or in development really, it’s just a handy little helper). This
@@ -349,7 +349,7 @@ const pgServices = [
 ];
 ```
 
-:::caution Don’t set `name` unless you need to!
+:::warning[Don’t set `name` unless you need to!]
 
 We recommend that you don’t set a `name` unless you have more than one
 pgService. If you do, the different services may need different properties on
@@ -403,7 +403,7 @@ why every adaptor should support them.
 
 :::
 
-:::caution `name` must be unique!
+:::warning[`name` must be unique!]
 
 The `name` option must be unique across all your `pgServices`; therefore if you
 have more than one entry in `pgServices` you must give each additional entry an
@@ -600,7 +600,7 @@ export default {
 };
 ```
 
-:::warning Use prefixes
+:::warning[Use prefixes]
 
 When adding details to `grafast.context`, you must careful to not add properties that
 will clash with system context keys such as `withPgClient`, `pgSettings`,
@@ -613,7 +613,7 @@ context keys with your initials, company name, or similar.
 
 :::
 
-:::tip Use helpers
+:::tip[Use helpers]
 
 It’s _not_ a good idea to give direct access to the `req` or `res` objects
 via `grafast.context` as it binds the GraphQL context too tightly to the HTTP
@@ -672,7 +672,7 @@ export default {
 };
 ```
 
-:::caution Naming conventions
+:::warning[Naming conventions]
 
 You can use `pgSettings` to define variables that your Postgres
 functions/policies depend on, or to tweak internal Postgres settings.
@@ -781,7 +781,7 @@ export default {
 };
 ```
 
-:::tip Use abstractions
+:::tip[Use abstractions]
 
 GraphQL itself is transport agnostic, as is `grafast`, so depending on how you
 choose to use your PostGraphile schema you may or may not have access to an

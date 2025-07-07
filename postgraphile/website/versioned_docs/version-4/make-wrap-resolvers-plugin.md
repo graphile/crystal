@@ -16,7 +16,8 @@ PostGraphile. You can
 `--append-plugins` via the PostGraphile CLI, or with `appendPlugins` via the
 PostGraphile library.
 
-:::important important
+:::info[Important]
+
 Because PostGraphile uses the Graphile Engine look-ahead features,
 overriding a resolver may not effect the SQL that will be generated. If you want
 to influence how the system executes, only use this for modifying root-level
@@ -24,6 +25,7 @@ resolvers (as these are responsible for generating the SQL and fetching from the
 database); however it's safe to use resolver wrapping for augmenting the
 returned values (for example masking private data, performing normalization,
 etc) on any field.
+
 :::
 
 Let's look at the `makeWrapResolvers` definition in the `graphile-utils` source

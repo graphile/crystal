@@ -129,7 +129,7 @@ operation.
 The optimize method is called starting with the dependencies (leaves) and
 working its way up the dependents (trunk) of the execution plan's directed
 acyclic graph. Since plans should only talk to their ancestors (and not their
-descendents) during optimize, this ensures that their dependencies remain what
+descendants) during optimize, this ensures that their dependencies remain what
 the class expects until after it is optimized.
 
 Once optimization is complete, <Grafast /> tree shakes again to remove any

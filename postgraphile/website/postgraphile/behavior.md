@@ -76,7 +76,7 @@ These global defaults can still be overridden by each entity, so they’re a
 good way of making wide ranging “default” behaviors without locking yourself in
 too hard.
 
-:::info Global behavior in presets
+:::info[Global behavior in presets]
 
 If you’re authoring a preset that is not the final configuration for a schema
 then this default behavior setting is likely to be overridden (replaced) by the

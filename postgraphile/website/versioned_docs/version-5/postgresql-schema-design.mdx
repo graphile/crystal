@@ -745,7 +745,7 @@ we said users would never be able to insert into
 `forum_example_private.person_account` because it uses the privileges of the
 definer.
 
-:::warning exercise caution when using security definer
+:::warning[exercise caution when using security definer]
 
 Make sure that when you create a function with `security definer`
 there are no ‘holes’ a user could use to see or mutate more data than they are
@@ -854,7 +854,7 @@ create role forum_example_person;
 grant forum_example_person to forum_example_postgraphile;
 ```
 
-:::caution warning
+:::warning
 
 The `forum_example_postgraphile` role will have all of the
 permissions of the roles granted to it. So it can do everything
@@ -891,7 +891,7 @@ Would turn into a token that looks like:
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhIjoxLCJiIjoyLCJjIjozfQ.hxhGCCCmGV9nT1slief1WgEsOsfdnlVizNrODxfh1M8
 ```
 
-:::warning JWTs are public
+:::warning[JWTs are public]
 
 The information in a JWT can be read by anyone, so do not put
 private information in a JWT. What makes JWTs secure is that unless they were
@@ -941,7 +941,7 @@ set local jwt.claims.role to 'forum_example_person';
 Now, the user would have the permissions of the `forum_example_person` role as
 they execute their query.
 
-:::warning Check JWT expiration behavior
+:::warning[Check JWT expiration behavior]
 
 Unless explicitly set, JWTs never expire. Once they have been
 issued they may never be invalidated. This is both good and bad, good in that

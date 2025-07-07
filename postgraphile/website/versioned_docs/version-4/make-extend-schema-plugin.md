@@ -233,19 +233,23 @@ app.listen(3030);
 
 ## The `selectGraphQLResultFromTable` helper
 
-:::important important
+:::info[Important]
+
 this helper is for populating data you return from your
 \*resolver; you _should not_ use `selectGraphQLResultFromTable` to retrieve data
 for your resolver to process. Instead use `context.pgClient` directly.
+
 :::
 
-:::important important
+:::info[Important]
+
 `selectGraphQLResultFromTable` should only be called once per
 resolver; it doesn't make sense to call it multiple times, and attempting to
 combine the results is liable to cause issues. If you feel the need to call it
 multiple times, please read the IMPORTANT note above, and/or consider
 implementing your requirement via multiple fields/resolvers rather than trying
 to do it all in one.
+
 :::
 
 Resolvers are passed 4 arguments: `parent, args, context, resolveInfo`. In the
@@ -747,7 +751,7 @@ Notes:
 
 **This section applies to PostGraphile v4.4.6+**
 
-:::caution bug
+:::danger[Bug]
 
 It seems `@pgQuery` only supports _scalars_ (not _enums_) right now:
 https://github.com/graphile/postgraphile/issues/1601**

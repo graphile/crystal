@@ -1,6 +1,6 @@
 # pgCondition
 
-:::warning OUT OF DATE
+:::danger OUT OF DATE
 
 This documentation page is out of date! We've not had time to update it
 correctly yet, but here's an incredibly quick and poor overview... (Please do

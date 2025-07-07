@@ -24,10 +24,12 @@ you're doing a read-only operation, or mutating the schema directly) or return
 an alternative schema (e.g. a derivative).
 
 :::note
+
 Some third party tooling mutates the existing GraphQL schema
 which is likely to cause issues. Please use only tools that treat GraphQL
 schemas as immutable; if you cannot then try building a sacrificial schema that
 delegates to the PostGraphile schema but can be mutated.
+
 :::
 
 ### Example

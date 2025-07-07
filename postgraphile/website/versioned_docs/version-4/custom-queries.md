@@ -46,7 +46,7 @@ could be queried in GraphQL like this:
 }
 ```
 
-:::tip Nullability Note
+:::tip[Nullability Note]
 
 By default all attributes on postgres types are nullable, and so a function that
 returns a type instead of a table will have all its fields treated as such by the
@@ -128,7 +128,7 @@ And that’s it! You can now use this function in your GraphQL like so:
 }
 ```
 
-:::tip Performance Note
+:::tip[Performance Note]
 
 This function will have poor performance because `ILIKE`
 specifications of this form (beginning and ending with `%`) do not utilize
@@ -176,7 +176,7 @@ filters which can be exposed as GraphQL field arguments - if you reduce the
 amount of data that the function can produce (e.g. to 100 rows) then it reduces
 the potential cost of having this function in your schema.
 
-:::caution Disclaimer
+:::warning[Disclaimer]
 
 The information in this advice section is not 100% true, for
 example PostgreSQL can "see through" some `SQL` functions and has a highly

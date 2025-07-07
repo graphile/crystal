@@ -85,7 +85,7 @@ context_ `requestContext`. If you pass these parameters then `grafast` will
 take care of building the _GraphQL context_ for you based on what is in your
 preset.
 
-:::caution
+:::warning[`requestContext` is not the same as GraphQL's `context`]
 
 Do not confuse `requestContext` with the GraphQL context; `requestContext` is
 the parameter passed to your `preset.grafast.context(requestContext)` callback

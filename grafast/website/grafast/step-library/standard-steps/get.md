@@ -10,7 +10,7 @@ Usage:
 const $userId = get($user, "id");
 ```
 
-:::warning
+:::danger
 
 This could lead to unexpected results (which could introduce security issues) if
 it is not used carefully; only use it on JSON-like data, preferably where the

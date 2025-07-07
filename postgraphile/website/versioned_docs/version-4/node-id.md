@@ -25,12 +25,14 @@ export const client = new ApolloClient({
 });
 ```
 
-:::caution warning
+:::tip
+
 By default, we call the Global Object Identifier `nodeId` to avoid
 clashing with the `id` field that's common practice in database design. If you
 wish to call the Global Object Identifier field `id` instead (as is mandated by
 the specification), you can do so with our `--classic-ids` CLI flag. In doing
 so, any `id` column will automatically be renamed to `rowId`.
+
 :::
 
 ### Disabling the Global Object Identifier

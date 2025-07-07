@@ -7,7 +7,7 @@ the “bread and butter” of customizing your PostGraphile schema, enabling you
 add new fields and types to your GraphQL schema in a convenient and concise
 familiar syntax — GraphQL SDL.
 
-:::info The SDL is not validated
+:::info[The SDL is not validated]
 
 Though the SDL syntax is used, it is not validated — if you define a type but
 never use that type, that will likely not cause a schema validation error. If
@@ -50,7 +50,7 @@ The callback should return an object with the following keys:
 - `resolvers` (optional, not recommended): like `plans`, except the functions are
   a traditional resolver functions rather than plan resolver functions
 
-:::info Use Plans, not Resolvers
+:::info[Use Plans, not Resolvers]
 
 Unlike in PostGraphile v4, the fourth argument to the resolver functions in
 `resolvers` does _not_ contain Graphile Build-related helpers. Since the
@@ -270,7 +270,7 @@ const schema = makeExtendSchemaPlugin((build) => {
 });
 ```
 
-:::note It is possible to unset or overwrite automatic scopes
+:::note[It is possible to unset or overwrite automatic scopes]
 
 `makeExtendSchemaPlugin` might try and guess the scopes to use to be helpful;
 if it gets them wrong then be sure to overwrite them using the instructions
@@ -383,7 +383,7 @@ export const MyChannelsPlugin = makeExtendSchemaPlugin((build) => {
 });
 ```
 
-:::note Automatic type generation
+:::note[Automatic type generation]
 
 The `Channel` type used in the `typeDefs` above is the type that PostGraphile
 generated automatically for the `channels` table. See
@@ -392,7 +392,7 @@ database table.
 
 :::
 
-:::info Gra*fast* will optimize the requests
+:::info[Gra*fast* will optimize the requests]
 
 Though you might be thinking that this would result in multiple requests being
 issued to the database, thanks to the magic of Gra*fast* and `@dataplan/pg`,
@@ -426,7 +426,7 @@ second argument, and an asynchronous callback as the third argument. The callbac
 will be called with a `PgClient` instance and the resolved data from the step
 in the second argument.
 
-:::info `PgClient` is an abstraction
+:::info[`PgClient` is an abstraction]
 
 The `PgClient` instance is an abstraction provided by `@dataplan/pg`, it
 contains common functionality but also any helpers that the specific Postgres

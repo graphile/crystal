@@ -4,7 +4,7 @@ sidebar_position: 8
 
 # Request overview
 
-:::caution
+:::info[This is an approximation]
 
 The following deliberately over-simplifies the inner workings of <Grafast /> by
 focussing on single-payload GraphQL requests rather than those that return

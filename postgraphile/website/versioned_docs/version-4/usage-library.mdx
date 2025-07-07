@@ -261,7 +261,7 @@ watch mode).
 
 As PostGraphile evolves, we add more features; however we can't always enable
 these features by default as they may be breaking changes. There are also
-options that may have security repurcussions. For this reason, many features are
+options that may have security repercussions. For this reason, many features are
 behind flags. We understand this page is very long, so we've included some
 default option sets you might like to use:
 
@@ -320,6 +320,8 @@ const postgraphileOptions = {
 The `postgraphile` middleware factory function takes three arguments, all of
 which are optional. The below options are valid
 for <tt>postgraphile@<span></span>4.12.3</tt>.
+
+{/* `<span></span>` prevents autolinking */}
 
 - **`pgConfig`**: Specifies the PostgreSQL database you wish to connect to. You
   may pass a PostgreSQL connection string, a configuration object to pass to the
@@ -510,7 +512,7 @@ for <tt>postgraphile@<span></span>4.12.3</tt>.
     GraphiQL can be used to show the user the SQL statements that were executed.
     Set to a boolean to enable all users to use this, or to a function that
     filters each request to determine if the request may use Explain. DO NOT USE
-    IN PRODUCTION unless you're comfortable with the security repurcussions of
+    IN PRODUCTION unless you're comfortable with the security repercussions of
     doing so.
   - `additionalGraphQLContextFromRequest`: Some Graphile Engine schema plugins
     may need additional information available on the `context` argument to the
@@ -589,7 +591,7 @@ Everything returned by `pgSettings` is applied to the current session with
 `set_config($key, $value, true)`; note that `set_config` only supports string
 values so it is best to only feed `pgSettings` string values (we'll convert
 other values using the `String` constructor function, which may not have the
-effect you intend.
+effect you intend).
 
 You can use `pgSettings` to define variables that your Postgres
 functions/policies depend on, or to tweak internal Postgres settings. When

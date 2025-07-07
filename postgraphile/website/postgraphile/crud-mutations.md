@@ -38,7 +38,7 @@ PostGraphile gives you a lot of ways to define your own mutations (from
 extensions](./extend-schema), to [custom plugins](./extending)),
 so you can pick whichever pattern you and your team are most comfortable with.
 
-:::note PostGraphile brings more than just handling CRUD mutations
+:::note[PostGraphile brings more than just handling CRUD mutations]
 
 You might be wondering, &quot;What value do users see in PostGraphile if not the
 CRUD mutations?&quot; These users typically recognize PostGraphile’s significant

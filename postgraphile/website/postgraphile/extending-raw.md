@@ -153,7 +153,7 @@ export default {
 };
 ```
 
-:::tip It's more efficient to stop generation than to remove fields later
+:::tip[It's more efficient to stop generation than to remove fields later]
 
 For efficiency’s sake, it’s advised that rather than removing things from the
 schema, you instead avoid them being generated in the first place using the
