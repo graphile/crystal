@@ -3845,7 +3845,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@graphiql/plugin-explorer@npm:^5.0.0-rc.3":
+"@graphiql/plugin-explorer@npm:^5.0.0":
   version: 5.0.0
   resolution: "@graphiql/plugin-explorer@npm:5.0.0"
   dependencies:
@@ -3874,9 +3874,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@graphiql/react@npm:^0.35.0, @graphiql/react@npm:^0.35.0-rc.6":
-  version: 0.35.1
-  resolution: "@graphiql/react@npm:0.35.1"
+"@graphiql/react@npm:^0.35.0, @graphiql/react@npm:^0.35.4":
+  version: 0.35.4
+  resolution: "@graphiql/react@npm:0.35.4"
   dependencies:
     "@graphiql/toolkit": "npm:^0.11.3"
     "@radix-ui/react-dialog": "npm:^1.1"
@@ -3899,7 +3899,7 @@ __metadata:
     graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
     react: ^18 || ^19
     react-dom: ^18 || ^19
-  checksum: 10/f1ee727edc426a0827d8a86d9ab7bac200fa2a2233f0800453598bb1aaf27ee21b6dd049a8b5a6cbab9845644ab875628e534d023bf785cff51f06e64fa5f6d0
+  checksum: 10/e4380d61a80f905dca82e6e1b71b3808c22ac0c3aa6d4662b9c77012b4c905c5ce108f7e18729e7e58b49b5d527df7f4a82c40f64ccc5f0efab8c4d67151112f
   languageName: node
   linkType: hard
 
@@ -14028,19 +14028,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graphiql@npm:^5.0.0-rc.4":
-  version: 5.0.0
-  resolution: "graphiql@npm:5.0.0"
+"graphiql@npm:^5.0.3":
+  version: 5.0.3
+  resolution: "graphiql@npm:5.0.3"
   dependencies:
     "@graphiql/plugin-doc-explorer": "npm:^0.3.0"
     "@graphiql/plugin-history": "npm:^0.3.0"
-    "@graphiql/react": "npm:^0.35.0"
+    "@graphiql/react": "npm:^0.35.4"
     react-compiler-runtime: "npm:19.1.0-rc.1"
   peerDependencies:
     graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
     react: ^18 || ^19
     react-dom: ^18 || ^19
-  checksum: 10/6c521bf3f754f683690fbb10ace6b22695d42f6bbbcbc3148e804f12ab3d9a528a72c5d17a1728a345dfb431688c6b26c1a66314163c39b2fec5da22679112b1
+  checksum: 10/a56eb5e78380289eefed758ea6f7b09b97bc272aa7d186f979a7da75a9fa9712364b2c3693b5af2d233c6513d425015d6598aa00e6dfcc78cf1fe13356c73edf
   languageName: node
   linkType: hard
 
@@ -22179,8 +22179,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "ruru-components@workspace:grafast/ruru-components"
   dependencies:
-    "@graphiql/plugin-explorer": "npm:^5.0.0-rc.3"
-    "@graphiql/react": "npm:^0.35.0-rc.6"
+    "@graphiql/plugin-explorer": "npm:^5.0.0"
+    "@graphiql/react": "npm:^0.35.4"
     "@graphiql/toolkit": "npm:^0.11.3"
     "@types/codemirror": "npm:^5.60.16"
     "@types/debug": "npm:^4.1.12"
@@ -22190,7 +22190,7 @@ __metadata:
     "@types/react": "npm:^19.1.8"
     "@types/react-dom": "npm:^19.1.6"
     grafast: "workspace:^"
-    graphiql: "npm:^5.0.0-rc.4"
+    graphiql: "npm:^5.0.3"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     graphql-ws: "npm:^6.0.5"
     jest: "npm:^30.0.0"
