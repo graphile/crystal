@@ -3,7 +3,6 @@ import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import type { Compiler, Configuration, Resolver } from "webpack";
-import webpack from "webpack";
 // import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -62,28 +61,46 @@ function backtickEscape(string: string) {
 class OutputDataToSrcPlugin {
   apply(compiler: Compiler) {
     compiler.hooks.emit.tap("OutputDataToSrcPlugin", (compilation) => {
-      //const code = readFileSync(`${__dirname}/bundle/ruru.min.js`, null);
-      const code = compilation.assets["ruru.min.js"].source();
-      writeFileSync(
-        `${__dirname}/src/bundleData.ts`,
-        `\
-/* eslint-disable */
-export const graphiQLContent: string = \`\\
-${backtickEscape(code.toString("utf8").trim())}
-\`;
-`,
-      );
+      const output: string[] = [];
+      output.push("/* eslint-disable */");
+      output.push("export const bundleData = {");
+      const entries = Object.entries(compilation.assets);
+      entries.sort((a, z) => (a[0] < z[0] ? -1 : a[0] > z[0] ? 1 : 0));
+      for (const [filename, asset] of entries) {
+        const source = asset.source();
+        if (/\.([mc]?[jt]sx?|json|css|svg)$/.test(filename)) {
+          const content = backtickEscape(source.toString("utf8").trim());
+          output.push(`  ${JSON.stringify(filename)}: \`\n${content}\`,`);
+        } else {
+          const buf = Buffer.isBuffer(source)
+            ? source
+            : Buffer.from(source as string);
+          const base64 = buf.toString("base64");
+          output.push(`  ${filename}: Buffer.from("${base64}", "base64"),`);
+        }
+      }
+      output.push("};");
+      writeFileSync(`${__dirname}/src/bundleData.ts`, output.join("\n") + "\n");
     });
   }
 }
 
 const config: Configuration = {
-  entry: "./src/bundle.mtsx",
+  entry: {
+    ruru: "./src/bundle.mtsx",
+    jsonWorker: "monaco-editor/esm/vs/language/json/json.worker.js",
+    graphqlWorker: "monaco-graphql/esm/graphql.worker.js",
+    editorWorker: "monaco-editor/esm/vs/editor/editor.worker.js",
+  },
   output: {
-    // @ts-ignore
     path: `${__dirname}/bundle`,
-    filename: "ruru.min.js",
-    library: "RuruBundle",
+    filename: "[name].js",
+    module: true,
+    chunkFormat: "module",
+    chunkLoading: "import",
+  },
+  experiments: {
+    outputModule: true,
   },
   module: {
     rules: [
@@ -118,15 +135,8 @@ const config: Configuration = {
   },
   plugins: [
     // new BundleAnalyzerPlugin(),
-    new webpack.optimize.LimitChunkCountPlugin({
-      maxChunks: 1,
-    }),
     new OutputDataToSrcPlugin(),
   ],
-  optimization: {
-    splitChunks: false,
-    runtimeChunk: false,
-  },
   //stats: "detailed",
 };
 
