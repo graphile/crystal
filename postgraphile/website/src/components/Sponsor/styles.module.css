@@ -9,15 +9,22 @@
   flex: 0 0 18rem;
   font-size: 1.5rem;
 }
+
+.featured,
+.leaders {
+  border: 3px solid var(--ifm-color-primary-dark);
+  background: white;
+  border-radius: 12px;
+}
+
 .featured .name {
   font-size: 2rem;
   padding-top: 1rem;
 }
 
-.featured {
-  border: 3px solid var(--ifm-color-primary-dark);
-  background: white;
-  border-radius: 12px;
+.leaders .name {
+  font-size: 1.24rem;
+  padding-top: 1rem;
 }
 
 .name {
@@ -41,10 +48,16 @@
   color: var(--ifm-color-primary);
 }
 
-img.avatar {
+.featured .avatar {
   border-radius: 10rem;
   width: 10rem;
   height: 10rem;
+}
+
+.leaders .avatar {
+  border-radius: 5rem;
+  width: 5rem;
+  height: 5rem;
 }
 
 .business {
