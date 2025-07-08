@@ -167,6 +167,20 @@ export async function run(args: ArgsFromOptions<typeof options>) {
   const STATIC = "/static/";
   const staticMw = serveStatic(STATIC);
   const server = createServer((req, res) => {
+    const next = (e?: Error) => {
+      if (e) {
+        console.error(`Fatal request error: ${e}`);
+        res.writeHead(500, undefined, { "content-type": "text/plain" });
+        res.end("Internal server error (see logs for details)");
+      } else if (proxy) {
+        proxy.web(req, res, { target: endpointBase });
+        return;
+      } else {
+        res.writeHead(308, undefined, { Location: "/" });
+        res.end();
+        return;
+      }
+    };
     if (req.url === "/" && req.headers.accept?.includes("text/html")) {
       res.writeHead(200, undefined, {
         "Content-Type": "text/html; charset=utf-8",
@@ -189,15 +203,9 @@ export async function run(args: ArgsFromOptions<typeof options>) {
       );
       return;
     } else if (req.url?.startsWith(STATIC)) {
-      return staticMw(req, res);
-    }
-    if (proxy) {
-      proxy.web(req, res, { target: endpointBase });
-      return;
+      return staticMw(req, res, next);
     } else {
-      res.writeHead(308, undefined, { Location: "/" });
-      res.end();
-      return;
+      return next();
     }
   });
 
