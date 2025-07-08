@@ -1,5 +1,5 @@
 import type { FC, JSX } from "react";
-import { useCallback, useMemo, useState } from "react";
+import { Fragment, useCallback, useMemo, useState } from "react";
 
 export const FormatSQL: FC<{ sql: string }> = ({ sql }) => {
   const [highlitIndex, setHighlitIndex] = useState(null);
@@ -57,7 +57,9 @@ export const FormatSQL: FC<{ sql: string }> = ({ sql }) => {
           }}
           key={i}
         >
-          {parts}
+          {parts.map((p, i) => (
+            <Fragment key={i}>{p}</Fragment>
+          ))}
         </code>,
       );
     }
