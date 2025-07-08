@@ -6,13 +6,6 @@ import { useCallback, useEffect, useRef } from "react";
 const sleep = (ms: number) =>
   new Promise<void>((resolve) => setTimeout(resolve, ms));
 
-declare global {
-  interface Window {
-    prettier: any;
-    plugins: any;
-  }
-}
-
 /**
  * Prettifies with 'prettier' if available, otherwise using GraphiQL's built in
  * prettify.
