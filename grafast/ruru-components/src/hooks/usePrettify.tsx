@@ -28,7 +28,6 @@ export const usePrettify = () => {
   const actualPrettify = useCallback(async () => {
     const { prettier, prettierPlugins } = prettierRef.current;
     if (!prettier || !prettierPlugins || !queryEditor) {
-      console.log("FALLBACK!", { prettier, prettierPlugins, queryEditor });
       fallbackPrettify();
     } else {
       const queryText = queryEditor.getValue();
@@ -37,14 +36,12 @@ export const usePrettify = () => {
         const model = queryEditor.getModel();
         const cursorOffset =
           position && model ? model.getOffsetAt(position) : undefined;
-        console.log({ position, model, cursorOffset });
         const result = await prettier.formatWithCursor(queryText, {
           parser: "graphql",
           plugins: prettierPlugins,
           cursorOffset: cursorOffset ?? 0,
         });
         queryEditor?.setValue(result.formatted);
-        console.log({ model, r: result.cursorOffset });
         if (model && result.cursorOffset > 0) {
           queryEditor.setPosition(model.getPositionAt(result.cursorOffset));
         }
