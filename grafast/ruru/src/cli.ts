@@ -181,7 +181,10 @@ export async function run(args: ArgsFromOptions<typeof options>) {
         return;
       }
     };
-    if (req.url === "/" && req.headers.accept?.includes("text/html")) {
+    if (
+      req.url === "/" &&
+      (!req.headers.accept || /\btext\/html\b/.test(req.headers.accept))
+    ) {
       res.writeHead(200, undefined, {
         "Content-Type": "text/html; charset=utf-8",
       });
