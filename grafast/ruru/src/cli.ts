@@ -165,29 +165,25 @@ export async function run(args: ArgsFromOptions<typeof options>) {
     );
   }
   const STATIC = "/static/";
-  const staticMw = serveStatic(STATIC);
+  const staticMiddleware = serveStatic(STATIC);
   const server = createServer((req, res) => {
     const next = (e?: Error) => {
       if (e) {
         console.error(`Fatal request error: ${e}`);
-        res.writeHead(500, undefined, { "content-type": "text/plain" });
+        res.writeHead(500, { "content-type": "text/plain" });
         res.end("Internal server error (see logs for details)");
       } else if (proxy) {
         proxy.web(req, res, { target: endpointBase });
-        return;
       } else {
-        res.writeHead(308, undefined, { Location: "/" });
+        res.writeHead(308, { location: "/" });
         res.end();
-        return;
       }
     };
     if (
       req.url === "/" &&
       (!req.headers.accept || /\btext\/html\b/.test(req.headers.accept))
     ) {
-      res.writeHead(200, undefined, {
-        "Content-Type": "text/html; charset=utf-8",
-      });
+      res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
       res.end(
         ruruHTML(
           {
@@ -204,11 +200,10 @@ export async function run(args: ArgsFromOptions<typeof options>) {
           htmlParts,
         ),
       );
-      return;
     } else if (req.url?.startsWith(STATIC)) {
-      return staticMw(req, res, next);
+      staticMiddleware(req, res, next);
     } else {
-      return next();
+      next();
     }
   });
 
