@@ -16,6 +16,12 @@ export interface StaticFiles {
   [filename: string]: StaticFile;
 }
 
+/** A single entry read from 'bundleData.ts' or 'bundleMaps.ts' */
+interface BundleEntry {
+  etag: string;
+  buffer: Buffer;
+}
+
 const MIME_TYPES: Record<string, string | undefined> = {
   txt: "text/plain; charset=utf-8",
   js: "text/javascript; charset=utf-8",
@@ -23,7 +29,8 @@ const MIME_TYPES: Record<string, string | undefined> = {
   map: "application/json",
 };
 
-function makeStaticFile(filename: string, content: Buffer): StaticFile {
+function makeStaticFile(filename: string, entry: BundleEntry): StaticFile {
+  const { buffer: content, etag } = entry;
   const i = filename.lastIndexOf(".");
   if (i < 0) throw new Error(`${filename} has no extension`);
   const ext = filename.substring(i + 1);
@@ -37,12 +44,13 @@ function makeStaticFile(filename: string, content: Buffer): StaticFile {
       "content-type": contentType,
       "content-encoding": "deflate",
       "content-length": String(content.length),
+      etag,
     },
   };
 }
 
 function createStaticFileLoader(
-  loadFile: () => Promise<{ bundleData: Record<string, Buffer> }>,
+  loadFile: () => Promise<{ bundleData: Record<string, BundleEntry> }>,
 ) {
   let cache: PromiseOrDirect<StaticFiles> | null = null;
   return () => {
@@ -193,10 +201,17 @@ export function serveStatic(staticPath: string) {
           acceptEncoding: req.headers["accept-encoding"],
         });
         if (file) {
-          // As per RFC9112 Section 4.2, a client SHOULD ignore the
-          // reason-phrase; it's even phased out in HTTP/2+
-          res.writeHead(200, "LGTM", file.headers);
-          res.end(file.content);
+          const etag = file.headers.etag;
+          const reqEtag = req.headers["if-none-match"];
+          if (reqEtag === etag) {
+            res.writeHead(304, "Not Modified", { etag });
+            res.end();
+          } else {
+            // As per RFC9112 Section 4.2, a client SHOULD ignore the
+            // reason-phrase; it's even phased out in HTTP/2+
+            res.writeHead(200, "LGTM", file.headers);
+            res.end(file.content);
+          }
           return;
         }
       }

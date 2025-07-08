@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -55,17 +56,17 @@ class TsResolvePlugin {
   }
 }
 
+const intro = [
+  "/* eslint-disable */",
+  "/** IMPORTANT: these buffers are deflated */",
+  "export const bundleData: Record<string, { etag: string, buffer: Buffer }> = {",
+];
+const outro = ["};"];
 class OutputDataToSrcPlugin {
   apply(compiler: Compiler) {
     compiler.hooks.emit.tap("OutputDataToSrcPlugin", (compilation) => {
-      const output: string[] = [];
-      output.push("/* eslint-disable */");
-      output.push("/** IMPORTANT: these buffers are deflated */");
-      output.push("export const bundleData: Record<string, Buffer> = {");
-      const mapOutput: string[] = [];
-      mapOutput.push("/* eslint-disable */");
-      mapOutput.push("/** IMPORTANT: these buffers are deflated */");
-      mapOutput.push("export const bundleData: Record<string, Buffer> = {");
+      const data: string[] = [...intro];
+      const maps: string[] = [...intro];
       const entries = Object.entries(compilation.assets);
       entries.sort((a, z) => (a[0] < z[0] ? -1 : a[0] > z[0] ? 1 : 0));
       for (const [filename, asset] of entries) {
@@ -75,21 +76,16 @@ class OutputDataToSrcPlugin {
           ? source
           : Buffer.from(source as string);
         const deflated = deflateSync(buf);
+        const hash = createHash("sha256").update(deflated).digest("base64url");
+        const etag = `"sha256-${hash}"`; // quoted per HTTP spec
         const base64 = deflated.toString("base64");
-        const sourceLine = `  ${key}: Buffer.from("${base64}", "base64"),`;
-        if (filename.endsWith(".map")) {
-          mapOutput.push(sourceLine);
-        } else {
-          output.push(sourceLine);
-        }
+        const sourceLine = `  ${key}: { etag: ${JSON.stringify(etag)}, buffer: Buffer.from("${base64}", "base64") },`;
+        (filename.endsWith(".map") ? maps : data).push(sourceLine);
       }
-      output.push("};");
-      mapOutput.push("};");
-      writeFileSync(`${__dirname}/src/bundleData.ts`, output.join("\n") + "\n");
-      writeFileSync(
-        `${__dirname}/src/bundleMaps.ts`,
-        mapOutput.join("\n") + "\n",
-      );
+      data.push(...outro);
+      maps.push(...outro);
+      writeFileSync(`${__dirname}/src/bundleData.ts`, data.join("\n") + "\n");
+      writeFileSync(`${__dirname}/src/bundleMaps.ts`, maps.join("\n") + "\n");
     });
   }
 }
