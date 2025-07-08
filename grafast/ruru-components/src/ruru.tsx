@@ -50,6 +50,7 @@ export const Ruru: FC<RuruProps> = (props) => {
     inputValueDeprecation,
     schemaDescription,
     defaultQuery,
+    showPersistHeadersSettings,
 
     // Things we're handling elsewhere
     fetcher: _fetcher,
@@ -90,7 +91,7 @@ export const Ruru: FC<RuruProps> = (props) => {
           <DocExplorerStore>
             <RuruInner
               {...otherProps}
-              // showPersistHeadersSettings={props.showPersistHeadersSettings}
+              showPersistHeadersSettings={showPersistHeadersSettings ?? true}
               // onEditQuery={props.onEditQuery}
               // onEditVariables={props.onEditVariables}
               // onEditHeaders={props.onEditHeaders}
