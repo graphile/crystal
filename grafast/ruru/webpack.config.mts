@@ -1,6 +1,7 @@
 import { writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { deflateSync } from "node:zlib";
 
 import type { Compiler, Configuration, Resolver } from "webpack";
 // import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
@@ -54,36 +55,41 @@ class TsResolvePlugin {
   }
 }
 
-function backtickEscape(string: string) {
-  return string.replace(/([`\\]|\$\{)/g, `\\$&`);
-}
-
 class OutputDataToSrcPlugin {
   apply(compiler: Compiler) {
     compiler.hooks.emit.tap("OutputDataToSrcPlugin", (compilation) => {
       const output: string[] = [];
       output.push("/* eslint-disable */");
-      output.push(
-        "export const bundleData: Record<string, string | Buffer> = {",
-      );
+      output.push("/** IMPORTANT: these buffers are deflated */");
+      output.push("export const bundleData: Record<string, Buffer> = {");
+      const mapOutput: string[] = [];
+      mapOutput.push("/* eslint-disable */");
+      mapOutput.push("/** IMPORTANT: these buffers are deflated */");
+      mapOutput.push("export const bundleData: Record<string, Buffer> = {");
       const entries = Object.entries(compilation.assets);
       entries.sort((a, z) => (a[0] < z[0] ? -1 : a[0] > z[0] ? 1 : 0));
       for (const [filename, asset] of entries) {
         const source = asset.source();
         const key = JSON.stringify(filename);
-        if (/\.([mc]?[jt]sx?|json|css|svg|txt|map)$/.test(filename)) {
-          const content = backtickEscape(source.toString("utf8").trim());
-          output.push(`  ${key}: \`${content}\`,`);
+        const buf = Buffer.isBuffer(source)
+          ? source
+          : Buffer.from(source as string);
+        const deflated = deflateSync(buf);
+        const base64 = deflated.toString("base64");
+        const sourceLine = `  ${key}: Buffer.from("${base64}", "base64"),`;
+        if (filename.endsWith(".map")) {
+          mapOutput.push(sourceLine);
         } else {
-          const buf = Buffer.isBuffer(source)
-            ? source
-            : Buffer.from(source as string);
-          const base64 = buf.toString("base64");
-          output.push(`  ${key}: Buffer.from("${base64}", "base64"),`);
+          output.push(sourceLine);
         }
       }
       output.push("};");
+      mapOutput.push("};");
       writeFileSync(`${__dirname}/src/bundleData.ts`, output.join("\n") + "\n");
+      writeFileSync(
+        `${__dirname}/src/bundleMaps.ts`,
+        mapOutput.join("\n") + "\n",
+      );
     });
   }
 }

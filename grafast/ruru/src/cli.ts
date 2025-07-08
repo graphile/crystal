@@ -1,4 +1,3 @@
-import type { IncomingMessage, ServerResponse } from "node:http";
 import { createServer } from "node:http";
 
 import { resolvePreset } from "graphile-config";
@@ -6,9 +5,9 @@ import type { ArgsFromOptions, Argv } from "graphile-config/cli";
 import { loadConfig } from "graphile-config/load";
 import type { createProxyServer } from "http-proxy";
 
-import { bundleData } from "./bundleData.js";
 import type { RuruConfig } from "./server.js";
 import { makeHTMLParts, ruruHTML } from "./server.js";
+import { serveStatic } from "./static.js";
 
 export function options(yargs: Argv) {
   return yargs
@@ -166,7 +165,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
     );
   }
   const STATIC = "/static/";
-  const staticMw = cheapStaticMiddleware(STATIC);
+  const staticMw = serveStatic(STATIC);
   const server = createServer((req, res) => {
     if (req.url === "/" && req.headers.accept?.includes("text/html")) {
       res.writeHead(200, undefined, {
@@ -215,79 +214,4 @@ export async function run(args: ArgsFromOptions<typeof options>) {
       `Serving Ruru at http://localhost:${port} for GraphQL API at '${endpoint}'`,
     );
   });
-}
-
-function getBaseHeaders(filename: string): Record<string, string> {
-  const i = filename.lastIndexOf(".");
-  if (i < 0) throw new Error(`${filename} has no extension`);
-  const ext = filename.substring(i + 1);
-  switch (ext) {
-    case "txt":
-      return { "content-type": "text/plain; charset=utf-8" };
-    case "js":
-      return { "content-type": "text/javascript; charset=utf-8" };
-    case "ttf":
-      return {
-        "Access-Control-Allow-Origin": "*",
-        "content-type": "font/ttf",
-      };
-    case "map":
-      return { "content-type": "application/json" };
-    default:
-      throw new Error(`Unknown extension ${ext}`);
-  }
-}
-
-const files: Record<
-  string,
-  { content: Buffer; headers: Record<string, string> }
-> = Object.create(null);
-for (const filename of Object.keys(bundleData)) {
-  const content = bundleData[filename];
-  const buffer = Buffer.isBuffer(content)
-    ? content
-    : Buffer.from(content, "utf8");
-  files[filename] = {
-    content: buffer,
-    headers: {
-      ...getBaseHeaders(filename),
-      "content-length": String(buffer.length),
-    },
-  };
-}
-
-function cheapStaticMiddleware(STATIC: string) {
-  return (
-    req: IncomingMessage,
-    res: ServerResponse,
-    next?: (e?: Error) => void,
-  ) => {
-    if (req.url?.startsWith(STATIC)) {
-      const path = req.url.substring(STATIC.length).replace(/\?.*$/, "");
-      try {
-        const file = files[path];
-        if (file) {
-          res.writeHead(200, file.headers);
-          res.end(file.content);
-        } else {
-          res.writeHead(404, { "content-type": "text/plain" });
-          res.end("Not found");
-        }
-      } catch (e) {
-        if (typeof next === "function") {
-          return next(e);
-        } else {
-          res.writeHead(500);
-          res.end("Failed to setup static middleware");
-        }
-      }
-    } else {
-      if (typeof next === "function") {
-        return next();
-      } else {
-        res.writeHead(404, { "content-type": "text/plain" });
-        res.end("Not found");
-      }
-    }
-  };
 }
