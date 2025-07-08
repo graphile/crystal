@@ -7,6 +7,7 @@ export const useGraphQLChangeStream = (
   refetch: () => void,
   streamEndpoint: string | null,
 ) => {
+  const { eventSourceInit } = props;
   const [error, setError] = useState<Error | null>(null);
 
   const eventSourceRef = useRef<EventSource | null>(null);
@@ -14,7 +15,7 @@ export const useGraphQLChangeStream = (
   // Starts listening to the event stream at the `sourceUrl`.
   useEffect(() => {
     eventSourceRef.current = streamEndpoint
-      ? new EventSource(streamEndpoint, props.eventSourceInit)
+      ? new EventSource(streamEndpoint, eventSourceInit)
       : null;
     const eventSource = eventSourceRef.current;
     return () => {
@@ -28,7 +29,7 @@ export const useGraphQLChangeStream = (
         eventSourceRef.current = null;
       }
     };
-  }, [streamEndpoint]);
+  }, [eventSourceInit, streamEndpoint]);
 
   const eventSource = eventSourceRef.current;
   useEffect(() => {

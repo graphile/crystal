@@ -26,9 +26,7 @@ body {
  height: 100vh;
 }
 </style>`;
-const baseHeaderScripts = `\
-<script src="https://unpkg.com/prettier@1.13.0/standalone.js"></script>
-<script src="https://unpkg.com/prettier@1.13.0/parser-graphql.js"></script>`;
+const baseHeaderScripts = ``;
 
 const baseElements = `\
 <div id="ruru-root"></div>`;

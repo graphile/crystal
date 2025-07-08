@@ -13,9 +13,8 @@ import {
   ToolbarButton,
   ToolbarMenu,
   useGraphiQLActions,
-  usePluginContext,
 } from "@graphiql/react";
-import type { GraphiQLProps } from "graphiql";
+import type { GraphiQLInterfaceProps } from "graphiql";
 import { GraphiQL, GraphiQLInterface } from "graphiql";
 import type { FC } from "react";
 import { useCallback, useMemo, useState } from "react";
@@ -47,14 +46,24 @@ const plugins = [
 ];
 
 export const Ruru: FC<RuruProps> = (props) => {
+  const {
+    inputValueDeprecation,
+    schemaDescription,
+    defaultQuery,
+
+    // Things we're handling elsewhere
+    fetcher: _fetcher,
+    debugTools: _debugTools,
+
+    // Pass everything else through to GraphiQL
+    ...otherProps
+  } = props;
   const storage = useStorage();
   const explain = storage.get("explain") === "true";
   const verbose = storage.get("verbose") === "true";
-  const saveHeaders = storage.get("saveHeaders") === "true";
   const setExplain = useCallback(
-    (newExplain: boolean) => {
-      storage.set("explain", newExplain ? "true" : "");
-    },
+    (newExplain: boolean) =>
+      void storage.set("explain", newExplain ? "true" : ""),
     [storage],
   );
   const { fetcher, explainResults, streamEndpoint } = useFetcher(props, {
@@ -63,38 +72,37 @@ export const Ruru: FC<RuruProps> = (props) => {
   });
   const [error, setError] = useState<Error | null>(null);
   const explainHelpers = useExplain(storage);
-  const defaultQuery = props.defaultQuery ?? DEFAULT_QUERY;
+  const explainContextValue = useMemo(
+    () => ({ explain, explainHelpers, explainResults, setExplain }),
+    [explain, explainHelpers, explainResults, setExplain],
+  );
   return (
-    //EditorContextProvider
-    <ExplainContext.Provider
-      value={{
-        explainHelpers,
-        explain,
-        setExplain,
-        explainResults,
-      }}
-    >
+    <ExplainContext.Provider value={explainContextValue}>
       <GraphiQLProvider
-        defaultTheme={props.defaultTheme}
-        editorTheme={props.editorTheme}
-        inputValueDeprecation={true}
-        schemaDescription={true}
+        {...otherProps}
+        inputValueDeprecation={inputValueDeprecation ?? true}
+        schemaDescription={schemaDescription ?? true}
         fetcher={fetcher}
-        defaultQuery={defaultQuery}
-        initialQuery={props.query ?? props.initialQuery}
-        initialVariables={props.variables ?? props.initialVariables}
+        defaultQuery={defaultQuery ?? DEFAULT_QUERY}
         plugins={plugins}
-        shouldPersistHeaders={saveHeaders}
       >
         <HistoryStore maxHistoryLength={props.maxHistoryLength}>
           <DocExplorerStore>
             <RuruInner
+              {...otherProps}
+              // showPersistHeadersSettings={props.showPersistHeadersSettings}
+              // onEditQuery={props.onEditQuery}
+              // onEditVariables={props.onEditVariables}
+              // onEditHeaders={props.onEditHeaders}
+              // responseTooltip={props.responseTooltip}
+              // defaultEditorToolsVisibility={props.defaultEditorToolsVisibility}
+              // isHeadersEditorEnabled={props.isHeadersEditorEnabled}
+              // forcedTheme={props.forcedTheme}
+              // confirmCloseTab={props.confirmCloseTab}
+              // className={props.className}
               storage={storage}
-              forcedTheme={props.forcedTheme}
               error={error}
               setError={setError}
-              onEditQuery={props.onEditQuery}
-              onEditVariables={props.onEditVariables}
               streamEndpoint={streamEndpoint}
             />
           </DocExplorerStore>
@@ -105,27 +113,33 @@ export const Ruru: FC<RuruProps> = (props) => {
 };
 
 export const RuruInner: FC<{
-  forcedTheme?: GraphiQLProps["forcedTheme"];
+  // RuruInner props
   storage: RuruStorage;
   error: Error | null;
   setError: React.Dispatch<React.SetStateAction<Error | null>>;
-  onEditQuery?: GraphiQLProps["onEditQuery"];
-  onEditVariables?: GraphiQLProps["onEditVariables"];
   streamEndpoint: string | null;
+
+  // GraphiQLInterfaceProps
+  showPersistHeadersSettings?: GraphiQLInterfaceProps["showPersistHeadersSettings"];
+  onEditQuery?: GraphiQLInterfaceProps["onEditQuery"];
+  onEditVariables?: GraphiQLInterfaceProps["onEditVariables"];
+  onEditHeaders?: GraphiQLInterfaceProps["onEditHeaders"];
+  responseTooltip?: GraphiQLInterfaceProps["responseTooltip"];
+  defaultEditorToolsVisibility?: GraphiQLInterfaceProps["defaultEditorToolsVisibility"];
+  isHeadersEditorEnabled?: GraphiQLInterfaceProps["isHeadersEditorEnabled"];
+  forcedTheme?: GraphiQLInterfaceProps["forcedTheme"];
+  confirmCloseTab?: GraphiQLInterfaceProps["confirmCloseTab"];
+  className?: GraphiQLInterfaceProps["className"];
 }> = (props) => {
   const {
     storage,
-    forcedTheme,
     error,
     setError,
-    onEditQuery,
-    onEditVariables,
     streamEndpoint,
+    ...graphiqlInterfaceProps
   } = props;
   const prettify = usePrettify();
-  const { copyQuery, mergeQuery, setSchemaReference, introspect } =
-    useGraphiQLActions();
-  setSchemaReference;
+  const { copyQuery, mergeQuery, introspect } = useGraphiQLActions();
   useGraphQLChangeStream(props, introspect, streamEndpoint);
 
   return (
@@ -148,11 +162,7 @@ export const RuruInner: FC<{
           position: "relative",
         }}
       >
-        <GraphiQLInterface
-          forcedTheme={forcedTheme}
-          onEditQuery={onEditQuery}
-          onEditVariables={onEditVariables}
-        >
+        <GraphiQLInterface {...graphiqlInterfaceProps}>
           <GraphiQL.Logo>
             <a
               href="https://grafast.org/ruru"
@@ -219,15 +229,6 @@ export const RuruInner: FC<{
                     <span>
                       {storage.get("verbose") === "true" ? check : nocheck}
                       Verbose
-                    </span>
-                  </ToolbarMenu.Item>
-                  <ToolbarMenu.Item
-                    title="Should we persist the headers to localStorage? Header editor is next to variable editor at the bottom."
-                    onSelect={() => storage.toggle("saveHeaders")}
-                  >
-                    <span>
-                      {storage.get("saveHeaders") === "true" ? check : nocheck}
-                      Save headers
                     </span>
                   </ToolbarMenu.Item>
                 </ToolbarMenu>

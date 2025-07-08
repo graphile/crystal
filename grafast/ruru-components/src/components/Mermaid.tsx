@@ -30,7 +30,9 @@ export const Mermaid: FC<{ plan: GrafastPlanJSON }> = ({ plan }) => {
     );
   } else {
     return (
-      <div>Mermaid hasn't (yet) loaded, so we cannot render plan diagrams</div>
+      <div>
+        Mermaid hasn&apos;t (yet) loaded, so we cannot render plan diagrams
+      </div>
     );
   }
 };

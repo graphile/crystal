@@ -205,9 +205,6 @@ if (file) {
 ## Usage - bundle
 
 ```html
-<!-- optionally import Prettier for query formatting -->
-<script src="https://unpkg.com/prettier@1.13.0/standalone.js"></script>
-<script src="https://unpkg.com/prettier@1.13.0/parser-graphql.js"></script>
 <!-- Required below here -->
 <div id="ruru-root"></div>
 <script type="module">
