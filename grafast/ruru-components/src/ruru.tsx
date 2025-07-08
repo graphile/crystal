@@ -1,4 +1,9 @@
+import {
+  DOC_EXPLORER_PLUGIN,
+  DocExplorerStore,
+} from "@graphiql/plugin-doc-explorer";
 import { explorerPlugin as makeExplorerPlugin } from "@graphiql/plugin-explorer";
+import { HISTORY_PLUGIN, HistoryStore } from "@graphiql/plugin-history";
 import {
   CopyIcon,
   GraphiQLProvider,
@@ -7,13 +12,13 @@ import {
   SettingsIcon,
   ToolbarButton,
   ToolbarMenu,
-  useGraphiQL,
   useGraphiQLActions,
+  usePluginContext,
 } from "@graphiql/react";
 import type { GraphiQLProps } from "graphiql";
 import { GraphiQL } from "graphiql";
 import type { FC } from "react";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { ErrorPopup } from "./components/ErrorPopup.js";
 import { RuruFooter } from "./components/Footer.js";
@@ -34,7 +39,12 @@ const nocheck = <span style={checkCss}></span>;
 const explorerPlugin = makeExplorerPlugin({
   showAttribution: false,
 });
-const plugins = [explorerPlugin, EXPLAIN_PLUGIN];
+const plugins = [
+  DOC_EXPLORER_PLUGIN,
+  HISTORY_PLUGIN,
+  explorerPlugin,
+  EXPLAIN_PLUGIN,
+];
 
 export const Ruru: FC<RuruProps> = (props) => {
   const storage = useStorage();
@@ -74,18 +84,22 @@ export const Ruru: FC<RuruProps> = (props) => {
         plugins={plugins}
         shouldPersistHeaders={saveHeaders}
       >
-        <RuruInner
-          storage={storage}
-          editorTheme={props.editorTheme}
-          defaultTheme={props.defaultTheme}
-          forcedTheme={props.forcedTheme}
-          error={error}
-          setError={setError}
-          onEditQuery={props.onEditQuery}
-          onEditVariables={props.onEditVariables}
-          streamEndpoint={streamEndpoint}
-          fetcher={fetcher}
-        />
+        <HistoryStore maxHistoryLength={props.maxHistoryLength}>
+          <DocExplorerStore>
+            <RuruInner
+              storage={storage}
+              editorTheme={props.editorTheme}
+              defaultTheme={props.defaultTheme}
+              forcedTheme={props.forcedTheme}
+              error={error}
+              setError={setError}
+              onEditQuery={props.onEditQuery}
+              onEditVariables={props.onEditVariables}
+              streamEndpoint={streamEndpoint}
+              fetcher={fetcher}
+            />
+          </DocExplorerStore>
+        </HistoryStore>
       </GraphiQLProvider>
     </ExplainContext.Provider>
   );
@@ -116,6 +130,11 @@ export const RuruInner: FC<{
     fetcher,
   } = props;
   const prettify = usePrettify();
+  const { plugins: allPlugins } = usePluginContext();
+  const [referencePlugin, plugins] = useMemo(
+    () => [allPlugins[0], allPlugins.slice(1)],
+    [allPlugins],
+  );
   const { copyQuery, mergeQuery, setSchemaReference, introspect } =
     useGraphiQLActions();
   setSchemaReference;
@@ -141,6 +160,7 @@ export const RuruInner: FC<{
           position: "relative",
         }}
       >
+        {/* TODO: Render GraphiQLInterface here instead, once GraphiQL supports it */}
         <GraphiQL
           defaultTheme={defaultTheme}
           forcedTheme={forcedTheme}
@@ -148,6 +168,8 @@ export const RuruInner: FC<{
           onEditQuery={onEditQuery}
           onEditVariables={onEditVariables}
           fetcher={fetcher}
+          referencePlugin={referencePlugin}
+          plugins={plugins}
         >
           <GraphiQL.Logo>
             <a
