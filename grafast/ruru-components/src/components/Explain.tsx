@@ -1,5 +1,5 @@
-import { planToMermaid } from "grafast/mermaid";
-import type { RenderResult } from "mermaid";
+import type * as GrafastMermaid from "grafast/mermaid";
+import type * as MermaidLib from "mermaid";
 import type { FC } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
@@ -9,12 +9,6 @@ import type { ExplainResults } from "../hooks/useFetcher.js";
 import { Copy } from "./Copy.js";
 import { FormatSQL } from "./FormatSQL.js";
 import { Mermaid } from "./Mermaid.js";
-
-declare global {
-  interface Window {
-    mermaid?: any;
-  }
-}
 
 export const Explain: FC<{
   explain: boolean;
@@ -78,34 +72,34 @@ export const ExplainMain: FC<{
   const saveSVG = useCallback(() => {
     if (!selectedResult || selectedResult.type !== "plan") return;
     setSaving(true);
-    setTimeout(() => {
-      if (window.mermaid) {
-        const diagram = planToMermaid(selectedResult.plan);
-        window.mermaid.mermaidAPI
-          .render("id1", diagram)
-          .then(({ svg }: RenderResult) => {
-            const file = new File(
-              [svg.replace(/<br>/g, "<br/>")],
-              "grafast-plan.svg",
-            );
+    (async () => {
+      const mermaid = await loadMermaid();
+      const { planToMermaid } = await loadGrafastMermaid();
+      const diagram = planToMermaid(selectedResult.plan);
+      mermaid.default
+        .render("id1", diagram)
+        .then(({ svg }: MermaidLib.RenderResult) => {
+          const file = new File(
+            [svg.replace(/<br>/g, "<br/>")],
+            "grafast-plan.svg",
+          );
 
-            const a = document.createElement("a");
-            a.href = URL.createObjectURL(file);
-            a.download = file.name;
-            a.style.display = "none";
-            document.body.appendChild(a);
-            a.click();
-            setSaving(false);
+          const a = document.createElement("a");
+          a.href = URL.createObjectURL(file);
+          a.download = file.name;
+          a.style.display = "none";
+          document.body.appendChild(a);
+          a.click();
+          setSaving(false);
 
-            setTimeout(() => {
-              URL.revokeObjectURL(a.href);
-              a.parentNode!.removeChild(a);
-            }, 0);
-          });
-      } else {
-        alert("Mermaid hasn't loaded (yet)");
-      }
-    }, 0);
+          setTimeout(() => {
+            URL.revokeObjectURL(a.href);
+            a.parentNode!.removeChild(a);
+          }, 0);
+        });
+    })().catch((e) => {
+      alert(String(e));
+    });
   }, [selectedResult]);
 
   const component = (() => {
@@ -196,3 +190,13 @@ export const ExplainMain: FC<{
     </div>
   );
 };
+
+let _mermaid: Promise<typeof MermaidLib> | undefined;
+function loadMermaid() {
+  return (_mermaid ??= import("mermaid"));
+}
+
+let _grafastMermaid: Promise<typeof GrafastMermaid> | undefined;
+function loadGrafastMermaid() {
+  return (_grafastMermaid ??= import("grafast/mermaid"));
+}

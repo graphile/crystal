@@ -9,18 +9,16 @@ let initialized = false;
 const MermaidReal: FC<{ plan: GrafastPlanJSON }> = ({ plan }) => {
   const diagram = useMemo(() => planToMermaid(plan), [plan]);
   useEffect(() => {
-    if (mermaid) {
-      if (!initialized) {
-        initialized = true;
-        mermaid.initialize({
-          startOnLoad: true,
-          maxTextSize: 1000000,
-          maxEdges: 1000,
-        });
-      }
-      if (diagram) {
-        mermaid.contentLoaded();
-      }
+    if (!initialized) {
+      initialized = true;
+      mermaid.initialize({
+        startOnLoad: true,
+        maxTextSize: 1000000,
+        maxEdges: 1000,
+      });
+    }
+    if (diagram) {
+      mermaid.contentLoaded();
     }
   }, [diagram]);
   return (
