@@ -1,4 +1,4 @@
-import type { GraphiQLProps } from "graphiql";
+import type { RuruProps } from "ruru-components";
 
 import type { RuruConfig } from "./interfaces.js";
 import { version } from "./version.js";
@@ -56,50 +56,35 @@ const baseBodyInitScript = `\
   root.render(tree);
 </script>`;
 
-/**
- * The `EventSource` specification only specifies the `withCredentials` option,
- * but some implementations support additional options. Our configuration
- * allows arbitrary options.
- */
-interface RuruEventSourceInit extends EventSourceInit, Record<string, any> {}
-
-export interface RuruServerConfig {
+export interface RuruServerConfig
+  extends Pick<
+    RuruProps,
+    | "debugTools"
+    | "editorTheme"
+    | "forcedTheme"
+    | "defaultTheme"
+    | "initialHeaders"
+    | "defaultHeaders"
+    | "defaultQuery"
+    | "initialQuery"
+    | "responseTooltip"
+    | "maxHistoryLength"
+    | "initialVariables"
+    | "schemaDescription"
+    | "subscriptionEndpoint"
+    | "inputValueDeprecation"
+    | "showPersistHeadersSettings"
+    | "isHeadersEditorEnabled"
+    | "className"
+    | "endpoint"
+    | "eventSourceInit"
+  > {
   /**
    * Ruru's static assets must be served for Ruru to work. Pass the URL to the
    * root of this folder; it must end in a slash. Defaults to
    * `https://unpkg.com/ruru@${version}/static/`
    */
   staticPath?: string;
-
-  /**
-   * The URL to the GraphQL endpoint.
-   */
-  endpoint?: string;
-
-  /**
-   * The URL to the GraphQL subscriptions endpoint. (ws:// or wss://)
-   */
-  subscriptionEndpoint?: string;
-
-  editorTheme?: GraphiQLProps["editorTheme"];
-  /**
-   * The list of debug tools available to the user.
-   *
-   * explain - output the SQL executed
-   * plan - output the plan executed
-   */
-  debugTools?: Array<"explain" | "plan">;
-
-  /**
-   * Will be passed to `new EventSource(url, eventSourceInit)`.
-   *
-   * Per the specification, the only option is `withCredentials`; however, some
-   * implementations support additional options. For example:
-   *
-   * - `reconnectInterval: 1000`
-   * - `maxReconnectAttempts: 3`
-   */
-  eventSourceInit?: RuruEventSourceInit;
 }
 
 /**
