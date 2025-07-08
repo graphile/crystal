@@ -166,13 +166,18 @@ function getStaticFileInner(
  * _must_ end in a slash).
  */
 export function serveStatic(staticPath: string) {
-  return async (
+  return (
     req: IncomingMessage,
     res: ServerResponse,
     next?: (e?: Error) => void,
-  ) => {
-    if (req.url?.startsWith(staticPath)) {
-      try {
+  ) => void staticMiddleware(req, res, next);
+  async function staticMiddleware(
+    req: IncomingMessage,
+    res: ServerResponse,
+    next?: (e?: Error) => void,
+  ) {
+    try {
+      if (req.url?.startsWith(staticPath)) {
         const file = await getStaticFile({
           staticPath,
           urlPath: req.url,
@@ -185,22 +190,22 @@ export function serveStatic(staticPath: string) {
           res.writeHead(404, { "content-type": "text/plain" });
           res.end("Not found");
         }
-      } catch (e) {
+      } else {
         if (typeof next === "function") {
-          return next(e);
+          return next();
         } else {
-          res.writeHead(500);
-          res.end("Failed to setup static middleware");
-          return;
+          res.writeHead(404, { "content-type": "text/plain" });
+          res.end("Not found");
         }
       }
-    } else {
+    } catch (e) {
       if (typeof next === "function") {
-        return next();
+        return next(e);
       } else {
-        res.writeHead(404, { "content-type": "text/plain" });
-        res.end("Not found");
+        res.writeHead(500);
+        res.end("Failed to setup static middleware");
+        return;
       }
     }
-  };
+  }
 }
