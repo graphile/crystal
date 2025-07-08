@@ -98,6 +98,35 @@ function getStaticMaps(): PromiseOrDirect<StaticFiles> {
   return _maps;
 }
 
+export interface GetStaticFileOptions {
+  /**
+   * The URL path to the root of the folder from which static files are being
+   * served; must start and end with a slash.
+   */
+  staticPath: string;
+
+  /**
+   * The URL path that the user has requested; if it's within the `staticPath`
+   * then we'll look for a matching file.
+   */
+  urlPath: string;
+
+  /**
+   * The content of the `Accept-Encoding` header supplied by the client, if
+   * any. Hopefully this includes 'deflate'. If it does not include 'deflate'
+   * then we will need to inflate the content before returning it to you, which
+   * is more expensive.
+   */
+  acceptEncoding: ReadonlyArray<string> | string | undefined;
+
+  /**
+   * Source maps take up a lot more space in memory and aren't essential; by
+   * setting this to `true` we will not attempt to load source maps into memory
+   * and will instead return `null`.
+   */
+  disallowSourceMaps?: boolean;
+}
+
 /**
  * Given the `staticPath` (which must end in a `/`) from which Ruru's static
  * assets are served over HTTP, and the `urlPath` that the user has requested,
@@ -107,14 +136,12 @@ function getStaticMaps(): PromiseOrDirect<StaticFiles> {
  * IMPORTANT: `staticPath` is the URL path, not the filesystem path. It will be
  * pruned from the beginning of `urlPath` before looking up the file.
  */
-export function getStaticFile(options: {
-  staticPath: string;
-  urlPath: string;
-  acceptEncoding?: string;
-  // Source maps take up a lot more space in memory and aren't essential.
-  disallowSourceMaps?: boolean;
-}): PromiseOrDirect<StaticFile | null> {
-  const { staticPath, urlPath, acceptEncoding, disallowSourceMaps } = options;
+export function getStaticFile({
+  staticPath,
+  urlPath,
+  acceptEncoding,
+  disallowSourceMaps,
+}: GetStaticFileOptions): PromiseOrDirect<StaticFile | null> {
   const i = urlPath.indexOf("?", staticPath.length);
   const path = urlPath.substring(staticPath.length, i >= 0 ? i : undefined);
   const files =
@@ -127,7 +154,9 @@ export function getStaticFile(options: {
 }
 
 const DEFLATE_REGEXP = /\bdeflate\b/i;
-function hasDeflate(acceptEncoding?: string): boolean {
+function hasDeflate(
+  acceptEncoding: ReadonlyArray<string> | string | undefined,
+): boolean {
   return typeof acceptEncoding === "string"
     ? DEFLATE_REGEXP.test(acceptEncoding)
     : false;
@@ -136,7 +165,7 @@ function hasDeflate(acceptEncoding?: string): boolean {
 function getStaticFileInner(
   files: StaticFiles,
   path: string,
-  acceptEncoding: string | undefined,
+  acceptEncoding: ReadonlyArray<string> | string | undefined,
 ) {
   const file = files[path];
   if (!file) return null;
