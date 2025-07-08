@@ -16,7 +16,7 @@ import {
   usePluginContext,
 } from "@graphiql/react";
 import type { GraphiQLProps } from "graphiql";
-import { GraphiQL } from "graphiql";
+import { GraphiQL, GraphiQLInterface } from "graphiql";
 import type { FC } from "react";
 import { useCallback, useMemo, useState } from "react";
 
@@ -75,6 +75,8 @@ export const Ruru: FC<RuruProps> = (props) => {
       }}
     >
       <GraphiQLProvider
+        defaultTheme={props.defaultTheme}
+        editorTheme={props.editorTheme}
         inputValueDeprecation={true}
         schemaDescription={true}
         fetcher={fetcher}
@@ -88,15 +90,12 @@ export const Ruru: FC<RuruProps> = (props) => {
           <DocExplorerStore>
             <RuruInner
               storage={storage}
-              editorTheme={props.editorTheme}
-              defaultTheme={props.defaultTheme}
               forcedTheme={props.forcedTheme}
               error={error}
               setError={setError}
               onEditQuery={props.onEditQuery}
               onEditVariables={props.onEditVariables}
               streamEndpoint={streamEndpoint}
-              fetcher={fetcher}
             />
           </DocExplorerStore>
         </HistoryStore>
@@ -106,35 +105,24 @@ export const Ruru: FC<RuruProps> = (props) => {
 };
 
 export const RuruInner: FC<{
-  editorTheme?: GraphiQLProps["editorTheme"];
   forcedTheme?: GraphiQLProps["forcedTheme"];
-  defaultTheme?: GraphiQLProps["defaultTheme"];
   storage: RuruStorage;
   error: Error | null;
   setError: React.Dispatch<React.SetStateAction<Error | null>>;
   onEditQuery?: GraphiQLProps["onEditQuery"];
   onEditVariables?: GraphiQLProps["onEditVariables"];
   streamEndpoint: string | null;
-  fetcher: GraphiQLProps["fetcher"];
 }> = (props) => {
   const {
     storage,
-    editorTheme,
     forcedTheme,
-    defaultTheme,
     error,
     setError,
     onEditQuery,
     onEditVariables,
     streamEndpoint,
-    fetcher,
   } = props;
   const prettify = usePrettify();
-  const { plugins: allPlugins } = usePluginContext();
-  const [referencePlugin, plugins] = useMemo(
-    () => [allPlugins[0], allPlugins.slice(1)],
-    [allPlugins],
-  );
   const { copyQuery, mergeQuery, setSchemaReference, introspect } =
     useGraphiQLActions();
   setSchemaReference;
@@ -160,16 +148,10 @@ export const RuruInner: FC<{
           position: "relative",
         }}
       >
-        {/* TODO: Render GraphiQLInterface here instead, once GraphiQL supports it */}
-        <GraphiQL
-          defaultTheme={defaultTheme}
+        <GraphiQLInterface
           forcedTheme={forcedTheme}
-          editorTheme={editorTheme}
           onEditQuery={onEditQuery}
           onEditVariables={onEditVariables}
-          fetcher={fetcher}
-          referencePlugin={referencePlugin}
-          plugins={plugins}
         >
           <GraphiQL.Logo>
             <a
@@ -256,7 +238,7 @@ export const RuruInner: FC<{
           <GraphiQL.Footer>
             <RuruFooter />
           </GraphiQL.Footer>
-        </GraphiQL>
+        </GraphiQLInterface>
       </div>
       {error ? (
         <ErrorPopup error={error} onClose={() => setError(null)} />
