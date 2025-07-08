@@ -1,26 +1,33 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
+import { promisify } from "node:util";
 import { isPromise } from "node:util/types";
-import { inflateSync } from "node:zlib";
+import { inflate as inflateCb } from "node:zlib";
 
-function getBaseHeaders(filename: string): Record<string, string> {
+const inflate = promisify(inflateCb);
+
+const MIME_TYPES: Record<string, string | undefined> = {
+  txt: "text/plain; charset=utf-8",
+  js: "text/javascript; charset=utf-8",
+  ttf: "font/ttf",
+  map: "application/json",
+};
+
+function makeStaticFile(filename: string, content: Buffer): StaticFile {
   const i = filename.lastIndexOf(".");
   if (i < 0) throw new Error(`${filename} has no extension`);
   const ext = filename.substring(i + 1);
-  switch (ext) {
-    case "txt":
-      return { "content-type": "text/plain; charset=utf-8" };
-    case "js":
-      return { "content-type": "text/javascript; charset=utf-8" };
-    case "ttf":
-      return {
-        "Access-Control-Allow-Origin": "*",
-        "content-type": "font/ttf",
-      };
-    case "map":
-      return { "content-type": "application/json" };
-    default:
-      throw new Error(`Unknown extension ${ext}`);
+  const contentType = MIME_TYPES[ext];
+  if (!contentType) {
+    throw new Error(`Unknown extension ${ext}`);
   }
+  return {
+    content,
+    headers: {
+      "content-type": contentType,
+      "content-encoding": "deflate",
+      "content-length": String(content.length),
+    },
+  };
 }
 
 type PromiseOrDirect<T> = T | Promise<T>;
@@ -46,14 +53,7 @@ function getStaticFiles(): PromiseOrDirect<StaticFiles> {
       const files: StaticFiles = Object.create(null);
       for (const filename of Object.keys(bundleData)) {
         const content = bundleData[filename];
-        files[filename] = {
-          content,
-          headers: {
-            ...getBaseHeaders(filename),
-            "content-encoding": "deflate",
-            "content-length": String(content.length),
-          },
-        };
+        files[filename] = makeStaticFile(filename, content);
       }
       _files = files;
       return files;
@@ -78,14 +78,7 @@ function getStaticMaps(): PromiseOrDirect<StaticFiles> {
       const files: StaticFiles = Object.create(null);
       for (const filename of Object.keys(bundleData)) {
         const content = bundleData[filename];
-        files[filename] = {
-          content,
-          headers: {
-            ...getBaseHeaders(filename),
-            "content-encoding": "deflate",
-            "content-length": String(content.length),
-          },
-        };
+        files[filename] = makeStaticFile(filename, content);
       }
       _maps = files;
       return files;
@@ -173,18 +166,18 @@ function getStaticFileInner(
     // Already deflated
     return file;
   } else {
+    // We need to inflate for the client
     const {
       content: deflatedContent,
       headers: { "content-encoding": _delete, ...otherHeaders },
     } = file;
-    const content = inflateSync(deflatedContent);
-    return {
+    return inflate(deflatedContent).then((content) => ({
       content,
       headers: {
         ...otherHeaders,
         "content-length": String(content.length),
       },
-    };
+    }));
   }
 }
 
