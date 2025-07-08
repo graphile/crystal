@@ -12,6 +12,27 @@ documentation.
 
 For other usage patterns, please see the main [ruru][] package.
 
+```jsx
+import "graphiql/style.css";
+import "@graphiql/plugin-explorer/style.css";
+import "ruru-components/ruru.css";
+
+// Have Webpack include the Monaco workers
+import "graphiql/setup-workers/webpack";
+// Or: import "graphiql/setup-workers/vite";
+// Or: see "Monaco workers" below
+
+import { Ruru } from "ruru-components";
+
+React.render(<Ruru endpoint="/graphql" />);
+```
+
+### Monaco workers
+
+If you can't use `graphiql/setup-workers/webpack` (or
+`graphiql/setup-workers/vite` for Vite) to set up the Monaco workers for you,
+then instead add this `<script>` block to your HTML above your Ruru import:
+
 ```html
 <script type="module">
   /* Set up monaco workers */
@@ -32,17 +53,6 @@ For other usage patterns, please see the main [ruru][] package.
     },
   };
 </script>
-```
-
-```jsx
-import { Ruru } from "ruru-components";
-import "graphiql/style.css";
-import "@graphiql/plugin-explorer/style.css";
-import "ruru-components/ruru.css";
-import "graphiql/setup-workers/webpack";
-import { Ruru } from "ruru-components";
-
-React.render(<Ruru endpoint="/graphql" />);
 ```
 
 [GNU Terry Pratchett](http://www.gnuterrypratchett.com/)
