@@ -5,6 +5,17 @@ import { inflate as inflateCb } from "node:zlib";
 
 const inflate = promisify(inflateCb);
 
+type PromiseOrDirect<T> = T | Promise<T>;
+
+export interface StaticFile {
+  content: Buffer;
+  headers: Record<string, string>;
+}
+
+export interface StaticFiles {
+  [filename: string]: StaticFile;
+}
+
 const MIME_TYPES: Record<string, string | undefined> = {
   txt: "text/plain; charset=utf-8",
   js: "text/javascript; charset=utf-8",
@@ -30,66 +41,42 @@ function makeStaticFile(filename: string, content: Buffer): StaticFile {
   };
 }
 
-type PromiseOrDirect<T> = T | Promise<T>;
-
-export interface StaticFile {
-  content: Buffer;
-  headers: Record<string, string>;
+function createStaticFileLoader(
+  loadFile: () => Promise<{ bundleData: Record<string, Buffer> }>,
+) {
+  let cache: PromiseOrDirect<StaticFiles> | null = null;
+  return () => {
+    if (cache === null) {
+      cache = (async () => {
+        const { bundleData } = await loadFile();
+        const files: StaticFiles = Object.create(null);
+        for (const filename of Object.keys(bundleData)) {
+          const content = bundleData[filename];
+          files[filename] = makeStaticFile(filename, content);
+        }
+        cache = files;
+        return files;
+      })();
+      cache.catch((e) => {
+        console.error(`Failed to load static files: ${e}`);
+        cache = null;
+      });
+    }
+    return cache;
+  };
 }
 
-export interface StaticFiles {
-  [filename: string]: StaticFile;
-}
-
-let _files: PromiseOrDirect<StaticFiles> | null = null;
 /**
  * Returns an object containing all of the static files needed by Ruru; calling
  * this will increase memory consumption by ~4MB
  */
-function getStaticFiles(): PromiseOrDirect<StaticFiles> {
-  if (_files === null) {
-    _files = (async () => {
-      const { bundleData } = await import("./bundleData.js");
-      const files: StaticFiles = Object.create(null);
-      for (const filename of Object.keys(bundleData)) {
-        const content = bundleData[filename];
-        files[filename] = makeStaticFile(filename, content);
-      }
-      _files = files;
-      return files;
-    })();
-    _files.catch((e) => {
-      console.error(`Failed to load static files: ${e}`);
-      _files = null;
-    });
-  }
-  return _files;
-}
+const getStaticFiles = createStaticFileLoader(() => import("./bundleData.js"));
 
-let _maps: PromiseOrDirect<StaticFiles> | null = null;
 /**
  * Returns an object containing all of the source maps for ruru source; calling
  * this will increase memory consumption by ~10MB
  */
-function getStaticMaps(): PromiseOrDirect<StaticFiles> {
-  if (_maps === null) {
-    _maps = (async () => {
-      const { bundleData } = await import("./bundleMaps.js");
-      const files: StaticFiles = Object.create(null);
-      for (const filename of Object.keys(bundleData)) {
-        const content = bundleData[filename];
-        files[filename] = makeStaticFile(filename, content);
-      }
-      _maps = files;
-      return files;
-    })();
-    _maps.catch((e) => {
-      console.error(`Failed to load static files: ${e}`);
-      _maps = null;
-    });
-  }
-  return _maps;
-}
+const getStaticMaps = createStaticFileLoader(() => import("./bundleMaps.js"));
 
 export interface GetStaticFileOptions {
   /**
