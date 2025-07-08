@@ -86,7 +86,7 @@ const getStaticFiles = createStaticFileLoader(() => import("./bundleData.js"));
  */
 const getStaticMaps = createStaticFileLoader(() => import("./bundleMaps.js"));
 
-export interface GetStaticFileOptions {
+export interface GetStaticFileContext {
   /**
    * The URL path to the root of the folder from which static files are being
    * served; must start and end with a slash.
@@ -129,7 +129,7 @@ export function getStaticFile({
   urlPath,
   acceptEncoding,
   disallowSourceMaps,
-}: GetStaticFileOptions): PromiseOrDirect<StaticFile | null> {
+}: GetStaticFileContext): PromiseOrDirect<StaticFile | null> {
   const i = urlPath.indexOf("?", staticPath.length);
   const path = urlPath.substring(staticPath.length, i >= 0 ? i : undefined);
   const files =
