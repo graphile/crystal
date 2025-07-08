@@ -9,7 +9,7 @@ const sleep = (ms: number) =>
 declare global {
   interface Window {
     prettier: any;
-    prettierPlugins: any;
+    plugins: any;
   }
 }
 
@@ -18,36 +18,56 @@ declare global {
  * prettify.
  */
 export const usePrettify = () => {
-  const queryEditor = useGraphiQL((s) => s.queryEditor);
+  const { queryEditor, headerEditor, responseEditor } = useGraphiQL(
+    ({ queryEditor, headerEditor, responseEditor }) => ({
+      queryEditor,
+      headerEditor,
+      responseEditor,
+    }),
+  );
   const { prettifyEditors: fallbackPrettify } = useGraphiQLActions();
   const prettierRef = useRef({
     loaded: false as boolean | Promise<void>,
     prettier: null as null | typeof PrettierStandalone,
-    prettierPlugins: [] as Plugin[],
+    plugins: [] as Plugin[],
   });
   const actualPrettify = useCallback(async () => {
-    const { prettier, prettierPlugins } = prettierRef.current;
-    if (!prettier || !prettierPlugins || !queryEditor) {
+    const { prettier, plugins } = prettierRef.current;
+    if (
+      !prettier ||
+      !plugins ||
+      !queryEditor ||
+      !headerEditor ||
+      !responseEditor
+    ) {
       fallbackPrettify();
     } else {
-      const queryText = queryEditor.getValue();
-      if (queryText != null) {
-        const position = queryEditor.getPosition();
-        const model = queryEditor.getModel();
-        const cursorOffset =
-          position && model ? model.getOffsetAt(position) : undefined;
-        const result = await prettier.formatWithCursor(queryText, {
-          parser: "graphql",
-          plugins: prettierPlugins,
-          cursorOffset: cursorOffset ?? 0,
-        });
-        queryEditor?.setValue(result.formatted);
-        if (model && result.cursorOffset > 0) {
-          queryEditor.setPosition(model.getPositionAt(result.cursorOffset));
+      for (const editor of [queryEditor, headerEditor, responseEditor]) {
+        const editorText = editor.getValue();
+        if (editorText != null) {
+          const position = editor.getPosition();
+          const model = editor.getModel();
+          const cursorOffset =
+            position && model ? (model.getOffsetAt(position) ?? 0) : 0;
+          const parser =
+            editor === queryEditor
+              ? "graphql"
+              : editor === headerEditor
+                ? "jsonc"
+                : "json";
+          const result = await prettier.formatWithCursor(editorText, {
+            parser,
+            plugins,
+            cursorOffset,
+          });
+          editor.setValue(result.formatted);
+          if (model && result.cursorOffset > 0) {
+            editor.setPosition(model.getPositionAt(result.cursorOffset));
+          }
         }
       }
     }
-  }, [fallbackPrettify, queryEditor]);
+  }, [fallbackPrettify, headerEditor, queryEditor, responseEditor]);
   const prettify = useCallback(() => {
     if (prettierRef.current.loaded === false) {
       const promise = (async () => {
@@ -57,7 +77,7 @@ export const usePrettify = () => {
           import("prettier/plugins/graphql"),
         ]);
         prettierRef.current.prettier = prettier;
-        prettierRef.current.prettierPlugins = [estree as Plugin, graphql];
+        prettierRef.current.plugins = [estree as Plugin, graphql];
         prettierRef.current.loaded = true;
       })();
       prettierRef.current.loaded = promise;
