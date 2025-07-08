@@ -174,66 +174,56 @@ export const RuruInner: FC<{
             </a>
           </GraphiQL.Logo>
           <GraphiQL.Toolbar>
-            {() => (
-              <>
-                <ToolbarButton
-                  onClick={prettify}
-                  label="Prettify Query (Shift-Ctrl-P)"
-                >
-                  <PrettifyIcon
+            <ToolbarButton
+              onClick={prettify}
+              label="Prettify Query (Shift-Ctrl-P)"
+            >
+              <PrettifyIcon
+                className="graphiql-toolbar-icon"
+                aria-hidden="true"
+              />
+            </ToolbarButton>
+            <ToolbarButton
+              onSelect={mergeQuery}
+              label="Merge Query (Shift-Ctrl-M)"
+            >
+              <MergeIcon className="graphiql-toolbar-icon" aria-hidden="true" />
+            </ToolbarButton>
+            <ToolbarButton
+              onClick={copyQuery}
+              label="Copy query (Shift-Ctrl-C)"
+            >
+              <CopyIcon className="graphiql-toolbar-icon" aria-hidden="true" />
+            </ToolbarButton>
+            <ToolbarMenu
+              button={
+                <ToolbarButton label="Options">
+                  <SettingsIcon
                     className="graphiql-toolbar-icon"
                     aria-hidden="true"
                   />
                 </ToolbarButton>
-                <ToolbarButton
-                  onSelect={mergeQuery}
-                  label="Merge Query (Shift-Ctrl-M)"
-                >
-                  <MergeIcon
-                    className="graphiql-toolbar-icon"
-                    aria-hidden="true"
-                  />
-                </ToolbarButton>
-                <ToolbarButton
-                  onClick={copyQuery}
-                  label="Copy query (Shift-Ctrl-C)"
-                >
-                  <CopyIcon
-                    className="graphiql-toolbar-icon"
-                    aria-hidden="true"
-                  />
-                </ToolbarButton>
-                <ToolbarMenu
-                  button={
-                    <ToolbarButton label="Options">
-                      <SettingsIcon
-                        className="graphiql-toolbar-icon"
-                        aria-hidden="true"
-                      />
-                    </ToolbarButton>
-                  }
-                >
-                  <ToolbarMenu.Item
-                    title="View the SQL statements that this query invokes"
-                    onSelect={() => storage.toggle("explain")}
-                  >
-                    <span>
-                      {storage.get("explain") === "true" ? check : nocheck}
-                      Explain (if supported)
-                    </span>
-                  </ToolbarMenu.Item>
-                  <ToolbarMenu.Item
-                    title="Don't hide explain from results"
-                    onSelect={() => storage.toggle("verbose")}
-                  >
-                    <span>
-                      {storage.get("verbose") === "true" ? check : nocheck}
-                      Verbose
-                    </span>
-                  </ToolbarMenu.Item>
-                </ToolbarMenu>
-              </>
-            )}
+              }
+            >
+              <ToolbarMenu.Item
+                title="View the SQL statements that this query invokes"
+                onSelect={() => storage.toggle("explain")}
+              >
+                <span>
+                  {storage.get("explain") === "true" ? check : nocheck}
+                  Explain (if supported)
+                </span>
+              </ToolbarMenu.Item>
+              <ToolbarMenu.Item
+                title="Don't hide explain from results"
+                onSelect={() => storage.toggle("verbose")}
+              >
+                <span>
+                  {storage.get("verbose") === "true" ? check : nocheck}
+                  Verbose
+                </span>
+              </ToolbarMenu.Item>
+            </ToolbarMenu>
           </GraphiQL.Toolbar>
 
           <GraphiQL.Footer>
