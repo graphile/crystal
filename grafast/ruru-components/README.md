@@ -26,8 +26,9 @@ For other usage patterns, please see the main [ruru][] package.
           return createJSONWorker();
         case "graphql":
           return createGraphQLWorker();
+        default:
+          return createEditorWorker();
       }
-      return createEditorWorker();
     },
   };
 </script>
