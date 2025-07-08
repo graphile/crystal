@@ -31,7 +31,6 @@ const baseHeaderScripts = ``;
 const baseElements = `\
 <div id="ruru-root"></div>`;
 const baseBodyScripts = `\
-<script type="module"> import merm from 'https://cdn.jsdelivr.net/npm/mermaid@11.6.0/+esm'; window.mermaid = merm </script>
 <script type="module">
 // Setup Monaco Editor workers
 function worker(file) {

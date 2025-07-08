@@ -1,5 +1,4 @@
 import BrowserOnly from "@docusaurus/BrowserOnly";
-import Head from "@docusaurus/Head";
 import React from "react";
 import { ErrorBoundary } from "react-error-boundary";
 
@@ -44,13 +43,6 @@ export default function Playground() {
           const PlaygroundInner = require("./PlaygroundInner").default;
           return (
             <>
-              <Head>
-                <script type="module">
-                  import merm from
-                  "https://cdn.jsdelivr.net/npm/mermaid@11.6.0/+esm";
-                  window.mermaid = merm;
-                </script>
-              </Head>
               <PlaygroundInner />
             </>
           );

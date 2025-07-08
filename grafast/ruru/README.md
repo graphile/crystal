@@ -208,10 +208,6 @@ if (file) {
 <!-- Required below here -->
 <div id="ruru-root"></div>
 <script type="module">
-  import merm from "https://cdn.jsdelivr.net/npm/mermaid@11.6.0/+esm";
-  window.mermaid = merm;
-</script>
-<script type="module">
   const RURU_STATIC = "https://unpkg.com/ruru/static/";
   // Setup Monaco Editor workers
   const worker = (file) =>
