@@ -184,19 +184,19 @@ export function serveStatic(staticPath: string) {
           acceptEncoding: req.headers["accept-encoding"],
         });
         if (file) {
-          res.writeHead(200, file.headers);
+          // As per RFC9112 Section 4.2, a client SHOULD ignore the
+          // reason-phrase; it's even phased out in HTTP/2+
+          res.writeHead(200, "LGTM", file.headers);
           res.end(file.content);
-        } else {
-          res.writeHead(404, { "content-type": "text/plain" });
-          res.end("Not found");
+          return;
         }
+      }
+      // Not found
+      if (typeof next === "function") {
+        return next();
       } else {
-        if (typeof next === "function") {
-          return next();
-        } else {
-          res.writeHead(404, { "content-type": "text/plain" });
-          res.end("Not found");
-        }
+        res.writeHead(404, { "content-type": "text/plain" });
+        res.end("Not found");
       }
     } catch (e) {
       if (typeof next === "function") {
