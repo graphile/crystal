@@ -45,7 +45,11 @@ export default function Playground() {
           return (
             <>
               <Head>
-                <script src="https://cdn.jsdelivr.net/npm/mermaid@9.4.3"></script>
+                <script type="module">
+                  import merm from
+                  "https://cdn.jsdelivr.net/npm/mermaid@11.6.0/+esm";
+                  window.mermaid = merm;
+                </script>
               </Head>
               <PlaygroundInner />
             </>
