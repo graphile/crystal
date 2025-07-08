@@ -11,11 +11,11 @@ const sleep = (ms: number) =>
  * prettify.
  */
 export const usePrettify = () => {
-  const { queryEditor, headerEditor, responseEditor } = useGraphiQL(
-    ({ queryEditor, headerEditor, responseEditor }) => ({
+  const { queryEditor, variableEditor, headerEditor } = useGraphiQL(
+    ({ queryEditor, variableEditor, headerEditor }) => ({
       queryEditor,
+      variableEditor,
       headerEditor,
-      responseEditor,
     }),
   );
   const { prettifyEditors: fallbackPrettify } = useGraphiQLActions();
@@ -30,12 +30,12 @@ export const usePrettify = () => {
       !prettier ||
       !plugins ||
       !queryEditor ||
-      !headerEditor ||
-      !responseEditor
+      !variableEditor ||
+      !headerEditor
     ) {
       fallbackPrettify();
     } else {
-      for (const editor of [queryEditor, headerEditor, responseEditor]) {
+      for (const editor of [queryEditor, variableEditor, headerEditor]) {
         const editorText = editor.getValue();
         if (editorText != null) {
           const position = editor.getPosition();
@@ -45,7 +45,7 @@ export const usePrettify = () => {
           const parser =
             editor === queryEditor
               ? "graphql"
-              : editor === headerEditor
+              : editor === variableEditor || editor === headerEditor
                 ? "jsonc"
                 : "json";
           const result = await prettier.formatWithCursor(editorText, {
@@ -60,17 +60,18 @@ export const usePrettify = () => {
         }
       }
     }
-  }, [fallbackPrettify, headerEditor, queryEditor, responseEditor]);
+  }, [fallbackPrettify, headerEditor, queryEditor, variableEditor]);
   const prettify = useCallback(() => {
     if (prettierRef.current.loaded === false) {
       const promise = (async () => {
-        const [prettier, estree, graphql] = await Promise.all([
+        const [prettier, estree, babel, graphql] = await Promise.all([
           import("prettier/standalone"),
           import("prettier/plugins/estree"),
+          import("prettier/plugins/babel"),
           import("prettier/plugins/graphql"),
         ]);
         prettierRef.current.prettier = prettier;
-        prettierRef.current.plugins = [estree as Plugin, graphql];
+        prettierRef.current.plugins = [estree.default, babel, graphql];
         prettierRef.current.loaded = true;
       })();
       prettierRef.current.loaded = promise;
