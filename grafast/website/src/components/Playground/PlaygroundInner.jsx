@@ -6,28 +6,16 @@ import { grafast, makeGrafastSchema } from "grafast";
 import { parse, GraphQLError } from "graphql";
 import React, { useCallback, useMemo, useState, useEffect } from "react";
 
-import createJSONWorker from "https://esm.sh/monaco-editor/esm/vs/language/json/json.worker.js?worker";
-import createGraphQLWorker from "https://esm.sh/monaco-graphql/esm/graphql.worker.js?worker";
-import createEditorWorker from "https://esm.sh/monaco-editor/esm/vs/editor/editor.worker.js?worker";
-
-globalThis.MonacoEnvironment = {
-  getWorker(_workerId, label) {
-    switch (label) {
-      case "json":
-        return createJSONWorker();
-      case "graphql":
-        return createGraphQLWorker();
-    }
-    return createEditorWorker();
-  },
-};
-
 // import "graphiql/setup-workers/webpack";
 import { Ruru } from "ruru-components";
 import { useColorMode } from "@docusaurus/theme-common";
 import { githubLight, githubDark } from "@uiw/codemirror-theme-github";
 
 import styles from "./styles.module.css";
+
+if (!window.MonacoEnvironment) {
+  console.error(`MONACO ENVIRONMENT NOT SET!`);
+}
 
 const INITIAL_QUERY = `\
 query Example {
