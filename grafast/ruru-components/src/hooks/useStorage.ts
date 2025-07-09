@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 
 export interface StoredKeys {
-  saveHeaders: "true" | "";
   explain: "true" | "";
   explorerIsOpen: "true" | "";
   explainIsOpen: "true" | "";
@@ -11,7 +10,6 @@ export interface StoredKeys {
 }
 
 const KEYS: { [key in keyof StoredKeys]: string } = {
-  saveHeaders: "Ruru:saveHeadersText",
   explain: "Ruru:explain",
   explainSize: "Ruru:explainSize",
   explainIsOpen: "Ruru:explainIsOpen",
