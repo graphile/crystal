@@ -8,7 +8,7 @@ import type { createProxyServer } from "http-proxy";
 import type { RuruConfig, RuruServerConfig } from "./server.js";
 import { ruruHTML } from "./server.js";
 import { serveStatic } from "./static.js";
-const DEFAULT_STATIC_PATH = "/static/";
+const DEFAULT_STATIC_PATH = "/ruru-static/";
 
 export function options(yargs: Argv) {
   return yargs

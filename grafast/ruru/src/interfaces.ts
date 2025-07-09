@@ -85,7 +85,8 @@ export interface RuruConfig {
   /**
    * Ruru's static assets must be served for Ruru to work. Pass the URL to the
    * root of this folder; it must end in a slash. Defaults to
-   * `https://unpkg.com/ruru@${version}/static/`
+   * `https://unpkg.com/ruru@${version}/static/` in most places, though the CLI
+   * defaults to `/ruru-static/` since it serves its own files.
    */
   staticPath?: string;
 
@@ -111,13 +112,15 @@ export interface RuruConfig {
    * Override the HTML parts that are used to build the Ruru
    */
   htmlParts?: {
-    [K in keyof RuruHTMLParts]?: (
-      original: string,
-      clientConfig: BakedRuruClientConfig,
-      serverConfig: RuruConfig,
-      htmlParts: RuruHTMLParts,
-      key: keyof RuruHTMLParts,
-    ) => string;
+    [K in keyof RuruHTMLParts]?:
+      | string
+      | ((
+          original: string,
+          clientConfig: BakedRuruClientConfig,
+          serverConfig: RuruConfig,
+          htmlParts: RuruHTMLParts,
+          key: keyof RuruHTMLParts,
+        ) => string);
   };
 
   /** Will be serialized and sent to the client */
