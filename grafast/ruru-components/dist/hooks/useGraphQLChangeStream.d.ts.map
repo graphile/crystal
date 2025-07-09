@@ -1,0 +1,1 @@
+{"version":3,"file":"useGraphQLChangeStream.d.ts","sourceRoot":"","sources":["../../src/hooks/useGraphQLChangeStream.ts"],"names":[],"mappings":"AAEA,OAAO,KAAK,EAAE,SAAS,EAAE,MAAM,kBAAkB,CAAC;AAElD,eAAO,MAAM,sBAAsB,GACjC,OAAO,SAAS,EAChB,SAAS,MAAM,IAAI,EACnB,gBAAgB,MAAM,GAAG,IAAI;;CA0D9B,CAAC"}

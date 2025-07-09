@@ -1,0 +1,1 @@
+{"version":3,"file":"stripAnsi.js","sourceRoot":"","sources":["../src/stripAnsi.ts"],"names":[],"mappings":";;;AAMA,8BAEC;AARD,iEAAiE;AACjE,kFAAkF;AAClF,oDAAoD;AACvC,QAAA,WAAW;AACtB,+DAA+D;AAC/D,4KAA4K,CAAC;AAC/K,SAAgB,SAAS,CAAC,GAAW;IACnC,OAAO,GAAG,CAAC,OAAO,CAAC,mBAAW,EAAE,EAAE,CAAC,CAAC;AACtC,CAAC"}

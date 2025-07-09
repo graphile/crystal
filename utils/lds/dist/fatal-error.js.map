@@ -1,0 +1,1 @@
+{"version":3,"file":"fatal-error.js","sourceRoot":"","sources":["../src/fatal-error.ts"],"names":[],"mappings":";;AAAA,MAAqB,UAAW,SAAQ,KAAK;IAI3C,YAAY,OAAe,EAAE,aAAqB;QAChD,KAAK,CAAC,OAAO,CAAC,CAAC;QAJV,UAAK,GAAG,IAAI,CAAC;QAKlB,MAAM,CAAC,cAAc,CAAC,IAAI,EAAE,GAAG,CAAC,MAAM,CAAC,SAAS,CAAC,CAAC;QAClD,IAAI,CAAC,aAAa,GAAG,aAAa,CAAC;IACrC,CAAC;CACF;AATD,6BASC"}

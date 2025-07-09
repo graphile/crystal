@@ -1,0 +1,1 @@
+{"version":3,"file":"hstore.d.ts","sourceRoot":"","sources":["../../src/codecUtils/hstore.ts"],"names":[],"mappings":"AAEA,MAAM,WAAW,QAAQ;IACvB,CAAC,GAAG,EAAE,MAAM,GAAG,MAAM,GAAG,IAAI,CAAC;CAC9B;AAOD;;;;GAIG;AACH,wBAAgB,WAAW,CAAC,YAAY,EAAE,MAAM,GAAG,QAAQ,CAoI1D;AAUD;;;;GAIG;AACH,wBAAgB,eAAe,CAAC,CAAC,EAAE,QAAQ,GAAG,IAAI,GAAG,MAAM,GAAG,IAAI,CAiBjE"}

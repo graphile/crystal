@@ -1,0 +1,1 @@
+{"version":3,"file":"AddInterfaceSubtypesToTypesPlugin.d.ts","sourceRoot":"","sources":["../../src/plugins/AddInterfaceSubtypesToTypesPlugin.ts"],"names":[],"mappings":"AAAA,OAAO,iBAAiB,CAAC;AAIzB,OAAO,CAAC,MAAM,CAAC;IACb,UAAU,cAAc,CAAC;QACvB,UAAU,OAAO;YACf,iCAAiC,EAAE,IAAI,CAAC;SACzC;KACF;CACF;AAED,eAAO,MAAM,iCAAiC,EAAE,cAAc,CAAC,MA6B9D,CAAC"}

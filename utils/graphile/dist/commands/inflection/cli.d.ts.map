@@ -1,0 +1,1 @@
+{"version":3,"file":"cli.d.ts","sourceRoot":"","sources":["../../../src/commands/inflection/cli.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,eAAe,EAAE,IAAI,EAAE,MAAM,qBAAqB,CAAC;AAIjE,wBAAgB,OAAO,CAAC,KAAK,EAAE,IAAI,YASlC;AAED,wBAAgB,GAAG,CAAC,KAAK,EAAE,eAAe,CAAC,OAAO,OAAO,CAAC,QAGzD"}

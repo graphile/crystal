@@ -1,0 +1,3 @@
+import type { CallbackDescriptor, CallbackOrDescriptor, FunctionalityObject } from "./interfaces.js";
+export declare function orderedApply<TFunctionality extends FunctionalityObject<TFunctionality>>(plugins: readonly GraphileConfig.Plugin[] | undefined, functionalityRetriever: (plugin: GraphileConfig.Plugin) => Partial<TFunctionality> | undefined, applyCallback: <TFunctionalityName extends keyof TFunctionality>(functionalityName: TFunctionalityName, hookFn: TFunctionality[TFunctionalityName] extends CallbackOrDescriptor<infer U> ? U : TFunctionality[TFunctionalityName] extends ReadonlyArray<CallbackDescriptor<infer U>> ? U : never, plugin: GraphileConfig.Plugin) => void): void;
+//# sourceMappingURL=functionality.d.ts.map

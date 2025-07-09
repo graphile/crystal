@@ -1,0 +1,1 @@
+{"version":3,"file":"CollectReferencedTypesPlugin.d.ts","sourceRoot":"","sources":["../../src/plugins/CollectReferencedTypesPlugin.ts"],"names":[],"mappings":"AAAA,OAAO,iBAAiB,CAAC;AAOzB,OAAO,CAAC,MAAM,CAAC;IACb,UAAU,cAAc,CAAC;QACvB,UAAU,OAAO;YACf,4BAA4B,EAAE,IAAI,CAAC;SACpC;KACF;CACF;AAED,eAAO,MAAM,4BAA4B,EAAE,cAAc,CAAC,MA2BzD,CAAC"}

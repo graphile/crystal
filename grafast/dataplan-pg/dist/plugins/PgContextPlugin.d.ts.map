@@ -1,0 +1,1 @@
+{"version":3,"file":"PgContextPlugin.d.ts","sourceRoot":"","sources":["../../src/plugins/PgContextPlugin.ts"],"names":[],"mappings":"AAMA,eAAO,MAAM,YAAY,EAAE,MAAM,CAAC,MAAM,EAAE,KAAK,CAE9C,CAAC;AAEF,OAAO,CAAC,MAAM,CAAC;IACb,UAAU,cAAc,CAAC;QACvB,UAAU,OAAO;YACf,eAAe,EAAE,IAAI,CAAC;SACvB;KACF;CACF;AAED,eAAO,MAAM,eAAe,EAAE,cAAc,CAAC,MAmE5C,CAAC"}

@@ -1,0 +1,3 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+export const RuruFooter = () => (_jsxs("div", { style: { padding: 7 }, children: ["Community-funded OSS \uD83D\uDE4F", " ", _jsx("a", { title: "All our projects are supported by the community, please sponsor ongoing development", href: "https://graphile.org/sponsor/", target: "new", children: "please sponsor" }), " ", "\uD83D\uDC96"] }));
+//# sourceMappingURL=Footer.js.map

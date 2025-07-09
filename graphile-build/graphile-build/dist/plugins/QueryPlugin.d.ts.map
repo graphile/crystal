@@ -1,0 +1,1 @@
+{"version":3,"file":"QueryPlugin.d.ts","sourceRoot":"","sources":["../../src/plugins/QueryPlugin.ts"],"names":[],"mappings":"AAAA,OAAO,iBAAiB,CAAC;AAMzB,OAAO,CAAC,MAAM,CAAC;IACb,UAAU,cAAc,CAAC;QACvB,UAAU,OAAO;YACf,WAAW,EAAE,IAAI,CAAC;SACnB;QACD,UAAU,QAAQ;YAChB,KAAK,EAAE,IAAI,CAAC;SACb;KACF;CACF;AAED;;;;;;;;;;;;GAYG;AACH,eAAO,MAAM,WAAW,EAAE,cAAc,CAAC,MAuDxC,CAAC"}

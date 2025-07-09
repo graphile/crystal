@@ -1,0 +1,1 @@
+{"version":3,"file":"SubscriptionPlugin.d.ts","sourceRoot":"","sources":["../../src/plugins/SubscriptionPlugin.ts"],"names":[],"mappings":"AAAA,OAAO,iBAAiB,CAAC;AAOzB,OAAO,CAAC,MAAM,CAAC;IACb,UAAU,cAAc,CAAC;QACvB,UAAU,OAAO;YACf,kBAAkB,EAAE,IAAI,CAAC;SAC1B;QAED,UAAU,QAAQ;YAChB,YAAY,EAAE,IAAI,CAAC;SACpB;KACF;CACF;AAED;;;;;;;;;;GAUG;AACH,eAAO,MAAM,kBAAkB,EAAE,cAAc,CAAC,MAgE/C,CAAC"}

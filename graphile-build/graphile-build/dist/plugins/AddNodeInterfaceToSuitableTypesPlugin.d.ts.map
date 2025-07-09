@@ -1,0 +1,1 @@
+{"version":3,"file":"AddNodeInterfaceToSuitableTypesPlugin.d.ts","sourceRoot":"","sources":["../../src/plugins/AddNodeInterfaceToSuitableTypesPlugin.ts"],"names":[],"mappings":"AAAA,OAAO,iBAAiB,CAAC;AAUzB,OAAO,CAAC,MAAM,CAAC;IACb,UAAU,cAAc,CAAC;QACvB,UAAU,OAAO;YACf,qCAAqC,EAAE,IAAI,CAAC;SAC7C;KACF;CACF;AAED,eAAO,MAAM,qCAAqC,EAAE,cAAc,CAAC,MAsJlE,CAAC"}

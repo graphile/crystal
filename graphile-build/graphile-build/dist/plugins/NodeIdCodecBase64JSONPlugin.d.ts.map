@@ -1,0 +1,1 @@
+{"version":3,"file":"NodeIdCodecBase64JSONPlugin.d.ts","sourceRoot":"","sources":["../../src/plugins/NodeIdCodecBase64JSONPlugin.ts"],"names":[],"mappings":"AAAA,OAAO,iBAAiB,CAAC;AAEzB,OAAO,CAAC,MAAM,CAAC;IACb,UAAU,cAAc,CAAC;QACvB,UAAU,OAAO;YACf,2BAA2B,EAAE,IAAI,CAAC;SACnC;KACF;CACF;AAED,eAAO,MAAM,2BAA2B,EAAE,cAAc,CAAC,MA2CxD,CAAC"}

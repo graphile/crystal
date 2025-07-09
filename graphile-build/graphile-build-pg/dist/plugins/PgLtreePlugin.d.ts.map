@@ -1,0 +1,1 @@
+{"version":3,"file":"PgLtreePlugin.d.ts","sourceRoot":"","sources":["../../src/plugins/PgLtreePlugin.ts"],"names":[],"mappings":"AAWA,OAAO,CAAC,MAAM,CAAC;IACb,UAAU,cAAc,CAAC;QACvB,UAAU,OAAO;YACf,aAAa,EAAE,IAAI,CAAC;SACrB;KACF;CACF;AAED,eAAO,MAAM,aAAa,EAAE,cAAc,CAAC,MA+E1C,CAAC"}

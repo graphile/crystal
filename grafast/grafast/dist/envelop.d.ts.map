@@ -1,0 +1,1 @@
+{"version":3,"file":"envelop.d.ts","sourceRoot":"","sources":["../src/envelop.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,MAAM,IAAI,aAAa,EAAE,MAAM,eAAe,CAAC;AAQ7D,MAAM,WAAW,iBAAiB;IAChC;;;OAGG;IACH,cAAc,CAAC,EAAE,OAAO,GAAG,MAAM,EAAE,CAAC;CACrC;AA4BD;;;GAGG;AACH,eAAO,MAAM,UAAU,GAAI,UAAS,iBAAsB,KAAG,aAiD5D,CAAC;AAEF;;;GAGG;AACH,eAAO,MAAM,qBAAqB,QAAO,aAcvC,CAAC"}

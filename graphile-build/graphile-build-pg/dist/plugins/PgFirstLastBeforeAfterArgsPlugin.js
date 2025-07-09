@@ -1,0 +1,95 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.PgFirstLastBeforeAfterArgsPlugin = void 0;
+require("./PgTablesPlugin.js");
+require("graphile-config");
+const graphile_build_1 = require("graphile-build");
+const version_js_1 = require("../version.js");
+exports.PgFirstLastBeforeAfterArgsPlugin = {
+    name: "PgFirstLastBeforeAfterArgsPlugin",
+    description: "Adds the 'first', 'last', 'before' and 'after' arguments to connection and list fields",
+    version: version_js_1.version,
+    schema: {
+        entityBehavior: {
+            pgResource: "resource:connection:backwards",
+        },
+        hooks: {
+            GraphQLObjectType_fields_field_args: commonFn,
+            GraphQLInterfaceType_fields_field_args: commonFn,
+        },
+    },
+};
+function commonFn(args, build, context) {
+    const { extend, getTypeByName, graphql: { GraphQLInt }, } = build;
+    const { scope, Self } = context;
+    const { fieldName, isPgFieldConnection, isPgFieldSimpleCollection, pgFieldResource: pgResource, pgFieldCodec, } = scope;
+    if (!(isPgFieldConnection || isPgFieldSimpleCollection)) {
+        return args;
+    }
+    const codec = pgFieldCodec ?? pgResource?.codec;
+    const isSuitableSource = pgResource && !pgResource.isUnique;
+    const isSuitableCodec = codec &&
+        (isSuitableSource ||
+            (!pgResource && codec?.polymorphism?.mode === "union"));
+    if (!isSuitableCodec) {
+        return args;
+    }
+    const Cursor = getTypeByName("Cursor");
+    const canPaginateBackwards = isPgFieldConnection &&
+        (!pgResource ||
+            build.behavior.pgResourceMatches(pgResource, "resource:connection:backwards"));
+    return extend(args, {
+        first: {
+            description: build.wrapDescription("Only read the first `n` values of the set.", "arg"),
+            type: GraphQLInt,
+            applyPlan: (0, graphile_build_1.EXPORTABLE)(() => function plan(_, $connection, arg) {
+                $connection.setFirst(arg.getRaw());
+            }, []),
+        },
+        ...(canPaginateBackwards
+            ? {
+                last: {
+                    description: build.wrapDescription("Only read the last `n` values of the set.", "arg"),
+                    type: GraphQLInt,
+                    applyPlan: (0, graphile_build_1.EXPORTABLE)(() => function plan(_, $connection, val) {
+                        $connection.setLast(val.getRaw());
+                    }, []),
+                },
+            }
+            : null),
+        offset: {
+            description: build.wrapDescription(isPgFieldConnection
+                ? "Skip the first `n` values from our `after` cursor, an alternative to cursor based pagination. May not be used with `last`."
+                : "Skip the first `n` values.", "arg"),
+            type: GraphQLInt,
+            applyPlan: (0, graphile_build_1.EXPORTABLE)(() => function plan(_, $connection, val) {
+                $connection.setOffset(val.getRaw());
+            }, []),
+        },
+        ...(canPaginateBackwards
+            ? {
+                before: {
+                    description: build.wrapDescription("Read all values in the set before (above) this cursor.", "arg"),
+                    type: Cursor,
+                    applyPlan: (0, graphile_build_1.EXPORTABLE)(() => function plan(_, $connection, val) {
+                        $connection.setBefore(val.getRaw());
+                    }, []),
+                },
+            }
+            : null),
+        ...(isPgFieldConnection
+            ? {
+                after: {
+                    description: build.wrapDescription("Read all values in the set after (below) this cursor.", "arg"),
+                    type: Cursor,
+                    applyPlan: (0, graphile_build_1.EXPORTABLE)(() => function plan(_, $connection, val) {
+                        $connection.setAfter(val.getRaw());
+                    }, []),
+                },
+            }
+            : null),
+    }, isPgFieldConnection
+        ? `Adding connection pagination args to field '${fieldName}' of '${Self.name}'`
+        : `Adding simple collection args to field '${fieldName}' of '${Self.name}'`);
+}
+//# sourceMappingURL=PgFirstLastBeforeAfterArgsPlugin.js.map

@@ -1,0 +1,1 @@
+{"version":3,"file":"BuiltinScalarConnectionsPlugin.d.ts","sourceRoot":"","sources":["../../src/plugins/BuiltinScalarConnectionsPlugin.ts"],"names":[],"mappings":"AAAA,OAAO,uBAAuB,CAAC;AAC/B,OAAO,iBAAiB,CAAC;AAIzB,OAAO,CAAC,MAAM,CAAC;IACb,UAAU,cAAc,CAAC;QACvB,UAAU,OAAO;YACf,8BAA8B,EAAE,IAAI,CAAC;SACtC;KACF;CACF;AAED,eAAO,MAAM,8BAA8B,EAAE,cAAc,CAAC,MAkC3D,CAAC"}

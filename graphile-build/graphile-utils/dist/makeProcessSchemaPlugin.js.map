@@ -1,0 +1,1 @@
+{"version":3,"file":"makeProcessSchemaPlugin.js","sourceRoot":"","sources":["../src/makeProcessSchemaPlugin.ts"],"names":[],"mappings":";;AAMA,0DAcC;AAjBD,IAAI,OAAO,GAAG,CAAC,CAAC;AAGhB,SAAgB,uBAAuB,CACrC,QAA+B;IAE/B,OAAO;QACL,IAAI,EAAE,uBAAuB,EAAE,OAAO,EAAE;QACxC,OAAO,EAAE,OAAO;QAChB,MAAM,EAAE;YACN,KAAK,EAAE;gBACL,QAAQ,EAAE;oBACR,QAAQ;iBACT;aACF;SACF;KACF,CAAC;AACJ,CAAC"}

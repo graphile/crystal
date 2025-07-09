@@ -1,0 +1,1 @@
+{"version":3,"file":"MutationPlugin.d.ts","sourceRoot":"","sources":["../../src/plugins/MutationPlugin.ts"],"names":[],"mappings":"AAAA,OAAO,iBAAiB,CAAC;AAOzB,OAAO,CAAC,MAAM,CAAC;IACb,UAAU,cAAc,CAAC;QACvB,UAAU,OAAO;YACf,cAAc,EAAE,IAAI,CAAC;SACtB;QACD,UAAU,QAAQ;YAChB,QAAQ,EAAE,IAAI,CAAC;SAChB;KACF;CACF;AAED;;;;;;;;;;GAUG;AACH,eAAO,MAAM,cAAc,EAAE,cAAc,CAAC,MAiE3C,CAAC"}

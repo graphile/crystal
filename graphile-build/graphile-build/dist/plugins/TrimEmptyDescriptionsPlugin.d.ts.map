@@ -1,0 +1,1 @@
+{"version":3,"file":"TrimEmptyDescriptionsPlugin.d.ts","sourceRoot":"","sources":["../../src/plugins/TrimEmptyDescriptionsPlugin.ts"],"names":[],"mappings":"AAAA,OAAO,iBAAiB,CAAC;AASzB,OAAO,CAAC,MAAM,CAAC;IACb,UAAU,cAAc,CAAC;QACvB,UAAU,OAAO;YACf,2BAA2B,EAAE,IAAI,CAAC;SACnC;KACF;CACF;AAiDD,eAAO,MAAM,2BAA2B,EAAE,cAAc,CAAC,MAoBxD,CAAC"}

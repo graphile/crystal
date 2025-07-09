@@ -1,0 +1,1 @@
+{"version":3,"file":"formatSQLForDebugging.d.ts","sourceRoot":"","sources":["../src/formatSQLForDebugging.ts"],"names":[],"mappings":"AAEA;;;;;;;;GAQG;AACH,wBAAgB,qBAAqB,CACnC,GAAG,EAAE,MAAM,EACX,KAAK,CAAC,EAAE;IAAE,QAAQ,CAAC,EAAE,MAAM,GAAG,MAAM,CAAC;IAAC,OAAO,CAAC,EAAE,MAAM,CAAA;CAAE,GAAG,IAAI,GAC9D,MAAM,CAmDR"}

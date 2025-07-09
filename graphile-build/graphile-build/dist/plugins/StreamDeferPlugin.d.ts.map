@@ -1,0 +1,1 @@
+{"version":3,"file":"StreamDeferPlugin.d.ts","sourceRoot":"","sources":["../../src/plugins/StreamDeferPlugin.ts"],"names":[],"mappings":"AAAA,OAAO,iBAAiB,CAAC;AAEzB,OAAO,CAAC,MAAM,CAAC;IACb,UAAU,cAAc,CAAC;QACvB,UAAU,OAAO;YACf,iBAAiB,EAAE,IAAI,CAAC;SACzB;KACF;CACF;AAED;;;;;GAKG;AACH,eAAO,MAAM,iBAAiB,EAAE,cAAc,CAAC,MAc9C,CAAC"}
