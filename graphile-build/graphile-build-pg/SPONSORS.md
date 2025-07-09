@@ -12,17 +12,17 @@ Graphile ecosystem. Find out
 ## Leaders
 
 - Robert Claypool
-- Principia Mentis
 - nigelrmtaylor
+- Principia Mentis
 - Trigger.dev
 - Axinom
 - Taiste
 - BairesDev
-- Cintra
 - Two Bit Solutions
+- Apollo
 - Dimply
 - Ndustrial
-- Apollo
+- Cintra
 - Beacon
 - deliver.media
 - Ravio
@@ -41,12 +41,12 @@ Graphile ecosystem. Find out
 - nullachtvierzehn
 - Zymego
 - garpulon
+- Vizcom
 - Ether
-- Nate Smith
 - The Outbound Collective
 - Charlie Hadden
-- Vizcom
 - Kiron Open Higher Education
+- Nate Smith
 - Andrew Joseph
 - SIED 70 - TE 70
 - Peter C. Romano
@@ -58,3 +58,4 @@ Graphile ecosystem. Find out
 - Jody Hoon-Starr
 - Justin Carrus
 - WorkOS
+- Malachi Bergman
