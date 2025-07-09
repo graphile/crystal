@@ -117,7 +117,7 @@ export function inputArgsApply<
     | ((
         parent: TArg,
         inputValue: any,
-        scope: TScope,
+        info: { scope: TScope },
       ) => TTarget | undefined | (() => TTarget))
     | undefined,
   scope: TScope,
@@ -125,7 +125,7 @@ export function inputArgsApply<
   try {
     inputArgsApplyDepth++;
     const target = getTargetFromParent
-      ? getTargetFromParent(parent, inputValue, scope)
+      ? getTargetFromParent(parent, inputValue, { scope })
       : (parent as unknown as TTarget);
     if (target != null) {
       _inputArgsApply<TTarget>(schema, inputType, target, inputValue, scope);
