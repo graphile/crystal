@@ -7,7 +7,11 @@
   margin: 0.5rem;
   padding: 1rem;
   flex: 0 0 18rem;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
+}
+
+.leaders {
+  flex: 0 0 16rem;
 }
 
 .featured,
@@ -18,7 +22,7 @@
 }
 
 [data-theme="dark"] .featured,
-.leaders {
+[data-theme="dark"] .leaders {
   border: 3px solid var(--ifm-color-primary);
 }
 
@@ -28,7 +32,7 @@
 }
 
 .leaders .name {
-  font-size: 1.24rem;
+  font-size: 1.2rem;
   padding-top: 1rem;
 }
 
@@ -58,9 +62,9 @@
 }
 
 .leaders .avatar {
-  border-radius: 5rem;
-  width: 5rem;
-  height: 5rem;
+  border-radius: 4rem;
+  width: 4rem;
+  height: 4rem;
 }
 
 .business {
@@ -73,4 +77,24 @@
   background-color: inherit;
   border-radius: inherit;
   border: inherit;
+}
+
+.backers:last-child {
+  display: none;
+}
+
+.backers:first-child {
+  display: flex;
+}
+
+@media screen and (max-width: 995px) {
+  .leaders {
+    display: none;
+  }
+  .backers:first-child {
+    display: none;
+  }
+  .backers:last-child {
+    display: flex;
+  }
 }
