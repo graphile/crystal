@@ -5,9 +5,10 @@ import type { ArgsFromOptions, Argv } from "graphile-config/cli";
 import { loadConfig } from "graphile-config/load";
 import type { createProxyServer } from "http-proxy";
 
-import type { RuruConfig } from "./server.js";
-import { makeHTMLParts, ruruHTML } from "./server.js";
+import type { RuruConfig, RuruServerConfig } from "./server.js";
+import { ruruHTML } from "./server.js";
 import { serveStatic } from "./static.js";
+const DEFAULT_STATIC_PATH = "/static/";
 
 export function options(yargs: Argv) {
   return yargs
@@ -111,11 +112,6 @@ export async function run(args: ArgsFromOptions<typeof options>) {
     enableProxy,
   } = config.ruru ?? {};
 
-  const htmlParts = {
-    ...makeHTMLParts(),
-    ...config.ruru?.htmlParts,
-  };
-
   const createProxyServer = enableProxy
     ? await tryLoadHttpProxyCreateProxyServer()
     : null;
@@ -143,7 +139,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
     }
   });
   const endpointUrl = new URL(endpoint);
-  const subscriptionsEndpointUrl = subscriptionEndpoint
+  const subscriptionEndpointUrl = subscriptionEndpoint
     ? new URL(subscriptionEndpoint)
     : subscriptions
       ? (() => {
@@ -164,8 +160,18 @@ export async function run(args: ArgsFromOptions<typeof options>) {
       `If you receive CORS issues, consider installing the 'http-proxy' module alongside 'ruru' and using the '-P' option so that we'll proxy to the API for you`,
     );
   }
-  const STATIC = "/static/";
-  const staticMiddleware = serveStatic(STATIC);
+
+  const serverConfig = {
+    ...config.ruru,
+    staticPath: config.ruru?.staticPath ?? DEFAULT_STATIC_PATH,
+    endpoint: proxy ? endpointUrl.pathname + endpointUrl.search : endpoint,
+    subscriptionEndpoint:
+      proxy && subscriptionEndpointUrl
+        ? subscriptionEndpointUrl.pathname + subscriptionEndpointUrl.search
+        : subscriptionEndpoint,
+  } satisfies RuruServerConfig;
+
+  const staticMiddleware = serveStatic(serverConfig.staticPath);
   const server = createServer((req, res) => {
     const next = (e?: Error) => {
       if (e) {
@@ -184,23 +190,8 @@ export async function run(args: ArgsFromOptions<typeof options>) {
       (!req.headers.accept || /\btext\/html\b/.test(req.headers.accept))
     ) {
       res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
-      res.end(
-        ruruHTML(
-          {
-            staticPath: STATIC,
-            endpoint: proxy
-              ? endpointUrl.pathname + endpointUrl.search
-              : endpoint,
-            subscriptionEndpoint:
-              proxy && subscriptionsEndpointUrl
-                ? subscriptionsEndpointUrl.pathname +
-                  subscriptionsEndpointUrl.search
-                : subscriptionEndpoint,
-          },
-          htmlParts,
-        ),
-      );
-    } else if (req.url?.startsWith(STATIC)) {
+      res.end(ruruHTML(serverConfig));
+    } else if (req.url?.startsWith(serverConfig.staticPath)) {
       staticMiddleware(req, res, next);
     } else {
       next();

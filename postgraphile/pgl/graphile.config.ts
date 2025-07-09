@@ -8,7 +8,6 @@ import { makePgService } from "pgl/adaptors/pg";
 import { PostGraphileAmberPreset } from "pgl/amber";
 import { context, listen, object } from "pgl/grafast";
 import type {} from "pgl/grafserv/node";
-import { defaultHTMLParts } from "pgl/grafserv/ruru/server";
 import { StreamDeferPlugin } from "pgl/graphile-build";
 import { PgRelayPreset } from "pgl/relay";
 import { makeV4Preset } from "pgl/v4";
@@ -75,7 +74,7 @@ function ruruTitle(title: string): GraphileConfig.Plugin {
 
     grafserv: {
       middleware: {
-        ruruHTMLParts(next, event) {
+        ruruHTML(next, event) {
           const { htmlParts, request } = event;
           htmlParts.titleTag = `<title>${escapeHTML(
             title + " | " + request.getHeader("host"),
@@ -179,7 +178,7 @@ const preset: GraphileConfig.Preset = {
   ],
   ruru: {
     htmlParts: {
-      metaTags: defaultHTMLParts.metaTags + "<!-- HELLO WORLD! -->",
+      metaTags: (original) => original + "<!-- HELLO WORLD! -->",
     },
   },
   inflection: {},
