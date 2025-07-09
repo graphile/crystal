@@ -48,7 +48,7 @@ export function getGrafservMiddleware(
           break;
         }
         case "ruruHTMLParts": {
-          middleware.register("ruruHTMLParts", (next, event) => {
+          middleware.register("ruruHTML", (next, event) => {
             const { resolvedPreset, request, htmlParts } = event;
             const result = fn({ resolvedPreset }, htmlParts, {
               request,

@@ -22,7 +22,6 @@ import {
 } from "postgraphile/grafast";
 import { defaultMaskError } from "postgraphile/grafserv";
 import type {} from "postgraphile/grafserv/node";
-import { defaultHTMLParts } from "postgraphile/grafserv/ruru/server";
 import { StreamDeferPlugin } from "postgraphile/graphile-build";
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 import { PgLazyJWTPreset } from "postgraphile/presets/lazy-jwt";
@@ -92,7 +91,7 @@ function ruruTitle(title: string): GraphileConfig.Plugin {
 
     grafserv: {
       middleware: {
-        ruruHTMLParts(next, event) {
+        ruruHTML(next, event) {
           const { htmlParts, request } = event;
           htmlParts.titleTag = `<title>${escapeHTML(
             title + " | " + request.getHeader("host"),
@@ -110,7 +109,7 @@ const RuruQueryParamsPlugin: GraphileConfig.Plugin = {
 
   grafserv: {
     middleware: {
-      ruruHTMLParts(next, event) {
+      ruruHTML(next, event) {
         const { htmlParts } = event;
         htmlParts.headerScripts += `
 <script>
@@ -140,7 +139,7 @@ const RuruQueryParamsUpdatePlugin: GraphileConfig.Plugin = {
 
   grafserv: {
     middleware: {
-      ruruHTMLParts(next, event) {
+      ruruHTML(next, event) {
         const { htmlParts } = event;
         htmlParts.headerScripts += `
 <script>
@@ -157,6 +156,7 @@ const RuruQueryParamsUpdatePlugin: GraphileConfig.Plugin = {
 }
 </script>
 `;
+        return next();
       },
     },
   },
@@ -531,7 +531,7 @@ const preset: GraphileConfig.Preset = {
   ],
   ruru: {
     htmlParts: {
-      metaTags: defaultHTMLParts.metaTags + "<!-- HELLO WORLD! -->",
+      metaTags: (base) => base + "<!-- HELLO WORLD! -->",
     },
   },
   inflection: {},

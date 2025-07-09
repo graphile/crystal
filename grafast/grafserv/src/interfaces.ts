@@ -10,7 +10,7 @@ import type {
   ValidationRule,
 } from "grafast/graphql";
 import type { Context, ID, SubscribePayload } from "graphql-ws";
-import type { RuruHTMLParts } from "ruru/server";
+import type { RuruConfig, RuruHTMLParts } from "ruru/server";
 
 import type { GrafservBase } from ".";
 import type { makeParseAndValidateFunction } from "./middleware/graphql";
@@ -80,8 +80,9 @@ export interface ProcessRequestEvent {
   instance: GrafservBase;
 }
 
-export interface RuruHTMLPartsEvent {
+export interface RuruHTMLEvent {
   resolvedPreset: GraphileConfig.ResolvedPreset;
+  config: RuruConfig;
   htmlParts: RuruHTMLParts;
   request: NormalizedRequestDigest;
 }

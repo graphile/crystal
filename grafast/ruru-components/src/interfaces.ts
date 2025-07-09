@@ -10,7 +10,30 @@ export { Fetcher };
  */
 interface RuruEventSourceInit extends EventSourceInit, Record<string, any> {}
 
-export interface RuruProps {
+export interface RuruProps
+  extends Pick<
+    GraphiQLProps,
+    | "editorTheme"
+    | "defaultTheme"
+    | "maxHistoryLength"
+    | "inputValueDeprecation"
+    | "schemaDescription"
+    | "showPersistHeadersSettings"
+    | "onEditQuery"
+    | "onEditVariables"
+    | "onEditHeaders"
+    | "responseTooltip"
+    | "defaultEditorToolsVisibility"
+    | "isHeadersEditorEnabled"
+    | "forcedTheme"
+    | "confirmCloseTab"
+    | "className"
+    | "initialVariables"
+    | "initialQuery"
+    | "initialHeaders"
+    | "defaultQuery"
+    | "defaultHeaders"
+  > {
   /**
    * Optionally override the fetcher.
    */
@@ -26,10 +49,6 @@ export interface RuruProps {
    */
   subscriptionEndpoint?: string;
 
-  editorTheme?: GraphiQLProps["editorTheme"];
-  forcedTheme?: GraphiQLProps["forcedTheme"];
-  defaultTheme?: GraphiQLProps["defaultTheme"];
-
   /**
    * The list of debug tools available to the user.
    *
@@ -37,41 +56,6 @@ export interface RuruProps {
    * plan - output the plan executed
    */
   debugTools?: Array<"explain" | "plan">;
-
-  /**
-   * The query to use when the user has never visited the page before (unless `initialQuery` is set).
-   */
-  defaultQuery?: string;
-
-  /**
-   * @deprecated Use `query` instead
-   */
-  initialQuery?: string;
-
-  /**
-   * @deprecated Use `variables` instead
-   */
-  initialVariables?: string;
-
-  /**
-   * The query to prepopulate the editor with.
-   */
-  query?: string;
-
-  /**
-   * The variables to prepopulate the editor with.
-   */
-  variables?: string;
-
-  /**
-   * Callback executed when the current query changes.
-   */
-  onEditQuery?: GraphiQLProps["onEditQuery"];
-
-  /**
-   * Callback executed when the variables change.
-   */
-  onEditVariables?: GraphiQLProps["onEditVariables"];
 
   /**
    * Will be passed to `new EventSource(url, eventSourceInit)`.

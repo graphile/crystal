@@ -17,16 +17,20 @@
       "node": "./dist/server.js",
       "default": "./dist/server.js"
     },
+    "./static": {
+      "types": "./dist/static.d.ts",
+      "node": "./dist/static.js",
+      "default": "./dist/static.js"
+    },
     "./cli": {
       "types": "./dist/cli.d.ts",
       "node": "./dist/cli.js"
-    },
-    "./bundle": "./bundle/ruru.min.js"
+    }
   },
   "scripts": {
-    "webpack": "node --loader ts-node/esm \"$(yarn bin webpack-cli)\"",
+    "webpack": "node --loader ts-node/esm \"$(yarn bin webpack-cli)\" --config webpack.config.mts",
     "watch": "yarn webpack --watch --mode=development",
-    "prepack": "rm -Rf dist bundle tsconfig.tsbuildinfo tsconfig.build.tsbuildinfo && yarn webpack --mode=production && tsc -b tsconfig.build.json && cp src/.npmignore dist/ && chmod +x dist/cli-run.js"
+    "prepack": "rm -Rf dist static tsconfig.tsbuildinfo tsconfig.build.tsbuildinfo && yarn webpack --mode=production && tsc -b tsconfig.build.json && cp src/.npmignore dist/ && chmod +x dist/cli-run.js"
   },
   "repository": {
     "type": "git",
@@ -69,8 +73,7 @@
   },
   "files": [
     "dist",
-    "bundle",
-    "index.js"
+    "static"
   ],
   "devDependencies": {
     "@types/http-proxy": "^1.17.16",
@@ -79,6 +82,7 @@
     "css-loader": "^7.1.2",
     "file-loader": "^6.2.0",
     "graphql": "16.1.0-experimental-stream-defer.6",
+    "mini-css-extract-plugin": "^2.9.2",
     "ruru-components": "workspace:^",
     "style-loader": "^4.0.0",
     "svg-inline-loader": "^0.8.2",

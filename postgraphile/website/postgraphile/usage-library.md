@@ -515,7 +515,7 @@ npm pkg delete author license description keywords scripts main
 # Don't allow publishing to npm
 npm pkg set private=true --json
 # Use ESModule syntax and set some scripts
-npm pkg set type=module scripts.start="node src/server.ts" scripts.build=tsc scripts.prod="node dist/server.js"
+npm pkg set type=module scripts.start="node --env-file=./.env src/server.ts" scripts.build=tsc scripts.prod="node dist/server.js"
 ```
 
 The `package.json` file should now have content similar to the following (likely

@@ -28,7 +28,7 @@ function ruruTitle(title: string): GraphileConfig.Plugin {
 
     grafserv: {
       middleware: {
-        ruruHTMLParts(next, event) {
+        ruruHTML(next, event) {
           const { htmlParts, request } = event;
           htmlParts.titleTag = `<title>${escapeHTML(
             title + " | " + request.getHeader("host"),

@@ -237,7 +237,7 @@ deduplicatedWith(
 ```
 
 If <Grafast /> determines that this specific step instance should be replaced
-by one of its peers (thanks to the results from `deduplicate` above), <grafast
+by one of its peers (thanks to the results from `deduplicate` above), <Grafast
 /> will call `deduplicatedWith` on the step that is being replaced, passing the
 step that it is being replaced with as the first argument. This gives your step
 a chance to pass any information to the peer that may be necessary to make the

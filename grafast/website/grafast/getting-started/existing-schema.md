@@ -6,7 +6,7 @@ sidebar_position: 3
 
 If you already have a GraphQL.js schema and you're looking to migrate to
 <Grafast /> then it's not necessary to translate everything into <Grafast />
-plan resolvers from the get-go, instead <grafast/> includes emulation of
+plan resolvers from the get-go, instead <Grafast/> includes emulation of
 GraphQL.js behaviors that allows it to run an existing GraphQL.js schema
 directly in many cases (or with small modification in other cases).
 

@@ -1,3 +1,5 @@
+import "graphiql/setup-workers/webpack";
+
 import CodeMirror from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import { graphql } from "cm6-graphql";
@@ -10,6 +12,10 @@ import { useColorMode } from "@docusaurus/theme-common";
 import { githubLight, githubDark } from "@uiw/codemirror-theme-github";
 
 import styles from "./styles.module.css";
+
+if (!globalThis.MonacoEnvironment) {
+  console.error(`MONACO ENVIRONMENT NOT SET!`);
+}
 
 const INITIAL_QUERY = `\
 query Example {
@@ -26,7 +32,7 @@ const objects = {
   Query: {
     plans: {
       addTwoNumbers(_, { $a, $b }) {
-        return lambda([$a, $b], ([a, b]) => a + b, true);
+        return lambda([$a, $b], ([a, b]) => a + b);
       },
     },
   },
