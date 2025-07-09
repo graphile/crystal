@@ -57,36 +57,42 @@ class TsResolvePlugin {
   }
 }
 
+function isDevDep(filename: string) {
+  return filename.endsWith(".map") || filename.endsWith(".ts");
+}
+
 const intro = [
   "/* eslint-disable */",
   "/** IMPORTANT: these buffers are deflated */",
   "export const bundleData: Record<string, { etag: string, buffer: Buffer }> = {",
 ];
-const outro = ["};"];
+const outro = ["};", ""];
+
 class OutputDataToSrcPlugin {
   apply(compiler: Compiler) {
     compiler.hooks.emit.tap("OutputDataToSrcPlugin", (compilation) => {
-      const data: string[] = [...intro];
-      const maps: string[] = [...intro];
+      const code: string[] = [...intro];
+      const meta: string[] = [...intro];
       const entries = Object.entries(compilation.assets);
       entries.sort((a, z) => (a[0] < z[0] ? -1 : a[0] > z[0] ? 1 : 0));
       for (const [filename, asset] of entries) {
         const source = asset.source();
-        const key = JSON.stringify(filename);
-        const buf = Buffer.isBuffer(source)
-          ? source
-          : Buffer.from(source as string);
+        const buf = Buffer.isBuffer(source) ? source : Buffer.from(source);
         const deflated = deflateSync(buf);
         const hash = createHash("sha256").update(deflated).digest("base64url");
         const etag = `"sha256-${hash}"`; // quoted per HTTP spec
         const base64 = deflated.toString("base64");
-        const sourceLine = `  ${key}: { etag: ${JSON.stringify(etag)}, buffer: Buffer.from("${base64}", "base64") },`;
-        (filename.endsWith(".map") ? maps : data).push(sourceLine);
+        const sourceLine = `\
+  ${JSON.stringify(filename)}: {
+    etag: ${JSON.stringify(etag)},
+    buffer: Buffer.from(${JSON.stringify(base64)}, "base64"),
+  },`;
+        (isDevDep(filename) ? meta : code).push(sourceLine);
       }
-      data.push(...outro);
-      maps.push(...outro);
-      writeFileSync(`${__dirname}/src/bundleData.ts`, data.join("\n") + "\n");
-      writeFileSync(`${__dirname}/src/bundleMaps.ts`, maps.join("\n") + "\n");
+      code.push(...outro);
+      meta.push(...outro);
+      writeFileSync(`${__dirname}/src/bundleCode.ts`, code.join("\n"));
+      writeFileSync(`${__dirname}/src/bundleMeta.ts`, meta.join("\n"));
     });
   }
 }

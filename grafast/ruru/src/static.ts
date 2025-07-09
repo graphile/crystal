@@ -16,7 +16,7 @@ export interface StaticFiles {
   [filename: string]: StaticFile;
 }
 
-/** A single entry read from 'bundleData.ts' or 'bundleMaps.ts' */
+/** A single entry read from 'bundleCode.ts' or 'bundleMeta.ts' */
 interface BundleEntry {
   etag: string;
   buffer: Buffer;
@@ -80,13 +80,13 @@ function createStaticFileLoader(
  * Returns an object containing all of the static files needed by Ruru; calling
  * this will increase memory consumption by ~4MB
  */
-const getStaticFiles = createStaticFileLoader(() => import("./bundleData.js"));
+const getStaticFiles = createStaticFileLoader(() => import("./bundleCode.js"));
 
 /**
  * Returns an object containing all of the source maps for ruru source; calling
  * this will increase memory consumption by ~10MB
  */
-const getStaticMaps = createStaticFileLoader(() => import("./bundleMaps.js"));
+const getStaticMaps = createStaticFileLoader(() => import("./bundleMeta.js"));
 
 export interface GetStaticFileContext {
   /**
