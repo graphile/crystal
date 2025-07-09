@@ -1,4 +1,5 @@
 package.json
+latestSchema.json
 node_modules/
 /.vscode/pnpify/
 /utils/pg-sql2/examples/
