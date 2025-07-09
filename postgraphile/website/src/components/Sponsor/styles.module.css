@@ -7,11 +7,11 @@
   margin: 0.5rem;
   padding: 1rem;
   flex: 0 0 18rem;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
 }
 
 .leaders {
-  flex: 0 0 9rem;
+  flex: 0 0 12rem;
 }
 
 .featured,
@@ -27,8 +27,8 @@
 }
 
 .leaders .name {
-  font-size: 1rem;
-  padding-top: 0.5rem;
+  font-size: 1.2rem;
+  padding-top: 0.8rem;
 }
 
 .name {
