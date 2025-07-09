@@ -10,8 +10,9 @@ node_modules/
 /postgraphile/postgraphile/exported-schema.mjs
 /postgraphile/postgraphile/exported-schema.webpacked.js
 /grafast/grafast/__tests__/dcc/dcc-types.ts
-/grafast/ruru/bundle/ruru.min.js
-/grafast/ruru/bundle/ruru.min.js.LICENSE.txt
+/grafast/ruru/static/
+/grafast/ruru/src/bundleData.ts
+/grafast/ruru/src/bundleMaps.ts
 /graphile-build/graphile-build-pg/webpacked/
 /graphile-build/graphile-build-pg/exported-schema-for-webpack.mjs
 /graphile-build/graphile-build-pg/schema-export-output.mjs
