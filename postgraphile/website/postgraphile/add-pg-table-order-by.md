@@ -44,11 +44,11 @@ export default addPgTableOrderBy(
     const sqlIdentifier = sql.identifier(Symbol("lastPostInForum"));
     return orderByAscDesc(
       "LAST_POST_CREATED_AT",
-      ($select) => {
+      (queryBuilder) => {
         const orderByFrag = sql`(
           select ${sqlIdentifier}.created_at
           from app_public.posts as ${sqlIdentifier}
-          where ${sqlIdentifier}.forum_id = ${$select.alias}.id
+          where ${sqlIdentifier}.forum_id = ${queryBuilder.alias}.id
           order by ${sqlIdentifier}.created_at desc
           limit 1
         )`;
@@ -105,7 +105,7 @@ interface MakeAddPgTableOrderByPluginOrders {
   [orderByEnumValue: string]: {
     extensions: {
       grafast: {
-        applyPlan($select: PgSelectStep): void;
+        apply(queryBuilder: PgSelectQueryBuilder): void;
       };
     };
   };
@@ -116,10 +116,10 @@ interface MakeAddPgTableOrderByPluginOrders {
 object) which maps from the name of the enum value to [a
 `GraphQLEnumValueConfig`
 spec](https://graphql.org/graphql-js/type/#graphqlenumtype). Importantly, these
-enum values have an associated `extensions.grafast.applyPlan` method which will
-be used to apply the ordering to the parent PgSelectStep via
-`$select.orderBy(...)`. The `applyPlan` can also choose to set the order as
-unique via `$select.setOrderIsUnique()`, which will mean that the primary key
+enum values have an associated `extensions.grafast.apply` method which will
+be used to apply the ordering to the parent PgSelectQueryBuilder via
+`queryBuilder.orderBy(...)`. The `apply` can also choose to set the order as
+unique via `queryBuilder.setOrderIsUnique()`, which will mean that the primary key
 will not need to be added to the order by clause.
 
 :::tip[Use helpers]
@@ -144,7 +144,10 @@ export function orderByAscDesc(
 type OrderBySpecIdentity =
   | string // Column name
   | Omit<PgOrderSpec, "direction"> // Expression
-  | (($select: PgSelectStep) => Omit<PgOrderSpec, "direction">); // Callback, allows for joins/etc
+  | ((
+      queryBuilder: PgSelectQueryBuilder,
+      info: { scope: unknown },
+    ) => Omit<PgOrderSpec, "direction">); // Callback, allows for joins/etc
 ```
 
 The `baseName` will have `_ASC` and `_DESC` appended for the two enum values
@@ -195,12 +198,12 @@ or lowest-rated first (meaning the average of the movie’s reviews):
 ```ts
 const customOrderBy = orderByAscDesc(
   "RATING",
-  ($select) => {
+  (queryBuilder) => {
     const sqlIdentifier = sql.identifier(Symbol("movie_reviews"));
     return sql`(
       select avg(${sqlIdentifier}.rating)
       from app_public.movie_reviews as ${sqlIdentifier}
-      where ${sqlIdentifier}.movie_id = ${$select.alias}.id
+      where ${sqlIdentifier}.movie_id = ${queryBuilder.alias}.id
     )`;
   },
   { nulls: "last" },
