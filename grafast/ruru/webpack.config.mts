@@ -98,7 +98,6 @@ class OutputDataToSrcPlugin {
 }
 
 const config: Configuration = {
-  mode: "production",
   entry: {
     ruru: "./src/bundle.mtsx",
     jsonWorker: "monaco-editor/esm/vs/language/json/json.worker.js",
