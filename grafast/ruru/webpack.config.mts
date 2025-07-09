@@ -57,7 +57,7 @@ class TsResolvePlugin {
   }
 }
 
-function isDevDep(filename: string) {
+function isDevAsset(filename: string) {
   return filename.endsWith(".map") || filename.endsWith(".ts");
 }
 
@@ -87,7 +87,7 @@ class OutputDataToSrcPlugin {
     etag: ${JSON.stringify(etag)},
     buffer: Buffer.from(${JSON.stringify(base64)}, "base64"),
   },`;
-        (isDevDep(filename) ? meta : code).push(sourceLine);
+        (isDevAsset(filename) ? meta : code).push(sourceLine);
       }
       code.push(...outro);
       meta.push(...outro);
