@@ -13,7 +13,7 @@ import { githubLight, githubDark } from "@uiw/codemirror-theme-github";
 
 import styles from "./styles.module.css";
 
-if (!window.MonacoEnvironment) {
+if (!globalThis.MonacoEnvironment) {
   console.error(`MONACO ENVIRONMENT NOT SET!`);
 }
 
