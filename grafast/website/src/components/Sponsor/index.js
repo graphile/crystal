@@ -25,6 +25,16 @@ export default function Sponsor({
     );
   }
 
+  function LinkTo({ href }) {
+    return href ? (
+      <Link className={styles.name} to={href}>
+        {name}
+      </Link>
+    ) : (
+      <div className={styles.name}>{name}</div>
+    );
+  }
+
   return (
     <div
       className={clsx(
@@ -40,12 +50,7 @@ export default function Sponsor({
         <Avatar src={avatar ? "https://www.graphile.org" + avatar : null} />
       ) : null}
 
-      <Link
-        className={styles.name}
-        to={href ?? "https://www.graphile.org/sponsor"}
-      >
-        {name}
-      </Link>
+      <LinkTo href={href} />
     </div>
   );
 }
