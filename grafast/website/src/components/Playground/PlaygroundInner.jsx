@@ -32,7 +32,7 @@ const objects = {
   Query: {
     plans: {
       addTwoNumbers(_, { $a, $b }) {
-        return lambda([$a, $b], ([a, b]) => a + b, true);
+        return lambda([$a, $b], ([a, b]) => a + b);
       },
     },
   },
