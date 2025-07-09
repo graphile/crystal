@@ -175,7 +175,7 @@ Context is an object with the following values:
   can include query string)
 - `acceptEncoding` - the value of the `Accept-Encoding` HTTP header, or
   `undefined` if not set
-- `disallowSourceMaps` (optional) - set to `true` to forbid sending source maps
+- `disallowDevAssets` (optional) - set to `true` to forbid sending source maps
   (reduces server memory pressure by about 10MB at the cost of debuggability)
 
 The result is either `null` if the file isn't found, or an object containing:

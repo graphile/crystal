@@ -114,7 +114,7 @@ export interface GetStaticFileContext {
    * setting this to `true` we will not attempt to load source maps into memory
    * and will instead return `null`.
    */
-  disallowSourceMaps?: boolean;
+  disallowDevAssets?: boolean;
 }
 
 /**
@@ -130,12 +130,12 @@ export function getStaticFile({
   staticPath,
   urlPath,
   acceptEncoding,
-  disallowSourceMaps,
+  disallowDevAssets,
 }: GetStaticFileContext): PromiseOrDirect<StaticFile | null> {
   const i = urlPath.indexOf("?", staticPath.length);
   const path = urlPath.substring(staticPath.length, i >= 0 ? i : undefined);
   const files =
-    path.endsWith(".map") && !disallowSourceMaps
+    path.endsWith(".map") && !disallowDevAssets
       ? getStaticMaps()
       : getStaticFiles();
   return isPromise(files)
