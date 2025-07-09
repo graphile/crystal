@@ -23,7 +23,7 @@ const baseMetaTags = `\
 const baseTitleTag = `\
 <title>Ruru - GraphQL/Grafast IDE</title>
 `;
-const baseElements = /* HTML */ `<div id="ruru-root" class="loading">
+const baseElements = /* HTML */ `<div id="ruru-root">
   <div class="graphiql-container">
     <div class="graphiql-sidebar"></div>
     <div class="graphiql-main">
@@ -138,9 +138,6 @@ body {
   import { React, createRoot, Ruru } from ${JSON.stringify(staticPath + "ruru.js")};
   const tree = React.createElement(Ruru, RURU_CONFIG);
   const container = document.getElementById("ruru-root");
-  // Not loading any more!
-  container.innerHTML = "";
-  container.className = "";
   const root = createRoot(container);
   root.render(tree);
 </script>`;
