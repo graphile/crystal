@@ -712,6 +712,22 @@ declare global {
 
     interface InputObjectTypeExtensions {
       baked?: InputObjectTypeBakedResolver;
+      /**
+       * EXPERIMENTAL!
+       *
+       * Scope to pass to `.apply()` methods called by `applyInput()` step.
+       *
+       * IMPORTANT: the scope is only evaluated for the top-level named type
+       * that `applyInput()` is applied against, so any type that nests this
+       * (e.g. other input objects) needs to ensure they have an `applyScope()`
+       * that's compatible; similarly this `applyPlan()` needs to supply values
+       * that are compatible with all the descendant input objects, enums and
+       * scalars. For this reason we recommend that you return an object with a
+       * scoped key that you care about so it's easily merged.
+       *
+       * @experimental
+       */
+      applyScope?: () => Step;
     }
 
     interface InputFieldExtensions {
@@ -787,7 +803,22 @@ declare global {
       ): AbstractTypePlanner;
     }
 
-    interface EnumTypeExtensions {}
+    interface EnumTypeExtensions {
+      /**
+       * EXPERIMENTAL!
+       *
+       * Scope to pass to `.apply()` methods called by `applyInput()` step.
+       *
+       * IMPORTANT: the scope is only evaluated for the top-level named type
+       * that `applyInput()` is applied against, so any type that nests this
+       * (e.g. input objects) needs to ensure they have an `applyScope()`
+       * that's compatible. For this reason we recommend that you return an
+       * object with a scoped key that you care about so it's easily merged.
+       *
+       * @experimental
+       */
+      applyScope?: () => Step;
+    }
 
     interface EnumValueExtensions {
       /**
@@ -804,6 +835,20 @@ declare global {
     interface ScalarTypeExtensions {
       plan?: ScalarPlanResolver;
       inputPlan?: ScalarInputPlanResolver;
+      /**
+       * EXPERIMENTAL!
+       *
+       * Scope to pass to `.apply()` methods called by `applyInput()` step.
+       *
+       * IMPORTANT: the scope is only evaluated for the top-level named type
+       * that `applyInput()` is applied against, so any type that nests this
+       * (e.g. input objects) needs to ensure they have an `applyScope()`
+       * that's compatible. For this reason we recommend that you return an
+       * object with a scoped key that you care about so it's easily merged.
+       *
+       * @experimental
+       */
+      applyScope?: () => Step;
       /**
        * Set true if `serialize(serialize(foo)) === serialize(foo)` for all foo
        */

@@ -310,6 +310,7 @@ export type InputObjectFieldApplyResolver<TParent = any, TData = any> = (
     schema: GraphQLSchema;
     fieldName: string;
     field: GraphQLInputField;
+    scope: any;
   },
 ) => any;
 
@@ -371,7 +372,10 @@ export type ScalarInputPlanResolver<TResultStep extends Step = Step> = (
  *
  * @experimental
  */
-export type EnumValueApplyResolver<TParent = any> = (parent: TParent) => void;
+export type EnumValueApplyResolver<TParent = any> = (
+  parent: TParent,
+  info: { scope: any },
+) => void;
 
 /**
  * Basically GraphQLFieldConfig but with an easy to access `plan` method.

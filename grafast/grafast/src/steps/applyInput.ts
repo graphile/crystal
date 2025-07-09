@@ -1,5 +1,6 @@
 import type { GraphQLInputType, GraphQLSchema } from "graphql";
 import {
+  getNamedType,
   isEnumType,
   isInputObjectType,
   isListType,
@@ -20,6 +21,7 @@ let inputArgsApplyDepth = 0;
 export class ApplyInputStep<
   TParent extends object = any,
   TTarget extends object = TParent,
+  TScope = any,
 > extends UnbatchedStep<(arg: TParent) => void> {
   static $$export = {
     moduleName: "grafast",
@@ -29,6 +31,7 @@ export class ApplyInputStep<
   public allowMultipleOptimizations = true;
 
   valueDepId: 0;
+  scopeDepId: 1 | null;
   constructor(
     private inputType: GraphQLInputType,
     $value: AnyInputStep,
@@ -38,9 +41,11 @@ export class ApplyInputStep<
           inputValue: any,
         ) => TTarget | undefined | (() => TTarget))
       | undefined,
+    $scope?: Step<TScope> | null,
   ) {
     super();
     this.valueDepId = this.addUnaryDependency($value) as 0;
+    this.scopeDepId = $scope ? (this.addUnaryDependency($scope) as 1) : null;
     if (!this._isUnary) {
       throw new Error(`applyInput() must be unary`);
     }
@@ -57,7 +62,12 @@ export class ApplyInputStep<
 
   public optimize() {
     const $value = this.getDep(this.valueDepId);
-    if ($value instanceof ConstantStep) {
+    const $scope =
+      this.scopeDepId === null ? null : this.getDep(this.scopeDepId);
+    if (
+      (!$scope || $scope instanceof ConstantStep) &&
+      $value instanceof ConstantStep
+    ) {
       // Replace myself with a constant!
       const {
         operationPlan: { schema },
@@ -65,14 +75,22 @@ export class ApplyInputStep<
         getTargetFromParent,
       } = this;
       const { data } = $value;
+      const scope = $scope?.data;
       return constant(function applyInputConstant(parent: TParent) {
-        inputArgsApply(schema, inputType, parent, data, getTargetFromParent);
+        inputArgsApply(
+          schema,
+          inputType,
+          parent,
+          data,
+          getTargetFromParent,
+          scope,
+        );
       }, false);
     }
     return this;
   }
 
-  unbatchedExecute(extra: UnbatchedExecutionExtra, value: any) {
+  unbatchedExecute(extra: UnbatchedExecutionExtra, value: any, scope: TScope) {
     const { getTargetFromParent } = this;
     return (parentThing: TParent) =>
       inputArgsApply(
@@ -81,6 +99,7 @@ export class ApplyInputStep<
         parentThing,
         value,
         getTargetFromParent,
+        scope,
       );
   }
 }
@@ -88,22 +107,28 @@ export class ApplyInputStep<
 export function inputArgsApply<
   TArg extends object,
   TTarget extends object = TArg,
+  TScope = any,
 >(
   schema: GraphQLSchema,
   inputType: GraphQLInputType,
   parent: TArg,
   inputValue: unknown,
   getTargetFromParent:
-    | ((parent: TArg, inputValue: any) => TTarget | undefined | (() => TTarget))
+    | ((
+        parent: TArg,
+        inputValue: any,
+        scope: TScope,
+      ) => TTarget | undefined | (() => TTarget))
     | undefined,
+  scope: TScope,
 ): void {
   try {
     inputArgsApplyDepth++;
     const target = getTargetFromParent
-      ? getTargetFromParent(parent, inputValue)
+      ? getTargetFromParent(parent, inputValue, scope)
       : (parent as unknown as TTarget);
     if (target != null) {
-      _inputArgsApply<TTarget>(schema, inputType, target, inputValue);
+      _inputArgsApply<TTarget>(schema, inputType, target, inputValue, scope);
     }
   } finally {
     inputArgsApplyDepth--;
@@ -135,18 +160,32 @@ export function applyInput<
 ) {
   const opPlan = operationPlan();
   const { schema } = opPlan;
+  const namedType = getNamedType(inputType);
   return opPlan.withRootLayerPlan(() => {
-    if ($value instanceof ConstantStep) {
+    const $scope = namedType.extensions?.grafast?.applyScope?.() ?? null;
+    if (
+      (!$scope || $scope instanceof ConstantStep) &&
+      $value instanceof ConstantStep
+    ) {
       // Replace us with a constant
       const { data } = $value;
+      const scope = $scope?.data;
       return constant(function applyInputConstant(parent: TParent) {
-        inputArgsApply(schema, inputType, parent, data, getTargetFromParent);
+        inputArgsApply(
+          schema,
+          inputType,
+          parent,
+          data,
+          getTargetFromParent,
+          scope,
+        );
       }, false);
     } else {
       return new ApplyInputStep<TParent, TTarget>(
         inputType,
         $value,
         getTargetFromParent,
+        $scope,
       );
     }
   });
@@ -164,11 +203,12 @@ const defaultInputObjectTypeInputPlanResolver: InputObjectTypeInputPlanResolver 
   };
 */
 
-function _inputArgsApply<TArg extends object>(
+function _inputArgsApply<TArg extends object, TScope = any>(
   schema: GraphQLSchema,
   inputType: GraphQLInputType,
   target: TArg | (() => TArg),
   inputValue: unknown,
+  scope: TScope,
 ): void {
   // PERF: we should have the plan generate a digest of `inputType` so that we
   // can jump right to the relevant parts without too much traversal cost.
@@ -179,7 +219,7 @@ function _inputArgsApply<TArg extends object>(
     if (inputValue === null) {
       throw new Error(`null value found in non-null position`);
     }
-    _inputArgsApply(schema, inputType.ofType, target, inputValue);
+    _inputArgsApply(schema, inputType.ofType, target, inputValue, scope);
   } else if (isListType(inputType)) {
     if (inputValue == null) return;
     if (!Array.isArray(inputValue)) {
@@ -187,7 +227,7 @@ function _inputArgsApply<TArg extends object>(
     }
     for (const item of inputValue) {
       const itemTarget = typeof target === "function" ? target() : target;
-      _inputArgsApply(schema, inputType.ofType, itemTarget, item);
+      _inputArgsApply(schema, inputType.ofType, itemTarget, item, scope);
     }
   } else if (typeof target === "function") {
     throw new Error(
@@ -206,9 +246,10 @@ function _inputArgsApply<TArg extends object>(
           schema,
           field,
           fieldName,
+          scope,
         });
         if (newTarget != null) {
-          _inputArgsApply(schema, field.type, newTarget, val);
+          _inputArgsApply(schema, field.type, newTarget, val, scope);
         }
       }
     }
@@ -223,7 +264,7 @@ function _inputArgsApply<TArg extends object>(
     const value = values.find((v) => v.value === inputValue);
     if (value) {
       if (value.extensions.grafast?.apply) {
-        value.extensions.grafast.apply(target);
+        value.extensions.grafast.apply(target, { scope });
       }
     } else {
       throw new Error(`Couldn't find value in ${inputType} for ${inputValue}`);

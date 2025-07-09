@@ -10,7 +10,10 @@ import { EXPORTABLE } from "./exportable.js";
 type OrderBySpecIdentity =
   | string // Attribute name
   | Omit<PgOrderSpec, "direction"> // Expression
-  | ((queryBuilder: PgSelectQueryBuilder) => Omit<PgOrderSpec, "direction">); // Callback, allows for joins/etc
+  | ((
+      queryBuilder: PgSelectQueryBuilder,
+      info: { scope: any }, // The `info` argument to `EnumValueApplyResolver`
+    ) => Omit<PgOrderSpec, "direction">); // Callback, allows for joins/etc
 
 export interface MakeAddPgTableOrderByPluginOrders {
   [orderByEnumValue: string]: GraphQLEnumValueConfig;
@@ -155,10 +158,13 @@ export function orderByAscDesc(
       : typeof attributeOrSqlFragment === "function"
         ? EXPORTABLE(
             (ascendingNulls, attributeOrSqlFragment, nullable, unique) =>
-              function apply(queryBuilder: PgSelectQueryBuilder) {
+              function apply(
+                queryBuilder: PgSelectQueryBuilder,
+                info: { scope: any },
+              ) {
                 queryBuilder.orderBy({
                   nulls: ascendingNulls,
-                  ...attributeOrSqlFragment(queryBuilder),
+                  ...attributeOrSqlFragment(queryBuilder, info),
                   direction: "ASC",
                   nullable,
                 } as PgOrderSpec);
@@ -206,10 +212,13 @@ export function orderByAscDesc(
       : typeof attributeOrSqlFragment === "function"
         ? EXPORTABLE(
             (attributeOrSqlFragment, descendingNulls, nullable, unique) =>
-              function apply(queryBuilder: PgSelectQueryBuilder) {
+              function apply(
+                queryBuilder: PgSelectQueryBuilder,
+                info: { scope: any },
+              ) {
                 queryBuilder.orderBy({
                   nulls: descendingNulls,
-                  ...attributeOrSqlFragment(queryBuilder),
+                  ...attributeOrSqlFragment(queryBuilder, info),
                   direction: "DESC",
                   nullable,
                 } as PgOrderSpec);
