@@ -304,14 +304,18 @@ export type FieldPlanResolver<
   info: FieldInfo,
 ) => TResultStep | null;
 
-export type InputObjectFieldApplyResolver<TParent = any, TData = any> = (
+export type InputObjectFieldApplyResolver<
+  TParent = any,
+  TData = any,
+  TScope = any,
+> = (
   target: TParent,
   input: TData, // Don't use unknown here, otherwise users can't easily cast it
   info: {
     schema: GraphQLSchema;
     fieldName: string;
     field: GraphQLInputField;
-    scope: any;
+    scope: TScope;
   },
 ) => any;
 
@@ -373,9 +377,9 @@ export type ScalarInputPlanResolver<TResultStep extends Step = Step> = (
  *
  * @experimental
  */
-export type EnumValueApplyResolver<TParent = any> = (
+export type EnumValueApplyResolver<TParent = any, TScope = any> = (
   parent: TParent,
-  info: { value: GraphQLEnumValue; scope: any },
+  info: { value: GraphQLEnumValue; scope: TScope },
 ) => void;
 
 /**

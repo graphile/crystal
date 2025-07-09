@@ -21,7 +21,6 @@ let inputArgsApplyDepth = 0;
 export class ApplyInputStep<
   TParent extends object = any,
   TTarget extends object = TParent,
-  TScope = any,
 > extends UnbatchedStep<(arg: TParent) => void> {
   static $$export = {
     moduleName: "grafast",
@@ -39,9 +38,10 @@ export class ApplyInputStep<
       | ((
           parent: TParent,
           inputValue: any,
+          info: { scope: unknown },
         ) => TTarget | undefined | (() => TTarget))
       | undefined,
-    $scope?: Step<TScope> | null,
+    $scope?: Step | null,
   ) {
     super();
     this.valueDepId = this.addUnaryDependency($value) as 0;
@@ -90,7 +90,7 @@ export class ApplyInputStep<
     return this;
   }
 
-  unbatchedExecute(extra: UnbatchedExecutionExtra, value: any, scope: TScope) {
+  unbatchedExecute(extra: UnbatchedExecutionExtra, value: any, scope: unknown) {
     const { getTargetFromParent } = this;
     return (parentThing: TParent) =>
       inputArgsApply(
@@ -107,7 +107,6 @@ export class ApplyInputStep<
 export function inputArgsApply<
   TArg extends object,
   TTarget extends object = TArg,
-  TScope = any,
 >(
   schema: GraphQLSchema,
   inputType: GraphQLInputType,
@@ -117,10 +116,10 @@ export function inputArgsApply<
     | ((
         parent: TArg,
         inputValue: any,
-        info: { scope: TScope },
+        info: { scope: unknown },
       ) => TTarget | undefined | (() => TTarget))
     | undefined,
-  scope: TScope,
+  scope: unknown,
 ): void {
   try {
     inputArgsApplyDepth++;
@@ -156,6 +155,7 @@ export function applyInput<
   getTargetFromParent?: (
     parent: TParent,
     inputValue: any,
+    info: { scope: unknown },
   ) => TTarget | undefined,
 ) {
   const opPlan = operationPlan();
@@ -203,12 +203,12 @@ const defaultInputObjectTypeInputPlanResolver: InputObjectTypeInputPlanResolver 
   };
 */
 
-function _inputArgsApply<TArg extends object, TScope = any>(
+function _inputArgsApply<TArg extends object>(
   schema: GraphQLSchema,
   inputType: GraphQLInputType,
   target: TArg | (() => TArg),
   inputValue: unknown,
-  scope: TScope,
+  scope: unknown,
 ): void {
   // PERF: we should have the plan generate a digest of `inputType` so that we
   // can jump right to the relevant parts without too much traversal cost.

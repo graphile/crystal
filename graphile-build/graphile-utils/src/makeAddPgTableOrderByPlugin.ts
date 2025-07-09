@@ -12,7 +12,7 @@ type OrderBySpecIdentity =
   | Omit<PgOrderSpec, "direction"> // Expression
   | ((
       queryBuilder: PgSelectQueryBuilder,
-      info: { scope: any }, // The `info` argument to `EnumValueApplyResolver`
+      info: { scope: unknown }, // The `info` argument to `EnumValueApplyResolver`
     ) => Omit<PgOrderSpec, "direction">); // Callback, allows for joins/etc
 
 export interface MakeAddPgTableOrderByPluginOrders {
@@ -160,7 +160,7 @@ export function orderByAscDesc(
             (ascendingNulls, attributeOrSqlFragment, nullable, unique) =>
               function apply(
                 queryBuilder: PgSelectQueryBuilder,
-                info: { scope: any },
+                info: { scope: unknown },
               ) {
                 queryBuilder.orderBy({
                   nulls: ascendingNulls,
@@ -214,7 +214,7 @@ export function orderByAscDesc(
             (attributeOrSqlFragment, descendingNulls, nullable, unique) =>
               function apply(
                 queryBuilder: PgSelectQueryBuilder,
-                info: { scope: any },
+                info: { scope: unknown },
               ) {
                 queryBuilder.orderBy({
                   nulls: descendingNulls,

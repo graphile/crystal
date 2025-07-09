@@ -146,7 +146,7 @@ type OrderBySpecIdentity =
   | Omit<PgOrderSpec, "direction"> // Expression
   | ((
       queryBuilder: PgSelectQueryBuilder,
-      info: { scope: any },
+      info: { scope: unknown },
     ) => Omit<PgOrderSpec, "direction">); // Callback, allows for joins/etc
 ```
 
