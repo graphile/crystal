@@ -201,7 +201,7 @@ const preset: GraphileConfig.Preset = {
   ruru: {
     /* options for customizing Ruru, e.g.: */
     htmlParts: {
-      metaTags: (original) => original + "<!-- HELLO WORLD! -->",
+      metaTags: (base) => base + "<!-- HELLO WORLD! -->",
     },
   },
   pgServices: [

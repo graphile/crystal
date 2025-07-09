@@ -531,7 +531,7 @@ const preset: GraphileConfig.Preset = {
   ],
   ruru: {
     htmlParts: {
-      metaTags: (original) => original + "<!-- HELLO WORLD! -->",
+      metaTags: (base) => base + "<!-- HELLO WORLD! -->",
     },
   },
   inflection: {},

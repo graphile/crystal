@@ -4,9 +4,7 @@ const preset: GraphileConfig.Preset = {
   ruru: {
     enableProxy: true,
     htmlParts: {
-      metaTags(original) {
-        return original + "<!-- local override -->";
-      },
+      metaTags: (base) => base + "<!-- local override -->",
     },
   },
 };
