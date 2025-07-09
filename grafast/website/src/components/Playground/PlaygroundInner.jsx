@@ -5,8 +5,6 @@ import * as Grafast from "grafast";
 import { grafast, makeGrafastSchema } from "grafast";
 import { parse, GraphQLError } from "graphql";
 import React, { useCallback, useMemo, useState, useEffect } from "react";
-
-// import "graphiql/setup-workers/webpack";
 import { Ruru } from "ruru-components";
 import { useColorMode } from "@docusaurus/theme-common";
 import { githubLight, githubDark } from "@uiw/codemirror-theme-github";
