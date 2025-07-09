@@ -24,9 +24,11 @@ interface BundleEntry {
 
 const MIME_TYPES: Record<string, string | undefined> = {
   txt: "text/plain; charset=utf-8",
+  ts: "text/plain; charset=utf-8",
   js: "text/javascript; charset=utf-8",
   ttf: "font/ttf",
   map: "application/json",
+  css: "text/css; charset=utf-8",
 };
 
 function makeStaticFile(filename: string, entry: BundleEntry): StaticFile {

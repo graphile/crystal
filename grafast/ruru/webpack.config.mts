@@ -4,6 +4,7 @@ import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { deflateSync } from "node:zlib";
 
+import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import type { Compiler, Configuration, Resolver } from "webpack";
 // import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 
@@ -125,7 +126,7 @@ const config: Configuration = {
       },
       {
         test: /\.css$/,
-        use: ["style-loader", "css-loader"],
+        use: [MiniCssExtractPlugin.loader, "css-loader"],
         sideEffects: true,
       },
       {
@@ -148,6 +149,9 @@ const config: Configuration = {
   },
   plugins: [
     // new BundleAnalyzerPlugin(),
+    new MiniCssExtractPlugin({
+      filename: "ruru.css",
+    }),
     new OutputDataToSrcPlugin(),
   ],
   //stats: "detailed",

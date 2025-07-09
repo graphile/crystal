@@ -22237,6 +22237,7 @@ __metadata:
     graphile-config: "workspace:^"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     http-proxy: "npm:^1.18.1"
+    mini-css-extract-plugin: "npm:^2.9.2"
     ruru-components: "workspace:^"
     style-loader: "npm:^4.0.0"
     svg-inline-loader: "npm:^0.8.2"

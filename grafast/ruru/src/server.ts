@@ -23,7 +23,56 @@ const baseMetaTags = `\
 const baseTitleTag = `\
 <title>Ruru - GraphQL/Grafast IDE</title>
 `;
-const baseElements = `<div id="ruru-root" class="loading"></div>`;
+const baseElements = /* HTML */ `<div id="ruru-root" class="loading">
+  <div class="graphiql-container">
+    <div class="graphiql-sidebar"></div>
+    <div class="graphiql-main">
+      <div class="graphiql-plugin" style="min-width: 200px; flex: 0.25 1 0%;">
+        <div>
+          <div class="graphiql-doc-explorer-header">
+            <div class="graphiql-doc-explorer-title">Loading...</div>
+          </div>
+          <div class="graphiql-doc-explorer-content">
+            <p>Ruru is loading, this should only take a moment...</p>
+          </div>
+        </div>
+      </div>
+      <div class="graphiql-horizontal-drag-bar"></div>
+      <div class="graphiql-sessions" style="flex: 1 1 0%;">
+        <div class="graphiql-session-header">
+          <ul role="tablist" class="graphiql-tabs no-scrollbar">
+            <li class="graphiql-tab graphiql-tab-active">
+              <button
+                type="button"
+                class="graphiql-un-styled graphiql-tab-button"
+                disabled
+              >
+                Loading...
+              </button>
+            </li>
+          </ul>
+        </div>
+        <div role="tabpanel" id="graphiql-session">
+          <div class="graphiql-editors" style="flex: 1 1 0%;">
+            <section class="graphiql-query-editor" style="flex: 3 1 0%;">
+              <div class="graphiql-editor"></div>
+              <div class="graphiql-toolbar"></div>
+            </section>
+            <div class="graphiql-editor-tools">
+              <button type="button" class="graphiql-un-styled active" disabled>
+                &nbsp;
+              </button>
+            </div>
+          </div>
+          <div class="graphiql-horizontal-drag-bar"></div>
+          <div class="graphiql-response" style="flex: 1 1 0%;">
+            <section class="result-window"></section>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>`.replace(/^\s+/gm, "");
 const baseBodyScripts = ``;
 
 export interface RuruServerConfig extends RuruConfig {
@@ -56,6 +105,7 @@ export function makeHTMLParts(config: RuruServerConfig): RuruHTMLParts {
   };
 
   const baseStyleTags = `\
+<link rel="stylesheet" href="${staticPath}ruru.css" />
 <style>
 body {
   margin: 0;
@@ -88,6 +138,9 @@ body {
   import { React, createRoot, Ruru } from ${JSON.stringify(staticPath + "ruru.js")};
   const tree = React.createElement(Ruru, RURU_CONFIG);
   const container = document.getElementById("ruru-root");
+  // Not loading any more!
+  container.innerHTML = "";
+  container.className = "";
   const root = createRoot(container);
   root.render(tree);
 </script>`;

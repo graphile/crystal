@@ -144,97 +144,75 @@ export const RuruInner: FC<{
   useGraphQLChangeStream(props, introspect, streamEndpoint);
 
   return (
-    <div
-      className="graphiql-container"
-      style={{
-        position: "absolute",
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          flex: "1 1 100%",
-          overflow: "hidden",
-          position: "relative",
-        }}
-      >
-        <GraphiQLInterface {...graphiqlInterfaceProps}>
-          <GraphiQL.Logo>
-            <a
-              href="https://grafast.org/ruru"
-              style={{ textDecoration: "none" }}
-              target="_blank"
-              rel="noreferrer"
+    <>
+      <GraphiQLInterface {...graphiqlInterfaceProps}>
+        <GraphiQL.Logo>
+          <a
+            href="https://grafast.org/ruru"
+            style={{ textDecoration: "none" }}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Ruru
+          </a>
+        </GraphiQL.Logo>
+        <GraphiQL.Toolbar>
+          <ToolbarButton
+            onClick={prettify}
+            label="Prettify Query (Shift-Ctrl-P)"
+          >
+            <PrettifyIcon
+              className="graphiql-toolbar-icon"
+              aria-hidden="true"
+            />
+          </ToolbarButton>
+          <ToolbarButton
+            onSelect={mergeQuery}
+            label="Merge Query (Shift-Ctrl-M)"
+          >
+            <MergeIcon className="graphiql-toolbar-icon" aria-hidden="true" />
+          </ToolbarButton>
+          <ToolbarButton onClick={copyQuery} label="Copy query (Shift-Ctrl-C)">
+            <CopyIcon className="graphiql-toolbar-icon" aria-hidden="true" />
+          </ToolbarButton>
+          <ToolbarMenu
+            button={
+              <ToolbarButton label="Options">
+                <SettingsIcon
+                  className="graphiql-toolbar-icon"
+                  aria-hidden="true"
+                />
+              </ToolbarButton>
+            }
+          >
+            <ToolbarMenu.Item
+              title="View the SQL statements that this query invokes"
+              onSelect={() => storage.toggle("explain")}
             >
-              Ruru
-            </a>
-          </GraphiQL.Logo>
-          <GraphiQL.Toolbar>
-            <ToolbarButton
-              onClick={prettify}
-              label="Prettify Query (Shift-Ctrl-P)"
+              <span>
+                {storage.get("explain") === "true" ? check : nocheck}
+                Explain (if supported)
+              </span>
+            </ToolbarMenu.Item>
+            <ToolbarMenu.Item
+              title="Don't hide explain from results"
+              onSelect={() => storage.toggle("verbose")}
             >
-              <PrettifyIcon
-                className="graphiql-toolbar-icon"
-                aria-hidden="true"
-              />
-            </ToolbarButton>
-            <ToolbarButton
-              onSelect={mergeQuery}
-              label="Merge Query (Shift-Ctrl-M)"
-            >
-              <MergeIcon className="graphiql-toolbar-icon" aria-hidden="true" />
-            </ToolbarButton>
-            <ToolbarButton
-              onClick={copyQuery}
-              label="Copy query (Shift-Ctrl-C)"
-            >
-              <CopyIcon className="graphiql-toolbar-icon" aria-hidden="true" />
-            </ToolbarButton>
-            <ToolbarMenu
-              button={
-                <ToolbarButton label="Options">
-                  <SettingsIcon
-                    className="graphiql-toolbar-icon"
-                    aria-hidden="true"
-                  />
-                </ToolbarButton>
-              }
-            >
-              <ToolbarMenu.Item
-                title="View the SQL statements that this query invokes"
-                onSelect={() => storage.toggle("explain")}
-              >
-                <span>
-                  {storage.get("explain") === "true" ? check : nocheck}
-                  Explain (if supported)
-                </span>
-              </ToolbarMenu.Item>
-              <ToolbarMenu.Item
-                title="Don't hide explain from results"
-                onSelect={() => storage.toggle("verbose")}
-              >
-                <span>
-                  {storage.get("verbose") === "true" ? check : nocheck}
-                  Verbose
-                </span>
-              </ToolbarMenu.Item>
-            </ToolbarMenu>
-          </GraphiQL.Toolbar>
+              <span>
+                {storage.get("verbose") === "true" ? check : nocheck}
+                Verbose
+              </span>
+            </ToolbarMenu.Item>
+          </ToolbarMenu>
+        </GraphiQL.Toolbar>
 
-          <GraphiQL.Footer>
-            <RuruFooter />
-          </GraphiQL.Footer>
-        </GraphiQLInterface>
-      </div>
+        <GraphiQL.Footer>
+          <RuruFooter />
+        </GraphiQL.Footer>
+      </GraphiQLInterface>
       {error ? (
         <ErrorPopup error={error} onClose={() => setError(null)} />
       ) : null}
-    </div>
+    </>
   );
 };
