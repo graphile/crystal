@@ -36,7 +36,8 @@ We've also added some additional improvements:
 
 - If you are using Ruru directly (i.e. importing from `ruru/server`), please see
   the new Ruru README for setup instructions, you'll want to switch out your
-  previous setup. In particular, you now need to serve the static files.
+  previous setup. In particular, `ruru/bundle` no longer exists and you now need
+  to serve the static files (via `ruru/static`).
 - `defaultHTMLParts` is no more; instead `config.htmlParts` (also
   `preset.ruru.htmlParts` for Graphile Config users) now allows the entries to
   be callback functions reducing boilerplate:
