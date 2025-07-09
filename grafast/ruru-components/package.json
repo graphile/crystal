@@ -38,13 +38,17 @@
   },
   "homepage": "https://grafast.org/ruru/",
   "dependencies": {
+    "@graphiql/plugin-doc-explorer": "^0.3.0",
     "@graphiql/plugin-explorer": "^5.0.0",
+    "@graphiql/plugin-history": "^0.3.0",
     "@graphiql/react": "^0.35.4",
     "@graphiql/toolkit": "^0.11.3",
     "@types/node": "^22.15.32",
     "grafast": "workspace:^",
     "graphiql": "patch:graphiql@npm%3A5.0.3#~/.yarn/patches/graphiql-npm-5.0.3-b00030a0c3.patch",
     "graphql-ws": "^6.0.5",
+    "mermaid": "^11.6.0",
+    "prettier": "^3.5.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "tslib": "^2.8.1"

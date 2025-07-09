@@ -13225,10 +13225,10 @@ __metadata:
   linkType: hard
 
 "framer-motion@npm:^12.12":
-  version: 12.19.2
-  resolution: "framer-motion@npm:12.19.2"
+  version: 12.23.0
+  resolution: "framer-motion@npm:12.23.0"
   dependencies:
-    motion-dom: "npm:^12.19.0"
+    motion-dom: "npm:^12.22.0"
     motion-utils: "npm:^12.19.0"
     tslib: "npm:^2.4.0"
   peerDependencies:
@@ -13242,7 +13242,7 @@ __metadata:
       optional: true
     react-dom:
       optional: true
-  checksum: 10/5841acf026eae3b53435a917708304090c7a47ebe63b221adeb376b7cc134598c87c4a9e0229ffa46c03197ccbeb71b1fffbd2d20bdf5d4031a70409ed5ca119
+  checksum: 10/61a5bee46a3d354419f63125c3cf745adde06d213caaa2f2a8ff88cc50aea8f9d09558993d86e9fce4251e0438d833de5023778ac33d85e0a8e60fd48354a0b2
   languageName: node
   linkType: hard
 
@@ -18509,12 +18509,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"motion-dom@npm:^12.19.0":
-  version: 12.19.0
-  resolution: "motion-dom@npm:12.19.0"
+"motion-dom@npm:^12.22.0":
+  version: 12.22.0
+  resolution: "motion-dom@npm:12.22.0"
   dependencies:
     motion-utils: "npm:^12.19.0"
-  checksum: 10/52aa28dc43fd727bebdbea64717e4dec8e7cb5ab0e001b465ee25526378fdbbd8bdd2b35004069192469872cb55c7b63f435df71ac8315a32fada9d7885576c6
+  checksum: 10/857de46f6b0fbf1b340f2198a5ccc9ad1d5cfb9dbaa86764ec521c17bb5c9f0f97681e883c05a76f04f8521d9adf6accc721dca154e8812fb888a855aa2a2f3e
   languageName: node
   linkType: hard
 
@@ -22196,7 +22196,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "ruru-components@workspace:grafast/ruru-components"
   dependencies:
+    "@graphiql/plugin-doc-explorer": "npm:^0.3.0"
     "@graphiql/plugin-explorer": "npm:^5.0.0"
+    "@graphiql/plugin-history": "npm:^0.3.0"
     "@graphiql/react": "npm:^0.35.4"
     "@graphiql/toolkit": "npm:^0.11.3"
     "@types/codemirror": "npm:^5.60.16"
@@ -22211,7 +22213,9 @@ __metadata:
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     graphql-ws: "npm:^6.0.5"
     jest: "npm:^30.0.0"
+    mermaid: "npm:^11.6.0"
     nodemon: "npm:^3.1.10"
+    prettier: "npm:^3.5.3"
     react: "npm:^19.1.0"
     react-dom: "npm:^19.1.0"
     tslib: "npm:^2.8.1"
