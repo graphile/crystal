@@ -105,7 +105,7 @@ interface MakeAddPgTableOrderByPluginOrders {
   [orderByEnumValue: string]: {
     extensions: {
       grafast: {
-        applyPlan($select: PgSelectStep): void;
+        apply(queryBuilder: PgSelectQueryBuilder): void;
       };
     };
   };
