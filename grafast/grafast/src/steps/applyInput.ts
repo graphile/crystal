@@ -264,7 +264,7 @@ function _inputArgsApply<TArg extends object, TScope = any>(
     const value = values.find((v) => v.value === inputValue);
     if (value) {
       if (value.extensions.grafast?.apply) {
-        value.extensions.grafast.apply(target, { scope });
+        value.extensions.grafast.apply(target, { scope, value });
       }
     } else {
       throw new Error(`Couldn't find value in ${inputType} for ${inputValue}`);

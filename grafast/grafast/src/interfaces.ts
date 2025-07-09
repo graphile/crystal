@@ -7,6 +7,7 @@ import type {
   GraphQLArgs,
   GraphQLArgument,
   GraphQLArgumentConfig,
+  GraphQLEnumValue,
   GraphQLField,
   GraphQLFieldConfig,
   GraphQLInputField,
@@ -374,7 +375,7 @@ export type ScalarInputPlanResolver<TResultStep extends Step = Step> = (
  */
 export type EnumValueApplyResolver<TParent = any> = (
   parent: TParent,
-  info: { scope: any },
+  info: { value: GraphQLEnumValue; scope: any },
 ) => void;
 
 /**
