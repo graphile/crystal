@@ -5202,6 +5202,7 @@ __metadata:
     react: "npm:^19.1.0"
     react-dom: "npm:^19.1.0"
     react-error-boundary: "npm:^6.0.0"
+    ruru-components: "workspace:^"
     sqlite3: "npm:^5.1.7"
   languageName: unknown
   linkType: soft
