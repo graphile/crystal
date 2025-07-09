@@ -137,7 +137,6 @@ const config: Configuration = {
       {
         test: /\.svg$/,
         use: [{ loader: "svg-inline-loader" }],
-        sideEffects: true,
       },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/,
@@ -145,7 +144,6 @@ const config: Configuration = {
         generator: {
           filename: "[hash][ext]",
         },
-        sideEffects: true,
       },
     ],
   },
