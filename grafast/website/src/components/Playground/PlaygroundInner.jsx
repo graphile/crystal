@@ -1,3 +1,5 @@
+import "graphiql/setup-workers/webpack";
+
 import CodeMirror from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import { graphql } from "cm6-graphql";

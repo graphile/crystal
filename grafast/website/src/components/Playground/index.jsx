@@ -1,5 +1,4 @@
 import BrowserOnly from "@docusaurus/BrowserOnly";
-import Head from "@docusaurus/Head";
 import React, { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 
@@ -44,24 +43,6 @@ export default function Playground() {
           const PlaygroundInner = React.lazy(() => import("./PlaygroundInner"));
           return (
             <>
-              <Head>
-                <script type="module">
-                  {`\
-import createJSONWorker from "https://esm.sh/monaco-editor/esm/vs/language/json/json.worker.js?worker";
-import createGraphQLWorker from "https://esm.sh/monaco-graphql/esm/graphql.worker.js?worker";
-import createEditorWorker from "https://esm.sh/monaco-editor/esm/vs/editor/editor.worker.js?worker";
-
-globalThis.MonacoEnvironment = {
-  getWorker(_workerId, label) {
-    switch (label) {
-      case "json": return createJSONWorker();
-      case "graphql": return createGraphQLWorker();
-      default: return createEditorWorker();
-    }
-  },
-};`}
-                </script>
-              </Head>
               <Suspense fallback="Loading...">
                 <PlaygroundInner />
               </Suspense>
