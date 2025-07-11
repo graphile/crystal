@@ -28,14 +28,14 @@
   "dependencies": {
     "@types/json5": "^2.2.0",
     "json5": "^2.2.3",
-    "prettier": "^3.5.3",
+    "prettier": "^3.6.2",
     "tslib": "^2.8.1"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
-    "@types/node": "^24.0.4",
-    "jest": "^30.0.0",
-    "pretty-format": "^30.0.0",
+    "@types/node": "^24.0.13",
+    "jest": "^30.0.4",
+    "pretty-format": "^30.0.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },

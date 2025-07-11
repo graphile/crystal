@@ -57,12 +57,12 @@
     }
   },
   "devDependencies": {
-    "@types/node": "^24.0.4",
+    "@types/node": "^24.0.13",
     "grafast": "workspace:^",
     "grafserv": "workspace:^",
     "graphile-config": "workspace:^",
     "graphql": "^16.1.0-experimental-stream-defer.6",
-    "jest": "^30.0.0",
+    "jest": "^30.0.4",
     "jest-serializer-graphql-schema": "workspace:^",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
