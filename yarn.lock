@@ -3874,7 +3874,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@graphiql/react@npm:^0.35.0, @graphiql/react@npm:^0.35.4":
+"@graphiql/react@npm:^0.35.0":
   version: 0.35.4
   resolution: "@graphiql/react@npm:0.35.4"
   dependencies:
@@ -3900,6 +3900,35 @@ __metadata:
     react: ^18 || ^19
     react-dom: ^18 || ^19
   checksum: 10/e4380d61a80f905dca82e6e1b71b3808c22ac0c3aa6d4662b9c77012b4c905c5ce108f7e18729e7e58b49b5d527df7f4a82c40f64ccc5f0efab8c4d67151112f
+  languageName: node
+  linkType: hard
+
+"@graphiql/react@npm:^0.35.5":
+  version: 0.35.5
+  resolution: "@graphiql/react@npm:0.35.5"
+  dependencies:
+    "@graphiql/toolkit": "npm:^0.11.3"
+    "@radix-ui/react-dialog": "npm:^1.1"
+    "@radix-ui/react-dropdown-menu": "npm:^2.1"
+    "@radix-ui/react-tooltip": "npm:^1.2"
+    "@radix-ui/react-visually-hidden": "npm:^1.2"
+    clsx: "npm:^1.2.1"
+    framer-motion: "npm:^12.12"
+    get-value: "npm:^3.0.1"
+    graphql-language-service: "npm:^5.3.1"
+    jsonc-parser: "npm:^3.3.1"
+    markdown-it: "npm:^14.1.0"
+    monaco-editor: "npm:^0.52.2"
+    monaco-graphql: "npm:^1.7.1"
+    prettier: "npm:^3.5.3"
+    react-compiler-runtime: "npm:19.1.0-rc.1"
+    set-value: "npm:^4.1.0"
+    zustand: "npm:^5"
+  peerDependencies:
+    graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
+    react: ^18 || ^19
+    react-dom: ^18 || ^19
+  checksum: 10/e23099756fb5c2a2743910ae8065ce8a1da4bd1fd043707726d873222731a428d059a26b262315f064d7f4071afb0daabc5b06d9eac1850b437840033b06fa92
   languageName: node
   linkType: hard
 
@@ -14029,35 +14058,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graphiql@npm:5.0.3":
-  version: 5.0.3
-  resolution: "graphiql@npm:5.0.3"
+"graphiql@npm:^5.0.4":
+  version: 5.0.4
+  resolution: "graphiql@npm:5.0.4"
   dependencies:
     "@graphiql/plugin-doc-explorer": "npm:^0.3.0"
     "@graphiql/plugin-history": "npm:^0.3.0"
-    "@graphiql/react": "npm:^0.35.4"
+    "@graphiql/react": "npm:^0.35.5"
     react-compiler-runtime: "npm:19.1.0-rc.1"
   peerDependencies:
     graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
     react: ^18 || ^19
     react-dom: ^18 || ^19
-  checksum: 10/a56eb5e78380289eefed758ea6f7b09b97bc272aa7d186f979a7da75a9fa9712364b2c3693b5af2d233c6513d425015d6598aa00e6dfcc78cf1fe13356c73edf
-  languageName: node
-  linkType: hard
-
-"graphiql@patch:graphiql@npm%3A5.0.3#~/.yarn/patches/graphiql-npm-5.0.3-b00030a0c3.patch":
-  version: 5.0.3
-  resolution: "graphiql@patch:graphiql@npm%3A5.0.3#~/.yarn/patches/graphiql-npm-5.0.3-b00030a0c3.patch::version=5.0.3&hash=af2ae7"
-  dependencies:
-    "@graphiql/plugin-doc-explorer": "npm:^0.3.0"
-    "@graphiql/plugin-history": "npm:^0.3.0"
-    "@graphiql/react": "npm:^0.35.4"
-    react-compiler-runtime: "npm:19.1.0-rc.1"
-  peerDependencies:
-    graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
-    react: ^18 || ^19
-    react-dom: ^18 || ^19
-  checksum: 10/b206627d8f904afea3638b26309e96fc9eef1c8cfbc925181ae73d72491d40371554977f6fe8a14090e2c4665f33d959c502a81385af2619787e855507b1f619
+  checksum: 10/5c511c0f4db1b29b35617c97ed30a02debb37e8020dce32a84e7018507fc8ac54a25cd2eee5e1084bb1f7116d254f430dbf257c9c9fb146eaf273466c9172934
   languageName: node
   linkType: hard
 
@@ -22199,7 +22212,7 @@ __metadata:
     "@graphiql/plugin-doc-explorer": "npm:^0.3.0"
     "@graphiql/plugin-explorer": "npm:^5.0.0"
     "@graphiql/plugin-history": "npm:^0.3.0"
-    "@graphiql/react": "npm:^0.35.4"
+    "@graphiql/react": "npm:^0.35.5"
     "@graphiql/toolkit": "npm:^0.11.3"
     "@types/codemirror": "npm:^5.60.16"
     "@types/debug": "npm:^4.1.12"
@@ -22209,7 +22222,7 @@ __metadata:
     "@types/react": "npm:^19.1.8"
     "@types/react-dom": "npm:^19.1.6"
     grafast: "workspace:^"
-    graphiql: "patch:graphiql@npm%3A5.0.3#~/.yarn/patches/graphiql-npm-5.0.3-b00030a0c3.patch"
+    graphiql: "npm:^5.0.4"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     graphql-ws: "npm:^6.0.5"
     jest: "npm:^30.0.0"
