@@ -14,9 +14,8 @@ import {
   ToolbarMenu,
   useGraphiQLActions,
 } from "@graphiql/react";
-import type { GraphiQLInterfaceProps } from "graphiql";
 import { GraphiQL, GraphiQLInterface } from "graphiql";
-import type { FC } from "react";
+import type { ComponentProps, FC } from "react";
 import { useCallback, useMemo, useState } from "react";
 
 import { ErrorPopup } from "./components/ErrorPopup.js";
@@ -30,6 +29,8 @@ import type { RuruStorage } from "./hooks/useStorage.js";
 import { useStorage } from "./hooks/useStorage.js";
 import type { RuruProps } from "./interfaces.js";
 import { EXPLAIN_PLUGIN } from "./plugins/explain.js";
+
+type GraphiQLInterfaceProps = ComponentProps<typeof GraphiQLInterface>;
 
 const checkCss = { width: "1.5rem", display: "inline-block" };
 const check = <span style={checkCss}>✔</span>;
