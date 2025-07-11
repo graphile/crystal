@@ -82,6 +82,8 @@ const baseElements = /* HTML */ trim`<div id="ruru-root">
     </div>
   </div>
 </div>
+`;
+const baseBodyScripts = trim`
 <script>
   const $ = s => document.querySelector(s);
   if (!localStorage.getItem('graphiql:visiblePlugin')) {
@@ -93,8 +95,8 @@ const baseElements = /* HTML */ trim`<div id="ruru-root">
     const val = localStorage.getItem('graphiql:' + key);
     if (val) $(sel).style.flex = val + " 1 0%";
   }
-</script>`;
-const baseBodyScripts = ``;
+</script>
+`;
 
 export interface RuruServerConfig extends RuruConfig {
   // ----- Legacy -----
@@ -160,7 +162,8 @@ export function makeHTMLParts(config: RuruServerConfig): RuruHTMLParts {
   import { React, createRoot, Ruru } from ${JSON.stringify(staticPath + "ruru.js")};
   createRoot(document.getElementById("ruru-root"))
     .render(React.createElement(Ruru, RURU_CONFIG));
-</script>`;
+</script>
+`;
   const parts: RuruHTMLParts = {
     metaTags: baseMetaTags,
     titleTag: baseTitleTag,
