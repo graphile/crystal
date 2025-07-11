@@ -94,7 +94,7 @@ const baseElements = html`
   </div>
 `;
 const baseBodyScripts = html`
-  <script>
+  <script type="module">
     const $ = (s) => document.querySelector(s);
     if (!localStorage.getItem("graphiql:visiblePlugin")) {
       $(".graphiql-plugin").style.display = "none";
