@@ -18,12 +18,20 @@ const escapeJS = (str: string) => {
     .replaceAll("<script", "<\\script");
 };
 
-const baseMetaTags = `\
-<meta charset="utf-8" />`;
-const baseTitleTag = `\
+function trim(arr: TemplateStringsArray, ...placeholders: string[]) {
+  const final = arr
+    .map((str, i) => (i === 0 ? str : placeholders[i - 1] + str))
+    .join("");
+  return final.trim().replace(/^\s+/gm, "");
+}
+
+const baseMetaTags = trim`
+<meta charset="utf-8" />
+`;
+const baseTitleTag = trim`
 <title>Ruru - GraphQL/Grafast IDE</title>
 `;
-const baseElements = /* HTML */ `<div id="ruru-root">
+const baseElements = /* HTML */ trim`<div id="ruru-root">
   <div class="graphiql-container">
     <div class="graphiql-sidebar"></div>
     <div class="graphiql-main">
@@ -70,24 +78,17 @@ const baseElements = /* HTML */ `<div id="ruru-root">
   </div>
 </div>
 <script>
-try {
-  const $ = document.querySelector.bind(document);
+  const $ = s => document.querySelector(s);
   if (!localStorage.getItem('graphiql:visiblePlugin')) {
     $('.graphiql-plugin').style.display = 'none';
     $('.graphiql-horizontal-drag-bar').style.display = 'none';
   }
-  const flexes = [
-    { key: 'docExplorerFlex', identifier: '.graphiql-plugin' },
-    { key: 'editorFlex', identifier: '.graphiql-editors' },
-  ];
-  for (const {key, identifier} of flexes) {
+  const flexes = [['docExplorerFlex','.graphiql-plugin'], ['editorFlex','.graphiql-editors']];
+  for (const [key, sel] of flexes) {
     const val = localStorage.getItem('graphiql:' + key);
-    if (val) $(identifier).style.flex = val + " 1 0%";
+    if (val) $(sel).style.flex = val + " 1 0%";
   }
-} catch (e) {
-  console.error('Failed to prettify the loading state', e);
-}
-</script>`.replace(/^\s+/gm, "");
+</script>`;
 const baseBodyScripts = ``;
 
 export interface RuruServerConfig extends RuruConfig {
@@ -119,25 +120,20 @@ export function makeHTMLParts(config: RuruServerConfig): RuruHTMLParts {
     subscriptionEndpoint,
   };
 
-  const baseStyleTags = `\
+  const baseStyleTags = trim`
 <link rel="stylesheet" href="${staticPath}ruru.css" />
 <style>
-body {
-  margin: 0;
-}
-#ruru-root {
-  height: 100vh;
-}
+  body{margin:0;}
+  #ruru-root {height:100vh;}
 </style>`;
-  const baseConfigScript = `\
+  const baseConfigScript = trim`
 <script>const RURU_CONFIG = ${escapeJS(JSON.stringify(clientConfig))};</script>`;
-  const baseHeaderScripts = `\
+  const baseHeaderScripts = trim`
 <script type="module">
-  // Setup Monaco Editor workers
   const worker = (file) =>
     new Worker(new URL(${JSON.stringify(staticPath)} + file, import.meta.url), { type: "module" });
   globalThis.MonacoEnvironment = {
-    getWorker(_workerId, label) {
+    getWorker(_, label) {
       switch (label) {
         case "json": return worker('jsonWorker.js');
         case "graphql": return worker('graphqlWorker.js');
@@ -147,14 +143,11 @@ body {
   }
 </script>
 `;
-  const baseBodyInitScript = `\
+  const baseBodyInitScript = trim`
 <script type="module">
-  // Load and render Ruru
   import { React, createRoot, Ruru } from ${JSON.stringify(staticPath + "ruru.js")};
-  const tree = React.createElement(Ruru, RURU_CONFIG);
-  const container = document.getElementById("ruru-root");
-  const root = createRoot(container);
-  root.render(tree);
+  createRoot(document.getElementById("ruru-root"))
+    .render(React.createElement(Ruru, RURU_CONFIG));
 </script>`;
   const parts: RuruHTMLParts = {
     metaTags: baseMetaTags,
