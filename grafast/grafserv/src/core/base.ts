@@ -41,6 +41,7 @@ import {
   makeGraphQLHandler,
   makeParseAndValidateFunction,
 } from "../middleware/graphql.js";
+import type { OptionsFromConfig } from "../options.js";
 import { optionsFromConfig } from "../options.js";
 import { handleErrors, normalizeRequest, sleep } from "../utils.js";
 
@@ -638,6 +639,11 @@ const DIVIDE = Buffer.from(
   "utf8",
 );
 
+function eventStreamHeaders(dynamicOptions: OptionsFromConfig) {
+  if (!dynamicOptions) return null;
+  return { ["x-graphql-event-stream"]: dynamicOptions.eventStreamPath };
+}
+
 export function convertHandlerResultToResult(
   handlerResult: HandlerResult | null,
 ): PromiseOrDirect<Result | null> {
@@ -658,11 +664,9 @@ export function convertHandlerResultToResult(
       handleErrors(payload);
       const headers: Record<string, string> = {
         __proto__: null as never,
-        ...handlerResult.headers,
+        ...eventStreamHeaders(dynamicOptions),
         "content-type": contentType,
-        ...(dynamicOptions.watch
-          ? { ["x-graphql-event-stream"]: dynamicOptions.eventStreamPath }
-          : null),
+        ...handlerResult.headers,
       };
       if (preferJSON && !outputDataAsString) {
         return {
@@ -694,12 +698,10 @@ export function convertHandlerResultToResult(
       } = handlerResult;
       const headers: Record<string, string> = {
         __proto__: null as never,
-        ...handlerResult.headers,
+        ...eventStreamHeaders(dynamicOptions),
         "content-type": 'multipart/mixed; boundary="-"',
         "transfer-encoding": "chunked",
-        ...(dynamicOptions.watch
-          ? { ["x-graphql-event-stream"]: dynamicOptions.eventStreamPath }
-          : null),
+        ...handlerResult.headers,
       };
 
       const bufferIterator = mapIterator(
@@ -737,9 +739,9 @@ export function convertHandlerResultToResult(
             : "text/plain; charset=utf-8";
       const headers: Record<string, string> = {
         __proto__: null as never,
-        ...handlerResult.headers,
         "content-length": String(payload.length),
         ...(contentType ? { "content-type": contentType } : null),
+        ...handlerResult.headers,
       };
       return {
         type: "buffer",
@@ -785,12 +787,12 @@ export function convertHandlerResultToResult(
       // Set headers for Server-Sent Events.
       const headers: Record<string, string> = {
         __proto__: null as never,
-        ...handlerResult.headers,
         // Don't buffer EventStream in nginx
         "x-accel-buffering": "no",
         "content-type": "text/event-stream",
         "cache-control": "no-cache, no-transform",
         ...(httpVersionMajor >= 2 ? null : { connection: "keep-alive" }),
+        ...handlerResult.headers,
       };
 
       // Creates a stream for the response
@@ -868,14 +870,18 @@ function dangerousCorsWrap(result: Result | null) {
   if (result === null) {
     return result;
   }
-  result.headers["access-control-allow-origin"] = "*";
-  result.headers["access-control-allow-headers"] = "*";
+  if (!result.headers["access-control-allow-origin"]) {
+    result.headers["access-control-allow-origin"] = "*";
+  }
+  if (!result.headers["access-control-allow-headers"]) {
+    result.headers["access-control-allow-headers"] = "*";
+  }
   return result;
 }
 
 function optionsResponse(
   request: NormalizedRequestDigest,
-  dynamicOptions: DynamicOptions,
+  dynamicOptions: OptionsFromConfig,
 ): NoContentHandlerResult {
   return {
     type: "noContent",
