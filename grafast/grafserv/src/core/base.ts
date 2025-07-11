@@ -132,7 +132,7 @@ export class GrafservBase {
       request.method === "OPTIONS";
     try {
       if (request.path === dynamicOptions.graphqlPath) {
-        if (forceCORS) return optionsResponse(request, this.dynamicOptions);
+        if (forceCORS) return optionsResponse(request, dynamicOptions);
         return this.graphqlHandler(request, this.graphiqlHandler);
       }
 
@@ -879,12 +879,12 @@ function dangerousCorsWrap(result: Result | null) {
 
 function optionsResponse(
   request: NormalizedRequestDigest,
-  dynamicOptions: any,
+  dynamicOptions: DynamicOptions,
 ): NoContentHandlerResult {
   return {
     type: "noContent",
     request,
-    dynamicOptions: dynamicOptions,
+    dynamicOptions,
     statusCode: 204,
   };
 }
