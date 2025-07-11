@@ -24,7 +24,6 @@ error.
 
 - `GraphQLObjectType*`: When creating a GraphQLObjectType,
   we'll execute the following hooks:
-
   - `GraphQLObjectType` to add any root-level attributes, e.g. a description.
   - `GraphQLObjectType_interfaces` to add additional interfaces to this object
     type.
@@ -39,7 +38,6 @@ error.
   - `GraphQLObjectType_fields_field_args_arg` to modify a specific argument.
 
 - `GraphQLInputObjectType*`: When creating a GraphQLInputObjectType, we'll execute the following hooks:
-
   - `GraphQLInputObjectType` to add any root-level attributes, e.g. a
     description.
   - `GraphQLInputObjectType_fields` (_deferred_) to add additional fields to
@@ -51,7 +49,6 @@ error.
 
 - `GraphQLEnumType*`: When creating a GraphQLEnumType, we'll
   execute the following hooks:
-
   - `GraphQLEnumType` add any root-level attributes, e.g. add a description.
   - `GraphQLEnumType_values` add values.
   - `GraphQLEnumType_values_value` customize an individual value from above.
