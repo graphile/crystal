@@ -19,7 +19,8 @@ export async function runCli<TArgs>(
   options: OptionsFunction<TArgs>,
   run: (args: Args<TArgs>) => Promise<void>,
 ) {
-  const argv = await options(yargs(hideBin(process.argv)))
+  const y = yargs(hideBin(process.argv));
+  const argv = await options(y)
     .strict()
     .showHelpOnFail(false, "Specify --help for available options")
     .epilogue(
@@ -30,10 +31,10 @@ Graphile's MIT-licensed Open Source Software is made possible thanks to support 
 
 Thank you for using our software.`,
     )
-    .wrap(yargs.terminalWidth()).argv;
+    .wrap(y.terminalWidth()).argv;
   await run(argv);
 }
 
 export function getTerminalWidth() {
-  return yargs.terminalWidth();
+  return yargs().terminalWidth();
 }
