@@ -95,7 +95,7 @@ export function optionsFromConfig(config: GraphileConfig.ResolvedPreset) {
     graphiql = true,
     graphiqlOnGraphQLGET = true,
     graphiqlPath = "/",
-    graphiqlStaticPath = `/ruru-static/`,
+    graphiqlStaticPath = "/ruru-static/",
     watch = false,
     eventStreamPath = "/graphql/stream",
     maxRequestLength = 100_000,
