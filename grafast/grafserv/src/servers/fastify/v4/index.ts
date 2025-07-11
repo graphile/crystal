@@ -181,6 +181,7 @@ export class FastifyGrafserv extends GrafservBase {
       graphiqlOnGraphQLGET,
       graphqlPath,
       graphiqlPath,
+      graphiqlStaticPath,
       graphqlOverGET,
       maxRequestLength: bodyLimit,
       watch,
@@ -252,6 +253,24 @@ export class FastifyGrafserv extends GrafservBase {
             payload: this.makeStream(),
             statusCode: 200,
           };
+          const result = await convertHandlerResultToResult(handlerResult);
+          return this.send(request, reply, result);
+        },
+      });
+    }
+
+    if (graphiql) {
+      // Must come last, because wildcard
+      app.route({
+        method: "GET",
+        url: graphiqlStaticPath + "*",
+        exposeHeadRoute,
+        bodyLimit,
+        handler: async (request, reply) => {
+          const digest = getDigest(request, reply);
+          const handlerResult = await this.graphiqlStaticHandler(
+            normalizeRequest(digest),
+          );
           const result = await convertHandlerResultToResult(handlerResult);
           return this.send(request, reply, result);
         },

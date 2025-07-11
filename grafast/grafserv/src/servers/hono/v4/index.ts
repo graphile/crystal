@@ -174,6 +174,16 @@ export class HonoGrafserv extends GrafservBase {
     return this.send(ctx, result);
   }
 
+  public async handleGraphiqlStaticEvent(ctx: Ctx) {
+    const digest = getDigest(ctx);
+
+    const handlerResult = await this.graphiqlStaticHandler(
+      normalizeRequest(digest),
+    );
+    const result = await convertHandlerResultToResult(handlerResult);
+    return this.send(ctx, result);
+  }
+
   public async handleEventStreamEvent(ctx: Ctx) {
     const digest = getDigest(ctx);
 
@@ -297,6 +307,13 @@ export class HonoGrafserv extends GrafservBase {
     if (dynamicOptions.watch) {
       app.get(this.dynamicOptions.eventStreamPath, (c) =>
         this.handleEventStreamEvent(c),
+      );
+    }
+
+    if (dynamicOptions.graphiql) {
+      // Must come last, because wildcard
+      app.get(this.dynamicOptions.graphiqlStaticPath + "*", (c) =>
+        this.handleGraphiqlStaticEvent(c),
       );
     }
   }
