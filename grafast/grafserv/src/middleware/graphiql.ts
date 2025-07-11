@@ -14,7 +14,7 @@ import type {
 } from "../interfaces.js";
 import type { OptionsFromConfig } from "../options.js";
 
-const brotliCompress = promisify(brotliCompressCb)
+const brotliCompress = promisify(brotliCompressCb);
 
 export function makeGraphiQLHandler(
   resolvedPreset: GraphileConfig.ResolvedPreset,
@@ -56,24 +56,31 @@ export function makeGraphiQLHandler(
     }
 
     const statusCode = 200;
-    const headers: Record<string, string> = Object.create(null)
-    let payload = Buffer.from(html, 'utf8')
+    const headers: Record<string, string> = Object.create(null);
+    let payload = Buffer.from(html, "utf8");
 
-    const accept = request.getHeader('accept-encoding')
-    if (typeof accept === 'string' && /\bbr\b/.test(accept)) {
-      headers['content-encoding'] = 'br'
+    const accept = request.getHeader("accept-encoding");
+    if (typeof accept === "string" && /\bbr\b/.test(accept)) {
+      headers["content-encoding"] = "br";
       payload = await brotliCompress(payload, {
         params: {
           // No compression is ~3.2KB and 100,000 compresses takes 195ms
           // Level 1 compression is ~1.2KB and 100,000 compresses takes 1.46s
           // Level 5 compression is ~0.96KB and 100,000 compresses takes 3.12s
           // Level 11 compression is ~0.85KB and 100,000 compresses takes 211s
-          [constants.BROTLI_PARAM_QUALITY]: 5
-        }
-      })
+          [constants.BROTLI_PARAM_QUALITY]: 5,
+        },
+      });
     }
 
-    return { type: "html", request, dynamicOptions, statusCode, headers, payload };
+    return {
+      type: "html",
+      request,
+      dynamicOptions,
+      statusCode,
+      headers,
+      payload,
+    };
   };
 }
 
