@@ -644,6 +644,12 @@ function eventStreamHeaders(dynamicOptions: OptionsFromConfig) {
   return { ["x-graphql-event-stream"]: dynamicOptions.eventStreamPath };
 }
 
+const CONTENT_TYPE_HEADERS = {
+  raw: null,
+  html: { "content-type": "text/html; charset=utf-8" },
+  text: { "content-type": "text/plain; charset=utf-8" },
+} as const;
+
 export function convertHandlerResultToResult(
   handlerResult: HandlerResult | null,
 ): PromiseOrDirect<Result | null> {
@@ -731,16 +737,10 @@ export function convertHandlerResultToResult(
     case "html":
     case "raw": {
       const { payload, statusCode = 200 } = handlerResult;
-      const contentType =
-        handlerResult.type === "raw"
-          ? null
-          : handlerResult.type === "html"
-            ? "text/html; charset=utf-8"
-            : "text/plain; charset=utf-8";
       const headers: Record<string, string> = {
         __proto__: null as never,
+        ...CONTENT_TYPE_HEADERS[handlerResult.type],
         "content-length": String(payload.length),
-        ...(contentType ? { "content-type": contentType } : null),
         ...handlerResult.headers,
       };
       return {
