@@ -2,7 +2,6 @@ import type { PromiseOrDirect } from "grafast";
 import type { Middleware } from "graphile-config";
 import type { RuruServerConfig } from "ruru/server";
 import { makeHTMLParts, ruruHTML } from "ruru/server";
-import type { GetStaticFileContext } from "ruru/static";
 import { getStaticFile } from "ruru/static";
 
 import type {
