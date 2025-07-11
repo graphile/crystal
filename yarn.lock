@@ -16143,7 +16143,6 @@ __metadata:
     "@types/node": "npm:^24.0.13"
     jest: "npm:^30.0.4"
     json5: "npm:^2.2.3"
-    prettier: "npm:^3.6.2"
     pretty-format: "npm:^30.0.2"
     ts-node: "npm:^10.9.2"
     tslib: "npm:^2.8.1"
