@@ -1,4 +1,5 @@
 import { promisify } from "node:util";
+import type { BrotliOptions } from "node:zlib";
 import { brotliCompress as brotliCompressCb, constants } from "node:zlib";
 
 import type { PromiseOrDirect } from "grafast";
@@ -15,6 +16,20 @@ import type {
 import type { OptionsFromConfig } from "../options.js";
 
 const brotliCompress = promisify(brotliCompressCb);
+
+const BROTLI_OPTIONS: BrotliOptions = {
+  params: {
+    // No compression is ~3.2KB and 100,000 compresses takes 195ms
+    // Level 1 compression is ~1.2KB and 100,000 compresses takes 1.46s
+    // Level 5 compression is ~0.96KB and 100,000 compresses takes 3.12s
+    // Level 11 compression is ~0.85KB and 100,000 compresses takes 211s
+    [constants.BROTLI_PARAM_QUALITY]: 5,
+  },
+};
+const BROTLI_HEADERS = {
+  "content-encoding": "br",
+  "content-type": "text/html; charset=utf-8",
+};
 
 export function makeGraphiQLHandler(
   resolvedPreset: GraphileConfig.ResolvedPreset,
@@ -58,32 +73,11 @@ export function makeGraphiQLHandler(
     let payload = Buffer.from(html, "utf8");
     const accept = request.getHeader("accept-encoding");
     if (typeof accept === "string" && /\bbr\b/i.test(accept)) {
-      payload = await brotliCompress(payload, {
-        params: {
-          // No compression is ~3.2KB and 100,000 compresses takes 195ms
-          // Level 1 compression is ~1.2KB and 100,000 compresses takes 1.46s
-          // Level 5 compression is ~0.96KB and 100,000 compresses takes 3.12s
-          // Level 11 compression is ~0.85KB and 100,000 compresses takes 211s
-          [constants.BROTLI_PARAM_QUALITY]: 5,
-        },
-      });
-      return {
-        type: "raw",
-        request,
-        dynamicOptions,
-        headers: {
-          "content-encoding": "br",
-          "content-type": "text/html; charset=utf-8",
-        },
-        payload,
-      };
+      payload = await brotliCompress(payload, BROTLI_OPTIONS);
+      const headers = BROTLI_HEADERS;
+      return { type: "raw", request, dynamicOptions, headers, payload };
     } else {
-      return {
-        type: "html",
-        request,
-        dynamicOptions,
-        payload,
-      };
+      return { type: "html", request, dynamicOptions, payload };
     }
   };
 }
