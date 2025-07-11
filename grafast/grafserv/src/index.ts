@@ -110,6 +110,8 @@ declare global {
       graphiqlOnGraphQLGET?: boolean;
       /** The path at which GraphiQL will be available; usually / */
       graphiqlPath?: string;
+      /** The path from which GraphiQL's static assets are served, must end in a slash. Usually /ruru-static/ */
+      graphiqlStaticPath?: string;
 
       /** Set true to enable watch mode */
       watch?: boolean;

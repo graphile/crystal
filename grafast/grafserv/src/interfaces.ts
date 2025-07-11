@@ -157,6 +157,7 @@ interface IHandlerResult {
   request: NormalizedRequestDigest;
   dynamicOptions: OptionsFromConfig;
   statusCode?: number;
+  headers?: Record<string, string>;
 }
 export interface HTMLHandlerResult extends IHandlerResult {
   type: "html";
@@ -194,13 +195,25 @@ export interface EventStreamHeandlerResult extends IHandlerResult {
   type: "event-stream";
   payload: AsyncIterable<EventStreamEvent>;
 }
+export interface NotFoundResult extends IHandlerResult {
+  type: "notFound";
+  payload?: Buffer;
+}
+export interface RawHandlerResult extends IHandlerResult {
+  type: "raw";
+  payload: Buffer;
+  // Must have headers; must have `content-type`!
+  headers: Record<string, string>;
+}
 export type HandlerResult =
   | HTMLHandlerResult
   | GraphQLHandlerResult
   | GraphQLIncrementalHandlerResult
   | TextHandlerResult
   | EventStreamHeandlerResult
-  | NoContentHandlerResult;
+  | NoContentHandlerResult
+  | NotFoundResult
+  | RawHandlerResult;
 
 export type SchemaChangeEvent = {
   event: "change";

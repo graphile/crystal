@@ -14,9 +14,8 @@ import {
   ToolbarMenu,
   useGraphiQLActions,
 } from "@graphiql/react";
-import type { GraphiQLInterfaceProps } from "graphiql";
 import { GraphiQL, GraphiQLInterface } from "graphiql";
-import type { FC } from "react";
+import type { ComponentProps, FC } from "react";
 import { useCallback, useMemo, useState } from "react";
 
 import { ErrorPopup } from "./components/ErrorPopup.js";
@@ -30,6 +29,8 @@ import type { RuruStorage } from "./hooks/useStorage.js";
 import { useStorage } from "./hooks/useStorage.js";
 import type { RuruProps } from "./interfaces.js";
 import { EXPLAIN_PLUGIN } from "./plugins/explain.js";
+
+type GraphiQLInterfaceProps = ComponentProps<typeof GraphiQLInterface>;
 
 const checkCss = { width: "1.5rem", display: "inline-block" };
 const check = <span style={checkCss}>✔</span>;
@@ -56,6 +57,10 @@ export const Ruru: FC<RuruProps> = (props) => {
     fetcher: _fetcher,
     debugTools: _debugTools,
 
+    // Deprecated stuff
+    ["query" as never]: _query,
+    ["variables" as never]: _variables,
+
     // Pass everything else through to GraphiQL
     ...otherProps
   } = props;
@@ -78,15 +83,15 @@ export const Ruru: FC<RuruProps> = (props) => {
     [explain, explainHelpers, explainResults, setExplain],
   );
   return (
-    <ExplainContext.Provider value={explainContextValue}>
-      <GraphiQLProvider
-        {...otherProps}
-        inputValueDeprecation={inputValueDeprecation ?? true}
-        schemaDescription={schemaDescription ?? true}
-        fetcher={fetcher}
-        defaultQuery={defaultQuery ?? DEFAULT_QUERY}
-        plugins={plugins}
-      >
+    <GraphiQLProvider
+      {...otherProps}
+      inputValueDeprecation={inputValueDeprecation ?? true}
+      schemaDescription={schemaDescription ?? true}
+      fetcher={fetcher}
+      defaultQuery={defaultQuery ?? DEFAULT_QUERY}
+      plugins={plugins}
+    >
+      <ExplainContext.Provider value={explainContextValue}>
         <HistoryStore maxHistoryLength={props.maxHistoryLength}>
           <DocExplorerStore>
             <RuruInner
@@ -108,8 +113,8 @@ export const Ruru: FC<RuruProps> = (props) => {
             />
           </DocExplorerStore>
         </HistoryStore>
-      </GraphiQLProvider>
-    </ExplainContext.Provider>
+      </ExplainContext.Provider>
+    </GraphiQLProvider>
   );
 };
 
