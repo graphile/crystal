@@ -659,11 +659,11 @@ export function convertHandlerResultToResult(
       const headers: Record<string, string> = {
         __proto__: null as never,
         ...handlerResult.headers,
+        "content-type": contentType,
+        ...(dynamicOptions.watch
+          ? { ["x-graphql-event-stream"]: dynamicOptions.eventStreamPath }
+          : null),
       };
-      headers["content-type"] = contentType;
-      if (dynamicOptions.watch) {
-        headers["x-graphql-event-stream"] = dynamicOptions.eventStreamPath;
-      }
       if (preferJSON && !outputDataAsString) {
         return {
           type: "json",
@@ -695,12 +695,12 @@ export function convertHandlerResultToResult(
       const headers: Record<string, string> = {
         __proto__: null as never,
         ...handlerResult.headers,
+        "content-type": 'multipart/mixed; boundary="-"',
+        "transfer-encoding": "chunked",
+        ...(dynamicOptions.watch
+          ? { ["x-graphql-event-stream"]: dynamicOptions.eventStreamPath }
+          : null),
       };
-      headers["content-type"] = 'multipart/mixed; boundary="-"';
-      headers["transfer-encoding"] = "chunked";
-      if (dynamicOptions.watch) {
-        headers["x-graphql-event-stream"] = dynamicOptions.eventStreamPath;
-      }
 
       const bufferIterator = mapIterator(
         iterator,
@@ -729,18 +729,18 @@ export function convertHandlerResultToResult(
     case "html":
     case "raw": {
       const { payload, statusCode = 200 } = handlerResult;
+      const contentType =
+        handlerResult.type === "raw"
+          ? null
+          : handlerResult.type === "html"
+            ? "text/html; charset=utf-8"
+            : "text/plain; charset=utf-8";
       const headers: Record<string, string> = {
         __proto__: null as never,
         ...handlerResult.headers,
+        "content-length": String(payload.length),
+        ...(contentType ? { "content-type": contentType } : null),
       };
-      if (handlerResult.type === "html") {
-        headers["content-type"] = "text/html; charset=utf-8";
-      } else if (handlerResult.type === "text") {
-        headers["content-type"] = "text/plain; charset=utf-8";
-      } else {
-        // RAW!
-      }
-      headers["content-length"] = String(payload.length);
       return {
         type: "buffer",
         statusCode,
@@ -786,16 +786,12 @@ export function convertHandlerResultToResult(
       const headers: Record<string, string> = {
         __proto__: null as never,
         ...handlerResult.headers,
+        // Don't buffer EventStream in nginx
+        "x-accel-buffering": "no",
+        "content-type": "text/event-stream",
+        "cache-control": "no-cache, no-transform",
+        ...(httpVersionMajor >= 2 ? null : { connection: "keep-alive" }),
       };
-      // Don't buffer EventStream in nginx
-      headers["x-accel-buffering"] = "no";
-      headers["content-type"] = "text/event-stream";
-      headers["cache-control"] = "no-cache, no-transform";
-      if (httpVersionMajor >= 2) {
-        // NOOP
-      } else {
-        headers["connection"] = "keep-alive";
-      }
 
       // Creates a stream for the response
       const event2buffer = (event: EventStreamEvent): Buffer => {
@@ -842,9 +838,9 @@ export function convertHandlerResultToResult(
       );
       const headers: Record<string, string> = {
         __proto__: null as never,
+        "content-type": "text/plain; charset=utf-8",
+        "content-length": String(payload.length),
       };
-      headers["content-type"] = "text/plain; charset=utf-8";
-      headers["content-length"] = String(payload.length);
       return {
         type: "buffer",
         statusCode: 500,
