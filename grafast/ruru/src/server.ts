@@ -18,6 +18,14 @@ const escapeJS = (str: string) => {
     .replaceAll("<script", "<\\script");
 };
 
+const ENTITIES: Record<string, string> = {
+  "&": "&amp;",
+  '"': "&quot;",
+  "<": "&lt;",
+  ">": "&gt;",
+};
+const escapeHTML = (str: string) => str.replace(/[&"<>]/g, (c) => ENTITIES[c]!);
+
 function trim(arr: TemplateStringsArray, ...placeholders: string[]) {
   const final = arr
     .map((str, i) => (i === 0 ? str : placeholders[i - 1] + str))
@@ -25,9 +33,6 @@ function trim(arr: TemplateStringsArray, ...placeholders: string[]) {
   return final.trim().replace(/^\s+/gm, "");
 }
 
-const baseMetaTags = trim`
-<meta charset="utf-8" />
-`;
 const baseTitleTag = trim`
 <title>Ruru - GraphQL/Grafast IDE</title>
 `;
@@ -120,6 +125,13 @@ export function makeHTMLParts(config: RuruServerConfig): RuruHTMLParts {
     subscriptionEndpoint,
   };
 
+  const baseMetaTags = trim`
+<meta charset="utf-8" />
+<link rel="modulepreload" href="${escapeHTML(staticPath + "ruru.js")}" />
+<link rel="modulepreload" href="${escapeHTML(staticPath + "jsonWorker.js")}" as="worker" />
+<link rel="modulepreload" href="${escapeHTML(staticPath + "graphqlWorker.js")}" as="worker" />
+<link rel="modulepreload" href="${escapeHTML(staticPath + "editorWorker.js")}" as="worker" />
+`;
   const baseStyleTags = trim`
 <link rel="stylesheet" href="${staticPath}ruru.css" />
 <style>
