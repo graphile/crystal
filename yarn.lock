@@ -3874,36 +3874,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@graphiql/react@npm:^0.35.0":
-  version: 0.35.4
-  resolution: "@graphiql/react@npm:0.35.4"
-  dependencies:
-    "@graphiql/toolkit": "npm:^0.11.3"
-    "@radix-ui/react-dialog": "npm:^1.1"
-    "@radix-ui/react-dropdown-menu": "npm:^2.1"
-    "@radix-ui/react-tooltip": "npm:^1.2"
-    "@radix-ui/react-visually-hidden": "npm:^1.2"
-    clsx: "npm:^1.2.1"
-    framer-motion: "npm:^12.12"
-    get-value: "npm:^3.0.1"
-    graphql-language-service: "npm:^5.3.1"
-    jsonc-parser: "npm:^3.3.1"
-    markdown-it: "npm:^14.1.0"
-    monaco-editor: "npm:^0.52.2"
-    monaco-graphql: "npm:^1.7.1"
-    prettier: "npm:^3.5.3"
-    react-compiler-runtime: "npm:19.1.0-rc.1"
-    set-value: "npm:^4.1.0"
-    zustand: "npm:^5"
-  peerDependencies:
-    graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
-    react: ^18 || ^19
-    react-dom: ^18 || ^19
-  checksum: 10/e4380d61a80f905dca82e6e1b71b3808c22ac0c3aa6d4662b9c77012b4c905c5ce108f7e18729e7e58b49b5d527df7f4a82c40f64ccc5f0efab8c4d67151112f
-  languageName: node
-  linkType: hard
-
-"@graphiql/react@npm:^0.35.5":
+"@graphiql/react@npm:^0.35.0, @graphiql/react@npm:^0.35.5":
   version: 0.35.5
   resolution: "@graphiql/react@npm:0.35.5"
   dependencies:
