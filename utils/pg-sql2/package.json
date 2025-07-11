@@ -37,8 +37,8 @@
   "devDependencies": {
     "@types/debug": "4.1.12",
     "@types/jest": "^30.0.0",
-    "@types/node": "^22.15.32",
-    "jest": "^30.0.0",
+    "@types/node": "^22.16.3",
+    "jest": "^30.0.4",
     "markdown-doctest": "^1.1.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
