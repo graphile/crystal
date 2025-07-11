@@ -2,6 +2,8 @@ import type { PromiseOrDirect } from "grafast";
 import type { Middleware } from "graphile-config";
 import type { RuruServerConfig } from "ruru/server";
 import { makeHTMLParts, ruruHTML } from "ruru/server";
+import type { GetStaticFileContext } from "ruru/static";
+import { getStaticFile } from "ruru/static";
 
 import type {
   HandlerResult,
@@ -16,8 +18,10 @@ export function makeGraphiQLHandler(
   dynamicOptions: OptionsFromConfig,
 ): (request: NormalizedRequestDigest) => PromiseOrDirect<HandlerResult> {
   return async (request) => {
-    const config: RuruServerConfig = {
+    const config = {
       ...resolvedPreset.ruru,
+      // Override the ruru staticPath; this isn't for Ruru CLI
+      staticPath: dynamicOptions.graphiqlStaticPath,
       endpoint: dynamicOptions.graphqlPath,
       // TODO: websocket endpoint
       clientConfig: {
@@ -29,7 +33,7 @@ export function makeGraphiQLHandler(
               ? []
               : (dynamicOptions.explain as any[]),
       },
-    };
+    } satisfies RuruServerConfig;
     const htmlParts = makeHTMLParts(config);
     let html: string;
     if (middleware != null && middleware.middleware.ruruHTML != null) {
@@ -52,6 +56,49 @@ export function makeGraphiQLHandler(
       dynamicOptions,
       type: "html",
       payload: Buffer.from(html, "utf8"),
+    };
+  };
+}
+
+export function makeGraphiQLStaticHandler(
+  resolvedPreset: GraphileConfig.ResolvedPreset,
+  _middleware: Middleware<GraphileConfig.GrafservMiddleware> | null,
+  dynamicOptions: OptionsFromConfig,
+): (request: NormalizedRequestDigest) => PromiseOrDirect<HandlerResult> {
+  return async (request) => {
+    const file = await getStaticFile({
+      ...resolvedPreset.ruru,
+      // Override the ruru staticPath; this isn't for Ruru CLI
+      staticPath: dynamicOptions.graphiqlStaticPath,
+      urlPath: request.path,
+      acceptEncoding: request.getHeader("accept-encoding"),
+    });
+    if (!file) {
+      return {
+        request,
+        dynamicOptions,
+        type: "notFound",
+      };
+    }
+
+    const etag = request.getHeader("if-none-match");
+    if (etag === file.headers.etag) {
+      return {
+        statusCode: 304,
+        request,
+        dynamicOptions,
+        type: "noContent",
+        headers: { etag },
+      };
+    }
+
+    return {
+      statusCode: 200,
+      request,
+      dynamicOptions,
+      type: "raw",
+      headers: file.headers,
+      payload: file.content,
     };
   };
 }

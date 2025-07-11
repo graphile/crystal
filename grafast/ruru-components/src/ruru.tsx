@@ -57,6 +57,10 @@ export const Ruru: FC<RuruProps> = (props) => {
     fetcher: _fetcher,
     debugTools: _debugTools,
 
+    // Deprecated stuff
+    ["query" as never]: _query,
+    ["variables" as never]: _variables,
+
     // Pass everything else through to GraphiQL
     ...otherProps
   } = props;
