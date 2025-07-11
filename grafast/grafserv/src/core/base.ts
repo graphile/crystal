@@ -45,10 +45,11 @@ import type { OptionsFromConfig } from "../options.js";
 import { optionsFromConfig } from "../options.js";
 import { handleErrors, normalizeRequest, sleep } from "../utils.js";
 
-const fourOhFourDoc = Buffer.from(
+const fourOhFourBuffer = Buffer.from(
   `<!doctype html><html><head><title>Not found</title></head><body><h1>Not found</h1><p>Please try again with a different URL</p></body></html>`,
   "utf8",
 );
+const serviceUnavailableBuffer = Buffer.from("Service unavailable", "utf8");
 
 const failedToBuildHandlersError = new graphql.GraphQLError(
   "Unknown error occurred.",
@@ -477,12 +478,11 @@ export class GrafservBase {
     const [request] = args;
     const { dynamicOptions } = this;
     return {
-      type: "raw",
+      type: "text",
       request,
       dynamicOptions,
       statusCode: 503,
-      headers: { "content-type": "text/plain" },
-      payload: Buffer.from("Service unavailable", "utf8"),
+      payload: serviceUnavailableBuffer,
     };
   };
 
@@ -772,7 +772,7 @@ export function convertHandlerResultToResult(
         type: "buffer",
         statusCode,
         headers,
-        buffer: fourOhFourDoc,
+        buffer: fourOhFourBuffer,
       } as BufferResult;
     }
     case "event-stream": {
