@@ -79,15 +79,15 @@ export const Ruru: FC<RuruProps> = (props) => {
     [explain, explainHelpers, explainResults, setExplain],
   );
   return (
-    <ExplainContext.Provider value={explainContextValue}>
-      <GraphiQLProvider
-        {...otherProps}
-        inputValueDeprecation={inputValueDeprecation ?? true}
-        schemaDescription={schemaDescription ?? true}
-        fetcher={fetcher}
-        defaultQuery={defaultQuery ?? DEFAULT_QUERY}
-        plugins={plugins}
-      >
+    <GraphiQLProvider
+      {...otherProps}
+      inputValueDeprecation={inputValueDeprecation ?? true}
+      schemaDescription={schemaDescription ?? true}
+      fetcher={fetcher}
+      defaultQuery={defaultQuery ?? DEFAULT_QUERY}
+      plugins={plugins}
+    >
+      <ExplainContext.Provider value={explainContextValue}>
         <HistoryStore maxHistoryLength={props.maxHistoryLength}>
           <DocExplorerStore>
             <RuruInner
@@ -109,8 +109,8 @@ export const Ruru: FC<RuruProps> = (props) => {
             />
           </DocExplorerStore>
         </HistoryStore>
-      </GraphiQLProvider>
-    </ExplainContext.Provider>
+      </ExplainContext.Provider>
+    </GraphiQLProvider>
   );
 };
 
