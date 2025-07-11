@@ -16,6 +16,7 @@ import { resolvePreset } from "graphile-config";
 import { getGrafservMiddleware } from "../hooks.js";
 import type {
   BufferResult,
+  BufferStreamResult,
   DynamicOptions,
   ErrorResult,
   EventStreamEvent,
@@ -45,11 +46,11 @@ import type { OptionsFromConfig } from "../options.js";
 import { optionsFromConfig } from "../options.js";
 import { handleErrors, normalizeRequest, sleep } from "../utils.js";
 
-const fourOhFourBuffer = Buffer.from(
+const buffer404 = Buffer.from(
   `<!doctype html><html><head><title>Not found</title></head><body><h1>Not found</h1><p>Please try again with a different URL</p></body></html>`,
   "utf8",
 );
-const serviceUnavailableBuffer = Buffer.from("Service unavailable", "utf8");
+const buffer503 = Buffer.from("Service unavailable", "utf8");
 
 const failedToBuildHandlersError = new graphql.GraphQLError(
   "Unknown error occurred.",
@@ -482,7 +483,7 @@ export class GrafservBase {
       request,
       dynamicOptions,
       statusCode: 503,
-      payload: serviceUnavailableBuffer,
+      payload: buffer503,
     };
   };
 
@@ -675,24 +676,14 @@ export function convertHandlerResultToResult(
         ...handlerResult.headers,
       };
       if (preferJSON && !outputDataAsString) {
-        return {
-          type: "json",
-          statusCode,
-          headers,
-          json: payload as any,
-        };
+        return { type: "json", statusCode, headers, json: payload as any };
       } else {
         const buffer = Buffer.from(
           stringifyPayload(payload as any, outputDataAsString),
           "utf8",
         );
         headers["content-length"] = String(buffer.length);
-        return {
-          type: "buffer",
-          statusCode,
-          headers,
-          buffer,
-        };
+        return { type: "buffer", statusCode, headers, buffer };
       }
     }
     case "graphqlIncremental": {
@@ -731,24 +722,19 @@ export function convertHandlerResultToResult(
         statusCode,
         lowLatency: true,
         bufferIterator,
-      };
+      } as BufferStreamResult;
     }
     case "text":
     case "html":
     case "raw": {
-      const { payload, statusCode = 200 } = handlerResult;
+      const { payload: buffer, statusCode = 200 } = handlerResult;
       const headers: Record<string, string> = {
         __proto__: null as never,
         ...CONTENT_TYPE_HEADERS[handlerResult.type],
-        "content-length": String(payload.length),
+        "content-length": String(buffer.length),
         ...handlerResult.headers,
       };
-      return {
-        type: "buffer",
-        statusCode,
-        headers,
-        buffer: payload,
-      } as BufferResult;
+      return { type: "buffer", statusCode, headers, buffer } as BufferResult;
     }
     case "noContent": {
       const { statusCode = 204 } = handlerResult;
@@ -756,24 +742,16 @@ export function convertHandlerResultToResult(
         __proto__: null as never,
         ...handlerResult.headers,
       };
-      return {
-        type: "noContent",
-        statusCode,
-        headers,
-      } as NoContentResult;
+      return { type: "noContent", statusCode, headers } as NoContentResult;
     }
     case "notFound": {
-      const { statusCode = 404 } = handlerResult;
+      const { statusCode = 404, payload: buffer = buffer404 } = handlerResult;
       const headers: Record<string, string> = {
         __proto__: null as never,
+        ...CONTENT_TYPE_HEADERS.html,
         ...handlerResult.headers,
       };
-      return {
-        type: "buffer",
-        statusCode,
-        headers,
-        buffer: fourOhFourBuffer,
-      } as BufferResult;
+      return { type: "buffer", statusCode, headers, buffer } as BufferResult;
     }
     case "event-stream": {
       const {
@@ -827,28 +805,24 @@ export function convertHandlerResultToResult(
         headers,
         lowLatency: true,
         bufferIterator,
-      };
+      } as BufferStreamResult;
     }
     default: {
       const never: never = handlerResult;
       console.error(
         `Did not understand '${never}' passed to convertHandlerResultToResult`,
       );
-      const payload = Buffer.from(
+      const statusCode = 500;
+      const buffer = Buffer.from(
         "Unexpected input to convertHandlerResultToResult",
         "utf8",
       );
       const headers: Record<string, string> = {
         __proto__: null as never,
         "content-type": "text/plain; charset=utf-8",
-        "content-length": String(payload.length),
+        "content-length": String(buffer.length),
       };
-      return {
-        type: "buffer",
-        statusCode: 500,
-        headers,
-        buffer: payload,
-      } as BufferResult;
+      return { type: "buffer", statusCode, headers, buffer } as BufferResult;
     }
   }
 }

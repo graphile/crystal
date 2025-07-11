@@ -197,6 +197,7 @@ export interface EventStreamHeandlerResult extends IHandlerResult {
 }
 export interface NotFoundResult extends IHandlerResult {
   type: "notFound";
+  payload?: Buffer;
 }
 export interface RawHandlerResult extends IHandlerResult {
   type: "raw";
