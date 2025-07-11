@@ -57,7 +57,7 @@ export function makeGraphiQLHandler(
 
     let payload = Buffer.from(html, "utf8");
     const accept = request.getHeader("accept-encoding");
-    if (typeof accept === "string" && /\bbr\b/.test(accept)) {
+    if (typeof accept === "string" && /\bbr\b/i.test(accept)) {
       payload = await brotliCompress(payload, {
         params: {
           // No compression is ~3.2KB and 100,000 compresses takes 195ms
