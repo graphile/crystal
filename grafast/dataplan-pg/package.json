@@ -52,7 +52,7 @@
     "@dataplan/json": "workspace:^",
     "@graphile/lru": "workspace:^",
     "@types/node": "^22.16.3",
-    "chalk": "^4.1.2",
+    "chalk": "^5.4.1",
     "debug": "^4.4.1",
     "eventemitter3": "^5.0.1",
     "grafast": "workspace:^",

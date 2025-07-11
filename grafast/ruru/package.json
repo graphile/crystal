@@ -54,7 +54,7 @@
     "graphql": "^16.1.0-experimental-stream-defer.6",
     "http-proxy": "^1.18.1",
     "tslib": "^2.8.1",
-    "yargs": "^17.7.2"
+    "yargs": "^18.0.0"
   },
   "engines": {
     "node": ">=16"

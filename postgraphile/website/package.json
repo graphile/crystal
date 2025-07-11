@@ -28,7 +28,7 @@
     "@mdx-js/react": "^3.1.0",
     "clsx": "^2.1.1",
     "postcss": "^8.5.6",
-    "postcss-nested": "^6.2.0",
+    "postcss-nested": "^7.0.2",
     "prism-react-renderer": "^2.4.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
