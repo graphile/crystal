@@ -640,7 +640,7 @@ const DIVIDE = Buffer.from(
 );
 
 function eventStreamHeaders(dynamicOptions: OptionsFromConfig) {
-  if (!dynamicOptions) return null;
+  if (!dynamicOptions.watch) return null;
   return { ["x-graphql-event-stream"]: dynamicOptions.eventStreamPath };
 }
 
