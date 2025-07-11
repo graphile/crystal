@@ -729,6 +729,43 @@ is true then Gra*fast* will _not_ remove this step during tree shaking, and
 will ensure that the step is executed even if it doesn't appear to be used in
 any output.
 
+:::info[Network requests are not side effects]
+
+In languages like Scala/Haskell, a side effect is anything that is visible
+outside of the function/component itself: a network call, logging, etc. You
+might have heard that "a pure function has no side effects visible to any
+observer."
+
+Not so with <Grafast />, we're not talking about pure functions here. If your
+step is meant to fetch data from a remote source and return it as part of the
+result, then that fetch is not a side effect of the step; it's the main event.
+If nothing ever depends on that data, then we can determine it wasn't needed and
+we can "tree shake" the step out of the plan such that that fetch never happens.
+Similarly, if two steps are doing the exact same thing, we may be able to
+de-duplicate them such that two fetches become one.
+
+For <Grafast />, a side effect is something that should happen _even if_ nothing
+ever depends on the result. It's something that must not be tree-shaken away or
+de-duplicated. The most common use case for this is mutations: adding, deleting,
+or updating state in your backend storage, triggering an event to be sent, etc.;
+however it may also be used for things like logging where you want the log
+statement to run even if nothing ever depends on the output of the step:
+
+```ts
+const $step = doSomething();
+
+// Nothing depends on this, but because it hasSideEffects it will not be tree
+// shaken away, and will be executed.
+sideEffect($step, (value) => void console.log(value));
+
+return $step;
+```
+
+If you're looking for the equivalent of a "pure function" in Grafast, the
+closest is a step that `isSyncAndSafe`...
+
+:::
+
 ### isSyncAndSafe
 
 :::danger
@@ -746,13 +783,15 @@ schema may no longer be GraphQL compliant).
 Do not set this true unless the following hold:
 
 - The `execute` method must be a regular (not async) function
-- The `execute` method must NEVER return a promise
-- The values within the list returned from `execute` must NEVER include promises
+- The `execute` method must NEVER return a promise, iterator, or similar
+- The values within the list returned from `execute` must NEVER include promises,
+  iterators, or similar
 - The result of calling `execute` should not differ after a
   `step.hasSideEffects` has executed (i.e. it should be pure, only dependent on
   its deps and use no external state)
 
-It's acceptable for the `execute` method to throw if it needs to.
+It's acceptable for the `execute` method to throw if it needs to, but this will
+impact every batched value.
 
 This optimisation applies to the majority of the built in plans and allows the
 engine to execute without needing to resolve any promises which saves precious
