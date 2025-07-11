@@ -1,6 +1,6 @@
 // Babel config, used by Jest
 module.exports = {
-  plugins: ["@babel/plugin-transform-modules-commonjs"],
+  plugins: [],
   presets: [
     [
       "@babel/env",
@@ -15,7 +15,7 @@ module.exports = {
   ],
   env: {
     test: {
-      plugins: ["babel-plugin-transform-import-meta"],
+      plugins: [],
       presets: [
         [
           "@babel/env",

@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "test": "jest",
+    "test": "node --experimental-vm-modules $(yarn bin jest)",
     "prepack": "tsc -b",
     "watch": "tsc -b --watch"
   },

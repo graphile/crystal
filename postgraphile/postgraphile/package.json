@@ -184,12 +184,13 @@
   "bin": "./dist/cli-run.js",
   "scripts": {
     "test": "yarn test:jest && UPDATE_SNAPSHOTS=\"\" yarn test:schema-exports && UPDATE_SNAPSHOTS=\"\" yarn test:operations-exports",
-    "test:jest": "jest",
+    "test:jest": "yarn jest",
     "test:schema-exports": "node scripts/test-schema-exports.mjs",
     "test:operations-exports": "yarn test:operations-exports:typeDefs",
     "//test:operations-exports": "yarn test:operations-exports:typeDefs && yarn test:operations-exports:graphql-js",
-    "test:operations-exports:typeDefs": "EXPORT_SCHEMA=typeDefs jest __tests__/queries __tests__/mutations",
-    "test:operations-exports:graphql-js": "EXPORT_SCHEMA=graphql-js jest __tests__/queries __tests__/mutations",
+    "test:operations-exports:typeDefs": "EXPORT_SCHEMA=typeDefs yarn jest __tests__/queries __tests__/mutations",
+    "test:operations-exports:graphql-js": "EXPORT_SCHEMA=graphql-js yarn jest __tests__/queries __tests__/mutations",
+    "jest": "node --experimental-vm-modules $(yarn bin jest)",
     "prepack": "tsc -b tsconfig.build.json"
   },
   "repository": {

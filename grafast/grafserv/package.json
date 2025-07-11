@@ -69,7 +69,7 @@
   },
   "scripts": {
     "prepack": "tsc -b",
-    "test": "jest"
+    "test": "node --experimental-vm-modules $(yarn bin jest)"
   },
   "repository": {
     "type": "git",

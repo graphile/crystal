@@ -17,7 +17,7 @@
     }
   },
   "scripts": {
-    "test": "jest",
+    "test": "node --experimental-vm-modules $(yarn bin jest)",
     "prepack": "tsc -b && cp src/.npmignore dist/.npmignore"
   },
   "repository": {
