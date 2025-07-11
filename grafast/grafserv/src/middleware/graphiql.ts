@@ -1,3 +1,5 @@
+import { brotliCompressSync } from "node:zlib";
+
 import type { PromiseOrDirect } from "grafast";
 import type { Middleware } from "graphile-config";
 import type { RuruServerConfig } from "ruru/server";
@@ -49,13 +51,18 @@ export function makeGraphiQLHandler(
     } else {
       html = ruruHTML(config, htmlParts);
     }
-    return {
-      statusCode: 200,
-      request,
-      dynamicOptions,
-      type: "html",
-      payload: Buffer.from(html, "utf8"),
-    };
+
+    const statusCode = 200;
+    const headers: Record<string, string> = Object.create(null)
+    let payload = Buffer.from(html, 'utf8')
+
+    const accept = request.getHeader('accept-encoding')
+    if (typeof accept === 'string' && /\bbr\b/.test(accept)) {
+      headers['content-encoding'] = 'br'
+      payload = brotliCompressSync(payload)
+    }
+
+    return { type: "html", request, dynamicOptions, statusCode, headers, payload };
   };
 }
 
