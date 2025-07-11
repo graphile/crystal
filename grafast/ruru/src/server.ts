@@ -27,7 +27,7 @@ const baseElements = /* HTML */ `<div id="ruru-root">
   <div class="graphiql-container">
     <div class="graphiql-sidebar"></div>
     <div class="graphiql-main">
-      <div class="graphiql-plugin" style="min-width: 200px; flex: 0.25 1 0%;">
+      <div class="graphiql-plugin" style="min-width: 200px; flex: 0.333333 1 0%;">
         <div>
           <div class="graphiql-doc-explorer-header">
             <div class="graphiql-doc-explorer-title">Loading...</div>
@@ -42,11 +42,7 @@ const baseElements = /* HTML */ `<div id="ruru-root">
         <div class="graphiql-session-header">
           <ul role="tablist" class="graphiql-tabs no-scrollbar">
             <li class="graphiql-tab graphiql-tab-active">
-              <button
-                type="button"
-                class="graphiql-un-styled graphiql-tab-button"
-                disabled
-              >
+              <button type="button" class="graphiql-un-styled graphiql-tab-button" disabled>
                 Loading...
               </button>
             </li>
@@ -72,7 +68,26 @@ const baseElements = /* HTML */ `<div id="ruru-root">
       </div>
     </div>
   </div>
-</div>`.replace(/^\s+/gm, "");
+</div>
+<script>
+try {
+  const $ = document.querySelector.bind(document);
+  if (!localStorage.getItem('graphiql:visiblePlugin')) {
+    $('.graphiql-plugin').style.display = 'none';
+    $('.graphiql-horizontal-drag-bar').style.display = 'none';
+  }
+  const flexes = [
+    { key: 'docExplorerFlex', identifier: '.graphiql-plugin' },
+    { key: 'editorFlex', identifier: '.graphiql-editors' },
+  ];
+  for (const {key, identifier} of flexes) {
+    const val = localStorage.getItem('graphiql:' + key);
+    if (val) $(identifier).style.flex = val + " 1 0%";
+  }
+} catch (e) {
+  console.error('Failed to prettify the loading state', e);
+}
+</script>`.replace(/^\s+/gm, "");
 const baseBodyScripts = ``;
 
 export interface RuruServerConfig extends RuruConfig {
