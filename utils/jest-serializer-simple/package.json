@@ -28,7 +28,6 @@
   "dependencies": {
     "@types/json5": "^2.2.0",
     "json5": "^2.2.3",
-    "prettier": "^3.6.2",
     "tslib": "^2.8.1"
   },
   "devDependencies": {
