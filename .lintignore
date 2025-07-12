@@ -35,6 +35,8 @@ _LOCAL/
 
 .docusaurus/
 /*/website/build/
+/*/website/versioned_sidebars/*-sidebars.json
+/*/website/versioned_docs/
 contrib/
 
 # MDXv3 isn't supported by prettier right now
