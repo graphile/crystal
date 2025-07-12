@@ -1,5 +1,24 @@
 # ruru
 
+## 2.0.0-beta.26
+
+### Patch Changes
+
+- [#2629](https://github.com/graphile/crystal/pull/2629)
+  [`c5cc0ba`](https://github.com/graphile/crystal/commit/c5cc0ba6228c754bca60219d78ca1bc1b10759ca)
+  Thanks [@benjie](https://github.com/benjie)! - Fix loading worker scripts from
+  remote URLs.
+
+- [#2631](https://github.com/graphile/crystal/pull/2631)
+  [`506b7a1`](https://github.com/graphile/crystal/commit/506b7a16bbdee72b0ac41eb3f3235775d629be6c)
+  Thanks [@benjie](https://github.com/benjie)! - Add a `ruru.html` file you can
+  self-host, and move Ruru documentation to the website for easier navigation
+
+- [#2632](https://github.com/graphile/crystal/pull/2632)
+  [`418190a`](https://github.com/graphile/crystal/commit/418190a04169fdd01e166ae30fa764098bb34249)
+  Thanks [@benjie](https://github.com/benjie)! - Ruru loading state now matches
+  expected theme (light/dark).
+
 ## 2.0.0-beta.25
 
 ### Patch Changes
