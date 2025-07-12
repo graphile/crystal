@@ -1,5 +1,5 @@
 ---
-title: makePgSmartTagsPlugin
+title: pgSmartTags
 ---
 
 Smart Tags enable you to customize how (or if) your PostgreSQL resources are
@@ -26,28 +26,28 @@ can be served by this plugin.
 
 ## Smart tags plugin generators
 
-`makePgSmartTagsPlugin` and `makeJSONPgSmartTagsPlugin` are plugin generators
+`pgSmartTags` and `jsonPgSmartTags` are plugin generators
 that allows you to easily apply smart tags to various PostgreSQL entities.
 
-- `makePgSmartTagsFromFilePlugin` is the highest level function, and loads smart
+- `pgSmartTagsFromFile` is the highest level function, and loads smart
   tags from a JSON5 file.
-- `makeJSONPgSmartTagsPlugin` is like `makePgSmartTagsFromFilePlugin`, except it
+- `jsonPgSmartTags` is like `pgSmartTagsFromFile`, except it
   allows you to specify the configuration object in code rather than via a JSON5
   file.
-- `makePgSmartTagsPlugin` is the lowest level plugin, it allows you to apply
+- `pgSmartTags` is the lowest level plugin, it allows you to apply
   smart tags to PostgreSQL entities that match your specified rules.
 
-## makePgSmartTagsFromFilePlugin
+## pgSmartTagsFromFile
 
 Usage example:
 
 ```ts
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 // highlight-next-line
-import { makePgSmartTagsFromFilePlugin } from "postgraphile/utils";
+import { pgSmartTagsFromFile } from "postgraphile/utils";
 
 // highlight-start
-const SmartTagsPlugin = makePgSmartTagsFromFilePlugin(
+const SmartTagsPlugin = pgSmartTagsFromFile(
   // JSON and JSONC are also JSON5 compatible, so you can use these extensions if you prefer:
   "/path/to/my/tags.file.json5",
 );
@@ -66,23 +66,23 @@ This plugin powers the [postgraphile.tags.json5 file](./smart-tags-file)
 enabled by `TagsFilePlugin`. You can use it multiple times to merge smart tags
 from multiple files should you wish.
 
-## makeJSONPgSmartTagsPlugin
+## jsonPgSmartTags
 
 This plugin generator takes a `JSONPgSmartTags` object, and adds the relevant
 tags to the relevant entities referenced. It is what powers
-`makePgSmartTagsFromFilePlugin` above, but you can also use it in your own
+`pgSmartTagsFromFile` above, but you can also use it in your own
 PostGraphile schema plugins.
 
 ### Importing
 
 ```ts
-import { makeJSONPgSmartTagsPlugin } from "postgraphile/utils";
+import { jsonPgSmartTags } from "postgraphile/utils";
 ```
 
 ### Signature
 
 ```ts
-function makeJSONPgSmartTagsPlugin(
+function jsonPgSmartTags(
   jsonOrThunk: ThunkOrDirect<PromiseOrDirect<JSONPgSmartTags | null>>,
   subscribeToJSONUpdatesCallback?: SubscribeToJSONPgSmartTagsUpdatesCallback | null,
   details?: { name?: string; description?: string; version?: string },
@@ -210,25 +210,25 @@ mode, this callback will be called, and it will be passed a callback function
 that in turn must be called when a change takes place. When watch mode is
 exited, the function will be called again without a callback, and whatever was
 in place for watching must be released. An example implementation of this can
-be found in `makePgSmartTagsFromFilePlugin`, which monitors a JSON5 file for
+be found in `pgSmartTagsFromFile`, which monitors a JSON5 file for
 changes and triggers the schema to refresh when this file changes.
 
-## makePgSmartTagsPlugin
+## pgSmartTags
 
 This is a more versatile, but higher effort plugin generator that powers
-`makeJSONPgSmartTagsPlugin`. Rather than passing a configuration object, a list
+`jsonPgSmartTags`. Rather than passing a configuration object, a list
 of rules (or a single rule) is passed.
 
 ### Importing
 
 ```ts
-import { makePgSmartTagsPlugin } from "postgraphile/utils";
+import { pgSmartTags } from "postgraphile/utils";
 ```
 
 ### Signature
 
 ```ts
-function makePgSmartTagsPlugin(
+function pgSmartTags(
   initialRules: ThunkOrDirect<
     PromiseOrDirect<PgSmartTagRule | PgSmartTagRule[] | null>
   >,
@@ -263,17 +263,17 @@ type SubscribeToPgSmartTagUpdatesCallback = (
 
 Rules must specify a `kind` (`class`, `attribute`, `constraint` or `procedure`)
 and a `match` which could be the identifier (following the same rules as for
-`makeJSONPgSmartTagsPlugin`) or a matcher function. The matcher function makes
+`jsonPgSmartTags`) or a matcher function. The matcher function makes
 this plugin generator incredibly powerful, for example it could be used to apply
 tags to all PostgreSQL entities that match a particular criteria that does not
 need to relate to the entity's name. The matcher function is passed
 a `pg-introspection` entity, and must return a boolean to say whether this
 entity should be matched or not.
 
-Like with `makeJSONPgSmartTagsPlugin`, the rule may also optionally supply the
+Like with `jsonPgSmartTags`, the rule may also optionally supply the
 `tags` Smart Tags object to be merged, and a `description` to overwrite the
 previous description.
 
 The plugin also supports a `subscribeToUpdatesCallback` to enable watch mode,
 which works in the same way as `subscribeToJSONUpdatesCallback` from
-`makeJSONPgSmartTagsPlugin`.
+`jsonPgSmartTags`.

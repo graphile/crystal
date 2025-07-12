@@ -1,8 +1,8 @@
 ---
-title: makeExtendSchemaPlugin
+title: extendSchema
 ---
 
-`makeExtendSchemaPlugin` is _the_ plugin generator you need to know about. It’s
+`extendSchema` is _the_ plugin generator you need to know about. It’s
 the “bread and butter” of customizing your PostGraphile schema, enabling you to
 add new fields and types to your GraphQL schema in a convenient and concise
 familiar syntax — GraphQL SDL.
@@ -20,17 +20,17 @@ a Graphile Build plugin by hand.
 :::
 
 If you’re already familiar with the `typeDefs`/`resolvers` pattern used by
-systems such as `graphql-tools` then using `makeExtendSchemaPlugin` should feel
+systems such as `graphql-tools` then using `extendSchema` should feel
 familiar for you.
 
 ## Signature
 
-`makeExtendSchemaPlugin` is called with a single parameter: a callback
+`extendSchema` is called with a single parameter: a callback
 function. This function will be passed the `build` object, and it must return
 (synchronously) an object defining `typeDefs`, and one or more of `plans`
 and/or `resolvers`.
 
-The `build` argument to the makeExtendSchemaPlugin callback contains lots of
+The `build` argument to the extendSchema callback contains lots of
 information and helpers defined by various plugins, in particular the registry
 (`build.input.pgRegistry`) which contains all the resources and codecs from
 introspection, the inflection functions (`build.inflection`), and the SQL helper
@@ -39,9 +39,9 @@ introspection, the inflection functions (`build.inflection`), and the SQL helper
 
 The callback should return an object with the following keys:
 
-- `typeDefs`: a GraphQL AST generated with the `gql` helper from
-  `postgraphile/utils` (note this is NOT from the `graphql-tag` library, ours
-  works in a slightly different way).
+- `typeDefs`: a string in GraphQL schema definition language (SDL) or a GraphQL
+  AST generated with the `gql` helper from `postgraphile/utils` (note this is NOT
+  from the `graphql-tag` library, ours works in a slightly different way).
 - `plans` (optional, recommended): an object keyed by GraphQL type name that you’re adding
   or extending in `typeDefs`, the values of which are objects keyed by the
   fieldName you’ve added, and the value of which is typically a plan resolver
@@ -62,15 +62,15 @@ should use `plans` rather than `resolvers`.
 ## Example
 
 ```ts
-import { makeExtendSchemaPlugin, gql } from "postgraphile/utils";
+import { extendSchema } from "postgraphile/utils";
 import { constant } from "postgraphile/grafast";
 
-export const MyPlugin = makeExtendSchemaPlugin((build) => {
+export const MyPlugin = extendSchema((build) => {
   // Get any helpers we need from `build`
   const { sql, inflection } = build;
 
   return {
-    typeDefs: gql`
+    typeDefs: /* GraphQL */ `
       extend type Query {
         meaningOfLife: Int
       }
@@ -87,7 +87,7 @@ export const MyPlugin = makeExtendSchemaPlugin((build) => {
     },
 
     /*
-    // Though makeExtendSchemaPlugin and Grafast both support traditional
+    // Though extendSchema and Grafast both support traditional
     // resolvers, plan resolvers are preferred for a "pure" Grafast schema.
     // Here's what the above would look like with traditional resolvers:
     resolvers: {
@@ -104,13 +104,13 @@ export const MyPlugin = makeExtendSchemaPlugin((build) => {
 
 ## The `gql` helper
 
-The `gql` helper is responsible for turning the human-readable GraphQL schema
-language you write into an abstract syntax tree (AST) that the application can
-understand. Our `gql` help differs slightly from the one you may be familiar
-with in the `graphql-tag` npm module, namely in how the placeholders work. Ours
-is designed to work with PostGraphile’s [inflection system](./inflection), so
-you can embed strings directly. You may also embed other gql tags directly. For
-example:
+The `gql` helper, usage of which is optional, is responsible for turning the
+human-readable GraphQL schema language you write into an abstract syntax tree
+(AST) that the application can understand. Our `gql` help differs slightly from
+the one you may be familiar with in the `graphql-tag` npm module, namely in how
+the placeholders work. Ours is designed to work with PostGraphile’s [inflection
+system](./inflection), so you can embed strings directly. You may also embed
+other gql tags directly. For example:
 
 ```ts
 const nameOfType = "MyType"; // Or use the inflection system to generate a type
@@ -158,12 +158,7 @@ const typeDefs = gql`
 
 -->
 
-## “Special” fields
-
-In GraphQL, it is forbidden to name any fields beginning with `__` (two
-underscores) since that is reserved for introspection. We therefore use this
-prefix to provide additional details to types. What additional information is
-relevant depends on the type:
+## Type-level fields
 
 ### Object type step assertion
 
@@ -187,10 +182,10 @@ it can be an “assertion function” that throws an error if the passed step is
 not of the right type, e.g.:
 
 ```ts
-import { makeExtendSchemaPlugin, gql } from "postgraphile/utils";
+import { extendSchema } from "postgraphile/utils";
 
-const schema = makeExtendSchemaPlugin({
-  typeDefs: gql`
+const schema = extendSchema({
+  typeDefs: /* GraphQL */ `
     type MyObject {
       id: Int
     }
@@ -226,7 +221,7 @@ that are scoped as `isPgFieldConnection: true` and have an associated and
 suitable `pgFieldResource` scope set.
 
 You can add to/overwrite the Graphile Build “scope” of a type by adding the
-`__scope` property to the object’s `plans` object.
+`scope` property to the object’s `plans` object.
 
 You can add to/overwrite the Graphile Build scope of a field by making the
 field definition an object (if it was previously a function, move the function
@@ -235,12 +230,12 @@ to be inside the object using the `plan` key) and adding the `scope` property.
 For example:
 
 ```ts
-import { makeExtendSchemaPlugin, gql } from "postgraphile/utils";
+import { extendSchema } from "postgraphile/utils";
 
-const schema = makeExtendSchemaPlugin((build) => {
+const schema = extendSchema((build) => {
   const { users } = build.input.pgRegistry.pgResources;
   return {
-    typeDefs: gql`
+    typeDefs: /* GraphQL */ `
       type MyObject {
         id: Int
       }
@@ -272,7 +267,7 @@ const schema = makeExtendSchemaPlugin((build) => {
 
 :::note[It is possible to unset or overwrite automatic scopes]
 
-`makeExtendSchemaPlugin` might try and guess the scopes to use to be helpful;
+`extendSchema` might try and guess the scopes to use to be helpful;
 if it gets them wrong then be sure to overwrite them using the instructions
 above. To unset scopes, set them to `undefined`.
 
@@ -355,13 +350,13 @@ const $channels = channels.find({ organization_id: $organizationId });
 Pulling this all together, you could build a plugin that adds a `Query.myChannels` field returning all the channels just from your organization:
 
 ```ts
-import { makeExtendSchemaPlugin, gql } from "postgraphile/utils";
+import { extendSchema } from "postgraphile/utils";
 import { context } from "postgraphile/grafast";
 
-export const MyChannelsPlugin = makeExtendSchemaPlugin((build) => {
+export const MyChannelsPlugin = extendSchema((build) => {
   const { users, channels } = build.input.pgRegistry.pgResources;
   return {
-    typeDefs: gql`
+    typeDefs: /* GraphQL */ `
       extend type Query {
         myChannels: [Channel]
       }
@@ -475,18 +470,18 @@ Here’s the previous example again, this time rewritten to use `withPgClient` t
 retrieve the `organization_id` rather than the user resource:
 
 ```ts
-import { makeExtendSchemaPlugin, gql } from "postgraphile/utils";
+import { extendSchema } from "postgraphile/utils";
 import { context } from "postgraphile/grafast";
 // highlight-next-line
 import { withPgClient } from "postgraphile/@dataplan/pg";
 
-export const MyChannelsPlugin = makeExtendSchemaPlugin((build) => {
+export const MyChannelsPlugin = extendSchema((build) => {
   const { channels } = build.input.pgRegistry.pgResources;
   const executor = build.input.pgRegistry.pgExecutors.main;
   // or: `const executor = channels.executor;`
 
   return {
-    typeDefs: gql`
+    typeDefs: /* GraphQL */ `
       extend type Query {
         myChannels: [Channel]
       }
@@ -581,7 +576,7 @@ step](https://grafast.org/grafast/step-library/standard-steps/loadOne) to
 batch-convert these values from USD to AUD:
 
 ```js
-import { makeExtendSchemaPlugin, gql } from "postgraphile/utils";
+import { extendSchema } from "postgraphile/utils";
 import { loadOne } from "postgraphile/grafast";
 import { getExchangeRate } from "./myBusinessLogic.mjs";
 
@@ -592,9 +587,9 @@ async function convertUsdToAud(values) {
 }
 // highlight-end
 
-export const MyForeignExchangePlugin = makeExtendSchemaPlugin((build) => {
+export const MyForeignExchangePlugin = extendSchema((build) => {
   return {
-    typeDefs: gql`
+    typeDefs: /* GraphQL */ `
       extend type Product {
         priceInAuCents: Int!
       }
@@ -617,19 +612,19 @@ export const MyForeignExchangePlugin = makeExtendSchemaPlugin((build) => {
 
 ## Returning a connection
 
-When returning a connection in `makeExtendSchemaPlugin`, you must be sure that your plan resolver yields a `connection(...)` step; failure to do this may result in errors such as `$connection.getSubplan is not a function`.
+When returning a connection in `extendSchema`, you must be sure that your plan resolver yields a `connection(...)` step; failure to do this may result in errors such as `$connection.getSubplan is not a function`.
 
 For example, if you want to expose a related `ReviewConnection` from `Product`:
 
 ```js
-import { makeExtendSchemaPlugin, gql } from "postgraphile/utils";
+import { extendSchema } from "postgraphile/utils";
 import { connection } from "postgraphile/grafast";
 
-export const MyProductReviewsPlugin = makeExtendSchemaPlugin((build) => {
+export const MyProductReviewsPlugin = extendSchema((build) => {
   const { reviews } = build.input.pgRegistry.pgResources;
 
   return {
-    typeDefs: gql`
+    typeDefs: /* GraphQL */ `
       extend type Product {
         reviews: ReviewConnection
       }
@@ -658,17 +653,17 @@ You might want to add a custom `registerUser` mutation which inserts the new
 user into the database and also sends them an email:
 
 ```ts
-import { makeExtendSchemaPlugin, gql } from "postgraphile/utils";
+import { extendSchema } from "postgraphile/utils";
 import { access, constant, object } from "postgraphile/grafast";
 import { withPgClientTransaction } from "postgraphile/@dataplan/pg";
 
-export const MyRegisterUserMutationPlugin = makeExtendSchemaPlugin((build) => {
+export const MyRegisterUserMutationPlugin = extendSchema((build) => {
   const { sql } = build;
   const { users } = build.input.pgRegistry.pgResources;
   const { executor } = users;
   // Or: `const executor = build.input.pgRegistry.pgExecutors.main;`
   return {
-    typeDefs: gql`
+    typeDefs: /* GraphQL */ `
       input RegisterUserInput {
         name: String!
         email: String!
@@ -762,11 +757,11 @@ check that the user performing the soft-delete is the owner of the record.
 [@graphile-contrib/pg-omit-archived](https://github.com/graphile-contrib/pg-omit-archived)
 
 ```ts
-import { makeExtendSchemaPlugin, gql } from "postgraphile/utils";
+import { extendSchema } from "postgraphile/utils";
 import { context, list, specFromNodeId } from "postgraphile/grafast";
 import { withPgClientTransaction } from "postgraphile/@dataplan/pg";
 
-const DeleteItemByNodeIdPlugin = makeExtendSchemaPlugin((build) => {
+const DeleteItemByNodeIdPlugin = extendSchema((build) => {
   // We need the nodeId handler for the Item type so that we can decode the ID.
   const handler = build.getNodeIdHandler("Item")!;
 
@@ -776,7 +771,7 @@ const DeleteItemByNodeIdPlugin = makeExtendSchemaPlugin((build) => {
   // Or: `const executor = build.input.pgRegistry.pgExecutors.main;`
 
   return {
-    typeDefs: gql`
+    typeDefs: /* GraphQL */ `
       input DeleteItemInput {
         id: ID!
       }
@@ -847,7 +842,7 @@ the known, supported, errors then it will return the given error type.
 
 ```ts
 import { withPgClient } from "@dataplan/pg";
-import { gql, makeExtendSchemaPlugin } from "graphile-utils";
+import { extendSchema } from "postgraphile/utils";
 import {
   ObjectStep,
   constant,
@@ -858,12 +853,12 @@ import {
 } from "postgraphile/grafast";
 import { DatabaseError } from "pg";
 
-export const RegisterUserPlugin = makeExtendSchemaPlugin((build) => {
+export const RegisterUserPlugin = extendSchema((build) => {
   const { users } = build.input.pgRegistry.pgResources;
   const { executor } = users;
   // Or: `const executor = build.input.pgRegistry.pgExecutors.main;`
   return {
-    typeDefs: gql`
+    typeDefs: /* GraphQL */ `
       extend type Mutation {
         registerUser(input: RegisterUserInput!): RegisterUserPayload
       }

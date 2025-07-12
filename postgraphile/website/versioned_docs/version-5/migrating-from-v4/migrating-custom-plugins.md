@@ -719,8 +719,7 @@ property to `GraphileBuild.Build`, you might do:
 
 ```ts
 // Ensure that the types are imported for TypeScript
-import "graphile-build";
-import "graphile-config";
+import "postgraphile";
 
 // Extend the global GraphileBuild.Build type to add our 'flibble' attribute:
 declare global {

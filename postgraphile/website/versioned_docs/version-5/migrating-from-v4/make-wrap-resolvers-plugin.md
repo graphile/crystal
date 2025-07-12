@@ -94,7 +94,7 @@ const plugin = makeWrapPlansPlugin({
 });
 ```
 
-:::caution
+:::warning
 
 Plans with side effects are only expected/supported in field plans on the
 `Mutation` type. Side effect plans elsewhere may lead to unexpected results.

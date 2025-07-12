@@ -608,7 +608,7 @@ comment on column forum_example_private.person_account.email is 'The email addre
 comment on column forum_example_private.person_account.password_hash is 'An opaque hash of the person’s password.';
 ```
 
-:::warning
+:::danger
 
 Never store passwords in plaintext! The `password_hash` column
 will contain the user’s password _after_ it has gone through a secure hashing
@@ -745,7 +745,7 @@ we said users would never be able to insert into
 `forum_example_private.person_account` because it uses the privileges of the
 definer.
 
-:::warning[exercise caution when using security definer]
+:::danger[Exercise caution when using security definer]
 
 Make sure that when you create a function with `security definer`
 there are no ‘holes’ a user could use to see or mutate more data than they are
@@ -1074,7 +1074,7 @@ successfully find a person with that email, we store it in the `account`
 variable. If we do not find anything, `account` will be null. The second part of
 our function is:
 
-```sql
+```plsql
 if account.password_hash = crypt(password, account.password_hash) then
   return ('forum_example_person', account.person_id)::forum_example.jwt_token;
 else

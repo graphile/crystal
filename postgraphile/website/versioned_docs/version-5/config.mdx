@@ -21,7 +21,7 @@ The PostGraphile base presets are named after crystals; the first base preset
 available is `postgraphile/presets/amber`, so you’ll almost definitely want
 that.
 
-:::caution[Avoid naming conflicts!]
+:::warning[Avoid naming conflicts!]
 
 Please don’t name your own presets after crystals, or we may end up having
 confusion!
@@ -50,6 +50,7 @@ without the overhead of requiring TypeScript.
 Here’s an example preset which only extends the “Amber” preset:
 
 ```js title="graphile.config.mjs"
+// @ts-check
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 
 /** @type {GraphileConfig.Preset} */
@@ -60,13 +61,9 @@ const preset = {
 export default preset;
 ```
 
-You could also have created this in TypeScript, in which case you might add a
-couple of `import` statements to the top in order to ensure that the relevant
-TypeScript types exist.
+Or in TypeScript:
 
-```ts title="graphile.config.ts"
-import "graphile-config";
-import "postgraphile";
+```ts title="graphile.config.mts"
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 
 const preset: GraphileConfig.Preset = {
@@ -76,9 +73,11 @@ const preset: GraphileConfig.Preset = {
 export default preset;
 ```
 
-Similarly, you can create your config as a `.js`, `.cjs`, `.mts` or `.cts` file;
+Similarly, you can create your config as a `.js`, `.cjs`, `.ts` or `.cts` file;
 the PostGraphile CLI will pick up all of these automatically assuming that you
-have TypeScript installed locally.
+have TypeScript installed locally and are running Node 24 or higher. (For Node
+22.6+ you'll need to be running with the `node --experimental-strip-types` flag,
+or have `tsx`, `ts-node`, or similar installed locally.)
 
 ## General structure
 
@@ -105,9 +104,7 @@ registers the `grafast` scope; Grafserv registers the `grafserv` scope; and
 
 We highly recommend using TypeScript for dealing with your preset so that you
 get auto-completion for the options available in each scope; you can also use
-the `graphile config options` command detailed below. It may be necessary to
-add `import "postgraphile"` at the top of the configuration file so that
-TypeScript imports all the available scopes.
+the `graphile config options` command detailed below.
 
 :::tip[The Schema Build Process]
 
@@ -124,8 +121,7 @@ The schema build process in PostGraphile is:
 
 ### Simple example
 
-```ts title="graphile.config.ts"
-import "postgraphile"; // To import the TypeScript types
+```ts title="graphile.config.mts"
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 import { makePgService } from "postgraphile/adaptors/pg";
 
@@ -138,10 +134,7 @@ const preset: GraphileConfig.Preset = {
 
 ### Larger example
 
-```ts title="graphile.config.ts"
-// Only needed for TypeScript types support
-import "postgraphile";
-
+```ts title="graphile.config.mts"
 // The standard base preset to use, includes the main PostGraphile features
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 
@@ -151,9 +144,6 @@ import { PgRelayPreset } from "postgraphile/presets/relay";
 
 // Use the 'pg' module to connect to the database
 import { makePgService } from "postgraphile/adaptors/pg";
-
-// In case we want to customize the Ruru we render:
-import { defaultHTMLParts } from "postgraphile/grafserv/ruru/server";
 
 // A plugin for the system to use for persisted operations support
 import PersistedPlugin from "@grafserv/persisted";
@@ -211,7 +201,7 @@ const preset: GraphileConfig.Preset = {
   ruru: {
     /* options for customizing Ruru, e.g.: */
     htmlParts: {
-      metaTags: defaultHTMLParts.metaTags + "<!-- HELLO WORLD! -->",
+      metaTags: (base) => base + "<!-- HELLO WORLD! -->",
     },
   },
   pgServices: [
@@ -237,7 +227,7 @@ export default preset;
 Once you have a basic configuration file, you can use the <Spon /> `graphile` CLI to
 find out what options are available to you:
 
-```sh
+```shell
 graphile config options
 ```
 
@@ -269,7 +259,7 @@ file.
 You can also use the <Spon /> `graphile` CLI to print out your resolved configuration
 (once all the presets have been applied). This can help with debugging:
 
-```sh
+```shell
 graphile config print
 ```
 
@@ -356,7 +346,7 @@ const pgServices = [
 ];
 ```
 
-:::caution[Don’t set `name` unless you need to!]
+:::warning[Don’t set `name` unless you need to!]
 
 We recommend that you don’t set a `name` unless you have more than one
 pgService. If you do, the different services may need different properties on
@@ -410,7 +400,7 @@ why every adaptor should support them.
 
 :::
 
-:::caution[`name` must be unique!]
+:::warning[`name` must be unique!]
 
 The `name` option must be unique across all your `pgServices`; therefore if you
 have more than one entry in `pgServices` you must give each additional entry an
@@ -679,7 +669,7 @@ export default {
 };
 ```
 
-:::caution[Naming conventions]
+:::warning[Naming conventions]
 
 You can use `pgSettings` to define variables that your Postgres
 functions/policies depend on, or to tweak internal Postgres settings.
