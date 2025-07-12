@@ -48,5 +48,3 @@ Options:
   -S, --subscriptions          enable subscriptions, converting --endpoint to a ws:// URL    [boolean] [default: false]
   -s, --subscription-endpoint  endpoint for subscription operations (overrides -S)                             [string]
 ```
-
-

@@ -11,12 +11,11 @@ Flexible usage options
 - [a Node.js middleware](https://grafast.com/ruru/server)
 - [a static HTML file](https://grafast.com/ruru/html) - hosted or self-hosted
 - [embedded](https://grafast.com/ruru/html#embedded) - render Ruru into your
-existing HTML pages
+  existing HTML pages
 
 See it in action at:
 
 https://grafast.com/myruru/#endpoint=https://countries.trevorblades.com/graphql
-
 
 If you have Node installed, you can instantly run `ruru` without permanently
 installing it using the `npx` command. Here's an example command to explore

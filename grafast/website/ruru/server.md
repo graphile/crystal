@@ -8,7 +8,7 @@ any server:
 
 - `ruruHTML(...)` - generate the HTML file
 - `getStaticFile(...)` - return the buffer and headers for the given static
-file, if it exists
+  file, if it exists
 
 If you're using node, express, or a similar server then you can use the
 `serveStatic(...)` middleware to handle the `getStaticFile(...)` calls for you.

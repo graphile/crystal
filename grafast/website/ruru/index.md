@@ -11,7 +11,7 @@ GraphQL IDE, that:
 - supports automatic hot-reloading GraphQL schemas via the `X-GraphQL-Event-Stream` header
 - focusses on ease of deployment
 - contains enhancements for use with a [<Grafast />](/grafast)-powered servers[^2]
-(namely: view your plan diagrams and similar debugging)
+  (namely: view your plan diagrams and similar debugging)
 - is somewhat customizable
 - will be more customizable in future
 
@@ -27,7 +27,7 @@ You can run Ruru in many ways:
     your endpoint's origin
   - [embedded](./html.md#embedded) on an existing webpage
 - [CLI](./cli.md) &mdash; proxy bypasses CORS, works offline, great for debugging
-arbitrary GraphQL APIs
+  arbitrary GraphQL APIs
   - instant usage (no permanent installation): `npx ruru -SPe http://...`
   - install globally: `npm install --global ruru`
   - install locally: `npm install --save-dev ruru`
@@ -35,18 +35,20 @@ arbitrary GraphQL APIs
   - integrate via the `ruruHTML({...})` HTML generator function
   - (optional) companion `serveStatic(...)` middleware enables offline usage
 
-[^1]: Jem and I are big fans of the late Terry Pratchett's Discworld universe. The
-city at the centre of many a Discworld tale is the twin-city city-state of
-Ankh-Morpork. A "morepork" is a type of New Zealand owl, known in Māori as
-"ruru."[^3] Owls have excellent sight, and Ruru helps you to get an insight into not
-just the inputs and outputs of your API, but also what it does internally.
-[GNU Terry Pratchett](http://www.gnuterrypratchett.com/)
+[^1]:
+    Jem and I are big fans of the late Terry Pratchett's Discworld universe. The
+    city at the centre of many a Discworld tale is the twin-city city-state of
+    Ankh-Morpork. A "morepork" is a type of New Zealand owl, known in Māori as
+    "ruru."[^3] Owls have excellent sight, and Ruru helps you to get an insight into not
+    just the inputs and outputs of your API, but also what it does internally.
+    [GNU Terry Pratchett](http://www.gnuterrypratchett.com/)
 
 [^2]: <Grafast /> is not required to run Ruru
 
-[^3]: RURU is also an abbreviation for checks to use when gathering information: "is
-it Reliable, Up-to-date, Relevant, and Useful?" We hope that you'll find Ruru to
-be all those things!
+[^3]:
+    RURU is also an abbreviation for checks to use when gathering information: "is
+    it Reliable, Up-to-date, Relevant, and Useful?" We hope that you'll find Ruru to
+    be all those things!
 
 [graphiql]: https://github.com/graphql/graphiql
 [grafast]: https://grafast.org
