@@ -116,7 +116,7 @@ as part of this.
 ### Extending schema in JS
 
 If you prefer adding to your schema on the JavaScript side, you can use
-[`makeExtendSchemaPlugin`](./make-extend-schema-plugin).
+[`extendSchema`](./extend-schema).
 
 <!--
 ### GraphQL Schema Stitching
@@ -148,7 +148,7 @@ filters which can be exposed as GraphQL field arguments — if you reduce the
 amount of data that the function can produce (e.g. to 100 rows) then it reduces
 the potential cost of having this function in your schema.
 
-:::caution[Disclaimer]
+:::warning[Disclaimer]
 
 The information in this advice section is not 100% true, for
 example PostgreSQL can “see through” some `SQL` functions and has a highly

@@ -40,12 +40,12 @@ convert the `price_in_us_cents` to AUD via the `convertUsdToAud` function.
 
 ```diff title="V4 -> V5 conversion"
 -const { makeExtendSchemaPlugin, gql } = require("graphile-utils");
-+const { makeExtendSchemaPlugin, gql } = require("postgraphile/utils");
++const { extendSchema, gql } = require("postgraphile/utils");
  const { convertUsdToAud } = require("ficticious-npm-library");
 +const { lambda } = require('postgraphile/grafast');
 
 -const MyForeignExchangePlugin = makeExtendSchemaPlugin((build, options) => {
-+const MyForeignExchangePlugin = makeExtendSchemaPlugin((build) => {
++const MyForeignExchangePlugin = extendSchema((build) => {
 +  const { options } = build;
    return {
      typeDefs: gql`
@@ -111,7 +111,8 @@ For leaf fields, if you need to do the calculation in the database rather than
 in JS, you might use an SQL expression:
 
 ```diff
- module.exports = makeExtendSchemaPlugin(build => {
+-module.exports = makeExtendSchemaPlugin(build => {
++module.exports = extendSchema(build => {
    const { pgSql: sql } = build;
    return {
      typeDefs: gql`
@@ -197,7 +198,8 @@ function then we add a plan for the `Query.matchingUser` field that executes the
 function, passing through the `searchText` argument.
 
 ```diff
- module.exports = makeExtendSchemaPlugin((build) => {
+-module.exports = makeExtendSchemaPlugin((build) => {
++module.exports = extendSchema((build) => {
 +  const matchUser = build.input.pgRegistry.pgResources.match_user;
    return {
      typeDefs: /* GraphQL */ `
@@ -234,7 +236,8 @@ Instead, the new pattern would have `typeDefs/objects` (for object types, types
 that use the `type` keyword in GraphQL) with the plans within that:
 
 ```diff
- module.exports = makeExtendSchemaPlugin((build) => {
+-module.exports = makeExtendSchemaPlugin((build) => {
++module.exports = extendSchema((build) => {
 +  const matchUser = build.input.pgRegistry.pgResources.match_user;
    return {
      typeDefs: /* GraphQL */ `
@@ -305,9 +308,9 @@ adaptor, so if you want to deal with your Postgres client of choice here (`pg`,
 import { object } from "postgraphile/grafast";
 // highlight-next-line
 import { withPgClientTransaction } from "postgraphile/@dataplan/pg";
-import { makeExtendSchemaPlugin } from "postgraphile/utils";
+import { extendSchema } from "postgraphile/utils";
 
-export default makeExtendSchemaPlugin((build) => {
+export default extendSchema((build) => {
   const { sql } = build;
   /**
    * The 'executor' tells us which database we're talking to.
@@ -398,7 +401,7 @@ export default makeExtendSchemaPlugin((build) => {
 });
 ```
 
-Another example of makeExtendSchemaPlugin being used can be found [`here`](https://gist.github.com/jamesallain/ca09979840c4530f72ce16378e49b927).
+Another example of extendSchema being used can be found [`here`](https://gist.github.com/jamesallain/ca09979840c4530f72ce16378e49b927).
 
 ## QueryBuilder "named children"
 

@@ -10,7 +10,7 @@ Line Interface.
 To try without installing, run the `pgl` command via the `npx` command that
 comes bundled with Node.js:
 
-```
+```shell
 npx pgl@beta -P pgl/amber -e -c postgres:///mydb
 ```
 
@@ -37,7 +37,7 @@ You can then run PostGraphile equivalent to above via:
 npx postgraphile -P postgraphile/presets/amber -e -c postgres:///mydb
 ```
 
-:::caution
+:::warning
 
 The `-e` option should only be used in development.
 

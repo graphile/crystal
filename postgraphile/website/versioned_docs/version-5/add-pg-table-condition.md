@@ -1,5 +1,5 @@
 ---
-title: makeAddPgTableConditionPlugin
+title: addPgTableCondition
 ---
 
 PostGraphile adds `condition` arguments to various of the table collection
@@ -39,10 +39,10 @@ filter more flexibly. Let’s make this clearer with an example:
 To return a list of forums which match a list of primary keys:
 
 ```ts
-import { makeAddPgTableConditionPlugin } from "postgraphile/utils";
+import { addPgTableCondition } from "postgraphile/utils";
 import { TYPES, listOfCodec } from "postgraphile/@dataplan/pg";
 
-export default makeAddPgTableConditionPlugin(
+export default addPgTableCondition(
   { schemaName: "app_public", tableName: "forums" },
   "idIn",
   (build) => {
@@ -76,10 +76,10 @@ those where a particular user has posted in (posts are stored in
 `app_public.posts`) you might create a plugin like this:
 
 ```ts
-import { makeAddPgTableConditionPlugin } from "postgraphile/utils";
+import { addPgTableCondition } from "postgraphile/utils";
 import { TYPES } from "postgraphile/@dataplan/pg";
 
-export default makeAddPgTableConditionPlugin(
+export default addPgTableCondition(
   { schemaName: "app_public", tableName: "forums" },
   "containsPostsByUserId",
   (build) => {
@@ -136,7 +136,7 @@ implementation then there’s a good chance your plugin is incorrect.
 ## Example with ordering
 
 It's also possible for condition plugins to change the order of results by using
-[QueryBuilder](./make-extend-schema-plugin#querybuilder)'s `orderBy` method.
+[QueryBuilder](./extend-schema#querybuilder)'s `orderBy` method.
 The following example both limits the list of quizzes returned to only those
 with a certain number of entries, _and_ orders the results such that the quizzes
 with the most entries are listed first.
@@ -150,9 +150,9 @@ like this should be loaded via `--prepend-plugins` (or `prependPlugins` in the
 library mode) because otherwise the default ordering plugin dominates the order.
 
 ```js
-const { makeAddPgTableConditionPlugin } = require("graphile-utils");
+const { addPgTableCondition } = require("graphile-utils");
 
-module.exports = makeAddPgTableConditionPlugin(
+module.exports = addPgTableCondition(
   "app_public",
   "quiz",
   "entryCountMin",
@@ -183,12 +183,12 @@ module.exports = makeAddPgTableConditionPlugin(
 
 ## Function signature
 
-### `makeAddPgTableConditionPlugin`
+### `addPgTableCondition`
 
-The signature of the `makeAddPgTableConditionPlugin` function is:
+The signature of the `addPgTableCondition` function is:
 
 ```ts
-function makeAddPgTableConditionPlugin(
+function addPgTableCondition(
   match: { serviceName?: string; schemaName: string; tableName: string },
   conditionFieldName: string,
   fieldSpecGenerator: (build: GraphileBuild.Build) => GraphileInputFieldConfig,

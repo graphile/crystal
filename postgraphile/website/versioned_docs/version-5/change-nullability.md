@@ -1,8 +1,8 @@
 ---
-title: makeChangeNullabilityPlugin
+title: changeNullability
 ---
 
-Use this plugin to easily change the nullability of fields and arguments in
+Use this plugin generator to easily change the nullability of fields and arguments in
 your GraphQL schema.
 
 For more information about nullability in PostGraphile in general (and to help
@@ -11,10 +11,10 @@ FAQ question [“Why is it nullable?”](./why-nullable)
 
 ## Function signature
 
-The `makeChangeNullabilityPlugin` function accepts one parameter, a rules object:
+The `changeNullability` function accepts one parameter, a rules object:
 
 ```ts
-function makeChangeNullabilityPlugin(
+function changeNullability(
   rules: ChangeNullabilityRules,
 ): GraphileConfig.Plugin;
 
@@ -63,9 +63,9 @@ To indicate that `UsersConnection.nodes` should be a non-nullable list of
 non-nullables you would do:
 
 ```ts
-import { makeChangeNullabilityPlugin } from "postgraphile/utils";
+import { changeNullability } from "postgraphile/utils";
 
-const MyNullabilityPlugin = makeChangeNullabilityPlugin({
+const MyNullabilityPlugin = changeNullability({
   UsersConnection: {
     nodes: "[!]!",
   },
