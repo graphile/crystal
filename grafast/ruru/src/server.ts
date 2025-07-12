@@ -177,11 +177,17 @@ export function makeHTMLParts(config: RuruServerConfig): RuruHTMLParts {
   `;
   const baseHeaderScripts = html`
     <script type="module">
-      const worker = (file) =>
-        new Worker(
-          new URL(${JSON.stringify(staticPath)} + file, import.meta.url),
-          { type: "module" },
-        );
+      const worker = (file) => new Worker(${
+          /*
+           * For local paths we can load the static files directly; but for
+           * remote URLs we'll get security issues if we do, so instead we
+           * create a file that imports the remote file. I do not understand
+           * the security basis that allows this to work... but it does.
+           */
+          staticPath.startsWith("/")
+            ? `new URL(${JSON.stringify(staticPath)} + file, import.meta.url)`
+            : `URL.createObjectURL(new Blob(['import "${staticPath}' + file + '";'], {type: 'text/javascript'}))`
+        }, { type: "module" });
       globalThis.MonacoEnvironment = {
         getWorker(_, label) {
           switch (label) {
