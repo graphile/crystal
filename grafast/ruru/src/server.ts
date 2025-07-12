@@ -100,6 +100,12 @@ const baseBodyScripts = html`
       $(".graphiql-plugin").style.display = "none";
       $(".graphiql-horizontal-drag-bar").style.display = "none";
     }
+    const getSystemTheme = () =>
+      window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+    const theme = localStorage.getItem("graphiql:theme") || getSystemTheme();
+    document.body.className += " graphiql-" + theme;
     const flexes = [
       ["docExplorerFlex", ".graphiql-plugin"],
       ["editorFlex", ".graphiql-editors"],
