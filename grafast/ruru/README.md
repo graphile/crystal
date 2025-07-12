@@ -7,15 +7,15 @@ and explaining executed operations. _(Ruru can be used without Gra*fast*.)_
 
 Flexible usage options
 
-- [a CLI](https://grafast.com/ruru/cli) - temporary or installed
-- [a Node.js middleware](https://grafast.com/ruru/server)
-- [a static HTML file](https://grafast.com/ruru/html) - hosted or self-hosted
-- [embedded](https://grafast.com/ruru/html#embedded) - render Ruru into your
+- [a CLI](https://grafast.org/ruru/cli) - temporary or installed
+- [a Node.js middleware](https://grafast.org/ruru/server)
+- [a static HTML file](https://grafast.org/ruru/html) - hosted or self-hosted
+- [embedded](https://grafast.org/ruru/html#embedded) - render Ruru into your
   existing HTML pages
 
 See it in action at:
 
-https://grafast.com/myruru/#endpoint=https://countries.trevorblades.com/graphql
+https://grafast.org/myruru/#endpoint=https://countries.trevorblades.com/graphql
 
 If you have Node installed, you can instantly run `ruru` without permanently
 installing it using the `npx` command. Here's an example command to explore
@@ -28,7 +28,7 @@ npx ruru -SPe https://countries.trevorblades.com/graphql
 (`-S` enables subscriptions, `-P` proxies GraphQL requests; neither of these are
 needed for Trevor's API, but you might want them for your API.)
 
-**Documentation**: https://grafast.com/ruru
+**Documentation**: https://grafast.org/ruru
 
 **PRERELEASE**: this is pre-release software; use at your own risk and do not
 embed into public-facing projects. This will likely change a lot before it's

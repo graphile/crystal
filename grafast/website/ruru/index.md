@@ -17,12 +17,14 @@ GraphQL IDE, that:
 
 ## Running
 
-**See a demo of Ruru in action in our [playground](/playground).**
+**See a demo of Ruru in action in the [Gra*fast* playground](/playground).**
+
+**Or try: [ruru serving https://countries.trevorblades.com/graphql](https://grafast.org/myruru/#endpoint=https%3A%2F%2Fcountries.trevorblades.com%2Fgraphql).**
 
 You can run Ruru in many ways:
 
 - [HTML file](./html.md) &mdash; entirely browser-based
-  - hosted: `https://grafast.org/myruru/#endpoint=http://.../graphql` (requires CORS)
+  - hosted: `https://grafast.org/myruru/#endpoint=http%3A%2F%@Fexample.com%2Fgraphql` (requires CORS)
   - self-hosted: serve the [`ruru.html`](https://unpkg.com/ruru/ruru.html) file from
     your endpoint's origin
   - [embedded](./html.md#embedded) on an existing webpage

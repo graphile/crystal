@@ -15,7 +15,7 @@ Great way to try it out without having to install anything!
 
 Try it out:
 
-- https://grafast.com/myruru/#endpoint=https://countries.trevorblades.com/graphql
+https://grafast.org/myruru/#endpoint=https://countries.trevorblades.com/graphql
 
 ## Self-hosted
 
