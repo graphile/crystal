@@ -1,5 +1,21 @@
 # @grafserv/persisted
 
+## 0.0.0-beta.37
+
+### Patch Changes
+
+- [#2605](https://github.com/graphile/crystal/pull/2605)
+  [`9d86063`](https://github.com/graphile/crystal/commit/9d86063aacf2d064c35bd62e2cf58ea687910ac8)
+  Thanks [@benjie](https://github.com/benjie)! - Tweak deps/peerDeps.
+
+- Updated dependencies
+  [[`1d76d2f`](https://github.com/graphile/crystal/commit/1d76d2f0d19b4d56895ee9988440a35d2c60f9f9),
+  [`c54c6db`](https://github.com/graphile/crystal/commit/c54c6db320b3967ab16784a504770c9b5ef24494),
+  [`a480f6d`](https://github.com/graphile/crystal/commit/a480f6d22605fbb0d0fcdf6845cbdf294d3194b5),
+  [`ad588ec`](https://github.com/graphile/crystal/commit/ad588ecde230359f56800e414b7c5fa1aed14957)]:
+  - grafserv@0.1.1-beta.27
+  - grafast@0.1.1-beta.24
+
 ## 0.0.0-beta.36
 
 ### Patch Changes

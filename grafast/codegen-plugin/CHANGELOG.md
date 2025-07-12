@@ -1,5 +1,15 @@
 # graphql-codegen-grafast
 
+## 0.0.1-beta.2
+
+### Patch Changes
+
+- [#2562](https://github.com/graphile/crystal/pull/2562)
+  [`3064e14`](https://github.com/graphile/crystal/commit/3064e14773676043799b270cf82c13759a7a5e7b)
+  Thanks [@adrtivv](https://github.com/adrtivv)! - Uses `convertName` to convert
+  names, should improve compatibility with non-standard configurations/field
+  names.
+
 ## 0.0.1-beta.1
 
 ### Patch Changes

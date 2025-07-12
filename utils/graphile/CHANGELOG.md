@@ -1,5 +1,26 @@
 # graphile
 
+## 5.0.0-beta.44
+
+### Patch Changes
+
+- [#2600](https://github.com/graphile/crystal/pull/2600)
+  [`ad588ec`](https://github.com/graphile/crystal/commit/ad588ecde230359f56800e414b7c5fa1aed14957)
+  Thanks [@benjie](https://github.com/benjie)! - Mark all
+  peerDependencies=dependencies modules as optional peerDependencies to make
+  pnpm marginally happier hopefully.
+- Updated dependencies
+  [[`4c8f028`](https://github.com/graphile/crystal/commit/4c8f028a7e5c4388efbab53ea65e7b3018ab6d47),
+  [`5451c90`](https://github.com/graphile/crystal/commit/5451c9031e341bdae16dc1b7a3b6b19154056701),
+  [`1d76d2f`](https://github.com/graphile/crystal/commit/1d76d2f0d19b4d56895ee9988440a35d2c60f9f9),
+  [`7147cb0`](https://github.com/graphile/crystal/commit/7147cb07e4d7286bb3b9e949164a2a232d59e28c),
+  [`7847c0b`](https://github.com/graphile/crystal/commit/7847c0b09aa6be5526df8ccdb3f429e680a2da03),
+  [`0e6c4e0`](https://github.com/graphile/crystal/commit/0e6c4e062be3ecb79c0ae30c89fad1550a0b5e98),
+  [`ad588ec`](https://github.com/graphile/crystal/commit/ad588ecde230359f56800e414b7c5fa1aed14957),
+  [`e8bb5be`](https://github.com/graphile/crystal/commit/e8bb5be91df242d3c2b8ed4e7010d48feffdcfe2)]:
+  - postgraphile@5.0.0-beta.44
+  - graphile-build@5.0.0-beta.36
+
 ## 5.0.0-beta.43
 
 ### Patch Changes
@@ -719,7 +740,6 @@
   resources, and more. So, we've renamed lots of things as part of the API
   stabilization work. You're probably only affected by the first 2 bullet
   points.
-
   - `pgConfigs` -> `pgServices` (also applies to related `pgConfig` terms such
     as `makePgConfig` -> `makePgService`, `MakePgConfigOptions` ->
     `MakePgServiceOptions`, etc) - see your `graphile.config.ts` or equivalent

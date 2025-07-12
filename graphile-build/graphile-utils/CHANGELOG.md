@@ -1,5 +1,34 @@
 # graphile-utils
 
+## 5.0.0-beta.42
+
+### Patch Changes
+
+- [#2559](https://github.com/graphile/crystal/pull/2559)
+  [`4c8f028`](https://github.com/graphile/crystal/commit/4c8f028a7e5c4388efbab53ea65e7b3018ab6d47)
+  Thanks [@benjie](https://github.com/benjie)! - Remove `make...Plugin`
+  prefix/suffix from plugin factories. (Old name is still supported but
+  deprecated, this is non-breaking.)
+
+- [#2620](https://github.com/graphile/crystal/pull/2620)
+  [`c54c6db`](https://github.com/graphile/crystal/commit/c54c6db320b3967ab16784a504770c9b5ef24494)
+  Thanks [@benjie](https://github.com/benjie)! - Add experimental `applyScope()`
+  method to input objects/enums to provide a `scope` to `.apply(...)` methods
+  invoked by the undocumented `applyInput()`. **Documentation help welcome.**
+- Updated dependencies
+  [[`4c8f028`](https://github.com/graphile/crystal/commit/4c8f028a7e5c4388efbab53ea65e7b3018ab6d47),
+  [`5451c90`](https://github.com/graphile/crystal/commit/5451c9031e341bdae16dc1b7a3b6b19154056701),
+  [`c54c6db`](https://github.com/graphile/crystal/commit/c54c6db320b3967ab16784a504770c9b5ef24494),
+  [`7147cb0`](https://github.com/graphile/crystal/commit/7147cb07e4d7286bb3b9e949164a2a232d59e28c),
+  [`7847c0b`](https://github.com/graphile/crystal/commit/7847c0b09aa6be5526df8ccdb3f429e680a2da03),
+  [`9d86063`](https://github.com/graphile/crystal/commit/9d86063aacf2d064c35bd62e2cf58ea687910ac8),
+  [`0e6c4e0`](https://github.com/graphile/crystal/commit/0e6c4e062be3ecb79c0ae30c89fad1550a0b5e98),
+  [`ad588ec`](https://github.com/graphile/crystal/commit/ad588ecde230359f56800e414b7c5fa1aed14957)]:
+  - graphile-build-pg@5.0.0-beta.42
+  - @dataplan/pg@0.0.1-beta.35
+  - grafast@0.1.1-beta.24
+  - graphile-build@5.0.0-beta.36
+
 ## 5.0.0-beta.41
 
 ### Patch Changes
@@ -54,7 +83,6 @@
   type-level fields no longer have the `__` prefix.
 
   Migration is quite straightforward:
-
   1. **Add new top-level properties**. Add `objects`, `interfaces`, `unions`,
      `inputObjects`, `scalars`, and `enums` as top level properties alongside
      `typeDefs` and `plans`. Each should be an empty object. You can skip any
@@ -114,7 +142,6 @@
   ```
 
   Other changes:
-
   - `ObjectPlans`/`GrafastPlans`/`FieldPlans`/`InputObjectPlans`/`ScalarPlans`
     all changed to signular
   - `InterfaceOrUnionPlans` split to `InterfacePlan`/`UnionPlan` (identical
@@ -227,7 +254,6 @@
   The following `ModifierStep` classes have all dropped their `Step` suffix,
   these `Modifier` classes now all run at runtime, and are thus no longer steps;
   they're invoked as part of the new `applyInput()` (TODO: document) step:
-
   - `ModifierStep` &rArr; `Modifier`
   - `PgBooleanFilterStep` &rArr; `PgBooleanFilter`
   - `PgClassFilterStep` &rArr; `PgClassFilter`
@@ -248,7 +274,6 @@
   The deprecated forms of the above have been removed.
 
   Methods that rely on these modifier plans have been removed:
-
   - `PgUnionAllStep.wherePlan` - use
     `fieldArg.apply($unionAll, qb => qb.whereBuilder())` instead
   - `PgUnionAllStep.havingPlan` - use
@@ -256,7 +281,6 @@
   - Same for PgSelectStep
 
   The following gain query builders:
-
   - `PgInsertSingle`
   - `PgUpdateSingle`
   - `PgDeleteSingle`
@@ -1371,7 +1395,6 @@
   resources, and more. So, we've renamed lots of things as part of the API
   stabilization work. You're probably only affected by the first 2 bullet
   points.
-
   - `pgConfigs` -> `pgServices` (also applies to related `pgConfig` terms such
     as `makePgConfig` -> `makePgService`, `MakePgConfigOptions` ->
     `MakePgServiceOptions`, etc) - see your `graphile.config.ts` or equivalent

@@ -1,5 +1,21 @@
 # grafast
 
+## 0.1.1-beta.24
+
+### Patch Changes
+
+- [#2620](https://github.com/graphile/crystal/pull/2620)
+  [`c54c6db`](https://github.com/graphile/crystal/commit/c54c6db320b3967ab16784a504770c9b5ef24494)
+  Thanks [@benjie](https://github.com/benjie)! - Add experimental `applyScope()`
+  method to input objects/enums to provide a `scope` to `.apply(...)` methods
+  invoked by the undocumented `applyInput()`. **Documentation help welcome.**
+
+- [#2600](https://github.com/graphile/crystal/pull/2600)
+  [`ad588ec`](https://github.com/graphile/crystal/commit/ad588ecde230359f56800e414b7c5fa1aed14957)
+  Thanks [@benjie](https://github.com/benjie)! - Mark all
+  peerDependencies=dependencies modules as optional peerDependencies to make
+  pnpm marginally happier hopefully.
+
 ## 0.1.1-beta.23
 
 ### Patch Changes
@@ -62,7 +78,6 @@
   [`8034614d1078b1bd177b6e7fcc949420614e3245`](https://github.com/graphile/crystal/commit/8034614d1078b1bd177b6e7fcc949420614e3245)
   Thanks [@benjie](https://github.com/benjie)! - Fix a number of edge-case
   issues relating to incremental delivery:
-
   - If a `@stream`'d step was `isSyncAndSafe` then the stream code wouldn't
     fire. Fixed by forcing all `@stream`'d steps to have
     `.isSyncAndSafe = false`.
@@ -119,7 +134,6 @@
   type-level fields no longer have the `__` prefix.
 
   Migration is quite straightforward:
-
   1. **Add new top-level properties**. Add `objects`, `interfaces`, `unions`,
      `inputObjects`, `scalars`, and `enums` as top level properties alongside
      `typeDefs` and `plans`. Each should be an empty object. You can skip any
@@ -179,7 +193,6 @@
   ```
 
   Other changes:
-
   - `ObjectPlans`/`GrafastPlans`/`FieldPlans`/`InputObjectPlans`/`ScalarPlans`
     all changed to signular
   - `InterfaceOrUnionPlans` split to `InterfacePlan`/`UnionPlan` (identical
@@ -228,7 +241,6 @@
   [`455f4811d37ad8fff91183c7a88621bcf9d79acf`](https://github.com/graphile/crystal/commit/455f4811d37ad8fff91183c7a88621bcf9d79acf)
   Thanks [@benjie](https://github.com/benjie)! - Various of our steps weren't as
   crisp on types as they could be. This makes them a lot stricter:
-
   - `coalesce()` now yields `null` if it fails
   - `each()` now reflects the type of the list item even if it's not a "list
     capable" step
@@ -249,7 +261,6 @@
   [`45adaff886e7cd72b864150927be6c0cb4a7dfe8`](https://github.com/graphile/crystal/commit/45adaff886e7cd72b864150927be6c0cb4a7dfe8)
   Thanks [@benjie](https://github.com/benjie)! - 🚨 Complete overhaul of
   polymorphism:
-
   - Centralized the responsibility of polymorphic resolution from field plan
     resolvers into abstract types.
   - Eliminated the concept of "polymorphic capable" steps: any step may now be
@@ -331,7 +342,6 @@
   [`fcaeb48844156e258a037f420ea1505edb50c52a`](https://github.com/graphile/crystal/commit/fcaeb48844156e258a037f420ea1505edb50c52a)
   Thanks [@benjie](https://github.com/benjie)! - Improve rendering of mermaid
   diagrams:
-
   - Don't render dependencies on the `undefined` constant, because it's messy
   - Group when there are multiple dependencies to the same step from the same
     step, and label the line with the count instead.
@@ -479,7 +489,6 @@
   [`c041fd250372c57601188b65a6411c8f440afab6`](https://github.com/graphile/crystal/commit/c041fd250372c57601188b65a6411c8f440afab6)
   Thanks [@benjie](https://github.com/benjie)! - Since the following have been
   removed from Grafast, throw an error if they're seen in the schema:
-
   - `autoApplyAfterParentInputPlan`
   - `autoApplyAfterParentApplyPlan`
   - `autoApplyAfterParentPlan`
@@ -552,7 +561,6 @@
   The following `ModifierStep` classes have all dropped their `Step` suffix,
   these `Modifier` classes now all run at runtime, and are thus no longer steps;
   they're invoked as part of the new `applyInput()` (TODO: document) step:
-
   - `ModifierStep` &rArr; `Modifier`
   - `PgBooleanFilterStep` &rArr; `PgBooleanFilter`
   - `PgClassFilterStep` &rArr; `PgClassFilter`
@@ -573,7 +581,6 @@
   The deprecated forms of the above have been removed.
 
   Methods that rely on these modifier plans have been removed:
-
   - `PgUnionAllStep.wherePlan` - use
     `fieldArg.apply($unionAll, qb => qb.whereBuilder())` instead
   - `PgUnionAllStep.havingPlan` - use
@@ -581,7 +588,6 @@
   - Same for PgSelectStep
 
   The following gain query builders:
-
   - `PgInsertSingle`
   - `PgUpdateSingle`
   - `PgDeleteSingle`
@@ -839,7 +845,6 @@
   accepts `resolvedPreset` and `requestContext` directly; passing these through
   additional arguments is now deprecated and support will be removed in a future
   revision. This affects:
-
   - `grafast()`
   - `execute()`
   - `subscribe()`
@@ -885,14 +890,12 @@
   `plugin.grafserv.hooks.*` are still supported but deprecated; instead use
   middleware `plugin.grafserv.middleware.*` (note that call signatures have
   changed slightly, similar to the diff above):
-
   - `hooks.init` -> `middleware.setPreset`
   - `hooks.processGraphQLRequestBody` -> `middleware.processGraphQLRequestBody`
   - `hooks.ruruHTMLParts` -> `middleware.ruruHTMLParts`
 
   A few TypeScript types related to Hooks have been renamed, but their old names
   are still available, just deprecated. They will be removed in a future update:
-
   - `HookObject` -> `FunctionalityObject`
   - `PluginHook` -> `CallbackOrDescriptor`
   - `PluginHookObject` -> `CallbackDescriptor`
@@ -1686,7 +1689,6 @@
 - [#335](https://github.com/benjie/crystal/pull/335)
   [`86e503d78`](https://github.com/benjie/crystal/commit/86e503d785626ad9a2e91ec2e70b272dd632d425)
   Thanks [@benjie](https://github.com/benjie)! - - Adjust OutputPlan printing
-
   - Fix `path` used to track planning errors
   - Fix tree shaking when eradicating all steps in a LayerPlan
   - Don't `deduplicateSteps()` when printing the plan graph 🤣
@@ -1713,7 +1715,6 @@
 - [`2389f47ec`](https://github.com/benjie/crystal/commit/2389f47ecf3b708f1085fdeb818eacaaeb257a2d)
   Thanks [@benjie](https://github.com/benjie)! - Massive overhaul of planning,
   now up to 2x faster!
-
   - 🚨 `metaKey` and `optimizeMetaKey` now default to `undefined` - if you need
     the `meta` object in your step class, be sure to set them (e.g.
     `this.metaKey = this.id`)
@@ -1725,7 +1726,6 @@
 - [`e91ee201d`](https://github.com/benjie/crystal/commit/e91ee201d80d3b32e4e632b101f4c25362a1a05b)
   Thanks [@benjie](https://github.com/benjie)! - Various optimizations of the
   Gra*fast* plan by converting things to constants where possible.
-
   - `Step.optimize()` is now passed a `meta` object if the step sets
     `optimizeMetaKey`; this object can store planning-only values and share
     across a step family.
@@ -2030,7 +2030,6 @@
   [`652cf1073`](https://github.com/benjie/crystal/commit/652cf107316ea5832f69c6a55574632187f5c876)
   Thanks [@benjie](https://github.com/benjie)! - 🚨 Breaking changes around
   types and postgres configuration:
-
   - `GraphileBuild.GraphileResolverContext` renamed to `Grafast.Context`
   - `GraphileConfig.GraphQLRequestContext` renamed to `Grafast.RequestContext`
   - `Grafast.PgDatabaseAdaptorOptions` renaed to
