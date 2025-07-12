@@ -143,21 +143,6 @@ export function makeHTMLParts(config: RuruServerConfig): RuruHTMLParts {
   const baseMetaTags = html`
     <meta charset="utf-8" />
     <link rel="modulepreload" href="${escapeHTML(staticPath + "ruru.js")}" />
-    <link
-      rel="modulepreload"
-      href="${escapeHTML(staticPath + "jsonWorker.js")}"
-      as="worker"
-    />
-    <link
-      rel="modulepreload"
-      href="${escapeHTML(staticPath + "graphqlWorker.js")}"
-      as="worker"
-    />
-    <link
-      rel="modulepreload"
-      href="${escapeHTML(staticPath + "editorWorker.js")}"
-      as="worker"
-    />
   `;
   const baseStyleTags = html`
     <link rel="stylesheet" href="${staticPath}ruru.css" />
