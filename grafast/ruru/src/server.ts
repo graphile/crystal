@@ -157,7 +157,7 @@ export function makeHTMLParts(config: RuruServerConfig): RuruHTMLParts {
   `;
   const baseConfigScript = html`
     <script>
-      const RURU_CONFIG = ${escapeJS(JSON.stringify(clientConfig))};
+      const RURU_CONFIG = ${escapeJS(JSON.stringify(clientConfig, null, 2))};
     </script>
   `;
   const baseHeaderScripts = html`
