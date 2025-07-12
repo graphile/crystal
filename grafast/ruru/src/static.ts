@@ -1,9 +1,9 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { promisify } from "node:util";
 import { isPromise } from "node:util/types";
-import { inflate as inflateCb } from "node:zlib";
+import { brotliDecompress as brotliDecompressCb } from "node:zlib";
 
-const inflate = promisify(inflateCb);
+const brotliDecompress = promisify(brotliDecompressCb);
 
 type PromiseOrDirect<T> = T | Promise<T>;
 
@@ -44,7 +44,7 @@ function makeStaticFile(filename: string, entry: BundleEntry): StaticFile {
     content,
     headers: {
       "content-type": contentType,
-      "content-encoding": "deflate",
+      "content-encoding": "br",
       "content-length": String(content.length),
       etag,
     },
@@ -103,9 +103,9 @@ export interface GetStaticFileContext {
 
   /**
    * The content of the `Accept-Encoding` header supplied by the client, if
-   * any. Hopefully this includes 'deflate'. If it does not include 'deflate'
-   * then we will need to inflate the content before returning it to you, which
-   * is more expensive.
+   * any. Hopefully this includes 'br'. If it does not include 'br' then we
+   * will need to decompress the content before returning it to you, which is
+   * more expensive.
    */
   acceptEncoding: ReadonlyArray<string> | string | undefined;
 
@@ -143,12 +143,12 @@ export function getStaticFile({
     : getStaticFileInner(files, path, acceptEncoding);
 }
 
-const DEFLATE_REGEXP = /\bdeflate\b/i;
-function hasDeflate(
+const BROTLI_REGEXP = /\bbr\b/i;
+function hasBrotli(
   acceptEncoding: ReadonlyArray<string> | string | undefined,
 ): boolean {
   return typeof acceptEncoding === "string"
-    ? DEFLATE_REGEXP.test(acceptEncoding)
+    ? BROTLI_REGEXP.test(acceptEncoding)
     : false;
 }
 
@@ -159,16 +159,16 @@ function getStaticFileInner(
 ) {
   const file = files[path];
   if (!file) return null;
-  if (hasDeflate(acceptEncoding)) {
-    // Already deflated
+  if (hasBrotli(acceptEncoding)) {
+    // Already compressed
     return file;
   } else {
-    // We need to inflate for the client
+    // We need to decompress for the client
     const {
-      content: deflatedContent,
+      content: compressed,
       headers: { "content-encoding": _delete, ...otherHeaders },
     } = file;
-    return inflate(deflatedContent).then((content) => ({
+    return brotliDecompress(compressed).then((content) => ({
       content,
       headers: {
         ...otherHeaders,

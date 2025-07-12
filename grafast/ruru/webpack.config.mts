@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import { writeFileSync } from "node:fs";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { deflateSync } from "node:zlib";
+import { brotliCompressSync, constants } from "node:zlib";
 
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import type { Compiler, Configuration, Resolver } from "webpack";
@@ -63,7 +63,7 @@ function isDevAsset(filename: string) {
 
 const intro = [
   "/* eslint-disable */",
-  "/** IMPORTANT: these buffers are deflated */",
+  "/** IMPORTANT: these buffers are compressed with brotli */",
   "export const bundleData: Record<string, { etag: string, buffer: Buffer }> = {",
 ];
 const outro = ["};", ""];
@@ -78,10 +78,14 @@ class OutputDataToSrcPlugin {
       for (const [filename, asset] of entries) {
         const source = asset.source();
         const buf = Buffer.isBuffer(source) ? source : Buffer.from(source);
-        const deflated = deflateSync(buf);
-        const hash = createHash("sha256").update(deflated).digest("base64url");
+        const compressed = brotliCompressSync(buf, {
+          params: {
+            [constants.BROTLI_PARAM_QUALITY]: 11, // max compression
+          }
+        });
+        const hash = createHash("sha256").update(compressed).digest("base64url");
         const etag = `"sha256-${hash}"`; // quoted per HTTP spec
-        const base64 = deflated.toString("base64");
+        const base64 = compressed.toString("base64");
         const sourceLine = `\
   ${JSON.stringify(filename)}: {
     etag: ${JSON.stringify(etag)},
