@@ -1,0 +1,22 @@
+## expect(errors).toBeFalsy()
+#> schema: ["polymorphic"]
+#> simpleCollections: "both"
+
+query {
+  favoriteApplication {
+    ...App
+  }
+}
+
+fragment App on Application {
+  __typename
+  id
+  name
+  lastDeployed
+  ... on AwsApplication {
+    awsId
+  }
+  ... on GcpApplication {
+    gcpId
+  }
+}
