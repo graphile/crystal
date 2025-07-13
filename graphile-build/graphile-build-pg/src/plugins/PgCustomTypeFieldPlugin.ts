@@ -1496,7 +1496,7 @@ function getFunctionSourceReturnGraphQLType(
   if (!resourceInnerCodec) {
     return null;
   }
-  if (resourceInnerCodec.polymorphism?.mode === 'union') {
+  if (resourceInnerCodec.polymorphism?.mode === "union") {
     console.warn(
       `Function may not return polymorphic mode:union codec '${resource.codec.name}'; insufficient information to determine the underlying type at runtime.`,
     );
