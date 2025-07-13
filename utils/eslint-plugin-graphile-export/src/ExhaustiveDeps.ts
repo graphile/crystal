@@ -23,6 +23,7 @@ import type {
 } from "estree";
 
 import { fastFindReferenceWithParent, reportProblem } from "./common.js";
+import { isExportableCall } from "./utils.js";
 
 interface CommonOptions {
   disableAutofix: boolean;
@@ -451,7 +452,7 @@ export const ExhaustiveDeps: Rule.RuleModule = {
 
     return {
       CallExpression(node) {
-        const callbackIndex = getScopesCallbackIndex(node.callee);
+        const callbackIndex = getScopesCallbackIndex(node);
         if (callbackIndex === -1) {
           // Not a EXPORTABLE call that needs deps.
           return;
@@ -762,7 +763,7 @@ function analyzePropertyChain(node: Node | ESTreeNode): string {
 function getScopesCallbackIndex(
   node: Expression | Super | ESTreeExpression | ESTreeSuper,
 ) {
-  if (node.type === "Identifier" && node.name === "EXPORTABLE") {
+  if (isExportableCall(node)) {
     return 0;
   } else {
     return -1;

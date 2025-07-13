@@ -3,6 +3,7 @@ import type { Rule } from "eslint";
 import type { Node as ESTreeNode } from "estree";
 
 import { reportProblem } from "./common.js";
+import { isExportableCall } from "./utils.js";
 
 interface CommonOptions {
   disableAutofix: boolean;
@@ -89,10 +90,3 @@ export function hasExportableParent(node: any): boolean {
   return false;
 }
 
-function isExportableCall(node: any): node is CallExpression {
-  return (
-    node.type === "CallExpression" &&
-    node.callee.type === "Identifier" &&
-    node.callee.name === "EXPORTABLE"
-  );
-}
