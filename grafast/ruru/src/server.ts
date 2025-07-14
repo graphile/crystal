@@ -227,10 +227,21 @@ export function makeHTMLParts(config: RuruServerConfig): RuruHTMLParts {
   return parts;
 }
 
+/**
+ * Generate the HTML file to serve Ruru.
+ *
+ * @param config Configuration
+ * @param deprecatedHTMLParts @deprecated Use config.htmlParts instead.
+ */
 export function ruruHTML(
   config: RuruServerConfig,
-  htmlParts = makeHTMLParts(config),
+  /** @deprecated */
+  deprecatedHTMLParts?: Partial<RuruHTMLParts>,
 ) {
+  const partsFromConfig = makeHTMLParts(config);
+  const htmlParts = deprecatedHTMLParts
+    ? { ...partsFromConfig, ...deprecatedHTMLParts }
+    : partsFromConfig;
   return `\
 <!DOCTYPE html>
 <html lang="en">
