@@ -1670,6 +1670,23 @@ comment on table polymorphic.gcp_applications is $$
 @refVia owner via:organizations
 $$;
 
+create function polymorphic.favorite_application() returns polymorphic.applications as $$
+  select id, name, last_deployed
+  from polymorphic.gcp_applications
+  where id = 2;
+$$ language sql stable;
+
+create function polymorphic.favorite_applications() returns setof polymorphic.applications as $$
+  select id, name, last_deployed
+  from polymorphic.gcp_applications
+  where id IN (2,3,5)
+union all
+  select id, name, last_deployed
+  from polymorphic.aws_applications
+  where id IN (2,4,7)
+order by id asc, name asc;
+$$ language sql stable;
+
 comment on table polymorphic.aws_application_first_party_vulnerabilities is '@omit';
 comment on table polymorphic.aws_application_third_party_vulnerabilities is '@omit';
 comment on table polymorphic.gcp_application_first_party_vulnerabilities is '@omit';
@@ -1714,7 +1731,6 @@ create type polymorphic.zero_implementation as (
   id int,
   name text
 );
-
 
 comment on type polymorphic.zero_implementation is $$
 @interface mode:union
