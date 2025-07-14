@@ -1,0 +1,12 @@
+## expect(errors).toBeFalsy()
+#> schema: ["relay"]
+#> graphileBuildOptions: { defaultNodeIdCodec: "pipeString" }
+#> extends: ["postgraphile/presets/relay:PgRelayPreset"]
+query Q {
+  a: user(id: "users|1") {
+    username # Alice
+    base: maxReadingDistance
+    model1: maxReadingDistance(withSpectacles: "spectacles|1")
+    nonsense2: maxReadingDistance(withSpectacles: "query")
+  }
+}
