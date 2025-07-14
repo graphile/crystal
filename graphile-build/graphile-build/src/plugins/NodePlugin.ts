@@ -31,6 +31,14 @@ declare global {
     interface ScopeObjectFieldsField {
       isRootNodeField?: boolean;
     }
+
+    interface SchemaOptions {
+      /**
+       * The default Node ID codec to use when not overridden by a smart tag.
+       * Use build.registerNodeIdCodec to register your own codecs.
+       */
+      defaultNodeIdCodec?: string;
+    }
   }
 }
 
