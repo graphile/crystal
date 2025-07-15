@@ -1,0 +1,49 @@
+.tiers {
+  display: flex;
+  width: 50%;
+  flex-direction: row;
+}
+
+.tierRow {
+  justify-content: center;
+  gap: 2rem;
+  flex-direction: row;
+}
+
+.tier {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: flex-start;
+  font-weight: normal;
+  margin: 0.5rem;
+  padding: 1rem;
+  border: 1px solid var(--ifm-color-primary-light);
+  border-radius: 12px;
+}
+
+.title {
+  color: var(--ifm-color-primary-darker);
+  text-align: center;
+}
+
+[data-theme="dark"] .title {
+  color: var(--ifm-color-primary-lighter);
+}
+
+.tagline {
+  composes: tagline from "@site/src/css/common.module.css";
+}
+
+.price {
+  font-weight: bold;
+}
+
+.note {
+  font-size: 0.8rem;
+  color: var(--ifm-color-primary-darker);
+}
+
+[data-theme="dark"] .note {
+  color: var(--ifm-color-primary-lighter);
+}
