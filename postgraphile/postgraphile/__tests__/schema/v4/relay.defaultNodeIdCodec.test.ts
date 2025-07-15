@@ -7,6 +7,6 @@ test(
     extends: [PgRelayPreset],
     schema: {
       defaultNodeIdCodec: "pipeString",
-    }
+    },
   }),
 );
