@@ -1,0 +1,14 @@
+{
+  "prettier.enable": true,
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "*.test.graphql": "$(capture).json5, $(capture).sql, $(capture).mermaid, $(capture).errors.json5, $(capture).deopt.sql, $(capture).deopt.mermaid",
+    "*.test.ts": "$(capture).1.export.mjs, $(capture).1.graphql, $(capture).export.mjs, $(capture).graphql"
+  }
+}

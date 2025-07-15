@@ -1,0 +1,6 @@
+{
+  "recommendations": [
+    "graphql.vscode-graphql-syntax",
+    "esbenp.prettier-vscode"
+  ]
+}
