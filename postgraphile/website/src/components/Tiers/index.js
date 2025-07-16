@@ -8,7 +8,7 @@ const TierList = [
     tagline: "Thank you!",
     pricing: "$25",
     link: "https://github.com/sponsors/benjie/sponsorships?tier_id=369",
-    buttonText: "Join",
+    buttonText: "Join on GitHub Sponsors",
     description: (
       <>
         <ul>
@@ -31,7 +31,7 @@ const TierList = [
     tagline: "Support sustainability",
     pricing: "$100",
     link: "https://github.com/sponsors/benjie/sponsorships?tier_id=368",
-    buttonText: "Join",
+    buttonText: "Join on GitHub Sponsors",
     description: (
       <>
         <ul>
@@ -62,7 +62,7 @@ const TierList = [
     tagline: "Get featured in the project",
     pricing: "$500",
     link: "https://github.com/sponsors/benjie/sponsorships?tier_id=367",
-    buttonText: "Join",
+    buttonText: "Join on GitHub Sponsors",
     description: (
       <>
         <ul>
@@ -83,8 +83,14 @@ const TierList = [
             PostGraphile CLI
           </li>
           <li>
-            The warm feeling that comes from knowing you're making a significant
-            difference to PostGraphile's development and sustainability
+            Access to <strong>#vip-lounge</strong> on Discord
+          </li>
+          <li>
+            The warm feeling that comes from knowing{" "}
+            <strong>
+              you're making a significant difference to PostGraphile's
+              development and sustainability
+            </strong>
           </li>
         </ul>
       </>
@@ -114,9 +120,9 @@ function Tier({ title, tagline, link, buttonText, description, pricing }) {
 
 export default function List() {
   return (
-    <section className={clsx("padding-vert--lg", styles.tiers)}>
-      <div className="container">
-        <div className={clsx("col", styles.tierRow)}>
+    <section className={clsx("padding-vert--lg")}>
+      <div className={clsx("", styles.tiers)}>
+        <div className={clsx(styles.tierRow)}>
           {TierList.map((props, idx) => (
             <Tier key={idx} {...props} />
           ))}
