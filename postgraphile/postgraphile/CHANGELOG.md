@@ -1,5 +1,17 @@
 # postgraphile
 
+## 5.0.0-beta.45
+
+### Patch Changes
+
+- [#2635](https://github.com/graphile/crystal/pull/2635)
+  [`85c8364`](https://github.com/graphile/crystal/commit/85c83642b6fe7abcdb17c6879fbafbe162175843)
+  Thanks [@benjie](https://github.com/benjie)! - Remove non-functional fields
+  generated from mode:union-returning functions from the schema.
+- Updated dependencies
+  [[`85c8364`](https://github.com/graphile/crystal/commit/85c83642b6fe7abcdb17c6879fbafbe162175843)]:
+  - graphile-build-pg@5.0.0-beta.43
+
 ## 5.0.0-beta.44
 
 ### Patch Changes

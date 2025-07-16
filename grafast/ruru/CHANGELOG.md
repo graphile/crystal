@@ -1,5 +1,17 @@
 # ruru
 
+## 2.0.0-beta.27
+
+### Patch Changes
+
+- [`a31dc7c`](https://github.com/graphile/crystal/commit/a31dc7ce30cea33fdbecb7fbe4f9c70f24d8a318)
+  Thanks [@benjie](https://github.com/benjie)! - Fix URLs in README
+
+- [#2636](https://github.com/graphile/crystal/pull/2636)
+  [`ba8dacb`](https://github.com/graphile/crystal/commit/ba8dacb1ef93f79a61622ea7581cce4e593243bc)
+  Thanks [@benjie](https://github.com/benjie)! - Improve backwards compatibility
+  of ruruHTML function; explicitly deprecate the htmlParts argument.
+
 ## 2.0.0-beta.26
 
 ### Patch Changes

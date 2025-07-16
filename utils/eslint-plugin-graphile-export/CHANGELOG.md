@@ -1,5 +1,14 @@
 # eslint-plugin-graphile-export
 
+## 0.0.2-beta.10
+
+### Patch Changes
+
+- [#2634](https://github.com/graphile/crystal/pull/2634)
+  [`598a912`](https://github.com/graphile/crystal/commit/598a9126a4081cea249c6000d51ae5a49d68e58d)
+  Thanks [@benjie](https://github.com/benjie)! - Lint plugin now supports
+  `build.EXPORTABLE` expressions.
+
 ## 0.0.2-beta.9
 
 ### Patch Changes
@@ -45,7 +54,6 @@
   [`c041fd250372c57601188b65a6411c8f440afab6`](https://github.com/graphile/crystal/commit/c041fd250372c57601188b65a6411c8f440afab6)
   Thanks [@benjie](https://github.com/benjie)! - Since the following have been
   removed from Grafast, throw an error if they're seen in the schema:
-
   - `autoApplyAfterParentInputPlan`
   - `autoApplyAfterParentApplyPlan`
   - `autoApplyAfterParentPlan`
@@ -98,7 +106,6 @@
   The following `ModifierStep` classes have all dropped their `Step` suffix,
   these `Modifier` classes now all run at runtime, and are thus no longer steps;
   they're invoked as part of the new `applyInput()` (TODO: document) step:
-
   - `ModifierStep` &rArr; `Modifier`
   - `PgBooleanFilterStep` &rArr; `PgBooleanFilter`
   - `PgClassFilterStep` &rArr; `PgClassFilter`
@@ -119,7 +126,6 @@
   The deprecated forms of the above have been removed.
 
   Methods that rely on these modifier plans have been removed:
-
   - `PgUnionAllStep.wherePlan` - use
     `fieldArg.apply($unionAll, qb => qb.whereBuilder())` instead
   - `PgUnionAllStep.havingPlan` - use
@@ -127,7 +133,6 @@
   - Same for PgSelectStep
 
   The following gain query builders:
-
   - `PgInsertSingle`
   - `PgUpdateSingle`
   - `PgDeleteSingle`
