@@ -30,7 +30,6 @@
 
 .title {
   color: var(--ifm-color-primary-darker);
-  text-align: center;
 }
 
 [data-theme="dark"] .title {
@@ -38,7 +37,6 @@
 }
 
 .tagline {
-  composes: tagline from "@site/src/css/common.module.css";
   font-weight: var(--ifm-heading-font-weight);
 }
 

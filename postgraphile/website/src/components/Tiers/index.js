@@ -20,8 +20,7 @@ const TierList = [
           <li>PostGraphile stickers</li>
           <li>Access to the #supporter-lounge on Discord</li>
           <li>
-            The warm feeling from knowing you&apos;re supporting Open Source
-            Software
+            The warm feeling from knowing you’re supporting Open Source Software
           </li>
         </ul>
       </>
@@ -51,8 +50,8 @@ const TierList = [
             PostGraphile CLI
           </li>
           <li>
-            The warm feeling that comes from knowing you&apos;re making a
-            difference to PostGraphile&apos;s development and sustainability
+            The warm feeling that comes from knowing you’re making a difference
+            to PostGraphile’s development and sustainability
           </li>
         </ul>
       </>
@@ -71,7 +70,7 @@ const TierList = [
           <li>
             Your name and avatar/logo{" "}
             <strong>
-              featured in the READMEs of Graphile&apos;s main OSS projects
+              featured in the READMEs of Graphile’s main OSS projects
             </strong>{" "}
             (shown on GitHub and npm)
           </li>
@@ -89,7 +88,7 @@ const TierList = [
           <li>
             The warm feeling that comes from knowing{" "}
             <strong>
-              you&apos;re making a significant difference to PostGraphile&apos;s
+              you’re making a significant difference to PostGraphile’s
               development and sustainability
             </strong>
           </li>
