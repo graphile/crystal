@@ -1431,7 +1431,12 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                         );
                       build.registerNodeIdHandler({
                         typeName: tableTypeName,
-                        codec: build.getNodeIdCodec!("base64JSON"),
+                        codec: build.getNodeIdCodec!(
+                          codec.extensions?.tags?.nodeIdCodec ??
+                            resource?.extensions?.tags?.nodeIdCodec ??
+                            build.options?.defaultNodeIdCodec ??
+                            "base64JSON",
+                        ),
                         deprecationReason: tagToString(
                           codec.extensions?.tags?.deprecation ??
                             resource?.extensions?.tags?.deprecated,

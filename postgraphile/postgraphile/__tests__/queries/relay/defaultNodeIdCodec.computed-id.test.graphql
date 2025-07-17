@@ -1,0 +1,30 @@
+## expect(errors).toBeFalsy()
+#> schema: ["relay"]
+#> graphileBuildOptions: { defaultNodeIdCodec: "pipeString" }
+#> extends: ["postgraphile/presets/relay:PgRelayPreset"]
+query Q {
+  a: user(id: "users|1") {
+    username # Alice
+    base: maxReadingDistance
+    model1: maxReadingDistance(withSpectacles: "spectacles|1")
+    model2: maxReadingDistance(withSpectacles: "spectacles|2")
+    model3: maxReadingDistance(withSpectacles: "spectacles|3")
+    model4: maxReadingDistance(withSpectacles: "spectacles|4")
+    # We treat invalid data as if `null` was specified
+    nonsense1: maxReadingDistance(withSpectacles: "users|1")
+    nonsense2: maxReadingDistance(withSpectacles: "query")
+    nonsense3: maxReadingDistance(withSpectacles: "invalidnodeid")
+  }
+  b: user(id: "users|2") {
+    username # Bob
+    base: maxReadingDistance
+    model1: maxReadingDistance(withSpectacles: "spectacles|1")
+    model2: maxReadingDistance(withSpectacles: "spectacles|2")
+    model3: maxReadingDistance(withSpectacles: "spectacles|3")
+    model4: maxReadingDistance(withSpectacles: "spectacles|4")
+    # We treat invalid data as if `null` was specified
+    nonsense1: maxReadingDistance(withSpectacles: "users|1")
+    nonsense2: maxReadingDistance(withSpectacles: "query")
+    nonsense3: maxReadingDistance(withSpectacles: "invalidnodeid")
+  }
+}

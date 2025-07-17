@@ -1,0 +1,12 @@
+{
+  updateLeftArm: {
+    leftArm: {
+      id: "left_arms|42",
+      personByPersonId: {
+        id: "people|4",
+      },
+      lengthInMetres: 0.71,
+      mood: "neutral",
+    },
+  },
+}

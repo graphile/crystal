@@ -51,6 +51,7 @@ declare global {
       foreignKey: string | string[];
       unique: string | string[];
       deprecated: string | string[];
+      nodeIdCodec: string;
       /** For functions returning polymorphic type, which type to choose? */
       returnType: string;
 
@@ -89,6 +90,7 @@ declare global {
       interface: string;
       name: string;
       unionMember: string | string[];
+      nodeIdCodec: string;
     }
 
     interface PgSmartTagsDict {

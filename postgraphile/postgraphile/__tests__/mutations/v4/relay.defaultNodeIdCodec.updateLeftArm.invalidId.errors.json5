@@ -1,0 +1,14 @@
+[
+  {
+    message: 'Invalid node identifier for \'Person\': "my_tables|1"',
+    locations: [
+      {
+        line: 2,
+        column: 3,
+      },
+    ],
+    path: [
+      'updateLeftArm',
+    ],
+  },
+]

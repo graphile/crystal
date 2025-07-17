@@ -1,0 +1,12 @@
+{
+  createLeftArm: {
+    leftArm: {
+      id: "left_arms|100",
+      personByPersonId: {
+        id: "people|6",
+      },
+      lengthInMetres: 0.69,
+      mood: "neutral",
+    },
+  },
+}
