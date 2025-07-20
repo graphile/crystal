@@ -78,7 +78,7 @@
 }
 
 .ruru-footer {
-  padding: 10px var(--px-8) 10px var(--px-8);
+  padding: var(--px-16) var(--px-8);
 }
 
 /* Ruru overrides for GraphiQL styles */
@@ -123,6 +123,9 @@
   .graphiql-tabs {
     border-radius: 0;
     padding: 0;
+  }
+  .graphiql-editor-tools > button:not(.graphiql-toggle-editor-tools) {
+    padding: var(--px-4) var(--px-8);
   }
   .graphiql-editor-tools > button,
   .graphiql-tab {
@@ -200,5 +203,13 @@
   .graphiql-doc-explorer-search:not(:focus-within) [role="combobox"] {
     font-size: 1rem;
     width: 5em;
+  }
+  .graphiql-chevron-icon {
+    height: var(--px-12);
+    width: var(--px-12);
+    margin: var(--px-8);
+  }
+  .ruru-footer {
+    padding: var(--px-8) var(--px-4);
   }
 }
