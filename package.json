@@ -8,7 +8,7 @@
     "posttest": "NODE_ENV=test yarn workspaces foreach --all --topological run posttest && node scripts/benjies-depcheck.mjs",
     "prepack:all": "scripts/prepack-all",
     "build": "yarn && yarn workspace ruru-components prepack && yarn workspace ruru prepack && tsc -b",
-    "watch": "yarn build && tsc -b --watch",
+    "watch": "BUILD_MODE=development yarn build && tsc -b --watch",
     "clean": "( jest --clearCache || true ) && ( rm -Rf {utils,grafast,graphile-build,postgraphile}/*/{dist,bundle,tsconfig.tsbuildinfo,tsconfig.*.tsbuildinfo} postgraphile/postgraphile/.tests_tmp/ grafast/ruru/static grafast/ruru/src/bundleCode.ts grafast/ruru/src/bundleMeta.ts || true )",
     "tsc:watch:clean": "( rm -Rf {utils,grafast,graphile-build,postgraphile}/*/{dist,tsconfig.tsbuildinfo,tsconfig.*.tsbuildinfo} || true ) && tsc -b --watch",
     "changeset:version": "yarn changeset version && node scripts/postversion.mjs",

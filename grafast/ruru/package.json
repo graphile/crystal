@@ -31,7 +31,7 @@
     "webpack": "node --loader ts-node/esm \"$(yarn bin webpack-cli)\" --config webpack.config.mts",
     "watch": "yarn webpack --watch --mode=development",
     "make-ruru-html": "node --experimental-strip-types scripts/make-ruru-html.mts",
-    "prepack": "rm -Rf dist static tsconfig.tsbuildinfo tsconfig.build.tsbuildinfo && yarn webpack --mode=production && tsc -b tsconfig.build.json && cp src/.npmignore dist/ && chmod +x dist/cli-run.js && yarn make-ruru-html"
+    "prepack": "rm -Rf dist static tsconfig.tsbuildinfo tsconfig.build.tsbuildinfo && yarn webpack --mode=${BUILD_MODE:-production} && tsc -b tsconfig.build.json && cp src/.npmignore dist/ && chmod +x dist/cli-run.js && yarn make-ruru-html"
   },
   "repository": {
     "type": "git",

@@ -1,12 +1,15 @@
 import { createHash } from "node:crypto";
-import { writeFileSync } from "node:fs";
+import { writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { brotliCompressSync, constants } from "node:zlib";
+import { promisify } from "node:util";
+import { brotliCompress as brotliCompressCb, constants } from "node:zlib";
 
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import type { Compiler, Configuration, Resolver } from "webpack";
 // import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
+
+const brotliCompress = promisify(brotliCompressCb);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -70,34 +73,48 @@ const outro = ["};", ""];
 
 class OutputDataToSrcPlugin {
   apply(compiler: Compiler) {
-    compiler.hooks.emit.tap("OutputDataToSrcPlugin", (compilation) => {
-      const code: string[] = [...intro];
-      const meta: string[] = [...intro];
-      const entries = Object.entries(compilation.assets);
-      entries.sort((a, z) => (a[0] < z[0] ? -1 : a[0] > z[0] ? 1 : 0));
-      for (const [filename, asset] of entries) {
-        const source = asset.source();
-        const buf = Buffer.isBuffer(source) ? source : Buffer.from(source);
-        const compressed = brotliCompressSync(buf, {
-          params: {
-            [constants.BROTLI_PARAM_QUALITY]: 11, // max compression
-          }
-        });
-        const hash = createHash("sha256").update(compressed).digest("base64url");
-        const etag = `"sha256-${hash}"`; // quoted per HTTP spec
-        const base64 = compressed.toString("base64");
-        const sourceLine = `\
+    compiler.hooks.emit.tapPromise(
+      "OutputDataToSrcPlugin",
+      async (compilation) => {
+        const code: string[] = [...intro];
+        const meta: string[] = [...intro];
+        const entries = Object.entries(compilation.assets);
+        entries.sort((a, z) => (a[0] < z[0] ? -1 : a[0] > z[0] ? 1 : 0));
+        const toAdd = await Promise.all(
+          entries.map(async ([filename, asset]) => {
+            const source = asset.source();
+            const buf = Buffer.isBuffer(source) ? source : Buffer.from(source);
+            const compressed = await brotliCompress(buf, {
+              params: {
+                [constants.BROTLI_PARAM_QUALITY]:
+                  compiler.options.mode === "production" ? 11 : 1, // max compression for prod, min for dev
+              },
+            });
+            const hash = createHash("sha256")
+              .update(compressed)
+              .digest("base64url");
+            const etag = `"sha256-${hash}"`; // quoted per HTTP spec
+            const base64 = compressed.toString("base64");
+            const sourceLine = `\
   ${JSON.stringify(filename)}: {
     etag: ${JSON.stringify(etag)},
     buffer: Buffer.from(${JSON.stringify(base64)}, "base64"),
   },`;
-        (isDevAsset(filename) ? meta : code).push(sourceLine);
-      }
-      code.push(...outro);
-      meta.push(...outro);
-      writeFileSync(`${__dirname}/src/bundleCode.ts`, code.join("\n"));
-      writeFileSync(`${__dirname}/src/bundleMeta.ts`, meta.join("\n"));
-    });
+            return [isDevAsset(filename) ? meta : code, sourceLine] as const;
+          }),
+        );
+        // To ensure they're added in order
+        for (const [target, line] of toAdd) {
+          target.push(line);
+        }
+        code.push(...outro);
+        meta.push(...outro);
+        await Promise.all([
+          writeFile(`${__dirname}/src/bundleCode.ts`, code.join("\n")),
+          writeFile(`${__dirname}/src/bundleMeta.ts`, meta.join("\n")),
+        ]);
+      },
+    );
   }
 }
 
