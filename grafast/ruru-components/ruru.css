@@ -76,3 +76,109 @@
   font-size: 0.75rem;
   white-space: pre-wrap;
 }
+
+.ruru-footer {
+  padding: 10px var(--px-8) 10px var(--px-8);
+}
+
+/* Ruru overrides for GraphiQL styles */
+
+.graphiql-explorer-root input {
+  /* Fixes 'ch' unit inputs so text isn't truncated */
+  font-family: var(--font-family-mono);
+  padding: 0;
+}
+
+.graphiql-container {
+  button,
+  button:focus {
+    outline: 0;
+  }
+}
+
+/* condensed layout */
+.graphiql-container {
+  --sidebar-width: 40px;
+  --line-height: 1.25;
+  --session-header-height: 34.5px;
+  --font-size-caption: 1rem;
+
+  .graphiql-sessions {
+    border-radius: 0;
+    margin: 0;
+  }
+
+  .graphiql-plugin {
+    padding: var(--px-8);
+  }
+
+  .graphiql-explorer-graphql-arguments > div > span > svg {
+    margin-top: 3px;
+    margin-bottom: -3px;
+  }
+
+  .graphiql-editor-tools {
+    padding: 0;
+  }
+  .graphiql-editor-tools > button,
+  .graphiql-tab {
+    outline: 0;
+    border-bottom: 3px solid transparent;
+    border-radius: 0;
+  }
+  .graphiql-editor-tools > button.active,
+  .graphiql-tab.graphiql-tab-active {
+    border-bottom-color: hsl(var(--color-primary));
+  }
+  .graphiql-tab {
+    background: none;
+    &:hover {
+      background-color: hsla(
+        var(--color-neutral),
+        var(--alpha-background-light)
+      );
+    }
+    &.graphiql-tab-active {
+      background-color: var(--bg);
+    }
+  }
+  .graphiql-query-editor,
+  .graphiql-editor-tool {
+    padding: var(--px-8);
+  }
+
+  .graphiql-session-header,
+  #graphiql-session {
+    padding: 0;
+    padding-right: var(--px-8);
+    height: initial;
+  }
+  .graphiql-session-header {
+    padding-top: var(--px-8);
+  }
+  .graphiql-horizontal-drag-bar {
+    background-color: hsla(var(--color-neutral), var(--alpha-background-light));
+    width: var(--px-8);
+  }
+  #graphiql-session .graphiql-horizontal-drag-bar {
+    background-color: transparent;
+  }
+  .graphiql-editors {
+    box-shadow: none;
+    border-radius: 0;
+    border-top-right-radius: 13px;
+  }
+  .graphiql-tab-button {
+    border-radius: 0;
+  }
+  .graphiql-logo {
+    padding-right: var(--px-8);
+  }
+  .graphiql-doc-explorer-content > * {
+    margin-top: var(--px-16);
+  }
+  .graphiql-doc-explorer-section-content > * + *,
+  .graphiql-markdown-description {
+    margin-top: var(--px-8);
+  }
+}
