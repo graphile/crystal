@@ -181,4 +181,19 @@
   .graphiql-markdown-description {
     margin-top: var(--px-8);
   }
+  .graphiql-doc-explorer-title,
+  .graphiql-history-header,
+  .doc-explorer-title {
+    font-size: var(--font-size-h3);
+  }
+  .graphiql-history-header {
+    align-items: flex-start;
+  }
+  .graphiql-doc-explorer-search-input {
+    padding: var(--px-4) var(--px-8);
+  }
+  .graphiql-doc-explorer-search:not(:focus-within) [role="combobox"] {
+    font-size: 1rem;
+    width: 5em;
+  }
 }
