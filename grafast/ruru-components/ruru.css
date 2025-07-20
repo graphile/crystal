@@ -146,6 +146,9 @@
   .graphiql-editor-tool {
     padding: var(--px-8);
   }
+  .graphiql-query-editor {
+    column-gap: var(--px-8);
+  }
 
   .graphiql-session-header,
   #graphiql-session {
