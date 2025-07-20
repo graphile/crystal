@@ -3851,54 +3851,54 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@graphiql/plugin-doc-explorer@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "@graphiql/plugin-doc-explorer@npm:0.3.0"
+"@graphiql/plugin-doc-explorer@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@graphiql/plugin-doc-explorer@npm:0.4.1"
   dependencies:
-    "@graphiql/react": "npm:^0.35.0"
     "@headlessui/react": "npm:^2.2"
-    react-compiler-runtime: "npm:19.1.0-rc.1"
     zustand: "npm:^5"
   peerDependencies:
+    "@graphiql/react": ^0.37.0
     graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
     react: ^18 || ^19
+    react-compiler-runtime: 19.1.0-rc.1
     react-dom: ^18 || ^19
-  checksum: 10/3061721ccf63c6fe676d8b0243848a2bfac27b76019cf7a1e475d7a21f0fa9683f1e4c141ba62fdbee3691d09af8d794e6e46262988bb48a6e2eb1929575c0fa
+  checksum: 10/8ab0e8657ccfee81b5777b5f3e28b0617b9e7b8a465fe8390054a21d3d2de8e478fd58a11aeb132fd85d3006b633aa8e44edde68255f0ef41bd6b7d04802815c
   languageName: node
   linkType: hard
 
-"@graphiql/plugin-explorer@npm:^5.0.0":
-  version: 5.0.0
-  resolution: "@graphiql/plugin-explorer@npm:5.0.0"
+"@graphiql/plugin-explorer@npm:^5.1.1":
+  version: 5.1.1
+  resolution: "@graphiql/plugin-explorer@npm:5.1.1"
   dependencies:
     graphiql-explorer: "npm:^0.9.0"
   peerDependencies:
-    "@graphiql/react": ^0.35.0-rc.0
+    "@graphiql/react": ^0.37.0
     graphql: ^15.5.0 || ^16.0.0 || ^17.0.0-alpha.2
     react: ^18 || ^19
     react-dom: ^18 || ^19
-  checksum: 10/9b6a0eefbec1a0ed3ccaf2781742e6b83a4f659e03a85ccb7ef8718190da047df89cc3eb8cd3440bf10c3db3ad80c056655544b6cceb3500a9da94975aa5cdde
+  checksum: 10/4a3c446029cc6cb12d5bfd8a3c484bd9d78a471c57d58a1e9f10e54eb7b12d88715ac8eb03f0eb28dc492eee12b7e78e5b4dae034d656e8303eb391caaac5883
   languageName: node
   linkType: hard
 
-"@graphiql/plugin-history@npm:^0.3.0":
-  version: 0.3.0
-  resolution: "@graphiql/plugin-history@npm:0.3.0"
+"@graphiql/plugin-history@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@graphiql/plugin-history@npm:0.4.1"
   dependencies:
-    "@graphiql/react": "npm:^0.35.0"
     "@graphiql/toolkit": "npm:^0.11.3"
-    react-compiler-runtime: "npm:19.1.0-rc.1"
     zustand: "npm:^5"
   peerDependencies:
+    "@graphiql/react": ^0.37.0
     react: ^18 || ^19
+    react-compiler-runtime: 19.1.0-rc.1
     react-dom: ^18 || ^19
-  checksum: 10/57bd4cd045914168c093ced3a1e78c0053dce564521b86d59d0aca9b019e7fc6f36eea1e4ad535de733a18e74dacb932616217cfbd31b1f3b1a060576b86773f
+  checksum: 10/1dea939d22369eb6ebc543a632f3edbf882178559fd185fa64b021f00e34b8653a0cea6481d1775d2bb274fd39d2b64a097a67180857555eeaa9cb1449ade4e7
   languageName: node
   linkType: hard
 
-"@graphiql/react@npm:^0.35.0, @graphiql/react@npm:^0.35.5":
-  version: 0.35.5
-  resolution: "@graphiql/react@npm:0.35.5"
+"@graphiql/react@npm:^0.37.1":
+  version: 0.37.1
+  resolution: "@graphiql/react@npm:0.37.1"
   dependencies:
     "@graphiql/toolkit": "npm:^0.11.3"
     "@radix-ui/react-dialog": "npm:^1.1"
@@ -3908,20 +3908,20 @@ __metadata:
     clsx: "npm:^1.2.1"
     framer-motion: "npm:^12.12"
     get-value: "npm:^3.0.1"
-    graphql-language-service: "npm:^5.3.1"
+    graphql-language-service: "npm:^5.5.0"
     jsonc-parser: "npm:^3.3.1"
     markdown-it: "npm:^14.1.0"
     monaco-editor: "npm:^0.52.2"
-    monaco-graphql: "npm:^1.7.1"
+    monaco-graphql: "npm:^1.7.2"
     prettier: "npm:^3.5.3"
-    react-compiler-runtime: "npm:19.1.0-rc.1"
     set-value: "npm:^4.1.0"
     zustand: "npm:^5"
   peerDependencies:
     graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
     react: ^18 || ^19
+    react-compiler-runtime: 19.1.0-rc.1
     react-dom: ^18 || ^19
-  checksum: 10/e23099756fb5c2a2743910ae8065ce8a1da4bd1fd043707726d873222731a428d059a26b262315f064d7f4071afb0daabc5b06d9eac1850b437840033b06fa92
+  checksum: 10/d2363cc6e2200772ec9c421c4371801d81e79d8338a23888b8ecd9150877416050410086187ef35f68df6cb57300b04a7152903711a494dc2f2fdbc3e7df0825
   languageName: node
   linkType: hard
 
@@ -14045,19 +14045,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graphiql@npm:^5.0.5":
-  version: 5.0.5
-  resolution: "graphiql@npm:5.0.5"
+"graphiql@npm:^5.2.0":
+  version: 5.2.0
+  resolution: "graphiql@npm:5.2.0"
   dependencies:
-    "@graphiql/plugin-doc-explorer": "npm:^0.3.0"
-    "@graphiql/plugin-history": "npm:^0.3.0"
-    "@graphiql/react": "npm:^0.35.5"
+    "@graphiql/plugin-doc-explorer": "npm:^0.4.1"
+    "@graphiql/plugin-history": "npm:^0.4.1"
+    "@graphiql/react": "npm:^0.37.1"
     react-compiler-runtime: "npm:19.1.0-rc.1"
   peerDependencies:
     graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
     react: ^18 || ^19
     react-dom: ^18 || ^19
-  checksum: 10/0ce7d9d915f6488443519b265138e2783115d1a88153072cae5dabd44c1464b0275bbddefb38b8d17772a575aee6a6212f28af13eb99d1ebcd9410fd3e16e604
+  checksum: 10/41cb01441ed7a98539ba791d8ee1c9cf9bcd8a23709fc95b94e9dbe9c039b9c06be30bcda8664d0ca34998196dbbd07745b5c8d658b07e0bbc8261841a1f5ae5
   languageName: node
   linkType: hard
 
@@ -14128,7 +14128,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graphql-language-service@npm:^5.3.0, graphql-language-service@npm:^5.3.1, graphql-language-service@npm:^5.4.0":
+"graphql-language-service@npm:^5.3.0":
   version: 5.4.0
   resolution: "graphql-language-service@npm:5.4.0"
   dependencies:
@@ -14140,6 +14140,21 @@ __metadata:
   bin:
     graphql: dist/temp-bin.js
   checksum: 10/d1489f40a67c45f1e3888cc0779d339dbc1eb409e12fe5961abb68ec2a7036eeef3532b355a34da87d45df7ac46b9b817f165d745178df6c657152c3d2a0aa7d
+  languageName: node
+  linkType: hard
+
+"graphql-language-service@npm:^5.5.0":
+  version: 5.5.0
+  resolution: "graphql-language-service@npm:5.5.0"
+  dependencies:
+    debounce-promise: "npm:^3.1.2"
+    nullthrows: "npm:^1.0.0"
+    vscode-languageserver-types: "npm:^3.17.1"
+  peerDependencies:
+    graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
+  bin:
+    graphql: dist/temp-bin.js
+  checksum: 10/7f398395cab50faaad717d107413df5424ac102bf33ac4a5e4ef34bf7c2e13a27d51fd93456601f560874801bf93bec281589164d901bab3aef56f4518782f60
   languageName: node
   linkType: hard
 
@@ -18494,17 +18509,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"monaco-graphql@npm:^1.7.1":
-  version: 1.7.1
-  resolution: "monaco-graphql@npm:1.7.1"
+"monaco-graphql@npm:^1.7.2":
+  version: 1.7.2
+  resolution: "monaco-graphql@npm:1.7.2"
   dependencies:
-    graphql-language-service: "npm:^5.4.0"
+    graphql-language-service: "npm:^5.5.0"
     picomatch-browser: "npm:^2.2.6"
   peerDependencies:
     graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
     monaco-editor: ">= 0.20.0 < 1"
     prettier: ^2.8.0 || ^3.0.0
-  checksum: 10/3c6673680fbf16f274c4c3490fee4e1f1f3d659dd4d1257c3620455b362d262a78335737c1240b919fb84127180384100f4fd3ed7cf76ea50112e2b521fa48fc
+  checksum: 10/5d550d104fdafc9c1884c64b50f07f27f1a8f866e8689f2bb1953c1b8023b761ce663f87f96134a763548162cf9d98e3e163e43df2a13f19a44a317d4e319fc4
   languageName: node
   linkType: hard
 
@@ -22195,10 +22210,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "ruru-components@workspace:grafast/ruru-components"
   dependencies:
-    "@graphiql/plugin-doc-explorer": "npm:^0.3.0"
-    "@graphiql/plugin-explorer": "npm:^5.0.0"
-    "@graphiql/plugin-history": "npm:^0.3.0"
-    "@graphiql/react": "npm:^0.35.5"
+    "@graphiql/plugin-doc-explorer": "npm:^0.4.1"
+    "@graphiql/plugin-explorer": "npm:^5.1.1"
+    "@graphiql/plugin-history": "npm:^0.4.1"
+    "@graphiql/react": "npm:^0.37.1"
     "@graphiql/toolkit": "npm:^0.11.3"
     "@types/codemirror": "npm:^5.60.16"
     "@types/debug": "npm:^4.1.12"
@@ -22208,7 +22223,7 @@ __metadata:
     "@types/react": "npm:^19.1.8"
     "@types/react-dom": "npm:^19.1.6"
     grafast: "workspace:^"
-    graphiql: "npm:^5.0.5"
+    graphiql: "npm:^5.2.0"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     graphql-ws: "npm:^6.0.5"
     jest: "npm:^30.0.4"
