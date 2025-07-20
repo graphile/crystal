@@ -36,7 +36,7 @@ function html(arr: TemplateStringsArray, ...placeholders: string[]) {
 const baseTitleTag = html` <title>Ruru - GraphQL/Grafast IDE</title> `;
 const baseElements = html`
   <div id="ruru-root">
-    <div class="graphiql-container">
+    <div class="graphiql-container condensed">
       <div class="graphiql-sidebar"></div>
       <div class="graphiql-main">
         <div

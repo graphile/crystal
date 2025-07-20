@@ -147,10 +147,14 @@ export const RuruInner: FC<{
   const prettify = usePrettify();
   const { copyQuery, mergeQuery, introspect } = useGraphiQLActions();
   useGraphQLChangeStream(props, introspect, streamEndpoint);
+  const condensed = storage.get("condensed") !== "";
 
   return (
     <>
-      <GraphiQLInterface {...graphiqlInterfaceProps}>
+      <GraphiQLInterface
+        {...graphiqlInterfaceProps}
+        className={`${graphiqlInterfaceProps.className ?? ""}${condensed ? " condensed" : ""}`}
+      >
         <GraphiQL.Logo>
           <a
             href="https://grafast.org/ruru"
@@ -206,6 +210,15 @@ export const RuruInner: FC<{
               <span>
                 {storage.get("verbose") === "true" ? check : nocheck}
                 Verbose
+              </span>
+            </ToolbarMenu.Item>
+            <ToolbarMenu.Item
+              title="Condensed"
+              onSelect={() => storage.toggle("condensed")}
+            >
+              <span>
+                {storage.get("condensed") !== "" ? check : nocheck}
+                Condensed
               </span>
             </ToolbarMenu.Item>
           </ToolbarMenu>
