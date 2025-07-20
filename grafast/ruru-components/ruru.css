@@ -120,10 +120,15 @@
   .graphiql-editor-tools {
     padding: 0;
   }
+  .graphiql-tabs {
+    border-radius: 0;
+    padding: 0;
+  }
   .graphiql-editor-tools > button,
   .graphiql-tab {
     outline: 0;
     border-bottom: 3px solid transparent;
+    border-top: 3px solid transparent;
     border-radius: 0;
   }
   .graphiql-editor-tools > button.active,
@@ -155,9 +160,6 @@
     padding: 0;
     padding-right: var(--px-8);
     height: initial;
-  }
-  .graphiql-session-header {
-    padding-top: var(--px-8);
   }
   .graphiql-horizontal-drag-bar {
     background-color: hsla(var(--color-neutral), var(--alpha-background-light));
