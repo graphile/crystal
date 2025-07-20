@@ -97,7 +97,7 @@
 }
 
 /* condensed layout */
-.graphiql-container {
+.graphiql-container.condensed {
   --sidebar-width: 40px;
   --line-height: 1.25;
   --session-header-height: 34.5px;
