@@ -80,10 +80,13 @@ class OutputDataToSrcPlugin {
         const buf = Buffer.isBuffer(source) ? source : Buffer.from(source);
         const compressed = brotliCompressSync(buf, {
           params: {
-            [constants.BROTLI_PARAM_QUALITY]: 11, // max compression
-          }
+            [constants.BROTLI_PARAM_QUALITY]:
+              compiler.options.mode === "production" ? 11 : 1, // max compression for prod, min for dev
+          },
         });
-        const hash = createHash("sha256").update(compressed).digest("base64url");
+        const hash = createHash("sha256")
+          .update(compressed)
+          .digest("base64url");
         const etag = `"sha256-${hash}"`; // quoted per HTTP spec
         const base64 = compressed.toString("base64");
         const sourceLine = `\
