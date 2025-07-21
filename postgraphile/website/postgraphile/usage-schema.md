@@ -255,7 +255,7 @@ export async function executeDocument<
   const result = await execute(args);
 
   // Cast the result to the types implied by the TypedDocumentNode:
-  return result as ExecutionResult<ResultOf<typeof document>, TVariables>;
+  return result as ExecutionResult<ResultOf<TDoc>, TExtensions>;
 }
 ```
 
