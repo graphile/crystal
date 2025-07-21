@@ -31,6 +31,18 @@ declare global {
     interface ScopeObjectFieldsField {
       isRootNodeField?: boolean;
     }
+
+    interface SchemaOptions {
+      /**
+       * The default Node ID codec to use. May be overridden on a
+       * table-by-table basis using the `@nodeIdCodec` smart tag.
+       *
+       * Use build.registerNodeIdCodec to register your own codecs.
+       *
+       * @defaultValue `"base64JSON"`
+       */
+      defaultNodeIdCodec?: string;
+    }
   }
 }
 

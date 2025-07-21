@@ -1,0 +1,53 @@
+{
+  allPosts: {
+    nodes: [
+      {
+        author: {
+          id: "people|3",
+        },
+        body: "Hello world",
+      },
+      {
+        author: {
+          id: "people|4",
+        },
+        body: "Hi Alice!",
+      },
+      {
+        author: {
+          id: "people|3",
+        },
+        body: "Hi Bob!",
+      },
+      {
+        author: null,
+        body: "Message from deleted user",
+      },
+    ],
+  },
+  alicesPosts: {
+    nodes: [
+      {
+        author: {
+          id: "people|3",
+        },
+        body: "Hello world",
+      },
+      {
+        author: {
+          id: "people|3",
+        },
+        body: "Hi Bob!",
+      },
+    ],
+  },
+  postsWithNoAuthor: {
+    nodes: [
+      {
+        author: null,
+        body: "Message from deleted user",
+      },
+    ],
+  },
+  z_invalidAuthorId: null,
+}

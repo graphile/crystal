@@ -1,0 +1,21 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+#> extends: ["postgraphile/presets/relay:PgRelayPreset"]
+#> graphileBuildOptions: { defaultNodeIdCodec: "pipeString" }
+mutation {
+  updateLeftArm(
+    input: {
+      id: "left_arms|42"
+      leftArmPatch: { personByPersonId: null, lengthInMetres: 0.71 }
+    }
+  ) {
+    leftArm {
+      id
+      personByPersonId {
+        id
+      }
+      lengthInMetres
+      mood
+    }
+  }
+}
