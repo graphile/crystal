@@ -119,7 +119,7 @@
   }
 
   .graphiql-plugin {
-    padding: var(--px-8);
+    padding: var(--px-8) var(--px-12);
   }
 
   .graphiql-explorer-graphql-arguments > div > span > svg {
@@ -229,4 +229,10 @@
 }
 .graphiql-dropdown-item {
   margin: 0;
+}
+.graphiql-dialog {
+  .graphiql-dialog-header,
+  .graphiql-dialog-section {
+    padding: var(--px-12);
+  }
 }
