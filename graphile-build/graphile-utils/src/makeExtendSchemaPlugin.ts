@@ -432,7 +432,13 @@ export function extendSchema(
                   node.kind === Kind.INTERFACE_TYPE_EXTENSION ||
                   node.kind === Kind.INTERFACE_TYPE_DEFINITION
                 ) {
-                  return ["an interface type", "interfaces"] as const;
+                  return [
+                    "an interface type",
+                    "interfaces",
+                    (nodes as Array<typeof node>)
+                      .flatMap((n) => n.fields?.map((f) => f.name.value))
+                      .filter(isNotNullish),
+                  ] as const;
                 } else if (
                   node.kind === Kind.UNION_TYPE_EXTENSION ||
                   node.kind === Kind.UNION_TYPE_DEFINITION
@@ -529,13 +535,22 @@ export function extendSchema(
             }
 
             for (const [typeName, spec] of Object.entries(interfaces ?? {})) {
-              assertLocation(typeName, "interfaces");
+              const fields = assertLocation(typeName, "interfaces");
               const o = {} as Record<string, any>;
               plans[typeName] = o as any;
 
-              for (const [key, val] of Object.entries(spec)) {
+              const { fields: fieldConfigs = {}, ...rest } = spec;
+              for (const [key, val] of Object.entries(rest)) {
                 assertNotDunder(`interfaces.${typeName}`, key);
                 o[`__${key}`] = val;
+              }
+              for (const [key, val] of Object.entries(fieldConfigs)) {
+                if (!fields.includes(key)) {
+                  throw new Error(
+                    `Interface type '${typeName}' field '${key}' was not defined in this plugin.`,
+                  );
+                }
+                o[key] = val;
               }
             }
 
@@ -691,16 +706,8 @@ export function extendSchema(
                       fieldsContext,
                       build,
                     ),
-                  ...(description
-                    ? {
-                        description,
-                      }
-                    : null),
-                  ...(p.__isTypeOf
-                    ? {
-                        isTypeOf: p.__isTypeOf,
-                      }
-                    : null),
+                  ...(description ? { description } : null),
+                  ...(p.__isTypeOf ? { isTypeOf: p.__isTypeOf } : null),
                   ...(p.__assertStep || p.__planType
                     ? {
                         extensions: {
@@ -733,11 +740,7 @@ export function extendSchema(
                 () => ({
                   fields: ({ Self }) =>
                     getInputFields(Self, definition.fields, build),
-                  ...(description
-                    ? {
-                        description,
-                      }
-                    : null),
+                  ...(description ? { description } : null),
                 }),
                 uniquePluginName,
               );
@@ -822,8 +825,8 @@ export function extendSchema(
                     getFields(
                       fieldsContext.Self,
                       definition.fields,
-                      Object.create(null), // Interface doesn't need resolvers
-                      Object.create(null), // Interface doesn't need resolvers
+                      resolvers,
+                      plans,
                       fieldsContext,
                       build,
                     ),
@@ -1059,7 +1062,7 @@ export function extendSchema(
           const {
             extend,
             makeExtendSchemaPlugin: {
-              [uniquePluginName]: { typeExtensions },
+              [uniquePluginName]: { typeExtensions, resolvers, plans },
             },
           } = build;
           const { Self } = context;
@@ -1074,8 +1077,8 @@ export function extendSchema(
                 const moreFields = getFields(
                   Self,
                   extension.fields,
-                  Object.create(null), // No resolvers for interfaces
-                  Object.create(null), // No resolvers for interfaces
+                  resolvers,
+                  plans,
                   context,
                   build,
                 );
@@ -1370,17 +1373,9 @@ export function extendSchema(
           const spec = possiblePlan ?? possibleResolver;
           const fieldSpecGenerator = () => {
             return {
-              ...(deprecationReason
-                ? {
-                    deprecationReason,
-                  }
-                : null),
-              ...(description
-                ? {
-                    description,
-                  }
-                : null),
-              ...(typeof spec === "function"
+              ...(deprecationReason ? { deprecationReason } : null),
+              ...(description ? { description } : null),
+              ...(isObjectType(Self) && typeof spec === "function"
                 ? {
                     [possiblePlan
                       ? isRootSubscription

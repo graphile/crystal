@@ -89,6 +89,11 @@ declare module "grafast" {
     TSpecifier extends Step = TSource,
   > {
     scope?: GraphileBuild.ScopeInterface;
+    fields?: {
+      [fieldName: string]: {
+        scope?: GraphileBuild.ScopeInterfaceFieldsField;
+      };
+    };
   }
   interface InputObjectPlan {
     scope?: GraphileBuild.ScopeInputObject;
