@@ -1,0 +1,7 @@
+{
+  alice: {
+    id: "people|3",
+    firstName: "Alice",
+    lastName: "Alicesson",
+  },
+}
