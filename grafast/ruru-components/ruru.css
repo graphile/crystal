@@ -108,6 +108,10 @@
     width: 12px;
     height: 12px;
   }
+  .graphiql-toolbar-icon {
+    width: calc(var(--toolbar-width) - 10px);
+    height: calc(var(--toolbar-width) - 10px);
+  }
 
   .graphiql-sessions {
     border-radius: 0;
@@ -218,4 +222,11 @@
   .ruru-footer {
     padding: var(--px-8) var(--px-4);
   }
+}
+
+.graphiql-dropdown-content {
+  padding: 0;
+}
+.graphiql-dropdown-item {
+  margin: 0;
 }
