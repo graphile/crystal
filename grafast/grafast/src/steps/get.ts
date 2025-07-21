@@ -4,11 +4,13 @@ import { access } from "./access.js";
 /**
  * If your step class has a `get` method you should implement this so users
  * benefit from type safety.
+ *
+ * e.g. `implements StepWithGet<{ a: Step<number>, b: Step<string> }>`
  */
-export interface StepWithGet<TObj> {
+export interface StepWithGet<TStepByKey extends Record<string, Step>> {
   /** TypeScript hack so we can infer the type of getting each key */
-  $inferGet?: TObj;
-  get<TKey extends keyof TObj>(key: TKey): Step<TObj[TKey]>;
+  __tshackGetLookup?: TStepByKey;
+  get<TKey extends keyof TStepByKey>(key: TKey): TStepByKey[TKey];
 }
 
 /**
@@ -19,14 +21,12 @@ export interface StepWithGet<TObj> {
  * 3. Otherwise, determine the type the Step encodes and extract the keys of that
  */
 type StepGetKeys<TStep extends Step> =
-  TStep extends StepWithGet<infer UObj>
-    ? keyof UObj
+  TStep extends StepWithGet<infer UStepByKey>
+    ? keyof UStepByKey
     : TStep extends { get(attr: infer U): any }
       ? U
       : TStep extends Step<infer UData>
-        ? UData extends Record<string, any>
-          ? keyof UData
-          : string
+        ? keyof UData
         : never;
 
 /**
@@ -37,16 +37,14 @@ type StepGetKeys<TStep extends Step> =
  * 3. Otherwise, determine the type the Step encodes and return a Step representing the relevant key of that
  */
 type GetResult<TStep extends Step, TAttr extends StepGetKeys<TStep>> =
-  TStep extends StepWithGet<infer TObj>
-    ? TAttr extends keyof TObj
-      ? Step<TObj[TAttr]>
+  TStep extends StepWithGet<infer UStepByKey>
+    ? TAttr extends keyof UStepByKey
+      ? UStepByKey[TAttr]
       : never
-    : TStep extends { get(attr: any): infer UStep }
-      ? UStep
+    : TStep extends { get(attr: any): infer UGetStep }
+      ? UGetStep
       : TStep extends Step<infer UData>
-        ? UData extends Record<string, any>
-          ? Step<UData[keyof UData]>
-          : Step<unknown>
+        ? Step<UData[keyof UData]>
         : never;
 
 /**
