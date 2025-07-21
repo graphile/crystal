@@ -238,6 +238,7 @@ import {
   sideEffect,
   SideEffectStep,
   specFromNodeId,
+  StepWithGet,
   trap,
   TRAP_ERROR,
   TRAP_ERROR_OR_INHIBITED,

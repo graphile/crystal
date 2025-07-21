@@ -10,7 +10,7 @@ export {
   TRAP_ERROR_OR_INHIBITED,
   TRAP_INHIBITED,
 } from "./__flag.js";
-export { access, AccessStep, get } from "./access.js";
+export { access, AccessStep } from "./access.js";
 export { coalesce, CoalesceStep } from "./coalesce.js";
 export {
   assertEdgeCapableStep,
@@ -27,6 +27,7 @@ export { each } from "./each.js";
 export { error, ErrorStep } from "./error.js";
 export { filter, FilterPlanMemo } from "./filter.js";
 export { first, FirstStep } from "./first.js";
+export { get, StepWithGet } from "./get.js";
 export { groupBy, GroupByPlanMemo } from "./groupBy.js";
 export { lambda, LambdaStep } from "./lambda.js";
 export { last, LastStep } from "./last.js";
