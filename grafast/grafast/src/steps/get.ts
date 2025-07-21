@@ -44,7 +44,9 @@ type GetResult<TStep extends Step, TAttr extends StepGetKeys<TStep>> =
     : TStep extends { get(attr: any): infer UGetStep }
       ? UGetStep
       : TStep extends Step<infer UData>
-        ? Step<UData[keyof UData]>
+        ? TAttr extends keyof UData
+          ? Step<UData[TAttr]>
+          : never
         : never;
 
 /**
