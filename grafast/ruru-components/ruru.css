@@ -102,6 +102,16 @@
   --line-height: 1.25;
   --session-header-height: 34.5px;
   --font-size-caption: 1rem;
+  --toolbar-width: 30px;
+
+  button.graphiql-execute-button > svg {
+    width: 12px;
+    height: 12px;
+  }
+  .graphiql-toolbar-icon {
+    width: calc(var(--toolbar-width) - 10px);
+    height: calc(var(--toolbar-width) - 10px);
+  }
 
   .graphiql-sessions {
     border-radius: 0;
@@ -109,7 +119,7 @@
   }
 
   .graphiql-plugin {
-    padding: var(--px-8);
+    padding: var(--px-8) var(--px-12);
   }
 
   .graphiql-explorer-graphql-arguments > div > span > svg {
@@ -180,7 +190,7 @@
     border-radius: 0;
   }
   .graphiql-logo {
-    padding-right: var(--px-8);
+    padding-right: var(--px-4);
   }
   .graphiql-doc-explorer-content > * {
     margin-top: var(--px-16);
@@ -211,5 +221,18 @@
   }
   .ruru-footer {
     padding: var(--px-8) var(--px-4);
+  }
+}
+
+.graphiql-dropdown-content {
+  padding: 0;
+}
+.graphiql-dropdown-item {
+  margin: 0;
+}
+.graphiql-dialog {
+  .graphiql-dialog-header,
+  .graphiql-dialog-section {
+    padding: var(--px-12);
   }
 }
