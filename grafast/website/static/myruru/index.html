@@ -113,6 +113,9 @@ if (!localStorage.getItem("graphiql:visiblePlugin")) {
 $(".graphiql-plugin").style.display = "none";
 $(".graphiql-horizontal-drag-bar").style.display = "none";
 }
+if (localStorage.getItem("Ruru:condensed") !== "") {
+$(".graphiql-container").className += " condensed";
+}
 const getSystemTheme = () =>
 window.matchMedia("(prefers-color-scheme: dark)").matches
 ? "dark"

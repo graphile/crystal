@@ -36,7 +36,7 @@ function html(arr: TemplateStringsArray, ...placeholders: string[]) {
 const baseTitleTag = html` <title>Ruru - GraphQL/Grafast IDE</title> `;
 const baseElements = html`
   <div id="ruru-root">
-    <div class="graphiql-container condensed">
+    <div class="graphiql-container">
       <div class="graphiql-sidebar"></div>
       <div class="graphiql-main">
         <div
@@ -99,6 +99,9 @@ const baseBodyScripts = html`
     if (!localStorage.getItem("graphiql:visiblePlugin")) {
       $(".graphiql-plugin").style.display = "none";
       $(".graphiql-horizontal-drag-bar").style.display = "none";
+    }
+    if (localStorage.getItem("Ruru:condensed") !== "") {
+      $(".graphiql-container").className += " condensed";
     }
     const getSystemTheme = () =>
       window.matchMedia("(prefers-color-scheme: dark)").matches
