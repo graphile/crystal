@@ -37,7 +37,7 @@ export class JSONParseStep<TJSON extends JSONValue> extends Step<TJSON> {
     return chalk.bold.yellow(String(this.getDep(0).id));
   }
 
-  __inferGet!: {
+  __inferGet?: {
     [TKey in keyof TJSON]: AccessStep<
       TJSON extends Record<string, unknown> ? TJSON[TKey] : never
     >;

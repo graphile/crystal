@@ -167,7 +167,7 @@ export class PgDeleteSingleStep<
     return `${this.resource.name}(${this.getBys.map((g) => g.name)})`;
   }
 
-  __inferGet!: {
+  __inferGet?: {
     [TAttr in keyof GetPgResourceAttributes<TResource>]: PgClassExpressionStep<
       GetPgResourceAttributes<TResource>[TAttr]["codec"],
       TResource

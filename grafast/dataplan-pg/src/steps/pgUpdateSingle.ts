@@ -212,7 +212,7 @@ export class PgUpdateSingleStep<
     this.attributes.push({ name, depId, pgCodec });
   }
 
-  __inferGet!: {
+  __inferGet?: {
     [TAttr in keyof GetPgResourceAttributes<TResource>]: PgClassExpressionStep<
       GetPgResourceAttributes<TResource>[TAttr]["codec"],
       TResource
