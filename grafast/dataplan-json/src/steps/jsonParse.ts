@@ -37,11 +37,14 @@ export class JSONParseStep<TJSON extends JSONValue> extends Step<TJSON> {
     return chalk.bold.yellow(String(this.getDep(0).id));
   }
 
+  __inferGet!: {
+    [TKey in keyof TJSON]: AccessStep<
+      TJSON extends object ? TJSON[TKey] : never
+    >;
+  };
   get<TKey extends keyof TJSON>(
     key: TKey,
-  ): AccessStep<
-    TJSON extends { [key: string]: unknown } ? TJSON[TKey] : never
-  > {
+  ): AccessStep<TJSON extends object ? TJSON[TKey] : never> {
     return access(this, [key as string]);
   }
 
@@ -92,5 +95,4 @@ export function jsonParse<TJSON extends JSONValue>(
 ): JSONParseStep<TJSON> {
   return new JSONParseStep<TJSON>($string);
 }
-
 exportAs("@dataplan/json", jsonParse, "jsonParse");

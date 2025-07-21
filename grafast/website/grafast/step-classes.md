@@ -426,6 +426,30 @@ from steps which don't adhere to these expectations.
 
 :::
 
+:::tip[Implementing `.get(key)` with per-key type safety]
+
+If you have put effort into making your `get` function type safe (such that
+accessing different keys returns different values), this will _not_ work with
+`get($step, key)` out of the box due to limitations of TypeScript.
+
+To work around this, you can add the `__inferGet` fake property to your class
+which should be an object with the same keys as your `get` function accepts, and
+the value should be the return type for that key - i.e. it's very similar to
+your `get` method itself:
+
+```ts
+class MyStep extends Step {
+  __inferGet?: {
+    [TKey in keyof MyData]: MySpecialStep<MyData[TKey]>;
+  };
+  get<TKey extends keyof MyData>(key: TKey): MySpecialStep<MyData[TKey]> {
+    // ...
+  }
+}
+```
+
+:::
+
 ### items
 
 Implement `.items()` if your step represents a collection and you want to give

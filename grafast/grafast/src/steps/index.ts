@@ -27,7 +27,7 @@ export { each } from "./each.js";
 export { error, ErrorStep } from "./error.js";
 export { filter, FilterPlanMemo } from "./filter.js";
 export { first, FirstStep } from "./first.js";
-export { get, StepWithGet } from "./get.js";
+export { get } from "./get.js";
 export { groupBy, GroupByPlanMemo } from "./groupBy.js";
 export { lambda, LambdaStep } from "./lambda.js";
 export { last, LastStep } from "./last.js";

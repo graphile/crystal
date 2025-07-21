@@ -170,6 +170,7 @@ export class AccessStep<TData> extends UnbatchedStep<TData> {
     return this.getDep(0);
   }
 
+  __inferGet?: { [TAttr in keyof TData]: AccessStep<TData[TAttr]> };
   /**
    * Get the named property of an object.
    */

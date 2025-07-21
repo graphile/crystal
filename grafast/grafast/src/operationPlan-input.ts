@@ -128,7 +128,7 @@ export function withFieldArgsForArguments<T extends Step>(
           if (typeof pathSegment === "number" && "at" in $entry) {
             $entry = $entry.at(pathSegment);
           } else if ("get" in $entry) {
-            $entry = $entry.get(pathSegment);
+            $entry = ($entry.get as any)(pathSegment);
           } else {
             throw new Error(
               `'getRaw' path must only relate to input objects right now; path was: '${path}' (failed at '${pathSegment}')`,
