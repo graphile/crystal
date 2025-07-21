@@ -212,6 +212,12 @@ export class PgUpdateSingleStep<
     this.attributes.push({ name, depId, pgCodec });
   }
 
+  __inferGet?: {
+    [TAttr in keyof GetPgResourceAttributes<TResource>]: PgClassExpressionStep<
+      GetPgResourceAttributes<TResource>[TAttr]["codec"],
+      TResource
+    >;
+  };
   /**
    * Returns a plan representing a named attribute (e.g. column) from the newly
    * updateed row.

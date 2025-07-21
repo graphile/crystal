@@ -323,6 +323,8 @@ export class ConnectionStep<
         return this.nodes();
       case "pageInfo":
         return this.pageInfo();
+      default:
+        return constant(undefined);
     }
   }
 
@@ -462,6 +464,8 @@ export class EdgeStep<
         return this.node();
       case "cursor":
         return this.cursor();
+      default:
+        return constant(undefined);
     }
   }
 

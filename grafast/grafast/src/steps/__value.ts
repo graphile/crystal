@@ -47,6 +47,9 @@ export class __ValueStep<TData> extends Step<TData> {
     );
   }
 
+  __inferGet?: {
+    [TAttr in keyof TData]: AccessStep<TData[TAttr]>;
+  };
   get<TAttr extends keyof TData>(attrName: TAttr): AccessStep<TData[TAttr]> {
     return this.cacheStep("get", attrName, () =>
       access(this, [attrName as string]),

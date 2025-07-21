@@ -177,10 +177,18 @@ export class __TrackedValueStep<
     return this.getDep<__ValueStep<TData> | AccessStep<TData>>(0, true);
   }
 
+  __inferGet?: {
+    [TAttribute in keyof TData & string]: __TrackedValueStepWithDollars<
+      TData[TAttribute],
+      TInputType extends GraphQLInputObjectType
+        ? ReturnType<TInputType["getFields"]>[TAttribute]["type"]
+        : undefined
+    >;
+  };
+
   /**
    * Get the named property of an object.
    */
-
   get<TAttribute extends keyof TData & string>(
     attrName: TAttribute,
   ): __TrackedValueStepWithDollars<
