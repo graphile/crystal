@@ -186,7 +186,7 @@
     border-radius: 0;
   }
   .graphiql-logo {
-    padding-right: var(--px-8);
+    padding-right: var(--px-4);
   }
   .graphiql-doc-explorer-content > * {
     margin-top: var(--px-16);
