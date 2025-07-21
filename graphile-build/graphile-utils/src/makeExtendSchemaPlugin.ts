@@ -3,7 +3,6 @@ import type {
   DeprecatedInputObjectPlan,
   DeprecatedObjectPlan,
   GrafastSchemaConfig,
-  InputObjectPlan,
   ObjectFieldConfig,
   ObjectPlan as GrafastObjectPlan,
   PlanTypeInfo,
