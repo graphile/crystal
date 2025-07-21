@@ -374,7 +374,7 @@ export function extendSchema(
                 `plans is deprecated and may not be specified alongside newer approaches`,
               );
             }
-            plans = rawPlans;
+            plans = rawPlans as Plans;
           } else {
             // Hackily convert the new format into the old format. We'll do away with
             // this in future, but for now it's the easiest way to ensure compatibility
@@ -484,6 +484,7 @@ export function extendSchema(
 
               const { plans: planResolvers = {}, ...rest } = spec;
               for (const [key, val] of Object.entries(rest)) {
+                assertNotDunder(`objects.${typeName}`, key);
                 o[`__${key}`] = val;
               }
               for (const [key, val] of Object.entries(planResolvers)) {
@@ -503,6 +504,7 @@ export function extendSchema(
 
               const { plans: planResolvers = {}, ...rest } = spec;
               for (const [key, val] of Object.entries(rest)) {
+                assertNotDunder(`inputObjects.${typeName}`, key);
                 o[`__${key}`] = val;
               }
               for (const [key, val] of Object.entries(planResolvers)) {
@@ -521,6 +523,7 @@ export function extendSchema(
               plans[typeName] = o as any;
 
               for (const [key, val] of Object.entries(spec)) {
+                assertNotDunder(`unions.${typeName}`, key);
                 o[`__${key}`] = val;
               }
             }
@@ -531,13 +534,37 @@ export function extendSchema(
               plans[typeName] = o as any;
 
               for (const [key, val] of Object.entries(spec)) {
+                assertNotDunder(`interfaces.${typeName}`, key);
                 o[`__${key}`] = val;
               }
             }
 
             for (const [typeName, spec] of Object.entries(scalars ?? {})) {
               assertLocation(typeName, "scalars");
-              plans[typeName] = spec;
+              if (spec instanceof GraphQLScalarType) {
+                plans[typeName] = spec as any;
+              } else {
+                const {
+                  plan,
+                  serialize,
+                  extensions,
+                  parseValue,
+                  parseLiteral,
+                  ...rest
+                } = spec;
+                const o = {
+                  plan,
+                  serialize,
+                  extensions,
+                  parseValue,
+                  parseLiteral,
+                } as Record<string, any>;
+                plans[typeName] = o as any;
+                for (const [key, val] of Object.entries(rest)) {
+                  assertNotDunder(`scalars.${typeName}`, key);
+                  o[`__${key}`] = val;
+                }
+              }
             }
 
             for (const [typeName, spec] of Object.entries(enums ?? {})) {
@@ -552,6 +579,7 @@ export function extendSchema(
                 );
               }
               for (const [key, val] of Object.entries(rest)) {
+                assertNotDunder(`enums.${typeName}`, key);
                 o[`__${key}`] = val;
               }
               for (const [key, val] of Object.entries(values)) {
@@ -1488,3 +1516,11 @@ function isNotNullish<T>(v: Maybe<T>): v is T {
 
 /** @deprecated Renamed to 'extendSchema' */
 export const makeExtendSchemaPlugin = extendSchema;
+
+function assertNotDunder(loc: string, key: string) {
+  if (key.startsWith("__")) {
+    throw new Error(
+      `Key ${JSON.stringify(key)} defined at location ${loc} shouldn't start with __`,
+    );
+  }
+}

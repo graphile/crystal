@@ -59,12 +59,42 @@ export {
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 declare module "grafast" {
+  interface ScalarPlan<TInternal = any, TExternal = any> {
+    scope?: GraphileBuild.ScopeScalar;
+  }
+  interface EnumPlan {
+    scope?: GraphileBuild.ScopeEnum;
+  }
+  interface EnumValueConfig {
+    scope?: Omit<GraphileBuild.ScopeEnumValuesValue, "valueName">;
+  }
+  interface ObjectPlan<TSource extends Step = Step> {
+    scope?: GraphileBuild.ScopeObject;
+  }
   interface ObjectFieldConfig<
     TSource extends Step = Step,
     TArgs extends BaseGraphQLArguments = any,
     TResultStep extends Step = Step,
   > {
     scope?: Omit<GraphileBuild.ScopeObjectFieldsField, "fieldName">;
+  }
+  interface UnionPlan<
+    TSource extends Step = any,
+    TSpecifier extends Step = TSource,
+  > {
+    scope?: GraphileBuild.ScopeUnion;
+  }
+  interface InterfacePlan<
+    TSource extends Step = any,
+    TSpecifier extends Step = TSource,
+  > {
+    scope?: GraphileBuild.ScopeInterface;
+  }
+  interface InputObjectPlan {
+    scope?: GraphileBuild.ScopeInputObject;
+  }
+  interface InputObjectFieldConfig<TParent = any, TData = any> {
+    scope?: Omit<GraphileBuild.ScopeInputObjectFieldsField, "fieldName">;
   }
 }
 /* eslint-enable @typescript-eslint/no-unused-vars */
