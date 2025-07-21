@@ -1582,6 +1582,91 @@ const spec_thirdPartyVulnerabilities = {
   executor: executor
 };
 const thirdPartyVulnerabilitiesCodec = recordCodec(spec_thirdPartyVulnerabilities);
+const ApplicationIdentifier = sql.identifier("polymorphic", "applications");
+const spec_Application = {
+  name: "Application",
+  identifier: ApplicationIdentifier,
+  attributes: {
+    __proto__: null,
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {
+          notNull: true
+        }
+      }
+    },
+    name: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {
+          notNull: true
+        }
+      }
+    },
+    last_deployed: {
+      description: undefined,
+      codec: TYPES.timestamptz,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  },
+  description: undefined,
+  extensions: {
+    isTableLike: false,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "applications"
+    },
+    tags: {
+      __proto__: null,
+      interface: "mode:union",
+      name: "Application",
+      behavior: "node",
+      ref: ["vulnerabilities to:Vulnerability plural", "owner to:PersonOrOrganization singular"]
+    },
+    refDefinitions: {
+      __proto__: null,
+      vulnerabilities: {
+        singular: false,
+        graphqlType: "Vulnerability",
+        sourceGraphqlType: undefined,
+        extensions: {
+          via: undefined,
+          tags: {
+            behavior: undefined
+          }
+        }
+      },
+      owner: {
+        singular: true,
+        graphqlType: "PersonOrOrganization",
+        sourceGraphqlType: undefined,
+        extensions: {
+          via: undefined,
+          tags: {
+            behavior: undefined
+          }
+        }
+      }
+    }
+  },
+  executor: executor,
+  polymorphism: {
+    mode: "union"
+  }
+};
+const ApplicationCodec = recordCodec(spec_Application);
 const awsApplicationsIdentifier = sql.identifier("polymorphic", "aws_applications");
 const spec_awsApplications = {
   name: "awsApplications",
@@ -2193,89 +2278,6 @@ const spec_relationalItems = {
   }
 };
 const relationalItemsCodec = recordCodec(spec_relationalItems);
-const spec_Application = {
-  name: "Application",
-  identifier: sql.identifier("polymorphic", "applications"),
-  attributes: {
-    __proto__: null,
-    id: {
-      description: undefined,
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {
-          notNull: true
-        }
-      }
-    },
-    name: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {
-          notNull: true
-        }
-      }
-    },
-    last_deployed: {
-      description: undefined,
-      codec: TYPES.timestamptz,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
-    }
-  },
-  description: undefined,
-  extensions: {
-    isTableLike: false,
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "applications"
-    },
-    tags: {
-      __proto__: null,
-      interface: "mode:union",
-      name: "Application",
-      behavior: "node",
-      ref: ["vulnerabilities to:Vulnerability plural", "owner to:PersonOrOrganization singular"]
-    },
-    refDefinitions: {
-      __proto__: null,
-      vulnerabilities: {
-        singular: false,
-        graphqlType: "Vulnerability",
-        sourceGraphqlType: undefined,
-        extensions: {
-          via: undefined,
-          tags: {
-            behavior: undefined
-          }
-        }
-      },
-      owner: {
-        singular: true,
-        graphqlType: "PersonOrOrganization",
-        sourceGraphqlType: undefined,
-        extensions: {
-          via: undefined,
-          tags: {
-            behavior: undefined
-          }
-        }
-      }
-    }
-  },
-  executor: executor,
-  polymorphism: {
-    mode: "union"
-  }
-};
 const spec_Vulnerability = {
   name: "Vulnerability",
   identifier: sql.identifier("polymorphic", "vulnerabilities"),
@@ -3079,6 +3081,35 @@ const registryConfig_pgResources_third_party_vulnerabilities_third_party_vulnera
     }
   }
 };
+const favorite_applicationFunctionIdentifer = sql.identifier("polymorphic", "favorite_application");
+const resourceConfig_Application = {
+  executor: executor,
+  name: "Application",
+  identifier: "main.polymorphic.applications",
+  from: ApplicationIdentifier,
+  codec: ApplicationCodec,
+  uniques: [],
+  isVirtual: true,
+  description: undefined,
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "applications"
+    },
+    isInsertable: false,
+    isUpdatable: false,
+    isDeletable: false,
+    tags: {
+      interface: "mode:union",
+      name: "Application",
+      behavior: "node",
+      ref: ["vulnerabilities to:Vulnerability plural", "owner to:PersonOrOrganization singular"]
+    }
+  }
+};
+const favorite_applicationsFunctionIdentifer = sql.identifier("polymorphic", "favorite_applications");
 const aws_applicationsUniques = [{
   isPrimary: true,
   attributes: ["id"],
@@ -3259,8 +3290,9 @@ const registryConfig = {
     firstPartyVulnerabilities: firstPartyVulnerabilitiesCodec,
     float8: TYPES.float,
     thirdPartyVulnerabilities: thirdPartyVulnerabilitiesCodec,
-    awsApplications: awsApplicationsCodec,
+    Application: ApplicationCodec,
     timestamptz: TYPES.timestamptz,
+    awsApplications: awsApplicationsCodec,
     gcpApplications: gcpApplicationsCodec,
     bool: TYPES.boolean,
     singleTableItems: singleTableItemsCodec,
@@ -3269,7 +3301,6 @@ const registryConfig = {
     relationalItems: relationalItemsCodec,
     varchar: TYPES.varchar,
     bpchar: TYPES.bpchar,
-    Application: recordCodec(spec_Application),
     Vulnerability: recordCodec(spec_Vulnerability),
     ZeroImplementation: recordCodec(spec_ZeroImplementation)
   },
@@ -3376,6 +3407,48 @@ const registryConfig = {
     },
     first_party_vulnerabilities: registryConfig_pgResources_first_party_vulnerabilities_first_party_vulnerabilities,
     third_party_vulnerabilities: registryConfig_pgResources_third_party_vulnerabilities_third_party_vulnerabilities,
+    favorite_application: PgResource.functionResourceOptions(resourceConfig_Application, {
+      name: "favorite_application",
+      identifier: "main.polymorphic.favorite_application()",
+      from(...args) {
+        return sql`${favorite_applicationFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      returnsArray: false,
+      returnsSetof: false,
+      isMutation: false,
+      hasImplicitOrder: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "favorite_application"
+        },
+        tags: {}
+      },
+      description: undefined
+    }),
+    favorite_applications: PgResource.functionResourceOptions(resourceConfig_Application, {
+      name: "favorite_applications",
+      identifier: "main.polymorphic.favorite_applications()",
+      from(...args) {
+        return sql`${favorite_applicationsFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      returnsArray: false,
+      returnsSetof: true,
+      isMutation: false,
+      hasImplicitOrder: true,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "favorite_applications"
+        },
+        tags: {}
+      },
+      description: undefined
+    }),
     aws_applications: registryConfig_pgResources_aws_applications_aws_applications,
     gcp_applications: registryConfig_pgResources_gcp_applications_gcp_applications,
     single_table_items_meaning_of_life: {

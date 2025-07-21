@@ -1,20 +1,22 @@
+import {
+  DOC_EXPLORER_PLUGIN,
+  DocExplorerStore,
+} from "@graphiql/plugin-doc-explorer";
 import { explorerPlugin as makeExplorerPlugin } from "@graphiql/plugin-explorer";
+import { HISTORY_PLUGIN, HistoryStore } from "@graphiql/plugin-history";
 import {
   CopyIcon,
-  GraphiQLProvider as GP2,
+  GraphiQLProvider,
   MergeIcon,
   PrettifyIcon,
   SettingsIcon,
   ToolbarButton,
   ToolbarMenu,
-  useCopyQuery,
-  useMergeQuery,
-  useSchemaStore,
+  useGraphiQLActions,
 } from "@graphiql/react";
-import type { GraphiQLProps } from "graphiql";
-import { GraphiQL, GraphiQLInterface, GraphiQLProvider } from "graphiql";
-import type { FC } from "react";
-import { useCallback, useState } from "react";
+import { GraphiQL, GraphiQLInterface } from "graphiql";
+import type { ComponentProps, FC } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { ErrorPopup } from "./components/ErrorPopup.js";
 import { RuruFooter } from "./components/Footer.js";
@@ -28,9 +30,7 @@ import { useStorage } from "./hooks/useStorage.js";
 import type { RuruProps } from "./interfaces.js";
 import { EXPLAIN_PLUGIN } from "./plugins/explain.js";
 
-if (GP2 !== GraphiQLProvider) {
-  throw new Error("PACKAGE MANAGEMENT ERROR! The providers don't match up!");
-}
+type GraphiQLInterfaceProps = ComponentProps<typeof GraphiQLInterface>;
 
 const checkCss = { width: "1.5rem", display: "inline-block" };
 const check = <span style={checkCss}>✔</span>;
@@ -39,17 +39,37 @@ const nocheck = <span style={checkCss}></span>;
 const explorerPlugin = makeExplorerPlugin({
   showAttribution: false,
 });
-const plugins = [explorerPlugin, EXPLAIN_PLUGIN];
+const plugins = [
+  DOC_EXPLORER_PLUGIN,
+  HISTORY_PLUGIN,
+  explorerPlugin,
+  EXPLAIN_PLUGIN,
+];
 
 export const Ruru: FC<RuruProps> = (props) => {
+  const {
+    inputValueDeprecation,
+    schemaDescription,
+    defaultQuery,
+    showPersistHeadersSettings,
+
+    // Things we're handling elsewhere
+    fetcher: _fetcher,
+    debugTools: _debugTools,
+
+    // Deprecated stuff
+    ["query" as never]: _query,
+    ["variables" as never]: _variables,
+
+    // Pass everything else through to GraphiQL
+    ...otherProps
+  } = props;
   const storage = useStorage();
   const explain = storage.get("explain") === "true";
   const verbose = storage.get("verbose") === "true";
-  const saveHeaders = storage.get("saveHeaders") === "true";
   const setExplain = useCallback(
-    (newExplain: boolean) => {
-      storage.set("explain", newExplain ? "true" : "");
-    },
+    (newExplain: boolean) =>
+      void storage.set("explain", newExplain ? "true" : ""),
     [storage],
   );
   const { fetcher, explainResults, streamEndpoint } = useFetcher(props, {
@@ -58,196 +78,159 @@ export const Ruru: FC<RuruProps> = (props) => {
   });
   const [error, setError] = useState<Error | null>(null);
   const explainHelpers = useExplain(storage);
-  const defaultQuery = props.defaultQuery ?? DEFAULT_QUERY;
+  const explainContextValue = useMemo(
+    () => ({ explain, explainHelpers, explainResults, setExplain }),
+    [explain, explainHelpers, explainResults, setExplain],
+  );
   return (
-    //EditorContextProvider
-    <ExplainContext.Provider
-      value={{
-        explainHelpers,
-        explain,
-        setExplain,
-        explainResults,
-      }}
+    <GraphiQLProvider
+      {...otherProps}
+      inputValueDeprecation={inputValueDeprecation ?? true}
+      schemaDescription={schemaDescription ?? true}
+      fetcher={fetcher}
+      defaultQuery={defaultQuery ?? DEFAULT_QUERY}
+      plugins={plugins}
     >
-      <GraphiQLProvider
-        inputValueDeprecation={true}
-        schemaDescription={true}
-        fetcher={fetcher}
-        defaultQuery={defaultQuery}
-        query={props.query ?? props.initialQuery}
-        variables={props.variables ?? props.initialVariables}
-        plugins={plugins}
-        shouldPersistHeaders={saveHeaders}
-      >
-        <RuruInner
-          storage={storage}
-          editorTheme={props.editorTheme}
-          defaultTheme={props.defaultTheme}
-          forcedTheme={props.forcedTheme}
-          error={error}
-          setError={setError}
-          onEditQuery={props.onEditQuery}
-          onEditVariables={props.onEditVariables}
-          streamEndpoint={streamEndpoint}
-        />
-      </GraphiQLProvider>
-    </ExplainContext.Provider>
+      <ExplainContext.Provider value={explainContextValue}>
+        <HistoryStore maxHistoryLength={props.maxHistoryLength}>
+          <DocExplorerStore>
+            <RuruInner
+              {...otherProps}
+              showPersistHeadersSettings={showPersistHeadersSettings ?? true}
+              // onEditQuery={props.onEditQuery}
+              // onEditVariables={props.onEditVariables}
+              // onEditHeaders={props.onEditHeaders}
+              // responseTooltip={props.responseTooltip}
+              // defaultEditorToolsVisibility={props.defaultEditorToolsVisibility}
+              // isHeadersEditorEnabled={props.isHeadersEditorEnabled}
+              // forcedTheme={props.forcedTheme}
+              // confirmCloseTab={props.confirmCloseTab}
+              // className={props.className}
+              storage={storage}
+              error={error}
+              setError={setError}
+              streamEndpoint={streamEndpoint}
+            />
+          </DocExplorerStore>
+        </HistoryStore>
+      </ExplainContext.Provider>
+    </GraphiQLProvider>
   );
 };
 
 export const RuruInner: FC<{
-  editorTheme?: string;
-  forcedTheme?: GraphiQLProps["forcedTheme"];
-  defaultTheme?: GraphiQLProps["defaultTheme"];
+  // RuruInner props
   storage: RuruStorage;
   error: Error | null;
   setError: React.Dispatch<React.SetStateAction<Error | null>>;
-  onEditQuery?: GraphiQLProps["onEditQuery"];
-  onEditVariables?: GraphiQLProps["onEditVariables"];
   streamEndpoint: string | null;
+
+  // GraphiQLInterfaceProps
+  showPersistHeadersSettings?: GraphiQLInterfaceProps["showPersistHeadersSettings"];
+  onEditQuery?: GraphiQLInterfaceProps["onEditQuery"];
+  onEditVariables?: GraphiQLInterfaceProps["onEditVariables"];
+  onEditHeaders?: GraphiQLInterfaceProps["onEditHeaders"];
+  responseTooltip?: GraphiQLInterfaceProps["responseTooltip"];
+  defaultEditorToolsVisibility?: GraphiQLInterfaceProps["defaultEditorToolsVisibility"];
+  isHeadersEditorEnabled?: GraphiQLInterfaceProps["isHeadersEditorEnabled"];
+  forcedTheme?: GraphiQLInterfaceProps["forcedTheme"];
+  confirmCloseTab?: GraphiQLInterfaceProps["confirmCloseTab"];
+  className?: GraphiQLInterfaceProps["className"];
 }> = (props) => {
   const {
     storage,
-    editorTheme,
-    forcedTheme,
-    defaultTheme,
     error,
     setError,
-    onEditQuery,
-    onEditVariables,
     streamEndpoint,
+    ...graphiqlInterfaceProps
   } = props;
   const prettify = usePrettify();
-  const mergeQuery = useMergeQuery();
-  const copyQuery = useCopyQuery();
-  const introspect = useSchemaStore((s) => s.introspect);
+  const { copyQuery, mergeQuery, introspect } = useGraphiQLActions();
   useGraphQLChangeStream(props, introspect, streamEndpoint);
+  const condensed = storage.get("condensed") !== "";
 
   return (
-    <div
-      className="graphiql-container"
-      style={{
-        position: "absolute",
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          flex: "1 1 100%",
-          overflow: "hidden",
-          position: "relative",
-        }}
+    <>
+      <GraphiQLInterface
+        {...graphiqlInterfaceProps}
+        className={`${graphiqlInterfaceProps.className ?? ""}${condensed ? " condensed" : ""}`}
       >
-        <GraphiQLInterface
-          defaultTheme={defaultTheme}
-          forcedTheme={forcedTheme}
-          editorTheme={editorTheme ?? "graphiql"}
-          onEditQuery={onEditQuery}
-          onEditVariables={onEditVariables}
-        >
-          <GraphiQL.Logo>
-            <a
-              href="https://grafast.org/ruru"
-              style={{ textDecoration: "none" }}
-              target="_blank"
-              rel="noreferrer"
+        <GraphiQL.Logo>
+          <a
+            href="https://grafast.org/ruru"
+            style={{ textDecoration: "none" }}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Ruru
+          </a>
+        </GraphiQL.Logo>
+        <GraphiQL.Toolbar>
+          <ToolbarButton
+            onClick={prettify}
+            label="Prettify Query (Shift-Ctrl-P)"
+          >
+            <PrettifyIcon
+              className="graphiql-toolbar-icon"
+              aria-hidden="true"
+            />
+          </ToolbarButton>
+          <ToolbarButton
+            onSelect={mergeQuery}
+            label="Merge Query (Shift-Ctrl-M)"
+          >
+            <MergeIcon className="graphiql-toolbar-icon" aria-hidden="true" />
+          </ToolbarButton>
+          <ToolbarButton onClick={copyQuery} label="Copy query (Shift-Ctrl-C)">
+            <CopyIcon className="graphiql-toolbar-icon" aria-hidden="true" />
+          </ToolbarButton>
+          <ToolbarMenu
+            button={
+              <ToolbarButton label="Options">
+                <SettingsIcon
+                  className="graphiql-toolbar-icon"
+                  aria-hidden="true"
+                />
+              </ToolbarButton>
+            }
+          >
+            <ToolbarMenu.Item
+              title="View the SQL statements that this query invokes"
+              onSelect={() => storage.toggle("explain")}
             >
-              Ruru
-            </a>
-          </GraphiQL.Logo>
-          <GraphiQL.Toolbar>
-            {() => (
-              <>
-                <ToolbarButton
-                  onClick={prettify}
-                  label="Prettify Query (Shift-Ctrl-P)"
-                >
-                  <PrettifyIcon
-                    className="graphiql-toolbar-icon"
-                    aria-hidden="true"
-                  />
-                </ToolbarButton>
-                <ToolbarButton
-                  onSelect={mergeQuery}
-                  label="Merge Query (Shift-Ctrl-M)"
-                >
-                  <MergeIcon
-                    className="graphiql-toolbar-icon"
-                    aria-hidden="true"
-                  />
-                </ToolbarButton>
-                <ToolbarButton
-                  onClick={copyQuery}
-                  label="Copy query (Shift-Ctrl-C)"
-                >
-                  <CopyIcon
-                    className="graphiql-toolbar-icon"
-                    aria-hidden="true"
-                  />
-                </ToolbarButton>
-                <ToolbarMenu
-                  label="Options"
-                  button={
-                    <div
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
-                      <SettingsIcon
-                        className="graphiql-toolbar-icon"
-                        aria-hidden="true"
-                      />
-                    </div>
-                  }
-                >
-                  <ToolbarMenu.Item
-                    title="View the SQL statements that this query invokes"
-                    onSelect={() => storage.toggle("explain")}
-                  >
-                    <span>
-                      {storage.get("explain") === "true" ? check : nocheck}
-                      Explain (if supported)
-                    </span>
-                  </ToolbarMenu.Item>
-                  <ToolbarMenu.Item
-                    title="Don't hide explain from results"
-                    onSelect={() => storage.toggle("verbose")}
-                  >
-                    <span>
-                      {storage.get("verbose") === "true" ? check : nocheck}
-                      Verbose
-                    </span>
-                  </ToolbarMenu.Item>
-                  <ToolbarMenu.Item
-                    title="Should we persist the headers to localStorage? Header editor is next to variable editor at the bottom."
-                    onSelect={() => storage.toggle("saveHeaders")}
-                  >
-                    <span>
-                      {storage.get("saveHeaders") === "true" ? check : nocheck}
-                      Save headers
-                    </span>
-                  </ToolbarMenu.Item>
-                </ToolbarMenu>
-              </>
-            )}
-          </GraphiQL.Toolbar>
-          <GraphiQL.Footer>
-            <RuruFooter />
-          </GraphiQL.Footer>
-        </GraphiQLInterface>
-      </div>
+              <span>
+                {storage.get("explain") === "true" ? check : nocheck}
+                Explain (if supported)
+              </span>
+            </ToolbarMenu.Item>
+            <ToolbarMenu.Item
+              title="Don't hide explain from results"
+              onSelect={() => storage.toggle("verbose")}
+            >
+              <span>
+                {storage.get("verbose") === "true" ? check : nocheck}
+                Verbose
+              </span>
+            </ToolbarMenu.Item>
+            <ToolbarMenu.Item
+              title="Condensed"
+              onSelect={() => storage.toggle("condensed")}
+            >
+              <span>
+                {storage.get("condensed") !== "" ? check : nocheck}
+                Condensed
+              </span>
+            </ToolbarMenu.Item>
+          </ToolbarMenu>
+        </GraphiQL.Toolbar>
+
+        <GraphiQL.Footer>
+          <RuruFooter />
+        </GraphiQL.Footer>
+      </GraphiQLInterface>
       {error ? (
         <ErrorPopup error={error} onClose={() => setError(null)} />
       ) : null}
-    </div>
+    </>
   );
 };

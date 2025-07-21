@@ -1,6 +1,5 @@
 import BrowserOnly from "@docusaurus/BrowserOnly";
-import Head from "@docusaurus/Head";
-import React from "react";
+import React, { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
 
 export default function Playground() {
@@ -41,13 +40,12 @@ export default function Playground() {
     >
       <BrowserOnly>
         {() => {
-          const PlaygroundInner = require("./PlaygroundInner").default;
+          const PlaygroundInner = React.lazy(() => import("./PlaygroundInner"));
           return (
             <>
-              <Head>
-                <script src="https://cdn.jsdelivr.net/npm/mermaid@9.4.3"></script>
-              </Head>
-              <PlaygroundInner />
+              <Suspense fallback="Loading...">
+                <PlaygroundInner />
+              </Suspense>
             </>
           );
         }}

@@ -85,7 +85,7 @@ export.
 
 :::
 
-:::tip[Use eslint-plugin-graphile-export when writing plugins]
+:::tip[Use `eslint-plugin-graphile-export` when writing plugins]
 
 We **highly recommend** that plugin authors (both for internal project plugins
 and plugins distributed via `npm`) consult the

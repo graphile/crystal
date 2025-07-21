@@ -1,5 +1,20 @@
 # pg-introspection
 
+## 0.0.1-beta.12
+
+### Patch Changes
+
+- [#2587](https://github.com/graphile/crystal/pull/2587)
+  [`6abfd4f`](https://github.com/graphile/crystal/commit/6abfd4fcad7633da3c50b2d3ea82979a3a27e317)
+  Thanks [@ttfkam](https://github.com/ttfkam)! - Refactor ACL parsing for
+  marginal performance gain (thanks @ttfkam!)
+
+- [#2587](https://github.com/graphile/crystal/pull/2587)
+  [`9aa2637`](https://github.com/graphile/crystal/commit/9aa26374758e8489515a70a334c7ea4d345c6369)
+  Thanks [@ttfkam](https://github.com/ttfkam)! - Fix parsing and serialization
+  of awkward role identifiers, and fix order of permissions to match Postgres'
+  order.
+
 ## 0.0.1-beta.11
 
 ### Patch Changes

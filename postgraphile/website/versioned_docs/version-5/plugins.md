@@ -21,14 +21,14 @@ Currently these scopes are undocumented, so here's some examples
 ## Customizing Ruru's title:
 
 ```ts
-function makeRuruTitlePlugin(title: string): GraphileConfig.Plugin {
+function ruruTitle(title: string): GraphileConfig.Plugin {
   return {
     name: "RuruTitlePlugin",
     version: "0.0.0",
 
     grafserv: {
       middleware: {
-        ruruHTMLParts(next, event) {
+        ruruHTML(next, event) {
           const { htmlParts, request } = event;
           htmlParts.titleTag = `<title>${escapeHTML(
             title + " | " + request.getHeader("host"),

@@ -75,7 +75,10 @@
         "type": "doc",
         "id": "realtime"
       },
-      "items": ["subscriptions", "live-queries"]
+      "items": [
+        "subscriptions",
+        "live-queries"
+      ]
     },
     "background-tasks",
     "exporting-schema",
@@ -93,7 +96,10 @@
         "type": "doc",
         "id": "smart-tags"
       },
-      "items": ["smart-tags-file", "smart-comments"]
+      "items": [
+        "smart-tags-file",
+        "smart-comments"
+      ]
     },
     {
       "type": "category",
@@ -104,14 +110,14 @@
         "id": "extending"
       },
       "items": [
-        "make-add-inflectors-plugin",
-        "make-change-nullability-plugin",
-        "make-extend-schema-plugin",
-        "make-process-schema-plugin",
-        "make-wrap-plans-plugin",
-        "make-add-pg-table-condition-plugin",
-        "make-add-pg-table-order-by-plugin",
-        "make-pg-smart-tags-plugin",
+        "adding-and-replacing-inflectors",
+        "change-nullability",
+        "extend-schema",
+        "process-schema",
+        "wrap-plans",
+        "add-pg-table-condition",
+        "add-pg-table-order-by",
+        "pg-smart-tags",
         "extending-raw",
         "plugin-gallery",
         "community-plugins"

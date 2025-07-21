@@ -145,9 +145,6 @@ import { PgRelayPreset } from "postgraphile/presets/relay";
 // Use the 'pg' module to connect to the database
 import { makePgService } from "postgraphile/adaptors/pg";
 
-// In case we want to customize the Ruru we render:
-import { defaultHTMLParts } from "postgraphile/grafserv/ruru/server";
-
 // A plugin for the system to use for persisted operations support
 import PersistedPlugin from "@grafserv/persisted";
 
@@ -204,7 +201,7 @@ const preset: GraphileConfig.Preset = {
   ruru: {
     /* options for customizing Ruru, e.g.: */
     htmlParts: {
-      metaTags: defaultHTMLParts.metaTags + "<!-- HELLO WORLD! -->",
+      metaTags: (base) => base + "<!-- HELLO WORLD! -->",
     },
   },
   pgServices: [

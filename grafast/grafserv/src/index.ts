@@ -13,7 +13,7 @@ import type {
   ProcessRequestEvent,
   RequestContentType,
   Result,
-  RuruHTMLPartsEvent,
+  RuruHTMLEvent,
 } from "./interfaces.js";
 
 export {
@@ -110,6 +110,8 @@ declare global {
       graphiqlOnGraphQLGET?: boolean;
       /** The path at which GraphiQL will be available; usually / */
       graphiqlPath?: string;
+      /** The path from which GraphiQL's static assets are served, must end in a slash. Usually /ruru-static/ */
+      graphiqlStaticPath?: string;
 
       /** Set true to enable watch mode */
       watch?: boolean;
@@ -180,7 +182,7 @@ declare global {
       processGraphQLRequestBody(
         event: ProcessGraphQLRequestBodyEvent,
       ): PromiseOrDirect<void>;
-      /** @deprecated Please use middleware instead */
+      /** @deprecated Please use ruruHTML middleware instead */
       ruruHTMLParts(
         parts: RuruHTMLParts,
         extra: {
@@ -196,7 +198,10 @@ declare global {
       processGraphQLRequestBody(
         event: ProcessGraphQLRequestBodyEvent,
       ): PromiseOrDirect<void>;
-      ruruHTMLParts(event: RuruHTMLPartsEvent): PromiseOrDirect<void>;
+      /**
+       * Wraps the generation of the HTML to render from Ruru
+       */
+      ruruHTML(event: RuruHTMLEvent): PromiseOrDirect<string>;
       onSubscribe(
         event: OnSubscribeEvent,
       ): TruePromiseOrDirect<void | readonly GraphQLError[] | ExecutionArgs>;

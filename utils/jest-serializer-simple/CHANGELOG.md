@@ -1,5 +1,14 @@
 # jest-serializer-simple
 
+## 5.0.0-beta.6
+
+### Patch Changes
+
+- [#2625](https://github.com/graphile/crystal/pull/2625)
+  [`00f5b56`](https://github.com/graphile/crystal/commit/00f5b5653ded051af91bf3492389e4acaf511263)
+  Thanks [@benjie](https://github.com/benjie)! - Removes unnecessary dependency
+  on prettier.
+
 ## 5.0.0-beta.5
 
 ### Patch Changes

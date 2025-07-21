@@ -40,7 +40,7 @@
   ],
   "devDependencies": {
     "@types/jest": "^30.0.0",
-    "jest": "^30.0.0",
+    "jest": "^30.0.4",
     "jest-serializer-simple": "workspace:^",
     "typescript": "^5.8.3"
   }

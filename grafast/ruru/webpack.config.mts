@@ -1,10 +1,15 @@
-import { writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { promisify } from "node:util";
+import { brotliCompress as brotliCompressCb, constants } from "node:zlib";
 
+import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import type { Compiler, Configuration, Resolver } from "webpack";
-import webpack from "webpack";
 // import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
+
+const brotliCompress = promisify(brotliCompressCb);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -55,35 +60,84 @@ class TsResolvePlugin {
   }
 }
 
-function backtickEscape(string: string) {
-  return string.replace(/([`\\]|\$\{)/g, `\\$&`);
+function isDevAsset(filename: string) {
+  return filename.endsWith(".map") || filename.endsWith(".ts");
 }
+
+const intro = [
+  "/* eslint-disable */",
+  "/** IMPORTANT: these buffers are compressed with brotli */",
+  "export const bundleData: Record<string, { etag: string, buffer: Buffer }> = {",
+];
+const outro = ["};", ""];
 
 class OutputDataToSrcPlugin {
   apply(compiler: Compiler) {
-    compiler.hooks.emit.tap("OutputDataToSrcPlugin", (compilation) => {
-      //const code = readFileSync(`${__dirname}/bundle/ruru.min.js`, null);
-      const code = compilation.assets["ruru.min.js"].source();
-      writeFileSync(
-        `${__dirname}/src/bundleData.ts`,
-        `\
-/* eslint-disable */
-export const graphiQLContent: string = \`\\
-${backtickEscape(code.toString("utf8").trim())}
-\`;
-`,
-      );
-    });
+    compiler.hooks.emit.tapPromise(
+      "OutputDataToSrcPlugin",
+      async (compilation) => {
+        const code: string[] = [...intro];
+        const meta: string[] = [...intro];
+        const entries = Object.entries(compilation.assets);
+        entries.sort((a, z) => (a[0] < z[0] ? -1 : a[0] > z[0] ? 1 : 0));
+        const toAdd = await Promise.all(
+          entries.map(async ([filename, asset]) => {
+            const source = asset.source();
+            const buf = Buffer.isBuffer(source) ? source : Buffer.from(source);
+            const compressed = await brotliCompress(buf, {
+              params: {
+                [constants.BROTLI_PARAM_QUALITY]:
+                  compiler.options.mode === "production" ? 11 : 1, // max compression for prod, min for dev
+              },
+            });
+            const hash = createHash("sha256")
+              .update(compressed)
+              .digest("base64url");
+            const etag = `"sha256-${hash}"`; // quoted per HTTP spec
+            const base64 = compressed.toString("base64");
+            const sourceLine = `\
+  ${JSON.stringify(filename)}: {
+    etag: ${JSON.stringify(etag)},
+    buffer: Buffer.from(${JSON.stringify(base64)}, "base64"),
+  },`;
+            return [isDevAsset(filename) ? meta : code, sourceLine] as const;
+          }),
+        );
+        // To ensure they're added in order
+        for (const [target, line] of toAdd) {
+          target.push(line);
+        }
+        code.push(...outro);
+        meta.push(...outro);
+        await Promise.all([
+          writeFile(`${__dirname}/src/bundleCode.ts`, code.join("\n")),
+          writeFile(`${__dirname}/src/bundleMeta.ts`, meta.join("\n")),
+        ]);
+      },
+    );
   }
 }
 
 const config: Configuration = {
-  entry: "./src/bundle.mtsx",
+  entry: {
+    ruru: "./src/bundle.mtsx",
+    jsonWorker: "monaco-editor/esm/vs/language/json/json.worker.js",
+    graphqlWorker: "monaco-graphql/esm/graphql.worker.js",
+    editorWorker: "monaco-editor/esm/vs/editor/editor.worker.js",
+  },
   output: {
-    // @ts-ignore
-    path: `${__dirname}/bundle`,
-    filename: "ruru.min.js",
-    library: "RuruBundle",
+    path: `${__dirname}/static`,
+    filename: "[name].js",
+    module: true,
+    chunkFormat: "module",
+    chunkLoading: "import",
+    library: {
+      type: "module",
+    },
+  },
+  devtool: "source-map",
+  experiments: {
+    outputModule: true,
   },
   module: {
     rules: [
@@ -98,7 +152,7 @@ const config: Configuration = {
       },
       {
         test: /\.css$/,
-        use: ["style-loader", "css-loader"],
+        use: [MiniCssExtractPlugin.loader, "css-loader"],
         sideEffects: true,
       },
       {
@@ -107,7 +161,10 @@ const config: Configuration = {
       },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/,
-        use: ["file-loader"],
+        type: "asset/resource",
+        generator: {
+          filename: "[hash][ext]",
+        },
       },
     ],
   },
@@ -116,15 +173,11 @@ const config: Configuration = {
   },
   plugins: [
     // new BundleAnalyzerPlugin(),
-    new webpack.optimize.LimitChunkCountPlugin({
-      maxChunks: 1,
+    new MiniCssExtractPlugin({
+      filename: "ruru.css",
     }),
     new OutputDataToSrcPlugin(),
   ],
-  optimization: {
-    splitChunks: false,
-    runtimeChunk: false,
-  },
   //stats: "detailed",
 };
 

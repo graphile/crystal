@@ -1,5 +1,133 @@
 # ruru
 
+## 2.0.0-beta.27
+
+### Patch Changes
+
+- [`a31dc7c`](https://github.com/graphile/crystal/commit/a31dc7ce30cea33fdbecb7fbe4f9c70f24d8a318)
+  Thanks [@benjie](https://github.com/benjie)! - Fix URLs in README
+
+- [#2636](https://github.com/graphile/crystal/pull/2636)
+  [`ba8dacb`](https://github.com/graphile/crystal/commit/ba8dacb1ef93f79a61622ea7581cce4e593243bc)
+  Thanks [@benjie](https://github.com/benjie)! - Improve backwards compatibility
+  of ruruHTML function; explicitly deprecate the htmlParts argument.
+
+## 2.0.0-beta.26
+
+### Patch Changes
+
+- [#2629](https://github.com/graphile/crystal/pull/2629)
+  [`c5cc0ba`](https://github.com/graphile/crystal/commit/c5cc0ba6228c754bca60219d78ca1bc1b10759ca)
+  Thanks [@benjie](https://github.com/benjie)! - Fix loading worker scripts from
+  remote URLs.
+
+- [#2631](https://github.com/graphile/crystal/pull/2631)
+  [`506b7a1`](https://github.com/graphile/crystal/commit/506b7a16bbdee72b0ac41eb3f3235775d629be6c)
+  Thanks [@benjie](https://github.com/benjie)! - Add a `ruru.html` file you can
+  self-host, and move Ruru documentation to the website for easier navigation
+
+- [#2632](https://github.com/graphile/crystal/pull/2632)
+  [`418190a`](https://github.com/graphile/crystal/commit/418190a04169fdd01e166ae30fa764098bb34249)
+  Thanks [@benjie](https://github.com/benjie)! - Ruru loading state now matches
+  expected theme (light/dark).
+
+## 2.0.0-beta.25
+
+### Patch Changes
+
+- [#2578](https://github.com/graphile/crystal/pull/2578)
+  [`1d76d2f`](https://github.com/graphile/crystal/commit/1d76d2f0d19b4d56895ee9988440a35d2c60f9f9)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 **Ruru has been "rebuilt"!
+  The loading methods and APIs have changed!**
+
+  Ruru is now built on top of GraphiQL v5, which moves to using the Monaco
+  editor (the same editor used in VSCode) enabling more familiar keybindings and
+  more features (e.g. press F1 in the editor to see the command palette, and you
+  can now add comments in the variables JSON). This has required a
+  rearchitecture to Ruru's previously "single file" approach since Monaco uses
+  workers which require additional files.
+
+  In this release we have embraced the bundle splitting approach. We now bundle
+  both `prettier` and `mermaid`, and they are now loaded on-demand.
+
+  Usage instructions for all environments have had to change since we can no
+  longer serve Ruru as a single HTML file. We now include helpers for serving
+  Ruru's static files from whatever JS-based webserver you are using.
+
+  We've also added some additional improvements:
+  - Formatting with prettier now maintains the cursor position
+    (`Ctrl-Shift-P`/`Meta-Shift-P`/`Cmd-Shift-P` depending on platform)
+  - All editors are now formatted, not just the GraphQL editor
+  - Prettier and mermaid should now work offline
+  - Even more GraphiQL props are now passed through, including
+    `inputValueDeprecation` and `schemaDeprecation` which you can set to false
+    if your GraphQL server is, _ahem_, a little behind the GraphQL spec draft.
+
+  🚨 **Changes you need to make:** 🚨
+  - If you are using Ruru directly (i.e. importing from `ruru/server`), please
+    see the new Ruru README for setup instructions, you'll want to switch out
+    your previous setup. In particular, `ruru/bundle` no longer exists and you
+    now need to serve the static files (via `ruru/static`).
+  - `defaultHTMLParts` is no more; instead `config.htmlParts` (also
+    `preset.ruru.htmlParts` for Graphile Config users) now allows the entries to
+    be callback functions reducing boilerplate:
+    ```diff
+    -import { defaultHTMLParts } from "ruru/server";
+     const config = {
+       htmlParts: {
+    -    metaTags: defaultHTMLParts.metaTags + "<!-- local override -->",
+    +    metaTags: (base) => base + "<!-- local override -->",
+       }
+     }
+    ```
+    (alternatively you can use `makeHTMLParts(config)`)
+  - Grafserv users: `plugin.grafserv.middleware.ruruHTMLParts` is renamed to
+    `ruruHTML` and wraps the generation of the HTML - simply trim `Parts` from
+    the name and be sure calling `next()` is the final line of the function
+    ```diff
+     const plugin = {
+       grafserv: {
+         middleware: {
+    -      ruruHTMLParts(next, event) {
+    +      ruruHTML(next, event) {
+             const { htmlParts, request } = event;
+             htmlParts.titleTag = `<title>${escapeHTML(
+               "Ruru | " + request.getHeader("host"),
+             )}</title>`;
+             return next();
+           },
+         },
+       },
+     };
+    ```
+
+  Additional changes:
+  - `RuruConfig.clientConfig` has been added for props to explicitly pass to
+    Ruru making it explicit that these will be sent to the client
+  - `RuruServerConfig` has deprecated the client options `editorTheme`,
+    `debugTools` and `eventSourceInit` at the top level; instead these should be
+    passed via `RuruServerConfig.clientConfig` making it explicit these will be
+    sent to the client and expanding to cover more props
+    ```diff
+     const config = {
+       endpoint: "/graphql",
+    +  clientConfig: {
+       editorTheme: "dark",
+    +  },
+     }
+    ```
+
+- [#2605](https://github.com/graphile/crystal/pull/2605)
+  [`24d379a`](https://github.com/graphile/crystal/commit/24d379ae4b8a3c0afe3f1a309d87806a05e8d00d)
+  Thanks [@benjie](https://github.com/benjie)! - Add defaultTheme and
+  forcedTheme props to Ruru (passed through to GraphiQL)
+
+- [#2600](https://github.com/graphile/crystal/pull/2600)
+  [`ad588ec`](https://github.com/graphile/crystal/commit/ad588ecde230359f56800e414b7c5fa1aed14957)
+  Thanks [@benjie](https://github.com/benjie)! - Mark all
+  peerDependencies=dependencies modules as optional peerDependencies to make
+  pnpm marginally happier hopefully.
+
 ## 2.0.0-beta.24
 
 ### Patch Changes

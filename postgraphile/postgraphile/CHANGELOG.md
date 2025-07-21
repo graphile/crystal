@@ -1,5 +1,167 @@
 # postgraphile
 
+## 5.0.0-beta.45
+
+### Patch Changes
+
+- [#2635](https://github.com/graphile/crystal/pull/2635)
+  [`85c8364`](https://github.com/graphile/crystal/commit/85c83642b6fe7abcdb17c6879fbafbe162175843)
+  Thanks [@benjie](https://github.com/benjie)! - Remove non-functional fields
+  generated from mode:union-returning functions from the schema.
+- Updated dependencies
+  [[`85c8364`](https://github.com/graphile/crystal/commit/85c83642b6fe7abcdb17c6879fbafbe162175843)]:
+  - graphile-build-pg@5.0.0-beta.43
+
+## 5.0.0-beta.44
+
+### Patch Changes
+
+- [#2559](https://github.com/graphile/crystal/pull/2559)
+  [`4c8f028`](https://github.com/graphile/crystal/commit/4c8f028a7e5c4388efbab53ea65e7b3018ab6d47)
+  Thanks [@benjie](https://github.com/benjie)! - Remove `make...Plugin`
+  prefix/suffix from plugin factories. (Old name is still supported but
+  deprecated, this is non-breaking.)
+
+- [#2571](https://github.com/graphile/crystal/pull/2571)
+  [`5451c90`](https://github.com/graphile/crystal/commit/5451c9031e341bdae16dc1b7a3b6b19154056701)
+  Thanks [@slaskis](https://github.com/slaskis)! - Add support for JSONPath type
+  (thanks @slaskis!)
+
+- [#2578](https://github.com/graphile/crystal/pull/2578)
+  [`1d76d2f`](https://github.com/graphile/crystal/commit/1d76d2f0d19b4d56895ee9988440a35d2c60f9f9)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 **Ruru has been "rebuilt"!
+  The loading methods and APIs have changed!**
+
+  Ruru is now built on top of GraphiQL v5, which moves to using the Monaco
+  editor (the same editor used in VSCode) enabling more familiar keybindings and
+  more features (e.g. press F1 in the editor to see the command palette, and you
+  can now add comments in the variables JSON). This has required a
+  rearchitecture to Ruru's previously "single file" approach since Monaco uses
+  workers which require additional files.
+
+  In this release we have embraced the bundle splitting approach. We now bundle
+  both `prettier` and `mermaid`, and they are now loaded on-demand.
+
+  Usage instructions for all environments have had to change since we can no
+  longer serve Ruru as a single HTML file. We now include helpers for serving
+  Ruru's static files from whatever JS-based webserver you are using.
+
+  We've also added some additional improvements:
+  - Formatting with prettier now maintains the cursor position
+    (`Ctrl-Shift-P`/`Meta-Shift-P`/`Cmd-Shift-P` depending on platform)
+  - All editors are now formatted, not just the GraphQL editor
+  - Prettier and mermaid should now work offline
+  - Even more GraphiQL props are now passed through, including
+    `inputValueDeprecation` and `schemaDeprecation` which you can set to false
+    if your GraphQL server is, _ahem_, a little behind the GraphQL spec draft.
+
+  🚨 **Changes you need to make:** 🚨
+  - If you are using Ruru directly (i.e. importing from `ruru/server`), please
+    see the new Ruru README for setup instructions, you'll want to switch out
+    your previous setup. In particular, `ruru/bundle` no longer exists and you
+    now need to serve the static files (via `ruru/static`).
+  - `defaultHTMLParts` is no more; instead `config.htmlParts` (also
+    `preset.ruru.htmlParts` for Graphile Config users) now allows the entries to
+    be callback functions reducing boilerplate:
+    ```diff
+    -import { defaultHTMLParts } from "ruru/server";
+     const config = {
+       htmlParts: {
+    -    metaTags: defaultHTMLParts.metaTags + "<!-- local override -->",
+    +    metaTags: (base) => base + "<!-- local override -->",
+       }
+     }
+    ```
+    (alternatively you can use `makeHTMLParts(config)`)
+  - Grafserv users: `plugin.grafserv.middleware.ruruHTMLParts` is renamed to
+    `ruruHTML` and wraps the generation of the HTML - simply trim `Parts` from
+    the name and be sure calling `next()` is the final line of the function
+    ```diff
+     const plugin = {
+       grafserv: {
+         middleware: {
+    -      ruruHTMLParts(next, event) {
+    +      ruruHTML(next, event) {
+             const { htmlParts, request } = event;
+             htmlParts.titleTag = `<title>${escapeHTML(
+               "Ruru | " + request.getHeader("host"),
+             )}</title>`;
+             return next();
+           },
+         },
+       },
+     };
+    ```
+
+  Additional changes:
+  - `RuruConfig.clientConfig` has been added for props to explicitly pass to
+    Ruru making it explicit that these will be sent to the client
+  - `RuruServerConfig` has deprecated the client options `editorTheme`,
+    `debugTools` and `eventSourceInit` at the top level; instead these should be
+    passed via `RuruServerConfig.clientConfig` making it explicit these will be
+    sent to the client and expanding to cover more props
+    ```diff
+     const config = {
+       endpoint: "/graphql",
+    +  clientConfig: {
+       editorTheme: "dark",
+    +  },
+     }
+    ```
+
+- [#2571](https://github.com/graphile/crystal/pull/2571)
+  [`7147cb0`](https://github.com/graphile/crystal/commit/7147cb07e4d7286bb3b9e949164a2a232d59e28c)
+  Thanks [@slaskis](https://github.com/slaskis)! - 🚨 Give built-in codecs a
+  concept of "natural sorting" and "natural equality"; disable ordering by
+  default for those without natural sorting, disable filtering by default for
+  those without natural equality. Those using AmberPreset will have some order
+  enum options and filter options removed from their schema; V4 preset users
+  should be unaffected. To restore the previous items, a small plugin can be
+  introduced, see:
+  https://github.com/slaskis/crystal/blob/bb940399a3a741c0982b53fffbe4604eebe6ffb0/postgraphile/postgraphile/src/plugins/PgV4BehaviorPlugin.ts#L81-L98
+
+- [#2593](https://github.com/graphile/crystal/pull/2593)
+  [`7847c0b`](https://github.com/graphile/crystal/commit/7847c0b09aa6be5526df8ccdb3f429e680a2da03)
+  Thanks [@benjie](https://github.com/benjie)! - Fixes a bug where ordering or
+  filtering by 'via' attributes (such as those from polymorphic 'relational'
+  tables) resulted in an error.
+
+- [#2593](https://github.com/graphile/crystal/pull/2593)
+  [`0e6c4e0`](https://github.com/graphile/crystal/commit/0e6c4e062be3ecb79c0ae30c89fad1550a0b5e98)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 `resource.resolveVia()` has
+  changed result format; from `{ relation: string, attribute: string }` to
+  `{ relationName: string, attributeName: string, relation: PgCodecRelation, attribute: PgCodecAttribute }`.
+  If you use `resolveVia`, please be sure to extract the correct properties.
+
+- [#2600](https://github.com/graphile/crystal/pull/2600)
+  [`ad588ec`](https://github.com/graphile/crystal/commit/ad588ecde230359f56800e414b7c5fa1aed14957)
+  Thanks [@benjie](https://github.com/benjie)! - Mark all
+  peerDependencies=dependencies modules as optional peerDependencies to make
+  pnpm marginally happier hopefully.
+
+- [#2598](https://github.com/graphile/crystal/pull/2598)
+  [`e8bb5be`](https://github.com/graphile/crystal/commit/e8bb5be91df242d3c2b8ed4e7010d48feffdcfe2)
+  Thanks [@benjie](https://github.com/benjie)! - Amber and V4 preset now
+  implicitly import `postgraphile` which imports the Graphile Config types you
+  need from graphile-build, grafast, etc automatically.
+- Updated dependencies
+  [[`4c8f028`](https://github.com/graphile/crystal/commit/4c8f028a7e5c4388efbab53ea65e7b3018ab6d47),
+  [`5451c90`](https://github.com/graphile/crystal/commit/5451c9031e341bdae16dc1b7a3b6b19154056701),
+  [`1d76d2f`](https://github.com/graphile/crystal/commit/1d76d2f0d19b4d56895ee9988440a35d2c60f9f9),
+  [`c54c6db`](https://github.com/graphile/crystal/commit/c54c6db320b3967ab16784a504770c9b5ef24494),
+  [`7147cb0`](https://github.com/graphile/crystal/commit/7147cb07e4d7286bb3b9e949164a2a232d59e28c),
+  [`7847c0b`](https://github.com/graphile/crystal/commit/7847c0b09aa6be5526df8ccdb3f429e680a2da03),
+  [`9d86063`](https://github.com/graphile/crystal/commit/9d86063aacf2d064c35bd62e2cf58ea687910ac8),
+  [`a480f6d`](https://github.com/graphile/crystal/commit/a480f6d22605fbb0d0fcdf6845cbdf294d3194b5),
+  [`0e6c4e0`](https://github.com/graphile/crystal/commit/0e6c4e062be3ecb79c0ae30c89fad1550a0b5e98),
+  [`ad588ec`](https://github.com/graphile/crystal/commit/ad588ecde230359f56800e414b7c5fa1aed14957)]:
+  - graphile-build-pg@5.0.0-beta.42
+  - graphile-utils@5.0.0-beta.42
+  - @dataplan/pg@0.0.1-beta.35
+  - grafserv@0.1.1-beta.27
+  - grafast@0.1.1-beta.24
+  - graphile-build@5.0.0-beta.36
+
 ## 5.0.0-beta.43
 
 ### Patch Changes
@@ -87,7 +249,6 @@
   type-level fields no longer have the `__` prefix.
 
   Migration is quite straightforward:
-
   1. **Add new top-level properties**. Add `objects`, `interfaces`, `unions`,
      `inputObjects`, `scalars`, and `enums` as top level properties alongside
      `typeDefs` and `plans`. Each should be an empty object. You can skip any
@@ -147,7 +308,6 @@
   ```
 
   Other changes:
-
   - `ObjectPlans`/`GrafastPlans`/`FieldPlans`/`InputObjectPlans`/`ScalarPlans`
     all changed to signular
   - `InterfaceOrUnionPlans` split to `InterfacePlan`/`UnionPlan` (identical
@@ -172,7 +332,6 @@
   [`45adaff886e7cd72b864150927be6c0cb4a7dfe8`](https://github.com/graphile/crystal/commit/45adaff886e7cd72b864150927be6c0cb4a7dfe8)
   Thanks [@benjie](https://github.com/benjie)! - 🚨 Complete overhaul of
   polymorphism:
-
   - Centralized the responsibility of polymorphic resolution from field plan
     resolvers into abstract types.
   - Eliminated the concept of "polymorphic capable" steps: any step may now be
@@ -334,7 +493,6 @@
   The following `ModifierStep` classes have all dropped their `Step` suffix,
   these `Modifier` classes now all run at runtime, and are thus no longer steps;
   they're invoked as part of the new `applyInput()` (TODO: document) step:
-
   - `ModifierStep` &rArr; `Modifier`
   - `PgBooleanFilterStep` &rArr; `PgBooleanFilter`
   - `PgClassFilterStep` &rArr; `PgClassFilter`
@@ -355,7 +513,6 @@
   The deprecated forms of the above have been removed.
 
   Methods that rely on these modifier plans have been removed:
-
   - `PgUnionAllStep.wherePlan` - use
     `fieldArg.apply($unionAll, qb => qb.whereBuilder())` instead
   - `PgUnionAllStep.havingPlan` - use
@@ -363,7 +520,6 @@
   - Same for PgSelectStep
 
   The following gain query builders:
-
   - `PgInsertSingle`
   - `PgUpdateSingle`
   - `PgDeleteSingle`
@@ -581,7 +737,6 @@
   inflector - which is where most of the changes have come from. We've undone
   this change in the V4 preset, so if you don't use the V5 preset but need to
   undo this change, please check out the V4 overrides of:
-
   - [`_attributeName`](https://github.com/graphile/crystal/blob/ca9c872ff6c95915bd9e2f33c1370d86742ce815/postgraphile/postgraphile/src/presets/v4.ts#L135-L145)
   - [`_joinAttributeNames`](https://github.com/graphile/crystal/blob/ca9c872ff6c95915bd9e2f33c1370d86742ce815/postgraphile/postgraphile/src/plugins/PgV4InflectionPlugin.ts#L131-L138)
   - [`attribute`](https://github.com/graphile/crystal/blob/ca9c872ff6c95915bd9e2f33c1370d86742ce815/postgraphile/postgraphile/src/presets/v4.ts#L158-L169)
@@ -968,7 +1123,6 @@
   accepts `resolvedPreset` and `requestContext` directly; passing these through
   additional arguments is now deprecated and support will be removed in a future
   revision. This affects:
-
   - `grafast()`
   - `execute()`
   - `subscribe()`
@@ -1014,14 +1168,12 @@
   `plugin.grafserv.hooks.*` are still supported but deprecated; instead use
   middleware `plugin.grafserv.middleware.*` (note that call signatures have
   changed slightly, similar to the diff above):
-
   - `hooks.init` -> `middleware.setPreset`
   - `hooks.processGraphQLRequestBody` -> `middleware.processGraphQLRequestBody`
   - `hooks.ruruHTMLParts` -> `middleware.ruruHTMLParts`
 
   A few TypeScript types related to Hooks have been renamed, but their old names
   are still available, just deprecated. They will be removed in a future update:
-
   - `HookObject` -> `FunctionalityObject`
   - `PluginHook` -> `CallbackOrDescriptor`
   - `PluginHookObject` -> `CallbackDescriptor`
@@ -2269,7 +2421,6 @@
   [`ff91a5660`](https://github.com/benjie/crystal/commit/ff91a5660c5a33ab32555ab3da12f880179d9892)
   Thanks [@benjie](https://github.com/benjie)! - Added
   `postgraphile/presets/relay` preset:
-
   - Hides primary key columns from output schema, and includes `id: ID` instead
   - Hides foreign key columns from output schema, expecting you to use the
     relation instead
@@ -3065,7 +3216,6 @@
   resources, and more. So, we've renamed lots of things as part of the API
   stabilization work. You're probably only affected by the first 2 bullet
   points.
-
   - `pgConfigs` -> `pgServices` (also applies to related `pgConfig` terms such
     as `makePgConfig` -> `makePgService`, `MakePgConfigOptions` ->
     `MakePgServiceOptions`, etc) - see your `graphile.config.ts` or equivalent
@@ -3517,7 +3667,6 @@
   [`652cf1073`](https://github.com/benjie/crystal/commit/652cf107316ea5832f69c6a55574632187f5c876)
   Thanks [@benjie](https://github.com/benjie)! - 🚨 Breaking changes around
   types and postgres configuration:
-
   - `GraphileBuild.GraphileResolverContext` renamed to `Grafast.Context`
   - `GraphileConfig.GraphQLRequestContext` renamed to `Grafast.RequestContext`
   - `Grafast.PgDatabaseAdaptorOptions` renaed to
@@ -3571,7 +3720,6 @@
 
 - [`72bf5f535`](undefined) - Overhaul the behavior system (see
   https://postgraphile.org/postgraphile/next/behavior).
-
   - Adds `schema.defaultBehavior` configuration option to save having to write a
     plugin for such a simple task
   - Changes a bunch of behavior strings:

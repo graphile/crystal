@@ -1,0 +1,13 @@
+## expect(errors).toBeFalsy()
+#> graphileBuildOptions: { defaultNodeIdCodec: "pipeString" }
+#> schema: ["d"]
+#> extends: ["postgraphile/presets/relay:PgRelayPreset"]
+query Q($alice: ID! = "people|3") {
+  alice: node(id: $alice) {
+    id
+    ... on Person {
+      firstName
+      lastName
+    }
+  }
+}

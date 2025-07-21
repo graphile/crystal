@@ -104,11 +104,25 @@ export function bakedInputRuntime(
       schema,
       applyChildren(parent) {
         applied = true;
-        inputArgsApply(schema, nullableInputType, parent, value, undefined);
+        inputArgsApply(
+          schema,
+          nullableInputType,
+          parent,
+          value,
+          undefined,
+          undefined,
+        );
       },
     });
     if (!applied) {
-      inputArgsApply(schema, nullableInputType, bakedObj, value, undefined);
+      inputArgsApply(
+        schema,
+        nullableInputType,
+        bakedObj,
+        value,
+        undefined,
+        undefined,
+      );
     }
     return bakedObj;
   }

@@ -1,6 +1,6 @@
 {
   "name": "graphile",
-  "version": "5.0.0-beta.43",
+  "version": "5.0.0-beta.44",
   "description": "Swiss army knife for dealing with all things Graphile",
   "main": "dist/index.js",
   "bin": "dist/cli-run.js",
@@ -56,8 +56,8 @@
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
-    "@types/node": "^22.15.32",
-    "jest": "^30.0.0",
+    "@types/node": "^22.16.3",
+    "jest": "^30.0.4",
     "ts-node": "^10.9.2"
   }
 }

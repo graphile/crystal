@@ -1,5 +1,19 @@
 # graphile-build
 
+## 5.0.0-beta.36
+
+### Patch Changes
+
+- [#2600](https://github.com/graphile/crystal/pull/2600)
+  [`ad588ec`](https://github.com/graphile/crystal/commit/ad588ecde230359f56800e414b7c5fa1aed14957)
+  Thanks [@benjie](https://github.com/benjie)! - Mark all
+  peerDependencies=dependencies modules as optional peerDependencies to make
+  pnpm marginally happier hopefully.
+- Updated dependencies
+  [[`c54c6db`](https://github.com/graphile/crystal/commit/c54c6db320b3967ab16784a504770c9b5ef24494),
+  [`ad588ec`](https://github.com/graphile/crystal/commit/ad588ecde230359f56800e414b7c5fa1aed14957)]:
+  - grafast@0.1.1-beta.24
+
 ## 5.0.0-beta.35
 
 ### Patch Changes
@@ -68,7 +82,6 @@
   [`c041fd250372c57601188b65a6411c8f440afab6`](https://github.com/graphile/crystal/commit/c041fd250372c57601188b65a6411c8f440afab6)
   Thanks [@benjie](https://github.com/benjie)! - Since the following have been
   removed from Grafast, throw an error if they're seen in the schema:
-
   - `autoApplyAfterParentInputPlan`
   - `autoApplyAfterParentApplyPlan`
   - `autoApplyAfterParentPlan`
@@ -126,7 +139,6 @@
   The following `ModifierStep` classes have all dropped their `Step` suffix,
   these `Modifier` classes now all run at runtime, and are thus no longer steps;
   they're invoked as part of the new `applyInput()` (TODO: document) step:
-
   - `ModifierStep` &rArr; `Modifier`
   - `PgBooleanFilterStep` &rArr; `PgBooleanFilter`
   - `PgClassFilterStep` &rArr; `PgClassFilter`
@@ -147,7 +159,6 @@
   The deprecated forms of the above have been removed.
 
   Methods that rely on these modifier plans have been removed:
-
   - `PgUnionAllStep.wherePlan` - use
     `fieldArg.apply($unionAll, qb => qb.whereBuilder())` instead
   - `PgUnionAllStep.havingPlan` - use
@@ -155,7 +166,6 @@
   - Same for PgSelectStep
 
   The following gain query builders:
-
   - `PgInsertSingle`
   - `PgUpdateSingle`
   - `PgDeleteSingle`
@@ -298,7 +308,6 @@
   inflector - which is where most of the changes have come from. We've undone
   this change in the V4 preset, so if you don't use the V5 preset but need to
   undo this change, please check out the V4 overrides of:
-
   - [`_attributeName`](https://github.com/graphile/crystal/blob/ca9c872ff6c95915bd9e2f33c1370d86742ce815/postgraphile/postgraphile/src/presets/v4.ts#L135-L145)
   - [`_joinAttributeNames`](https://github.com/graphile/crystal/blob/ca9c872ff6c95915bd9e2f33c1370d86742ce815/postgraphile/postgraphile/src/plugins/PgV4InflectionPlugin.ts#L131-L138)
   - [`attribute`](https://github.com/graphile/crystal/blob/ca9c872ff6c95915bd9e2f33c1370d86742ce815/postgraphile/postgraphile/src/presets/v4.ts#L158-L169)
@@ -483,7 +492,6 @@
   accepts `resolvedPreset` and `requestContext` directly; passing these through
   additional arguments is now deprecated and support will be removed in a future
   revision. This affects:
-
   - `grafast()`
   - `execute()`
   - `subscribe()`
@@ -529,14 +537,12 @@
   `plugin.grafserv.hooks.*` are still supported but deprecated; instead use
   middleware `plugin.grafserv.middleware.*` (note that call signatures have
   changed slightly, similar to the diff above):
-
   - `hooks.init` -> `middleware.setPreset`
   - `hooks.processGraphQLRequestBody` -> `middleware.processGraphQLRequestBody`
   - `hooks.ruruHTMLParts` -> `middleware.ruruHTMLParts`
 
   A few TypeScript types related to Hooks have been renamed, but their old names
   are still available, just deprecated. They will be removed in a future update:
-
   - `HookObject` -> `FunctionalityObject`
   - `PluginHook` -> `CallbackOrDescriptor`
   - `PluginHookObject` -> `CallbackDescriptor`
@@ -1308,7 +1314,6 @@
   resources, and more. So, we've renamed lots of things as part of the API
   stabilization work. You're probably only affected by the first 2 bullet
   points.
-
   - `pgConfigs` -> `pgServices` (also applies to related `pgConfig` terms such
     as `makePgConfig` -> `makePgService`, `MakePgConfigOptions` ->
     `MakePgServiceOptions`, etc) - see your `graphile.config.ts` or equivalent
@@ -1529,7 +1534,6 @@
   [`652cf1073`](https://github.com/benjie/crystal/commit/652cf107316ea5832f69c6a55574632187f5c876)
   Thanks [@benjie](https://github.com/benjie)! - 🚨 Breaking changes around
   types and postgres configuration:
-
   - `GraphileBuild.GraphileResolverContext` renamed to `Grafast.Context`
   - `GraphileConfig.GraphQLRequestContext` renamed to `Grafast.RequestContext`
   - `Grafast.PgDatabaseAdaptorOptions` renaed to
@@ -1565,7 +1569,6 @@
 
 - [`72bf5f535`](undefined) - Overhaul the behavior system (see
   https://postgraphile.org/postgraphile/next/behavior).
-
   - Adds `schema.defaultBehavior` configuration option to save having to write a
     plugin for such a simple task
   - Changes a bunch of behavior strings:

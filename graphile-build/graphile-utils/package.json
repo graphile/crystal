@@ -1,6 +1,6 @@
 {
   "name": "graphile-utils",
-  "version": "5.0.0-beta.41",
+  "version": "5.0.0-beta.42",
   "description": "Utilities to help with building graphile-build plugins",
   "type": "commonjs",
   "main": "dist/index.js",
@@ -63,13 +63,13 @@
   },
   "devDependencies": {
     "@dataplan/pg": "workspace:^",
-    "@types/node": "^24.0.4",
+    "@types/node": "^24.0.13",
     "grafast": "workspace:^",
     "graphile-build": "workspace:^",
     "graphile-build-pg": "workspace:^",
     "graphile-config": "workspace:^",
     "graphql": "^16.1.0-experimental-stream-defer.6",
-    "jest": "^30.0.0",
+    "jest": "^30.0.4",
     "jest-serializer-graphql-schema": "workspace:^",
     "nodemon": "^3.1.10",
     "postgraphile": "workspace:^",

@@ -1,5 +1,77 @@
 # graphile-build-pg
 
+## 5.0.0-beta.43
+
+### Patch Changes
+
+- [#2635](https://github.com/graphile/crystal/pull/2635)
+  [`85c8364`](https://github.com/graphile/crystal/commit/85c83642b6fe7abcdb17c6879fbafbe162175843)
+  Thanks [@benjie](https://github.com/benjie)! - Remove non-functional fields
+  generated from mode:union-returning functions from the schema.
+
+## 5.0.0-beta.42
+
+### Patch Changes
+
+- [#2559](https://github.com/graphile/crystal/pull/2559)
+  [`4c8f028`](https://github.com/graphile/crystal/commit/4c8f028a7e5c4388efbab53ea65e7b3018ab6d47)
+  Thanks [@benjie](https://github.com/benjie)! - Remove `make...Plugin`
+  prefix/suffix from plugin factories. (Old name is still supported but
+  deprecated, this is non-breaking.)
+
+- [#2571](https://github.com/graphile/crystal/pull/2571)
+  [`5451c90`](https://github.com/graphile/crystal/commit/5451c9031e341bdae16dc1b7a3b6b19154056701)
+  Thanks [@slaskis](https://github.com/slaskis)! - Add support for JSONPath type
+  (thanks @slaskis!)
+
+- [#2571](https://github.com/graphile/crystal/pull/2571)
+  [`7147cb0`](https://github.com/graphile/crystal/commit/7147cb07e4d7286bb3b9e949164a2a232d59e28c)
+  Thanks [@slaskis](https://github.com/slaskis)! - 🚨 Give built-in codecs a
+  concept of "natural sorting" and "natural equality"; disable ordering by
+  default for those without natural sorting, disable filtering by default for
+  those without natural equality. Those using AmberPreset will have some order
+  enum options and filter options removed from their schema; V4 preset users
+  should be unaffected. To restore the previous items, a small plugin can be
+  introduced, see:
+  https://github.com/slaskis/crystal/blob/bb940399a3a741c0982b53fffbe4604eebe6ffb0/postgraphile/postgraphile/src/plugins/PgV4BehaviorPlugin.ts#L81-L98
+
+- [#2593](https://github.com/graphile/crystal/pull/2593)
+  [`7847c0b`](https://github.com/graphile/crystal/commit/7847c0b09aa6be5526df8ccdb3f429e680a2da03)
+  Thanks [@benjie](https://github.com/benjie)! - Fixes a bug where ordering or
+  filtering by 'via' attributes (such as those from polymorphic 'relational'
+  tables) resulted in an error.
+
+- [#2605](https://github.com/graphile/crystal/pull/2605)
+  [`9d86063`](https://github.com/graphile/crystal/commit/9d86063aacf2d064c35bd62e2cf58ea687910ac8)
+  Thanks [@benjie](https://github.com/benjie)! - Tweak deps/peerDeps.
+
+- [#2593](https://github.com/graphile/crystal/pull/2593)
+  [`0e6c4e0`](https://github.com/graphile/crystal/commit/0e6c4e062be3ecb79c0ae30c89fad1550a0b5e98)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 `resource.resolveVia()` has
+  changed result format; from `{ relation: string, attribute: string }` to
+  `{ relationName: string, attributeName: string, relation: PgCodecRelation, attribute: PgCodecAttribute }`.
+  If you use `resolveVia`, please be sure to extract the correct properties.
+
+- [#2600](https://github.com/graphile/crystal/pull/2600)
+  [`ad588ec`](https://github.com/graphile/crystal/commit/ad588ecde230359f56800e414b7c5fa1aed14957)
+  Thanks [@benjie](https://github.com/benjie)! - Mark all
+  peerDependencies=dependencies modules as optional peerDependencies to make
+  pnpm marginally happier hopefully.
+- Updated dependencies
+  [[`6abfd4f`](https://github.com/graphile/crystal/commit/6abfd4fcad7633da3c50b2d3ea82979a3a27e317),
+  [`5451c90`](https://github.com/graphile/crystal/commit/5451c9031e341bdae16dc1b7a3b6b19154056701),
+  [`c54c6db`](https://github.com/graphile/crystal/commit/c54c6db320b3967ab16784a504770c9b5ef24494),
+  [`7147cb0`](https://github.com/graphile/crystal/commit/7147cb07e4d7286bb3b9e949164a2a232d59e28c),
+  [`9aa2637`](https://github.com/graphile/crystal/commit/9aa26374758e8489515a70a334c7ea4d345c6369),
+  [`7847c0b`](https://github.com/graphile/crystal/commit/7847c0b09aa6be5526df8ccdb3f429e680a2da03),
+  [`9d86063`](https://github.com/graphile/crystal/commit/9d86063aacf2d064c35bd62e2cf58ea687910ac8),
+  [`0e6c4e0`](https://github.com/graphile/crystal/commit/0e6c4e062be3ecb79c0ae30c89fad1550a0b5e98),
+  [`ad588ec`](https://github.com/graphile/crystal/commit/ad588ecde230359f56800e414b7c5fa1aed14957)]:
+  - pg-introspection@0.0.1-beta.12
+  - @dataplan/pg@0.0.1-beta.35
+  - grafast@0.1.1-beta.24
+  - graphile-build@5.0.0-beta.36
+
 ## 5.0.0-beta.41
 
 ### Patch Changes
@@ -59,7 +131,6 @@
   [`455f4811d37ad8fff91183c7a88621bcf9d79acf`](https://github.com/graphile/crystal/commit/455f4811d37ad8fff91183c7a88621bcf9d79acf)
   Thanks [@benjie](https://github.com/benjie)! - Various of our steps weren't as
   crisp on types as they could be. This makes them a lot stricter:
-
   - `coalesce()` now yields `null` if it fails
   - `each()` now reflects the type of the list item even if it's not a "list
     capable" step
@@ -147,7 +218,6 @@
   [`c041fd250372c57601188b65a6411c8f440afab6`](https://github.com/graphile/crystal/commit/c041fd250372c57601188b65a6411c8f440afab6)
   Thanks [@benjie](https://github.com/benjie)! - Since the following have been
   removed from Grafast, throw an error if they're seen in the schema:
-
   - `autoApplyAfterParentInputPlan`
   - `autoApplyAfterParentApplyPlan`
   - `autoApplyAfterParentPlan`
@@ -205,7 +275,6 @@
   The following `ModifierStep` classes have all dropped their `Step` suffix,
   these `Modifier` classes now all run at runtime, and are thus no longer steps;
   they're invoked as part of the new `applyInput()` (TODO: document) step:
-
   - `ModifierStep` &rArr; `Modifier`
   - `PgBooleanFilterStep` &rArr; `PgBooleanFilter`
   - `PgClassFilterStep` &rArr; `PgClassFilter`
@@ -226,7 +295,6 @@
   The deprecated forms of the above have been removed.
 
   Methods that rely on these modifier plans have been removed:
-
   - `PgUnionAllStep.wherePlan` - use
     `fieldArg.apply($unionAll, qb => qb.whereBuilder())` instead
   - `PgUnionAllStep.havingPlan` - use
@@ -234,7 +302,6 @@
   - Same for PgSelectStep
 
   The following gain query builders:
-
   - `PgInsertSingle`
   - `PgUpdateSingle`
   - `PgDeleteSingle`
@@ -430,7 +497,6 @@
   inflector - which is where most of the changes have come from. We've undone
   this change in the V4 preset, so if you don't use the V5 preset but need to
   undo this change, please check out the V4 overrides of:
-
   - [`_attributeName`](https://github.com/graphile/crystal/blob/ca9c872ff6c95915bd9e2f33c1370d86742ce815/postgraphile/postgraphile/src/presets/v4.ts#L135-L145)
   - [`_joinAttributeNames`](https://github.com/graphile/crystal/blob/ca9c872ff6c95915bd9e2f33c1370d86742ce815/postgraphile/postgraphile/src/plugins/PgV4InflectionPlugin.ts#L131-L138)
   - [`attribute`](https://github.com/graphile/crystal/blob/ca9c872ff6c95915bd9e2f33c1370d86742ce815/postgraphile/postgraphile/src/presets/v4.ts#L158-L169)
@@ -1682,7 +1748,6 @@
   [`ff91a5660`](https://github.com/benjie/crystal/commit/ff91a5660c5a33ab32555ab3da12f880179d9892)
   Thanks [@benjie](https://github.com/benjie)! - Added
   `postgraphile/presets/relay` preset:
-
   - Hides primary key columns from output schema, and includes `id: ID` instead
   - Hides foreign key columns from output schema, expecting you to use the
     relation instead
@@ -2269,7 +2334,6 @@
   resources, and more. So, we've renamed lots of things as part of the API
   stabilization work. You're probably only affected by the first 2 bullet
   points.
-
   - `pgConfigs` -> `pgServices` (also applies to related `pgConfig` terms such
     as `makePgConfig` -> `makePgService`, `MakePgConfigOptions` ->
     `MakePgServiceOptions`, etc) - see your `graphile.config.ts` or equivalent
@@ -2578,7 +2642,6 @@
   [`652cf1073`](https://github.com/benjie/crystal/commit/652cf107316ea5832f69c6a55574632187f5c876)
   Thanks [@benjie](https://github.com/benjie)! - 🚨 Breaking changes around
   types and postgres configuration:
-
   - `GraphileBuild.GraphileResolverContext` renamed to `Grafast.Context`
   - `GraphileConfig.GraphQLRequestContext` renamed to `Grafast.RequestContext`
   - `Grafast.PgDatabaseAdaptorOptions` renaed to
@@ -2630,7 +2693,6 @@
 
 - [`72bf5f535`](undefined) - Overhaul the behavior system (see
   https://postgraphile.org/postgraphile/next/behavior).
-
   - Adds `schema.defaultBehavior` configuration option to save having to write a
     plugin for such a simple task
   - Changes a bunch of behavior strings:

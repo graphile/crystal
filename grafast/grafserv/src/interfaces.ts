@@ -10,7 +10,7 @@ import type {
   ValidationRule,
 } from "grafast/graphql";
 import type { Context, ID, SubscribePayload } from "graphql-ws";
-import type { RuruHTMLParts } from "ruru/server";
+import type { RuruConfig, RuruHTMLParts } from "ruru/server";
 
 import type { GrafservBase } from ".";
 import type { makeParseAndValidateFunction } from "./middleware/graphql";
@@ -80,8 +80,9 @@ export interface ProcessRequestEvent {
   instance: GrafservBase;
 }
 
-export interface RuruHTMLPartsEvent {
+export interface RuruHTMLEvent {
   resolvedPreset: GraphileConfig.ResolvedPreset;
+  config: RuruConfig;
   htmlParts: RuruHTMLParts;
   request: NormalizedRequestDigest;
 }
@@ -156,6 +157,7 @@ interface IHandlerResult {
   request: NormalizedRequestDigest;
   dynamicOptions: OptionsFromConfig;
   statusCode?: number;
+  headers?: Record<string, string>;
 }
 export interface HTMLHandlerResult extends IHandlerResult {
   type: "html";
@@ -193,13 +195,25 @@ export interface EventStreamHeandlerResult extends IHandlerResult {
   type: "event-stream";
   payload: AsyncIterable<EventStreamEvent>;
 }
+export interface NotFoundResult extends IHandlerResult {
+  type: "notFound";
+  payload?: Buffer;
+}
+export interface RawHandlerResult extends IHandlerResult {
+  type: "raw";
+  payload: Buffer;
+  // Must have headers; must have `content-type`!
+  headers: Record<string, string>;
+}
 export type HandlerResult =
   | HTMLHandlerResult
   | GraphQLHandlerResult
   | GraphQLIncrementalHandlerResult
   | TextHandlerResult
   | EventStreamHeandlerResult
-  | NoContentHandlerResult;
+  | NoContentHandlerResult
+  | NotFoundResult
+  | RawHandlerResult;
 
 export type SchemaChangeEvent = {
   event: "change";

@@ -1,23 +1,23 @@
 import { useMemo, useState } from "react";
 
 export interface StoredKeys {
-  saveHeaders: "true" | "";
   explain: "true" | "";
   explorerIsOpen: "true" | "";
   explainIsOpen: "true" | "";
   explainAtBottom: "true" | "";
   explainSize: string;
   verbose: "true" | "";
+  condensed: "true" | "";
 }
 
 const KEYS: { [key in keyof StoredKeys]: string } = {
-  saveHeaders: "Ruru:saveHeadersText",
   explain: "Ruru:explain",
   explainSize: "Ruru:explainSize",
   explainIsOpen: "Ruru:explainIsOpen",
   explainAtBottom: "Ruru:explainAtBottom",
   explorerIsOpen: "graphiql:explorerIsOpen",
   verbose: "Ruru:verbose",
+  condensed: "Ruru:condensed",
 };
 
 const up = (v: number) => v + 1;
@@ -64,7 +64,8 @@ export const useStorage = (): RuruStorage => {
         bump(up);
       },
       toggle(key) {
-        if (this.get(key)) {
+        const val = this.get(key);
+        if (val || (val == null && key === "condensed")) {
           this.set(key, "");
         } else {
           this.set(key, "true");

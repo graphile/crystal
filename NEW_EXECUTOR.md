@@ -144,7 +144,6 @@ Other notes:
 Polymorphism
 
 - When handling polymorphism (and maybe list/stream/etc items?)
-
   1. create a new LayerPlan for the thing
   2. create the plans necessary in that LayerPlan for its rootPlanId
   3. deduplicate _across sibling LayerPlans (of same reason.type)_

@@ -108,6 +108,16 @@ export class H3Grafserv extends GrafservBase {
     return this.send(event, result);
   }
 
+  public async handleGraphiqlStaticEvent(event: H3Event) {
+    const digest = getDigest(event);
+
+    const handlerResult = await this.graphiqlStaticHandler(
+      normalizeRequest(digest),
+    );
+    const result = await convertHandlerResultToResult(handlerResult);
+    return this.send(event, result);
+  }
+
   public async handleEventStreamEvent(event: H3Event) {
     const digest = getDigest(event);
 
@@ -245,6 +255,14 @@ export class H3Grafserv extends GrafservBase {
       router.get(
         this.dynamicOptions.eventStreamPath,
         eventHandler((event) => this.handleEventStreamEvent(event)),
+      );
+    }
+
+    if (dynamicOptions.graphiql) {
+      // Must come last, because wildcard
+      router.get(
+        this.dynamicOptions.graphiqlStaticPath + "*",
+        eventHandler((event) => this.handleGraphiqlStaticEvent(event)),
       );
     }
   }

@@ -266,6 +266,8 @@ const oldConfig = {
       files: [
         "grafast/ruru/src/**/*.ts",
         "grafast/ruru/src/**/*.tsx",
+        "grafast/ruru-components/src/**/*.ts",
+        "grafast/ruru-components/src/**/*.tsx",
         "**/website/src/**",
       ],
       rules: {

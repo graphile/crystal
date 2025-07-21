@@ -1,6 +1,6 @@
 {
   "name": "ruru",
-  "version": "2.0.0-beta.24",
+  "version": "2.0.0-beta.27",
   "description": "Grafast-flavoured GraphiQL distribution",
   "type": "commonjs",
   "main": "./dist/index.js",
@@ -17,16 +17,21 @@
       "node": "./dist/server.js",
       "default": "./dist/server.js"
     },
+    "./static": {
+      "types": "./dist/static.d.ts",
+      "node": "./dist/static.js",
+      "default": "./dist/static.js"
+    },
     "./cli": {
       "types": "./dist/cli.d.ts",
       "node": "./dist/cli.js"
-    },
-    "./bundle": "./bundle/ruru.min.js"
+    }
   },
   "scripts": {
-    "webpack": "node --loader ts-node/esm \"$(yarn bin webpack-cli)\"",
+    "webpack": "node --loader ts-node/esm \"$(yarn bin webpack-cli)\" --config webpack.config.mts",
     "watch": "yarn webpack --watch --mode=development",
-    "prepack": "rm -Rf dist bundle tsconfig.tsbuildinfo tsconfig.build.tsbuildinfo && yarn webpack --mode=production && tsc -b tsconfig.build.json && cp src/.npmignore dist/ && chmod +x dist/cli-run.js"
+    "make-ruru-html": "node --experimental-strip-types scripts/make-ruru-html.mts",
+    "prepack": "rm -Rf dist static tsconfig.tsbuildinfo tsconfig.build.tsbuildinfo && yarn webpack --mode=${BUILD_MODE:-production} && tsc -b tsconfig.build.json && cp src/.npmignore dist/ && chmod +x dist/cli-run.js && yarn make-ruru-html"
   },
   "repository": {
     "type": "git",
@@ -68,9 +73,9 @@
     }
   },
   "files": [
+    "ruru.html",
     "dist",
-    "bundle",
-    "index.js"
+    "static"
   ],
   "devDependencies": {
     "@types/http-proxy": "^1.17.16",
@@ -79,12 +84,13 @@
     "css-loader": "^7.1.2",
     "file-loader": "^6.2.0",
     "graphql": "16.1.0-experimental-stream-defer.6",
+    "mini-css-extract-plugin": "^2.9.2",
     "ruru-components": "workspace:^",
     "style-loader": "^4.0.0",
     "svg-inline-loader": "^0.8.2",
     "ts-loader": "^9.5.2",
     "typescript": "^5.8.3",
-    "webpack": "^5.99.9",
+    "webpack": "^5.100.1",
     "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^6.0.1"
   }

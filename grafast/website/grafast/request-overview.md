@@ -37,7 +37,7 @@ possible - for example "variable $foo is a list" is preferred over "variable
 $foo
 is the list [1,2,3]" - to maximize reuse.
 
-When an operation is seen a future time, <grafast/> looks for an existing
+When an operation is seen a future time, <Grafast/> looks for an existing
 operation plan whose constraints fit the request. If there is one then this
 operation plan can be executed, otherwise a new operation plan is created (see
 previous paragraph).
