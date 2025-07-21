@@ -74,11 +74,7 @@ const baseElements = html`
                 <div class="graphiql-toolbar"></div>
               </section>
               <div class="graphiql-editor-tools">
-                <button
-                  type="button"
-                  class="graphiql-un-styled active"
-                  disabled
-                >
+                <button type="button" class="graphiql-un-styled" disabled>
                   &nbsp;
                 </button>
               </div>
