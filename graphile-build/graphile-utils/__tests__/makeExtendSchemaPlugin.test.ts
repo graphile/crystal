@@ -419,3 +419,229 @@ it("supports arbitrary sql queries, does not dedup unrelated queries", async () 
     },
   });
 });
+
+it("scope", async () => {
+  const scopes: Record<string, any> = Object.create(null);
+  const preset: GraphileConfig.Preset = {
+    extends: [PostGraphileAmberPreset],
+    plugins: [
+      {
+        name: "TestPlugin",
+        schema: {
+          hooks: {
+            GraphQLObjectType(config, build, context) {
+              if (config.name === "Object") {
+                scopes[config.name] = context.scope;
+              }
+              return config;
+            },
+            GraphQLObjectType_fields_field(config, build, context) {
+              if (context.Self.name === "Object") {
+                scopes[`${context.Self.name}.${context.scope.fieldName}`] =
+                  context.scope;
+              }
+              return config;
+            },
+            GraphQLInterfaceType(config, build, context) {
+              if (config.name === "Interface") {
+                scopes[config.name] = context.scope;
+              }
+              return config;
+            },
+            GraphQLInterfaceType_fields_field(config, build, context) {
+              if (context.Self.name === "Interface") {
+                scopes[`${context.Self.name}.${context.scope.fieldName}`] =
+                  context.scope;
+              }
+              return config;
+            },
+            GraphQLUnionType(config, build, context) {
+              if (config.name === "Union") {
+                scopes[config.name] = context.scope;
+              }
+              return config;
+            },
+            GraphQLInputObjectType(config, build, context) {
+              if (config.name === "InputObject") {
+                scopes[config.name] = context.scope;
+              }
+              return config;
+            },
+            GraphQLInputObjectType_fields_field(config, build, context) {
+              if (context.Self.name === "InputObject") {
+                scopes[`${context.Self.name}.${context.scope.fieldName}`] =
+                  context.scope;
+              }
+              return config;
+            },
+            GraphQLEnumType(config, build, context) {
+              if (config.name === "Enum") {
+                scopes[config.name] = context.scope;
+              }
+              return config;
+            },
+            GraphQLEnumType_values_value(config, build, context) {
+              if (context.Self.name === "Enum") {
+                scopes[`${context.Self.name}.${context.scope.valueName}`] =
+                  context.scope;
+              }
+              return config;
+            },
+            GraphQLScalarType(config, build, context) {
+              if (config.name === "Scalar") {
+                scopes[config.name] = context.scope;
+              }
+              return config;
+            },
+          },
+        },
+      },
+      extendSchema(() => {
+        return {
+          typeDefs: gql`
+            extend type Query {
+              object: Object
+              interface: Interface
+              union: Union
+              inputObject(inputObject: InputObject): Int
+              enum: Enum
+              scalar: Scalar
+            }
+            type Object {
+              field: Int
+            }
+            interface Interface {
+              field: Int
+            }
+            union Union = Object
+            input InputObject {
+              field: Int
+            }
+            enum Enum {
+              VALUE
+            }
+            scalar Scalar
+          `,
+          objects: {
+            Object: {
+              scope: {
+                test1: 1,
+              } as any,
+              plans: {
+                field: {
+                  scope: {
+                    test2: 2,
+                  } as any,
+                },
+              },
+            },
+          },
+          interfaces: {
+            Interface: {
+              scope: {
+                test3: 3,
+              } as any,
+              fields: {
+                field: {
+                  scope: {
+                    test4: 4,
+                  } as any,
+                },
+              },
+            },
+          },
+          unions: {
+            Union: {
+              scope: {
+                test5: 5,
+              } as any,
+            },
+          },
+          inputObjects: {
+            InputObject: {
+              scope: {
+                test6: 6,
+              } as any,
+              plans: {
+                field: {
+                  scope: {
+                    test7: 7,
+                  } as any,
+                },
+              },
+            },
+          },
+          enums: {
+            Enum: {
+              scope: {
+                test8: 8,
+              } as any,
+              values: {
+                VALUE: {
+                  scope: {
+                    test9: 9,
+                  } as any,
+                },
+              },
+            },
+          },
+          scalars: {
+            Scalar: {
+              scope: {
+                test10: 10,
+              } as any,
+            },
+          },
+        };
+      }),
+    ],
+    pgServices: [
+      makePgService({
+        pool: pgPool!,
+        schemas: ["graphile_utils"],
+      }),
+    ],
+  };
+  await makeSchema(preset);
+  expect(scopes).toMatchObject({
+    Object: {
+      test1: 1,
+    },
+    "Object.field": {
+      test1: 1,
+      test2: 2,
+    },
+    Interface: {
+      test3: 3,
+    },
+    "Interface.field": {
+      test3: 3,
+      test4: 4,
+    },
+    Union: {
+      test5: 5,
+    },
+    InputObject: {
+      test6: 6,
+    },
+    "InputObject.field": {
+      test6: 6,
+      test7: 7,
+    },
+    Enum: {
+      test8: 8,
+    },
+
+    // TODO: can't support this until the minimum version of GraphQL.js
+    // includes https://github.com/graphql/graphql-js/pull/4122
+    //
+    // "Enum.VALUE": {
+    //   test8: 8,
+    //   test9: 9,
+    // },
+
+    Scalar: {
+      test10: 10,
+    },
+  });
+});
