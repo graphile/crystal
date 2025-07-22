@@ -8,7 +8,6 @@ import type {
 } from "../interfaces.js";
 import type { Step } from "../step.js";
 import { UnbatchedStep } from "../step.js";
-import { arrayOfLength } from "../utils.js";
 import { access } from "./access.js";
 import { constant, ConstantStep } from "./constant.js";
 import { each } from "./each.js";
@@ -59,37 +58,40 @@ export interface PaginationParams<TCursorValue = string> {
   limit: number | null;
 
   /**
-   * Skip this many rows; only provided if `paginationSupport.offset` is `true`.
+   * Skip this many rows. Always null unless `paginationSupport.offset` is `true`.
    *
    * If `after` is set, the offset applies after the `after`.
    */
-  offset?: number | null;
+  offset: number | null;
 
   /**
    * A cursor representing the "exclusive lower bound" for the results -
-   * skip over anything up to and including this cursor. Only provided if
+   * skip over anything up to and including this cursor. Always `null` unless
    * `paginationSupport.cursor` is `true`.
    *
-   * Note: if `reverse` is set, this applies after the collection has been
+   * Note: if `reverse` is `true`, this applies after the collection has been
    * reversed (i.e. if `reverse` is true then `after` is equivalent to the
    * `before` argument exposed through GraphQL.
    */
-  after?: TCursorValue | null;
+  after: TCursorValue | null;
 
   /**
    * If we're paginating backwards then the collection should be reversed
-   * before applying the limit, offset and after. Only provided if
+   * before applying the limit, offset and after. Always `false` unless
    * `paginationSupport.cursor` is `true`.
    */
-  reverse?: boolean;
+  reverse: boolean;
 }
 
 /**
  * Describes what a plan may implement for ConnectionStep to be able to
  * utilise it in the most optimal way.
  *
- * Every part of this is optional, but:
+ * Implementing this is optional, but:
  *
+ * - `connectionClone` must be implemented if you want to support any
+ *   pagination optimization, to save us from mutating a step that we don't
+ *   "own"
  * - `paginationSupport` should be set (even an empty object) if your data
  *   source supports setting a limit
  * - `paginationSupport.reverse` should be implemented if you plan to support
@@ -103,26 +105,39 @@ export interface PaginationParams<TCursorValue = string> {
  * @param TNodeStep - A derivative of TItemStep that represents the _node_ itself. Defaults to TItemStep.
  * @param TCursorValue - If your step wants us to parse the cursor for you, the result of the parse. Useful for throwing an error before the fetch if the cursor is invalid.
  */
-export interface ConnectionCapableStep<
+export interface ConnectionOptimizedStep<
   TItemStep extends Step = Step,
   TNodeStep extends Step = TItemStep,
   TCursorValue = string,
 > extends Step {
   /**
+   * Clone the plan, ignoring the pagination parameters.
+   *
+   * Required if we're to apply conditions to the step (via `applyPagination`)
+   * otherwise we're manipulating a potentially unrelated step.
+   *
+   * Useful for implementing things like `totalCount` or aggregates.
+   */
+  connectionClone(
+    $connection: ConnectionStep<TItemStep, TNodeStep, TCursorValue, any>,
+    ...args: any[]
+  ): ConnectionOptimizedStep<TItemStep, TNodeStep, TCursorValue>; // TODO: `this`
+
+  /**
    * If set, we assume that you support at least `limit` pagination, even on an
    * empty object.
    *
-   * Must not be set without also implementing `applyPagination`.
+   * Must not be set without also implementing `applyPagination` and `connectionClone`.
    */
-  paginationSupport?: PaginationFeatures;
+  paginationSupport: PaginationFeatures;
 
   /**
    * Receives the pagination parameters that were declared to be supported by
    * `paginationSupport`.
    *
-   * Must not be implemented without also adding `paginationSupport`.
+   * Must not be implemented without also adding `paginationSupport` and `connectionClone`.
    */
-  applyPagination?($params: Step<PaginationParams<TCursorValue>>): void;
+  applyPagination($params: Step<PaginationParams<TCursorValue>>): void;
 
   /**
    * Optionally implement this and we will parse the cursor for you before
@@ -149,23 +164,26 @@ export interface ConnectionCapableStep<
    * use instead.
    */
   nodeForItem?($item: TItemStep): TNodeStep;
-
-  /**
-   * Clone the plan, ignoring the pagination parameters.
-   *
-   * Useful for implementing things like `totalCount` or aggregates.
-   */
-  connectionClone?(
-    $connection: ConnectionStep<TItemStep, TNodeStep, TCursorValue, any>,
-    ...args: any[]
-  ): ConnectionCapableStep<TItemStep, TNodeStep, TCursorValue>; // TODO: `this`
 }
 
 const EMPTY_OBJECT = Object.freeze(Object.create(null));
 
 interface ConnectionResult {
+  pageInfo: {
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
   items: ReadonlyArray<unknown>;
 }
+
+type ConnectionCapableStep<
+  TItemStep extends Step,
+  TNodeStep extends Step = TItemStep,
+  TCursorValue = string,
+> =
+  | ConnectionOptimizedStep<TItemStep, TNodeStep, TCursorValue>
+  | StepWithItems
+  | Step<readonly any[]>;
 
 /**
  * Handles GraphQL cursor pagination in a standard and consistent way
@@ -187,7 +205,8 @@ export class ConnectionStep<
   };
   isSyncAndSafe = true;
 
-  private collectionDepId: number;
+  private collectionRefId: number;
+  private collectionDepId: number | null = null;
 
   // Pagination stuff
   private _firstDepId: number | null = null;
@@ -196,17 +215,73 @@ export class ConnectionStep<
   private _beforeDepId: number | null | undefined = undefined;
   private _afterDepId: number | null | undefined = undefined;
 
+  /** If `null` we **must not** mess with this.getSubplan() */
   private collectionPaginationSupport: PaginationFeatures | null;
 
-  // TYPES: if subplan is `ConnectionCapableStep<EdgeCapableStep<any>>` then `nodePlan`/`cursorPlan` aren't needed; otherwise `cursorPlan` is required.
+  /** If the user asks for details of `hasNextPage`/`hasPreviousPage`, then fetch one extra */
+  private fetchOneExtra = false;
+  private needsCursor = false;
+
   constructor(subplan: TCollectionStep) {
     super();
-    this.collectionDepId = this.addDependency(subplan);
-    this.collectionPaginationSupport = subplan.paginationSupport ?? null;
+    const refId = this.addRef(subplan);
+    if (!refId) {
+      throw new Error(`${this} couldn't depend on ${subplan}`);
+    }
+    this.collectionRefId = refId;
+    if (
+      "paginationSupport" in subplan &&
+      "connectionClone" in subplan &&
+      "applyPagination" in subplan
+    ) {
+      this.collectionPaginationSupport = subplan.paginationSupport;
+    } else {
+      this.collectionPaginationSupport = null;
+    }
+  }
+
+  public getSubplan(): TCollectionStep {
+    return this.getRef(this.collectionRefId) as TCollectionStep;
+  }
+
+  private _getSubplan() {
+    return this.getSubplan() as TCollectionStep &
+      Partial<ConnectionOptimizedStep<TItemStep, TNodeStep, TCursorValue>>;
+  }
+
+  /**
+   * This represents a single page from the collection - not only have
+   * conditions and ordering been applied but we've also applied the pagination
+   * constraints (before, after, first, last, offset). It's useful for
+   * returning the actual edges and nodes of the connection.
+   *
+   * This cannot be called before the arguments have been finalized.
+   */
+  private setupSubplanWithPagination() {
+    if (this.collectionDepId != null) {
+      return this.getDepOptions(this.collectionDepId).step as TCollectionStep &
+        Partial<ConnectionOptimizedStep<TItemStep, TNodeStep, TCursorValue>>;
+    }
+    const subplan = this._getSubplan();
+    if (this.collectionPaginationSupport) {
+      // Clone it so we can mess with it
+      const $clone = subplan.connectionClone!(this);
+      this.collectionDepId = this.addDependency($clone);
+      return $clone;
+    } else {
+      // It's pure, don't change it!
+      this.collectionDepId = this.addDependency(subplan);
+      return subplan as TCollectionStep &
+        Partial<ConnectionOptimizedStep<TItemStep, TNodeStep, TCursorValue>>;
+    }
   }
 
   public toStringMeta(): string {
-    return String(this.getDepOptions(this.collectionDepId).step.id);
+    return String(this.getRef(this.collectionRefId)?.id);
+  }
+
+  public setNeedsNextPage() {
+    this.fetchOneExtra = true;
   }
 
   public getFirst(): Step<number | null | undefined> | null {
@@ -262,7 +337,7 @@ export class ConnectionStep<
       throw new Error(`${this}->setBefore already called`);
     }
     const $parsedBeforePlan =
-      this.getSubplan().parseCursor?.($beforePlan) ?? $beforePlan;
+      this._getSubplan().parseCursor?.($beforePlan) ?? $beforePlan;
     this._beforeDepId = this.addUnaryDependency({
       step: $parsedBeforePlan,
       nonUnaryMessage: () =>
@@ -280,16 +355,12 @@ export class ConnectionStep<
       throw new Error(`${this}->setAfter already called`);
     }
     const $parsedAfterPlan =
-      this.getSubplan().parseCursor?.($afterPlan) ?? $afterPlan;
+      this._getSubplan().parseCursor?.($afterPlan) ?? $afterPlan;
     this._afterDepId = this.addUnaryDependency({
       step: $parsedAfterPlan,
       nonUnaryMessage: () =>
         `${this}.setAfter(...) must be passed a _unary_ step, but ${$parsedAfterPlan} (and presumably ${$afterPlan}) is not unary. See: https://err.red/gud#connection`,
     });
-  }
-
-  public getSubplan(): TCollectionStep {
-    return this.getDepOptions(this.collectionDepId).step as TCollectionStep;
   }
 
   /**
@@ -303,14 +374,22 @@ export class ConnectionStep<
    * This cannot be called before the arguments have been finalized.
    */
   public cloneSubplanWithoutPagination(
-    ...args: ParametersExceptFirst<TCollectionStep["connectionClone"]>
+    ...args: ParametersExceptFirst<
+      TCollectionStep extends ConnectionOptimizedStep<
+        TItemStep,
+        TNodeStep,
+        TCursorValue
+      >
+        ? TCollectionStep["connectionClone"]
+        : never
+    >
   ): TCollectionStep {
     if (!this.isArgumentsFinalized) {
       throw new Error(
         "Forbidden to call ConnectionStep.nodes before arguments finalize",
       );
     }
-    const plan = this.getSubplan();
+    const plan = this._getSubplan();
     if (typeof plan.connectionClone !== "function") {
       throw new Error(`${plan} does not support cloning the subplan`);
     }
@@ -318,28 +397,15 @@ export class ConnectionStep<
     return clonedPlan;
   }
 
-  /**
-   * This represents a single page from the collection - not only have
-   * conditions and ordering been applied but we've also applied the pagination
-   * constraints (before, after, first, last, offset). It's useful for
-   * returning the actual edges and nodes of the connection.
-   *
-   * This cannot be called before the arguments have been finalized.
-   */
-  public cloneSubplanWithPagination(
-    // TYPES: ugh. The `|[]` shouldn't be needed.
-    ...args: ParametersExceptFirst<TCollectionStep["connectionClone"]> | []
-  ): TCollectionStep {
-    const clonedPlan = this.cloneSubplanWithoutPagination(...(args as any));
-    if (typeof clonedPlan.applyPagination === "function") {
-      clonedPlan.applyPagination(this.paginationParams());
+  private paginationParams() {
+    if (!this.collectionPaginationSupport) {
+      throw new Error(
+        `Subplan must support pagination optimization to call this method`,
+      );
     }
-    return clonedPlan;
-  }
-
-  public paginationParams() {
-    const step = this.getSubplan();
-    return new ConnectionParamsStep(step.paginationSupport, {
+    return new ConnectionParamsStep<TCursorValue>({
+      paginationSupport: this.collectionPaginationSupport,
+      fetchOneExtra: this.fetchOneExtra,
       before: this.getBefore(),
       after: this.getAfter(),
       first: this.getFirst(),
@@ -373,7 +439,7 @@ export class ConnectionStep<
   }
 
   public nodePlan = ($rawItem: Step<unknown>, _$index: Step<number>) => {
-    const subplan = this.getSubplan();
+    const subplan = this.setupSubplanWithPagination();
     const $item = subplan.listItem?.($rawItem) ?? ($rawItem as TItemStep);
     if (typeof subplan.nodeForItem === "function") {
       return subplan.nodeForItem($item);
@@ -383,23 +449,26 @@ export class ConnectionStep<
   };
 
   public edgePlan = ($rawItem: Step<unknown>, $index: Step<number>) => {
-    const subplan = this.getSubplan();
+    const subplan = this.setupSubplanWithPagination();
     const $item = subplan.listItem?.($rawItem) ?? ($rawItem as TItemStep);
     return new EdgeStep<TItemStep, TNodeStep>(this, $item, $index);
   };
 
   public edges(): Step {
+    this.setupSubplanWithPagination();
     const $items = access(this, "items");
     return each($items, this.edgePlan);
   }
 
   public nodes() {
+    this.setupSubplanWithPagination();
     const $items = access(this, "items");
     return each($items, this.nodePlan);
   }
 
-  cursorPlan($item: TItemStep, $index: Step<number>) {
-    const subplan = this.getSubplan();
+  public cursorPlan($item: TItemStep, $index: Step<number>) {
+    this.needsCursor = true;
+    const subplan = this._getSubplan();
     if (typeof subplan.cursorForItem === "function") {
       return subplan.cursorForItem($item);
     } else {
@@ -412,6 +481,11 @@ export class ConnectionStep<
   }
 
   public optimize() {
+    if (this.collectionPaginationSupport && this.collectionDepId != null) {
+      const $clone = this.getDepOptions(this.collectionDepId)
+        .step as TCollectionStep & ConnectionOptimizedStep;
+      $clone.applyPagination(this.paginationParams());
+    }
     /*
      * **IMPORTANT**: no matter the arguments, we cannot optimize ourself away
      * by replacing ourself with a constant because otherwise errors in
@@ -419,12 +493,20 @@ export class ConnectionStep<
      */
     return this;
   }
+  deduplicatedWith(replacement: ConnectionStep<any, any, any, any>) {
+    if (this.needsCursor) {
+      replacement.needsCursor = true;
+    }
+    if (this.fetchOneExtra) {
+      replacement.fetchOneExtra = true;
+    }
+  }
 
   public execute({
     count,
     values,
     indexMap,
-  }: ExecutionDetails): GrafastResultsList<ConnectionResult> {
+  }: ExecutionDetails): GrafastResultsList<ConnectionResult | null> {
     const collectionDep = values[this.collectionDepId];
     const first =
       this._firstDepId != null ? values[this._firstDepId].unaryValue() : null;
@@ -517,18 +599,30 @@ export class ConnectionStep<
       if (list != null) {
         // Now we need to apply our pagination stuff to it
         let items = list as ReadonlyArray<unknown>;
+        let hasNext = false;
         let sliced = false;
         const diy = !isForwardPagination && !alreadyReversed;
         if (diy) {
           sliced = true;
           items = [...items].reverse();
         }
-        if (sliceStart > 0 || limit != null) {
+        if (sliceStart > 0) {
           sliced = true;
-          items = items.slice(
-            sliceStart,
-            limit != null ? sliceStart + limit : items.length,
-          );
+          items = items.slice(sliceStart);
+        }
+        if (limit != null) {
+          if (this.fetchOneExtra) {
+            hasNext = limitFromEnd != null ? false : items.length >= limit;
+            if (hasNext) {
+              sliced = true;
+              items = items.slice(0, limit - 1);
+            }
+          } else {
+            if (limit < items.length) {
+              sliced = true;
+              items = items.slice(0, limit);
+            }
+          }
         }
         if (limitFromEnd != null && limitFromEnd < items.length) {
           sliced = true;
@@ -538,10 +632,13 @@ export class ConnectionStep<
           items = (sliced ? (items as Array<unknown>) : [...items]).reverse();
         }
 
+        const hasNextPage = isForwardPagination ? hasNext : false;
+        const hasPreviousPage = isForwardPagination ? false : hasNext;
+
         return {
+          // TODO: we should probably pass some info through so PageInfo can be extended
+          // collectionMeta: collectionValue === list ? null : collectionValue,
           pageInfo: {
-            startCursor,
-            endCursor,
             hasNextPage,
             hasPreviousPage,
           },
@@ -558,39 +655,18 @@ export class ConnectionStep<
   }
 }
 
-export interface EdgeCapableStep<TNodeStep extends Step> extends Step {
-  node(): TNodeStep;
-  cursor(): Step<string | null>;
-}
-
-export function assertEdgeCapableStep<TNodeStep extends Step>(
-  $step: Step | EdgeCapableStep<TNodeStep>,
-): asserts $step is EdgeCapableStep<TNodeStep> {
-  const $typed = $step as Step & {
-    node?: any;
-    cursor?: any;
-  };
-  if (
-    typeof $typed.node !== "function" ||
-    typeof $typed.cursor !== "function"
-  ) {
-    throw new Error(`Expected a EdgeCapableStep, but found '${$step}'`);
-  }
-}
-
-export class EdgeStep<TItemStep extends Step, TNodeStep extends Step = Step>
-  extends UnbatchedStep
-  implements EdgeCapableStep<TNodeStep>
-{
+export class EdgeStep<
+  TItemStep extends Step,
+  TNodeStep extends Step = Step,
+> extends UnbatchedStep {
   static $$export = {
     moduleName: "grafast",
     exportName: "EdgeStep",
   };
   isSyncAndSafe = true;
 
-  private readonly cursorDepId: number | null;
+  private readonly cursorDepId: number | null = null;
   private connectionRefId: number | null;
-  private needCursor = false;
 
   constructor(
     $connection: ConnectionStep<TItemStep, TNodeStep, any, any>,
@@ -654,57 +730,33 @@ export class EdgeStep<TItemStep extends Step, TNodeStep extends Step = Step>
   }
 
   cursor(): Step<string | null> {
-    this.needCursor = true;
-    const $connection = this.getRef(this.connectionRefId);
-    if (!($connection instanceof ConnectionStep)) {
-      throw new Error(`Expected ${$connection} to be a ConnectionStep.`);
-    }
-    const $cursor = $connection.cursorPlan($item);
-    this.cursorDepId = this.addDependency($cursor);
-    assert.strictEqual(
-      this.cursorDepId,
-      1,
-      "GrafastInternalError<46e4b5ca-0c11-4737-973d-0edd0be060c9>: cursor must be second dependency",
-    );
-
-    return this.getDep(this.cursorDepId!);
+    const $connection = this.getConnectionStep();
+    const $item = this.getItemStep();
+    const $index = this.getIndexStep();
+    return $connection.cursorPlan($item, $index);
   }
 
-  optimize() {
-    if (!this.needCursor && this.cursorDepId !== null) {
-      return new EdgeStep(this.getConnectionStep(), this.getItemStep(), true);
-    }
-    return this;
-  }
-
-  deduplicate(
-    _peers: EdgeStep<any, any, any, any>[],
-  ): EdgeStep<TItemStep, TCursorStep, TStep, TNodeStep>[] {
+  deduplicate(_peers: EdgeStep<any, any>[]): EdgeStep<TItemStep, TNodeStep>[] {
     return _peers;
   }
 
-  deduplicatedWith(replacement: EdgeStep<any, any, any, any>) {
-    if (this.needCursor) {
-      replacement.needCursor = true;
-    }
-  }
-
-  unbatchedExecute(
-    _extra: UnbatchedExecutionExtra,
-    record: any,
-    cursor: any,
-  ): any {
+  unbatchedExecute(_extra: UnbatchedExecutionExtra, record: any): any {
     // Handle nulls; everything else comes from the child plans
-    return record == null && (this.cursorDepId == null || cursor == null)
-      ? null
-      : EMPTY_OBJECT;
+    return record == null ? null : EMPTY_OBJECT;
   }
 }
 
-let warned = false;
+const warned = false;
 
 interface ConnectionParams {
   fieldArgs?: FieldArgs;
+
+  /** @internal */
+  nodePlan?: never;
+  /** @internal */
+  edgeDataPlan?: never;
+  /** @internal */
+  cursorPlan?: never;
 }
 
 /**
@@ -713,35 +765,33 @@ interface ConnectionParams {
  */
 export function connection<
   TItemStep extends Step,
-  TCursorStep extends Step,
-  TStep extends ConnectionCapableStep<TItemStep, TCursorStep>,
-  TEdgeDataStep extends Step = TItemStep,
-  TNodeStep extends Step = Step,
+  TNodeStep extends Step = TItemStep,
+  TCursorValue = string,
+  TCollectionStep extends ConnectionOptimizedStep<
+    TItemStep,
+    TNodeStep,
+    TCursorValue
+  > = ConnectionOptimizedStep<TItemStep, TNodeStep, TCursorValue>,
 >(
-  step: TStep,
-  params?: ConnectionParams<TItemStep, TEdgeDataStep, TNodeStep>,
-): ConnectionStep<TItemStep, TCursorStep, TStep, TEdgeDataStep, TNodeStep> {
-  if (typeof params === "function") {
-    if (!warned) {
-      warned = true;
-      console.warn(
-        `The call signature for connection() has changed, arguments after the first argument should be specified via a config object`,
-      );
-    }
-    return connection(step, {
-      // eslint-disable-next-line prefer-rest-params
-      nodePlan: arguments[1] as any,
-      // eslint-disable-next-line prefer-rest-params
-      cursorPlan: arguments[2] as any,
-    });
+  step: TCollectionStep,
+  params?: ConnectionParams,
+): ConnectionStep<TItemStep, TNodeStep, TCursorValue, TCollectionStep> {
+  if (
+    typeof params === "function" ||
+    params?.nodePlan ||
+    params?.edgeDataPlan ||
+    params?.cursorPlan
+  ) {
+    throw new Error(
+      `connection() was completely overhauled during the beta; this usage is no longer supported. Usage is much more straightforward now.`,
+    );
   }
   const $connection = new ConnectionStep<
     TItemStep,
-    TCursorStep,
-    TStep,
-    TEdgeDataStep,
-    TNodeStep
-  >(step, params);
+    TNodeStep,
+    TCursorValue,
+    TCollectionStep
+  >(step);
   const fieldArgs = params?.fieldArgs;
   if (fieldArgs) {
     const { $first, $last, $before, $after, $offset } = fieldArgs;
@@ -755,13 +805,15 @@ export function connection<
   return $connection;
 }
 
-export type ItemsStep<
-  T extends Step<readonly any[]> | ConnectionCapableStep<any, any>,
-> = T extends ConnectionCapableStep<any, any> ? ReturnType<T["items"]> : T;
+interface StepWithItems<TItem = any> extends Step {
+  items(): Step<ReadonlyArray<TItem>>;
+}
+export type ItemsStep<T extends StepWithItems | Step<readonly any[]>> =
+  T extends StepWithItems ? ReturnType<T["items"]> : T;
 
-export function itemsOrStep<
-  T extends Step<readonly any[]> | ConnectionCapableStep<any, any>,
->($step: T): Step<readonly any[]> {
+export function itemsOrStep<T extends Step<readonly any[]> | StepWithItems>(
+  $step: T,
+): Step<readonly any[]> {
   return "items" in $step && typeof $step.items === "function"
     ? $step.items()
     : $step;
@@ -776,4 +828,81 @@ function decodeNumericCursor(cursor: string): number {
     throw new Error(`Invalid cursor`);
   }
   return i;
+}
+
+export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
+  PaginationParams<TCursorValue>
+> {
+  static $$export = {
+    moduleName: "grafast",
+    exportName: "ConnectionParamsStep",
+  };
+  private paginationSupport: PaginationFeatures;
+  private fetchOneExtra: boolean;
+  // Pagination stuff
+  private firstDepId: number | null;
+  private lastDepId: number | null;
+  private offsetDepId: number | null;
+  private beforeDepId: number | null;
+  private afterDepId: number | null;
+  constructor(options: {
+    paginationSupport: PaginationFeatures;
+    fetchOneExtra: boolean;
+    first: Step<Maybe<number>> | null;
+    last: Step<Maybe<number>> | null;
+    offset: Step<Maybe<number>> | null;
+    before: Step<Maybe<TCursorValue>> | null;
+    after: Step<Maybe<TCursorValue>> | null;
+  }) {
+    super();
+    const {
+      paginationSupport,
+      fetchOneExtra,
+      first,
+      last,
+      offset,
+      before,
+      after,
+    } = options;
+    this.paginationSupport = paginationSupport;
+    this.fetchOneExtra = fetchOneExtra;
+    this.firstDepId = this.addUnaryDependency(first ?? constant(null));
+    this.lastDepId = this.addUnaryDependency(last ?? constant(null));
+    this.offsetDepId = this.addUnaryDependency(offset ?? constant(null));
+    this.beforeDepId = this.addUnaryDependency(before ?? constant(null));
+    this.afterDepId = this.addUnaryDependency(after ?? constant(null));
+    assert.strictEqual(this.firstDepId, 0, "first must be dep 0");
+    assert.strictEqual(this.lastDepId, 1, "last must be dep 1");
+    assert.strictEqual(this.offsetDepId, 2, "offset must be dep 2");
+    assert.strictEqual(this.beforeDepId, 3, "before must be dep 3");
+    assert.strictEqual(this.afterDepId, 4, "after must be dep 4");
+  }
+  unbatchedExecute(
+    extra: UnbatchedExecutionExtra,
+    gqlFirst: Maybe<number>,
+    gqlLast: Maybe<number>,
+    gqlOffset: Maybe<number>,
+    gqlBefore: Maybe<string>,
+    gqlAfter: Maybe<string>,
+  ): PaginationParams<TCursorValue> {
+    const {
+      paginationSupport: {
+        reverse: supportsReverse,
+        offset: supportsOffset,
+        cursor: supportCursor,
+      },
+      fetchOneExtra,
+    } = this;
+    const limit = null;
+    const offset = null;
+    const after = null;
+    const reverse = false;
+    // TODO: implement logic
+    return {
+      limit,
+      offset,
+      after,
+      reverse,
+    };
+  }
 }
