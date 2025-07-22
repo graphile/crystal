@@ -52,6 +52,7 @@ export function each<
     itemPlan: ItemsStep<TListStep> extends ListCapableStep<any, any>
       ? ReturnType<ItemsStep<TListStep>["listItem"]>
       : Step<TListStep extends Step<Maybe<ReadonlyArray<infer U>>> ? U : any>,
+    $index: Step<number>,
   ) => TResultItemStep,
 ): __ListTransformStep<any, any, any, any> {
   return listTransform<any, any, any, any>({

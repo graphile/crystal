@@ -1394,3 +1394,16 @@ export function directiveArgument<T>(
         )
       : undefined;
 }
+export function stableStringSort(a: string, z: string) {
+  return a < z ? -1 : a > z ? 1 : 0;
+}
+/**
+ * Sorts tuples by a string sort of their first entry - useful for
+ * `Object.fromEntries(Object.entries(...).sort(stableStringSortFirstTupleEntry))`
+ */
+export function stableStringSortFirstTupleEntry(
+  a: readonly [string, ...any[]],
+  z: readonly [string, ...any[]],
+) {
+  return a[0] < z[0] ? -1 : a[0] > z[0] ? 1 : 0;
+}
