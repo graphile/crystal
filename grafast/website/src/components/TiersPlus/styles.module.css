@@ -1,19 +1,20 @@
 .tiers {
   display: flex;
   width: 100%;
-  flex-direction: row;
+  flex-direction: column;
 }
 
 .tierRow {
   justify-content: center;
   gap: 2rem;
   display: flex;
+  flex-direction: column;
 }
 
 .tier {
   display: flex;
   flex-direction: column;
-  flex: 0 0 30%;
+  flex: 0 0 75%;
   justify-content: flex-start;
   align-items: flex-start;
   font-weight: normal;
@@ -30,6 +31,20 @@
 
 .tier:nth-child(2) {
   border: 3px solid var(--grafast-color-pink);
+}
+
+.banner {
+  display: flex;
+  width: 100%;
+  flex: 0 0 33%;
+  justify-content: space-between;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
 }
 
 .title {
@@ -62,10 +77,24 @@
   font-weight: bold;
 }
 
+.was {
+  color: var(--ifm-color-gray-400);
+  text-decoration: line-through;
+}
+
+[data-theme="dark"] .was {
+  color: var(--ifm-color-gray-700);
+}
+
+.description {
+  font-size: 1rem;
+  padding: 0.5rem 0 0.5rem 0;
+}
+
 .button {
   composes: comicFont from "@site/src/css/common.module.css";
   width: 100%;
-  margin: 1rem 0 1rem 0;
+  margin: 0 0 1rem 0;
 }
 
 .tier .button {
@@ -93,31 +122,55 @@
   border-color: var(--grafast-color-pink);
 }
 
-.tier:nth-child(2) .button:hover {
-  background-color: var(--ifm-color-primary-darkest);
-  border-color: var(--ifm-color-primary-darkest);
+.borderbutton {
+  composes: button;
 }
 
-[data-theme="dark"] .tier:nth-child(2) .button:hover {
+.tier:nth-child(n) .borderbutton {
+  background-color: transparent;
+  border: 1px solid var(--grafast-color-purple);
+  color: var(--grafast-color-purple);
+}
+
+.tier:nth-child(n) .borderbutton:hover {
+  border: 1px solid var(--grafast-color-pink);
+  color: var(--grafast-color-pink);
+}
+
+[data-theme="dark"] .tier:nth-child(n) .borderbutton {
+  border: 1px solid var(--grafast-color-pink);
+  color: var(--grafast-color-pink);
+}
+
+[data-theme="dark"] .tier:nth-child(n) .borderbutton:hover {
   border: 1px solid var(--ifm-color-primary-lightest);
-  background-color: var(--ifm-color-primary-lightest);
+  color: var(--ifm-color-primary-lightest);
+  background-color: transparent;
 }
 
 .button:before {
   content: "Join on GitHub Sponsors";
 }
 
+.borderbutton:before {
+  content: "Contact for bespoke service";
+}
+
 @media screen and (max-width: 1200px) {
   .tierRow {
     flex-direction: column;
-    gap: 0.5rem;
   }
   .tier {
-    flex: 0 0 auto;
     font-size: 1rem;
     margin: 0;
   }
+  .banner {
+    flex-direction: column;
+  }
   .button:before {
     content: "GitHub Sponsors";
+  }
+  .borderbutton:before {
+    content: "Contact";
   }
 }

@@ -8,29 +8,25 @@
 .borderbutton {
   composes: comicFont from from "@site/src/css/common.module.css";
   font-size: 1.5rem;
-  color: var(--ifm-color-primary);
+  color: var(--grafast-color-pink);
   max-width: 100%;
   margin-left: 1rem;
-  border: 1px solid var(--ifm-color-primary);
+  border: 1px solid var(--grafast-color-pink);
   border-radius: 7px;
 }
 
 .borderbutton:hover {
   border-radius: 7px;
-  border: 1px solid var(--ifm-color-primary-darkest);
-  color: var(--ifm-color-primary-darkest);
-}
-
-[data-theme="dark"] .borderbutton {
-  border: 1px solid var(--grafast-color-pink);
-  color: var(--grafast-color-pink);
+  border: 1px solid var(--grafast-color-purple);
+  color: var(--grafast-color-purple);
 }
 
 .sponsorbutton {
   composes: comicFont from from "@site/src/css/common.module.css";
   font-size: 1.5rem;
   max-width: 100%;
-  border: 1px solid var(--ifm-color-primary);
+  border: 1px solid var(--grafast-color-purple);
+  background-color: var(--grafast-color-purple);
   border-radius: 7px;
 }
 
@@ -54,14 +50,13 @@
 }
 
 [data-theme="dark"] .sponsorbutton:hover {
-  border: 1px solid var(--ifm-color-primary-lightest);
+  border: 1px solid var(--ifm-color-primary-dark);
   background-color: var(--ifm-color-primary-dark);
-  color: white;
 }
 
 [data-theme="dark"] .borderbutton:hover {
   border: 1px solid var(--ifm-color-primary-lightest);
-  color: var(--ifm-color-lightest);
+  color: var(--ifm-color-primary-lightest);
 }
 
 @media screen and (max-width: 995px) {

@@ -11,6 +11,7 @@ import SponsorButtons from "@site/src/components/SponsorButtons";
 import Link from "@docusaurus/Link";
 import styles from "@site/src/css/common.module.css";
 import TierList from "@site/src/components/Tiers";
+import TierPlusList from "@site/src/components/TiersPlus";
 
 {
 
@@ -126,8 +127,21 @@ users then benefit from.
 As well as ensuring the sustainability and longevity of PostGraphile and the
 wider Graphile suite of developer tooling, sponsorship also gives you or your
 company some benefits. Choose the tier which matches your funding goal, higher
-tiers come with more benefits. It is recommended Enterprises join at the private
-advisor tier, which comes with a Development Support contract and includes access
-to a discounted consultancy rate.
+tiers come with more benefits.
 
 <TierList />
+
+{
+
+<div className={styles.mainSectionInstructionContainer}>
+  <div className={styles.instructionSponsor}>
+    Development Support &amp; Consultancy Offers
+  </div>
+</div>
+}
+
+Graphile offer enhanced packages for enterprise-level support and consultancy,
+as well as development support. These are available through the GitHub Sponsor
+platform or bespoke invoicing.
+
+<TierPlusList />

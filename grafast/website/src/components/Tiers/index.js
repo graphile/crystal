@@ -9,13 +9,15 @@ const TierList = [
     tagline: "Thank you!",
     pricing: "$25",
     link: "https://github.com/sponsors/benjie/sponsorships?tier_id=369",
-    buttonText: "Join on GitHub Sponsors",
+    buttonText: "",
     description: (
       <>
         <ul>
-          <li>Your name on the Sponsors page of graphile.org</li>
           <li>
-            Your name among those randomly featured in the <Grafast /> CLI
+            Your name on the{" "}
+            <Link to="https://graphile.org/sponsor">
+              Graphile Sponsors page
+            </Link>
           </li>
           <li>Post job opportunities to our Discord community</li>
           <li>
@@ -34,7 +36,7 @@ const TierList = [
     tagline: "Support sustainability",
     pricing: "$100",
     link: "https://github.com/sponsors/benjie/sponsorships?tier_id=368",
-    buttonText: "Join on GitHub Sponsors",
+    buttonText: "",
     description: (
       <>
         <ul>
@@ -43,18 +45,18 @@ const TierList = [
             Access to <strong>private security announcements</strong>
           </li>
           <li>
-            Free access to <strong>@graphile/pro</strong>
+            Access to{" "}
+            <Link to="https://github.com/graphile-pro">
+              <strong>graphile-pro</strong>
+            </Link>
           </li>
           <li>
             Your name and <strong>avatar/logo</strong> featured on our websites
           </li>
           <li>
-            Your name <strong>more frequently featured</strong> in the{" "}
-            <Grafast /> CLI
-          </li>
-          <li>
             The warm feeling that comes from knowing you’re making a difference
-            to PostGraphile’s development and sustainability
+            to <Grafast />
+            ’s development and sustainability
           </li>
         </ul>
       </>
@@ -65,7 +67,7 @@ const TierList = [
     tagline: "Get featured in the project",
     pricing: "$500",
     link: "https://github.com/sponsors/benjie/sponsorships?tier_id=367",
-    buttonText: "Join on GitHub Sponsors",
+    buttonText: "",
     description: (
       <>
         <ul>
@@ -82,17 +84,19 @@ const TierList = [
             our websites
           </li>
           <li>
-            Your name <strong>even more frequently featured</strong> in the{" "}
-            <Grafast /> CLI
+            Access to <strong>#vip-lounge</strong> on Discord
           </li>
           <li>
-            Access to <strong>#vip-lounge</strong> on Discord
+            Free access to{" "}
+            <strong>
+              <Link to="https://pgrita.com">pgRITA</Link>
+            </strong>
           </li>
           <li>
             The warm feeling that comes from knowing{" "}
             <strong>
-              you’re making a significant difference to PostGraphile’s
-              development and sustainability
+              you’re making a significant difference to <Grafast />
+              ’s development and sustainability
             </strong>
           </li>
         </ul>
@@ -123,8 +127,8 @@ function Tier({ title, tagline, link, buttonText, description, pricing }) {
 
 export default function List() {
   return (
-    <section className={clsx("padding-vert--lg")}>
-      <div className={clsx("", styles.tiers)}>
+    <section className="padding-vert--lg">
+      <div className={styles.tiers}>
         <div className={clsx(styles.tierRow)}>
           {TierList.map((props, idx) => (
             <Tier key={idx} {...props} />
