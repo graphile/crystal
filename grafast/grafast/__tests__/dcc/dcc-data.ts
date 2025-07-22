@@ -764,3 +764,38 @@ export const batchGetLootBoxById: LoadOneCallback<
 > = (ids, { unary: data }) => {
   return ids.map((id) => data.lootBoxes.find((c) => c.id === id));
 };
+
+export const batchGetFriendIdsByCrawlerId: LoadManyCallback<
+  number,
+  number,
+  Maybe<ReadonlyArray<Maybe<number>>>,
+  { first?: number; last?: number; before?: string; after?: string },
+  Database
+> = (
+  ids,
+  { unary: data, params: { first, last, before: rawBefore, after: rawAfter } },
+) => {
+  // NOTE: if you were using an actual database or service, you would do this much more efficiently!
+  return ids.map((id) => {
+    const crawler = data.crawlers.find((c) => c.id === id);
+    if (!crawler) return null;
+    const friendIds = crawler.friends;
+    if (!friendIds) return null;
+
+    // Apply pagination, a la https://relay.dev/graphql/connections.htm#EdgesToReturn()
+    let edges = friendIds;
+    const before = rawBefore != null ? parseInt(rawBefore, 10) : null;
+    const after = rawAfter != null ? parseInt(rawAfter, 10) : null;
+    if (after != null) edges = edges.filter((e) => e <= after);
+    if (before != null) edges = edges.filter((e) => e >= before);
+    if (first != null) {
+      if (first < 0) throw new Error(`Invalid 'first'`);
+      if (edges.length > first) edges = edges.slice(0, first);
+    }
+    if (last != null) {
+      if (last < 0) throw new Error(`Invalid 'last'`);
+      if (edges.length > last) edges = edges.slice(edges.length - last);
+    }
+    return edges;
+  });
+};

@@ -9,6 +9,7 @@ import type {
 } from "../../dist/index.js";
 import {
   coalesce,
+  connection,
   constant,
   context,
   each,
@@ -32,6 +33,7 @@ import {
   batchGetConsumableById,
   batchGetCrawlerById,
   batchGetEquipmentById,
+  batchGetFriendIdsByCrawlerId,
   batchGetLocationsByFloorNumber,
   batchGetLootBoxById,
   batchGetLootDataByItemTypeAndId,
@@ -150,8 +152,29 @@ export const makeBaseArgs = () => {
         items(first: Int): [Item]
         favouriteItem: Item
         friends(first: Int): [Character]
+        friendsConnection(
+          first: Int
+          last: Int
+          before: String
+          after: String
+        ): CharacterConnection
         bestFriend: ActiveCrawler
         crawlerNumber: Int
+      }
+      type CharacterConnection {
+        edges: [CharacterEdge]
+        nodes: [Character]
+        pageInfo: PageInfo!
+      }
+      type CharacterEdge {
+        node: Character
+        cursor: String!
+      }
+      type PageInfo {
+        hasNextPage: Boolean!
+        hasPreviousPage: Boolean!
+        startCursor: String
+        endCursor: String
       }
       interface Item {
         id: Int!
@@ -322,8 +345,33 @@ export const makeBaseArgs = () => {
             return loadOne($id, $db, null, batchGetCrawlerById);
           },
           friends($activeCrawler, { $first }) {
-            const $ids = get($activeCrawler, "friends");
-            return lambda([$ids, $first], applyLimit);
+            const $crawlerId = get($activeCrawler, "id");
+            const $ids = loadMany($crawlerId, batchGetFriendIdsByCrawlerId);
+            // Apply our limit by passing a param to our loader
+            $ids.setParam("first", $first);
+            return $ids;
+          },
+          friendsConnection($activeCrawler, fieldArgs) {
+            const $crawlerId = get($activeCrawler, "id");
+            const $ids = loadMany($crawlerId, batchGetFriendIdsByCrawlerId);
+            return connection($ids, {
+              fieldArgs,
+              // The cursor, edge and node are all just the resulting id
+              cursorPlan: ($id) => $id,
+              edgeDataPlan: ($id) => $id,
+              nodePlan: ($id) => $id,
+            });
+            /*
+             * Passing `fieldArgs` above saves us from doing this:
+             * ```ts
+             * const $connection = connection($ids);
+             * $connection.setFirst($first);
+             * $connection.setLast($last);
+             * $connection.setBefore($before);
+             * $connection.setAfter($after);
+             * return $connection;
+             * ```
+             */
           },
           items($crawler, { $first }) {
             const $items = get($crawler, "items");
