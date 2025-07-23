@@ -1,3 +1,5 @@
+// Run with:
+// yarn jscodeshift -t ./shifts/loadArguments.ts */*/src --extensions=ts --parser=ts
 import { API, FileInfo, JSCodeshift } from "jscodeshift";
 
 /**
@@ -43,6 +45,7 @@ export default function transformer(file: FileInfo, api: API) {
     return j.objectExpression(props);
   }
 
+  let changed = false;
   root
     .find(j.CallExpression, {
       callee: {
@@ -56,9 +59,14 @@ export default function transformer(file: FileInfo, api: API) {
 
       const options = buildOptions(args);
       if (!options) return;
+      changed = true;
 
       path.node.arguments = [options];
     });
+
+  if (!changed) {
+    return file.source;
+  }
 
   return root.toSource({ quote: "single" });
 }
