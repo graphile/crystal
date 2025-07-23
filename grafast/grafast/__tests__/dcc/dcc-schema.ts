@@ -354,19 +354,25 @@ export const makeBaseArgs = () => {
           },
           friends($activeCrawler, { $first }) {
             const $crawlerId = get($activeCrawler, "id");
+            const $db = context().get("dccDb");
             const $ids = loadMany({
               lookup: $crawlerId,
               load: batchGetFriendIdsByCrawlerId,
+              unary: $db,
+              paginationSupport: {},
             });
             // Apply our limit by passing a param to our loader
-            $ids.setParam("first", $first);
+            $ids.setParam("limit", $first);
             return $ids;
           },
           friendsConnection($activeCrawler, fieldArgs) {
             const $crawlerId = get($activeCrawler, "id");
+            const $db = context().get("dccDb");
             const $ids = loadMany({
               lookup: $crawlerId,
               load: batchGetFriendIdsByCrawlerId,
+              unary: $db,
+              paginationSupport: {},
             });
             return connection($ids, {
               fieldArgs,
