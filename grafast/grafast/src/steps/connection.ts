@@ -8,7 +8,7 @@ import type {
   Maybe,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
-import { Step , UnbatchedStep } from "../step.js";
+import { Step, UnbatchedStep } from "../step.js";
 import { access } from "./access.js";
 import { constant, ConstantStep } from "./constant.js";
 import { each } from "./each.js";
@@ -631,7 +631,7 @@ export class ConnectionStep<
             // Already applied offset
           } else {
             const afterIndex = decodeNumericCursor(after as string);
-            sliceStart = afterIndex;
+            sliceStart = afterIndex + 1;
           }
         }
       }
@@ -1034,9 +1034,9 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
           // Collection doesn't support cursors; we must be using numeric cursors
           const afterIndex = decodeNumericCursor(after as string);
           if (supportsOffset) {
-            params.offset = (params.offset ?? 0) + afterIndex;
+            params.offset = (params.offset ?? 0) + afterIndex + 1;
           } else {
-            params.__skipOver += afterIndex;
+            params.__skipOver += afterIndex + 1;
           }
         }
       }
