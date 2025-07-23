@@ -205,7 +205,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                       // here because doing so will mark the row as unique, and
                       // then the ordering logic (and thus cursor) will differ.
                       const $single = $select.row(first($select));
-                      return new EdgeStep($connection, $single);
+                      return new EdgeStep($connection, $single, constant(0));
                     },
                   [
                     EdgeStep,
