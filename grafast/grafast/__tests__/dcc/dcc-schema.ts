@@ -154,9 +154,10 @@ export const makeBaseArgs = () => {
         friends(first: Int): [Character]
         friendsConnection(
           first: Int
+          after: String
+          offset: Int
           last: Int
           before: String
-          after: String
         ): CharacterConnection
         bestFriend: ActiveCrawler
         crawlerNumber: Int
