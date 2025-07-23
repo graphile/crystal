@@ -34,6 +34,7 @@ import type {
   ExecutionResults,
   GrafastResultsList,
   JSONValue,
+  Maybe,
   PromiseOrDirect,
   StepOptimizeOptions,
   StepOptions,
@@ -792,7 +793,6 @@ ${printDeps(step, 1)}
   public toRecord?(): Step;
   public toSpecifier?(): Step;
   public toTypename?(): Step<string>;
-  public cursor?(): Step;
   // public itemPlan?($item: Step): Step;
 }
 
@@ -974,18 +974,19 @@ export function isListLikeStep<TData extends [...Step[]] = [...Step[]]>(
 export interface ListCapableStep<
   TOutputData,
   TItemStep extends Step<TOutputData> = Step<TOutputData>,
-> extends Step<ReadonlyArray<any>> {
-  listItem(itemPlan: __ItemStep<this>): TItemStep;
+  TInputData = any,
+> extends Step<Maybe<ReadonlyArray<TInputData>>> {
+  listItem(itemPlan: __ItemStep<TInputData>): TItemStep;
 }
 
 export function isListCapableStep<TData, TItemStep extends Step<TData>>(
-  plan: Step<ReadonlyArray<TData>>,
+  plan: Step<Maybe<ReadonlyArray<TData>>>,
 ): plan is ListCapableStep<TData, TItemStep> {
   return "listItem" in plan && typeof (plan as any).listItem === "function";
 }
 
 export function assertListCapableStep<TData, TItemStep extends Step<TData>>(
-  plan: Step<ReadonlyArray<TData>>,
+  plan: Step<Maybe<ReadonlyArray<TData>>>,
   pathDescription: string,
 ): asserts plan is ListCapableStep<TData, TItemStep> {
   if (!isListCapableStep(plan)) {

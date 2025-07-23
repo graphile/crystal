@@ -1,7 +1,7 @@
 import { createHash } from "crypto";
 import debugFactory from "debug";
 import type {
-  ConnectionCapableStep,
+  ConnectionOptimizedStep,
   ConnectionStep,
   ExecutionDetails,
   GrafastResultsList,
@@ -68,6 +68,7 @@ import type {
 } from "./pgCondition.js";
 import { PgCondition } from "./pgCondition.js";
 import type { PgCursorDetails } from "./pgCursor.js";
+import { PgCursorStep } from "./pgCursor.js";
 import type { PgPageInfoStep } from "./pgPageInfo.js";
 import { pgPageInfo } from "./pgPageInfo.js";
 import type { PgSelectSinglePlanOptions } from "./pgSelectSingle.js";
@@ -364,9 +365,11 @@ export class PgSelectStep<
   >
   extends PgStmtBaseStep<PgSelectStepResult>
   implements
-    ConnectionCapableStep<
+    ConnectionOptimizedStep<
+      any,
       PgSelectSingleStep<TResource>,
-      PgSelectParsedCursorStep
+      PgSelectSingleStep<TResource>,
+      null | string[]
     >,
     /**
      * @internal PgSelectStep might not always implement PgSelectQueryBuilder;
@@ -894,7 +897,7 @@ export class PgSelectStep<
   }
 
   connectionClone(
-    $connection: ConnectionStep<any, any, any, any>,
+    $connection: ConnectionStep<any, any, any, any, any>,
     mode?: PgSelectMode,
   ): PgSelectStep<TResource> {
     const $plan = this.clone(mode);
@@ -1015,9 +1018,23 @@ export class PgSelectStep<
     return pgPageInfo($connectionPlan);
   }
 
-  public getCursorDetails(): Step<PgCursorDetails> {
+  private getCursorDetails(): Step<PgCursorDetails> {
     this.needsCursor = true;
     return access(this, "cursorDetails");
+  }
+
+  /**
+   * When selecting a connection we need to be able to get the cursor. The
+   * cursor is built from the values of the `ORDER BY` clause so that we can
+   * find nodes before/after it.
+   */
+  public cursorPlan(
+    $row: PgSelectSingleStep<TResource>,
+  ): PgCursorStep<PgSelectSingleStep<TResource>> {
+    return new PgCursorStep<PgSelectSingleStep<TResource>>(
+      $row,
+      this.getCursorDetails(),
+    );
   }
 
   private needsGroups = false;

@@ -1,9 +1,8 @@
 import { createHash } from "crypto";
 import type {
   __InputStaticLeafStep,
-  ConnectionCapableStep,
+  ConnectionOptimizedStep,
   ConnectionStep,
-  EdgeCapableStep,
   ExecutionDetails,
   GrafastResultsList,
   GrafastValuesList,
@@ -186,7 +185,7 @@ export interface PgUnionAllStepOrder<TAttributes extends string> {
   direction: "ASC" | "DESC";
 }
 
-export class PgUnionAllSingleStep extends Step implements EdgeCapableStep<any> {
+export class PgUnionAllSingleStep extends Step {
   static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "PgUnionAllSingleStep",
@@ -226,26 +225,13 @@ export class PgUnionAllSingleStep extends Step implements EdgeCapableStep<any> {
     );
   }
 
-  toTypename() {
+  toTypename(): Step<string> {
     if (this.typeKey === null) {
       throw new Error(
         `${this} not polymorphic because parent isn't in normal mode`,
       );
     }
     return access(this, this.typeKey) as Step<string>;
-  }
-
-  /**
-   * When selecting a connection we need to be able to get the cursor. The
-   * cursor is built from the values of the `ORDER BY` clause so that we can
-   * find nodes before/after it.
-   */
-  public cursor(): PgCursorStep<this> {
-    const cursorPlan = new PgCursorStep<this>(
-      this,
-      this.getClassStep().getCursorDetails(),
-    );
-    return cursorPlan;
   }
 
   public getClassStep(): PgUnionAllStep<string, string> {
@@ -260,10 +246,6 @@ export class PgUnionAllSingleStep extends Step implements EdgeCapableStep<any> {
 
   public getMeta(key: string) {
     return this.getClassStep().getMeta(key);
-  }
-
-  public node() {
-    return this;
   }
 
   public scopedSQL = makeScopedSQL(this);
@@ -438,7 +420,12 @@ export class PgUnionAllStep<
   >
   extends PgStmtBaseStep<PgUnionAllStepResult>
   implements
-    ConnectionCapableStep<PgSelectSingleStep<any>, PgSelectParsedCursorStep>
+    ConnectionOptimizedStep<
+      any,
+      PgSelectSingleStep<any>,
+      PgSelectSingleStep<any>,
+      null | any[]
+    >
 {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -954,9 +941,18 @@ on (${sql.indent(
     return this;
   }
 
-  public getCursorDetails(): Step<PgCursorDetails> {
+  private getCursorDetails(): Step<PgCursorDetails> {
     this.needsCursor = true;
     return access(this, "cursorDetails");
+  }
+
+  public cursorPlan(
+    $item: PgUnionAllSingleStep,
+  ): PgCursorStep<PgUnionAllSingleStep> {
+    return new PgCursorStep<PgUnionAllSingleStep>(
+      $item,
+      this.getCursorDetails(),
+    );
   }
 
   private typeIdx: number | null = null;

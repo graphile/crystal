@@ -13,14 +13,11 @@ export {
 export { access, AccessStep } from "./access.js";
 export { coalesce, CoalesceStep } from "./coalesce.js";
 export {
-  assertEdgeCapableStep,
-  assertPageInfoCapableStep,
   connection,
-  ConnectionCapableStep,
+  ConnectionOptimizedStep,
   ConnectionStep,
-  EdgeCapableStep,
   EdgeStep,
-  PageInfoCapableStep,
+  StepRepresentingList,
 } from "./connection.js";
 export { constant, ConstantStep } from "./constant.js";
 export { each } from "./each.js";

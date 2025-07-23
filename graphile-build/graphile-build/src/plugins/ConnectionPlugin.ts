@@ -1,11 +1,7 @@
 import "graphile-config";
 
-import type { EdgeCapableStep } from "grafast";
-import {
-  assertEdgeCapableStep,
-  assertPageInfoCapableStep,
-  ConnectionStep,
-} from "grafast";
+import type { EdgeCapableStep, Step } from "grafast";
+import { ConnectionStep } from "grafast";
 
 import { EXPORTABLE } from "../utils.js";
 import { version } from "../version.js";
@@ -48,7 +44,10 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
   schema: {
     hooks: {
       build(build) {
-        const { nullableIf } = build;
+        const {
+          nullableIf,
+          grafast: { get },
+        } = build;
         return build.extend(
           build,
           {
@@ -101,7 +100,6 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
                   isConnectionEdgeType: true,
                 },
                 () => ({
-                  assertStep: assertEdgeCapableStep,
                   description: build.wrapDescription(
                     `A \`${typeName}\` edge in the connection.`,
                     "type",
@@ -125,9 +123,8 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
                           ),
                           type: Cursor,
                           plan: EXPORTABLE(
-                            () => ($edge: EdgeCapableStep<any>) =>
-                              $edge.cursor(),
-                            [],
+                            (get) => ($edge: Step) => get($edge, "cursor"),
+                            [get],
                           ),
                         }),
                       ),
@@ -142,8 +139,8 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
                           ),
                           type: nullableIf(!nonNullNode, NodeType),
                           plan: EXPORTABLE(
-                            () => ($edge: EdgeCapableStep<any>) => $edge.node(),
-                            [],
+                            (get) => ($edge: Step) => get($edge, "node"),
+                            [get],
                           ),
                         }),
                       ),
@@ -242,7 +239,6 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
             inflection.builtin("PageInfo"),
             { isPageInfo: true },
             () => ({
-              assertStep: assertPageInfoCapableStep,
               description: build.wrapDescription(
                 "Information about pagination in a connection.",
                 "type",
@@ -259,13 +255,6 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
                       "field",
                     ),
                     type: new GraphQLNonNull(GraphQLBoolean),
-                    plan: EXPORTABLE(
-                      () =>
-                        function plan($pageInfo) {
-                          return $pageInfo.hasNextPage() as any;
-                        },
-                      [],
-                    ),
                   }),
                 ),
                 hasPreviousPage: fieldWithHooks(
@@ -279,13 +268,6 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
                       "field",
                     ),
                     type: new GraphQLNonNull(GraphQLBoolean),
-                    plan: EXPORTABLE(
-                      () =>
-                        function plan($pageInfo) {
-                          return $pageInfo.hasPreviousPage() as any;
-                        },
-                      [],
-                    ),
                   }),
                 ),
               }),
