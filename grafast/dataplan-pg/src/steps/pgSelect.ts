@@ -894,14 +894,8 @@ export class PgSelectStep<
     return PgSelectStep.clone(this, mode);
   }
 
-  connectionClone(
-    $connection: ConnectionStep<any, any, any, any, any>,
-    mode?: PgSelectMode,
-  ): PgSelectStep<TResource> {
-    const $plan = this.clone(mode);
-    // In case any errors are raised
-    $plan.connectionDepId = $plan.addStrongDependency($connection);
-    return $plan;
+  connectionClone(mode?: PgSelectMode): PgSelectStep<TResource> {
+    return this.clone(mode);
   }
 
   where(

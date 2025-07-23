@@ -689,13 +689,9 @@ on (${sql.indent(
   }
 
   connectionClone(
-    $connection: ConnectionStep<any, any, any, any, any>,
     mode?: PgUnionAllMode,
   ): PgUnionAllStep<TAttributes, TTypeNames> {
-    const $plan = PgUnionAllStep.clone(this, mode);
-    // In case any errors are raised
-    $plan.connectionDepId = $plan.addDependency($connection);
-    return $plan;
+    return PgUnionAllStep.clone(this, mode);
   }
 
   select<TAttribute extends TAttributes>(key: TAttribute): number {

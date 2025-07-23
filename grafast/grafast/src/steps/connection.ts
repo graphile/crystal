@@ -15,10 +15,6 @@ import { first } from "./first.js";
 import { lambda } from "./lambda.js";
 import { last } from "./last.js";
 
-type ParametersExceptFirst<F> = F extends (arg0: any, ...rest: infer R) => any
-  ? R
-  : never[];
-
 /**
  * Indicates which features are supported for pagination; support for `limit`
  * is assumed even in the case of an empty object. Features unsupported can be
@@ -151,7 +147,6 @@ export interface ConnectionOptimizedStep<
    * Useful for implementing things like `totalCount` or aggregates.
    */
   connectionClone(
-    $connection: ConnectionStep<TItem, TItemStep, TNodeStep, TCursorValue, any>,
     ...args: any[]
   ): ConnectionOptimizedStep<TItem, TItemStep, TNodeStep, TCursorValue>; // TODO: `this`
 
@@ -273,7 +268,7 @@ export class ConnectionStep<
     ) {
       this.collectionPaginationSupport = subplan.paginationSupport;
       // Clone it so we can mess with it
-      const $clone = subplan.connectionClone!(this);
+      const $clone = subplan.connectionClone();
       this.collectionDepId = this.addDependency($clone);
     } else {
       this.collectionPaginationSupport = null;
@@ -408,7 +403,7 @@ export class ConnectionStep<
    * This cannot be called before the arguments have been finalized.
    */
   public cloneSubplanWithoutPagination(
-    ...args: ParametersExceptFirst<
+    ...args: Parameters<
       TCollectionStep extends ConnectionOptimizedStep<
         TItem,
         TItemStep,
