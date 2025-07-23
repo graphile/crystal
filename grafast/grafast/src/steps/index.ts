@@ -85,15 +85,21 @@ export { applyTransforms, ApplyTransformsStep } from "./applyTransforms.js";
 export { bakedInput, bakedInputRuntime, BakedInputStep } from "./bakedInput.js";
 export { condition, ConditionStep } from "./condition.js";
 export { graphqlResolver, GraphQLResolverStep } from "./graphqlResolver.js";
+export { LoadedRecordStep } from "./loadedRecord.js";
 export {
-  LoadedRecordStep,
   loadMany,
+  LoadManyArguments,
   LoadManyCallback,
   loadManyCallback,
+  LoadManyInfo,
+  LoadManyStep,
+} from "./loadMany.js";
+export {
   loadOne,
+  LoadOneArguments,
   LoadOneCallback,
   loadOneCallback,
-  LoadOptions,
-  LoadStep,
-} from "./load.js";
+  LoadOneInfo,
+  LoadOneStep,
+} from "./loadOne.js";
 export { proxy, ProxyStep } from "./proxy.js";
