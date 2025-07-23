@@ -318,7 +318,7 @@ export const makeBaseArgs = () => {
             return loadOne({
               lookup: $id,
               load: batchGetCrawlerById,
-              unary: $db
+              unary: $db,
             });
           },
           character(_, { $id }) {
@@ -349,14 +349,14 @@ export const makeBaseArgs = () => {
             return loadOne({
               lookup: $id,
               load: batchGetCrawlerById,
-              unary: $db
+              unary: $db,
             });
           },
           friends($activeCrawler, { $first }) {
             const $crawlerId = get($activeCrawler, "id");
             const $ids = loadMany({
               lookup: $crawlerId,
-              load: batchGetFriendIdsByCrawlerId
+              load: batchGetFriendIdsByCrawlerId,
             });
             // Apply our limit by passing a param to our loader
             $ids.setParam("first", $first);
@@ -366,14 +366,10 @@ export const makeBaseArgs = () => {
             const $crawlerId = get($activeCrawler, "id");
             const $ids = loadMany({
               lookup: $crawlerId,
-              load: batchGetFriendIdsByCrawlerId
+              load: batchGetFriendIdsByCrawlerId,
             });
             return connection($ids, {
               fieldArgs,
-              // The cursor, edge and node are all just the resulting id
-              cursorPlan: ($id) => $id,
-              edgeDataPlan: ($id) => $id,
-              nodePlan: ($id) => $id,
             });
             /*
              * Passing `fieldArgs` above saves us from doing this:
@@ -402,7 +398,7 @@ export const makeBaseArgs = () => {
             return loadOne({
               lookup: $id,
               load: batchGetCrawlerById,
-              unary: $db
+              unary: $db,
             });
           },
           items($npc, { $first }) {
@@ -422,7 +418,7 @@ export const makeBaseArgs = () => {
               return loadOne({
                 lookup: $id,
                 load: batchGetCrawlerById,
-                unary: $db
+                unary: $db,
               });
             });
           },
@@ -489,7 +485,7 @@ export const makeBaseArgs = () => {
             return loadMany({
               lookup: $number,
               load: batchGetLocationsByFloorNumber,
-              unary: $db
+              unary: $db,
             });
           },
         },
@@ -509,7 +505,7 @@ export const makeBaseArgs = () => {
               return loadOne({
                 lookup: $id,
                 load: batchGetNpcById,
-                unary: $db
+                unary: $db,
               });
             });
           },
@@ -530,7 +526,7 @@ export const makeBaseArgs = () => {
               loadMany({
                 lookup: $id,
                 load: batchGetLootDataByLootBoxId,
-                unary: $db
+                unary: $db,
               }),
             );
             return each($lootData, ($lootDatum) => {
@@ -564,7 +560,7 @@ export const makeBaseArgs = () => {
             loadOne({
               lookup: $crawlerId,
               load: batchGetCrawlerById,
-              unary: $db
+              unary: $db,
             }),
           );
           const $crawlerTypename = lambda($crawler, crawlerToTypeName);
@@ -574,7 +570,7 @@ export const makeBaseArgs = () => {
             loadOne({
               lookup: $npcId,
               load: batchGetNpcById,
-              unary: $db
+              unary: $db,
             }),
           );
           const $npcTypename = lambda($npc, npcToTypeName);
@@ -603,7 +599,7 @@ export const makeBaseArgs = () => {
             loadOne({
               lookup: $npcId,
               load: batchGetNpcById,
-              unary: $db
+              unary: $db,
             }),
           );
           const $__typename = lambda(inhibitOnNull($npc), npcToTypeName);
@@ -631,7 +627,7 @@ export const makeBaseArgs = () => {
                 const $saferoom = loadOne({
                   lookup: $id,
                   load: batchGetSafeRoomById,
-                  unary: $db
+                  unary: $db,
                 });
                 return delegate(
                   $saferoom,
@@ -643,7 +639,7 @@ export const makeBaseArgs = () => {
                 const $club = loadOne({
                   lookup: $id,
                   load: batchGetClubById,
-                  unary: $db
+                  unary: $db,
                 });
                 return delegate(
                   $club,
@@ -655,7 +651,7 @@ export const makeBaseArgs = () => {
                 const $stairwell = loadOne({
                   lookup: $id,
                   load: batchGetStairwellById,
-                  unary: $db
+                  unary: $db,
                 });
                 return delegate(
                   $stairwell,
@@ -691,7 +687,7 @@ function lootBoxesForItem($type: Step<string>, $id: Step<number>) {
     loadMany({
       lookup: [$type, $id],
       load: batchGetLootDataByItemTypeAndId,
-      unary: $db
+      unary: $db,
     }),
   );
   return each($lootData, ($lootDatum) => {
@@ -700,7 +696,7 @@ function lootBoxesForItem($type: Step<string>, $id: Step<number>) {
     return loadOne({
       lookup: get($lootDatum, "lootBoxId"),
       load: batchGetLootBoxById,
-      unary: $db
+      unary: $db,
     });
   });
 }
@@ -749,28 +745,28 @@ const ItemResolver = {
           return loadOne({
             lookup: $id,
             load: batchGetEquipmentById,
-            unary: $db
+            unary: $db,
           });
         }
         if (t.name === "Consumable") {
           return loadOne({
             lookup: $id,
             load: batchGetConsumableById,
-            unary: $db
+            unary: $db,
           });
         }
         if (t.name === "UtilityItem") {
           return loadOne({
             lookup: $id,
             load: batchGetUtilityItemById,
-            unary: $db
+            unary: $db,
           });
         }
         if (t.name === "MiscItem") {
           return loadOne({
             lookup: $id,
             load: batchGetMiscItemById,
-            unary: $db
+            unary: $db,
           });
         }
         return null;
@@ -785,7 +781,7 @@ function getCreator($source: Step<{ creator?: number }>) {
   return loadOne({
     lookup: $id,
     load: batchGetCrawlerById,
-    unary: $db
+    unary: $db,
   });
 }
 
