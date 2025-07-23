@@ -1,5 +1,10 @@
-import type { __ItemStep, Deferred, ExecutionDetails } from "../index.js";
-import { defer } from "../index.js";
+import { defer } from "../deferred.js";
+import type {
+  __ItemStep,
+  ConnectionOptimizedStep,
+  Deferred,
+  ExecutionDetails,
+} from "../index.js";
 import type {
   GrafastResultsList,
   Maybe,
@@ -14,8 +19,10 @@ import {
   canonicalJSONStringify,
   isTuple,
   recordsMatch,
+  stableStringSortFirstTupleEntry,
 } from "../utils.js";
 import { access } from "./access.js";
+import { constant } from "./constant.js";
 
 const nextTick: (cb: () => void) => void =
   typeof process !== "undefined" && typeof process.nextTick === "function"
@@ -129,7 +136,9 @@ export class LoadedRecordStep<
   isSyncAndSafe = true;
 
   attributes = new Set<keyof TItem>();
-  params: Partial<TParams> = Object.create(null);
+  paramDepIdByKey: {
+    [TKey in keyof TParams]: number;
+  } = Object.create(null);
   constructor(
     $data: Step<TData>,
     private isSingle: boolean,
@@ -160,14 +169,16 @@ export class LoadedRecordStep<
   }
   setParam<TParamKey extends keyof TParams>(
     paramKey: TParamKey,
-    value: TParams[TParamKey],
+    value: TParams[TParamKey] | Step<TParams[TParamKey]>,
   ): void {
     if (!this.isSingle) {
       throw new Error(
         "setParam should not be called on list items - call it on the collection (`loadMany()` step)",
       );
     }
-    this.params[paramKey] = value;
+    this.paramDepIdByKey[paramKey] = this.addUnaryDependency(
+      value instanceof Step ? value : constant(value),
+    );
   }
   deduplicate(peers: LoadedRecordStep<any, any>[]) {
     return peers.filter(
@@ -175,7 +186,7 @@ export class LoadedRecordStep<
         p.isSingle === this.isSingle &&
         p.sourceDescription === this.sourceDescription &&
         recordsMatch(p.ioEquivalence, this.ioEquivalence) &&
-        recordsMatch(p.params, this.params),
+        recordsMatch(p.paramDepIdByKey, this.paramDepIdByKey),
     );
   }
   public deduplicatedWith(replacement: LoadedRecordStep<any, any>): void {
@@ -188,8 +199,8 @@ export class LoadedRecordStep<
     if ($source instanceof LoadStep) {
       // Tell our parent we only need certain attributes
       $source.addAttributes(this.attributes);
-      for (const [key, value] of Object.entries(this.params)) {
-        $source.setParam(key, value);
+      for (const [key, depId] of Object.entries(this.paramDepIdByKey)) {
+        $source.setParam(key, this.getDep(depId));
       }
     } else {
       // This should never happen
@@ -214,27 +225,37 @@ export class LoadedRecordStep<
 }
 
 export class LoadStep<
-  const TMultistep extends Multistep,
-  TItem,
-  TData extends
-    | Maybe<TItem> // loadOne
-    | Maybe<ReadonlyArray<Maybe<TItem>>>, // loadMany
-  TParams extends Record<string, any>,
-  const TUnaryMultistep extends Multistep = never,
-> extends Step<TData> {
-  /* implements ListCapableStep<TItem, LoadedRecordStep<TItem, TParams>> */
+    const TMultistep extends Multistep,
+    TItem,
+    TData extends
+      | Maybe<TItem> // loadOne
+      | Maybe<ReadonlyArray<Maybe<TItem>>>, // loadMany
+    TParams extends Record<string, any> & {
+      first?: Maybe<number>;
+      last?: Maybe<number>;
+      offset?: Maybe<number>;
+      before?: Maybe<string>;
+      after?: Maybe<string>;
+    },
+    const TUnaryMultistep extends Multistep = never,
+  >
+  extends Step<TData>
+  implements ConnectionOptimizedStep<TItem, any, any, any>
+{
   static $$export = { moduleName: "grafast", exportName: "LoadStep" };
 
   public isSyncAndSafe = false;
 
   loadOptions: Omit<
     LoadOptions<TItem, TParams, UnwrapMultistep<TUnaryMultistep>>,
-    "unary"
+    "unary" | "params"
   > | null = null;
   loadOptionsKey = "";
 
   attributes = new Set<keyof TItem>();
-  params: Partial<TParams> = Object.create(null);
+  paramDepIdByKey: {
+    [TKey in keyof TParams]: number;
+  } = Object.create(null);
   unaryDepId: number | null = null;
   constructor(
     spec: TMultistep,
@@ -313,9 +334,11 @@ export class LoadStep<
   }
   setParam<TParamKey extends keyof TParams>(
     paramKey: TParamKey,
-    value: TParams[TParamKey],
+    value: TParams[TParamKey] | Step<TParams[TParamKey]>,
   ): void {
-    this.params[paramKey] = value;
+    this.paramDepIdByKey[paramKey] = this.addUnaryDependency(
+      value instanceof Step ? value : constant(value),
+    );
   }
   addAttributes(attributes: Set<keyof TItem>): void {
     for (const attribute of attributes) {
@@ -327,7 +350,7 @@ export class LoadStep<
       (p) =>
         p.load === this.load &&
         ioEquivalenceMatches(p.ioEquivalence, this.ioEquivalence) &&
-        recordsMatch(p.params, this.params),
+        recordsMatch(p.paramDepIdByKey, this.paramDepIdByKey),
     );
   }
   public deduplicatedWith(
@@ -337,17 +360,34 @@ export class LoadStep<
       replacement.attributes.add(attr);
     }
   }
+  _paramSig?: string;
+  getParamSignature() {
+    if (!this._paramSig) {
+      // No more params allowed!
+      Object.freeze(this.paramDepIdByKey);
+      this._paramSig = JSON.stringify(
+        Object.fromEntries(
+          Object.entries(this.paramDepIdByKey)
+            .map(
+              ([key, depId]) =>
+                [key, this.getDepOptions(depId).step.id] as const,
+            )
+            .sort(stableStringSortFirstTupleEntry),
+        ),
+      );
+    }
+    return this._paramSig;
+  }
   finalize() {
     // Find all steps of this type that use the same callback and have
     // equivalent params and then match their list of attributes together.
-    const stringifiedParams = canonicalJSONStringify(this.params);
+    const paramSig = this.getParamSignature();
     const kin = this.operationPlan
       .getStepsByStepClass(LoadStep)
       .filter((step) => {
         if (step.id === this.id) return false;
         if (step.load !== this.load) return false;
-        if (canonicalJSONStringify(step.params) !== stringifiedParams)
-          return false;
+        if (step.getParamSignature() !== paramSig) return false;
         return true;
       });
     for (const otherStep of kin) {
@@ -357,10 +397,9 @@ export class LoadStep<
     }
 
     // Build the loadOptions
-    this.loadOptions = {
-      attributes: [...this.attributes].sort(),
-      params: this.params,
-    };
+    const attributes = [...this.attributes].sort();
+    this.loadOptions = { attributes };
+
     // If the canonicalJSONStringify is the same, then we deem that the options are the same
     this.loadOptionsKey = canonicalJSONStringify(this.loadOptions);
     let loadId = idByLoad.get(this.load);
@@ -374,7 +413,7 @@ export class LoadStep<
 
   execute({
     count,
-    values: [values0, values1],
+    values,
     extra,
   }: ExecutionDetails<
     [UnwrapMultistep<TMultistep>, UnwrapMultistep<TUnaryMultistep>]
@@ -386,7 +425,28 @@ export class LoadStep<
       meta.cache = cache;
     }
     const batch = new Map<UnwrapMultistep<TMultistep>, number[]>();
-    const unary = values1?.isBatch === false ? values1.value : undefined;
+    const values0 = values[0];
+    const unary =
+      this.unaryDepId != null
+        ? (values[
+            this.unaryDepId
+          ].unaryValue() as UnwrapMultistep<TUnaryMultistep>)
+        : (undefined as never);
+    const params = Object.fromEntries(
+      Object.entries(this.paramDepIdByKey).map(([key, depId]) => [
+        key,
+        values[depId].unaryValue(),
+      ]),
+    ) as Partial<TParams>;
+    const loadOptions: LoadOptions<
+      TItem,
+      TParams,
+      UnwrapMultistep<TUnaryMultistep>
+    > = {
+      ...this.loadOptions!,
+      params,
+      unary,
+    };
 
     const results: Array<PromiseOrDirect<TData>> = [];
     for (let i = 0; i < count; i++) {
@@ -421,14 +481,10 @@ export class LoadStep<
         loadBatches = [loadBatch];
         meta.loadBatchesByLoad.set(this.load, loadBatches);
         // Guaranteed by the metaKey to be equivalent for all entries sharing the same `meta`. Note equivalent is not identical; key order may change.
-        const loadOptions = this.loadOptions!;
         nextTick(() => {
           // Don't allow adding anything else to the batch
           meta.loadBatchesByLoad!.delete(this.load);
-          executeBatches(loadBatches!, this.load, {
-            ...loadOptions,
-            unary: unary as UnwrapMultistep<TUnaryMultistep>,
-          });
+          executeBatches(loadBatches!, this.load, loadOptions);
         });
       }
       return (async () => {
