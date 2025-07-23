@@ -2104,7 +2104,7 @@ export function makeExampleSchema(
     }),
   });
 
-  const MessageEdge = newObjectTypeBuilder<MessageStep>(PgSelectSingleStep)({
+  const MessageEdge = newObjectTypeBuilder<Step>(Step)({
     name: "MessageEdge",
     fields: {
       cursor: {

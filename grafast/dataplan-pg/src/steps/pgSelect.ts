@@ -1012,9 +1012,10 @@ export class PgSelectStep<
    * cursor is built from the values of the `ORDER BY` clause so that we can
    * find nodes before/after it.
    */
-  public cursorPlan(
-    $row: PgSelectSingleStep<TResource>,
+  public cursorForItem(
+    $item: Step<unknown>,
   ): PgCursorStep<PgSelectSingleStep<TResource>> {
+    const $row = this.listItem($item) as PgSelectSingleStep<TResource>;
     return new PgCursorStep<PgSelectSingleStep<TResource>>(
       $row,
       this.getCursorDetails(),
@@ -1945,7 +1946,7 @@ export class PgSelectStep<
     options?: PgSelectSinglePlanOptions,
   ): PgSelectSingleStep<TResource> {
     this.setUnique(true);
-    return new PgSelectSingleStep(this, first(this), options);
+    return new PgSelectSingleStep(this, first(access(this, "items")), options);
   }
 
   /**

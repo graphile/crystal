@@ -934,11 +934,10 @@ on (${sql.indent(
     return access(this, "cursorDetails");
   }
 
-  public cursorPlan(
-    $item: PgUnionAllSingleStep,
-  ): PgCursorStep<PgUnionAllSingleStep> {
+  public cursorForItem($item: Step): PgCursorStep<PgUnionAllSingleStep> {
+    const $row: PgUnionAllSingleStep = this.listItem($item);
     return new PgCursorStep<PgUnionAllSingleStep>(
-      $item,
+      $row,
       this.getCursorDetails(),
     );
   }
