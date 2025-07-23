@@ -29,15 +29,15 @@ export default function transformer(file: FileInfo, api: API) {
       },
     })
     .forEach((path) => {
-      const args = path.node.arguments;
+      const args = path.node.arguments.filter(
+        (arg) =>
+          arg.type !== "NullLiteral" &&
+          (arg.type !== "Identifier" || arg.name !== "undefined"),
+      );
       if (args.length < 2 || args.length > 4) return;
 
       function buildOptions() {
-        const [spec, a, b, c] = args.filter(
-          (arg) =>
-            arg.type !== "NullLiteral" &&
-            (arg.type !== "Identifier" || arg.name !== "undefined"),
-        );
+        const [spec, a, b, c] = args;
         if (spec?.type === "SpreadElement") throw new Error("Spread forbidden");
         if (a?.type === "SpreadElement") throw new Error("Spread forbidden");
         if (b?.type === "SpreadElement") throw new Error("Spread forbidden");
