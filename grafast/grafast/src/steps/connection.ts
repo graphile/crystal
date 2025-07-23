@@ -1159,6 +1159,11 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
 }
 
 class PageInfoStep extends UnbatchedStep {
+  static $$export = {
+    moduleName: "grafast",
+    exportName: "PageInfoStep",
+  };
+  public isSyncAndSafe = true;
   constructor($connection: ConnectionStep<any, any, any, any, any, any>) {
     super();
     this.addDependency($connection);
