@@ -1,5 +1,4 @@
-import { defer } from "../deferred.js";
-import type { Deferred, ExecutionDetails } from "../index.js";
+import type { ExecutionDetails } from "../index.js";
 import type {
   GrafastResultsList,
   Maybe,
@@ -11,9 +10,9 @@ import { Step } from "../step.js";
 import { canonicalJSONStringify, recordsMatch } from "../utils.js";
 import type { IOEquivalence } from "./_loadCommon.js";
 import {
+  executeLoad,
   ioEquivalenceMatches,
   makeAccessMap,
-  nextTick,
   paramSig,
 } from "./_loadCommon.js";
 import { access } from "./access.js";
@@ -22,9 +21,9 @@ import { constant } from "./constant.js";
 export interface LoadOneInfo<
   TItem,
   TParams extends Record<string, any>,
-  TUnarySpec = never,
+  TLoadContext = never,
 > {
-  unary: TUnarySpec;
+  unary: TLoadContext;
   attributes: ReadonlyArray<keyof TItem>;
   params: Partial<TParams>;
 }
@@ -59,59 +58,41 @@ export function loadOneCallback<
   return load;
 }
 
-interface LoadOneBatch {
-  deferred: Deferred<any>;
-  batchSpecs: readonly any[];
-}
-
-interface LoadOneMeta {
-  cache?: Map<any, any>;
-  loadBatchesByLoad?:
-    | Map<LoadOneCallback<any, any, any, any>, LoadOneBatch[]>
-    | undefined;
-}
-
 const idByLoad = new WeakMap<LoadOneCallback<any, any, any, any>, string>();
 let loadCounter = 0;
 
 export class LoadOneStep<
-  const TMultistep extends Multistep,
+  const TLookup extends Multistep,
   TItem,
   TData extends Maybe<TItem>,
   TParams extends Record<string, any>,
-  const TUnaryMultistep extends Multistep = never,
+  const TLoadContext extends Multistep = never,
 > extends Step<TData> {
   static $$export = { moduleName: "grafast", exportName: "LoadOneStep" };
 
   public isSyncAndSafe = false;
 
   loadInfo: Omit<
-    LoadOneInfo<TItem, TParams, UnwrapMultistep<TUnaryMultistep>>,
+    LoadOneInfo<TItem, TParams, UnwrapMultistep<TLoadContext>>,
     "unary" | "params"
   > | null = null;
-  loadOptionsKey = "";
+  loadInfoKey = "";
 
   attributes = new Set<keyof TItem>();
   paramDepIdByKey: {
     [TKey in keyof TParams]: number;
   } = Object.create(null);
   unaryDepId: number | null = null;
-  private ioEquivalence: IOEquivalence<TMultistep> | null;
+  private ioEquivalence: IOEquivalence<TLookup> | null;
   private load: LoadOneCallback<
-    UnwrapMultistep<TMultistep>,
+    UnwrapMultistep<TLookup>,
     TItem,
     TData,
     TParams,
-    UnwrapMultistep<TUnaryMultistep>
+    UnwrapMultistep<TLoadContext>
   >;
   constructor(
-    options: LoadOneArguments<
-      TMultistep,
-      TItem,
-      TData,
-      TParams,
-      TUnaryMultistep
-    >,
+    options: LoadOneArguments<TLookup, TItem, TData, TParams, TLoadContext>,
   ) {
     super();
 
@@ -197,111 +178,26 @@ export class LoadOneStep<
     this.loadInfo = { attributes };
 
     // If the canonicalJSONStringify is the same, then we deem that the options are the same
-    this.loadOptionsKey = canonicalJSONStringify(this.loadInfo);
+    this.loadInfoKey = canonicalJSONStringify(this.loadInfo);
     let loadId = idByLoad.get(this.load);
     if (!loadId) {
       loadId = String(++loadCounter);
       idByLoad.set(this.load, loadId);
     }
-    this.metaKey = `LoadOneStep|${loadId}|${this.loadOptionsKey}`;
+    this.metaKey = `LoadOneStep|${loadId}|${this.loadInfoKey}`;
     super.finalize();
   }
 
-  execute({
-    count,
-    values,
-    extra,
-  }: ExecutionDetails<
-    [UnwrapMultistep<TMultistep>, UnwrapMultistep<TUnaryMultistep>]
-  >): PromiseOrDirect<GrafastResultsList<TData>> {
-    const meta = extra.meta as LoadOneMeta;
-    let cache = meta.cache;
-    if (!cache) {
-      cache = new Map();
-      meta.cache = cache;
-    }
-    const batch = new Map<UnwrapMultistep<TMultistep>, number[]>();
-    const values0 = values[0];
-    const unary =
-      this.unaryDepId != null
-        ? (values[
-            this.unaryDepId
-          ].unaryValue() as UnwrapMultistep<TUnaryMultistep>)
-        : (undefined as never);
-    const params = Object.fromEntries(
-      Object.entries(this.paramDepIdByKey).map(([key, depId]) => [
-        key,
-        values[depId].unaryValue(),
-      ]),
-    ) as Partial<TParams>;
-    const loadInfo: LoadOneInfo<
-      TItem,
-      TParams,
-      UnwrapMultistep<TUnaryMultistep>
-    > = {
-      ...this.loadInfo!,
-      params,
-      unary,
-    };
-
-    const results: Array<PromiseOrDirect<TData>> = [];
-    for (let i = 0; i < count; i++) {
-      const spec = values0.at(i);
-      if (cache.has(spec)) {
-        results.push(cache.get(spec)!);
-      } else {
-        // We'll fill this in in a minute
-        const index = results.push(null as any) - 1;
-        const existingIdx = batch.get(spec);
-        if (existingIdx !== undefined) {
-          existingIdx.push(index);
-        } else {
-          batch.set(spec, [index]);
-        }
-      }
-    }
-    const pendingCount = batch.size;
-    if (pendingCount > 0) {
-      const deferred = defer<ReadonlyArray<TData>>();
-      const batchSpecs = [...batch.keys()];
-      const loadBatch: LoadOneBatch = { deferred, batchSpecs };
-      if (!meta.loadBatchesByLoad) {
-        meta.loadBatchesByLoad = new Map();
-      }
-      let loadBatches = meta.loadBatchesByLoad.get(this.load);
-      if (loadBatches) {
-        // Add to existing batch load
-        loadBatches.push(loadBatch);
-      } else {
-        // Create new batch load
-        loadBatches = [loadBatch];
-        meta.loadBatchesByLoad.set(this.load, loadBatches);
-        // Guaranteed by the metaKey to be equivalent for all entries sharing the same `meta`. Note equivalent is not identical; key order may change.
-        nextTick(() => {
-          // Don't allow adding anything else to the batch
-          meta.loadBatchesByLoad!.delete(this.load);
-          executeBatches(loadBatches!, this.load, loadInfo);
-        });
-      }
-      return (async () => {
-        const loadResults = await deferred;
-        for (
-          let pendingIndex = 0;
-          pendingIndex < pendingCount;
-          pendingIndex++
-        ) {
-          const spec = batchSpecs[pendingIndex];
-          const targetIndexes = batch.get(spec)!;
-          const loadResult = loadResults[pendingIndex];
-          cache.set(spec, loadResult);
-          for (const targetIndex of targetIndexes) {
-            results[targetIndex] = loadResult;
-          }
-        }
-        return results;
-      })();
-    }
-    return results;
+  execute(
+    details: ExecutionDetails,
+  ): PromiseOrDirect<GrafastResultsList<TData>> {
+    return executeLoad(
+      details,
+      this.unaryDepId,
+      this.paramDepIdByKey,
+      this.loadInfo!,
+      this.load,
+    );
   }
 
   // Things that were originally in LoadedRecordStep
@@ -323,45 +219,7 @@ export class LoadOneStep<
   }
 }
 
-async function executeBatches(
-  loadBatches: readonly LoadOneBatch[],
-  load: LoadOneCallback<any, any, any, any, any>,
-  loadInfo: LoadOneInfo<any, any, any>,
-) {
-  try {
-    const numberOfBatches = loadBatches.length;
-    if (numberOfBatches === 1) {
-      const [loadBatch] = loadBatches;
-      loadBatch.deferred.resolve(load(loadBatch.batchSpecs, loadInfo));
-      return;
-    } else {
-      // Do some tick-batching!
-      const indexStarts: number[] = [];
-      const allBatchSpecs: any[] = [];
-      for (let i = 0; i < numberOfBatches; i++) {
-        const loadBatch = loadBatches[i];
-        indexStarts[i] = allBatchSpecs.length;
-        for (const batchSpec of loadBatch.batchSpecs) {
-          allBatchSpecs.push(batchSpec);
-        }
-      }
-      const results = await load(allBatchSpecs, loadInfo);
-      for (let i = 0; i < numberOfBatches; i++) {
-        const loadBatch = loadBatches[i];
-        const start = indexStarts[i];
-        const stop = indexStarts[i + 1] ?? allBatchSpecs.length;
-        const entries = results.slice(start, stop);
-        loadBatch.deferred.resolve(entries);
-      }
-    }
-  } catch (e) {
-    for (const loadBatch of loadBatches) {
-      loadBatch.deferred.reject(e);
-    }
-  }
-}
-
-interface LoadOneArguments<
+export interface LoadOneArguments<
   TLookup extends Multistep,
   TItem,
   TData extends Maybe<TItem> = Maybe<TItem>,
