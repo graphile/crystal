@@ -190,6 +190,11 @@ export interface ConnectionOptimizedStep<
   edgeForItem?($item: Step<TItem>): TEdgeStep;
 
   /**
+   * Used as a fallback if nodeForItem isn't implemented.
+   */
+  listItem?($item: Step<TItem>): TNodeStep;
+
+  /**
    * Given the $item, return a step representing the cursor.
    *
    * Must be implemented if and only if `paginationSupport.cursor` is `true`.
@@ -512,6 +517,8 @@ export class ConnectionStep<
     const subplan = this.setupSubplanWithPagination();
     if (typeof subplan.nodeForItem === "function") {
       return subplan.nodeForItem($rawItem);
+    } else if (typeof subplan.listItem === "function") {
+      return subplan.listItem($rawItem);
     } else {
       return $rawItem as unknown as TNodeStep;
     }
