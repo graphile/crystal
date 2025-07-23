@@ -1,12 +1,12 @@
 import { $$deepDepSkip } from "../constants.js";
-import type { UnbatchedExecutionExtra } from "../interfaces.js";
+import type { Maybe, UnbatchedExecutionExtra } from "../interfaces.js";
 import type { Step } from "../step.js";
 import { UnbatchedStep } from "../step.js";
-import type { ConnectionCapableStep } from "./connection.js";
+import type { StepRepresentingList } from "./connection.js";
 import { itemsOrStep } from "./connection.js";
 import { ListStep } from "./list.js";
 
-export class LastStep<TData> extends UnbatchedStep<TData> {
+export class LastStep<TData> extends UnbatchedStep<Maybe<TData>> {
   static $$export = {
     moduleName: "grafast",
     exportName: "LastStep",
@@ -14,11 +14,7 @@ export class LastStep<TData> extends UnbatchedStep<TData> {
   isSyncAndSafe = true;
   allowMultipleOptimizations = true;
 
-  constructor(
-    parentPlan:
-      | Step<ReadonlyArray<TData>>
-      | ConnectionCapableStep<Step<TData>, any>,
-  ) {
+  constructor(parentPlan: StepRepresentingList<TData>) {
     super();
     this.addDependency(itemsOrStep(parentPlan));
   }
@@ -53,7 +49,7 @@ export class LastStep<TData> extends UnbatchedStep<TData> {
  * plan.
  */
 export function last<TData>(
-  plan: Step<ReadonlyArray<TData>> | ConnectionCapableStep<Step<TData>, any>,
+  plan: StepRepresentingList<TData>,
 ): LastStep<TData> {
   return plan.operationPlan.cacheStep(
     plan,

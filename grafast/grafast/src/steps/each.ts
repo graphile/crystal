@@ -5,9 +5,10 @@ import type { ListCapableStep, Step } from "../step.js";
 import { isListCapableStep } from "../step.js";
 import { __ItemStep } from "./__item.js";
 import type {
-  ConnectionCapableStep,
+  ConnectionOptimizedStep,
   ConnectionStep,
   ItemsStep,
+  StepRepresentingList,
 } from "./connection.js";
 import type { __ListTransformStep } from "./listTransform.js";
 import { listTransform } from "./listTransform.js";
@@ -42,9 +43,8 @@ const eachCallbackForListPlan = (
  * Transforms a list by wrapping each element in the list with the given mapper.
  */
 export function each<
-  TListStep extends
-    | (Step<readonly any[]> & Partial<ConnectionCapableStep<any, any>>)
-    | ConnectionCapableStep<any, any>,
+  TListStep extends StepRepresentingList<any> &
+    Partial<ConnectionOptimizedStep<any, any, any, any>>,
   TResultItemStep extends Step,
 >(
   listStep: TListStep,
@@ -84,15 +84,15 @@ export function each<
             this: __ListTransformStep<TListStep>,
             $connection: ConnectionStep<any, any, any, any>,
             ...args: any[]
-          ): ConnectionCapableStep<any, any> {
+          ): ConnectionOptimizedStep<any, any> {
             const $list = this.getListStep() as TListStep &
-              ConnectionCapableStep<any, any>;
+              ConnectionOptimizedStep<any, any>;
             const $clonedList = $list.connectionClone(
               $connection,
               ...args,
-            ) as TListStep & ConnectionCapableStep<any, any>;
+            ) as TListStep & ConnectionOptimizedStep<any, any>;
             return each($clonedList, mapper) as __ListTransformStep<TListStep> &
-              ConnectionCapableStep<any, any>;
+              ConnectionOptimizedStep<any, any>;
           },
         }
       : null),

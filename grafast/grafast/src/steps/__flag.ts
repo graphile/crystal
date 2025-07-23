@@ -18,7 +18,6 @@ import type {
   ExecutionEntryFlags,
   GrafastResultsList,
 } from "../interfaces.js";
-import type { ListCapableStep } from "../step.js";
 import { isListCapableStep, Step } from "../step.js";
 import type { __ItemStep } from "./__item.js";
 
@@ -153,11 +152,9 @@ export class __FlagStep<TStep extends Step> extends Step<DataFromStep<TStep>> {
   [$$deepDepSkip](): Step {
     return this.getDepOptions(0).step;
   }
-  listItem?: (
-    $item: __ItemStep<ListCapableStep<unknown, Step<unknown>>>,
-  ) => Step;
+  listItem?: ($item: __ItemStep<unknown>) => Step;
   // Copied over listItem if the dependent step is a list capable step
-  _listItem($item: __ItemStep<ListCapableStep<unknown, Step<unknown>>>) {
+  _listItem($item: __ItemStep<unknown>) {
     const $dep = this.dependencies[0];
     return isListCapableStep($dep) ? $dep.listItem($item) : $item;
   }

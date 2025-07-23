@@ -6,7 +6,7 @@ import type {
 } from "../interfaces.js";
 import type { Step } from "../step.js";
 import { UnbatchedStep } from "../step.js";
-import type { ConnectionCapableStep } from "./connection.js";
+import type { StepRepresentingList } from "./connection.js";
 import { itemsOrStep } from "./connection.js";
 import { ListStep } from "./list.js";
 
@@ -18,11 +18,7 @@ export class FirstStep<TData> extends UnbatchedStep<TData> {
   isSyncAndSafe = true;
   allowMultipleOptimizations = true;
 
-  constructor(
-    parentPlan:
-      | Step<ReadonlyArray<TData>>
-      | ConnectionCapableStep<Step<TData>, any>,
-  ) {
+  constructor(parentPlan: StepRepresentingList<TData>) {
     super();
     this.addStrongDependency(itemsOrStep(parentPlan));
   }
@@ -61,7 +57,7 @@ export class FirstStep<TData> extends UnbatchedStep<TData> {
  * plan.
  */
 export function first<TData>(
-  plan: Step<ReadonlyArray<TData>> | ConnectionCapableStep<Step<TData>, any>,
+  plan: StepRepresentingList<TData>,
 ): FirstStep<TData> {
   return plan.operationPlan.cacheStep(
     plan,
