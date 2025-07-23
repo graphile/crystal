@@ -259,6 +259,8 @@ export class ConnectionStep<
   private needsHasMore = false;
   private needsCursor = false;
 
+  private paramsDepId: number;
+
   constructor(subplan: TCollectionStep) {
     super();
     if (
@@ -269,8 +271,15 @@ export class ConnectionStep<
       this.collectionPaginationSupport = subplan.paginationSupport;
       // Clone it so we can mess with it
       const $clone = subplan.connectionClone();
+      const $params = new ConnectionParamsStep<TCursorValue>(
+        this.collectionPaginationSupport,
+      );
+      this.paramsDepId = this.addUnaryDependency($params);
+      $clone.applyPagination($params);
       this.collectionDepId = this.addDependency($clone);
     } else {
+      const $params = new ConnectionParamsStep<TCursorValue>(null);
+      this.paramsDepId = this.addUnaryDependency($params);
       this.collectionPaginationSupport = null;
       // It's pure, don't change it!
       this.collectionDepId = this.addDependency(subplan);
@@ -308,7 +317,7 @@ export class ConnectionStep<
     return String(this.getDepOptions(this.collectionDepId).step.id);
   }
 
-  public setNeedsNextPage() {
+  public setNeedsHasMore() {
     this.needsHasMore = true;
     this.setupSubplanWithPagination();
   }
@@ -326,6 +335,7 @@ export class ConnectionStep<
       nonUnaryMessage: () =>
         `${this}.setFirst(...) must be passed a _unary_ step, but ${$first} is not unary. See: https://err.red/gud#connection`,
     });
+    this.paginationParams().setFirst($first);
   }
   public getLast(): Step<number | null | undefined> | null {
     return this.maybeGetDep<Step<number | null | undefined>>(this._lastDepId);
@@ -340,6 +350,7 @@ export class ConnectionStep<
       nonUnaryMessage: () =>
         `${this}.setLast(...) must be passed a _unary_ step, but ${$last} is not unary. See: https://err.red/gud#connection`,
     });
+    this.paginationParams().setLast($last);
   }
   public getOffset(): Step<number | null | undefined> | null {
     return this.maybeGetDep<Step<number | null | undefined>>(this._offsetDepId);
@@ -354,6 +365,7 @@ export class ConnectionStep<
       nonUnaryMessage: () =>
         `${this}.setOffset(...) must be passed a _unary_ step, but ${$offset} is not unary. See: https://err.red/gud#connection`,
     });
+    this.paginationParams().setOffset($offset);
   }
   public getBefore(): Step<Maybe<TCursorValue>> | null {
     return this.maybeGetDep<Step<Maybe<TCursorValue>>>(this._beforeDepId, true);
@@ -366,12 +378,14 @@ export class ConnectionStep<
       throw new Error(`${this}->setBefore already called`);
     }
     const $parsedBeforePlan =
-      this._getSubplan().parseCursor?.($beforePlan) ?? $beforePlan;
+      this._getSubplan().parseCursor?.($beforePlan) ??
+      ($beforePlan as Step<Maybe<TCursorValue>>);
     this._beforeDepId = this.addUnaryDependency({
       step: $parsedBeforePlan,
       nonUnaryMessage: () =>
         `${this}.setBefore(...) must be passed a _unary_ step, but ${$parsedBeforePlan} (and presumably ${$beforePlan}) is not unary. See: https://err.red/gud#connection`,
     });
+    this.paginationParams().setBefore($parsedBeforePlan);
   }
   public getAfter(): Step<Maybe<TCursorValue>> | null {
     return this.maybeGetDep<Step<Maybe<TCursorValue>>>(this._afterDepId, true);
@@ -384,12 +398,14 @@ export class ConnectionStep<
       throw new Error(`${this}->setAfter already called`);
     }
     const $parsedAfterPlan =
-      this._getSubplan().parseCursor?.($afterPlan) ?? $afterPlan;
+      this._getSubplan().parseCursor?.($afterPlan) ??
+      ($afterPlan as Step<Maybe<TCursorValue>>);
     this._afterDepId = this.addUnaryDependency({
       step: $parsedAfterPlan,
       nonUnaryMessage: () =>
         `${this}.setAfter(...) must be passed a _unary_ step, but ${$parsedAfterPlan} (and presumably ${$afterPlan}) is not unary. See: https://err.red/gud#connection`,
     });
+    this.paginationParams().setAfter($parsedAfterPlan);
   }
 
   /**
@@ -423,26 +439,13 @@ export class ConnectionStep<
     if (typeof plan.connectionClone !== "function") {
       throw new Error(`${plan} does not support cloning the subplan`);
     }
-    const clonedPlan = plan.connectionClone(this, ...args) as TCollectionStep;
+    const clonedPlan = plan.connectionClone(...args) as TCollectionStep;
     return clonedPlan;
   }
 
   private paginationParams() {
-    if (!this.collectionPaginationSupport) {
-      throw new Error(
-        `Subplan must support pagination optimization to call this method`,
-      );
-    }
-    // TODO: memoize
-    return new ConnectionParamsStep<TCursorValue>({
-      paginationSupport: this.collectionPaginationSupport,
-      fetchOneExtra: this.needsHasMore,
-      before: this.getBefore(),
-      after: this.getAfter(),
-      first: this.getFirst(),
-      last: this.getLast(),
-      offset: this.getOffset(),
-    });
+    return this.getDepOptions(this.paramsDepId)
+      .step as ConnectionParamsStep<TCursorValue>;
   }
 
   /**
@@ -529,15 +532,9 @@ export class ConnectionStep<
   public optimize() {
     if (!this.neededCollection) {
       return constant(EMPTY_CONNECTION_RESULT);
-    } else if (this.collectionPaginationSupport) {
-      const $clone = this.getDepOptions(this.collectionDepId)
-        .step as ConnectionOptimizedStep<
-        TItem,
-        TItemStep,
-        TNodeStep,
-        TCursorValue
-      >;
-      $clone.applyPagination(this.paginationParams());
+    }
+    if (this.needsHasMore) {
+      this.paginationParams().setNeedsHasMore();
     }
     /*
      * **IMPORTANT**: no matter the arguments, we cannot optimize ourself away
@@ -942,71 +939,71 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
     moduleName: "grafast",
     exportName: "ConnectionParamsStep",
   };
-  private paginationSupport: PaginationFeatures;
-  private fetchOneExtra: boolean;
+  private needsHasMore = false;
   // Pagination stuff
-  private firstDepId: number | null;
-  private lastDepId: number | null;
-  private offsetDepId: number | null;
-  private beforeDepId: number | null;
-  private afterDepId: number | null;
-  constructor(options: {
-    paginationSupport: PaginationFeatures;
-    fetchOneExtra: boolean;
-    first: Step<Maybe<number>> | null;
-    last: Step<Maybe<number>> | null;
-    offset: Step<Maybe<number>> | null;
-    before: Step<Maybe<TCursorValue>> | null;
-    after: Step<Maybe<TCursorValue>> | null;
-  }) {
+  private firstDepId: number | null = null;
+  private lastDepId: number | null = null;
+  private offsetDepId: number | null = null;
+  private beforeDepId: number | null = null;
+  private afterDepId: number | null = null;
+  constructor(private paginationSupport: PaginationFeatures | null) {
     super();
-    const {
-      paginationSupport,
-      fetchOneExtra,
-      first,
-      last,
-      offset,
-      before,
-      after,
-    } = options;
-    this.paginationSupport = paginationSupport;
-    this.fetchOneExtra = fetchOneExtra;
-    this.firstDepId = this.addUnaryDependency(first ?? constant(null));
-    this.lastDepId = this.addUnaryDependency(last ?? constant(null));
-    this.offsetDepId = this.addUnaryDependency(offset ?? constant(null));
-    this.beforeDepId = this.addUnaryDependency(before ?? constant(null));
-    this.afterDepId = this.addUnaryDependency(after ?? constant(null));
-    assert.strictEqual(this.firstDepId, 0, "first must be dep 0");
-    assert.strictEqual(this.lastDepId, 1, "last must be dep 1");
-    assert.strictEqual(this.offsetDepId, 2, "offset must be dep 2");
-    assert.strictEqual(this.beforeDepId, 3, "before must be dep 3");
-    assert.strictEqual(this.afterDepId, 4, "after must be dep 4");
+  }
+  setFirst($first: Step<Maybe<number>>) {
+    if (this.firstDepId != null) throw new Error(`first already set`);
+    this.firstDepId = this.addUnaryDependency($first);
+  }
+  setLast($last: Step<Maybe<number>>) {
+    if (this.lastDepId != null) throw new Error(`last already set`);
+    this.lastDepId = this.addUnaryDependency($last);
+  }
+  setOffset($offset: Step<Maybe<number>>) {
+    if (this.offsetDepId != null) throw new Error(`offset already set`);
+    this.offsetDepId = this.addUnaryDependency($offset);
+  }
+  setBefore($before: Step<Maybe<TCursorValue>>) {
+    if (this.beforeDepId != null) throw new Error(`before already set`);
+    this.beforeDepId = this.addUnaryDependency($before);
+  }
+  setAfter($after: Step<Maybe<TCursorValue>>) {
+    if (this.afterDepId != null) throw new Error(`after already set`);
+    this.afterDepId = this.addUnaryDependency($after);
+  }
+  setNeedsHasMore() {
+    this.needsHasMore = true;
   }
   deduplicate(
     peers: ConnectionParamsStep<any>[],
   ): ConnectionParamsStep<TCursorValue>[] {
     return peers.filter(
-      (p) =>
-        p.paginationSupport === this.paginationSupport &&
-        p.fetchOneExtra === this.fetchOneExtra,
+      (p) => p.paginationSupport === this.paginationSupport,
     ) as ConnectionParamsStep<TCursorValue>[];
+  }
+  public deduplicatedWith(replacement: ConnectionParamsStep<any>): void {
+    if (this.needsHasMore) {
+      replacement.needsHasMore = true;
+    }
   }
   unbatchedExecute(
     extra: UnbatchedExecutionExtra,
-    first: Maybe<number>,
-    last: Maybe<number>,
-    offset: Maybe<number>,
-    before: Maybe<TCursorValue>,
-    after: Maybe<TCursorValue>,
+    ...values: any[]
   ): PaginationParams<TCursorValue> {
+    const first: Maybe<number> =
+      this.firstDepId != null ? values[this.firstDepId] : null;
+    const last: Maybe<number> =
+      this.lastDepId != null ? values[this.lastDepId] : null;
+    const offset: Maybe<number> =
+      this.offsetDepId != null ? values[this.offsetDepId] : null;
+    const before: Maybe<TCursorValue> =
+      this.beforeDepId != null ? values[this.beforeDepId] : null;
+    const after: Maybe<TCursorValue> =
+      this.afterDepId != null ? values[this.afterDepId] : null;
+    const { needsHasMore } = this;
     const {
-      paginationSupport: {
-        reverse: supportsReverse,
-        offset: supportsOffset,
-        cursor: supportsCursor,
-      },
-      fetchOneExtra,
-    } = this;
+      reverse: supportsReverse,
+      offset: supportsOffset,
+      cursor: supportsCursor,
+    } = this.paginationSupport ?? {};
     /** How many records do we need to skip over in addition to a limit implied by `first`/`last`? */
     const params: PaginationParams<TCursorValue> = {
       __skipOver: 0,
@@ -1057,7 +1054,7 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
         }
       }
       if (first != null) {
-        params.limit = params.__skipOver + first + (fetchOneExtra ? 1 : 0);
+        params.limit = params.__skipOver + first + (needsHasMore ? 1 : 0);
       } else {
         // Just fetch the lot
       }
@@ -1076,7 +1073,7 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
           }
         }
         if (last != null) {
-          params.limit = params.__skipOver + last + (fetchOneExtra ? 1 : 0);
+          params.limit = params.__skipOver + last + (needsHasMore ? 1 : 0);
         } else {
           // Just fetch the lot
         }
