@@ -939,6 +939,8 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
     moduleName: "grafast",
     exportName: "ConnectionParamsStep",
   };
+  /** sync and safe because it's unary; an error thrown for one is thrown for all */
+  public isSyncAndSafe = true;
   private needsHasMore = false;
   // Pagination stuff
   private firstDepId: number | null = null;
