@@ -17,6 +17,8 @@ export {
   ConnectionOptimizedStep,
   ConnectionStep,
   EdgeStep,
+  PaginationFeatures,
+  PaginationParams,
   StepRepresentingList,
 } from "./connection.js";
 export { constant, ConstantStep } from "./constant.js";

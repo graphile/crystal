@@ -1,4 +1,9 @@
-import type { __InputStaticLeafStep, ExecutionDetails, Maybe } from "grafast";
+import type {
+  __InputStaticLeafStep,
+  ExecutionDetails,
+  Maybe,
+  PaginationParams,
+} from "grafast";
 import { access, applyTransforms, lambda, SafeError, Step } from "grafast";
 import { type SQL, sql } from "pg-sql2";
 
@@ -233,6 +238,23 @@ export abstract class PgStmtBaseStep<T>
     this.assertCursorPaginationAllowed();
     const $parsedCursorPlan = lambda($cursorPlan, parseCursor);
     return $parsedCursorPlan;
+  }
+
+  paginationSupport = {
+    reverse: true,
+    cursor: true,
+    offset: true,
+  };
+
+  applyPagination(
+    $params: Step<PaginationParams<null | readonly string[]>>,
+  ): void {
+    const $converted = lambda($params, convertParamsToLegacy, true);
+    this.setFirst(access($converted, "first"));
+    this.setLast(access($converted, "last"));
+    this.setBefore(access($converted, "before"));
+    this.setAfter(access($converted, "after"));
+    this.setOffset(access($converted, "offset"));
   }
 
   /**
@@ -609,4 +631,24 @@ export function makeValues(
     identifiersAlias,
     handlePlaceholder,
   };
+}
+
+function convertParamsToLegacy(params: PaginationParams<null | string[]>) {
+  if (params.reverse) {
+    return {
+      after: null,
+      first: null,
+      before: params.after,
+      last: params.limit,
+      offset: params.offset,
+    };
+  } else {
+    return {
+      after: params.after,
+      first: params.limit,
+      before: null,
+      last: null,
+      offset: params.offset,
+    };
+  }
 }
