@@ -12,7 +12,12 @@ const TierList = [
     description: (
       <>
         <ul>
-          <li>Your name on the Sponsors page of graphile.org</li>
+          <li>
+            Your name on the{" "}
+            <Link to="https://graphile.org/sponsor">
+              Graphile Sponsors page
+            </Link>{" "}
+          </li>
           <li>
             Your name among those randomly featured in the PostGraphile CLI
           </li>
@@ -40,10 +45,17 @@ const TierList = [
             Access to <strong>private security announcements</strong>
           </li>
           <li>
-            Free access to <strong>@graphile/pro</strong>
+            Free access to <strong>PostGraphile V4 Pro</strong>
           </li>
           <li>
-            Your name and <strong>avatar/logo</strong> featured on our websites
+            Access to{" "}
+            <Link to="https://github.com/graphile-pro">
+              <strong>graphile-pro</strong>
+            </Link>
+          </li>
+          <li>
+            Your name and <strong>avatar/logo</strong> featured on our websites,
+            including this one
           </li>
           <li>
             Your name <strong>more frequently featured</strong> in the
@@ -84,6 +96,12 @@ const TierList = [
           </li>
           <li>
             Access to <strong>#vip-lounge</strong> on Discord
+          </li>
+          <li>
+            Free access to{" "}
+            <strong>
+              <Link to="https://pgrita.com">pgRITA</Link>
+            </strong>
           </li>
           <li>
             The warm feeling that comes from knowing{" "}

@@ -51,7 +51,8 @@ const TierList = [
             </Link>
           </li>
           <li>
-            Your name and <strong>avatar/logo</strong> featured on our websites
+            Your name and <strong>avatar/logo</strong> featured on our websites,
+            including this one
           </li>
           <li>
             The warm feeling that comes from knowing you’re making a difference
