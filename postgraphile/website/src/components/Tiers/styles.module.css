@@ -95,6 +95,11 @@
   border-color: var(--ifm-color-primary-light);
 }
 
+[data-theme="dark"] .tier:nth-child(2) .button {
+  background-color: var(--ifm-color-primary);
+  border-color: var(--ifm-color-primary);
+}
+
 [data-theme="dark"] .tier .button:hover {
   background-color: var(--ifm-color-primary-lightest);
   border-color: var(--ifm-color-primary-lightest);
