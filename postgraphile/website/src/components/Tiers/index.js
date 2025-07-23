@@ -16,7 +16,7 @@ const TierList = [
             Your name on the{" "}
             <Link to="https://graphile.org/sponsor">
               Graphile Sponsors page
-            </Link>{" "}
+            </Link>
           </li>
           <li>
             Your name among those randomly featured in the PostGraphile CLI
@@ -45,7 +45,10 @@ const TierList = [
             Access to <strong>private security announcements</strong>
           </li>
           <li>
-            Free access to <strong>PostGraphile V4 Pro</strong>
+            Free access to{" "}
+            <strong>
+              <Link to="/pricing">PostGraphile V4 Pro</Link>
+            </strong>
           </li>
           <li>
             Access to{" "}
