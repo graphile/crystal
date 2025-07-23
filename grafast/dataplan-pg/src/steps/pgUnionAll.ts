@@ -689,7 +689,7 @@ on (${sql.indent(
   }
 
   connectionClone(
-    $connection: ConnectionStep<any, any, any, any>,
+    $connection: ConnectionStep<any, any, any, any, any>,
     mode?: PgUnionAllMode,
   ): PgUnionAllStep<TAttributes, TTypeNames> {
     const $plan = PgUnionAllStep.clone(this, mode);
@@ -913,7 +913,7 @@ on (${sql.indent(
     // this step throws (e.g. due to invalid cursor) then so does the
     // connection.
     /*
-      const $connection = this.getDep<ConnectionStep<any, any, any>>(
+      const $connection = this.getDep<ConnectionStep<any, any, any, any, any>>(
         this.connectionDepId,
       );
       $connection.addValidation(() => {

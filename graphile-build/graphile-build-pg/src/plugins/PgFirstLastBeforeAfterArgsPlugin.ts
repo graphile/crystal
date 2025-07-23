@@ -109,8 +109,10 @@ function commonFn(
             function plan(
               _: any,
               $connection: ConnectionStep<
+                any,
                 PgSelectSingleStep,
-                PgSelectParsedCursorStep,
+                PgSelectSingleStep,
+                null | readonly any[],
                 PgSelectStep
               >,
               arg,
@@ -133,8 +135,10 @@ function commonFn(
                   function plan(
                     _: any,
                     $connection: ConnectionStep<
+                      any,
                       PgSelectSingleStep,
-                      PgSelectParsedCursorStep,
+                      PgSelectSingleStep,
+                      null | readonly any[],
                       PgSelectStep
                     >,
                     val,
@@ -159,8 +163,10 @@ function commonFn(
             function plan(
               _: any,
               $connection: ConnectionStep<
+                any,
                 PgSelectSingleStep,
-                PgSelectParsedCursorStep,
+                PgSelectSingleStep,
+                null | readonly any[],
                 PgSelectStep
               >,
               val,
@@ -183,8 +189,10 @@ function commonFn(
                   function plan(
                     _: any,
                     $connection: ConnectionStep<
+                      any,
                       PgSelectSingleStep,
-                      PgSelectParsedCursorStep,
+                      PgSelectSingleStep,
+                      null | readonly any[],
                       PgSelectStep
                     >,
                     val,
@@ -209,8 +217,10 @@ function commonFn(
                   function plan(
                     _: any,
                     $connection: ConnectionStep<
+                      any,
                       PgSelectSingleStep,
-                      PgSelectParsedCursorStep,
+                      PgSelectSingleStep,
+                      null | readonly any[],
                       PgSelectStep
                     >,
                     val,

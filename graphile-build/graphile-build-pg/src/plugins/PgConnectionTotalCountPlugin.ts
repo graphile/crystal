@@ -103,10 +103,11 @@ export const PgConnectionTotalCountPlugin: GraphileConfig.Plugin = {
                     (TYPES, sql) =>
                       (
                         $connection: ConnectionStep<
+                          any,
                           PgSelectSingleStep<any> | PgUnionAllStep<any, any>,
-                          PgSelectParsedCursorStep,
-                          PgSelectStep<any> | PgUnionAllStep<any, any>,
-                          PgSelectSingleStep<any> | PgUnionAllStep<any, any>
+                          PgSelectSingleStep<any> | PgUnionAllStep<any, any>,
+                          null | readonly any[],
+                          PgSelectStep<any> | PgUnionAllStep<any, any>
                         >,
                       ) =>
                         $connection

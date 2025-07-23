@@ -82,7 +82,7 @@ export function each<
       ? {
           connectionClone(
             this: __ListTransformStep<TListStep>,
-            $connection: ConnectionStep<any, any, any, any>,
+            $connection: ConnectionStep<any, any, any, any, any>,
             ...args: any[]
           ): ConnectionOptimizedStep<any, any> {
             const $list = this.getListStep() as TListStep &

@@ -193,8 +193,10 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
                       (
                         parent,
                         $connection: ConnectionStep<
+                          any,
                           PgSelectSingleStep<any>,
-                          PgSelectParsedCursorStep,
+                          PgSelectSingleStep<any>,
+                          null | readonly any[],
                           PgSelectStep<any>
                         >,
                         value,

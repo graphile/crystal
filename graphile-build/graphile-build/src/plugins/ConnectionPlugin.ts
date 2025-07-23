@@ -151,7 +151,7 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
               );
 
               // Register connection
-              build.registerObjectType<ConnectionStep<any, any, any>>(
+              build.registerObjectType<ConnectionStep<any, any, any, any, any>>(
                 connectionTypeName,
                 {
                   ...scope,

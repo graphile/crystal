@@ -564,7 +564,7 @@ export class ConnectionStep<
      */
     return this;
   }
-  deduplicatedWith(replacement: ConnectionStep<any, any, any, any>) {
+  deduplicatedWith(replacement: ConnectionStep<any, any, any, any, any>) {
     if (this.needsCursor) {
       replacement.needsCursor = true;
     }
@@ -788,7 +788,7 @@ export class EdgeStep<
   private connectionRefId: number | null;
 
   constructor(
-    $connection: ConnectionStep<TItemStep, TNodeStep, any, any>,
+    $connection: ConnectionStep<any, TItemStep, TNodeStep, any, any>,
     $item: TItemStep,
     $index: Step<number>,
   ) {
@@ -821,6 +821,7 @@ export class EdgeStep<
 
   private getConnectionStep() {
     return this.getRef(this.connectionRefId) as ConnectionStep<
+      any,
       TItemStep,
       TNodeStep,
       any,
@@ -1129,13 +1130,14 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
 }
 
 class PageInfoStep extends UnbatchedStep {
-  constructor($connection: ConnectionStep<any, any, any, any>) {
+  constructor($connection: ConnectionStep<any, any, any, any, any>) {
     super();
     this.addDependency($connection);
   }
 
   get(key: string) {
     const $connection = this.getDepOptions(0).step as ConnectionStep<
+      any,
       any,
       any,
       any,

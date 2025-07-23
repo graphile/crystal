@@ -213,8 +213,9 @@ function makeFieldsHook(isInterface: boolean) {
                             $connection: ConnectionStep<
                               any,
                               any,
-                              PgUnionAllStep,
-                              any
+                              any,
+                              any,
+                              PgUnionAllStep
                             >,
                             fieldArgs: FieldArgs,
                           ) => {

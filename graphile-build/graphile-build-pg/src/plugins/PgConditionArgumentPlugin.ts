@@ -180,8 +180,10 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                       (
                         _condition,
                         $connection: ConnectionStep<
+                          any,
                           PgSelectSingleStep,
-                          PgSelectParsedCursorStep,
+                          PgSelectSingleStep,
+                          null | readonly any[],
                           PgSelectStep
                         >,
                         arg,
