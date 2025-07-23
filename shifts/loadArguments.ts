@@ -1,5 +1,5 @@
 // Run with:
-// yarn jscodeshift -t ./shifts/loadArguments.ts */*/src --extensions=ts --parser=ts
+// yarn jscodeshift -t ./shifts/loadArguments.ts {grafast,graphile-build}/*/{src,__tests__} --extensions=ts,js,mjs --parser=ts
 import { API, FileInfo, JSCodeshift } from "jscodeshift";
 
 /**
@@ -38,10 +38,10 @@ export default function transformer(file: FileInfo, api: API) {
             arg.type !== "NullLiteral" &&
             (arg.type !== "Identifier" || arg.name !== "undefined"),
         );
-        if (spec.type === "SpreadElement") throw new Error("Spread forbidden");
-        if (a.type === "SpreadElement") throw new Error("Spread forbidden");
-        if (b.type === "SpreadElement") throw new Error("Spread forbidden");
-        if (c.type === "SpreadElement") throw new Error("Spread forbidden");
+        if (spec?.type === "SpreadElement") throw new Error("Spread forbidden");
+        if (a?.type === "SpreadElement") throw new Error("Spread forbidden");
+        if (b?.type === "SpreadElement") throw new Error("Spread forbidden");
+        if (c?.type === "SpreadElement") throw new Error("Spread forbidden");
         const props = [j.objectProperty(j.identifier("lookup"), spec)];
 
         if (args.length === 2) {
