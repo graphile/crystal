@@ -105,7 +105,8 @@ export const PgConnectionTotalCountPlugin: GraphileConfig.Plugin = {
                         $connection: ConnectionStep<
                           any,
                           PgSelectSingleStep<any> | PgUnionAllStep<any, any>,
-                          PgSelectSingleStep<any> | PgUnionAllStep<any, any>,
+                          any,
+                          any,
                           null | readonly any[],
                           PgSelectStep<any> | PgUnionAllStep<any, any>
                         >,

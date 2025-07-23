@@ -421,7 +421,7 @@ export class PgUnionAllStep<
     ConnectionOptimizedStep<
       any,
       PgSelectSingleStep<any>,
-      PgSelectSingleStep<any>,
+      any,
       null | readonly any[]
     >
 {
@@ -909,7 +909,7 @@ on (${sql.indent(
     // this step throws (e.g. due to invalid cursor) then so does the
     // connection.
     /*
-      const $connection = this.getDep<ConnectionStep<any, any, any, any, any>>(
+      const $connection = this.getDep<ConnectionStep<any, any, any, any, any, any>>(
         this.connectionDepId,
       );
       $connection.addValidation(() => {

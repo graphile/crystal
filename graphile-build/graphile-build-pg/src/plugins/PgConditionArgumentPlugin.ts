@@ -182,7 +182,8 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                         $connection: ConnectionStep<
                           any,
                           PgSelectSingleStep,
-                          PgSelectSingleStep,
+                          any,
+                          any,
                           null | readonly any[],
                           PgSelectStep
                         >,

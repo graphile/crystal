@@ -12,19 +12,20 @@ interface ConnectionParams {
 }
 export function connection<
   TItem,
-  TItemStep extends Step<TItem> = Step<TItem>,
-  TNodeStep extends Step = TItemStep,
+  TNodeStep extends Step = Step<TItem>,
+  TEdgeDataStep extends Step = Step<TItem>,
+  TEdgeStep extends EdgeCapableStep<TItem, TNodeStep, TEdgeDataStep> = EdgeStep<TItem, TNodeStep, TEdgeDataStep>,
   TCursorValue = string,
-  TCollectionStep extends ConnectionOptimizedStep<
+  TCollectionStep extends StepRepresentingList<
     TItem,
-    TItemStep,
     TNodeStep,
+    TEdgeStep,
     TCursorValue
-  > = ConnectionOptimizedStep<TItem, TItemStep, TNodeStep, TCursorValue>,
+  > = StepRepresentingList<TItem, TNodeStep, TEdgeStep, TCursorValue>,
 >(
   step: TCollectionStep,
   params?: ConnectionParams,
-): ConnectionStep<TItem, TItemStep, TNodeStep, TCursorValue, TCollectionStep> {
+): ConnectionStep<TItem, TNodeStep, TEdgeDataStep, TEdgeStep, TCursorValue, TCollectionStep> {
 ```
 
 ## Improving performance

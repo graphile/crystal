@@ -111,7 +111,8 @@ function commonFn(
               $connection: ConnectionStep<
                 any,
                 PgSelectSingleStep,
-                PgSelectSingleStep,
+                any,
+                any,
                 null | readonly any[],
                 PgSelectStep
               >,
@@ -137,7 +138,8 @@ function commonFn(
                     $connection: ConnectionStep<
                       any,
                       PgSelectSingleStep,
-                      PgSelectSingleStep,
+                      any,
+                      any,
                       null | readonly any[],
                       PgSelectStep
                     >,
@@ -165,7 +167,8 @@ function commonFn(
               $connection: ConnectionStep<
                 any,
                 PgSelectSingleStep,
-                PgSelectSingleStep,
+                any,
+                any,
                 null | readonly any[],
                 PgSelectStep
               >,
@@ -191,7 +194,8 @@ function commonFn(
                     $connection: ConnectionStep<
                       any,
                       PgSelectSingleStep,
-                      PgSelectSingleStep,
+                      any,
+                      any,
                       null | readonly any[],
                       PgSelectStep
                     >,
@@ -219,7 +223,8 @@ function commonFn(
                     $connection: ConnectionStep<
                       any,
                       PgSelectSingleStep,
-                      PgSelectSingleStep,
+                      any,
+                      any,
                       null | readonly any[],
                       PgSelectStep
                     >,

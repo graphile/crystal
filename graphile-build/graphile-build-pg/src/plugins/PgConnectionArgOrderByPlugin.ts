@@ -195,7 +195,8 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
                         $connection: ConnectionStep<
                           any,
                           PgSelectSingleStep<any>,
-                          PgSelectSingleStep<any>,
+                          any,
+                          any,
                           null | readonly any[],
                           PgSelectStep<any>
                         >,

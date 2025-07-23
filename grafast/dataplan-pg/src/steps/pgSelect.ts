@@ -366,7 +366,7 @@ export class PgSelectStep<
     ConnectionOptimizedStep<
       any,
       PgSelectSingleStep<TResource> | PgClassExpressionStep<any, TResource>,
-      PgSelectSingleStep<TResource> | PgClassExpressionStep<any, TResource>,
+      any,
       null | readonly any[]
     >,
     /**
@@ -1910,7 +1910,7 @@ export class PgSelectStep<
       this.addDependency($validate);
     } else {
       // To make the error be thrown in the right place, we should also add this error to our parent connection
-      const $connection = this.getDep<ConnectionStep<any, any, any, any, any>>(
+      const $connection = this.getDep<ConnectionStep<any, any, any, any, any, any>>(
         this.connectionDepId,
       );
       $connection.addValidation(() => {

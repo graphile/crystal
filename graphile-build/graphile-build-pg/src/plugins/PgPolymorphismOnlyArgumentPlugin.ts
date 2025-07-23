@@ -215,6 +215,7 @@ function makeFieldsHook(isInterface: boolean) {
                               any,
                               any,
                               any,
+                              any,
                               PgUnionAllStep
                             >,
                             fieldArgs: FieldArgs,

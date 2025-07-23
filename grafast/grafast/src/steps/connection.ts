@@ -129,14 +129,17 @@ export interface PaginationParams<TCursorValue = string> {
  * Be sure to read the documentation of the features you indicate support for!
  *
  * @param TItem - The data represented by an individual list item
- * @param TItemStep - Represents an item in the collection, typically equivalent to an _edge_.
- * @param TNodeStep - A derivative of TItemStep that represents the _node_ itself. Defaults to TItemStep.
+ * @param TNodeStep - A derivative of TEdgeStep that represents the _node_ itself. Defaults to TEdgeStep.
+ * @param TEdgeStep - Represents an item in the collection, typically equivalent to an _edge_.
  * @param TCursorValue - If your step wants us to parse the cursor for you, the result of the parse. Useful for throwing an error before the fetch if the cursor is invalid.
  */
 export interface ConnectionOptimizedStep<
   TItem,
-  TItemStep extends Step<TItem> = Step<TItem>,
-  TNodeStep extends Step = TItemStep,
+  TNodeStep extends Step = Step<TItem>,
+  TEdgeStep extends EdgeCapableStep<TItem, TNodeStep> = EdgeStep<
+    TItem,
+    TNodeStep
+  >,
   TCursorValue = string,
 > extends Step {
   /**
@@ -149,7 +152,7 @@ export interface ConnectionOptimizedStep<
    */
   connectionClone(
     ...args: any[]
-  ): ConnectionOptimizedStep<TItem, TItemStep, TNodeStep, TCursorValue>; // TODO: `this`
+  ): ConnectionOptimizedStep<TItem, TNodeStep, TEdgeStep, TCursorValue>; // TODO: `this`
 
   /**
    * If set, we assume that you support at least `limit` pagination, even on an
@@ -176,26 +179,26 @@ export interface ConnectionOptimizedStep<
   parseCursor?($cursor: Step<Maybe<string>>): Step<Maybe<TCursorValue>>;
 
   /**
+   * If the `$item` represents an edge rather than the node, return the node to
+   * use instead.
+   */
+  nodeForItem?($item: Step<TItem>): TNodeStep;
+
+  /**
    * Turn a value from the list into an item step
    */
-  listItem?($item: Step<unknown>): TItemStep;
+  edgeForItem?($item: Step<TItem>): TEdgeStep;
 
   /**
    * Given the $item, return a step representing the cursor.
    *
    * Must be implemented if and only if `paginationSupport.cursor` is `true`.
    */
-  cursorForItem?($item: TItemStep): Step<string>;
-
-  /**
-   * If the `$item` represents an edge rather than the node, return the node to
-   * use instead.
-   */
-  nodeForItem?($item: TItemStep): TNodeStep;
+  cursorForItem?($item: Step<TItem>): Step<string>;
 }
 
 const EMPTY_OBJECT = Object.freeze(Object.create(null));
-const EMPTY_CONNECTION_RESULT: ConnectionResult = Object.freeze({
+const EMPTY_CONNECTION_RESULT: ConnectionResult<never> = Object.freeze({
   items: Object.freeze([]),
   pageInfo: Object.freeze({
     hasNextPage: false,
@@ -203,21 +206,34 @@ const EMPTY_CONNECTION_RESULT: ConnectionResult = Object.freeze({
   }),
 });
 
-interface ConnectionResult {
+interface ConnectionResult<TItem> {
   pageInfo: {
     hasNextPage: boolean;
     hasPreviousPage: boolean;
   };
-  items: ReadonlyArray<unknown>;
+  items: ReadonlyArray<TItem>;
+}
+
+interface EdgeCapableStep<
+  TItem,
+  TNodeStep extends Step,
+  TEdgeDataStep extends Step = Step<TItem>,
+> extends Step {
+  node(): TNodeStep;
+  cursor(): Step<string>;
+  data(): TEdgeDataStep;
 }
 
 export type StepRepresentingList<
   TItem,
-  TItemStep extends Step<TItem> = Step<TItem>,
-  TNodeStep extends Step = TItemStep,
+  TNodeStep extends Step = Step<TItem>,
+  TEdgeStep extends EdgeCapableStep<TItem, TNodeStep> = EdgeStep<
+    TItem,
+    TNodeStep
+  >,
   TCursorValue = string,
 > =
-  | ConnectionOptimizedStep<TItem, TItemStep, TNodeStep, TCursorValue>
+  | ConnectionOptimizedStep<TItem, TNodeStep, TEdgeStep, TCursorValue>
   | StepWithItems<TItem>
   | Step<Maybe<readonly TItem[]>>;
 
@@ -227,16 +243,21 @@ export type StepRepresentingList<
  */
 export class ConnectionStep<
   TItem,
-  TItemStep extends Step<TItem> = Step<TItem>,
-  TNodeStep extends Step = TItemStep,
+  TNodeStep extends Step = Step<TItem>,
+  TEdgeDataStep extends Step = Step<TItem>,
+  TEdgeStep extends EdgeCapableStep<TItem, TNodeStep, TEdgeDataStep> = EdgeStep<
+    TItem,
+    TNodeStep,
+    TEdgeDataStep
+  >,
   TCursorValue = string,
   TCollectionStep extends StepRepresentingList<
     TItem,
-    TItemStep,
     TNodeStep,
+    TEdgeStep,
     TCursorValue
-  > = StepRepresentingList<TItem, TItemStep, TNodeStep, TCursorValue>,
-> extends Step<ConnectionResult | null> {
+  > = StepRepresentingList<TItem, TNodeStep, TEdgeStep, TCursorValue>,
+> extends Step<ConnectionResult<TItem> | null> {
   static $$export = {
     moduleName: "grafast",
     exportName: "ConnectionStep",
@@ -262,8 +283,18 @@ export class ConnectionStep<
 
   private paramsDepId: number;
 
-  constructor(subplan: TCollectionStep) {
+  edgeDataPlan: ($rawItem: Step<TItem>) => TEdgeDataStep;
+
+  constructor(
+    subplan: TCollectionStep,
+    params: Omit<ConnectionParams<any, TItem, TEdgeDataStep>, "fieldArgs"> = {},
+  ) {
     super();
+    if (params.edgeDataPlan) {
+      this.edgeDataPlan = params.edgeDataPlan!;
+    } else {
+      this.edgeDataPlan = (i) => i as TEdgeDataStep;
+    }
     if (
       "paginationSupport" in subplan &&
       "connectionClone" in subplan &&
@@ -294,7 +325,7 @@ export class ConnectionStep<
   private _getSubplan() {
     return this.getSubplan() as TCollectionStep &
       Partial<
-        ConnectionOptimizedStep<TItem, TItemStep, TNodeStep, TCursorValue>
+        ConnectionOptimizedStep<TItem, TNodeStep, TEdgeStep, TCursorValue>
       >;
   }
 
@@ -310,7 +341,7 @@ export class ConnectionStep<
     this.neededCollection = true;
     return this.getDepOptions(this.collectionDepId).step as TCollectionStep &
       Partial<
-        ConnectionOptimizedStep<TItem, TItemStep, TNodeStep, TCursorValue>
+        ConnectionOptimizedStep<TItem, TNodeStep, TEdgeStep, TCursorValue>
       >;
   }
 
@@ -423,8 +454,8 @@ export class ConnectionStep<
     ...args: Parameters<
       TCollectionStep extends ConnectionOptimizedStep<
         TItem,
-        TItemStep,
         TNodeStep,
+        TEdgeStep,
         TCursorValue
       >
         ? TCollectionStep["connectionClone"]
@@ -473,36 +504,37 @@ export class ConnectionStep<
     }
   }
 
-  public listItem($rawItem: Step<unknown>) {
-    const subplan = this._getSubplan();
-    return subplan.listItem?.($rawItem) ?? ($rawItem as TItemStep);
+  public listItem($rawItem: Step<TItem>) {
+    return this.nodePlan($rawItem);
   }
 
-  public nodePlan = ($rawItem: Step<unknown>) => {
+  public nodePlan = ($rawItem: Step<TItem>) => {
     const subplan = this.setupSubplanWithPagination();
-    const $item = this.listItem($rawItem);
     if (typeof subplan.nodeForItem === "function") {
-      return subplan.nodeForItem($item);
+      return subplan.nodeForItem($rawItem);
     } else {
-      return $item as unknown as TNodeStep;
+      return $rawItem as unknown as TNodeStep;
     }
   };
 
-  public edgePlan = ($rawItem: Step<unknown>) => {
-    this.setupSubplanWithPagination();
-    const $item = this.listItem($rawItem);
-    return new EdgeStep<TItemStep, TNodeStep>(this, $item);
+  public edgePlan = ($rawItem: Step<TItem>) => {
+    const subplan = this.setupSubplanWithPagination();
+    if (typeof subplan.edgeForItem === "function") {
+      return subplan.edgeForItem($rawItem);
+    } else {
+      return new EdgeStep<TItem, TNodeStep, TEdgeStep>(this, $rawItem);
+    }
   };
 
   public edges(): Step {
     this.setupSubplanWithPagination();
-    const $items = access(this, "items");
+    const $items = access(this, "items") as Step<ReadonlyArray<TItem>>;
     return each($items, this.edgePlan);
   }
 
   public nodes() {
     this.setupSubplanWithPagination();
-    const $items = access(this, "items");
+    const $items = access(this, "items") as Step<ReadonlyArray<TItem>>;
     return each($items, this.nodePlan);
   }
 
@@ -564,7 +596,7 @@ export class ConnectionStep<
   public execute({
     values,
     indexMap,
-  }: ExecutionDetails): GrafastResultsList<ConnectionResult | null> {
+  }: ExecutionDetails): GrafastResultsList<ConnectionResult<TItem> | null> {
     if (!this.neededCollection) {
       // The main collection is not actually fetched, so we don't need to do
       // any pagination stuff. Could be they just wanted `totalCount` for
@@ -700,7 +732,7 @@ export class ConnectionStep<
       }
 
       // Now we need to apply our pagination stuff to it
-      let items = list as ReadonlyArray<unknown>;
+      let items = list as ReadonlyArray<TItem>;
       let hasNext = false;
       if (sliceStart > 0) {
         items = items.slice(sliceStart);
@@ -760,8 +792,9 @@ export class ConnectionStep<
 }
 
 export class EdgeStep<
-  TItemStep extends Step,
+  TItem,
   TNodeStep extends Step = Step,
+  TEdgeDataStep extends Step = Step<TItem>,
 > extends UnbatchedStep {
   static $$export = {
     moduleName: "grafast",
@@ -772,11 +805,11 @@ export class EdgeStep<
   private connectionRefId: number | null;
 
   constructor(
-    $connection: ConnectionStep<any, TItemStep, TNodeStep, any, any>,
-    $item: TItemStep,
+    $connection: ConnectionStep<TItem, TNodeStep, any, any, any>,
+    $rawItem: Step<TItem>,
   ) {
     super();
-    const itemDepId = this.addDependency($item);
+    const itemDepId = this.addDependency($rawItem);
     assert.strictEqual(
       itemDepId,
       0,
@@ -791,6 +824,8 @@ export class EdgeStep<
         return this.node();
       case "cursor":
         return this.cursor();
+      case "data":
+        return this.data();
       default:
         return constant(undefined);
     }
@@ -798,35 +833,38 @@ export class EdgeStep<
 
   private getConnectionStep() {
     return this.getRef(this.connectionRefId) as ConnectionStep<
-      any,
-      TItemStep,
+      TItem,
       TNodeStep,
       any,
-      any
+      any,
+      any,
+      TEdgeDataStep
     >;
   }
 
-  private getItemStep() {
+  private getRawItemStep() {
     // We know we're not using flags
-    return this.getDepOptions<TItemStep>(0).step;
+    return this.getDepOptions<Step<TItem>>(0).step;
   }
-  // public data(): TEdgeDataStep {
-  //   const $item = this.getItemStep();
-  //   return this.getConnectionStep().edgeDataPlan?.($item) ?? ($item as any);
-  // }
+
+  data(): TEdgeDataStep {
+    const $connection = this.getConnectionStep();
+    const $rawItem = this.getRawItemStep();
+    return $connection.edgeDataPlan($rawItem);
+  }
 
   node(): TNodeStep {
-    const $item = this.getItemStep();
-    return this.getConnectionStep().nodePlan($item);
+    const $rawItem = this.getRawItemStep();
+    return this.getConnectionStep().nodePlan($rawItem);
   }
 
-  cursor(): Step<string | null> {
+  cursor(): Step<string> {
     const $connection = this.getConnectionStep();
-    const $item = this.getItemStep();
-    return $connection.cursorPlan($item);
+    const $rawItem = this.getRawItemStep();
+    return $connection.cursorPlan($rawItem);
   }
 
-  deduplicate(_peers: EdgeStep<any, any>[]): EdgeStep<TItemStep, TNodeStep>[] {
+  deduplicate(_peers: EdgeStep<any, any>[]): EdgeStep<TItem, TNodeStep>[] {
     return _peers;
   }
 
@@ -836,13 +874,16 @@ export class EdgeStep<
   }
 }
 
-interface ConnectionParams<TObj extends BaseGraphQLArguments = any> {
+interface ConnectionParams<
+  TObj extends BaseGraphQLArguments = any,
+  TItem = any,
+  TEdgeDataStep extends Step = Step<TItem>,
+> {
   fieldArgs?: FieldArgs<TObj>;
+  edgeDataPlan?: ($item: Step<TItem>) => TEdgeDataStep;
 
   /** @internal */
   nodePlan?: never;
-  /** @internal */
-  edgeDataPlan?: never;
   /** @internal */
   cursorPlan?: never;
 }
@@ -853,37 +894,45 @@ interface ConnectionParams<TObj extends BaseGraphQLArguments = any> {
  */
 export function connection<
   TItem,
-  TItemStep extends Step<TItem> = Step<TItem>,
-  TNodeStep extends Step = TItemStep,
+  TNodeStep extends Step = Step<TItem>,
+  TEdgeDataStep extends Step = Step<TItem>,
+  TEdgeStep extends EdgeCapableStep<TItem, TNodeStep, TEdgeDataStep> = EdgeStep<
+    TItem,
+    TNodeStep,
+    TEdgeDataStep
+  >,
   TCursorValue = any,
   TCollectionStep extends StepRepresentingList<
     TItem,
-    TItemStep,
     TNodeStep,
+    TEdgeStep,
     TCursorValue
-  > = StepRepresentingList<TItem, TItemStep, TNodeStep, TCursorValue>,
+  > = StepRepresentingList<TItem, TNodeStep, TEdgeStep, TCursorValue>,
   TFieldArgs extends BaseGraphQLArguments = any,
 >(
   step: TCollectionStep,
-  params?: ConnectionParams<TFieldArgs>,
-): ConnectionStep<TItem, TItemStep, TNodeStep, TCursorValue, TCollectionStep> {
-  if (
-    typeof params === "function" ||
-    params?.nodePlan ||
-    params?.edgeDataPlan ||
-    params?.cursorPlan
-  ) {
+  params?: ConnectionParams<TFieldArgs, TItem, TEdgeDataStep>,
+): ConnectionStep<
+  TItem,
+  TNodeStep,
+  TEdgeDataStep,
+  TEdgeStep,
+  TCursorValue,
+  TCollectionStep
+> {
+  if (typeof params === "function" || params?.nodePlan || params?.cursorPlan) {
     throw new Error(
       `connection() was completely overhauled during the beta; this usage is no longer supported. Usage is much more straightforward now.`,
     );
   }
   const $connection = new ConnectionStep<
     TItem,
-    TItemStep,
     TNodeStep,
+    TEdgeDataStep,
+    TEdgeStep,
     TCursorValue,
     TCollectionStep
-  >(step);
+  >(step, params);
   const fieldArgs = params?.fieldArgs;
   if (fieldArgs) {
     const { $first, $last, $before, $after, $offset } = fieldArgs as FieldArgs;
@@ -1103,13 +1152,14 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
 }
 
 class PageInfoStep extends UnbatchedStep {
-  constructor($connection: ConnectionStep<any, any, any, any, any>) {
+  constructor($connection: ConnectionStep<any, any, any, any, any, any>) {
     super();
     this.addDependency($connection);
   }
 
   get(key: string) {
     const $connection = this.getDepOptions(0).step as ConnectionStep<
+      any,
       any,
       any,
       any,
@@ -1145,7 +1195,7 @@ class PageInfoStep extends UnbatchedStep {
   }
   unbatchedExecute(
     _extra: UnbatchedExecutionExtra,
-    _connection: ConnectionResult,
+    _connection: ConnectionResult<any>,
   ) {
     return EMPTY_OBJECT;
   }

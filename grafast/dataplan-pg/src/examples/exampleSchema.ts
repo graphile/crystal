@@ -1704,7 +1704,8 @@ export function makeExampleSchema(
   > = ConnectionStep<
     any,
     PgSelectSingleStep<TResource>,
-    PgSelectSingleStep<TResource>,
+    any,
+    any,
     null | readonly any[],
     PgSelectStep<TResource>
   >;
@@ -3720,7 +3721,8 @@ export function makeExampleSchema(
   type VulnerabilityConnectionStep = ConnectionStep<
     any,
     PgUnionAllSingleStep,
-    PgUnionAllSingleStep,
+    any,
+    any,
     null | readonly any[],
     PgUnionAllStep<any, any>
   >;
