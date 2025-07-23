@@ -1,5 +1,6 @@
 import * as assert from "../assert.js";
 import type {
+  BaseGraphQLArguments,
   ExecutionDetails,
   FieldArgs,
   GrafastResultsList,
@@ -845,8 +846,8 @@ export class EdgeStep<
   }
 }
 
-interface ConnectionParams {
-  fieldArgs?: FieldArgs;
+interface ConnectionParams<TObj extends BaseGraphQLArguments = any> {
+  fieldArgs?: FieldArgs<TObj>;
 
   /** @internal */
   nodePlan?: never;
@@ -865,15 +866,16 @@ export function connection<
   TItemStep extends Step<TItem> = Step<TItem>,
   TNodeStep extends Step = TItemStep,
   TCursorValue = any,
-  TCollectionStep extends ConnectionOptimizedStep<
+  TCollectionStep extends StepRepresentingList<
     TItem,
     TItemStep,
     TNodeStep,
     TCursorValue
-  > = ConnectionOptimizedStep<TItem, TItemStep, TNodeStep, TCursorValue>,
+  > = StepRepresentingList<TItem, TItemStep, TNodeStep, TCursorValue>,
+  TFieldArgs extends BaseGraphQLArguments = any,
 >(
   step: TCollectionStep,
-  params?: ConnectionParams,
+  params?: ConnectionParams<TFieldArgs>,
 ): ConnectionStep<TItem, TItemStep, TNodeStep, TCursorValue, TCollectionStep> {
   if (
     typeof params === "function" ||
@@ -894,7 +896,7 @@ export function connection<
   >(step);
   const fieldArgs = params?.fieldArgs;
   if (fieldArgs) {
-    const { $first, $last, $before, $after, $offset } = fieldArgs;
+    const { $first, $last, $before, $after, $offset } = fieldArgs as FieldArgs;
     // Connections may have a mixture of these arguments, so we must check each exists
     if ($first) $connection.setFirst($first);
     if ($last) $connection.setLast($last);

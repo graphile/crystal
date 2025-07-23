@@ -71,16 +71,19 @@ export function loadManyCallback<
 const idByLoad = new WeakMap<LoadManyCallback<any, any, any, any>, string>();
 let loadCounter = 0;
 
+interface LoadManyBaseParams {
+  [key: string]: Maybe<any>;
+  reverse?: Maybe<boolean>;
+  after?: Maybe<string>;
+  offset?: Maybe<number>;
+  limit?: Maybe<number>;
+}
+
 export class LoadManyStep<
     const TLookup extends Multistep,
     TItem,
     TData extends Maybe<ReadonlyArray<Maybe<TItem>>>, // loadMany
-    TParams extends Record<string, any> & {
-      reverse?: Maybe<boolean>;
-      after?: Maybe<string>;
-      offset?: Maybe<number>;
-      first?: Maybe<number>;
-    },
+    TParams extends LoadManyBaseParams = any,
     const TLoadContext extends Multistep = never,
   >
   extends Step<TData>
@@ -156,7 +159,7 @@ export class LoadManyStep<
   }
   setParam<TParamKey extends keyof TParams>(
     paramKey: TParamKey,
-    value: TParams[TParamKey] | Step<TParams[TParamKey]>,
+    value: TParams[TParamKey] | Step<Maybe<TParams[TParamKey]>>,
   ): void {
     this.paramDepIdByKey[paramKey] = this.addUnaryDependency(
       value instanceof Step ? value : constant(value),
@@ -285,7 +288,7 @@ export interface LoadManyArguments<
   TData extends Maybe<ReadonlyArray<Maybe<TItem>>> = Maybe<
     ReadonlyArray<Maybe<TItem>>
   >,
-  TParams extends Record<string, any> = Record<string, any>,
+  TParams extends LoadManyBaseParams = LoadManyBaseParams,
   TLoadContext extends Multistep = never,
 > {
   lookup: TLookup;
