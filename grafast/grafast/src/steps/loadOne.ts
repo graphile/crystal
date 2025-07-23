@@ -105,7 +105,13 @@ export class LoadOneStep<
     UnwrapMultistep<TUnaryMultistep>
   >;
   constructor(
-    options: LoadOneOptions<TMultistep, TItem, TData, TParams, TUnaryMultistep>,
+    options: LoadOneArguments<
+      TMultistep,
+      TItem,
+      TData,
+      TParams,
+      TUnaryMultistep
+    >,
   ) {
     super();
 
@@ -355,7 +361,7 @@ async function executeBatches(
   }
 }
 
-interface LoadOneOptions<
+interface LoadOneArguments<
   TLookup extends Multistep,
   TItem,
   TData extends Maybe<TItem> = Maybe<TItem>,
@@ -400,7 +406,7 @@ export function loadOne<
   TParams extends Record<string, any> = Record<string, any>,
   const TLoadContext extends Multistep = never,
 >(
-  options: LoadOneOptions<TLookup, TItem, TData, TParams, TLoadContext>,
+  options: LoadOneArguments<TLookup, TItem, TData, TParams, TLoadContext>,
 ): LoadOneStep<TLookup, TItem, TData, TParams, TLoadContext> {
   return new LoadOneStep(options);
 }
