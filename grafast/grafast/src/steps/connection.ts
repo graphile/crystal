@@ -247,8 +247,8 @@ export class ConnectionStep<
   };
   isSyncAndSafe = true;
 
-  private collectionRefId: number;
-  private collectionDepId: number | null = null;
+  private neededCollection = false;
+  private collectionDepId: number;
 
   // Pagination stuff
   private _firstDepId: number | null = null;
@@ -266,24 +266,24 @@ export class ConnectionStep<
 
   constructor(subplan: TCollectionStep) {
     super();
-    const refId = this.addRef(subplan);
-    if (!refId) {
-      throw new Error(`${this} couldn't depend on ${subplan}`);
-    }
-    this.collectionRefId = refId;
     if (
       "paginationSupport" in subplan &&
       "connectionClone" in subplan &&
       "applyPagination" in subplan
     ) {
       this.collectionPaginationSupport = subplan.paginationSupport;
+      // Clone it so we can mess with it
+      const $clone = subplan.connectionClone!(this);
+      this.collectionDepId = this.addDependency($clone);
     } else {
       this.collectionPaginationSupport = null;
+      // It's pure, don't change it!
+      this.collectionDepId = this.addDependency(subplan);
     }
   }
 
   public getSubplan(): TCollectionStep {
-    return this.getRef(this.collectionRefId) as TCollectionStep;
+    return this.getDepOptions(this.collectionDepId).step as TCollectionStep;
   }
 
   private _getSubplan() {
@@ -302,30 +302,15 @@ export class ConnectionStep<
    * This cannot be called before the arguments have been finalized.
    */
   private setupSubplanWithPagination() {
-    if (this.collectionDepId != null) {
-      return this.getDepOptions(this.collectionDepId).step as TCollectionStep &
-        Partial<
-          ConnectionOptimizedStep<TItem, TItemStep, TNodeStep, TCursorValue>
-        >;
-    }
-    const subplan = this._getSubplan();
-    if (this.collectionPaginationSupport) {
-      // Clone it so we can mess with it
-      const $clone = subplan.connectionClone!(this);
-      this.collectionDepId = this.addDependency($clone);
-      return $clone;
-    } else {
-      // It's pure, don't change it!
-      this.collectionDepId = this.addDependency(subplan);
-      return subplan as TCollectionStep &
-        Partial<
-          ConnectionOptimizedStep<TItem, TItemStep, TNodeStep, TCursorValue>
-        >;
-    }
+    this.neededCollection = true;
+    return this.getDepOptions(this.collectionDepId).step as TCollectionStep &
+      Partial<
+        ConnectionOptimizedStep<TItem, TItemStep, TNodeStep, TCursorValue>
+      >;
   }
 
   public toStringMeta(): string {
-    return String(this.getRef(this.collectionRefId)?.id);
+    return String(this.getDepOptions(this.collectionDepId).step.id);
   }
 
   public setNeedsNextPage() {
@@ -547,7 +532,9 @@ export class ConnectionStep<
   }
 
   public optimize() {
-    if (this.collectionPaginationSupport && this.collectionDepId != null) {
+    if (!this.neededCollection) {
+      return constant(EMPTY_CONNECTION_RESULT);
+    } else if (this.collectionPaginationSupport) {
       const $clone = this.getDepOptions(this.collectionDepId)
         .step as ConnectionOptimizedStep<
         TItem,
@@ -577,7 +564,7 @@ export class ConnectionStep<
     values,
     indexMap,
   }: ExecutionDetails): GrafastResultsList<ConnectionResult | null> {
-    if (this.collectionDepId == null) {
+    if (!this.neededCollection) {
       // The main collection is not actually fetched, so we don't need to do
       // any pagination stuff. Could be they just wanted `totalCount` for
       // example.
