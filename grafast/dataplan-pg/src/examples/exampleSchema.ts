@@ -112,7 +112,6 @@ import type {
   PgCodec,
   PgSelectQueryBuilderCallback,
 } from "../interfaces";
-import { PgPageInfoStep } from "../steps/pgPageInfo.js";
 import type {
   PgSelectParsedCursorStep,
   PgSelectQueryBuilder,

@@ -69,8 +69,6 @@ import type {
 import { PgCondition } from "./pgCondition.js";
 import type { PgCursorDetails } from "./pgCursor.js";
 import { PgCursorStep } from "./pgCursor.js";
-import type { PgPageInfoStep } from "./pgPageInfo.js";
-import { pgPageInfo } from "./pgPageInfo.js";
 import type { PgSelectSinglePlanOptions } from "./pgSelectSingle.js";
 import { PgSelectSingleStep } from "./pgSelectSingle.js";
 import type {
@@ -1008,14 +1006,6 @@ export class PgSelectStep<
       "" /* Digest of our arguments */,
       () => new PgSelectRowsStep(this),
     );
-  }
-
-  public pageInfo(
-    $connectionPlan: ConnectionStep<any, PgSelectParsedCursorStep, this, any>,
-  ): PgPageInfoStep<this> {
-    this.assertCursorPaginationAllowed();
-    this.lock();
-    return pgPageInfo($connectionPlan);
   }
 
   private getCursorDetails(): Step<PgCursorDetails> {

@@ -51,8 +51,6 @@ import type {
 import { PgCondition } from "./pgCondition.js";
 import type { PgCursorDetails } from "./pgCursor.js";
 import { PgCursorStep } from "./pgCursor.js";
-import type { PgPageInfoStep } from "./pgPageInfo.js";
-import { pgPageInfo } from "./pgPageInfo.js";
 import type { PgSelectParsedCursorStep } from "./pgSelect.js";
 import { getFragmentAndCodecFromOrder } from "./pgSelect.js";
 import type { PgSelectSingleStep } from "./pgSelectSingle.js";
@@ -817,12 +815,6 @@ on (${sql.indent(
   listItem(itemPlan: Step) {
     const $single = new PgUnionAllSingleStep(this, itemPlan);
     return $single as any;
-  }
-
-  public pageInfo(
-    $connectionPlan: ConnectionStep<any, PgSelectParsedCursorStep, this, any>,
-  ): PgPageInfoStep<this> {
-    return pgPageInfo($connectionPlan);
   }
 
   where(

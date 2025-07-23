@@ -1,6 +1,6 @@
 import "graphile-config";
 
-import type { EdgeCapableStep, Step } from "grafast";
+import type { Step } from "grafast";
 import { ConnectionStep } from "grafast";
 
 import { EXPORTABLE } from "../utils.js";
