@@ -49,18 +49,32 @@ export default function transformer(file: FileInfo, api: API) {
           props.push(j.objectProperty(j.identifier("load"), a));
         } else if (args.length === 3) {
           // Ambiguous: could be (spec, ioEquivalence, loadCallback) OR (spec, unary, loadCallback)
+          props.push(j.objectProperty(j.identifier("load"), b));
+          const isArrayOfStrings =
+            a.type === "ArrayExpression" &&
+            a.elements.every((e) => e?.type === "StringLiteral");
+          const isObjectOfStrings =
+            a.type === "ObjectExpression" &&
+            a.properties.every(
+              (p) =>
+                p?.type === "ObjectProperty" &&
+                p.value.type === "StringLiteral",
+            );
+          const isString = a.type === "StringLiteral";
+          /** This is our best guess */
+          const isIoEquivalence =
+            isArrayOfStrings || isObjectOfStrings || isString;
           props.push(
             j.objectProperty(
-              j.identifier("unaryOrIoEquivalencePleaseResolve"),
+              j.identifier(isIoEquivalence ? "ioEquivalence" : "unary"),
               a,
             ),
           );
-          props.push(j.objectProperty(j.identifier("load"), b));
         } else if (args.length === 4) {
           // (spec, unary, ioEquivalence, loadCallback)
+          props.push(j.objectProperty(j.identifier("load"), c));
           props.push(j.objectProperty(j.identifier("unary"), a));
           props.push(j.objectProperty(j.identifier("ioEquivalence"), b));
-          props.push(j.objectProperty(j.identifier("load"), c));
         } else {
           return null;
         }
@@ -71,7 +85,6 @@ export default function transformer(file: FileInfo, api: API) {
       const options = buildOptions();
       if (!options) return;
       changed = true;
-
       path.node.arguments = [options];
     });
 
