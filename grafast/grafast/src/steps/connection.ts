@@ -1,4 +1,5 @@
 import * as assert from "../assert.js";
+import { $$inhibit } from "../error.js";
 import type {
   BaseGraphQLArguments,
   ExecutionDetails,
@@ -7,8 +8,7 @@ import type {
   Maybe,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
-import type { Step } from "../step.js";
-import { UnbatchedStep } from "../step.js";
+import { Step , UnbatchedStep } from "../step.js";
 import { access } from "./access.js";
 import { constant, ConstantStep } from "./constant.js";
 import { each } from "./each.js";
@@ -52,7 +52,7 @@ export interface PaginationFeatures {
 
   /**
    * If you support cursor pagination you must provide a
-   * `.cursorForItem($item, $index)` method that returns the cursor to use for
+   * `.cursorForItem($item)` method that returns the cursor to use for
    * the given item, and we will assume yout support (and you must support) the
    * `after` parameter in `PaginationParams`.
    *
@@ -181,7 +181,7 @@ export interface ConnectionOptimizedStep<
   listItem?($item: Step<unknown>): TItemStep;
 
   /**
-   * Given the $item and the $index, return a step representing the cursor.
+   * Given the $item, return a step representing the cursor.
    *
    * Must be implemented if and only if `paginationSupport.cursor` is `true`.
    */
@@ -236,7 +236,7 @@ export class ConnectionStep<
     TNodeStep,
     TCursorValue
   > = StepRepresentingList<TItem, TItemStep, TNodeStep, TCursorValue>,
-> extends UnbatchedStep<ConnectionResult | null> {
+> extends Step<ConnectionResult | null> {
   static $$export = {
     moduleName: "grafast",
     exportName: "ConnectionStep",
@@ -478,7 +478,7 @@ export class ConnectionStep<
     return subplan.listItem?.($rawItem) ?? ($rawItem as TItemStep);
   }
 
-  public nodePlan = ($rawItem: Step<unknown>, _$index: Step<number>) => {
+  public nodePlan = ($rawItem: Step<unknown>) => {
     const subplan = this.setupSubplanWithPagination();
     const $item = this.listItem($rawItem);
     if (typeof subplan.nodeForItem === "function") {
@@ -488,10 +488,10 @@ export class ConnectionStep<
     }
   };
 
-  public edgePlan = ($rawItem: Step<unknown>, $index: Step<number>) => {
+  public edgePlan = ($rawItem: Step<unknown>) => {
     this.setupSubplanWithPagination();
     const $item = this.listItem($rawItem);
-    return new EdgeStep<TItemStep, TNodeStep>(this, $item, $index);
+    return new EdgeStep<TItemStep, TNodeStep>(this, $item);
   };
 
   public edges(): Step {
@@ -510,11 +510,11 @@ export class ConnectionStep<
     return this.nodes();
   }
 
-  public cursorPlan($item: TItemStep, $index: Step<number>) {
+  public cursorPlan($rawItem: Step<TItem>) {
     this.needsCursor = true;
     const subplan = this._getSubplan();
     if (this.collectionPaginationSupport?.cursor) {
-      return subplan.cursorForItem!($item);
+      return subplan.cursorForItem!(this.listItem($rawItem));
     } else {
       // We're doing cursors, which also means we're NOT doing reverse.
       // NOTE: there won't be a needsHasMore causing an extra row fetch when
@@ -522,6 +522,11 @@ export class ConnectionStep<
       // we start > 0
       const $leftPad = access(this.paginationParams(), "__skipOver");
       const $offset = access(this.paginationParams(), "offset", 0);
+      const $index = lambda(
+        { list: this.items(), item: $rawItem },
+        indexOf,
+        true,
+      );
       return lambda([$leftPad, $offset, $index], encodeNumericCursor);
     }
   }
@@ -545,6 +550,9 @@ export class ConnectionStep<
     return this;
   }
   deduplicatedWith(replacement: ConnectionStep<any, any, any, any, any>) {
+    if (this.neededCollection) {
+      replacement.neededCollection = true;
+    }
     if (this.needsCursor) {
       replacement.needsCursor = true;
     }
@@ -749,10 +757,6 @@ export class ConnectionStep<
       };
     });
   }
-
-  public unbatchedExecute() {
-    return EMPTY_OBJECT;
-  }
 }
 
 export class EdgeStep<
@@ -770,20 +774,13 @@ export class EdgeStep<
   constructor(
     $connection: ConnectionStep<any, TItemStep, TNodeStep, any, any>,
     $item: TItemStep,
-    $index: Step<number>,
   ) {
     super();
     const itemDepId = this.addDependency($item);
-    const indexDepId = this.addDependency($index);
     assert.strictEqual(
       itemDepId,
       0,
       "GrafastInternalError<89cc75cd-ccaf-4b7e-873f-a629c36d55f7>: item must be first dependency",
-    );
-    assert.strictEqual(
-      indexDepId,
-      1,
-      "GrafastInternalError<cfed94c3-f2f0-41e7-a05e-bd514f31e55c>: index must be second dependency",
     );
     this.connectionRefId = this.addRef($connection);
   }
@@ -813,11 +810,6 @@ export class EdgeStep<
     // We know we're not using flags
     return this.getDepOptions<TItemStep>(0).step;
   }
-  private getIndexStep() {
-    // We know we're not using flags
-    return this.getDepOptions<Step<number>>(0).step;
-  }
-
   // public data(): TEdgeDataStep {
   //   const $item = this.getItemStep();
   //   return this.getConnectionStep().edgeDataPlan?.($item) ?? ($item as any);
@@ -825,15 +817,13 @@ export class EdgeStep<
 
   node(): TNodeStep {
     const $item = this.getItemStep();
-    const $index = this.getIndexStep();
-    return this.getConnectionStep().nodePlan($item, $index);
+    return this.getConnectionStep().nodePlan($item);
   }
 
   cursor(): Step<string | null> {
     const $connection = this.getConnectionStep();
     const $item = this.getItemStep();
-    const $index = this.getIndexStep();
-    return $connection.cursorPlan($connection.listItem($item), $index);
+    return $connection.cursorPlan($item);
   }
 
   deduplicate(_peers: EdgeStep<any, any>[]): EdgeStep<TItemStep, TNodeStep>[] {
@@ -1139,14 +1129,13 @@ class PageInfoStep extends UnbatchedStep {
         // Get first node, get cursor for it
         const $items = access($connection, "items");
         const $first = first($items);
-        return $connection.cursorPlan($first, constant(0));
+        return $connection.cursorPlan($first);
       }
       case "endCursor": {
         // Get first node, get cursor for it
         const $items = access($connection, "items");
         const $last = last($items);
-        const $lastIndex = lambda($items, lengthMinusOne, true);
-        return $connection.cursorPlan($last, $lastIndex);
+        return $connection.cursorPlan($last);
       }
       default: {
         // TODO: allow expansion
@@ -1161,6 +1150,15 @@ class PageInfoStep extends UnbatchedStep {
     return EMPTY_OBJECT;
   }
 }
-function lengthMinusOne(list: Maybe<ReadonlyArray<any>>): number {
-  return list ? list.length - 1 : -1;
+
+function indexOf(params: {
+  list: Maybe<ReadonlyArray<any>>;
+  item: any;
+}): number | typeof $$inhibit {
+  const { list, item } = params;
+  if (Array.isArray(list)) {
+    const index = list.indexOf(item);
+    if (index >= 0) return index;
+  }
+  return $$inhibit;
 }
