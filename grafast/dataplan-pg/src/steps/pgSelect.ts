@@ -90,7 +90,7 @@ import { validateParsedCursor } from "./pgValidateParsedCursor.js";
 
 const ALWAYS_ALLOWED = true;
 
-export type PgSelectParsedCursorStep = LambdaStep<string, null | any[]>;
+export type PgSelectParsedCursorStep = Step<null | readonly any[]>;
 
 // Maximum identifier length in Postgres is 63 chars, so trim one off. (We
 // could do base64... but meh.)
@@ -365,9 +365,9 @@ export class PgSelectStep<
   implements
     ConnectionOptimizedStep<
       any,
-      PgSelectSingleStep<TResource>,
-      PgSelectSingleStep<TResource>,
-      null | string[]
+      PgSelectSingleStep<TResource> | PgClassExpressionStep<any, TResource>,
+      PgSelectSingleStep<TResource> | PgClassExpressionStep<any, TResource>,
+      null | readonly any[]
     >,
     /**
      * @internal PgSelectStep might not always implement PgSelectQueryBuilder;

@@ -224,11 +224,11 @@ export abstract class PgStmtBaseStep<T>
     return this;
   }
 
-  setAfter($parsedCursorPlan: PgSelectParsedCursorStep): void {
+  setAfter($parsedCursorPlan: Step<null | readonly any[]>): void {
     this.afterStepId = this.addUnaryDependency($parsedCursorPlan);
   }
 
-  setBefore($parsedCursorPlan: PgSelectParsedCursorStep): void {
+  setBefore($parsedCursorPlan: Step<null | readonly any[]>): void {
     this.beforeStepId = this.addUnaryDependency($parsedCursorPlan);
   }
 
@@ -247,7 +247,7 @@ export abstract class PgStmtBaseStep<T>
   };
 
   applyPagination(
-    $params: Step<PaginationParams<null | readonly string[]>>,
+    $params: Step<PaginationParams<null | readonly any[]>>,
   ): void {
     const $converted = lambda($params, convertParamsToLegacy, true);
     this.setFirst(access($converted, "first"));
@@ -633,7 +633,9 @@ export function makeValues(
   };
 }
 
-function convertParamsToLegacy(params: PaginationParams<null | string[]>) {
+function convertParamsToLegacy(
+  params: PaginationParams<null | readonly any[]>,
+) {
   if (params.reverse) {
     return {
       after: null,

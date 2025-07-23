@@ -884,7 +884,7 @@ export function connection<
   TItem,
   TItemStep extends Step<TItem> = Step<TItem>,
   TNodeStep extends Step = TItemStep,
-  TCursorValue = string,
+  TCursorValue = any,
   TCollectionStep extends ConnectionOptimizedStep<
     TItem,
     TItemStep,

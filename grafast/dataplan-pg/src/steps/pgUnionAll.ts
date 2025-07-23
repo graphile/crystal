@@ -422,7 +422,7 @@ export class PgUnionAllStep<
       any,
       PgSelectSingleStep<any>,
       PgSelectSingleStep<any>,
-      null | any[]
+      null | readonly any[]
     >
 {
   static $$export = {
