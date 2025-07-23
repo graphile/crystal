@@ -11,7 +11,9 @@ import { UnbatchedStep } from "../step.js";
 import { access } from "./access.js";
 import { constant, ConstantStep } from "./constant.js";
 import { each } from "./each.js";
+import { first } from "./first.js";
 import { lambda } from "./lambda.js";
+import { last } from "./last.js";
 
 type ParametersExceptFirst<F> = F extends (arg0: any, ...rest: infer R) => any
   ? R
@@ -52,6 +54,10 @@ export interface PaginationFeatures {
 }
 
 export interface PaginationParams<TCursorValue = string> {
+  /** @internal */
+  __skipOver: number;
+  /** @internal */
+  __isForwardPagination: boolean;
   /**
    * Fetch only this many rows. If null, apply no limit.
    */
@@ -106,7 +112,8 @@ export interface PaginationParams<TCursorValue = string> {
  * @param TCursorValue - If your step wants us to parse the cursor for you, the result of the parse. Useful for throwing an error before the fetch if the cursor is invalid.
  */
 export interface ConnectionOptimizedStep<
-  TItemStep extends Step = Step,
+  TItem,
+  TItemStep extends Step<TItem> = Step<TItem>,
   TNodeStep extends Step = TItemStep,
   TCursorValue = string,
 > extends Step {
@@ -119,9 +126,9 @@ export interface ConnectionOptimizedStep<
    * Useful for implementing things like `totalCount` or aggregates.
    */
   connectionClone(
-    $connection: ConnectionStep<TItemStep, TNodeStep, TCursorValue, any>,
+    $connection: ConnectionStep<TItem, TItemStep, TNodeStep, TCursorValue, any>,
     ...args: any[]
-  ): ConnectionOptimizedStep<TItemStep, TNodeStep, TCursorValue>; // TODO: `this`
+  ): ConnectionOptimizedStep<TItem, TItemStep, TNodeStep, TCursorValue>; // TODO: `this`
 
   /**
    * If set, we assume that you support at least `limit` pagination, even on an
@@ -167,6 +174,13 @@ export interface ConnectionOptimizedStep<
 }
 
 const EMPTY_OBJECT = Object.freeze(Object.create(null));
+const EMPTY_CONNECTION_RESULT: ConnectionResult = Object.freeze({
+  items: Object.freeze([]),
+  pageInfo: Object.freeze({
+    hasNextPage: false,
+    hasPreviousPage: false,
+  }),
+});
 
 interface ConnectionResult {
   pageInfo: {
@@ -176,28 +190,31 @@ interface ConnectionResult {
   items: ReadonlyArray<unknown>;
 }
 
-type ConnectionCapableStep<
-  TItemStep extends Step,
+export type StepRepresentingList<
+  TItem,
+  TItemStep extends Step<TItem> = Step<TItem>,
   TNodeStep extends Step = TItemStep,
   TCursorValue = string,
 > =
-  | ConnectionOptimizedStep<TItemStep, TNodeStep, TCursorValue>
-  | StepWithItems
-  | Step<readonly any[]>;
+  | ConnectionOptimizedStep<TItem, TItemStep, TNodeStep, TCursorValue>
+  | StepWithItems<TItem>
+  | Step<Maybe<readonly TItem[]>>;
 
 /**
  * Handles GraphQL cursor pagination in a standard and consistent way
  * indepdenent of data source.
  */
 export class ConnectionStep<
-  TItemStep extends Step,
+  TItem,
+  TItemStep extends Step<TItem> = Step<TItem>,
   TNodeStep extends Step = TItemStep,
   TCursorValue = string,
-  TCollectionStep extends ConnectionCapableStep<
+  TCollectionStep extends StepRepresentingList<
+    TItem,
     TItemStep,
     TNodeStep,
     TCursorValue
-  > = ConnectionCapableStep<TItemStep, TNodeStep, TCursorValue>,
+  > = StepRepresentingList<TItem, TItemStep, TNodeStep, TCursorValue>,
 > extends UnbatchedStep<ConnectionResult | null> {
   static $$export = {
     moduleName: "grafast",
@@ -246,7 +263,9 @@ export class ConnectionStep<
 
   private _getSubplan() {
     return this.getSubplan() as TCollectionStep &
-      Partial<ConnectionOptimizedStep<TItemStep, TNodeStep, TCursorValue>>;
+      Partial<
+        ConnectionOptimizedStep<TItem, TItemStep, TNodeStep, TCursorValue>
+      >;
   }
 
   /**
@@ -260,7 +279,9 @@ export class ConnectionStep<
   private setupSubplanWithPagination() {
     if (this.collectionDepId != null) {
       return this.getDepOptions(this.collectionDepId).step as TCollectionStep &
-        Partial<ConnectionOptimizedStep<TItemStep, TNodeStep, TCursorValue>>;
+        Partial<
+          ConnectionOptimizedStep<TItem, TItemStep, TNodeStep, TCursorValue>
+        >;
     }
     const subplan = this._getSubplan();
     if (this.collectionPaginationSupport) {
@@ -272,7 +293,9 @@ export class ConnectionStep<
       // It's pure, don't change it!
       this.collectionDepId = this.addDependency(subplan);
       return subplan as TCollectionStep &
-        Partial<ConnectionOptimizedStep<TItemStep, TNodeStep, TCursorValue>>;
+        Partial<
+          ConnectionOptimizedStep<TItem, TItemStep, TNodeStep, TCursorValue>
+        >;
     }
   }
 
@@ -282,6 +305,7 @@ export class ConnectionStep<
 
   public setNeedsNextPage() {
     this.fetchOneExtra = true;
+    this.setupSubplanWithPagination();
   }
 
   public getFirst(): Step<number | null | undefined> | null {
@@ -376,6 +400,7 @@ export class ConnectionStep<
   public cloneSubplanWithoutPagination(
     ...args: ParametersExceptFirst<
       TCollectionStep extends ConnectionOptimizedStep<
+        TItem,
         TItemStep,
         TNodeStep,
         TCursorValue
@@ -438,9 +463,14 @@ export class ConnectionStep<
     }
   }
 
+  public listItem($rawItem: Step<unknown>) {
+    const subplan = this._getSubplan();
+    return subplan.listItem?.($rawItem) ?? ($rawItem as TItemStep);
+  }
+
   public nodePlan = ($rawItem: Step<unknown>, _$index: Step<number>) => {
     const subplan = this.setupSubplanWithPagination();
-    const $item = subplan.listItem?.($rawItem) ?? ($rawItem as TItemStep);
+    const $item = this.listItem($rawItem);
     if (typeof subplan.nodeForItem === "function") {
       return subplan.nodeForItem($item);
     } else {
@@ -449,8 +479,8 @@ export class ConnectionStep<
   };
 
   public edgePlan = ($rawItem: Step<unknown>, $index: Step<number>) => {
-    const subplan = this.setupSubplanWithPagination();
-    const $item = subplan.listItem?.($rawItem) ?? ($rawItem as TItemStep);
+    this.setupSubplanWithPagination();
+    const $item = this.listItem($rawItem);
     return new EdgeStep<TItemStep, TNodeStep>(this, $item, $index);
   };
 
@@ -466,13 +496,28 @@ export class ConnectionStep<
     return each($items, this.nodePlan);
   }
 
+  public items() {
+    return this.nodes();
+  }
+
   public cursorPlan($item: TItemStep, $index: Step<number>) {
     this.needsCursor = true;
     const subplan = this._getSubplan();
-    if (typeof subplan.cursorForItem === "function") {
-      return subplan.cursorForItem($item);
+    if (this.collectionPaginationSupport?.cursor) {
+      const $cursor = subplan.cursorForItem!($item);
+      if (this.collectionPaginationSupport.reverse) {
+        return $cursor;
+      } else {
+        // Need to handle the possibility that we have reverse pagination
+        const $paginationParams = this.paginationParams();
+        return lambda(
+          [$cursor, $paginationParams, $index],
+          encodeNumericCursorIfBackwards,
+        );
+      }
     } else {
-      return lambda($index, encodeNumericCursor);
+      const $leftPad = this.getLeftPad();
+      return lambda([$index, $leftPad], encodeNumericCursor);
     }
   }
 
@@ -483,7 +528,12 @@ export class ConnectionStep<
   public optimize() {
     if (this.collectionPaginationSupport && this.collectionDepId != null) {
       const $clone = this.getDepOptions(this.collectionDepId)
-        .step as TCollectionStep & ConnectionOptimizedStep;
+        .step as ConnectionOptimizedStep<
+        TItem,
+        TItemStep,
+        TNodeStep,
+        TCursorValue
+      >;
       $clone.applyPagination(this.paginationParams());
     }
     /*
@@ -503,21 +553,43 @@ export class ConnectionStep<
   }
 
   public execute({
-    count,
     values,
     indexMap,
   }: ExecutionDetails): GrafastResultsList<ConnectionResult | null> {
+    if (this.collectionDepId == null) {
+      // The main collection is not actually fetched, so we don't need to do
+      // any pagination stuff. Could be they just wanted `totalCount` for
+      // example.
+      return indexMap((i) => EMPTY_CONNECTION_RESULT);
+    }
     const collectionDep = values[this.collectionDepId];
     const first =
-      this._firstDepId != null ? values[this._firstDepId].unaryValue() : null;
+      this._firstDepId != null
+        ? (values[this._firstDepId].unaryValue() as Maybe<number>)
+        : null;
     const last =
-      this._lastDepId != null ? values[this._lastDepId].unaryValue() : null;
+      this._lastDepId != null
+        ? (values[this._lastDepId].unaryValue() as Maybe<number>)
+        : null;
     const offset =
-      this._offsetDepId != null ? values[this._offsetDepId].unaryValue() : null;
+      this._offsetDepId != null
+        ? (values[this._offsetDepId].unaryValue() as Maybe<number>)
+        : null;
     const before =
-      this._beforeDepId != null ? values[this._beforeDepId].unaryValue() : null;
+      this._beforeDepId != null
+        ? (values[this._beforeDepId].unaryValue() as Maybe<TCursorValue>)
+        : null;
     const after =
-      this._afterDepId != null ? values[this._afterDepId].unaryValue() : null;
+      this._afterDepId != null
+        ? (values[this._afterDepId].unaryValue() as Maybe<TCursorValue>)
+        : null;
+
+    const { collectionPaginationSupport, fetchOneExtra } = this;
+    const {
+      reverse: supportsReverse,
+      offset: supportsOffset,
+      cursor: supportsCursor,
+    } = collectionPaginationSupport ?? {};
 
     const isForwardPagination =
       first != null || after != null || (before == null && last == null);
@@ -543,15 +615,20 @@ export class ConnectionStep<
     if (isForwardPagination) {
       if (after != null) {
         // Assert: before == null
-        if (this.collectionPaginationSupport?.cursor) {
+        if (supportsCursor) {
           // Already applied
         } else {
           // Collection doesn't support cursors; we must be using numeric cursors
-          sliceStart = decodeNumericCursor(after);
+          if (supportsOffset) {
+            // Already applied offset
+          } else {
+            const afterIndex = decodeNumericCursor(after as string);
+            sliceStart = afterIndex;
+          }
         }
       }
       if (offset != null) {
-        if (this.collectionPaginationSupport?.offset) {
+        if (supportsOffset) {
           // Already applied
         } else {
           sliceStart += offset;
@@ -565,21 +642,26 @@ export class ConnectionStep<
       }
     } else {
       // Backward pagination
-      if (this.collectionPaginationSupport?.reverse) {
+      if (supportsReverse) {
         // Collection will have reversed the data
         alreadyReversed = true;
         if (before != null) {
           // Assert: after == null
-          if (this.collectionPaginationSupport?.cursor) {
+          if (supportsCursor) {
             // Already applied
           } else {
             // Collection doesn't support cursors; we must be using numeric cursors
-            sliceStart = decodeNumericCursor(before);
+            const afterIndex = decodeNumericCursor(before as string);
+            if (supportsOffset) {
+              // Already applied
+            } else {
+              sliceStart = afterIndex;
+            }
           }
         }
       } else {
         // Collection doesn't support reversing the data, we must do everything ourselves
-        sliceStart = decodeNumericCursor(before);
+        sliceStart = decodeNumericCursor(before as string);
       }
       if (last != null) {
         limit = last;
@@ -596,57 +678,58 @@ export class ConnectionStep<
       const list = Array.isArray(collectionValue)
         ? collectionValue
         : collectionValue?.items;
-      if (list != null) {
-        // Now we need to apply our pagination stuff to it
-        let items = list as ReadonlyArray<unknown>;
-        let hasNext = false;
-        let sliced = false;
-        const diy = !isForwardPagination && !alreadyReversed;
-        if (diy) {
-          sliced = true;
-          items = [...items].reverse();
-        }
-        if (sliceStart > 0) {
-          sliced = true;
-          items = items.slice(sliceStart);
-        }
-        if (limit != null) {
-          if (this.fetchOneExtra) {
-            hasNext = limitFromEnd != null ? false : items.length >= limit;
-            if (hasNext) {
-              sliced = true;
-              items = items.slice(0, limit - 1);
-            }
-          } else {
-            if (limit < items.length) {
-              sliced = true;
-              items = items.slice(0, limit);
-            }
-          }
-        }
-        if (limitFromEnd != null && limitFromEnd < items.length) {
-          sliced = true;
-          items = items.slice(items.length - limitFromEnd);
-        }
-        if (alreadyReversed || diy) {
-          items = (sliced ? (items as Array<unknown>) : [...items]).reverse();
-        }
 
-        const hasNextPage = isForwardPagination ? hasNext : false;
-        const hasPreviousPage = isForwardPagination ? false : hasNext;
-
-        return {
-          // TODO: we should probably pass some info through so PageInfo can be extended
-          // collectionMeta: collectionValue === list ? null : collectionValue,
-          pageInfo: {
-            hasNextPage,
-            hasPreviousPage,
-          },
-          items,
-        };
-      } else {
+      if (list == null) {
         return null;
       }
+
+      // Now we need to apply our pagination stuff to it
+      let items = list as ReadonlyArray<unknown>;
+      let hasNext = false;
+      let sliced = false;
+      const diy = !isForwardPagination && !alreadyReversed;
+      if (diy) {
+        sliced = true;
+        items = [...items].reverse();
+      }
+      if (sliceStart > 0) {
+        sliced = true;
+        items = items.slice(sliceStart);
+      }
+      if (limit != null) {
+        if (fetchOneExtra) {
+          hasNext = limitFromEnd != null ? false : items.length >= limit;
+          if (hasNext) {
+            sliced = true;
+            items = items.slice(0, limit - 1);
+          }
+        } else {
+          if (limit < items.length) {
+            sliced = true;
+            items = items.slice(0, limit);
+          }
+        }
+      }
+      if (limitFromEnd != null && limitFromEnd < items.length) {
+        sliced = true;
+        items = items.slice(items.length - limitFromEnd);
+      }
+      if (alreadyReversed || diy) {
+        items = (sliced ? (items as Array<unknown>) : [...items]).reverse();
+      }
+
+      const hasNextPage = isForwardPagination ? hasNext : false;
+      const hasPreviousPage = isForwardPagination ? false : hasNext;
+
+      return {
+        // TODO: we should probably pass some info through so PageInfo can be extended
+        // collectionMeta: collectionValue === list ? null : collectionValue,
+        pageInfo: {
+          hasNextPage,
+          hasPreviousPage,
+        },
+        items,
+      };
     });
   }
 
@@ -665,7 +748,6 @@ export class EdgeStep<
   };
   isSyncAndSafe = true;
 
-  private readonly cursorDepId: number | null = null;
   private connectionRefId: number | null;
 
   constructor(
@@ -733,7 +815,7 @@ export class EdgeStep<
     const $connection = this.getConnectionStep();
     const $item = this.getItemStep();
     const $index = this.getIndexStep();
-    return $connection.cursorPlan($item, $index);
+    return $connection.cursorPlan($connection.listItem($item), $index);
   }
 
   deduplicate(_peers: EdgeStep<any, any>[]): EdgeStep<TItemStep, TNodeStep>[] {
@@ -745,8 +827,6 @@ export class EdgeStep<
     return record == null ? null : EMPTY_OBJECT;
   }
 }
-
-const warned = false;
 
 interface ConnectionParams {
   fieldArgs?: FieldArgs;
@@ -764,18 +844,20 @@ interface ConnectionParams {
  * cursor connections.
  */
 export function connection<
-  TItemStep extends Step,
+  TItem,
+  TItemStep extends Step<TItem> = Step<TItem>,
   TNodeStep extends Step = TItemStep,
   TCursorValue = string,
   TCollectionStep extends ConnectionOptimizedStep<
+    TItem,
     TItemStep,
     TNodeStep,
     TCursorValue
-  > = ConnectionOptimizedStep<TItemStep, TNodeStep, TCursorValue>,
+  > = ConnectionOptimizedStep<TItem, TItemStep, TNodeStep, TCursorValue>,
 >(
   step: TCollectionStep,
   params?: ConnectionParams,
-): ConnectionStep<TItemStep, TNodeStep, TCursorValue, TCollectionStep> {
+): ConnectionStep<TItem, TItemStep, TNodeStep, TCursorValue, TCollectionStep> {
   if (
     typeof params === "function" ||
     params?.nodePlan ||
@@ -787,6 +869,7 @@ export function connection<
     );
   }
   const $connection = new ConnectionStep<
+    TItem,
     TItemStep,
     TNodeStep,
     TCursorValue,
@@ -806,21 +889,23 @@ export function connection<
 }
 
 interface StepWithItems<TItem = any> extends Step {
-  items(): Step<ReadonlyArray<TItem>>;
+  items(): Step<Maybe<ReadonlyArray<TItem>>>;
 }
-export type ItemsStep<T extends StepWithItems | Step<readonly any[]>> =
-  T extends StepWithItems ? ReturnType<T["items"]> : T;
+export type ItemsStep<TStep extends StepRepresentingList<any>> =
+  TStep extends StepWithItems ? ReturnType<TStep["items"]> : TStep;
 
-export function itemsOrStep<T extends Step<readonly any[]> | StepWithItems>(
-  $step: T,
-): Step<readonly any[]> {
+export function itemsOrStep<
+  T extends Step<Maybe<readonly any[]>> | StepWithItems,
+>($step: T): Step<Maybe<readonly any[]>> {
   return "items" in $step && typeof $step.items === "function"
     ? $step.items()
     : $step;
 }
 
-function encodeNumericCursor(index: number): string {
-  return Buffer.from(String(index), "utf8").toString("base64");
+function encodeNumericCursor(index: number | readonly number[]): string {
+  const cursor =
+    typeof index === "number" ? index : index.reduce((memo, n) => memo + n, 0);
+  return Buffer.from(String(cursor), "utf8").toString("base64");
 }
 function decodeNumericCursor(cursor: string): number {
   const i = parseInt(Buffer.from(cursor, "base64").toString("utf8"), 10);
@@ -879,30 +964,166 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
   }
   unbatchedExecute(
     extra: UnbatchedExecutionExtra,
-    gqlFirst: Maybe<number>,
-    gqlLast: Maybe<number>,
-    gqlOffset: Maybe<number>,
-    gqlBefore: Maybe<string>,
-    gqlAfter: Maybe<string>,
+    first: Maybe<number>,
+    last: Maybe<number>,
+    offset: Maybe<number>,
+    before: Maybe<TCursorValue>,
+    after: Maybe<TCursorValue>,
   ): PaginationParams<TCursorValue> {
     const {
       paginationSupport: {
         reverse: supportsReverse,
         offset: supportsOffset,
-        cursor: supportCursor,
+        cursor: supportsCursor,
       },
       fetchOneExtra,
     } = this;
-    const limit = null;
-    const offset = null;
-    const after = null;
-    const reverse = false;
-    // TODO: implement logic
-    return {
-      limit,
-      offset,
-      after,
-      reverse,
+    /** How many records do we need to skip over in addition to a limit implied by `first`/`last`? */
+    const params: PaginationParams<TCursorValue> = {
+      __skipOver: 0,
+      __isForwardPagination: true,
+      limit: null,
+      offset: null,
+      after: null,
+      reverse: false,
     };
+
+    const isForwardPagination =
+      first != null || after != null || (before == null && last == null);
+    if (first != null && (!Number.isSafeInteger(first) || first < 0)) {
+      throw new Error("Invalid 'first'");
+    }
+    if (last != null && (!Number.isSafeInteger(last) || last < 0)) {
+      throw new Error("Invalid 'last'");
+    }
+    if (isForwardPagination && before != null) {
+      throw new Error(
+        `May not set both 'after' and 'before': please paginate only forwards or backwards.`,
+      );
+    }
+    if (!isForwardPagination && offset != null) {
+      throw new Error(`May not combine 'offset' with backward pagination.`);
+    }
+
+    params.__isForwardPagination = isForwardPagination;
+    if (isForwardPagination) {
+      if (after != null) {
+        if (supportsCursor) {
+          params.after = after;
+        } else {
+          // Collection doesn't support cursors; we must be using numeric cursors
+          const afterIndex = decodeNumericCursor(after as string);
+          if (supportsOffset) {
+            params.offset = (params.offset ?? 0) + afterIndex;
+          } else {
+            params.__skipOver += afterIndex;
+          }
+        }
+      }
+      if (offset != null) {
+        if (supportsOffset) {
+          params.offset = (params.offset ?? 0) + offset;
+        } else {
+          params.__skipOver += offset;
+        }
+      }
+      if (first != null) {
+        params.limit = params.__skipOver + first + (fetchOneExtra ? 1 : 0);
+      } else {
+        // Just fetch the lot
+      }
+      // Note: last is ignored here - it's applied by collection() only
+    } else {
+      // Backward pagination
+      if (supportsReverse) {
+        params.reverse = true;
+        if (before != null) {
+          if (supportsCursor) {
+            params.after = before;
+          } else {
+            // Collection doesn't support cursors; we must be using numeric cursors
+            const afterIndex = decodeNumericCursor(before as string);
+            if (supportsOffset) {
+              params.offset = (params.offset ?? 0) + afterIndex;
+            } else {
+              params.__skipOver += afterIndex;
+            }
+          }
+        }
+        if (last != null) {
+          params.limit = params.__skipOver + last + (fetchOneExtra ? 1 : 0);
+        } else {
+          // Just fetch the lot
+        }
+        // Note: first is ignored here - it's applied by connection() only
+      } else {
+        // Fetch everything
+      }
+    }
+
+    return params;
   }
+}
+
+class PageInfoStep extends UnbatchedStep {
+  constructor($connection: ConnectionStep<any, any, any, any>) {
+    super();
+    this.addDependency($connection);
+  }
+
+  get(key: string) {
+    const $connection = this.getDepOptions(0).step as ConnectionStep<
+      any,
+      any,
+      any,
+      any
+    >;
+    switch (key) {
+      case "hasNextPage": {
+        const $pageInfo = access($connection, "pageInfo");
+        return access($pageInfo, "hasNextPage");
+      }
+      case "hasPreviousPage": {
+        const $pageInfo = access($connection, "pageInfo");
+        return access($pageInfo, "hasPreviousPage");
+      }
+      case "startCursor": {
+        // Get first node, get cursor for it
+        const $items = access($connection, "items");
+        const $first = first($items);
+        return $connection.cursorPlan($first, constant(0));
+      }
+      case "endCursor": {
+        // Get first node, get cursor for it
+        const $items = access($connection, "items");
+        const $last = last($items);
+        const $lastIndex = lambda($items, lengthMinusOne, true);
+        return $connection.cursorPlan($last, $lastIndex);
+      }
+      default: {
+        // TODO: allow expansion
+        return constant(undefined);
+      }
+    }
+  }
+  unbatchedExecute(
+    _extra: UnbatchedExecutionExtra,
+    _connection: ConnectionResult,
+  ) {
+    return EMPTY_OBJECT;
+  }
+}
+function lengthMinusOne(list: Maybe<ReadonlyArray<any>>): number {
+  return list ? list.length - 1 : -1;
+}
+
+function encodeNumericCursorIfBackwards([cursor, params, index]: [
+  cursor: string,
+  paginationParams: PaginationParams,
+  index: number,
+]): string {
+  if (params.__isForwardPagination === true) {
+    return cursor;
+  }
+  return encodeNumericCursor(index + params.__skipOver);
 }
