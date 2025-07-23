@@ -29,10 +29,27 @@ export interface PaginationFeatures {
   /**
    * If you want to support reverse pagination, supporting `reverse` is vital.
    * Without it, we must fetch the entire collection (no limit, offset, or
-   * cursor) in order to access the last entries. To support `reverse`, all you
-   * need to do is fetch in the inverse order. It is recommended that if you do
-   * not support `reverse` that you do not expose the reverse pagination
-   * arguments (`before` and `last`) as part of a GraphQL schema.
+   * cursor) in order to access the last entries.
+   *
+   * If you support `reverse` you MUST also support `cursor`, otherwise a
+   * request such as `last: 3` cannot determine the cursors to use (since we
+   * would need to know the length of the collection), and since cursors must
+   * be the same values whether paginating forwards or backwards. If you cannot
+   * support cursor, then simply do not indicate that you support `reverse` and
+   * `connection()` will take care of pagination for you.
+   *
+   * To support `reverse`, you need to be able to apply the other supported
+   * params from the end of the collection working backwards (`after` becomes
+   * `before`, `offset` skips the nodes at the end instead of the start,
+   * `limit` is applied such that it limits from the end rather than from the
+   * start). One way to implement this is to reverse the ordering, apply the
+   * params as normal, and then reverse the ordering back again. Do **NOT**
+   * return the list in reverse order.
+   *
+   * It is recommended that if you do not support `reverse` that you do not
+   * expose the reverse pagination arguments (`before` and `last`) as part of a
+   * GraphQL schema, since `connection()` will need to fetch your entire
+   * collection to implement pagination.
    */
   reverse?: boolean;
 
@@ -41,14 +58,21 @@ export interface PaginationFeatures {
    * `.cursorForItem($item, $index)` method that returns the cursor to use for
    * the given item, and we will assume yout support (and you must support) the
    * `after` parameter in `PaginationParams`.
+   *
+   * If this is true but `reverse` is not, we will reject all attempts to do
+   * reverse pagination (because a cursor cannot be applied by us, even if we
+   * were to fetch the full collection). You should therefore strongly consider
+   * implementing `reverse` support, or simply do not allow reverse pagination
+   * through your schema.
    */
   cursor?: boolean;
 
   /**
    * If you support offset pagination, set this to true. If you also set
-   * `cursor` to true, then the offset must apply _from_ the cursor; if you do
-   * not support combining `offset` and `cursor` together then you should set
-   * `offset` to false (and raise an issue so we can add new options for that).
+   * `cursor` to true, then the offset must apply _from_ the cursor; if have
+   * `cursor` enabled and do not support combining `offset` and `cursor`
+   * together then you should set `offset` to `false` (and raise an issue so we
+   * can add new options for that).
    */
   offset?: boolean;
 }
@@ -75,16 +99,16 @@ export interface PaginationParams<TCursorValue = string> {
    * skip over anything up to and including this cursor. Always `null` unless
    * `paginationSupport.cursor` is `true`.
    *
-   * Note: if `reverse` is `true`, this applies after the collection has been
-   * reversed (i.e. if `reverse` is true then `after` is equivalent to the
-   * `before` argument exposed through GraphQL.
+   * Note: if `reverse` is `true`, this applies in the reverse direction (i.e.
+   * if `after` becomes equivalent to the `before` argument exposed through
+   * GraphQL).
    */
   after: TCursorValue | null;
 
   /**
-   * If we're paginating backwards then the collection should be reversed
-   * before applying the limit, offset and after. Always `false` unless
-   * `paginationSupport.cursor` is `true`.
+   * If we're paginating backwards then the collection should apply the other
+   * parameters (`limit`, `offset`, `after`) in reverse (from the end of the
+   * collection). Always `false` unless `paginationSupport.cursor` is `true`.
    */
   reverse: boolean;
 }
@@ -107,6 +131,7 @@ export interface PaginationParams<TCursorValue = string> {
  *
  * Be sure to read the documentation of the features you indicate support for!
  *
+ * @param TItem - The data represented by an individual list item
  * @param TItemStep - Represents an item in the collection, typically equivalent to an _edge_.
  * @param TNodeStep - A derivative of TItemStep that represents the _node_ itself. Defaults to TItemStep.
  * @param TCursorValue - If your step wants us to parse the cursor for you, the result of the parse. Useful for throwing an error before the fetch if the cursor is invalid.
@@ -236,7 +261,7 @@ export class ConnectionStep<
   private collectionPaginationSupport: PaginationFeatures | null;
 
   /** If the user asks for details of `hasNextPage`/`hasPreviousPage`, then fetch one extra */
-  private fetchOneExtra = false;
+  private needsHasMore = false;
   private needsCursor = false;
 
   constructor(subplan: TCollectionStep) {
@@ -304,7 +329,7 @@ export class ConnectionStep<
   }
 
   public setNeedsNextPage() {
-    this.fetchOneExtra = true;
+    this.needsHasMore = true;
     this.setupSubplanWithPagination();
   }
 
@@ -428,9 +453,10 @@ export class ConnectionStep<
         `Subplan must support pagination optimization to call this method`,
       );
     }
+    // TODO: memoize
     return new ConnectionParamsStep<TCursorValue>({
       paginationSupport: this.collectionPaginationSupport,
-      fetchOneExtra: this.fetchOneExtra,
+      fetchOneExtra: this.needsHasMore,
       before: this.getBefore(),
       after: this.getAfter(),
       first: this.getFirst(),
@@ -504,20 +530,15 @@ export class ConnectionStep<
     this.needsCursor = true;
     const subplan = this._getSubplan();
     if (this.collectionPaginationSupport?.cursor) {
-      const $cursor = subplan.cursorForItem!($item);
-      if (this.collectionPaginationSupport.reverse) {
-        return $cursor;
-      } else {
-        // Need to handle the possibility that we have reverse pagination
-        const $paginationParams = this.paginationParams();
-        return lambda(
-          [$cursor, $paginationParams, $index],
-          encodeNumericCursorIfBackwards,
-        );
-      }
+      return subplan.cursorForItem!($item);
     } else {
-      const $leftPad = this.getLeftPad();
-      return lambda([$index, $leftPad], encodeNumericCursor);
+      // We're doing cursors, which also means we're NOT doing reverse.
+      // NOTE: there won't be a needsHasMore causing an extra row fetch when
+      // doing numeric pagination backwards - we know there's another record if
+      // we start > 0
+      const $leftPad = access(this.paginationParams(), "__skipOver");
+      const $offset = access(this.paginationParams(), "offset", 0);
+      return lambda([$leftPad, $offset, $index], encodeNumericCursor);
     }
   }
 
@@ -547,8 +568,8 @@ export class ConnectionStep<
     if (this.needsCursor) {
       replacement.needsCursor = true;
     }
-    if (this.fetchOneExtra) {
-      replacement.fetchOneExtra = true;
+    if (this.needsHasMore) {
+      replacement.needsHasMore = true;
     }
   }
 
@@ -584,7 +605,7 @@ export class ConnectionStep<
         ? (values[this._afterDepId].unaryValue() as Maybe<TCursorValue>)
         : null;
 
-    const { collectionPaginationSupport, fetchOneExtra } = this;
+    const { collectionPaginationSupport, needsHasMore } = this;
     const {
       reverse: supportsReverse,
       offset: supportsOffset,
@@ -611,7 +632,6 @@ export class ConnectionStep<
     let limit = null;
     let limitFromEnd = null;
     let sliceStart = 0;
-    let alreadyReversed = false;
     if (isForwardPagination) {
       if (after != null) {
         // Assert: before == null
@@ -643,28 +663,36 @@ export class ConnectionStep<
     } else {
       // Backward pagination
       if (supportsReverse) {
-        // Collection will have reversed the data
-        alreadyReversed = true;
         if (before != null) {
+          assert.ok(
+            supportsCursor,
+            "If reverse pagination is supported, cursor pagination must also be supported.",
+          );
           // Assert: after == null
-          if (supportsCursor) {
-            // Already applied
-          } else {
-            // Collection doesn't support cursors; we must be using numeric cursors
-            const afterIndex = decodeNumericCursor(before as string);
-            if (supportsOffset) {
-              // Already applied
-            } else {
-              sliceStart = afterIndex;
-            }
-          }
+          // Already applied limit and cursor (and offset is forbidden)
         }
       } else {
-        // Collection doesn't support reversing the data, we must do everything ourselves
-        sliceStart = decodeNumericCursor(before as string);
-      }
-      if (last != null) {
-        limit = last;
+        if (before != null) {
+          // Collection doesn't support reversing the data, we must do
+          // it with numbers.
+          const beforeIndex = decodeNumericCursor(before as string);
+          if (last != null) {
+            if (supportsOffset) {
+              //Already handled
+              sliceStart = 0;
+            } else {
+              sliceStart = Math.max(0, beforeIndex - last);
+            }
+            limit = Math.min(last, beforeIndex);
+          } else {
+            sliceStart = 0;
+            limit = beforeIndex;
+          }
+        } else {
+          throw new Error(
+            "Reverse pagination without `before` parameter is forbidden on this collection",
+          );
+        }
       }
       if (first != null) {
         limitFromEnd = first;
@@ -686,36 +714,45 @@ export class ConnectionStep<
       // Now we need to apply our pagination stuff to it
       let items = list as ReadonlyArray<unknown>;
       let hasNext = false;
-      let sliced = false;
-      const diy = !isForwardPagination && !alreadyReversed;
-      if (diy) {
-        sliced = true;
-        items = [...items].reverse();
-      }
       if (sliceStart > 0) {
-        sliced = true;
         items = items.slice(sliceStart);
       }
       if (limit != null) {
-        if (fetchOneExtra) {
-          hasNext = limitFromEnd != null ? false : items.length >= limit;
-          if (hasNext) {
-            sliced = true;
-            items = items.slice(0, limit - 1);
+        if (needsHasMore) {
+          if (!supportsCursor && !isForwardPagination && last != null) {
+            // In this special case, hasNext is simply whether we started
+            // fetching > 0 or not
+            hasNext = decodeNumericCursor(before as string) - last > 0;
+            if (items.length > limit) {
+              items = items.slice(items.length - limit);
+            }
+          } else {
+            hasNext = limitFromEnd != null ? false : items.length >= limit;
+            if (hasNext) {
+              const n = limit - 1;
+              if (isForwardPagination) {
+                items = items.slice(0, n);
+              } else {
+                items = items.slice(Math.max(0, items.length - n));
+              }
+            }
           }
         } else {
           if (limit < items.length) {
-            sliced = true;
-            items = items.slice(0, limit);
+            if (isForwardPagination) {
+              items = items.slice(0, limit);
+            } else {
+              items = items.slice(Math.max(0, items.length - limit));
+            }
           }
         }
       }
       if (limitFromEnd != null && limitFromEnd < items.length) {
-        sliced = true;
-        items = items.slice(items.length - limitFromEnd);
-      }
-      if (alreadyReversed || diy) {
-        items = (sliced ? (items as Array<unknown>) : [...items]).reverse();
+        if (isForwardPagination) {
+          items = items.slice(items.length - limitFromEnd);
+        } else {
+          items = items.slice(0, limitFromEnd);
+        }
       }
 
       const hasNextPage = isForwardPagination ? hasNext : false;
@@ -962,6 +999,15 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
     assert.strictEqual(this.beforeDepId, 3, "before must be dep 3");
     assert.strictEqual(this.afterDepId, 4, "after must be dep 4");
   }
+  deduplicate(
+    peers: ConnectionParamsStep<any>[],
+  ): ConnectionParamsStep<TCursorValue>[] {
+    return peers.filter(
+      (p) =>
+        p.paginationSupport === this.paginationSupport &&
+        p.fetchOneExtra === this.fetchOneExtra,
+    ) as ConnectionParamsStep<TCursorValue>[];
+  }
   unbatchedExecute(
     extra: UnbatchedExecutionExtra,
     first: Maybe<number>,
@@ -1041,13 +1087,9 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
           if (supportsCursor) {
             params.after = before;
           } else {
-            // Collection doesn't support cursors; we must be using numeric cursors
-            const afterIndex = decodeNumericCursor(before as string);
-            if (supportsOffset) {
-              params.offset = (params.offset ?? 0) + afterIndex;
-            } else {
-              params.__skipOver += afterIndex;
-            }
+            throw new Error(
+              "If reverse pagination is supported, cursor pagination must also be supported.",
+            );
           }
         }
         if (last != null) {
@@ -1057,7 +1099,28 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
         }
         // Note: first is ignored here - it's applied by connection() only
       } else {
-        // Fetch everything
+        // Implement numeric cursor pagination
+        if (before != null) {
+          const beforeIndex = decodeNumericCursor(before as string);
+          if (last != null) {
+            if (supportsOffset) {
+              /** Inclusive */
+              const lowerIndex = Math.max(0, beforeIndex - last);
+              params.offset = lowerIndex;
+              params.limit = beforeIndex - lowerIndex;
+            } else {
+              // Fetch everything before beforeIndex, we'll trim it out in connection()
+              params.limit = beforeIndex;
+            }
+          } else {
+            // Fetch everything before beforeIndex
+            params.limit = beforeIndex;
+          }
+        } else {
+          throw new Error(
+            "Reverse pagination without `before` parameter is forbidden on this collection",
+          );
+        }
       }
     }
 
@@ -1115,15 +1178,4 @@ class PageInfoStep extends UnbatchedStep {
 }
 function lengthMinusOne(list: Maybe<ReadonlyArray<any>>): number {
   return list ? list.length - 1 : -1;
-}
-
-function encodeNumericCursorIfBackwards([cursor, params, index]: [
-  cursor: string,
-  paginationParams: PaginationParams,
-  index: number,
-]): string {
-  if (params.__isForwardPagination === true) {
-    return cursor;
-  }
-  return encodeNumericCursor(index + params.__skipOver);
 }
