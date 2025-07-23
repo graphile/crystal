@@ -8,7 +8,7 @@ const TierList = [
     tagline: "Thank you!",
     pricing: "$25",
     link: "https://github.com/sponsors/benjie/sponsorships?tier_id=369",
-    buttonText: "Join on GitHub Sponsors",
+    buttonText: "",
     description: (
       <>
         <ul>
@@ -31,7 +31,7 @@ const TierList = [
     tagline: "Support sustainability",
     pricing: "$100",
     link: "https://github.com/sponsors/benjie/sponsorships?tier_id=368",
-    buttonText: "Join on GitHub Sponsors",
+    buttonText: "",
     description: (
       <>
         <ul>
@@ -62,7 +62,7 @@ const TierList = [
     tagline: "Get featured in the project",
     pricing: "$500",
     link: "https://github.com/sponsors/benjie/sponsorships?tier_id=367",
-    buttonText: "Join on GitHub Sponsors",
+    buttonText: "",
     description: (
       <>
         <ul>

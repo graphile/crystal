@@ -20,19 +20,29 @@
   font-size: 0.9rem;
   margin: 0.5rem;
   padding: 1rem;
-  border: 2px solid var(--ifm-color-primary-light);
+  border: 2px solid var(--ifm-color-primary-dark);
   border-radius: 12px;
 }
 
 .tier:nth-child(2) {
-  border: 3px solid var(--ifm-color-primary-dark);
+  border: 3px solid var(--ifm-color-primary-light);
 }
 
-.title {
+[data-theme="dark"] .tier {
+  border: 3px solid var(--ifm-color-primary-light);
+}
+
+[data-theme="dark"] .tier:nth-child(2) {
+  border: 3px solid var(--ifm-color-primary);
+}
+
+.title,
+.note {
   color: var(--ifm-color-primary-darker);
 }
 
-[data-theme="dark"] .title {
+[data-theme="dark"] .title,
+[data-theme="dark"] .note {
   color: var(--ifm-color-primary-lighter);
 }
 
@@ -46,25 +56,61 @@
 
 .note {
   font-size: 0.8rem;
-  color: var(--ifm-color-primary-darker);
   font-weight: var(--ifm-font-weight-base);
 }
 
-[data-theme="dark"] .note {
-  color: var(--ifm-color-primary-lighter);
+.tier:nth-child(2) .title,
+.tier:nth-child(2) .note {
+  color: var(--ifm-color-primary);
+}
+
+[data-theme="dark"] .tier:nth-child(2) .title,
+[data-theme="dark"] .tier:nth-child(2) .note {
+  color: var(--ifm-color-primary);
 }
 
 .button {
   width: 100%;
   margin: 1rem 0 1rem 0;
+  background-color: var(--ifm-color-primary-dark);
+  border-color: var(--ifm-color-primary-dark);
+}
+
+.button:before {
+  content: "Join on GitHub Sponsors";
+}
+
+.tier:nth-child(2) .button {
+  background-color: var(--ifm-color-primary);
+  border-color: var(--ifm-color-primary);
+}
+
+.tier .button:hover {
+  background-color: var(--ifm-color-primary-darkest);
+  border-color: var(--ifm-color-primary-darkest);
+}
+
+[data-theme="dark"] .button {
+  background-color: var(--ifm-color-primary-light);
+  border-color: var(--ifm-color-primary-light);
+}
+
+[data-theme="dark"] .tier .button:hover {
+  background-color: var(--ifm-color-primary-lightest);
+  border-color: var(--ifm-color-primary-lightest);
 }
 
 @media screen and (max-width: 1200px) {
   .tierRow {
     flex-direction: column;
+    gap: 0.5rem;
   }
   .tier {
-    font-size: 1rem;
     flex: 0 0 auto;
+    font-size: 1rem;
+    margin: 0;
+  }
+  .button:before {
+    content: "GitHub Sponsors";
   }
 }
