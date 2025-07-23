@@ -195,48 +195,55 @@ const makeSchema = (useStreamableStep = false) => {
       Query: {
         plans: {
           thingById(_, { $id }) {
-            return loadOne($id as Step<number>, loadThingByIds);
+            return loadOne({
+              lookup: $id as Step<number>,
+              load: loadThingByIds,
+            });
           },
           thingByIdObj(_, { $id }) {
-            return loadOne(
-              { identifier: $id as Step<number> },
-              { identifier: "id" },
-              loadThingByIdentifierObjs,
-            );
+            return loadOne({
+              lookup: { identifier: $id as Step<number> },
+              load: loadThingByIdentifierObjs,
+              ioEquivalence: { identifier: "id" },
+            });
           },
           thingByIdList(_, { $id }) {
-            return loadOne(
-              [$id as Step<number>],
-              ["id"],
-              loadThingByIdentifierLists,
-            );
+            return loadOne({
+              lookup: [$id as Step<number>],
+              load: loadThingByIdentifierLists,
+              ioEquivalence: ["id"],
+            });
           },
           thingByOrgIdRegNoTuple(_, fieldArgs) {
             const $regNo = fieldArgs.getRaw("regNo") as Step<number>;
             const $orgId = context().get("orgId");
-            return loadOne(
-              [$orgId, $regNo],
+            return loadOne({
+              lookup: [$orgId, $regNo],
+              load: loadThingByOrgIdRegNoTuples,
               // Deliberately not using ioEquivalence here to test stable object/tuple creation
-              //["orgId", "orgRegNo"],
-              loadThingByOrgIdRegNoTuples,
-            );
+              //   ioEquivalence: ["orgId", "orgRegNo"],
+            });
           },
           thingByOrgIdRegNoObj(_, fieldArgs) {
             const $regNo = fieldArgs.getRaw("regNo") as Step<number>;
             const $orgId = context().get("orgId");
-            return loadOne(
-              { orgId: $orgId, regNo: $regNo },
+            return loadOne({
+              lookup: { orgId: $orgId, regNo: $regNo },
+              load: loadThingByOrgIdRegNoObjs,
               // Deliberately not using ioEquivalence here to test stable object/tuple creation
-              //{ orgId: "orgId", regNo: "orgRegNo" },
-              loadThingByOrgIdRegNoObjs,
-            );
+              //   ioEquivalence: { orgId: "orgId", regNo: "orgRegNo" },
+            });
           },
         },
       },
       Thing: {
         plans: {
           org($thing) {
-            return loadOne($thing.get("orgId"), "id", loadOrgByIds);
+            return loadOne({
+              lookup: $thing.get("orgId"),
+              load: loadOrgByIds,
+              ioEquivalence: "id",
+            });
           },
         },
       } as ObjectPlan<LoadedRecordStep<Thing>>,
@@ -244,19 +251,19 @@ const makeSchema = (useStreamableStep = false) => {
         plans: {
           thingByTuple($org: LoadedRecordStep<Org>, { $regNo }) {
             const $orgId = $org.get("id");
-            return loadOne(
-              [$orgId, $regNo],
-              ["orgId", "orgRegNo"],
-              loadThingByOrgIdRegNoTuples,
-            );
+            return loadOne({
+              lookup: [$orgId, $regNo],
+              load: loadThingByOrgIdRegNoTuples,
+              ioEquivalence: ["orgId", "orgRegNo"],
+            });
           },
           thingByObj($org: LoadedRecordStep<Org>, { $regNo }) {
             const $orgId = $org.get("id");
-            return loadOne(
-              { orgId: $orgId, regNo: $regNo },
-              { orgId: "orgId", regNo: "orgRegNo" },
-              loadThingByOrgIdRegNoObjs,
-            );
+            return loadOne({
+              lookup: { orgId: $orgId, regNo: $regNo },
+              load: loadThingByOrgIdRegNoObjs,
+              ioEquivalence: { orgId: "orgId", regNo: "orgRegNo" },
+            });
           },
         },
       },

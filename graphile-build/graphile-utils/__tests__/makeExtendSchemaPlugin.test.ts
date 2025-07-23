@@ -219,10 +219,10 @@ it("supports unary steps in loadOne", async () => {
                 uppercaseName($user) {
                   const $name = $user.get("name");
                   const $executorContext = main.context();
-                  return loadOne(
-                    $name,
-                    $executorContext,
-                    async (names, { unary: executorContext }) => {
+                  return loadOne({
+                    lookup: $name,
+
+                    load: async (names, { unary: executorContext }) => {
                       const { withPgClient, pgSettings } = executorContext;
                       const { rows } = await withPgClient(
                         pgSettings,
@@ -237,7 +237,9 @@ it("supports unary steps in loadOne", async () => {
                           rows.find((r) => r.i === String(i))?.upper_name,
                       );
                     },
-                  );
+
+                    unary: $executorContext,
+                  });
                 },
               },
             },
