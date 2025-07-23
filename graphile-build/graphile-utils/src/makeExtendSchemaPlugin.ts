@@ -1,5 +1,6 @@
 import type {
   AbstractTypePlanner,
+  DeprecatedInputObjectPlan,
   DeprecatedObjectPlan,
   GrafastSchemaConfig,
   ObjectFieldConfig,
@@ -374,7 +375,7 @@ export function extendSchema(
                 `plans is deprecated and may not be specified alongside newer approaches`,
               );
             }
-            plans = rawPlans;
+            plans = rawPlans as Plans;
           } else {
             // Hackily convert the new format into the old format. We'll do away with
             // this in future, but for now it's the easiest way to ensure compatibility
@@ -432,7 +433,13 @@ export function extendSchema(
                   node.kind === Kind.INTERFACE_TYPE_EXTENSION ||
                   node.kind === Kind.INTERFACE_TYPE_DEFINITION
                 ) {
-                  return ["an interface type", "interfaces"] as const;
+                  return [
+                    "an interface type",
+                    "interfaces",
+                    (nodes as Array<typeof node>)
+                      .flatMap((n) => n.fields?.map((f) => f.name.value))
+                      .filter(isNotNullish),
+                  ] as const;
                 } else if (
                   node.kind === Kind.UNION_TYPE_EXTENSION ||
                   node.kind === Kind.UNION_TYPE_DEFINITION
@@ -484,6 +491,7 @@ export function extendSchema(
 
               const { plans: planResolvers = {}, ...rest } = spec;
               for (const [key, val] of Object.entries(rest)) {
+                assertNotDunder(`objects.${typeName}`, key);
                 o[`__${key}`] = val;
               }
               for (const [key, val] of Object.entries(planResolvers)) {
@@ -503,6 +511,7 @@ export function extendSchema(
 
               const { plans: planResolvers = {}, ...rest } = spec;
               for (const [key, val] of Object.entries(rest)) {
+                assertNotDunder(`inputObjects.${typeName}`, key);
                 o[`__${key}`] = val;
               }
               for (const [key, val] of Object.entries(planResolvers)) {
@@ -521,23 +530,57 @@ export function extendSchema(
               plans[typeName] = o as any;
 
               for (const [key, val] of Object.entries(spec)) {
+                assertNotDunder(`unions.${typeName}`, key);
                 o[`__${key}`] = val;
               }
             }
 
             for (const [typeName, spec] of Object.entries(interfaces ?? {})) {
-              assertLocation(typeName, "interfaces");
+              const fields = assertLocation(typeName, "interfaces");
               const o = {} as Record<string, any>;
               plans[typeName] = o as any;
 
-              for (const [key, val] of Object.entries(spec)) {
+              const { fields: fieldConfigs = {}, ...rest } = spec;
+              for (const [key, val] of Object.entries(rest)) {
+                assertNotDunder(`interfaces.${typeName}`, key);
                 o[`__${key}`] = val;
+              }
+              for (const [key, val] of Object.entries(fieldConfigs)) {
+                if (!fields.includes(key)) {
+                  throw new Error(
+                    `Interface type '${typeName}' field '${key}' was not defined in this plugin.`,
+                  );
+                }
+                o[key] = val;
               }
             }
 
             for (const [typeName, spec] of Object.entries(scalars ?? {})) {
               assertLocation(typeName, "scalars");
-              plans[typeName] = spec;
+              if (spec instanceof GraphQLScalarType) {
+                plans[typeName] = spec as any;
+              } else {
+                const {
+                  plan,
+                  serialize,
+                  extensions,
+                  parseValue,
+                  parseLiteral,
+                  ...rest
+                } = spec;
+                const o = {
+                  plan,
+                  serialize,
+                  extensions,
+                  parseValue,
+                  parseLiteral,
+                } as Record<string, any>;
+                plans[typeName] = o as any;
+                for (const [key, val] of Object.entries(rest)) {
+                  assertNotDunder(`scalars.${typeName}`, key);
+                  o[`__${key}`] = val;
+                }
+              }
             }
 
             for (const [typeName, spec] of Object.entries(enums ?? {})) {
@@ -552,6 +595,7 @@ export function extendSchema(
                 );
               }
               for (const [key, val] of Object.entries(rest)) {
+                assertNotDunder(`enums.${typeName}`, key);
                 o[`__${key}`] = val;
               }
               for (const [key, val] of Object.entries(values)) {
@@ -656,23 +700,15 @@ export function extendSchema(
                   interfaces: () => getInterfaces(definition.interfaces, build),
                   fields: (fieldsContext) =>
                     getFields(
+                      build,
+                      fieldsContext,
                       fieldsContext.Self,
                       definition.fields,
                       resolvers,
                       plans,
-                      fieldsContext,
-                      build,
                     ),
-                  ...(description
-                    ? {
-                        description,
-                      }
-                    : null),
-                  ...(p.__isTypeOf
-                    ? {
-                        isTypeOf: p.__isTypeOf,
-                      }
-                    : null),
+                  ...(description ? { description } : null),
+                  ...(p.__isTypeOf ? { isTypeOf: p.__isTypeOf } : null),
                   ...(p.__assertStep || p.__planType
                     ? {
                         extensions: {
@@ -703,13 +739,9 @@ export function extendSchema(
                 name,
                 scope,
                 () => ({
-                  fields: ({ Self }) =>
-                    getInputFields(Self, definition.fields, build),
-                  ...(description
-                    ? {
-                        description,
-                      }
-                    : null),
+                  fields: (context) =>
+                    getInputFields(build, context, definition.fields, plans),
+                  ...(description ? { description } : null),
                 }),
                 uniquePluginName,
               );
@@ -792,12 +824,12 @@ export function extendSchema(
                   ...(description ? { description } : null),
                   fields: (fieldsContext) =>
                     getFields(
+                      build,
+                      fieldsContext,
                       fieldsContext.Self,
                       definition.fields,
-                      Object.create(null), // Interface doesn't need resolvers
-                      Object.create(null), // Interface doesn't need resolvers
-                      fieldsContext,
-                      build,
+                      resolvers,
+                      plans,
                     ),
                   ...(description
                     ? {
@@ -925,12 +957,12 @@ export function extendSchema(
                 extension: ObjectTypeExtensionNode,
               ) => {
                 const moreFields = getFields(
+                  build,
+                  context,
                   Self,
                   extension.fields,
                   resolvers,
                   plans,
-                  context,
-                  build,
                 );
                 return extend(
                   memo,
@@ -992,7 +1024,7 @@ export function extendSchema(
           const {
             extend,
             makeExtendSchemaPlugin: {
-              [uniquePluginName]: { typeExtensions },
+              [uniquePluginName]: { typeExtensions, plans },
             },
           } = build;
           const { Self } = context;
@@ -1005,9 +1037,10 @@ export function extendSchema(
                 extension: InputObjectTypeExtensionNode,
               ) => {
                 const moreFields = getInputFields(
-                  Self,
-                  extension.fields,
                   build,
+                  context,
+                  extension.fields,
+                  plans,
                 );
                 return extend(
                   memo,
@@ -1031,7 +1064,7 @@ export function extendSchema(
           const {
             extend,
             makeExtendSchemaPlugin: {
-              [uniquePluginName]: { typeExtensions },
+              [uniquePluginName]: { typeExtensions, resolvers, plans },
             },
           } = build;
           const { Self } = context;
@@ -1044,12 +1077,12 @@ export function extendSchema(
                 extension: InterfaceTypeExtensionNode,
               ) => {
                 const moreFields = getFields(
+                  build,
+                  context,
                   Self,
                   extension.fields,
-                  Object.create(null), // No resolvers for interfaces
-                  Object.create(null), // No resolvers for interfaces
-                  context,
-                  build,
+                  resolvers,
+                  plans,
                 );
                 return extend(
                   memo,
@@ -1284,14 +1317,14 @@ export function extendSchema(
   }
 
   function getFields<TSource>(
+    build: GraphileBuild.Build,
+    context:
+      | GraphileBuild.ContextInterfaceFields
+      | GraphileBuild.ContextObjectFields,
     SelfGeneric: TSource,
     fields: ReadonlyArray<FieldDefinitionNode> | undefined,
     resolvers: Resolvers,
     plans: Plans,
-    context:
-      | GraphileBuild.ContextInterfaceFields
-      | GraphileBuild.ContextObjectFields,
-    build: GraphileBuild.Build,
   ) {
     const {
       graphql: { getNullableType, getNamedType },
@@ -1342,17 +1375,9 @@ export function extendSchema(
           const spec = possiblePlan ?? possibleResolver;
           const fieldSpecGenerator = () => {
             return {
-              ...(deprecationReason
-                ? {
-                    deprecationReason,
-                  }
-                : null),
-              ...(description
-                ? {
-                    description,
-                  }
-                : null),
-              ...(typeof spec === "function"
+              ...(deprecationReason ? { deprecationReason } : null),
+              ...(description ? { description } : null),
+              ...(build.graphql.isObjectType(Self) && typeof spec === "function"
                 ? {
                     [possiblePlan
                       ? isRootSubscription
@@ -1436,29 +1461,46 @@ export function extendSchema(
     return {};
   }
 
-  function getInputFields<TSource>(
-    _Self: TSource,
-    fields: ReadonlyArray<InputValueDefinitionNode> | undefined,
+  function getInputFields(
     build: GraphileBuild.Build,
+    context: GraphileBuild.ContextInputObjectFields,
+    fields: ReadonlyArray<InputValueDefinitionNode> | undefined,
+    plans: Plans,
   ) {
+    const { Self } = context;
     if (fields && fields.length) {
       return fields.reduce((memo, field) => {
         if (field.kind === "InputValueDefinition") {
           const description = getDescription(field.description);
           const fieldName = getName(field.name);
           const type = getType(field.type, build);
+          const directives = getDirectives(field.directives);
+          if (!build.graphql.isInputType(type)) {
+            throw new Error(`${Self.name}.${fieldName} must use an input type`);
+          }
           const defaultValue = field.defaultValue
             ? getValue(field.defaultValue, type)
             : undefined;
-          memo[fieldName] = {
+          const spec = (plans[Self.name] as Maybe<DeprecatedInputObjectPlan>)?.[
+            fieldName
+          ];
+          const scope: GraphileBuild.ScopeObjectFieldsField = {
+            fieldDirectives: directives,
+
+            // Allow user to overwrite
+            ...scopeFromDirectives(directives),
+            ...(typeof spec === "object" && spec !== null
+              ? (spec as any).scope
+              : null),
+
+            // fieldName always wins
+            fieldName,
+          };
+          memo[fieldName] = context.fieldWithHooks(scope, {
             type,
             defaultValue,
-            ...(description
-              ? {
-                  description,
-                }
-              : null),
-          };
+            ...(description ? { description } : null),
+          });
         } else {
           throw new Error(
             `AST issue: expected 'FieldDefinition', instead received '${field.kind}'`,
@@ -1488,3 +1530,11 @@ function isNotNullish<T>(v: Maybe<T>): v is T {
 
 /** @deprecated Renamed to 'extendSchema' */
 export const makeExtendSchemaPlugin = extendSchema;
+
+function assertNotDunder(loc: string, key: string) {
+  if (key.startsWith("__")) {
+    throw new Error(
+      `Key ${JSON.stringify(key)} defined at location ${loc} shouldn't start with __`,
+    );
+  }
+}

@@ -310,6 +310,7 @@ ${inner}
     return this;
   }
 
+  __inferGet?: TPlans;
   /**
    * Get the original plan with the given key back again.
    */

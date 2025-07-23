@@ -191,12 +191,12 @@ export type EnumValueInput =
 /**
  * The values/configs for the entries in a GraphQL enum type.
  */
-export type EnumPlan = {
+export interface EnumPlan {
   values?: {
     // The internal value for the enum
     [enumValueName: string]: EnumValueInput | undefined;
   };
-};
+}
 
 /**
  * A map from GraphQL named type to the config for that type.

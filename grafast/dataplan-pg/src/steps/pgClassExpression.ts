@@ -133,6 +133,12 @@ export class PgClassExpressionStep<
     }
   }
 
+  __inferGet?: {
+    [TAttr in keyof GetPgCodecAttributes<TExpressionCodec>]: PgClassExpressionStep<
+      GetPgCodecAttributes<TExpressionCodec>[TAttr]["codec"],
+      TResource
+    >;
+  };
   /* Here's the proper type of this function, but that makes using it painful.
     ```ts
     public get<

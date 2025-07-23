@@ -14128,22 +14128,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graphql-language-service@npm:^5.3.0":
-  version: 5.4.0
-  resolution: "graphql-language-service@npm:5.4.0"
-  dependencies:
-    debounce-promise: "npm:^3.1.2"
-    nullthrows: "npm:^1.0.0"
-    vscode-languageserver-types: "npm:^3.17.1"
-  peerDependencies:
-    graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
-  bin:
-    graphql: dist/temp-bin.js
-  checksum: 10/d1489f40a67c45f1e3888cc0779d339dbc1eb409e12fe5961abb68ec2a7036eeef3532b355a34da87d45df7ac46b9b817f165d745178df6c657152c3d2a0aa7d
-  languageName: node
-  linkType: hard
-
-"graphql-language-service@npm:^5.5.0":
+"graphql-language-service@npm:^5.3.0, graphql-language-service@npm:^5.5.0":
   version: 5.5.0
   resolution: "graphql-language-service@npm:5.5.0"
   dependencies:

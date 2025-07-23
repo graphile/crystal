@@ -124,14 +124,17 @@ export class ConstantStep<TData> extends UnbatchedStep<TData> {
     return this.data === undefined;
   }
 
-  get(key: string) {
+  __inferGet?: {
+    [TKey in keyof TData]: ConstantStep<TData[TKey]>;
+  };
+  get<TKey extends keyof TData>(key: TKey): ConstantStep<TData[TKey]> {
     const value =
       typeof this.data === "object" &&
       this.data !== null &&
       Object.hasOwn(this.data, key)
-        ? (this.data as Record<string, any>)[key]
+        ? this.data[key]
         : undefined;
-    return constant(value);
+    return constant(value as TData[TKey]);
   }
 
   at(index: number) {

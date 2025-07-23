@@ -131,7 +131,14 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
             );
             continue;
           }
-          const pgResource = resources[0];
+          const tableResources = resources.filter((s) => !s.parameters);
+          if (tableResources.length !== 1) {
+            console.warn(
+              `Multiple tables were found representing ${codec.name}; since we don't know which one to use, we won't use any.`,
+            );
+            continue;
+          }
+          const pgResource = tableResources[0];
           const primaryKey = (pgResource.uniques as PgResourceUnique[]).find(
             (u) => u.isPrimary === true,
           );
@@ -153,19 +160,17 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
               isSafeObjectPropertyName(attributeName),
             );
 
-          const firstSource = resources.find((s) => !s.parameters);
-
           build.registerNodeIdHandler({
             typeName: tableTypeName,
             codec: build.getNodeIdCodec!(
               codec.extensions?.tags?.nodeIdCodec ??
-                firstSource?.extensions?.tags?.nodeIdCodec ??
+                pgResource?.extensions?.tags?.nodeIdCodec ??
                 build.options?.defaultNodeIdCodec ??
                 "base64JSON",
             ),
             deprecationReason: tagToString(
               codec.extensions?.tags?.deprecation ??
-                firstSource?.extensions?.tags?.deprecated,
+                pgResource?.extensions?.tags?.deprecated,
             ),
             plan: clean
               ? // eslint-disable-next-line graphile-export/exhaustive-deps

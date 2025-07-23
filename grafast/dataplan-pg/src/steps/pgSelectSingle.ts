@@ -160,6 +160,18 @@ export class PgSelectSingleStep<
     return this.get("" as any) as any;
   }
 
+  __inferGet?: {
+    [TAttr in keyof GetPgResourceAttributes<TResource>]: PgClassExpressionStep<
+      GetPgResourceAttributes<TResource>[TAttr] extends PgCodecAttribute<
+        infer UCodec,
+        any
+      >
+        ? UCodec
+        : never,
+      TResource
+    >;
+  };
+
   /**
    * Returns a plan representing a named attribute (e.g. column) from the class
    * (e.g. table).
