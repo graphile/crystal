@@ -1,5 +1,13 @@
 # ruru
 
+## 2.0.0-beta.29
+
+### Patch Changes
+
+- [`ce9dd46`](https://github.com/graphile/crystal/commit/ce9dd46bd0625ab23ee0f728baec0479149ef895)
+  Thanks [@benjie](https://github.com/benjie)! - Fix the sidebar border in
+  collapsed mode
+
 ## 2.0.0-beta.28
 
 ### Patch Changes
