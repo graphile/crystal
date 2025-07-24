@@ -120,6 +120,11 @@
 
   .graphiql-plugin {
     padding: var(--px-8) var(--px-12);
+    border-left: none;
+  }
+  .graphiql-sidebar {
+    border-right: 1px solid
+      hsla(var(--color-neutral), var(--alpha-background-heavy));
   }
 
   .graphiql-explorer-graphql-arguments > div > span > svg {
