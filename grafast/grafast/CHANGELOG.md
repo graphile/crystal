@@ -1,5 +1,19 @@
 # grafast
 
+## 0.1.1-beta.25
+
+### Patch Changes
+
+- [#2652](https://github.com/graphile/crystal/pull/2652)
+  [`2adfd6e`](https://github.com/graphile/crystal/commit/2adfd6efedd1ab6831605526a515c683a7e95c2c)
+  Thanks [@benjie](https://github.com/benjie)! - Make `get($step, attr)` more
+  type-safe when the underlying steps implement the new `__inferGet` pattern.
+
+- [#2649](https://github.com/graphile/crystal/pull/2649)
+  [`6113518`](https://github.com/graphile/crystal/commit/61135188900c39d0cb6bd2f9c0033f0954cd0e6a)
+  Thanks [@benjie](https://github.com/benjie)! - Add missing export
+  `InputObjectFieldConfig`
+
 ## 0.1.1-beta.24
 
 ### Patch Changes

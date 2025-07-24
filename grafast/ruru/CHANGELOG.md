@@ -1,5 +1,20 @@
 # ruru
 
+## 2.0.0-beta.28
+
+### Patch Changes
+
+- [#2646](https://github.com/graphile/crystal/pull/2646)
+  [`59adcd5`](https://github.com/graphile/crystal/commit/59adcd52d3fd465c8d6afdcefaa41c82c9a77319)
+  Thanks [@benjie](https://github.com/benjie)! - Add condensed mode for Ruru,
+  enabled by default. (To disable, use the settings cog in the editor view and
+  uncheck condensed.)
+
+- [#2645](https://github.com/graphile/crystal/pull/2645)
+  [`f941cfd`](https://github.com/graphile/crystal/commit/f941cfdcc8235e34716d3595745a05e49267de12)
+  Thanks [@benjie](https://github.com/benjie)! - Upgrade GraphiQL to latest
+  release
+
 ## 2.0.0-beta.27
 
 ### Patch Changes
