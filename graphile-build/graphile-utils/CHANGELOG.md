@@ -1,5 +1,24 @@
 # graphile-utils
 
+## 5.0.0-beta.43
+
+### Patch Changes
+
+- [#2649](https://github.com/graphile/crystal/pull/2649)
+  [`8cfd4b3`](https://github.com/graphile/crystal/commit/8cfd4b37057ec54814f2f53f96a42400cbde69ca)
+  Thanks [@benjie](https://github.com/benjie)! - Allow setting scope in the new
+  `extendSchema()` format on all the GraphQL types, plus object fields and input
+  object fields.
+- Updated dependencies
+  [[`9e21b2a`](https://github.com/graphile/crystal/commit/9e21b2ac0814c351d68f50b5a121699e088209bd),
+  [`2adfd6e`](https://github.com/graphile/crystal/commit/2adfd6efedd1ab6831605526a515c683a7e95c2c),
+  [`73f626b`](https://github.com/graphile/crystal/commit/73f626b8065389f226f66a4752112cf6b013855a),
+  [`6113518`](https://github.com/graphile/crystal/commit/61135188900c39d0cb6bd2f9c0033f0954cd0e6a)]:
+  - graphile-build@5.0.0-beta.37
+  - graphile-build-pg@5.0.0-beta.44
+  - @dataplan/pg@0.0.1-beta.36
+  - grafast@0.1.1-beta.25
+
 ## 5.0.0-beta.42
 
 ### Patch Changes

@@ -1,5 +1,33 @@
 # ruru-components
 
+## 2.0.0-beta.35
+
+### Patch Changes
+
+- [`ce9dd46`](https://github.com/graphile/crystal/commit/ce9dd46bd0625ab23ee0f728baec0479149ef895)
+  Thanks [@benjie](https://github.com/benjie)! - Fix the sidebar border in
+  collapsed mode
+
+## 2.0.0-beta.34
+
+### Patch Changes
+
+- [#2646](https://github.com/graphile/crystal/pull/2646)
+  [`59adcd5`](https://github.com/graphile/crystal/commit/59adcd52d3fd465c8d6afdcefaa41c82c9a77319)
+  Thanks [@benjie](https://github.com/benjie)! - Add condensed mode for Ruru,
+  enabled by default. (To disable, use the settings cog in the editor view and
+  uncheck condensed.)
+
+- [#2645](https://github.com/graphile/crystal/pull/2645)
+  [`f941cfd`](https://github.com/graphile/crystal/commit/f941cfdcc8235e34716d3595745a05e49267de12)
+  Thanks [@benjie](https://github.com/benjie)! - Upgrade GraphiQL to latest
+  release
+
+- Updated dependencies
+  [[`2adfd6e`](https://github.com/graphile/crystal/commit/2adfd6efedd1ab6831605526a515c683a7e95c2c),
+  [`6113518`](https://github.com/graphile/crystal/commit/61135188900c39d0cb6bd2f9c0033f0954cd0e6a)]:
+  - grafast@0.1.1-beta.25
+
 ## 2.0.0-beta.33
 
 ### Patch Changes
