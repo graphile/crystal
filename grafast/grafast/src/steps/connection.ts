@@ -1,4 +1,7 @@
+import { isAsyncIterable, isIterable } from "iterall";
+
 import * as assert from "../assert.js";
+import { defer } from "../deferred.js";
 import { currentFieldStreamDetails } from "../engine/lib/withGlobalLayerPlan.js";
 import { $$inhibit } from "../error.js";
 import type {
@@ -8,6 +11,7 @@ import type {
   FieldArgs,
   GrafastResultsList,
   Maybe,
+  PromiseOrDirect,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import { Step, UnbatchedStep } from "../step.js";
@@ -78,10 +82,6 @@ export interface PaginationFeatures {
 }
 
 export interface PaginationParams<TCursorValue = string> {
-  /** @internal */
-  __skipOver: number;
-  /** @internal */
-  __isForwardPagination: boolean;
   /**
    * Fetch only this many rows. If null, apply no limit.
    */
@@ -119,6 +119,59 @@ export interface PaginationParams<TCursorValue = string> {
    * `executionDetails.stream`.
    */
   stream: ExecutionDetailsStream | null;
+
+  /* ---------------------------------------- */
+
+  /**
+   * True if `after` or `first` is set, or if neither `before` or `last` is
+   * set.
+   *
+   * @internal */
+  __isForwardPagination: boolean;
+
+  /**
+   * How many records to trim off the front of the stream; typically used where
+   * the underlying collection doesn't support 'offset'.
+   *
+   * @internal
+   */
+  __skipOver: number;
+
+  /**
+   * Stop after this many rows. Only used for reverse numerical pagination when
+   * `limit` is unsupported.
+   *
+   * @internal
+   */
+  __limit: number;
+
+  /**
+   * True if we know there's definitely more records.
+   * False if we know there's definitely no more records.
+   * Otherwise a tuple saying which side of the remaining result we should pick
+   * from (and drop from) to determine if there's a next page.
+   *
+   * If side = `l` then we need to retain records until we hit `limit`. When we
+   * start dropping records, we set `hasMore` to true.
+   *
+   * If side = `r` then we can stream through `limit` records and then stop
+   * sending records, but we consume one extra to see if `hasMore` is true or
+   * not.
+   *
+   * @internal */
+  __hasMore: boolean | [side: "l" | "r", limit: number];
+
+  // /**
+  //  * If set, how many records to retain in memory  whilst traversing the collection.
+  //  *
+  //  * If __isForwardPagination then we'll stop traversing the collection once we
+  //  * have retained this many. Otherwise we'll dropping the first each time we
+  //  * exceed the limit.
+  //  *
+  //  * We only start retaining after we have passed `__skipOver`.
+  //  *
+  //  * @internal */
+  // __retain: number | null;
 }
 
 /**
@@ -216,18 +269,14 @@ export interface ConnectionOptimizedStep<
 const EMPTY_OBJECT = Object.freeze(Object.create(null));
 const EMPTY_CONNECTION_RESULT: ConnectionResult<never> = Object.freeze({
   items: Object.freeze([]),
-  pageInfo: Object.freeze({
-    hasNextPage: false,
-    hasPreviousPage: false,
-  }),
+  hasNextPage: false,
+  hasPreviousPage: false,
 });
 
 interface ConnectionResult<TItem> {
-  pageInfo: {
-    hasNextPage: boolean;
-    hasPreviousPage: boolean;
-  };
-  items: ReadonlyArray<TItem>;
+  hasNextPage: PromiseOrDirect<boolean>;
+  hasPreviousPage: PromiseOrDirect<boolean>;
+  items: ReadonlyArray<TItem> | Iterable<TItem> | AsyncIterable<TItem>;
 }
 
 interface EdgeCapableStep<
@@ -629,6 +678,11 @@ export class ConnectionStep<
       return indexMap((i) => EMPTY_CONNECTION_RESULT);
     }
     const collectionDep = values[this.collectionDepId];
+    const params = values[
+      this.paramsDepId
+    ].unaryValue() as PaginationParams<TCursorValue>;
+
+    /*
     const first =
       this._firstDepId != null
         ? (values[this._firstDepId].unaryValue() as Maybe<number>)
@@ -649,6 +703,7 @@ export class ConnectionStep<
       this._afterDepId != null
         ? (values[this._afterDepId].unaryValue() as Maybe<TCursorValue>)
         : null;
+    */
 
     const { collectionPaginationSupport, needsHasMore } = this;
     const {
@@ -656,6 +711,8 @@ export class ConnectionStep<
       offset: supportsOffset,
       cursor: supportsCursor,
     } = collectionPaginationSupport ?? {};
+
+    /* The following have already been asserted by ConnectionParamsStep.
 
     const isForwardPagination =
       first != null || after != null || (before == null && last == null);
@@ -665,6 +722,13 @@ export class ConnectionStep<
     if (last != null && (!Number.isSafeInteger(last) || last < 0)) {
       throw new Error("Invalid 'last'");
     }
+    if (first != null && last != null) {
+      // Setting boht first and last makes queries nonsensical.
+      // https://relay.dev/graphql/connections.htm#note-95f8a
+      throw new Error(
+        "It is not permitted to set both 'first' and 'last' in the same field.",
+      );
+    }
     if (isForwardPagination && before != null) {
       throw new Error(
         `May not set both 'after' and 'before': please paginate only forwards or backwards.`,
@@ -673,9 +737,12 @@ export class ConnectionStep<
     if (!isForwardPagination && offset != null) {
       throw new Error(`May not combine 'offset' with backward pagination.`);
     }
+    */
 
-    let limit = null;
-    let limitFromEnd = null;
+    const { __isForwardPagination } = params;
+
+    let limitL = null;
+    let limitR = null;
     let sliceStart = 0;
     if (isForwardPagination) {
       if (after != null) {
@@ -700,10 +767,10 @@ export class ConnectionStep<
         }
       }
       if (first != null) {
-        limit = first;
+        limitL = first;
       }
       if (last != null) {
-        limitFromEnd = last;
+        limitR = last;
       }
     } else {
       // Backward pagination
@@ -714,24 +781,41 @@ export class ConnectionStep<
             "If reverse pagination is supported, cursor pagination must also be supported.",
           );
           // Assert: after == null
-          // Already applied limit and cursor (and offset is forbidden)
+          // Already applied limit (`last`) and cursor (`before`) (and `offset` is forbidden)
+        }
+        if (first != null) {
+          limitL = first;
+        }
+        if (last != null && (first == null || last < first)) {
+          limitR = last;
         }
       } else {
+        // Does NOT support reverse.
+        if (supportsCursor) {
+          throw new Error("This endpoint does not support reverse pagination");
+        }
+        // No cursor
         if (before != null) {
           // Collection doesn't support reversing the data, we must do
           // it with numbers.
-          const beforeIndex = decodeNumericCursor(before as string);
-          if (last != null) {
+          let beforeIndex = decodeNumericCursor(before as string);
+          if (first != null) {
+            beforeIndex = Math.min(first, beforeIndex);
+            if (last != null && last < beforeIndex) {
+              if (!supportsOffset) {
+                sliceStart = beforeIndex - last;
+                limitL = last;
+              }
+            }
+          } else if (last != null) {
             if (supportsOffset) {
               //Already handled
-              sliceStart = 0;
             } else {
               sliceStart = Math.max(0, beforeIndex - last);
             }
-            limit = Math.min(last, beforeIndex);
+            limitL = Math.min(last, beforeIndex);
           } else {
-            sliceStart = 0;
-            limit = beforeIndex;
+            limitL = beforeIndex;
           }
         } else {
           throw new Error(
@@ -739,8 +823,10 @@ export class ConnectionStep<
           );
         }
       }
+      // The relay spec is daft and applies `first` before `last` in reverse pagination
       if (first != null) {
-        limitFromEnd = first;
+        // `limit` will have been `null`
+        limitR = first;
       }
     }
 
@@ -748,41 +834,92 @@ export class ConnectionStep<
       const collectionValue = collectionDep.at(i);
       // The value is either a list of items, or an object that contains the
       // `items` key.
-      const list = Array.isArray(collectionValue)
-        ? collectionValue
-        : collectionValue?.items;
-
-      if (list == null) {
+      let mode: Mode = 0;
+      let collection:
+        | Array<TItem>
+        | Iterable<TItem>
+        | AsyncIterable<TItem>
+        | null = null;
+      if (collectionValue == null) {
+        mode = 0;
+      } else if (Array.isArray(collectionValue)) {
+        collection = collectionValue;
+        mode = 1;
+      } else if (isIterable(collectionValue)) {
+        collection = collectionValue; // [Symbol.iterator]();
+        mode = 2;
+      } else if (isAsyncIterable(collectionValue)) {
+        collection = collectionValue; //[Symbol.asyncIterator]();
+        mode = 3;
+      } else if (
+        typeof collectionValue === "object" &&
+        "items" in collectionValue
+      ) {
+        const items = collectionValue.items;
+        if (items == null) {
+          mode = 0;
+        } else if (Array.isArray(items)) {
+          collection = items;
+          mode = 1;
+        } else if (isIterable(items)) {
+          collection = items; // [Symbol.iterator]();
+          mode = 2;
+        } else if (isAsyncIterable(items)) {
+          collection = items; // [Symbol.asyncIterator]();
+          mode = 3;
+        } else {
+          // WTF?
+          mode = 0;
+        }
+      } else {
+        // WTF?
+        mode = 0;
+      }
+      if (mode === 0 || collection === null) {
         return null;
       }
 
+      const operations: Op[] = [];
+
       // Now we need to apply our pagination stuff to it
-      let items = list as ReadonlyArray<TItem>;
-      let hasNext = false;
+      let hasNext: boolean | null = null;
       if (sliceStart > 0) {
-        items = items.slice(sliceStart);
+        //items = items.slice(sliceStart);
+        operations.push({ op: "skip", n: sliceStart });
       }
-      if (limit != null) {
+      if (limitL != null) {
         if (needsHasMore) {
           if (!supportsCursor && !isForwardPagination && last != null) {
             // In this special case, hasNext is simply whether we started
             // fetching > 0 or not
             hasNext = decodeNumericCursor(before as string) - last > 0;
-            if (items.length > limit) {
-              items = items.slice(items.length - limit);
-            }
+
+            // if (items.length > limit) { items = items.slice(items.length - limit); }
+            operations.push({ op: "pickLast", n: limitL });
           } else {
-            hasNext = limitFromEnd != null ? false : items.length >= limit;
-            if (hasNext) {
-              const n = limit - 1;
-              if (isForwardPagination) {
-                items = items.slice(0, n);
-              } else {
-                items = items.slice(Math.max(0, items.length - n));
+            if (limitR != null) {
+              hasNext = false;
+            } else {
+              /*
+              hasNext = items.length >= limit;
+              if (hasNext) {
+                const n = limit - 1;
+                if (isForwardPagination) {
+                  items = items.slice(0, n);
+                } else {
+                  items = items.slice(Math.max(0, items.length - n));
+                }
               }
+              */
+              operations.push({
+                op: isForwardPagination ? "pickFirst" : "pickLast",
+                n: limitL - 1,
+                setHaveNext: true,
+              });
             }
           }
         } else {
+          /*
           if (limit < items.length) {
             if (isForwardPagination) {
               items = items.slice(0, limit);
@@ -790,30 +927,172 @@ export class ConnectionStep<
               items = items.slice(Math.max(0, items.length - limit));
             }
           }
+          */
+          operations.push({
+            op: isForwardPagination ? "pickFirst" : "pickLast",
+            n: limitL,
+          });
         }
       }
-      if (limitFromEnd != null && limitFromEnd < items.length) {
-        if (isForwardPagination) {
-          items = items.slice(items.length - limitFromEnd);
-        } else {
-          items = items.slice(0, limitFromEnd);
+      if (limitR != null) {
+        /*
+        if (limitFromEnd < items.length) {
+          if (isForwardPagination) {
+            items = items.slice(items.length - limitFromEnd);
+          } else {
+            items = items.slice(0, limitFromEnd);
+          }
         }
+        */
+        operations.push({
+          op: isForwardPagination ? "pickLast" : "pickFirst",
+          n: limitR,
+        });
       }
 
-      const hasNextPage = isForwardPagination ? hasNext : false;
-      const hasPreviousPage = isForwardPagination ? false : hasNext;
-
-      return {
-        // TODO: we should probably pass some info through so PageInfo can be extended
-        // collectionMeta: collectionValue === list ? null : collectionValue,
-        pageInfo: {
-          hasNextPage,
-          hasPreviousPage,
-        },
-        items,
-      };
+      return applyOperations(
+        mode,
+        collection,
+        operations,
+        hasNext,
+        isForwardPagination,
+      );
     });
   }
+}
+
+const MODE_NULL = 0;
+const MODE_ARRAY = 1;
+const MODE_ITERABLE = 2;
+const MODE_ASYNC_ITERABLE = 3;
+type Mode =
+  | typeof MODE_NULL
+  | typeof MODE_ARRAY
+  | typeof MODE_ITERABLE
+  | typeof MODE_ASYNC_ITERABLE;
+
+/**
+ * Skip over n entries
+ */
+interface Skip {
+  op: "skip";
+  n: number;
+}
+
+/**
+ * Truncate to the first n entries, discarding the rest.
+ */
+interface PickFirst {
+  op: "pickFirst";
+  n: number;
+  /** If true, set `hasNext` to true if we discarded at least 1 record */
+  setHaveNext?: true;
+}
+
+/**
+ * Truncate to the last n entries, discarding the rest.
+ */
+interface PickLast {
+  op: "pickLast";
+  n: number;
+  /** If true, set `hasNext` to true if we discarded at least 1 record */
+  setHaveNext?: true;
+}
+type Op = Skip | PickFirst | PickLast;
+
+function applyOperations<TItem>(
+  mode: Exclude<Mode, typeof MODE_NULL>,
+  collection: Array<TItem> | Iterable<TItem> | AsyncIterable<TItem>,
+  operations: Op[],
+  rawHasNext: boolean | null,
+  isForwardPagination: boolean,
+): ConnectionResult<TItem> {
+  if (operations.length === 0) {
+    // Shortcut
+    return {
+      items: collection,
+      hasNextPage: false,
+      hasPreviousPage: false,
+    };
+  }
+  let hasNext: boolean | PromiseLike<boolean>;
+  let items: Array<TItem> | Iterable<TItem> | AsyncIterable<TItem>;
+  if (mode === 1) {
+    if (typeof rawHasNext === "boolean") {
+      hasNext = rawHasNext;
+    } else {
+      hasNext = false;
+    }
+    let list = collection as ReadonlyArray<TItem>;
+    let sliced = false;
+    for (const op of operations) {
+      switch (op.op) {
+        case "skip": {
+          sliced = true;
+          list = list.slice(op.n);
+          break;
+        }
+        case "pickFirst": {
+          const hasMore = list.length > op.n;
+          if (hasMore) {
+            sliced = true;
+            list = list.slice(0, op.n);
+          }
+          if (op.setHaveNext) {
+            hasNext = hasMore;
+          }
+          break;
+        }
+        case "pickLast": {
+          const hasMore = list.length > op.n;
+          if (hasMore) {
+            sliced = true;
+            list = list.slice(list.length - op.n);
+          }
+          if (op.setHaveNext) {
+            hasNext = hasMore;
+          }
+          break;
+        }
+        default: {
+          const never: never = op;
+          throw new Error(`Operation ${never as any} not understood`);
+        }
+      }
+    }
+    items = list;
+  } else {
+    const deferredHasNext = rawHasNext !== null ? null : defer<boolean>();
+    hasNext = deferredHasNext ?? rawHasNext!;
+    // There's guaranteed to be at least one operation
+    const opIndex = 0;
+    const op = operations[opIndex];
+    items = (async function* () {
+      // Deliberately shadowed
+      const hasNext = false;
+      // TODO...
+
+      // Apply our own iterator
+      try {
+        // TODO...
+        for await (const item of collection) {
+          // TODO...
+        }
+      } finally {
+        if (deferredHasNext) {
+          deferredHasNext.resolve(hasNext);
+        }
+      }
+    })();
+  }
+  const hasNextPage = isForwardPagination ? hasNext : false;
+  const hasPreviousPage = isForwardPagination ? false : hasNext;
+
+  return {
+    hasNextPage,
+    hasPreviousPage,
+    items,
+  };
 }
 
 export class EdgeStep<
@@ -1100,10 +1379,13 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
       offset: supportsOffset,
       cursor: supportsCursor,
     } = this.paginationSupport ?? {};
+    const supportsLimit = this.paginationSupport != null;
     /** How many records do we need to skip over in addition to a limit implied by `first`/`last`? */
     const params: PaginationParams<TCursorValue> = {
       __skipOver: 0,
       __isForwardPagination: true,
+      __hasMore: false,
+      __retain: null,
       limit: null,
       offset: null,
       after: null,
@@ -1119,83 +1401,138 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
     if (last != null && (!Number.isSafeInteger(last) || last < 0)) {
       throw new Error("Invalid 'last'");
     }
-    if (isForwardPagination && before != null) {
+
+    // Setting boht first and last makes queries nonsensical.
+    // https://relay.dev/graphql/connections.htm#note-95f8a
+    if (first != null && before != null) {
       throw new Error(
-        `May not set both 'after' and 'before': please paginate only forwards or backwards.`,
+        "You should specify `first` and optionally `after` to paginate forwards, or `last` and optionally `before` to paginate backwards; you must not set `first` and `before`",
       );
     }
+    if (last != null && after != null) {
+      throw new Error(
+        "You should specify `first` and optionally `after` to paginate forwards, or `last` and optionally `before` to paginate backwards; you must not set `last` and `after`",
+      );
+    }
+    if (first != null && last != null) {
+      throw new Error(
+        "It is not permitted to set both 'first' and 'last' in the same field.",
+      );
+    }
+
     if (!isForwardPagination && offset != null) {
       throw new Error(`May not combine 'offset' with backward pagination.`);
     }
 
     params.__isForwardPagination = isForwardPagination;
     if (isForwardPagination) {
-      if (after != null) {
-        if (supportsCursor) {
+      // Forwards: after, offset, first
+      if (supportsCursor) {
+        // Limit definitely supported
+        if (after != null) {
           params.after = after;
-        } else {
-          // Collection doesn't support cursors; we must be using numeric cursors
-          const afterIndex = decodeNumericCursor(after as string);
+        }
+        if (offset != null) {
           if (supportsOffset) {
-            params.offset = (params.offset ?? 0) + afterIndex + 1;
+            params.offset = (params.offset ?? 0) + offset;
           } else {
-            params.__skipOver += afterIndex + 1;
+            params.__skipOver += offset;
           }
         }
-      }
-      if (offset != null) {
-        if (supportsOffset) {
-          params.offset = (params.offset ?? 0) + offset;
-        } else {
-          params.__skipOver += offset;
-        }
-      }
-      if (first != null) {
-        params.limit = params.__skipOver + first + (needsHasMore ? 1 : 0);
-      } else {
-        // Just fetch the lot
-      }
-      // Note: last is ignored here - it's applied by collection() only
-    } else {
-      // Backward pagination
-      if (supportsReverse) {
-        params.reverse = true;
-        if (before != null) {
-          if (supportsCursor) {
-            params.after = before;
-          } else {
-            throw new Error(
-              "If reverse pagination is supported, cursor pagination must also be supported.",
-            );
-          }
-        }
-        if (last != null) {
-          params.limit = params.__skipOver + last + (needsHasMore ? 1 : 0);
+        if (first != null) {
+          params.limit = params.__skipOver + first + (needsHasMore ? 1 : 0);
         } else {
           // Just fetch the lot
         }
-        // Note: first is ignored here - it's applied by connection() only
       } else {
+        // Collection doesn't support cursors; we must be using numeric cursors
+        let initialIndex = 0;
+        if (after != null) {
+          initialIndex = decodeNumericCursor(after as string) + 1;
+        }
+        if (offset != null) {
+          initialIndex += offset;
+        }
+        let beforeIndex = Infinity;
+        if (first != null) {
+          beforeIndex = initialIndex + first;
+        }
+
+        if (supportsOffset) {
+          params.offset = initialIndex;
+        } else {
+          params.__skipOver = initialIndex;
+        }
+
+        if (Number.isFinite(beforeIndex)) {
+          const max = beforeIndex - initialIndex;
+          if (supportsLimit) {
+            params.limit = params.__skipOver + max + (needsHasMore ? 1 : 0);
+            params.__hasMore = needsHasMore ? ["r", max] : false;
+          } else {
+            // We're using __hasMore as a hack to apply our limit
+            params.__hasMore = ["r", max];
+          }
+        } else {
+          // There is no limit
+          params.__hasMore = false;
+        }
+      }
+    } else {
+      // Backwards: before, last
+      if (supportsReverse) {
+        if (!supportsCursor) {
+          throw new Error(
+            "If reverse pagination is supported, cursor pagination must also be supported.",
+          );
+        }
+        params.reverse = true;
+        if (before != null) {
+          params.after = before;
+        }
+        if (last != null) {
+          params.limit = last + (needsHasMore ? 1 : 0);
+          params.__hasMore = needsHasMore ? ["l", last] : false;
+        } else {
+          // Just fetch the lot
+          params.__hasMore = false;
+        }
+      } else {
+        if (supportsCursor) {
+          throw new Error(
+            "This cursor-supporting collection does not support reverse pagination.",
+          );
+        }
         // Implement numeric cursor pagination
         if (before != null) {
           const beforeIndex = decodeNumericCursor(before as string);
+          let initialIndex = 0;
           if (last != null) {
-            if (supportsOffset) {
-              /** Inclusive */
-              const lowerIndex = Math.max(0, beforeIndex - last);
-              params.offset = lowerIndex;
-              params.limit = beforeIndex - lowerIndex;
-            } else {
-              // Fetch everything before beforeIndex, we'll trim it out in connection()
-              params.limit = beforeIndex;
-            }
-          } else {
-            // Fetch everything before beforeIndex
-            params.limit = beforeIndex;
+            initialIndex = Math.max(0, beforeIndex - last);
           }
+          if (supportsOffset) {
+            params.offset = initialIndex;
+          } else {
+            params.__skipOver = initialIndex;
+          }
+          const max = beforeIndex - initialIndex;
+          if (supportsLimit) {
+            params.limit = params.__skipOver + max;
+          } else {
+            params.__limit = max;
+          }
+          // In this special case, hasNext is simply whether we started
+          // fetching > 0 or not
+          params.__hasMore = initialIndex > 0;
+        } else if (last != null) {
+          //params.__retain = last + (needsHasMore ? 1 : 0);
+          //params.__hasMore = needsHasMore ? ["l", last] : false;
+
+          // Hackily use the __hasMore retain mechanism to trim the collection
+          params.__hasMore = ["l", last];
         } else {
           throw new Error(
-            "Reverse pagination without `before` parameter is forbidden on this collection",
+            `GrafastInternalError<62c60e68-2925-41a7-837c-674234acab1b>: This code should be unreachable`,
           );
         }
       }
