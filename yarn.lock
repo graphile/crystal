@@ -3839,7 +3839,7 @@ __metadata:
   resolution: "@grafserv/persisted@workspace:grafast/grafserv-persisted"
   dependencies:
     "@graphile/lru": "workspace:^"
-    "@types/node": "npm:^24.0.13"
+    "@types/node": "npm:^22.16.3"
     grafast: "workspace:^"
     grafserv: "workspace:^"
     graphile-config: "workspace:^"
@@ -3865,7 +3865,7 @@ __metadata:
   resolution: "@graphile/lds@workspace:utils/lds"
   dependencies:
     "@types/jest": "npm:^30.0.0"
-    "@types/node": "npm:^24.0.13"
+    "@types/node": "npm:^22.16.3"
     "@types/pg": "npm:^8.15.4"
     "@types/ws": "npm:^8.18.1"
     jest: "npm:^30.0.4"
@@ -5220,7 +5220,7 @@ __metadata:
   resolution: "@localrepo/grafast-bench@workspace:grafast/bench"
   dependencies:
     "@types/glob": "npm:^8.1.0"
-    "@types/node": "npm:^24.0.13"
+    "@types/node": "npm:^22.16.3"
     glob: "npm:^11.0.3"
     grafast: "workspace:^"
     graphile-config: "workspace:^"
@@ -7397,7 +7397,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:^24.0.13":
+"@types/node@npm:*":
   version: 24.0.13
   resolution: "@types/node@npm:24.0.13"
   dependencies:
@@ -7421,11 +7421,11 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:^22.16.3":
-  version: 22.16.3
-  resolution: "@types/node@npm:22.16.3"
+  version: 22.16.5
+  resolution: "@types/node@npm:22.16.5"
   dependencies:
     undici-types: "npm:~6.21.0"
-  checksum: 10/b71fe7abf242091e2f303b400b27f677c311b03a3125bf5532e06aff8a4cd41944bcc6f70a0666834e4352228607e676bc8082fa38d3739d3e1460a20d5c51d2
+  checksum: 10/ba45b5c9113cbc5edb12960fcfe7e80db2c998af5c1931264240695b27d756570d92462150b95781bd67a03aa82111cc970ab0f4504eb99213edff8bf425354e
   languageName: node
   linkType: hard
 
@@ -12305,7 +12305,7 @@ __metadata:
     "@types/eslint": "npm:^9.6.1"
     "@types/estree": "npm:^1.0.8"
     "@types/jest": "npm:^30.0.0"
-    "@types/node": "npm:^24.0.13"
+    "@types/node": "npm:^22.16.3"
     jest: "npm:^30.0.4"
     ts-node: "npm:^10.9.2"
     tslib: "npm:^2.8.1"
@@ -13875,7 +13875,7 @@ __metadata:
     "@types/express": "npm:^4.17.23"
     "@types/koa": "npm:^2.15.0"
     "@types/koa-bodyparser": "npm:^4.3.12"
-    "@types/node": "npm:^24.0.13"
+    "@types/node": "npm:^22.16.3"
     "@whatwg-node/fetch": "npm:^0.10.8"
     "@whatwg-node/server": "npm:^0.10.10"
     debug: "npm:^4.4.1"
@@ -14077,7 +14077,7 @@ __metadata:
   resolution: "graphile-utils@workspace:graphile-build/graphile-utils"
   dependencies:
     "@dataplan/pg": "workspace:^"
-    "@types/node": "npm:^24.0.13"
+    "@types/node": "npm:^22.16.3"
     debug: "npm:^4.4.1"
     grafast: "workspace:^"
     graphile-build: "workspace:^"
@@ -16226,7 +16226,7 @@ __metadata:
   resolution: "jest-serializer-graphql-schema@workspace:utils/jest-serializer-graphql-schema"
   dependencies:
     "@types/jest": "npm:^30.0.0"
-    "@types/node": "npm:^24.0.13"
+    "@types/node": "npm:^22.16.3"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     jest: "npm:^30.0.4"
     pretty-format: "npm:^30.0.2"
@@ -16244,7 +16244,7 @@ __metadata:
   dependencies:
     "@types/jest": "npm:^30.0.0"
     "@types/json5": "npm:^2.2.0"
-    "@types/node": "npm:^24.0.13"
+    "@types/node": "npm:^22.16.3"
     jest: "npm:^30.0.4"
     json5: "npm:^2.2.3"
     pretty-format: "npm:^30.0.2"
