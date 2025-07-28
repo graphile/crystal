@@ -602,15 +602,13 @@ export class ConnectionStep<
   public edges(): Step {
     this.captureStream();
     this.setupSubplanWithPagination();
-    const $items = access(this, "items") as Step<ReadonlyArray<TItem>>;
-    return each($items, this.edgePlan);
+    return new ConnectionItemsStep(this, this.edgePlan);
   }
 
   public nodes() {
     this.captureStream();
     this.setupSubplanWithPagination();
-    const $items = access(this, "items") as Step<ReadonlyArray<TItem>>;
-    return each($items, this.nodePlan);
+    return new ConnectionItemsStep(this, this.nodePlan);
   }
 
   public items() {
@@ -1328,14 +1326,12 @@ class PageInfoStep extends UnbatchedStep<ConnectionResult<any>> {
       }
       case "startCursor": {
         // Get first node, get cursor for it
-        const $items = access($connection, "items"); // TODO: UNSAFE! `!isSyncAndSafe`!!
-        const $first = first($items as any); // TODO: fix TS
+        const $first = first($connection);
         return $connection.cursorPlan($first);
       }
       case "endCursor": {
         // Get first node, get cursor for it
-        const $items = access($connection, "items"); // TODO: UNSAFE! `!isSyncAndSafe`!!
-        const $last = last($items as any); // TODO: fix TS
+        const $last = last($connection);
         return $connection.cursorPlan($last);
       }
       default: {
@@ -1362,4 +1358,44 @@ function indexOf(params: {
     if (index >= 0) return index;
   }
   return $$inhibit;
+}
+
+export class ConnectionItemsStep extends Step {
+  static $$export = {
+    moduleName: "grafast",
+    exportName: "ConnectionItemsStep",
+  };
+
+  public isSyncAndSafe = false;
+
+  constructor(
+    $connection: ConnectionStep<any, any, any, any, any, any>,
+    private map: ($item: Step) => Step,
+  ) {
+    super();
+    this.addStrongDependency($connection);
+  }
+
+  public getConnection() {
+    return this.getDepOptions(0).step as ConnectionStep<
+      any,
+      any,
+      any,
+      any,
+      any,
+      any
+    >;
+  }
+
+  listItem(itemPlan: Step) {
+    return this.map(itemPlan);
+  }
+  public deduplicate(_peers: readonly ConnectionItemsStep[]) {
+    return _peers.filter((p) => p.map === this.map);
+  }
+
+  execute(executionDetails: ExecutionDetails) {
+    const connection = executionDetails.values[0];
+    return executionDetails.indexMap((i) => connection.at(i)?.items);
+  }
 }
