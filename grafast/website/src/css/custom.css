@@ -88,4 +88,16 @@ sup a {
 
 .footnotes li::marker {
   color: var(--grafast-color-pink);
+  font-weight: bold;
+}
+
+[data-theme="dark"] .footnotes {
+  color: var(--ifm-color-gray-200);
+  border-top: 2px solid var(--ifm-color-gray-400);
+}
+
+@media screen and (max-width: 995px) {
+  .footnotes {
+    font-size: 1rem;
+  }
 }
