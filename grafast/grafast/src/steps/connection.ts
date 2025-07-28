@@ -1075,6 +1075,14 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
     }
   }
 
+  /**
+   * True if it's possible this'll stream, false if we've not
+   * been told anything about streaming.
+   */
+  public mightStream() {
+    return this.streamDetailsDepIds.length > 0;
+  }
+
   deduplicate(
     peers: ConnectionParamsStep<any>[],
   ): ConnectionParamsStep<TCursorValue>[] {
@@ -1291,7 +1299,7 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
   }
 }
 
-class PageInfoStep extends UnbatchedStep {
+class PageInfoStep extends UnbatchedStep<ConnectionResult<any>> {
   static $$export = {
     moduleName: "grafast",
     exportName: "PageInfoStep",
@@ -1313,23 +1321,21 @@ class PageInfoStep extends UnbatchedStep {
     >;
     switch (key) {
       case "hasNextPage": {
-        const $pageInfo = access($connection, "pageInfo");
-        return access($pageInfo, "hasNextPage");
+        return access($connection, "hasNextPage");
       }
       case "hasPreviousPage": {
-        const $pageInfo = access($connection, "pageInfo");
-        return access($pageInfo, "hasPreviousPage");
+        return access($connection, "hasPreviousPage");
       }
       case "startCursor": {
         // Get first node, get cursor for it
-        const $items = access($connection, "items");
-        const $first = first($items);
+        const $items = access($connection, "items"); // TODO: UNSAFE! `!isSyncAndSafe`!!
+        const $first = first($items as any); // TODO: fix TS
         return $connection.cursorPlan($first);
       }
       case "endCursor": {
         // Get first node, get cursor for it
-        const $items = access($connection, "items");
-        const $last = last($items);
+        const $items = access($connection, "items"); // TODO: UNSAFE! `!isSyncAndSafe`!!
+        const $last = last($items as any); // TODO: fix TS
         return $connection.cursorPlan($last);
       }
       default: {
@@ -1342,7 +1348,7 @@ class PageInfoStep extends UnbatchedStep {
     _extra: UnbatchedExecutionExtra,
     _connection: ConnectionResult<any>,
   ) {
-    return EMPTY_OBJECT;
+    return _connection;
   }
 }
 

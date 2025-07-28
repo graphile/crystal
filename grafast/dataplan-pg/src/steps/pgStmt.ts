@@ -246,9 +246,19 @@ export abstract class PgStmtBaseStep<T>
     offset: true,
   };
 
-  protected paramsStreamDepId: number | null = null;
+  protected paginationParamsDepId: number | null = null;
+  paginationParams() {
+    return this.paginationParamsDepId != null
+      ? (this.getDepOptions(this.paginationParamsDepId)
+          .step as Step<PaginationParams | null> & {
+          mightStream?(): boolean;
+        })
+      : null;
+  }
   applyPagination(
-    $params: Step<PaginationParams<null | readonly any[]>>,
+    $params: Step<PaginationParams<null | readonly any[]>> & {
+      mightStream?(): boolean;
+    },
   ): void {
     const $converted = lambda($params, convertParamsToLegacy, true);
     this.setFirst(access($converted, "first"));
@@ -256,9 +266,7 @@ export abstract class PgStmtBaseStep<T>
     this.setBefore(access($converted, "before"));
     this.setAfter(access($converted, "after"));
     this.setOffset(access($converted, "offset"));
-    this.paramsStreamDepId = this.addUnaryDependency(
-      access($converted, "stream"),
-    );
+    this.paginationParamsDepId = this.addUnaryDependency($params);
   }
 
   /**
@@ -478,6 +486,8 @@ export interface PgStmtCommonQueryInfo {
   readonly offsetStepId: number | null;
   readonly beforeStepId: number | null;
   readonly afterStepId: number | null;
+
+  readonly paginationParamsDepId: number | null;
 
   readonly groups: ReadonlyArray<PgGroupSpec>;
   readonly havingConditions: ReadonlyArray<SQL>;

@@ -7,6 +7,7 @@ import type {
   GrafastResultsList,
   LambdaStep,
   Maybe,
+  PaginationParams,
   PromiseOrDirect,
   StepOptimizeOptions,
   UnbatchedExecutionExtra,
@@ -1049,10 +1050,11 @@ export class PgSelectStep<
       values,
       extra: { eventEmitter },
     } = executionDetails;
-    let stream = executionDetails.stream;
-    if (stream === null && this.paramsStreamDepId !== null) {
-      stream = values[this.paramsStreamDepId].unaryValue();
-    }
+    const params =
+      this.paginationParamsDepId != null
+        ? values[this.paginationParamsDepId].unaryValue()
+        : null;
+    const stream = executionDetails.stream ?? params?.stream;
     const {
       meta,
       text,
@@ -1078,6 +1080,8 @@ export class PgSelectStep<
       afterStepId: this.afterStepId,
       beforeStepId: this.beforeStepId,
       applyDepIds: this.applyDepIds,
+
+      paginationParamsDepId: this.paginationParamsDepId,
 
       // Stuff referencing dependency IDs in a nested fashion
       placeholders: this.placeholders,
@@ -1762,7 +1766,12 @@ export class PgSelectStep<
     }
   }
 
-  optimize({ stream }: StepOptimizeOptions): Step {
+  optimize(options: StepOptimizeOptions): Step {
+    const $params = this.paginationParams();
+    const mightHaveStream =
+      options.stream !== null ||
+      ($params !== null && ($params.mightStream?.() ?? true));
+
     // In case we have any lock actions in future:
     this.lock();
 
@@ -1771,7 +1780,7 @@ export class PgSelectStep<
     if (
       !this.isInliningForbidden &&
       !this.hasSideEffects &&
-      !stream &&
+      !mightHaveStream &&
       !this.joins.some((j) => j.type !== "left") &&
       (parentDetails = this.getParentForInlining()) !== null &&
       parentDetails.$pgSelect.mode === "normal"
@@ -1834,6 +1843,7 @@ export class PgSelectStep<
               $offset: this.maybeGetDep(this.offsetStepId),
               $after: this.maybeGetDep(this.afterStepId),
               $before: this.maybeGetDep(this.beforeStepId),
+              $params: this.paginationParams(),
               applySteps: this.applyDepIds.map((depId) => this.getDep(depId)),
               skipJoin,
             }),
@@ -1881,6 +1891,7 @@ export class PgSelectStep<
                 $offset: this.maybeGetDep(this.offsetStepId),
                 $after: this.maybeGetDep(this.afterStepId),
                 $before: this.maybeGetDep(this.beforeStepId),
+                $params: this.paginationParams(),
                 applySteps: this.applyDepIds.map((depId) => this.getDep(depId)),
               }),
             );
@@ -2880,7 +2891,12 @@ function buildTheQueryCore<
     },
   };
 
-  const { count, stream, values } = info.executionDetails;
+  const { count, values } = info.executionDetails;
+  const params =
+    info.paginationParamsDepId != null
+      ? values[info.paginationParamsDepId].unaryValue()
+      : null;
+  const stream = info.executionDetails.stream ?? params?.stream;
 
   for (const applyDepId of info.applyDepIds) {
     const val = values[applyDepId].unaryValue();
@@ -3362,6 +3378,7 @@ class PgSelectInlineApplyStep<
   private offsetStepId: number | null;
   private afterStepId: number | null;
   private beforeStepId: number | null;
+  private paginationParamsDepId: number | null;
   private applyDepIds: number[];
 
   private skipJoin: boolean;
@@ -3375,6 +3392,7 @@ class PgSelectInlineApplyStep<
       $offset: Step | null;
       $after: Step | null;
       $before: Step | null;
+      $params: Step<PaginationParams | null> | null;
       applySteps: Step[];
       /** @internal @experimental */
       skipJoin?: boolean;
@@ -3388,6 +3406,7 @@ class PgSelectInlineApplyStep<
       $offset,
       $after,
       $before,
+      $params,
       applySteps,
       skipJoin,
     } = details;
@@ -3398,6 +3417,9 @@ class PgSelectInlineApplyStep<
     this.offsetStepId = $offset ? this.addUnaryDependency($offset) : null;
     this.afterStepId = $after ? this.addUnaryDependency($after) : null;
     this.beforeStepId = $before ? this.addUnaryDependency($before) : null;
+    this.paginationParamsDepId = $params
+      ? this.addUnaryDependency($params)
+      : null;
     this.applyDepIds = applySteps.map(($apply) =>
       this.addUnaryDependency($apply),
     );
@@ -3419,6 +3441,8 @@ class PgSelectInlineApplyStep<
           afterStepId: this.afterStepId,
           beforeStepId: this.beforeStepId,
           applyDepIds: this.applyDepIds,
+
+          paginationParamsDepId: this.paginationParamsDepId,
 
           // Data that's independent of dependencies
           ...this.staticInfo,
