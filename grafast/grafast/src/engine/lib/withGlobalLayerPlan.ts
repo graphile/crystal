@@ -1,11 +1,21 @@
-import type { Step } from "../..";
 import { operationPlan } from "../../global.js";
+import type {
+  ExecutionDetailsStream,
+  Maybe,
+  StepStreamOptions,
+} from "../../interfaces";
+import type { Step } from "../../step";
+import { constant } from "../../steps/constant";
+import { lambda } from "../../steps/lambda.js";
+import { object } from "../../steps/object.js";
 import type { LayerPlan } from "../LayerPlan";
 
 let globalData_layerPlan: LayerPlan | undefined = undefined;
 let globalData_polymorphicPaths: ReadonlySet<string> | null | undefined =
   undefined;
 let globalData_planningPath: string | undefined = undefined;
+let globalData_stepStreamOptions: StepStreamOptions | null | undefined =
+  undefined;
 
 export function withGlobalLayerPlan<
   T,
@@ -15,6 +25,7 @@ export function withGlobalLayerPlan<
   layerPlan: LayerPlan,
   polymorphicPaths: ReadonlySet<string> | null,
   planningPath: string | null,
+  stepStreamOptions: StepStreamOptions | null,
   callback: (this: TThis, ...args: TArgs) => T,
   callbackThis?: TThis,
   ...callbackArgs: TArgs
@@ -23,6 +34,8 @@ export function withGlobalLayerPlan<
   globalData_layerPlan = layerPlan;
   const oldPolymorphicPaths = globalData_polymorphicPaths;
   globalData_polymorphicPaths = polymorphicPaths;
+  const oldStepStreamOptions = globalData_stepStreamOptions;
+  globalData_stepStreamOptions = stepStreamOptions;
   const oldPlanningPath = globalData_planningPath;
   // Keep the old planning path if we've not been given a new one
   if (planningPath != null) {
@@ -33,6 +46,7 @@ export function withGlobalLayerPlan<
   } finally {
     globalData_layerPlan = oldLayerPlan;
     globalData_polymorphicPaths = oldPolymorphicPaths;
+    globalData_stepStreamOptions = oldStepStreamOptions;
     globalData_planningPath = oldPlanningPath;
   }
 }
@@ -66,6 +80,34 @@ export function currentPlanningPath(): string | undefined {
     );
   }
   return globalData_planningPath;
+}
+
+export function currentFieldStreamDetails(): Step<ExecutionDetailsStream | null> | null {
+  if (globalData_stepStreamOptions == null) {
+    return null;
+  }
+  const { ifStepId, initialCountStepId } = globalData_stepStreamOptions;
+  return operationPlan().withRootLayerPlan(() => {
+    const $obj = object({
+      if: ifStepId
+        ? operationPlan().dangerouslyGetStep(ifStepId)
+        : constant(undefined),
+      initialCount: initialCountStepId
+        ? operationPlan().dangerouslyGetStep(initialCountStepId)
+        : constant(undefined),
+    });
+    return lambda($obj, resolveStreamDetails, true);
+  });
+}
+
+function resolveStreamDetails(details: {
+  if: boolean;
+  initialCount: Maybe<number>;
+}): ExecutionDetailsStream | null {
+  if (details.if === false) return null;
+  return {
+    initialCount: details.initialCount ?? 0,
+  };
 }
 
 export function isUnaryStep($step: Step): boolean {

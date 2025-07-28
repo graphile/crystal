@@ -1,14 +1,17 @@
 import * as assert from "../assert.js";
+import { currentFieldStreamDetails } from "../engine/lib/withGlobalLayerPlan.js";
 import { $$inhibit } from "../error.js";
 import type {
   BaseGraphQLArguments,
   ExecutionDetails,
+  ExecutionDetailsStream,
   FieldArgs,
   GrafastResultsList,
   Maybe,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import { Step, UnbatchedStep } from "../step.js";
+import { arraysMatch } from "../utils.js";
 import { access } from "./access.js";
 import { constant, ConstantStep } from "./constant.js";
 import { each } from "./each.js";
@@ -108,6 +111,14 @@ export interface PaginationParams<TCursorValue = string> {
    * collection). Always `false` unless `paginationSupport.cursor` is `true`.
    */
   reverse: boolean;
+
+  /**
+   * This will be non-null if it's desirable for the underlying step to stream.
+   * Underlying step should detect whether to stream or not from
+   * `(executionDetails.stream ?? params?.stream)` - works exactly as
+   * `executionDetails.stream`.
+   */
+  stream: ExecutionDetailsStream | null;
 }
 
 /**
@@ -533,13 +544,20 @@ export class ConnectionStep<
     }
   };
 
+  private captureStream() {
+    const $streamDetails = currentFieldStreamDetails();
+    this.paginationParams().addStreamDetails($streamDetails);
+  }
+
   public edges(): Step {
+    this.captureStream();
     this.setupSubplanWithPagination();
     const $items = access(this, "items") as Step<ReadonlyArray<TItem>>;
     return each($items, this.edgePlan);
   }
 
   public nodes() {
+    this.captureStream();
     this.setupSubplanWithPagination();
     const $items = access(this, "items") as Step<ReadonlyArray<TItem>>;
     return each($items, this.nodePlan);
@@ -996,6 +1014,7 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
   private offsetDepId: number | null = null;
   private beforeDepId: number | null = null;
   private afterDepId: number | null = null;
+  private streamDetailsDepIds: number[] = [];
   constructor(private paginationSupport: PaginationFeatures | null) {
     super();
   }
@@ -1022,11 +1041,24 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
   setNeedsHasMore() {
     this.needsHasMore = true;
   }
+  addStreamDetails($details: Step<ExecutionDetailsStream | null> | null) {
+    if ($details) {
+      this.streamDetailsDepIds.push(this.addUnaryDependency($details));
+    }
+  }
+
   deduplicate(
     peers: ConnectionParamsStep<any>[],
   ): ConnectionParamsStep<TCursorValue>[] {
     return peers.filter(
-      (p) => p.paginationSupport === this.paginationSupport,
+      (p) =>
+        p.paginationSupport === this.paginationSupport &&
+        p.firstDepId === this.firstDepId &&
+        p.afterDepId === this.afterDepId &&
+        p.offsetDepId === this.offsetDepId &&
+        p.beforeDepId === this.beforeDepId &&
+        p.afterDepId === this.afterDepId &&
+        arraysMatch(p.streamDetailsDepIds, this.streamDetailsDepIds),
     ) as ConnectionParamsStep<TCursorValue>[];
   }
   public deduplicatedWith(replacement: ConnectionParamsStep<any>): void {
@@ -1038,6 +1070,20 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
     extra: UnbatchedExecutionExtra,
     ...values: any[]
   ): PaginationParams<TCursorValue> {
+    /** If we should stream, set this (to 0 or more), otherwise leave it null */
+    let initialCount: number | null = null;
+    for (const depId of this.streamDetailsDepIds) {
+      const v = values[depId] as ExecutionDetailsStream | null;
+      if (v != null) {
+        const c = v.initialCount ?? 0;
+        if (initialCount === null || c > initialCount) {
+          initialCount = c;
+        }
+      }
+    }
+    const stream: ExecutionDetailsStream | null =
+      initialCount != null ? { initialCount } : null;
+
     const first: Maybe<number> =
       this.firstDepId != null ? values[this.firstDepId] : null;
     const last: Maybe<number> =
@@ -1062,6 +1108,7 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
       offset: null,
       after: null,
       reverse: false,
+      stream,
     };
 
     const isForwardPagination =

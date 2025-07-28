@@ -246,6 +246,7 @@ export abstract class PgStmtBaseStep<T>
     offset: true,
   };
 
+  protected paramsStreamDepId: number | null = null;
   applyPagination(
     $params: Step<PaginationParams<null | readonly any[]>>,
   ): void {
@@ -255,6 +256,9 @@ export abstract class PgStmtBaseStep<T>
     this.setBefore(access($converted, "before"));
     this.setAfter(access($converted, "after"));
     this.setOffset(access($converted, "offset"));
+    this.paramsStreamDepId = this.addUnaryDependency(
+      access($converted, "stream"),
+    );
   }
 
   /**

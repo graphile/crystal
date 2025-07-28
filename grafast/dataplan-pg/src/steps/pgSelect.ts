@@ -1048,8 +1048,11 @@ export class PgSelectStep<
       count,
       values,
       extra: { eventEmitter },
-      stream,
     } = executionDetails;
+    let stream = executionDetails.stream;
+    if (stream === null && this.paramsStreamDepId !== null) {
+      stream = values[this.paramsStreamDepId].unaryValue();
+    }
     const {
       meta,
       text,

@@ -31,7 +31,7 @@ import {
   newSelectionSetDigest,
 } from "../graphqlCollectFields.js";
 import { fieldSelectionsForType } from "../graphqlMergeSelectionSets.js";
-import type { GrafastPlanJSON } from "../index.js";
+import type { GrafastPlanJSON, StepStreamOptions } from "../index.js";
 import {
   __FlagStep,
   __ItemStep,
@@ -806,10 +806,12 @@ export class OperationPlan {
     }
     const planningPath = rootType.name + ".";
     const selectionSet = this.operation.selectionSet;
+    const stepStreamOptions = {};
     const groupedFieldSet = withGlobalLayerPlan(
       this.rootLayerPlan,
       POLYMORPHIC_ROOT_PATHS,
       planningPath,
+      stepStreamOptions,
       graphqlCollectFields,
       null,
       this,
@@ -858,6 +860,7 @@ export class OperationPlan {
             this.rootLayerPlan,
             POLYMORPHIC_ROOT_PATHS,
             planningPath,
+            stepStreamOptions,
             this.getTrackedArguments,
             this,
             fieldArgsSpec,
@@ -895,6 +898,7 @@ export class OperationPlan {
         subscriptionEventLayerPlan,
         POLYMORPHIC_ROOT_PATHS,
         planningPath,
+        null,
         () => new __ItemStep(subscribeStep),
       );
       subscriptionEventLayerPlan.setRootStep($__item);
@@ -903,6 +907,7 @@ export class OperationPlan {
             subscriptionEventLayerPlan,
             POLYMORPHIC_ROOT_PATHS,
             planningPath,
+            null,
             subscribeStep.itemPlan,
             subscribeStep,
             $__item,
@@ -933,6 +938,7 @@ export class OperationPlan {
         this.rootLayerPlan,
         POLYMORPHIC_ROOT_PATHS,
         planningPath,
+        null,
         () => {
           const $args = object(trackedArguments);
           const rawResolver = fieldSpec.resolve;
@@ -958,7 +964,7 @@ export class OperationPlan {
           );
         },
       );
-      subscribeStep._stepOptions.stream = {};
+      subscribeStep._stepOptions.stream = stepStreamOptions;
       subscribeStep._stepOptions.walkIterable = true;
 
       this.rootLayerPlan.setRootStep(subscribeStep);
@@ -972,6 +978,7 @@ export class OperationPlan {
         subscriptionEventLayerPlan,
         POLYMORPHIC_ROOT_PATHS,
         planningPath,
+        null,
         () => new __ItemStep(subscribeStep),
       );
 
@@ -982,6 +989,7 @@ export class OperationPlan {
             subscriptionEventLayerPlan,
             POLYMORPHIC_ROOT_PATHS,
             planningPath,
+            null,
             subscribeStep.itemPlan,
             subscribeStep,
             $__item,
@@ -1072,6 +1080,7 @@ export class OperationPlan {
       layerPlan,
       listStep.polymorphicPaths,
       planningPath,
+      null,
       () => new __ItemStep(listStep, depth),
     );
     layerPlan.setRootStep(itemStep);
@@ -1277,6 +1286,7 @@ export class OperationPlan {
                 this.rootLayerPlan,
                 POLYMORPHIC_ROOT_PATHS,
                 fieldPlanningPath,
+                null,
                 this.getTrackedArguments,
                 this,
                 objectFieldArgs,
@@ -1381,6 +1391,7 @@ export class OperationPlan {
             fieldLayerPlan,
             polymorphicPaths,
             fieldPlanningPath,
+            null, // TODO: fix me?
             () => {
               const $args = object(trackedArguments);
               return graphqlResolver(resolver, subscriber, step, $args, {
@@ -1529,6 +1540,7 @@ export class OperationPlan {
       layerPlan,
       polymorphicPaths,
       planningPath,
+      null,
       graphqlCollectFields,
       null,
       this,
@@ -1835,6 +1847,7 @@ export class OperationPlan {
                   layerPlan,
                   polymorphicPaths,
                   planningPath,
+                  null,
                   graphqlType.extensions.grafast.toSpecifier,
                   graphqlType.extensions.grafast,
                   parentStep,
@@ -1844,6 +1857,7 @@ export class OperationPlan {
                     layerPlan,
                     polymorphicPaths,
                     planningPath,
+                    null,
                     parentStep.toSpecifier,
                     parentStep,
                   )
@@ -1852,6 +1866,7 @@ export class OperationPlan {
                       layerPlan,
                       polymorphicPaths,
                       planningPath,
+                      null,
                       parentStep.toRecord,
                       parentStep,
                     )
@@ -1864,6 +1879,7 @@ export class OperationPlan {
             combinedLayerPlan,
             combinedPolymorphicPaths,
             planningPath,
+            null,
             newValueStepCallback,
             null,
             false,
@@ -1895,6 +1911,7 @@ export class OperationPlan {
                 commonLayerPlan,
                 polymorphicPaths,
                 planningPath,
+                null,
                 graphqlType.extensions.grafast.toSpecifier,
                 graphqlType.extensions.grafast,
                 $original,
@@ -1904,6 +1921,7 @@ export class OperationPlan {
                   commonLayerPlan,
                   polymorphicPaths,
                   planningPath,
+                  null,
                   $original.toSpecifier,
                   $original,
                 )
@@ -1912,6 +1930,7 @@ export class OperationPlan {
                     commonLayerPlan,
                     polymorphicPaths,
                     planningPath,
+                    null,
                     $original.toRecord,
                     $original,
                   )
@@ -1947,6 +1966,7 @@ export class OperationPlan {
             commonLayerPlan,
             combinedPolymorphicPaths,
             planningPath,
+            null,
             planType,
             null,
             commonStep,
@@ -1986,6 +2006,7 @@ export class OperationPlan {
                     polymorphicLayerPlan,
                     polymorphicPaths,
                     planningPath + "?",
+                    null,
                     polymorphicTypePlanner.planForType,
                     polymorphicTypePlanner,
                     type,
@@ -1995,6 +2016,7 @@ export class OperationPlan {
                       polymorphicLayerPlan,
                       polymorphicPaths,
                       planningPath + "?",
+                      null,
                       type.extensions.grafast.planType,
                       type.extensions.grafast,
                       commonStep,
@@ -2004,6 +2026,7 @@ export class OperationPlan {
                 polymorphicLayerPlan,
                 polymorphicPaths,
                 planningPath + "?",
+                null,
                 constant,
                 null,
                 $$inhibit,
@@ -2169,6 +2192,7 @@ export class OperationPlan {
         parentLayerPlan,
         polymorphicPaths,
         listItemPlanningPath,
+        null,
         itemsOrStep,
         null,
         $step,
@@ -2226,6 +2250,7 @@ export class OperationPlan {
                   parentLayerPlan,
                   polymorphicPaths,
                   planningPath,
+                  null,
                   scalarPlanResolver,
                   null,
                   $step,
@@ -2472,6 +2497,7 @@ export class OperationPlan {
           $__item.layerPlan,
           $__item.polymorphicPaths,
           listItemPlanningPath,
+          null,
           $list.listItem,
           $list,
           $__item,
@@ -2916,10 +2942,24 @@ export class OperationPlan {
 
     if (this.loc !== null) this.loc.push(`planField(${path.join(".")})`);
     try {
+      let stepStreamOptions: Maybe<StepStreamOptions> = undefined;
+      if (streamDetails === true) {
+        // subscription
+        stepStreamOptions = {};
+      } else if (streamDetails === false) {
+        stepStreamOptions = null;
+      } else if (streamDetails != null) {
+        stepStreamOptions = {
+          initialCountStepId: streamDetails.initialCount.id,
+          ifStepId: streamDetails.if.id,
+          labelStepId: streamDetails.label.id,
+        };
+      }
       let step = withGlobalLayerPlan(
         layerPlan,
         polymorphicPaths,
         planningPath,
+        stepStreamOptions ?? null,
         withFieldArgsForArguments,
         null,
         this,
@@ -2945,6 +2985,7 @@ export class OperationPlan {
             layerPlan,
             polymorphicPaths,
             planningPath,
+            null,
             constant,
             null,
             null,
@@ -2953,18 +2994,9 @@ export class OperationPlan {
       }
       assertExecutableStep(step);
 
-      if (streamDetails === true) {
-        // subscription
-        step._stepOptions.stream = {};
-        step._stepOptions.walkIterable = true;
-      } else if (streamDetails === false) {
-        step._stepOptions.walkIterable = true;
-      } else if (streamDetails != null) {
-        step._stepOptions.stream = {
-          initialCountStepId: streamDetails.initialCount.id,
-          ifStepId: streamDetails.if.id,
-          labelStepId: streamDetails.label.id,
-        };
+      if (stepStreamOptions !== undefined) {
+        // `null` is fine! `undefined` is not.
+        step._stepOptions.stream = stepStreamOptions;
         step._stepOptions.walkIterable = true;
       }
       return { step, haltTree };
@@ -2996,6 +3028,7 @@ export class OperationPlan {
         layerPlan,
         polymorphicPaths,
         planningPath,
+        null,
         error,
         null,
         e,
@@ -3059,6 +3092,7 @@ export class OperationPlan {
       this.rootLayerPlan,
       POLYMORPHIC_ROOT_PATHS,
       "",
+      null,
       newValueStepCallback,
       null,
       variableDefinitions != null,
@@ -3067,6 +3101,7 @@ export class OperationPlan {
       this.rootLayerPlan,
       POLYMORPHIC_ROOT_PATHS,
       "",
+      null,
       () =>
         new __TrackedValueStep(
           value,
@@ -3189,6 +3224,7 @@ export class OperationPlan {
       replacementStep = withGlobalLayerPlan(
         step.layerPlan,
         step.polymorphicPaths,
+        null,
         null,
         callback,
         this,
@@ -4092,6 +4128,7 @@ export class OperationPlan {
       step.layerPlan,
       step.polymorphicPaths,
       null, // TODO: can we get the operation path when phase === "plan"?
+      null,
       this.phase === "plan" ? this.deduplicateStep : this.hoistAndDeduplicate,
       this,
       step,
@@ -5275,6 +5312,7 @@ export class OperationPlan {
     return withGlobalLayerPlan(
       this.rootLayerPlan,
       POLYMORPHIC_ROOT_PATHS,
+      null,
       null,
       cb,
     );

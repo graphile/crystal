@@ -53,6 +53,7 @@ export class ApplyTransformsStep extends Step {
       this.subroutineLayer,
       listPlan.polymorphicPaths,
       null,
+      null,
       () => {
         // This does NOT use `itemPlanFor` because __ListTransformPlans are special.
         const $__listItem = new __ItemStep(listPlan);

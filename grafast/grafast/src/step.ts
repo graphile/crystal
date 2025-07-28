@@ -386,6 +386,7 @@ export /* abstract */ class Step<TData = any> {
       this.layerPlan,
       this.polymorphicPaths,
       null,
+      null,
       callback,
     );
   }
@@ -395,6 +396,7 @@ export /* abstract */ class Step<TData = any> {
     return withGlobalLayerPlan(
       this.layerPlan,
       this.polymorphicPaths,
+      null,
       null,
       callback,
     );
