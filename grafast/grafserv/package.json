@@ -152,7 +152,7 @@
     "hono": "^4.8.4",
     "jest": "^30.0.4",
     "jest-serializer-graphql-schema": "workspace:^",
-    "koa": "^2.16.1",
+    "koa": "^3.0.1",
     "koa-bodyparser": "^4.4.1",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
