@@ -58,3 +58,11 @@ figure {
 figure iframe {
   display: inline-block;
 }
+
+.mdx-wrapper {
+  article > :not(.wide) {
+    max-width: 49rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}

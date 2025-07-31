@@ -1,6 +1,9 @@
 .tiers {
+  composes: wide from global;
   display: flex;
   flex-direction: column;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
 }
 
 .tierRow {
