@@ -728,7 +728,24 @@ export function executeBucket(
                     }
                     continue stepLoop;
                   }
-                  deps.push(depVal);
+                  if ($dep.cloneStreams) {
+                    // if (isDistributor(depVal)) {
+                    //   deps.push(depVal.iterableFor(step.id));
+                    // }
+                    const err = new Error(
+                      `It's not safe for an unbatched isSyncAndSafe step (${step}) to consume a step that has cloneStreams=true (${$dep})`,
+                    );
+                    if (step._isUnary) {
+                      const uev = unaryExecutionValue(err, FLAG_ERROR);
+                      bucket.store.set(step.id, uev);
+                      bucket.flagUnion |= FLAG_ERROR;
+                    } else {
+                      bucket.setResult(step, dataIndex, err, FLAG_ERROR);
+                    }
+                    continue stepLoop;
+                  } else {
+                    deps.push(depVal);
+                  }
                 }
               }
             }
@@ -775,6 +792,9 @@ export function executeBucket(
           }
         }
       }
+      // Note: we don't need to release the distributors for sync steps because
+      // we specifically forbid isSyncAndSafe steps from having distributors as
+      // deps.
       return next();
     };
 

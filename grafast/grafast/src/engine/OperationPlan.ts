@@ -4373,6 +4373,16 @@ export class OperationPlan {
   private finalizeSteps(): void {
     const initialStepCount = this.stepTracker.stepCount;
     for (const step of this.stepTracker.activeSteps) {
+      if (step.isSyncAndSafe) {
+        const dependencies = sudo(step).dependencies;
+        for (const dep of dependencies) {
+          if (dep.cloneStreams) {
+            throw new Error(
+              `${step} has isSyncAndSafe=true, but depends on ${dep} which has cloneStreams=true - this is forbidden.`,
+            );
+          }
+        }
+      }
       const wasLocked = isDev && unlock(step);
       step.finalize();
       if (step._stepOptions.stream) {
