@@ -43,6 +43,8 @@ import {
   isPromiseLike,
   sudo,
 } from "../utils.js";
+import type { Distributor } from "./distributor.js";
+import { DEFAULT_DISTRIBUTOR_BUFFER_SIZE, distributor } from "./distributor.js";
 import type { LayerPlan } from "./LayerPlan.js";
 import type { MetaByMetaKey } from "./OperationPlan.js";
 
@@ -99,6 +101,10 @@ export function executeBucket(
   bucket: Bucket,
   requestContext: RequestTools,
 ): PromiseOrDirect<void> {
+  const distributorBufferSize =
+    requestContext.args.resolvedPreset?.grafast?.distributorBufferSize ??
+    DEFAULT_DISTRIBUTOR_BUFFER_SIZE;
+
   /**
    * Execute the step directly; since there's no errors we can pass the
    * dependencies through verbatim.
@@ -285,67 +291,107 @@ export function executeBucket(
         finishedStep: Step,
         bucket: Bucket,
         resultIndex: number,
-        value: unknown,
+        rawValue: unknown,
         flags: ExecutionEntryFlags,
       ) => {
         // Fast lanes
-        if (value == null) {
+        if (rawValue == null) {
           // null / undefined
           const finalFlags = flags | FLAG_NULL;
-          bucket.setResult(finishedStep, resultIndex, value, finalFlags);
+          bucket.setResult(finishedStep, resultIndex, rawValue, finalFlags);
           return;
-        } else if (typeof value !== "object") {
+        } else if (typeof rawValue !== "object") {
           // non-objects
-          bucket.setResult(finishedStep, resultIndex, value, flags);
+          bucket.setResult(finishedStep, resultIndex, rawValue, flags);
           return;
-        } else if (isFlaggedValue(value)) {
+        } else if (isFlaggedValue(rawValue)) {
           // flagged values
-          const finalFlags = flags | value.flags;
-          bucket.setResult(finishedStep, resultIndex, value.value, finalFlags);
+          const finalFlags = flags | rawValue.flags;
+          bucket.setResult(
+            finishedStep,
+            resultIndex,
+            rawValue.value,
+            finalFlags,
+          );
           return;
         }
 
-        let valueIsAsyncIterable;
+        // PERF: do we want to handle arrays differently?
+        let valueIsIterable = false;
+        let valueIsAsyncIterable = false;
+        if (
+          finishedStep.cloneStreams ||
+          finishedStep._stepOptions.walkIterable
+        ) {
+          valueIsIterable = isIterable(rawValue);
+          valueIsAsyncIterable = !valueIsIterable && isAsyncIterable(rawValue);
+        }
+
+        let stream: ExecutionDetailsStream | null = null;
         if (
           finishedStep._stepOptions.walkIterable &&
-          // PERF: do we want to handle arrays differently?
-          ((valueIsAsyncIterable = isAsyncIterable(value)) || isIterable(value))
+          (valueIsAsyncIterable || valueIsIterable)
         ) {
           // PERF: we've already calculated this once; can we reference that again here?
-          const stream = evaluateStream(bucket, finishedStep);
+          stream = evaluateStream(bucket, finishedStep, distributorBufferSize);
+        }
 
-          if (!stream && !valueIsAsyncIterable && Array.isArray(value)) {
-            // Fast mode
-            const valueCount = value.length;
-            /** We only create a duplicate array if the source array contains promises */
-            let replacement: Array<any> | null = null;
-            for (let i = 0; i < valueCount; i++) {
-              const item = value[i];
-              if (isPromiseLike(item)) {
-                if (replacement === null) {
-                  // Copy up to here!
-                  replacement = value.slice(0, i);
-                }
-                replacement[i] = null;
-                const index = i;
-                const promise = item.then(
-                  (v) => void (replacement![index] = v),
-                  (e) => void (replacement![index] = flagError(e)),
-                );
-                if (!promises) {
-                  promises = [promise];
-                } else {
-                  promises.push(promise);
-                }
-              } else if (replacement !== null) {
-                replacement[i] = item;
+        if (!stream && !valueIsAsyncIterable && Array.isArray(rawValue)) {
+          // Fast mode
+          const value = rawValue;
+
+          const valueCount = value.length;
+          /** We only create a duplicate array if the source array contains promises */
+          let replacement: Array<any> | null = null;
+          for (let i = 0; i < valueCount; i++) {
+            const item = value[i];
+            if (isPromiseLike(item)) {
+              if (replacement === null) {
+                // Copy up to here!
+                replacement = value.slice(0, i);
               }
+              replacement[i] = null;
+              const index = i;
+              const promise = item.then(
+                (v) => void (replacement![index] = v),
+                (e) => void (replacement![index] = flagError(e)),
+              );
+              if (!promises) {
+                promises = [promise];
+              } else {
+                promises.push(promise);
+              }
+            } else if (replacement !== null) {
+              replacement[i] = item;
             }
-            const list = replacement === null ? value : replacement;
-            bucket.setResult(finishedStep, resultIndex, list, flags);
-            return;
           }
+          const list = replacement === null ? value : replacement;
+          bucket.setResult(finishedStep, resultIndex, list, flags);
+          return;
+        }
 
+        const willConsumeAsIterator =
+          finishedStep._stepOptions.walkIterable &&
+          (valueIsAsyncIterable || valueIsIterable);
+
+        /**
+         * If 'cloneStreams' is set, we clone iff it's an iterable and we're
+         * not walking it ourselves.
+         */
+        const shouldUseDistributor =
+          finishedStep.cloneStreams &&
+          (valueIsIterable || valueIsAsyncIterable) &&
+          !finishedStep._stepOptions.walkIterable;
+
+        if (shouldUseDistributor) {
+          const value = distributor(
+            rawValue as AsyncIterable<any> | Iterable<any>,
+            finishedStep.dependents.map((d) => d.step),
+            distributorBufferSize,
+          );
+          bucket.setResult(finishedStep, resultIndex, value, flags);
+        } else if (willConsumeAsIterator) {
+          const value = rawValue;
           const initialCount = stream?.initialCount ?? Infinity;
 
           let iterator: Iterator<any, any, any> | AsyncIterator<any, any, any>;
@@ -430,7 +476,7 @@ export function executeBucket(
             }
           }
         } else {
-          bucket.setResult(finishedStep, resultIndex, value, flags);
+          bucket.setResult(finishedStep, resultIndex, rawValue, flags);
         }
       };
 
@@ -546,7 +592,7 @@ export function executeBucket(
           stopTime,
           meta,
           eventEmitter,
-          stream: evaluateStream(bucket, step),
+          stream: evaluateStream(bucket, step, distributorBufferSize),
           _bucket: bucket,
           _requestContext: requestContext,
         };
@@ -799,7 +845,7 @@ export function executeBucket(
       count,
       values,
       extra,
-      stream: evaluateStream(bucket, step),
+      stream: evaluateStream(bucket, step, distributorBufferSize),
     };
     if (!step.isSyncAndSafe && middleware != null) {
       return middleware.run(
@@ -1020,7 +1066,7 @@ export function executeBucket(
         stopTime,
         meta,
         eventEmitter,
-        stream: evaluateStream(bucket, step),
+        stream: evaluateStream(bucket, step, distributorBufferSize),
         _bucket: bucket,
         _requestContext: requestContext,
       };
@@ -1653,6 +1699,7 @@ function executeStepFromEvent(event: ExecuteStepEvent) {
 function evaluateStream(
   bucket: Bucket,
   step: Step,
+  distributorBufferSize: number,
 ): ExecutionDetailsStream | null {
   const stream = step._stepOptions.stream;
   if (!stream) return null;
@@ -1667,5 +1714,9 @@ function evaluateStream(
     stream.initialCountStepId == null
       ? 0
       : (bucket.store.get(stream.initialCountStepId)?.unaryValue() ?? 0);
+  if (initialCount >= distributorBufferSize) {
+    // It would be unsafe to stream this
+    return null;
+  }
   return { initialCount };
 }

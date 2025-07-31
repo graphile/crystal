@@ -2,7 +2,9 @@ import type { Deferred } from "../deferred";
 import { defer } from "../deferred";
 import type { Step } from "../step";
 
-interface Distributor<TData> {
+export const DEFAULT_DISTRIBUTOR_BUFFER_SIZE = 100;
+
+export interface Distributor<TData> {
   iterableFor(stepId: number): AsyncIterable<TData, undefined, never>;
   release(stepId: number): void;
 }
