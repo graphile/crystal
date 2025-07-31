@@ -4,9 +4,18 @@ import type { Step } from "../step";
 
 export const DEFAULT_DISTRIBUTOR_BUFFER_SIZE = 100;
 
+const $$isDistributor = Symbol("$$isDistributor");
+
 export interface Distributor<TData> {
+  [$$isDistributor]: true;
   iterableFor(stepId: number): AsyncIterable<TData, undefined, never>;
   release(stepId: number): void;
+}
+
+export function isDistributor<TData = any>(
+  value: object & { [$$isDistributor]?: true },
+): value is Distributor<TData> {
+  return value[$$isDistributor] === true;
 }
 
 // Save on garbage collection by just using this promise for everything
@@ -182,6 +191,7 @@ export function distributor<TData>(
   }
 
   return {
+    [$$isDistributor]: true,
     iterableFor(stepId) {
       const stepIndex = getStepIndex(stepId);
       return {
