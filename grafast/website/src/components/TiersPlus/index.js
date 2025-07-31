@@ -1,52 +1,67 @@
 import Link from "@docusaurus/Link";
 import styles from "@site/src/components/TiersPlus/styles.module.css";
 import clsx from "clsx";
-import Grafast from "@site/src/components/Grafast";
+import React from "react";
 
 const TierList = [
   {
-    title: "Private Advisor Offer",
-    tagline: "Development support in your chat server & code repository",
+    title: "Monthly Plan",
+    tagline: "Pay month-to-month with full flexibility",
     pricing: "$999",
-    annual: "$9,999",
     was: "$1,500",
     link: "https://github.com/sponsors/benjie/sponsorships?tier_id=42012",
-    buttonText: "",
-    contact: "mailto:team@graphile.com?subject=Private%20Advisor%20enquiry",
-    contactText: "",
+    buttonText: "Start Monthly Plan",
+    frequency: "/mo",
+    comparison: "Cancel any time",
+    badge: "Updated August 2025",
     description: (
       <>
-        <div className={styles.description}>
-          Access development support for Graphile projects through the Private
-          Advisor tier, giving your organization access to the knowledge and
-          experience of the Graphile team for any issues you have with{" "}
-          <Grafast />, PostGraphile and the wider Graphile suite, and other
-          tools in the ecosystem such as TypeScript, SQL, Node.js, GraphQL and
-          more. If you’re running any of the Graphile tools, you won’t find
-          anyone more qualified to help.
-        </div>
         <ul>
-          <li>All the benefits of a Featured Sponsor and...</li>
-          <li>One-to-one access to the Graphile team throughout the year </li>
           <li>
-            <strong>Priority support straight from the maintainer</strong>
+            Start today with <strong>payment through GitHub</strong>
           </li>
           <li>
-            Add the Graphile team to your chat server for timely responses
+            <strong>Flexible</strong>
           </li>
-          <li>Add the Graphile team to your GitHub/GitLab organization</li>
-          <li>Reference your code verbatim</li>
-          <li>Calls arranged as required</li>
-          <li>NDA available</li>
+          <li>New lower price for 2025</li>
+          <li>
+            <strong>Access to discounted consultancy packages</strong>
+          </li>
+        </ul>
+      </>
+    ),
+  },
+  {
+    title: "Annual Plan",
+    tagline: "Maximum savings with full year commitment",
+    pricing: "$899",
+    hint: "10% discount",
+    //was: "$11,988",
+    link: "mailto:team@graphile.com?subject=Private%20Advisor%20enquiry",
+    buttonText: "Contact Graphile",
+    frequency: "/mo",
+    comparison: "Paid annually — $10,788/yr",
+    badge: "Best Value — Save $1,200",
+    featured: true,
+    description: (
+      <>
+        <ul>
+          <li>
+            <strong>Lock in your rate</strong> for a full year
+          </li>
+
+          <li>
+            <strong>Save money</strong> — pay once, enjoy the lowest rate
+          </li>
+          <li>
+            <strong>One invoice, one payment</strong> — no monthly admin
+            headaches
+          </li>
           <li>
             <strong>Access to discounted consultancy packages</strong>
           </li>
           <li>
-            The warm feeling that comes from knowing{" "}
-            <strong>
-              you’re making a significant difference to <Grafast />
-              ’s development and sustainability
-            </strong>
+            <strong>Formal contract</strong> for your procurement process
           </li>
         </ul>
       </>
@@ -61,27 +76,31 @@ function Tier({
   buttonText,
   description,
   pricing,
-  annual,
   was,
-  contact,
-  contactText,
+  frequency,
+  comparison,
+  badge,
+  featured,
+  hint,
 }) {
   return (
-    <div className={styles.tier}>
+    <div className={clsx(styles.tier, featured ? styles.featured : null)}>
+      {badge ? <div className={styles.badge}>{badge}</div> : null}
       <div className={styles.banner}>
         <div className={styles.info}>
           <h2 className={styles.title}>{title}</h2>
-          <h3 className={styles.tagline}>
-            <span className={styles.was}>{was}</span>{" "}
-            <span className={styles.price}>{pricing}</span>&nbsp;
-            <span className={styles.note}>/month</span>
-          </h3>
-          <h4 className={styles.tagline}>
-            <span className={styles.note}>
-              or <span className={styles.tagline}>{annual}</span>&nbsp;/year -
-              annual discount applied
+          <div className={styles.tagline}>{tagline}</div>
+          <div className={styles.priceline}>
+            {was ? <span className={styles.was}>{was}</span> : null}{" "}
+            <span className={styles.price}>
+              {pricing}
+              <span className={styles.pricesub}>{frequency}</span>
             </span>
-          </h4>
+            {hint ? <span className={styles.hint}>{hint}</span> : null}
+          </div>
+          <div className={styles.qualifierline}>
+            <span className={styles.note}>{comparison}</span>
+          </div>
         </div>
         <div className={styles.info}>
           <Link
@@ -90,26 +109,16 @@ function Tier({
           >
             {buttonText}
           </Link>
-          <Link
-            className={clsx(
-              "button button--outline button--lg",
-              styles.borderbutton,
-            )}
-            to={contact}
-          >
-            {contactText}
-          </Link>
         </div>
       </div>
-      <h3 className={styles.tagline}>{tagline}</h3>
-      <p>{description}</p>
+      <div className={styles.description}>{description}</div>
     </div>
   );
 }
 
 export default function List() {
   return (
-    <section className="padding-vert--sm">
+    <section className="padding-vert--lg">
       <div className={styles.tiers}>
         <div className={clsx(styles.tierRow)}>
           {TierList.map((props, idx) => (
