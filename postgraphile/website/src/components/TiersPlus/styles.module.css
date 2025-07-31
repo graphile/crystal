@@ -28,6 +28,14 @@
   }
 }
 
+[data-theme="dark"] .tier {
+  border: 2px solid var(--ifm-color-primary-lighter);
+  &.featured {
+    background-color: #000a15;
+    border: 3px solid var(--ifm-color-primary);
+  }
+}
+
 .hint {
   background: rgb(230, 246, 230);
   color: #059669;
@@ -36,6 +44,11 @@
   border-radius: calc(infinity * 1px);
   margin-left: 1rem;
   height: 1.5rem;
+}
+
+[data-theme="dark"] .hint {
+  background: #059669;
+  color: rgb(230, 246, 230);
 }
 
 .badge {
@@ -57,8 +70,15 @@
   }
 }
 
-[data-theme="dark"] .tier {
-  border: 2px solid var(--ifm-color-primary);
+[data-theme="dark"] .badge {
+  background-color: var(--ifm-color-primary-lighter);
+  border-color: var(--ifm-color-primary-lighter);
+  color: black;
+}
+
+[data-theme="dark"] .featured .badge {
+  background-color: var(--ifm-color-primary);
+  border-color: var(--ifm-color-primary);
 }
 
 .banner {
@@ -99,6 +119,11 @@
 
 [data-theme="dark"] .title,
 [data-theme="dark"] .note {
+  color: var(--ifm-color-primary-lighter);
+}
+
+[data-theme="dark"] .featured .title,
+[data-theme="dark"] .featured .note {
   color: var(--ifm-color-primary);
 }
 
@@ -125,6 +150,14 @@
   .featured & {
     color: var(--ifm-color-primary);
   }
+}
+
+[data-theme="dark"] .pricesub {
+  color: var(--ifm-color-primary-lighter);
+}
+
+[data-theme="dark"] .featured .pricesub {
+  color: var(--ifm-color-primary);
 }
 
 .was {
@@ -168,6 +201,11 @@
 }
 
 [data-theme="dark"] .button {
+  background-color: var(--ifm-color-primary-lighter);
+  border-color: var(--ifm-color-primary-lighter);
+}
+
+[data-theme="dark"] .featured .button {
   background-color: var(--ifm-color-primary);
   border-color: var(--ifm-color-primary);
 }
