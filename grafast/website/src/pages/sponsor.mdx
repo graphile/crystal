@@ -10,6 +10,7 @@ import Sponsors from "@site/src/components/Sponsors";
 import SponsorButtons from "@site/src/components/SponsorButtons";
 import Link from "@docusaurus/Link";
 import styles from "@site/src/css/common.module.css";
+import sponsorStyles from "@site/src/components/TiersPlus/styles.module.css";
 import TierList from "@site/src/components/Tiers";
 import TierPlusList from "@site/src/components/TiersPlus";
 
@@ -89,13 +90,44 @@ sponsorship. THANK YOU!
 
 {/* SPONSORS_END */}
 
-Graphile has a number of crowd-funded open-source projects, licensed under the
-permissive MIT license, including Gra<em>fast</em>, PostGraphile, Graphile Worker,
-Graphile Migrate and Graphile Starter. Sponsorship increases
-the rate of fixes, documentation improvements, and feature development on these
-and other projects.
+{
 
-<SponsorButtons></SponsorButtons>
+<div className={styles.mainSectionInstructionContainer}>
+  <div className={styles.instructionSponsor}>Sponsor tiers &amp; benefits</div>
+</div>
+}
+
+<TierList />
+
+{
+
+<div className={sponsorStyles.tiers}>
+  <div className={sponsorStyles.tier}>
+    <div className={sponsorStyles.info}>
+      <div className={sponsorStyles.title}>Development Support</div>
+      <div className={sponsorStyles.priceline}>
+        <span className={sponsorStyles.note}>From </span>
+        <span className={sponsorStyles.price}>$899</span>
+        <span className={sponsorStyles.note}>/mo</span>
+      </div>
+    </div>
+    <Link
+      className={clsx(
+        "button button--primary button--lg",
+        sponsorStyles.button,
+      )}
+      to="/support"
+    >
+      Find out more
+    </Link>
+  </div>
+</div>
+}
+
+As well as ensuring the sustainability and longevity of <Grafast /> and the
+wider Graphile suite of developer tooling, sponsorship also gives you or your
+company some additional benefits such as access to security announcements and being
+featured in the README files of Graphile’s main open source projects.
 
 {
 
@@ -106,40 +138,15 @@ and other projects.
 </div>
 }
 
-Many of our projects are open-source to give users great freedom in how they use
-the software, and to enable the community to have influence over how the projects
-progress to make it appropriate for a wide range of use-cases. To ensure users can
-rely on these projects for years to come, they need to be well directed and
-financially sustainable.
+Many of our projects are open-source under the permissive MIT licence to give users
+great freedom in how they use the software, and to enable the community to have
+influence over how the projects progress to make it appropriate for a wide range of
+use-cases. To ensure users can rely on these projects for years to come, they need
+to be well directed and financially sustainable.
 
 **The best way to ensure that Graphile software is something you can depend on for
 years to come is through monthly sponsorship.** Crowd-sourced funding enables us to
 spend the most time directly working on improving the software, which you and other
 users then benefit from.
 
-{
-
-<div className={styles.mainSectionInstructionContainer}>
-  <div className={styles.instructionSponsor}>Sponsor tiers &amp; benefits</div>
-</div>
-}
-
-As well as ensuring the sustainability and longevity of <Grafast /> and the
-wider Graphile suite of developer tooling, sponsorship also gives you or your
-company some additional benefits such as access to security announcements and being
-featured in the README files of Graphile’s main open source projects. Choose the tier
-which matches your funding goal, higher tiers come with more benefits.
-
-<TierList />
-
-{
-
-<div className={styles.mainSectionInstructionContainer}>
-  <div className={styles.instructionSponsor}>Development Support</div>
-</div>
-}
-
-Access development support for Graphile projects through the Private Advisor
-sponsor tier, giving your organization access to the knowledge and experience of
-the Graphile team for any issues you have with <Grafast />, PostGraphile and
-the wider Graphile suite.
+<SponsorButtons></SponsorButtons>
