@@ -29,7 +29,7 @@
 }
 
 [data-theme="dark"] .tier {
-  border: 2px solid var(--ifm-color-primary-lighter);
+  border: 2px solid var(--ifm-color-primary-light);
   &.featured {
     background-color: #000a15;
     border: 3px solid var(--ifm-color-primary);
@@ -71,8 +71,8 @@
 }
 
 [data-theme="dark"] .badge {
-  background-color: var(--ifm-color-primary-lighter);
-  border-color: var(--ifm-color-primary-lighter);
+  background-color: var(--ifm-color-primary-light);
+  border-color: var(--ifm-color-primary-light);
   color: black;
 }
 
@@ -201,8 +201,8 @@
 }
 
 [data-theme="dark"] .button {
-  background-color: var(--ifm-color-primary-lighter);
-  border-color: var(--ifm-color-primary-lighter);
+  background-color: var(--ifm-color-primary-light);
+  border-color: var(--ifm-color-primary-light);
 }
 
 [data-theme="dark"] .featured .button {

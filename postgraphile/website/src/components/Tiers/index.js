@@ -122,11 +122,13 @@ const TierList = [
 function Tier({ title, tagline, link, buttonText, description, pricing }) {
   return (
     <div className={styles.tier}>
-      <h2 className={styles.title}>{title}</h2>
-      <h3 className={styles.tagline}>
-        <span className={styles.price}>{pricing}</span>&nbsp;
-        <span className={styles.note}>/month</span>
-      </h3>
+      <div className={styles.banner}>
+        <h2 className={styles.title}>{title}</h2>
+        <h3 className={styles.priceline}>
+          <span className={styles.price}>{pricing}</span>
+          <span className={styles.note}>/mo</span>
+        </h3>
+      </div>
       <Link
         className={clsx("button button--primary button--lg", styles.button)}
         to={link}

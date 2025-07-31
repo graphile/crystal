@@ -36,6 +36,26 @@
   border: 3px solid var(--ifm-color-primary);
 }
 
+.banner {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  > * {
+    text-align: center;
+  }
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.note {
+  font-size: 0.9rem;
+}
+
 .title,
 .note {
   color: var(--ifm-color-primary-darker);
@@ -50,13 +70,29 @@
   font-weight: var(--ifm-heading-font-weight);
 }
 
+.priceline {
+  font-weight: var(--ifm-heading-font-weight);
+  font-size: 2rem;
+}
+
 .price {
   font-weight: bold;
 }
 
 .note {
-  font-size: 0.8rem;
-  font-weight: var(--ifm-font-weight-base);
+  font-size: 1rem;
+  color: var(--ifm-color-primary-darker);
+  .featured & {
+    color: var(--ifm-color-primary);
+  }
+}
+
+[data-theme="dark"] .note {
+  color: var(--ifm-color-primary-lighter);
+}
+
+[data-theme="dark"] .featured .note {
+  color: var(--ifm-color-primary);
 }
 
 .tier:nth-child(2) .title,
