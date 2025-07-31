@@ -117,6 +117,8 @@ export class LoadManyStep<
     options: LoadManyArguments<TLookup, TItem, TData, TParams, TLoadContext>,
   ) {
     super();
+    // TODO: prompt users to disable this if they don't need it.
+    this.cloneStreams = true;
 
     const { lookup, load, unary, ioEquivalence, paginationSupport } = options;
     this.load = load;

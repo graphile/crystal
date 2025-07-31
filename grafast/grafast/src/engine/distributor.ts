@@ -13,9 +13,9 @@ export interface Distributor<TData> {
 }
 
 export function isDistributor<TData = any>(
-  value: object & { [$$isDistributor]?: true },
+  value: null | undefined | (object & { [$$isDistributor]?: true }),
 ): value is Distributor<TData> {
-  return value[$$isDistributor] === true;
+  return value != null && value[$$isDistributor] === true;
 }
 
 // Save on garbage collection by just using this promise for everything

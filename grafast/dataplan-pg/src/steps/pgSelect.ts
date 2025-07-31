@@ -1772,6 +1772,10 @@ export class PgSelectStep<
       options.stream !== null ||
       ($params !== null && ($params.mightStream?.() ?? true));
 
+    if (mightHaveStream) {
+      this.cloneStreams = true;
+    }
+
     // In case we have any lock actions in future:
     this.lock();
 

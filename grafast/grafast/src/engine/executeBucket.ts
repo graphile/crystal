@@ -44,7 +44,11 @@ import {
   sudo,
 } from "../utils.js";
 import type { Distributor } from "./distributor.js";
-import { DEFAULT_DISTRIBUTOR_BUFFER_SIZE, distributor } from "./distributor.js";
+import {
+  DEFAULT_DISTRIBUTOR_BUFFER_SIZE,
+  distributor,
+  isDistributor,
+} from "./distributor.js";
 import type { LayerPlan } from "./LayerPlan.js";
 import type { MetaByMetaKey } from "./OperationPlan.js";
 
@@ -1107,12 +1111,50 @@ export function executeBucket(
             `GrafastInternalError<58bc38e2-8722-4c19-ba38-fd01a020654b>: unary step ${step} cannot be made dependent on non-unary step ${$dep}!`,
           );
         }
-        const executionValue = store.get($dep.id);
-        if (executionValue === undefined) {
+        const rawExecutionValue = store.get($dep.id);
+        if (rawExecutionValue === undefined) {
           throw new Error(
             `GrafastInternalError<d9e9eb37-4251-4659-a545-4730826ecf0e>: ${$dep} data couldn't be found, but required by ${step} (with side effect ${step.implicitSideEffectStep})!`,
           );
         }
+
+        let executionValue: ExecutionValue;
+        if ($dep.cloneStreams) {
+          // Need to check if the EV contains distributors
+          if (rawExecutionValue.isBatch) {
+            let firstDistributorIndex =
+              rawExecutionValue.entries.findIndex(isDistributor);
+            if (firstDistributorIndex >= 0) {
+              const entries = [];
+              for (let i = 0; i < size; i++) {
+                const val = rawExecutionValue.entries[i];
+                if (i < firstDistributorIndex || !isDistributor(val)) {
+                  entries.push(val);
+                } else {
+                  entries.push(val.iterableFor(step.id));
+                }
+              }
+              executionValue = batchExecutionValue(
+                entries,
+                rawExecutionValue._flags,
+              );
+            } else {
+              executionValue = rawExecutionValue;
+            }
+          } else {
+            if (isDistributor(rawExecutionValue.value)) {
+              executionValue = unaryExecutionValue(
+                rawExecutionValue.value.iterableFor(step.id),
+                rawExecutionValue._entryFlags,
+              );
+            } else {
+              executionValue = rawExecutionValue;
+            }
+          }
+        } else {
+          executionValue = rawExecutionValue;
+        }
+
         _rawDependencies.push(executionValue);
         _rawForbiddenFlags.push(forbiddenFlags);
         _rawOnReject.push(onReject);
