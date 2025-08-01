@@ -36,7 +36,6 @@ const TierList = [
     tagline: "Maximum savings with full year commitment",
     pricing: "$899",
     hint: "10% discount",
-    //was: "$11,988",
     link: "mailto:team@graphile.com?subject=Private%20Advisor%20enquiry",
     buttonText: "Contact Graphile",
     frequency: "/mo",
