@@ -1,7 +1,10 @@
 .tiers {
+  composes: wide from global;
   display: flex;
   width: 100%;
   flex-direction: row;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
 }
 
 .tierRow {
@@ -110,6 +113,7 @@
   margin: 1rem 0 1rem 0;
   background-color: var(--ifm-color-primary-dark);
   border-color: var(--ifm-color-primary-dark);
+  text-transform: uppercase;
 }
 
 .button:before {

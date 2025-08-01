@@ -1,6 +1,9 @@
 .tiers {
+  composes: wide from global;
   display: flex;
   flex-direction: column;
+  padding-top: 2rem;
+  padding-bottom: 2rem;
 }
 
 .tierRow {
@@ -9,7 +12,8 @@
   display: flex;
 }
 
-.tier {
+.tier,
+.tierSupport {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -28,11 +32,25 @@
   }
 }
 
-[data-theme="dark"] .tier {
+[data-theme="dark"] .tier,
+[data-theme="dark"] .tierSupport {
   border: 2px solid var(--ifm-color-primary-light);
   &.featured {
     background-color: #000a15;
     border: 3px solid var(--ifm-color-primary);
+  }
+}
+
+.tierSupport {
+  flex: 0 0 100%;
+  &.featured {
+    background-color: transparent;
+  }
+}
+
+[data-theme="dark"] .tierSupport {
+  &.featured {
+    background-color: transparent;
   }
 }
 
@@ -184,6 +202,7 @@
 .button {
   width: 100%;
   margin: 1rem 0 0 0;
+  text-transform: uppercase;
 }
 
 .button {

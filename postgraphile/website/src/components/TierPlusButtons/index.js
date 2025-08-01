@@ -1,7 +1,6 @@
 import Link from "@docusaurus/Link";
 import styles from "@site/src/components/TierPlusButtons/styles.module.css";
 import clsx from "clsx";
-import React from "react";
 
 export default function SponsorButtons() {
   return (

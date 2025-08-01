@@ -1,0 +1,69 @@
+.sponsorbuttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.borderbutton {
+  color: white;
+  text-transform: uppercase;
+  max-width: 100%;
+  margin-left: 1rem;
+  border: 1px solid var(--ifm-color-primary);
+}
+
+.borderbutton:hover {
+  border-radius: 7px;
+  border: 1px solid var(--ifm-color-primary-darkest);
+  background-color: var(--ifm-color-primary-darkest);
+}
+
+.sponsorbutton {
+  text-transform: uppercase;
+  max-width: 100%;
+  border: 1px solid var(--ifm-color-primary-darker);
+  background-color: var(--ifm-color-primary-darker);
+}
+
+.sponsorbutton:before {
+  content: "Start Monthly Plan";
+}
+
+.borderbutton:before {
+  content: "Contact Graphile";
+}
+
+.sponsorbutton:hover {
+  background-color: var(--ifm-color-primary-darkest);
+  border: 1px solid var(--ifm-color-primary-darkest);
+}
+
+[data-theme="dark"] .sponsorbutton {
+  border: 1px solid var(--ifm-color-primary);
+  background-color: var(--ifm-color-primary);
+}
+
+[data-theme="dark"] .sponsorbutton:hover {
+  border: 1px solid var(--ifm-color-primary-lightest);
+  background-color: var(--ifm-color-primary-lightest);
+}
+
+[data-theme="dark"] .borderbutton:hover {
+  border: 1px solid var(--ifm-color-primary-lightest);
+  color: var(--ifm-color-lightest);
+}
+
+@media screen and (max-width: 995px) {
+  .sponsorbuttons {
+    display: flex;
+    flex-direction: column;
+  }
+  .borderbutton {
+    margin-top: 1rem;
+    margin-left: 0rem;
+  }
+  .borderbutton:before {
+    content: "Contact";
+  }
+}

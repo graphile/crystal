@@ -10,8 +10,8 @@ import Sponsors from "@site/src/components/Sponsors";
 import SponsorButtons from "@site/src/components/SponsorButtons";
 import Link from "@docusaurus/Link";
 import styles from "@site/src/css/common.module.css";
+import sponsorStyles from "@site/src/components/TiersPlus/styles.module.css";
 import TierList from "@site/src/components/Tiers";
-import TierPlusList from "@site/src/components/TiersPlus";
 
 ## Sponsor Graphile’s Open Source Software
 
@@ -83,16 +83,44 @@ import TierPlusList from "@site/src/components/TiersPlus";
 
 {/* SPONSORS_END */}
 
-<h3 className={styles.tagline}>
-  {" "}
-  Graphile has a number of crowd-funded open-source projects, licensed under the
-  permissive MIT license, including PostGraphile, Gra<em>fast</em>, Graphile
-  Worker, Graphile Migrate and Graphile Starter. Sponsorship increases the rate
-  of fixes, documentation improvements, and feature development on these and
-  other projects.{" "}
-</h3>
+## Sponsor tiers &amp; benefits
 
-<SponsorButtons></SponsorButtons>
+<TierList />
+
+{
+
+<div className={sponsorStyles.tiers}>
+  <div className={sponsorStyles.tierRow}>
+    <div className={clsx(sponsorStyles.tierSupport, sponsorStyles.featured)}>
+      <div className={sponsorStyles.banner}>
+        <div className={sponsorStyles.info}>
+          <div className={sponsorStyles.title}>Development Support</div>
+          <div className={sponsorStyles.priceline}>
+            <span className={sponsorStyles.note}>From </span>
+            <span className={sponsorStyles.price}>$899</span>
+            <span className={sponsorStyles.note}>/mo</span>
+          </div>
+        </div>
+        <Link
+          className={clsx(
+            "button button--primary button--lg",
+            sponsorStyles.button,
+          )}
+          to="/support"
+        >
+          Find out more
+        </Link>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+As well as ensuring the sustainability and longevity of PostGraphile and the
+wider Graphile suite of developer tooling, sponsorship also gives you or your
+company some additional benefits such as access to security announcements and being
+featured in the README files of Graphile’s main open source projects. Choose the tier
+which matches your funding goal, higher tiers come with more benefits.
 
 ## Why are Graphile projects &ldquo;crowd-funded open-source&rdquo;?
 
@@ -107,46 +135,4 @@ years to come is through monthly sponsorship.** Crowd-sourced funding enables us
 spend the most time directly working on improving the software, which you and other
 users then benefit from.
 
-## Sponsor tiers &amp; benefits
-
-As well as ensuring the sustainability and longevity of PostGraphile and the
-wider Graphile suite of developer tooling, sponsorship also gives you or your
-company some additional benefits such as access to security announcements and being
-featured in the README files of Graphile’s main open source projects. Choose the tier
-which matches your funding goal, higher tiers come with more benefits.
-
-<TierList />
-
-## Development Support
-
-Access development support for Graphile projects through the Private Advisor
-sponsor tier, giving your organization access to the knowledge and experience of
-the Graphile team for any issues you have with Graphile Worker, PostGraphile and
-the wider Graphile suite, and other tools in the ecosystem such as TypeScript,
-SQL, Node.js, GraphQL and more. If you’re running any of the Graphile tools, you
-won’t find anyone more qualified to help.
-
-{
-
-<ul>
-  <li>All the benefits of a Featured Sponsor and...</li>
-  <li>One-to-one access to the Graphile team throughout the year </li>
-  <li>
-    <strong>Priority support straight from the maintainer</strong>
-  </li>
-  <li>Add the Graphile team to your chat server for timely responses</li>
-  <li>Add the Graphile team to your GitHub/GitLab organization</li>
-  <li>Reference your code verbatim</li>
-  <li>Calls arranged as required</li>
-  <li>NDA available</li>
-  <li>
-    The warm feeling that comes from knowing{" "}
-    <strong>
-      you’re making a significant difference to Graphile Worker’s development
-      and sustainability
-    </strong>
-  </li>
-</ul>
-}
-
-<TierPlusList />
+<SponsorButtons></SponsorButtons>

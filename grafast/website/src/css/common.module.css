@@ -1,6 +1,6 @@
 .mainSectionInstructionContainer {
   composes: wide from global;
-  margin-left: 6rem;
+  margin-left: 8rem;
   padding-top: 0.8rem;
   padding-bottom: 0.8rem;
 }
@@ -63,4 +63,10 @@ code {
 [data-theme="light"] img[src$="#dark-mode-only"],
 [data-theme="dark"] img[src$="#light-mode-only"] {
   display: none;
+}
+
+@media screen and (max-width: 1200px) {
+  .mainSectionInstructionContainer {
+    margin-left: 0rem;
+  }
 }
