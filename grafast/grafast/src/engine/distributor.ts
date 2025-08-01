@@ -9,7 +9,7 @@ const $$isDistributor = Symbol("$$isDistributor");
 export interface Distributor<TData> {
   [$$isDistributor]: true;
   iterableFor(stepId: number): AsyncIterable<TData, undefined, never>;
-  release(stepId: number): void;
+  releaseIfUnused(stepId: number): void;
 }
 
 export function isDistributor<TData = any>(
@@ -49,20 +49,32 @@ export function distributor<TData>(
   let sourceIterator: AsyncIterator<TData> | Iterator<TData> | null = null;
 
   /**
-   * An array of the currently delivering/delivered index for each of the dependent steps.
+   * An array of the currently delivered index for each of the dependent steps.
+   * One a given index has been delivered by all streams, the lowWaterMark may
+   * advance.
+   * -1 indicates that no item has been delivered yet.
+   */
+  const deliveredIndex: number[] = dependentSteps.map(() => -1);
+
+  /**
+   * An array of the highest index requested for each of the dependent steps.
    * -1 indicates that no item has been requested yet.
    */
-  const currentIndex: number[] = dependentSteps.map(() => -1);
+  const requestedIndex: number[] = dependentSteps.map(() => -1);
 
   /**
    * If a consumer is terminated via `.return()` or `.throw()` (or if the
-   * underlying stream terminates) then the `currentIndex` for that consumer
+   * underlying stream terminates) then the `deliveredIndex` for that consumer
    * will be set to `Infinity` and their final result, to be returned from all
    * further `.next()` calls, will be stored here.
    */
   const terminalResult: Array<Promise<IteratorReturnResult<undefined>> | null> =
     dependentSteps.map(() => null);
 
+  /**
+   * What's the lowest index we must retain? Equal to the lowest
+   * `deliveredIndex` + 1
+   */
   let lowWaterMark = 0;
 
   /**
@@ -70,27 +82,28 @@ export function distributor<TData>(
    * consumer to request the next index will fetch from the underlying stream and store
    * the value here, as the slowest consumers catch up, old results will be shifted from
    * the start of the array and the `lowWaterMark` will be advanced. The item to pull
-   * for a given position is `buffer[currentIndex[stepIndex] - lowWaterMark]`.
+   * for a given position is `buffer[requestedIndex[stepIndex] - lowWaterMark]`.
    */
   const buffer: Array<Promise<IteratorResult<TData, undefined>>> = [];
 
   // Easy way to resolve a promise for slowing down the fastest consumer
-  let wmi: Deferred<void> | null = null;
+  let wmi: [Deferred<void>, Promise<void>] | null = null;
   function lowWaterMarkIncreased() {
     if (wmi === null) {
-      wmi = defer<void>();
+      const d = defer<void>();
+      wmi = [d, Promise.resolve(d)];
     }
-    return Promise.resolve(wmi);
+    return wmi[1];
   }
 
   // Stop us retaining data we don't need to retain
   function maybeAdvanceLowWaterMark() {
-    if (currentIndex.every((i) => i >= lowWaterMark)) {
+    if (deliveredIndex.every((i) => i >= lowWaterMark)) {
       buffer.shift();
       lowWaterMark++;
       if (wmi !== null) {
         // Avoid race condition
-        const deferred = wmi;
+        const deferred = wmi[0];
         wmi = null;
         deferred.resolve();
       }
@@ -103,12 +116,14 @@ export function distributor<TData>(
 
     // Keep in mind `advance(stepIndex)` might be called more than once for the
     // same step without waiting for previous calls to resolve.
-    const index = currentIndex[stepIndex]++;
+    const index = ++requestedIndex[stepIndex];
 
     return yieldValue(stepIndex, index);
   }
 
   /**
+   * **ONLY CALL THIS** if you've already checked for a terminal result.
+   *
    * Called from advance(), returns the relevant iterator result. If
    * necessary, waits for the low water mark to advance.
    */
@@ -139,13 +154,32 @@ export function distributor<TData>(
       // The next value already exists
       result = buffer[bufferIndex];
     }
+
+    // assert.equal(deliveredIndex[stepIndex], index - 1);
+    if (result == null) {
+      return stop(
+        stepIndex,
+        new Error(
+          `GrafastInternalError<330dba8c-baf0-4352-9cb7-3445e7f14bfc>: bug in Distributor; deliveredIndex: ${
+            deliveredIndex[stepIndex]
+          }, requestedIndex: ${
+            requestedIndex[stepIndex]
+          }, currentIndex: ${index}, bufferIndex: ${
+            bufferIndex
+          }, buffer.length: ${buffer.length}`,
+        ),
+      );
+    }
+
+    deliveredIndex[stepIndex] = index;
     maybeAdvanceLowWaterMark();
+
     return result;
   }
 
   function stop(stepIndex: number, error?: unknown) {
     if (!terminalResult[stepIndex]) {
-      currentIndex[stepIndex] = Infinity;
+      deliveredIndex[stepIndex] = Infinity;
       terminalResult[stepIndex] = error ? Promise.reject(error) : DONE_PROMISE;
       maybeAdvanceLowWaterMark();
     }
@@ -176,33 +210,37 @@ export function distributor<TData>(
       [Symbol.asyncIterator]() {
         return this;
       },
-      next() {
-        return advance(stepIndex);
-      },
-      return() {
-        return stop(stepIndex);
-      },
-      throw(e) {
-        return stop(stepIndex, e);
-      },
+      next: () => advance(stepIndex),
+      return: () => stop(stepIndex),
+      throw: (e) => stop(stepIndex, e),
     };
 
     return iterator;
   }
 
+  const hasIterator = dependentSteps.map(() => false);
   return {
     [$$isDistributor]: true,
     iterableFor(stepId) {
       const stepIndex = getStepIndex(stepId);
       return {
         [Symbol.asyncIterator]() {
+          if (hasIterator[stepIndex]) {
+            throw new Error(
+              `Attempted to create iterator a second time (or possibly after release)!`,
+            );
+          }
+          hasIterator[stepIndex] = true;
           return newIterator(stepIndex);
         },
       };
     },
-    release(stepId: number) {
+    releaseIfUnused(stepId: number) {
       const stepIndex = getStepIndex(stepId);
-      stop(stepIndex);
+      if (!hasIterator[stepIndex]) {
+        hasIterator[stepIndex] = true;
+        stop(stepIndex);
+      }
     },
   };
 }
