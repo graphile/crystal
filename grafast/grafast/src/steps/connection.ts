@@ -820,7 +820,6 @@ function makeProcessedCollection<TItem>(
           hasNext = false;
         }
       }
-      hasNext = false;
     }
     items = wrapIndicies ? array.map(indexedItem) : array;
   } else {
