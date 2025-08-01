@@ -2,10 +2,8 @@ import { createHash } from "crypto";
 import debugFactory from "debug";
 import type {
   ConnectionOptimizedStep,
-  ConnectionStep,
   ExecutionDetails,
   GrafastResultsList,
-  LambdaStep,
   Maybe,
   PaginationParams,
   PromiseOrDirect,
@@ -21,6 +19,7 @@ import {
   access,
   arrayOfLength,
   ConstantStep,
+  currentFieldStreamDetails,
   DEFAULT_ACCEPT_FLAGS,
   exportAs,
   first,
@@ -643,8 +642,11 @@ export class PgSelectStep<
     return $clone;
   }
 
+  _fieldMightStream: boolean;
+
   constructor(options: PgSelectOptions<TResource>) {
     super();
+    this._fieldMightStream = currentFieldStreamDetails() != null;
     const {
       resource,
       parameters = resource.parameters,
@@ -995,11 +997,13 @@ export class PgSelectStep<
   }
 
   public items() {
-    return this.operationPlan.cacheStep(
-      this,
-      "items",
-      "" /* Digest of our arguments */,
-      () => new PgSelectRowsStep(this),
+    return this.withMyLayerPlan(() =>
+      this.operationPlan.cacheStep(
+        this,
+        "items",
+        "" /* Digest of our arguments */,
+        () => new PgSelectRowsStep(this),
+      ),
     );
   }
 
@@ -1766,14 +1770,18 @@ export class PgSelectStep<
     }
   }
 
-  optimize(options: StepOptimizeOptions): Step {
+  mightHaveStream() {
+    if (this._fieldMightStream) return true;
     const $params = this.paginationParams();
-    const mightHaveStream =
-      options.stream !== null ||
-      ($params !== null && ($params.mightStream?.() ?? true));
+    return $params !== null && ($params.mightStream?.() ?? true);
+  }
 
-    if (mightHaveStream) {
-      this.cloneStreams = true;
+  optimize(options: StepOptimizeOptions): Step {
+    const mightHaveStream = this.mightHaveStream();
+    if (options.stream && !mightHaveStream) {
+      throw new Error(
+        `Inconsistency: we didn't think we might have a stream, but optimize says we might!`,
+      );
     }
 
     // In case we have any lock actions in future:
@@ -2114,11 +2122,12 @@ export class PgSelectRowsStep<
     return _peers;
   }
 
-  // optimize() {
-  //   const $access = access(this.getClassStep(), "items");
-  //   $access.isSyncAndSafe = false;
-  //   return $access;
-  // }
+  optimize() {
+    if (this.getClassStep().mightHaveStream()) {
+      this.cloneStreams = true;
+    }
+    return this;
+  }
 
   execute(executionDetails: ExecutionDetails) {
     const pgSelect = executionDetails.values[0];
