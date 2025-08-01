@@ -385,15 +385,29 @@ export function executeBucket(
         const shouldUseDistributor =
           finishedStep.cloneStreams &&
           (valueIsIterable || valueIsAsyncIterable) &&
-          !finishedStep._stepOptions.walkIterable;
+          !Array.isArray(rawValue) &&
+          // A single `__ItemStep` is fine, but more than that and we need a distributor
+          finishedStep.dependents.length > 1;
 
         if (shouldUseDistributor) {
-          const value = distributor(
-            rawValue as AsyncIterable<any> | Iterable<any>,
-            finishedStep.dependents.map((d) => d.step),
-            distributorBufferSize,
-          );
-          bucket.setResult(finishedStep, resultIndex, value, flags);
+          if (finishedStep._stepOptions.walkIterable) {
+            const error = new Error(
+              `GrafastInternalError<ea0665f6-1b5c-4f7f-bcf0-92ddc112dcf3>: ${finishedStep} needs to be walked (it is used for a list field or subscription), but should use a distributor (it's dependend on by other steps too). We should be using a wrapping 'cloneStream' step for this, but we don't seem to be doing so.`,
+            );
+            bucket.setResult(
+              finishedStep,
+              resultIndex,
+              error,
+              flags | FLAG_ERROR,
+            );
+          } else {
+            const value = distributor(
+              rawValue as AsyncIterable<any> | Iterable<any>,
+              finishedStep.dependents.map((d) => d.step),
+              distributorBufferSize,
+            );
+            bucket.setResult(finishedStep, resultIndex, value, flags);
+          }
         } else if (willConsumeAsIterator) {
           const value = rawValue;
           const initialCount = stream?.initialCount ?? Infinity;
@@ -1122,7 +1136,7 @@ export function executeBucket(
         if ($dep.cloneStreams) {
           // Need to check if the EV contains distributors
           if (rawExecutionValue.isBatch) {
-            let firstDistributorIndex =
+            const firstDistributorIndex =
               rawExecutionValue.entries.findIndex(isDistributor);
             if (firstDistributorIndex >= 0) {
               const entries = [];

@@ -602,17 +602,28 @@ export class ConnectionStep<
   public edges(): Step {
     this.captureStream();
     this.setupSubplanWithPagination();
-    return new ConnectionItemsStep(this, this.edgePlan);
+    return each(this._items(), this.edgePlan as any);
   }
 
   public nodes() {
     this.captureStream();
     this.setupSubplanWithPagination();
-    return new ConnectionItemsStep(this, this.nodePlan);
+    return each(this._items(), this.nodePlan as any);
   }
 
   public items() {
     return this.nodes();
+  }
+
+  private _items() {
+    return this.withMyLayerPlan(() =>
+      this.operationPlan.cacheStep(
+        this,
+        "_items",
+        null,
+        () => new ConnectionItemsStep(this),
+      ),
+    );
   }
 
   public cursorPlan($rawItem: Step<TItem>) {
@@ -1367,11 +1378,9 @@ export class ConnectionItemsStep extends Step {
   };
 
   public isSyncAndSafe = false;
+  public cloneStreams = true;
 
-  constructor(
-    $connection: ConnectionStep<any, any, any, any, any, any>,
-    private map: ($item: Step) => Step,
-  ) {
+  constructor($connection: ConnectionStep<any, any, any, any, any, any>) {
     super();
     this.addStrongDependency($connection);
   }
@@ -1387,11 +1396,8 @@ export class ConnectionItemsStep extends Step {
     >;
   }
 
-  listItem(itemPlan: Step) {
-    return this.map(itemPlan);
-  }
   public deduplicate(_peers: readonly ConnectionItemsStep[]) {
-    return _peers.filter((p) => p.map === this.map);
+    return _peers;
   }
 
   execute(executionDetails: ExecutionDetails) {

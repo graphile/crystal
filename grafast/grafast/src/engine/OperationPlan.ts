@@ -76,6 +76,7 @@ import {
   stepHasToRecord,
   stepHasToSpecifier,
 } from "../step.js";
+import { __cloneStream } from "../steps/__cloneStream.js";
 import { __TrackedValueStepWithDollars } from "../steps/__trackedValue.js";
 import { itemsOrStep } from "../steps/connection.js";
 import { constant, ConstantStep } from "../steps/constant.js";
@@ -965,6 +966,8 @@ export class OperationPlan {
         },
       );
       subscribeStep._stepOptions.stream = stepStreamOptions;
+      // Note this should only have one dependent, so it should not be a
+      // distributor
       subscribeStep._stepOptions.walkIterable = true;
 
       this.rootLayerPlan.setRootStep(subscribeStep);
@@ -2188,7 +2191,7 @@ export class OperationPlan {
             ? `#${streamDetails.initialCount.id}|${streamDetails.if.id}|${streamDetails.label.id}`
             : ""
         }]`;
-      const $list = withGlobalLayerPlan(
+      let $list = withGlobalLayerPlan(
         parentLayerPlan,
         polymorphicPaths,
         listItemPlanningPath,
@@ -2200,6 +2203,19 @@ export class OperationPlan {
       if ($list !== $step) {
         $list._stepOptions.stream = $step._stepOptions.stream;
       }
+
+      // Clone the stream
+      $list = withGlobalLayerPlan(
+        parentLayerPlan,
+        polymorphicPaths,
+        listItemPlanningPath,
+        null,
+        __cloneStream,
+        null,
+        $list,
+      );
+      $list._stepOptions.stream = $step._stepOptions.stream;
+
       $list._stepOptions.walkIterable = true;
       const listOutputPlan = new OutputPlan(
         parentLayerPlan,
@@ -2947,13 +2963,16 @@ export class OperationPlan {
         // subscription
         stepStreamOptions = {};
       } else if (streamDetails === false) {
+        // List
         stepStreamOptions = null;
       } else if (streamDetails != null) {
+        // List with @stream
         stepStreamOptions = {
           initialCountStepId: streamDetails.initialCount.id,
           ifStepId: streamDetails.if.id,
           labelStepId: streamDetails.label.id,
         };
+        // } else { // it's not a list and not a subscription
       }
       let step = withGlobalLayerPlan(
         layerPlan,
@@ -2994,9 +3013,25 @@ export class OperationPlan {
       }
       assertExecutableStep(step);
 
+      // `undefined` for non-lists (?)
       if (stepStreamOptions !== undefined) {
         // `null` is fine! `undefined` is not.
         step._stepOptions.stream = stepStreamOptions;
+
+        // Unless it's a subscription, we should clone the stream
+        if (streamDetails !== true) {
+          step = withGlobalLayerPlan(
+            layerPlan,
+            polymorphicPaths,
+            planningPath,
+            null,
+            __cloneStream,
+            null,
+            step,
+          );
+          step._stepOptions.stream = stepStreamOptions;
+        }
+
         step._stepOptions.walkIterable = true;
       }
       return { step, haltTree };
@@ -3376,6 +3411,8 @@ export class OperationPlan {
       layerPlan: layerPlan,
       constructor: stepConstructor,
       peerKey,
+      isSyncAndSafe,
+      cloneStreams,
     } = sstep;
     // const streamInitialCount = sstep._stepOptions.stream?.initialCount;
     const dependencyCount = deps.length;
@@ -3390,6 +3427,8 @@ export class OperationPlan {
         if (
           possiblyPeer !== step &&
           !possiblyPeer.hasSideEffects &&
+          possiblyPeer.cloneStreams === cloneStreams &&
+          possiblyPeer.isSyncAndSafe === isSyncAndSafe &&
           isPeerLayerPlan(possiblyPeer.layerPlan, layerPlan) &&
           possiblyPeer._stepOptions.stream == null &&
           possiblyPeer.peerKey === peerKey
@@ -3429,6 +3468,8 @@ export class OperationPlan {
           peerDependencyIndex !== dependencyIndex ||
           rawPossiblyPeer === step ||
           rawPossiblyPeer.hasSideEffects ||
+          rawPossiblyPeer.cloneStreams !== cloneStreams ||
+          rawPossiblyPeer.isSyncAndSafe !== isSyncAndSafe ||
           rawPossiblyPeer._stepOptions.stream != null ||
           rawPossiblyPeer.constructor !== stepConstructor ||
           rawPossiblyPeer.peerKey !== peerKey
@@ -3497,6 +3538,8 @@ export class OperationPlan {
               peerDependencyIndex !== dependencyIndex ||
               rawPossiblyPeer === step ||
               rawPossiblyPeer.hasSideEffects ||
+              rawPossiblyPeer.cloneStreams !== cloneStreams ||
+              rawPossiblyPeer.isSyncAndSafe !== isSyncAndSafe ||
               rawPossiblyPeer._stepOptions.stream != null ||
               rawPossiblyPeer.constructor !== stepConstructor ||
               rawPossiblyPeer.peerKey !== peerKey
@@ -4373,7 +4416,7 @@ export class OperationPlan {
   private finalizeSteps(): void {
     const initialStepCount = this.stepTracker.stepCount;
     for (const step of this.stepTracker.activeSteps) {
-      if (step.isSyncAndSafe) {
+      if (step.isSyncAndSafe && !(step instanceof __ItemStep)) {
         const dependencies = sudo(step).dependencies;
         for (const dep of dependencies) {
           if (dep.cloneStreams) {

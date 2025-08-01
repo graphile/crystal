@@ -56,7 +56,10 @@ import { defer, Deferred } from "./deferred.js";
 // Handy for debugging
 import { isDev, noop } from "./dev.js";
 import { defaultPlanResolver } from "./engine/lib/defaultPlanResolver.js";
-import { isUnaryStep } from "./engine/lib/withGlobalLayerPlan.js";
+import {
+  currentFieldStreamDetails,
+  isUnaryStep,
+} from "./engine/lib/withGlobalLayerPlan.js";
 import { OperationPlan } from "./engine/OperationPlan.js";
 import { $$inhibit, flagError, isSafeError, SafeError } from "./error.js";
 import { execute } from "./execute.js";
@@ -330,6 +333,7 @@ export {
   ConstantStep,
   context,
   createObjectAndApplyChildren,
+  currentFieldStreamDetails,
   DataFromObjectSteps,
   DataFromStep,
   debugPlans,
@@ -660,6 +664,7 @@ exportAsMany("grafast", {
   flagError,
   SafeError,
   isUnaryStep,
+  currentFieldStreamDetails,
   defaultPlanResolver,
   multistep,
 });

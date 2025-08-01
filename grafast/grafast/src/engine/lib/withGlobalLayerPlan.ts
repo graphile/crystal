@@ -82,6 +82,9 @@ export function currentPlanningPath(): string | undefined {
   return globalData_planningPath;
 }
 
+/**
+ * @experimental
+ */
 export function currentFieldStreamDetails(): Step<ExecutionDetailsStream | null> | null {
   if (globalData_stepStreamOptions == null) {
     return null;
