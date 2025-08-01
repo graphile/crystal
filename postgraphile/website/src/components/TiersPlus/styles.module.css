@@ -70,10 +70,6 @@
 }
 
 .badge {
-  /* position: absolute;
-  left: 50%;
-  top: 0%;
-  transform: translate(-50%, -50%); */
   margin: -1.8rem 0 0;
   background-color: white;
   border-radius: calc(infinity * 1px);
@@ -150,12 +146,17 @@
   font-size: 1rem;
 }
 
-.priceline {
+.priceline,
+.pricelineSupport {
   font-weight: var(--ifm-heading-font-weight);
   text-align: center;
   font-size: 2rem;
   display: flex;
   align-items: center;
+}
+
+.pricelineSupport {
+  align-items: baseline;
 }
 
 .price {
