@@ -6,14 +6,14 @@
     friendsConnection: {
       edges: [
         {
-          cursor: 'MA==',
+          cursor: 'MQ==',
           node: {
             id: 103,
             name: 'Katia',
           },
         },
         {
-          cursor: 'MQ==',
+          cursor: 'Mg==',
           node: {
             id: 104,
             name: 'Imani',
