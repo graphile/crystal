@@ -3,7 +3,6 @@ import { isAsyncIterable, isIterable } from "iterall";
 import * as assert from "../assert.js";
 import { defer } from "../deferred.js";
 import { currentFieldStreamDetails } from "../engine/lib/withGlobalLayerPlan.js";
-import { $$inhibit } from "../error.js";
 import type {
   BaseGraphQLArguments,
   ExecutionDetails,
@@ -180,9 +179,6 @@ export interface PaginationParams<TCursorValue = string> {
  *
  * Implementing this is optional, but:
  *
- * - `connectionClone` must be implemented if you want to support any
- *   pagination optimization, to save us from mutating a step that we don't
- *   "own"
  * - `paginationSupport` should be set (even an empty object) if your data
  *   source supports setting a limit
  * - `paginationSupport.reverse` should be implemented if you plan to support
@@ -207,18 +203,6 @@ export interface ConnectionOptimizedStep<
   TCursorValue = string,
 > extends Step {
   /**
-   * Clone the plan, ignoring the pagination parameters.
-   *
-   * Required if we're to apply conditions to the step (via `applyPagination`)
-   * otherwise we're manipulating a potentially unrelated step.
-   *
-   * Useful for implementing things like `totalCount` or aggregates.
-   */
-  connectionClone(
-    ...args: any[]
-  ): ConnectionOptimizedStep<TItem, TNodeStep, TEdgeStep, TCursorValue>; // TODO: `this`
-
-  /**
    * If set, we assume that you support at least `limit` pagination, even on an
    * empty object.
    *
@@ -233,6 +217,15 @@ export interface ConnectionOptimizedStep<
    * Must not be implemented without also adding `paginationSupport` and `connectionClone`.
    */
   applyPagination($params: Step<PaginationParams<TCursorValue>>): void;
+
+  /**
+   * Clone the plan, ignoring the pagination parameters.
+   *
+   * Useful for implementing things like `totalCount` or aggregates.
+   */
+  connectionClone?(
+    ...args: any[]
+  ): ConnectionOptimizedStep<TItem, TNodeStep, TEdgeStep, TCursorValue>; // TODO: `this`
 
   /**
    * Optionally implement this and we will parse the cursor for you before
@@ -372,20 +365,14 @@ export class ConnectionStep<
     } else {
       this.edgeDataPlan = (i) => i as TEdgeDataStep;
     }
-    if (
-      "paginationSupport" in subplan &&
-      "connectionClone" in subplan &&
-      "applyPagination" in subplan
-    ) {
+    if ("paginationSupport" in subplan && "applyPagination" in subplan) {
       this.collectionPaginationSupport = subplan.paginationSupport;
-      // Clone it so we can mess with it
-      const $clone = subplan.connectionClone();
       const $params = new ConnectionParamsStep<TCursorValue>(
         this.collectionPaginationSupport,
       );
       this.paramsDepId = this.addUnaryDependency($params);
-      $clone.applyPagination($params);
-      this.collectionDepId = this.addDependency($clone);
+      subplan.applyPagination($params);
+      this.collectionDepId = this.addDependency(subplan);
     } else {
       const $params = new ConnectionParamsStep<TCursorValue>(null);
       this.paramsDepId = this.addUnaryDependency($params);
@@ -536,7 +523,7 @@ export class ConnectionStep<
         TEdgeStep,
         TCursorValue
       >
-        ? TCollectionStep["connectionClone"]
+        ? Exclude<TCollectionStep["connectionClone"], undefined>
         : never
     >
   ): TCollectionStep {

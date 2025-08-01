@@ -85,7 +85,7 @@ export function each<
           ): ConnectionOptimizedStep<any, any> {
             const $list = this.getListStep() as TListStep &
               ConnectionOptimizedStep<any, any>;
-            const $clonedList = $list.connectionClone(...args) as TListStep &
+            const $clonedList = $list.connectionClone!(...args) as TListStep &
               ConnectionOptimizedStep<any, any>;
             return each($clonedList, mapper) as __ListTransformStep<TListStep> &
               ConnectionOptimizedStep<any, any>;
