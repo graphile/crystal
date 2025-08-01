@@ -815,7 +815,7 @@ function makeProcessedCollection<TItem>(
       } else {
         if (array.length > limit) {
           hasNext = true;
-          array = array.slice(limit);
+          array = array.slice(0, limit);
         } else {
           hasNext = false;
         }
@@ -1250,8 +1250,10 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
         }
         if (first != null) {
           params.limit = params.__skipOver + first + (needsHasMore ? 1 : 0);
+          params.__hasMore = needsHasMore ? ["r", first] : false;
         } else {
           // Just fetch the lot
+          params.__hasMore = false;
         }
       } else {
         // Collection doesn't support cursors; we must be using numeric cursors
@@ -1373,9 +1375,11 @@ class PageInfoStep extends UnbatchedStep<ConnectionResult<any>> {
     >;
     switch (key) {
       case "hasNextPage": {
+        $connection.setNeedsHasMore();
         return access($connection, "hasNextPage");
       }
       case "hasPreviousPage": {
+        $connection.setNeedsHasMore();
         return access($connection, "hasPreviousPage");
       }
       case "startCursor": {
