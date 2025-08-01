@@ -158,7 +158,7 @@ export class AccessStep<TData> extends UnbatchedStep<TData> {
     this.path = path;
     this.hasSymbols = this.path.some((k) => typeof k === "symbol");
     this.peerKey =
-      (this.fallback === "undefined" ? "U" : "D") +
+      (this.fallback === undefined ? "U" : "D") +
       (this.hasSymbols ? "§" : ".") +
       digestKeys(this.path);
     this.addStrongDependency(parentPlan);
