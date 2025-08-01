@@ -251,7 +251,7 @@ export interface ConnectionOptimizedStep<
   /**
    * Turn a value from the list into an item step
    */
-  edgeForItem?($item: Step<TItem>): TEdgeStep;
+  edgeForItem?($item: Step<MaybeIndexed<TItem>>): TEdgeStep;
 
   /**
    * Used as a fallback if nodeForItem isn't implemented.
@@ -273,10 +273,22 @@ const EMPTY_CONNECTION_RESULT: ConnectionResult<never> = Object.freeze({
   hasPreviousPage: false,
 });
 
+interface Indexed<TItem> {
+  index: number;
+  item: TItem;
+}
+function indexedItem<TItem>(item: TItem, index: number): Indexed<TItem> {
+  return { index, item };
+}
+type MaybeIndexed<TItem> = TItem | Indexed<TItem>;
+
 interface ConnectionResult<TItem> {
   hasNextPage: PromiseOrDirect<boolean>;
   hasPreviousPage: PromiseOrDirect<boolean>;
-  items: ReadonlyArray<TItem> | Iterable<TItem> | AsyncIterable<TItem>;
+  items:
+    | ReadonlyArray<MaybeIndexed<TItem>>
+    | Iterable<MaybeIndexed<TItem>>
+    | AsyncIterable<MaybeIndexed<TItem>>;
 }
 
 interface EdgeCapableStep<
@@ -327,7 +339,7 @@ export class ConnectionStep<
     moduleName: "grafast",
     exportName: "ConnectionStep",
   };
-  isSyncAndSafe = true;
+  isSyncAndSafe = false;
 
   private neededCollection = false;
   private collectionDepId: number;
@@ -574,18 +586,25 @@ export class ConnectionStep<
     return this.nodePlan($rawItem);
   }
 
-  public nodePlan = ($rawItem: Step<TItem>) => {
+  public getUnindexedItem($rawItem: Step<MaybeIndexed<TItem>>) {
+    const $item = this.collectionPaginationSupport?.cursor
+      ? ($rawItem as Step<TItem>)
+      : (access($rawItem as Step<Indexed<TItem>>, "item") as Step<TItem>);
+    return $item;
+  }
+  public nodePlan = ($rawItem: Step<MaybeIndexed<TItem>>) => {
+    const $item = this.getUnindexedItem($rawItem);
     const subplan = this.setupSubplanWithPagination();
     if (typeof subplan.nodeForItem === "function") {
-      return subplan.nodeForItem($rawItem);
+      return subplan.nodeForItem($item);
     } else if (typeof subplan.listItem === "function") {
-      return subplan.listItem($rawItem);
+      return subplan.listItem($item);
     } else {
-      return $rawItem as unknown as TNodeStep;
+      return $item as unknown as TNodeStep;
     }
   };
 
-  public edgePlan = ($rawItem: Step<TItem>) => {
+  public edgePlan = ($rawItem: Step<MaybeIndexed<TItem>>) => {
     const subplan = this.setupSubplanWithPagination();
     if (typeof subplan.edgeForItem === "function") {
       return subplan.edgeForItem($rawItem);
@@ -627,23 +646,21 @@ export class ConnectionStep<
     );
   }
 
-  public cursorPlan($rawItem: Step<TItem>) {
+  public cursorPlan($rawItem: Step<MaybeIndexed<TItem>>) {
     this.needsCursor = true;
     const subplan = this._getSubplan();
     if (this.collectionPaginationSupport?.cursor) {
-      return subplan.cursorForItem!(this.listItem($rawItem));
+      const $item = $rawItem as Step<TItem>;
+      return subplan.cursorForItem!($item);
     } else {
+      const $indexed = $rawItem as Step<Indexed<TItem>>;
       // We're doing cursors, which also means we're NOT doing reverse.
       // NOTE: there won't be a needsHasMore causing an extra row fetch when
       // doing numeric pagination backwards - we know there's another record if
       // we start > 0
       const $leftPad = access(this.paginationParams(), "__skipOver");
       const $offset = access(this.paginationParams(), "offset", 0);
-      const $index = lambda(
-        { list: this.items(), item: $rawItem },
-        indexOf,
-        true,
-      );
+      const $index = access($indexed, "index") as Step<number>;
       return lambda([$leftPad, $offset, $index], encodeNumericCursor);
     }
   }
@@ -742,7 +759,12 @@ export class ConnectionStep<
         return null;
       }
 
-      return makeProcessedCollection(mode, collection, params);
+      return makeProcessedCollection(
+        mode,
+        collection,
+        params,
+        !this.collectionPaginationSupport?.cursor,
+      );
     });
   }
 }
@@ -756,102 +778,131 @@ type Mode =
   | typeof MODE_ARRAY
   | typeof MODE_ITERABLE
   | typeof MODE_ASYNC_ITERABLE;
-
 function makeProcessedCollection<TItem>(
   mode: Exclude<Mode, typeof MODE_NULL>,
   collection: Array<TItem> | Iterable<TItem> | AsyncIterable<TItem>,
   params: PaginationParams<any>,
+  wrapIndicies: boolean,
 ): ConnectionResult<TItem> {
   const { __isForwardPagination, __hasMore, __skipOver, __limit } = params;
 
   // If we don't need to do anything, return the underlying collection directly
-  if (__skipOver === 0 && __limit === null && typeof __hasMore === "boolean") {
+  if (
+    __skipOver === 0 &&
+    __limit === null &&
+    typeof __hasMore === "boolean" &&
+    (!wrapIndicies || Array.isArray(collection))
+  ) {
     const hasNextPage = __isForwardPagination ? __hasMore : false;
     const hasPreviousPage = __isForwardPagination ? __hasMore : false;
-    return { items: collection, hasNextPage, hasPreviousPage };
+    const items = wrapIndicies
+      ? (collection as ReadonlyArray<TItem>).map(indexedItem)
+      : collection;
+    return { items, hasNextPage, hasPreviousPage };
   }
 
-  /*
   let hasNext: boolean | PromiseLike<boolean>;
-  let items: Array<TItem> | Iterable<TItem> | AsyncIterable<TItem>;
-  if (mode === 1) {
-    if (typeof rawHasNext === "boolean") {
-      hasNext = rawHasNext;
-    } else {
-      hasNext = false;
+  let items:
+    | Array<MaybeIndexed<TItem>>
+    | Iterable<MaybeIndexed<TItem>>
+    | AsyncIterable<MaybeIndexed<TItem>>;
+  if (mode === MODE_ARRAY) {
+    let array = collection as ReadonlyArray<TItem>;
+    if (__skipOver > 0) {
+      array = array.slice(__skipOver);
     }
-    let list = collection as ReadonlyArray<TItem>;
-    let sliced = false;
-    for (const op of operations) {
-      switch (op.op) {
-        case "skip": {
-          sliced = true;
-          list = list.slice(op.n);
-          break;
+    if (__limit != null) {
+      array = array.slice(0, __limit);
+    }
+    if (typeof __hasMore === "boolean") {
+      hasNext = __hasMore;
+    } else {
+      const [side, limit] = __hasMore;
+      if (side === "l") {
+        if (array.length > limit) {
+          hasNext = true;
+          array = array.slice(array.length - limit);
+        } else {
+          hasNext = false;
         }
-        case "pickFirst": {
-          const hasMore = list.length > op.n;
-          if (hasMore) {
-            sliced = true;
-            list = list.slice(0, op.n);
-          }
-          if (op.setHaveNext) {
-            hasNext = hasMore;
-          }
-          break;
-        }
-        case "pickLast": {
-          const hasMore = list.length > op.n;
-          if (hasMore) {
-            sliced = true;
-            list = list.slice(list.length - op.n);
-          }
-          if (op.setHaveNext) {
-            hasNext = hasMore;
-          }
-          break;
-        }
-        default: {
-          const never: never = op;
-          throw new Error(`Operation ${never as any} not understood`);
+      } else {
+        if (array.length > limit) {
+          hasNext = true;
+          array = array.slice(limit);
+        } else {
+          hasNext = false;
         }
       }
+      hasNext = false;
     }
-    items = list;
+    items = wrapIndicies ? array.map(indexedItem) : array;
   } else {
-    const deferredHasNext = rawHasNext !== null ? null : defer<boolean>();
-    hasNext = deferredHasNext ?? rawHasNext!;
-    // There's guaranteed to be at least one operation
-    const opIndex = 0;
-    const op = operations[opIndex];
+    const deferredHasNext =
+      typeof __hasMore === "boolean" ? null : defer<boolean>();
+    hasNext = deferredHasNext ?? (__hasMore as boolean);
     items = (async function* () {
-      // Deliberately shadowed
-      const hasNext = false;
-      // TODO...
-
-      // Apply our own iterator
+      let didHaveNext = false;
       try {
-        // TODO...
+        let skip = __skipOver;
+        let index = 0;
+        const accumulator: TItem[] | null =
+          typeof __hasMore !== "boolean" && __hasMore[0] === "l" ? [] : null;
         for await (const item of collection) {
-          // TODO...
+          if (skip > 0) {
+            --skip;
+          } else if (__limit === null || index < __limit) {
+            if (typeof __hasMore === "boolean") {
+              yield wrapIndicies ? { index, item } : item;
+            } else {
+              const limit = __hasMore[1];
+              if (accumulator /* same as __hasMore[0] === "l" */) {
+                // DO NOT USE `index` IN THIS BRANCH
+                const index = null;
+
+                if (accumulator.length < limit) {
+                  // All good
+                } else {
+                  // Drop one!
+                  accumulator.shift();
+                  didHaveNext = true;
+                }
+                accumulator.push(item);
+              } else {
+                if (index < limit) {
+                  yield wrapIndicies ? { index, item } : item;
+                } else {
+                  didHaveNext = true;
+                  break;
+                }
+              }
+            }
+            index++;
+          } else {
+            break;
+          }
+        }
+        if (accumulator) {
+          index = 0;
+          for (const item of accumulator) {
+            yield wrapIndicies ? { index, item } : item;
+            ++index;
+          }
         }
       } finally {
         if (deferredHasNext) {
-          deferredHasNext.resolve(hasNext);
+          deferredHasNext.resolve(didHaveNext);
         }
       }
     })();
   }
-  const hasNextPage = isForwardPagination ? hasNext : false;
-  const hasPreviousPage = isForwardPagination ? false : hasNext;
+  const hasNextPage = __isForwardPagination ? hasNext : false;
+  const hasPreviousPage = __isForwardPagination ? false : hasNext;
 
   return {
     hasNextPage,
     hasPreviousPage,
     items,
   };
-  */
-  throw new Error("Unimplemented");
 }
 
 export class EdgeStep<
@@ -869,7 +920,7 @@ export class EdgeStep<
 
   constructor(
     $connection: ConnectionStep<TItem, TNodeStep, any, any, any>,
-    $rawItem: Step<TItem>,
+    $rawItem: Step<MaybeIndexed<TItem>>,
   ) {
     super();
     const itemDepId = this.addDependency($rawItem);
@@ -907,13 +958,17 @@ export class EdgeStep<
 
   private getRawItemStep() {
     // We know we're not using flags
-    return this.getDepOptions<Step<TItem>>(0).step;
+    return this.getDepOptions<Step<MaybeIndexed<TItem>>>(0).step;
+  }
+  private getItemStep(): Step<TItem> {
+    const $rawItem = this.getRawItemStep();
+    return this.getConnectionStep().getUnindexedItem($rawItem);
   }
 
   data(): TEdgeDataStep {
     const $connection = this.getConnectionStep();
-    const $rawItem = this.getRawItemStep();
-    return $connection.edgeDataPlan($rawItem);
+    const $item = this.getItemStep();
+    return $connection.edgeDataPlan($item);
   }
 
   node(): TNodeStep {
@@ -1358,18 +1413,6 @@ class PageInfoStep extends UnbatchedStep<ConnectionResult<any>> {
   ) {
     return _connection;
   }
-}
-
-function indexOf(params: {
-  list: Maybe<ReadonlyArray<any>>;
-  item: any;
-}): number | typeof $$inhibit {
-  const { list, item } = params;
-  if (Array.isArray(list)) {
-    const index = list.indexOf(item);
-    if (index >= 0) return index;
-  }
-  return $$inhibit;
 }
 
 export class ConnectionItemsStep extends Step {
