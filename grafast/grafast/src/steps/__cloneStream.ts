@@ -1,5 +1,5 @@
 import type { ExecutionDetails } from "../interfaces.js";
-import type { ListCapableStep} from "../step.js";
+import type { ListCapableStep } from "../step.js";
 import { Step } from "../step.js";
 import type { __ItemStep } from "./__item.js";
 
@@ -28,7 +28,12 @@ export class __CloneStreamStep extends Step {
   }
   execute({ values: [val], indexMap }: ExecutionDetails) {
     // The stream has already been cloned, we're just a placeholder really
-    return indexMap((i) => val.at(i));
+    if (val.isBatch) {
+      return val.entries;
+    } else {
+      const v = val.value;
+      return indexMap(() => v);
+    }
   }
 }
 

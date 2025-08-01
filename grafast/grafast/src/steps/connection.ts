@@ -615,7 +615,8 @@ export class ConnectionStep<
     return this.nodes();
   }
 
-  private _items() {
+  /** @internal */
+  public _items() {
     return this.withMyLayerPlan(() =>
       this.operationPlan.cacheStep(
         this,
@@ -1337,12 +1338,12 @@ class PageInfoStep extends UnbatchedStep<ConnectionResult<any>> {
       }
       case "startCursor": {
         // Get first node, get cursor for it
-        const $first = first($connection);
+        const $first = first($connection._items());
         return $connection.cursorPlan($first);
       }
       case "endCursor": {
         // Get first node, get cursor for it
-        const $last = last($connection);
+        const $last = last($connection._items());
         return $connection.cursorPlan($last);
       }
       default: {
