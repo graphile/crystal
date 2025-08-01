@@ -3018,21 +3018,10 @@ export class OperationPlan {
         // `null` is fine! `undefined` is not.
         step._stepOptions.stream = stepStreamOptions;
 
-        // Unless it's a subscription, we should clone the stream
-        if (streamDetails !== true) {
-          step = withGlobalLayerPlan(
-            layerPlan,
-            polymorphicPaths,
-            planningPath,
-            null,
-            __cloneStream,
-            null,
-            step,
-          );
-          step._stepOptions.stream = stepStreamOptions;
+        if (streamDetails === true) {
+          // Subscriptions need to be informed to walkIterable
+          step._stepOptions.walkIterable = true;
         }
-
-        step._stepOptions.walkIterable = true;
       }
       return { step, haltTree };
     } catch (e) {
