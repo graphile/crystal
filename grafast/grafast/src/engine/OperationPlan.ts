@@ -4401,8 +4401,8 @@ export class OperationPlan {
       } else if ($step instanceof __CloneStreamStep) {
         const $clone = sudo($step);
         const $dep = $clone.dependencies[0];
-        // TODO: if $dep.dependents.length === 1, replace with $dep?
-        if (!$dep.cloneStreams) {
+        if (!$dep.cloneStreams || $dep.dependents.length === 1) {
+          $dep.cloneStreams = false;
           $dep._stepOptions.walkIterable ||= $clone._stepOptions.walkIterable;
           $dep._stepOptions.stream ||= $clone._stepOptions.stream;
           this.stepTracker.replaceStep($clone, $dep);
