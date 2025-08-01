@@ -2958,14 +2958,15 @@ export class OperationPlan {
         step._stepOptions.stream = {};
         step._stepOptions.walkIterable = true;
       } else if (streamDetails === false) {
-        step._stepOptions.walkIterable = true;
+        // Simple list, no action necessary
       } else if (streamDetails != null) {
+        // Streamed list, mark it as such
         step._stepOptions.stream = {
           initialCountStepId: streamDetails.initialCount.id,
           ifStepId: streamDetails.if.id,
           labelStepId: streamDetails.label.id,
         };
-        step._stepOptions.walkIterable = true;
+        // } else { // Non-list, non-subscription - no action necessary
       }
       return { step, haltTree };
     } catch (e) {
