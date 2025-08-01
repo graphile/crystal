@@ -1,4 +1,6 @@
 .mainSectionInstructionContainer {
+  composes: wide from global;
+  margin-left: 6rem;
   padding-top: 0.8rem;
   padding-bottom: 0.8rem;
 }

@@ -102,24 +102,28 @@ sponsorship. THANK YOU!
 {
 
 <div className={sponsorStyles.tiers}>
-  <div className={sponsorStyles.tier}>
-    <div className={sponsorStyles.info}>
-      <div className={sponsorStyles.title}>Development Support</div>
-      <div className={sponsorStyles.priceline}>
-        <span className={sponsorStyles.note}>From </span>
-        <span className={sponsorStyles.price}>$899</span>
-        <span className={sponsorStyles.note}>/mo</span>
+  <div className={sponsorStyles.tierRow}>
+    <div className={clsx(sponsorStyles.tierSupport, sponsorStyles.featured)}>
+      <div className={sponsorStyles.banner}>
+        <div className={sponsorStyles.info}>
+          <div className={sponsorStyles.title}>Development Support</div>
+          <div className={sponsorStyles.priceline}>
+            <span className={sponsorStyles.note}>From </span>
+            <span className={sponsorStyles.price}>$899</span>
+            <span className={sponsorStyles.note}>/mo</span>
+          </div>
+        </div>
+        <Link
+          className={clsx(
+            "button button--primary button--lg",
+            sponsorStyles.button,
+          )}
+          to="/support"
+        >
+          Find out more
+        </Link>
       </div>
     </div>
-    <Link
-      className={clsx(
-        "button button--primary button--lg",
-        sponsorStyles.button,
-      )}
-      to="/support"
-    >
-      Find out more
-    </Link>
   </div>
 </div>
 }

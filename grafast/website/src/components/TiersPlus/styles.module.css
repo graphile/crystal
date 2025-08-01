@@ -12,7 +12,8 @@
   display: flex;
 }
 
-.tier {
+.tier,
+.tierSupport {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -31,11 +32,25 @@
   }
 }
 
-[data-theme="dark"] .tier {
+[data-theme="dark"] .tier,
+[data-theme="dark"] .tierSupport {
   border: 2px solid var(--ifm-color-primary);
   &.featured {
     background-color: #13020d;
     border: 3px solid var(--grafast-color-pink);
+  }
+}
+
+.tierSupport {
+  flex: 0 0 100%;
+  &.featured {
+    background-color: transparent;
+  }
+}
+
+[data-theme="dark"] .tierSupport {
+  &.featured {
+    background-color: transparent;
   }
 }
 
