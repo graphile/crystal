@@ -1,3 +1,4 @@
+import { $$deepDepSkip } from "../constants.js";
 import type { ExecutionDetails } from "../interfaces.js";
 import type { ListCapableStep } from "../step.js";
 import { Step } from "../step.js";
@@ -12,6 +13,9 @@ export class __CloneStreamStep extends Step {
   constructor($dep: Step) {
     super();
     this.addDependency($dep);
+  }
+  [$$deepDepSkip](): Step {
+    return this.getDepOptions(0).step;
   }
   listItem($item: __ItemStep<any>): Step {
     const $dep = this.getDepOptions(0).step as Step &
