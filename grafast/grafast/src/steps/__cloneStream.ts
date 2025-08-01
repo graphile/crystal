@@ -18,12 +18,8 @@ export class __CloneStreamStep extends Step {
       Partial<ListCapableStep<any, any, any>>;
     return $dep.listItem?.($item) ?? $item;
   }
-  optimize(): Step {
-    const $dep = this.getDepOptions(0).step;
-    if (!$dep.cloneStreams) {
-      return $dep;
-    }
-    // TODO: if $dep.dependents.length === 1, replace with $dep?
+  optimize() {
+    // IMPORTANT: optimization is handled in OperationPlan's inlineSteps()
     return this;
   }
   execute({ values: [val], indexMap }: ExecutionDetails) {

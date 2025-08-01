@@ -76,7 +76,7 @@ import {
   stepHasToRecord,
   stepHasToSpecifier,
 } from "../step.js";
-import { __cloneStream } from "../steps/__cloneStream.js";
+import { __cloneStream, __CloneStreamStep } from "../steps/__cloneStream.js";
 import { __TrackedValueStepWithDollars } from "../steps/__trackedValue.js";
 import { itemsOrStep } from "../steps/connection.js";
 import { constant, ConstantStep } from "../steps/constant.js";
@@ -4332,8 +4332,9 @@ export class OperationPlan {
   }
 
   private inlineSteps() {
-    flagLoop: for (const $flag of this.stepTracker.activeSteps) {
-      if ($flag instanceof __FlagStep) {
+    flagLoop: for (const $step of this.stepTracker.activeSteps) {
+      if ($step instanceof __FlagStep) {
+        const $flag = $step;
         // We can only inline it if it's not used by an output plan or layer plan
         {
           const usages = this.stepTracker.outputPlansByRootStep.get($flag);
@@ -4397,6 +4398,15 @@ export class OperationPlan {
         }
         const $flagDep = sudo($flag).dependencies[0];
         this.stepTracker.replaceStep($flag, $flagDep);
+      } else if ($step instanceof __CloneStreamStep) {
+        const $clone = sudo($step);
+        const $dep = $clone.dependencies[0];
+        // TODO: if $dep.dependents.length === 1, replace with $dep?
+        if (!$dep.cloneStreams) {
+          $dep._stepOptions.walkIterable ||= $clone._stepOptions.walkIterable;
+          $dep._stepOptions.stream ||= $clone._stepOptions.stream;
+          this.stepTracker.replaceStep($clone, $dep);
+        }
       }
     }
   }
