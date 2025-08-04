@@ -19,6 +19,7 @@ import type {
   GrafastResultsList,
 } from "../interfaces.js";
 import { isListCapableStep, Step } from "../step.js";
+import { sudo } from "../utils.js";
 import type { __ItemStep } from "./__item.js";
 
 // PUBLIC FLAGS
@@ -137,6 +138,8 @@ export class __FlagStep<TStep extends Step> extends Step<DataFromStep<TStep>> {
     if (isListCapableStep(step)) {
       this.listItem = this._listItem;
     }
+    sudo(this).implicitSideEffectStep = null;
+    this.layerPlan.latestSideEffectStep = null; // Can't be `this`, because __FlagStep can be optimized away.
   }
   public toStringMeta(): string | null {
     const acceptFlags = ALL_FLAGS & ~this.forbiddenFlags;
