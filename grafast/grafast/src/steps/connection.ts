@@ -855,7 +855,7 @@ export class ConnectionStep<
           mode = MODE_ARRAY;
         } else if (isIterable(items)) {
           collection = items; // [Symbol.iterator]();
-          mode = MODE_ARRAY;
+          mode = MODE_ITERABLE;
         } else if (isAsyncIterable(items)) {
           collection = items; // [Symbol.asyncIterator]();
           mode = MODE_ASYNC_ITERABLE;
