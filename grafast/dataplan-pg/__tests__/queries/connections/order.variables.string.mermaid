@@ -8,12 +8,12 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/connections/order.variables.string"
-    Bucket0("Bucket 0 (root)<br /><br />1: PgSelectInlineApply[57]<br />ᐳ: 10, 14, 15, 62, 63, 64, 16, 20, 61, 18<br />2: PgSelect[13], PgSelect[25]<br />ᐳ: Access[26], Access[37], Access[58]<br />3: Connection[17], First[27]<br />ᐳ: 28, 29<br />4: ConnectionItems[21]<br />5: First[35], Last[39]<br />ᐳ: 36, 38, 40, 41"):::bucket
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 17, 21, 37, 58, 29, 38, 41<br /><br />ROOT Connectionᐸ13ᐳ[17]"):::bucket
-    Bucket3("Bucket 3 (listItem)<br />Deps: 37, 58<br /><br />ROOT __Item{3}ᐸ30ᐳ[31]"):::bucket
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 31, 37, 32, 58<br /><br />ROOT Edge{3}[32]"):::bucket
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 42, 58<br /><br />ROOT PgSelectSingle{4}ᐸmessagesᐳ[42]<br />1: <br />ᐳ: 46, 59, 60, 52<br />2: First[53]<br />ᐳ: PgSelectSingle[54]"):::bucket
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 54<br /><br />ROOT PgSelectSingle{5}ᐸusersᐳ[54]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: PgSelectInlineApply[56]<br />ᐳ: 10, 14, 15, 61, 62, 63, 16, 20, 60, 18<br />2: PgSelect[13], PgSelect[25]<br />ᐳ: Access[26], Access[36], Access[57]<br />3: Connection[17], First[27]<br />ᐳ: 28, 29<br />4: ConnectionItems[21]<br />5: First[34], Last[38]<br />ᐳ: 35, 37, 39, 40"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 17, 21, 36, 57, 29, 37, 40<br /><br />ROOT Connectionᐸ13ᐳ[17]"):::bucket
+    Bucket3("Bucket 3 (listItem)<br />Deps: 36, 57<br /><br />ROOT __Item{3}ᐸ21ᐳ[30]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 30, 36, 31, 57<br /><br />ROOT Edge{3}[31]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 41, 57<br /><br />ROOT PgSelectSingle{4}ᐸmessagesᐳ[41]<br />1: <br />ᐳ: 45, 58, 59, 51<br />2: First[52]<br />ᐳ: PgSelectSingle[53]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 53<br /><br />ROOT PgSelectSingle{5}ᐸusersᐳ[53]"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket3
@@ -22,28 +22,28 @@ graph TD
     Bucket5 --> Bucket6
 
     %% plan dependencies
-    PgSelect13[["PgSelect[13∈0] ➊<br />ᐸmessages+1ᐳ<br />More deps:<br />- Constantᐸ5ᐳ[63]"]]:::plan
+    PgSelect13[["PgSelect[13∈0] ➊<br />ᐸmessages+1ᐳ<br />More deps:<br />- Constantᐸ5ᐳ[62]"]]:::plan
     Object16{{"Object[16∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     ApplyInput18{{"ApplyInput[18∈0] ➊"}}:::plan
-    Lambda20{{"Lambda[20∈0] ➊<br />ᐸincludeArchivedConditionᐳ<br />More deps:<br />- Constantᐸ[ undefined, 'INHERIT' ]ᐳ[62]"}}:::plan
-    PgSelectInlineApply57["PgSelectInlineApply[57∈0] ➊"]:::plan
-    Object16 & ApplyInput18 & Lambda20 & PgSelectInlineApply57 --> PgSelect13
-    PgSelect25[["PgSelect[25∈0] ➊<br />ᐸmessages(aggregate)ᐳ<br />More deps:<br />- Constantᐸ5ᐳ[63]"]]:::plan
+    Lambda20{{"Lambda[20∈0] ➊<br />ᐸincludeArchivedConditionᐳ<br />More deps:<br />- Constantᐸ[ undefined, 'INHERIT' ]ᐳ[61]"}}:::plan
+    PgSelectInlineApply56["PgSelectInlineApply[56∈0] ➊"]:::plan
+    Object16 & ApplyInput18 & Lambda20 & PgSelectInlineApply56 --> PgSelect13
+    PgSelect25[["PgSelect[25∈0] ➊<br />ᐸmessages(aggregate)ᐳ<br />More deps:<br />- Constantᐸ5ᐳ[62]"]]:::plan
     Object16 & ApplyInput18 & Lambda20 --> PgSelect25
     Access14{{"Access[14∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access15{{"Access[15∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access14 & Access15 --> Object16
-    Connection17[["Connection[17∈0] ➊<br />ᐸ13ᐳ<br />Dependents: 2<br />More deps:<br />- Constantᐸ5ᐳ[63]"]]:::plan
+    Connection17[["Connection[17∈0] ➊<br />ᐸ13ᐳ<br />Dependents: 2<br />More deps:<br />- Constantᐸ5ᐳ[62]"]]:::plan
     PgSelect13 --> Connection17
-    List61{{"List[61∈0] ➊<br />ᐸ10,64ᐳ<br />More deps:<br />- Constantᐸ'BODY_ASC'ᐳ[64]"}}:::plan
+    List60{{"List[60∈0] ➊<br />ᐸ10,63ᐳ<br />More deps:<br />- Constantᐸ'BODY_ASC'ᐳ[63]"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ0.stringᐳ"}}:::plan
-    Access10 --> List61
+    Access10 --> List60
     __Value0["__Value[0∈0] ➊<br />ᐸvariableValuesᐳ"]:::plan
     __Value0 --> Access10
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access14
     __Value2 --> Access15
-    List61 --> ApplyInput18
+    List60 --> ApplyInput18
     ConnectionItems21[["ConnectionItems[21∈0] ➊<br />Dependents: 3<br />More deps:<br />- Connection[17]"]]:::plan
     Access26{{"Access[26∈0] ➊<br />ᐸ25.itemsᐳ"}}:::plan
     PgSelect25 --> Access26
@@ -51,54 +51,52 @@ graph TD
     Access26 --> First27
     PgSelectSingle28{{"PgSelectSingle[28∈0] ➊<br />ᐸmessagesᐳ"}}:::plan
     First27 --> PgSelectSingle28
-    First35[["First[35∈0] ➊<br />More deps:<br />- ConnectionItems[21]"]]:::plan
-    PgSelectSingle36{{"PgSelectSingle[36∈0] ➊<br />ᐸmessagesᐳ"}}:::plan
-    First35 --> PgSelectSingle36
-    Access37{{"Access[37∈0] ➊<br />ᐸ13.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
-    PgSelect13 --> Access37
-    Last39[["Last[39∈0] ➊<br />More deps:<br />- ConnectionItems[21]"]]:::plan
-    PgSelectSingle40{{"PgSelectSingle[40∈0] ➊<br />ᐸmessagesᐳ"}}:::plan
-    Last39 --> PgSelectSingle40
-    Access58{{"Access[58∈0] ➊<br />ᐸ13.m.joinDetailsFor48ᐳ"}}:::plan
-    PgSelect13 --> Access58
+    First34[["First[34∈0] ➊<br />More deps:<br />- ConnectionItems[21]"]]:::plan
+    PgSelectSingle35{{"PgSelectSingle[35∈0] ➊<br />ᐸmessagesᐳ"}}:::plan
+    First34 --> PgSelectSingle35
+    Access36{{"Access[36∈0] ➊<br />ᐸ13.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
+    PgSelect13 --> Access36
+    Last38[["Last[38∈0] ➊<br />More deps:<br />- ConnectionItems[21]"]]:::plan
+    PgSelectSingle39{{"PgSelectSingle[39∈0] ➊<br />ᐸmessagesᐳ"}}:::plan
+    Last38 --> PgSelectSingle39
+    Access57{{"Access[57∈0] ➊<br />ᐸ13.m.joinDetailsFor47ᐳ"}}:::plan
+    PgSelect13 --> Access57
     PageInfo24{{"PageInfo[24∈1] ➊<br />More deps:<br />- Connection[17]"}}:::plan
-    __CloneStream30[["__CloneStream[30∈1] ➊<br />More deps:<br />- ConnectionItems[21]"]]:::plan
-    __Item31[/"__Item[31∈3]<br />ᐸ30ᐳ"\]:::itemplan
-    __CloneStream30 ==> __Item31
-    Edge32{{"Edge[32∈3]"}}:::plan
-    __Item31 --> Edge32
-    PgCursor44{{"PgCursor[44∈4]<br />More deps:<br />- Access[37]"}}:::plan
-    PgSelectSingle42{{"PgSelectSingle[42∈4]<br />ᐸmessagesᐳ"}}:::plan
-    PgSelectSingle42 --> PgCursor44
-    __Item31 --> PgSelectSingle42
-    List59{{"List[59∈5]<br />ᐸ58,42ᐳ"}}:::plan
-    Access58 & PgSelectSingle42 --> List59
-    PgClassExpression46{{"PgClassExpression[46∈5]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
-    PgSelectSingle42 --> PgClassExpression46
-    Access52{{"Access[52∈5]<br />ᐸ60.itemsᐳ"}}:::plan
-    Lambda60{{"Lambda[60∈5]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda60 --> Access52
-    First53[["First[53∈5]"]]:::plan
-    Access52 --> First53
-    PgSelectSingle54{{"PgSelectSingle[54∈5]<br />ᐸusersᐳ"}}:::plan
-    First53 --> PgSelectSingle54
-    List59 --> Lambda60
-    PgClassExpression55{{"PgClassExpression[55∈6]<br />ᐸ__users__.”username”ᐳ"}}:::plan
-    PgSelectSingle54 --> PgClassExpression55
-    PgClassExpression56{{"PgClassExpression[56∈6]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
-    PgSelectSingle54 --> PgClassExpression56
+    __Item30[/"__Item[30∈3]<br />ᐸ21ᐳ<br />More deps:<br />- ConnectionItems[21]"\]:::itemplan
+    Edge31{{"Edge[31∈3]"}}:::plan
+    __Item30 --> Edge31
+    PgCursor43{{"PgCursor[43∈4]<br />More deps:<br />- Access[36]"}}:::plan
+    PgSelectSingle41{{"PgSelectSingle[41∈4]<br />ᐸmessagesᐳ"}}:::plan
+    PgSelectSingle41 --> PgCursor43
+    __Item30 --> PgSelectSingle41
+    List58{{"List[58∈5]<br />ᐸ57,41ᐳ"}}:::plan
+    Access57 & PgSelectSingle41 --> List58
+    PgClassExpression45{{"PgClassExpression[45∈5]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
+    PgSelectSingle41 --> PgClassExpression45
+    Access51{{"Access[51∈5]<br />ᐸ59.itemsᐳ"}}:::plan
+    Lambda59{{"Lambda[59∈5]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
+    Lambda59 --> Access51
+    First52[["First[52∈5]"]]:::plan
+    Access51 --> First52
+    PgSelectSingle53{{"PgSelectSingle[53∈5]<br />ᐸusersᐳ"}}:::plan
+    First52 --> PgSelectSingle53
+    List58 --> Lambda59
+    PgClassExpression54{{"PgClassExpression[54∈6]<br />ᐸ__users__.”username”ᐳ"}}:::plan
+    PgSelectSingle53 --> PgClassExpression54
+    PgClassExpression55{{"PgClassExpression[55∈6]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
+    PgSelectSingle53 --> PgClassExpression55
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value2,Access10,PgSelect13,Access14,Access15,Object16,Connection17,ApplyInput18,Lambda20,ConnectionItems21,PgSelect25,Access26,First27,PgSelectSingle28,First35,PgSelectSingle36,Access37,Last39,PgSelectSingle40,PgSelectInlineApply57,Access58,List61 bucket0
+    class Bucket0,__Value0,__Value2,Access10,PgSelect13,Access14,Access15,Object16,Connection17,ApplyInput18,Lambda20,ConnectionItems21,PgSelect25,Access26,First27,PgSelectSingle28,First34,PgSelectSingle35,Access36,Last38,PgSelectSingle39,PgSelectInlineApply56,Access57,List60 bucket0
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PageInfo24,__CloneStream30 bucket1
+    class Bucket1,PageInfo24 bucket1
     classDef bucket3 stroke:#ffa500
-    class Bucket3,__Item31,Edge32 bucket3
+    class Bucket3,__Item30,Edge31 bucket3
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgSelectSingle42,PgCursor44 bucket4
+    class Bucket4,PgSelectSingle41,PgCursor43 bucket4
     classDef bucket5 stroke:#7fff00
-    class Bucket5,PgClassExpression46,Access52,First53,PgSelectSingle54,List59,Lambda60 bucket5
+    class Bucket5,PgClassExpression45,Access51,First52,PgSelectSingle53,List58,Lambda59 bucket5
     classDef bucket6 stroke:#ff1493
-    class Bucket6,PgClassExpression55,PgClassExpression56 bucket6
+    class Bucket6,PgClassExpression54,PgClassExpression55 bucket6
 
