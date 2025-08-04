@@ -35,6 +35,7 @@ import type { GrafastPlanJSON, StepStreamOptions } from "../index.js";
 import {
   __FlagStep,
   __ItemStep,
+  __ListTransformStep,
   __TrackedValueStep,
   __ValueStep,
   $$inhibit,
@@ -80,6 +81,7 @@ import { __cloneStream, __CloneStreamStep } from "../steps/__cloneStream.js";
 import { __TrackedValueStepWithDollars } from "../steps/__trackedValue.js";
 import { itemsOrStep } from "../steps/connection.js";
 import { constant, ConstantStep } from "../steps/constant.js";
+import { isSkippableEach } from "../steps/each.js";
 import {
   graphqlResolver,
   graphqlResolveType,
@@ -2500,10 +2502,19 @@ export class OperationPlan {
       locationDetails,
       resolverEmulation,
     } = details;
+
+    // "see through" a list transform step that's only doing `each(...)` (and
+    // no stream), and deduplicate so we only get one layer plan and one
+    // `__Item` step.
+    // IMPORTANT: we still need to use $list below otherwise we won't get the
+    // right mapped items.
+    const $listForItem =
+      stream == null && isSkippableEach($list) ? $list.getListStep() : $list;
+
     const $__item = this.itemStepForListStep(
       parentLayerPlan,
       listItemPlanningPath,
-      $list,
+      $listForItem,
       listDepth,
       stream,
     );

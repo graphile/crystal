@@ -10,8 +10,7 @@ import type {
   ItemsStep,
   StepRepresentingList,
 } from "./connection.js";
-import type { __ListTransformStep } from "./listTransform.js";
-import { listTransform } from "./listTransform.js";
+import { __ListTransformStep, listTransform } from "./listTransform.js";
 
 const eachReduceCallback = (memo: any[], item: any) => {
   memo.push(item);
@@ -39,6 +38,19 @@ const eachCallbackForListPlan = (
   return result;
 };
 
+function eachOptimize(this: __ListTransformStep<any>) {
+  const layerPlan = this.subroutineLayer;
+  const rootStep = layerPlan.rootStep;
+  if (
+    rootStep instanceof __ItemStep &&
+    rootStep.getParentStep().layerPlan !== layerPlan
+  ) {
+    // We don't do anything; replace ourself with our parent
+    return this.getListStep();
+  }
+  return this;
+}
+
 /**
  * Transforms a list by wrapping each element in the list with the given mapper.
  */
@@ -65,18 +77,7 @@ export function each<
     meta: `each:${chalk.yellow(listStep.id)}${
       mapper.name ? `/${mapper.name}` : ""
     }`,
-    optimize(this: __ListTransformStep<any>) {
-      const layerPlan = this.subroutineLayer;
-      const rootStep = layerPlan.rootStep;
-      if (
-        rootStep instanceof __ItemStep &&
-        rootStep.getParentStep().layerPlan !== layerPlan
-      ) {
-        // We don't do anything; replace ourself with our parent
-        return this.getListStep();
-      }
-      return this;
-    },
+    optimize: eachOptimize,
     ...(listStep.connectionClone != null
       ? {
           connectionClone(
@@ -93,4 +94,17 @@ export function each<
         }
       : null),
   });
+}
+
+export function isSkippableEach($step: Step): $step is __ListTransformStep {
+  if ($step instanceof __ListTransformStep) {
+    return (
+      $step.itemPlanCallback === eachItemPlanCallback &&
+      $step.initialState === eachInitialState &&
+      $step.reduceCallback === eachReduceCallback &&
+      $step.optimize === eachOptimize &&
+      $step.optimize() === $step.getListStep()
+    );
+  }
+  return false;
 }
