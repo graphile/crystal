@@ -485,8 +485,18 @@ export function planToMermaid(
         graph.push("    %% implicit side effects");
         firstSideEffect = false;
       }
-      const sideEffectStep = stepById[step.implicitSideEffectStepId];
-      graph.push(`    ${planId(sideEffectStep)} -.-o ${planId(step)}`);
+      // Only add it if our parent doesn't already have it
+      if (
+        !step.dependencyIds.some(
+          (stepId) =>
+            stepId === step.implicitSideEffectStepId ||
+            stepById[stepId].implicitSideEffectStepId ===
+              step.implicitSideEffectStepId,
+        )
+      ) {
+        const sideEffectStep = stepById[step.implicitSideEffectStepId];
+        graph.push(`    ${planId(sideEffectStep)} -.-o ${planId(step)}`);
+      }
     }
   });
 
