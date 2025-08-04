@@ -35,6 +35,7 @@ import {
   constant,
   context,
   each,
+  EdgeStep,
   error,
   ExecutableStep,
   filter,
@@ -119,9 +120,10 @@ import type {
 import { sqlFromArgDigests } from "../steps/pgSelect.js";
 import type {
   PgUnionAllQueryBuilder,
+  PgUnionAllSingleStep,
   PgUnionAllStep,
 } from "../steps/pgUnionAll.js";
-import { pgUnionAll, PgUnionAllSingleStep } from "../steps/pgUnionAll.js";
+import { pgUnionAll } from "../steps/pgUnionAll.js";
 import {
   WithPgClientStep,
   withPgClientTransaction,
@@ -3727,8 +3729,8 @@ export function makeExampleSchema(
     PgUnionAllStep<any, any>
   >;
 
-  const VulnerabilityEdge = newObjectTypeBuilder<PgUnionAllSingleStep>(
-    PgUnionAllSingleStep,
+  const VulnerabilityEdge = newObjectTypeBuilder<EdgeStep<any, any, any>>(
+    EdgeStep,
   )({
     name: "VulnerabilityEdge",
     fields: {
