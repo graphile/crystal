@@ -8,7 +8,7 @@ import type {
 } from "../interfaces.js";
 import { Step } from "../step.js";
 import { __FlagStep } from "../steps/__flag.js";
-import { sudo, writeableArray } from "../utils.js";
+import { stepAMayDependOnStepB, sudo, writeableArray } from "../utils.js";
 import type {
   LayerPlan,
   LayerPlanReasonCombined,
@@ -627,8 +627,14 @@ export class StepTracker {
         layerPlans.clear();
       }
     }
-    sudo($replacement).implicitSideEffectStep =
-      $original.implicitSideEffectStep;
+
+    const $sideEffect = $original.implicitSideEffectStep;
+    if (
+      $sideEffect != null &&
+      stepAMayDependOnStepB($replacement, $sideEffect)
+    ) {
+      sudo($replacement).implicitSideEffectStep = $sideEffect;
+    }
 
     // NOTE: I don't think side-effect plans need any special handling, since
     // they cannot be deduplicated.
