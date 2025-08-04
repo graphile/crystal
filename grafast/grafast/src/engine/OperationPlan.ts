@@ -1073,7 +1073,10 @@ export class OperationPlan {
         listStep.polymorphicPaths !== null &&
         itemStep.polymorphicPaths !== null
       ) {
-        for (const p of listStep.polymorphicPaths) {
+        for (const p of intersectPolyPaths(
+          listStep.polymorphicPaths,
+          polymorphicPathsForLayer(parentLayerPlan),
+        )!) {
           (itemStep.polymorphicPaths as Set<string>).add(p);
         }
       }
@@ -1088,7 +1091,10 @@ export class OperationPlan {
     });
     const itemStep = withGlobalLayerPlan(
       layerPlan,
-      listStep.polymorphicPaths,
+      intersectPolyPaths(
+        listStep.polymorphicPaths,
+        polymorphicPathsForLayer(layerPlan),
+      ),
       planningPath,
       null,
       () => new __ItemStep(listStep, depth),
@@ -2543,12 +2549,16 @@ export class OperationPlan {
       } else {
         $item = $__item;
       }
+      const newPolymorphicPaths = intersectPolyPaths(
+        $item.polymorphicPaths,
+        polymorphicPaths,
+      );
 
       this.queueNextLayer(this.planIntoOutputPlan, {
         outputPlan: listOutputPlan,
         path,
         planningPath: listItemPlanningPath + "^",
-        polymorphicPaths,
+        polymorphicPaths: newPolymorphicPaths,
         parentStep: $item,
         positionType: nullableFieldType.ofType,
         layerPlan: $item.layerPlan,
@@ -5769,4 +5779,24 @@ function getDescendents(
   }
 
   return descendents;
+}
+
+/**
+ * Return the set of poly paths that are common to both `one` and `two` - note
+ * that `null` means all possible poly paths.
+ */
+function intersectPolyPaths(
+  one: ReadonlySet<string> | null,
+  two: ReadonlySet<string> | null,
+): ReadonlySet<string> | null {
+  if (one === two) return one;
+  if (one == null) return two;
+  if (two == null) return one;
+  const set = new Set<string>();
+  for (const str of one) {
+    if (two.has(str)) {
+      set.add(str);
+    }
+  }
+  return set;
 }
