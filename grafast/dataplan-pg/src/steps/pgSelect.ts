@@ -672,8 +672,6 @@ export class PgSelectStep<
 
     this.mode = mode ?? "normal";
 
-    this.hasSideEffects = this.mode === "mutation";
-
     this.resource = resource;
 
     // Since we're applying this to the original it doesn't make sense to
@@ -718,6 +716,9 @@ export class PgSelectStep<
     }
 
     this.peerKey = this.resource.name;
+
+    // Must be the last thing to happen
+    this.hasSideEffects = this.mode === "mutation";
 
     debugPlanVerbose(`%s (%s) constructor (%s)`, this, this.name, this.mode);
 

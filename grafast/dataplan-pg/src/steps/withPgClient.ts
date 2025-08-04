@@ -51,6 +51,7 @@ export class WithPgClientStep<
     this.executor = executor;
     this.contextId = this.addDependency(this.executor.context());
     this.dataId = this.addDependency($data);
+
     // Be sure to set this _after_ we've added the dependencies - we don't want them to be dependent on us!
     this.hasSideEffects = true;
   }

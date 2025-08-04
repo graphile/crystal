@@ -24,8 +24,10 @@ export class SideEffectStep<TIn, TOut> extends UnbatchedStep<TOut> {
     private fn: (value: TIn) => PromiseOrDirect<TOut>,
   ) {
     super();
-    this.hasSideEffects = true;
     this.planDep = $plan != null ? this.addDependency($plan) : null;
+
+    // This must be the last thing to happen
+    this.hasSideEffects = true;
   }
 
   toStringMeta() {
