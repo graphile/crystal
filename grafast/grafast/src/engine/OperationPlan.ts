@@ -4498,13 +4498,14 @@ export class OperationPlan {
     const ensurePlanAvailableInLayer = (
       dep: Step,
       layerPlan: LayerPlan,
+      reason: () => string,
     ): void => {
       let currentLayerPlan: LayerPlan | null = layerPlan;
 
       while (dep.layerPlan !== currentLayerPlan) {
         if (currentLayerPlan.reason.type === "root") {
           throw new Error(
-            `GrafastInternalError<7f3ce201-810c-4639-8e69-f44a95221c6d>: reached root whilst ensuring ${dep} is available in ${layerPlan}`,
+            `GrafastInternalError<7f3ce201-810c-4639-8e69-f44a95221c6d>: reached root whilst ensuring ${dep} is available in ${layerPlan} (${reason()})`,
           );
         }
         if (currentLayerPlan.copyStepIds.includes(dep.id)) {
@@ -4533,7 +4534,7 @@ export class OperationPlan {
             } else if (
               layerPlanHeirarchyContains(parentLayerPlan, dep.layerPlan)
             ) {
-              ensurePlanAvailableInLayer(dep, parentLayerPlan);
+              ensurePlanAvailableInLayer(dep, parentLayerPlan, reason);
             }
           }
           if (currentLayerPlan == null) {
@@ -4986,16 +4987,24 @@ export class OperationPlan {
           continue;
         }
         for (const dep of sudo(step).dependencies) {
-          ensurePlanAvailableInLayer(dep, layerPlan);
+          ensurePlanAvailableInLayer(dep, layerPlan, () => `${step} (dep)`);
         }
         if (step.implicitSideEffectStep) {
-          ensurePlanAvailableInLayer(step.implicitSideEffectStep, layerPlan);
+          ensurePlanAvailableInLayer(
+            step.implicitSideEffectStep,
+            layerPlan,
+            () => `${step} (side effect)`,
+          );
         }
       }
 
       const $root = layerPlan.rootStep;
       if ($root) {
-        ensurePlanAvailableInLayer($root, layerPlan);
+        ensurePlanAvailableInLayer(
+          $root,
+          layerPlan,
+          () => `${layerPlan}.rootStep`,
+        );
 
         // If $root explicitly dependends on `layerPlan.parentSideEffectStep`
         // then we should remove the implicit layerPlan dependency (e.g. so
@@ -5027,6 +5036,7 @@ export class OperationPlan {
           ensurePlanAvailableInLayer(
             $sideEffect,
             layerPlan.reason.parentLayerPlan,
+            () => `${layerPlan}.parentSideEffectStep`,
           );
         }
       }
@@ -5034,7 +5044,11 @@ export class OperationPlan {
       // Copy polymorphic parentStepId
       if (layerPlan.reason.type === "polymorphic") {
         const parentStep = layerPlan.reason.parentStep;
-        ensurePlanAvailableInLayer(parentStep, layerPlan);
+        ensurePlanAvailableInLayer(
+          parentStep,
+          layerPlan,
+          () => `${layerPlan} poly`,
+        );
       }
 
       // Ensure list is accessible in parent layerPlan
@@ -5043,6 +5057,7 @@ export class OperationPlan {
         ensurePlanAvailableInLayer(
           parentStep,
           layerPlan.reason.parentLayerPlan,
+          () => `${layerPlan} listItem`,
         );
         const stream = layerPlan.reason.stream;
         if (stream != null) {
@@ -5050,18 +5065,21 @@ export class OperationPlan {
             ensurePlanAvailableInLayer(
               this.stepTracker.getStepById(stream.initialCountStepId),
               layerPlan.reason.parentLayerPlan,
+              () => `${layerPlan} stream`,
             );
           }
           if (stream.ifStepId) {
             ensurePlanAvailableInLayer(
               this.stepTracker.getStepById(stream.ifStepId),
               layerPlan.reason.parentLayerPlan,
+              () => `${layerPlan} stream 2`,
             );
           }
           if (stream.labelStepId) {
             ensurePlanAvailableInLayer(
               this.stepTracker.getStepById(stream.labelStepId),
               layerPlan.reason.parentLayerPlan,
+              () => `${layerPlan} stream 3`,
             );
           }
         }
@@ -5081,7 +5099,11 @@ export class OperationPlan {
               );
             }
             const step = this.stepTracker.getStepById(stepId);
-            ensurePlanAvailableInLayer(step, sourceLayerPlan);
+            ensurePlanAvailableInLayer(
+              step,
+              sourceLayerPlan,
+              () => `${layerPlan} combo`,
+            );
           }
         }
       }
@@ -5089,7 +5111,11 @@ export class OperationPlan {
 
     // Populate copyPlanIds for output plans' rootStepId
     this.stepTracker.allOutputPlans.forEach((outputPlan) => {
-      ensurePlanAvailableInLayer(outputPlan.rootStep, outputPlan.layerPlan);
+      ensurePlanAvailableInLayer(
+        outputPlan.rootStep,
+        outputPlan.layerPlan,
+        () => `${outputPlan} output plan root step`,
+      );
     });
 
     for (const layerPlan of this.stepTracker.layerPlans) {
