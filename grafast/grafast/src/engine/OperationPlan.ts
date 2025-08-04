@@ -4123,7 +4123,11 @@ export class OperationPlan {
                   continue tryAgain;
                 } else {
                   throw new Error(
-                    `GrafastInternalError<93da1006-3af9-44dd-a54b-5bf6fe3e791c>: ${s} has polymorphic paths ${[...(s.polymorphicPaths ?? [])]}; but ${p} is not in ${[...layerPolymorphicPaths]}.`,
+                    `GrafastInternalError<93da1006-3af9-44dd-a54b-5bf6fe3e791c>: polymorphic mismatch...${`
+${s}∈${s.layerPlan}${s !== step ? ` (equivalent to ${step})` : ""} has polymorphic paths:
+  - ${[...(s.polymorphicPaths ?? [])].join("\n  - ")}
+But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
+  - ${[...layerPolymorphicPaths].join("\n  - ")}`.replace(/\n/g, "\n      ")}`,
                   );
                 }
               }
