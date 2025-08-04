@@ -2207,7 +2207,7 @@ export class OperationPlan {
       }
 
       // Clone the stream
-      if ($step._stepOptions.stream) {
+      if ($list._stepOptions.stream) {
         $list = withGlobalLayerPlan(
           parentLayerPlan,
           polymorphicPaths,
