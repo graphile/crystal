@@ -11,6 +11,7 @@ import type {
   GrafastResultsList,
   Maybe,
   PromiseOrDirect,
+  StepOptimizeOptions,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import { Step, UnbatchedStep } from "../step.js";
@@ -404,6 +405,10 @@ export class ConnectionStep<
 
   private neededCollection = false;
   private collectionDepId: number;
+  /**
+   * null = unknown
+   */
+  private _mightStream: boolean | null = null;
 
   // Pagination stuff
   private _firstDepId: number | null = null;
@@ -452,6 +457,10 @@ export class ConnectionStep<
       // It's pure, don't change it!
       this.collectionDepId = this.addDependency(subplan);
     }
+  }
+
+  public mightStream() {
+    return this._mightStream === true;
   }
 
   public getSubplan(): TCollectionStep {
@@ -689,6 +698,12 @@ export class ConnectionStep<
   private captureStream() {
     const $streamDetails = currentFieldStreamDetails();
     this.getHandler().addStreamDetails?.($streamDetails);
+    if ($streamDetails === null) {
+      this._mightStream = false;
+    } else if (this._mightStream === null) {
+      // Only override if it was unknown
+      this._mightStream = true;
+    }
   }
 
   public edges(): Step {
@@ -788,68 +803,95 @@ export class ConnectionStep<
             this.paramsDepId
           ].unaryValue() as PaginationParams<TCursorValue>)
         : null;
-    if (params === null) {
-      // Handler does everything!
-      return collectionDep.isBatch
-        ? collectionDep.entries
-        : indexMap(() => collectionDep.value);
-    }
-
     return indexMap((i) => {
       const collectionValue = collectionDep.at(i);
+
+      if (params === null) {
+        // collection handles everything
+        const result = collectionValue as ConnectionHandlingResult<any>;
+        if (
+          !this._mightStream &&
+          result.items != null &&
+          !Array.isArray(result.items)
+        ) {
+          // Except it might return a stream which we should turn into an array.
+          return (async () => ({
+            ...result,
+            items: await iterableToArray(result.items),
+          }))();
+        } else {
+          return result;
+        }
+      }
+
       // The value is either a list of items, or an object that contains the
       // `items` key.
-      let mode: Mode = 0;
+      let mode: Mode = MODE_NULL;
       let collection:
         | Array<TItem>
         | Iterable<TItem>
         | AsyncIterable<TItem>
         | null = null;
       if (collectionValue == null) {
-        mode = 0;
+        mode = MODE_NULL;
       } else if (Array.isArray(collectionValue)) {
         collection = collectionValue;
-        mode = 1;
+        mode = MODE_ARRAY;
       } else if (isIterable(collectionValue)) {
         collection = collectionValue; // [Symbol.iterator]();
-        mode = 2;
+        mode = MODE_ITERABLE;
       } else if (isAsyncIterable(collectionValue)) {
         collection = collectionValue; //[Symbol.asyncIterator]();
-        mode = 3;
+        mode = MODE_ASYNC_ITERABLE;
       } else if (
         typeof collectionValue === "object" &&
         "items" in collectionValue
       ) {
         const items = collectionValue.items;
         if (items == null) {
-          mode = 0;
+          mode = MODE_NULL;
         } else if (Array.isArray(items)) {
           collection = items;
-          mode = 1;
+          mode = MODE_ARRAY;
         } else if (isIterable(items)) {
           collection = items; // [Symbol.iterator]();
-          mode = 2;
+          mode = MODE_ARRAY;
         } else if (isAsyncIterable(items)) {
           collection = items; // [Symbol.asyncIterator]();
-          mode = 3;
+          mode = MODE_ASYNC_ITERABLE;
         } else {
           // WTF?
-          mode = 0;
+          mode = MODE_NULL;
         }
       } else {
         // WTF?
-        mode = 0;
+        mode = MODE_NULL;
       }
-      if (mode === 0 || collection === null) {
+      if (mode === MODE_NULL || collection === null) {
         return null;
       }
 
-      return makeProcessedCollection(
-        mode,
-        collection,
-        params,
-        !this.collectionPaginationSupport?.cursor,
-      );
+      if (
+        this._mightStream !== true &&
+        (mode === MODE_ITERABLE || mode === MODE_ASYNC_ITERABLE)
+      ) {
+        // Convert to array, then process
+        return iterableToArray(collection).then((array) =>
+          makeProcessedCollection(
+            MODE_ARRAY,
+            array,
+            params,
+            !this.collectionPaginationSupport?.cursor,
+          ),
+        );
+      } else {
+        return makeProcessedCollection(
+          mode,
+          collection,
+          params,
+          !this.collectionPaginationSupport?.cursor,
+        );
+      }
     });
   }
 }
@@ -1535,6 +1577,12 @@ export class ConnectionItemsStep extends Step {
     >;
   }
 
+  public optimize(_options: StepOptimizeOptions): Step {
+    // If false, connection guarantees an array
+    this.cloneStreams = this.getConnection().mightStream();
+    return this;
+  }
+
   public deduplicate(_peers: readonly ConnectionItemsStep[]) {
     return _peers;
   }
@@ -1543,4 +1591,14 @@ export class ConnectionItemsStep extends Step {
     const connection = executionDetails.values[0];
     return executionDetails.indexMap((i) => connection.at(i)?.items);
   }
+}
+
+async function iterableToArray<T>(
+  input: Iterable<T> | AsyncIterable<T>,
+): Promise<ReadonlyArray<T>> {
+  const items: T[] = [];
+  for await (const item of input) {
+    items.push(item);
+  }
+  return items;
 }
