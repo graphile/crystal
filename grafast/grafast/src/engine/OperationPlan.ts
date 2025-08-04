@@ -873,7 +873,11 @@ export class OperationPlan {
 
     if (subscriptionPlanResolver !== undefined) {
       // PERF: optimize this
-      const { haltTree, step: subscribeStep } = this.batchPlanField({
+      const {
+        haltTree,
+        step: subscribeStep,
+        latestSideEffectStep,
+      } = this.batchPlanField({
         typeName: rootType.name,
         fieldName,
         layerPlan: this.rootLayerPlan,
@@ -890,6 +894,7 @@ export class OperationPlan {
       if (haltTree) {
         throw new SafeError("Failed to setup subscription");
       }
+      this.rootLayerPlan.latestSideEffectStep = latestSideEffectStep;
       this.rootLayerPlan.setRootStep(subscribeStep);
 
       const subscriptionEventLayerPlan = new LayerPlan(this, {
@@ -1362,20 +1367,24 @@ export class OperationPlan {
           }
         }
         if (typeof planResolver === "function") {
-          ({ step, haltTree } = yield this.batchPlanField({
-            typeName: objectType.name,
-            fieldName,
-            layerPlan: fieldLayerPlan,
-            path: fieldPath,
-            polymorphicPaths,
-            planningPath: fieldPlanningPath,
-            planResolver,
-            applyAfterMode: "plan",
-            rawParentStep: parentStep,
-            field: objectField,
-            trackedArguments,
-            streamDetails: isList ? (streamDetails ?? false) : null,
-          }));
+          let latestSideEffectStep: Step | null;
+          ({ step, haltTree, latestSideEffectStep } = yield this.batchPlanField(
+            {
+              typeName: objectType.name,
+              fieldName,
+              layerPlan: fieldLayerPlan,
+              path: fieldPath,
+              polymorphicPaths,
+              planningPath: fieldPlanningPath,
+              planResolver,
+              applyAfterMode: "plan",
+              rawParentStep: parentStep,
+              field: objectField,
+              trackedArguments,
+              streamDetails: isList ? (streamDetails ?? false) : null,
+            },
+          ));
+          fieldLayerPlan.latestSideEffectStep = latestSideEffectStep;
         } else {
           // No plan resolver (or plan resolver fallback) so there must be a
           // `resolve` method, so we'll feed the full parent step into the
@@ -2705,59 +2714,66 @@ export class OperationPlan {
       isNonNull,
       resolverEmulation,
     } = details;
-    if (outputPlan.type.mode !== "polymorphic") {
-      throw new Error(
-        `GrafastInternalError<4c8d9d82-6cb2-4712-aa1e-fdd2173a0760>: expected a polymorphic output plan`,
-      );
-    }
-    const polymorphicOutputPlan =
-      outputPlan as OutputPlan<OutputPlanTypePolymorphicObject>;
+    const $sideEffect = polymorphicLayerPlan.latestSideEffectStep;
+    try {
+      if (outputPlan.type.mode !== "polymorphic") {
+        throw new Error(
+          `GrafastInternalError<4c8d9d82-6cb2-4712-aa1e-fdd2173a0760>: expected a polymorphic output plan`,
+        );
+      }
+      const polymorphicOutputPlan =
+        outputPlan as OutputPlan<OutputPlanTypePolymorphicObject>;
 
-    if (
-      polymorphicLayerPlan.reason.type !== "polymorphic" &&
-      polymorphicLayerPlan.reason.type !== "polymorphicPartition"
-    ) {
-      // NOTE: when queued, this method will be queued with a different layer
-      // plan, but `planPending` should go through and convert it to the
-      // relevant polymorphic layer plans for us.
-      throw new Error(
-        `GrafastInternalError<877eaa1c-30c9-4526-ada4-3ccce020ee0e>: expected ${polymorphicLayerPlan} to be a polymorphic or polymorphicPartition layer plan`,
-      );
-    }
+      if (
+        polymorphicLayerPlan.reason.type !== "polymorphic" &&
+        polymorphicLayerPlan.reason.type !== "polymorphicPartition"
+      ) {
+        // NOTE: when queued, this method will be queued with a different layer
+        // plan, but `planPending` should go through and convert it to the
+        // relevant polymorphic layer plans for us.
+        throw new Error(
+          `GrafastInternalError<877eaa1c-30c9-4526-ada4-3ccce020ee0e>: expected ${polymorphicLayerPlan} to be a polymorphic or polymorphicPartition layer plan`,
+        );
+      }
 
-    const objectOutputPlan = new OutputPlan(
-      polymorphicLayerPlan,
-      $root,
-      {
-        mode: "object",
-        deferLabel: undefined,
-        typeName: type.name,
-      },
-      locationDetails,
-    );
-    this.planSelectionSet({
-      outputPlan: objectOutputPlan,
-      path,
-      planningPath: polymorphicPlanningPath + ".",
-      polymorphicPaths: newPolymorphicPaths,
-      parentStep: $root,
-      positionType: type,
-      layerPlan: polymorphicLayerPlan,
-      selections: fieldNodes,
-      resolverEmulation,
-    });
-    polymorphicOutputPlan.addChild(type, null, {
-      type: "outputPlan",
-      isNonNull,
-      outputPlan: objectOutputPlan,
-      locationDetails,
-    });
+      const objectOutputPlan = new OutputPlan(
+        polymorphicLayerPlan,
+        $root,
+        {
+          mode: "object",
+          deferLabel: undefined,
+          typeName: type.name,
+        },
+        locationDetails,
+      );
+      this.planSelectionSet({
+        outputPlan: objectOutputPlan,
+        path,
+        planningPath: polymorphicPlanningPath + ".",
+        polymorphicPaths: newPolymorphicPaths,
+        parentStep: $root,
+        positionType: type,
+        layerPlan: polymorphicLayerPlan,
+        selections: fieldNodes,
+        resolverEmulation,
+      });
+      polymorphicOutputPlan.addChild(type, null, {
+        type: "outputPlan",
+        isNonNull,
+        outputPlan: objectOutputPlan,
+        locationDetails,
+      });
+    } finally {
+      polymorphicLayerPlan.latestSideEffectStep = $sideEffect;
+    }
   }
 
   planFieldBatch: PlanFieldBatch | null = null;
-  private batchPlanField(
-    batchPlanFieldDetails: PlanFieldDetails,
-  ): () => { haltTree: boolean; step: Step } {
+  private batchPlanField(batchPlanFieldDetails: PlanFieldDetails): () => {
+    haltTree: boolean;
+    step: Step;
+    latestSideEffectStep: Step | null;
+  } {
     let b: PlanFieldBatch;
     if (this.planFieldBatch != null) {
       b = this.planFieldBatch;
@@ -3036,7 +3052,11 @@ export class OperationPlan {
           step._stepOptions.walkIterable = true;
         }
       }
-      return { step, haltTree };
+      return {
+        step,
+        haltTree,
+        latestSideEffectStep: layerPlan.latestSideEffectStep,
+      };
     } catch (e) {
       if (ALWAYS_THROW_PLANNING_ERRORS) {
         throw e;
@@ -3073,9 +3093,14 @@ export class OperationPlan {
       const haltTree = true;
       // PERF: consider deleting all steps that were allocated during this. For
       // now we'll just rely on tree-shaking.
-      return { step, haltTree };
+      return {
+        step,
+        haltTree,
+        latestSideEffectStep: layerPlan.latestSideEffectStep,
+      };
     } finally {
       if (this.loc !== null) this.loc.pop();
+      layerPlan.latestSideEffectStep = previousSideEffectStep;
     }
   }
 
@@ -3415,6 +3440,7 @@ export class OperationPlan {
       peerKey,
       isSyncAndSafe,
       cloneStreams,
+      implicitSideEffectStep,
     } = sstep;
     // const streamInitialCount = sstep._stepOptions.stream?.initialCount;
     const dependencyCount = deps.length;
@@ -3429,6 +3455,7 @@ export class OperationPlan {
         if (
           possiblyPeer !== step &&
           !possiblyPeer.hasSideEffects &&
+          possiblyPeer.implicitSideEffectStep === implicitSideEffectStep &&
           possiblyPeer.cloneStreams === cloneStreams &&
           possiblyPeer.isSyncAndSafe === isSyncAndSafe &&
           isPeerLayerPlan(possiblyPeer.layerPlan, layerPlan) &&
@@ -3470,6 +3497,7 @@ export class OperationPlan {
           peerDependencyIndex !== dependencyIndex ||
           rawPossiblyPeer === step ||
           rawPossiblyPeer.hasSideEffects ||
+          rawPossiblyPeer.implicitSideEffectStep !== implicitSideEffectStep ||
           rawPossiblyPeer.cloneStreams !== cloneStreams ||
           rawPossiblyPeer.isSyncAndSafe !== isSyncAndSafe ||
           rawPossiblyPeer._stepOptions.stream != null ||
@@ -3540,6 +3568,8 @@ export class OperationPlan {
               peerDependencyIndex !== dependencyIndex ||
               rawPossiblyPeer === step ||
               rawPossiblyPeer.hasSideEffects ||
+              rawPossiblyPeer.implicitSideEffectStep !==
+                implicitSideEffectStep ||
               rawPossiblyPeer.cloneStreams !== cloneStreams ||
               rawPossiblyPeer.isSyncAndSafe !== isSyncAndSafe ||
               rawPossiblyPeer._stepOptions.stream != null ||
@@ -3633,6 +3663,11 @@ export class OperationPlan {
     if (this.isImmoveable(step)) {
       return;
     }
+    if (step.implicitSideEffectStep?.layerPlan === step.layerPlan) {
+      // Can't hoist past our side effect
+      return;
+    }
+
     // PERF: would be nice to prevent ConstantStep from being hoisted - we
     // don't want to keep multiplying up and up its data as it traverses the buckets - would be better
     // to push the step down to the furthest level and then have it run there straight away.
@@ -5665,7 +5700,12 @@ interface PlanFieldDetails {
 
 type PlanFieldBatchResult =
   | { error: Error }
-  | { error?: never; haltTree: boolean; step: Step };
+  | {
+      error?: never;
+      haltTree: boolean;
+      step: Step;
+      latestSideEffectStep: Step | null;
+    };
 
 interface PlanFieldBatch {
   complete: boolean;
