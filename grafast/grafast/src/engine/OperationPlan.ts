@@ -2205,16 +2205,18 @@ export class OperationPlan {
       }
 
       // Clone the stream
-      $list = withGlobalLayerPlan(
-        parentLayerPlan,
-        polymorphicPaths,
-        listItemPlanningPath,
-        null,
-        __cloneStream,
-        null,
-        $list,
-      );
-      $list._stepOptions.stream = $step._stepOptions.stream;
+      if ($step._stepOptions.stream) {
+        $list = withGlobalLayerPlan(
+          parentLayerPlan,
+          polymorphicPaths,
+          listItemPlanningPath,
+          null,
+          __cloneStream,
+          null,
+          $list,
+        );
+        $list._stepOptions.stream = $step._stepOptions.stream;
+      }
 
       $list._stepOptions.walkIterable = true;
       const listOutputPlan = new OutputPlan(
