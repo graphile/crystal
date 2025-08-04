@@ -10,9 +10,9 @@ graph TD
     subgraph "Buckets for queries/functions/custom-query-random-user-array-set"
     Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: Access[7], Access[8], Object[9]<br />2: PgSelect[6]<br />3: PgSelectRows[11]<br />4: __ListTransform[10]"):::bucket
     Bucket1("Bucket 1 (subroutine)<br /><br />ROOT PgClassExpression{1}ᐸ__random_u..._set_idx__ᐳ[14]"):::bucket
-    Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ10ᐳ[15]"):::bucket
-    Bucket4("Bucket 4 (listItem)<br /><br />ROOT __Item{4}ᐸ15ᐳ[18]"):::bucket
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 19<br /><br />ROOT PgSelectSingle{4}ᐸrandom_user_array_setᐳ[19]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ10ᐳ[16]"):::bucket
+    Bucket4("Bucket 4 (listItem)<br /><br />ROOT __Item{4}ᐸ16ᐳ[20]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 21<br /><br />ROOT PgSelectSingle{4}ᐸrandom_user_array_setᐳ[21]"):::bucket
     end
     Bucket0 --> Bucket1 & Bucket2
     Bucket2 --> Bucket4
@@ -36,16 +36,16 @@ graph TD
     __Item12 --> PgSelectSingle13
     PgClassExpression14{{"PgClassExpression[14∈1]<br />ᐸ__random_u..._set_idx__ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression14
-    __Item15[/"__Item[15∈2]<br />ᐸ10ᐳ"\]:::itemplan
-    __ListTransform10 ==> __Item15
-    __Item18[/"__Item[18∈4]<br />ᐸ15ᐳ"\]:::itemplan
-    __Item15 ==> __Item18
-    PgSelectSingle19{{"PgSelectSingle[19∈4]<br />ᐸrandom_user_array_setᐳ"}}:::plan
-    __Item18 --> PgSelectSingle19
-    PgClassExpression20{{"PgClassExpression[20∈5]<br />ᐸ__random_u...”username”ᐳ"}}:::plan
-    PgSelectSingle19 --> PgClassExpression20
-    PgClassExpression21{{"PgClassExpression[21∈5]<br />ᐸ__random_u...vatar_url”ᐳ"}}:::plan
-    PgSelectSingle19 --> PgClassExpression21
+    __Item16[/"__Item[16∈2]<br />ᐸ10ᐳ"\]:::itemplan
+    __ListTransform10 ==> __Item16
+    __Item20[/"__Item[20∈4]<br />ᐸ16ᐳ"\]:::itemplan
+    __Item16 ==> __Item20
+    PgSelectSingle21{{"PgSelectSingle[21∈4]<br />ᐸrandom_user_array_setᐳ"}}:::plan
+    __Item20 --> PgSelectSingle21
+    PgClassExpression22{{"PgClassExpression[22∈5]<br />ᐸ__random_u...”username”ᐳ"}}:::plan
+    PgSelectSingle21 --> PgClassExpression22
+    PgClassExpression23{{"PgClassExpression[23∈5]<br />ᐸ__random_u...vatar_url”ᐳ"}}:::plan
+    PgSelectSingle21 --> PgClassExpression23
 
     %% define steps
     classDef bucket0 stroke:#696969
@@ -53,9 +53,9 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item12,PgSelectSingle13,PgClassExpression14 bucket1
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item15 bucket2
+    class Bucket2,__Item16 bucket2
     classDef bucket4 stroke:#0000ff
-    class Bucket4,__Item18,PgSelectSingle19 bucket4
+    class Bucket4,__Item20,PgSelectSingle21 bucket4
     classDef bucket5 stroke:#7fff00
-    class Bucket5,PgClassExpression20,PgClassExpression21 bucket5
+    class Bucket5,PgClassExpression22,PgClassExpression23 bucket5
 

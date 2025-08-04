@@ -10,8 +10,8 @@ graph TD
     subgraph "Buckets for subscriptions/basics/forum-single-message-evolve"
     Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 16, 17, 45, 7, 18<br />2: Listen[9]"):::bucket
     Bucket1("Bucket 1 (subscription)<br />Deps: 18, 4<br /><br />ROOT __Item{1}ᐸ9ᐳ[10]"):::bucket
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 11, 18<br /><br />ROOT JSONParse{1}ᐸ10ᐳ[11]<br />1: <br />ᐳ: Access[12], Access[14], Lambda[13]<br />2: PgSelect[15]<br />3: PgSelectRows[20]<br />ᐳ: First[19], PgSelectSingle[21]"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 21, 18<br /><br />ROOT PgSelectSingle{2}ᐸmessagesᐳ[21]<br />1: <br />ᐳ: 22, 23, 24, 25, 26, 34<br />2: PgSelect[27], PgSelect[35]<br />3: PgSelectRows[32], PgSelectRows[38]<br />ᐳ: 31, 33, 37, 39"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 11, 18<br /><br />ROOT JSONParse{1}ᐸ10ᐳ[11]<br />1: <br />ᐳ: Access[12], Access[14], Lambda[13]<br />2: PgSelect[15]<br />ᐳ: Access[19]<br />3: First[20]<br />ᐳ: PgSelectSingle[21]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 21, 18<br /><br />ROOT PgSelectSingle{2}ᐸmessagesᐳ[21]<br />1: <br />ᐳ: 22, 23, 24, 25, 26, 34<br />2: PgSelect[27], PgSelect[35]<br />ᐳ: Access[31], Access[37]<br />3: First[32], First[38]<br />ᐳ: PgSelectSingle[33], PgSelectSingle[39]"):::bucket
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 33, 26<br /><br />ROOT PgSelectSingle{3}ᐸforumsᐳ[33]"):::bucket
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 39<br /><br />ROOT PgSelectSingle{3}ᐸusersᐳ[39]"):::bucket
     end
@@ -45,12 +45,12 @@ graph TD
     Lambda13{{"Lambda[13∈2]"}}:::plan
     Access12 --> Lambda13
     JSONParse11 --> Access14
-    First19{{"First[19∈2]"}}:::plan
-    PgSelectRows20[["PgSelectRows[20∈2]"]]:::plan
-    PgSelectRows20 --> First19
-    PgSelect15 --> PgSelectRows20
+    Access19{{"Access[19∈2]<br />ᐸ15.itemsᐳ"}}:::plan
+    PgSelect15 --> Access19
+    First20[["First[20∈2]"]]:::plan
+    Access19 --> First20
     PgSelectSingle21{{"PgSelectSingle[21∈2]<br />ᐸmessagesᐳ"}}:::plan
-    First19 --> PgSelectSingle21
+    First20 --> PgSelectSingle21
     PgSelect27[["PgSelect[27∈3]<br />ᐸforumsᐳ<br />More deps:<br />- Object[18]"]]:::plan
     PgClassExpression26{{"PgClassExpression[26∈3]<br />ᐸ__messages__.”forum_id”ᐳ"}}:::plan
     PgClassExpression26 --> PgSelect27
@@ -66,19 +66,19 @@ graph TD
     PgClassExpression25{{"PgClassExpression[25∈3]<br />ᐸ(__message... not null)ᐳ"}}:::plan
     PgSelectSingle21 --> PgClassExpression25
     PgSelectSingle21 --> PgClassExpression26
-    First31{{"First[31∈3]"}}:::plan
-    PgSelectRows32[["PgSelectRows[32∈3]"]]:::plan
-    PgSelectRows32 --> First31
-    PgSelect27 --> PgSelectRows32
+    Access31{{"Access[31∈3]<br />ᐸ27.itemsᐳ"}}:::plan
+    PgSelect27 --> Access31
+    First32[["First[32∈3]"]]:::plan
+    Access31 --> First32
     PgSelectSingle33{{"PgSelectSingle[33∈3]<br />ᐸforumsᐳ"}}:::plan
-    First31 --> PgSelectSingle33
+    First32 --> PgSelectSingle33
     PgSelectSingle21 --> PgClassExpression34
-    First37{{"First[37∈3]"}}:::plan
-    PgSelectRows38[["PgSelectRows[38∈3]"]]:::plan
-    PgSelectRows38 --> First37
-    PgSelect35 --> PgSelectRows38
+    Access37{{"Access[37∈3]<br />ᐸ35.itemsᐳ"}}:::plan
+    PgSelect35 --> Access37
+    First38[["First[38∈3]"]]:::plan
+    Access37 --> First38
     PgSelectSingle39{{"PgSelectSingle[39∈3]<br />ᐸusersᐳ"}}:::plan
-    First37 --> PgSelectSingle39
+    First38 --> PgSelectSingle39
     PgClassExpression42{{"PgClassExpression[42∈4]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
     PgSelectSingle33 --> PgClassExpression42
     PgClassExpression44{{"PgClassExpression[44∈4]<br />ᐸ(__forums_... not null)ᐳ"}}:::plan
@@ -94,9 +94,9 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item10,JSONParse11 bucket1
     classDef bucket2 stroke:#7f007f
-    class Bucket2,Access12,Lambda13,Access14,PgSelect15,First19,PgSelectRows20,PgSelectSingle21 bucket2
+    class Bucket2,Access12,Lambda13,Access14,PgSelect15,Access19,First20,PgSelectSingle21 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression22,PgClassExpression23,PgClassExpression24,PgClassExpression25,PgClassExpression26,PgSelect27,First31,PgSelectRows32,PgSelectSingle33,PgClassExpression34,PgSelect35,First37,PgSelectRows38,PgSelectSingle39 bucket3
+    class Bucket3,PgClassExpression22,PgClassExpression23,PgClassExpression24,PgClassExpression25,PgClassExpression26,PgSelect27,Access31,First32,PgSelectSingle33,PgClassExpression34,PgSelect35,Access37,First38,PgSelectSingle39 bucket3
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression42,PgClassExpression44 bucket4
     classDef bucket5 stroke:#7fff00
