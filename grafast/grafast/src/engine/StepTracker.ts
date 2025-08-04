@@ -627,6 +627,8 @@ export class StepTracker {
         layerPlans.clear();
       }
     }
+    sudo($replacement).implicitSideEffectStep =
+      $original.implicitSideEffectStep;
 
     // NOTE: I don't think side-effect plans need any special handling, since
     // they cannot be deduplicated.

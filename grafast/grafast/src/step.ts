@@ -326,7 +326,7 @@ export /* abstract */ class Step<TData = any> {
     // Populated in `OperationPlan` during `finalizeLayerPlans`
     this._isSelectiveStep = false;
 
-    this.implicitSideEffectStep = null;
+    this.implicitSideEffectStep = layerPlan.latestSideEffectStep;
     this.hasSideEffects ??= false;
     this.cloneStreams = false;
     let hasSideEffects = false;
