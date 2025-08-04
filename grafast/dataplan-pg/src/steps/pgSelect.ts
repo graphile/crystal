@@ -1058,11 +1058,6 @@ export class PgSelectStep<
       values,
       extra: { eventEmitter },
     } = executionDetails;
-    const params =
-      this.paginationParamsDepId != null
-        ? values[this.paginationParamsDepId].unaryValue()
-        : null;
-    const stream = executionDetails.stream ?? params?.stream;
     const {
       meta,
       text,
@@ -1104,7 +1099,7 @@ export class PgSelectStep<
     }
     const context = values[this.contextId].unaryValue();
 
-    if (stream == null) {
+    if (streamInitialCount == null) {
       const specs = indexMap<PgExecutorInput<any>>((i) => {
         return {
           // The context is how we'd handle different connections with different claims
@@ -2948,7 +2943,6 @@ function buildTheQueryCore<
         }
       }
     }
-    stream = null;
   } else if (info.paginationParamsDepId != null) {
     const params = values[
       info.paginationParamsDepId
