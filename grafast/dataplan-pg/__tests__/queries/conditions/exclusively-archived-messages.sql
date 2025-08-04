@@ -5,7 +5,9 @@ select
       __messages__."body",
       __messages__."id",
       __users__."username",
-      __users__."gravatar_url"
+      __users__."gravatar_url",
+      __users_2."username",
+      __users_2."gravatar_url"
     ]::text[]
     from app_public.messages as __messages__
     left outer join app_public.users as __users__
@@ -13,6 +15,15 @@ select
     /* WHERE becoming ON */
       (
         __users__."id" = __messages__."author_id"
+      ) and (
+        true /* authorization checks */
+      )
+    )
+    left outer join app_public.users as __users_2
+    on (
+    /* WHERE becoming ON */
+      (
+        __users_2."id" = __messages__."author_id"
       ) and (
         true /* authorization checks */
       )
