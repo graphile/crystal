@@ -481,14 +481,15 @@ export class ConnectionStep<
       >;
   }
 
-  private getHandlerSubplan():
+  private getHandler():
     | (TCollectionStep &
         ConnectionHandlingStep<TItem, TNodeStep, TEdgeStep, TCursorValue>)
-    | null {
-    if (!this.collectionPaginationSupport?.full) {
-      return null;
+    | ConnectionParamsStep<TCursorValue> {
+    if (this.collectionPaginationSupport?.full) {
+      return this.setupSubplanWithPagination() as any;
+    } else {
+      return this.paginationParams();
     }
-    return this.setupSubplanWithPagination() as any;
   }
 
   public toStringMeta(): string {
@@ -513,12 +514,7 @@ export class ConnectionStep<
       nonUnaryMessage: () =>
         `${this}.setFirst(...) must be passed a _unary_ step, but ${$first} is not unary. See: https://err.red/gud#connection`,
     });
-    const $handler = this.getHandlerSubplan();
-    if ($handler) {
-      $handler.setFirst($first);
-    } else {
-      this.paginationParams().setFirst($first);
-    }
+    this.getHandler().setFirst($first);
   }
   public getLast(): Step<number | null | undefined> | null {
     return this.maybeGetDep<Step<number | null | undefined>>(this._lastDepId);
@@ -533,12 +529,7 @@ export class ConnectionStep<
       nonUnaryMessage: () =>
         `${this}.setLast(...) must be passed a _unary_ step, but ${$last} is not unary. See: https://err.red/gud#connection`,
     });
-    const $handler = this.getHandlerSubplan();
-    if ($handler) {
-      $handler.setLast($last);
-    } else {
-      this.paginationParams().setLast($last);
-    }
+    this.getHandler().setLast($last);
   }
   public getOffset(): Step<number | null | undefined> | null {
     return this.maybeGetDep<Step<number | null | undefined>>(this._offsetDepId);
@@ -553,12 +544,7 @@ export class ConnectionStep<
       nonUnaryMessage: () =>
         `${this}.setOffset(...) must be passed a _unary_ step, but ${$offset} is not unary. See: https://err.red/gud#connection`,
     });
-    const $handler = this.getHandlerSubplan();
-    if ($handler) {
-      $handler.setOffset($offset);
-    } else {
-      this.paginationParams().setOffset($offset);
-    }
+    this.getHandler().setOffset($offset);
   }
   public getBefore(): Step<Maybe<TCursorValue>> | null {
     return this.maybeGetDep<Step<Maybe<TCursorValue>>>(this._beforeDepId, true);
@@ -578,12 +564,7 @@ export class ConnectionStep<
       nonUnaryMessage: () =>
         `${this}.setBefore(...) must be passed a _unary_ step, but ${$parsedBeforePlan} (and presumably ${$beforePlan}) is not unary. See: https://err.red/gud#connection`,
     });
-    const $handler = this.getHandlerSubplan();
-    if ($handler) {
-      $handler.setBefore($parsedBeforePlan);
-    } else {
-      this.paginationParams().setBefore($parsedBeforePlan);
-    }
+    this.getHandler().setBefore($parsedBeforePlan);
   }
   public getAfter(): Step<Maybe<TCursorValue>> | null {
     // TODO: Move all of these to params, get rid of our dep here.
@@ -604,12 +585,7 @@ export class ConnectionStep<
       nonUnaryMessage: () =>
         `${this}.setAfter(...) must be passed a _unary_ step, but ${$parsedAfterPlan} (and presumably ${$afterPlan}) is not unary. See: https://err.red/gud#connection`,
     });
-    const $handler = this.getHandlerSubplan();
-    if ($handler) {
-      $handler.setAfter($parsedAfterPlan);
-    } else {
-      this.paginationParams().setAfter($parsedAfterPlan);
-    }
+    this.getHandler().setAfter($parsedAfterPlan);
   }
 
   /**
@@ -712,12 +688,7 @@ export class ConnectionStep<
 
   private captureStream() {
     const $streamDetails = currentFieldStreamDetails();
-    const $handler = this.getHandlerSubplan();
-    if ($handler) {
-      $handler.addStreamDetails?.($streamDetails);
-    } else {
-      this.paginationParams().addStreamDetails($streamDetails);
-    }
+    this.getHandler().addStreamDetails?.($streamDetails);
   }
 
   public edges(): Step {
@@ -779,12 +750,7 @@ export class ConnectionStep<
       return constant(EMPTY_CONNECTION_RESULT);
     }
     if (this.needsHasMore) {
-      const $handler = this.getHandlerSubplan();
-      if ($handler) {
-        $handler.setNeedsHasMore();
-      } else {
-        this.paginationParams().setNeedsHasMore();
-      }
+      this.getHandler().setNeedsHasMore();
     }
     /*
      * **IMPORTANT**: no matter the arguments, we cannot optimize ourself away
