@@ -14,6 +14,8 @@ export { access, AccessStep } from "./access.js";
 export { coalesce, CoalesceStep } from "./coalesce.js";
 export {
   connection,
+  ConnectionHandlingResult,
+  ConnectionHandlingStep,
   ConnectionOptimizedStep,
   ConnectionStep,
   EdgeStep,

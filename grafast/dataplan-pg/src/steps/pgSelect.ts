@@ -1,8 +1,10 @@
 import { createHash } from "crypto";
 import debugFactory from "debug";
 import type {
+  ConnectionHandlingResult,
   ConnectionOptimizedStep,
   ExecutionDetails,
+  ExecutionDetailsStream,
   GrafastResultsList,
   Maybe,
   PaginationParams,
@@ -104,7 +106,8 @@ const debugPlanVerbose = debugPlan.extend("verbose");
 
 const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
 const NO_ROWS = Object.freeze({
-  hasMore: false,
+  hasNextPage: false,
+  hasPreviousPage: false,
   items: [],
   cursorDetails: undefined,
   groupDetails: undefined,
@@ -333,8 +336,9 @@ interface QueryBuildResult {
   groupDetails: PgGroupDetails | undefined;
 }
 
-interface PgSelectStepResult {
-  hasMore: boolean;
+interface PgSelectStepResult extends ConnectionHandlingResult<unknown> {
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
   /** a tuple based on what is selected at runtime */
   items: ReadonlyArray<unknown[]> | AsyncIterable<unknown[]>;
   cursorDetails: PgCursorDetails | undefined;
@@ -361,7 +365,7 @@ export interface PgGroupDetails {
 export class PgSelectStep<
     TResource extends PgResource<any, any, any, any, any> = PgResource,
   >
-  extends PgStmtBaseStep<PgSelectStepResult>
+  extends PgStmtBaseStep<any>
   implements
     ConnectionOptimizedStep<
       any,
@@ -1084,6 +1088,7 @@ export class PgSelectStep<
       afterStepId: this.afterStepId,
       beforeStepId: this.beforeStepId,
       applyDepIds: this.applyDepIds,
+      streamDetailsDepIds: this.streamDetailsDepIds,
 
       paginationParamsDepId: this.paginationParamsDepId,
 
@@ -1202,11 +1207,12 @@ export class PgSelectStep<
       return streams.map((iterable, idx) => {
         if (!isAsyncIterable(iterable)) {
           // Must be an error
-          return iterable;
+          return iterable as never;
         }
         if (!initialFetchResult) {
           return {
-            hasMore: false,
+            hasNextPage: false,
+            hasPreviousPage: false,
             items: iterable,
             cursorDetails,
             groupDetails,
@@ -1259,7 +1265,8 @@ export class PgSelectStep<
           },
         };
         return {
-          hasMore: false,
+          hasNextPage: false,
+          hasPreviousPage: false,
           items: mergedGenerator,
           cursorDetails,
           groupDetails,
@@ -1770,8 +1777,20 @@ export class PgSelectStep<
     }
   }
 
+  private streamDetailsDepIds: number[] | null = [];
+  addStreamDetails($details: Step<ExecutionDetailsStream | null> | null) {
+    if ($details) {
+      this.streamDetailsDepIds?.push(this.addUnaryDependency($details));
+    } else {
+      // Explicitly disable streaming
+      this.streamDetailsDepIds = null;
+    }
+  }
+
   mightHaveStream() {
     if (this._fieldMightStream) return true;
+    if (this.streamDetailsDepIds != null && this.streamDetailsDepIds.length > 0)
+      return true;
     const $params = this.paginationParams();
     return $params !== null && ($params.mightStream?.() ?? true);
   }
@@ -2714,6 +2733,8 @@ interface PgSelectQueryInfo<
     SQL
   >;
   readonly meta: { readonly [key: string]: any };
+
+  readonly streamDetailsDepIds: null | readonly number[];
 }
 
 type CoreInfo<TResource extends PgResource<any, any, any, any, any>> = Readonly<
@@ -2905,11 +2926,35 @@ function buildTheQueryCore<
   };
 
   const { count, values } = info.executionDetails;
-  const params =
-    info.paginationParamsDepId != null
-      ? values[info.paginationParamsDepId].unaryValue()
-      : null;
-  const stream = info.executionDetails.stream ?? params?.stream;
+  let stream: ExecutionDetailsStream | null = null;
+  if (info.executionDetails.stream != null) {
+    stream = info.executionDetails.stream;
+  } else if (
+    rawInfo.streamDetailsDepIds != null &&
+    rawInfo.streamDetailsDepIds.length > 0
+  ) {
+    for (const depId of rawInfo.streamDetailsDepIds) {
+      const deets = values[depId].unaryValue() as ExecutionDetailsStream | null;
+      if (deets == null) {
+        // Null wins
+        stream = null;
+        break;
+      } else {
+        if (stream == null) {
+          stream = { ...deets };
+        } else if (deets.initialCount > stream.initialCount) {
+          // Higher initial count wins
+          stream.initialCount = deets.initialCount;
+        }
+      }
+    }
+    stream = null;
+  } else if (info.paginationParamsDepId != null) {
+    const params = values[
+      info.paginationParamsDepId
+    ].unaryValue() as PaginationParams<null | readonly string[]>;
+    stream = params.stream;
+  }
 
   for (const applyDepId of info.applyDepIds) {
     const val = values[applyDepId].unaryValue();
@@ -3236,11 +3281,12 @@ ${lateralText};`;
     ? { indicies: groupIndicies }
     : undefined;
 
-  if (stream) {
+  const initialCount = stream?.initialCount;
+  if (initialCount != null) {
     // PERF: should use the queryForSingle optimization in here too
 
     // When streaming we can't reverse order in JS - we must do it in the DB.
-    if (stream.initialCount > 0) {
+    if (initialCount > 0) {
       /*
        * Here our stream is constructed of two parts - an
        * `initialFetchQuery` to satisfy the `initialCount` and then a
@@ -3252,7 +3298,7 @@ ${lateralText};`;
         rawSqlValues,
         identifierIndex: initialFetchIdentifierIndex,
       } = makeQuery({
-        limit: stream.initialCount,
+        limit: initialCount,
         options: { placeholderValues },
       });
       const {
@@ -3260,7 +3306,7 @@ ${lateralText};`;
         rawSqlValues: rawSqlValuesForDeclare,
         identifierIndex: streamIdentifierIndex,
       } = makeQuery({
-        offset: stream.initialCount,
+        offset: initialCount,
         options: { placeholderValues },
       });
       if (initialFetchIdentifierIndex !== streamIdentifierIndex) {
@@ -3277,7 +3323,7 @@ ${lateralText};`;
         rawSqlValuesForDeclare,
         identifierIndex,
         shouldReverseOrder: false,
-        streamInitialCount: stream.initialCount,
+        streamInitialCount: initialCount,
         queryValues,
         first,
         last,
@@ -3454,6 +3500,7 @@ class PgSelectInlineApplyStep<
           afterStepId: this.afterStepId,
           beforeStepId: this.beforeStepId,
           applyDepIds: this.applyDepIds,
+          streamDetailsDepIds: null,
 
           paginationParamsDepId: this.paginationParamsDepId,
 
@@ -3996,8 +4043,11 @@ function createSelectResult(
   const orderedRows = shouldReverseOrder
     ? reverseArray(slicedRows)
     : slicedRows;
+  const hasNextPage = first != null ? hasMore : false;
+  const hasPreviousPage = last != null ? hasMore : false;
   return {
-    hasMore,
+    hasNextPage,
+    hasPreviousPage,
     items: orderedRows,
     cursorDetails,
     groupDetails,
@@ -4019,7 +4069,8 @@ function pgInlineViaJoinTransform([details, item]: readonly [
     items.push(newItem);
   }
   return {
-    hasMore: false,
+    hasPreviousPage: false,
+    hasNextPage: false,
     // We return a list here because our children are going to use a
     // `first` plan on us.
     // NOTE: we don't need to reverse the list for relay pagination

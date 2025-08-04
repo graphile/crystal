@@ -1,6 +1,8 @@
 import { createHash } from "crypto";
 import type {
   __InputStaticLeafStep,
+  ConnectionHandlingResult,
+  ConnectionHandlingStep,
   ConnectionOptimizedStep,
   ConnectionStep,
   ExecutionDetails,
@@ -89,7 +91,8 @@ const digestSpecificExpressionFromAttributeName = (
 const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
 const NO_ROWS = Object.freeze({
   m: Object.create(null),
-  hasMore: false,
+  hasNextPage: false,
+  hasPreviousPage: false,
   items: [],
 } as PgUnionAllStepResult);
 
@@ -400,9 +403,10 @@ interface QueryBuildResult {
   cursorDetails: PgCursorDetails | undefined;
 }
 
-interface PgUnionAllStepResult {
+interface PgUnionAllStepResult extends ConnectionHandlingResult<unknown> {
   m: Record<string, unknown>;
-  hasMore?: boolean;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
   /** a tuple based on what is selected at runtime */
   items: ReadonlyArray<unknown[]>;
   cursorDetails?: PgCursorDetails;
@@ -418,7 +422,7 @@ export class PgUnionAllStep<
   >
   extends PgStmtBaseStep<PgUnionAllStepResult>
   implements
-    ConnectionOptimizedStep<
+    ConnectionHandlingStep<
       any,
       PgSelectSingleStep<any>,
       any,
@@ -1067,9 +1071,12 @@ on (${sql.indent(
       const orderedRows = shouldReverseOrder
         ? reverseArray(slicedRows)
         : slicedRows;
+      const hasNextPage = first != null ? hasMore : false;
+      const hasPreviousPage = last != null ? hasMore : false;
       return {
         m: meta,
-        hasMore,
+        hasNextPage,
+        hasPreviousPage,
         items: orderedRows,
         cursorDetails,
       };

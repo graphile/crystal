@@ -14,7 +14,7 @@ import type {
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import { Step, UnbatchedStep } from "../step.js";
-import { arraysMatch } from "../utils.js";
+import { arraysMatch, maybeArraysMatch } from "../utils.js";
 import { access } from "./access.js";
 import { constant, ConstantStep } from "./constant.js";
 import { each } from "./each.js";
@@ -78,6 +78,17 @@ export interface PaginationFeatures {
    * can add new options for that).
    */
   offset?: boolean;
+
+  /**
+   * Set this if your collection supports every feature of GraphQL pagination,
+   * and implements the `ConnectionHandlingStep` interface. Instead of caling
+   * `applyPagination` as we do for `ConnectionOptimizedStep`, we will pass
+   * each individual parameter through to your collection step. Your collection
+   * step is also responsible for implementing the
+   * `hasNextPage`/`hasPreviousPage` logic, and must yield from execution an
+   * object conforming to `ConnectionHandlingResult`.
+   */
+  full?: boolean;
 }
 
 export interface PaginationParams<TCursorValue = string> {
@@ -259,6 +270,63 @@ export interface ConnectionOptimizedStep<
   cursorForItem?($item: Step<TItem>): Step<string>;
 }
 
+/** The result of a "ConnectionHandlingStep". */
+export interface ConnectionHandlingResult<
+  TItem,
+> /* extends ConnectionResult */ {
+  hasNextPage: PromiseOrDirect<boolean>;
+  hasPreviousPage: PromiseOrDirect<boolean>;
+  items: ReadonlyArray<TItem> | AsyncIterable<TItem>;
+}
+
+export interface ConnectionHandlingStep<
+  TItem,
+  TNodeStep extends Step = Step<TItem>,
+  TEdgeStep extends EdgeCapableStep<TItem, TNodeStep> = EdgeStep<
+    TItem,
+    TNodeStep
+  >,
+  TCursorValue = string,
+> extends Step<Maybe<ConnectionHandlingResult<TItem>>>,
+    Pick<
+      ConnectionOptimizedStep<TItem, TNodeStep, TEdgeStep, TCursorValue>,
+      | "connectionClone"
+      | "parseCursor"
+      | "nodeForItem"
+      | "edgeForItem"
+      | "listItem"
+      | "cursorForItem"
+    > {
+  paginationSupport: {
+    full: true;
+  } /* satisfies PaginationFeatures */;
+
+  setFirst($first: Step<Maybe<number>>): void;
+  setLast($last: Step<Maybe<number>>): void;
+  setOffset($offset: Step<Maybe<number>>): void;
+  setBefore($before: Step<Maybe<TCursorValue>>): void;
+  setAfter($after: Step<Maybe<TCursorValue>>): void;
+
+  /**
+   * Called when `hasNextPage`/`hasPreviousPage` are requested.
+   */
+  setNeedsHasMore(): void;
+
+  // TODO: would be better to expose this as
+  // `setInitialCount(Step<number | null>): void` and only call it once.
+  /**
+   * Passes the stream options that this collection is accessed with. This may
+   * happen more than once (e.g. if you have
+   * `nodes @stream(...) {...}, edges @stream(...) {...}`). If so, `null` wins,
+   * and failing that, the largest `initialCount` wins.
+   *
+   * WARNING: This may be called more than once!
+   */
+  addStreamDetails?(
+    $streamDetails: Step<ExecutionDetailsStream | null> | null,
+  ): void;
+}
+
 const EMPTY_OBJECT = Object.freeze(Object.create(null));
 const EMPTY_CONNECTION_RESULT: ConnectionResult<never> = Object.freeze({
   items: Object.freeze([]),
@@ -351,7 +419,7 @@ export class ConnectionStep<
   private needsHasMore = false;
   private needsCursor = false;
 
-  private paramsDepId: number;
+  private paramsDepId: number | null;
 
   edgeDataPlan: ($rawItem: Step<TItem>) => TEdgeDataStep;
 
@@ -367,11 +435,15 @@ export class ConnectionStep<
     }
     if ("paginationSupport" in subplan && "applyPagination" in subplan) {
       this.collectionPaginationSupport = subplan.paginationSupport;
-      const $params = new ConnectionParamsStep<TCursorValue>(
-        this.collectionPaginationSupport,
-      );
-      this.paramsDepId = this.addUnaryDependency($params);
-      subplan.applyPagination($params);
+      if (this.collectionPaginationSupport.full) {
+        this.paramsDepId = null;
+      } else {
+        const $params = new ConnectionParamsStep<TCursorValue>(
+          this.collectionPaginationSupport,
+        );
+        this.paramsDepId = this.addUnaryDependency($params);
+        subplan.applyPagination($params);
+      }
       this.collectionDepId = this.addDependency(subplan);
     } else {
       const $params = new ConnectionParamsStep<TCursorValue>(null);
@@ -409,6 +481,16 @@ export class ConnectionStep<
       >;
   }
 
+  private getHandlerSubplan():
+    | (TCollectionStep &
+        ConnectionHandlingStep<TItem, TNodeStep, TEdgeStep, TCursorValue>)
+    | null {
+    if (!this.collectionPaginationSupport?.full) {
+      return null;
+    }
+    return this.setupSubplanWithPagination() as any;
+  }
+
   public toStringMeta(): string {
     return String(this.getDepOptions(this.collectionDepId).step.id);
   }
@@ -431,7 +513,12 @@ export class ConnectionStep<
       nonUnaryMessage: () =>
         `${this}.setFirst(...) must be passed a _unary_ step, but ${$first} is not unary. See: https://err.red/gud#connection`,
     });
-    this.paginationParams().setFirst($first);
+    const $handler = this.getHandlerSubplan();
+    if ($handler) {
+      $handler.setFirst($first);
+    } else {
+      this.paginationParams().setFirst($first);
+    }
   }
   public getLast(): Step<number | null | undefined> | null {
     return this.maybeGetDep<Step<number | null | undefined>>(this._lastDepId);
@@ -446,7 +533,12 @@ export class ConnectionStep<
       nonUnaryMessage: () =>
         `${this}.setLast(...) must be passed a _unary_ step, but ${$last} is not unary. See: https://err.red/gud#connection`,
     });
-    this.paginationParams().setLast($last);
+    const $handler = this.getHandlerSubplan();
+    if ($handler) {
+      $handler.setLast($last);
+    } else {
+      this.paginationParams().setLast($last);
+    }
   }
   public getOffset(): Step<number | null | undefined> | null {
     return this.maybeGetDep<Step<number | null | undefined>>(this._offsetDepId);
@@ -461,7 +553,12 @@ export class ConnectionStep<
       nonUnaryMessage: () =>
         `${this}.setOffset(...) must be passed a _unary_ step, but ${$offset} is not unary. See: https://err.red/gud#connection`,
     });
-    this.paginationParams().setOffset($offset);
+    const $handler = this.getHandlerSubplan();
+    if ($handler) {
+      $handler.setOffset($offset);
+    } else {
+      this.paginationParams().setOffset($offset);
+    }
   }
   public getBefore(): Step<Maybe<TCursorValue>> | null {
     return this.maybeGetDep<Step<Maybe<TCursorValue>>>(this._beforeDepId, true);
@@ -481,7 +578,12 @@ export class ConnectionStep<
       nonUnaryMessage: () =>
         `${this}.setBefore(...) must be passed a _unary_ step, but ${$parsedBeforePlan} (and presumably ${$beforePlan}) is not unary. See: https://err.red/gud#connection`,
     });
-    this.paginationParams().setBefore($parsedBeforePlan);
+    const $handler = this.getHandlerSubplan();
+    if ($handler) {
+      $handler.setBefore($parsedBeforePlan);
+    } else {
+      this.paginationParams().setBefore($parsedBeforePlan);
+    }
   }
   public getAfter(): Step<Maybe<TCursorValue>> | null {
     // TODO: Move all of these to params, get rid of our dep here.
@@ -502,7 +604,12 @@ export class ConnectionStep<
       nonUnaryMessage: () =>
         `${this}.setAfter(...) must be passed a _unary_ step, but ${$parsedAfterPlan} (and presumably ${$afterPlan}) is not unary. See: https://err.red/gud#connection`,
     });
-    this.paginationParams().setAfter($parsedAfterPlan);
+    const $handler = this.getHandlerSubplan();
+    if ($handler) {
+      $handler.setAfter($parsedAfterPlan);
+    } else {
+      this.paginationParams().setAfter($parsedAfterPlan);
+    }
   }
 
   /**
@@ -541,7 +648,10 @@ export class ConnectionStep<
   }
 
   private paginationParams() {
-    return this.getDepOptions(this.paramsDepId)
+    if (this.collectionPaginationSupport?.full) {
+      throw new Error(`Full pagination support does not generate params`);
+    }
+    return this.getDepOptions(this.paramsDepId!)
       .step as ConnectionParamsStep<TCursorValue>;
   }
 
@@ -602,7 +712,12 @@ export class ConnectionStep<
 
   private captureStream() {
     const $streamDetails = currentFieldStreamDetails();
-    this.paginationParams().addStreamDetails($streamDetails);
+    const $handler = this.getHandlerSubplan();
+    if ($handler) {
+      $handler.addStreamDetails?.($streamDetails);
+    } else {
+      this.paginationParams().addStreamDetails($streamDetails);
+    }
   }
 
   public edges(): Step {
@@ -636,7 +751,10 @@ export class ConnectionStep<
   public cursorPlan($rawItem: Step<MaybeIndexed<TItem>>) {
     this.needsCursor = true;
     const subplan = this._getSubplan();
-    if (this.collectionPaginationSupport?.cursor) {
+    if (
+      this.collectionPaginationSupport?.cursor ||
+      this.collectionPaginationSupport?.full
+    ) {
       const $item = $rawItem as Step<TItem>;
       return subplan.cursorForItem!($item);
     } else {
@@ -661,7 +779,12 @@ export class ConnectionStep<
       return constant(EMPTY_CONNECTION_RESULT);
     }
     if (this.needsHasMore) {
-      this.paginationParams().setNeedsHasMore();
+      const $handler = this.getHandlerSubplan();
+      if ($handler) {
+        $handler.setNeedsHasMore();
+      } else {
+        this.paginationParams().setNeedsHasMore();
+      }
     }
     /*
      * **IMPORTANT**: no matter the arguments, we cannot optimize ourself away
@@ -693,9 +816,18 @@ export class ConnectionStep<
       return indexMap((i) => EMPTY_CONNECTION_RESULT);
     }
     const collectionDep = values[this.collectionDepId];
-    const params = values[
-      this.paramsDepId
-    ].unaryValue() as PaginationParams<TCursorValue>;
+    const params =
+      this.paramsDepId != null
+        ? (values[
+            this.paramsDepId
+          ].unaryValue() as PaginationParams<TCursorValue>)
+        : null;
+    if (params === null) {
+      // Handler does everything!
+      return collectionDep.isBatch
+        ? collectionDep.entries
+        : indexMap(() => collectionDep.value);
+    }
 
     return indexMap((i) => {
       const collectionValue = collectionDep.at(i);
@@ -1093,7 +1225,7 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
   private offsetDepId: number | null = null;
   private beforeDepId: number | null = null;
   private afterDepId: number | null = null;
-  private streamDetailsDepIds: number[] = [];
+  private streamDetailsDepIds: number[] | null = [];
   constructor(private paginationSupport: PaginationFeatures | null) {
     super();
   }
@@ -1122,7 +1254,10 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
   }
   addStreamDetails($details: Step<ExecutionDetailsStream | null> | null) {
     if ($details) {
-      this.streamDetailsDepIds.push(this.addUnaryDependency($details));
+      this.streamDetailsDepIds?.push(this.addUnaryDependency($details));
+    } else {
+      // Explicitly disable streaming
+      this.streamDetailsDepIds = null;
     }
   }
 
@@ -1131,7 +1266,9 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
    * been told anything about streaming.
    */
   public mightStream() {
-    return this.streamDetailsDepIds.length > 0;
+    return (
+      this.streamDetailsDepIds != null && this.streamDetailsDepIds.length > 0
+    );
   }
 
   deduplicate(
@@ -1145,7 +1282,7 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
         p.offsetDepId === this.offsetDepId &&
         p.beforeDepId === this.beforeDepId &&
         p.afterDepId === this.afterDepId &&
-        arraysMatch(p.streamDetailsDepIds, this.streamDetailsDepIds),
+        maybeArraysMatch(p.streamDetailsDepIds, this.streamDetailsDepIds),
     ) as ConnectionParamsStep<TCursorValue>[];
   }
   public deduplicatedWith(replacement: ConnectionParamsStep<any>): void {
@@ -1159,12 +1296,14 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
   ): PaginationParams<TCursorValue> {
     /** If we should stream, set this (to 0 or more), otherwise leave it null */
     let initialCount: number | null = null;
-    for (const depId of this.streamDetailsDepIds) {
-      const v = values[depId] as ExecutionDetailsStream | null;
-      if (v != null) {
-        const c = v.initialCount ?? 0;
-        if (initialCount === null || c > initialCount) {
-          initialCount = c;
+    if (this.streamDetailsDepIds != null) {
+      for (const depId of this.streamDetailsDepIds) {
+        const v = values[depId] as ExecutionDetailsStream | null;
+        if (v != null) {
+          const c = v.initialCount ?? 0;
+          if (initialCount === null || c > initialCount) {
+            initialCount = c;
+          }
         }
       }
     }

@@ -36,6 +36,7 @@ import type {
   ExecutionEntryFlags,
   GrafastFieldConfig,
   GrafastInputFieldConfig,
+  Maybe,
 } from "./interfaces.js";
 import type { Step } from "./step.js";
 import { constant } from "./steps/constant.js";
@@ -336,6 +337,19 @@ export function arraysMatch<T>(
     }
   }
   return true;
+}
+
+export function maybeArraysMatch<T>(
+  array1: Maybe<ReadonlyArray<T>>,
+  array2: Maybe<ReadonlyArray<T>>,
+  comparator?: (val1: T, val2: T) => boolean,
+): boolean {
+  return (
+    array1 === array2 ||
+    (array1 != null &&
+      array2 != null &&
+      arraysMatch(array1, array2, comparator))
+  );
 }
 
 /**

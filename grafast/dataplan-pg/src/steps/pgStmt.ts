@@ -1,5 +1,7 @@
 import type {
   __InputStaticLeafStep,
+  ConnectionHandlingResult,
+  ConnectionHandlingStep,
   ExecutionDetails,
   Maybe,
   PaginationParams,
@@ -16,6 +18,7 @@ import type {
 import type { PgLocker } from "../pgLocker.js";
 import { makeScopedSQL } from "../utils.js";
 import type { PgSelectParsedCursorStep } from "./pgSelect.js";
+import type { PgSelectSingleStep } from "./pgSelectSingle.js";
 
 export interface QueryValue {
   dependencyIndex: number;
@@ -49,8 +52,15 @@ const UNHANDLED_PLACEHOLDER = sql`(1/0) /* ERROR! Unhandled placeholder! */`;
 const UNHANDLED_DEFERRED = sql`(1/0) /* ERROR! Unhandled deferred! */`;
 
 export abstract class PgStmtBaseStep<T>
-  extends Step<T>
-  implements PgQueryRootStep
+  extends Step<Maybe<ConnectionHandlingResult<T>>>
+  implements
+    PgQueryRootStep,
+    ConnectionHandlingStep<
+      any,
+      PgSelectSingleStep<any>,
+      any,
+      null | readonly any[]
+    >
 {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -244,6 +254,7 @@ export abstract class PgStmtBaseStep<T>
     reverse: true,
     cursor: true,
     offset: true,
+    full: true as const,
   };
 
   protected paginationParamsDepId: number | null = null;
@@ -273,9 +284,8 @@ export abstract class PgStmtBaseStep<T>
    * Someone (probably pageInfo) wants to know if there's more records. To
    * determine this we fetch one extra record and then throw it away.
    */
-  public hasMore(): Step<boolean> {
+  public setNeedsHasMore() {
     this.fetchOneExtra = true;
-    return access(this, "hasMore", false);
   }
 
   public getPgRoot() {
