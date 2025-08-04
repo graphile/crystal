@@ -29,6 +29,7 @@ import {
   isDev,
   isPromiseLike,
   lambda,
+  maybeArraysMatch,
   reverseArray,
   SafeError,
   Step,
@@ -1463,6 +1464,10 @@ export class PgSelectStep<
           this,
           p,
         );
+        return false;
+      }
+
+      if (!maybeArraysMatch(this.streamDetailsDepIds, p.streamDetailsDepIds)) {
         return false;
       }
 
