@@ -211,6 +211,7 @@ describe("queries", () => {
         const operationName = op.name?.value;
         let expectIncremental = false;
         let variableValues: any;
+        let expectedErrorCount = 0;
         for (const dir of op.directives ?? []) {
           if (dir.name.value === "incremental") {
             expectIncremental = true;
@@ -225,6 +226,9 @@ describe("queries", () => {
               );
             }
             variableValues = valueFromASTUntyped(values.value) as any;
+          }
+          if (dir.name.value === "expectError") {
+            expectedErrorCount = 1;
           }
         }
         const suffix = i === 0 ? "" : `.${operationName}`;
@@ -293,12 +297,24 @@ describe("queries", () => {
               expect(result.data).to.deep.equal(JSON5.parse(original));
             });
           }
-          it("did not error", function () {
-            if (result.errors) {
-              console.dir(result.errors);
-            }
-            expect(result.errors).not.to.exist;
-          });
+          if (expectedErrorCount === 0) {
+            it("did not error", function () {
+              if (result.errors) {
+                console.dir(result.errors);
+              }
+              expect(result.errors).not.to.exist;
+            });
+          } else {
+            it(`raised ${expectedErrorCount} errors`, async function () {
+              expect(result.errors).to.exist;
+              expect(result.errors).to.have.length(expectedErrorCount);
+              await snapshot(
+                JSON5.stringify(result.errors, null, 2) + "\n",
+                `${BASE_DIR}/${baseName}.errors.json5`,
+                i === 0,
+              );
+            });
+          }
           it("matched plan snapshot", async function () {
             const ext = result.extensions;
             const plan = (ext as any)?.explain?.operations?.find(

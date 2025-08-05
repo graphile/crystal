@@ -1,0 +1,23 @@
+{
+  character: {
+    id: 102,
+    name: 'Princess Donut',
+    itemsConnection: {
+      nodes: [
+        {
+          __typename: 'Consumable',
+          id: 204,
+          name: 'Healing Potion',
+        },
+        {
+          __typename: 'Consumable',
+          id: 205,
+          name: "Dolores Doesn't Splat Potion",
+        },
+      ],
+      pageInfo: {
+        endCursor: 'Ng==',
+      },
+    },
+  },
+}

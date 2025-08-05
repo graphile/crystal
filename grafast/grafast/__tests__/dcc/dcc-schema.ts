@@ -71,6 +71,7 @@ export const makeBaseArgs = () => {
       directive @incremental on QUERY | MUTATION | SUBSCRIPTION
       scalar _RawJSON
       directive @variables(values: _RawJSON!) on QUERY | MUTATION | SUBSCRIPTION
+      directive @expectError on QUERY | MUTATION | SUBSCRIPTION
 
       enum Species {
         HUMAN
@@ -84,6 +85,13 @@ export const makeBaseArgs = () => {
       }
       interface HasInventory {
         items(first: Int): [Item]
+        itemsConnection(
+          first: Int
+          after: String
+          offset: Int
+          last: Int
+          before: String
+        ): ItemConnection
       }
 
       type Guide implements NPC & Character {
@@ -100,6 +108,13 @@ export const makeBaseArgs = () => {
         name: String!
         species: Species
         items(first: Int): [Item]
+        itemsConnection(
+          first: Int
+          after: String
+          offset: Int
+          last: Int
+          before: String
+        ): ItemConnection
         exCrawler: Boolean
         friends(first: Int): [Character]
         bestFriend: Character
@@ -122,6 +137,13 @@ export const makeBaseArgs = () => {
         bestFriend: Character
         friends(first: Int): [Character]
         items(first: Int): [Item]
+        itemsConnection(
+          first: Int
+          after: String
+          offset: Int
+          last: Int
+          before: String
+        ): ItemConnection
       }
       interface NPC implements Character {
         id: Int!
@@ -150,6 +172,13 @@ export const makeBaseArgs = () => {
         name: String!
         species: Species
         items(first: Int): [Item]
+        itemsConnection(
+          first: Int
+          after: String
+          offset: Int
+          last: Int
+          before: String
+        ): ItemConnection
         favouriteItem: Item
         friends(first: Int): [Character]
         friendsConnection(
@@ -161,6 +190,15 @@ export const makeBaseArgs = () => {
         ): CharacterConnection
         bestFriend: ActiveCrawler
         crawlerNumber: Int
+      }
+      type ItemConnection {
+        edges: [ItemEdge]
+        nodes: [Item]
+        pageInfo: PageInfo!
+      }
+      type ItemEdge {
+        node: Item
+        cursor: String!
       }
       type CharacterConnection {
         edges: [CharacterEdge]
@@ -393,6 +431,10 @@ export const makeBaseArgs = () => {
           items($crawler, { $first }) {
             const $items = get($crawler, "items");
             return lambda([$items, $first], applyLimit);
+          },
+          itemsConnection($crawler, fieldArgs) {
+            const $items = get($crawler, "items");
+            return connection($items, { fieldArgs });
           },
         },
       },
