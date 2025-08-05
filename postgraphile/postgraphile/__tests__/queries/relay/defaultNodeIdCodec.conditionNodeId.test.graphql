@@ -1,7 +1,7 @@
 ## expect(errors).toHaveLength(1)
 #> dontLogErrors: true
 ## expect(errors[0].message).toEqual("Invalid node identifier for 'Person'")
-## expect(errors[0].path).toEqual(['z_invalidAuthorId', 'nodes'])
+## expect(errors[0].path).toEqual(['z_invalidAuthorId'])
 #> graphileBuildOptions: { defaultNodeIdCodec: "pipeString" }
 #> schema: ["d"]
 #> extends: ["postgraphile/presets/relay:PgRelayPreset"]
