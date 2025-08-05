@@ -3,8 +3,6 @@ import type {
   __InputStaticLeafStep,
   ConnectionHandlingResult,
   ConnectionHandlingStep,
-  ConnectionOptimizedStep,
-  ConnectionStep,
   ExecutionDetails,
   GrafastResultsList,
   GrafastValuesList,
@@ -53,7 +51,6 @@ import type {
 import { PgCondition } from "./pgCondition.js";
 import type { PgCursorDetails } from "./pgCursor.js";
 import { PgCursorStep } from "./pgCursor.js";
-import type { PgSelectParsedCursorStep } from "./pgSelect.js";
 import { getFragmentAndCodecFromOrder } from "./pgSelect.js";
 import type { PgSelectSingleStep } from "./pgSelectSingle.js";
 import type {

@@ -948,10 +948,10 @@ declare global {
 
       /**
        * This must be set higher than the largest `@stream(initialCount:)`
-       * argument you want to support. This supports the `$step.cloneStreams =
-       * true` option, allowing multiple consumers to consume the same
-       * underlying stream, but prevents any one consumer getting too far ahead
-       * of any other (and causing memory exhaustion).
+       * argument you want to support. This supports the
+       * `$step.cloneStreams = true` option, allowing multiple consumers to
+       * consume the same underlying stream, but prevents any one consumer
+       * getting too far ahead of any other (and causing memory exhaustion).
        */
       distributorBufferSize?: number;
     }

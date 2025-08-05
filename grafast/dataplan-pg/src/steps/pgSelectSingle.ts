@@ -22,7 +22,6 @@ import {
   pgClassExpression,
   PgClassExpressionStep,
 } from "./pgClassExpression.js";
-import { PgCursorStep } from "./pgCursor.js";
 import type { PgSelectMode } from "./pgSelect.js";
 import { PgSelectStep } from "./pgSelect.js";
 // import debugFactory from "debug";

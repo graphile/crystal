@@ -3,7 +3,6 @@ import "graphile-config";
 
 import type {
   PgCodecWithAttributes,
-  PgSelectParsedCursorStep,
   PgSelectQueryBuilder,
   PgSelectSingleStep,
   PgSelectStep,

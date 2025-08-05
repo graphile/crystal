@@ -43,7 +43,6 @@ import {
   isPromiseLike,
   sudo,
 } from "../utils.js";
-import type { Distributor } from "./distributor.js";
 import {
   DEFAULT_DISTRIBUTOR_BUFFER_SIZE,
   distributor,

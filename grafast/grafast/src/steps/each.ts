@@ -6,7 +6,6 @@ import { isListCapableStep } from "../step.js";
 import { __ItemStep } from "./__item.js";
 import type {
   ConnectionOptimizedStep,
-  ConnectionStep,
   ItemsStep,
   StepRepresentingList,
 } from "./connection.js";

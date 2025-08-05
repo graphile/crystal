@@ -15,7 +15,7 @@ import type {
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import { Step, UnbatchedStep } from "../step.js";
-import { arraysMatch, maybeArraysMatch } from "../utils.js";
+import { maybeArraysMatch } from "../utils.js";
 import { access } from "./access.js";
 import { constant, ConstantStep } from "./constant.js";
 import { each } from "./each.js";
@@ -799,7 +799,7 @@ export class ConnectionStep<
       // The main collection is not actually fetched, so we don't need to do
       // any pagination stuff. Could be they just wanted `totalCount` for
       // example.
-      return indexMap((i) => EMPTY_CONNECTION_RESULT);
+      return indexMap(() => EMPTY_CONNECTION_RESULT);
     }
     const collectionDep = values[this.collectionDepId];
     const params =
@@ -988,6 +988,7 @@ function makeProcessedCollection<TItem>(
               const limit = __hasMore[1];
               if (accumulator /* same as __hasMore[0] === "l" */) {
                 // DO NOT USE `index` IN THIS BRANCH
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 const index = null;
 
                 if (accumulator.length < limit) {

@@ -113,10 +113,7 @@ import type {
   PgCodec,
   PgSelectQueryBuilderCallback,
 } from "../interfaces";
-import type {
-  PgSelectParsedCursorStep,
-  PgSelectQueryBuilder,
-} from "../steps/pgSelect.js";
+import type { PgSelectQueryBuilder } from "../steps/pgSelect.js";
 import { sqlFromArgDigests } from "../steps/pgSelect.js";
 import type {
   PgUnionAllQueryBuilder,

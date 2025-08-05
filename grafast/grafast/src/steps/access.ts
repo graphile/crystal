@@ -3,11 +3,7 @@ import type { TE } from "tamedevil";
 import te from "tamedevil";
 
 import { inspect } from "../inspect.js";
-import type {
-  ExecutionExtra,
-  Maybe,
-  UnbatchedExecutionExtra,
-} from "../interfaces.js";
+import type { ExecutionExtra, UnbatchedExecutionExtra } from "../interfaces.js";
 import type { Step } from "../step.js";
 import { UnbatchedStep } from "../step.js";
 import { arraysMatch, digestKeys } from "../utils.js";

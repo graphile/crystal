@@ -3,7 +3,6 @@ import "./PgBasicsPlugin.js";
 import "graphile-config";
 
 import type {
-  PgSelectParsedCursorStep,
   PgSelectSingleStep,
   PgSelectStep,
   PgUnionAllStep,

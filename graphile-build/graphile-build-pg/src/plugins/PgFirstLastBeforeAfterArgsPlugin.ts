@@ -1,11 +1,7 @@
 import "./PgTablesPlugin.js";
 import "graphile-config";
 
-import type {
-  PgSelectParsedCursorStep,
-  PgSelectSingleStep,
-  PgSelectStep,
-} from "@dataplan/pg";
+import type { PgSelectSingleStep, PgSelectStep } from "@dataplan/pg";
 import type { ConnectionStep, GrafastFieldConfigArgumentMap } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 
