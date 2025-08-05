@@ -11,12 +11,12 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     Bucket1("Bucket 1 (polymorphic)<br />__typename: Lambda[9]<br />Deps: 2, 8, 9, 71, 73, 77, 81, 85, 89, 93, 4"):::bucket
     Bucket2("Bucket 2 (polymorphicPartition)<br />|Query<br />Deps: 71, 4<br />ᐳQuery"):::bucket
-    Bucket3("Bucket 3 (polymorphicPartition)<br />|Post<br />Deps: 17, 99, 73<br />ᐳPost<br /><br />1: PgSelect[14]<br />2: PgSelectRows[19]<br />ᐳ: 18, 20, 74, 75, 76"):::bucket
-    Bucket4("Bucket 4 (polymorphicPartition)<br />|Person<br />Deps: 17, 99, 77<br />ᐳPerson<br /><br />1: PgSelect[24]<br />2: PgSelectRows[29]<br />ᐳ: 28, 30, 78, 79, 80, 97, 98"):::bucket
-    Bucket5("Bucket 5 (polymorphicPartition)<br />|Film<br />Deps: 17, 99, 81<br />ᐳFilm<br /><br />1: PgSelect[34]<br />2: PgSelectRows[39]<br />ᐳ: 38, 40, 82, 83, 84"):::bucket
-    Bucket6("Bucket 6 (polymorphicPartition)<br />|Studio<br />Deps: 17, 99, 85<br />ᐳStudio<br /><br />1: PgSelect[44]<br />2: PgSelectRows[49]<br />ᐳ: 48, 50, 86, 87, 88"):::bucket
-    Bucket7("Bucket 7 (polymorphicPartition)<br />|TvShow<br />Deps: 17, 99, 89<br />ᐳTvShow<br /><br />1: PgSelect[54]<br />2: PgSelectRows[59]<br />ᐳ: 58, 60, 90, 91, 92"):::bucket
-    Bucket8("Bucket 8 (polymorphicPartition)<br />|TvEpisode<br />Deps: 17, 99, 93<br />ᐳTvEpisode<br /><br />1: PgSelect[64]<br />2: PgSelectRows[69]<br />ᐳ: 68, 70, 94, 95, 96"):::bucket
+    Bucket3("Bucket 3 (polymorphicPartition)<br />|Post<br />Deps: 17, 99, 73<br />ᐳPost<br /><br />1: PgSelect[14]<br />ᐳ: Access[18]<br />2: First[19]<br />ᐳ: 20, 74, 75, 76"):::bucket
+    Bucket4("Bucket 4 (polymorphicPartition)<br />|Person<br />Deps: 17, 99, 77<br />ᐳPerson<br /><br />1: PgSelect[24]<br />ᐳ: Access[28]<br />2: First[29]<br />ᐳ: 30, 78, 79, 80, 97, 98"):::bucket
+    Bucket5("Bucket 5 (polymorphicPartition)<br />|Film<br />Deps: 17, 99, 81<br />ᐳFilm<br /><br />1: PgSelect[34]<br />ᐳ: Access[38]<br />2: First[39]<br />ᐳ: 40, 82, 83, 84"):::bucket
+    Bucket6("Bucket 6 (polymorphicPartition)<br />|Studio<br />Deps: 17, 99, 85<br />ᐳStudio<br /><br />1: PgSelect[44]<br />ᐳ: Access[48]<br />2: First[49]<br />ᐳ: 50, 86, 87, 88"):::bucket
+    Bucket7("Bucket 7 (polymorphicPartition)<br />|TvShow<br />Deps: 17, 99, 89<br />ᐳTvShow<br /><br />1: PgSelect[54]<br />ᐳ: Access[58]<br />2: First[59]<br />ᐳ: 60, 90, 91, 92"):::bucket
+    Bucket8("Bucket 8 (polymorphicPartition)<br />|TvEpisode<br />Deps: 17, 99, 93<br />ᐳTvEpisode<br /><br />1: PgSelect[64]<br />ᐳ: Access[68]<br />2: First[69]<br />ᐳ: 70, 94, 95, 96"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2 & Bucket3 & Bucket4 & Bucket5 & Bucket6 & Bucket7 & Bucket8
@@ -42,12 +42,12 @@ graph TD
     List75{{"List[75∈3] ➊^<br />ᐸ73,74ᐳ<br />More deps:<br />- Constantᐸ'posts'ᐳ[73]"}}:::plan
     PgClassExpression74{{"PgClassExpression[74∈3] ➊^<br />ᐸ__post__.”id”ᐳ"}}:::plan
     PgClassExpression74 --> List75
-    First18{{"First[18∈3] ➊^"}}:::plan
-    PgSelectRows19[["PgSelectRows[19∈3] ➊^"]]:::plan
-    PgSelectRows19 --> First18
-    PgSelect14 --> PgSelectRows19
+    Access18{{"Access[18∈3] ➊^<br />ᐸ14.itemsᐳ"}}:::plan
+    PgSelect14 --> Access18
+    First19[["First[19∈3] ➊^"]]:::plan
+    Access18 --> First19
     PgSelectSingle20{{"PgSelectSingle[20∈3] ➊^<br />ᐸpostᐳ"}}:::plan
-    First18 --> PgSelectSingle20
+    First19 --> PgSelectSingle20
     PgSelectSingle20 --> PgClassExpression74
     Lambda76{{"Lambda[76∈3] ➊^<br />ᐸpipeStringEncodeᐳ"}}:::plan
     List75 --> Lambda76
@@ -57,12 +57,12 @@ graph TD
     List79{{"List[79∈4] ➊^<br />ᐸ77,78ᐳ<br />More deps:<br />- Constantᐸ'people'ᐳ[77]"}}:::plan
     PgClassExpression78{{"PgClassExpression[78∈4] ➊^<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgClassExpression78 --> List79
-    First28{{"First[28∈4] ➊^"}}:::plan
-    PgSelectRows29[["PgSelectRows[29∈4] ➊^"]]:::plan
-    PgSelectRows29 --> First28
-    PgSelect24 --> PgSelectRows29
+    Access28{{"Access[28∈4] ➊^<br />ᐸ24.itemsᐳ"}}:::plan
+    PgSelect24 --> Access28
+    First29[["First[29∈4] ➊^"]]:::plan
+    Access28 --> First29
     PgSelectSingle30{{"PgSelectSingle[30∈4] ➊^<br />ᐸpersonᐳ"}}:::plan
-    First28 --> PgSelectSingle30
+    First29 --> PgSelectSingle30
     PgSelectSingle30 --> PgClassExpression78
     Lambda80{{"Lambda[80∈4] ➊^<br />ᐸpipeStringEncodeᐳ"}}:::plan
     List79 --> Lambda80
@@ -76,12 +76,12 @@ graph TD
     List83{{"List[83∈5] ➊^<br />ᐸ81,82ᐳ<br />More deps:<br />- Constantᐸ'films'ᐳ[81]"}}:::plan
     PgClassExpression82{{"PgClassExpression[82∈5] ➊^<br />ᐸ__films__.”code”ᐳ"}}:::plan
     PgClassExpression82 --> List83
-    First38{{"First[38∈5] ➊^"}}:::plan
-    PgSelectRows39[["PgSelectRows[39∈5] ➊^"]]:::plan
-    PgSelectRows39 --> First38
-    PgSelect34 --> PgSelectRows39
+    Access38{{"Access[38∈5] ➊^<br />ᐸ34.itemsᐳ"}}:::plan
+    PgSelect34 --> Access38
+    First39[["First[39∈5] ➊^"]]:::plan
+    Access38 --> First39
     PgSelectSingle40{{"PgSelectSingle[40∈5] ➊^<br />ᐸfilmsᐳ"}}:::plan
-    First38 --> PgSelectSingle40
+    First39 --> PgSelectSingle40
     PgSelectSingle40 --> PgClassExpression82
     Lambda84{{"Lambda[84∈5] ➊^<br />ᐸpipeStringEncodeᐳ"}}:::plan
     List83 --> Lambda84
@@ -91,12 +91,12 @@ graph TD
     List87{{"List[87∈6] ➊^<br />ᐸ85,86ᐳ<br />More deps:<br />- Constantᐸ'studios'ᐳ[85]"}}:::plan
     PgClassExpression86{{"PgClassExpression[86∈6] ➊^<br />ᐸ__studios__.”id”ᐳ"}}:::plan
     PgClassExpression86 --> List87
-    First48{{"First[48∈6] ➊^"}}:::plan
-    PgSelectRows49[["PgSelectRows[49∈6] ➊^"]]:::plan
-    PgSelectRows49 --> First48
-    PgSelect44 --> PgSelectRows49
+    Access48{{"Access[48∈6] ➊^<br />ᐸ44.itemsᐳ"}}:::plan
+    PgSelect44 --> Access48
+    First49[["First[49∈6] ➊^"]]:::plan
+    Access48 --> First49
     PgSelectSingle50{{"PgSelectSingle[50∈6] ➊^<br />ᐸstudiosᐳ"}}:::plan
-    First48 --> PgSelectSingle50
+    First49 --> PgSelectSingle50
     PgSelectSingle50 --> PgClassExpression86
     Lambda88{{"Lambda[88∈6] ➊^<br />ᐸpipeStringEncodeᐳ"}}:::plan
     List87 --> Lambda88
@@ -106,12 +106,12 @@ graph TD
     List91{{"List[91∈7] ➊^<br />ᐸ89,90ᐳ<br />More deps:<br />- Constantᐸ'tv_shows'ᐳ[89]"}}:::plan
     PgClassExpression90{{"PgClassExpression[90∈7] ➊^<br />ᐸ__tv_shows__.”code”ᐳ"}}:::plan
     PgClassExpression90 --> List91
-    First58{{"First[58∈7] ➊^"}}:::plan
-    PgSelectRows59[["PgSelectRows[59∈7] ➊^"]]:::plan
-    PgSelectRows59 --> First58
-    PgSelect54 --> PgSelectRows59
+    Access58{{"Access[58∈7] ➊^<br />ᐸ54.itemsᐳ"}}:::plan
+    PgSelect54 --> Access58
+    First59[["First[59∈7] ➊^"]]:::plan
+    Access58 --> First59
     PgSelectSingle60{{"PgSelectSingle[60∈7] ➊^<br />ᐸtv_showsᐳ"}}:::plan
-    First58 --> PgSelectSingle60
+    First59 --> PgSelectSingle60
     PgSelectSingle60 --> PgClassExpression90
     Lambda92{{"Lambda[92∈7] ➊^<br />ᐸpipeStringEncodeᐳ"}}:::plan
     List91 --> Lambda92
@@ -121,12 +121,12 @@ graph TD
     List95{{"List[95∈8] ➊^<br />ᐸ93,94ᐳ<br />More deps:<br />- Constantᐸ'tv_episodes'ᐳ[93]"}}:::plan
     PgClassExpression94{{"PgClassExpression[94∈8] ➊^<br />ᐸ__tv_episodes__.”code”ᐳ"}}:::plan
     PgClassExpression94 --> List95
-    First68{{"First[68∈8] ➊^"}}:::plan
-    PgSelectRows69[["PgSelectRows[69∈8] ➊^"]]:::plan
-    PgSelectRows69 --> First68
-    PgSelect64 --> PgSelectRows69
+    Access68{{"Access[68∈8] ➊^<br />ᐸ64.itemsᐳ"}}:::plan
+    PgSelect64 --> Access68
+    First69[["First[69∈8] ➊^"]]:::plan
+    Access68 --> First69
     PgSelectSingle70{{"PgSelectSingle[70∈8] ➊^<br />ᐸtv_episodesᐳ"}}:::plan
-    First68 --> PgSelectSingle70
+    First69 --> PgSelectSingle70
     PgSelectSingle70 --> PgClassExpression94
     Lambda96{{"Lambda[96∈8] ➊^<br />ᐸpipeStringEncodeᐳ"}}:::plan
     List95 --> Lambda96
@@ -139,15 +139,15 @@ graph TD
     classDef bucket2 stroke:#7f007f
     class Bucket2,Lambda72 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgSelect14,First18,PgSelectRows19,PgSelectSingle20,PgClassExpression74,List75,Lambda76 bucket3
+    class Bucket3,PgSelect14,Access18,First19,PgSelectSingle20,PgClassExpression74,List75,Lambda76 bucket3
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgSelect24,First28,PgSelectRows29,PgSelectSingle30,PgClassExpression78,List79,Lambda80,PgClassExpression97,PgClassExpression98 bucket4
+    class Bucket4,PgSelect24,Access28,First29,PgSelectSingle30,PgClassExpression78,List79,Lambda80,PgClassExpression97,PgClassExpression98 bucket4
     classDef bucket5 stroke:#7fff00
-    class Bucket5,PgSelect34,First38,PgSelectRows39,PgSelectSingle40,PgClassExpression82,List83,Lambda84 bucket5
+    class Bucket5,PgSelect34,Access38,First39,PgSelectSingle40,PgClassExpression82,List83,Lambda84 bucket5
     classDef bucket6 stroke:#ff1493
-    class Bucket6,PgSelect44,First48,PgSelectRows49,PgSelectSingle50,PgClassExpression86,List87,Lambda88 bucket6
+    class Bucket6,PgSelect44,Access48,First49,PgSelectSingle50,PgClassExpression86,List87,Lambda88 bucket6
     classDef bucket7 stroke:#808000
-    class Bucket7,PgSelect54,First58,PgSelectRows59,PgSelectSingle60,PgClassExpression90,List91,Lambda92 bucket7
+    class Bucket7,PgSelect54,Access58,First59,PgSelectSingle60,PgClassExpression90,List91,Lambda92 bucket7
     classDef bucket8 stroke:#dda0dd
-    class Bucket8,PgSelect64,First68,PgSelectRows69,PgSelectSingle70,PgClassExpression94,List95,Lambda96 bucket8
+    class Bucket8,PgSelect64,Access68,First69,PgSelectSingle70,PgClassExpression94,List95,Lambda96 bucket8
 
