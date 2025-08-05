@@ -9,9 +9,9 @@ graph TD
 
     subgraph "Buckets for queries/interfaces-via-union-all/vulnerabilitiesConnection.before1.variables"
     Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 12, 13, 15, 29, 57, 14, 17<br />2: PgUnionAll[11]<br />ᐳ: Access[24]<br />3: Connection[16]<br />4: ConnectionItems[18]"):::bucket
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 16, 29, 18, 24, 14<br /><br />ROOT Connectionᐸ11ᐳ[16]"):::bucket
-    Bucket3("Bucket 3 (listItem)<br />Deps: 29, 24, 14<br /><br />ROOT __Item{3}ᐸ18ᐳ[21]"):::bucket
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 21, 24, 31, 22, 14, 33<br /><br />ROOT Edge{3}[22]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 16, 24, 29, 18, 14<br /><br />ROOT Connectionᐸ11ᐳ[16]"):::bucket
+    Bucket3("Bucket 3 (listItem)<br />Deps: 24, 29, 14<br /><br />ROOT __Item{3}ᐸ18ᐳ[21]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 31, 22, 14, 33, 25<br /><br />ROOT Edge{3}[22]"):::bucket
     Bucket5("Bucket 5 (polymorphic)<br />__typename: Access[32]<br />Deps: 32, 14, 33"):::bucket
     Bucket6("Bucket 6 (polymorphicPartition)<br />|FirstPartyVulnerability<br />Deps: 14, 33<br />ᐳFirstPartyVulnerability<br /><br />1: PgSelect[34]<br />ᐳ: Access[38]<br />2: First[39]<br />ᐳ: 40, 49, 51, 53, 55"):::bucket
     Bucket7("Bucket 7 (polymorphicPartition)<br />|ThirdPartyVulnerability<br />Deps: 14, 33<br />ᐳThirdPartyVulnerability<br /><br />1: PgSelect[42]<br />ᐳ: Access[46]<br />2: First[47]<br />ᐳ: 48, 50, 52, 54, 56"):::bucket
@@ -47,18 +47,18 @@ graph TD
     Access27{{"Access[27∈3]<br />ᐸ21.0ᐳ"}}:::plan
     Access28{{"Access[28∈3]<br />ᐸ21.1ᐳ"}}:::plan
     Access27 & Access28 --> List30
-    __Item21[/"__Item[21∈3]<br />ᐸ18ᐳ"\]:::itemplan
-    ConnectionItems18 ==> __Item21
     Edge22{{"Edge[22∈3]"}}:::plan
-    __Item21 --> Edge22
+    __Item21[/"__Item[21∈3]<br />ᐸ18ᐳ"\]:::itemplan
+    PgCursor25{{"PgCursor[25∈3]"}}:::plan
+    __Item21 & PgCursor25 --> Edge22
+    __Item21 & Access24 --> PgCursor25
+    ConnectionItems18 ==> __Item21
     __Item21 --> Access27
     __Item21 --> Access28
     Lambda31{{"Lambda[31∈3]<br />ᐸtoSpecifierᐳ"}}:::plan
     List30 --> Lambda31
     Access33{{"Access[33∈3]<br />ᐸ31.idᐳ"}}:::plan
     Lambda31 --> Access33
-    PgCursor25{{"PgCursor[25∈4]"}}:::plan
-    __Item21 & Access24 --> PgCursor25
     Access32{{"Access[32∈4]<br />ᐸ31.__typenameᐳ"}}:::plan
     Lambda31 --> Access32
     PgSelect34[["PgSelect[34∈6]<br />ᐸfirst_party_vulnerabilitiesᐳ<br />ᐳFirstPartyVulnerability<br />More deps:<br />- Object[14]"]]:::plan
@@ -100,9 +100,9 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class Bucket1 bucket1
     classDef bucket3 stroke:#ffa500
-    class Bucket3,__Item21,Edge22,Access27,Access28,List30,Lambda31,Access33 bucket3
+    class Bucket3,__Item21,Edge22,PgCursor25,Access27,Access28,List30,Lambda31,Access33 bucket3
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgCursor25,Access32 bucket4
+    class Bucket4,Access32 bucket4
     classDef bucket5 stroke:#7fff00
     class Bucket5 bucket5
     classDef bucket6 stroke:#ff1493
