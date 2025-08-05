@@ -1102,19 +1102,39 @@ export class EdgeStep<
     return this.getConnectionStep().nodePlan($rawItem);
   }
 
+  private cursorDepId: number | null = null;
   cursor(): Step<string> {
-    const $connection = this.getConnectionStep();
-    const $rawItem = this.getRawItemStep();
-    return $connection.cursorPlan($rawItem);
+    if (this.cursorDepId == null) {
+      const $connection = this.getConnectionStep();
+      const $rawItem = this.getRawItemStep();
+      const $cursor = this.withMyLayerPlan(() =>
+        $connection.cursorPlan($rawItem),
+      );
+      this.cursorDepId = this.addDependency($cursor);
+      if (this.cursorDepId !== 1) {
+        throw new Error(
+          `Expected cursor to have depId = 1, but instead it got depId ${this.cursorDepId}`,
+        );
+      }
+      return $cursor;
+    } else {
+      return this.getDepOptions(this.cursorDepId).step;
+    }
   }
 
   deduplicate(_peers: EdgeStep<any, any>[]): EdgeStep<TItem, TNodeStep>[] {
     return _peers;
   }
 
-  unbatchedExecute(_extra: UnbatchedExecutionExtra, record: any): any {
+  unbatchedExecute(
+    _extra: UnbatchedExecutionExtra,
+    record: any,
+    cursor: any,
+  ): any {
     // Handle nulls; everything else comes from the child plans
-    return record == null ? null : EMPTY_OBJECT;
+    return record == null || (this.cursorDepId === 1 && cursor == null)
+      ? null
+      : EMPTY_OBJECT;
   }
 }
 
