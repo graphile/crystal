@@ -350,6 +350,8 @@ export /* abstract */ class Step<TData = any> {
           // them, that's fine too.
           for (let id = this.id + 1; id <= maxStepId; id++) {
             const step = stepTracker.getStepById(id);
+            // Allow global steps
+            if (step.layerPlan.reason.type === "root") continue;
             if (stepADependsOnStepB(this, step)) continue;
             if (nonDependentSteps === null) {
               nonDependentSteps = [step];
