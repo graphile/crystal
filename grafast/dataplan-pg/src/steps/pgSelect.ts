@@ -1026,7 +1026,7 @@ export class PgSelectStep<
   public cursorForItem(
     $item: Step<unknown>,
   ): PgCursorStep<PgSelectSingleStep<TResource>> {
-    const $row = this.listItem($item) as PgSelectSingleStep<TResource>;
+    const $row = $item as PgSelectSingleStep<TResource>;
     return new PgCursorStep<PgSelectSingleStep<TResource>>(
       $row,
       this.getCursorDetails(),

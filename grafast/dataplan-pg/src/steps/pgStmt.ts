@@ -17,6 +17,7 @@ import type {
 } from "../interfaces.js";
 import type { PgLocker } from "../pgLocker.js";
 import { makeScopedSQL } from "../utils.js";
+import type { PgCursorStep } from "./pgCursor.js";
 import type { PgSelectParsedCursorStep } from "./pgSelect.js";
 import type { PgSelectSingleStep } from "./pgSelectSingle.js";
 
@@ -249,6 +250,7 @@ export abstract class PgStmtBaseStep<T>
     const $parsedCursorPlan = lambda($cursorPlan, parseCursor);
     return $parsedCursorPlan;
   }
+  abstract cursorForItem($item: Step): PgCursorStep<any>;
 
   paginationSupport = {
     reverse: true,

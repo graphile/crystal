@@ -296,7 +296,12 @@ export interface ConnectionHandlingStep<
       | "nodeForItem"
       | "edgeForItem"
       | "listItem"
-      | "cursorForItem"
+    >,
+    Required<
+      Pick<
+        ConnectionOptimizedStep<TItem, TNodeStep, TEdgeStep, TCursorValue>,
+        "cursorForItem"
+      >
     > {
   paginationSupport: {
     full: true;
