@@ -601,7 +601,7 @@ export const MyForeignExchangePlugin = extendSchema((build) => {
             // highlight-next-line
             const $cents = $product.get("price_in_us_cents");
             // highlight-next-line
-            return loadOne($cents, convertUsdToAud);
+            return loadOne({ lookup: $cents, load: convertUsdToAud });
           },
         },
       },

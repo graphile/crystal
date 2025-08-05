@@ -32,9 +32,13 @@ consider using an alternative step, such as
 marking it as having side effects:
 
 ```ts
-const $random = loadOne(list([$min, $max]), (tuples) =>
-  tuples.map(([min, max]) => min + Math.floor(Math.random() * (max - min + 1))),
-);
+const $random = loadOne({
+  lookup: list([$min, $max]),
+  load: (tuples) =>
+    tuples.map(
+      ([min, max]) => min + Math.floor(Math.random() * (max - min + 1)),
+    ),
+});
 $random.hasSideEffects = true;
 
 return $random;

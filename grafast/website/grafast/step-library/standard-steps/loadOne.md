@@ -25,11 +25,11 @@ business logic, only retrieving the data you need.
 
 ### Input/output equivalence
 
-If you (optionally) pass an `ioEquivalence` parameter to `loadOne` (the second
-parameter) then you can use it to indicate which field(s) on the output is
-equivalent to the input(s). This enables an optimization where a chained fetch
-can instead be performed in parallel if the child only depends on an output
-which is equivalent to an input. Hopefully an example will make this clearer...
+If you (optionally) pass an `ioEquivalence` parameter to `loadOne` then you can
+use it to indicate which field(s) on the output is equivalent to the input(s).
+This enables an optimization where a chained fetch can instead be performed in
+parallel if the child only depends on an output which is equivalent to an input.
+Hopefully an example will make this clearer...
 
 Imagine you're loading a user and their organization:
 
@@ -54,7 +54,7 @@ const objects = {
     plans: {
       currentUser() {
         const $currentUserId = context().get("userId");
-        return loadOne($currentUserId, batchGetUserById);
+        return loadOne({ lookup: $currentUserId, load: batchGetUserById });
       },
     },
   },
@@ -62,7 +62,7 @@ const objects = {
     plans: {
       friends($user) {
         const $userId = $user.get("id");
-        return loadMany($userId, batchGetFriendsByUserId);
+        return loadMany({ lookup: $userId, load: batchGetFriendsByUserId });
       },
     },
   },
@@ -91,8 +91,11 @@ However, we can indicate that the output of the `loadOne` step's `id` property
      plans: {
        currentUser() {
          const $currentUserId = context().get("userId");
--        return loadOne($currentUserId, batchGetUserById);
-+        return loadOne($currentUserId, 'id', batchGetUserById);
+         return loadOne({
+           lookup: $currentUserId,
+           load: batchGetUserById,
++          ioEquivalence: "id",
+         });
        },
      },
    },
@@ -100,7 +103,7 @@ However, we can indicate that the output of the `loadOne` step's `id` property
      plans: {
        friends($user) {
          const $userId = $user.get("id");
-         return loadMany($userId, batchGetFriendsByUserId);
+         return loadMany({ lookup: $userId, load: batchGetFriendsByUserId });
        },
      },
    },
@@ -122,30 +125,38 @@ stateDiagram
 
 ## Usage
 
-```
-loadOne($spec, [$unaryStep,] [ioEquivalence,] callback)
-```
-
-`loadOne` accepts two to four arguments. The first is the step that specifies
-which records to load (the _specifier step_), the last is the callback function called with these
-specs responsible for loading them.
-
 ```ts
-// Basic usage:
-const $record = loadOne($spec, callback);
-
-// Advanced usage:
-const $record = loadOne($spec, $unaryStep, ioEquivalence, callback);
-const $record = loadOne($spec, $unaryStep, callback);
-const $record = loadOne($spec, ioEquivalence, callback);
+function loadOne(options: {
+  lookup: Step | Step[] | Record<string, Step>;
+  load: LoadOneCallback;
+  ioEquivalence?: string | Record<string, string>;
+  unary?: Step | Step[] | Record<string, Step>;
+}): Step;
+type LoadOneCallback = (
+  specs: TLookup[],
+  info: LoadOneInfo,
+) => PromiseOrDirect<TResult[]>;
+interface LoadOneInfo {
+  unary: TUnary;
+  attributes: string[];
+  params: Readonly<string, any>;
+}
 ```
 
-Where:
+`loadOne` accepts an options object accepting 2-4 attributes:
 
-- `$spec` is any step
-- `$unaryStep` is any _unary_ step - see [Unary step usage](#unary-step-usage) below
-- `ioEquivalence` is either `null`, a string, an array of strings, or a string-string object map - see [ioEquivalence usage](#ioequivalence-usage) below
-- and `callback` is a callback function responsible for fetching the data.
+- `lookup` (mostly required) - the step (or multistep) that specifies which
+  records to load - only not required when the load function can load data without
+  requiring identification.
+- `load` (required) - the callback function called with the values from lookup
+  responsible for loading the associated records
+- `$unaryStep` (optional) - any _unary_ step (or multistep), useful for passing
+  things from context or arguments without complicating the lookup; see [Unary
+  step usage](#unary-step-usage) below
+- `ioEquivalence` (optional, advanced) - a string, an array of strings, or a
+  string-string object map used to indicate which attributes on output are
+  equivalent of those on input - see [ioEquivalence usage](#ioequivalence-usage)
+  below
 
 ### Callback
 
@@ -202,8 +213,7 @@ identifier".
 
 ```ts
 const $userId = $post.get("author_id");
-const $user = loadOne($userId, batchGetUserById);
-// OR: const $user = loadOne($userId, 'id', batchGetUserById);
+const $user = loadOne({ lookup: $userId, load: batchGetUserById });
 ```
 
 An example of the callback function might be:
@@ -233,17 +243,23 @@ A unary step is a step that only ever represents one value, e.g. simple derivati
 
 :::
 
-In addition to the forms seen in "Basic usage" above, you can pass a second
-step to `loadOne`. This second step must be a [**unary
-step**](../../step-classes.md#addunarydependency), meaning that it must represent
-exactly one value across the entire request (not a batch of values like most
-steps).
+In addition to the forms seen in "Basic usage" above, you can pass another step
+to `loadOne`'s `unary` option. This step must be a [**unary
+step**](../../step-classes.md#addunarydependency), meaning that it must
+represent exactly one value across the entire request (not a batch of values
+like most steps), and is useful for representing values from the GraphQL context
+or from input values (arguments, variables, etc).
 
 ```ts
 const $userId = $post.get("author_id");
 const $dbClient = context().get("dbClient");
-const $user = loadOne($userId, $dbClient, "id", batchGetUserFromDbById);
-// OR: const $user = loadOne($userId, $dbClient, batchGetUserFromDbById);
+const $user = loadOne({
+  lookup: $userId,
+  load: batchGetUserFromDbById,
+  unary: $dbClient,
+  // optional:
+  ioEquivalence: "id",
+});
 ```
 
 Since we know it will have exactly one value, we can pass it into the
@@ -284,11 +300,11 @@ The `ioEquivalence` optional parameter can accept the following values:
   to the given entry on the input
 
 ```ts title="Example for a list step"
-const $member = loadOne(
-  list([$organizationId, $userId]),
-  ["organization_id", "user_id"],
-  batchGetMemberByOrganizationIdAndUserId,
-);
+const $member = loadOne({
+  lookup: [$organizationId, $userId],
+  load: batchGetMemberByOrganizationIdAndUserId,
+  ioEquivalence: ["organization_id", "user_id"],
+});
 
 // - batchGetMemberByOrganizationIdAndUserId will be called with a list of
 //   2-tuples, the first value in each tuple being the organizationId and the
@@ -299,11 +315,11 @@ const $member = loadOne(
 ```
 
 ```ts title="Example for an object step"
-const $member = loadOne(
-  object({ oid: $organizationId, uid: $userId }),
-  { oid: "organization_id", uid: "user_id" },
-  batchGetMemberByOrganizationIdAndUserId,
-);
+const $member = loadOne({
+  lookup: { oid: $organizationId, uid: $userId },
+  load: batchGetMemberByOrganizationIdAndUserId,
+  ioEquivalence: { oid: "organization_id", uid: "user_id" },
+});
 
 // - batchGetMemberByOrganizationIdAndUserId will be called with a list of
 //   objects; each object will have the key `oid` set to an organization id,
@@ -322,7 +338,10 @@ to pass the value of more than one step into your callback:
 ```ts
 const $isAdmin = $user.get("admin");
 const $stripeId = $customer.get("stripe_id");
-const $last4 = loadOne(list([$isAdmin, $stripeId]), getLast4FromStripeIfAdmin);
+const $last4 = loadOne({
+  lookup: [$isAdmin, $stripeId],
+  load: getLast4FromStripeIfAdmin,
+});
 ```
 
 The first argument to the `getLast4FromStripeIfAdmin` callback will then be an

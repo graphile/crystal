@@ -21,7 +21,7 @@ function plan($source) {
   // highlight-next-line
   const $db = context().get("db");
   return each($ids, ($id) => {
-    return loadOne($id, $db, null, batchGetThingById);
+    return loadOne({ lookup: $id, unary: $db, load: batchGetThingById });
   });
 }
 ```
@@ -40,7 +40,7 @@ function plan($source) {
   return each($ids, ($id) => {
     // highlight-next-line
     const $db = context().get("db");
-    return loadOne($id, $db, null, batchGetThingById);
+    return loadOne({ lookup: $id, unary: $db, load: batchGetThingById });
   });
 }
 ```
