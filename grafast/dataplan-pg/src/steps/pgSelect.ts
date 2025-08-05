@@ -1435,12 +1435,18 @@ export class PgSelectStep<
         this.maybeGetDep(myDepId) === p.maybeGetDep(theirDepId);
       // Check LIMIT, OFFSET and CURSOR matches
       if (
+        !depsMatch(this.beforeStepId, p.beforeStepId) ||
+        !depsMatch(this.afterStepId, p.afterStepId) ||
         !depsMatch(this.firstStepId, p.firstStepId) ||
         !depsMatch(this.lastStepId, p.lastStepId) ||
         !depsMatch(this.offsetStepId, p.offsetStepId) ||
         !depsMatch(this.lowerIndexStepId, p.lowerIndexStepId) ||
         !depsMatch(this.upperIndexStepId, p.upperIndexStepId)
       ) {
+        return false;
+      }
+
+      if (!maybeArraysMatch(this.streamDetailsDepIds, p.streamDetailsDepIds)) {
         return false;
       }
 
@@ -1465,10 +1471,6 @@ export class PgSelectStep<
           this,
           p,
         );
-        return false;
-      }
-
-      if (!maybeArraysMatch(this.streamDetailsDepIds, p.streamDetailsDepIds)) {
         return false;
       }
 
