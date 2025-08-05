@@ -1,5 +1,5 @@
 import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, PgSelectStep, TYPES, assertPgClassSingleStep, domainOfCodec, enumCodec, listOfCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgFromExpression, pgInsertSingle, pgSelectFromRecord, pgSelectFromRecords, pgSelectSingleFromRecord, pgUpdateSingle, rangeOfCodec, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, makeGrafastSchema, object, operationPlan, rootValue, stepAMayDependOnStepB, trap } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, assertExecutableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, makeGrafastSchema, object, operationPlan, rootValue, stepAMayDependOnStepB, trap } from "grafast";
 import { GraphQLError, GraphQLInt, GraphQLString, Kind, valueFromASTUntyped } from "graphql";
 import { sql } from "pg-sql2";
 const executor = new PgExecutor({
@@ -20579,11 +20579,7 @@ export const objects = {
       bTypeFunctionConnection: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs15($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -20604,11 +20600,7 @@ export const objects = {
       cBadlyBehavedFunction: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs11($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -20638,11 +20630,7 @@ export const objects = {
       cCompoundTypeSetQuery: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs9($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -20679,11 +20667,7 @@ export const objects = {
       cFuncOutComplexSetof: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs10($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -20708,11 +20692,7 @@ export const objects = {
       cFuncOutOutSetof: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs5($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -20733,11 +20713,7 @@ export const objects = {
       cFuncOutSetof: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -20758,11 +20734,7 @@ export const objects = {
       cFuncOutTableSetof: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs12($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -20787,11 +20759,7 @@ export const objects = {
       cFuncReturnsTableMultiCol: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs8($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -20808,11 +20776,7 @@ export const objects = {
       cFuncReturnsTableOneCol: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs4($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -20829,11 +20793,7 @@ export const objects = {
       cIntSetQuery: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs7($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -20926,11 +20886,7 @@ export const objects = {
       cSearchTestSummaries: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs6($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -20951,11 +20907,7 @@ export const objects = {
       cTableSetQuery: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs13($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -20972,11 +20924,7 @@ export const objects = {
       cTableSetQueryPlpgsql: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs14($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -21063,11 +21011,7 @@ export const objects = {
       queryIntervalSet: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs2($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -21123,11 +21067,7 @@ export const objects = {
       staticBigInteger: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs3($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -23945,13 +23885,12 @@ export const objects = {
     }
   },
   BListEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -24122,13 +24061,12 @@ export const objects = {
     }
   },
   BTypeEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -24186,7 +24124,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       clientMutationId($object) {
@@ -24213,13 +24151,12 @@ export const objects = {
     }
   },
   BUpdatableViewEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -24303,13 +24240,12 @@ export const objects = {
     }
   },
   CCompoundKeyEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -24356,13 +24292,12 @@ export const objects = {
     }
   },
   CCompoundTypeEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -24397,13 +24332,12 @@ export const objects = {
     }
   },
   CEdgeCaseEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -24433,13 +24367,12 @@ export const objects = {
     }
   },
   CFuncOutComplexSetofEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -24491,13 +24424,12 @@ export const objects = {
     }
   },
   CFuncOutOutSetofEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -24516,13 +24448,12 @@ export const objects = {
     }
   },
   CFuncOutSetofEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -24538,13 +24469,12 @@ export const objects = {
     }
   },
   CFuncReturnsTableMultiColEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -24560,13 +24490,12 @@ export const objects = {
     }
   },
   CFuncReturnsTableOneColEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -24594,13 +24523,12 @@ export const objects = {
     }
   },
   CIntSetQueryEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -24628,13 +24556,12 @@ export const objects = {
     }
   },
   CIssue756Edge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -24662,7 +24589,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       clientMutationId($object) {
@@ -24787,13 +24714,12 @@ export const objects = {
     }
   },
   CLeftArmEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -24821,7 +24747,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       clientMutationId($object) {
@@ -25091,7 +25017,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       query() {
@@ -25210,13 +25136,12 @@ export const objects = {
     }
   },
   CMyTableEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -25268,13 +25193,12 @@ export const objects = {
     }
   },
   CNullTestRecordEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -25472,11 +25396,7 @@ export const objects = {
       friends: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs16($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -25590,11 +25510,7 @@ export const objects = {
       typeFunctionConnection: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs17($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -25669,13 +25585,12 @@ export const objects = {
     }
   },
   CPersonEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -25711,13 +25626,12 @@ export const objects = {
     }
   },
   CPersonSecretEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -25765,7 +25679,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       clientMutationId($mutation) {
@@ -25804,7 +25718,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       clientMutationId($mutation) {
@@ -25858,7 +25772,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       clientMutationId($mutation) {
@@ -25912,7 +25826,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       clientMutationId($mutation) {
@@ -25951,7 +25865,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       clientMutationId($mutation) {
@@ -25994,7 +25908,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       query() {
@@ -26033,7 +25947,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       query() {
@@ -26072,7 +25986,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       query() {
@@ -26111,7 +26025,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       query() {
@@ -26150,7 +26064,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       query() {
@@ -26204,7 +26118,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       query() {
@@ -26258,7 +26172,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       query() {
@@ -26297,7 +26211,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       query() {
@@ -26339,7 +26253,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       }
     }
@@ -26378,7 +26292,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       }
     }
@@ -26417,7 +26331,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       }
     }
@@ -26456,7 +26370,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       }
     }
@@ -26495,7 +26409,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       }
     }
@@ -26564,7 +26478,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       }
     }
@@ -26578,13 +26492,12 @@ export const objects = {
     }
   },
   CSearchTestSummariesEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -26624,7 +26537,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       query() {
@@ -26692,13 +26605,12 @@ export const objects = {
     }
   },
   DefaultValueEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -26729,7 +26641,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       clientMutationId($mutation) {
@@ -26768,7 +26680,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       clientMutationId($mutation) {
@@ -26807,7 +26719,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       clientMutationId($mutation) {
@@ -26846,7 +26758,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       clientMutationId($mutation) {
@@ -26885,7 +26797,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       clientMutationId($mutation) {
@@ -26928,7 +26840,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       query() {
@@ -26967,7 +26879,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       query() {
@@ -27006,7 +26918,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       query() {
@@ -27045,7 +26957,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       query() {
@@ -27084,7 +26996,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       query() {
@@ -27123,7 +27035,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       query() {
@@ -27177,7 +27089,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       query() {
@@ -27216,7 +27128,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       query() {
@@ -27258,7 +27170,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       }
     }
@@ -27297,7 +27209,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       }
     }
@@ -27336,7 +27248,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       }
     }
@@ -27375,7 +27287,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       }
     }
@@ -27414,7 +27326,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       }
     }
@@ -27468,7 +27380,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       }
     }
@@ -27507,13 +27419,12 @@ export const objects = {
     }
   },
   ForeignKeyEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -27541,13 +27452,12 @@ export const objects = {
     }
   },
   InputEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -27631,13 +27541,12 @@ export const objects = {
     }
   },
   NonUpdatableViewEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -27665,30 +27574,12 @@ export const objects = {
     }
   },
   NoPrimaryKeyEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
-      }
-    }
-  },
-  PageInfo: {
-    assertStep: assertPageInfoCapableStep,
-    plans: {
-      endCursor($pageInfo) {
-        return $pageInfo.endCursor();
-      },
-      hasNextPage($pageInfo) {
-        return $pageInfo.hasNextPage();
-      },
-      hasPreviousPage($pageInfo) {
-        return $pageInfo.hasPreviousPage();
-      },
-      startCursor($pageInfo) {
-        return $pageInfo.startCursor();
+        return get2($edge, "node");
       }
     }
   },
@@ -27716,13 +27607,12 @@ export const objects = {
     }
   },
   PatchEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -27793,11 +27683,7 @@ export const objects = {
       computedIntervalSet: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs18($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -27885,13 +27771,12 @@ export const objects = {
     }
   },
   PostComputedIntervalSetEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -27904,13 +27789,12 @@ export const objects = {
     }
   },
   PostEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -27957,7 +27841,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       query() {
@@ -27977,13 +27861,12 @@ export const objects = {
     }
   },
   QueryIntervalSetEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -28011,13 +27894,12 @@ export const objects = {
     }
   },
   ReservedEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -28045,13 +27927,12 @@ export const objects = {
     }
   },
   ReservedInputRecordEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -28079,13 +27960,12 @@ export const objects = {
     }
   },
   ReservedPatchRecordEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -28125,13 +28005,12 @@ export const objects = {
     }
   },
   SimilarTable1Edge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -28159,13 +28038,12 @@ export const objects = {
     }
   },
   SimilarTable2Edge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -28178,13 +28056,12 @@ export const objects = {
     }
   },
   StaticBigIntegerEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -28200,13 +28077,12 @@ export const objects = {
     }
   },
   TestviewEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -28243,13 +28119,12 @@ export const objects = {
     }
   },
   UniqueForeignKeyEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -28280,7 +28155,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       clientMutationId($mutation) {
@@ -28319,7 +28194,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       clientMutationId($mutation) {
@@ -28358,7 +28233,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       clientMutationId($mutation) {
@@ -28397,7 +28272,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       clientMutationId($mutation) {
@@ -28436,7 +28311,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       clientMutationId($mutation) {
@@ -28479,7 +28354,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       query() {
@@ -28518,7 +28393,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       query() {
@@ -28557,7 +28432,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       query() {
@@ -28596,7 +28471,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       query() {
@@ -28635,7 +28510,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       query() {
@@ -28674,7 +28549,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       query() {
@@ -28728,7 +28603,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       query() {
@@ -28767,7 +28642,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       },
       query() {
@@ -28809,7 +28684,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       }
     }
@@ -28848,7 +28723,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       }
     }
@@ -28887,7 +28762,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       }
     }
@@ -28926,7 +28801,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       }
     }
@@ -28965,7 +28840,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       }
     }
@@ -29019,7 +28894,7 @@ export const objects = {
         // NOTE: you must not use `$single = $select.single()`
         // here because doing so will mark the row as unique, and
         // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
+        const $single = first($connection);
         return new EdgeStep($connection, $single);
       }
     }
@@ -29048,13 +28923,12 @@ export const objects = {
     }
   },
   ViewTableEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   }
