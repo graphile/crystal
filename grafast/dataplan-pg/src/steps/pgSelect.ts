@@ -333,6 +333,7 @@ interface QueryBuildResult {
 
   first: Maybe<number>;
   last: Maybe<number>;
+  offset: Maybe<number>;
   cursorDetails: PgCursorDetails | undefined;
   groupDetails: PgGroupDetails | undefined;
 }
@@ -1073,6 +1074,7 @@ export class PgSelectStep<
       shouldReverseOrder,
       first,
       last,
+      offset,
       cursorDetails,
       groupDetails,
     } = buildTheQuery({
@@ -1137,6 +1139,7 @@ export class PgSelectStep<
         return createSelectResult(allVals, {
           first,
           last,
+          offset,
           fetchOneExtra: this.fetchOneExtra,
           shouldReverseOrder,
           meta,
@@ -3067,6 +3070,7 @@ function buildTheQuery<
 
     first,
     last,
+    offset,
     shouldReverseOrder,
     cursorDigest,
     cursorIndicies,
@@ -3329,6 +3333,7 @@ ${lateralText};`;
         queryValues,
         first,
         last,
+        offset,
         cursorDetails,
         groupDetails,
       };
@@ -3364,6 +3369,7 @@ ${lateralText};`;
         queryValues,
         first,
         last,
+        offset,
         cursorDetails,
         groupDetails,
       };
@@ -3384,6 +3390,7 @@ ${lateralText};`;
       queryValues,
       first,
       last,
+      offset,
       cursorDetails,
       groupDetails,
     };
@@ -3520,7 +3527,14 @@ class PgSelectInlineApplyStep<
           groupIndicies != null ? { indicies: groupIndicies } : undefined;
 
         if (this.viaSubquery) {
-          const { first, last, fetchOneExtra, meta, shouldReverseOrder } = info;
+          const {
+            first,
+            last,
+            offset,
+            fetchOneExtra,
+            meta,
+            shouldReverseOrder,
+          } = info;
           const { sql: baseQuery } = buildQueryFromParts(parts, {
             asArray: true,
           });
@@ -3537,6 +3551,7 @@ class PgSelectInlineApplyStep<
             selectIndex,
             first,
             last,
+            offset,
             meta,
           };
           queryBuilder.setMeta(this.identifier, details);
@@ -3592,6 +3607,7 @@ interface PgSelectInlineViaSubqueryDetails {
   fetchOneExtra: boolean;
   first: Maybe<number>;
   last: Maybe<number>;
+  offset: Maybe<number>;
   shouldReverseOrder: boolean;
 }
 
@@ -4016,9 +4032,11 @@ function createSelectResult(
     meta,
     cursorDetails,
     groupDetails,
+    offset,
   }: {
     first: Maybe<number> | null;
     last: Maybe<number> | null;
+    offset: Maybe<number> | null;
     fetchOneExtra: boolean;
     shouldReverseOrder: boolean;
     meta: Record<string, any>;
@@ -4045,8 +4063,8 @@ function createSelectResult(
   const orderedRows = shouldReverseOrder
     ? reverseArray(slicedRows)
     : slicedRows;
-  const hasNextPage = first != null ? hasMore : false;
-  const hasPreviousPage = last != null ? hasMore : false;
+  const hasNextPage = hasNextPageCb(first, last, hasMore);
+  const hasPreviousPage = hasPreviousPageCb(first, last, offset, hasMore);
   return {
     hasNextPage,
     hasPreviousPage,
@@ -4090,4 +4108,30 @@ function pgInlineViaSubqueryTransform([details, item]: readonly [
 ]) {
   const allVals = parseArray(item[details.selectIndex]);
   return createSelectResult(allVals, details);
+}
+
+function hasNextPageCb(
+  first: Maybe<number>,
+  last: Maybe<number>,
+  hasMore: boolean,
+) {
+  return first != null && last == null && first !== 0 ? hasMore : false;
+}
+
+function hasPreviousPageCb(
+  first: Maybe<number>,
+  last: Maybe<number>,
+  offset: Maybe<number>,
+  hasMore: boolean,
+) {
+  if (first === 0 || last === 0) {
+    return false;
+  }
+  if (last != null && first == null) {
+    return hasMore;
+  } else if (offset != null && offset !== 0) {
+    return true;
+  } else {
+    return false;
+  }
 }
