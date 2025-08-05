@@ -11,7 +11,7 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 15, 17, 32<br /><br />1: PgInsertSingle[11]<br />2: <br />ᐳ: Object[16]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 11, 17, 14, 32<br /><br />ROOT Object{1}ᐸ{result}ᐳ[16]"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 11, 17, 14, 32<br /><br />ROOT PgInsertSingle{1}ᐸleft_arm()ᐳ[11]<br />1: <br />ᐳ: 19, 18, 20, 21, 22, 30, 31<br />2: PgSelect[23]<br />3: PgSelectRows[28]<br />ᐳ: First[27], PgSelectSingle[29]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 11, 17, 14, 32<br /><br />ROOT PgInsertSingle{1}ᐸleft_arm()ᐳ[11]<br />1: <br />ᐳ: 19, 18, 20, 21, 22, 30, 31<br />2: PgSelect[23]<br />ᐳ: Access[27]<br />3: First[28]<br />ᐳ: PgSelectSingle[29]"):::bucket
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 29, 32<br /><br />ROOT PgSelectSingle{3}ᐸpersonᐳ[29]"):::bucket
     end
     Bucket0 --> Bucket1
@@ -48,12 +48,12 @@ graph TD
     Lambda21{{"Lambda[21∈3] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List20 --> Lambda21
     Access19 --> PgClassExpression22
-    First27{{"First[27∈3] ➊"}}:::plan
-    PgSelectRows28[["PgSelectRows[28∈3] ➊"]]:::plan
-    PgSelectRows28 --> First27
-    PgSelect23 --> PgSelectRows28
+    Access27{{"Access[27∈3] ➊<br />ᐸ23.itemsᐳ"}}:::plan
+    PgSelect23 --> Access27
+    First28[["First[28∈3] ➊"]]:::plan
+    Access27 --> First28
     PgSelectSingle29{{"PgSelectSingle[29∈3] ➊<br />ᐸpersonᐳ"}}:::plan
-    First27 --> PgSelectSingle29
+    First28 --> PgSelectSingle29
     PgClassExpression30{{"PgClassExpression[30∈3] ➊<br />ᐸ__left_arm...in_metres”ᐳ"}}:::plan
     Access19 --> PgClassExpression30
     PgClassExpression31{{"PgClassExpression[31∈3] ➊<br />ᐸ__left_arm__.”mood”ᐳ"}}:::plan
@@ -73,7 +73,9 @@ graph TD
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression18,Access19,List20,Lambda21,PgClassExpression22,PgSelect23,First27,PgSelectRows28,PgSelectSingle29,PgClassExpression30,PgClassExpression31 bucket3
+    class Bucket3,PgClassExpression18,Access19,List20,Lambda21,PgClassExpression22,PgSelect23,Access27,First28,PgSelectSingle29,PgClassExpression30,PgClassExpression31 bucket3
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression33,List34,Lambda35 bucket4
+
+    %% implicit side effects
 

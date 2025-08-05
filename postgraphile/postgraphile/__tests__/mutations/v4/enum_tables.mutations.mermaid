@@ -11,7 +11,7 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 51, 13<br /><br />1: PgDeleteSingle[9]<br />2: <br />ᐳ: Object[14]"):::bucket
     Bucket2("Bucket 2 (mutationField)<br />Deps: 22, 2<br /><br />1: Access[19]<br />2: Access[20]<br />3: Object[21]<br />4: PgInsertSingle[18]<br />5: <br />ᐳ: Object[23]"):::bucket
-    Bucket3("Bucket 3 (mutationField)<br />Deps: 41, 2, 30<br /><br />1: Access[32]<br />2: Access[33]<br />3: Object[34]<br />4: PgFromExpression[35]<br />5: PgSelect[31]<br />6: PgSelectRows[37]<br />ᐳ: 36, 38, 39, 40"):::bucket
+    Bucket3("Bucket 3 (mutationField)<br />Deps: 41, 2, 30<br /><br />1: Access[32]<br />2: Access[33]<br />3: Object[34]<br />4: PgFromExpression[35]<br />5: PgSelect[31]<br />6: <br />ᐳ: Access[36]<br />7: First[37]<br />ᐳ: 38, 39, 40"):::bucket
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 14, 9<br /><br />ROOT Object{1}ᐸ{result}ᐳ[14]"):::bucket
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 23, 18<br /><br />ROOT Object{2}ᐸ{result}ᐳ[23]"):::bucket
     Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 40, 39<br /><br />ROOT Object{3}ᐸ{result}ᐳ[40]"):::bucket
@@ -66,12 +66,12 @@ graph TD
     Access33{{"Access[33∈3] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access32 & Access33 --> Object34
     BakedInput30 --> PgFromExpression35
-    First36{{"First[36∈3] ➊"}}:::plan
-    PgSelectRows37[["PgSelectRows[37∈3] ➊"]]:::plan
-    PgSelectRows37 --> First36
-    PgSelect31 --> PgSelectRows37
+    Access36{{"Access[36∈3] ➊<br />ᐸ31.itemsᐳ"}}:::plan
+    PgSelect31 --> Access36
+    First37[["First[37∈3] ➊"]]:::plan
+    Access36 --> First37
     PgSelectSingle38{{"PgSelectSingle[38∈3] ➊<br />ᐸreferencing_table_mutationᐳ"}}:::plan
-    First36 --> PgSelectSingle38
+    First37 --> PgSelectSingle38
     PgClassExpression39{{"PgClassExpression[39∈3] ➊<br />ᐸ__referenc...tation__.vᐳ"}}:::plan
     PgSelectSingle38 --> PgClassExpression39
     Object40{{"Object[40∈3] ➊<br />ᐸ{result}ᐳ"}}:::plan
@@ -103,7 +103,7 @@ graph TD
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgInsertSingle18,Access19,Access20,Object21,Object23 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgSelect31,Access32,Access33,Object34,PgFromExpression35,First36,PgSelectRows37,PgSelectSingle38,PgClassExpression39,Object40 bucket3
+    class Bucket3,PgSelect31,Access32,Access33,Object34,PgFromExpression35,Access36,First37,PgSelectSingle38,PgClassExpression39,Object40 bucket3
     classDef bucket4 stroke:#0000ff
     class Bucket4 bucket4
     classDef bucket5 stroke:#7fff00
@@ -114,4 +114,6 @@ graph TD
     class Bucket7,PgClassExpression42,Access43,PgClassExpression46,PgClassExpression48 bucket7
     classDef bucket8 stroke:#dda0dd
     class Bucket8,PgClassExpression44,Access45,PgClassExpression47,PgClassExpression49,PgClassExpression50 bucket8
+
+    %% implicit side effects
 
