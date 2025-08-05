@@ -6,13 +6,7 @@ select
       (count(*))::text
     ]::text[]
     from "c"."person_friends"(__person__) as __person_friends__
-  )::text as "2",
-  array(
-    select array[
-      (count(*))::text
-    ]::text[]
-    from "c"."person_friends"(__person__) as __person_friends__
-  )::text as "3"
+  )::text as "2"
 from "c"."person" as __person__
 where (
   __person__."email" = $1::"b"."email"
