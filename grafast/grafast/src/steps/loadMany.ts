@@ -122,6 +122,11 @@ export class LoadManyStep<
 
     const { lookup, load, unary, ioEquivalence, paginationSupport } = options;
     this.load = load;
+    if (typeof this.load !== "function") {
+      throw new Error(
+        `Invalid options passed to LoadManyStep - there must be a 'load' function!`,
+      );
+    }
     this.ioEquivalence = ioEquivalence ?? null;
 
     const $lookup = multistep(lookup, "load");
@@ -323,5 +328,10 @@ export function loadMany<
   TParams,
   UnwrapMultistep<TLoadContext>
 > {
+  if (arguments.length > 1) {
+    throw new Error(
+      "The signature of loadMany has changed, it now accepts an object: `loadMany({ lookup, load, unary?, ioEquivalence? })`",
+    );
+  }
   return new LoadManyStep(options);
 }

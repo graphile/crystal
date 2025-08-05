@@ -98,6 +98,11 @@ export class LoadOneStep<
 
     const { lookup: value, load, unary: unary, ioEquivalence } = options;
     this.load = load;
+    if (typeof this.load !== "function") {
+      throw new Error(
+        `Invalid options passed to LoadOneStep - there must be a 'load' function!`,
+      );
+    }
     this.ioEquivalence = ioEquivalence ?? null;
 
     const $spec = multistep(value, "load");
@@ -266,5 +271,10 @@ export function loadOne<
 >(
   options: LoadOneArguments<TLookup, TItem, TData, TParams, TLoadContext>,
 ): LoadOneStep<TLookup, TItem, TData, TParams, TLoadContext> {
+  if (arguments.length > 1) {
+    throw new Error(
+      "The signature of loadOne has changed, it now accepts an object: `loadOne({ lookup, load, unary?, ioEquivalence? })`",
+    );
+  }
   return new LoadOneStep(options);
 }
