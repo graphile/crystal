@@ -28,6 +28,22 @@ export function connection<
 ): ConnectionStep<TItem, TNodeStep, TEdgeDataStep, TEdgeStep, TCursorValue, TCollectionStep> {
 ```
 
+:::warning Wrapping a step in connection may mutate the step!
+
+If your `$step` has `paginationSupport` and `applyPagination` defined (TODO:
+document these!) then creating a connection via `connection($step)` will
+result in `$step.applyPagination(...)` being called by the
+connection. If your `$step` is also used in another position in the schema then
+these changes (e.g. pagination limits) will apply there also.
+
+This is generally not a concern, but serves as a warning to ensure you're
+creating fresh steps to use with connections (rather than using, for example, a
+cached step).
+
+Steps which do not have `paginationSupport` are unaffected.
+
+:::
+
 ## Improving performance
 
 Out of the box, `connection()` tries to handle connection concerns for you, but
