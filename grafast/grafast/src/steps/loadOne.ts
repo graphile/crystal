@@ -62,6 +62,22 @@ export function loadOneCallback<
   return load;
 }
 
+/**
+ * A TypeScript Identity Function to help you strongly type your
+ * LoadOneLoader.
+ */
+export function loadOneLoader<
+  const TLookup extends Multistep,
+  TItem,
+  TData extends Maybe<TItem> = Maybe<TItem>,
+  TParams extends Record<string, any> = Record<string, any>,
+  const TShared extends Multistep = never,
+>(
+  load: LoadOneLoader<TLookup, TItem, TData, TParams, TShared>,
+): LoadOneLoader<TLookup, TItem, TData, TParams, TShared> {
+  return load;
+}
+
 const idByLoad = new WeakMap<LoadOneCallback<any, any, any, any>, string>();
 let loadCounter = 0;
 

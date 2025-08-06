@@ -72,6 +72,24 @@ export function loadManyCallback<
   return load;
 }
 
+/**
+ * A TypeScript Identity Function to help you strongly type your
+ * LoadManyLoader.
+ */
+export function loadManyLoader<
+  const TLookup extends Multistep,
+  TItem,
+  TData extends Maybe<ReadonlyArray<Maybe<TItem>>> = Maybe<
+    ReadonlyArray<Maybe<TItem>>
+  >,
+  TParams extends Record<string, any> = Record<string, any>,
+  const TShared extends Multistep = never,
+>(
+  load: LoadManyLoader<TLookup, TItem, TData, TParams, TShared>,
+): LoadManyLoader<TLookup, TItem, TData, TParams, TShared> {
+  return load;
+}
+
 const idByLoad = new WeakMap<LoadManyCallback<any, any, any, any>, string>();
 let loadCounter = 0;
 
