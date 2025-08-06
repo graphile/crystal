@@ -1387,12 +1387,12 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
     // https://relay.dev/graphql/connections.htm#note-95f8a
     if (first != null && before != null) {
       throw new Error(
-        "You should specify `first` and optionally `after` to paginate forwards, or `last` and optionally `before` to paginate backwards; you must not set `first` and `before`",
+        "You must not set both `first` and `before`; specify `first` and optionally `after` to paginate forwards, or `last` and optionally `before` to paginate backwards.",
       );
     }
     if (last != null && after != null) {
       throw new Error(
-        "You should specify `first` and optionally `after` to paginate forwards, or `last` and optionally `before` to paginate backwards; you must not set `last` and `after`",
+        "You must not set `last` and `after`; specify `first` and optionally `after` to paginate forwards, or `last` and optionally `before` to paginate backwards; ",
       );
     }
     if (first != null && last != null) {
