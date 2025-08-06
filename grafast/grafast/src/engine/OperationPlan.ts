@@ -3002,7 +3002,7 @@ export class OperationPlan {
         // subscription
         stepStreamOptions = {};
       } else if (streamDetails === false) {
-        // List
+        // Simple list, no action necessary
         stepStreamOptions = null;
       } else if (streamDetails != null) {
         // List with @stream
