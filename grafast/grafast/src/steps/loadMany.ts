@@ -368,13 +368,9 @@ export function loadMany<
   const TShared extends Multistep = never,
 >(
   lookup: TLookup,
-  loader: LoadManyLoader<
-    UnwrapMultistep<TLookup>,
-    TItem,
-    TData,
-    TParams,
-    TShared
-  >,
+  loader:
+    | LoadManyCallback<UnwrapMultistep<TLookup>, TItem, TData, TParams, TShared>
+    | LoadManyLoader<UnwrapMultistep<TLookup>, TItem, TData, TParams, TShared>,
 ): LoadManyStep<
   UnwrapMultistep<TLookup>,
   TItem,
