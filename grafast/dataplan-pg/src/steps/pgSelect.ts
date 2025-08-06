@@ -1988,7 +1988,7 @@ export class PgSelectStep<
     options?: PgSelectSinglePlanOptions,
   ): PgSelectSingleStep<TResource> {
     this.setUnique(true);
-    return new PgSelectSingleStep(this, first(access(this, "items")), options);
+    return new PgSelectSingleStep(this, first(this), options);
   }
 
   /**
