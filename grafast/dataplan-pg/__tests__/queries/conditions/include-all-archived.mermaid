@@ -12,7 +12,7 @@ graph TD
     Bucket1("Bucket 1 (listItem)<br />Deps: 47<br /><br />ROOT __Item{1}ᐸ15ᐳ[16]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 47, 16<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[17]<br />1: <br />ᐳ: 18, 48, 49<br />2: PgSelectRows[28]"):::bucket
     Bucket3("Bucket 3 (listItem)<br />Deps: 49<br /><br />ROOT __Item{3}ᐸ28ᐳ[29]"):::bucket
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 30, 43<br /><br />ROOT PgSelectSingle{3}ᐸmessagesᐳ[30]<br />1: <br />ᐳ: 31, 44, 45, 37<br />2: First[38]<br />ᐳ: PgSelectSingle[39]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 30, 43<br /><br />ROOT PgSelectSingle{3}ᐸmessagesᐳ[30]<br />1: <br />ᐳ: 31, 44, 45<br />2: PgSelectRows[38]<br />3: First[37]<br />ᐳ: PgSelectSingle[39]"):::bucket
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 39<br /><br />ROOT PgSelectSingle{4}ᐸusersᐳ[39]"):::bucket
     end
     Bucket0 --> Bucket1
@@ -62,13 +62,13 @@ graph TD
     Access43 & PgSelectSingle30 --> List44
     PgClassExpression31{{"PgClassExpression[31∈4]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
     PgSelectSingle30 --> PgClassExpression31
-    Access37{{"Access[37∈4]<br />ᐸ45.itemsᐳ"}}:::plan
+    First37[["First[37∈4]"]]:::plan
+    PgSelectRows38[["PgSelectRows[38∈4]"]]:::plan
+    PgSelectRows38 --> First37
     Lambda45{{"Lambda[45∈4]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda45 --> Access37
-    First38[["First[38∈4]"]]:::plan
-    Access37 --> First38
+    Lambda45 --> PgSelectRows38
     PgSelectSingle39{{"PgSelectSingle[39∈4]<br />ᐸusersᐳ"}}:::plan
-    First38 --> PgSelectSingle39
+    First37 --> PgSelectSingle39
     List44 --> Lambda45
     PgClassExpression40{{"PgClassExpression[40∈5]<br />ᐸ__users__.”username”ᐳ"}}:::plan
     PgSelectSingle39 --> PgClassExpression40
@@ -85,7 +85,7 @@ graph TD
     classDef bucket3 stroke:#ffa500
     class Bucket3,__Item29,PgSelectSingle30,Access43 bucket3
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgClassExpression31,Access37,First38,PgSelectSingle39,List44,Lambda45 bucket4
+    class Bucket4,PgClassExpression31,First37,PgSelectRows38,PgSelectSingle39,List44,Lambda45 bucket4
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgClassExpression40,PgClassExpression41 bucket5
 

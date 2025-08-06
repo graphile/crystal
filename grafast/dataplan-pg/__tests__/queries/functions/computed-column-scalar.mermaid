@@ -8,8 +8,8 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/functions/computed-column-scalar"
-    Bucket0("Bucket 0 (root)<br /><br />1: 44, 49, 54<br />ᐳ: 8, 9, 14, 58, 59, 60, 10, 43, 48, 53<br />2: PgSelect[7]<br />ᐳ: 11, 45, 50, 55<br />3: First[12]<br />ᐳ: PgSelectSingle[13]"):::bucket
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 45, 13, 50, 55<br /><br />ROOT PgSelectSingleᐸforumsᐳ[13]<br />1: <br />ᐳ: 46, 51, 56, 47, 52, 57, 21, 30, 39<br />2: First[22], First[31], First[40]<br />ᐳ: 23, 24, 32, 33, 41, 42"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: 44, 49, 54<br />ᐳ: 8, 9, 14, 58, 59, 60, 10, 43, 48, 53<br />2: PgSelect[7]<br />ᐳ: Access[45], Access[50], Access[55]<br />3: PgSelectRows[12]<br />4: First[11]<br />ᐳ: PgSelectSingle[13]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 45, 13, 50, 55<br /><br />ROOT PgSelectSingleᐸforumsᐳ[13]<br />1: <br />ᐳ: 46, 51, 56, 47, 52, 57<br />2: 22, 31, 40<br />3: First[21], First[30], First[39]<br />ᐳ: 23, 24, 32, 33, 41, 42"):::bucket
     end
     Bucket0 --> Bucket1
 
@@ -29,12 +29,12 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
-    Access11{{"Access[11∈0] ➊<br />ᐸ7.itemsᐳ"}}:::plan
-    PgSelect7 --> Access11
-    First12[["First[12∈0] ➊"]]:::plan
-    Access11 --> First12
+    First11[["First[11∈0] ➊"]]:::plan
+    PgSelectRows12[["PgSelectRows[12∈0] ➊"]]:::plan
+    PgSelectRows12 --> First11
+    PgSelect7 --> PgSelectRows12
     PgSelectSingle13{{"PgSelectSingle[13∈0] ➊<br />ᐸforumsᐳ"}}:::plan
-    First12 --> PgSelectSingle13
+    First11 --> PgSelectSingle13
     Access45{{"Access[45∈0] ➊<br />ᐸ7.m.joinDetailsFor16ᐳ"}}:::plan
     PgSelect7 --> Access45
     Access50{{"Access[50∈0] ➊<br />ᐸ7.m.joinDetailsFor27ᐳ"}}:::plan
@@ -47,31 +47,31 @@ graph TD
     Access50 & PgSelectSingle13 --> List51
     List56{{"List[56∈1] ➊<br />ᐸ55,13ᐳ"}}:::plan
     Access55 & PgSelectSingle13 --> List56
-    Access21{{"Access[21∈1] ➊<br />ᐸ47.itemsᐳ"}}:::plan
+    First21[["First[21∈1] ➊"]]:::plan
+    PgSelectRows22[["PgSelectRows[22∈1] ➊"]]:::plan
+    PgSelectRows22 --> First21
     Lambda47{{"Lambda[47∈1] ➊<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda47 --> Access21
-    First22[["First[22∈1] ➊"]]:::plan
-    Access21 --> First22
+    Lambda47 --> PgSelectRows22
     PgSelectSingle23{{"PgSelectSingle[23∈1] ➊<br />ᐸforums_unique_author_countᐳ"}}:::plan
-    First22 --> PgSelectSingle23
+    First21 --> PgSelectSingle23
     PgClassExpression24{{"PgClassExpression[24∈1] ➊<br />ᐸ__forums_u..._count__.vᐳ"}}:::plan
     PgSelectSingle23 --> PgClassExpression24
-    Access30{{"Access[30∈1] ➊<br />ᐸ52.itemsᐳ"}}:::plan
+    First30[["First[30∈1] ➊"]]:::plan
+    PgSelectRows31[["PgSelectRows[31∈1] ➊"]]:::plan
+    PgSelectRows31 --> First30
     Lambda52{{"Lambda[52∈1] ➊<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda52 --> Access30
-    First31[["First[31∈1] ➊"]]:::plan
-    Access30 --> First31
+    Lambda52 --> PgSelectRows31
     PgSelectSingle32{{"PgSelectSingle[32∈1] ➊<br />ᐸforums_unique_author_countᐳ"}}:::plan
-    First31 --> PgSelectSingle32
+    First30 --> PgSelectSingle32
     PgClassExpression33{{"PgClassExpression[33∈1] ➊<br />ᐸ__forums_u..._count__.vᐳ"}}:::plan
     PgSelectSingle32 --> PgClassExpression33
-    Access39{{"Access[39∈1] ➊<br />ᐸ57.itemsᐳ"}}:::plan
+    First39[["First[39∈1] ➊"]]:::plan
+    PgSelectRows40[["PgSelectRows[40∈1] ➊"]]:::plan
+    PgSelectRows40 --> First39
     Lambda57{{"Lambda[57∈1] ➊<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda57 --> Access39
-    First40[["First[40∈1] ➊"]]:::plan
-    Access39 --> First40
+    Lambda57 --> PgSelectRows40
     PgSelectSingle41{{"PgSelectSingle[41∈1] ➊<br />ᐸforums_unique_author_countᐳ"}}:::plan
-    First40 --> PgSelectSingle41
+    First39 --> PgSelectSingle41
     PgClassExpression42{{"PgClassExpression[42∈1] ➊<br />ᐸ__forums_u..._count__.vᐳ"}}:::plan
     PgSelectSingle41 --> PgClassExpression42
     List46 --> Lambda47
@@ -80,7 +80,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,PgSelect7,Access8,Access9,Object10,Access11,First12,PgSelectSingle13,PgFromExpression43,PgSelectInlineApply44,Access45,PgFromExpression48,PgSelectInlineApply49,Access50,PgFromExpression53,PgSelectInlineApply54,Access55 bucket0
+    class Bucket0,__Value2,PgSelect7,Access8,Access9,Object10,First11,PgSelectRows12,PgSelectSingle13,PgFromExpression43,PgSelectInlineApply44,Access45,PgFromExpression48,PgSelectInlineApply49,Access50,PgFromExpression53,PgSelectInlineApply54,Access55 bucket0
     classDef bucket1 stroke:#00bfff
-    class Bucket1,Access21,First22,PgSelectSingle23,PgClassExpression24,Access30,First31,PgSelectSingle32,PgClassExpression33,Access39,First40,PgSelectSingle41,PgClassExpression42,List46,Lambda47,List51,Lambda52,List56,Lambda57 bucket1
+    class Bucket1,First21,PgSelectRows22,PgSelectSingle23,PgClassExpression24,First30,PgSelectRows31,PgSelectSingle32,PgClassExpression33,First39,PgSelectRows40,PgSelectSingle41,PgClassExpression42,List46,Lambda47,List51,Lambda52,List56,Lambda57 bucket1
 

@@ -16,10 +16,10 @@ graph TD
     Bucket7("Bucket 7 (listItem)<br />Deps: 38, 11<br /><br />ROOT __Item{7}ᐸ29ᐳ[34]"):::bucket
     Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 35, 11<br /><br />ROOT PgSelectSingle{7}ᐸmessagesᐳ[35]"):::bucket
     Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 36, 35, 11, 39<br /><br />ROOT Edge{7}[36]"):::bucket
-    Bucket10("Bucket 10 (defer)<br />Deps: 35, 11<br /><br />1: <br />ᐳ: PgClassExpression[41]<br />2: PgSelect[42]<br />ᐳ: Access[46]<br />3: First[47]<br />ᐳ: PgSelectSingle[48]"):::bucket
+    Bucket10("Bucket 10 (defer)<br />Deps: 35, 11<br /><br />1: <br />ᐳ: PgClassExpression[41]<br />2: PgSelect[42]<br />3: PgSelectRows[47]<br />4: First[46]<br />ᐳ: PgSelectSingle[48]"):::bucket
     Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 35, 11<br /><br />ROOT PgSelectSingle{7}ᐸmessagesᐳ[35]"):::bucket
     Bucket12("Bucket 12 (nullableBoundary)<br />Deps: 48<br /><br />ROOT PgSelectSingle{10}ᐸusersᐳ[48]"):::bucket
-    Bucket13("Bucket 13 (defer)<br />Deps: 35, 11<br /><br />1: <br />ᐳ: PgClassExpression[51]<br />2: PgSelect[52]<br />ᐳ: Access[56]<br />3: First[57]<br />ᐳ: PgSelectSingle[58]"):::bucket
+    Bucket13("Bucket 13 (defer)<br />Deps: 35, 11<br /><br />1: <br />ᐳ: PgClassExpression[51]<br />2: PgSelect[52]<br />3: PgSelectRows[57]<br />4: First[56]<br />ᐳ: PgSelectSingle[58]"):::bucket
     Bucket14("Bucket 14 (nullableBoundary)<br />Deps: 58<br /><br />ROOT PgSelectSingle{13}ᐸusersᐳ[58]"):::bucket
     end
     Bucket0 --> Bucket1
@@ -80,12 +80,12 @@ graph TD
     PgClassExpression41{{"PgClassExpression[41∈10]<br />ᐸ__messages...author_id”ᐳ"}}:::plan
     PgClassExpression41 --> PgSelect42
     PgSelectSingle35 --> PgClassExpression41
-    Access46{{"Access[46∈10]<br />ᐸ42.itemsᐳ"}}:::plan
-    PgSelect42 --> Access46
-    First47[["First[47∈10]"]]:::plan
-    Access46 --> First47
+    First46[["First[46∈10]"]]:::plan
+    PgSelectRows47[["PgSelectRows[47∈10]"]]:::plan
+    PgSelectRows47 --> First46
+    PgSelect42 --> PgSelectRows47
     PgSelectSingle48{{"PgSelectSingle[48∈10]<br />ᐸusersᐳ"}}:::plan
-    First47 --> PgSelectSingle48
+    First46 --> PgSelectSingle48
     PgClassExpression49{{"PgClassExpression[49∈11]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
     PgSelectSingle35 --> PgClassExpression49
     PgClassExpression50{{"PgClassExpression[50∈12]<br />ᐸ__users__.”username”ᐳ"}}:::plan
@@ -96,12 +96,12 @@ graph TD
     PgClassExpression51{{"PgClassExpression[51∈13]<br />ᐸ__messages...author_id”ᐳ"}}:::plan
     PgClassExpression51 --> PgSelect52
     PgSelectSingle35 --> PgClassExpression51
-    Access56{{"Access[56∈13]<br />ᐸ52.itemsᐳ"}}:::plan
-    PgSelect52 --> Access56
-    First57[["First[57∈13]"]]:::plan
-    Access56 --> First57
+    First56[["First[56∈13]"]]:::plan
+    PgSelectRows57[["PgSelectRows[57∈13]"]]:::plan
+    PgSelectRows57 --> First56
+    PgSelect52 --> PgSelectRows57
     PgSelectSingle58{{"PgSelectSingle[58∈13]<br />ᐸusersᐳ"}}:::plan
-    First57 --> PgSelectSingle58
+    First56 --> PgSelectSingle58
     PgClassExpression60{{"PgClassExpression[60∈14]<br />ᐸ__users__.”username”ᐳ"}}:::plan
     PgSelectSingle58 --> PgClassExpression60
     PgClassExpression61{{"PgClassExpression[61∈14]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
@@ -125,13 +125,13 @@ graph TD
     classDef bucket9 stroke:#ff0000
     class Bucket9 bucket9
     classDef bucket10 stroke:#ffff00
-    class Bucket10,PgClassExpression41,PgSelect42,Access46,First47,PgSelectSingle48 bucket10
+    class Bucket10,PgClassExpression41,PgSelect42,First46,PgSelectRows47,PgSelectSingle48 bucket10
     classDef bucket11 stroke:#00ffff
     class Bucket11,PgClassExpression49 bucket11
     classDef bucket12 stroke:#4169e1
     class Bucket12,PgClassExpression50,PgClassExpression59 bucket12
     classDef bucket13 stroke:#3cb371
-    class Bucket13,PgClassExpression51,PgSelect52,Access56,First57,PgSelectSingle58 bucket13
+    class Bucket13,PgClassExpression51,PgSelect52,First56,PgSelectRows57,PgSelectSingle58 bucket13
     classDef bucket14 stroke:#a52a2a
     class Bucket14,PgClassExpression60,PgClassExpression61 bucket14
 

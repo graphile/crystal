@@ -32,10 +32,10 @@ graph TD
     Bucket21("Bucket 21 (nullableBoundary)<br />Deps: 72, 153, 270, 77, 4<br /><br />ROOT Object{7}ᐸ{result}ᐳ[77]"):::bucket
     Bucket22("Bucket 22 (nullableBoundary)<br />Deps: 80, 153, 270, 85, 4<br /><br />ROOT Object{8}ᐸ{result}ᐳ[85]"):::bucket
     Bucket23("Bucket 23 (nullableBoundary)<br />Deps: 87, 153, 270, 92, 4<br /><br />ROOT Object{9}ᐸ{result}ᐳ[92]"):::bucket
-    Bucket24("Bucket 24 (nullableBoundary)<br />Deps: 100, 191, 270, 103, 105, 4, 202<br /><br />ROOT Object{10}ᐸ{result}ᐳ[105]<br />1: <br />ᐳ: 193, 286, 192, 194, 195, 196<br />2: PgSelect[322], PgSelect[339]<br />ᐳ: Access[326], Access[341]<br />3: First[327], First[342]<br />ᐳ: 328, 343"):::bucket
-    Bucket25("Bucket 25 (nullableBoundary)<br />Deps: 109, 191, 270, 112, 114, 4, 202<br /><br />ROOT Object{11}ᐸ{result}ᐳ[114]<br />1: <br />ᐳ: 198, 287, 197, 199, 200, 201<br />2: PgSelect[330], PgSelect[345]<br />ᐳ: Access[334], Access[347]<br />3: First[335], First[348]<br />ᐳ: 336, 349"):::bucket
+    Bucket24("Bucket 24 (nullableBoundary)<br />Deps: 100, 191, 270, 103, 105, 4, 202<br /><br />ROOT Object{10}ᐸ{result}ᐳ[105]<br />1: <br />ᐳ: 193, 286, 192, 194, 195, 196<br />2: PgSelect[322], PgSelect[339]<br />3: PgSelectRows[327], PgSelectRows[342]<br />4: First[326], First[341]<br />ᐳ: 328, 343"):::bucket
+    Bucket25("Bucket 25 (nullableBoundary)<br />Deps: 109, 191, 270, 112, 114, 4, 202<br /><br />ROOT Object{11}ᐸ{result}ᐳ[114]<br />1: <br />ᐳ: 198, 287, 197, 199, 200, 201<br />2: PgSelect[330], PgSelect[345]<br />3: PgSelectRows[335], PgSelectRows[348]<br />4: First[334], First[347]<br />ᐳ: 336, 349"):::bucket
     Bucket26("Bucket 26 (nullableBoundary)<br />Deps: 117, 202, 270, 122, 4<br /><br />ROOT Object{12}ᐸ{result}ᐳ[122]"):::bucket
-    Bucket27("Bucket 27 (nullableBoundary)<br />Deps: 125, 202, 270, 128, 398, 130, 4<br /><br />ROOT Object{13}ᐸ{result}ᐳ[130]<br />1: <br />ᐳ: 208, 288, 359, 207, 209, 210, 312, 337, 350<br />2: PgSelect[351]<br />ᐳ: Access[355]<br />3: First[356]<br />ᐳ: 357, 360"):::bucket
+    Bucket27("Bucket 27 (nullableBoundary)<br />Deps: 125, 202, 270, 128, 398, 130, 4<br /><br />ROOT Object{13}ᐸ{result}ᐳ[130]<br />1: <br />ᐳ: 208, 288, 359, 207, 209, 210, 312, 337, 350<br />2: PgSelect[351]<br />3: PgSelectRows[356]<br />4: First[355]<br />ᐳ: 357, 360"):::bucket
     Bucket28("Bucket 28 (nullableBoundary)<br />Deps: 133, 202, 136, 270, 138, 4<br /><br />ROOT Object{14}ᐸ{result}ᐳ[138]<br />1: <br />ᐳ: 212, 289, 211, 213, 214, 216<br />2: PgSelect[217]<br />ᐳ: Access[276]<br />3: Connection[222]<br />4: ConnectionItems[224]<br />5: First[223]<br />ᐳ: 277, 301, 227"):::bucket
     Bucket30("Bucket 30 (nullableBoundary)<br />Deps: 12, 157, 154, 302, 313<br /><br />ROOT PgDeleteSingle{1}ᐸpost(id)ᐳ[12]"):::bucket
     Bucket31("Bucket 31 (nullableBoundary)<br />Deps: 24, 161, 158, 303, 314<br /><br />ROOT PgDeleteSingle{2}ᐸpost(id)ᐳ[24]"):::bucket
@@ -406,18 +406,18 @@ graph TD
     Lambda196{{"Lambda[196∈24] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List195 --> Lambda196
     Lambda286{{"Lambda[286∈24] ➊<br />ᐸrawEncodeᐳ<br />More deps:<br />- Constantᐸ'query'ᐳ[270]"}}:::plan
-    Access326{{"Access[326∈24] ➊<br />ᐸ322.itemsᐳ"}}:::plan
-    PgSelect322 --> Access326
-    First327[["First[327∈24] ➊"]]:::plan
-    Access326 --> First327
+    First326[["First[326∈24] ➊"]]:::plan
+    PgSelectRows327[["PgSelectRows[327∈24] ➊"]]:::plan
+    PgSelectRows327 --> First326
+    PgSelect322 --> PgSelectRows327
     PgSelectSingle328{{"PgSelectSingle[328∈24] ➊<br />ᐸpersonᐳ"}}:::plan
-    First327 --> PgSelectSingle328
-    Access341{{"Access[341∈24] ➊<br />ᐸ339.itemsᐳ"}}:::plan
-    PgSelect339 --> Access341
-    First342[["First[342∈24] ➊"]]:::plan
-    Access341 --> First342
+    First326 --> PgSelectSingle328
+    First341[["First[341∈24] ➊"]]:::plan
+    PgSelectRows342[["PgSelectRows[342∈24] ➊"]]:::plan
+    PgSelectRows342 --> First341
+    PgSelect339 --> PgSelectRows342
     PgSelectSingle343{{"PgSelectSingle[343∈24] ➊<br />ᐸpersonᐳ"}}:::plan
-    First342 --> PgSelectSingle343
+    First341 --> PgSelectSingle343
     List200{{"List[200∈25] ➊<br />ᐸ191,197,199ᐳ<br />More deps:<br />- Constantᐸ'compound_keys'ᐳ[191]"}}:::plan
     PgClassExpression197{{"PgClassExpression[197∈25] ➊<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
     PgClassExpression199{{"PgClassExpression[199∈25] ➊<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
@@ -433,18 +433,18 @@ graph TD
     Lambda201{{"Lambda[201∈25] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List200 --> Lambda201
     Lambda287{{"Lambda[287∈25] ➊<br />ᐸrawEncodeᐳ<br />More deps:<br />- Constantᐸ'query'ᐳ[270]"}}:::plan
-    Access334{{"Access[334∈25] ➊<br />ᐸ330.itemsᐳ"}}:::plan
-    PgSelect330 --> Access334
-    First335[["First[335∈25] ➊"]]:::plan
-    Access334 --> First335
+    First334[["First[334∈25] ➊"]]:::plan
+    PgSelectRows335[["PgSelectRows[335∈25] ➊"]]:::plan
+    PgSelectRows335 --> First334
+    PgSelect330 --> PgSelectRows335
     PgSelectSingle336{{"PgSelectSingle[336∈25] ➊<br />ᐸpersonᐳ"}}:::plan
-    First335 --> PgSelectSingle336
-    Access347{{"Access[347∈25] ➊<br />ᐸ345.itemsᐳ"}}:::plan
-    PgSelect345 --> Access347
-    First348[["First[348∈25] ➊"]]:::plan
-    Access347 --> First348
+    First334 --> PgSelectSingle336
+    First347[["First[347∈25] ➊"]]:::plan
+    PgSelectRows348[["PgSelectRows[348∈25] ➊"]]:::plan
+    PgSelectRows348 --> First347
+    PgSelect345 --> PgSelectRows348
     PgSelectSingle349{{"PgSelectSingle[349∈25] ➊<br />ᐸpersonᐳ"}}:::plan
-    First348 --> PgSelectSingle349
+    First347 --> PgSelectSingle349
     List205{{"List[205∈26] ➊<br />ᐸ202,203ᐳ<br />More deps:<br />- Constantᐸ'people'ᐳ[202]"}}:::plan
     PgClassExpression203{{"PgClassExpression[203∈26] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgClassExpression203 --> List205
@@ -472,12 +472,12 @@ graph TD
     PgClassExpression337{{"PgClassExpression[337∈27] ➊<br />ᐸ__person__.”email”ᐳ"}}:::plan
     Access208 --> PgClassExpression337
     Access208 --> PgClassExpression350
-    Access355{{"Access[355∈27] ➊<br />ᐸ351.itemsᐳ"}}:::plan
-    PgSelect351 --> Access355
-    First356[["First[356∈27] ➊"]]:::plan
-    Access355 --> First356
+    First355[["First[355∈27] ➊"]]:::plan
+    PgSelectRows356[["PgSelectRows[356∈27] ➊"]]:::plan
+    PgSelectRows356 --> First355
+    PgSelect351 --> PgSelectRows356
     PgSelectSingle357{{"PgSelectSingle[357∈27] ➊<br />ᐸpersonᐳ"}}:::plan
-    First356 --> PgSelectSingle357
+    First355 --> PgSelectSingle357
     PgClassExpression360{{"PgClassExpression[360∈27] ➊<br />ᐸ(1/0) /* E...ferred! */ᐳ"}}:::plan
     PgSelectSingle357 --> PgClassExpression360
     List213{{"List[213∈28] ➊<br />ᐸ202,211ᐳ<br />More deps:<br />- Constantᐸ'people'ᐳ[202]"}}:::plan
@@ -600,13 +600,13 @@ graph TD
     classDef bucket23 stroke:#ff1493
     class Bucket23,PgClassExpression187,Access188,List189,Lambda190,Lambda285,PgClassExpression309,PgClassExpression320 bucket23
     classDef bucket24 stroke:#808000
-    class Bucket24,PgClassExpression192,Access193,PgClassExpression194,List195,Lambda196,Lambda286,PgSelect322,Access326,First327,PgSelectSingle328,PgSelect339,Access341,First342,PgSelectSingle343 bucket24
+    class Bucket24,PgClassExpression192,Access193,PgClassExpression194,List195,Lambda196,Lambda286,PgSelect322,First326,PgSelectRows327,PgSelectSingle328,PgSelect339,First341,PgSelectRows342,PgSelectSingle343 bucket24
     classDef bucket25 stroke:#dda0dd
-    class Bucket25,PgClassExpression197,Access198,PgClassExpression199,List200,Lambda201,Lambda287,PgSelect330,Access334,First335,PgSelectSingle336,PgSelect345,Access347,First348,PgSelectSingle349 bucket25
+    class Bucket25,PgClassExpression197,Access198,PgClassExpression199,List200,Lambda201,Lambda287,PgSelect330,First334,PgSelectRows335,PgSelectSingle336,PgSelect345,First347,PgSelectRows348,PgSelectSingle349 bucket25
     classDef bucket26 stroke:#ff0000
     class Bucket26,PgClassExpression203,Access204,List205,Lambda206,Lambda271 bucket26
     classDef bucket27 stroke:#ffff00
-    class Bucket27,PgClassExpression207,Access208,List209,Lambda210,Lambda288,PgClassExpression312,PgClassExpression337,PgClassExpression350,PgSelect351,Access355,First356,PgSelectSingle357,PgFromExpression359,PgClassExpression360 bucket27
+    class Bucket27,PgClassExpression207,Access208,List209,Lambda210,Lambda288,PgClassExpression312,PgClassExpression337,PgClassExpression350,PgSelect351,First355,PgSelectRows356,PgSelectSingle357,PgFromExpression359,PgClassExpression360 bucket27
     classDef bucket28 stroke:#00ffff
     class Bucket28,PgClassExpression211,Access212,List213,Lambda214,PgClassExpression216,PgSelect217,Connection222,First223,ConnectionItems224,Edge227,Access276,PgCursor277,Lambda289,PgSelectSingle301 bucket28
     classDef bucket30 stroke:#3cb371

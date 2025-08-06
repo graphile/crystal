@@ -8,7 +8,7 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/v4/enum_tables.queries"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 6, 9, 10, 103, 104, 11, 35, 41, 43, 48<br />2: 8, 15, 20, 25, 30, 38, 45<br />ᐳ: Access[27], Access[32]<br />3: 12, 17, 22, 28, 33, 40, 47<br />ᐳ: PgSelectSingle[29], PgSelectSingle[34]<br />4: 50, 53, 56, 61, 64"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 6, 9, 10, 103, 104, 11, 35, 41, 43, 48<br />2: 8, 15, 20, 25, 30, 38, 45<br />3: 12, 17, 22, 28, 33, 40, 47<br />4: 27, 32, 50, 53, 56, 61, 64<br />ᐳ: PgSelectSingle[29], PgSelectSingle[34]"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 50<br /><br />ROOT Connectionᐸ8ᐳ[12]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 53<br /><br />ROOT Connectionᐸ15ᐳ[17]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 22, 56<br /><br />ROOT Connectionᐸ20ᐳ[22]"):::bucket
@@ -71,18 +71,18 @@ graph TD
     Object11 --> PgSelect20
     Connection22[["Connection[22∈0] ➊<br />ᐸ20ᐳ"]]:::plan
     PgSelect20 --> Connection22
-    Access27{{"Access[27∈0] ➊<br />ᐸ25.itemsᐳ"}}:::plan
-    PgSelect25 --> Access27
-    First28[["First[28∈0] ➊"]]:::plan
-    Access27 --> First28
+    First27[["First[27∈0] ➊"]]:::plan
+    PgSelectRows28[["PgSelectRows[28∈0] ➊"]]:::plan
+    PgSelectRows28 --> First27
+    PgSelect25 --> PgSelectRows28
     PgSelectSingle29{{"PgSelectSingle[29∈0] ➊<br />ᐸletter_descriptionsᐳ"}}:::plan
-    First28 --> PgSelectSingle29
-    Access32{{"Access[32∈0] ➊<br />ᐸ30.itemsᐳ"}}:::plan
-    PgSelect30 --> Access32
-    First33[["First[33∈0] ➊"]]:::plan
-    Access32 --> First33
+    First27 --> PgSelectSingle29
+    First32[["First[32∈0] ➊"]]:::plan
+    PgSelectRows33[["PgSelectRows[33∈0] ➊"]]:::plan
+    PgSelectRows33 --> First32
+    PgSelect30 --> PgSelectRows33
     PgSelectSingle34{{"PgSelectSingle[34∈0] ➊<br />ᐸletter_descriptionsᐳ"}}:::plan
-    First33 --> PgSelectSingle34
+    First32 --> PgSelectSingle34
     Connection40[["Connection[40∈0] ➊<br />ᐸ38ᐳ"]]:::plan
     PgSelect38 --> Connection40
     __InputObject35 --> ApplyInput41
@@ -178,7 +178,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,PgSelect8,Access9,Access10,Object11,Connection12,PgSelect15,Connection17,PgSelect20,Connection22,PgSelect25,Access27,First28,PgSelectSingle29,PgSelect30,Access32,First33,PgSelectSingle34,__InputObject35,PgSelect38,Connection40,ApplyInput41,__InputObject43,PgSelect45,Connection47,ApplyInput48,ConnectionItems50,ConnectionItems53,ConnectionItems56,ConnectionItems61,ConnectionItems64 bucket0
+    class Bucket0,__Value2,PgSelect8,Access9,Access10,Object11,Connection12,PgSelect15,Connection17,PgSelect20,Connection22,PgSelect25,First27,PgSelectRows28,PgSelectSingle29,PgSelect30,First32,PgSelectRows33,PgSelectSingle34,__InputObject35,PgSelect38,Connection40,ApplyInput41,__InputObject43,PgSelect45,Connection47,ApplyInput48,ConnectionItems50,ConnectionItems53,ConnectionItems56,ConnectionItems61,ConnectionItems64 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1 bucket1
     classDef bucket2 stroke:#7f007f

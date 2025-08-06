@@ -15,16 +15,16 @@ graph TD
     Bucket6("Bucket 6 (listItem)<br />Deps: 24, 40, 12, 119, 90, 95<br /><br />ROOT __Item{6}ᐸ30ᐳ[33]"):::bucket
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 42, 34, 12, 44, 119, 90, 95, 36<br /><br />ROOT Edge{6}[34]"):::bucket
     Bucket8("Bucket 8 (polymorphic)<br />__typename: Access[43]<br />Deps: 43, 12, 44, 119, 90, 95"):::bucket
-    Bucket9("Bucket 9 (polymorphicPartition)<br />|AwsApplication<br />Deps: 12, 44, 119, 90<br />ᐳAwsApplication<br /><br />1: PgSelect[45]<br />ᐳ: Access[49]<br />2: First[50]<br />ᐳ: 51, 60<br />3: PgUnionAll[62]<br />4: Connection[66]<br />5: ConnectionItems[72]"):::bucket
-    Bucket10("Bucket 10 (polymorphicPartition)<br />|GcpApplication<br />Deps: 12, 44, 119, 95<br />ᐳGcpApplication<br /><br />1: PgSelect[53]<br />ᐳ: Access[57]<br />2: First[58]<br />ᐳ: 59, 61<br />3: PgUnionAll[67]<br />4: Connection[71]<br />5: ConnectionItems[75]"):::bucket
+    Bucket9("Bucket 9 (polymorphicPartition)<br />|AwsApplication<br />Deps: 12, 44, 119, 90<br />ᐳAwsApplication<br /><br />1: PgSelect[45]<br />2: PgSelectRows[50]<br />3: First[49]<br />ᐳ: 51, 60<br />4: PgUnionAll[62]<br />5: Connection[66]<br />6: ConnectionItems[72]"):::bucket
+    Bucket10("Bucket 10 (polymorphicPartition)<br />|GcpApplication<br />Deps: 12, 44, 119, 95<br />ᐳGcpApplication<br /><br />1: PgSelect[53]<br />2: PgSelectRows[58]<br />3: First[57]<br />ᐳ: 59, 61<br />4: PgUnionAll[67]<br />5: Connection[71]<br />6: ConnectionItems[75]"):::bucket
     Bucket13("Bucket 13 (listItem)<br />Deps: 62, 90, 12<br /><br />ROOT __Item{13}ᐸ72ᐳ[78]"):::bucket
     Bucket14("Bucket 14 (listItem)<br />Deps: 67, 95, 12<br /><br />ROOT __Item{14}ᐸ75ᐳ[80]"):::bucket
     Bucket15("Bucket 15 (nullableBoundary)<br />Deps: 78, 90, 79, 12, 83<br /><br />ROOT Edge{13}[79]"):::bucket
     Bucket16("Bucket 16 (nullableBoundary)<br />Deps: 80, 95, 81, 12, 85<br /><br />ROOT Edge{14}[81]"):::bucket
     Bucket17("Bucket 17 (combined)<br />Deps: 12"):::bucket
     Bucket18("Bucket 18 (polymorphic)<br />__typename: Access[99]<br />Deps: 99, 12, 100"):::bucket
-    Bucket19("Bucket 19 (polymorphicPartition)<br />|FirstPartyVulnerability<br />Deps: 12, 100<br />(2) ...ᐳFirstPartyVulnerability<br /><br />1: PgSelect[101]<br />ᐳ: Access[105]<br />2: First[106]<br />ᐳ: 107, 116"):::bucket
-    Bucket20("Bucket 20 (polymorphicPartition)<br />|ThirdPartyVulnerability<br />Deps: 12, 100<br />(2) ...ᐳThirdPartyVulnerability<br /><br />1: PgSelect[109]<br />ᐳ: Access[113]<br />2: First[114]<br />ᐳ: 115, 117"):::bucket
+    Bucket19("Bucket 19 (polymorphicPartition)<br />|FirstPartyVulnerability<br />Deps: 12, 100<br />(2) ...ᐳFirstPartyVulnerability<br /><br />1: PgSelect[101]<br />2: PgSelectRows[106]<br />3: First[105]<br />ᐳ: 107, 116"):::bucket
+    Bucket20("Bucket 20 (polymorphicPartition)<br />|ThirdPartyVulnerability<br />Deps: 12, 100<br />(2) ...ᐳThirdPartyVulnerability<br /><br />1: PgSelect[109]<br />2: PgSelectRows[114]<br />3: First[113]<br />ᐳ: 115, 117"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket3
@@ -97,12 +97,12 @@ graph TD
     Access44 --> PgSelect45
     Connection66[["Connection[66∈9]^<br />ᐸ62ᐳ<br />More deps:<br />- Constantᐸ1ᐳ[119]"]]:::plan
     PgUnionAll62 --> Connection66
-    Access49{{"Access[49∈9]^<br />ᐸ45.itemsᐳ"}}:::plan
-    PgSelect45 --> Access49
-    First50[["First[50∈9]^"]]:::plan
-    Access49 --> First50
+    First49[["First[49∈9]^"]]:::plan
+    PgSelectRows50[["PgSelectRows[50∈9]^"]]:::plan
+    PgSelectRows50 --> First49
+    PgSelect45 --> PgSelectRows50
     PgSelectSingle51{{"PgSelectSingle[51∈9]^<br />ᐸaws_applicationsᐳ"}}:::plan
-    First50 --> PgSelectSingle51
+    First49 --> PgSelectSingle51
     PgSelectSingle51 --> PgClassExpression60
     ConnectionItems72[["ConnectionItems[72∈9]^"]]:::plan
     Connection66 --> ConnectionItems72
@@ -113,12 +113,12 @@ graph TD
     Access44 --> PgSelect53
     Connection71[["Connection[71∈10]^<br />ᐸ67ᐳ<br />More deps:<br />- Constantᐸ1ᐳ[119]"]]:::plan
     PgUnionAll67 --> Connection71
-    Access57{{"Access[57∈10]^<br />ᐸ53.itemsᐳ"}}:::plan
-    PgSelect53 --> Access57
-    First58[["First[58∈10]^"]]:::plan
-    Access57 --> First58
+    First57[["First[57∈10]^"]]:::plan
+    PgSelectRows58[["PgSelectRows[58∈10]^"]]:::plan
+    PgSelectRows58 --> First57
+    PgSelect53 --> PgSelectRows58
     PgSelectSingle59{{"PgSelectSingle[59∈10]^<br />ᐸgcp_applicationsᐳ"}}:::plan
-    First58 --> PgSelectSingle59
+    First57 --> PgSelectSingle59
     PgSelectSingle59 --> PgClassExpression61
     ConnectionItems75[["ConnectionItems[75∈10]^"]]:::plan
     Connection71 --> ConnectionItems75
@@ -161,22 +161,22 @@ graph TD
     __Value98 --> Access100
     PgSelect101[["PgSelect[101∈19]<br />ᐸfirst_party_vulnerabilitiesᐳ<br />(2) ...ᐳFirstPartyVulnerability<br />More deps:<br />- Object[12]"]]:::plan
     Access100 --> PgSelect101
-    Access105{{"Access[105∈19]^<br />ᐸ101.itemsᐳ"}}:::plan
-    PgSelect101 --> Access105
-    First106[["First[106∈19]^"]]:::plan
-    Access105 --> First106
+    First105[["First[105∈19]^"]]:::plan
+    PgSelectRows106[["PgSelectRows[106∈19]^"]]:::plan
+    PgSelectRows106 --> First105
+    PgSelect101 --> PgSelectRows106
     PgSelectSingle107{{"PgSelectSingle[107∈19]^<br />ᐸfirst_party_vulnerabilitiesᐳ"}}:::plan
-    First106 --> PgSelectSingle107
+    First105 --> PgSelectSingle107
     PgClassExpression116{{"PgClassExpression[116∈19]^<br />ᐸ__first_pa...ies__.”id”ᐳ"}}:::plan
     PgSelectSingle107 --> PgClassExpression116
     PgSelect109[["PgSelect[109∈20]<br />ᐸthird_party_vulnerabilitiesᐳ<br />(2) ...ᐳThirdPartyVulnerability<br />More deps:<br />- Object[12]"]]:::plan
     Access100 --> PgSelect109
-    Access113{{"Access[113∈20]^<br />ᐸ109.itemsᐳ"}}:::plan
-    PgSelect109 --> Access113
-    First114[["First[114∈20]^"]]:::plan
-    Access113 --> First114
+    First113[["First[113∈20]^"]]:::plan
+    PgSelectRows114[["PgSelectRows[114∈20]^"]]:::plan
+    PgSelectRows114 --> First113
+    PgSelect109 --> PgSelectRows114
     PgSelectSingle115{{"PgSelectSingle[115∈20]^<br />ᐸthird_party_vulnerabilitiesᐳ"}}:::plan
-    First114 --> PgSelectSingle115
+    First113 --> PgSelectSingle115
     PgClassExpression117{{"PgClassExpression[117∈20]^<br />ᐸ__third_pa...ies__.”id”ᐳ"}}:::plan
     PgSelectSingle115 --> PgClassExpression117
 
@@ -196,9 +196,9 @@ graph TD
     classDef bucket8 stroke:#dda0dd
     class Bucket8 bucket8
     classDef bucket9 stroke:#ff0000
-    class Bucket9,PgSelect45,Access49,First50,PgSelectSingle51,PgClassExpression60,PgUnionAll62,Connection66,ConnectionItems72 bucket9
+    class Bucket9,PgSelect45,First49,PgSelectRows50,PgSelectSingle51,PgClassExpression60,PgUnionAll62,Connection66,ConnectionItems72 bucket9
     classDef bucket10 stroke:#ffff00
-    class Bucket10,PgSelect53,Access57,First58,PgSelectSingle59,PgClassExpression61,PgUnionAll67,Connection71,ConnectionItems75 bucket10
+    class Bucket10,PgSelect53,First57,PgSelectRows58,PgSelectSingle59,PgClassExpression61,PgUnionAll67,Connection71,ConnectionItems75 bucket10
     classDef bucket13 stroke:#3cb371
     class Bucket13,__Item78,Edge79,Access82,PgCursor83 bucket13
     classDef bucket14 stroke:#a52a2a
@@ -212,9 +212,9 @@ graph TD
     classDef bucket18 stroke:#00bfff
     class Bucket18 bucket18
     classDef bucket19 stroke:#7f007f
-    class Bucket19,PgSelect101,Access105,First106,PgSelectSingle107,PgClassExpression116 bucket19
+    class Bucket19,PgSelect101,First105,PgSelectRows106,PgSelectSingle107,PgClassExpression116 bucket19
     classDef bucket20 stroke:#ffa500
-    class Bucket20,PgSelect109,Access113,First114,PgSelectSingle115,PgClassExpression117 bucket20
+    class Bucket20,PgSelect109,First113,PgSelectRows114,PgSelectSingle115,PgClassExpression117 bucket20
 
     Lambda92 -.-x __Value98
     Lambda97 -.-x __Value98

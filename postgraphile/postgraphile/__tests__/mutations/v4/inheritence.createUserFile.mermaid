@@ -14,7 +14,7 @@ graph TD
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16, 11, 26<br /><br />ROOT Object{1}ᐸ{result}ᐳ[16]"):::bucket
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 25, 20, 23<br /><br />ROOT Object{2}ᐸ{result}ᐳ[25]"):::bucket
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 11, 26<br /><br />ROOT PgInsertSingle{1}ᐸuser()ᐳ[11]"):::bucket
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 20, 23<br /><br />ROOT PgInsertSingle{2}ᐸuser_file()ᐳ[20]<br />1: <br />ᐳ: 32, 31, 34, 36<br />2: PgSelect[37]<br />ᐳ: Access[41]<br />3: First[42]<br />ᐳ: PgSelectSingle[43]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 20, 23<br /><br />ROOT PgInsertSingle{2}ᐸuser_file()ᐳ[20]<br />1: <br />ᐳ: 32, 31, 34, 36<br />2: PgSelect[37]<br />3: PgSelectRows[42]<br />4: First[41]<br />ᐳ: PgSelectSingle[43]"):::bucket
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 43<br /><br />ROOT PgSelectSingle{6}ᐸuserᐳ[43]"):::bucket
     end
     Bucket0 --> Bucket1 & Bucket2
@@ -72,12 +72,12 @@ graph TD
     PgClassExpression34{{"PgClassExpression[34∈6] ➊<br />ᐸ__user_fil...”filename”ᐳ"}}:::plan
     Access32 --> PgClassExpression34
     Access32 --> PgClassExpression36
-    Access41{{"Access[41∈6] ➊<br />ᐸ37.itemsᐳ"}}:::plan
-    PgSelect37 --> Access41
-    First42[["First[42∈6] ➊"]]:::plan
-    Access41 --> First42
+    First41[["First[41∈6] ➊"]]:::plan
+    PgSelectRows42[["PgSelectRows[42∈6] ➊"]]:::plan
+    PgSelectRows42 --> First41
+    PgSelect37 --> PgSelectRows42
     PgSelectSingle43{{"PgSelectSingle[43∈6] ➊<br />ᐸuserᐳ"}}:::plan
-    First42 --> PgSelectSingle43
+    First41 --> PgSelectSingle43
     PgClassExpression44{{"PgClassExpression[44∈7] ➊<br />ᐸ__user__.”id”ᐳ"}}:::plan
     PgSelectSingle43 --> PgClassExpression44
     PgClassExpression45{{"PgClassExpression[45∈7] ➊<br />ᐸ__user__.”name”ᐳ"}}:::plan
@@ -97,7 +97,7 @@ graph TD
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgClassExpression27,Access28,List29,Lambda30,PgClassExpression35 bucket5
     classDef bucket6 stroke:#ff1493
-    class Bucket6,PgClassExpression31,Access32,PgClassExpression34,PgClassExpression36,PgSelect37,Access41,First42,PgSelectSingle43 bucket6
+    class Bucket6,PgClassExpression31,Access32,PgClassExpression34,PgClassExpression36,PgSelect37,First41,PgSelectRows42,PgSelectSingle43 bucket6
     classDef bucket7 stroke:#808000
     class Bucket7,PgClassExpression44,PgClassExpression45 bucket7
 

@@ -8,7 +8,7 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/connections/pagination-before-last-pagination-only"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 11, 12, 26, 27, 28, 13, 16, 17<br />2: PgSelect[10], PgSelect[19]<br />ᐳ: Access[20]<br />3: Connection[14], First[21]<br />ᐳ: 22, 23"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 11, 12, 26, 27, 28, 13, 16, 17<br />2: PgSelect[10], PgSelect[19]<br />3: Connection[14], PgSelectRows[21]<br />4: First[20]<br />ᐳ: 22, 23"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14, 23<br /><br />ROOT Connectionᐸ10ᐳ[14]"):::bucket
     end
     Bucket0 --> Bucket1
@@ -29,18 +29,18 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access11
     __Value2 --> Access12
-    Access20{{"Access[20∈0] ➊<br />ᐸ19.itemsᐳ"}}:::plan
-    PgSelect19 --> Access20
-    First21[["First[21∈0] ➊"]]:::plan
-    Access20 --> First21
+    First20[["First[20∈0] ➊"]]:::plan
+    PgSelectRows21[["PgSelectRows[21∈0] ➊"]]:::plan
+    PgSelectRows21 --> First20
+    PgSelect19 --> PgSelectRows21
     PgSelectSingle22{{"PgSelectSingle[22∈0] ➊<br />ᐸmessagesᐳ"}}:::plan
-    First21 --> PgSelectSingle22
+    First20 --> PgSelectSingle22
     PageInfo18{{"PageInfo[18∈1] ➊"}}:::plan
     Connection14 --> PageInfo18
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,PgSelect10,Access11,Access12,Object13,Connection14,Lambda16,Lambda17,PgSelect19,Access20,First21,PgSelectSingle22 bucket0
+    class Bucket0,__Value2,PgSelect10,Access11,Access12,Object13,Connection14,Lambda16,Lambda17,PgSelect19,First20,PgSelectRows21,PgSelectSingle22 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PageInfo18 bucket1
 

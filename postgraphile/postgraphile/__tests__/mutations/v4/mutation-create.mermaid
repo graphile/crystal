@@ -21,23 +21,23 @@ graph TD
     Bucket10("Bucket 10 (mutationField)<br />Deps: 180, 2<br /><br />1: Access[177]<br />2: Access[178]<br />3: Object[179]<br />4: PgInsertSingle[176]<br />5: <br />ᐳ: Object[181]"):::bucket
     Bucket11("Bucket 11 (mutationField)<br />Deps: 190, 2<br /><br />1: Access[187]<br />2: Access[188]<br />3: Object[189]<br />4: PgInsertSingle[186]<br />5: <br />ᐳ: Object[191]"):::bucket
     Bucket12("Bucket 12 (nullableBoundary)<br />Deps: 531, 79, 74, 511, 77, 4<br /><br />ROOT Object{1}ᐸ{result}ᐳ[79]"):::bucket
-    Bucket13("Bucket 13 (nullableBoundary)<br />Deps: 91, 94, 516, 531, 1061, 96, 4<br /><br />ROOT Object{2}ᐸ{result}ᐳ[96]<br />1: <br />ᐳ: 200, 598, 705, 199, 519, 520, 646, 657, 662, 674, 684, 688, 692, 696<br />2: 201, 262, 367, 398, 429, 460, 697<br />ᐳ: 547, 557, 574, 580, 586, 592, 701<br />3: 206, 265, 308, 339, 370, 401, 432, 463, 702<br />ᐳ: 703, 706<br />4: 208, 267, 310, 341, 372, 403, 434, 465<br />5: 207, 266, 309, 340, 371, 402, 433, 464<br />ᐳ: 548, 558, 567, 571, 575, 581, 587, 593, 609, 613, 617, 620, 623, 626, 629, 632, 211, 270, 313, 344, 375, 406, 437, 468"):::bucket
-    Bucket14("Bucket 14 (nullableBoundary)<br />Deps: 106, 109, 516, 531, 1061, 111, 4<br /><br />ROOT Object{3}ᐸ{result}ᐳ[111]<br />1: <br />ᐳ: 213, 599, 716, 212, 523, 524, 647, 658, 663, 675, 685, 689, 693, 707<br />2: 214, 272, 377, 408, 439, 470, 708<br />ᐳ: 549, 559, 576, 582, 588, 594, 712<br />3: 219, 275, 318, 349, 380, 411, 442, 473, 713<br />ᐳ: 714, 717<br />4: 221, 277, 320, 351, 382, 413, 444, 475<br />5: 220, 276, 319, 350, 381, 412, 443, 474<br />ᐳ: 550, 560, 568, 572, 577, 583, 589, 595, 610, 614, 618, 621, 624, 627, 630, 633, 224, 280, 323, 354, 385, 416, 447, 478"):::bucket
-    Bucket15("Bucket 15 (nullableBoundary)<br />Deps: 115, 118, 525, 531, 120, 516, 4<br /><br />ROOT Object{4}ᐸ{result}ᐳ[120]<br />1: <br />ᐳ: 226, 569, 225, 281, 529, 530, 659<br />2: PgSelect[227], PgSelect[282]<br />ᐳ: Access[231], Access[284]<br />3: First[232], First[285]<br />ᐳ: 233, 286"):::bucket
+    Bucket13("Bucket 13 (nullableBoundary)<br />Deps: 91, 94, 516, 531, 1061, 96, 4<br /><br />ROOT Object{2}ᐸ{result}ᐳ[96]<br />1: <br />ᐳ: 200, 598, 705, 199, 519, 520, 646, 657, 662, 674, 684, 688, 692, 696<br />2: 201, 262, 367, 398, 429, 460, 697<br />ᐳ: 547, 557, 574, 580, 586, 592<br />3: 206, 265, 308, 339, 370, 401, 432, 463, 702<br />4: 208, 267, 310, 341, 372, 403, 434, 465, 701<br />ᐳ: 703, 706<br />5: 207, 266, 309, 340, 371, 402, 433, 464<br />ᐳ: 548, 558, 567, 571, 575, 581, 587, 593, 609, 613, 617, 620, 623, 626, 629, 632, 211, 270, 313, 344, 375, 406, 437, 468"):::bucket
+    Bucket14("Bucket 14 (nullableBoundary)<br />Deps: 106, 109, 516, 531, 1061, 111, 4<br /><br />ROOT Object{3}ᐸ{result}ᐳ[111]<br />1: <br />ᐳ: 213, 599, 716, 212, 523, 524, 647, 658, 663, 675, 685, 689, 693, 707<br />2: 214, 272, 377, 408, 439, 470, 708<br />ᐳ: 549, 559, 576, 582, 588, 594<br />3: 219, 275, 318, 349, 380, 411, 442, 473, 713<br />4: 221, 277, 320, 351, 382, 413, 444, 475, 712<br />ᐳ: 714, 717<br />5: 220, 276, 319, 350, 381, 412, 443, 474<br />ᐳ: 550, 560, 568, 572, 577, 583, 589, 595, 610, 614, 618, 621, 624, 627, 630, 633, 224, 280, 323, 354, 385, 416, 447, 478"):::bucket
+    Bucket15("Bucket 15 (nullableBoundary)<br />Deps: 115, 118, 525, 531, 120, 516, 4<br /><br />ROOT Object{4}ᐸ{result}ᐳ[120]<br />1: <br />ᐳ: 226, 569, 225, 281, 529, 530, 659<br />2: PgSelect[227], PgSelect[282]<br />3: PgSelectRows[232], PgSelectRows[285]<br />4: First[231], First[284]<br />ᐳ: 233, 286"):::bucket
     Bucket16("Bucket 16 (nullableBoundary)<br />Deps: 531, 128, 123, 4<br /><br />ROOT Object{5}ᐸ{result}ᐳ[128]"):::bucket
     Bucket17("Bucket 17 (nullableBoundary)<br />Deps: 531, 136, 131, 4<br /><br />ROOT Object{6}ᐸ{result}ᐳ[136]"):::bucket
-    Bucket18("Bucket 18 (nullableBoundary)<br />Deps: 146, 149, 516, 531, 1061, 151, 4<br /><br />ROOT Object{7}ᐸ{result}ᐳ[151]<br />1: <br />ᐳ: 235, 600, 727, 234, 536, 537, 649, 660, 672, 682, 686, 690, 694, 718<br />2: 236, 288, 387, 418, 449, 480, 719<br />ᐳ: 554, 564, 578, 584, 590, 596, 723<br />3: 241, 291, 328, 359, 390, 421, 452, 483, 724<br />ᐳ: 725, 728<br />4: 243, 293, 330, 361, 392, 423, 454, 485<br />5: 242, 292, 329, 360, 391, 422, 453, 484<br />ᐳ: 555, 565, 570, 573, 579, 585, 591, 597, 612, 616, 619, 622, 625, 628, 631, 634, 246, 296, 333, 364, 395, 426, 457, 488"):::bucket
+    Bucket18("Bucket 18 (nullableBoundary)<br />Deps: 146, 149, 516, 531, 1061, 151, 4<br /><br />ROOT Object{7}ᐸ{result}ᐳ[151]<br />1: <br />ᐳ: 235, 600, 727, 234, 536, 537, 649, 660, 672, 682, 686, 690, 694, 718<br />2: 236, 288, 387, 418, 449, 480, 719<br />ᐳ: 554, 564, 578, 584, 590, 596<br />3: 241, 291, 328, 359, 390, 421, 452, 483, 724<br />4: 243, 293, 330, 361, 392, 423, 454, 485, 723<br />ᐳ: 725, 728<br />5: 242, 292, 329, 360, 391, 422, 453, 484<br />ᐳ: 555, 565, 570, 573, 579, 585, 591, 597, 612, 616, 619, 622, 625, 628, 631, 634, 246, 296, 333, 364, 395, 426, 457, 488"):::bucket
     Bucket19("Bucket 19 (nullableBoundary)<br />Deps: 1061, 162, 157, 160<br /><br />ROOT Object{8}ᐸ{result}ᐳ[162]"):::bucket
     Bucket20("Bucket 20 (nullableBoundary)<br />Deps: 171, 166<br /><br />ROOT Object{9}ᐸ{result}ᐳ[171]"):::bucket
     Bucket21("Bucket 21 (nullableBoundary)<br />Deps: 181, 176, 179<br /><br />ROOT Object{10}ᐸ{result}ᐳ[181]"):::bucket
-    Bucket22("Bucket 22 (nullableBoundary)<br />Deps: 186, 189, 191<br /><br />ROOT Object{11}ᐸ{result}ᐳ[191]<br />1: 984, 988<br />ᐳ: 248, 983, 247, 297, 603, 641, 644<br />2: 249, 298, 642<br />ᐳ: Access[300], Access[985], Access[989]<br />3: 254, 301, 767<br />ᐳ: PgSelectSingle[302]<br />4: ConnectionItems[256]<br />5: First[255]<br />ᐳ: 259, 556, 986, 987"):::bucket
+    Bucket22("Bucket 22 (nullableBoundary)<br />Deps: 186, 189, 191<br /><br />ROOT Object{11}ᐸ{result}ᐳ[191]<br />1: 984, 988<br />ᐳ: 248, 983, 247, 297, 603, 641, 644<br />2: 249, 298, 642<br />ᐳ: Access[985], Access[989]<br />3: 254, 301, 767<br />4: ConnectionItems[256], First[300]<br />ᐳ: PgSelectSingle[302]<br />5: First[255]<br />ᐳ: 259, 556, 986, 987"):::bucket
     Bucket48("Bucket 48 (nullableBoundary)<br />Deps: 123<br /><br />ROOT PgInsertSingle{5}ᐸedge_case()ᐳ[123]"):::bucket
     Bucket49("Bucket 49 (nullableBoundary)<br />Deps: 131<br /><br />ROOT PgInsertSingle{6}ᐸedge_case()ᐳ[131]"):::bucket
-    Bucket50("Bucket 50 (nullableBoundary)<br />Deps: 157, 160, 503<br /><br />ROOT PgInsertSingle{8}ᐸperson()ᐳ[157]<br />1: <br />ᐳ: Access[494], PgClassExpression[493]<br />2: PgSelect[495]<br />ᐳ: Access[499]<br />3: First[500]<br />ᐳ: 501, 504"):::bucket
+    Bucket50("Bucket 50 (nullableBoundary)<br />Deps: 157, 160, 503<br /><br />ROOT PgInsertSingle{8}ᐸperson()ᐳ[157]<br />1: <br />ᐳ: Access[494], PgClassExpression[493]<br />2: PgSelect[495]<br />3: PgSelectRows[500]<br />4: First[499]<br />ᐳ: 501, 504"):::bucket
     Bucket51("Bucket 51 (nullableBoundary)<br />Deps: 166<br /><br />ROOT PgInsertSingle{9}ᐸdefault_value()ᐳ[166]"):::bucket
     Bucket52("Bucket 52 (nullableBoundary)<br />Deps: 176, 179<br /><br />ROOT PgInsertSingle{10}ᐸpost()ᐳ[176]<br />1: <br />ᐳ: 508, 507, 602, 635, 640<br />2: PgSelect[636]<br />3: PgSelectRows[766]"):::bucket
     Bucket53("Bucket 53 (nullableBoundary)<br />Deps: 186, 302, 767, 247, 603<br /><br />ROOT PgInsertSingle{11}ᐸpost()ᐳ[186]"):::bucket
-    Bucket54("Bucket 54 (nullableBoundary)<br />Deps: 74, 511, 77, 975, 979<br /><br />ROOT PgInsertSingle{1}ᐸtypes()ᐳ[74]<br />1: <br />ᐳ: 513, 512, 514, 515, 645, 656, 661, 673, 683, 687, 691, 695, 729, 730, 731, 732, 733, 734, 735, 736, 737, 738, 739, 740, 741, 742, 743, 744, 745, 753, 759, 760, 761, 762, 763, 764, 765, 858, 859, 860, 898, 899, 900<br />2: PgSelect[746], PgSelect[754]<br />ᐳ: 750, 756, 976, 980<br />3: First[751], First[757]<br />ᐳ: 752, 758, 862, 902, 918, 919, 927, 929, 931, 932, 977, 978, 981, 982, 866, 906<br />4: First[867], First[907]<br />ᐳ: 868, 908"):::bucket
+    Bucket54("Bucket 54 (nullableBoundary)<br />Deps: 74, 511, 77, 975, 979<br /><br />ROOT PgInsertSingle{1}ᐸtypes()ᐳ[74]<br />1: <br />ᐳ: 513, 512, 514, 515, 645, 656, 661, 673, 683, 687, 691, 695, 729, 730, 731, 732, 733, 734, 735, 736, 737, 738, 739, 740, 741, 742, 743, 744, 745, 753, 759, 760, 761, 762, 763, 764, 765, 858, 859, 860, 898, 899, 900<br />2: PgSelect[746], PgSelect[754]<br />ᐳ: Access[976], Access[980]<br />3: PgSelectRows[751], PgSelectRows[757]<br />4: First[750], First[756]<br />ᐳ: 752, 758, 862, 902, 918, 919, 927, 929, 931, 932, 977, 978, 981, 982<br />5: PgSelectRows[867], PgSelectRows[907]<br />6: First[866], First[906]<br />ᐳ: 868, 908"):::bucket
     Bucket55("Bucket 55 (nullableBoundary)<br />Deps: 91, 520, 199, 646, 657, 662, 674, 684, 688, 692, 706<br /><br />ROOT PgInsertSingle{2}ᐸperson()ᐳ[91]"):::bucket
     Bucket56("Bucket 56 (nullableBoundary)<br />Deps: 106, 524, 212, 647, 658, 663, 675, 685, 689, 693, 717<br /><br />ROOT PgInsertSingle{3}ᐸperson()ᐳ[106]"):::bucket
     Bucket57("Bucket 57 (nullableBoundary)<br />Deps: 115, 233, 516, 286, 530, 225, 281, 659<br /><br />ROOT PgInsertSingle{4}ᐸcompound_key()ᐳ[115]"):::bucket
@@ -78,7 +78,7 @@ graph TD
     Bucket92("Bucket 92 (nullableBoundary)<br />Deps: 4, 599<br /><br />ROOT __ValueᐸrootValueᐳ[4]"):::bucket
     Bucket93("Bucket 93 (nullableBoundary)<br />Deps: 4, 600<br /><br />ROOT __ValueᐸrootValueᐳ[4]"):::bucket
     Bucket94("Bucket 94 (nullableBoundary)<br />Deps: 302<br /><br />ROOT PgSelectSingle{22}ᐸpersonᐳ[302]"):::bucket
-    Bucket95("Bucket 95 (nullableBoundary)<br />Deps: 556, 987, 989<br /><br />ROOT PgSelectSingle{22}ᐸpostᐳ[556]<br />1: PgSelectRows[933]<br />ᐳ: 778, 871, 990, 991, 923<br />2: First[924]<br />ᐳ: PgSelectSingle[925]"):::bucket
+    Bucket95("Bucket 95 (nullableBoundary)<br />Deps: 556, 987, 989<br /><br />ROOT PgSelectSingle{22}ᐸpostᐳ[556]<br />1: PgSelectRows[933]<br />ᐳ: 778, 871, 990, 991<br />2: PgSelectRows[924]<br />3: First[923]<br />ᐳ: PgSelectSingle[925]"):::bucket
     Bucket96("Bucket 96 (nullableBoundary)<br />Deps: 609, 516<br /><br />ROOT PgSelectSingle{13}ᐸpersonᐳ[609]"):::bucket
     Bucket97("Bucket 97 (nullableBoundary)<br />Deps: 610, 516<br /><br />ROOT PgSelectSingle{14}ᐸpersonᐳ[610]"):::bucket
     Bucket98("Bucket 98 (nullableBoundary)<br />Deps: 612, 516<br /><br />ROOT PgSelectSingle{18}ᐸpersonᐳ[612]"):::bucket
@@ -506,12 +506,12 @@ graph TD
     PgClassExpression692{{"PgClassExpression[692∈13] ➊<br />ᐸ__person__.”user_mac”ᐳ"}}:::plan
     Access200 --> PgClassExpression692
     Access200 --> PgClassExpression696
-    Access701{{"Access[701∈13] ➊<br />ᐸ697.itemsᐳ"}}:::plan
-    PgSelect697 --> Access701
-    First702[["First[702∈13] ➊"]]:::plan
-    Access701 --> First702
+    First701[["First[701∈13] ➊"]]:::plan
+    PgSelectRows702[["PgSelectRows[702∈13] ➊"]]:::plan
+    PgSelectRows702 --> First701
+    PgSelect697 --> PgSelectRows702
     PgSelectSingle703{{"PgSelectSingle[703∈13] ➊<br />ᐸpersonᐳ"}}:::plan
-    First702 --> PgSelectSingle703
+    First701 --> PgSelectSingle703
     PgClassExpression706{{"PgClassExpression[706∈13] ➊<br />ᐸ(1/0) /* E...ferred! */ᐳ"}}:::plan
     PgSelectSingle703 --> PgClassExpression706
     PgSelect708[["PgSelect[708∈14] ➊<br />ᐸpersonᐳ"]]:::plan
@@ -662,12 +662,12 @@ graph TD
     PgClassExpression693{{"PgClassExpression[693∈14] ➊<br />ᐸ__person__.”user_mac”ᐳ"}}:::plan
     Access213 --> PgClassExpression693
     Access213 --> PgClassExpression707
-    Access712{{"Access[712∈14] ➊<br />ᐸ708.itemsᐳ"}}:::plan
-    PgSelect708 --> Access712
-    First713[["First[713∈14] ➊"]]:::plan
-    Access712 --> First713
+    First712[["First[712∈14] ➊"]]:::plan
+    PgSelectRows713[["PgSelectRows[713∈14] ➊"]]:::plan
+    PgSelectRows713 --> First712
+    PgSelect708 --> PgSelectRows713
     PgSelectSingle714{{"PgSelectSingle[714∈14] ➊<br />ᐸpersonᐳ"}}:::plan
-    First713 --> PgSelectSingle714
+    First712 --> PgSelectSingle714
     PgClassExpression717{{"PgClassExpression[717∈14] ➊<br />ᐸ(1/0) /* E...ferred! */ᐳ"}}:::plan
     PgSelectSingle714 --> PgClassExpression717
     List529{{"List[529∈15] ➊<br />ᐸ525,225,281ᐳ<br />More deps:<br />- Constantᐸ'compound_keys'ᐳ[525]"}}:::plan
@@ -681,19 +681,19 @@ graph TD
     Access226{{"Access[226∈15] ➊<br />ᐸ115.tᐳ"}}:::plan
     Access226 --> PgClassExpression225
     PgInsertSingle115 --> Access226
-    Access231{{"Access[231∈15] ➊<br />ᐸ227.itemsᐳ"}}:::plan
-    PgSelect227 --> Access231
-    First232[["First[232∈15] ➊"]]:::plan
-    Access231 --> First232
+    First231[["First[231∈15] ➊"]]:::plan
+    PgSelectRows232[["PgSelectRows[232∈15] ➊"]]:::plan
+    PgSelectRows232 --> First231
+    PgSelect227 --> PgSelectRows232
     PgSelectSingle233{{"PgSelectSingle[233∈15] ➊<br />ᐸpersonᐳ"}}:::plan
-    First232 --> PgSelectSingle233
+    First231 --> PgSelectSingle233
     Access226 --> PgClassExpression281
-    Access284{{"Access[284∈15] ➊<br />ᐸ282.itemsᐳ"}}:::plan
-    PgSelect282 --> Access284
-    First285[["First[285∈15] ➊"]]:::plan
-    Access284 --> First285
+    First284[["First[284∈15] ➊"]]:::plan
+    PgSelectRows285[["PgSelectRows[285∈15] ➊"]]:::plan
+    PgSelectRows285 --> First284
+    PgSelect282 --> PgSelectRows285
     PgSelectSingle286{{"PgSelectSingle[286∈15] ➊<br />ᐸpersonᐳ"}}:::plan
-    First285 --> PgSelectSingle286
+    First284 --> PgSelectSingle286
     Lambda530{{"Lambda[530∈15] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List529 --> Lambda530
     Lambda569{{"Lambda[569∈15] ➊<br />ᐸrawEncodeᐳ<br />More deps:<br />- Constantᐸ'query'ᐳ[531]"}}:::plan
@@ -849,12 +849,12 @@ graph TD
     PgClassExpression694{{"PgClassExpression[694∈18] ➊<br />ᐸ__person__.”user_mac”ᐳ"}}:::plan
     Access235 --> PgClassExpression694
     Access235 --> PgClassExpression718
-    Access723{{"Access[723∈18] ➊<br />ᐸ719.itemsᐳ"}}:::plan
-    PgSelect719 --> Access723
-    First724[["First[724∈18] ➊"]]:::plan
-    Access723 --> First724
+    First723[["First[723∈18] ➊"]]:::plan
+    PgSelectRows724[["PgSelectRows[724∈18] ➊"]]:::plan
+    PgSelectRows724 --> First723
+    PgSelect719 --> PgSelectRows724
     PgSelectSingle725{{"PgSelectSingle[725∈18] ➊<br />ᐸpersonᐳ"}}:::plan
-    First724 --> PgSelectSingle725
+    First723 --> PgSelectSingle725
     PgClassExpression728{{"PgClassExpression[728∈18] ➊<br />ᐸ(1/0) /* E...ferred! */ᐳ"}}:::plan
     PgSelectSingle725 --> PgClassExpression728
     PgFromExpression503{{"PgFromExpression[503∈19] ➊<br />More deps:<br />- Constantᐸ'graphile-build.issue.27@example.com'ᐳ[1061]"}}:::plan
@@ -885,12 +885,12 @@ graph TD
     Edge259{{"Edge[259∈22] ➊"}}:::plan
     First255 --> Edge259
     Access248 --> PgClassExpression297
-    Access300{{"Access[300∈22] ➊<br />ᐸ298.itemsᐳ"}}:::plan
-    PgSelect298 --> Access300
-    First301[["First[301∈22] ➊"]]:::plan
-    Access300 --> First301
+    First300[["First[300∈22] ➊"]]:::plan
+    PgSelectRows301[["PgSelectRows[301∈22] ➊"]]:::plan
+    PgSelectRows301 --> First300
+    PgSelect298 --> PgSelectRows301
     PgSelectSingle302{{"PgSelectSingle[302∈22] ➊<br />ᐸpersonᐳ"}}:::plan
-    First301 --> PgSelectSingle302
+    First300 --> PgSelectSingle302
     PgSelectSingle556{{"PgSelectSingle[556∈22] ➊<br />ᐸpostᐳ"}}:::plan
     First255 --> PgSelectSingle556
     PgClassExpression603{{"PgClassExpression[603∈22] ➊<br />ᐸ__post__.”headline”ᐳ"}}:::plan
@@ -919,12 +919,12 @@ graph TD
     Access494{{"Access[494∈50] ➊<br />ᐸ157.tᐳ"}}:::plan
     Access494 --> PgClassExpression493
     PgInsertSingle157 --> Access494
-    Access499{{"Access[499∈50] ➊<br />ᐸ495.itemsᐳ"}}:::plan
-    PgSelect495 --> Access499
-    First500[["First[500∈50] ➊"]]:::plan
-    Access499 --> First500
+    First499[["First[499∈50] ➊"]]:::plan
+    PgSelectRows500[["PgSelectRows[500∈50] ➊"]]:::plan
+    PgSelectRows500 --> First499
+    PgSelect495 --> PgSelectRows500
     PgSelectSingle501{{"PgSelectSingle[501∈50] ➊<br />ᐸpersonᐳ"}}:::plan
-    First500 --> PgSelectSingle501
+    First499 --> PgSelectSingle501
     PgClassExpression504{{"PgClassExpression[504∈50] ➊<br />ᐸ(1/0) /* E...ferred! */ᐳ"}}:::plan
     PgSelectSingle501 --> PgClassExpression504
     PgClassExpression505{{"PgClassExpression[505∈51] ➊<br />ᐸ__default_value__.”id”ᐳ"}}:::plan
@@ -1017,18 +1017,18 @@ graph TD
     PgClassExpression744{{"PgClassExpression[744∈54] ➊<br />ᐸ__types__.”money”ᐳ"}}:::plan
     Access513 --> PgClassExpression744
     Access513 --> PgClassExpression745
-    Access750{{"Access[750∈54] ➊<br />ᐸ746.itemsᐳ"}}:::plan
-    PgSelect746 --> Access750
-    First751[["First[751∈54] ➊"]]:::plan
-    Access750 --> First751
+    First750[["First[750∈54] ➊"]]:::plan
+    PgSelectRows751[["PgSelectRows[751∈54] ➊"]]:::plan
+    PgSelectRows751 --> First750
+    PgSelect746 --> PgSelectRows751
     PgSelectSingle752{{"PgSelectSingle[752∈54] ➊<br />ᐸfrmcdc_compoundTypeᐳ"}}:::plan
-    First751 --> PgSelectSingle752
+    First750 --> PgSelectSingle752
     Access513 --> PgClassExpression753
-    Access756{{"Access[756∈54] ➊<br />ᐸ754.itemsᐳ"}}:::plan
-    PgSelect754 --> Access756
-    First757[["First[757∈54] ➊"]]:::plan
-    Access756 --> First757
-    First757 --> PgSelectSingle758
+    First756[["First[756∈54] ➊"]]:::plan
+    PgSelectRows757[["PgSelectRows[757∈54] ➊"]]:::plan
+    PgSelectRows757 --> First756
+    PgSelect754 --> PgSelectRows757
+    First756 --> PgSelectSingle758
     PgClassExpression759{{"PgClassExpression[759∈54] ➊<br />ᐸ__types__.”point”ᐳ"}}:::plan
     Access513 --> PgClassExpression759
     PgClassExpression760{{"PgClassExpression[760∈54] ➊<br />ᐸ__types__....ablePoint”ᐳ"}}:::plan
@@ -1051,13 +1051,13 @@ graph TD
     PgClassExpression736 --> Access860
     PgClassExpression862{{"PgClassExpression[862∈54] ➊<br />ᐸ__frmcdc_c...type__.”a”ᐳ"}}:::plan
     PgSelectSingle752 --> PgClassExpression862
-    Access866{{"Access[866∈54] ➊<br />ᐸ978.itemsᐳ"}}:::plan
+    First866[["First[866∈54] ➊"]]:::plan
+    PgSelectRows867[["PgSelectRows[867∈54] ➊"]]:::plan
+    PgSelectRows867 --> First866
     Lambda978{{"Lambda[978∈54] ➊<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda978 --> Access866
-    First867[["First[867∈54] ➊"]]:::plan
-    Access866 --> First867
+    Lambda978 --> PgSelectRows867
     PgSelectSingle868{{"PgSelectSingle[868∈54] ➊<br />ᐸfrmcdc_compoundTypeᐳ"}}:::plan
-    First867 --> PgSelectSingle868
+    First866 --> PgSelectSingle868
     Access898{{"Access[898∈54] ➊<br />ᐸ734.endᐳ"}}:::plan
     PgClassExpression734 --> Access898
     Access899{{"Access[899∈54] ➊<br />ᐸ735.endᐳ"}}:::plan
@@ -1066,13 +1066,13 @@ graph TD
     PgClassExpression736 --> Access900
     PgClassExpression902{{"PgClassExpression[902∈54] ➊<br />ᐸ__frmcdc_c...type__.”b”ᐳ"}}:::plan
     PgSelectSingle752 --> PgClassExpression902
-    Access906{{"Access[906∈54] ➊<br />ᐸ982.itemsᐳ"}}:::plan
+    First906[["First[906∈54] ➊"]]:::plan
+    PgSelectRows907[["PgSelectRows[907∈54] ➊"]]:::plan
+    PgSelectRows907 --> First906
     Lambda982{{"Lambda[982∈54] ➊<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda982 --> Access906
-    First907[["First[907∈54] ➊"]]:::plan
-    Access906 --> First907
+    Lambda982 --> PgSelectRows907
     PgSelectSingle908{{"PgSelectSingle[908∈54] ➊<br />ᐸfrmcdc_compoundTypeᐳ"}}:::plan
-    First907 --> PgSelectSingle908
+    First906 --> PgSelectSingle908
     PgClassExpression918{{"PgClassExpression[918∈54] ➊<br />ᐸ__frmcdc_c...type__.”c”ᐳ"}}:::plan
     PgSelectSingle752 --> PgClassExpression918
     PgClassExpression919{{"PgClassExpression[919∈54] ➊<br />ᐸ__frmcdc_n....”baz_buz”ᐳ"}}:::plan
@@ -1117,13 +1117,13 @@ graph TD
     PgSelectSingle556 --> PgClassExpression778
     PgClassExpression871{{"PgClassExpression[871∈95] ➊<br />ᐸ__post__.”headline”ᐳ"}}:::plan
     PgSelectSingle556 --> PgClassExpression871
-    Access923{{"Access[923∈95] ➊<br />ᐸ991.itemsᐳ"}}:::plan
+    First923[["First[923∈95] ➊"]]:::plan
+    PgSelectRows924[["PgSelectRows[924∈95] ➊"]]:::plan
+    PgSelectRows924 --> First923
     Lambda991{{"Lambda[991∈95] ➊<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda991 --> Access923
-    First924[["First[924∈95] ➊"]]:::plan
-    Access923 --> First924
+    Lambda991 --> PgSelectRows924
     PgSelectSingle925{{"PgSelectSingle[925∈95] ➊<br />ᐸpersonᐳ"}}:::plan
-    First924 --> PgSelectSingle925
+    First923 --> PgSelectSingle925
     PgSelectRows933[["PgSelectRows[933∈95] ➊"]]:::plan
     Lambda987 --> PgSelectRows933
     List990 --> Lambda991
@@ -1428,17 +1428,17 @@ graph TD
     classDef bucket12 stroke:#4169e1
     class Bucket12,Lambda546,PgSelectInlineApply975,PgSelectInlineApply979 bucket12
     classDef bucket13 stroke:#3cb371
-    class Bucket13,PgClassExpression199,Access200,PgSelect201,Connection206,First207,ConnectionItems208,Edge211,PgSelect262,Connection265,First266,ConnectionItems267,Edge270,Connection308,First309,ConnectionItems310,Edge313,Connection339,First340,ConnectionItems341,Edge344,PgSelect367,Connection370,First371,ConnectionItems372,Edge375,PgSelect398,Connection401,First402,ConnectionItems403,Edge406,PgSelect429,Connection432,First433,ConnectionItems434,Edge437,PgSelect460,Connection463,First464,ConnectionItems465,Edge468,List519,Lambda520,Access547,PgCursor548,Access557,PgCursor558,PgCursor567,PgCursor571,Access574,PgCursor575,Access580,PgCursor581,Access586,PgCursor587,Access592,PgCursor593,Lambda598,PgSelectSingle609,PgSelectSingle613,PgSelectSingle617,PgSelectSingle620,PgSelectSingle623,PgSelectSingle626,PgSelectSingle629,PgSelectSingle632,PgClassExpression646,PgClassExpression657,PgClassExpression662,PgClassExpression674,PgClassExpression684,PgClassExpression688,PgClassExpression692,PgClassExpression696,PgSelect697,Access701,First702,PgSelectSingle703,PgFromExpression705,PgClassExpression706 bucket13
+    class Bucket13,PgClassExpression199,Access200,PgSelect201,Connection206,First207,ConnectionItems208,Edge211,PgSelect262,Connection265,First266,ConnectionItems267,Edge270,Connection308,First309,ConnectionItems310,Edge313,Connection339,First340,ConnectionItems341,Edge344,PgSelect367,Connection370,First371,ConnectionItems372,Edge375,PgSelect398,Connection401,First402,ConnectionItems403,Edge406,PgSelect429,Connection432,First433,ConnectionItems434,Edge437,PgSelect460,Connection463,First464,ConnectionItems465,Edge468,List519,Lambda520,Access547,PgCursor548,Access557,PgCursor558,PgCursor567,PgCursor571,Access574,PgCursor575,Access580,PgCursor581,Access586,PgCursor587,Access592,PgCursor593,Lambda598,PgSelectSingle609,PgSelectSingle613,PgSelectSingle617,PgSelectSingle620,PgSelectSingle623,PgSelectSingle626,PgSelectSingle629,PgSelectSingle632,PgClassExpression646,PgClassExpression657,PgClassExpression662,PgClassExpression674,PgClassExpression684,PgClassExpression688,PgClassExpression692,PgClassExpression696,PgSelect697,First701,PgSelectRows702,PgSelectSingle703,PgFromExpression705,PgClassExpression706 bucket13
     classDef bucket14 stroke:#a52a2a
-    class Bucket14,PgClassExpression212,Access213,PgSelect214,Connection219,First220,ConnectionItems221,Edge224,PgSelect272,Connection275,First276,ConnectionItems277,Edge280,Connection318,First319,ConnectionItems320,Edge323,Connection349,First350,ConnectionItems351,Edge354,PgSelect377,Connection380,First381,ConnectionItems382,Edge385,PgSelect408,Connection411,First412,ConnectionItems413,Edge416,PgSelect439,Connection442,First443,ConnectionItems444,Edge447,PgSelect470,Connection473,First474,ConnectionItems475,Edge478,List523,Lambda524,Access549,PgCursor550,Access559,PgCursor560,PgCursor568,PgCursor572,Access576,PgCursor577,Access582,PgCursor583,Access588,PgCursor589,Access594,PgCursor595,Lambda599,PgSelectSingle610,PgSelectSingle614,PgSelectSingle618,PgSelectSingle621,PgSelectSingle624,PgSelectSingle627,PgSelectSingle630,PgSelectSingle633,PgClassExpression647,PgClassExpression658,PgClassExpression663,PgClassExpression675,PgClassExpression685,PgClassExpression689,PgClassExpression693,PgClassExpression707,PgSelect708,Access712,First713,PgSelectSingle714,PgFromExpression716,PgClassExpression717 bucket14
+    class Bucket14,PgClassExpression212,Access213,PgSelect214,Connection219,First220,ConnectionItems221,Edge224,PgSelect272,Connection275,First276,ConnectionItems277,Edge280,Connection318,First319,ConnectionItems320,Edge323,Connection349,First350,ConnectionItems351,Edge354,PgSelect377,Connection380,First381,ConnectionItems382,Edge385,PgSelect408,Connection411,First412,ConnectionItems413,Edge416,PgSelect439,Connection442,First443,ConnectionItems444,Edge447,PgSelect470,Connection473,First474,ConnectionItems475,Edge478,List523,Lambda524,Access549,PgCursor550,Access559,PgCursor560,PgCursor568,PgCursor572,Access576,PgCursor577,Access582,PgCursor583,Access588,PgCursor589,Access594,PgCursor595,Lambda599,PgSelectSingle610,PgSelectSingle614,PgSelectSingle618,PgSelectSingle621,PgSelectSingle624,PgSelectSingle627,PgSelectSingle630,PgSelectSingle633,PgClassExpression647,PgClassExpression658,PgClassExpression663,PgClassExpression675,PgClassExpression685,PgClassExpression689,PgClassExpression693,PgClassExpression707,PgSelect708,First712,PgSelectRows713,PgSelectSingle714,PgFromExpression716,PgClassExpression717 bucket14
     classDef bucket15 stroke:#ff00ff
-    class Bucket15,PgClassExpression225,Access226,PgSelect227,Access231,First232,PgSelectSingle233,PgClassExpression281,PgSelect282,Access284,First285,PgSelectSingle286,List529,Lambda530,Lambda569,PgClassExpression659 bucket15
+    class Bucket15,PgClassExpression225,Access226,PgSelect227,First231,PgSelectRows232,PgSelectSingle233,PgClassExpression281,PgSelect282,First284,PgSelectRows285,PgSelectSingle286,List529,Lambda530,Lambda569,PgClassExpression659 bucket15
     classDef bucket16 stroke:#f5deb3
     class Bucket16,Lambda532 bucket16
     classDef bucket17 stroke:#696969
     class Bucket17,Lambda533 bucket17
     classDef bucket18 stroke:#00bfff
-    class Bucket18,PgClassExpression234,Access235,PgSelect236,Connection241,First242,ConnectionItems243,Edge246,PgSelect288,Connection291,First292,ConnectionItems293,Edge296,Connection328,First329,ConnectionItems330,Edge333,Connection359,First360,ConnectionItems361,Edge364,PgSelect387,Connection390,First391,ConnectionItems392,Edge395,PgSelect418,Connection421,First422,ConnectionItems423,Edge426,PgSelect449,Connection452,First453,ConnectionItems454,Edge457,PgSelect480,Connection483,First484,ConnectionItems485,Edge488,List536,Lambda537,Access554,PgCursor555,Access564,PgCursor565,PgCursor570,PgCursor573,Access578,PgCursor579,Access584,PgCursor585,Access590,PgCursor591,Access596,PgCursor597,Lambda600,PgSelectSingle612,PgSelectSingle616,PgSelectSingle619,PgSelectSingle622,PgSelectSingle625,PgSelectSingle628,PgSelectSingle631,PgSelectSingle634,PgClassExpression649,PgClassExpression660,PgClassExpression672,PgClassExpression682,PgClassExpression686,PgClassExpression690,PgClassExpression694,PgClassExpression718,PgSelect719,Access723,First724,PgSelectSingle725,PgFromExpression727,PgClassExpression728 bucket18
+    class Bucket18,PgClassExpression234,Access235,PgSelect236,Connection241,First242,ConnectionItems243,Edge246,PgSelect288,Connection291,First292,ConnectionItems293,Edge296,Connection328,First329,ConnectionItems330,Edge333,Connection359,First360,ConnectionItems361,Edge364,PgSelect387,Connection390,First391,ConnectionItems392,Edge395,PgSelect418,Connection421,First422,ConnectionItems423,Edge426,PgSelect449,Connection452,First453,ConnectionItems454,Edge457,PgSelect480,Connection483,First484,ConnectionItems485,Edge488,List536,Lambda537,Access554,PgCursor555,Access564,PgCursor565,PgCursor570,PgCursor573,Access578,PgCursor579,Access584,PgCursor585,Access590,PgCursor591,Access596,PgCursor597,Lambda600,PgSelectSingle612,PgSelectSingle616,PgSelectSingle619,PgSelectSingle622,PgSelectSingle625,PgSelectSingle628,PgSelectSingle631,PgSelectSingle634,PgClassExpression649,PgClassExpression660,PgClassExpression672,PgClassExpression682,PgClassExpression686,PgClassExpression690,PgClassExpression694,PgClassExpression718,PgSelect719,First723,PgSelectRows724,PgSelectSingle725,PgFromExpression727,PgClassExpression728 bucket18
     classDef bucket19 stroke:#7f007f
     class Bucket19,PgFromExpression503 bucket19
     classDef bucket20 stroke:#ffa500
@@ -1446,13 +1446,13 @@ graph TD
     classDef bucket21 stroke:#0000ff
     class Bucket21 bucket21
     classDef bucket22 stroke:#7fff00
-    class Bucket22,PgClassExpression247,Access248,PgSelect249,Connection254,First255,ConnectionItems256,Edge259,PgClassExpression297,PgSelect298,Access300,First301,PgSelectSingle302,PgSelectSingle556,PgClassExpression603,PgClassExpression641,PgSelect642,PgFromExpression644,PgSelectRows767,PgFromExpression983,PgSelectInlineApply984,Access985,List986,Lambda987,PgSelectInlineApply988,Access989 bucket22
+    class Bucket22,PgClassExpression247,Access248,PgSelect249,Connection254,First255,ConnectionItems256,Edge259,PgClassExpression297,PgSelect298,First300,PgSelectRows301,PgSelectSingle302,PgSelectSingle556,PgClassExpression603,PgClassExpression641,PgSelect642,PgFromExpression644,PgSelectRows767,PgFromExpression983,PgSelectInlineApply984,Access985,List986,Lambda987,PgSelectInlineApply988,Access989 bucket22
     classDef bucket48 stroke:#a52a2a
     class Bucket48,PgClassExpression489,Access490 bucket48
     classDef bucket49 stroke:#ff00ff
     class Bucket49,PgClassExpression491,Access492 bucket49
     classDef bucket50 stroke:#f5deb3
-    class Bucket50,PgClassExpression493,Access494,PgSelect495,Access499,First500,PgSelectSingle501,PgClassExpression504 bucket50
+    class Bucket50,PgClassExpression493,Access494,PgSelect495,First499,PgSelectRows500,PgSelectSingle501,PgClassExpression504 bucket50
     classDef bucket51 stroke:#696969
     class Bucket51,PgClassExpression505,Access506,PgClassExpression601 bucket51
     classDef bucket52 stroke:#00bfff
@@ -1460,7 +1460,7 @@ graph TD
     classDef bucket53 stroke:#7f007f
     class Bucket53 bucket53
     classDef bucket54 stroke:#ffa500
-    class Bucket54,PgClassExpression512,Access513,List514,Lambda515,PgClassExpression645,PgClassExpression656,PgClassExpression661,PgClassExpression673,PgClassExpression683,PgClassExpression687,PgClassExpression691,PgClassExpression695,PgClassExpression729,PgClassExpression730,PgClassExpression731,PgClassExpression732,PgClassExpression733,PgClassExpression734,PgClassExpression735,PgClassExpression736,PgClassExpression737,PgClassExpression738,PgClassExpression739,PgClassExpression740,PgClassExpression741,PgClassExpression742,PgClassExpression743,PgClassExpression744,PgClassExpression745,PgSelect746,Access750,First751,PgSelectSingle752,PgClassExpression753,PgSelect754,Access756,First757,PgSelectSingle758,PgClassExpression759,PgClassExpression760,PgClassExpression761,PgClassExpression762,PgClassExpression763,PgClassExpression764,PgClassExpression765,Access858,Access859,Access860,PgClassExpression862,Access866,First867,PgSelectSingle868,Access898,Access899,Access900,PgClassExpression902,Access906,First907,PgSelectSingle908,PgClassExpression918,PgClassExpression919,PgClassExpression927,PgClassExpression929,PgClassExpression931,PgClassExpression932,Access976,List977,Lambda978,Access980,List981,Lambda982 bucket54
+    class Bucket54,PgClassExpression512,Access513,List514,Lambda515,PgClassExpression645,PgClassExpression656,PgClassExpression661,PgClassExpression673,PgClassExpression683,PgClassExpression687,PgClassExpression691,PgClassExpression695,PgClassExpression729,PgClassExpression730,PgClassExpression731,PgClassExpression732,PgClassExpression733,PgClassExpression734,PgClassExpression735,PgClassExpression736,PgClassExpression737,PgClassExpression738,PgClassExpression739,PgClassExpression740,PgClassExpression741,PgClassExpression742,PgClassExpression743,PgClassExpression744,PgClassExpression745,PgSelect746,First750,PgSelectRows751,PgSelectSingle752,PgClassExpression753,PgSelect754,First756,PgSelectRows757,PgSelectSingle758,PgClassExpression759,PgClassExpression760,PgClassExpression761,PgClassExpression762,PgClassExpression763,PgClassExpression764,PgClassExpression765,Access858,Access859,Access860,PgClassExpression862,First866,PgSelectRows867,PgSelectSingle868,Access898,Access899,Access900,PgClassExpression902,First906,PgSelectRows907,PgSelectSingle908,PgClassExpression918,PgClassExpression919,PgClassExpression927,PgClassExpression929,PgClassExpression931,PgClassExpression932,Access976,List977,Lambda978,Access980,List981,Lambda982 bucket54
     classDef bucket55 stroke:#0000ff
     class Bucket55 bucket55
     classDef bucket56 stroke:#7fff00
@@ -1542,7 +1542,7 @@ graph TD
     classDef bucket94 stroke:#ff0000
     class Bucket94,PgClassExpression777,PgClassExpression851 bucket94
     classDef bucket95 stroke:#ffff00
-    class Bucket95,PgClassExpression778,PgClassExpression871,Access923,First924,PgSelectSingle925,PgSelectRows933,List990,Lambda991 bucket95
+    class Bucket95,PgClassExpression778,PgClassExpression871,First923,PgSelectRows924,PgSelectSingle925,PgSelectRows933,List990,Lambda991 bucket95
     classDef bucket96 stroke:#00ffff
     class Bucket96,PgClassExpression779,List780,Lambda781,PgClassExpression872 bucket96
     classDef bucket97 stroke:#4169e1

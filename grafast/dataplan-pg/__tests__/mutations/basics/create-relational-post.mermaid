@@ -10,8 +10,8 @@ graph TD
     subgraph "Buckets for mutations/basics/create-relational-post"
     Bucket0("Bucket 0 (root)"):::bucket
     Bucket1("Bucket 1 (mutationField)<br />Deps: 15, 10, 11, 79, 80, 81, 2<br /><br />1: PgInsertSingle[12]<br />2: Access[19]<br />3: Access[20]<br />4: Object[21]<br />5: Access[17]<br />6: PgClassExpression[16]<br />7: PgInsertSingle[18]<br />8: <br />ᐳ: Access[23], PgClassExpression[22]"):::bucket
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 18, 15, 22<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[22]<br />1: 66, 75<br />ᐳ: 25, 74, 24<br />2: PgSelectInlineApply[70]<br />3: PgSelect[26]<br />ᐳ: Access[30], Access[71], Access[76]<br />4: First[31]<br />ᐳ: PgSelectSingle[32]"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 32, 71, 76<br /><br />ROOT PgSelectSingle{2}ᐸrelational_postsᐳ[32]<br />1: <br />ᐳ: 33, 34, 35, 36, 72, 77, 73, 78, 43, 49, 67<br />2: First[44], First[50]<br />ᐳ: 45, 46, 51, 52, 68, 69, 61<br />3: First[62]<br />ᐳ: PgSelectSingle[63]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 18, 15, 22<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[22]<br />1: 66, 75<br />ᐳ: 25, 74, 24<br />2: PgSelectInlineApply[70]<br />3: PgSelect[26]<br />ᐳ: Access[71], Access[76]<br />4: PgSelectRows[31]<br />5: First[30]<br />ᐳ: PgSelectSingle[32]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 32, 71, 76<br /><br />ROOT PgSelectSingle{2}ᐸrelational_postsᐳ[32]<br />1: <br />ᐳ: 33, 34, 35, 36, 72, 77, 73, 78, 67<br />2: PgSelectRows[44], PgSelectRows[50]<br />3: First[43], First[49]<br />ᐳ: 45, 46, 51, 52, 68, 69<br />4: PgSelectRows[62]<br />5: First[61]<br />ᐳ: PgSelectSingle[63]"):::bucket
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 63<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[63]"):::bucket
     end
     Bucket0 --> Bucket1
@@ -49,12 +49,12 @@ graph TD
     Access25{{"Access[25∈2] ➊<br />ᐸ18.tᐳ"}}:::plan
     Access25 --> PgClassExpression24
     PgInsertSingle18 --> Access25
-    Access30{{"Access[30∈2] ➊<br />ᐸ26.itemsᐳ"}}:::plan
-    PgSelect26 --> Access30
-    First31[["First[31∈2] ➊"]]:::plan
-    Access30 --> First31
+    First30[["First[30∈2] ➊"]]:::plan
+    PgSelectRows31[["PgSelectRows[31∈2] ➊"]]:::plan
+    PgSelectRows31 --> First30
+    PgSelect26 --> PgSelectRows31
     PgSelectSingle32{{"PgSelectSingle[32∈2] ➊<br />ᐸrelational_postsᐳ"}}:::plan
-    First31 --> PgSelectSingle32
+    First30 --> PgSelectSingle32
     PgSelectInlineApply66["PgSelectInlineApply[66∈2] ➊"]:::plan
     PgSelectInlineApply66 --> PgSelectInlineApply70
     Access71{{"Access[71∈2] ➊<br />ᐸ26.m.joinDetailsFor47ᐳ"}}:::plan
@@ -77,30 +77,30 @@ graph TD
     PgSelectSingle32 --> PgClassExpression35
     PgClassExpression36{{"PgClassExpression[36∈3] ➊<br />ᐸ__relation...s__.”note”ᐳ"}}:::plan
     PgSelectSingle32 --> PgClassExpression36
-    Access43{{"Access[43∈3] ➊<br />ᐸ78.itemsᐳ"}}:::plan
+    First43[["First[43∈3] ➊"]]:::plan
+    PgSelectRows44[["PgSelectRows[44∈3] ➊"]]:::plan
+    PgSelectRows44 --> First43
     Lambda78{{"Lambda[78∈3] ➊<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda78 --> Access43
-    First44[["First[44∈3] ➊"]]:::plan
-    Access43 --> First44
+    Lambda78 --> PgSelectRows44
     PgSelectSingle45{{"PgSelectSingle[45∈3] ➊<br />ᐸtextᐳ"}}:::plan
-    First44 --> PgSelectSingle45
+    First43 --> PgSelectSingle45
     PgClassExpression46{{"PgClassExpression[46∈3] ➊<br />ᐸ__relation..._lower__.vᐳ"}}:::plan
     PgSelectSingle45 --> PgClassExpression46
-    Access49{{"Access[49∈3] ➊<br />ᐸ73.itemsᐳ"}}:::plan
+    First49[["First[49∈3] ➊"]]:::plan
+    PgSelectRows50[["PgSelectRows[50∈3] ➊"]]:::plan
+    PgSelectRows50 --> First49
     Lambda73{{"Lambda[73∈3] ➊<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda73 --> Access49
-    First50[["First[50∈3] ➊"]]:::plan
-    Access49 --> First50
-    First50 --> PgSelectSingle51
+    Lambda73 --> PgSelectRows50
+    First49 --> PgSelectSingle51
     PgClassExpression52{{"PgClassExpression[52∈3] ➊<br />ᐸ__relation..._archived”ᐳ"}}:::plan
     PgSelectSingle51 --> PgClassExpression52
-    Access61{{"Access[61∈3] ➊<br />ᐸ69.itemsᐳ"}}:::plan
+    First61[["First[61∈3] ➊"]]:::plan
+    PgSelectRows62[["PgSelectRows[62∈3] ➊"]]:::plan
+    PgSelectRows62 --> First61
     Lambda69{{"Lambda[69∈3] ➊<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda69 --> Access61
-    First62[["First[62∈3] ➊"]]:::plan
-    Access61 --> First62
+    Lambda69 --> PgSelectRows62
     PgSelectSingle63{{"PgSelectSingle[63∈3] ➊<br />ᐸpeopleᐳ"}}:::plan
-    First62 --> PgSelectSingle63
+    First61 --> PgSelectSingle63
     Lambda73 --> Access67
     List68 --> Lambda69
     List72 --> Lambda73
@@ -116,9 +116,9 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle12,PgClassExpression16,Access17,PgInsertSingle18,Access19,Access20,Object21,PgClassExpression22,Access23 bucket1
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgClassExpression24,Access25,PgSelect26,Access30,First31,PgSelectSingle32,PgSelectInlineApply66,PgSelectInlineApply70,Access71,PgFromExpression74,PgSelectInlineApply75,Access76 bucket2
+    class Bucket2,PgClassExpression24,Access25,PgSelect26,First30,PgSelectRows31,PgSelectSingle32,PgSelectInlineApply66,PgSelectInlineApply70,Access71,PgFromExpression74,PgSelectInlineApply75,Access76 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression33,PgClassExpression34,PgClassExpression35,PgClassExpression36,Access43,First44,PgSelectSingle45,PgClassExpression46,Access49,First50,PgSelectSingle51,PgClassExpression52,Access61,First62,PgSelectSingle63,Access67,List68,Lambda69,List72,Lambda73,List77,Lambda78 bucket3
+    class Bucket3,PgClassExpression33,PgClassExpression34,PgClassExpression35,PgClassExpression36,First43,PgSelectRows44,PgSelectSingle45,PgClassExpression46,First49,PgSelectRows50,PgSelectSingle51,PgClassExpression52,First61,PgSelectRows62,PgSelectSingle63,Access67,List68,Lambda69,List72,Lambda73,List77,Lambda78 bucket3
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression64,PgClassExpression65 bucket4
 

@@ -13,8 +13,8 @@ graph TD
     Bucket3("Bucket 3 (listItem)<br />Deps: 11, 31<br /><br />ROOT __Item{3}ᐸ14ᐳ[17]"):::bucket
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 18, 11, 31<br /><br />ROOT PgSelectSingle{3}ᐸlog_entriesᐳ[18]<br />1: <br />ᐳ: 19, 20, 21<br />2: PgUnionAll[22]<br />ᐳ: Access[53]<br />3: First[26]<br />ᐳ: 29, 30, 32, 33, 34"):::bucket
     Bucket5("Bucket 5 (polymorphic)<br />__typename: Access[34]<br />Deps: 34, 33, 11"):::bucket
-    Bucket6("Bucket 6 (polymorphicPartition)<br />|Organization<br />Deps: 33, 11<br />ᐳOrganization<br /><br />1: <br />ᐳ: Access[35]<br />2: PgSelect[36]<br />ᐳ: Access[40]<br />3: First[41]<br />ᐳ: 42, 51"):::bucket
-    Bucket7("Bucket 7 (polymorphicPartition)<br />|Person<br />Deps: 33, 11<br />ᐳPerson<br /><br />1: <br />ᐳ: Access[43]<br />2: PgSelect[44]<br />ᐳ: Access[48]<br />3: First[49]<br />ᐳ: 50, 52"):::bucket
+    Bucket6("Bucket 6 (polymorphicPartition)<br />|Organization<br />Deps: 33, 11<br />ᐳOrganization<br /><br />1: <br />ᐳ: Access[35]<br />2: PgSelect[36]<br />3: PgSelectRows[41]<br />4: First[40]<br />ᐳ: 42, 51"):::bucket
+    Bucket7("Bucket 7 (polymorphicPartition)<br />|Person<br />Deps: 33, 11<br />ᐳPerson<br /><br />1: <br />ᐳ: Access[43]<br />2: PgSelect[44]<br />3: PgSelectRows[49]<br />4: First[48]<br />ᐳ: 50, 52"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket3
@@ -65,24 +65,24 @@ graph TD
     Access35{{"Access[35∈6]<br />ᐸ33.organization_idᐳ<br />ᐳOrganization"}}:::plan
     Access35 --> PgSelect36
     Lambda33 --> Access35
-    Access40{{"Access[40∈6]^<br />ᐸ36.itemsᐳ"}}:::plan
-    PgSelect36 --> Access40
-    First41[["First[41∈6]^"]]:::plan
-    Access40 --> First41
+    First40[["First[40∈6]^"]]:::plan
+    PgSelectRows41[["PgSelectRows[41∈6]^"]]:::plan
+    PgSelectRows41 --> First40
+    PgSelect36 --> PgSelectRows41
     PgSelectSingle42{{"PgSelectSingle[42∈6]^<br />ᐸorganizationsᐳ"}}:::plan
-    First41 --> PgSelectSingle42
+    First40 --> PgSelectSingle42
     PgClassExpression51{{"PgClassExpression[51∈6]^<br />ᐸ__organiza...s__.”name”ᐳ"}}:::plan
     PgSelectSingle42 --> PgClassExpression51
     PgSelect44[["PgSelect[44∈7]^<br />ᐸpeopleᐳ<br />More deps:<br />- Object[11]"]]:::plan
     Access43{{"Access[43∈7]<br />ᐸ33.person_idᐳ<br />ᐳPerson"}}:::plan
     Access43 --> PgSelect44
     Lambda33 --> Access43
-    Access48{{"Access[48∈7]^<br />ᐸ44.itemsᐳ"}}:::plan
-    PgSelect44 --> Access48
-    First49[["First[49∈7]^"]]:::plan
-    Access48 --> First49
+    First48[["First[48∈7]^"]]:::plan
+    PgSelectRows49[["PgSelectRows[49∈7]^"]]:::plan
+    PgSelectRows49 --> First48
+    PgSelect44 --> PgSelectRows49
     PgSelectSingle50{{"PgSelectSingle[50∈7]^<br />ᐸpeopleᐳ"}}:::plan
-    First49 --> PgSelectSingle50
+    First48 --> PgSelectSingle50
     PgClassExpression52{{"PgClassExpression[52∈7]^<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle50 --> PgClassExpression52
 
@@ -98,7 +98,7 @@ graph TD
     classDef bucket5 stroke:#7fff00
     class Bucket5 bucket5
     classDef bucket6 stroke:#ff1493
-    class Bucket6,Access35,PgSelect36,Access40,First41,PgSelectSingle42,PgClassExpression51 bucket6
+    class Bucket6,Access35,PgSelect36,First40,PgSelectRows41,PgSelectSingle42,PgClassExpression51 bucket6
     classDef bucket7 stroke:#808000
-    class Bucket7,Access43,PgSelect44,Access48,First49,PgSelectSingle50,PgClassExpression52 bucket7
+    class Bucket7,Access43,PgSelect44,First48,PgSelectRows49,PgSelectSingle50,PgClassExpression52 bucket7
 

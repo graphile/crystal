@@ -8,11 +8,11 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/v4/partitions"
-    Bucket0("Bucket 0 (root)<br /><br />1: PgSelectInlineApply[48]<br />ᐳ: Access[9], Access[10], Object[11]<br />2: PgSelect[8], PgSelect[17]<br />ᐳ: Access[18], Access[26], Access[49]<br />3: Connection[12], First[19]<br />ᐳ: 20, 21<br />4: ConnectionItems[14]<br />5: First[25], Last[28]<br />ᐳ: PgCursor[27], PgCursor[29]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: PgSelectInlineApply[48]<br />ᐳ: Access[9], Access[10], Object[11]<br />2: PgSelect[8], PgSelect[17]<br />ᐳ: Access[26], Access[49]<br />3: Connection[12], PgSelectRows[19]<br />4: ConnectionItems[14], First[18]<br />ᐳ: 20, 21<br />5: First[25], Last[28]<br />ᐳ: PgCursor[27], PgCursor[29]"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 26, 14, 49, 21, 27, 29<br /><br />ROOT Connectionᐸ8ᐳ[12]"):::bucket
     Bucket3("Bucket 3 (listItem)<br />Deps: 26, 49<br /><br />ROOT __Item{3}ᐸ14ᐳ[23]"):::bucket
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 23, 24, 49, 33<br /><br />ROOT Edge{3}[24]"):::bucket
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 34, 49<br /><br />ROOT PgSelectSingle{4}ᐸmeasurementsᐳ[34]<br />1: <br />ᐳ: 35, 36, 37, 50, 51, 43<br />2: First[44]<br />ᐳ: PgSelectSingle[45]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 34, 49<br /><br />ROOT PgSelectSingle{4}ᐸmeasurementsᐳ[34]<br />1: <br />ᐳ: 35, 36, 37, 50, 51<br />2: PgSelectRows[44]<br />3: First[43]<br />ᐳ: PgSelectSingle[45]"):::bucket
     Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 45<br /><br />ROOT PgSelectSingle{5}ᐸusersᐳ[45]"):::bucket
     end
     Bucket0 --> Bucket1
@@ -37,12 +37,12 @@ graph TD
     ConnectionItems14[["ConnectionItems[14∈0] ➊<br />Dependents: 3<br />More deps:<br />- Connection[12]"]]:::plan
     PgSelect17[["PgSelect[17∈0] ➊<br />ᐸmeasurements(aggregate)ᐳ"]]:::plan
     Object11 --> PgSelect17
-    Access18{{"Access[18∈0] ➊<br />ᐸ17.itemsᐳ"}}:::plan
-    PgSelect17 --> Access18
-    First19[["First[19∈0] ➊"]]:::plan
-    Access18 --> First19
+    First18[["First[18∈0] ➊"]]:::plan
+    PgSelectRows19[["PgSelectRows[19∈0] ➊"]]:::plan
+    PgSelectRows19 --> First18
+    PgSelect17 --> PgSelectRows19
     PgSelectSingle20{{"PgSelectSingle[20∈0] ➊<br />ᐸmeasurementsᐳ"}}:::plan
-    First19 --> PgSelectSingle20
+    First18 --> PgSelectSingle20
     First25[["First[25∈0] ➊<br />More deps:<br />- ConnectionItems[14]"]]:::plan
     Access26{{"Access[26∈0] ➊<br />ᐸ8.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect8 --> Access26
@@ -65,13 +65,13 @@ graph TD
     PgSelectSingle34 --> PgClassExpression36
     PgClassExpression37{{"PgClassExpression[37∈5]<br />ᐸ__measurem...__.”value”ᐳ"}}:::plan
     PgSelectSingle34 --> PgClassExpression37
-    Access43{{"Access[43∈5]<br />ᐸ51.itemsᐳ"}}:::plan
+    First43[["First[43∈5]"]]:::plan
+    PgSelectRows44[["PgSelectRows[44∈5]"]]:::plan
+    PgSelectRows44 --> First43
     Lambda51{{"Lambda[51∈5]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda51 --> Access43
-    First44[["First[44∈5]"]]:::plan
-    Access43 --> First44
+    Lambda51 --> PgSelectRows44
     PgSelectSingle45{{"PgSelectSingle[45∈5]<br />ᐸusersᐳ"}}:::plan
-    First44 --> PgSelectSingle45
+    First43 --> PgSelectSingle45
     List50 --> Lambda51
     PgClassExpression46{{"PgClassExpression[46∈6]<br />ᐸ__users__.”id”ᐳ"}}:::plan
     PgSelectSingle45 --> PgClassExpression46
@@ -80,7 +80,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,PgSelect8,Access9,Access10,Object11,Connection12,ConnectionItems14,PgSelect17,Access18,First19,PgSelectSingle20,First25,Access26,Last28,PgSelectInlineApply48,Access49 bucket0
+    class Bucket0,__Value2,PgSelect8,Access9,Access10,Object11,Connection12,ConnectionItems14,PgSelect17,First18,PgSelectRows19,PgSelectSingle20,First25,Access26,Last28,PgSelectInlineApply48,Access49 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1,PageInfo22 bucket1
     classDef bucket3 stroke:#ffa500
@@ -88,7 +88,7 @@ graph TD
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgSelectSingle34 bucket4
     classDef bucket5 stroke:#7fff00
-    class Bucket5,PgClassExpression35,PgClassExpression36,PgClassExpression37,Access43,First44,PgSelectSingle45,List50,Lambda51 bucket5
+    class Bucket5,PgClassExpression35,PgClassExpression36,PgClassExpression37,First43,PgSelectRows44,PgSelectSingle45,List50,Lambda51 bucket5
     classDef bucket6 stroke:#ff1493
     class Bucket6,PgClassExpression46,PgClassExpression47 bucket6
 

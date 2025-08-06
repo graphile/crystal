@@ -9,7 +9,7 @@ graph TD
 
     subgraph "Buckets for mutations/v4/authenticateFail"
     Bucket0("Bucket 0 (root)"):::bucket
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 11, 16<br /><br />1: PgSelect[8]<br />2: <br />ᐳ: Access[12]<br />3: First[13]<br />ᐳ: PgSelectSingle[14], Object[15]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 11, 16<br /><br />1: PgSelect[8]<br />2: PgSelectRows[13]<br />3: First[12]<br />ᐳ: PgSelectSingle[14], Object[15]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 14, 15<br /><br />ROOT Object{1}ᐸ{result}ᐳ[15]"):::bucket
     end
     Bucket0 --> Bucket1
@@ -28,12 +28,12 @@ graph TD
     __InputObject6 --> ApplyInput16
     PgSelect8[["PgSelect[8∈1] ➊<br />ᐸauthenticate_fail(mutation)ᐳ"]]:::sideeffectplan
     Object11 & ApplyInput16 --> PgSelect8
-    Access12{{"Access[12∈1] ➊<br />ᐸ8.itemsᐳ"}}:::plan
-    PgSelect8 --> Access12
-    First13[["First[13∈1] ➊"]]:::plan
-    Access12 --> First13
+    First12[["First[12∈1] ➊"]]:::plan
+    PgSelectRows13[["PgSelectRows[13∈1] ➊"]]:::plan
+    PgSelectRows13 --> First12
+    PgSelect8 --> PgSelectRows13
     PgSelectSingle14{{"PgSelectSingle[14∈1] ➊<br />ᐸauthenticate_failᐳ"}}:::plan
-    First13 --> PgSelectSingle14
+    First12 --> PgSelectSingle14
     Object15{{"Object[15∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgSelectSingle14 --> Object15
     PgClassExpression17{{"PgClassExpression[17∈2] ➊<br />ᐸ__authenticate_fail__ᐳ"}}:::plan
@@ -43,7 +43,7 @@ graph TD
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__InputObject6,Access9,Access10,Object11,ApplyInput16 bucket0
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect8,Access12,First13,PgSelectSingle14,Object15 bucket1
+    class Bucket1,PgSelect8,First12,PgSelectRows13,PgSelectSingle14,Object15 bucket1
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression17 bucket2
 

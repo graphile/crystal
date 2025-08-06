@@ -13,7 +13,7 @@ graph TD
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 11, 52, 29, 33, 30, 31, 6<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[16]<br />1: <br />ᐳ: 17, 20, 26<br />2: PgSelect[21]<br />3: Connection[25]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 25, 30, 31, 6, 11<br /><br />ROOT Connection{2}ᐸ21ᐳ[25]"):::bucket
     Bucket5("Bucket 5 (listItem)<br />Deps: 11<br /><br />ROOT __Item{5}ᐸ34ᐳ[38]"):::bucket
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 39, 11<br /><br />ROOT PgSelectSingle{5}ᐸmessagesᐳ[39]<br />1: <br />ᐳ: 40, 41<br />2: PgSelect[42]<br />ᐳ: Access[46]<br />3: First[47]<br />ᐳ: PgSelectSingle[48]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 39, 11<br /><br />ROOT PgSelectSingle{5}ᐸmessagesᐳ[39]<br />1: <br />ᐳ: 40, 41<br />2: PgSelect[42]<br />3: PgSelectRows[47]<br />4: First[46]<br />ᐳ: PgSelectSingle[48]"):::bucket
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 48<br /><br />ROOT PgSelectSingle{6}ᐸusersᐳ[48]"):::bucket
     end
     Bucket0 --> Bucket1
@@ -64,12 +64,12 @@ graph TD
     PgClassExpression40{{"PgClassExpression[40∈6]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
     PgSelectSingle39 --> PgClassExpression40
     PgSelectSingle39 --> PgClassExpression41
-    Access46{{"Access[46∈6]<br />ᐸ42.itemsᐳ"}}:::plan
-    PgSelect42 --> Access46
-    First47[["First[47∈6]"]]:::plan
-    Access46 --> First47
+    First46[["First[46∈6]"]]:::plan
+    PgSelectRows47[["PgSelectRows[47∈6]"]]:::plan
+    PgSelectRows47 --> First46
+    PgSelect42 --> PgSelectRows47
     PgSelectSingle48{{"PgSelectSingle[48∈6]<br />ᐸusersᐳ"}}:::plan
-    First47 --> PgSelectSingle48
+    First46 --> PgSelectSingle48
     PgClassExpression49{{"PgClassExpression[49∈7]<br />ᐸ__users__.”username”ᐳ"}}:::plan
     PgSelectSingle48 --> PgClassExpression49
     PgClassExpression50{{"PgClassExpression[50∈7]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
@@ -87,7 +87,7 @@ graph TD
     classDef bucket5 stroke:#7fff00
     class Bucket5,__Item38,PgSelectSingle39 bucket5
     classDef bucket6 stroke:#ff1493
-    class Bucket6,PgClassExpression40,PgClassExpression41,PgSelect42,Access46,First47,PgSelectSingle48 bucket6
+    class Bucket6,PgClassExpression40,PgClassExpression41,PgSelect42,First46,PgSelectRows47,PgSelectSingle48 bucket6
     classDef bucket7 stroke:#808000
     class Bucket7,PgClassExpression49,PgClassExpression50 bucket7
 

@@ -11,7 +11,7 @@ graph TD
     Bucket0("Bucket 0 (root)<br /><br />1: PgSelectInlineApply[100]<br />ᐳ: 6, 8, 9, 10<br />2: PgSelectInlineApply[104]<br />3: PgSelect[7]<br />ᐳ: Access[105]<br />4: PgSelectRows[11]"):::bucket
     Bucket1("Bucket 1 (listItem)<br />Deps: 105<br /><br />ROOT __Item{1}ᐸ11ᐳ[12]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 13, 105, 12<br /><br />ROOT PgSelectSingle{1}ᐸpeopleᐳ[13]<br />1: <br />ᐳ: 14, 106, 107<br />2: PgSelectRows[20]"):::bucket
-    Bucket3("Bucket 3 (listItem)<br />Deps: 107<br /><br />ROOT __Item{3}ᐸ20ᐳ[21]<br />1: <br />ᐳ: 22, 101, 23, 25, 26, 27, 77, 102, 103, 32<br />2: First[33]<br />ᐳ: 34, 83, 84, 95"):::bucket
+    Bucket3("Bucket 3 (listItem)<br />Deps: 107<br /><br />ROOT __Item{3}ᐸ20ᐳ[21]<br />1: <br />ᐳ: 22, 101, 23, 25, 26, 27, 77, 102, 103<br />2: PgSelectRows[33]<br />3: First[32]<br />ᐳ: 34, 83, 84, 95"):::bucket
     Bucket4("Bucket 4 (polymorphic)<br />__typename: Lambda[26]<br />Deps: 26, 84, 22, 23, 25, 77, 34, 27, 83, 95"):::bucket
     Bucket5("Bucket 5 (polymorphic)<br />__typename: Lambda[84]<br />Deps: 84, 34, 27, 83, 95"):::bucket
     end
@@ -65,13 +65,13 @@ graph TD
     PgClassExpression25 --> Lambda26
     PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__single_t...parent_id”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression27
-    Access32{{"Access[32∈3]<br />ᐸ103.itemsᐳ"}}:::plan
+    First32[["First[32∈3]"]]:::plan
+    PgSelectRows33[["PgSelectRows[33∈3]"]]:::plan
+    PgSelectRows33 --> First32
     Lambda103{{"Lambda[103∈3]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda103 --> Access32
-    First33[["First[33∈3]"]]:::plan
-    Access32 --> First33
+    Lambda103 --> PgSelectRows33
     PgSelectSingle34{{"PgSelectSingle[34∈3]<br />ᐸsingle_table_itemsᐳ"}}:::plan
-    First33 --> PgSelectSingle34
+    First32 --> PgSelectSingle34
     PgClassExpression77{{"PgClassExpression[77∈3]<br />ᐸ__single_t...__.”type2”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression77
     PgClassExpression83{{"PgClassExpression[83∈3]<br />ᐸ__single_t...s__.”type”ᐳ"}}:::plan
@@ -91,7 +91,7 @@ graph TD
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression14,PgSelectRows20,List106,Lambda107 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,__Item21,PgSelectSingle22,PgClassExpression23,PgClassExpression25,Lambda26,PgClassExpression27,Access32,First33,PgSelectSingle34,PgClassExpression77,PgClassExpression83,Lambda84,PgClassExpression95,Access101,List102,Lambda103 bucket3
+    class Bucket3,__Item21,PgSelectSingle22,PgClassExpression23,PgClassExpression25,Lambda26,PgClassExpression27,First32,PgSelectRows33,PgSelectSingle34,PgClassExpression77,PgClassExpression83,Lambda84,PgClassExpression95,Access101,List102,Lambda103 bucket3
     classDef bucket4 stroke:#0000ff
     class Bucket4 bucket4
     classDef bucket5 stroke:#7fff00

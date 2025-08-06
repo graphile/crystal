@@ -11,7 +11,7 @@ graph TD
     Bucket0("Bucket 0 (root)<br /><br />1: 240, 248<br />ᐳ: 6, 8, 9, 10<br />2: PgSelectInlineApply[244]<br />3: PgSelectInlineApply[252]<br />4: PgSelect[7]<br />ᐳ: Access[253]<br />5: PgSelectRows[11]"):::bucket
     Bucket1("Bucket 1 (listItem)<br />Deps: 253<br /><br />ROOT __Item{1}ᐸ11ᐳ[12]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 13, 253, 12<br /><br />ROOT PgSelectSingle{1}ᐸpeopleᐳ[13]<br />1: <br />ᐳ: 14, 254, 255<br />2: PgSelectRows[20]"):::bucket
-    Bucket3("Bucket 3 (listItem)<br />Deps: 255<br /><br />ROOT __Item{3}ᐸ20ᐳ[21]<br />1: <br />ᐳ: 22, 245, 249, 23, 25, 26, 27, 77, 112, 117, 122, 127, 132, 246, 247, 250, 251, 32, 85, 241<br />2: First[33], First[86]<br />ᐳ: 34, 87, 147, 148, 160, 205, 210, 215, 220, 225, 242, 243, 170<br />3: First[171]<br />ᐳ: PgSelectSingle[172]"):::bucket
+    Bucket3("Bucket 3 (listItem)<br />Deps: 255<br /><br />ROOT __Item{3}ᐸ20ᐳ[21]<br />1: <br />ᐳ: 22, 245, 249, 23, 25, 26, 27, 77, 112, 117, 122, 127, 132, 246, 247, 250, 251, 241<br />2: PgSelectRows[33], PgSelectRows[86]<br />3: First[32], First[85]<br />ᐳ: 34, 87, 147, 148, 160, 205, 210, 215, 220, 225, 242, 243<br />4: PgSelectRows[171]<br />5: First[170]<br />ᐳ: PgSelectSingle[172]"):::bucket
     Bucket4("Bucket 4 (polymorphic)<br />__typename: Lambda[26]<br />Deps: 22, 26, 87, 34, 148, 172, 23, 25, 77, 112, 117, 122, 127, 132, 27, 147, 160, 205, 210, 215, 220, 225"):::bucket
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 87<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[87]"):::bucket
     Bucket6("Bucket 6 (polymorphic)<br />__typename: Lambda[148]<br />Deps: 34, 148, 172, 27, 147, 160, 205, 210, 215, 220, 225"):::bucket
@@ -78,21 +78,21 @@ graph TD
     PgClassExpression25 --> Lambda26
     PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__single_t...parent_id”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression27
-    Access32{{"Access[32∈3]<br />ᐸ247.itemsᐳ"}}:::plan
+    First32[["First[32∈3]"]]:::plan
+    PgSelectRows33[["PgSelectRows[33∈3]"]]:::plan
+    PgSelectRows33 --> First32
     Lambda247{{"Lambda[247∈3]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda247 --> Access32
-    First33[["First[33∈3]"]]:::plan
-    Access32 --> First33
-    First33 --> PgSelectSingle34
+    Lambda247 --> PgSelectRows33
+    First32 --> PgSelectSingle34
     PgClassExpression77{{"PgClassExpression[77∈3]<br />ᐸ__single_t...__.”type2”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression77
-    Access85{{"Access[85∈3]<br />ᐸ251.itemsᐳ"}}:::plan
+    First85[["First[85∈3]"]]:::plan
+    PgSelectRows86[["PgSelectRows[86∈3]"]]:::plan
+    PgSelectRows86 --> First85
     Lambda251{{"Lambda[251∈3]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda251 --> Access85
-    First86[["First[86∈3]"]]:::plan
-    Access85 --> First86
+    Lambda251 --> PgSelectRows86
     PgSelectSingle87{{"PgSelectSingle[87∈3]<br />ᐸpeopleᐳ"}}:::plan
-    First86 --> PgSelectSingle87
+    First85 --> PgSelectSingle87
     PgClassExpression112{{"PgClassExpression[112∈3]<br />ᐸ__single_t...”position”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression112
     PgClassExpression117{{"PgClassExpression[117∈3]<br />ᐸ__single_t...reated_at”ᐳ"}}:::plan
@@ -109,13 +109,13 @@ graph TD
     PgClassExpression147 --> Lambda148
     PgClassExpression160{{"PgClassExpression[160∈3]<br />ᐸ__single_t...__.”type2”ᐳ"}}:::plan
     PgSelectSingle34 --> PgClassExpression160
-    Access170{{"Access[170∈3]<br />ᐸ243.itemsᐳ"}}:::plan
+    First170[["First[170∈3]"]]:::plan
+    PgSelectRows171[["PgSelectRows[171∈3]"]]:::plan
+    PgSelectRows171 --> First170
     Lambda243{{"Lambda[243∈3]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda243 --> Access170
-    First171[["First[171∈3]"]]:::plan
-    Access170 --> First171
+    Lambda243 --> PgSelectRows171
     PgSelectSingle172{{"PgSelectSingle[172∈3]<br />ᐸpeopleᐳ"}}:::plan
-    First171 --> PgSelectSingle172
+    First170 --> PgSelectSingle172
     PgClassExpression205{{"PgClassExpression[205∈3]<br />ᐸ__single_t...”position”ᐳ"}}:::plan
     PgSelectSingle34 --> PgClassExpression205
     PgClassExpression210{{"PgClassExpression[210∈3]<br />ᐸ__single_t...reated_at”ᐳ"}}:::plan
@@ -161,7 +161,7 @@ graph TD
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression14,PgSelectRows20,List254,Lambda255 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,__Item21,PgSelectSingle22,PgClassExpression23,PgClassExpression25,Lambda26,PgClassExpression27,Access32,First33,PgSelectSingle34,PgClassExpression77,Access85,First86,PgSelectSingle87,PgClassExpression112,PgClassExpression117,PgClassExpression122,PgClassExpression127,PgClassExpression132,PgClassExpression147,Lambda148,PgClassExpression160,Access170,First171,PgSelectSingle172,PgClassExpression205,PgClassExpression210,PgClassExpression215,PgClassExpression220,PgClassExpression225,Access241,List242,Lambda243,Access245,List246,Lambda247,Access249,List250,Lambda251 bucket3
+    class Bucket3,__Item21,PgSelectSingle22,PgClassExpression23,PgClassExpression25,Lambda26,PgClassExpression27,First32,PgSelectRows33,PgSelectSingle34,PgClassExpression77,First85,PgSelectRows86,PgSelectSingle87,PgClassExpression112,PgClassExpression117,PgClassExpression122,PgClassExpression127,PgClassExpression132,PgClassExpression147,Lambda148,PgClassExpression160,First170,PgSelectRows171,PgSelectSingle172,PgClassExpression205,PgClassExpression210,PgClassExpression215,PgClassExpression220,PgClassExpression225,Access241,List242,Lambda243,Access245,List246,Lambda247,Access249,List250,Lambda251 bucket3
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression137,PgClassExpression141,PgClassExpression143,PgClassExpression144 bucket4
     classDef bucket5 stroke:#7fff00

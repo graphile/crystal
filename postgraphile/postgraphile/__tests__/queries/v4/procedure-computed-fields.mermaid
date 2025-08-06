@@ -8,7 +8,7 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/v4/procedure-computed-fields"
-    Bucket0("Bucket 0 (root)<br /><br />1: 293, 297, 301, 309, 313, 317, 325, 329, 341<br />ᐳ: 6, 9, 10, 113, 131, 172, 275, 345, 346, 347, 348, 349, 350, 351, 352, 353, 354, 355, 356, 11, 49, 53, 56, 59, 62, 65, 93, 106, 126, 136, 139, 142, 145, 148, 156, 150, 158, 164<br />2: 15, 25, 30, 305, 321, 333<br />ᐳ: Access[32], Access[326], Access[330]<br />3: 8, 17, 27, 33, 337<br />ᐳ: 34, 294, 306, 310, 322<br />4: 12, 20, 39, 45<br />ᐳ: Access[338], Access[342]<br />5: Connection[22], ConnectionItems[36]<br />6: ConnectionItems[42]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: 293, 297, 301, 309, 313, 317, 325, 329, 341<br />ᐳ: 6, 9, 10, 113, 131, 172, 275, 345, 346, 347, 348, 349, 350, 351, 352, 353, 354, 355, 356, 11, 49, 53, 56, 59, 62, 65, 93, 106, 126, 136, 139, 142, 145, 148, 156, 150, 158, 164<br />2: 15, 25, 30, 305, 321, 333<br />ᐳ: Access[326], Access[330]<br />3: 8, 17, 27, 33, 337<br />ᐳ: 294, 306, 310, 322<br />4: 12, 20, 32, 39, 45<br />ᐳ: 34, 338, 342<br />5: Connection[22], ConnectionItems[36]<br />6: ConnectionItems[42]"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 36, 294, 306, 310, 322<br /><br />ROOT Connectionᐸ8ᐳ[12]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 39, 326, 330<br /><br />ROOT Connectionᐸ15ᐳ[17]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 22, 42, 338, 342, 345<br /><br />ROOT Connectionᐸ20ᐳ[22]"):::bucket
@@ -18,12 +18,12 @@ graph TD
     Bucket11("Bucket 11 (listItem)<br />Deps: 326, 330<br /><br />ROOT __Item{11}ᐸ39ᐳ[69]"):::bucket
     Bucket12("Bucket 12 (listItem)<br />Deps: 338, 342, 345<br /><br />ROOT __Item{12}ᐸ42ᐳ[71]"):::bucket
     Bucket13("Bucket 13 (listItem)<br /><br />ROOT __Item{13}ᐸ45ᐳ[73]"):::bucket
-    Bucket14("Bucket 14 (nullableBoundary)<br />Deps: 294, 68, 306, 310, 322<br /><br />ROOT PgSelectSingle{10}ᐸtypesᐳ[68]<br />1: <br />ᐳ: 295, 307, 311, 323, 296, 308, 312, 324, 80, 89, 102, 122, 298, 302<br />2: 81, 90, 103, 123<br />ᐳ: 82, 91, 104, 124, 179, 202, 220, 299, 300, 303, 304, 183, 206<br />3: First[184], First[207]<br />ᐳ: 185, 208"):::bucket
+    Bucket14("Bucket 14 (nullableBoundary)<br />Deps: 294, 68, 306, 310, 322<br /><br />ROOT PgSelectSingle{10}ᐸtypesᐳ[68]<br />1: <br />ᐳ: 295, 307, 311, 323, 296, 308, 312, 324, 298, 302<br />2: 81, 90, 103, 123<br />3: 80, 89, 102, 122<br />ᐳ: 82, 91, 104, 124, 179, 202, 220, 299, 300, 303, 304<br />4: PgSelectRows[184], PgSelectRows[207]<br />5: First[183], First[206]<br />ᐳ: 185, 208"):::bucket
     Bucket15("Bucket 15 (nullableBoundary)<br />Deps: 70, 326, 69, 330<br /><br />ROOT PgSelectSingle{11}ᐸpostᐳ[70]<br />1: <br />ᐳ: 83, 94, 107, 127, 137, 140, 143, 146, 149, 166, 168, 327, 331, 328, 332<br />2: Connection[173], PgSelectRows[174]<br />3: ConnectionItems[199]"):::bucket
-    Bucket16("Bucket 16 (nullableBoundary)<br />Deps: 72, 338, 71, 342, 345<br /><br />ROOT PgSelectSingle{12}ᐸpersonᐳ[72]<br />1: <br />ᐳ: 84, 96, 339, 343, 340, 344, 132<br />2: Connection[114], First[133]<br />ᐳ: PgSelectSingle[134]<br />3: ConnectionItems[187]"):::bucket
+    Bucket16("Bucket 16 (nullableBoundary)<br />Deps: 72, 338, 71, 342, 345<br /><br />ROOT PgSelectSingle{12}ᐸpersonᐳ[72]<br />1: <br />ᐳ: 84, 96, 339, 343, 340, 344<br />2: Connection[114], PgSelectRows[133]<br />3: First[132], ConnectionItems[187]<br />ᐳ: PgSelectSingle[134]"):::bucket
     Bucket17("Bucket 17 (nullableBoundary)<br />Deps: 74<br /><br />ROOT PgSelectSingle{13}ᐸedge_caseᐳ[74]"):::bucket
     Bucket18("Bucket 18 (nullableBoundary)<br />Deps: 104<br /><br />ROOT PgSelectSingle{14}ᐸfrmcdc_compoundTypeᐳ[104]"):::bucket
-    Bucket19("Bucket 19 (nullableBoundary)<br />Deps: 324, 124<br /><br />ROOT PgSelectSingle{14}ᐸfrmcdc_nestedCompoundTypeᐳ[124]<br />1: <br />ᐳ: 314, 318, 315, 316, 319, 320, 195, 213<br />2: First[196], First[214]<br />ᐳ: 197, 215"):::bucket
+    Bucket19("Bucket 19 (nullableBoundary)<br />Deps: 324, 124<br /><br />ROOT PgSelectSingle{14}ᐸfrmcdc_nestedCompoundTypeᐳ[124]<br />1: <br />ᐳ: 314, 318, 315, 316, 319, 320<br />2: PgSelectRows[196], PgSelectRows[214]<br />3: First[195], First[213]<br />ᐳ: 197, 215"):::bucket
     Bucket20("Bucket 20 (nullableBoundary)<br />Deps: 134<br /><br />ROOT PgSelectSingle{16}ᐸperson_first_postᐳ[134]"):::bucket
     Bucket21("Bucket 21 (listItem)<br /><br />ROOT __Item{21}ᐸ174ᐳ[175]"):::bucket
     Bucket22("Bucket 22 (listItem)<br /><br />ROOT __Item{22}ᐸ166ᐳ[177]"):::bucket
@@ -128,12 +128,12 @@ graph TD
     Object11 --> PgSelect25
     Connection27[["Connection[27∈0] ➊<br />ᐸ25ᐳ"]]:::plan
     PgSelect25 --> Connection27
-    Access32{{"Access[32∈0] ➊<br />ᐸ30.itemsᐳ"}}:::plan
-    PgSelect30 --> Access32
-    First33[["First[33∈0] ➊"]]:::plan
-    Access32 --> First33
+    First32[["First[32∈0] ➊"]]:::plan
+    PgSelectRows33[["PgSelectRows[33∈0] ➊"]]:::plan
+    PgSelectRows33 --> First32
+    PgSelect30 --> PgSelectRows33
     PgSelectSingle34{{"PgSelectSingle[34∈0] ➊<br />ᐸpersonᐳ"}}:::plan
-    First33 --> PgSelectSingle34
+    First32 --> PgSelectSingle34
     ConnectionItems36[["ConnectionItems[36∈0] ➊"]]:::plan
     Connection12 --> ConnectionItems36
     ConnectionItems39[["ConnectionItems[39∈0] ➊"]]:::plan
@@ -206,51 +206,51 @@ graph TD
     Access310 & PgSelectSingle68 --> List311
     List323{{"List[323∈14]<br />ᐸ322,68ᐳ"}}:::plan
     Access322 & PgSelectSingle68 --> List323
-    Access80{{"Access[80∈14]<br />ᐸ296.itemsᐳ"}}:::plan
+    First80[["First[80∈14]"]]:::plan
+    PgSelectRows81[["PgSelectRows[81∈14]"]]:::plan
+    PgSelectRows81 --> First80
     Lambda296{{"Lambda[296∈14]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda296 --> Access80
-    First81[["First[81∈14]"]]:::plan
-    Access80 --> First81
+    Lambda296 --> PgSelectRows81
     PgSelectSingle82{{"PgSelectSingle[82∈14]<br />ᐸfrmcdc_compoundTypeᐳ"}}:::plan
-    First81 --> PgSelectSingle82
-    Access89{{"Access[89∈14]<br />ᐸ308.itemsᐳ"}}:::plan
+    First80 --> PgSelectSingle82
+    First89[["First[89∈14]"]]:::plan
+    PgSelectRows90[["PgSelectRows[90∈14]"]]:::plan
+    PgSelectRows90 --> First89
     Lambda308{{"Lambda[308∈14]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda308 --> Access89
-    First90[["First[90∈14]"]]:::plan
-    Access89 --> First90
-    First90 --> PgSelectSingle91
-    Access102{{"Access[102∈14]<br />ᐸ312.itemsᐳ"}}:::plan
+    Lambda308 --> PgSelectRows90
+    First89 --> PgSelectSingle91
+    First102[["First[102∈14]"]]:::plan
+    PgSelectRows103[["PgSelectRows[103∈14]"]]:::plan
+    PgSelectRows103 --> First102
     Lambda312{{"Lambda[312∈14]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda312 --> Access102
-    First103[["First[103∈14]"]]:::plan
-    Access102 --> First103
+    Lambda312 --> PgSelectRows103
     PgSelectSingle104{{"PgSelectSingle[104∈14]<br />ᐸfrmcdc_compoundTypeᐳ"}}:::plan
-    First103 --> PgSelectSingle104
-    Access122{{"Access[122∈14]<br />ᐸ324.itemsᐳ"}}:::plan
+    First102 --> PgSelectSingle104
+    First122[["First[122∈14]"]]:::plan
+    PgSelectRows123[["PgSelectRows[123∈14]"]]:::plan
+    PgSelectRows123 --> First122
     Lambda324{{"Lambda[324∈14]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda324 --> Access122
-    First123[["First[123∈14]"]]:::plan
-    Access122 --> First123
+    Lambda324 --> PgSelectRows123
     PgSelectSingle124{{"PgSelectSingle[124∈14]<br />ᐸfrmcdc_nestedCompoundTypeᐳ"}}:::plan
-    First123 --> PgSelectSingle124
+    First122 --> PgSelectSingle124
     PgClassExpression179{{"PgClassExpression[179∈14]<br />ᐸ__frmcdc_c...type__.”a”ᐳ"}}:::plan
     PgSelectSingle82 --> PgClassExpression179
-    Access183{{"Access[183∈14]<br />ᐸ300.itemsᐳ"}}:::plan
+    First183[["First[183∈14]"]]:::plan
+    PgSelectRows184[["PgSelectRows[184∈14]"]]:::plan
+    PgSelectRows184 --> First183
     Lambda300{{"Lambda[300∈14]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda300 --> Access183
-    First184[["First[184∈14]"]]:::plan
-    Access183 --> First184
+    Lambda300 --> PgSelectRows184
     PgSelectSingle185{{"PgSelectSingle[185∈14]<br />ᐸfrmcdc_compoundTypeᐳ"}}:::plan
-    First184 --> PgSelectSingle185
+    First183 --> PgSelectSingle185
     PgClassExpression202{{"PgClassExpression[202∈14]<br />ᐸ__frmcdc_c....”foo_bar”ᐳ"}}:::plan
     PgSelectSingle82 --> PgClassExpression202
-    Access206{{"Access[206∈14]<br />ᐸ304.itemsᐳ"}}:::plan
+    First206[["First[206∈14]"]]:::plan
+    PgSelectRows207[["PgSelectRows[207∈14]"]]:::plan
+    PgSelectRows207 --> First206
     Lambda304{{"Lambda[304∈14]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda304 --> Access206
-    First207[["First[207∈14]"]]:::plan
-    Access206 --> First207
+    Lambda304 --> PgSelectRows207
     PgSelectSingle208{{"PgSelectSingle[208∈14]<br />ᐸfrmcdc_compoundTypeᐳ"}}:::plan
-    First207 --> PgSelectSingle208
+    First206 --> PgSelectSingle208
     PgClassExpression220{{"PgClassExpression[220∈14]<br />ᐸ”c”.”compo...nd_type__)ᐳ"}}:::plan
     PgSelectSingle82 --> PgClassExpression220
     List295 --> Lambda296
@@ -308,13 +308,13 @@ graph TD
     Connection114[["Connection[114∈16]<br />ᐸ340ᐳ"]]:::plan
     Lambda340{{"Lambda[340∈16]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda340 --> Connection114
-    Access132{{"Access[132∈16]<br />ᐸ344.itemsᐳ"}}:::plan
+    First132[["First[132∈16]"]]:::plan
+    PgSelectRows133[["PgSelectRows[133∈16]"]]:::plan
+    PgSelectRows133 --> First132
     Lambda344{{"Lambda[344∈16]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda344 --> Access132
-    First133[["First[133∈16]"]]:::plan
-    Access132 --> First133
+    Lambda344 --> PgSelectRows133
     PgSelectSingle134{{"PgSelectSingle[134∈16]<br />ᐸperson_first_postᐳ"}}:::plan
-    First133 --> PgSelectSingle134
+    First132 --> PgSelectSingle134
     ConnectionItems187[["ConnectionItems[187∈16]"]]:::plan
     Connection114 --> ConnectionItems187
     List339 --> Lambda340
@@ -337,20 +337,20 @@ graph TD
     List319{{"List[319∈19]<br />ᐸ318,124ᐳ"}}:::plan
     Access318{{"Access[318∈19]<br />ᐸ324.m.joinDetailsFor211ᐳ"}}:::plan
     Access318 & PgSelectSingle124 --> List319
-    Access195{{"Access[195∈19]<br />ᐸ316.itemsᐳ"}}:::plan
+    First195[["First[195∈19]"]]:::plan
+    PgSelectRows196[["PgSelectRows[196∈19]"]]:::plan
+    PgSelectRows196 --> First195
     Lambda316{{"Lambda[316∈19]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda316 --> Access195
-    First196[["First[196∈19]"]]:::plan
-    Access195 --> First196
+    Lambda316 --> PgSelectRows196
     PgSelectSingle197{{"PgSelectSingle[197∈19]<br />ᐸfrmcdc_compoundTypeᐳ"}}:::plan
-    First196 --> PgSelectSingle197
-    Access213{{"Access[213∈19]<br />ᐸ320.itemsᐳ"}}:::plan
+    First195 --> PgSelectSingle197
+    First213[["First[213∈19]"]]:::plan
+    PgSelectRows214[["PgSelectRows[214∈19]"]]:::plan
+    PgSelectRows214 --> First213
     Lambda320{{"Lambda[320∈19]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda320 --> Access213
-    First214[["First[214∈19]"]]:::plan
-    Access213 --> First214
+    Lambda320 --> PgSelectRows214
     PgSelectSingle215{{"PgSelectSingle[215∈19]<br />ᐸfrmcdc_compoundTypeᐳ"}}:::plan
-    First214 --> PgSelectSingle215
+    First213 --> PgSelectSingle215
     Lambda324 --> Access314
     List315 --> Lambda316
     Lambda324 --> Access318
@@ -448,7 +448,7 @@ graph TD
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,PgSelect8,Access9,Access10,Object11,Connection12,PgSelect15,Connection17,PgSelect20,Connection22,PgSelect25,Connection27,PgSelect30,Access32,First33,PgSelectSingle34,ConnectionItems36,ConnectionItems39,ConnectionItems42,ConnectionItems45,PgFromExpression49,PgFromExpression53,PgFromExpression56,PgFromExpression59,PgFromExpression62,PgFromExpression65,PgFromExpression93,PgFromExpression106,PgFromExpression113,PgFromExpression126,PgFromExpression131,PgFromExpression136,PgFromExpression139,PgFromExpression142,PgFromExpression145,PgFromExpression148,__InputObject150,__InputObject156,BakedInput158,PgFromExpression164,PgFromExpression172,PgFromExpression275,PgSelectInlineApply293,Access294,PgSelectInlineApply297,PgSelectInlineApply301,PgSelectInlineApply305,Access306,PgSelectInlineApply309,Access310,PgSelectInlineApply313,PgSelectInlineApply317,PgSelectInlineApply321,Access322,PgSelectInlineApply325,Access326,PgSelectInlineApply329,Access330,PgSelectInlineApply333,PgSelectInlineApply337,Access338,PgSelectInlineApply341,Access342 bucket0
+    class Bucket0,__Value2,PgSelect8,Access9,Access10,Object11,Connection12,PgSelect15,Connection17,PgSelect20,Connection22,PgSelect25,Connection27,PgSelect30,First32,PgSelectRows33,PgSelectSingle34,ConnectionItems36,ConnectionItems39,ConnectionItems42,ConnectionItems45,PgFromExpression49,PgFromExpression53,PgFromExpression56,PgFromExpression59,PgFromExpression62,PgFromExpression65,PgFromExpression93,PgFromExpression106,PgFromExpression113,PgFromExpression126,PgFromExpression131,PgFromExpression136,PgFromExpression139,PgFromExpression142,PgFromExpression145,PgFromExpression148,__InputObject150,__InputObject156,BakedInput158,PgFromExpression164,PgFromExpression172,PgFromExpression275,PgSelectInlineApply293,Access294,PgSelectInlineApply297,PgSelectInlineApply301,PgSelectInlineApply305,Access306,PgSelectInlineApply309,Access310,PgSelectInlineApply313,PgSelectInlineApply317,PgSelectInlineApply321,Access322,PgSelectInlineApply325,Access326,PgSelectInlineApply329,Access330,PgSelectInlineApply333,PgSelectInlineApply337,Access338,PgSelectInlineApply341,Access342 bucket0
     classDef bucket1 stroke:#00bfff
     class Bucket1 bucket1
     classDef bucket2 stroke:#7f007f
@@ -468,17 +468,17 @@ graph TD
     classDef bucket13 stroke:#3cb371
     class Bucket13,__Item73,PgSelectSingle74 bucket13
     classDef bucket14 stroke:#a52a2a
-    class Bucket14,Access80,First81,PgSelectSingle82,Access89,First90,PgSelectSingle91,Access102,First103,PgSelectSingle104,Access122,First123,PgSelectSingle124,PgClassExpression179,Access183,First184,PgSelectSingle185,PgClassExpression202,Access206,First207,PgSelectSingle208,PgClassExpression220,List295,Lambda296,Access298,List299,Lambda300,Access302,List303,Lambda304,List307,Lambda308,List311,Lambda312,List323,Lambda324 bucket14
+    class Bucket14,First80,PgSelectRows81,PgSelectSingle82,First89,PgSelectRows90,PgSelectSingle91,First102,PgSelectRows103,PgSelectSingle104,First122,PgSelectRows123,PgSelectSingle124,PgClassExpression179,First183,PgSelectRows184,PgSelectSingle185,PgClassExpression202,First206,PgSelectRows207,PgSelectSingle208,PgClassExpression220,List295,Lambda296,Access298,List299,Lambda300,Access302,List303,Lambda304,List307,Lambda308,List311,Lambda312,List323,Lambda324 bucket14
     classDef bucket15 stroke:#ff00ff
     class Bucket15,PgClassExpression83,PgClassExpression94,PgClassExpression107,PgClassExpression127,PgClassExpression137,PgClassExpression140,PgClassExpression143,PgClassExpression146,PgClassExpression149,PgClassExpression166,PgClassExpression168,Connection173,PgSelectRows174,ConnectionItems199,List327,Lambda328,List331,Lambda332 bucket15
     classDef bucket16 stroke:#f5deb3
-    class Bucket16,PgClassExpression84,PgClassExpression96,Connection114,Access132,First133,PgSelectSingle134,ConnectionItems187,List339,Lambda340,List343,Lambda344 bucket16
+    class Bucket16,PgClassExpression84,PgClassExpression96,Connection114,First132,PgSelectRows133,PgSelectSingle134,ConnectionItems187,List339,Lambda340,List343,Lambda344 bucket16
     classDef bucket17 stroke:#696969
     class Bucket17,PgClassExpression85,PgClassExpression97,PgClassExpression116 bucket17
     classDef bucket18 stroke:#00bfff
     class Bucket18,PgClassExpression186,PgClassExpression209,PgClassExpression222 bucket18
     classDef bucket19 stroke:#7f007f
-    class Bucket19,Access195,First196,PgSelectSingle197,Access213,First214,PgSelectSingle215,Access314,List315,Lambda316,Access318,List319,Lambda320 bucket19
+    class Bucket19,First195,PgSelectRows196,PgSelectSingle197,First213,PgSelectRows214,PgSelectSingle215,Access314,List315,Lambda316,Access318,List319,Lambda320 bucket19
     classDef bucket20 stroke:#ffa500
     class Bucket20,PgClassExpression198,PgClassExpression216 bucket20
     classDef bucket21 stroke:#0000ff

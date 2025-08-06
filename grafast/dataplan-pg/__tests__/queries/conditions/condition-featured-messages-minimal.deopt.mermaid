@@ -11,7 +11,7 @@ graph TD
     Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 9, 10, 38, 39, 40, 41, 11, 13, 18, 26, 30<br />2: PgSelect[8]<br />3: PgSelectRows[14]"):::bucket
     Bucket1("Bucket 1 (listItem)<br />Deps: 11, 40, 26, 30<br /><br />ROOT __Item{1}ᐸ14ᐳ[15]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 11, 40, 26, 30<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[16]<br />1: <br />ᐳ: 20, 27<br />2: PgSelect[21]<br />3: Connection[25]"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 25, 11, 20, 40, 26, 27, 30<br /><br />ROOT Connection{2}ᐸ21ᐳ[25]<br />1: PgSelect[32]<br />ᐳ: PageInfo[31], Access[33]<br />2: First[34]<br />ᐳ: 35, 36"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 25, 11, 20, 40, 26, 27, 30<br /><br />ROOT Connection{2}ᐸ21ᐳ[25]<br />1: PgSelect[32]<br />ᐳ: PageInfo[31]<br />2: PgSelectRows[34]<br />3: First[33]<br />ᐳ: 35, 36"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
@@ -50,12 +50,12 @@ graph TD
     PgClassExpression20 & PgClassExpression27 --> PgSelect32
     PageInfo31{{"PageInfo[31∈3]"}}:::plan
     Connection25 --> PageInfo31
-    Access33{{"Access[33∈3]<br />ᐸ32.itemsᐳ"}}:::plan
-    PgSelect32 --> Access33
-    First34[["First[34∈3]"]]:::plan
-    Access33 --> First34
+    First33[["First[33∈3]"]]:::plan
+    PgSelectRows34[["PgSelectRows[34∈3]"]]:::plan
+    PgSelectRows34 --> First33
+    PgSelect32 --> PgSelectRows34
     PgSelectSingle35{{"PgSelectSingle[35∈3]<br />ᐸmessagesᐳ"}}:::plan
-    First34 --> PgSelectSingle35
+    First33 --> PgSelectSingle35
     PgClassExpression36{{"PgClassExpression[36∈3]<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle35 --> PgClassExpression36
 
@@ -67,5 +67,5 @@ graph TD
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression20,PgSelect21,Connection25,PgClassExpression27 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PageInfo31,PgSelect32,Access33,First34,PgSelectSingle35,PgClassExpression36 bucket3
+    class Bucket3,PageInfo31,PgSelect32,First33,PgSelectRows34,PgSelectSingle35,PgClassExpression36 bucket3
 

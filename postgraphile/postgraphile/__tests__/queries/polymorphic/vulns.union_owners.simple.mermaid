@@ -12,14 +12,14 @@ graph TD
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 20, 13, 11, 40, 44, 72, 77, 98, 102<br /><br />ROOT Connectionᐸ8ᐳ[12]"):::bucket
     Bucket3("Bucket 3 (listItem)<br />Deps: 20, 11, 40, 44, 72, 77, 98, 102<br /><br />ROOT __Item{3}ᐸ13ᐳ[16]"):::bucket
     Bucket4("Bucket 4 (polymorphic)<br />__typename: Access[23]<br />Deps: 23, 11, 24, 40, 44, 72, 77, 98, 102"):::bucket
-    Bucket5("Bucket 5 (polymorphicPartition)<br />|FirstPartyVulnerability<br />Deps: 11, 24, 40, 72, 98, 102<br />ᐳFirstPartyVulnerability<br /><br />1: PgSelect[25]<br />ᐳ: Access[29]<br />2: First[30]<br />ᐳ: 31, 41, 42, 43, 48<br />3: PgUnionAll[50]<br />4: Connection[54]<br />5: ConnectionItems[60]"):::bucket
-    Bucket6("Bucket 6 (polymorphicPartition)<br />|ThirdPartyVulnerability<br />Deps: 11, 24, 44, 77, 98, 102<br />ᐳThirdPartyVulnerability<br /><br />1: PgSelect[33]<br />ᐳ: Access[37]<br />2: First[38]<br />ᐳ: 39, 45, 46, 47, 49<br />3: PgUnionAll[55]<br />4: Connection[59]<br />5: ConnectionItems[63]"):::bucket
+    Bucket5("Bucket 5 (polymorphicPartition)<br />|FirstPartyVulnerability<br />Deps: 11, 24, 40, 72, 98, 102<br />ᐳFirstPartyVulnerability<br /><br />1: PgSelect[25]<br />2: PgSelectRows[30]<br />3: First[29]<br />ᐳ: 31, 41, 42, 43, 48<br />4: PgUnionAll[50]<br />5: Connection[54]<br />6: ConnectionItems[60]"):::bucket
+    Bucket6("Bucket 6 (polymorphicPartition)<br />|ThirdPartyVulnerability<br />Deps: 11, 24, 44, 77, 98, 102<br />ᐳThirdPartyVulnerability<br /><br />1: PgSelect[33]<br />2: PgSelectRows[38]<br />3: First[37]<br />ᐳ: 39, 45, 46, 47, 49<br />4: PgUnionAll[55]<br />5: Connection[59]<br />6: ConnectionItems[63]"):::bucket
     Bucket9("Bucket 9 (listItem)<br />Deps: 72, 11, 98, 102<br /><br />ROOT __Item{9}ᐸ60ᐳ[66]"):::bucket
     Bucket10("Bucket 10 (listItem)<br />Deps: 77, 11, 98, 102<br /><br />ROOT __Item{10}ᐸ63ᐳ[68]"):::bucket
     Bucket11("Bucket 11 (combined)<br />Deps: 11, 98, 102"):::bucket
     Bucket12("Bucket 12 (polymorphic)<br />__typename: Access[81]<br />Deps: 81, 80, 11, 98, 102"):::bucket
-    Bucket13("Bucket 13 (polymorphicPartition)<br />|Organization<br />Deps: 80, 11, 98<br />(2) ...ᐳOrganization<br /><br />1: <br />ᐳ: Access[82]<br />2: PgSelect[83]<br />ᐳ: Access[87]<br />3: First[88]<br />ᐳ: 89, 99, 100, 101, 106"):::bucket
-    Bucket14("Bucket 14 (polymorphicPartition)<br />|Person<br />Deps: 80, 11, 102<br />(2) ...ᐳPerson<br /><br />1: <br />ᐳ: Access[90]<br />2: PgSelect[91]<br />ᐳ: Access[95]<br />3: First[96]<br />ᐳ: 97, 103, 104, 105, 107"):::bucket
+    Bucket13("Bucket 13 (polymorphicPartition)<br />|Organization<br />Deps: 80, 11, 98<br />(2) ...ᐳOrganization<br /><br />1: <br />ᐳ: Access[82]<br />2: PgSelect[83]<br />3: PgSelectRows[88]<br />4: First[87]<br />ᐳ: 89, 99, 100, 101, 106"):::bucket
+    Bucket14("Bucket 14 (polymorphicPartition)<br />|Person<br />Deps: 80, 11, 102<br />(2) ...ᐳPerson<br /><br />1: <br />ᐳ: Access[90]<br />2: PgSelect[91]<br />3: PgSelectRows[96]<br />4: First[95]<br />ᐳ: 97, 103, 104, 105, 107"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket3
@@ -66,12 +66,12 @@ graph TD
     PgClassExpression41 --> List42
     PgUnionAll50[["PgUnionAll[50∈5]^<br />ᐸPerson,Organization,Person,Organizationᐳ<br />More deps:<br />- Object[11]"]]:::plan
     PgClassExpression41 --> PgUnionAll50
-    Access29{{"Access[29∈5]^<br />ᐸ25.itemsᐳ"}}:::plan
-    PgSelect25 --> Access29
-    First30[["First[30∈5]^"]]:::plan
-    Access29 --> First30
+    First29[["First[29∈5]^"]]:::plan
+    PgSelectRows30[["PgSelectRows[30∈5]^"]]:::plan
+    PgSelectRows30 --> First29
+    PgSelect25 --> PgSelectRows30
     PgSelectSingle31{{"PgSelectSingle[31∈5]^<br />ᐸfirst_party_vulnerabilitiesᐳ"}}:::plan
-    First30 --> PgSelectSingle31
+    First29 --> PgSelectSingle31
     PgSelectSingle31 --> PgClassExpression41
     Lambda43{{"Lambda[43∈5]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List42 --> Lambda43
@@ -88,12 +88,12 @@ graph TD
     PgClassExpression45 --> List46
     PgUnionAll55[["PgUnionAll[55∈6]^<br />ᐸPerson,Organization,Person,Organizationᐳ<br />More deps:<br />- Object[11]"]]:::plan
     PgClassExpression45 --> PgUnionAll55
-    Access37{{"Access[37∈6]^<br />ᐸ33.itemsᐳ"}}:::plan
-    PgSelect33 --> Access37
-    First38[["First[38∈6]^"]]:::plan
-    Access37 --> First38
+    First37[["First[37∈6]^"]]:::plan
+    PgSelectRows38[["PgSelectRows[38∈6]^"]]:::plan
+    PgSelectRows38 --> First37
+    PgSelect33 --> PgSelectRows38
     PgSelectSingle39{{"PgSelectSingle[39∈6]^<br />ᐸthird_party_vulnerabilitiesᐳ"}}:::plan
-    First38 --> PgSelectSingle39
+    First37 --> PgSelectSingle39
     PgSelectSingle39 --> PgClassExpression45
     Lambda47{{"Lambda[47∈6]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List46 --> Lambda47
@@ -133,12 +133,12 @@ graph TD
     PgClassExpression99{{"PgClassExpression[99∈13]^<br />ᐸ__organiza...zation_id”ᐳ"}}:::plan
     PgClassExpression99 --> List100
     __Value80 --> Access82
-    Access87{{"Access[87∈13]^<br />ᐸ83.itemsᐳ"}}:::plan
-    PgSelect83 --> Access87
-    First88[["First[88∈13]^"]]:::plan
-    Access87 --> First88
+    First87[["First[87∈13]^"]]:::plan
+    PgSelectRows88[["PgSelectRows[88∈13]^"]]:::plan
+    PgSelectRows88 --> First87
+    PgSelect83 --> PgSelectRows88
     PgSelectSingle89{{"PgSelectSingle[89∈13]^<br />ᐸorganizationsᐳ"}}:::plan
-    First88 --> PgSelectSingle89
+    First87 --> PgSelectSingle89
     PgSelectSingle89 --> PgClassExpression99
     Lambda101{{"Lambda[101∈13]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List100 --> Lambda101
@@ -151,12 +151,12 @@ graph TD
     PgClassExpression103{{"PgClassExpression[103∈14]^<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
     PgClassExpression103 --> List104
     __Value80 --> Access90
-    Access95{{"Access[95∈14]^<br />ᐸ91.itemsᐳ"}}:::plan
-    PgSelect91 --> Access95
-    First96[["First[96∈14]^"]]:::plan
-    Access95 --> First96
+    First95[["First[95∈14]^"]]:::plan
+    PgSelectRows96[["PgSelectRows[96∈14]^"]]:::plan
+    PgSelectRows96 --> First95
+    PgSelect91 --> PgSelectRows96
     PgSelectSingle97{{"PgSelectSingle[97∈14]^<br />ᐸpeopleᐳ"}}:::plan
-    First96 --> PgSelectSingle97
+    First95 --> PgSelectSingle97
     PgSelectSingle97 --> PgClassExpression103
     Lambda105{{"Lambda[105∈14]^<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List104 --> Lambda105
@@ -173,9 +173,9 @@ graph TD
     classDef bucket4 stroke:#0000ff
     class Bucket4 bucket4
     classDef bucket5 stroke:#7fff00
-    class Bucket5,PgSelect25,Access29,First30,PgSelectSingle31,PgClassExpression41,List42,Lambda43,PgClassExpression48,PgUnionAll50,Connection54,ConnectionItems60 bucket5
+    class Bucket5,PgSelect25,First29,PgSelectRows30,PgSelectSingle31,PgClassExpression41,List42,Lambda43,PgClassExpression48,PgUnionAll50,Connection54,ConnectionItems60 bucket5
     classDef bucket6 stroke:#ff1493
-    class Bucket6,PgSelect33,Access37,First38,PgSelectSingle39,PgClassExpression45,List46,Lambda47,PgClassExpression49,PgUnionAll55,Connection59,ConnectionItems63 bucket6
+    class Bucket6,PgSelect33,First37,PgSelectRows38,PgSelectSingle39,PgClassExpression45,List46,Lambda47,PgClassExpression49,PgUnionAll55,Connection59,ConnectionItems63 bucket6
     classDef bucket9 stroke:#ff0000
     class Bucket9,__Item66,Access70,Access71,List73,Lambda74 bucket9
     classDef bucket10 stroke:#ffff00
@@ -185,9 +185,9 @@ graph TD
     classDef bucket12 stroke:#4169e1
     class Bucket12 bucket12
     classDef bucket13 stroke:#3cb371
-    class Bucket13,Access82,PgSelect83,Access87,First88,PgSelectSingle89,PgClassExpression99,List100,Lambda101,PgClassExpression106 bucket13
+    class Bucket13,Access82,PgSelect83,First87,PgSelectRows88,PgSelectSingle89,PgClassExpression99,List100,Lambda101,PgClassExpression106 bucket13
     classDef bucket14 stroke:#a52a2a
-    class Bucket14,Access90,PgSelect91,Access95,First96,PgSelectSingle97,PgClassExpression103,List104,Lambda105,PgClassExpression107 bucket14
+    class Bucket14,Access90,PgSelect91,First95,PgSelectRows96,PgSelectSingle97,PgClassExpression103,List104,Lambda105,PgClassExpression107 bucket14
 
     Lambda74 -.-x __Value80
     Lambda79 -.-x __Value80
