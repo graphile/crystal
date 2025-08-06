@@ -3,6 +3,7 @@ import type {
   GrafastResultsList,
   Maybe,
   PromiseOrDirect,
+  Thunk,
 } from "../interfaces.js";
 import type { Multistep, UnwrapMultistep } from "../multistep.js";
 import { multistep } from "../multistep.js";
@@ -250,7 +251,7 @@ export interface LoadOneLoader<
    * Details of anything your `load` function will need access to, for example
    * database connections, API clients, etc.
    */
-  shared?: TShared;
+  shared?: Thunk<TShared>;
 
   /**
    * Details of which attributes on the output are equivalent to those on the
