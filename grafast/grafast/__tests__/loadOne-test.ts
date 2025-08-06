@@ -212,13 +212,20 @@ const makeSchema = (useStreamableStep = false) => {
           thingByOrgIdRegNoTuple(_, fieldArgs) {
             const $regNo = fieldArgs.getRaw("regNo") as Step<number>;
             const $orgId = context().get("orgId");
-            return loadOne([$orgId, $regNo], loadThingByOrgIdRegNoTuples);
+            return loadOne(
+              [$orgId, $regNo],
+              // Deliberately not using ioEquivalence here to test stable object/tuple creation
+              //["orgId", "orgRegNo"],
+              loadThingByOrgIdRegNoTuples,
+            );
           },
           thingByOrgIdRegNoObj(_, fieldArgs) {
             const $regNo = fieldArgs.getRaw("regNo") as Step<number>;
             const $orgId = context().get("orgId");
             return loadOne(
               { orgId: $orgId, regNo: $regNo },
+              // Deliberately not using ioEquivalence here to test stable object/tuple creation
+              //{ orgId: "orgId", regNo: "orgRegNo" },
               loadThingByOrgIdRegNoObjs,
             );
           },
