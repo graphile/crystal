@@ -5,6 +5,7 @@ import type { ListCapableStep, Step } from "../step.js";
 import { isListCapableStep } from "../step.js";
 import { __ItemStep } from "./__item.js";
 import type {
+  ConnectionHandlingStep,
   ConnectionOptimizedStep,
   ItemsStep,
   StepRepresentingList,
@@ -55,7 +56,10 @@ function eachOptimize(this: __ListTransformStep<any>) {
  */
 export function each<
   TListStep extends StepRepresentingList<any> &
-    Partial<ConnectionOptimizedStep<any, any, any, any>>,
+    Partial<
+      | ConnectionOptimizedStep<any, any, any, any>
+      | ConnectionHandlingStep<any, any, any, any>
+    >,
   TResultItemStep extends Step,
 >(
   listStep: TListStep,
@@ -82,12 +86,13 @@ export function each<
           connectionClone(
             this: __ListTransformStep<TListStep>,
             ...args: any[]
-          ): ConnectionOptimizedStep<any, any> {
+          ) {
             const $list = this.getListStep() as TListStep &
               ConnectionOptimizedStep<any, any>;
             const $clonedList = $list.connectionClone!(...args) as TListStep &
               ConnectionOptimizedStep<any, any>;
             return each($clonedList, mapper) as __ListTransformStep<TListStep> &
+              // TYPES: this should also include ConnectionHandlingStep
               ConnectionOptimizedStep<any, any>;
           },
         }

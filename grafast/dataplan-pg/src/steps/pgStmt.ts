@@ -259,29 +259,6 @@ export abstract class PgStmtBaseStep<T>
     full: true as const,
   };
 
-  protected paginationParamsDepId: number | null = null;
-  paginationParams() {
-    return this.paginationParamsDepId != null
-      ? (this.getDepOptions(this.paginationParamsDepId)
-          .step as Step<PaginationParams | null> & {
-          mightStream?(): boolean;
-        })
-      : null;
-  }
-  applyPagination(
-    $params: Step<PaginationParams<null | readonly any[]>> & {
-      mightStream?(): boolean;
-    },
-  ): void {
-    const $converted = lambda($params, convertParamsToLegacy, true);
-    this.setFirst(access($converted, "first"));
-    this.setLast(access($converted, "last"));
-    this.setBefore(access($converted, "before"));
-    this.setAfter(access($converted, "after"));
-    this.setOffset(access($converted, "offset"));
-    this.paginationParamsDepId = this.addUnaryDependency($params);
-  }
-
   /**
    * Someone (probably pageInfo) wants to know if there's more records. To
    * determine this we fetch one extra record and then throw it away.
@@ -499,8 +476,6 @@ export interface PgStmtCommonQueryInfo {
   readonly beforeStepId: number | null;
   readonly afterStepId: number | null;
 
-  readonly paginationParamsDepId: number | null;
-
   readonly groups: ReadonlyArray<PgGroupSpec>;
   readonly havingConditions: ReadonlyArray<SQL>;
   readonly applyDepIds: ReadonlyArray<number>;
@@ -657,26 +632,4 @@ export function makeValues(
     identifiersAlias,
     handlePlaceholder,
   };
-}
-
-function convertParamsToLegacy(
-  params: PaginationParams<null | readonly any[]>,
-) {
-  if (params.reverse) {
-    return {
-      after: null,
-      first: null,
-      before: params.after,
-      last: params.limit,
-      offset: params.offset,
-    };
-  } else {
-    return {
-      after: params.after,
-      first: params.limit,
-      before: null,
-      last: null,
-      offset: params.offset,
-    };
-  }
 }

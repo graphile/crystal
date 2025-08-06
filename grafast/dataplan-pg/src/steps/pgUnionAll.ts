@@ -985,7 +985,6 @@ on (${sql.indent(
       offsetStepId: this.offsetStepId,
       afterStepId: this.afterStepId,
       beforeStepId: this.beforeStepId,
-      paginationParamsDepId: this.paginationParamsDepId,
       forceIdentity: this.forceIdentity,
       havingConditions: this.havingConditions,
       mode: this.mode,

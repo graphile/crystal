@@ -291,11 +291,7 @@ export interface ConnectionHandlingStep<
 > extends Step<Maybe<ConnectionHandlingResult<TItem>>>,
     Pick<
       ConnectionOptimizedStep<TItem, TNodeStep, TEdgeStep, TCursorValue>,
-      | "connectionClone"
-      | "parseCursor"
-      | "nodeForItem"
-      | "edgeForItem"
-      | "listItem"
+      "parseCursor" | "nodeForItem" | "edgeForItem" | "listItem"
     >,
     Required<
       Pick<
@@ -303,6 +299,15 @@ export interface ConnectionHandlingStep<
         "cursorForItem"
       >
     > {
+  /**
+   * Clone the plan, ignoring the pagination parameters.
+   *
+   * Useful for implementing things like `totalCount` or aggregates.
+   */
+  connectionClone?(
+    ...args: any[]
+  ): ConnectionHandlingStep<TItem, TNodeStep, TEdgeStep, TCursorValue>; // TODO: `this`
+
   paginationSupport: {
     full: true;
   } /* satisfies PaginationFeatures */;
@@ -614,12 +619,9 @@ export class ConnectionStep<
    */
   public cloneSubplanWithoutPagination(
     ...args: Parameters<
-      TCollectionStep extends ConnectionOptimizedStep<
-        TItem,
-        TNodeStep,
-        TEdgeStep,
-        TCursorValue
-      >
+      TCollectionStep extends
+        | ConnectionOptimizedStep<TItem, TNodeStep, TEdgeStep, TCursorValue>
+        | ConnectionHandlingStep<TItem, TNodeStep, TEdgeStep, TCursorValue>
         ? Exclude<TCollectionStep["connectionClone"], undefined>
         : never
     >
