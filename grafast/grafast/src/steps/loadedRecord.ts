@@ -2,7 +2,7 @@ import { type __ItemStep, type ExecutionDetails } from "../index.js";
 import type { GrafastResultsList, Maybe } from "../interfaces.js";
 import { Step } from "../step.js";
 import { arrayOfLength, recordsMatch } from "../utils.js";
-import { access } from "./access.js";
+import { access, AccessStep } from "./access.js";
 import { constant } from "./constant.js";
 import { LoadManyStep } from "./loadMany.js";
 
@@ -26,6 +26,7 @@ export class LoadedRecordStep<
     [TKey in keyof TParams]: number;
   } = Object.create(null);
   constructor(
+    $loadMany: LoadManyStep<any, any, any, any, any>,
     $data: Step<TData>,
     private isSingle: boolean,
     private sourceDescription: Maybe<string>,
@@ -34,6 +35,7 @@ export class LoadedRecordStep<
   ) {
     super();
     this.addDependency($data);
+    this.addDependency($loadMany);
   }
   toStringMeta() {
     return this.sourceDescription ?? null;
@@ -81,7 +83,7 @@ export class LoadedRecordStep<
     }
   }
   optimize() {
-    const $source = this.getDepDeep(0);
+    const $source = this.getDepDeep(1);
     if ($source instanceof LoadManyStep) {
       // Tell our parent we only need certain attributes
       $source.addAttributes(this.attributes);
@@ -90,7 +92,7 @@ export class LoadedRecordStep<
       }
     } else {
       // This should never happen
-      console.warn(
+      throw new Error(
         `LoadedRecordStep could not find the parent LoadManyStep; instead found ${$source}`,
       );
     }

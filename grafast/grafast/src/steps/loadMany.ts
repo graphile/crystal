@@ -193,7 +193,7 @@ export class LoadManyStep<
           : never
         : never,
       TParams
-    >($item, false, this.toStringMeta(), this.getAccessMap());
+    >(this, $item, false, this.toStringMeta(), this.getAccessMap());
   }
   setParam<TParamKey extends keyof TParams>(
     paramKey: TParamKey,
