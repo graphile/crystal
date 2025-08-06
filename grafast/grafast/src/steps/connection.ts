@@ -448,7 +448,11 @@ export class ConnectionStep<
     } else {
       this.edgeDataPlan = (i) => i as TEdgeDataStep;
     }
-    if ("paginationSupport" in subplan && "applyPagination" in subplan) {
+    if (
+      "paginationSupport" in subplan &&
+      subplan.paginationSupport != null &&
+      (subplan.paginationSupport.full || "applyPagination" in subplan)
+    ) {
       this.collectionPaginationSupport = subplan.paginationSupport;
       if (this.collectionPaginationSupport.full) {
         this.paramsDepId = null;
