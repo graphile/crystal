@@ -354,10 +354,9 @@ export const makeBaseArgs = () => {
         plans: {
           crawler(_, { $id }) {
             const $db = context().get("dccDb");
-            return loadOne({
-              lookup: $id,
+            return loadOne($id, {
               load: batchGetCrawlerById,
-              unary: $db,
+              shared: $db,
             });
           },
           character(_, { $id }) {
@@ -385,20 +384,18 @@ export const makeBaseArgs = () => {
           bestFriend($activeCrawler) {
             const $id = inhibitOnNull(get($activeCrawler, "bestFriend"));
             const $db = context().get("dccDb");
-            return loadOne({
-              lookup: $id,
+            return loadOne($id, {
               load: batchGetCrawlerById,
-              unary: $db,
+              shared: $db,
             });
           },
           friends($activeCrawler, { $first }) {
             const $crawlerId = get($activeCrawler, "id");
             const $db = context().get("dccDb");
-            const $ids = loadMany({
-              lookup: $crawlerId,
+            const $ids = loadMany($crawlerId, {
               load: batchGetFriendIdsByCrawlerId,
-              unary: $db,
               paginationSupport: {},
+              shared: $db,
             });
             // Apply our limit by passing a param to our loader
             $ids.setParam("limit", $first);
@@ -407,11 +404,10 @@ export const makeBaseArgs = () => {
           friendsConnection($activeCrawler, fieldArgs) {
             const $crawlerId = get($activeCrawler, "id");
             const $db = context().get("dccDb");
-            const $ids = loadMany({
-              lookup: $crawlerId,
+            const $ids = loadMany($crawlerId, {
               load: batchGetFriendIdsByCrawlerId,
-              unary: $db,
               paginationSupport: {},
+              shared: $db,
             });
             return connection($ids, {
               fieldArgs,
@@ -444,10 +440,9 @@ export const makeBaseArgs = () => {
           client($manager) {
             const $id = inhibitOnNull(get($manager, "client"));
             const $db = context().get("dccDb");
-            return loadOne({
-              lookup: $id,
+            return loadOne($id, {
               load: batchGetCrawlerById,
-              unary: $db,
+              shared: $db,
             });
           },
           items($npc, { $first }) {
@@ -464,10 +459,9 @@ export const makeBaseArgs = () => {
             const $ids = inhibitOnNull(get($security, "clients"));
             return each($ids, ($id) => {
               const $db = context().get("dccDb");
-              return loadOne({
-                lookup: $id,
+              return loadOne($id, {
                 load: batchGetCrawlerById,
-                unary: $db,
+                shared: $db,
               });
             });
           },
@@ -531,10 +525,9 @@ export const makeBaseArgs = () => {
           locations($floor) {
             const $number = get($floor, "number");
             const $db = context().get("dccDb");
-            return loadMany({
-              lookup: $number,
+            return loadMany($number, {
               load: batchGetLocationsByFloorNumber,
-              unary: $db,
+              shared: $db,
             });
           },
         },
@@ -551,10 +544,9 @@ export const makeBaseArgs = () => {
             const $ids = inhibitOnNull(get($club, "security"));
             return each($ids, ($id) => {
               const $db = context().get("dccDb");
-              return loadOne({
-                lookup: $id,
+              return loadOne($id, {
                 load: batchGetNpcById,
-                unary: $db,
+                shared: $db,
               });
             });
           },
@@ -572,10 +564,9 @@ export const makeBaseArgs = () => {
             const $db = context().get("dccDb");
 
             const $lootData = inhibitOnNull(
-              loadMany({
-                lookup: $id,
+              loadMany($id, {
                 load: batchGetLootDataByLootBoxId,
-                unary: $db,
+                shared: $db,
               }),
             );
             return each($lootData, ($lootDatum) => {
@@ -606,20 +597,18 @@ export const makeBaseArgs = () => {
             lambda($specifier, extractCrawlerId),
           );
           const $crawler = inhibitOnNull(
-            loadOne({
-              lookup: $crawlerId,
+            loadOne($crawlerId, {
               load: batchGetCrawlerById,
-              unary: $db,
+              shared: $db,
             }),
           );
           const $crawlerTypename = lambda($crawler, crawlerToTypeName);
 
           const $npcId = inhibitOnNull(lambda($specifier, extractNpcId));
           const $npc = inhibitOnNull(
-            loadOne({
-              lookup: $npcId,
+            loadOne($npcId, {
               load: batchGetNpcById,
-              unary: $db,
+              shared: $db,
             }),
           );
           const $npcTypename = lambda($npc, npcToTypeName);
@@ -645,10 +634,9 @@ export const makeBaseArgs = () => {
         planType($npcId) {
           const $db = context().get("dccDb");
           const $npc = inhibitOnNull(
-            loadOne({
-              lookup: $npcId,
+            loadOne($npcId, {
               load: batchGetNpcById,
-              unary: $db,
+              shared: $db,
             }),
           );
           const $__typename = lambda(inhibitOnNull($npc), npcToTypeName);
@@ -673,10 +661,9 @@ export const makeBaseArgs = () => {
               const $id = get($location, "id");
 
               if (t.name === "SafeRoom") {
-                const $saferoom = loadOne({
-                  lookup: $id,
+                const $saferoom = loadOne($id, {
                   load: batchGetSafeRoomById,
-                  unary: $db,
+                  shared: $db,
                 });
                 return delegate(
                   $saferoom,
@@ -685,10 +672,9 @@ export const makeBaseArgs = () => {
                 );
               }
               if (t.name === "Club") {
-                const $club = loadOne({
-                  lookup: $id,
+                const $club = loadOne($id, {
                   load: batchGetClubById,
-                  unary: $db,
+                  shared: $db,
                 });
                 return delegate(
                   $club,
@@ -697,10 +683,9 @@ export const makeBaseArgs = () => {
                 );
               }
               if (t.name === "Stairwell") {
-                const $stairwell = loadOne({
-                  lookup: $id,
+                const $stairwell = loadOne($id, {
                   load: batchGetStairwellById,
-                  unary: $db,
+                  shared: $db,
                 });
                 return delegate(
                   $stairwell,
@@ -733,19 +718,17 @@ function lootBoxesForItem($type: Step<string>, $id: Step<number>) {
   const $db = context().get("dccDb");
 
   const $lootData = inhibitOnNull(
-    loadMany({
-      lookup: [$type, $id],
+    loadMany([$type, $id], {
       load: batchGetLootDataByItemTypeAndId,
-      unary: $db,
+      shared: $db,
     }),
   );
   return each($lootData, ($lootDatum) => {
     const $db = context().get("dccDb");
 
-    return loadOne({
-      lookup: get($lootDatum, "lootBoxId"),
+    return loadOne(get($lootDatum, "lootBoxId"), {
       load: batchGetLootBoxById,
-      unary: $db,
+      shared: $db,
     });
   });
 }
@@ -791,31 +774,27 @@ const ItemResolver = {
         const $db = context().get("dccDb");
 
         if (t.name === "Equipment") {
-          return loadOne({
-            lookup: $id,
+          return loadOne($id, {
             load: batchGetEquipmentById,
-            unary: $db,
+            shared: $db,
           });
         }
         if (t.name === "Consumable") {
-          return loadOne({
-            lookup: $id,
+          return loadOne($id, {
             load: batchGetConsumableById,
-            unary: $db,
+            shared: $db,
           });
         }
         if (t.name === "UtilityItem") {
-          return loadOne({
-            lookup: $id,
+          return loadOne($id, {
             load: batchGetUtilityItemById,
-            unary: $db,
+            shared: $db,
           });
         }
         if (t.name === "MiscItem") {
-          return loadOne({
-            lookup: $id,
+          return loadOne($id, {
             load: batchGetMiscItemById,
-            unary: $db,
+            shared: $db,
           });
         }
         return null;
@@ -827,10 +806,9 @@ const ItemResolver = {
 function getCreator($source: Step<{ creator?: number }>) {
   const $db = context().get("dccDb");
   const $id = inhibitOnNull(get($source, "creator"));
-  return loadOne({
-    lookup: $id,
+  return loadOne($id, {
     load: batchGetCrawlerById,
-    unary: $db,
+    shared: $db,
   });
 }
 
