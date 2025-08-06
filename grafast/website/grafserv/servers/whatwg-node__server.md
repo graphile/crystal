@@ -5,7 +5,7 @@
 Create the Grafserv instance:
 
 ```ts
-import { grafserv } from "grafserv/whatwg-server__node/v0";
+import { grafserv } from "grafserv/whatwg-node__server/v4";
 import preset from "./graphile.config.mjs";
 import schema from "./schema.mjs";
 
