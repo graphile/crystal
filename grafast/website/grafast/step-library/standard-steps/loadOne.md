@@ -54,7 +54,9 @@ const objects = {
     plans: {
       currentUser() {
         const $currentUserId = context().get("userId");
-        return loadOne({ lookup: $currentUserId, load: batchGetUserById });
+        return loadOne($currentUserId, {
+          load: batchGetUserById,
+        });
       },
     },
   },
@@ -62,7 +64,7 @@ const objects = {
     plans: {
       friends($user) {
         const $userId = $user.get("id");
-        return loadMany({ lookup: $userId, load: batchGetFriendsByUserId });
+        return loadMany($userId, batchGetFriendsByUserId);
       },
     },
   },
@@ -91,8 +93,7 @@ However, we can indicate that the output of the `loadOne` step's `id` property
      plans: {
        currentUser() {
          const $currentUserId = context().get("userId");
-         return loadOne({
-           lookup: $currentUserId,
+         return loadOne($currentUserId, {
            load: batchGetUserById,
 +          ioEquivalence: "id",
          });
@@ -103,7 +104,7 @@ However, we can indicate that the output of the `loadOne` step's `id` property
      plans: {
        friends($user) {
          const $userId = $user.get("id");
-         return loadMany({ lookup: $userId, load: batchGetFriendsByUserId });
+         return loadMany($userId, batchGetFriendsByUserId);
        },
      },
    },
@@ -130,14 +131,14 @@ function loadOne(options: {
   lookup: Step | Step[] | Record<string, Step>;
   load: LoadOneCallback;
   ioEquivalence?: string | Record<string, string>;
-  unary?: Step | Step[] | Record<string, Step>;
+  shared?: Step | Step[] | Record<string, Step>;
 }): Step;
 type LoadOneCallback = (
   specs: TLookup[],
   info: LoadOneInfo,
 ) => PromiseOrDirect<TResult[]>;
 interface LoadOneInfo {
-  unary: TUnary;
+  shared: TShared;
   attributes: string[];
   params: Readonly<string, any>;
 }
@@ -150,9 +151,9 @@ interface LoadOneInfo {
   requiring identification.
 - `load` (required) - the callback function called with the values from lookup
   responsible for loading the associated records
-- `$unaryStep` (optional) - any _unary_ step (or multistep), useful for passing
-  things from context or arguments without complicating the lookup; see [Unary
-  step usage](#unary-step-usage) below
+- `$shared` (optional) - any _unary_ step (or multistep), useful for passing
+  things from context or arguments without complicating the lookup; see [Shared
+  step usage](#shared-step-usage) below
 - `ioEquivalence` (optional, advanced) - a string, an array of strings, or a
   string-string object map used to indicate which attributes on output are
   equivalent of those on input - see [ioEquivalence usage](#ioequivalence-usage)
@@ -168,7 +169,7 @@ may affect the fetching of the records.
 function callback(
   specs: ReadonlyArray<unknown>,
   options: {
-    unary: unknown;
+    shared: unknown;
     attributes: ReadonlyArray<string>;
     params: Record<string, unknown>;
   },
@@ -187,16 +188,16 @@ Within this definition of `callback`:
 
 - `specs` is the runtime values of each value that `$spec` represented
 - `options` is an object containing:
-  - `unary`: the runtime value that `$unaryStep` (if any) represented
+  - `shared`: the runtime value that `$shared` (if any) represented
   - `attributes`: the list of keys that have been accessed via
     `$record.get('<key>')`
   - `params`: the params set via `$record.setParam('<key>', <value>)`
 
 `specs` is deduplicated using strict equality; so it is best to keep `$spec`
 simple - typically it should only represent a single scalar value - which is
-why `$unaryStep` exists.
+why `$shared` exists.
 
-`options.unary` is very useful to keep specs simple (so that fetch
+`options.shared` is very useful to keep specs simple (so that fetch
 deduplication can work optimally) whilst passing in global values that you may
 need such as a database or API client.
 
@@ -213,7 +214,7 @@ identifier".
 
 ```ts
 const $userId = $post.get("author_id");
-const $user = loadOne({ lookup: $userId, load: batchGetUserById });
+const $user = loadOne($userId, batchGetUserById);
 ```
 
 An example of the callback function might be:
@@ -235,7 +236,7 @@ async function batchGetUserById(ids, { attributes }) {
 }
 ```
 
-### Unary step usage
+### Shared step usage
 
 :::info
 
@@ -243,8 +244,8 @@ A unary step is a step that only ever represents one value, e.g. simple derivati
 
 :::
 
-In addition to the forms seen in "Basic usage" above, you can pass another step
-to `loadOne`'s `unary` option. This step must be a [**unary
+In addition to the forms seen in "Basic usage" above, you can pass an additional
+`shared` step to `loadOne`. This step must be a [**unary
 step**](../../step-classes.md#addunarydependency), meaning that it must
 represent exactly one value across the entire request (not a batch of values
 like most steps), and is useful for representing values from the GraphQL context
@@ -253,10 +254,9 @@ or from input values (arguments, variables, etc).
 ```ts
 const $userId = $post.get("author_id");
 const $dbClient = context().get("dbClient");
-const $user = loadOne({
-  lookup: $userId,
+const $user = loadOne($userId, {
   load: batchGetUserFromDbById,
-  unary: $dbClient,
+  shared: $dbClient,
   // optional:
   ioEquivalence: "id",
 });
@@ -266,15 +266,15 @@ Since we know it will have exactly one value, we can pass it into the
 callback as a single value and our callback will be able to use it directly
 without having to perform any manual grouping.
 
-This unary dependency is useful for fixed values (for example, those from
+This shared dependency is useful for fixed values (for example, those from
 GraphQL field arguments) and values on the GraphQL context such as clients to
 various APIs and other data sources.
 
 An example of the callback function might be:
 
 ```ts
-async function batchGetUserFromDbById(ids, { attributes, unary }) {
-  const dbClient = unary;
+async function batchGetUserFromDbById(ids, { attributes, shared }) {
+  const dbClient = shared;
 
   const rows = await dbClient.query(
     sql`SELECT id, ${columnsToSql(attributes)} FROM users WHERE id = ANY($1);`,
@@ -300,8 +300,7 @@ The `ioEquivalence` optional parameter can accept the following values:
   to the given entry on the input
 
 ```ts title="Example for a list step"
-const $member = loadOne({
-  lookup: [$organizationId, $userId],
+const $member = loadOne([$organizationId, $userId], {
   load: batchGetMemberByOrganizationIdAndUserId,
   ioEquivalence: ["organization_id", "user_id"],
 });
@@ -315,11 +314,13 @@ const $member = loadOne({
 ```
 
 ```ts title="Example for an object step"
-const $member = loadOne({
-  lookup: { oid: $organizationId, uid: $userId },
-  load: batchGetMemberByOrganizationIdAndUserId,
-  ioEquivalence: { oid: "organization_id", uid: "user_id" },
-});
+const $member = loadOne(
+  { oid: $organizationId, uid: $userId },
+  {
+    load: batchGetMemberByOrganizationIdAndUserId,
+    ioEquivalence: { oid: "organization_id", uid: "user_id" },
+  },
+);
 
 // - batchGetMemberByOrganizationIdAndUserId will be called with a list of
 //   objects; each object will have the key `oid` set to an organization id,
@@ -338,10 +339,7 @@ to pass the value of more than one step into your callback:
 ```ts
 const $isAdmin = $user.get("admin");
 const $stripeId = $customer.get("stripe_id");
-const $last4 = loadOne({
-  lookup: [$isAdmin, $stripeId],
-  load: getLast4FromStripeIfAdmin,
-});
+const $last4 = loadOne([$isAdmin, $stripeId], getLast4FromStripeIfAdmin);
 ```
 
 The first argument to the `getLast4FromStripeIfAdmin` callback will then be an
@@ -365,7 +363,7 @@ async function getLast4FromStripeIfAdmin(tuples) {
 }
 ```
 
-This technique can also be used with the unary step in advanced usage.
+This technique can also be used with the shared step in advanced usage.
 
 :::tip Performance impact from using list/object
 

@@ -9,6 +9,7 @@ import {
   grafast,
   loadOne,
   loadOneCallback,
+  loadOneLoader,
   makeGrafastSchema,
 } from "../dist/index.js";
 
@@ -105,18 +106,19 @@ const loadThingByIds = loadOneCallback(
   },
 );
 
-const loadThingByIdentifierObjs = loadOneCallback(
-  (specs: readonly { identifier: number }[], { attributes, params }) => {
+const loadThingByIdentifierObjs = loadOneLoader({
+  load: (specs: readonly { identifier: number }[], { attributes, params }) => {
     const result = specs
       .map((spec) => THINGS.find((t) => t.id === spec.identifier))
       .map((t) => (t && attributes ? pick(t, attributes) : t));
     CALLS.push({ specs, result, attributes, params });
     return result;
   },
-);
+  ioEquivalence: { identifier: "id" },
+});
 
-const loadThingByIdentifierLists = loadOneCallback(
-  (
+const loadThingByIdentifierLists = loadOneLoader({
+  load: (
     specs: ReadonlyArray<readonly [identifier: number]>,
     { attributes, params },
   ) => {
@@ -126,7 +128,8 @@ const loadThingByIdentifierLists = loadOneCallback(
     CALLS.push({ specs, result, attributes, params });
     return result;
   },
-);
+  ioEquivalence: ["id"],
+});
 
 const loadThingByOrgIdRegNoObjs = loadOneCallback(
   (
@@ -200,17 +203,11 @@ const makeSchema = (useStreamableStep = false) => {
           thingByIdObj(_, { $id }) {
             return loadOne(
               { identifier: $id as Step<number> },
-              {
-                load: loadThingByIdentifierObjs,
-                ioEquivalence: { identifier: "id" },
-              },
+              loadThingByIdentifierObjs,
             );
           },
           thingByIdList(_, { $id }) {
-            return loadOne([$id as Step<number>], {
-              load: loadThingByIdentifierLists,
-              ioEquivalence: ["id"],
-            });
+            return loadOne([$id as Step<number>], loadThingByIdentifierLists);
           },
           thingByOrgIdRegNoTuple(_, fieldArgs) {
             const $regNo = fieldArgs.getRaw("regNo") as Step<number>;

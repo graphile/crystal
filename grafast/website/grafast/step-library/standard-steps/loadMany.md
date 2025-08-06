@@ -54,7 +54,9 @@ const objects = {
   Query: {
     plans: {
       usersByOrganizationId(_, { $id }) {
-        return loadMany({ lookup: $id, load: batchGetUsersByOrganizationId });
+        return loadMany($id, {
+          load: batchGetUsersByOrganizationId,
+        });
       },
     },
   },
@@ -62,7 +64,7 @@ const objects = {
     plans: {
       organization($user) {
         const $orgId = $user.get("organization_id");
-        return loadOne({ lookup: $orgId, load: batchGetOrganizationById });
+        return loadOne($orgId, batchGetOrganizationById);
       },
     },
   },
@@ -91,8 +93,7 @@ However, we can indicate that the output of the `loadMany` step's records'
    Query: {
      plans: {
        usersByOrganizationId(_, { $id }) {
-         return loadMany({
-           lookup: $id,
+         return loadMany($id, {
            load: batchGetUsersByOrganizationId
 +          ioEquivalence: "organization_id",
          });
@@ -103,7 +104,7 @@ However, we can indicate that the output of the `loadMany` step's records'
      plans: {
        organization($user) {
          const $orgId = $user.get("organization_id");
-         return loadOne({ lookup: $orgId, load: batchGetOrganizationById });
+         return loadOne($orgId, batchGetOrganizationById);
        },
      },
    },
@@ -130,14 +131,14 @@ function loadMany(options: {
   lookup: Step | Step[] | Record<string, Step>;
   load: LoadManyCallback;
   ioEquivalence?: string | Record<string, string>;
-  unary?: Step | Step[] | Record<string, Step>;
+  shared?: Step | Step[] | Record<string, Step>;
 }): Step;
 type LoadManyCallback = (
   specs: TLookup[],
   info: LoadOneInfo,
 ) => PromiseOrDirect<TResult[][]>;
 interface LoadManyInfo {
-  unary: TUnary;
+  shared: TShared;
   attributes: string[];
   params: Readonly<string, any>;
 }
@@ -150,9 +151,9 @@ interface LoadManyInfo {
   requiring identification.
 - `load` (required) - the callback function called with the values from lookup
   responsible for loading the associated collections of records
-- `$unaryStep` (optional) - any _unary_ step (or multistep), useful for passing
-  things from context or arguments without complicating the lookup; see [Unary
-  step usage](#unary-step-usage) below
+- `$shared` (optional) - any _unary_ step (or multistep), useful for passing
+  things from context or arguments without complicating the lookup; see [Shared
+  step usage](#shared-step-usage) below
 - `ioEquivalence` (optional, advanced) - a string, an array of strings, or a
   string-string object map used to indicate which attributes on output are
   equivalent of those on input - see [ioEquivalence usage](#ioequivalence-usage)
@@ -168,7 +169,7 @@ may affect the fetching of the records.
 function callback(
   specs: ReadonlyArray<unknown>,
   options: {
-    unary: unknown;
+    shared: unknown;
     attributes: ReadonlyArray<string>;
     params: Record<string, unknown>;
   },
@@ -187,16 +188,16 @@ Within this definition of `callback`:
 
 - `specs` is the runtime values of each value that `$spec` represented
 - `options` is an object containing:
-  - `unary`: the runtime value that `$unaryStep` (if any) represented
+  - `shared`: the runtime value that `$shared` (if any) represented
   - `attributes`: the list of keys that have been accessed via
     `$record.get('<key>')` for each of the records in `$records`
   - `params`: the params set via `$records.setParam('<key>', <value>)`
 
 `specs` is deduplicated using strict equality; so it is best to keep `$spec`
 simple - typically it should only represent a single scalar value - which is
-why `$unaryStep` exists.
+why `$shared` exists.
 
-`options.unary` is very useful to keep specs simple (so that fetch
+`options.shared` is very useful to keep specs simple (so that fetch
 deduplication can work optimally) whilst passing in global values that you may
 need such as a database or API client.
 
@@ -213,10 +214,7 @@ identifier".
 
 ```ts
 const $userId = $user.get("id");
-const $friendships = loadMany({
-  lookup: $userId,
-  load: getFriendshipsByUserIds,
-});
+const $friendships = loadMany($userId, getFriendshipsByUserIds);
 ```
 
 An example of the callback function might be:
@@ -230,7 +228,7 @@ const friendshipsByUserIdCallback = (ids, { attributes }) => {
 };
 ```
 
-### Unary step usage
+### Shared step usage
 
 :::info
 
@@ -239,7 +237,7 @@ A unary step is a step that only ever represents one value, e.g. simple derivati
 :::
 
 In addition to the forms seen in "Basic usage" above, you can pass an additional
-step to `loadMany`. This step must be a [**unary
+`shared` step to `loadMany`. This step must be a [**unary
 step**](../../step-classes.md#addunarydependency), meaning that it must represent
 exactly one value across the entire request (not a batch of values like most
 steps).
@@ -247,10 +245,9 @@ steps).
 ```ts
 const $userId = $user.get("id");
 const $dbClient = context().get("dbClient");
-const $friendships = loadMany({
-  lookup: $userId,
+const $friendships = loadMany($userId, {
   load: getFriendshipsByUserIds,
-  unary: $dbClient,
+  shared: $dbClient,
 });
 ```
 
@@ -258,7 +255,7 @@ Since we know it will have exactly one value, we can pass it into the
 callback as a single value and our callback will be able to use it directly
 without having to perform any manual grouping.
 
-This unary dependency is useful for fixed values (for example, those from
+This shared dependency is useful for fixed values (for example, those from
 GraphQL field arguments) and values on the GraphQL context such as clients to
 various APIs and other data sources.
 
@@ -277,8 +274,7 @@ The `ioEquivalence` optional parameter can accept the following values:
   to the given entry on the input
 
 ```ts title="Example for a scalar step"
-const $posts = loadMany({
-  lookup: $userId,
+const $posts = loadMany($userId, {
   load: friendshipsByUserIdCallback,
 
   // States that $post.get('user_id') should return $userId directly, since it
@@ -288,8 +284,7 @@ const $posts = loadMany({
 ```
 
 ```ts title="Example for a list step"
-const $posts = loadMany({
-  lookup: [$organizationId, $userId],
+const $posts = loadMany([$organizationId, $userId], {
   load: batchGetMemberPostsByOrganizationIdAndUserId,
 
   // States that:
@@ -300,15 +295,17 @@ const $posts = loadMany({
 ```
 
 ```ts title="Example for an object step"
-const $posts = loadMany({
-  lookup: { oid: $organizationId, uid: $userId },
-  load: batchGetMemberPostsByOrganizationIdAndUserId,
+const $posts = loadMany(
+  { oid: $organizationId, uid: $userId },
+  {
+    load: batchGetMemberPostsByOrganizationIdAndUserId,
 
-  // States that:
-  // - $post.get('organization_id') should return $organizationId directly (the value for the `oid` input), and
-  // - $post.get('user_id') should return $userId directly (the value for the `uid` input
-  ioEquivalence: { oid: "organization_id", uid: "user_id" },
-});
+    // States that:
+    // - $post.get('organization_id') should return $organizationId directly (the value for the `oid` input), and
+    // - $post.get('user_id') should return $userId directly (the value for the `uid` input
+    ioEquivalence: { oid: "organization_id", uid: "user_id" },
+  },
+);
 ```
 
 ### Passing multiple steps
@@ -317,7 +314,7 @@ The [`list()`](./list) or [`object()`](./object) step can be used if you need
 to pass the value of more than one step into your callback:
 
 ```ts
-const $result = loadMany({ lookup: [$a, $b, $c], load: callback });
+const $result = loadMany([$a, $b, $c], callback);
 ```
 
 The first argument to `callback` will then be an array of all the tuples of

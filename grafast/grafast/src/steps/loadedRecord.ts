@@ -28,7 +28,7 @@ export class LoadedRecordStep<
   constructor(
     $data: Step<TData>,
     private isSingle: boolean,
-    private sourceDescription: string,
+    private sourceDescription: Maybe<string>,
     // Only safe to reference this during planning phase
     private ioEquivalence: Record<string, Step>,
   ) {

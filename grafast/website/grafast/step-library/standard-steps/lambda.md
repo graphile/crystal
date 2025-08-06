@@ -87,13 +87,11 @@ examples above might look like with `loadOne` - note that these callbacks
 are now called with all the values at once, rather than one at a time:
 
 ```ts
-const $oneBasedIndex = loadOne({
-  lookup: $zeroBasedIndex,
-  load: (allN) => allN.map((n) => n + 1),
-});
+const $oneBasedIndex = loadOne($zeroBasedIndex, (allN) =>
+  allN.map((n) => n + 1),
+);
 
-const $aPlusB = loadOne({
-  lookup: [$a, $b],
-  load: (allAsAndBs) => allAsAndBs.map(([a, b]) => a + b),
-});
+const $aPlusB = loadOne([$a, $b], (allAsAndBs) =>
+  allAsAndBs.map(([a, b]) => a + b),
+);
 ```

@@ -21,7 +21,7 @@ function plan($source) {
   // highlight-next-line
   const $db = context().get("db");
   return each($ids, ($id) => {
-    return loadOne({ lookup: $id, unary: $db, load: batchGetThingById });
+    return loadOne($id, { load: batchGetThingById, shared: $db });
   });
 }
 ```
@@ -40,7 +40,7 @@ function plan($source) {
   return each($ids, ($id) => {
     // highlight-next-line
     const $db = context().get("db");
-    return loadOne({ lookup: $id, unary: $db, load: batchGetThingById });
+    return loadOne($id, { load: batchGetThingById, shared: $db });
   });
 }
 ```
@@ -51,6 +51,28 @@ closure, it is passed or constructs the steps it needs.
 :::tip Use our lint rules to avoid issues like this
 
 TODO: make these lint rules ;)
+
+:::
+
+:::tip Neater code for `loadOne`/`loadMany`
+
+`loadOne` and `loadMany` supports the `shared` attribute being a "thunk", so
+rather than specifying the entire configuration inline, you could instead create
+a "loader" object that contains these details (including the thunk to get the
+DB) and then that can be referenced simply in many different plan resolvers.
+This both neater and solves the issue above.
+
+```ts title="Neater code"
+const batchGetThingByIdLoader = {
+  load: batchGetThingById,
+  shared: () => context().get("db"),
+};
+
+function plan($source) {
+  const $ids = get($source, "relatedIds");
+  return each($ids, ($id) => loadOne($id, batchGetThingByIdLoader));
+}
+```
 
 :::
 

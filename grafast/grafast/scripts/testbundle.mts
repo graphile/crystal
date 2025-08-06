@@ -84,10 +84,7 @@ const schema = new GraphQLSchema({
         extensions: {
           grafast: {
             plan() {
-              return loadMany({
-                lookup: null,
-                load: (v) => v.map(() => [1, 2, 3]),
-              });
+              return loadMany(null, (v) => v.map(() => [1, 2, 3]));
             },
           },
         },

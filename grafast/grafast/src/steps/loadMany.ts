@@ -135,6 +135,7 @@ export class LoadManyStep<
     UnwrapMultistep<TShared>
   >;
   paginationSupport?: PaginationFeatures;
+  private name: Maybe<string>;
   constructor(
     lookup: TLookup,
     loader: LoadManyLoader<
@@ -150,6 +151,7 @@ export class LoadManyStep<
     this.cloneStreams = true;
 
     const { load, shared, ioEquivalence, paginationSupport } = loader;
+    this.name = loader.name || load.displayName || load.name;
     this.load = load;
     if (typeof this.load !== "function") {
       throw new Error(
@@ -173,7 +175,7 @@ export class LoadManyStep<
     }
   }
   toStringMeta() {
-    return this.load.displayName || this.load.name;
+    return this.name ?? null;
   }
   private _accessMap: Record<string, Step> | null = null;
   private getAccessMap(): Record<string, Step> {
@@ -336,6 +338,9 @@ export interface LoadManyLoader<
     TParams,
     UnwrapMultistep<TShared>
   >;
+
+  /** Name your function (for plan diagrams/debugging) */
+  name?: string;
 
   /**
    * Details of anything your `load` function will need access to, for example

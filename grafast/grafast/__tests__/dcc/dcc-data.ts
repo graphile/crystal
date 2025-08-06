@@ -591,7 +591,7 @@ export const batchGetCrawlerById: LoadOneCallback<
   Maybe<CrawlerData>,
   never,
   Database
-> = (ids, { unary: data }) => {
+> = (ids, { shared: data }) => {
   return ids.map((id) => data.crawlers.find((c) => c.id === id));
 };
 
@@ -601,7 +601,7 @@ export const batchGetCrawlersByIds: LoadManyCallback<
   Maybe<ReadonlyArray<Maybe<CrawlerData>>>,
   never,
   Database
-> = (idsList, { unary: data }) => {
+> = (idsList, { shared: data }) => {
   return idsList.map((ids) =>
     ids.map((id) => data.crawlers.find((c) => c.id === id)),
   );
@@ -613,7 +613,7 @@ export const batchGetNpcById: LoadOneCallback<
   Maybe<NpcData>,
   never,
   Database
-> = (ids, { unary: data }) => {
+> = (ids, { shared: data }) => {
   return ids.map((id) => data.npcs.find((c) => c.id === id));
 };
 
@@ -623,7 +623,7 @@ export const batchGetNpcsByIds: LoadManyCallback<
   Maybe<ReadonlyArray<Maybe<NpcData>>>,
   never,
   Database
-> = (idsList, { unary: data }) => {
+> = (idsList, { shared: data }) => {
   return idsList.map((ids) =>
     ids.map((id) => data.npcs.find((c) => c.id === id)),
   );
@@ -635,7 +635,7 @@ export const batchGetEquipmentById: LoadOneCallback<
   Maybe<EquipmentData>,
   never,
   Database
-> = (ids, { unary: data }) => {
+> = (ids, { shared: data }) => {
   return ids.map((id) => data.equipment.find((c) => c.id === id));
 };
 
@@ -645,7 +645,7 @@ export const batchGetConsumableById: LoadOneCallback<
   Maybe<ConsumableData>,
   never,
   Database
-> = (ids, { unary: data }) => {
+> = (ids, { shared: data }) => {
   return ids.map((id) => data.consumables.find((c) => c.id === id));
 };
 
@@ -655,7 +655,7 @@ export const batchGetUtilityItemById: LoadOneCallback<
   Maybe<UtilityItemData>,
   never,
   Database
-> = (ids, { unary: data }) => {
+> = (ids, { shared: data }) => {
   return ids.map((id) => data.utilityItems.find((c) => c.id === id));
 };
 
@@ -665,7 +665,7 @@ export const batchGetMiscItemById: LoadOneCallback<
   Maybe<MiscItemData>,
   never,
   Database
-> = (ids, { unary: data }) => {
+> = (ids, { shared: data }) => {
   return ids.map((id) => data.miscItems.find((c) => c.id === id));
 };
 
@@ -675,7 +675,7 @@ export const batchGetLocationsByFloorNumber: LoadManyCallback<
   Maybe<ReadonlyArray<Maybe<LocationData>>>,
   never,
   Database
-> = (floorNumberList, { unary: data }) => {
+> = (floorNumberList, { shared: data }) => {
   return floorNumberList.map((floorNumber) =>
     data.locations.filter((c) => c.floors.includes(floorNumber)),
   );
@@ -687,7 +687,7 @@ export const batchGetLocationById: LoadOneCallback<
   Maybe<LocationData>,
   never,
   Database
-> = (ids, { unary: data }) => {
+> = (ids, { shared: data }) => {
   return ids.map((id) => data.locations.find((c) => c.id === id));
 };
 
@@ -697,7 +697,7 @@ export const batchGetSafeRoomById: LoadOneCallback<
   Maybe<SafeRoomData>,
   never,
   Database
-> = (ids, { unary: data }) => {
+> = (ids, { shared: data }) => {
   return ids.map((id) => data.saferooms.find((c) => c.id === id));
 };
 
@@ -707,7 +707,7 @@ export const batchGetClubById: LoadOneCallback<
   Maybe<ClubData>,
   never,
   Database
-> = (ids, { unary: data }) => {
+> = (ids, { shared: data }) => {
   return ids.map((id) => data.clubs.find((c) => c.id === id));
 };
 
@@ -717,7 +717,7 @@ export const batchGetStairwellById: LoadOneCallback<
   Maybe<StairwellData>,
   never,
   Database
-> = (ids, { unary: data }) => {
+> = (ids, { shared: data }) => {
   return ids.map((id) => data.stairwells.find((c) => c.id === id));
 };
 
@@ -727,7 +727,7 @@ export const batchGetBetaLocationById: LoadOneCallback<
   Maybe<BetaLocationData>,
   never,
   Database
-> = (ids, { unary: data }) => {
+> = (ids, { shared: data }) => {
   return ids.map((id) => data.betaLocations.find((c) => c.id === id));
 };
 
@@ -737,7 +737,7 @@ export const batchGetLootDataByItemTypeAndId: LoadManyCallback<
   Maybe<ReadonlyArray<Maybe<LootDataData>>>,
   never,
   Database
-> = (identifiersList, { unary: data }) => {
+> = (identifiersList, { shared: data }) => {
   return identifiersList.map(([type, id]) =>
     data.lootData.filter((c) => c.itemType === type && c.itemId === id),
   );
@@ -749,7 +749,7 @@ export const batchGetLootDataByLootBoxId: LoadManyCallback<
   Maybe<ReadonlyArray<Maybe<LootDataData>>>,
   never,
   Database
-> = (identifiersList, { unary: data }) => {
+> = (identifiersList, { shared: data }) => {
   return identifiersList.map((id) =>
     data.lootData.filter((c) => c.lootBoxId === id),
   );
@@ -761,7 +761,7 @@ export const batchGetLootBoxById: LoadOneCallback<
   Maybe<LootBoxData>,
   never,
   Database
-> = (ids, { unary: data }) => {
+> = (ids, { shared: data }) => {
   return ids.map((id) => data.lootBoxes.find((c) => c.id === id));
 };
 
@@ -771,7 +771,7 @@ export const batchGetFriendIdsByCrawlerId: LoadManyCallback<
   Maybe<ReadonlyArray<Maybe<number>>>,
   { limit?: number },
   Database
-> = (ids, { unary: data, params: { limit } }) => {
+> = (ids, { shared: data, params: { limit } }) => {
   // NOTE: if you were using an actual database or service, you would do this much more efficiently!
   return ids.map((id) => {
     const crawler = data.crawlers.find((c) => c.id === id);

@@ -418,7 +418,7 @@ const schema = makeGrafastSchema({
         // Extract the ID
         const $id = get($obj, "id");
         // Fetch the record (same for all types)
-        const $record = loadOne({ lookup: $id, load: batchGetAnimalById });
+        const $record = loadOne($id, batchGetAnimalById);
         // Determine the GraphQL type name for the record
         const $__typename = $record.get("typename");
         // Return our polymorphic planner

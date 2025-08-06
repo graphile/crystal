@@ -220,7 +220,7 @@ it("supports unary steps in loadOne", async () => {
                   const $name = $user.get("name");
                   const $executorContext = main.context();
                   return loadOne($name, {
-                    load: async (names, { unary: executorContext }) => {
+                    load: async (names, { shared: executorContext }) => {
                       const { withPgClient, pgSettings } = executorContext;
                       const { rows } = await withPgClient(
                         pgSettings,

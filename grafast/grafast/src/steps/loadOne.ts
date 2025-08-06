@@ -111,6 +111,7 @@ export class LoadOneStep<
     TParams,
     UnwrapMultistep<TShared>
   >;
+  private name: Maybe<string>;
   constructor(
     lookup: TLookup,
     loader: LoadOneLoader<
@@ -124,6 +125,7 @@ export class LoadOneStep<
     super();
 
     const { load, shared, ioEquivalence } = loader;
+    this.name = loader.name || load.displayName || load.name;
     this.load = load;
     if (typeof this.load !== "function") {
       throw new Error(
@@ -141,7 +143,7 @@ export class LoadOneStep<
     }
   }
   toStringMeta() {
-    return this.load.displayName || this.load.name;
+    return this.name ?? null;
   }
 
   private _accessMap: Record<string, Step> | null = null;
@@ -262,6 +264,9 @@ export interface LoadOneLoader<
    * The function that actually loads data from the backend
    */
   load: LoadOneCallback<TSpec, TItem, TData, TParams, UnwrapMultistep<TShared>>;
+
+  /** Name your function (for plan diagrams/debugging) */
+  name?: string;
 
   /**
    * Details of anything your `load` function will need access to, for example
