@@ -27,11 +27,14 @@ import { LoadedRecordStep } from "./loadedRecord.js";
 export interface LoadManyInfo<
   TItem,
   TParams extends Record<string, any>,
-  TLoadContext = never,
+  TShared = never,
 > {
-  unary: TLoadContext;
+  shared: TShared;
   attributes: ReadonlyArray<keyof TItem>;
   params: Partial<TParams>;
+
+  /** @deprecated Please use `shared` instead (it's simply renamed) */
+  unary: TShared;
 }
 
 export type LoadManyCallback<
@@ -41,11 +44,11 @@ export type LoadManyCallback<
     ReadonlyArray<Maybe<TItem>>
   >,
   TParams extends Record<string, any> = Record<string, any>,
-  TLoadContext = never,
+  TShared = never,
 > = {
   (
     lookups: ReadonlyArray<TLookup>,
-    info: LoadManyInfo<TItem, TParams, TLoadContext>,
+    info: LoadManyInfo<TItem, TParams, TShared>,
   ): PromiseOrDirect<ReadonlyArray<TData>>;
   displayName?: string;
 };
@@ -61,10 +64,10 @@ export function loadManyCallback<
     ReadonlyArray<Maybe<TItem>>
   >,
   TParams extends Record<string, any> = Record<string, any>,
-  TLoadContext = never,
+  TShared = never,
 >(
-  load: LoadManyCallback<TLookup, TItem, TData, TParams, TLoadContext>,
-): LoadManyCallback<TLookup, TItem, TData, TParams, TLoadContext> {
+  load: LoadManyCallback<TLookup, TItem, TData, TParams, TShared>,
+): LoadManyCallback<TLookup, TItem, TData, TParams, TShared> {
   return load;
 }
 
@@ -84,7 +87,7 @@ export class LoadManyStep<
     TItem,
     TData extends Maybe<ReadonlyArray<Maybe<TItem>>>, // loadMany
     TParams extends LoadManyBaseParams = any,
-    const TLoadContext extends Multistep = never,
+    const TShared extends Multistep = never,
   >
   extends Step<TData>
   implements Partial<ConnectionOptimizedStep<TItem, any, any, any>>
@@ -94,8 +97,8 @@ export class LoadManyStep<
   public isSyncAndSafe = false;
 
   loadInfo: Omit<
-    LoadManyInfo<TItem, TParams, UnwrapMultistep<TLoadContext>>,
-    "unary" | "params"
+    LoadManyInfo<TItem, TParams, UnwrapMultistep<TShared>>,
+    "shared" | "unary" | "params"
   > | null = null;
   loadInfoKey = "";
 
@@ -103,24 +106,25 @@ export class LoadManyStep<
   paramDepIdByKey: {
     [TKey in keyof TParams]: number;
   } = Object.create(null);
-  unaryDepId: number | null = null;
+  sharedDepId: number | null = null;
   private ioEquivalence: IOEquivalence<TLookup> | null;
   private load: LoadManyCallback<
     UnwrapMultistep<TLookup>,
     TItem,
     TData,
     TParams,
-    UnwrapMultistep<TLoadContext>
+    UnwrapMultistep<TShared>
   >;
   paginationSupport?: PaginationFeatures;
   constructor(
-    options: LoadManyArguments<TLookup, TItem, TData, TParams, TLoadContext>,
+    lookup: TLookup,
+    loader: LoadManyLoader<TLookup, TItem, TData, TParams, TShared>,
   ) {
     super();
     // TODO: prompt users to disable this if they don't need it.
     this.cloneStreams = true;
 
-    const { lookup, load, unary, ioEquivalence, paginationSupport } = options;
+    const { load, shared, ioEquivalence, paginationSupport } = loader;
     this.load = load;
     if (typeof this.load !== "function") {
       throw new Error(
@@ -132,9 +136,9 @@ export class LoadManyStep<
     const $lookup = multistep(lookup, "load");
     this.addDependency($lookup);
 
-    if (unary != null) {
-      const $unary = multistep(unary, "loadUnary");
-      this.unaryDepId = this.addUnaryDependency($unary);
+    if (shared != null) {
+      const $shared = multistep(shared, "loadUnary");
+      this.sharedDepId = this.addUnaryDependency($shared);
     }
 
     if (!paginationSupport) {
@@ -237,7 +241,7 @@ export class LoadManyStep<
   ): PromiseOrDirect<GrafastResultsList<TData>> {
     return executeLoad(
       details,
-      this.unaryDepId,
+      this.sharedDepId,
       this.paramDepIdByKey,
       this.loadInfo!,
       this.load,
@@ -254,14 +258,13 @@ export class LoadManyStep<
   connectionClone() {
     const lookup = this.getDep(0) as TLookup;
     const { load, ioEquivalence } = this;
-    const unary =
-      this.unaryDepId != null
-        ? (this.getDep(this.unaryDepId) as TLoadContext)
-        : (null as any as TLoadContext);
-    const $clone = new LoadManyStep({
-      lookup,
+    const shared =
+      this.sharedDepId != null
+        ? (this.getDep(this.sharedDepId) as TShared)
+        : (null as any as TShared);
+    const $clone = new LoadManyStep(lookup, {
       load,
-      unary,
+      shared,
       ioEquivalence,
     });
 
@@ -289,25 +292,44 @@ export class LoadManyStep<
   }
 }
 
-export interface LoadManyArguments<
+export interface LoadManyLoader<
   TLookup extends Multistep,
   TItem,
   TData extends Maybe<ReadonlyArray<Maybe<TItem>>> = Maybe<
     ReadonlyArray<Maybe<TItem>>
   >,
   TParams extends LoadManyBaseParams = LoadManyBaseParams,
-  TLoadContext extends Multistep = never,
+  TShared extends Multistep = never,
 > {
-  lookup: TLookup;
+  /**
+   * The function that actually loads data from the backend
+   */
   load: LoadManyCallback<
     UnwrapMultistep<TLookup>,
     TItem,
     TData,
     TParams,
-    UnwrapMultistep<TLoadContext>
+    UnwrapMultistep<TShared>
   >;
-  unary?: TLoadContext;
+
+  /**
+   * Details of anything your `load` function will need access to, for example
+   * database connections, API clients, etc.
+   */
+  shared?: TShared;
+
+  /**
+   * Details of which attributes on the output are equivalent to those on the
+   * input (if any), useful for reducing unnecessary fetches (e.g. load the
+   * friends of a user by their id without ever loading the user).
+   */
   ioEquivalence?: IOEquivalence<TLookup>;
+
+  /**
+   * Describes the feature the `load` function supports relating to pagination.
+   * Even an empty object indicates that the load function supports `limit`, so
+   * if this is not supported do not set this attribute.
+   */
   paginationSupport?: PaginationFeatures;
 }
 
@@ -318,20 +340,32 @@ export function loadMany<
     ReadonlyArray<Maybe<TItem>>
   >,
   TParams extends Record<string, any> = Record<string, any>,
-  const TLoadContext extends Multistep = never,
+  const TShared extends Multistep = never,
 >(
-  options: LoadManyArguments<TLookup, TItem, TData, TParams, TLoadContext>,
+  lookup: TLookup,
+  loader: LoadManyLoader<TLookup, TItem, TData, TParams, TShared>,
 ): LoadManyStep<
   UnwrapMultistep<TLookup>,
   TItem,
   TData,
   TParams,
-  UnwrapMultistep<TLoadContext>
+  UnwrapMultistep<TShared>
 > {
-  if (arguments.length > 1) {
+  if (arguments.length > 2) {
     throw new Error(
-      "The signature of loadMany has changed, it now accepts an object: `loadMany({ lookup, load, unary?, ioEquivalence? })`",
+      "The signature of loadMany has changed, additional arguments should now be passed via a 'loader' object: `loadMany(lookup, loader)` where `loader` is either a `load` function or object containing it `{ load, shared?, ioEquivalence?, paginationSupport? }`",
     );
   }
-  return new LoadManyStep(options);
+  return new LoadManyStep(
+    lookup,
+    typeof loader === "function"
+      ? ({ load: loader } as LoadManyLoader<
+          TLookup,
+          TItem,
+          TData,
+          TParams,
+          TShared
+        >)
+      : loader,
+  );
 }

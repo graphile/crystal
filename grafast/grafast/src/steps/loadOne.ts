@@ -21,11 +21,14 @@ import { constant } from "./constant.js";
 export interface LoadOneInfo<
   TItem,
   TParams extends Record<string, any>,
-  TLoadContext = never,
+  TShared = never,
 > {
-  unary: TLoadContext;
+  shared: TShared;
   attributes: ReadonlyArray<keyof TItem>;
   params: Partial<TParams>;
+
+  /** @deprecated Please use 'shared' instead. It's simply renamed */
+  unary: TShared;
 }
 
 export type LoadOneCallback<
@@ -66,15 +69,15 @@ export class LoadOneStep<
   TItem,
   TData extends Maybe<TItem>,
   TParams extends Record<string, any>,
-  const TLoadContext extends Multistep = never,
+  const TShared extends Multistep = never,
 > extends Step<TData> {
   static $$export = { moduleName: "grafast", exportName: "LoadOneStep" };
 
   public isSyncAndSafe = false;
 
   loadInfo: Omit<
-    LoadOneInfo<TItem, TParams, UnwrapMultistep<TLoadContext>>,
-    "unary" | "params"
+    LoadOneInfo<TItem, TParams, UnwrapMultistep<TShared>>,
+    "shared" | "unary" | "params"
   > | null = null;
   loadInfoKey = "";
 
@@ -82,21 +85,22 @@ export class LoadOneStep<
   paramDepIdByKey: {
     [TKey in keyof TParams]: number;
   } = Object.create(null);
-  unaryDepId: number | null = null;
+  sharedDepId: number | null = null;
   private ioEquivalence: IOEquivalence<TLookup> | null;
   private load: LoadOneCallback<
     UnwrapMultistep<TLookup>,
     TItem,
     TData,
     TParams,
-    UnwrapMultistep<TLoadContext>
+    UnwrapMultistep<TShared>
   >;
   constructor(
-    options: LoadOneArguments<TLookup, TItem, TData, TParams, TLoadContext>,
+    lookup: TLookup,
+    loader: LoadOneLoader<TLookup, TItem, TData, TParams, TShared>,
   ) {
     super();
 
-    const { lookup: value, load, unary: unary, ioEquivalence } = options;
+    const { load, shared, ioEquivalence } = loader;
     this.load = load;
     if (typeof this.load !== "function") {
       throw new Error(
@@ -105,12 +109,12 @@ export class LoadOneStep<
     }
     this.ioEquivalence = ioEquivalence ?? null;
 
-    const $spec = multistep(value, "load");
+    const $spec = multistep(lookup, "load");
     this.addDependency($spec);
 
-    if (unary != null) {
-      const $unarySpec = multistep(unary, "loadUnary");
-      this.unaryDepId = this.addUnaryDependency($unarySpec);
+    if (shared != null) {
+      const $shared = multistep(shared, "loadUnary");
+      this.sharedDepId = this.addUnaryDependency($shared);
     }
   }
   toStringMeta() {
@@ -198,7 +202,7 @@ export class LoadOneStep<
   ): PromiseOrDirect<GrafastResultsList<TData>> {
     return executeLoad(
       details,
-      this.unaryDepId,
+      this.sharedDepId,
       this.paramDepIdByKey,
       this.loadInfo!,
       this.load,
@@ -224,19 +228,13 @@ export class LoadOneStep<
   }
 }
 
-export interface LoadOneArguments<
+export interface LoadOneLoader<
   TLookup extends Multistep,
   TItem,
   TData extends Maybe<TItem> = Maybe<TItem>,
   TParams extends Record<string, any> = Record<string, any>,
-  TLoadContext extends Multistep = never,
+  TShared extends Multistep = never,
 > {
-  /**
-   * A step/multistep representing the value to look up - could be an
-   * identifier or combination of identifiers.
-   */
-  lookup: TLookup;
-
   /**
    * The function that actually loads data from the backend
    */
@@ -245,14 +243,14 @@ export interface LoadOneArguments<
     TItem,
     TData,
     TParams,
-    UnwrapMultistep<TLoadContext>
+    UnwrapMultistep<TShared>
   >;
 
   /**
    * Details of anything your `load` function will need access to, for example
    * database connections, API clients, etc.
    */
-  unary?: TLoadContext;
+  shared?: TShared;
 
   /**
    * Details of which attributes on the output are equivalent to those on the
@@ -262,19 +260,46 @@ export interface LoadOneArguments<
   ioEquivalence?: IOEquivalence<TLookup>;
 }
 
+/**
+ * Loads an individual record identified by the `lookup` using the `loader`.
+ *
+ * @param lookup - A step/multistep representing the value to look up - could be an
+ * identifier or combination of identifiers.
+ * @param loader - The function to load this, or a LoadManyLoader object containing such a function
+ */
 export function loadOne<
   const TLookup extends Multistep,
   TItem,
   TData extends Maybe<TItem> = Maybe<TItem>,
   TParams extends Record<string, any> = Record<string, any>,
-  const TLoadContext extends Multistep = never,
+  const TShared extends Multistep = never,
 >(
-  options: LoadOneArguments<TLookup, TItem, TData, TParams, TLoadContext>,
-): LoadOneStep<TLookup, TItem, TData, TParams, TLoadContext> {
-  if (arguments.length > 1) {
+  lookup: TLookup,
+  loader:
+    | LoadOneCallback<
+        UnwrapMultistep<TLookup>,
+        TItem,
+        TData,
+        TParams,
+        never // If you want context, you must use the loader object
+      >
+    | LoadOneLoader<TLookup, TItem, TData, TParams, TShared>,
+): LoadOneStep<TLookup, TItem, TData, TParams, TShared> {
+  if (arguments.length > 2) {
     throw new Error(
-      "The signature of loadOne has changed, it now accepts an object: `loadOne({ lookup, load, unary?, ioEquivalence? })`",
+      "The signature of loadOne has changed, additional arguments should now be passed via a 'loader' object: `loadOne(lookup, loader)` where `loader` is either a `load` function or object containing it `{ load, shared?, ioEquivalence?, paginationSupport? }`",
     );
   }
-  return new LoadOneStep(options);
+  return new LoadOneStep(
+    lookup,
+    typeof loader === "function"
+      ? ({ load: loader } as LoadOneLoader<
+          TLookup,
+          TItem,
+          TData,
+          TParams,
+          TShared
+        >)
+      : loader,
+  );
 }

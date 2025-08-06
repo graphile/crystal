@@ -102,9 +102,11 @@ export interface LoadBatch {
 
 export async function executeBatches<
   TLoadInfo extends {
-    unary: any;
+    shared: any;
     attributes: readonly any[];
     params: any;
+    /** @deprecated */
+    unary: any;
   },
   TCallback extends (
     specs: ReadonlyArray<any>,
@@ -159,7 +161,7 @@ export function executeLoad<
   const TLoadContext extends Multistep = never,
 >(
   details: ExecutionDetails,
-  unaryDepId: number | null,
+  sharedDepId: number | null,
   paramDepIdByKey: Record<string, number>,
   baseLoadInfo: {
     attributes: readonly any[];
@@ -168,9 +170,9 @@ export function executeLoad<
 ) {
   const { count, extra, values } = details;
   const values0 = values[0] as UnwrapMultistep<TLookup>;
-  const unary =
-    unaryDepId != null
-      ? (values[unaryDepId].unaryValue() as UnwrapMultistep<TLoadContext>)
+  const shared =
+    sharedDepId != null
+      ? (values[sharedDepId].unaryValue() as UnwrapMultistep<TLoadContext>)
       : (undefined as never);
   const meta = extra.meta as LoadMeta;
   let cache = meta.cache;
@@ -188,11 +190,14 @@ export function executeLoad<
   const loadInfo: {
     attributes: ReadonlyArray<any>;
     params: Partial<TParams>;
+    shared: TLoadContext;
+    /** @deprecated */
     unary: TLoadContext;
   } = {
     ...baseLoadInfo,
     params,
-    unary,
+    shared,
+    unary: shared,
   };
 
   const results: Array<PromiseOrDirect<TData>> = [];
