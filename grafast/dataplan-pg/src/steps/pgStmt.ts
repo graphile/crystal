@@ -250,7 +250,7 @@ export abstract class PgStmtBaseStep<T>
     const $parsedCursorPlan = lambda($cursorPlan, parseCursor);
     return $parsedCursorPlan;
   }
-  abstract cursorForItem($item: Step): PgCursorStep<any>;
+  abstract cursorForItem($item: Step): PgCursorStep;
 
   paginationSupport = {
     reverse: true,

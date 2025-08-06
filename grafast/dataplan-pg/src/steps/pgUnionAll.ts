@@ -935,12 +935,10 @@ on (${sql.indent(
     return access(this, "cursorDetails");
   }
 
-  public cursorForItem($item: Step): PgCursorStep<PgUnionAllSingleStep> {
-    const $row: PgUnionAllSingleStep = this.listItem($item);
-    return new PgCursorStep<PgUnionAllSingleStep>(
-      $row,
-      this.getCursorDetails(),
-    );
+  public cursorForItem(
+    $item: Step<readonly [...(readonly any[])] | null>,
+  ): PgCursorStep {
+    return new PgCursorStep($item, this.getCursorDetails());
   }
 
   private typeIdx: number | null = null;

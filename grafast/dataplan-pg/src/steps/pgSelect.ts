@@ -1025,13 +1025,9 @@ export class PgSelectStep<
    * find nodes before/after it.
    */
   public cursorForItem(
-    $item: Step<unknown>,
-  ): PgCursorStep<PgSelectSingleStep<TResource>> {
-    const $row = $item as PgSelectSingleStep<TResource>;
-    return new PgCursorStep<PgSelectSingleStep<TResource>>(
-      $row,
-      this.getCursorDetails(),
-    );
+    $item: Step<readonly [...(readonly any[])] | null>,
+  ): PgCursorStep {
+    return new PgCursorStep($item, this.getCursorDetails());
   }
 
   private needsGroups = false;
