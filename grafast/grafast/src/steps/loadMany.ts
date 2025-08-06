@@ -126,7 +126,7 @@ export class LoadManyStep<
     [TKey in keyof TParams]: number;
   } = Object.create(null);
   sharedDepId: number | null = null;
-  private ioEquivalence: IOEquivalence<TLookup> | null;
+  private ioEquivalence: IOEquivalence<UnwrapMultistep<TLookup>> | null;
   private load: LoadManyCallback<
     UnwrapMultistep<TLookup>,
     TItem,
@@ -137,7 +137,13 @@ export class LoadManyStep<
   paginationSupport?: PaginationFeatures;
   constructor(
     lookup: TLookup,
-    loader: LoadManyLoader<TLookup, TItem, TData, TParams, TShared>,
+    loader: LoadManyLoader<
+      UnwrapMultistep<TLookup>,
+      TItem,
+      TData,
+      TParams,
+      TShared
+    >,
   ) {
     super();
     // TODO: prompt users to disable this if they don't need it.
@@ -312,7 +318,7 @@ export class LoadManyStep<
 }
 
 export interface LoadManyLoader<
-  TLookup extends Multistep,
+  TSpec,
   TItem,
   TData extends Maybe<ReadonlyArray<Maybe<TItem>>> = Maybe<
     ReadonlyArray<Maybe<TItem>>
@@ -324,7 +330,7 @@ export interface LoadManyLoader<
    * The function that actually loads data from the backend
    */
   load: LoadManyCallback<
-    UnwrapMultistep<TLookup>,
+    TSpec,
     TItem,
     TData,
     TParams,
@@ -342,7 +348,7 @@ export interface LoadManyLoader<
    * input (if any), useful for reducing unnecessary fetches (e.g. load the
    * friends of a user by their id without ever loading the user).
    */
-  ioEquivalence?: IOEquivalence<TLookup>;
+  ioEquivalence?: IOEquivalence<TSpec>;
 
   /**
    * Describes the feature the `load` function supports relating to pagination.
@@ -362,7 +368,13 @@ export function loadMany<
   const TShared extends Multistep = never,
 >(
   lookup: TLookup,
-  loader: LoadManyLoader<TLookup, TItem, TData, TParams, TShared>,
+  loader: LoadManyLoader<
+    UnwrapMultistep<TLookup>,
+    TItem,
+    TData,
+    TParams,
+    TShared
+  >,
 ): LoadManyStep<
   UnwrapMultistep<TLookup>,
   TItem,
@@ -379,7 +391,7 @@ export function loadMany<
     lookup,
     typeof loader === "function"
       ? ({ load: loader } as LoadManyLoader<
-          TLookup,
+          UnwrapMultistep<TLookup>,
           TItem,
           TData,
           TParams,

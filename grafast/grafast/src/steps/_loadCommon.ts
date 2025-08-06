@@ -16,22 +16,14 @@ export const nextTick: (cb: () => void) => void =
     ? (cb) => process.nextTick(cb)
     : (cb) => setTimeout(cb, 0);
 
-export type IOEquivalence<TLookup extends Multistep> =
+export type IOEquivalence<TSpec> =
   | null
   | string
-  | (UnwrapMultistep<TLookup> extends readonly [...(readonly any[])]
-      ? {
-          [key in Exclude<keyof UnwrapMultistep<TLookup>, keyof any[]>]:
-            | string
-            | null;
-        }
-      : UnwrapMultistep<TLookup> extends Record<string, any>
-        ? { [key in keyof UnwrapMultistep<TLookup>]?: string | null }
-        : never);
+  | { [key in Exclude<keyof TSpec, keyof any[]>]?: string | null };
 
 export function makeAccessMap<TLookup extends Multistep>(
   $spec: Step,
-  ioEquivalence: IOEquivalence<TLookup>,
+  ioEquivalence: IOEquivalence<UnwrapMultistep<TLookup>>,
 ): Record<string, Step> {
   const map = Object.create(null) as Record<string, Step>;
   if (ioEquivalence == null) {
@@ -47,7 +39,7 @@ export function makeAccessMap<TLookup extends Multistep>(
     return map;
   } else if (typeof ioEquivalence === "object") {
     for (const key of Object.keys(ioEquivalence)) {
-      const attr = ioEquivalence[key as any];
+      const attr = ioEquivalence[key];
       if (attr != null) {
         map[attr] = isObjectLikeStep($spec)
           ? $spec.get(key)

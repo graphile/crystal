@@ -67,14 +67,14 @@ export function loadOneCallback<
  * LoadOneLoader.
  */
 export function loadOneLoader<
-  const TLookup extends Multistep,
+  TSpec,
   TItem,
   TData extends Maybe<TItem> = Maybe<TItem>,
   TParams extends Record<string, any> = Record<string, any>,
-  const TShared extends Multistep = never,
+  TShared extends Multistep = never,
 >(
-  load: LoadOneLoader<TLookup, TItem, TData, TParams, TShared>,
-): LoadOneLoader<TLookup, TItem, TData, TParams, TShared> {
+  load: LoadOneLoader<TSpec, TItem, TData, TParams, TShared>,
+): LoadOneLoader<TSpec, TItem, TData, TParams, TShared> {
   return load;
 }
 
@@ -103,7 +103,7 @@ export class LoadOneStep<
     [TKey in keyof TParams]: number;
   } = Object.create(null);
   sharedDepId: number | null = null;
-  private ioEquivalence: IOEquivalence<TLookup> | null;
+  private ioEquivalence: IOEquivalence<UnwrapMultistep<TLookup>> | null;
   private load: LoadOneCallback<
     UnwrapMultistep<TLookup>,
     TItem,
@@ -113,7 +113,13 @@ export class LoadOneStep<
   >;
   constructor(
     lookup: TLookup,
-    loader: LoadOneLoader<TLookup, TItem, TData, TParams, TShared>,
+    loader: LoadOneLoader<
+      UnwrapMultistep<TLookup>,
+      TItem,
+      TData,
+      TParams,
+      TShared
+    >,
   ) {
     super();
 
@@ -246,7 +252,7 @@ export class LoadOneStep<
 }
 
 export interface LoadOneLoader<
-  TLookup extends Multistep,
+  TSpec,
   TItem,
   TData extends Maybe<TItem> = Maybe<TItem>,
   TParams extends Record<string, any> = Record<string, any>,
@@ -255,13 +261,7 @@ export interface LoadOneLoader<
   /**
    * The function that actually loads data from the backend
    */
-  load: LoadOneCallback<
-    UnwrapMultistep<TLookup>,
-    TItem,
-    TData,
-    TParams,
-    UnwrapMultistep<TShared>
-  >;
+  load: LoadOneCallback<TSpec, TItem, TData, TParams, UnwrapMultistep<TShared>>;
 
   /**
    * Details of anything your `load` function will need access to, for example
@@ -274,7 +274,7 @@ export interface LoadOneLoader<
    * input (if any), useful for reducing unnecessary fetches (e.g. load the
    * friends of a user by their id without ever loading the user).
    */
-  ioEquivalence?: IOEquivalence<TLookup>;
+  ioEquivalence?: IOEquivalence<TSpec>;
 }
 
 /**
@@ -300,8 +300,8 @@ export function loadOne<
         TParams,
         never // If you want context, you must use the loader object
       >
-    | LoadOneLoader<TLookup, TItem, TData, TParams, TShared>,
-): LoadOneStep<TLookup, TItem, TData, TParams, TShared> {
+    | LoadOneLoader<UnwrapMultistep<TLookup>, TItem, TData, TParams, TShared>,
+): LoadOneStep<UnwrapMultistep<TLookup>, TItem, TData, TParams, TShared> {
   if (arguments.length > 2) {
     throw new Error(
       "The signature of loadOne has changed, additional arguments should now be passed via a 'loader' object: `loadOne(lookup, loader)` where `loader` is either a `load` function or object containing it `{ load, shared?, ioEquivalence?, paginationSupport? }`",
@@ -311,7 +311,7 @@ export function loadOne<
     lookup,
     typeof loader === "function"
       ? ({ load: loader } as LoadOneLoader<
-          TLookup,
+          UnwrapMultistep<TLookup>,
           TItem,
           TData,
           TParams,
