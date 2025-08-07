@@ -41,8 +41,8 @@ export interface LoadManyInfo<
 export type LoadManyCallback<
   TLookup,
   TItem,
-  TData extends Maybe<ReadonlyArray<Maybe<TItem>>> = Maybe<
-    ReadonlyArray<Maybe<TItem>>
+  TData extends Maybe<ReadonlyArrayOrIterable<Maybe<TItem>>> = Maybe<
+    ReadonlyArrayOrIterable<Maybe<TItem>>
   >,
   TParams extends Record<string, any> = Record<string, any>,
   TShared = never,
@@ -61,8 +61,8 @@ export type LoadManyCallback<
 export function loadManyCallback<
   TLookup,
   TItem,
-  TData extends Maybe<ReadonlyArray<Maybe<TItem>>> = Maybe<
-    ReadonlyArray<Maybe<TItem>>
+  TData extends Maybe<ReadonlyArrayOrIterable<Maybe<TItem>>> = Maybe<
+    ReadonlyArrayOrIterable<Maybe<TItem>>
   >,
   TParams extends Record<string, any> = Record<string, any>,
   TShared = never,
@@ -79,8 +79,8 @@ export function loadManyCallback<
 export function loadManyLoader<
   const TLookup extends Multistep,
   TItem,
-  TData extends Maybe<ReadonlyArray<Maybe<TItem>>> = Maybe<
-    ReadonlyArray<Maybe<TItem>>
+  TData extends Maybe<ReadonlyArrayOrIterable<Maybe<TItem>>> = Maybe<
+    ReadonlyArrayOrIterable<Maybe<TItem>>
   >,
   TParams extends Record<string, any> = Record<string, any>,
   const TShared extends Multistep = never,
@@ -104,7 +104,7 @@ interface LoadManyBaseParams {
 export class LoadManyStep<
     const TLookup extends Multistep,
     TItem,
-    TData extends Maybe<ReadonlyArray<Maybe<TItem>>>, // loadMany
+    TData extends Maybe<ReadonlyArrayOrIterable<Maybe<TItem>>>, // loadMany
     TParams extends LoadManyBaseParams = any,
     const TShared extends Multistep = never,
   >
@@ -187,7 +187,7 @@ export class LoadManyStep<
   listItem($item: Step) {
     return new LoadedRecordStep<
       TItem,
-      TData extends Maybe<ReadonlyArray<infer U>>
+      TData extends Maybe<ReadonlyArrayOrIterable<infer U>>
         ? U extends Maybe<TItem>
           ? U
           : never
@@ -322,8 +322,8 @@ export class LoadManyStep<
 export interface LoadManyLoader<
   TSpec,
   TItem,
-  TData extends Maybe<ReadonlyArray<Maybe<TItem>>> = Maybe<
-    ReadonlyArray<Maybe<TItem>>
+  TData extends Maybe<ReadonlyArrayOrIterable<Maybe<TItem>>> = Maybe<
+    ReadonlyArrayOrIterable<Maybe<TItem>>
   >,
   TParams extends LoadManyBaseParams = LoadManyBaseParams,
   TShared extends Multistep = never,
@@ -366,8 +366,8 @@ export interface LoadManyLoader<
 export function loadMany<
   const TLookup extends Multistep,
   TItem,
-  TData extends Maybe<ReadonlyArray<Maybe<TItem>>> = Maybe<
-    ReadonlyArray<Maybe<TItem>>
+  TData extends Maybe<ReadonlyArrayOrIterable<Maybe<TItem>>> = Maybe<
+    ReadonlyArrayOrIterable<Maybe<TItem>>
   >,
   TParams extends Record<string, any> = Record<string, any>,
   const TShared extends Multistep = never,
@@ -401,3 +401,7 @@ export function loadMany<
       : loader,
   );
 }
+
+type ReadonlyArrayOrIterable<T> =
+  | ReadonlyArray<T>
+  | AsyncIterable<T, void, unknown>;
