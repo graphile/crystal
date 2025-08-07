@@ -339,4 +339,196 @@ it(
   }),
 );
 
-it("throws an error when initialCount > limit");
+it(
+  "refuses to stream when initialCount > limit",
+  throwOnUnhandledRejections(async () => {
+    const source = /* GraphQL */ `
+      {
+        connection {
+          edges @stream(initialCount: 8) {
+            cursor
+            node {
+              index
+              value
+            }
+          }
+          pageInfo {
+            ... @defer {
+              hasNextPage
+            }
+            ... @defer {
+              hasPreviousPage
+            }
+            ... @defer {
+              startCursor
+            }
+            ... @defer {
+              endCursor
+            }
+          }
+          nodes @stream(initialCount: 2) {
+            index
+            value
+          }
+        }
+      }
+    `;
+    const stream = await grafast({
+      schema,
+      requestContext,
+      resolvedPreset: resolvePreset({
+        extends: [
+          resolvedPreset,
+          {
+            grafast: {
+              // For this test to work, this must be < 11
+              distributorBufferSize: 8,
+            },
+          },
+        ],
+      }),
+      source,
+    });
+    if ("errors" in stream) {
+      const plan = (stream.extensions?.explain as any)?.operations?.find(
+        (op: any) => op.type === "plan",
+      );
+      if (plan) {
+        console.log(planToMermaid(plan.plan));
+      }
+      console.dir(stream.errors);
+      expect(stream.errors).not.to.exist;
+    }
+    assertIterable(stream);
+    const payloads = (await streamToArray(stream)) as AsyncExecutionResult[];
+    const expectedNodes = [
+      { index: 0, value: 1 },
+      { index: 1, value: 1 },
+      { index: 2, value: 2 },
+      { index: 3, value: 3 },
+      { index: 4, value: 5 },
+      { index: 5, value: 8 },
+      { index: 6, value: 13 },
+      { index: 7, value: 21 },
+      { index: 8, value: 34 },
+      { index: 9, value: 55 },
+      { index: 10, value: 89 },
+    ];
+    const expectedEdges = expectedNodes.map((node) => ({
+      cursor: Buffer.from(String(node.index)).toString("base64"),
+      node,
+    }));
+    expect(payloads[0].data).to.deep.equal({
+      connection: {
+        // Stream ignored - fetched in initial payload
+        edges: expectedEdges,
+        pageInfo: {},
+        nodes: expectedNodes.slice(0, 2),
+      },
+    });
+    const finalData = resolveStreamDefer(payloads);
+    expect(finalData.data).to.deep.equal({
+      connection: {
+        edges: expectedEdges,
+        nodes: expectedNodes,
+        pageInfo: {
+          hasNextPage: false,
+          hasPreviousPage: false,
+          startCursor: Buffer.from("0").toString("base64"),
+          endCursor: Buffer.from("10").toString("base64"),
+        },
+      },
+    });
+    expect(finalData.errors).not.to.exist;
+    expect(startCount).to.equal(1);
+    expect(endCount).to.equal(1);
+  }),
+);
+
+it(
+  "refuses to stream when initialCount > limit (simplified)",
+  throwOnUnhandledRejections(async () => {
+    const source = /* GraphQL */ `
+      {
+        connection {
+          edges @stream(initialCount: 8) {
+            cursor
+            node {
+              index
+              value
+            }
+          }
+          pageInfo {
+            ... @defer {
+              hasNextPage
+            }
+          }
+        }
+      }
+    `;
+    const stream = await grafast({
+      schema,
+      requestContext,
+      resolvedPreset: resolvePreset({
+        extends: [
+          resolvedPreset,
+          {
+            grafast: {
+              // For this test to work, this must be < 11
+              distributorBufferSize: 8,
+            },
+          },
+        ],
+      }),
+      source,
+    });
+    if ("errors" in stream) {
+      const plan = (stream.extensions?.explain as any)?.operations?.find(
+        (op: any) => op.type === "plan",
+      );
+      if (plan) {
+        console.log(planToMermaid(plan.plan));
+      }
+      console.dir(stream.errors);
+      expect(stream.errors).not.to.exist;
+    }
+    assertIterable(stream);
+    const payloads = (await streamToArray(stream)) as AsyncExecutionResult[];
+    const expectedNodes = [
+      { index: 0, value: 1 },
+      { index: 1, value: 1 },
+      { index: 2, value: 2 },
+      { index: 3, value: 3 },
+      { index: 4, value: 5 },
+      { index: 5, value: 8 },
+      { index: 6, value: 13 },
+      { index: 7, value: 21 },
+      { index: 8, value: 34 },
+      { index: 9, value: 55 },
+      { index: 10, value: 89 },
+    ];
+    const expectedEdges = expectedNodes.map((node) => ({
+      cursor: Buffer.from(String(node.index)).toString("base64"),
+      node,
+    }));
+    expect(payloads[0].data).to.deep.equal({
+      connection: {
+        // Stream ignored - fetched in initial payload
+        edges: expectedEdges,
+        pageInfo: {},
+      },
+    });
+    const finalData = resolveStreamDefer(payloads);
+    expect(finalData.data).to.deep.equal({
+      connection: {
+        edges: expectedEdges,
+        pageInfo: {
+          hasNextPage: false,
+        },
+      },
+    });
+    expect(finalData.errors).not.to.exist;
+    expect(startCount).to.equal(1);
+    expect(endCount).to.equal(1);
+  }),
+);
