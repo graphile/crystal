@@ -304,20 +304,14 @@ it(
           node,
         })),
         nodes: expectedNodes,
-        pageInfo: {
-          hasNextPage: false,
-          hasPreviousPage: false,
-          startCursor: Buffer.from("0").toString("base64"),
-          endCursor: Buffer.from("10").toString("base64"),
-        },
+        pageInfo: null, // Because: error
       },
     });
-    expect(finalData.errors).to.deep.equal([
-      {
-        message: "Throw in pageInfo requested!",
-        path: ["connection", "pageInfo"],
-      },
-    ]);
+    expect(finalData.errors).to.have.length(1);
+    expect(finalData.errors![0].toJSON()).to.deep.include({
+      message: "Throw in pageInfo requested!",
+      path: ["connection", "pageInfo"],
+    });
     expect(startCount).to.equal(1);
     expect(endCount).to.equal(1);
   }),
