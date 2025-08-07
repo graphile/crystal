@@ -150,7 +150,7 @@ export function changeNullability(
     }
     const rule = typeof rawRule !== "object" ? { type: rawRule } : rawRule;
     pendingMatches.delete(`${Self.name}.${fieldName}`);
-    if (rule.type) {
+    if (rule.type != null) {
       field.type = doIt(
         field.type,
         rule.type,
@@ -182,7 +182,7 @@ export function changeNullability(
     }
     const rule = typeof rawRule !== "object" ? { type: rawRule } : rawRule;
     const spec = rule.args?.[argName];
-    if (spec) {
+    if (spec != null) {
       arg.type = doIt(
         arg.type,
         spec,
@@ -218,7 +218,7 @@ export function changeNullability(
           const rule =
             typeof rawRule !== "object" ? { type: rawRule } : rawRule;
           pendingMatches.delete(`${Self.name}.${fieldName}`);
-          if (rule.type) {
+          if (rule.type != null) {
             field.type = doIt(
               field.type,
               rule.type,

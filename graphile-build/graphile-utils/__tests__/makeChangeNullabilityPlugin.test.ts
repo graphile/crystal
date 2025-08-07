@@ -34,6 +34,8 @@ const makeSchema = (plugins: GraphileConfig.Plugin[]) =>
             extend type Query implements EchoCapable {
               echo(message: [[String]!]): [[String]!]
               echo2(in: MyInput): [[String]!]
+              # NOT NULL to NULL
+              echo3(in: MyInput): [[String]!]!
             }
             input MyInput {
               message: [[String]!]
@@ -98,6 +100,7 @@ describe("object, interface and input", () => {
             },
           },
           echo2: spec,
+          echo3: spec,
         },
         EchoCapable: {
           echo: {
@@ -126,6 +129,11 @@ describe("object, interface and input", () => {
       }
       {
         const field = Query.getFields().echo2;
+        const nullability = getNullability(field.type);
+        expect(nullability).toEqual(expectation);
+      }
+      {
+        const field = Query.getFields().echo3;
         const nullability = getNullability(field.type);
         expect(nullability).toEqual(expectation);
       }
