@@ -8,7 +8,7 @@ const $$isDistributor = Symbol("$$isDistributor");
 
 export interface Distributor<TData> {
   [$$isDistributor]: true;
-  iterableFor(stepId: number): AsyncIterable<TData, undefined, never>;
+  iterableFor(stepId: number): AsyncIterable<TData, void, never>;
   releaseIfUnused(stepId: number): void;
 }
 
@@ -19,7 +19,7 @@ export function isDistributor<TData = any>(
 }
 
 // Save on garbage collection by just using this promise for everything
-const DONE_PROMISE: Promise<IteratorReturnResult<undefined>> = Promise.resolve({
+const DONE_PROMISE: Promise<IteratorReturnResult<void>> = Promise.resolve({
   done: true,
   value: undefined,
 });
@@ -38,8 +38,8 @@ const DONE_PROMISE: Promise<IteratorReturnResult<undefined>> = Promise.resolve({
  */
 export function distributor<TData>(
   sourceIterable:
-    | AsyncIterable<TData, undefined, never>
-    | Iterable<TData, undefined, never>,
+    | AsyncIterable<TData, void, never>
+    | Iterable<TData, void, never>,
   dependentSteps: readonly Step[],
   distributorBufferSize: number,
 ): Distributor<TData> {
@@ -68,7 +68,7 @@ export function distributor<TData>(
    * will be set to `Infinity` and their final result, to be returned from all
    * further `.next()` calls, will be stored here.
    */
-  const terminalResult: Array<Promise<IteratorReturnResult<undefined>> | null> =
+  const terminalResult: Array<Promise<IteratorReturnResult<void>> | null> =
     dependentSteps.map(() => null);
 
   /**
@@ -84,7 +84,7 @@ export function distributor<TData>(
    * the start of the array and the `lowWaterMark` will be advanced. The item to pull
    * for a given position is `buffer[requestedIndex[stepIndex] - lowWaterMark]`.
    */
-  const buffer: Array<Promise<IteratorResult<TData, undefined>>> = [];
+  const buffer: Array<Promise<IteratorResult<TData, void>>> = [];
 
   // Easy way to resolve a promise for slowing down the fastest consumer
   let wmi: [Deferred<void>, Promise<void>] | null = null;
@@ -102,7 +102,7 @@ export function distributor<TData>(
    */
   let finalIndex = Infinity;
   /** The final result from our sourceIterator (at index `finalIndex`), or `null` if it hasn't terminated yet. */
-  let finalResult: Promise<IteratorResult<TData, undefined>> | null = null;
+  let finalResult: Promise<IteratorResult<TData, void>> | null = null;
 
   /**
    * Once termination has been handled, this will be true.
@@ -172,7 +172,7 @@ export function distributor<TData>(
    */
   function sourceIteratorCompleted(
     _finalIndex: number,
-    _finalResult: Promise<IteratorResult<TData, undefined>>,
+    _finalResult: Promise<IteratorResult<TData, void>>,
   ) {
     // This indicates that sourceIterator has completed at index `finalIndex`.
     // This does not mean that we are `stopped`, since some clients still need
@@ -220,7 +220,7 @@ export function distributor<TData>(
     // !! Below here must be entirely synchronous! !!
 
     const bufferIndex = index - lowWaterMark;
-    let result: Promise<IteratorResult<TData, undefined>>;
+    let result: Promise<IteratorResult<TData, void>>;
     if (buffer.length <= bufferIndex) {
       // assert.equal(buffer.length, bufferIndex, "We've missed some indexes?!")
       // It's our job to pull the next value!
@@ -297,7 +297,7 @@ export function distributor<TData>(
           : sourceIterable[Symbol.iterator]();
     }
 
-    const iterator: AsyncIterableIterator<TData, undefined, never> = {
+    const iterator: AsyncIterableIterator<TData, void, never> = {
       [Symbol.asyncIterator]() {
         return this;
       },
