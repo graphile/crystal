@@ -14,13 +14,18 @@ import {
   sideEffect,
   Step,
 } from "../dist/index.js";
+import { planToMermaid } from "../dist/mermaid.js";
 import {
   assertIterable,
   resolveStreamDefer,
   streamToArray,
 } from "./incrementalUtils.js";
 
-const resolvedPreset = resolvePreset({});
+const resolvedPreset = resolvePreset({
+  grafast: {
+    explain: true,
+  },
+});
 const requestContext = {};
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -289,6 +294,12 @@ it(
       source,
     });
     if ("errors" in stream) {
+      const plan = (stream.extensions?.explain as any)?.operations?.find(
+        (op: any) => op.type === "plan",
+      );
+      if (plan) {
+        console.log(planToMermaid(plan.plan));
+      }
       console.dir(stream.errors);
       expect(stream.errors).not.to.exist;
     }
