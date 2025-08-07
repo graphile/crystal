@@ -96,17 +96,93 @@ export function distributor<TData>(
     return wmi[1];
   }
 
+  /**
+   * The maximum index that can be retrieved from our sourceIterator. Infinity
+   * until the iterator terminates.
+   */
+  let finalIndex = Infinity;
+  /** The final result from our sourceIterator (at index `finalIndex`), or `null` if it hasn't terminated yet. */
+  let finalResult: Promise<IteratorResult<TData, undefined>> | null = null;
+
+  /**
+   * Once termination has been handled, this will be true.
+   *
+   * NOTE: when this is `true`, `finalResult` will be set, but the reverse is
+   * not necessarily true.
+   */
+  let stopped = false;
+
   // Stop us retaining data we don't need to retain
   function maybeAdvanceLowWaterMark() {
-    if (deliveredIndex.every((i) => i >= lowWaterMark)) {
-      buffer.shift();
-      lowWaterMark++;
-      if (wmi !== null) {
+    if (stopped) {
+      console.warn(
+        `Attempted to advance low water mark after distributor completed for steps: ${dependentSteps}`,
+      );
+      return;
+    }
+    const smallest = Math.min(...deliveredIndex);
+    if (!Number.isFinite(smallest) || smallest >= finalIndex) {
+      // They're all done
+      stopped = true;
+      if (finalResult === null) {
+        // finalIndex was Infinity
+        finalIndex = 0;
+        finalResult = DONE_PROMISE;
+      }
+
+      if (!sourceIterator) {
+        // We never started the iterator... do we need to?
+        // For now, lets' start and then immediately terminate it
+        sourceIterator =
+          Symbol.asyncIterator in sourceIterable
+            ? sourceIterable[Symbol.asyncIterator]()
+            : sourceIterable[Symbol.iterator]();
+      }
+
+      if (sourceIterator.return) {
+        sourceIterator.return();
+      } else if (sourceIterator?.throw) {
+        sourceIterator.throw(new Error("Stop"));
+      } else {
+        // Just ignore it? Or do we need to call `.next()` indefinitely?
+        // Since it could be infinite, the next chain doesn't make sense, so
+        // we'll just stop.
+      }
+    } else {
+      // Advance the lowWaterMark as far as we can
+      let advanced = false;
+      while (smallest >= lowWaterMark) {
+        advanced = true;
+        buffer.shift();
+        lowWaterMark++;
+      }
+
+      // Announce that the lowWaterMark advanced
+      if (advanced && wmi !== null) {
         // Avoid race condition
         const deferred = wmi[0];
         wmi = null;
         deferred.resolve();
       }
+    }
+  }
+
+  /**
+   * Called when the sourceIterator completes - either with success or error.
+   */
+  function sourceIteratorCompleted(
+    _finalIndex: number,
+    _finalResult: Promise<IteratorResult<TData, undefined>>,
+  ) {
+    // This indicates that sourceIterator has completed at index `finalIndex`.
+    // This does not mean that we are `stopped`, since some clients still need
+    // to catch up.
+
+    // Note that this might be called more than once (because promises), we
+    // want the earliest termination index to "win".
+    if (finalResult === null || _finalIndex < finalIndex) {
+      finalIndex = _finalIndex;
+      finalResult = _finalResult;
     }
   }
 
@@ -148,14 +224,28 @@ export function distributor<TData>(
     if (buffer.length <= bufferIndex) {
       // assert.equal(buffer.length, bufferIndex, "We've missed some indexes?!")
       // It's our job to pull the next value!
-      result = Promise.resolve(sourceIterator!.next());
-      buffer[bufferIndex] = result;
+      // But first... did the source iterator already complete?
+      if (finalResult !== null) {
+        result = finalResult;
+      } else {
+        result = Promise.resolve(sourceIterator!.next());
+        buffer[bufferIndex] = result;
+
+        // See if this is the result that completes sourceIterator
+        result.then(
+          (value) => {
+            if (value.done) {
+              sourceIteratorCompleted(index, result);
+            }
+          },
+          () => void sourceIteratorCompleted(index, result),
+        );
+      }
     } else {
       // The next value already exists
       result = buffer[bufferIndex];
     }
 
-    // assert.equal(deliveredIndex[stepIndex], index - 1);
     if (result == null) {
       return stop(
         stepIndex,
@@ -171,6 +261,7 @@ export function distributor<TData>(
       );
     }
 
+    // assert.equal(deliveredIndex[stepIndex], index - 1);
     deliveredIndex[stepIndex] = index;
     maybeAdvanceLowWaterMark();
 
