@@ -1292,7 +1292,7 @@ function makeArrayExecutor<TAsString extends boolean>(
     ) {
       if (!Array.isArray(bucketRootValue)) {
         console.warn(
-          `Hit fallback for value ${inspect(
+          `${this} Hit fallback for value ${inspect(
             bucketRootValue,
           )} coercion to mode 'array'`,
         );

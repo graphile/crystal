@@ -13,10 +13,9 @@ import { LayerPlan } from "../engine/LayerPlan.js";
 import { withGlobalLayerPlan } from "../engine/lib/withGlobalLayerPlan.js";
 import { flagError } from "../error.js";
 import type { ExecutionDetails, GrafastResultsList } from "../interfaces.js";
-import type { ListCapableStep } from "../step.js";
 import { isListCapableStep, Step } from "../step.js";
 import { __ItemStep } from "./__item.js";
-import type { ConnectionCapableStep } from "./connection.js";
+import type { StepRepresentingList } from "./connection.js";
 import { itemsOrStep } from "./connection.js";
 
 /**
@@ -39,9 +38,7 @@ export class ApplyTransformsStep extends Step {
    */
   public subroutineLayer: LayerPlan<LayerPlanReasonSubroutine>;
 
-  constructor(
-    $step: ListCapableStep<any, any> | ConnectionCapableStep<any, any>,
-  ) {
+  constructor($step: StepRepresentingList<any>) {
     super();
     const listPlan = itemsOrStep($step);
     this.addDataDependency(listPlan);
@@ -55,6 +52,7 @@ export class ApplyTransformsStep extends Step {
     const itemPlan = withGlobalLayerPlan(
       this.subroutineLayer,
       listPlan.polymorphicPaths,
+      null,
       null,
       () => {
         // This does NOT use `itemPlanFor` because __ListTransformPlans are special.

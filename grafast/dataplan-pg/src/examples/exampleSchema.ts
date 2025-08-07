@@ -14,21 +14,20 @@ import { jsonParse, JSONParseStep } from "@dataplan/json";
 import * as crypto from "crypto";
 import { writeFileSync } from "fs";
 import type {
-  __InputObjectStep,
-  __InputObjectStepWithDollars,
-  __InputStaticLeafStep,
-  __TrackedValueStep,
-  __TrackedValueStepWithDollars,
   AccessStep,
   BaseGraphQLRootValue,
   GrafastArgumentConfig,
   GrafastFieldConfig,
   GrafastSubscriber,
   Maybe,
-  Step,
 } from "grafast";
 import {
+  __InputObjectStep,
+  __InputObjectStepWithDollars,
+  __InputStaticLeafStep,
   __ListTransformStep,
+  __TrackedValueStep,
+  __TrackedValueStepWithDollars,
   __ValueStep,
   bakedInput,
   connection,
@@ -36,6 +35,7 @@ import {
   constant,
   context,
   each,
+  EdgeStep,
   error,
   ExecutableStep,
   filter,
@@ -50,6 +50,7 @@ import {
   newObjectTypeBuilder,
   object,
   rootValue,
+  Step,
 } from "grafast";
 import type { GraphQLOutputType } from "grafast/graphql";
 import {
@@ -112,17 +113,14 @@ import type {
   PgCodec,
   PgSelectQueryBuilderCallback,
 } from "../interfaces";
-import { PgPageInfoStep } from "../steps/pgPageInfo.js";
-import type {
-  PgSelectParsedCursorStep,
-  PgSelectQueryBuilder,
-} from "../steps/pgSelect.js";
+import type { PgSelectQueryBuilder } from "../steps/pgSelect.js";
 import { sqlFromArgDigests } from "../steps/pgSelect.js";
 import type {
   PgUnionAllQueryBuilder,
+  PgUnionAllSingleStep,
   PgUnionAllStep,
 } from "../steps/pgUnionAll.js";
-import { pgUnionAll, PgUnionAllSingleStep } from "../steps/pgUnionAll.js";
+import { pgUnionAll } from "../steps/pgUnionAll.js";
 import {
   WithPgClientStep,
   withPgClientTransaction,
@@ -1703,10 +1701,12 @@ export function makeExampleSchema(
   type ResourceConnectionPlan<
     TResource extends PgResource<any, any, any, any, any>,
   > = ConnectionStep<
+    any,
     PgSelectSingleStep<TResource>,
-    PgSelectParsedCursorStep,
-    PgSelectStep<TResource>,
-    PgSelectSingleStep<TResource>
+    any,
+    any,
+    null | readonly any[],
+    PgSelectStep<TResource>
   >;
 
   const {
@@ -2103,50 +2103,32 @@ export function makeExampleSchema(
     }),
   });
 
-  const MessageEdge = newObjectTypeBuilder<MessageStep>(PgSelectSingleStep)({
+  const MessageEdge = newObjectTypeBuilder<Step>(Step)({
     name: "MessageEdge",
     fields: {
       cursor: {
         type: GraphQLString,
-        plan: EXPORTABLE(
-          () =>
-            function plan($node) {
-              return $node.cursor();
-            },
-          [],
-        ),
       },
       node: {
         type: Message,
-        plan: EXPORTABLE(
-          () =>
-            function plan($node) {
-              return $node;
-            },
-          [],
-        ),
       },
     },
   });
 
-  const PageInfo = newObjectTypeBuilder<PgPageInfoStep<any>>(PgPageInfoStep)({
+  const PageInfo = newObjectTypeBuilder(Step)({
     name: "PageInfo",
     fields: {
       hasNextPage: {
         type: new GraphQLNonNull(GraphQLBoolean),
-        plan: EXPORTABLE(() => ($pageInfo) => $pageInfo.hasNextPage(), []),
       },
       hasPreviousPage: {
         type: new GraphQLNonNull(GraphQLBoolean),
-        plan: EXPORTABLE(() => ($pageInfo) => $pageInfo.hasPreviousPage(), []),
       },
       startCursor: {
         type: GraphQLString,
-        plan: EXPORTABLE(() => ($pageInfo) => $pageInfo.startCursor(), []),
       },
       endCursor: {
         type: GraphQLString,
-        plan: EXPORTABLE(() => ($pageInfo) => $pageInfo.endCursor(), []),
       },
     },
   });
@@ -3736,36 +3718,24 @@ export function makeExampleSchema(
   });
 
   type VulnerabilityConnectionStep = ConnectionStep<
+    any,
     PgUnionAllSingleStep,
-    PgSelectParsedCursorStep,
-    PgUnionAllStep<any, any>,
-    PgUnionAllSingleStep
+    any,
+    any,
+    null | readonly any[],
+    PgUnionAllStep<any, any>
   >;
 
-  const VulnerabilityEdge = newObjectTypeBuilder<PgUnionAllSingleStep>(
-    PgUnionAllSingleStep,
+  const VulnerabilityEdge = newObjectTypeBuilder<EdgeStep<any, any, any>>(
+    EdgeStep,
   )({
     name: "VulnerabilityEdge",
     fields: {
       cursor: {
         type: GraphQLString,
-        plan: EXPORTABLE(
-          () =>
-            function plan($node) {
-              return $node.cursor();
-            },
-          [],
-        ),
       },
       node: {
         type: Vulnerability,
-        plan: EXPORTABLE(
-          () =>
-            function plan($node) {
-              return $node;
-            },
-          [],
-        ),
       },
     },
   });

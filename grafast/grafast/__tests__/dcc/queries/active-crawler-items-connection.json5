@@ -1,0 +1,23 @@
+{
+  character: {
+    id: 102,
+    name: 'Princess Donut',
+    itemsConnection: {
+      nodes: [
+        {
+          __typename: 'UtilityItem',
+          id: 202,
+          name: 'Bandage',
+        },
+        {
+          __typename: 'Consumable',
+          id: 203,
+          name: 'Mana Potion',
+        },
+      ],
+      pageInfo: {
+        endCursor: 'NA==',
+      },
+    },
+  },
+}

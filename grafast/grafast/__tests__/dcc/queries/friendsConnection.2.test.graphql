@@ -1,0 +1,19 @@
+{
+  crawler(id: 101) {
+    id
+    name
+    ... on ActiveCrawler {
+      species
+      # Should return Katia, Imani
+      friendsConnection(last: 2, before: "Mw==") {
+        edges {
+          cursor
+          node {
+            id
+            name
+          }
+        }
+      }
+    }
+  }
+}

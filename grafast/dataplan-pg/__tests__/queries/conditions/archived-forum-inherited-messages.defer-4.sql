@@ -4,9 +4,9 @@ select
     select array[
       __messages__."body",
       __messages__."author_id",
-      __messages__."id",
       __users__."username",
-      __users__."gravatar_url"
+      __users__."gravatar_url",
+      __messages__."id"
     ]::text[]
     from app_public.messages as __messages__
     left outer join app_public.users as __users__

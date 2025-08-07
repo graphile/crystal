@@ -8,109 +8,110 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/v4/unique-foreign-keys"
-    Bucket0("Bucket 0 (root)<br /><br />1: PgSelectInlineApply[47]<br />ᐳ: 9, 10, 12, 11<br />2: PgSelectInlineApply[51]<br />3: PgSelectInlineApply[55]"):::bucket
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 12, 55<br /><br />ROOT Connectionᐸ8ᐳ[12]<br />1: PgSelect[14]<br />ᐳ: Access[56]<br />2: PgSelectRows[15]"):::bucket
-    Bucket2("Bucket 2 (listItem)<br />Deps: 56<br /><br />ROOT __Item{2}ᐸ15ᐳ[16]"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 17, 56<br /><br />ROOT PgSelectSingle{2}ᐸcompound_keyᐳ[17]<br />1: <br />ᐳ: 18, 19, 57, 58<br />2: PgSelectRows[25]<br />ᐳ: First[24], PgSelectSingle[26]"):::bucket
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 26, 58<br /><br />ROOT PgSelectSingle{3}ᐸunique_foreign_keyᐳ[26]<br />1: <br />ᐳ: 27, 28, 52, 53, 54<br />2: PgSelectRows[34]<br />ᐳ: First[33], PgSelectSingle[35]"):::bucket
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 35, 54<br /><br />ROOT PgSelectSingle{4}ᐸcompound_keyᐳ[35]<br />1: <br />ᐳ: 36, 37, 48, 49, 50<br />2: PgSelectRows[43]<br />ᐳ: First[42], PgSelectSingle[44]"):::bucket
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 44<br /><br />ROOT PgSelectSingle{5}ᐸunique_foreign_keyᐳ[44]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: PgSelectInlineApply[48]<br />ᐳ: Access[9], Access[10], Object[11]<br />2: PgSelectInlineApply[52]<br />3: PgSelectInlineApply[56]<br />4: PgSelect[8]<br />ᐳ: Access[57]<br />5: Connection[12]<br />6: ConnectionItems[14]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 14, 57<br /><br />ROOT Connectionᐸ8ᐳ[12]"):::bucket
+    Bucket3("Bucket 3 (listItem)<br />Deps: 57<br /><br />ROOT __Item{3}ᐸ14ᐳ[17]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 18, 57<br /><br />ROOT PgSelectSingle{3}ᐸcompound_keyᐳ[18]<br />1: <br />ᐳ: 19, 20, 58, 59<br />2: PgSelectRows[26]<br />3: First[25]<br />ᐳ: PgSelectSingle[27]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 27, 59<br /><br />ROOT PgSelectSingle{4}ᐸunique_foreign_keyᐳ[27]<br />1: <br />ᐳ: 28, 29, 53, 54, 55<br />2: PgSelectRows[35]<br />3: First[34]<br />ᐳ: PgSelectSingle[36]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 36, 55<br /><br />ROOT PgSelectSingle{5}ᐸcompound_keyᐳ[36]<br />1: <br />ᐳ: 37, 38, 49, 50, 51<br />2: PgSelectRows[44]<br />3: First[43]<br />ᐳ: PgSelectSingle[45]"):::bucket
+    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 45<br /><br />ROOT PgSelectSingle{6}ᐸunique_foreign_keyᐳ[45]"):::bucket
     end
     Bucket0 --> Bucket1
-    Bucket1 --> Bucket2
-    Bucket2 --> Bucket3
+    Bucket1 --> Bucket3
     Bucket3 --> Bucket4
     Bucket4 --> Bucket5
     Bucket5 --> Bucket6
+    Bucket6 --> Bucket7
 
     %% plan dependencies
+    PgSelect8[["PgSelect[8∈0] ➊<br />ᐸcompound_keyᐳ"]]:::plan
     Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    PgSelectInlineApply56["PgSelectInlineApply[56∈0] ➊"]:::plan
+    Object11 & PgSelectInlineApply56 --> PgSelect8
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10
-    PgSelectInlineApply51["PgSelectInlineApply[51∈0] ➊"]:::plan
-    PgSelectInlineApply47["PgSelectInlineApply[47∈0] ➊"]:::plan
-    PgSelectInlineApply47 --> PgSelectInlineApply51
-    PgSelectInlineApply55["PgSelectInlineApply[55∈0] ➊"]:::plan
-    PgSelectInlineApply51 --> PgSelectInlineApply55
-    Connection12{{"Connection[12∈0] ➊<br />ᐸ8ᐳ"}}:::plan
-    PgSelect14[["PgSelect[14∈1] ➊<br />ᐸcompound_keyᐳ"]]:::plan
-    Object11 & Connection12 & PgSelectInlineApply55 --> PgSelect14
-    PgSelectRows15[["PgSelectRows[15∈1] ➊"]]:::plan
-    PgSelect14 --> PgSelectRows15
-    Access56{{"Access[56∈1] ➊<br />ᐸ14.m.joinDetailsFor20ᐳ"}}:::plan
-    PgSelect14 --> Access56
-    __Item16[/"__Item[16∈2]<br />ᐸ15ᐳ"\]:::itemplan
-    PgSelectRows15 ==> __Item16
-    PgSelectSingle17{{"PgSelectSingle[17∈2]<br />ᐸcompound_keyᐳ"}}:::plan
-    __Item16 --> PgSelectSingle17
-    List57{{"List[57∈3]<br />ᐸ56,17ᐳ"}}:::plan
-    Access56 & PgSelectSingle17 --> List57
-    PgClassExpression18{{"PgClassExpression[18∈3]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
-    PgSelectSingle17 --> PgClassExpression18
-    PgClassExpression19{{"PgClassExpression[19∈3]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
-    PgSelectSingle17 --> PgClassExpression19
-    First24{{"First[24∈3]"}}:::plan
-    PgSelectRows25[["PgSelectRows[25∈3]"]]:::plan
-    PgSelectRows25 --> First24
-    Lambda58{{"Lambda[58∈3]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda58 --> PgSelectRows25
-    PgSelectSingle26{{"PgSelectSingle[26∈3]<br />ᐸunique_foreign_keyᐳ"}}:::plan
-    First24 --> PgSelectSingle26
-    List57 --> Lambda58
-    List53{{"List[53∈4]<br />ᐸ52,26ᐳ"}}:::plan
-    Access52{{"Access[52∈4]<br />ᐸ58.m.joinDetailsFor29ᐳ"}}:::plan
-    Access52 & PgSelectSingle26 --> List53
-    PgClassExpression27{{"PgClassExpression[27∈4]<br />ᐸ__unique_f...und_key_1”ᐳ"}}:::plan
-    PgSelectSingle26 --> PgClassExpression27
-    PgClassExpression28{{"PgClassExpression[28∈4]<br />ᐸ__unique_f...und_key_2”ᐳ"}}:::plan
-    PgSelectSingle26 --> PgClassExpression28
-    First33{{"First[33∈4]"}}:::plan
-    PgSelectRows34[["PgSelectRows[34∈4]"]]:::plan
-    PgSelectRows34 --> First33
-    Lambda54{{"Lambda[54∈4]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda54 --> PgSelectRows34
-    PgSelectSingle35{{"PgSelectSingle[35∈4]<br />ᐸcompound_keyᐳ"}}:::plan
-    First33 --> PgSelectSingle35
-    Lambda58 --> Access52
-    List53 --> Lambda54
-    List49{{"List[49∈5]<br />ᐸ48,35ᐳ"}}:::plan
-    Access48{{"Access[48∈5]<br />ᐸ54.m.joinDetailsFor38ᐳ"}}:::plan
-    Access48 & PgSelectSingle35 --> List49
-    PgClassExpression36{{"PgClassExpression[36∈5]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
-    PgSelectSingle35 --> PgClassExpression36
-    PgClassExpression37{{"PgClassExpression[37∈5]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
-    PgSelectSingle35 --> PgClassExpression37
-    First42{{"First[42∈5]"}}:::plan
-    PgSelectRows43[["PgSelectRows[43∈5]"]]:::plan
-    PgSelectRows43 --> First42
-    Lambda50{{"Lambda[50∈5]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
-    Lambda50 --> PgSelectRows43
-    PgSelectSingle44{{"PgSelectSingle[44∈5]<br />ᐸunique_foreign_keyᐳ"}}:::plan
-    First42 --> PgSelectSingle44
-    Lambda54 --> Access48
-    List49 --> Lambda50
-    PgClassExpression45{{"PgClassExpression[45∈6]<br />ᐸ__unique_f...und_key_1”ᐳ"}}:::plan
-    PgSelectSingle44 --> PgClassExpression45
-    PgClassExpression46{{"PgClassExpression[46∈6]<br />ᐸ__unique_f...und_key_2”ᐳ"}}:::plan
-    PgSelectSingle44 --> PgClassExpression46
+    Connection12[["Connection[12∈0] ➊<br />ᐸ8ᐳ"]]:::plan
+    PgSelect8 --> Connection12
+    ConnectionItems14[["ConnectionItems[14∈0] ➊"]]:::plan
+    Connection12 --> ConnectionItems14
+    PgSelectInlineApply52["PgSelectInlineApply[52∈0] ➊"]:::plan
+    PgSelectInlineApply48["PgSelectInlineApply[48∈0] ➊"]:::plan
+    PgSelectInlineApply48 --> PgSelectInlineApply52
+    PgSelectInlineApply52 --> PgSelectInlineApply56
+    Access57{{"Access[57∈0] ➊<br />ᐸ8.m.joinDetailsFor21ᐳ"}}:::plan
+    PgSelect8 --> Access57
+    __Item17[/"__Item[17∈3]<br />ᐸ14ᐳ"\]:::itemplan
+    ConnectionItems14 ==> __Item17
+    PgSelectSingle18{{"PgSelectSingle[18∈3]<br />ᐸcompound_keyᐳ"}}:::plan
+    __Item17 --> PgSelectSingle18
+    List58{{"List[58∈4]<br />ᐸ57,18ᐳ"}}:::plan
+    Access57 & PgSelectSingle18 --> List58
+    PgClassExpression19{{"PgClassExpression[19∈4]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
+    PgSelectSingle18 --> PgClassExpression19
+    PgClassExpression20{{"PgClassExpression[20∈4]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
+    PgSelectSingle18 --> PgClassExpression20
+    First25[["First[25∈4]"]]:::plan
+    PgSelectRows26[["PgSelectRows[26∈4]"]]:::plan
+    PgSelectRows26 --> First25
+    Lambda59{{"Lambda[59∈4]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
+    Lambda59 --> PgSelectRows26
+    PgSelectSingle27{{"PgSelectSingle[27∈4]<br />ᐸunique_foreign_keyᐳ"}}:::plan
+    First25 --> PgSelectSingle27
+    List58 --> Lambda59
+    List54{{"List[54∈5]<br />ᐸ53,27ᐳ"}}:::plan
+    Access53{{"Access[53∈5]<br />ᐸ59.m.joinDetailsFor30ᐳ"}}:::plan
+    Access53 & PgSelectSingle27 --> List54
+    PgClassExpression28{{"PgClassExpression[28∈5]<br />ᐸ__unique_f...und_key_1”ᐳ"}}:::plan
+    PgSelectSingle27 --> PgClassExpression28
+    PgClassExpression29{{"PgClassExpression[29∈5]<br />ᐸ__unique_f...und_key_2”ᐳ"}}:::plan
+    PgSelectSingle27 --> PgClassExpression29
+    First34[["First[34∈5]"]]:::plan
+    PgSelectRows35[["PgSelectRows[35∈5]"]]:::plan
+    PgSelectRows35 --> First34
+    Lambda55{{"Lambda[55∈5]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
+    Lambda55 --> PgSelectRows35
+    PgSelectSingle36{{"PgSelectSingle[36∈5]<br />ᐸcompound_keyᐳ"}}:::plan
+    First34 --> PgSelectSingle36
+    Lambda59 --> Access53
+    List54 --> Lambda55
+    List50{{"List[50∈6]<br />ᐸ49,36ᐳ"}}:::plan
+    Access49{{"Access[49∈6]<br />ᐸ55.m.joinDetailsFor39ᐳ"}}:::plan
+    Access49 & PgSelectSingle36 --> List50
+    PgClassExpression37{{"PgClassExpression[37∈6]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
+    PgSelectSingle36 --> PgClassExpression37
+    PgClassExpression38{{"PgClassExpression[38∈6]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
+    PgSelectSingle36 --> PgClassExpression38
+    First43[["First[43∈6]"]]:::plan
+    PgSelectRows44[["PgSelectRows[44∈6]"]]:::plan
+    PgSelectRows44 --> First43
+    Lambda51{{"Lambda[51∈6]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
+    Lambda51 --> PgSelectRows44
+    PgSelectSingle45{{"PgSelectSingle[45∈6]<br />ᐸunique_foreign_keyᐳ"}}:::plan
+    First43 --> PgSelectSingle45
+    Lambda55 --> Access49
+    List50 --> Lambda51
+    PgClassExpression46{{"PgClassExpression[46∈7]<br />ᐸ__unique_f...und_key_1”ᐳ"}}:::plan
+    PgSelectSingle45 --> PgClassExpression46
+    PgClassExpression47{{"PgClassExpression[47∈7]<br />ᐸ__unique_f...und_key_2”ᐳ"}}:::plan
+    PgSelectSingle45 --> PgClassExpression47
 
     %% define steps
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value2,Access9,Access10,Object11,Connection12,PgSelectInlineApply47,PgSelectInlineApply51,PgSelectInlineApply55 bucket0
+    class Bucket0,__Value2,PgSelect8,Access9,Access10,Object11,Connection12,ConnectionItems14,PgSelectInlineApply48,PgSelectInlineApply52,PgSelectInlineApply56,Access57 bucket0
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect14,PgSelectRows15,Access56 bucket1
-    classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item16,PgSelectSingle17 bucket2
+    class Bucket1 bucket1
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression18,PgClassExpression19,First24,PgSelectRows25,PgSelectSingle26,List57,Lambda58 bucket3
+    class Bucket3,__Item17,PgSelectSingle18 bucket3
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgClassExpression27,PgClassExpression28,First33,PgSelectRows34,PgSelectSingle35,Access52,List53,Lambda54 bucket4
+    class Bucket4,PgClassExpression19,PgClassExpression20,First25,PgSelectRows26,PgSelectSingle27,List58,Lambda59 bucket4
     classDef bucket5 stroke:#7fff00
-    class Bucket5,PgClassExpression36,PgClassExpression37,First42,PgSelectRows43,PgSelectSingle44,Access48,List49,Lambda50 bucket5
+    class Bucket5,PgClassExpression28,PgClassExpression29,First34,PgSelectRows35,PgSelectSingle36,Access53,List54,Lambda55 bucket5
     classDef bucket6 stroke:#ff1493
-    class Bucket6,PgClassExpression45,PgClassExpression46 bucket6
+    class Bucket6,PgClassExpression37,PgClassExpression38,First43,PgSelectRows44,PgSelectSingle45,Access49,List50,Lambda51 bucket6
+    classDef bucket7 stroke:#808000
+    class Bucket7,PgClassExpression46,PgClassExpression47 bucket7
 

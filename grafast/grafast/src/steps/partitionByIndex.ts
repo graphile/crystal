@@ -3,7 +3,7 @@ import chalk from "chalk";
 import type { Step } from "../step.js";
 import { isListCapableStep } from "../step.js";
 import type { __ItemStep } from "./__item.js";
-import type { ConnectionCapableStep, ItemsStep } from "./connection.js";
+import type { ItemsStep, StepRepresentingList } from "./connection.js";
 import { each } from "./each.js";
 import type {
   __ListTransformStep,
@@ -75,7 +75,7 @@ const initialState = () => [];
  * Beware: the target indexes should not contain gaps.
  */
 export function partitionByIndex<
-  TListStep extends Step<readonly any[]> | ConnectionCapableStep<any, any>,
+  TListStep extends StepRepresentingList<any>,
   TItemStep extends Step<number>,
 >(
   listStep: TListStep,

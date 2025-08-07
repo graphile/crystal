@@ -48,10 +48,12 @@ export class WithPgClientStep<
     private callback: WithPgClientStepCallback<TData, TResult, TPgClient>,
   ) {
     super();
-    this.hasSideEffects = true;
     this.executor = executor;
     this.contextId = this.addDependency(this.executor.context());
     this.dataId = this.addDependency($data);
+
+    // Be sure to set this _after_ we've added the dependencies - we don't want them to be dependent on us!
+    this.hasSideEffects = true;
   }
 
   execute({

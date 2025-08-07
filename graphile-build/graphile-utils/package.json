@@ -63,7 +63,7 @@
   },
   "devDependencies": {
     "@dataplan/pg": "workspace:^",
-    "@types/node": "^24.0.13",
+    "@types/node": "^22.16.3",
     "grafast": "workspace:^",
     "graphile-build": "workspace:^",
     "graphile-build-pg": "workspace:^",

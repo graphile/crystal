@@ -1,4 +1,11 @@
 select
+  __material__."valueOf" as "0",
+  __material__."class" as "1",
+  __material__."id"::text as "2"
+from "js_reserved"."material" as __material__
+order by __material__."id" asc;
+
+select
   __material__."class" as "0",
   __material__."id"::text as "1"
 from "js_reserved"."material" as __material__
@@ -37,10 +44,3 @@ from "js_reserved"."crop" as __crop__
 where (
   __crop__."yield" = $1::"text"
 );
-
-select
-  __material__."valueOf" as "0",
-  __material__."class" as "1",
-  __material__."id"::text as "2"
-from "js_reserved"."material" as __material__
-order by __material__."id" asc;

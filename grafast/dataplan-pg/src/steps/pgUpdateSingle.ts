@@ -129,7 +129,6 @@ export class PgUpdateSingleStep<
     },
   ) {
     super();
-    this.hasSideEffects = true;
     this.resource = resource;
     this.name = resource.name;
     this.symbol = Symbol(this.name);
@@ -183,6 +182,9 @@ export class PgUpdateSingleStep<
         }
       });
     }
+
+    // This must be the last thing to happen
+    this.hasSideEffects = true;
   }
 
   public toStringMeta(): string | null {

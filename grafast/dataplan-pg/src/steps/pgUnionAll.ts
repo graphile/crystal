@@ -1,9 +1,8 @@
 import { createHash } from "crypto";
 import type {
   __InputStaticLeafStep,
-  ConnectionCapableStep,
-  ConnectionStep,
-  EdgeCapableStep,
+  ConnectionHandlingResult,
+  ConnectionHandlingStep,
   ExecutionDetails,
   GrafastResultsList,
   GrafastValuesList,
@@ -52,9 +51,6 @@ import type {
 import { PgCondition } from "./pgCondition.js";
 import type { PgCursorDetails } from "./pgCursor.js";
 import { PgCursorStep } from "./pgCursor.js";
-import type { PgPageInfoStep } from "./pgPageInfo.js";
-import { pgPageInfo } from "./pgPageInfo.js";
-import type { PgSelectParsedCursorStep } from "./pgSelect.js";
 import { getFragmentAndCodecFromOrder } from "./pgSelect.js";
 import type { PgSelectSingleStep } from "./pgSelectSingle.js";
 import type {
@@ -92,7 +88,8 @@ const digestSpecificExpressionFromAttributeName = (
 const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
 const NO_ROWS = Object.freeze({
   m: Object.create(null),
-  hasMore: false,
+  hasNextPage: false,
+  hasPreviousPage: false,
   items: [],
 } as PgUnionAllStepResult);
 
@@ -186,7 +183,7 @@ export interface PgUnionAllStepOrder<TAttributes extends string> {
   direction: "ASC" | "DESC";
 }
 
-export class PgUnionAllSingleStep extends Step implements EdgeCapableStep<any> {
+export class PgUnionAllSingleStep extends Step {
   static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "PgUnionAllSingleStep",
@@ -226,26 +223,13 @@ export class PgUnionAllSingleStep extends Step implements EdgeCapableStep<any> {
     );
   }
 
-  toTypename() {
+  toTypename(): Step<string> {
     if (this.typeKey === null) {
       throw new Error(
         `${this} not polymorphic because parent isn't in normal mode`,
       );
     }
     return access(this, this.typeKey) as Step<string>;
-  }
-
-  /**
-   * When selecting a connection we need to be able to get the cursor. The
-   * cursor is built from the values of the `ORDER BY` clause so that we can
-   * find nodes before/after it.
-   */
-  public cursor(): PgCursorStep<this> {
-    const cursorPlan = new PgCursorStep<this>(
-      this,
-      this.getClassStep().getCursorDetails(),
-    );
-    return cursorPlan;
   }
 
   public getClassStep(): PgUnionAllStep<string, string> {
@@ -260,10 +244,6 @@ export class PgUnionAllSingleStep extends Step implements EdgeCapableStep<any> {
 
   public getMeta(key: string) {
     return this.getClassStep().getMeta(key);
-  }
-
-  public node() {
-    return this;
   }
 
   public scopedSQL = makeScopedSQL(this);
@@ -420,9 +400,10 @@ interface QueryBuildResult {
   cursorDetails: PgCursorDetails | undefined;
 }
 
-interface PgUnionAllStepResult {
+interface PgUnionAllStepResult extends ConnectionHandlingResult<unknown> {
   m: Record<string, unknown>;
-  hasMore?: boolean;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
   /** a tuple based on what is selected at runtime */
   items: ReadonlyArray<unknown[]>;
   cursorDetails?: PgCursorDetails;
@@ -438,7 +419,12 @@ export class PgUnionAllStep<
   >
   extends PgStmtBaseStep<PgUnionAllStepResult>
   implements
-    ConnectionCapableStep<PgSelectSingleStep<any>, PgSelectParsedCursorStep>
+    ConnectionHandlingStep<
+      any,
+      PgSelectSingleStep<any>,
+      any,
+      null | readonly any[]
+    >
 {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -704,13 +690,9 @@ on (${sql.indent(
   }
 
   connectionClone(
-    $connection: ConnectionStep<any, any, any, any>,
     mode?: PgUnionAllMode,
   ): PgUnionAllStep<TAttributes, TTypeNames> {
-    const $plan = PgUnionAllStep.clone(this, mode);
-    // In case any errors are raised
-    $plan.connectionDepId = $plan.addDependency($connection);
-    return $plan;
+    return PgUnionAllStep.clone(this, mode);
   }
 
   select<TAttribute extends TAttributes>(key: TAttribute): number {
@@ -832,12 +814,6 @@ on (${sql.indent(
     return $single as any;
   }
 
-  public pageInfo(
-    $connectionPlan: ConnectionStep<any, PgSelectParsedCursorStep, this, any>,
-  ): PgPageInfoStep<this> {
-    return pgPageInfo($connectionPlan);
-  }
-
   where(
     rawWhereSpec: PgSQLCallbackOrDirect<PgWhereConditionSpec<TAttributes>>,
   ): void {
@@ -934,7 +910,7 @@ on (${sql.indent(
     // this step throws (e.g. due to invalid cursor) then so does the
     // connection.
     /*
-      const $connection = this.getDep<ConnectionStep<any, any, any>>(
+      const $connection = this.getDep<ConnectionStep<any, any, any, any, any, any>>(
         this.connectionDepId,
       );
       $connection.addValidation(() => {
@@ -954,9 +930,15 @@ on (${sql.indent(
     return this;
   }
 
-  public getCursorDetails(): Step<PgCursorDetails> {
+  private getCursorDetails(): Step<PgCursorDetails> {
     this.needsCursor = true;
     return access(this, "cursorDetails");
+  }
+
+  public cursorForItem(
+    $item: Step<readonly [...(readonly any[])] | null>,
+  ): PgCursorStep {
+    return new PgCursorStep($item, this.getCursorDetails());
   }
 
   private typeIdx: number | null = null;
@@ -1083,9 +1065,12 @@ on (${sql.indent(
       const orderedRows = shouldReverseOrder
         ? reverseArray(slicedRows)
         : slicedRows;
+      const hasNextPage = first != null ? hasMore : false;
+      const hasPreviousPage = last != null ? hasMore : false;
       return {
         m: meta,
-        hasMore,
+        hasNextPage,
+        hasPreviousPage,
         items: orderedRows,
         cursorDetails,
       };

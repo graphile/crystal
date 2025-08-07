@@ -1,9 +1,7 @@
-import type { ExecutableStep, UnbatchedExecutionExtra } from "grafast";
+import type { ExecutableStep, Step, UnbatchedExecutionExtra } from "grafast";
 import { UnbatchedStep } from "grafast";
 
 import type { PgCodec } from "../index.js";
-import type { PgSelectSingleStep } from "./pgSelectSingle.js";
-import type { PgUnionAllSingleStep } from "./pgUnionAll.js";
 
 export interface PgCursorDetails {
   readonly digest: string;
@@ -18,9 +16,7 @@ export interface PgCursorDetails {
  * orders applied and then fetching them and building a cursor string from
  * them.
  */
-export class PgCursorStep<
-  TStep extends PgSelectSingleStep<any> | PgUnionAllSingleStep,
-> extends UnbatchedStep<any> {
+export class PgCursorStep extends UnbatchedStep<any> {
   static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "PgCursorStep",
@@ -31,7 +27,7 @@ export class PgCursorStep<
   cursorDetailsDepId: number;
 
   constructor(
-    $item: TStep,
+    $item: Step<readonly [...(readonly any[])] | null>,
     $cursorDetails: ExecutableStep<PgCursorDetails | null>,
   ) {
     super();

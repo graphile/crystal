@@ -1,5 +1,5 @@
 import { PgExecutor, TYPES, assertPgClassSingleStep, makeRegistry, recordCodec, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, access, assertEdgeCapableStep, assertPageInfoCapableStep, connection, constant, context, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue } from "grafast";
+import { ConnectionStep, access, connection, constant, context, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 const nodeIdHandler_Query = {
@@ -482,30 +482,12 @@ export const objects = {
     }
   },
   EmployeesEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
-      }
-    }
-  },
-  PageInfo: {
-    assertStep: assertPageInfoCapableStep,
-    plans: {
-      endCursor($pageInfo) {
-        return $pageInfo.endCursor();
-      },
-      hasNextPage($pageInfo) {
-        return $pageInfo.hasNextPage();
-      },
-      hasPreviousPage($pageInfo) {
-        return $pageInfo.hasPreviousPage();
-      },
-      startCursor($pageInfo) {
-        return $pageInfo.startCursor();
+        return get2($edge, "node");
       }
     }
   }

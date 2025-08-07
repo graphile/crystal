@@ -18,8 +18,8 @@ import type {
   ExecutionEntryFlags,
   GrafastResultsList,
 } from "../interfaces.js";
-import type { ListCapableStep } from "../step.js";
 import { isListCapableStep, Step } from "../step.js";
+import { sudo } from "../utils.js";
 import type { __ItemStep } from "./__item.js";
 
 // PUBLIC FLAGS
@@ -138,6 +138,8 @@ export class __FlagStep<TStep extends Step> extends Step<DataFromStep<TStep>> {
     if (isListCapableStep(step)) {
       this.listItem = this._listItem;
     }
+    sudo(this).implicitSideEffectStep = null;
+    this.layerPlan.latestSideEffectStep = null; // Can't be `this`, because __FlagStep can be optimized away.
   }
   public toStringMeta(): string | null {
     const acceptFlags = ALL_FLAGS & ~this.forbiddenFlags;
@@ -153,11 +155,9 @@ export class __FlagStep<TStep extends Step> extends Step<DataFromStep<TStep>> {
   [$$deepDepSkip](): Step {
     return this.getDepOptions(0).step;
   }
-  listItem?: (
-    $item: __ItemStep<ListCapableStep<unknown, Step<unknown>>>,
-  ) => Step;
+  listItem?: ($item: __ItemStep<unknown>) => Step;
   // Copied over listItem if the dependent step is a list capable step
-  _listItem($item: __ItemStep<ListCapableStep<unknown, Step<unknown>>>) {
+  _listItem($item: __ItemStep<unknown>) {
     const $dep = this.dependencies[0];
     return isListCapableStep($dep) ? $dep.listItem($item) : $item;
   }

@@ -1,12 +1,7 @@
 import "./PgTablesPlugin.js";
 import "graphile-config";
 
-import type {
-  PgCodec,
-  PgSelectParsedCursorStep,
-  PgSelectSingleStep,
-  PgSelectStep,
-} from "@dataplan/pg";
+import type { PgCodec, PgSelectSingleStep, PgSelectStep } from "@dataplan/pg";
 import type { ConnectionStep, GrafastFieldConfigArgumentMap } from "grafast";
 import type { GraphQLEnumType } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
@@ -193,8 +188,11 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
                       (
                         parent,
                         $connection: ConnectionStep<
+                          any,
                           PgSelectSingleStep<any>,
-                          PgSelectParsedCursorStep,
+                          any,
+                          any,
+                          null | readonly any[],
                           PgSelectStep<any>
                         >,
                         value,

@@ -7,10 +7,6 @@ order by __compound_key__."extra" asc, __compound_key__."person_id_1" asc, __com
 limit 2;
 
 select
-  (count(*))::text as "0"
-from "c"."compound_key" as __compound_key__;
-
-select
   __compound_key__."extra"::text as "0",
   __compound_key__."person_id_1"::text as "1",
   __compound_key__."person_id_2"::text as "2"
@@ -30,3 +26,7 @@ where (
 )
 order by __compound_key__."extra" asc, __compound_key__."person_id_1" asc, __compound_key__."person_id_2" asc
 limit 2;
+
+select
+  (count(*))::text as "0"
+from "c"."compound_key" as __compound_key__;

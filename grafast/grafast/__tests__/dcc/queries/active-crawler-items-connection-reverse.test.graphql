@@ -1,0 +1,15 @@
+query Items {
+  character(id: 102) {
+    id
+    name
+    ... on ActiveCrawler {
+      itemsConnection(last: 2, before: "NA==") {
+        nodes {
+          __typename
+          id
+          name
+        }
+      }
+    }
+  }
+}

@@ -300,12 +300,6 @@ Call this ONLY if there can be at most one matching row. If you set this true
 when this is not the case then you may get unexpected results during inlining;
 if in doubt leave it at the default.
 
-### $pgSelect.hasMore()
-
-Returns a step indicating if there's a next page or not (by selecting 1 extra
-row and throwing it away). Typically this is used by the `connection()` steps
-`pageInfo` logic and you wouldn't call it yourself.
-
 ### $pgSelect.setInliningForbidden()
 
 Call this if you wish to prevent this query from being inlined into its parent.

@@ -1,4 +1,4 @@
-import { loadMany, loadOne } from "grafast";
+import { loadMany, loadManyLoader, loadOne, loadOneLoader } from "grafast";
 
 import {
   getFriendshipsByUserIds,
@@ -7,30 +7,47 @@ import {
   getUsersByIds,
 } from "./businessLogic.mjs";
 
-const userByIdCallback = (ids, { attributes }) =>
-  getUsersByIds(ids, { columns: attributes });
-userByIdCallback.displayName = "userById";
+// Reusable loaders:
+
+const userByIdLoader = loadOneLoader({
+  load: (ids, { attributes: columns }) => getUsersByIds(ids, { columns }),
+  name: "userById",
+  ioEquivalence: "id",
+});
+
+const friendshipsByUserIdsLoader = loadManyLoader({
+  load: (ids, { attributes: columns }) =>
+    getFriendshipsByUserIds(ids, { columns }),
+  name: "friendshipsByUserId",
+  ioEquivalence: "user_id",
+});
+
+const postByIdLoader = loadOneLoader({
+  load: (ids, { attributes: columns }) => getPostsByIds(ids, { columns }),
+  name: "postById",
+  ioEquivalence: "id",
+});
+
+const postsByAuthorIdsCallback = loadManyLoader({
+  load: (ids, { attributes: columns }) => getPostsByAuthorIds(ids, { columns }),
+  name: "postsByAuthorId",
+  ioEquivalence: "user_id",
+});
+
+// Plans
+
 export function userById($id) {
-  return loadOne($id, "id", userByIdCallback);
+  return loadOne($id, userByIdLoader);
 }
 
-const friendshipsByUserIdsCallback = (ids, { attributes }) =>
-  getFriendshipsByUserIds(ids, { columns: attributes });
-friendshipsByUserIdsCallback.displayName = "friendshipsByUserId";
 export function friendshipsByUserId($id) {
-  return loadMany($id, "user_id", friendshipsByUserIdsCallback);
+  return loadMany($id, friendshipsByUserIdsLoader);
 }
 
-const postByIdCallback = (ids, { attributes }) =>
-  getPostsByIds(ids, { columns: attributes });
-postByIdCallback.displayName = "postById";
 export function postById($id) {
-  return loadOne($id, "id", postByIdCallback);
+  return loadOne($id, postByIdLoader);
 }
 
-const postsByAuthorIdsCallback = (ids, { attributes }) =>
-  getPostsByAuthorIds(ids, { columns: attributes });
-postsByAuthorIdsCallback.displayName = "postsByAuthorId";
 export function postsByAuthorId($id) {
-  return loadMany($id, "user_id", postsByAuthorIdsCallback);
+  return loadMany($id, postsByAuthorIdsCallback);
 }

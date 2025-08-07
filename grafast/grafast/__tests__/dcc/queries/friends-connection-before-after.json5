@@ -1,0 +1,7 @@
+{
+  crawler: {
+    id: 101,
+    name: 'Carl',
+    friendsConnection: null,
+  },
+}

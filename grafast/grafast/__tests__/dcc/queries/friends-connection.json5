@@ -1,0 +1,90 @@
+{
+  crawler: {
+    id: 101,
+    name: 'Carl',
+    friendsConnection: {
+      nodes: [
+        {
+          id: 102,
+          name: 'Princess Donut',
+          itemsConnection: {
+            nodes: [
+              {
+                __typename: 'Equipment',
+                id: 204,
+              },
+              {
+                __typename: 'Equipment',
+                id: 206,
+              },
+              {
+                __typename: 'Consumable',
+                id: 201,
+              },
+              {
+                __typename: 'UtilityItem',
+                id: 202,
+              },
+              {
+                __typename: 'Consumable',
+                id: 203,
+              },
+            ],
+          },
+        },
+        {
+          id: 103,
+          name: 'Katia',
+          itemsConnection: {
+            nodes: [
+              {
+                __typename: 'Equipment',
+                id: 207,
+              },
+              {
+                __typename: 'Consumable',
+                id: 203,
+              },
+              {
+                __typename: 'Consumable',
+                id: 204,
+              },
+              {
+                __typename: 'Equipment',
+                id: 210,
+              },
+            ],
+          },
+        },
+        {
+          id: 104,
+          name: 'Imani',
+          itemsConnection: {
+            nodes: [
+              {
+                __typename: 'Equipment',
+                id: 208,
+              },
+              {
+                __typename: 'Equipment',
+                id: 209,
+              },
+              {
+                __typename: 'Consumable',
+                id: 204,
+              },
+              {
+                __typename: 'UtilityItem',
+                id: 202,
+              },
+              {
+                __typename: 'Consumable',
+                id: 203,
+              },
+            ],
+          },
+        },
+      ],
+    },
+  },
+}

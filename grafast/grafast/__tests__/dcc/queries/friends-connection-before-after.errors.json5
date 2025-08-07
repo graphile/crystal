@@ -1,0 +1,15 @@
+[
+  {
+    message: 'You must not set both `first` and `before`; specify `first` and optionally `after` to paginate forwards, or `last` and optionally `before` to paginate backwards.',
+    locations: [
+      {
+        line: 8,
+        column: 7,
+      },
+    ],
+    path: [
+      'crawler',
+      'friendsConnection',
+    ],
+  },
+]

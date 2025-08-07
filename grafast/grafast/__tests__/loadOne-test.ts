@@ -9,6 +9,7 @@ import {
   grafast,
   loadOne,
   loadOneCallback,
+  loadOneLoader,
   makeGrafastSchema,
 } from "../dist/index.js";
 
@@ -105,18 +106,19 @@ const loadThingByIds = loadOneCallback(
   },
 );
 
-const loadThingByIdentifierObjs = loadOneCallback(
-  (specs: readonly { identifier: number }[], { attributes, params }) => {
+const loadThingByIdentifierObjs = loadOneLoader({
+  load: (specs: readonly { identifier: number }[], { attributes, params }) => {
     const result = specs
       .map((spec) => THINGS.find((t) => t.id === spec.identifier))
       .map((t) => (t && attributes ? pick(t, attributes) : t));
     CALLS.push({ specs, result, attributes, params });
     return result;
   },
-);
+  ioEquivalence: { identifier: "id" },
+});
 
-const loadThingByIdentifierLists = loadOneCallback(
-  (
+const loadThingByIdentifierLists = loadOneLoader({
+  load: (
     specs: ReadonlyArray<readonly [identifier: number]>,
     { attributes, params },
   ) => {
@@ -126,7 +128,8 @@ const loadThingByIdentifierLists = loadOneCallback(
     CALLS.push({ specs, result, attributes, params });
     return result;
   },
-);
+  ioEquivalence: ["id"],
+});
 
 const loadThingByOrgIdRegNoObjs = loadOneCallback(
   (
@@ -200,16 +203,11 @@ const makeSchema = (useStreamableStep = false) => {
           thingByIdObj(_, { $id }) {
             return loadOne(
               { identifier: $id as Step<number> },
-              { identifier: "id" },
               loadThingByIdentifierObjs,
             );
           },
           thingByIdList(_, { $id }) {
-            return loadOne(
-              [$id as Step<number>],
-              ["id"],
-              loadThingByIdentifierLists,
-            );
+            return loadOne([$id as Step<number>], loadThingByIdentifierLists);
           },
           thingByOrgIdRegNoTuple(_, fieldArgs) {
             const $regNo = fieldArgs.getRaw("regNo") as Step<number>;
@@ -236,7 +234,10 @@ const makeSchema = (useStreamableStep = false) => {
       Thing: {
         plans: {
           org($thing) {
-            return loadOne($thing.get("orgId"), "id", loadOrgByIds);
+            return loadOne($thing.get("orgId"), {
+              load: loadOrgByIds,
+              ioEquivalence: "id",
+            });
           },
         },
       } as ObjectPlan<LoadedRecordStep<Thing>>,
@@ -244,18 +245,19 @@ const makeSchema = (useStreamableStep = false) => {
         plans: {
           thingByTuple($org: LoadedRecordStep<Org>, { $regNo }) {
             const $orgId = $org.get("id");
-            return loadOne(
-              [$orgId, $regNo],
-              ["orgId", "orgRegNo"],
-              loadThingByOrgIdRegNoTuples,
-            );
+            return loadOne([$orgId, $regNo], {
+              load: loadThingByOrgIdRegNoTuples,
+              ioEquivalence: ["orgId", "orgRegNo"],
+            });
           },
           thingByObj($org: LoadedRecordStep<Org>, { $regNo }) {
             const $orgId = $org.get("id");
             return loadOne(
               { orgId: $orgId, regNo: $regNo },
-              { orgId: "orgId", regNo: "orgRegNo" },
-              loadThingByOrgIdRegNoObjs,
+              {
+                load: loadThingByOrgIdRegNoObjs,
+                ioEquivalence: { orgId: "orgId", regNo: "orgRegNo" },
+              },
             );
           },
         },

@@ -31,14 +31,28 @@ left outer join lateral (select (__func_out_out_compound_type__."o2").*) as __fr
 on TRUE;
 
 select
+  __func_out_out_setof__."o1"::text as "0",
+  __func_out_out_setof__."o2" as "1",
+  (not (__func_out_out_setof__ is null))::text as "2"
+from "c"."func_out_out_setof"() as __func_out_out_setof__;
+
+select
   __func_out_out_unnamed__."column1"::text as "0",
   __func_out_out_unnamed__."column2" as "1",
   (not (__func_out_out_unnamed__ is null))::text as "2"
 from "c"."func_out_out_unnamed"() as __func_out_out_unnamed__;
 
 select
+  __func_out_setof__.v::text as "0"
+from "c"."func_out_setof"() as __func_out_setof__(v);
+
+select
   __func_out_table__."id"::text as "0"
 from "c"."func_out_table"() as __func_out_table__;
+
+select
+  __func_out_table_setof__."id"::text as "0"
+from "c"."func_out_table_setof"() as __func_out_table_setof__;
 
 select
   __func_out_unnamed__.v::text as "0"
@@ -52,10 +66,47 @@ select
 from "c"."func_out_unnamed_out_out_unnamed"() as __func_out_unnamed_out_out_unnamed__;
 
 select
+  __func_returns_table_multi_col__."col1"::text as "0",
+  __func_returns_table_multi_col__."col2" as "1",
+  (not (__func_returns_table_multi_col__ is null))::text as "2"
+from "c"."func_returns_table_multi_col"($1::"int4") as __func_returns_table_multi_col__;
+
+select
+  __func_returns_table_one_col__.v::text as "0"
+from "c"."func_returns_table_one_col"($1::"int4") as __func_returns_table_one_col__(v);
+
+select
   __search_test_summaries__."id"::text as "0",
   to_char(__search_test_summaries__."total_duration", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "1",
   (not (__search_test_summaries__ is null))::text as "2"
 from "c"."search_test_summaries"() as __search_test_summaries__;
+
+select
+  (count(*))::text as "0"
+from "c"."func_out_complex_setof"(
+  $1::"int4",
+  $2::"text"
+) as __func_out_complex_setof__;
+
+select
+  (count(*))::text as "0"
+from "c"."func_out_out_setof"() as __func_out_out_setof__;
+
+select
+  (count(*))::text as "0"
+from "c"."func_out_setof"() as __func_out_setof__(v);
+
+select
+  (count(*))::text as "0"
+from "c"."func_out_table_setof"() as __func_out_table_setof__;
+
+select
+  (count(*))::text as "0"
+from "c"."func_returns_table_multi_col"($1::"int4") as __func_returns_table_multi_col__;
+
+select
+  (count(*))::text as "0"
+from "c"."func_returns_table_one_col"($1::"int4") as __func_returns_table_one_col__(v);
 
 select
   __func_out_complex__."x"::text as "0",
@@ -83,6 +134,34 @@ from "c"."func_out_complex"(
 left outer join lateral (select (__func_out_complex__."y").*) as __frmcdc_compound_type__
 on TRUE
 left outer join lateral (select (__func_out_complex__."z").*) as __person__
+on TRUE;
+
+select
+  __func_out_complex_setof__."x"::text as "0",
+  (not (__func_out_complex_setof__ is null))::text as "1",
+  __frmcdc_compound_type__."a"::text as "2",
+  __frmcdc_compound_type__."b" as "3",
+  __frmcdc_compound_type__."c"::text as "4",
+  (not (__frmcdc_compound_type__ is null))::text as "5",
+  __person__."id"::text as "6",
+  __person__."person_full_name" as "7",
+  array(
+    select array[
+      __post__."id"::text
+    ]::text[]
+    from "a"."post" as __post__
+    where (
+      __post__."author_id" = __person__."id"
+    )
+    order by __post__."id" asc
+  )::text as "8"
+from "c"."func_out_complex_setof"(
+  $1::"int4",
+  $2::"text"
+) as __func_out_complex_setof__
+left outer join lateral (select (__func_out_complex_setof__."y").*) as __frmcdc_compound_type__
+on TRUE
+left outer join lateral (select (__func_out_complex_setof__."z").*) as __person__
 on TRUE;
 
 select
@@ -242,82 +321,3 @@ on (
 /* WHERE becoming ON */ (
   __person_secret_2."person_id" = __person_2."id"
 ));
-
-select
-  __func_out_complex_setof__."x"::text as "0",
-  (not (__func_out_complex_setof__ is null))::text as "1",
-  __frmcdc_compound_type__."a"::text as "2",
-  __frmcdc_compound_type__."b" as "3",
-  __frmcdc_compound_type__."c"::text as "4",
-  (not (__frmcdc_compound_type__ is null))::text as "5",
-  __person__."id"::text as "6",
-  __person__."person_full_name" as "7",
-  array(
-    select array[
-      __post__."id"::text
-    ]::text[]
-    from "a"."post" as __post__
-    where (
-      __post__."author_id" = __person__."id"
-    )
-    order by __post__."id" asc
-  )::text as "8"
-from "c"."func_out_complex_setof"(
-  $1::"int4",
-  $2::"text"
-) as __func_out_complex_setof__
-left outer join lateral (select (__func_out_complex_setof__."y").*) as __frmcdc_compound_type__
-on TRUE
-left outer join lateral (select (__func_out_complex_setof__."z").*) as __person__
-on TRUE;
-
-select
-  (count(*))::text as "0"
-from "c"."func_out_complex_setof"(
-  $1::"int4",
-  $2::"text"
-) as __func_out_complex_setof__;
-
-select
-  __func_out_out_setof__."o1"::text as "0",
-  __func_out_out_setof__."o2" as "1",
-  (not (__func_out_out_setof__ is null))::text as "2"
-from "c"."func_out_out_setof"() as __func_out_out_setof__;
-
-select
-  (count(*))::text as "0"
-from "c"."func_out_out_setof"() as __func_out_out_setof__;
-
-select
-  __func_out_setof__.v::text as "0"
-from "c"."func_out_setof"() as __func_out_setof__(v);
-
-select
-  (count(*))::text as "0"
-from "c"."func_out_setof"() as __func_out_setof__(v);
-
-select
-  __func_out_table_setof__."id"::text as "0"
-from "c"."func_out_table_setof"() as __func_out_table_setof__;
-
-select
-  (count(*))::text as "0"
-from "c"."func_out_table_setof"() as __func_out_table_setof__;
-
-select
-  __func_returns_table_multi_col__."col1"::text as "0",
-  __func_returns_table_multi_col__."col2" as "1",
-  (not (__func_returns_table_multi_col__ is null))::text as "2"
-from "c"."func_returns_table_multi_col"($1::"int4") as __func_returns_table_multi_col__;
-
-select
-  (count(*))::text as "0"
-from "c"."func_returns_table_multi_col"($1::"int4") as __func_returns_table_multi_col__;
-
-select
-  __func_returns_table_one_col__.v::text as "0"
-from "c"."func_returns_table_one_col"($1::"int4") as __func_returns_table_one_col__(v);
-
-select
-  (count(*))::text as "0"
-from "c"."func_returns_table_one_col"($1::"int4") as __func_returns_table_one_col__(v);

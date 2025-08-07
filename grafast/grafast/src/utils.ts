@@ -36,6 +36,7 @@ import type {
   ExecutionEntryFlags,
   GrafastFieldConfig,
   GrafastInputFieldConfig,
+  Maybe,
 } from "./interfaces.js";
 import type { Step } from "./step.js";
 import { constant } from "./steps/constant.js";
@@ -336,6 +337,19 @@ export function arraysMatch<T>(
     }
   }
   return true;
+}
+
+export function maybeArraysMatch<T>(
+  array1: Maybe<ReadonlyArray<T>>,
+  array2: Maybe<ReadonlyArray<T>>,
+  comparator?: (val1: T, val2: T) => boolean,
+): boolean {
+  return (
+    array1 === array2 ||
+    (array1 != null &&
+      array2 != null &&
+      arraysMatch(array1, array2, comparator))
+  );
 }
 
 /**
@@ -1011,7 +1025,11 @@ export function writeableArray<T>(a: ReadonlyArray<T>): Array<T> {
  * Returns `true` if the first argument depends on the second argument either
  * directly or indirectly (via a chain of dependencies).
  */
-export function stepADependsOnStepB(stepA: Step, stepB: Step): boolean {
+export function stepADependsOnStepB(
+  stepA: Step,
+  stepB: Step,
+  sansSideEffects = false,
+): boolean {
   if (stepA === stepB) {
     throw new Error("Invalid call to stepADependsOnStepB");
   }
@@ -1026,6 +1044,13 @@ export function stepADependsOnStepB(stepA: Step, stepB: Step): boolean {
   for (const dep of sudo(stepA).dependencies) {
     if (dep === stepB) {
       return true;
+    }
+    if (
+      sansSideEffects &&
+      dep.implicitSideEffectStep &&
+      dep.implicitSideEffectStep !== stepB.implicitSideEffectStep
+    ) {
+      return false;
     }
     if (stepADependsOnStepB(dep, stepB)) {
       return true;
@@ -1056,6 +1081,10 @@ export function stepAMayDependOnStepB($a: Step, $b: Step): boolean {
 }
 
 export function stepAShouldTryAndInlineIntoStepB($a: Step, $b: Step): boolean {
+  if ($a.implicitSideEffectStep !== $b.implicitSideEffectStep) {
+    return false;
+  }
+  // If there's any side effects in the path, reject
   if (isDev && !stepADependsOnStepB($a, $b)) {
     throw new Error(
       `Shouldn't try and inline into something you're not dependent on!`,
@@ -1088,6 +1117,11 @@ export function stepAShouldTryAndInlineIntoStepB($a: Step, $b: Step): boolean {
     if (lp.reason.type === "polymorphicPartition") {
       return false;
     }
+  }
+
+  // Don't go past any side effects
+  if (!stepADependsOnStepB($a, $b, true)) {
+    return false;
   }
 
   return true;
@@ -1393,4 +1427,17 @@ export function directiveArgument<T>(
                 (val.value as T),
         )
       : undefined;
+}
+export function stableStringSort(a: string, z: string) {
+  return a < z ? -1 : a > z ? 1 : 0;
+}
+/**
+ * Sorts tuples by a string sort of their first entry - useful for
+ * `Object.fromEntries(Object.entries(...).sort(stableStringSortFirstTupleEntry))`
+ */
+export function stableStringSortFirstTupleEntry(
+  a: readonly [string, ...any[]],
+  z: readonly [string, ...any[]],
+) {
+  return a[0] < z[0] ? -1 : a[0] > z[0] ? 1 : 0;
 }

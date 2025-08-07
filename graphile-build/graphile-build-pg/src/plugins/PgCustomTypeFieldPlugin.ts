@@ -1343,12 +1343,7 @@ function modFields(
                                 args,
                                 info,
                               ) as PgSelectStep;
-                              return connection($select, {
-                                cursorPlan: ($item: any) =>
-                                  $item.getParentStep
-                                    ? $item.getParentStep().cursor()
-                                    : $item.cursor(),
-                              });
+                              return connection($select);
                             },
                           [connection, getSelectPlanFromParentAndArgs],
                         ),

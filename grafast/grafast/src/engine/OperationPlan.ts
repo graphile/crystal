@@ -31,10 +31,11 @@ import {
   newSelectionSetDigest,
 } from "../graphqlCollectFields.js";
 import { fieldSelectionsForType } from "../graphqlMergeSelectionSets.js";
-import type { GrafastPlanJSON } from "../index.js";
+import type { GrafastPlanJSON, StepStreamOptions } from "../index.js";
 import {
   __FlagStep,
   __ItemStep,
+  __ListTransformStep,
   __TrackedValueStep,
   __ValueStep,
   $$inhibit,
@@ -76,9 +77,11 @@ import {
   stepHasToRecord,
   stepHasToSpecifier,
 } from "../step.js";
+import { __cloneStream, __CloneStreamStep } from "../steps/__cloneStream.js";
 import { __TrackedValueStepWithDollars } from "../steps/__trackedValue.js";
 import { itemsOrStep } from "../steps/connection.js";
 import { constant, ConstantStep } from "../steps/constant.js";
+import { isSkippableEach } from "../steps/each.js";
 import {
   graphqlResolver,
   graphqlResolveType,
@@ -806,10 +809,12 @@ export class OperationPlan {
     }
     const planningPath = rootType.name + ".";
     const selectionSet = this.operation.selectionSet;
+    const stepStreamOptions = {};
     const groupedFieldSet = withGlobalLayerPlan(
       this.rootLayerPlan,
       POLYMORPHIC_ROOT_PATHS,
       planningPath,
+      stepStreamOptions,
       graphqlCollectFields,
       null,
       this,
@@ -858,6 +863,7 @@ export class OperationPlan {
             this.rootLayerPlan,
             POLYMORPHIC_ROOT_PATHS,
             planningPath,
+            stepStreamOptions,
             this.getTrackedArguments,
             this,
             fieldArgsSpec,
@@ -867,7 +873,11 @@ export class OperationPlan {
 
     if (subscriptionPlanResolver !== undefined) {
       // PERF: optimize this
-      const { haltTree, step: subscribeStep } = this.batchPlanField({
+      const {
+        haltTree,
+        step: subscribeStep,
+        latestSideEffectStep,
+      } = this.batchPlanField({
         typeName: rootType.name,
         fieldName,
         layerPlan: this.rootLayerPlan,
@@ -884,6 +894,7 @@ export class OperationPlan {
       if (haltTree) {
         throw new SafeError("Failed to setup subscription");
       }
+      this.rootLayerPlan.latestSideEffectStep = latestSideEffectStep;
       this.rootLayerPlan.setRootStep(subscribeStep);
 
       const subscriptionEventLayerPlan = new LayerPlan(this, {
@@ -895,6 +906,7 @@ export class OperationPlan {
         subscriptionEventLayerPlan,
         POLYMORPHIC_ROOT_PATHS,
         planningPath,
+        null,
         () => new __ItemStep(subscribeStep),
       );
       subscriptionEventLayerPlan.setRootStep($__item);
@@ -903,6 +915,7 @@ export class OperationPlan {
             subscriptionEventLayerPlan,
             POLYMORPHIC_ROOT_PATHS,
             planningPath,
+            null,
             subscribeStep.itemPlan,
             subscribeStep,
             $__item,
@@ -933,6 +946,7 @@ export class OperationPlan {
         this.rootLayerPlan,
         POLYMORPHIC_ROOT_PATHS,
         planningPath,
+        null,
         () => {
           const $args = object(trackedArguments);
           const rawResolver = fieldSpec.resolve;
@@ -958,7 +972,9 @@ export class OperationPlan {
           );
         },
       );
-      subscribeStep._stepOptions.stream = {};
+      subscribeStep._stepOptions.stream = stepStreamOptions;
+      // Note this should only have one dependent, so it should not be a
+      // distributor
       subscribeStep._stepOptions.walkIterable = true;
 
       this.rootLayerPlan.setRootStep(subscribeStep);
@@ -972,6 +988,7 @@ export class OperationPlan {
         subscriptionEventLayerPlan,
         POLYMORPHIC_ROOT_PATHS,
         planningPath,
+        null,
         () => new __ItemStep(subscribeStep),
       );
 
@@ -982,6 +999,7 @@ export class OperationPlan {
             subscriptionEventLayerPlan,
             POLYMORPHIC_ROOT_PATHS,
             planningPath,
+            null,
             subscribeStep.itemPlan,
             subscribeStep,
             $__item,
@@ -1055,7 +1073,10 @@ export class OperationPlan {
         listStep.polymorphicPaths !== null &&
         itemStep.polymorphicPaths !== null
       ) {
-        for (const p of listStep.polymorphicPaths) {
+        for (const p of intersectPolyPaths(
+          listStep.polymorphicPaths,
+          polymorphicPathsForLayer(parentLayerPlan),
+        )!) {
           (itemStep.polymorphicPaths as Set<string>).add(p);
         }
       }
@@ -1070,8 +1091,12 @@ export class OperationPlan {
     });
     const itemStep = withGlobalLayerPlan(
       layerPlan,
-      listStep.polymorphicPaths,
+      intersectPolyPaths(
+        listStep.polymorphicPaths,
+        polymorphicPathsForLayer(layerPlan),
+      ),
       planningPath,
+      null,
       () => new __ItemStep(listStep, depth),
     );
     layerPlan.setRootStep(itemStep);
@@ -1277,6 +1302,7 @@ export class OperationPlan {
                 this.rootLayerPlan,
                 POLYMORPHIC_ROOT_PATHS,
                 fieldPlanningPath,
+                null,
                 this.getTrackedArguments,
                 this,
                 objectFieldArgs,
@@ -1347,20 +1373,24 @@ export class OperationPlan {
           }
         }
         if (typeof planResolver === "function") {
-          ({ step, haltTree } = yield this.batchPlanField({
-            typeName: objectType.name,
-            fieldName,
-            layerPlan: fieldLayerPlan,
-            path: fieldPath,
-            polymorphicPaths,
-            planningPath: fieldPlanningPath,
-            planResolver,
-            applyAfterMode: "plan",
-            rawParentStep: parentStep,
-            field: objectField,
-            trackedArguments,
-            streamDetails: isList ? (streamDetails ?? false) : null,
-          }));
+          let latestSideEffectStep: Step | null;
+          ({ step, haltTree, latestSideEffectStep } = yield this.batchPlanField(
+            {
+              typeName: objectType.name,
+              fieldName,
+              layerPlan: fieldLayerPlan,
+              path: fieldPath,
+              polymorphicPaths,
+              planningPath: fieldPlanningPath,
+              planResolver,
+              applyAfterMode: "plan",
+              rawParentStep: parentStep,
+              field: objectField,
+              trackedArguments,
+              streamDetails: isList ? (streamDetails ?? false) : null,
+            },
+          ));
+          fieldLayerPlan.latestSideEffectStep = latestSideEffectStep;
         } else {
           // No plan resolver (or plan resolver fallback) so there must be a
           // `resolve` method, so we'll feed the full parent step into the
@@ -1381,6 +1411,7 @@ export class OperationPlan {
             fieldLayerPlan,
             polymorphicPaths,
             fieldPlanningPath,
+            null, // TODO: fix me?
             () => {
               const $args = object(trackedArguments);
               return graphqlResolver(resolver, subscriber, step, $args, {
@@ -1529,6 +1560,7 @@ export class OperationPlan {
       layerPlan,
       polymorphicPaths,
       planningPath,
+      null,
       graphqlCollectFields,
       null,
       this,
@@ -1835,6 +1867,7 @@ export class OperationPlan {
                   layerPlan,
                   polymorphicPaths,
                   planningPath,
+                  null,
                   graphqlType.extensions.grafast.toSpecifier,
                   graphqlType.extensions.grafast,
                   parentStep,
@@ -1844,6 +1877,7 @@ export class OperationPlan {
                     layerPlan,
                     polymorphicPaths,
                     planningPath,
+                    null,
                     parentStep.toSpecifier,
                     parentStep,
                   )
@@ -1852,6 +1886,7 @@ export class OperationPlan {
                       layerPlan,
                       polymorphicPaths,
                       planningPath,
+                      null,
                       parentStep.toRecord,
                       parentStep,
                     )
@@ -1864,6 +1899,7 @@ export class OperationPlan {
             combinedLayerPlan,
             combinedPolymorphicPaths,
             planningPath,
+            null,
             newValueStepCallback,
             null,
             false,
@@ -1895,6 +1931,7 @@ export class OperationPlan {
                 commonLayerPlan,
                 polymorphicPaths,
                 planningPath,
+                null,
                 graphqlType.extensions.grafast.toSpecifier,
                 graphqlType.extensions.grafast,
                 $original,
@@ -1904,6 +1941,7 @@ export class OperationPlan {
                   commonLayerPlan,
                   polymorphicPaths,
                   planningPath,
+                  null,
                   $original.toSpecifier,
                   $original,
                 )
@@ -1912,6 +1950,7 @@ export class OperationPlan {
                     commonLayerPlan,
                     polymorphicPaths,
                     planningPath,
+                    null,
                     $original.toRecord,
                     $original,
                   )
@@ -1947,6 +1986,7 @@ export class OperationPlan {
             commonLayerPlan,
             combinedPolymorphicPaths,
             planningPath,
+            null,
             planType,
             null,
             commonStep,
@@ -1986,6 +2026,7 @@ export class OperationPlan {
                     polymorphicLayerPlan,
                     polymorphicPaths,
                     planningPath + "?",
+                    null,
                     polymorphicTypePlanner.planForType,
                     polymorphicTypePlanner,
                     type,
@@ -1995,6 +2036,7 @@ export class OperationPlan {
                       polymorphicLayerPlan,
                       polymorphicPaths,
                       planningPath + "?",
+                      null,
                       type.extensions.grafast.planType,
                       type.extensions.grafast,
                       commonStep,
@@ -2004,6 +2046,7 @@ export class OperationPlan {
                 polymorphicLayerPlan,
                 polymorphicPaths,
                 planningPath + "?",
+                null,
                 constant,
                 null,
                 $$inhibit,
@@ -2165,10 +2208,11 @@ export class OperationPlan {
             ? `#${streamDetails.initialCount.id}|${streamDetails.if.id}|${streamDetails.label.id}`
             : ""
         }]`;
-      const $list = withGlobalLayerPlan(
+      let $list = withGlobalLayerPlan(
         parentLayerPlan,
         polymorphicPaths,
         listItemPlanningPath,
+        null,
         itemsOrStep,
         null,
         $step,
@@ -2176,6 +2220,21 @@ export class OperationPlan {
       if ($list !== $step) {
         $list._stepOptions.stream = $step._stepOptions.stream;
       }
+
+      // Clone the stream
+      if ($list._stepOptions.stream) {
+        $list = withGlobalLayerPlan(
+          parentLayerPlan,
+          polymorphicPaths,
+          listItemPlanningPath,
+          null,
+          __cloneStream,
+          null,
+          $list,
+        );
+        $list._stepOptions.stream = $step._stepOptions.stream;
+      }
+
       $list._stepOptions.walkIterable = true;
       const listOutputPlan = new OutputPlan(
         parentLayerPlan,
@@ -2226,6 +2285,7 @@ export class OperationPlan {
                   parentLayerPlan,
                   polymorphicPaths,
                   planningPath,
+                  null,
                   scalarPlanResolver,
                   null,
                   $step,
@@ -2457,10 +2517,19 @@ export class OperationPlan {
       locationDetails,
       resolverEmulation,
     } = details;
+
+    // "see through" a list transform step that's only doing `each(...)` (and
+    // no stream), and deduplicate so we only get one layer plan and one
+    // `__Item` step.
+    // IMPORTANT: we still need to use $list below otherwise we won't get the
+    // right mapped items.
+    const $listForItem =
+      stream == null && isSkippableEach($list) ? $list.getListStep() : $list;
+
     const $__item = this.itemStepForListStep(
       parentLayerPlan,
       listItemPlanningPath,
-      $list,
+      $listForItem,
       listDepth,
       stream,
     );
@@ -2472,6 +2541,7 @@ export class OperationPlan {
           $__item.layerPlan,
           $__item.polymorphicPaths,
           listItemPlanningPath,
+          null,
           $list.listItem,
           $list,
           $__item,
@@ -2479,12 +2549,16 @@ export class OperationPlan {
       } else {
         $item = $__item;
       }
+      const newPolymorphicPaths = intersectPolyPaths(
+        $item.polymorphicPaths,
+        polymorphicPaths,
+      );
 
       this.queueNextLayer(this.planIntoOutputPlan, {
         outputPlan: listOutputPlan,
         path,
         planningPath: listItemPlanningPath + "^",
-        polymorphicPaths,
+        polymorphicPaths: newPolymorphicPaths,
         parentStep: $item,
         positionType: nullableFieldType.ofType,
         layerPlan: $item.layerPlan,
@@ -2650,59 +2724,66 @@ export class OperationPlan {
       isNonNull,
       resolverEmulation,
     } = details;
-    if (outputPlan.type.mode !== "polymorphic") {
-      throw new Error(
-        `GrafastInternalError<4c8d9d82-6cb2-4712-aa1e-fdd2173a0760>: expected a polymorphic output plan`,
-      );
-    }
-    const polymorphicOutputPlan =
-      outputPlan as OutputPlan<OutputPlanTypePolymorphicObject>;
+    const $sideEffect = polymorphicLayerPlan.latestSideEffectStep;
+    try {
+      if (outputPlan.type.mode !== "polymorphic") {
+        throw new Error(
+          `GrafastInternalError<4c8d9d82-6cb2-4712-aa1e-fdd2173a0760>: expected a polymorphic output plan`,
+        );
+      }
+      const polymorphicOutputPlan =
+        outputPlan as OutputPlan<OutputPlanTypePolymorphicObject>;
 
-    if (
-      polymorphicLayerPlan.reason.type !== "polymorphic" &&
-      polymorphicLayerPlan.reason.type !== "polymorphicPartition"
-    ) {
-      // NOTE: when queued, this method will be queued with a different layer
-      // plan, but `planPending` should go through and convert it to the
-      // relevant polymorphic layer plans for us.
-      throw new Error(
-        `GrafastInternalError<877eaa1c-30c9-4526-ada4-3ccce020ee0e>: expected ${polymorphicLayerPlan} to be a polymorphic or polymorphicPartition layer plan`,
-      );
-    }
+      if (
+        polymorphicLayerPlan.reason.type !== "polymorphic" &&
+        polymorphicLayerPlan.reason.type !== "polymorphicPartition"
+      ) {
+        // NOTE: when queued, this method will be queued with a different layer
+        // plan, but `planPending` should go through and convert it to the
+        // relevant polymorphic layer plans for us.
+        throw new Error(
+          `GrafastInternalError<877eaa1c-30c9-4526-ada4-3ccce020ee0e>: expected ${polymorphicLayerPlan} to be a polymorphic or polymorphicPartition layer plan`,
+        );
+      }
 
-    const objectOutputPlan = new OutputPlan(
-      polymorphicLayerPlan,
-      $root,
-      {
-        mode: "object",
-        deferLabel: undefined,
-        typeName: type.name,
-      },
-      locationDetails,
-    );
-    this.planSelectionSet({
-      outputPlan: objectOutputPlan,
-      path,
-      planningPath: polymorphicPlanningPath + ".",
-      polymorphicPaths: newPolymorphicPaths,
-      parentStep: $root,
-      positionType: type,
-      layerPlan: polymorphicLayerPlan,
-      selections: fieldNodes,
-      resolverEmulation,
-    });
-    polymorphicOutputPlan.addChild(type, null, {
-      type: "outputPlan",
-      isNonNull,
-      outputPlan: objectOutputPlan,
-      locationDetails,
-    });
+      const objectOutputPlan = new OutputPlan(
+        polymorphicLayerPlan,
+        $root,
+        {
+          mode: "object",
+          deferLabel: undefined,
+          typeName: type.name,
+        },
+        locationDetails,
+      );
+      this.planSelectionSet({
+        outputPlan: objectOutputPlan,
+        path,
+        planningPath: polymorphicPlanningPath + ".",
+        polymorphicPaths: newPolymorphicPaths,
+        parentStep: $root,
+        positionType: type,
+        layerPlan: polymorphicLayerPlan,
+        selections: fieldNodes,
+        resolverEmulation,
+      });
+      polymorphicOutputPlan.addChild(type, null, {
+        type: "outputPlan",
+        isNonNull,
+        outputPlan: objectOutputPlan,
+        locationDetails,
+      });
+    } finally {
+      polymorphicLayerPlan.latestSideEffectStep = $sideEffect;
+    }
   }
 
   planFieldBatch: PlanFieldBatch | null = null;
-  private batchPlanField(
-    batchPlanFieldDetails: PlanFieldDetails,
-  ): () => { haltTree: boolean; step: Step } {
+  private batchPlanField(batchPlanFieldDetails: PlanFieldDetails): () => {
+    haltTree: boolean;
+    step: Step;
+    latestSideEffectStep: Step | null;
+  } {
     let b: PlanFieldBatch;
     if (this.planFieldBatch != null) {
       b = this.planFieldBatch;
@@ -2916,10 +2997,27 @@ export class OperationPlan {
 
     if (this.loc !== null) this.loc.push(`planField(${path.join(".")})`);
     try {
+      let stepStreamOptions: Maybe<StepStreamOptions> = undefined;
+      if (streamDetails === true) {
+        // subscription
+        stepStreamOptions = {};
+      } else if (streamDetails === false) {
+        // Simple list, no action necessary
+        stepStreamOptions = null;
+      } else if (streamDetails != null) {
+        // List with @stream
+        stepStreamOptions = {
+          initialCountStepId: streamDetails.initialCount.id,
+          ifStepId: streamDetails.if.id,
+          labelStepId: streamDetails.label.id,
+        };
+        // } else { // it's not a list and not a subscription
+      }
       let step = withGlobalLayerPlan(
         layerPlan,
         polymorphicPaths,
         planningPath,
+        stepStreamOptions ?? null,
         withFieldArgsForArguments,
         null,
         this,
@@ -2945,6 +3043,7 @@ export class OperationPlan {
             layerPlan,
             polymorphicPaths,
             planningPath,
+            null,
             constant,
             null,
             null,
@@ -2953,22 +3052,21 @@ export class OperationPlan {
       }
       assertExecutableStep(step);
 
-      if (streamDetails === true) {
-        // subscription
-        step._stepOptions.stream = {};
-        step._stepOptions.walkIterable = true;
-      } else if (streamDetails === false) {
-        // Simple list, no action necessary
-      } else if (streamDetails != null) {
-        // Streamed list, mark it as such
-        step._stepOptions.stream = {
-          initialCountStepId: streamDetails.initialCount.id,
-          ifStepId: streamDetails.if.id,
-          labelStepId: streamDetails.label.id,
-        };
-        // } else { // Non-list, non-subscription - no action necessary
+      // `undefined` for non-lists (?)
+      if (stepStreamOptions !== undefined) {
+        // `null` is fine! `undefined` is not.
+        step._stepOptions.stream = stepStreamOptions;
+
+        if (streamDetails === true) {
+          // Subscriptions need to be informed to walkIterable
+          step._stepOptions.walkIterable = true;
+        }
       }
-      return { step, haltTree };
+      return {
+        step,
+        haltTree,
+        latestSideEffectStep: layerPlan.latestSideEffectStep,
+      };
     } catch (e) {
       if (ALWAYS_THROW_PLANNING_ERRORS) {
         throw e;
@@ -2997,6 +3095,7 @@ export class OperationPlan {
         layerPlan,
         polymorphicPaths,
         planningPath,
+        null,
         error,
         null,
         e,
@@ -3004,9 +3103,14 @@ export class OperationPlan {
       const haltTree = true;
       // PERF: consider deleting all steps that were allocated during this. For
       // now we'll just rely on tree-shaking.
-      return { step, haltTree };
+      return {
+        step,
+        haltTree,
+        latestSideEffectStep: layerPlan.latestSideEffectStep,
+      };
     } finally {
       if (this.loc !== null) this.loc.pop();
+      layerPlan.latestSideEffectStep = previousSideEffectStep;
     }
   }
 
@@ -3060,6 +3164,7 @@ export class OperationPlan {
       this.rootLayerPlan,
       POLYMORPHIC_ROOT_PATHS,
       "",
+      null,
       newValueStepCallback,
       null,
       variableDefinitions != null,
@@ -3068,6 +3173,7 @@ export class OperationPlan {
       this.rootLayerPlan,
       POLYMORPHIC_ROOT_PATHS,
       "",
+      null,
       () =>
         new __TrackedValueStep(
           value,
@@ -3190,6 +3296,7 @@ export class OperationPlan {
       replacementStep = withGlobalLayerPlan(
         step.layerPlan,
         step.polymorphicPaths,
+        null,
         null,
         callback,
         this,
@@ -3341,6 +3448,9 @@ export class OperationPlan {
       layerPlan: layerPlan,
       constructor: stepConstructor,
       peerKey,
+      isSyncAndSafe,
+      cloneStreams,
+      implicitSideEffectStep,
     } = sstep;
     // const streamInitialCount = sstep._stepOptions.stream?.initialCount;
     const dependencyCount = deps.length;
@@ -3355,6 +3465,9 @@ export class OperationPlan {
         if (
           possiblyPeer !== step &&
           !possiblyPeer.hasSideEffects &&
+          possiblyPeer.implicitSideEffectStep === implicitSideEffectStep &&
+          possiblyPeer.cloneStreams === cloneStreams &&
+          possiblyPeer.isSyncAndSafe === isSyncAndSafe &&
           isPeerLayerPlan(possiblyPeer.layerPlan, layerPlan) &&
           possiblyPeer._stepOptions.stream == null &&
           possiblyPeer.peerKey === peerKey
@@ -3394,6 +3507,9 @@ export class OperationPlan {
           peerDependencyIndex !== dependencyIndex ||
           rawPossiblyPeer === step ||
           rawPossiblyPeer.hasSideEffects ||
+          rawPossiblyPeer.implicitSideEffectStep !== implicitSideEffectStep ||
+          rawPossiblyPeer.cloneStreams !== cloneStreams ||
+          rawPossiblyPeer.isSyncAndSafe !== isSyncAndSafe ||
           rawPossiblyPeer._stepOptions.stream != null ||
           rawPossiblyPeer.constructor !== stepConstructor ||
           rawPossiblyPeer.peerKey !== peerKey
@@ -3462,6 +3578,10 @@ export class OperationPlan {
               peerDependencyIndex !== dependencyIndex ||
               rawPossiblyPeer === step ||
               rawPossiblyPeer.hasSideEffects ||
+              rawPossiblyPeer.implicitSideEffectStep !==
+                implicitSideEffectStep ||
+              rawPossiblyPeer.cloneStreams !== cloneStreams ||
+              rawPossiblyPeer.isSyncAndSafe !== isSyncAndSafe ||
               rawPossiblyPeer._stepOptions.stream != null ||
               rawPossiblyPeer.constructor !== stepConstructor ||
               rawPossiblyPeer.peerKey !== peerKey
@@ -3553,6 +3673,11 @@ export class OperationPlan {
     if (this.isImmoveable(step)) {
       return;
     }
+    if (step.implicitSideEffectStep?.layerPlan === step.layerPlan) {
+      // Can't hoist past our side effect
+      return;
+    }
+
     // PERF: would be nice to prevent ConstantStep from being hoisted - we
     // don't want to keep multiplying up and up its data as it traverses the buckets - would be better
     // to push the step down to the furthest level and then have it run there straight away.
@@ -4008,7 +4133,11 @@ export class OperationPlan {
                   continue tryAgain;
                 } else {
                   throw new Error(
-                    `GrafastInternalError<93da1006-3af9-44dd-a54b-5bf6fe3e791c>: ${s} has polymorphic paths ${[...(s.polymorphicPaths ?? [])]}; but ${p} is not in ${[...layerPolymorphicPaths]}.`,
+                    `GrafastInternalError<93da1006-3af9-44dd-a54b-5bf6fe3e791c>: polymorphic mismatch...${`
+${s}∈${s.layerPlan}${s !== step ? ` (equivalent to ${step})` : ""} has polymorphic paths:
+  - ${[...(s.polymorphicPaths ?? [])].join("\n  - ")}
+But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
+  - ${[...layerPolymorphicPaths].join("\n  - ")}`.replace(/\n/g, "\n      ")}`,
                   );
                 }
               }
@@ -4093,6 +4222,7 @@ export class OperationPlan {
       step.layerPlan,
       step.polymorphicPaths,
       null, // TODO: can we get the operation path when phase === "plan"?
+      null,
       this.phase === "plan" ? this.deduplicateStep : this.hoistAndDeduplicate,
       this,
       step,
@@ -4264,8 +4394,9 @@ export class OperationPlan {
   }
 
   private inlineSteps() {
-    flagLoop: for (const $flag of this.stepTracker.activeSteps) {
-      if ($flag instanceof __FlagStep) {
+    flagLoop: for (const $step of this.stepTracker.activeSteps) {
+      if ($step instanceof __FlagStep) {
+        const $flag = $step;
         // We can only inline it if it's not used by an output plan or layer plan
         {
           const usages = this.stepTracker.outputPlansByRootStep.get($flag);
@@ -4329,6 +4460,15 @@ export class OperationPlan {
         }
         const $flagDep = sudo($flag).dependencies[0];
         this.stepTracker.replaceStep($flag, $flagDep);
+      } else if ($step instanceof __CloneStreamStep) {
+        const $clone = sudo($step);
+        const $dep = $clone.dependencies[0];
+        if ($dep.dependents.length === 1) {
+          $dep.cloneStreams = false;
+          $dep._stepOptions.walkIterable ||= $clone._stepOptions.walkIterable;
+          $dep._stepOptions.stream ||= $clone._stepOptions.stream;
+          this.stepTracker.replaceStep($clone, $dep);
+        }
       }
     }
   }
@@ -4337,6 +4477,16 @@ export class OperationPlan {
   private finalizeSteps(): void {
     const initialStepCount = this.stepTracker.stepCount;
     for (const step of this.stepTracker.activeSteps) {
+      if (step.isSyncAndSafe && !(step instanceof __ItemStep)) {
+        const dependencies = sudo(step).dependencies;
+        for (const dep of dependencies) {
+          if (dep.cloneStreams) {
+            throw new Error(
+              `${step} has isSyncAndSafe=true, but depends on ${dep} which has cloneStreams=true - this is forbidden.`,
+            );
+          }
+        }
+      }
       const wasLocked = isDev && unlock(step);
       step.finalize();
       if (step._stepOptions.stream) {
@@ -4362,13 +4512,14 @@ export class OperationPlan {
     const ensurePlanAvailableInLayer = (
       dep: Step,
       layerPlan: LayerPlan,
+      reason: () => string,
     ): void => {
       let currentLayerPlan: LayerPlan | null = layerPlan;
 
       while (dep.layerPlan !== currentLayerPlan) {
         if (currentLayerPlan.reason.type === "root") {
           throw new Error(
-            `GrafastInternalError<7f3ce201-810c-4639-8e69-f44a95221c6d>: reached root whilst ensuring ${dep} is available in ${layerPlan}`,
+            `GrafastInternalError<7f3ce201-810c-4639-8e69-f44a95221c6d>: reached root whilst ensuring ${dep} is available in ${layerPlan} (${reason()})`,
           );
         }
         if (currentLayerPlan.copyStepIds.includes(dep.id)) {
@@ -4397,7 +4548,7 @@ export class OperationPlan {
             } else if (
               layerPlanHeirarchyContains(parentLayerPlan, dep.layerPlan)
             ) {
-              ensurePlanAvailableInLayer(dep, parentLayerPlan);
+              ensurePlanAvailableInLayer(dep, parentLayerPlan, reason);
             }
           }
           if (currentLayerPlan == null) {
@@ -4635,43 +4786,6 @@ export class OperationPlan {
       const pending = new Set<Step>(layerPlan.pendingSteps);
       const processed = new Set<Step>();
 
-      const latestSideEffectStepByPolymorphicPath = new Map<
-        string,
-        Step | undefined
-      >();
-
-      const getLatestSideEffectStepFor = (step: Step) => {
-        const polymorphicPaths = [...(step.polymorphicPaths ?? [""])];
-        const latestSideEffectStep = latestSideEffectStepByPolymorphicPath.get(
-          polymorphicPaths[0],
-        );
-        for (let i = 1, l = polymorphicPaths.length; i < l; i++) {
-          const se = latestSideEffectStepByPolymorphicPath.get(
-            polymorphicPaths[i],
-          );
-          if (se !== latestSideEffectStep) {
-            throw new Error(
-              `You shouldn't have side effects in polymorphic positions; ${
-                step
-              } exists in ${
-                polymorphicPaths
-              } but these positions have mixed side effects (${
-                latestSideEffectStep
-              } @ ${polymorphicPaths[0]}, ${se} @ ${polymorphicPaths[i]})`,
-            );
-          }
-        }
-        return latestSideEffectStep;
-      };
-
-      const setLatestSideEffectStep = (step: Step) => {
-        const polymorphicPaths = [...(step.polymorphicPaths ?? [""])];
-        // Store this side effect for use from now on
-        for (let i = 0, l = polymorphicPaths.length; i < l; i++) {
-          latestSideEffectStepByPolymorphicPath.set(polymorphicPaths[i], step);
-        }
-      };
-
       const processSideEffectPlan = (step: Step) => {
         if (processed.has(step) || isPrepopulatedStep(step)) {
           return;
@@ -4705,19 +4819,6 @@ export class OperationPlan {
         // run them in parallel, and they don't even have side effects!
         for (const dep of rest) {
           processSideEffectPlan(dep);
-        }
-
-        const latestSideEffectStep = getLatestSideEffectStepFor(step);
-
-        if (
-          latestSideEffectStep !== undefined &&
-          !stepADependsOnStepB(sstep, latestSideEffectStep)
-        ) {
-          sstep.implicitSideEffectStep = latestSideEffectStep;
-        }
-
-        if (step.hasSideEffects) {
-          setLatestSideEffectStep(step);
         }
 
         const phase = /*#__INLINE__*/ newLayerPlanPhase();
@@ -4761,14 +4862,6 @@ export class OperationPlan {
         for (const step of nextSteps) {
           processed.add(step);
           pending.delete(step);
-          const sstep = sudo(step);
-          const latestSideEffectStep = getLatestSideEffectStepFor(step);
-          if (
-            latestSideEffectStep !== undefined &&
-            !stepADependsOnStepB(sstep, latestSideEffectStep)
-          ) {
-            sstep.implicitSideEffectStep = latestSideEffectStep;
-          }
           if (
             step.isSyncAndSafe &&
             isUnbatchedStep(step) &&
@@ -4805,14 +4898,6 @@ export class OperationPlan {
               if (readyToExecute(step)) {
                 processed.add(step);
                 pending.delete(step);
-                const sstep = sudo(step);
-                const latestSideEffectStep = getLatestSideEffectStepFor(step);
-                if (
-                  latestSideEffectStep !== undefined &&
-                  !stepADependsOnStepB(sstep, latestSideEffectStep)
-                ) {
-                  sstep.implicitSideEffectStep = latestSideEffectStep;
-                }
                 foundOne = true;
                 if (phase.unbatchedSyncAndSafeSteps !== undefined) {
                   phase.unbatchedSyncAndSafeSteps.push({
@@ -4850,16 +4935,24 @@ export class OperationPlan {
           continue;
         }
         for (const dep of sudo(step).dependencies) {
-          ensurePlanAvailableInLayer(dep, layerPlan);
+          ensurePlanAvailableInLayer(dep, layerPlan, () => `${step} (dep)`);
         }
         if (step.implicitSideEffectStep) {
-          ensurePlanAvailableInLayer(step.implicitSideEffectStep, layerPlan);
+          ensurePlanAvailableInLayer(
+            step.implicitSideEffectStep,
+            layerPlan,
+            () => `${step} (side effect)`,
+          );
         }
       }
 
       const $root = layerPlan.rootStep;
       if ($root) {
-        ensurePlanAvailableInLayer($root, layerPlan);
+        ensurePlanAvailableInLayer(
+          $root,
+          layerPlan,
+          () => `${layerPlan}.rootStep`,
+        );
 
         // If $root explicitly dependends on `layerPlan.parentSideEffectStep`
         // then we should remove the implicit layerPlan dependency (e.g. so
@@ -4891,6 +4984,7 @@ export class OperationPlan {
           ensurePlanAvailableInLayer(
             $sideEffect,
             layerPlan.reason.parentLayerPlan,
+            () => `${layerPlan}.parentSideEffectStep`,
           );
         }
       }
@@ -4898,7 +4992,11 @@ export class OperationPlan {
       // Copy polymorphic parentStepId
       if (layerPlan.reason.type === "polymorphic") {
         const parentStep = layerPlan.reason.parentStep;
-        ensurePlanAvailableInLayer(parentStep, layerPlan);
+        ensurePlanAvailableInLayer(
+          parentStep,
+          layerPlan,
+          () => `${layerPlan} poly`,
+        );
       }
 
       // Ensure list is accessible in parent layerPlan
@@ -4907,6 +5005,7 @@ export class OperationPlan {
         ensurePlanAvailableInLayer(
           parentStep,
           layerPlan.reason.parentLayerPlan,
+          () => `${layerPlan} listItem`,
         );
         const stream = layerPlan.reason.stream;
         if (stream != null) {
@@ -4914,18 +5013,21 @@ export class OperationPlan {
             ensurePlanAvailableInLayer(
               this.stepTracker.getStepById(stream.initialCountStepId),
               layerPlan.reason.parentLayerPlan,
+              () => `${layerPlan} stream`,
             );
           }
           if (stream.ifStepId) {
             ensurePlanAvailableInLayer(
               this.stepTracker.getStepById(stream.ifStepId),
               layerPlan.reason.parentLayerPlan,
+              () => `${layerPlan} stream 2`,
             );
           }
           if (stream.labelStepId) {
             ensurePlanAvailableInLayer(
               this.stepTracker.getStepById(stream.labelStepId),
               layerPlan.reason.parentLayerPlan,
+              () => `${layerPlan} stream 3`,
             );
           }
         }
@@ -4945,7 +5047,11 @@ export class OperationPlan {
               );
             }
             const step = this.stepTracker.getStepById(stepId);
-            ensurePlanAvailableInLayer(step, sourceLayerPlan);
+            ensurePlanAvailableInLayer(
+              step,
+              sourceLayerPlan,
+              () => `${layerPlan} combo`,
+            );
           }
         }
       }
@@ -4953,7 +5059,11 @@ export class OperationPlan {
 
     // Populate copyPlanIds for output plans' rootStepId
     this.stepTracker.allOutputPlans.forEach((outputPlan) => {
-      ensurePlanAvailableInLayer(outputPlan.rootStep, outputPlan.layerPlan);
+      ensurePlanAvailableInLayer(
+        outputPlan.rootStep,
+        outputPlan.layerPlan,
+        () => `${outputPlan} output plan root step`,
+      );
     });
 
     for (const layerPlan of this.stepTracker.layerPlans) {
@@ -5277,6 +5387,7 @@ export class OperationPlan {
       this.rootLayerPlan,
       POLYMORPHIC_ROOT_PATHS,
       null,
+      null,
       cb,
     );
   }
@@ -5563,7 +5674,12 @@ interface PlanFieldDetails {
 
 type PlanFieldBatchResult =
   | { error: Error }
-  | { error?: never; haltTree: boolean; step: Step };
+  | {
+      error?: never;
+      haltTree: boolean;
+      step: Step;
+      latestSideEffectStep: Step | null;
+    };
 
 interface PlanFieldBatch {
   complete: boolean;
@@ -5597,4 +5713,24 @@ function getDescendents(
   }
 
   return descendents;
+}
+
+/**
+ * Return the set of poly paths that are common to both `one` and `two` - note
+ * that `null` means all possible poly paths.
+ */
+function intersectPolyPaths(
+  one: ReadonlySet<string> | null,
+  two: ReadonlySet<string> | null,
+): ReadonlySet<string> | null {
+  if (one === two) return one;
+  if (one == null) return two;
+  if (two == null) return one;
+  const set = new Set<string>();
+  for (const str of one) {
+    if (two.has(str)) {
+      set.add(str);
+    }
+  }
+  return set;
 }

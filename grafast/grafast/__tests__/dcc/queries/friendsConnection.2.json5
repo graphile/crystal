@@ -1,0 +1,25 @@
+{
+  crawler: {
+    id: 101,
+    name: 'Carl',
+    species: 'HUMAN',
+    friendsConnection: {
+      edges: [
+        {
+          cursor: 'MQ==',
+          node: {
+            id: 103,
+            name: 'Katia',
+          },
+        },
+        {
+          cursor: 'Mg==',
+          node: {
+            id: 104,
+            name: 'Imani',
+          },
+        },
+      ],
+    },
+  },
+}

@@ -1,5 +1,5 @@
 import { PgExecutor, PgResource, PgSelectSingleStep, PgUnionAllSingleStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgClassExpression, pgFromExpression, pgSelectSingleFromRecord, pgUnionAll, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, ConstantStep, assertEdgeCapableStep, assertPageInfoCapableStep, bakedInput, connection, constant, context, get as get2, lambda, makeGrafastSchema, object, operationPlan, rootValue, stepAMayDependOnStepB, trap } from "grafast";
+import { ConnectionStep, ConstantStep, bakedInput, connection, constant, context, get as get2, lambda, makeGrafastSchema, object, operationPlan, rootValue, stepAMayDependOnStepB, trap } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 const EMPTY_ARRAY = [];
@@ -10507,11 +10507,7 @@ export const objects = {
       allRelationalItemsFn: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs2($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -10684,11 +10680,7 @@ export const objects = {
       allSingleTables: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -10942,13 +10934,12 @@ export const objects = {
     }
   },
   ApplicationsEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -11289,13 +11280,12 @@ export const objects = {
     }
   },
   LogEntriesEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -11405,30 +11395,12 @@ export const objects = {
     }
   },
   OrganizationsEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
-      }
-    }
-  },
-  PageInfo: {
-    assertStep: assertPageInfoCapableStep,
-    plans: {
-      endCursor($pageInfo) {
-        return $pageInfo.endCursor();
-      },
-      hasNextPage($pageInfo) {
-        return $pageInfo.hasNextPage();
-      },
-      hasPreviousPage($pageInfo) {
-        return $pageInfo.hasPreviousPage();
-      },
-      startCursor($pageInfo) {
-        return $pageInfo.startCursor();
+        return get2($edge, "node");
       }
     }
   },
@@ -11441,13 +11413,12 @@ export const objects = {
     }
   },
   PeopleEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -11626,13 +11597,12 @@ export const objects = {
     assertStep: ConnectionStep
   },
   PersonOrOrganizationEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -11645,13 +11615,12 @@ export const objects = {
     }
   },
   PrioritiesEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -12269,13 +12238,12 @@ export const objects = {
     }
   },
   RelationalChecklistItemsEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -12288,13 +12256,12 @@ export const objects = {
     }
   },
   RelationalChecklistsEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -12587,13 +12554,12 @@ export const objects = {
     }
   },
   RelationalDividersEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -12662,13 +12628,12 @@ export const objects = {
     }
   },
   RelationalItemRelationCompositePksEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -12681,13 +12646,12 @@ export const objects = {
     }
   },
   RelationalItemRelationsEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -12700,13 +12664,12 @@ export const objects = {
     }
   },
   RelationalItemsEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -12999,13 +12962,12 @@ export const objects = {
     }
   },
   RelationalPostsEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -13337,13 +13299,12 @@ export const objects = {
     }
   },
   RelationalTopicsEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -14067,13 +14028,12 @@ export const objects = {
     }
   },
   SingleTableItemRelationCompositePksEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -14086,13 +14046,12 @@ export const objects = {
     }
   },
   SingleTableItemRelationsEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -14105,13 +14064,12 @@ export const objects = {
     }
   },
   SingleTableItemsEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -14667,13 +14625,12 @@ export const objects = {
     }
   },
   VulnerabilitiesEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   },
@@ -14686,13 +14643,12 @@ export const objects = {
     }
   },
   ZeroImplementationsEdge: {
-    assertStep: assertEdgeCapableStep,
     plans: {
       cursor($edge) {
-        return $edge.cursor();
+        return get2($edge, "cursor");
       },
       node($edge) {
-        return $edge.node();
+        return get2($edge, "node");
       }
     }
   }

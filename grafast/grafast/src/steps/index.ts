@@ -13,14 +13,15 @@ export {
 export { access, AccessStep } from "./access.js";
 export { coalesce, CoalesceStep } from "./coalesce.js";
 export {
-  assertEdgeCapableStep,
-  assertPageInfoCapableStep,
   connection,
-  ConnectionCapableStep,
+  ConnectionHandlingResult,
+  ConnectionHandlingStep,
+  ConnectionOptimizedStep,
   ConnectionStep,
-  EdgeCapableStep,
   EdgeStep,
-  PageInfoCapableStep,
+  PaginationFeatures,
+  PaginationParams,
+  StepRepresentingList,
 } from "./connection.js";
 export { constant, ConstantStep } from "./constant.js";
 export { each } from "./each.js";
@@ -88,15 +89,23 @@ export { applyTransforms, ApplyTransformsStep } from "./applyTransforms.js";
 export { bakedInput, bakedInputRuntime, BakedInputStep } from "./bakedInput.js";
 export { condition, ConditionStep } from "./condition.js";
 export { graphqlResolver, GraphQLResolverStep } from "./graphqlResolver.js";
+export { LoadedRecordStep } from "./loadedRecord.js";
 export {
-  LoadedRecordStep,
   loadMany,
   LoadManyCallback,
   loadManyCallback,
+  LoadManyInfo,
+  LoadManyLoader,
+  loadManyLoader,
+  LoadManyStep,
+} from "./loadMany.js";
+export {
   loadOne,
   LoadOneCallback,
   loadOneCallback,
-  LoadOptions,
-  LoadStep,
-} from "./load.js";
+  LoadOneInfo,
+  LoadOneLoader,
+  loadOneLoader,
+  LoadOneStep,
+} from "./loadOne.js";
 export { proxy, ProxyStep } from "./proxy.js";

@@ -1,0 +1,20 @@
+{
+  character: {
+    id: 102,
+    name: 'Princess Donut',
+    itemsConnection: {
+      nodes: [
+        {
+          __typename: 'Consumable',
+          id: 201,
+          name: 'Rev-Up Immunity Smoothie',
+        },
+        {
+          __typename: 'UtilityItem',
+          id: 202,
+          name: 'Bandage',
+        },
+      ],
+    },
+  },
+}
