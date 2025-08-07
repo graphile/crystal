@@ -274,7 +274,18 @@ it(
     const stream = await grafast({
       schema,
       requestContext,
-      resolvedPreset,
+      resolvedPreset: resolvePreset({
+        extends: [
+          resolvedPreset,
+          {
+            grafast: {
+              // We want to cache at most 3 records; this will hang waiting for new
+              // records if the skipped steps are not handled
+              distributorBufferSize: 3,
+            },
+          },
+        ],
+      }),
       source,
     });
     if ("errors" in stream) {
