@@ -1,4 +1,5 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
+import { expect } from "chai";
 import type {
   AsyncExecutionResult,
   ExecutionResult,
@@ -177,4 +178,10 @@ function canonicalSort(obj: Record<string, any>) {
       ),
     ),
   );
+}
+
+export function assertIterable<T, TReturn, TNext>(
+  stream: AsyncIterable<T, TReturn, TNext> | unknown,
+): asserts stream is AsyncIterable<T, TReturn, TNext> {
+  expect(stream).to.have.property(Symbol.asyncIterator).that.is.a("function");
 }

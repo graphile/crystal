@@ -6,13 +6,19 @@ import { it } from "mocha";
 
 import {
   connection,
+  get,
   grafast,
   loadMany,
   loadManyCallback,
   makeGrafastSchema,
+  sideEffect,
   Step,
 } from "../dist/index.js";
-import { resolveStreamDefer, streamToArray } from "./incrementalUtils.js";
+import {
+  assertIterable,
+  resolveStreamDefer,
+  streamToArray,
+} from "./incrementalUtils.js";
 
 const resolvedPreset = resolvePreset({});
 const requestContext = {};
@@ -27,7 +33,7 @@ const schema = makeGrafastSchema({
     type FibConnection {
       edges: [FibEdge]
       nodes: [Fib]
-      pageInfo: PageInfo!
+      pageInfo(throw: Boolean! = false): PageInfo
     }
     type FibEdge {
       cursor: String!
@@ -50,6 +56,18 @@ const schema = makeGrafastSchema({
         connection(_, { $max }) {
           const $fib = fib($max);
           return connection($fib);
+        },
+      },
+    },
+    FibConnection: {
+      plans: {
+        pageInfo($connection, { $throw }) {
+          sideEffect($throw, (t) => {
+            if (t) {
+              throw new Error(`Throw in pageInfo requested!`);
+            }
+          });
+          return get($connection, "pageInfo");
         },
       },
     },
@@ -219,10 +237,90 @@ it(
   }),
 );
 
-function assertIterable<T, TReturn, TNext>(
-  stream: AsyncIterable<T, TReturn, TNext> | unknown,
-): asserts stream is AsyncIterable<T, TReturn, TNext> {
-  expect(stream).to.have.property(Symbol.asyncIterator).that.is.a("function");
-}
+it(
+  "handles pageInfo throwing",
+  throwOnUnhandledRejections(async () => {
+    const source = /* GraphQL */ `
+      {
+        connection {
+          edges @stream(initialCount: 1) {
+            cursor
+            node {
+              index
+              value
+            }
+          }
+          pageInfo(throw: true) {
+            ... @defer {
+              hasNextPage
+            }
+            ... @defer {
+              hasPreviousPage
+            }
+            ... @defer {
+              startCursor
+            }
+            ... @defer {
+              endCursor
+            }
+          }
+          nodes @stream(initialCount: 2) {
+            index
+            value
+          }
+        }
+      }
+    `;
+    const stream = await grafast({
+      schema,
+      requestContext,
+      resolvedPreset,
+      source,
+    });
+    if ("errors" in stream) {
+      console.dir(stream.errors);
+      expect(stream.errors).not.to.exist;
+    }
+    assertIterable(stream);
+    const payloads = (await streamToArray(stream)) as AsyncExecutionResult[];
+    const finalData = resolveStreamDefer(payloads);
+    const expectedNodes = [
+      { index: 0, value: 1 },
+      { index: 1, value: 1 },
+      { index: 2, value: 2 },
+      { index: 3, value: 3 },
+      { index: 4, value: 5 },
+      { index: 5, value: 8 },
+      { index: 6, value: 13 },
+      { index: 7, value: 21 },
+      { index: 8, value: 34 },
+      { index: 9, value: 55 },
+      { index: 10, value: 89 },
+    ];
+    expect(finalData.data).to.deep.equal({
+      connection: {
+        edges: expectedNodes.map((node) => ({
+          cursor: Buffer.from(String(node.index)).toString("base64"),
+          node,
+        })),
+        nodes: expectedNodes,
+        pageInfo: {
+          hasNextPage: false,
+          hasPreviousPage: false,
+          startCursor: Buffer.from("0").toString("base64"),
+          endCursor: Buffer.from("10").toString("base64"),
+        },
+      },
+    });
+    expect(finalData.errors).to.deep.equal([
+      {
+        message: "Throw in pageInfo requested!",
+        path: ["connection", "pageInfo"],
+      },
+    ]);
+    expect(startCount).to.equal(1);
+    expect(endCount).to.equal(1);
+  }),
+);
 
 it("throws an error when initialCount > limit");
