@@ -264,7 +264,7 @@ export interface BufferStreamResult {
 
 export interface NoContentResult {
   type: "noContent";
-  statusCode: 204;
+  statusCode: 204 | 304;
   headers: Record<string, string>;
 }
 

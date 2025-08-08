@@ -126,6 +126,15 @@ export class WhatwgGrafserv extends GrafservBase {
         });
       }
 
+      case "noContent": {
+        const { statusCode, headers } = response;
+        const respHeaders = new Headers(headers);
+        return new Response(null, {
+          status: statusCode,
+          headers: respHeaders,
+        });
+      }
+
       default: {
         console.log("Unhandled:");
         console.dir(response);
