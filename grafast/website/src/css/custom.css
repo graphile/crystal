@@ -58,3 +58,46 @@ figure {
 figure iframe {
   display: inline-block;
 }
+
+sup a {
+  font-weight: bold;
+  color: var(--grafast-color-pink);
+}
+
+.footnotes {
+  color: var(--ifm-color-gray-700);
+  font-size: 0.8rem;
+  margin-top: 1rem;
+  border-top: 2px solid var(--ifm-color-gray-500);
+  padding-top: 1rem;
+}
+
+.footnotes h2 {
+  text-transform: uppercase;
+  font-size: 1rem;
+}
+
+.footnotes a {
+  color: var(--grafast-color-pink);
+}
+
+.footnotes a:hover {
+  color: var(--ifm-link-hover-color);
+  text-decoration: var(--ifm-link-hover-decoration);
+}
+
+.footnotes li::marker {
+  color: var(--grafast-color-pink);
+  font-weight: bold;
+}
+
+[data-theme="dark"] .footnotes {
+  color: var(--ifm-color-gray-200);
+  border-top: 2px solid var(--ifm-color-gray-400);
+}
+
+@media screen and (max-width: 995px) {
+  .footnotes {
+    font-size: 1rem;
+  }
+}
