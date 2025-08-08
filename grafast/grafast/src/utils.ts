@@ -1441,3 +1441,6 @@ export function stableStringSortFirstTupleEntry(
 ) {
   return a[0] < z[0] ? -1 : a[0] > z[0] ? 1 : 0;
 }
+
+export const sleep = (ms: number) =>
+  new Promise((resolve) => setTimeout(resolve, ms));

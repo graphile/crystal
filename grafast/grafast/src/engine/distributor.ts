@@ -1,8 +1,12 @@
+import type { Maybe } from "..";
 import type { Deferred } from "../deferred";
 import { defer } from "../deferred";
 import type { Step } from "../step";
+import { sleep } from "../utils";
 
-export const DEFAULT_DISTRIBUTOR_BUFFER_SIZE = 100;
+const DEFAULT_DISTRIBUTOR_BUFFER_SIZE = 250;
+const DEFAULT_DISTRIBUTOR_BUFFER_SIZE_INCREMENT = 250;
+const DEFAULT_DISTRIBUTOR_PAUSE_DURATION = 25; // milliseconds
 
 const $$isDistributor = Symbol("$$isDistributor");
 
@@ -31,18 +35,20 @@ const DONE_PROMISE: Promise<IteratorReturnResult<void>> = Promise.resolve({
  * @param sourceIterable - the iterable or async iterable to clone
  * @param dependentSteps - the steps we're expecting to depend on this (so we
  * know how many clones we'll need)
- * @param distributorBufferSize - Maximum amount any one consumer can be
- * ahead of any other - if they attempt to exceed this then we'll
- * automatically have the promise wait until the slowest consumer has caught
- * up.
+ * @param grafastOptions - the options (from the preset) that may be relevant
  */
 export function distributor<TData>(
   sourceIterable:
     | AsyncIterable<TData, void, never>
     | Iterable<TData, void, never>,
   dependentSteps: readonly Step[],
-  distributorBufferSize: number,
+  distributorOptions: DistributorOptions,
 ): Distributor<TData> {
+  const {
+    distributorTargetBufferSize: targetBufferSize,
+    distributorTargetBufferSizeIncrement: bufferSizeIncrement,
+    distributorPauseDuration: pauseDuration,
+  } = distributorOptions;
   /**
    * Once we start the underlying sourceIterable, we store the iterator here.
    */
@@ -78,11 +84,12 @@ export function distributor<TData>(
   let lowWaterMark = 0;
 
   /**
-   * This is our buffer (max: `distributorBufferSize`) of iterator results, the first
-   * consumer to request the next index will fetch from the underlying stream and store
-   * the value here, as the slowest consumers catch up, old results will be shifted from
-   * the start of the array and the `lowWaterMark` will be advanced. The item to pull
-   * for a given position is `buffer[requestedIndex[stepIndex] - lowWaterMark]`.
+   * This is our buffer of iterator results, the first consumer to request the
+   * next index will fetch from the underlying stream and store the value here,
+   * as the slowest consumers catch up, old results will be shifted from the
+   * start of the array and the `lowWaterMark` will be advanced. The item to
+   * pull for a given position is `buffer[requestedIndex[stepIndex] -
+   * lowWaterMark]`.
    */
   const buffer: Array<Promise<IteratorResult<TData, void>>> = [];
 
@@ -206,23 +213,46 @@ export function distributor<TData>(
   function yieldValue(
     stepIndex: number,
     index: number,
+    enableDelay = true,
   ): Promise<IteratorResult<TData>> {
-    if (index >= lowWaterMark + distributorBufferSize) {
-      // Whoa there! Getting a little ahead of ourselves! Wait for the slowest
-      // consumer to advance, then try again.
-      return lowWaterMarkIncreased().then(() => {
-        const terminal = terminalResult[stepIndex];
-        if (terminal) return terminal;
-        return yieldValue(stepIndex, index);
-      });
+    const bufferLength = buffer.length;
+    /** The index within the buffer that we'd like to retrieve */
+    const bufferIndex = index - lowWaterMark;
+    /** Is it our responsibility to pull the next record? */
+    const shouldPullNext = bufferIndex >= bufferLength;
+
+    if (
+      enableDelay &&
+      shouldPullNext &&
+      bufferIndex >= targetBufferSize &&
+      // If terminated, no need to delay
+      finalResult === null
+    ) {
+      if ((bufferIndex - targetBufferSize) % bufferSizeIncrement === 0) {
+        // Whoa there! Getting a little ahead of ourselves! Wait for the slowest
+        // consumer to advance (or for it to time out), then try again.
+        const oldLowWaterMark = lowWaterMark;
+        return Promise.race([
+          lowWaterMarkIncreased(),
+          sleep(pauseDuration),
+        ]).then(() => {
+          const terminal = terminalResult[stepIndex];
+          if (terminal) return terminal;
+          /** Delay again iff the lowWaterMark advanced */
+          const enableDelay = lowWaterMark > oldLowWaterMark;
+          return yieldValue(stepIndex, index, enableDelay);
+        });
+      } else {
+        // The slowest consumer is too slow - race ahead (until the next
+        // `bufferSizeIncrement`)
+      }
     }
 
     // !! Below here must be entirely synchronous! !!
 
-    const bufferIndex = index - lowWaterMark;
     let result: Promise<IteratorResult<TData, void>>;
-    if (buffer.length <= bufferIndex) {
-      // assert.equal(buffer.length, bufferIndex, "We've missed some indexes?!")
+    if (shouldPullNext) {
+      // assert.equal(bufferIndex, bufferLength, "We've missed some indexes?!")
       // It's our job to pull the next value!
       // But first... did the source iterator already complete?
       if (finalResult !== null) {
@@ -333,5 +363,28 @@ export function distributor<TData>(
         stop(stepIndex);
       }
     },
+  };
+}
+
+export type DistributorOptions = Required<
+  Pick<
+    GraphileConfig.GrafastOptions,
+    | "distributorPauseDuration"
+    | "distributorTargetBufferSize"
+    | "distributorTargetBufferSizeIncrement"
+  >
+>;
+
+export function resolveDistributorOptions(
+  options: Maybe<GraphileConfig.GrafastOptions>,
+): DistributorOptions {
+  return {
+    distributorTargetBufferSize:
+      options?.distributorTargetBufferSize ?? DEFAULT_DISTRIBUTOR_BUFFER_SIZE,
+    distributorTargetBufferSizeIncrement:
+      options?.distributorTargetBufferSizeIncrement ??
+      DEFAULT_DISTRIBUTOR_BUFFER_SIZE_INCREMENT,
+    distributorPauseDuration:
+      options?.distributorPauseDuration ?? DEFAULT_DISTRIBUTOR_PAUSE_DURATION,
   };
 }

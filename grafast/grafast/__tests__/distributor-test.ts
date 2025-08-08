@@ -286,7 +286,7 @@ it(
             grafast: {
               // We want to cache at most 3 records; this will hang waiting for new
               // records if the skipped steps are not handled
-              distributorBufferSize: 3,
+              distributorTargetBufferSize: 3,
             },
           },
         ],
@@ -381,8 +381,8 @@ it(
           resolvedPreset,
           {
             grafast: {
-              // For this test to work, this must be < 11
-              distributorBufferSize: 8,
+              // For this test to be meaningful, this must be < 11
+              distributorTargetBufferSize: 8,
             },
           },
         ],
@@ -474,8 +474,8 @@ it(
           resolvedPreset,
           {
             grafast: {
-              // For this test to work, this must be < 11
-              distributorBufferSize: 8,
+              // For this test to be meaningful, this must be < 11
+              distributorTargetBufferSize: 8,
             },
           },
         ],

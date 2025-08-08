@@ -289,9 +289,10 @@ export /* abstract */ class Step<TData = any> {
    * consume clones of the stream. Grafast will not wrap arrays in this way as
    * doing so is unnecessary.
    *
-   * [^1]: To avoid memory exhaustion, no clone can be more than
-   * `distributorBufferSize` items further ahead than another clone. Faster
-   * consumers will be paused until slower consumers catch up.
+   * [^1]: To avoid excessive memory consumption, if a clone gets
+   * `distributorTargetBufferSize` items further ahead than another clone, it
+   * will be temporarily paused (for up to `distributorPauseDuration`
+   * milliseconds) to give the slowest clone a chance to catch up.
    *
    * WARNING: Cloning an async iterable only clones its iterable behavior;
    * other methods and properties are not preserved. For example, if you return

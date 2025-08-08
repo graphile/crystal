@@ -43,10 +43,11 @@ import {
   isPromiseLike,
   sudo,
 } from "../utils.js";
+import type { DistributorOptions } from "./distributor.js";
 import {
-  DEFAULT_DISTRIBUTOR_BUFFER_SIZE,
   distributor,
   isDistributor,
+  resolveDistributorOptions,
 } from "./distributor.js";
 import type { LayerPlan } from "./LayerPlan.js";
 import type { MetaByMetaKey } from "./OperationPlan.js";
@@ -104,9 +105,9 @@ export function executeBucket(
   bucket: Bucket,
   requestContext: RequestTools,
 ): PromiseOrDirect<void> {
-  const distributorBufferSize =
-    requestContext.args.resolvedPreset?.grafast?.distributorBufferSize ??
-    DEFAULT_DISTRIBUTOR_BUFFER_SIZE;
+  const distributorOptions = resolveDistributorOptions(
+    requestContext.args.resolvedPreset?.grafast,
+  );
 
   /**
    * Execute the step directly; since there's no errors we can pass the
@@ -336,7 +337,7 @@ export function executeBucket(
           (valueIsAsyncIterable || valueIsIterable)
         ) {
           // PERF: we've already calculated this once; can we reference that again here?
-          stream = evaluateStream(bucket, finishedStep, distributorBufferSize);
+          stream = evaluateStream(bucket, finishedStep, distributorOptions);
         }
 
         if (!stream && !valueIsAsyncIterable && Array.isArray(rawValue)) {
@@ -403,7 +404,7 @@ export function executeBucket(
             const value = distributor(
               rawValue as AsyncIterable<any> | Iterable<any>,
               finishedStep.dependents.map((d) => d.step),
-              distributorBufferSize,
+              distributorOptions,
             );
             bucket.setResult(finishedStep, resultIndex, value, flags);
           }
@@ -609,7 +610,7 @@ export function executeBucket(
           stopTime,
           meta,
           eventEmitter,
-          stream: evaluateStream(bucket, step, distributorBufferSize),
+          stream: evaluateStream(bucket, step, distributorOptions),
           _bucket: bucket,
           _requestContext: requestContext,
         };
@@ -882,7 +883,7 @@ export function executeBucket(
       count,
       values,
       extra,
-      stream: evaluateStream(bucket, step, distributorBufferSize),
+      stream: evaluateStream(bucket, step, distributorOptions),
     };
     if (!step.isSyncAndSafe && middleware != null) {
       return middleware.run(
@@ -1103,7 +1104,7 @@ export function executeBucket(
         stopTime,
         meta,
         eventEmitter,
-        stream: evaluateStream(bucket, step, distributorBufferSize),
+        stream: evaluateStream(bucket, step, distributorOptions),
         _bucket: bucket,
         _requestContext: requestContext,
       };
@@ -1774,7 +1775,7 @@ function executeStepFromEvent(event: ExecuteStepEvent) {
 function evaluateStream(
   bucket: Bucket,
   step: Step,
-  distributorBufferSize: number,
+  distributorOptions: DistributorOptions,
 ): ExecutionDetailsStream | null {
   const stream = step._stepOptions.stream;
   if (!stream) return null;
@@ -1789,7 +1790,7 @@ function evaluateStream(
     stream.initialCountStepId == null
       ? 0
       : (bucket.store.get(stream.initialCountStepId)?.unaryValue() ?? 0);
-  if (initialCount >= distributorBufferSize) {
+  if (initialCount >= distributorOptions.distributorTargetBufferSize) {
     // It would be unsafe to stream this
     return null;
   }
