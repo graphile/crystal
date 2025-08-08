@@ -205,6 +205,29 @@ export function distributor<TData>(
   }
 
   /**
+   * Gets the next value from the source iterator _and_ checks to see if this
+   * is the result that completes the source iterator.
+   */
+  function getNext(index: number) {
+    if (finalResult !== null) {
+      return finalResult;
+    }
+    const result = Promise.resolve(sourceIterator!.next());
+
+    // Check if iterator is complete
+    result.then(
+      (value) => {
+        if (value.done) {
+          sourceIteratorCompleted(index, result);
+        }
+      },
+      () => void sourceIteratorCompleted(index, result),
+    );
+
+    return result;
+  }
+
+  /**
    * **ONLY CALL THIS** if you've already checked for a terminal result.
    *
    * Called from advance(), returns the relevant iterator result. If
@@ -213,63 +236,54 @@ export function distributor<TData>(
   function yieldValue(
     stepIndex: number,
     index: number,
-    enableDelay = true,
   ): Promise<IteratorResult<TData>> {
+    // !! Function must be synchronous to avoid race conditions !!
+
     const bufferLength = buffer.length;
     /** The index within the buffer that we'd like to retrieve */
     const bufferIndex = index - lowWaterMark;
-    /** Is it our responsibility to pull the next record? */
-    const shouldPullNext = bufferIndex >= bufferLength;
-
-    if (
-      enableDelay &&
-      shouldPullNext &&
-      bufferIndex >= targetBufferSize &&
-      // If terminated, no need to delay
-      finalResult === null
-    ) {
-      if ((bufferIndex - targetBufferSize) % bufferSizeIncrement === 0) {
-        // Whoa there! Getting a little ahead of ourselves! Wait for the slowest
-        // consumer to advance (or for it to time out), then try again.
-        const oldLowWaterMark = lowWaterMark;
-        return Promise.race([
-          lowWaterMarkIncreased(),
-          sleep(pauseDuration),
-        ]).then(() => {
-          const terminal = terminalResult[stepIndex];
-          if (terminal) return terminal;
-          /** Delay again iff the lowWaterMark advanced */
-          const enableDelay = lowWaterMark > oldLowWaterMark;
-          return yieldValue(stepIndex, index, enableDelay);
-        });
-      } else {
-        // The slowest consumer is too slow - race ahead (until the next
-        // `bufferSizeIncrement`)
-      }
-    }
-
-    // !! Below here must be entirely synchronous! !!
 
     let result: Promise<IteratorResult<TData, void>>;
-    if (shouldPullNext) {
+    if (bufferIndex >= bufferLength) {
       // assert.equal(bufferIndex, bufferLength, "We've missed some indexes?!")
       // It's our job to pull the next value!
       // But first... did the source iterator already complete?
       if (finalResult !== null) {
         result = finalResult;
       } else {
-        result = Promise.resolve(sourceIterator!.next());
-        buffer[bufferIndex] = result;
-
-        // See if this is the result that completes sourceIterator
-        result.then(
-          (value) => {
-            if (value.done) {
-              sourceIteratorCompleted(index, result);
-            }
-          },
-          () => void sourceIteratorCompleted(index, result),
-        );
+        if (
+          bufferIndex >= targetBufferSize &&
+          // If this next check fails then the slowest consumer is too slow; we
+          // should race ahead (until the next `bufferSizeIncrement`)
+          (bufferIndex - targetBufferSize) % bufferSizeIncrement === 0
+        ) {
+          // Whoa there! Getting a little ahead of ourselves! Wait for the slowest
+          // consumer to advance (or for it to time out), before resolving.
+          // const oldLowWaterMark = lowWaterMark;
+          const next = Promise.race([
+            lowWaterMarkIncreased(),
+            sleep(pauseDuration),
+          ]).then(
+            // const advanced = lowWaterMark > oldLowWaterMark;
+            // TODO: should we wait a little longer if we did advance so we're
+            // not creating a new timer for each and every low watermark
+            // increase?
+            () => getNext(index),
+          );
+          buffer[bufferIndex] = next;
+          /*
+           * TODO: should we be reflecting the terminalResult here?
+           * ```
+           * const terminal = terminalResult[stepIndex];
+           * if (terminal) return terminal;
+           * // if (finalResult !== null) return finalResult;
+           * ```
+           */
+          result = next;
+        } else {
+          result = getNext(index);
+          buffer[bufferIndex] = result;
+        }
       }
     } else {
       // The next value already exists
