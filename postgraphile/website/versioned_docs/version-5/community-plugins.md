@@ -91,11 +91,6 @@ Schema extension plugins for PostGraphile:
 - [@haathie/postgraphile-otel](https://github.com/haathie/graphile-tools/tree/main/packages/otel) - Plugin for OpenTelemetry Tracing Capabilities for GraphQL Requests. :white_check_mark:
 - [@haathie/postgraphile-reasonable-limits](https://github.com/haathie/graphile-tools/tree/main/packages/reasonable-limits) - Plugin to enforce reasonable limits on queries, preventing excessive data retrieval. :white_check_mark:
 
-
-
-
-
-
 Examples of using these plugins:
 
 - [postgraphile-upload-example](https://github.com/mattbretl/postgraphile-upload-example) -
