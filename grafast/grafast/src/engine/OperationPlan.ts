@@ -5088,21 +5088,12 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
         return;
       }
 
-      // Indicate that this layerPlan must release the relevant distributors if
-      // it skips those indicies.
-      if (lp.distributorDependencies === null) {
-        lp.distributorDependencies = Object.create(null) as {};
-      }
-      const list = (lp.distributorDependencies[distrib.id] ??= []);
-      list.push(sstep.id);
-
+      // Recurse first (throw error on bad assumption)
       switch (lp.reason.type) {
         case "defer":
         case "nullableBoundary":
         case "polymorphic":
-        case "mutationField":
-        case "mutationField":
-        case "subroutine": {
+        case "mutationField": {
           const parentLayerPlan = lp.reason.parentLayerPlan;
           stepDependsOnDistributorInLayerPlan(sstep, distrib, parentLayerPlan);
           break;
@@ -5112,6 +5103,7 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
             `Planning error - could not find path from ${sstep} up to ${distrib}; this is likely a bug in your plan resolvers.`,
           );
         }
+        case "subroutine":
         case "combined":
         case "listItem":
         case "subscription":
@@ -5127,6 +5119,14 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
           );
         }
       }
+
+      // Indicate that this layerPlan must release the relevant distributors if
+      // it skips those indicies.
+      if (lp.distributorDependencies === null) {
+        lp.distributorDependencies = Object.create(null) as {};
+      }
+      const list = (lp.distributorDependencies[distrib.id] ??= []);
+      list.push(sstep.id);
     };
 
     for (const step of this.stepTracker.activeSteps) {

@@ -9,6 +9,7 @@ import {
   FORBIDDEN_BY_NULLABLE_BOUNDARY_FLAGS,
   NO_FLAGS,
 } from "../constants.js";
+import { isDev } from "../dev.js";
 import { isFlaggedValue } from "../error.js";
 import { inspect } from "../inspect.js";
 import type { ExecutionValue, UnaryExecutionValue } from "../interfaces.js";
@@ -604,6 +605,13 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       parentSideEffectValue = null;
     }
 
+    const skippedIndicies =
+      this.distributorDependencies === null ? null : ([] as number[]);
+    const skipIndex =
+      skippedIndicies === null
+        ? null
+        : skippedIndicies.push.bind(skippedIndicies);
+
     let size = 0;
     switch (this.reason.type) {
       case "nullableBoundary": {
@@ -660,6 +668,8 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
                     ev._copyResult(newIndex, orig, originalIndex);
                   }
                 }
+              } else {
+                skipIndex?.(originalIndex);
               }
             }
           }
@@ -739,6 +749,8 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
                   ev._copyResult(newIndex, orig, originalIndex);
                 }
               }
+            } else {
+              skipIndex?.(originalIndex);
             }
           }
         }
@@ -823,6 +835,8 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
                 }
               }
             }
+          } else {
+            skipIndex?.(originalIndex);
           }
         }
 
@@ -878,18 +892,21 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         ) {
           const flags = typenameEV._flagsAt(originalIndex);
           if ((flags & NO_TYPENAME_FLAGS) !== 0) {
+            skipIndex?.(originalIndex);
             continue;
           }
           if (
             parentSideEffectValue !== null &&
             parentSideEffectValue._flagsAt(originalIndex) & FLAG_ERROR
           ) {
+            skipIndex?.(originalIndex);
             continue;
           }
           const polymorphicPath =
             parentBucket.polymorphicPathList.at(originalIndex);
           const typeName = typenameEV.at(originalIndex);
           if (!this.reason.typeNames.includes(typeName)) {
+            skipIndex?.(originalIndex);
             // Search: InvalidConcreteTypeName
             // TODO: should we throw an error?
 
@@ -942,10 +959,12 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             parentSideEffectValue !== null &&
             parentSideEffectValue._flagsAt(originalIndex) & FLAG_ERROR
           ) {
+            skipIndex?.(originalIndex);
             continue;
           }
           const typeName = parentBucket.polymorphicType!.at(originalIndex)!;
           if (!this.reason.typeNames.includes(typeName)) {
+            skipIndex?.(originalIndex);
             continue;
           }
           const newIndex = size++;
@@ -990,7 +1009,36 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     }
 
     if (size > 0) {
-      if (this.distributorDependencies !== null && skippedIndexes !== null) {
+      if (this.distributorDependencies !== null) {
+        if (isDev) {
+          if (this.reason.type === "listItem") {
+            throw new Error(
+              `distributorDependencies should not be set on ${this}`,
+            );
+          }
+          assert.strictEqual(
+            skippedIndicies?.length,
+            parentBucket.size - size,
+            "Incorrectly populated skippedIndicies",
+          );
+        }
+        if (skippedIndicies !== null && skippedIndicies.length > 0) {
+          for (const [distributorStepId, consumerStepIds] of Object.entries(
+            this.distributorDependencies,
+          )) {
+            const distribEV = parentBucket.store.get(
+              Number(distributorStepId),
+            )!;
+            for (const originalIndex of skippedIndicies) {
+              const v = distribEV.at(originalIndex);
+              if (isDistributor(v)) {
+                for (const consumerStepId of consumerStepIds) {
+                  v.releaseIfUnused(consumerStepId);
+                }
+              }
+            }
+          }
+        }
       }
 
       // Reference
