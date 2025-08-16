@@ -406,6 +406,7 @@ export function executeBucket(
               finishedStep.dependents.map((d) => d.step),
               distributorOptions,
             );
+            // TODO: add distributor to cleanup
             bucket.setResult(finishedStep, resultIndex, value, flags);
           }
         } else if (willConsumeAsIterator) {

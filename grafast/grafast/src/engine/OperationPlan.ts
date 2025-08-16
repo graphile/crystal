@@ -5090,8 +5090,11 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
 
       // Indicate that this layerPlan must release the relevant distributors if
       // it skips those indicies.
-      const list = (lp.distributorDependencies ??= []);
-      list.push({ distributorStepId: distrib.id, consumerStepId: sstep.id });
+      if (lp.distributorDependencies === null) {
+        lp.distributorDependencies = Object.create(null) as {};
+      }
+      const list = (lp.distributorDependencies[distrib.id] ??= []);
+      list.push(sstep.id);
 
       switch (lp.reason.type) {
         case "defer":

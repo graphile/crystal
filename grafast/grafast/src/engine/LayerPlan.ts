@@ -15,6 +15,7 @@ import type { ExecutionValue, UnaryExecutionValue } from "../interfaces.js";
 import type { Step, UnbatchedStep } from "../step";
 import type { __ValueStep } from "../steps/index.js";
 import { arrayOfLength, arraysMatch, setsMatch } from "../utils.js";
+import { isDistributor } from "./distributor.js";
 import { batchExecutionValue, newBucket } from "./executeBucket.js";
 import type { OperationPlan } from "./OperationPlan";
 
@@ -323,10 +324,10 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
   /** @internal */
   public children: LayerPlan[] = [];
 
-  public distributorDependencies: null | Array<{
-    distributorStepId: number;
-    consumerStepId: number;
-  }> = null;
+  public distributorDependencies: null | {
+    // Map of all the dependent stepIds for a given distributor step
+    [distributorStepId: number]: number[];
+  } = null;
 
   /** @internal */
   steps: Step[] = [];
@@ -989,6 +990,9 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     }
 
     if (size > 0) {
+      if (this.distributorDependencies !== null && skippedIndexes !== null) {
+      }
+
       // Reference
       const childBucket = newBucket(parentBucket, {
         layerPlan: this,
@@ -1007,6 +1011,27 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
 
       return childBucket;
     } else {
+      if (this.distributorDependencies !== null) {
+        const parentBucketSize = parentBucket.size;
+        for (const [distributorStepId, consumerStepIds] of Object.entries(
+          this.distributorDependencies!,
+        )) {
+          const distribEV = parentBucket.store.get(Number(distributorStepId))!;
+          for (
+            let originalIndex = 0;
+            originalIndex < parentBucketSize;
+            originalIndex++
+          ) {
+            const v = distribEV.at(originalIndex);
+            if (isDistributor(v)) {
+              for (const consumerStepId of consumerStepIds) {
+                v.releaseIfUnused(consumerStepId);
+              }
+            }
+          }
+        }
+      }
+
       return null;
     }
   }
