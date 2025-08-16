@@ -624,7 +624,13 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           } else {
             store.set(itemStepId, fieldValue);
             for (const stepId of copyStepIds) {
-              store.set(stepId, parentBucket.store.get(stepId)!);
+              const ev = parentBucket.store.get(stepId)!;
+              if (ev.isBatch) {
+                // Prepare store with an empty list for each copyPlanId
+                store.set(stepId, batchExecutionValue([]));
+              } else {
+                store.set(stepId, ev);
+              }
             }
             const parentBucketSize = parentBucket.size;
             for (
@@ -641,6 +647,13 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
                 polymorphicPathList[newIndex] =
                   parentBucket.polymorphicPathList[originalIndex];
                 iterators[newIndex] = parentBucket.iterators[originalIndex];
+                for (const stepId of copyStepIds) {
+                  const ev = store.get(stepId)!;
+                  if (ev.isBatch) {
+                    const orig = parentBucket.store.get(stepId)!;
+                    ev._copyResult(newIndex, orig, originalIndex);
+                  }
+                }
               }
             }
           }
