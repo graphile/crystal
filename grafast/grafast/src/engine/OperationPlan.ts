@@ -540,6 +540,9 @@ export class OperationPlan {
 
     this.lap("finalizeOutputPlans");
 
+    this.finalize();
+    this.lap("finalizeOperationPlan");
+
     this.phase = "ready";
     this.resetCache();
 
@@ -5069,6 +5072,71 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
     for (const layerPlan of this.stepTracker.layerPlans) {
       if (layerPlan !== null) {
         layerPlan.finalize();
+      }
+    }
+  }
+
+  private finalize(): void {
+    const stepDependsOnDistributorInLayerPlan = (
+      sstep: Sudo<Step>,
+      distrib: Step,
+      lp: LayerPlan,
+    ) => {
+      if (distrib.layerPlan === lp) {
+        // No need to handle dependencies in same layer plan; this only relates
+        // to handling buckets skipping indexes.
+        return;
+      }
+
+      // Indicate that this layerPlan must release the relevant distributors if
+      // it skips those indicies.
+      const list = (lp.distributorDependencies ??= []);
+      list.push({ distributorStepId: distrib.id, consumerStepId: sstep.id });
+
+      switch (lp.reason.type) {
+        case "defer":
+        case "nullableBoundary":
+        case "polymorphic":
+        case "mutationField":
+        case "mutationField":
+        case "subroutine": {
+          const parentLayerPlan = lp.reason.parentLayerPlan;
+          stepDependsOnDistributorInLayerPlan(sstep, distrib, parentLayerPlan);
+          break;
+        }
+        case "root": {
+          throw new Error(
+            `Planning error - could not find path from ${sstep} up to ${distrib}; this is likely a bug in your plan resolvers.`,
+          );
+        }
+        case "combined":
+        case "listItem":
+        case "subscription":
+        case "polymorphicPartition": {
+          throw new Error(
+            `${sstep} depends on ${distrib} which is marked with 'cloneStreams'; however this dependency crosses a forbidden layer plan boundary at ${lp}`,
+          );
+        }
+        default: {
+          const never: never = lp.reason;
+          throw new Error(
+            `Unhandled layer plan reason ${(never as any)?.type}`,
+          );
+        }
+      }
+    };
+
+    for (const step of this.stepTracker.activeSteps) {
+      const sstep = sudo(step);
+      const distribs = sstep.dependencies.filter((d) => d.cloneStreams);
+      sstep._dependsOnDistributor = distribs.length > 0;
+      if (distribs.length > 0) {
+        sstep._dependsOnDistributor = true;
+        for (const distrib of distribs) {
+          stepDependsOnDistributorInLayerPlan(sstep, distrib, sstep.layerPlan);
+        }
+      } else {
+        sstep._dependsOnDistributor = false;
       }
     }
   }

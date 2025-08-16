@@ -323,6 +323,11 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
   /** @internal */
   public children: LayerPlan[] = [];
 
+  public distributorDependencies: null | Array<{
+    distributorStepId: number;
+    consumerStepId: number;
+  }> = null;
+
   /** @internal */
   steps: Step[] = [];
   /** @internal */

@@ -306,6 +306,14 @@ export /* abstract */ class Step<TData = any> {
   public cloneStreams: boolean;
 
   /**
+   * True if one of our dependencies has cloneStreams set. Only populated
+   * during `operationPlan.finalize()`.
+   *
+   * @internal
+   **/
+  public _dependsOnDistributor = false;
+
+  /**
    * DO NOT USE! (Specifically exists so that very VERY special steps could
    * override it if they so wished.)
    *
