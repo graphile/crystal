@@ -398,6 +398,7 @@ function executePreemptive(
     });
     const bucketPromise = executeBucket(subscriptionBucket, requestContext);
     function outputStreamBucket() {
+      // NOTE: this is the root output plan for a subscription operation.
       const [ctx, result] = outputBucket(
         operationPlan.rootOutputPlan,
         subscriptionBucket,
@@ -527,6 +528,7 @@ function executePreemptive(
       return iterator;
     }
 
+    // NOTE: this is the root output plan of a query/mutation operation
     const [ctx, result] = outputBucket(
       operationPlan.rootOutputPlan,
       rootBucket,
@@ -846,6 +848,7 @@ async function processStream(
       const promises: PromiseLike<any>[] = [];
       for (let bucketIndex = 0; bucketIndex < size; bucketIndex++) {
         const actualIndex = entries[bucketIndex][1];
+        // NOTE: this is a stream, so rootBucket.reason.type === 'listItem'
         const [ctx, result] = outputBucket(
           spec.outputPlan,
           rootBucket,
@@ -1014,6 +1017,8 @@ function processSingleDeferred(
     const promises: PromiseLike<any>[] = [];
     for (let bucketIndex = 0; bucketIndex < size; bucketIndex++) {
       const [iterator, spec] = specs[bucketIndex];
+      // NOTE: this is a deferred output plan, so it'll be a `defer` bucket and
+      // an `object` outputPlan
       const [ctx, result] = outputBucket(
         spec.outputPlan,
         rootBucket,
