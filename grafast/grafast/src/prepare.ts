@@ -656,7 +656,6 @@ export function grafastPrepare(
 
   const executionTimeout = options.timeouts?.execution ?? null;
   const abortController = new AbortController();
-  let handled = false;
   try {
     const result = executePreemptive(
       args,
@@ -668,65 +667,21 @@ export function grafastPrepare(
       executionTimeout,
       abortController.signal,
     );
-    /**
-     * The promise has been resolved, but this may still be an AsyncGenerator.
-     * If so, wrap it so that we know when the generator completes.
-     */
-    const handleMaybeIterator = (
-      result:
-        | graphql.ExecutionResult
-        | AsyncGenerator<graphql.AsyncExecutionResult, void, void>,
-    ) => {
-      if (Symbol.asyncIterator in result) {
-        const iterator = result[Symbol.asyncIterator]();
-        const done = (e?: unknown) => abortController.abort(e);
-        const checkDone = (r: IteratorResult<any>) => {
-          if (r.done) done();
-        };
-        return {
-          [Symbol.asyncIterator]() {
-            return this;
-          },
-          [Symbol.asyncDispose]() {
-            return iterator[Symbol.asyncDispose]();
-          },
-          next() {
-            const v = iterator.next();
-            v.then(checkDone, done);
-            return v;
-          },
-          return() {
-            done();
-            return iterator.return();
-          },
-          throw(e: unknown) {
-            done(e);
-            return iterator.throw(e);
-          },
-        };
-      } else {
-        abortController.abort();
-        return result;
-      }
-    };
     if (isPromiseLike(result)) {
       result.then(
-        (v) => handleMaybeIterator(v),
+        (v) => handleMaybeIterator(abortController, v),
         (e) => abortController.abort(e),
       );
       // NOTE: abortController.abort() will never throw (even if event
       // listeners throw), so we do not need a `.then(null, noop)`
 
-      handled = true;
       return result;
     } else {
-      handled = true;
-      return handleMaybeIterator(result);
+      return handleMaybeIterator(abortController, result);
     }
-  } finally {
-    if (!handled) {
-      abortController.abort();
-    }
+  } catch (e) {
+    abortController.abort(e);
+    throw e;
   }
 }
 
@@ -1221,5 +1176,48 @@ function processDeferred(
       setTimeout(processBatchNotAsString, 1);
     }
     return nextBatchNotAsString;
+  }
+}
+
+/**
+ * The promise has been resolved, but this may still be an AsyncGenerator.
+ * If so, wrap it so that we know when the generator completes.
+ */
+function handleMaybeIterator(
+  abortController: AbortController,
+  result:
+    | graphql.ExecutionResult
+    | AsyncGenerator<graphql.AsyncExecutionResult, void, void>,
+) {
+  if (Symbol.asyncIterator in result) {
+    const iterator = result[Symbol.asyncIterator]();
+    const done = (e?: unknown) => abortController.abort(e);
+    const checkDone = (r: IteratorResult<any>) => {
+      if (r.done) done();
+    };
+    return {
+      [Symbol.asyncIterator]() {
+        return this;
+      },
+      [Symbol.asyncDispose]() {
+        return iterator[Symbol.asyncDispose]();
+      },
+      next() {
+        const v = iterator.next();
+        v.then(checkDone, done);
+        return v;
+      },
+      return() {
+        done();
+        return iterator.return();
+      },
+      throw(e: unknown) {
+        done(e);
+        return iterator.throw(e);
+      },
+    };
+  } else {
+    abortController.abort();
+    return result;
   }
 }
