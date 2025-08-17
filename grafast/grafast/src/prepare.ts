@@ -668,14 +668,13 @@ export function grafastPrepare(
       abortController.signal,
     );
     if (isPromiseLike(result)) {
-      result.then(
+      return result.then(
         (v) => handleMaybeIterator(abortController, v),
-        (e) => abortController.abort(e),
+        (e) => {
+          abortController.abort(e);
+          return Promise.reject(e);
+        },
       );
-      // NOTE: abortController.abort() will never throw (even if event
-      // listeners throw), so we do not need a `.then(null, noop)`
-
-      return result;
     } else {
       return handleMaybeIterator(abortController, result);
     }

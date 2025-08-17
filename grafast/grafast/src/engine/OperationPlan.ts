@@ -5135,8 +5135,16 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
       sstep._dependsOnDistributor = distribs.length > 0;
       if (distribs.length > 0) {
         sstep._dependsOnDistributor = true;
-        for (const distrib of distribs) {
-          stepDependsOnDistributorInLayerPlan(sstep, distrib, sstep.layerPlan);
+        if (step instanceof __ItemStep) {
+          // Ignore this special dependency type
+        } else {
+          for (const distrib of distribs) {
+            stepDependsOnDistributorInLayerPlan(
+              sstep,
+              distrib,
+              sstep.layerPlan,
+            );
+          }
         }
       } else {
         sstep._dependsOnDistributor = false;
