@@ -1047,6 +1047,7 @@ function processSingleDeferred(
         promises.push(promise);
       }
     }
+    cleanupDistributors(rootBucket);
     if (promises.length !== 0) {
       return Promise.all(promises).then(noop);
     }
@@ -1057,6 +1058,28 @@ function processSingleDeferred(
   } else {
     return output();
   }
+}
+
+function cleanupDistributors(bucket: Bucket) {
+  /*
+   * Our job is to release all distributors created during executeBucket that
+   * will not be referenced via ctx.root.queue or ctx.root.streams
+   *
+   * By the time we get here, `ctx.root.streams` will already be initialized
+   * streams (async iterators - not necessarily iterables), so we can treat
+   * those as already handled, and it's forbidden to reference distributors
+   * across listItem boundaries so no concerns here.
+   *
+   * Thus, we just need to clean up all distributors created during
+   * `executeBucket` (including from descendents) _except_ for those that are
+   * in deferred buckets that we're about to visit. `ctx.root.queue` is an
+   * array of `SubsequentPayloadSpec` which details the bucket and bucketIndex
+   * that will be handled via defer; so we want to clear out any that aren't
+   * referenced by this bucket/bucketIndex.
+   *
+   * However, it's possible for the bucket to reference them more than once
+   * (e.g. a deferred bucket might reference `startCursor` and `endCursor`).
+   */
 }
 
 function processBatches(
