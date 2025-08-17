@@ -404,6 +404,7 @@ export function executeBucket(
             const value = distributor(
               rawValue as AsyncIterable<any> | Iterable<any>,
               finishedStep.dependents.map((d) => d.step),
+              requestContext.abortSignal,
               distributorOptions,
             );
             // TODO: add distributor to cleanup

@@ -287,8 +287,8 @@ it(
               // We want to cache at most 3 records; this will hang waiting for new
               // records if the skipped steps are not handled
               distributorTargetBufferSize: 3,
-              // Must be longer than the test timeout
-              distributorPauseDuration: 5001,
+              // Must be less than the test timeout
+              distributorPauseDuration: 10,
             },
           },
         ],
@@ -385,8 +385,8 @@ it(
             grafast: {
               // For this test to be meaningful, this must be < 11
               distributorTargetBufferSize: 8,
-              // Must be longer than the test timeout
-              distributorPauseDuration: 5001,
+              // Must be less than the test timeout
+              distributorPauseDuration: 10,
             },
           },
         ],

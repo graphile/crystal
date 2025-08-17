@@ -4,9 +4,9 @@ import { defer } from "../deferred";
 import type { Step } from "../step";
 import { sleep } from "../utils";
 
-const DEFAULT_DISTRIBUTOR_BUFFER_SIZE = 250;
-const DEFAULT_DISTRIBUTOR_BUFFER_SIZE_INCREMENT = 250;
-const DEFAULT_DISTRIBUTOR_PAUSE_DURATION = 25; // milliseconds
+const DEFAULT_DISTRIBUTOR_BUFFER_SIZE = 1001;
+const DEFAULT_DISTRIBUTOR_BUFFER_SIZE_INCREMENT = 1001;
+const DEFAULT_DISTRIBUTOR_PAUSE_DURATION = 5; // milliseconds
 
 const $$isDistributor = Symbol("$$isDistributor");
 
@@ -42,6 +42,7 @@ export function distributor<TData>(
     | AsyncIterable<TData, void, never>
     | Iterable<TData, void, never>,
   dependentSteps: readonly Step[],
+  abortSignal: AbortSignal,
   distributorOptions: DistributorOptions,
 ): Distributor<TData> {
   const {
@@ -341,20 +342,33 @@ export function distributor<TData>(
           : sourceIterable[Symbol.iterator]();
     }
 
-    const iterator: AsyncIterableIterator<TData, void, never> = {
+    const onAbort = () => {
+      iterator.return();
+    };
+    const iterator = {
       [Symbol.asyncIterator]() {
         return this;
       },
-      next: () => advance(stepIndex),
-      return: () => stop(stepIndex),
-      throw: (e) => stop(stepIndex, e),
-    };
+      next() {
+        return advance(stepIndex);
+      },
+      return() {
+        abortSignal.removeEventListener("abort", onAbort);
+        return stop(stepIndex);
+      },
+      throw(e) {
+        abortSignal.removeEventListener("abort", onAbort);
+        return stop(stepIndex, e);
+      },
+    } satisfies AsyncIterableIterator<TData, void, never>;
+
+    abortSignal.addEventListener("abort", onAbort);
 
     return iterator;
   }
 
   const hasIterator = dependentSteps.map(() => false);
-  return {
+  const distributor: Distributor<TData> = {
     [$$isDistributor]: true,
     iterableFor(stepId) {
       const stepIndex = getStepIndex(stepId);
@@ -378,6 +392,12 @@ export function distributor<TData>(
       }
     },
   };
+  abortSignal.addEventListener("abort", () => {
+    for (const step of dependentSteps) {
+      distributor.releaseIfUnused(step.id);
+    }
+  });
+  return distributor;
 }
 
 export type DistributorOptions = Required<
