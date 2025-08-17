@@ -123,9 +123,6 @@ export function distributor<TData>(
   // Stop us retaining data we don't need to retain
   function maybeAdvanceLowWaterMark() {
     if (stopped) {
-      console.warn(
-        `Attempted to advance low water mark after distributor completed for steps: ${dependentSteps}`,
-      );
       return;
     }
     const smallest = Math.min(...deliveredIndex);
