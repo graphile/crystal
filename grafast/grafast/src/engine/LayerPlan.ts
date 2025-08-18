@@ -12,7 +12,11 @@ import {
 import { isDev } from "../dev.js";
 import { isFlaggedValue } from "../error.js";
 import { inspect } from "../inspect.js";
-import type { ExecutionValue, UnaryExecutionValue } from "../interfaces.js";
+import type {
+  BatchExecutionValue,
+  ExecutionValue,
+  UnaryExecutionValue,
+} from "../interfaces.js";
 import type { Step, UnbatchedStep } from "../step";
 import type { __ValueStep } from "../steps/index.js";
 import { arrayOfLength, arraysMatch, setsMatch } from "../utils.js";
@@ -637,13 +641,16 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             size = 0;
           } else {
             store.set(itemStepId, fieldValue);
+            const batchCopy: BatchCopy = [];
             for (const stepId of copyStepIds) {
-              const ev = parentBucket.store.get(stepId)!;
-              if (ev.isBatch) {
+              const orig = parentBucket.store.get(stepId)!;
+              if (orig.isBatch) {
                 // Prepare store with an empty list for each copyPlanId
-                store.set(stepId, batchExecutionValue([]));
-              } else {
+                const ev = batchExecutionValue([]);
                 store.set(stepId, ev);
+                batchCopy.push({ orig, ev });
+              } else {
+                store.set(stepId, orig);
               }
             }
             const parentBucketSize = parentBucket.size;
@@ -661,12 +668,8 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
                 polymorphicPathList[newIndex] =
                   parentBucket.polymorphicPathList[originalIndex];
                 iterators[newIndex] = parentBucket.iterators[originalIndex];
-                for (const stepId of copyStepIds) {
-                  const ev = store.get(stepId)!;
-                  if (ev.isBatch) {
-                    const orig = parentBucket.store.get(stepId)!;
-                    ev._copyResult(newIndex, orig, originalIndex);
-                  }
+                for (const { orig, ev } of batchCopy) {
+                  ev._copyResult(newIndex, orig, originalIndex);
                 }
               } else {
                 skipIndex?.(originalIndex);
@@ -700,14 +703,17 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         } else {
           const ev = batchExecutionValue([]);
           store.set(itemStepId, ev);
+          const batchCopy: BatchCopy = [];
 
           for (const stepId of copyStepIds) {
-            const ev = parentBucket.store.get(stepId)!;
-            if (ev.isBatch) {
+            const orig = parentBucket.store.get(stepId)!;
+            if (orig.isBatch) {
               // Prepare store with an empty list for each copyPlanId
-              store.set(stepId, batchExecutionValue([]));
-            } else {
+              const ev = batchExecutionValue([]);
               store.set(stepId, ev);
+              batchCopy.push({ orig, ev });
+            } else {
+              store.set(stepId, orig);
             }
           }
 
@@ -742,12 +748,8 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
               polymorphicPathList[newIndex] =
                 parentBucket.polymorphicPathList[originalIndex];
               iterators[newIndex] = parentBucket.iterators[originalIndex];
-              for (const stepId of copyStepIds) {
-                const ev = store.get(stepId)!;
-                if (ev.isBatch) {
-                  const orig = parentBucket.store.get(stepId)!;
-                  ev._copyResult(newIndex, orig, originalIndex);
-                }
+              for (const { orig, ev } of batchCopy) {
+                ev._copyResult(newIndex, orig, originalIndex);
               }
             } else {
               skipIndex?.(originalIndex);
@@ -780,15 +782,18 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         }
         const ev = batchExecutionValue([] as any[]);
         store.set(itemStepId, ev);
+        const batchCopy: BatchCopy = [];
 
         for (const stepId of copyStepIds) {
           // Deliberate shadowing
-          const ev = parentBucket.store.get(stepId)!;
-          if (ev.isBatch) {
+          const orig = parentBucket.store.get(stepId)!;
+          if (orig.isBatch) {
             // Prepare store with an empty list for each copyPlanId
-            store.set(stepId, batchExecutionValue([]));
-          } else {
+            const ev = batchExecutionValue([]);
             store.set(stepId, ev);
+            batchCopy.push({ orig, ev });
+          } else {
+            store.set(stepId, orig);
           }
         }
 
@@ -827,12 +832,8 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
               polymorphicPathList[newIndex] =
                 parentBucket.polymorphicPathList[originalIndex];
               iterators[newIndex] = parentBucket.iterators[originalIndex];
-              for (const stepId of copyStepIds) {
-                const ev = store.get(stepId)!;
-                if (ev.isBatch) {
-                  const orig = parentBucket.store.get(stepId)!;
-                  ev._copyResult(newIndex, orig, originalIndex);
-                }
+              for (const { orig, ev } of batchCopy) {
+                ev._copyResult(newIndex, orig, originalIndex);
               }
             }
           } else {
@@ -865,10 +866,10 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           );
         }
 
-        const batchCopyStepIds = [];
+        const batchCopy: BatchCopy = [];
         for (const stepId of copyStepIds) {
-          const ev = parentBucket.store.get(stepId);
-          if (!ev) {
+          const orig = parentBucket.store.get(stepId);
+          if (!orig) {
             throw new Error(
               `GrafastInternalError<548f0d84-4556-4189-8655-fb16aa3345a6>: new bucket for ${this} wants to copy ${this.operationPlan.dangerouslyGetStep(
                 stepId,
@@ -877,11 +878,12 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
               } doesn't contain that plan`,
             );
           }
-          if (ev.isBatch) {
-            batchCopyStepIds.push(stepId);
-            store.set(stepId, batchExecutionValue([]));
-          } else {
+          if (orig.isBatch) {
+            const ev = batchExecutionValue([]);
             store.set(stepId, ev);
+            batchCopy.push({ orig, ev });
+          } else {
+            store.set(stepId, orig);
           }
         }
 
@@ -919,9 +921,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             (polymorphicPath ?? "") + ">" + typeName;
           polymorphicType![newIndex] = typeName;
           iterators[newIndex] = parentBucket.iterators[originalIndex];
-          for (const planId of batchCopyStepIds) {
-            const ev = store.get(planId)!;
-            const orig = parentBucket.store.get(planId)!;
+          for (const { orig, ev } of batchCopy) {
             ev._copyResult(newIndex, orig, originalIndex);
           }
         }
@@ -930,10 +930,10 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       }
       case "polymorphicPartition": {
         // Similar to polymorphic
-        const batchCopyStepIds = [];
+        const batchCopy: BatchCopy = [];
         for (const stepId of copyStepIds) {
-          const ev = parentBucket.store.get(stepId);
-          if (!ev) {
+          const orig = parentBucket.store.get(stepId);
+          if (!orig) {
             throw new Error(
               `GrafastInternalError<548f0d84-4556-4189-8655-fb16aa3345a6>: new bucket for ${this} wants to copy ${this.operationPlan.dangerouslyGetStep(
                 stepId,
@@ -942,11 +942,12 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
               } doesn't contain that plan`,
             );
           }
-          if (ev.isBatch) {
-            batchCopyStepIds.push(stepId);
-            store.set(stepId, batchExecutionValue([]));
-          } else {
+          if (orig.isBatch) {
+            const ev = batchExecutionValue([]);
             store.set(stepId, ev);
+            batchCopy.push({ orig, ev });
+          } else {
+            store.set(stepId, orig);
           }
         }
 
@@ -972,9 +973,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           polymorphicPathList[newIndex] =
             parentBucket.polymorphicPathList.at(originalIndex)!;
           iterators[newIndex] = parentBucket.iterators[originalIndex];
-          for (const planId of batchCopyStepIds) {
-            const ev = store.get(planId)!;
-            const orig = parentBucket.store.get(planId)!;
+          for (const { orig, ev } of batchCopy) {
             ev._copyResult(newIndex, orig, originalIndex);
           }
         }
@@ -1313,3 +1312,15 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     });
   }
 }
+
+/**
+ * When we're copying from an `orig` execution to a new `ev` we store them both
+ * like this to avoid having to look up the underlying values via their
+ * `stepId` over and over again.
+ */
+type BatchCopy = Array<{
+  // We could add the `stepId` here, but nothing ever needs it.
+  // stepId: number
+  orig: BatchExecutionValue;
+  ev: BatchExecutionValue;
+}>;
