@@ -478,6 +478,18 @@ export function planToMermaid(
   }
 
   let firstSideEffect = true;
+  const recursivelyDependsOnSideEffect = (
+    dependentId: number | string,
+    sideEffectId: number | string,
+  ): boolean => {
+    const step = stepById[dependentId];
+    return step.dependencyIds.some(
+      (stepId) =>
+        stepId === sideEffectId ||
+        stepById[stepId].implicitSideEffectStepId === sideEffectId ||
+        recursivelyDependsOnSideEffect(stepId, sideEffectId),
+    );
+  };
   sortedSteps.forEach((step) => {
     if (step.implicitSideEffectStepId) {
       if (firstSideEffect) {
@@ -487,12 +499,7 @@ export function planToMermaid(
       }
       // Only add it if our parent doesn't already have it
       if (
-        !step.dependencyIds.some(
-          (stepId) =>
-            stepId === step.implicitSideEffectStepId ||
-            stepById[stepId].implicitSideEffectStepId ===
-              step.implicitSideEffectStepId,
-        )
+        !recursivelyDependsOnSideEffect(step.id, step.implicitSideEffectStepId)
       ) {
         const sideEffectStep = stepById[step.implicitSideEffectStepId];
         graph.push(`    ${planId(sideEffectStep)} -.-o ${planId(step)}`);
