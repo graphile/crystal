@@ -4515,14 +4515,14 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
     const ensurePlanAvailableInLayer = (
       dep: Step,
       layerPlan: LayerPlan,
-      reason: () => string,
+      reasonCb: null | (() => string),
     ): void => {
       let currentLayerPlan: LayerPlan | null = layerPlan;
 
       while (dep.layerPlan !== currentLayerPlan) {
         if (currentLayerPlan.reason.type === "root") {
           throw new Error(
-            `GrafastInternalError<7f3ce201-810c-4639-8e69-f44a95221c6d>: reached root whilst ensuring ${dep} is available in ${layerPlan} (${reason()})`,
+            `GrafastInternalError<7f3ce201-810c-4639-8e69-f44a95221c6d>: reached root whilst ensuring ${dep} is available in ${layerPlan}${reasonCb ? ` (${reasonCb()})` : ""}`,
           );
         }
         if (currentLayerPlan.copyStepIds.includes(dep.id)) {
@@ -4551,7 +4551,7 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
             } else if (
               layerPlanHeirarchyContains(parentLayerPlan, dep.layerPlan)
             ) {
-              ensurePlanAvailableInLayer(dep, parentLayerPlan, reason);
+              ensurePlanAvailableInLayer(dep, parentLayerPlan, reasonCb);
             }
           }
           if (currentLayerPlan == null) {
@@ -4938,13 +4938,17 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
           continue;
         }
         for (const dep of sudo(step).dependencies) {
-          ensurePlanAvailableInLayer(dep, layerPlan, () => `${step} (dep)`);
+          ensurePlanAvailableInLayer(
+            dep,
+            layerPlan,
+            isDev ? () => `${step} (dep)` : null,
+          );
         }
         if (step.implicitSideEffectStep) {
           ensurePlanAvailableInLayer(
             step.implicitSideEffectStep,
             layerPlan,
-            () => `${step} (side effect)`,
+            isDev ? () => `${step} (side effect)` : null,
           );
         }
       }
@@ -4954,7 +4958,7 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
         ensurePlanAvailableInLayer(
           $root,
           layerPlan,
-          () => `${layerPlan}.rootStep`,
+          isDev ? () => `${layerPlan}.rootStep` : null,
         );
 
         // If $root explicitly dependends on `layerPlan.parentSideEffectStep`
@@ -4987,7 +4991,7 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
           ensurePlanAvailableInLayer(
             $sideEffect,
             layerPlan.reason.parentLayerPlan,
-            () => `${layerPlan}.parentSideEffectStep`,
+            isDev ? () => `${layerPlan}.parentSideEffectStep` : null,
           );
         }
       }
@@ -4998,7 +5002,7 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
         ensurePlanAvailableInLayer(
           parentStep,
           layerPlan,
-          () => `${layerPlan} poly`,
+          isDev ? () => `${layerPlan} poly` : null,
         );
       }
 
@@ -5008,7 +5012,7 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
         ensurePlanAvailableInLayer(
           parentStep,
           layerPlan.reason.parentLayerPlan,
-          () => `${layerPlan} listItem`,
+          isDev ? () => `${layerPlan} listItem` : null,
         );
         const stream = layerPlan.reason.stream;
         if (stream != null) {
@@ -5016,21 +5020,21 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
             ensurePlanAvailableInLayer(
               this.stepTracker.getStepById(stream.initialCountStepId),
               layerPlan.reason.parentLayerPlan,
-              () => `${layerPlan} stream`,
+              isDev ? () => `${layerPlan} stream` : null,
             );
           }
           if (stream.ifStepId) {
             ensurePlanAvailableInLayer(
               this.stepTracker.getStepById(stream.ifStepId),
               layerPlan.reason.parentLayerPlan,
-              () => `${layerPlan} stream 2`,
+              isDev ? () => `${layerPlan} stream 2` : null,
             );
           }
           if (stream.labelStepId) {
             ensurePlanAvailableInLayer(
               this.stepTracker.getStepById(stream.labelStepId),
               layerPlan.reason.parentLayerPlan,
-              () => `${layerPlan} stream 3`,
+              isDev ? () => `${layerPlan} stream 3` : null,
             );
           }
         }
@@ -5053,7 +5057,7 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
             ensurePlanAvailableInLayer(
               step,
               sourceLayerPlan,
-              () => `${layerPlan} combo`,
+              isDev ? () => `${layerPlan} combo` : null,
             );
           }
         }
@@ -5065,7 +5069,7 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
       ensurePlanAvailableInLayer(
         outputPlan.rootStep,
         outputPlan.layerPlan,
-        () => `${outputPlan} output plan root step`,
+        isDev ? () => `${outputPlan} output plan root step` : null,
       );
     });
 
