@@ -3295,9 +3295,15 @@ export class OperationPlan {
     }
 
     let replacementStep: Step = step;
+
+    /** Cache the stepLayerPlan because hoist/pushDown may change it! */
+    const stepOriginalLayerPlan = step.layerPlan;
+
+    const $sideEffect = stepOriginalLayerPlan.latestSideEffectStep;
     try {
+      stepOriginalLayerPlan.latestSideEffectStep = step.implicitSideEffectStep;
       replacementStep = withGlobalLayerPlan(
-        step.layerPlan,
+        stepOriginalLayerPlan,
         step.polymorphicPaths,
         null,
         null,
@@ -3311,7 +3317,10 @@ export class OperationPlan {
         e,
       );
       throw e;
+    } finally {
+      stepOriginalLayerPlan.latestSideEffectStep = $sideEffect;
     }
+
     if (!replacementStep) {
       throw new Error(
         `The callback did not return a step during ${actionDescription}`,

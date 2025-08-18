@@ -416,24 +416,24 @@ export /* abstract */ class Step<TData = any> {
   }
 
   protected withMyLayerPlan<T>(callback: () => T): T {
-    return withGlobalLayerPlan(
-      this.layerPlan,
-      this.polymorphicPaths,
-      null,
-      null,
-      callback,
-    );
+    const $sideEffect = this.layerPlan.latestSideEffectStep;
+    try {
+      this.layerPlan.latestSideEffectStep = this.implicitSideEffectStep;
+      return withGlobalLayerPlan(
+        this.layerPlan,
+        this.polymorphicPaths,
+        null,
+        null,
+        callback,
+      );
+    } finally {
+      this.layerPlan.latestSideEffectStep = $sideEffect;
+    }
   }
 
   /** @experimental */
   public withLayerPlan<T>(callback: () => T): T {
-    return withGlobalLayerPlan(
-      this.layerPlan,
-      this.polymorphicPaths,
-      null,
-      null,
-      callback,
-    );
+    return this.withMyLayerPlan(callback);
   }
 
   protected getStep(id: number): Step {
