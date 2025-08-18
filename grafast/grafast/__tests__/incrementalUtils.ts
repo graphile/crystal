@@ -185,3 +185,9 @@ export function assertIterable<T, TReturn, TNext>(
 ): asserts stream is AsyncIterable<T, TReturn, TNext> {
   expect(stream).to.have.property(Symbol.asyncIterator).that.is.a("function");
 }
+
+export function assertNotIterable<T>(
+  stream: AsyncIterable<any> | AsyncGenerator<any> | T,
+): asserts stream is T {
+  expect(stream).not.to.have.property(Symbol.asyncIterator);
+}

@@ -136,20 +136,19 @@ export function distributor<TData>(
       }
 
       if (!sourceIterator) {
-        // We never started the iterator... do we need to?
-        // For now, lets' start and then immediately terminate it
-        sourceIterator =
-          Symbol.asyncIterator in sourceIterable
-            ? sourceIterable[Symbol.asyncIterator]()
-            : sourceIterable[Symbol.iterator]();
-      }
-
-      if (sourceIterator.return) {
+        // We never started the iterator, so there's nothing
+        // to clean up. (All initial work for an async
+        // iterable should be done on the iterables first
+        // `next()` call - if `next()` is never called, then
+        // no action should have been taken.)
+      } else if (sourceIterator.return) {
         sourceIterator.return();
       } else if (sourceIterator?.throw) {
         sourceIterator.throw(new Error("Stop"));
       } else {
-        // Just ignore it? Or do we need to call `.next()` indefinitely?
+        // Just ignore it? Or do we need to call `.next()`
+        // indefinitely?
+        //
         // Since it could be infinite, the next chain doesn't make sense, so
         // we'll just stop.
       }

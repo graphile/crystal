@@ -17,6 +17,7 @@ import {
 import { planToMermaid } from "../dist/mermaid.js";
 import {
   assertIterable,
+  assertNotIterable,
   resolveStreamDefer,
   streamToArray,
 } from "./incrementalUtils.js";
@@ -36,8 +37,8 @@ const schema = makeGrafastSchema({
       connection(max: Int! = 100): FibConnection
     }
     type FibConnection {
-      edges: [FibEdge]
-      nodes: [Fib]
+      edges(throw: Boolean! = false): [FibEdge]
+      nodes(throw: Boolean! = false): [Fib]
       pageInfo(throw: Boolean! = false): PageInfo
     }
     type FibEdge {
@@ -74,6 +75,22 @@ const schema = makeGrafastSchema({
           });
           return get($connection, "pageInfo");
         },
+        edges($connection, { $throw }) {
+          sideEffect($throw, (t) => {
+            if (t) {
+              throw new Error(`Throw in edges requested!`);
+            }
+          });
+          return get($connection, "edges");
+        },
+        nodes($connection, { $throw }) {
+          sideEffect($throw, (t) => {
+            if (t) {
+              throw new Error(`Throw in nodes requested!`);
+            }
+          });
+          return get($connection, "nodes");
+        },
       },
     },
   },
@@ -88,25 +105,92 @@ const fibonacciLoader = loadManyCallback((maxes: readonly number[]) => {
   return maxes.map((max) => fibonacci(max));
 });
 
+async function* fibonacciReal(max: number) {
+  let index = 0;
+  let a = 0;
+  let b = 1;
+  while (b < max) {
+    await sleep(1);
+    yield { index: index++, value: b };
+    const c = a + b;
+    a = b;
+    b = c;
+  }
+}
+
+let getIteratorCount = 0;
 let startCount = 0;
 let endCount = 0;
+let nextCount = 0;
 
-async function* fibonacci(max: number) {
-  startCount++;
-  try {
-    let index = 0;
-    let a = 0;
-    let b = 1;
-    while (b < max) {
-      await sleep(1);
-      yield { index: index++, value: b };
-      const c = a + b;
-      a = b;
-      b = c;
-    }
-  } finally {
-    endCount++;
-  }
+beforeEach(() => {
+  getIteratorCount = 0;
+  startCount = 0;
+  endCount = 0;
+  nextCount = 0;
+});
+
+/**
+ * We want to ensure that the iterator is released even if `.next()` is never
+ * called; so we monkey patch the iterator.
+ */
+function fibonacci(max: number): ReturnType<typeof fibonacciReal> {
+  const iterator = fibonacciReal(max);
+  let first = true;
+  let done = false;
+
+  return {
+    [Symbol.asyncIterator]() {
+      getIteratorCount++;
+      const it2 = iterator[Symbol.asyncIterator]();
+      expect(it2).to.equal(iterator);
+      return this;
+    },
+    [Symbol.asyncDispose]() {
+      if (!done) {
+        endCount++;
+        done = true;
+      }
+      return iterator[Symbol.asyncDispose]();
+    },
+    return(...args) {
+      if (!done) {
+        endCount++;
+        done = true;
+      }
+      return iterator.return(...args);
+    },
+    throw(...args) {
+      if (!done) {
+        endCount++;
+        done = true;
+      }
+      return iterator.throw(...args);
+    },
+    next(...args) {
+      if (first) {
+        startCount++;
+        first = false;
+      }
+      nextCount++;
+      const result = iterator.next(...args);
+      Promise.resolve(result).then(
+        () => {
+          if (!done) {
+            endCount++;
+            done = true;
+          }
+        },
+        (_e) => {
+          if (!done) {
+            endCount++;
+            done = true;
+          }
+        },
+      );
+      return result;
+    },
+  };
 }
 
 function throwOnUnhandledRejections(callback: () => Promise<void>) {
@@ -129,11 +213,6 @@ function throwOnUnhandledRejections(callback: () => Promise<void>) {
     }
   };
 }
-
-beforeEach(() => {
-  startCount = 0;
-  endCount = 0;
-});
 
 it(
   "happy path",
@@ -338,6 +417,92 @@ it(
     });
     expect(startCount).to.equal(1);
     expect(endCount).to.equal(1);
+  }),
+);
+
+it(
+  "handles everything throwing",
+  throwOnUnhandledRejections(async () => {
+    const source = /* GraphQL */ `
+      {
+        connection {
+          edges(throw: true) @stream(initialCount: 1) {
+            cursor
+            node {
+              index
+              value
+            }
+          }
+          pageInfo(throw: true) {
+            ... @defer {
+              hasNextPage
+            }
+            ... @defer {
+              hasPreviousPage
+            }
+            ... @defer {
+              startCursor
+            }
+            ... @defer {
+              endCursor
+            }
+          }
+          nodes(throw: true) @stream(initialCount: 2) {
+            index
+            value
+          }
+        }
+      }
+    `;
+    const result = await grafast({
+      schema,
+      requestContext,
+      resolvedPreset: resolvePreset({
+        extends: [
+          resolvedPreset,
+          {
+            grafast: {
+              // We want to cache at most 3 records; this will hang waiting for new
+              // records if the skipped steps are not handled
+              distributorTargetBufferSize: 3,
+              // Must be less than the test timeout
+              distributorPauseDuration: 10,
+            },
+          },
+        ],
+      }),
+      source,
+    });
+
+    // No incremental!
+    assertNotIterable(result);
+
+    expect(result.data).to.deep.equal({
+      connection: {
+        edges: null,
+        nodes: null,
+        pageInfo: null, // Because: error
+      },
+    });
+    expect(result.errors).to.have.length(3);
+    expect(result.errors![0].toJSON()).to.deep.include({
+      message: "Throw in edges requested!",
+      path: ["connection", "edges"],
+    });
+    expect(result.errors![1].toJSON()).to.deep.include({
+      message: "Throw in pageInfo requested!",
+      path: ["connection", "pageInfo"],
+    });
+    expect(result.errors![2].toJSON()).to.deep.include({
+      message: "Throw in nodes requested!",
+      path: ["connection", "nodes"],
+    });
+    // The iterator should never be started, since nothing ever
+    // consumes it.
+    expect(getIteratorCount).to.equal(0);
+    expect(startCount).to.equal(0);
+    expect(nextCount).to.equal(0);
+    expect(endCount).to.equal(0);
   }),
 );
 
