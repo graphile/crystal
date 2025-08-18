@@ -342,12 +342,12 @@ it(
 );
 
 it(
-  "refuses to stream when initialCount > limit",
+  "when initialCount > limit",
   throwOnUnhandledRejections(async () => {
     const source = /* GraphQL */ `
       {
         connection {
-          edges @stream(initialCount: 8) {
+          edges @stream(initialCount: 9) {
             cursor
             node {
               index
@@ -450,12 +450,12 @@ it(
 );
 
 it(
-  "refuses to stream when initialCount > limit (simplified)",
+  "when initialCount > limit (simplified)",
   throwOnUnhandledRejections(async () => {
     const source = /* GraphQL */ `
       {
         connection {
-          edges @stream(initialCount: 8) {
+          edges @stream(initialCount: 9) {
             cursor
             node {
               index
