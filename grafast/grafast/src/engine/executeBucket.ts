@@ -1793,7 +1793,9 @@ function evaluateStream(
       ? 0
       : (bucket.store.get(stream.initialCountStepId)?.unaryValue() ?? 0);
   if (initialCount >= distributorOptions.distributorTargetBufferSize) {
-    // It would be unsafe to stream this
+    // Streaming this would cause a delay, so let's just fetch it all up front.
+    // (Really a user should have a validation cap on the maximum size of an
+    // incremental initialCount.)
     return null;
   }
   return { initialCount };
