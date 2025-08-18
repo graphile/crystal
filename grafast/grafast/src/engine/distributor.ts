@@ -89,8 +89,8 @@ export function distributor<TData>(
    * next index will fetch from the underlying stream and store the value here,
    * as the slowest consumers catch up, old results will be shifted from the
    * start of the array and the `lowWaterMark` will be advanced. The item to
-   * pull for a given position is `buffer[requestedIndex[stepIndex] -
-   * lowWaterMark]`.
+   * pull for a given position is
+   * `buffer[requestedIndex[stepIndex] - lowWaterMark]`.
    */
   const buffer: Array<Promise<IteratorResult<TData, void>>> = [];
 

@@ -5123,7 +5123,10 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
       // Indicate that this layerPlan must release the relevant distributors if
       // it skips those indicies.
       if (lp.distributorDependencies === null) {
-        lp.distributorDependencies = Object.create(null) as {};
+        lp.distributorDependencies = Object.create(null) as Exclude<
+          typeof lp.distributorDependencies,
+          null
+        >;
       }
       const list = (lp.distributorDependencies[distrib.id] ??= []);
       list.push(sstep.id);

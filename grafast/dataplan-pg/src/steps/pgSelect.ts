@@ -3,7 +3,6 @@ import debugFactory from "debug";
 import type {
   ConnectionHandlingResult,
   ConnectionHandlingStep,
-  ConnectionOptimizedStep,
   ExecutionDetails,
   ExecutionDetailsStream,
   GrafastResultsList,

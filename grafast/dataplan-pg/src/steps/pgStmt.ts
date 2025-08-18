@@ -4,9 +4,8 @@ import type {
   ConnectionHandlingStep,
   ExecutionDetails,
   Maybe,
-  PaginationParams,
 } from "grafast";
-import { access, applyTransforms, lambda, SafeError, Step } from "grafast";
+import { applyTransforms, lambda, SafeError, Step } from "grafast";
 import { type SQL, sql } from "pg-sql2";
 
 import type {

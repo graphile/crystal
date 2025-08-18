@@ -97,7 +97,7 @@ export async function executeBatches<
     shared: any;
     attributes: readonly any[];
     params: any;
-    /** @deprecated */
+    /** @deprecated use `shared` instead (it's identical) */
     unary: any;
   },
   TCallback extends (
@@ -183,7 +183,7 @@ export function executeLoad<
     attributes: ReadonlyArray<any>;
     params: Partial<TParams>;
     shared: TLoadContext;
-    /** @deprecated */
+    /** @deprecated use `shared` instead (it's identical) */
     unary: TLoadContext;
   } = {
     ...baseLoadInfo,

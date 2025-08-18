@@ -2,7 +2,7 @@ import { type __ItemStep, type ExecutionDetails } from "../index.js";
 import type { GrafastResultsList, Maybe } from "../interfaces.js";
 import { Step } from "../step.js";
 import { arrayOfLength, recordsMatch } from "../utils.js";
-import { access, AccessStep } from "./access.js";
+import { access } from "./access.js";
 import { constant } from "./constant.js";
 import { LoadManyStep } from "./loadMany.js";
 
