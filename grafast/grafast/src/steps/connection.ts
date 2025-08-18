@@ -15,7 +15,11 @@ import type {
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import { Step, UnbatchedStep } from "../step.js";
-import { maybeArraysMatch } from "../utils.js";
+import {
+  asyncIteratorWithCleanup,
+  maybeArraysMatch,
+  terminateIterable,
+} from "../utils.js";
 import { access } from "./access.js";
 import { constant, ConstantStep } from "./constant.js";
 import { each } from "./each.js";
@@ -977,13 +981,15 @@ function makeProcessedCollection<TItem>(
     const deferredHasNext =
       typeof __hasMore === "boolean" ? null : defer<boolean>();
     hasNext = deferredHasNext ?? (__hasMore as boolean);
-    items = (async function* () {
-      let didHaveNext = false;
-      try {
+    let didHaveNext = false;
+    let started = false;
+    items = asyncIteratorWithCleanup(
+      (async function* () {
         let skip = __skipOver;
         let index = 0;
         const accumulator: TItem[] | null =
           typeof __hasMore !== "boolean" && __hasMore[0] === "l" ? [] : null;
+        started = true;
         for await (const item of collection) {
           if (skip > 0) {
             --skip;
@@ -1026,12 +1032,16 @@ function makeProcessedCollection<TItem>(
             ++index;
           }
         }
-      } finally {
+      })(),
+      () => {
         if (deferredHasNext) {
           deferredHasNext.resolve(didHaveNext);
         }
-      }
-    })();
+        if (!started) {
+          terminateIterable(collection);
+        }
+      },
+    );
   }
   const hasNextPage = __isForwardPagination ? hasNext : false;
   const hasPreviousPage = __isForwardPagination ? false : hasNext;

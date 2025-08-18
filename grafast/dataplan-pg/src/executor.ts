@@ -9,7 +9,13 @@ import type {
   ObjectStep,
   PromiseOrDirect,
 } from "grafast";
-import { defer, exportAs, isAsyncIterable, isDev } from "grafast";
+import {
+  asyncIteratorWithCleanup,
+  defer,
+  exportAs,
+  isAsyncIterable,
+  isDev,
+} from "grafast";
 import type { SQLRawValue } from "pg-sql2";
 
 import { formatSQLForDebugging } from "./formatSQLForDebugging.js";
@@ -807,24 +813,27 @@ ${duration}
         // IMPORTANT: must *NOT* throw between here and the try block in the callback below
         let remainingBatches = batch.length;
         batch.forEach(({ resultIndex }, batchIndex) => {
-          streams[resultIndex] = (async function* () {
-            try {
-              for (;;) {
-                yield await getNext(batchIndex);
+          streams[resultIndex] = asyncIteratorWithCleanup(
+            (async function* () {
+              try {
+                for (;;) {
+                  yield await getNext(batchIndex);
+                }
+              } catch (e) {
+                if (e === $$FINISHED) {
+                  return;
+                } else {
+                  throw e;
+                }
               }
-            } catch (e) {
-              if (e === $$FINISHED) {
-                return;
-              } else {
-                throw e;
-              }
-            } finally {
+            })(),
+            () => {
               remainingBatches--;
               if (remainingBatches === 0) {
                 releaseCursor();
               }
-            }
-          })();
+            },
+          );
         });
       })();
       promise.then(null, (e) => {
@@ -862,7 +871,6 @@ ${duration}
     const queryResult = await withPgClient(pgSettings, (client) =>
       this._executeWithClient<TData>(client, text, values),
     );
-
     // PERF: we could probably make this more efficient rather than blowing away the entire cache!
     // Wipe the cache since a mutation succeeded.
     (context as any)[this.$$cache]?.reset();

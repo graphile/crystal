@@ -497,12 +497,14 @@ it(
       message: "Throw in nodes requested!",
       path: ["connection", "nodes"],
     });
-    // The iterator should never be started, since nothing ever
-    // consumes it.
+    // The iterator should never be started, since nothing ever consumes it,
+    // but we should still call `.return()` or `.error()` on it to terminate it
+    // (even though this wouldn't be the case for generator functions, for
+    // iterables the user might do anything).
     expect(getIteratorCount).to.equal(0);
     expect(startCount).to.equal(0);
     expect(nextCount).to.equal(0);
-    expect(endCount).to.equal(0);
+    expect(endCount).to.equal(1);
   }),
 );
 

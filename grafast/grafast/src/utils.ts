@@ -1444,3 +1444,71 @@ export function stableStringSortFirstTupleEntry(
 
 export const sleep = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
+
+// Save on garbage collection by just using this promise for everything
+const DONE_PROMISE: Promise<IteratorReturnResult<void>> = Promise.resolve({
+  done: true,
+  value: undefined,
+});
+
+/**
+ * Returns a new version of `iterable` that calls `callback()` on termination,
+ * **even if `next()` is never called**.
+ *
+ * @experimental
+ */
+export function asyncIteratorWithCleanup<T>(
+  iterable: AsyncIterable<T, void, never>,
+  callback: () => void,
+): AsyncIterableIterator<T, void, never> & AsyncIteratorObject<T, void, never> {
+  let iterator:
+    | (AsyncIterator<T, void, never> &
+        Partial<AsyncIteratorObject<T, void, never>>)
+    | null = null;
+  let done = false;
+  function cleanup(e?: unknown) {
+    if (!done) {
+      done = true;
+      callback();
+    }
+  }
+  function checkDone(result: IteratorResult<T, void>) {
+    if (done) return;
+    if (result.done) cleanup();
+  }
+  return {
+    [Symbol.asyncIterator]() {
+      iterator ??= iterable[Symbol.asyncIterator]();
+      return this;
+    },
+    [Symbol.asyncDispose]() {
+      iterator ??= iterable[Symbol.asyncIterator]();
+      cleanup();
+      return iterator[Symbol.asyncDispose]?.() ?? Promise.resolve();
+    },
+    return(value) {
+      iterator ??= iterable[Symbol.asyncIterator]();
+      cleanup();
+      return iterator.return?.(value) ?? DONE_PROMISE;
+    },
+    throw(e) {
+      iterator ??= iterable[Symbol.asyncIterator]();
+      cleanup(e);
+      return iterator.throw?.(e) ?? DONE_PROMISE;
+    },
+    next() {
+      iterator ??= iterable[Symbol.asyncIterator]();
+      const result = iterator.next();
+      result.then(checkDone, cleanup);
+      return result;
+    },
+  };
+}
+
+export function terminateIterable(
+  iterable: readonly any[] | Iterable<any> | AsyncIterable<any>,
+) {
+  if ("return" in iterable && typeof iterable.return === "function") {
+    iterable.return();
+  }
+}

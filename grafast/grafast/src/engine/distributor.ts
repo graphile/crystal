@@ -135,20 +135,25 @@ export function distributor<TData>(
         finalResult = DONE_PROMISE;
       }
 
-      if (!sourceIterator) {
-        // We never started the iterator, so there's nothing
-        // to clean up. (All initial work for an async
-        // iterable should be done on the iterables first
-        // `next()` call - if `next()` is never called, then
-        // no action should have been taken.)
-      } else if (sourceIterator.return) {
-        sourceIterator.return();
-      } else if (sourceIterator?.throw) {
-        sourceIterator.throw(new Error("Stop"));
+      // Even if we never started the iterator... we should still clean it up
+      // if we can.
+      const iterator = (sourceIterator ?? sourceIterable) as Partial<
+        Iterator<any> | AsyncIterator<any>
+      >;
+
+      // We're not using `using` so it's not appropriate for us to async dispose
+      //if (iterator[Symbol.asyncDispose]) {
+      //  iterator[Symbol.asyncDispose]!();
+      //} else if (iterator[Symbol.dispose]) {
+      //  iterator[Symbol.dispose]!();
+      //} else
+
+      if (iterator.return) {
+        iterator.return();
+      } else if (iterator?.throw) {
+        iterator.throw(new Error("Stop"));
       } else {
-        // Just ignore it? Or do we need to call `.next()`
-        // indefinitely?
-        //
+        // Just ignore it? Or do we need to call `.next()` indefinitely?
         // Since it could be infinite, the next chain doesn't make sense, so
         // we'll just stop.
       }

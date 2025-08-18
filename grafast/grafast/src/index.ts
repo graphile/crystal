@@ -260,6 +260,7 @@ import { subscribe } from "./subscribe.js";
 import {
   arrayOfLength,
   arraysMatch,
+  asyncIteratorWithCleanup,
   getEnumValueConfig,
   getEnumValueConfigs,
   GrafastInputFieldConfigMap,
@@ -319,6 +320,7 @@ export {
   assertModifier,
   assertNotNull,
   assertStep,
+  asyncIteratorWithCleanup,
   bakedInput,
   bakedInputRuntime,
   BakedInputStep,
@@ -657,6 +659,7 @@ exportAsMany("grafast", {
   stepADependsOnStepB,
   stepAMayDependOnStepB,
   stepsAreInSamePhase,
+  asyncIteratorWithCleanup,
   stepAShouldTryAndInlineIntoStepB,
   isPromiseLike,
   isDev,
