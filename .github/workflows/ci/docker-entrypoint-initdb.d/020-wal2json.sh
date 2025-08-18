@@ -14,10 +14,12 @@ createdb root -O root
 
 apt-get update
 apt-get install -f -y --no-install-recommends \
+        ca-certificates \
         build-essential \
         pkg-config \
         git \
         postgresql-server-dev-$PG_MAJOR
+update-ca-certificates
 localedef -i en_US -f UTF-8 en_US.UTF-8
 rm -rf /var/lib/apt/lists/*
 
