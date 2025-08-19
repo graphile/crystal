@@ -327,11 +327,13 @@ export function distributor<TData>(
     return result;
   }
 
-  function stop(stepIndex: number, error?: unknown) {
+  function stop(stepIndex: number, error?: unknown, advance = true) {
     if (!terminalResult[stepIndex]) {
       deliveredIndex[stepIndex] = Infinity;
       terminalResult[stepIndex] = error ? Promise.reject(error) : DONE_PROMISE;
-      maybeAdvanceLowWaterMark();
+      if (advance) {
+        maybeAdvanceLowWaterMark();
+      }
     }
     return terminalResult[stepIndex];
   }
@@ -407,9 +409,15 @@ export function distributor<TData>(
     },
   };
   abortSignal.addEventListener("abort", () => {
-    for (const step of dependentSteps) {
-      distributor.releaseIfUnused(step.id);
+    for (
+      let stepIndex = 0, l = dependentSteps.length;
+      stepIndex < l;
+      stepIndex++
+    ) {
+      hasIterator[stepIndex] = true;
+      stop(stepIndex, undefined, false);
     }
+    maybeAdvanceLowWaterMark();
   });
   return distributor;
 }
