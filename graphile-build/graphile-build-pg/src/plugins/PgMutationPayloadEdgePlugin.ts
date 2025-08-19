@@ -166,9 +166,9 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                       fieldArgs: FieldArgs,
                     ) =>
                       pgMutationPayloadEdge(
-                        $mutation,
-                        pkAttributes,
                         resource,
+                        pkAttributes,
+                        $mutation,
                         fieldArgs,
                       ),
                   [pgMutationPayloadEdge, pkAttributes, resource],
@@ -186,14 +186,14 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
 const getPgSelectSingleFromMutationResult = EXPORTABLE(
   (PgDeleteSingleStep, pgSelectFromRecord) =>
     (
-      $mutation: ObjectStep<{
-        result: PgClassSingleStep;
-      }>,
-      pkAttributes: readonly string[],
       resource: Exclude<
         ReturnType<GraphileBuild.Build["pgTableResource"]>,
         null | undefined
       >,
+      pkAttributes: readonly string[],
+      $mutation: ObjectStep<{
+        result: PgClassSingleStep;
+      }>,
     ) => {
       const $result = $mutation.getStepForKey("result", true);
       if (!$result) return null;
@@ -221,20 +221,20 @@ const pgMutationPayloadEdge = EXPORTABLE(
     getPgSelectSingleFromMutationResult,
   ) =>
     (
-      $mutation: ObjectStep<{
-        result: PgClassSingleStep;
-      }>,
-      pkAttributes: readonly string[],
       resource: Exclude<
         ReturnType<GraphileBuild.Build["pgTableResource"]>,
         null | undefined
       >,
+      pkAttributes: readonly string[],
+      $mutation: ObjectStep<{
+        result: PgClassSingleStep;
+      }>,
       fieldArgs: FieldArgs,
     ) => {
       const $select = getPgSelectSingleFromMutationResult(
-        $mutation,
-        pkAttributes,
         resource,
+        pkAttributes,
+        $mutation,
       );
       if (!$select) return constant(null);
       fieldArgs.apply($select, "orderBy");
