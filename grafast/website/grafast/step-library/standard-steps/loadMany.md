@@ -17,20 +17,19 @@ are not possible in DataLoader.
 
 ### Attribute and parameter tracking
 
-A `loadMany` step (technically a `LoadStep`) keeps track of the
-attribute names accessed on each of the records returned via
-`.get(attrName)` and any parameters set via `.setParam(key, value)`. This
-information will be passed through to your callback function such that you may
-make more optimal calls to your backend business logic, only retrieving the
-data you need.
+A `loadMany` step (technically a `LoadManyStep`) tracks:
+
+- which attributes are accessed on returned records via `.get(attrName)`, and
+- any parameters you set on the step via `.setParam(key, value)`.
+
+Both are surfaced to your `load` callback (via `attributes` and `params`
+respectively) so you can fetch only what you need.
 
 ### Input/output equivalence
 
-If you (optionally) pass an `ioEquivalence` parameter to `loadMany` then you
-can use it to indicate which field(s) on each record in the output are
-equivalent to the input(s). This enables an optimization where a chained fetch
-can instead be performed in parallel if the child only depends on an output
-which is equivalent to an input. Hopefully an example will make this clearer...
+If you (optionally) pass an `ioEquivalence` to `loadMany` you can declare which
+output fields correspond to which input(s). This allows children to start
+immediately when they only depend on those equivalent outputs.
 
 Imagine you're loading the users within a given organization:
 
@@ -126,152 +125,240 @@ stateDiagram
 
 ## Usage
 
+Called as `loadMany($lookup, loader)`; `$lookup` is a step representing a
+"lookup" value (identifying the records to look up) and `loader` is responsible
+for loading the related records.
+
+Here's a simplified form of the type signature:
+
 ```ts
-function loadMany(options: {
-  lookup: Step | Step[] | Record<string, Step>;
-  load: LoadManyCallback;
-  ioEquivalence?: string | Record<string, string>;
-  shared?: Step | Step[] | Record<string, Step>;
-}): Step;
-type LoadManyCallback = (
-  specs: TLookup[],
-  info: LoadOneInfo,
-) => PromiseOrDirect<TResult[][]>;
-interface LoadManyInfo {
+/**
+ * @template TLookup - type used to identify the record to look up (typically an
+ * string/UUID/integer, but composite types are supported).
+ * @template TItem - The type of each individual record returned.
+ * @template TData - The type of the collection for one lookup (array or async
+ * iterable of `TItem`, including nullability concerns).
+ * @template TParams - The shape of the `params` object available in the `info`
+ * argument - add params using `$loadMany.setParam(...)`, see below.
+ * @template TShared - Optional shared data, typically API or database clients,
+ * current user or session information, or other values shared by all entries in
+ * the batch.
+ */
+function loadMany<TLookup, TItem, TData, TParams, TShared>(
+  lookup: Step<TLookup> | Multistep,
+  loader:
+    | LoadManyLoader<TLookup, TItem, TData, TParams, TShared>
+    | LoadManyCallback<TLookup, TItem, TData, TParams, undefined>,
+): LoadManyStep<TLookup, TItem, TData, TParams, TShared>;
+
+interface LoadManyLoader<TLookup, TItem, TData, TParams, TShared> {
+  load: LoadManyCallback<TLookup, TItem, TData, TParams, TShared>;
+  name?: string;
+  shared?: Thunk<Step<TShared>>;
+  ioEquivalence?: IOEquivalence<TLookup>;
+  paginationSupport?: PaginationFeatures; // see "Pagination interop"
+}
+
+type LoadManyCallback<TLookup, TItem, TData, TParams, TShared> = (
+  lookups: ReadonlyArray<TLookup>,
+  info: LoadManyInfo<TItem, TParams, TShared>,
+) => PromiseOrDirect<ReadonlyArray<TData>>;
+
+interface LoadManyInfo<TItem, TParams, TShared> {
+  attributes: ReadonlyArray<keyof TItem>;
+  params: Partial<TParams>;
   shared: TShared;
-  attributes: string[];
-  params: Readonly<string, any>;
 }
 ```
 
-`loadMany` accepts an options object accepting 2-4 attributes:
+:::tip Don't declare your `loader` inline
 
-- `lookup` (mostly required) - the step (or multistep) that specifies which
-  records to load - only not required when the load function can load data without
-  requiring identification.
-- `load` (required) - the callback function called with the values from lookup
-  responsible for loading the associated collections of records
-- `$shared` (optional) - any _unary_ step (or multistep), useful for passing
-  things from context or arguments without complicating the lookup; see [Shared
-  step usage](#shared-step-usage) below
-- `ioEquivalence` (optional, advanced) - a string, an array of strings, or a
-  string-string object map used to indicate which attributes on output are
-  equivalent of those on input - see [ioEquivalence usage](#ioequivalence-usage)
-  below
-
-### Callback
-
-The `callback` function is called with two arguments, the first is
-a list of the values from the _specifier step_ `$spec` and the second is options that
-may affect the fetching of the records.
-
-```ts
-function callback(
-  specs: ReadonlyArray<unknown>,
-  options: {
-    shared: unknown;
-    attributes: ReadonlyArray<string>;
-    params: Record<string, unknown>;
-  },
-): PromiseOrDirect<ReadonlyArray<ReadonlyArray<unknown>>>;
-```
-
-:::tip
-
-For optimal results, we strongly recommend that the callback function is defined
-in a common location so that it can be reused over and over again, rather than
-defined inline. This will allow the underlying steps to optimize calls to this function.
+The `loader` function acts as a gateway between the Grafast plan execution and
+your business logic; you should keep it in a centralized location so that it may
+be used by multiple plan resolvers easily. This also allows for equivalent calls
+to this same loader to be deduplicated for increased performance.
 
 :::
 
-Within this definition of `callback`:
+Key points:
 
-- `specs` is the runtime values of each value that `$spec` represented
-- `options` is an object containing:
-  - `shared`: the runtime value that `$shared` (if any) represented
-  - `attributes`: the list of keys that have been accessed via
-    `$record.get('<key>')` for each of the records in `$records`
-  - `params`: the params set via `$records.setParam('<key>', <value>)`
+- **Arguments:** `loadMany($lookup, loader)` where `$lookup` is a **Multistep**
+  (a `Step`, an array of `Step`s, or an object of `Step`s), and `loader` is
+  either a function or an object `{ load, shared?, ioEquivalence?, paginationSupport?, name? }`.
+- **Return type of `load`:** one result collection per lookup value. Each
+  collection may be an array or an async iterable; items may be `null`:
+  `PromiseOrDirect<ReadonlyArray<Maybe<ReadonlyArrayOrAsyncIterable<Maybe<TItem>>>>>`.
+- **`info` arg for `load`:**
+  - `shared`: resolved value from `loader.shared` (typically API/DB clients,
+    current user/session details, etc)
+  - `attributes`: the set of accessed keys (`keyof TItem`) that our children
+    need
+  - `params`: a **partial** map of params set via `.setParam(...)` (used to
+    indicate pagination, filtering, etc)
 
-`specs` is deduplicated using strict equality; so it is best to keep `$spec`
-simple - typically it should only represent a single scalar value - which is
-why `$shared` exists.
+### Simple usage
 
-`options.shared` is very useful to keep specs simple (so that fetch
-deduplication can work optimally) whilst passing in global values that you may
-need such as a database or API client.
-
-`options.attributes` is useful for optimizing your fetch - e.g. if the user
-only ever requested `$record.get('id')` and `$record.get('avatarUrl')` then
-there's no need to fetch all the other attributes from your datasource.
-
-`options.params` can be used to pass additional context to your callback
-function, perhaps options like "should we include archived records" or "should
-we expand 'customer' into a full object rather than just returning the
-identifier".
-
-### Basic usage
+In our plan resolver we might load a user's friends like this:
 
 ```ts
-const $userId = $user.get("id");
-const $friendships = loadMany($userId, getFriendshipsByUserIds);
+const $userId = get($user, "id");
+const $friends = loadMany($userId, friendsByUserId);
 ```
 
-An example of the callback function might be:
+Where our `friendsByUserId` loader might be something like:
 
 ```ts
-const friendshipsByUserIdCallback = (ids, { attributes }) => {
-  // Your business logic would be called here; e.g. this might be the same
-  // function that your DataLoaders would call, except additional information
-  // can be passed to it:
-  return getFriendshipsByUserIds(ids, { attributes });
-};
+import { db } from "./db"; // Assume this is your database client
+
+// This could be the same callback you use with DataLoader!
+async function friendsByUserId(userIds) {
+  const rows = await db.query(sql`
+    select u.id as _user_id, f.*
+    from users u
+    inner join friendships on (friendships.user_id = u.id)
+    inner join users f on (f.id = friendships.friend_id)
+    where u.id = any(${sql.value(userIds)})
+  `);
+
+  // Return an array of arrays, where each inner array contains the friends
+  // for the respective userId we were passed.
+  return userIds.map((id) => rows.filter((r) => r._user_id === id));
+}
+```
+
+### Only requesting the required attributes
+
+```ts
+import { db } from "./db"; // Assume this is your database client
+
+async function friendsByUserId(userIds, { attributes }) {
+  // highlight-start
+  // Only need to request the given `attributes` (being sure to avoid SQL
+  // injection!)
+  const sqlAttrs = attributes.map((attr) => sql`f.${sql.identifier(attr)}`);
+  // highlight-end
+
+  const rows = await db.query(sql`
+    /* highlight-next-line */
+    select u.id as _user_id, ${sql.join(sqlAttrs, ",")}
+    from users u
+    inner join friendships on (friendships.user_id = u.id)
+    inner join users f on (f.id = friendships.friend_id)
+    where u.id = any(${sql.value(userIds)})
+  `);
+
+  return userIds.map((id) => rows.filter((r) => r._user_id === id));
+}
+```
+
+### Setting custom params
+
+You can use `.setParam(key, value)` (where `value` may be a **unary** step, or a
+static value) to pass parameters to your loader; this is typically used for
+filtering, ordering, pagination and related concerns:
+
+```ts
+const $friends = loadMany($userId, friendsByUserId);
+$friends.setParam("includeArchived", true); // appears in info.params.includeArchived
+```
+
+Your loader can access these params via the `info.params` object:
+
+```ts
+import { db } from "./db"; // Assume this is your database client
+
+async function friendsByUserId(userIds, { attributes, params }) {
+  const sqlAttrs = attributes.map((attr) => sql`f.${sql.identifier(attr)}`);
+
+  const rows = await db.query(sql`
+    select u.id as _user_id, ${sql.join(sqlAttrs, ",")}
+    from users u
+    inner join friendships on (friendships.user_id = u.id)
+    inner join users f on (f.id = friendships.friend_id)
+    where u.id = any(${sql.value(userIds)})
+    /* highlight-next-line */
+    and friendships.archived = ${sql.value(params.includeArchived ?? false)}
+  `);
+
+  return userIds.map((id) => rows.filter((r) => r._user_id === id));
+}
 ```
 
 ### Shared step usage
 
-:::info
-
-A unary step is a step that only ever represents one value, e.g. simple derivatives of `context()`, `fieldArgs`, or `constant()`.
-
-:::
-
-In addition to the forms seen in "Basic usage" above, you can pass an additional
-`shared` step to `loadMany`. This step must be a [**unary
-step**](../../step-classes.md#addunarydependency), meaning that it must represent
-exactly one value across the entire request (not a batch of values like most
-steps).
+You could use params to pass through things like a database client, user
+credentials, etc - however since things like this are _always_ needed by your
+loader, having to set them in each plan resolver is a chore. Instead, it makes
+sense to centralize them alongside your loader. To do so, we'll change our
+load callback into a loader object, and use the `shared` callback to
+load the database client from the GraphQL context:
 
 ```ts
-const $userId = $user.get("id");
-const $dbClient = context().get("dbClient");
-const $friendships = loadMany($userId, {
-  load: getFriendshipsByUserIds,
-  shared: $dbClient,
-});
+// NOTE: no longer need to import a global `db` client; we can get one with more
+// specific permissions dedicated to this single GraphQL request.
+
+const friendsByUserId = {
+  name: "friendsByUserId",
+
+  // Load the database client from the GraphQL context
+  // highlight-next-line
+  shared: () => context().get("dbClient"),
+
+  // Our loader that batch loads all the friends for all the userIds
+  // highlight-next-line
+  async load(userIds, { attributes, params, shared: db }) {
+    const sqlAttrs = attributes.map((attr) => sql`f.${sql.identifier(attr)}`);
+
+    const rows = await db.query(sql`
+      select u.id as _user_id, ${sql.join(sqlAttrs, ",")}
+      from users u
+      inner join friendships on (friendships.user_id = u.id)
+      inner join users f on (f.id = friendships.friend_id)
+      where u.id = any(${sql.value(userIds)})
+      and friendships.archived = ${sql.value(params.includeArchived ?? false)}
+    `);
+
+    return userIds.map((id) => rows.filter((r) => r._user_id === id));
+  },
+};
 ```
 
-Since we know it will have exactly one value, we can pass it into the
-callback as a single value and our callback will be able to use it directly
-without having to perform any manual grouping.
+## Callback details
 
-This shared dependency is useful for fixed values (for example, those from
-GraphQL field arguments) and values on the GraphQL context such as clients to
-various APIs and other data sources.
+```ts
+const loader = {
+  load: (lookups, info) => {
+    // lookups: readonly array of resolved lookup values
+    // info.shared: resolved shared value(s)
+    // info.attributes: readonly array of accessed keys (keyof TItem)
+    // info.params: Partial<TParams> including any `.setParam(...)` and pagination params
+    return batch(lookups, info);
+  },
+  paginationSupport: { cursor: true, offset: true, reverse: true },
+  shared: () => context().get("db"),
+};
+```
 
 ### ioEquivalence usage
+
+```ts
+type IOEquivalence<TSpec> =
+  | null
+  | string
+  | { [key in Exclude<keyof TSpec, keyof any[]>]?: string | null };
+```
 
 The `ioEquivalence` optional parameter can accept the following values:
 
 - `null` to indicate no input/output equivalence
 - a string to indicate that the same named property on the output is equivalent
-  to the entire input plan
-- if the step is a `list()` (or similar) plan, an array containing a list of
-  keys (or null for no relation) on the output that are equivalent to the same
-  entry in the input
-- if the step is a `object()` (or similar) plan, an object that maps between
-  the attributes of the object and the key(s) in the output that are equivalent
-  to the given entry on the input
+  to the lookup value
+- if the lookup was an array, an array containing a list of keys (or
+  null for no relation) on the output that are equivalent to the same entry in the
+  input
+- if the lookup was an object, an object that maps between the attributes of the
+  object and the key(s) in the output that are equivalent to the given entry on
+  the input
 
 ```ts title="Example for a scalar step"
 const $posts = loadMany($userId, {
@@ -308,25 +395,47 @@ const $posts = loadMany(
 );
 ```
 
-### Passing multiple steps
+## Pagination interop with `connection()`
 
-The [`list()`](./list) or [`object()`](./object) step can be used if you need
-to pass the value of more than one step into your callback:
+You can combine `loadMany` with `connection()`:
 
 ```ts
-const $result = loadMany([$a, $b, $c], callback);
+function User_friends($user, fieldArgs) {
+  const $userId = $user.get("id");
+  const $friends = loadMany($userId, friendsByUserId);
+  return connection($friends, { fieldArgs });
+}
 ```
 
-The first argument to `callback` will then be an array of all the tuples of
-values from these plans: `ReadonlyArray<[a: AValue, b: BValue, c: CValue]>`.
+- If your loader object includes `paginationSupport` (even `{}`), the
+  `LoadManyStep` exposes GraphQL pagination to your `load` via `info.params`,
+  thereby setting:
+  - `info.params.limit`
+  - `info.params.offset` (applied after `after` when cursors are used)
+  - `info.params.after` (exclusive lower bound cursor; in reverse mode it behaves as “before”)
+  - `info.params.reverse` (boolean)
+- If you advertise `cursor: true` in `paginationSupport`, each returned item
+  must include a stable `cursor: string` attribute which will be used verbatim
+  by `connection()` to populate `edges { cursor }` and
+  `pageInfo { startCursor endCursor }`.
+- `fieldArgs` in `connection($step, { fieldArgs })` is the `fieldArgs` parameter
+  from your plan resolver, and is assumed to represent arguments including the
+  `first`, `last`, `before`, `after` and `offset` pagination arguments. This saves
+  you from manually calling `$connection.setFirst(fieldArgs.getRaw('first'))` for
+  each of the pagination arguments in turn.
 
-:::tip Performance impact from using list/object
+:::warning Without `paginationSupport`, the entire list will be fetched
 
-Using `list()` / `object()` like this will likely reduce the effectiveness of
-`loadMany`'s built in deduplication; to address this a stable object/list is
-required - please track this issue:
-https://github.com/graphile/crystal/issues/2170
+If you **don’t** set `paginationSupport`, `connection()` will handle cursors and
+pagination for you, which requires the entire collection to be downloaded.
 
 :::
+
+## Attribute merging
+
+`LoadManyStep`s that share the same `load` function **and** identical param
+signatures automatically merge their `attributes` sets before execution to maximize
+cache reuse (even if it means some requests will need to fetch more attributes
+than strictly required).
 
 [dataloader]: https://github.com/graphql/dataloader
