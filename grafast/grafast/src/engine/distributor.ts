@@ -3,7 +3,7 @@ import * as assert from "../assert";
 import type { Deferred } from "../deferred";
 import { defer } from "../deferred";
 import type { Step } from "../step";
-import { sleep } from "../utils";
+import { arrayOfLength, sleep } from "../utils";
 
 const DEFAULT_DISTRIBUTOR_BUFFER_SIZE = 1001;
 const DEFAULT_DISTRIBUTOR_BUFFER_SIZE_INCREMENT = 1001;
@@ -381,7 +381,7 @@ export function distributor<TData>(
     return iterator;
   }
 
-  const hasIterator = dependentSteps.map(() => false);
+  const hasIterator = arrayOfLength(dependentSteps.length, false);
   const distributor: Distributor<TData> = {
     [$$isDistributor]: true,
     iterableFor(stepId) {
