@@ -440,7 +440,7 @@ export class ConnectionStep<
     if (params.edgeDataPlan) {
       this.edgeDataPlan = params.edgeDataPlan!;
     } else {
-      this.edgeDataPlan = (i) => i as TEdgeDataStep;
+      this.edgeDataPlan = defaultEdgeDataPlan<TEdgeDataStep>;
     }
     if (
       "paginationSupport" in subplan &&
@@ -1633,4 +1633,7 @@ async function iterableToArray<T>(
     items.push(item);
   }
   return items;
+}
+function defaultEdgeDataPlan<T extends Step>(i: Step): T {
+  return i as T;
 }
