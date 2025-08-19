@@ -95,13 +95,13 @@ export function distributor<TData>(
   const buffer: Array<Promise<IteratorResult<TData, void>>> = [];
 
   // Easy way to resolve a promise for slowing down the fastest consumer
-  let wmi: [Deferred<void>, Promise<void>] | null = null;
-  function lowWaterMarkIncreased() {
+  let wmi: Deferred<void> | null = null;
+  function lowWaterMarkIncreased(): PromiseLike<void> {
     if (wmi === null) {
       const d = defer<void>();
-      wmi = [d, Promise.resolve(d)];
+      wmi = d;
     }
-    return wmi[1];
+    return wmi;
   }
 
   /**
@@ -169,7 +169,7 @@ export function distributor<TData>(
       // Announce that the lowWaterMark advanced
       if (advanced && wmi !== null) {
         // Avoid race condition
-        const deferred = wmi[0];
+        const deferred = wmi;
         wmi = null;
         deferred.resolve();
       }
