@@ -1,16 +1,15 @@
 # first
 
-Resolves to the first entry in the array or iterable returned by the given step.
+Resolves to the first entry in the array returned by the given step.
 
-Pass `true` as the second parameter if you know the result will be an array (or
-`null`/`undefined`) and the step will be more optimal, otherwise iterables and
-async iterables will be handled automatically.
+Pass `false` as the second parameter to also handle iterables/async iterables.
 
 Usage:
 
 ```ts
-const $firstItem = first($iterable);
+const $firstItem = first($array);
 
-// Iff `$array` represents `Maybe<Array<any>>`, pass `true` to optimize:
-const $firstItem = first($array, true);
+// If the argument is an iterable, pass `false` to opt out of the array
+// optimizations
+const $firstItem = first($iterable, false);
 ```

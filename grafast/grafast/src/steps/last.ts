@@ -31,10 +31,10 @@ export class LastStep<TData> extends Step<Maybe<TData>> {
   allowMultipleOptimizations = true;
   unbatchedExecute?: typeof unbatchedExecute;
 
-  constructor(parentPlan: StepRepresentingList<TData>, array = false) {
+  constructor(parentPlan: StepRepresentingList<TData>, isArray = true) {
     super();
     this.addDependency(itemsOrStep(parentPlan));
-    if (array) {
+    if (isArray) {
       this.unbatchedExecute = unbatchedExecute;
       this.execute = optimalExecute<TData>;
       this.isSyncAndSafe = true;
@@ -91,7 +91,7 @@ export class LastStep<TData> extends Step<Maybe<TData>> {
  */
 export function last<TData>(
   plan: StepRepresentingList<TData>,
-  array = false,
+  array = true,
 ): LastStep<TData> {
   return plan.operationPlan.cacheStep(
     plan,

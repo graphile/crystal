@@ -1562,12 +1562,12 @@ class PageInfoStep extends UnbatchedStep<ConnectionResult<any>> {
       }
       case "startCursor": {
         // Get first node, get cursor for it
-        const $first = first($connection._items());
+        const $first = first($connection._items(), false);
         return $connection.cursorPlan($first);
       }
       case "endCursor": {
-        // Get first node, get cursor for it
-        const $last = last($connection._items());
+        // Get last node, get cursor for it
+        const $last = last($connection._items(), false);
         return $connection.cursorPlan($last);
       }
       default: {

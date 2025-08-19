@@ -27,10 +27,10 @@ export class FirstStep<TData> extends Step<TData> {
   allowMultipleOptimizations = true;
   unbatchedExecute?: typeof unbatchedExecute;
 
-  constructor(parentPlan: StepRepresentingList<TData>, array = false) {
+  constructor(parentPlan: StepRepresentingList<TData>, isArray = true) {
     super();
     this.addStrongDependency(itemsOrStep(parentPlan));
-    if (array) {
+    if (isArray) {
       this.unbatchedExecute = unbatchedExecute;
       this.execute = optimalExecute<TData>;
       this.isSyncAndSafe = true;
@@ -86,7 +86,7 @@ export class FirstStep<TData> extends Step<TData> {
  */
 export function first<TData>(
   plan: StepRepresentingList<TData>,
-  array = false,
+  array = true,
 ): FirstStep<TData> {
   return plan.operationPlan.cacheStep(
     plan,
