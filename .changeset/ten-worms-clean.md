@@ -53,7 +53,9 @@ instead to co-locate it with your data loading callbacks:
 +  {
 +    shared: () => context().get("apiClient"),
 +    load:
-       (userIds, { unary: apiClient }) => {
+       (userIds, info) => {
+-        const apiClient = info.unary;
++        const apiClient = info.shared;
          /* ... */
        }
 +  }
