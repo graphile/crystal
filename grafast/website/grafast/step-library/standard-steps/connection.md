@@ -1,82 +1,93 @@
 # connection
 
-Wraps a collection fetch to provide the utilities for working with GraphQL
-cursor connections. It only requires one argument which is a step that
-represents a collection (list) of records. This collection step is expected to
-either yield an array, to yield an object with an `items` key that's an array
-(`{ items: any[] }`), or to support the `.items()` method.
+`connection()` wraps a collection fetch to provide the utilities for working
+with GraphQL cursor connections.
+
+The underlying collection step may yield:
+
+- an array,
+- an object with an `items` array (`{ items: any[] }`), or
+- support the `.items()` method.
 
 ```ts
+export function connection<...>(
+  step: StepRepresentingList<...>,
+  params?: ConnectionParams,
+): ConnectionStep<...>
+
 interface ConnectionParams {
   fieldArgs?: FieldArgs;
+  edgeDataPlan?: ($item: Step<any>) => Step;
 }
-export function connection<
-  TItem,
-  TNodeStep extends Step = Step<TItem>,
-  TEdgeDataStep extends Step = Step<TItem>,
-  TEdgeStep extends EdgeCapableStep<TItem, TNodeStep, TEdgeDataStep> = EdgeStep<TItem, TNodeStep, TEdgeDataStep>,
-  TCursorValue = string,
-  TCollectionStep extends StepRepresentingList<
-    TItem,
-    TNodeStep,
-    TEdgeStep,
-    TCursorValue
-  > = StepRepresentingList<TItem, TNodeStep, TEdgeStep, TCursorValue>,
->(
-  step: TCollectionStep,
-  params?: ConnectionParams,
-): ConnectionStep<TItem, TNodeStep, TEdgeDataStep, TEdgeStep, TCursorValue, TCollectionStep> {
 ```
 
-:::warning Wrapping a step in connection may mutate the step!
+:::warning Wrapping a step in `connection()` may mutate the step!
 
-If your `$step` has `paginationSupport` and `applyPagination` defined (TODO:
-document these!) then creating a connection via `connection($step)` will
-result in `$step.applyPagination(...)` being called by the
-connection. If your `$step` is also used in another position in the schema then
-these changes (e.g. pagination limits) will apply there also.
+If your step implements `paginationSupport` and `applyPagination`, then
+`connection(step)` will call `step.applyPagination(...)`. If you reuse the same
+step elsewhere, the pagination limits may leak across.
 
-This is generally not a concern, but serves as a warning to ensure you're
-creating fresh steps to use with connections (rather than using, for example, a
-cached step).
-
-Steps which do not have `paginationSupport` are unaffected.
+Create fresh steps for connections. Steps without `paginationSupport` are
+unaffected.
 
 :::
 
-## Improving performance
+## Pagination support
 
-Out of the box, `connection()` tries to handle connection concerns for you, but
-doing so is incredibly expensive (we need you to fetch all the data so that we
-can handle the pagination in memory).
+If your underlying step can handle pagination directly, it should expose its
+capabilities via a `paginationSupport` object.
 
-To fix this, your underlying step may indicate that it supports certain
-optimizations for this by implementing `paginationFeatures`. For full
-optimization you should honour the following arguments:
+If `paginationSupport` is
+present, support for `limit` is assumed. Support for other features is indicated
+via the flags:
 
-- `reverse` - if true, the `limit`, `after` and `offset` apply in reverse - i.e.
-  apply them from the end of the list working backwards.
-  `before`. Do **NOT** return the data in reverse order!
-- `limit` - only fetch this many nodes
-- `after` - only fetch nodes after this cursor
+- `offset?: boolean`
+  The step supports numeric offsets - specifically a count of the records to
+  skip over before returning results.
 
-You can indicate which features you support:
+- `cursor?: boolean`
+  The step supports cursor pagination (`after`). If you support `cursor` but not
+  `reverse`, then reverse queries (`last`, `before`) will result in an error, so
+  do not expose these via the GraphQL schema. (If combined with `offset`, offset
+  applies after the cursor. If you can’t support that combination, we recommend
+  that you keep `cursor: true` and set `offset: false`.)
 
-- `cursor` - you support cursor pagination - the `after` argument. Note: if you
-  indicate `cursor` support but not `reverse` support then any attempt at reverse
-  pagination will be met with an error.
-- `reverse` - you support reverse pagination alongside `cursor`. Requires
-  `cursor` support.
-- `offset` - you support skipping over a number of rows (relative to `after` if
-  `cursor` support is indicated)
+- `reverse?: boolean`
+  The step support reverse pagination with cursors. **Requires `cursor`**.
+  Reverse means apply `limit`, `offset`, and `after` working backwards from the
+  end. One way to achieve this is to reverse the sort order, apply the parameters
+  as usual, then restore the original order. Do **not** return the final list in
+  reverse order.
 
-At a bare minimum, `limit` support is required if you indicate
-`paginationFeatures` at all.
+- `full?: boolean`
+  **ADVANCED**. The step implements the complete `ConnectionHandlingStep`
+  interface. Instead of us slicing, you receive the raw GraphQL params directly
+  and must yield an object with `{ items, hasNextPage, hasPreviousPage }`.
 
-If you have `paginationFeatures` but do not implement `cursor` support, then we
-will use limit/offset pagination where the cursor is the index from the start.
-and thus will forbid queries such as `last: 3` that have no accompanying
-`before` cursor (otherwise a full fetch of the collection would be required to
-determine cursors).
+### Cursor support
 
-TODO: the documentation for this is terrible. Sorry.
+If you don’t support `cursor`, then we’ll fall back to numeric cursors (the item
+index). In that mode, queries like `last: 3` without a `before` would require
+fetching the entire collection to determine cursors - we recommend you forbid
+these.
+
+## Performance
+
+If you don’t indicate any `paginationSupport`, `connection()` will do all the
+pagination in memory. This requires fetching the full dataset, which is often
+expensive.
+
+Adding `paginationSupport` lets you push a selection of supported pagination
+concerns to your data source for efficiency.
+
+## Other notes
+
+- If `reverse` is not supported, it’s recommended not to expose `before`/`last`
+  args in your schema, since we would otherwise need to fetch the entire
+  collection to emulate them.
+- If `cursor` is supported, the step **must** also implement
+  `cursorForItem($item: Step<TItem>): Step<string>` to return stable cursors.
+- `nodeForItem`, `edgeForItem`, and `listItem` give finer control over how nodes
+  and edges are represented.
+- `connectionClone()` can be used to make an unpaginated copy of the step, e.g.
+  for `totalCount` and other aggregates.
