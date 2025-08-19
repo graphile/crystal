@@ -141,7 +141,8 @@ export interface PaginationParams<TCursorValue = string> {
    * True if `after` or `first` is set, or if neither `before` or `last` is
    * set.
    *
-   * @internal */
+   * @internal
+   */
   __isForwardPagination: boolean;
 
   /**
@@ -173,20 +174,9 @@ export interface PaginationParams<TCursorValue = string> {
    * sending records, but we consume one extra to see if `hasMore` is true or
    * not.
    *
-   * @internal */
+   * @internal
+   */
   __hasMore: boolean | [side: "l" | "r", limit: number];
-
-  // /**
-  //  * If set, how many records to retain in memory  whilst traversing the collection.
-  //  *
-  //  * If __isForwardPagination then we'll stop traversing the collection once we
-  //  * have retained this many. Otherwise we'll dropping the first each time we
-  //  * exceed the limit.
-  //  *
-  //  * We only start retaining after we have passed `__skipOver`.
-  //  *
-  //  * @internal */
-  // __retain: number | null;
 }
 
 /**
