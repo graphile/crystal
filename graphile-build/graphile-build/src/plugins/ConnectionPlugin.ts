@@ -122,10 +122,6 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
                             "field",
                           ),
                           type: Cursor,
-                          plan: EXPORTABLE(
-                            (get) => ($edge: Step) => get($edge, "cursor"),
-                            [get],
-                          ),
                         }),
                       ),
                       node: fieldWithHooks(
@@ -138,10 +134,6 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
                             "field",
                           ),
                           type: nullableIf(!nonNullNode, NodeType),
-                          plan: EXPORTABLE(
-                            (get) => ($edge: Step) => get($edge, "node"),
-                            [get],
-                          ),
                         }),
                       ),
                     };
