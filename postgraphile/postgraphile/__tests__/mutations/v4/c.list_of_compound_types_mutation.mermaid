@@ -10,10 +10,10 @@ graph TD
     subgraph "Buckets for mutations/v4/c.list_of_compound_types_mutation"
     Bucket0("Bucket 0 (root)"):::bucket
     Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 15, 17<br /><br />1: PgSelect[11]<br />2: PgSelectRows[18]<br />ᐳ: Object[16]"):::bucket
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 18<br /><br />ROOT Object{1}ᐸ{result}ᐳ[16]"):::bucket
-    Bucket3("Bucket 3 (listItem)<br /><br />ROOT __Item{3}ᐸ18ᐳ[19]"):::bucket
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 20<br /><br />ROOT PgSelectSingle{3}ᐸlist_of_compound_types_mutationᐳ[20]"):::bucket
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 27<br /><br />ROOT PgClassExpression{4}ᐸ__list_of_...tion__.”g”ᐳ[27]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 11, 18<br /><br />ROOT Object{1}ᐸ{result}ᐳ[16]"):::bucket
+    Bucket3("Bucket 3 (listItem)<br />Deps: 11<br /><br />ROOT __Item{3}ᐸ18ᐳ[19]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 20, 11<br /><br />ROOT PgSelectSingle{3}ᐸlist_of_compound_types_mutationᐳ[20]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 27, 11<br /><br />ROOT PgClassExpression{4}ᐸ__list_of_...tion__.”g”ᐳ[27]"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
@@ -66,6 +66,12 @@ graph TD
     PgSelectSingle20 --> PgClassExpression27
     PgClassExpression28{{"PgClassExpression[28∈4]<br />ᐸ__list_of_....”foo_bar”ᐳ"}}:::plan
     PgSelectSingle20 --> PgClassExpression28
+    Access29{{"Access[29∈5]<br />ᐸ27.secondsᐳ"}}:::plan
+    PgClassExpression27 --> Access29
+    Access30{{"Access[30∈5]<br />ᐸ27.minutesᐳ"}}:::plan
+    PgClassExpression27 --> Access30
+    Access31{{"Access[31∈5]<br />ᐸ27.hoursᐳ"}}:::plan
+    PgClassExpression27 --> Access31
 
     %% define steps
     classDef bucket0 stroke:#696969
@@ -79,7 +85,7 @@ graph TD
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression21,PgClassExpression22,PgClassExpression23,PgClassExpression24,PgClassExpression25,PgClassExpression26,PgClassExpression27,PgClassExpression28 bucket4
     classDef bucket5 stroke:#7fff00
-    class Bucket5 bucket5
+    class Bucket5,Access29,Access30,Access31 bucket5
 
     %% implicit side effects
 

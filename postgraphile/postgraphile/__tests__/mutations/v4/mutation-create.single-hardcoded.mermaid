@@ -9,13 +9,13 @@ graph TD
 
     subgraph "Buckets for mutations/v4/mutation-create.single-hardcoded"
     Bucket0("Bucket 0 (root)"):::bucket
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 20, 21, 52, 4, 56<br /><br />1: PgInsertSingle[17]<br />2: <br />ᐳ: Object[22]"):::bucket
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 20, 52, 22, 4, 56<br /><br />ROOT Object{1}ᐸ{result}ᐳ[22]<br />1: <br />ᐳ: 26, 53, 25<br />2: PgSelect[27]<br />ᐳ: Access[49]<br />3: Connection[32], Connection[43]<br />4: 34, 45<br />5: First[33], First[44]<br />ᐳ: 50, 51, 54, 55, 37, 48"):::bucket
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 37, 54, 56, 50<br /><br />ROOT Edge{2}[37]"):::bucket
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 48, 55, 56, 51<br /><br />ROOT Edge{2}[48]"):::bucket
-    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 4, 53<br /><br />ROOT __ValueᐸrootValueᐳ[4]"):::bucket
-    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 54, 56<br /><br />ROOT PgSelectSingle{2}ᐸpersonᐳ[54]"):::bucket
-    Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 55, 56<br /><br />ROOT PgSelectSingle{2}ᐸpersonᐳ[55]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 20, 21, 2, 52, 4, 56<br /><br />1: PgInsertSingle[17]<br />2: <br />ᐳ: Object[22]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 2, 52, 22, 4, 56<br /><br />ROOT Object{1}ᐸ{result}ᐳ[22]<br />1: <br />ᐳ: 23, 26, 28, 29, 53, 25, 30<br />2: PgSelect[27]<br />ᐳ: Access[49]<br />3: Connection[32], Connection[43]<br />4: 34, 45<br />5: First[33], First[44]<br />ᐳ: 50, 51, 54, 55, 37, 48"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 37, 54, 17, 56, 50<br /><br />ROOT Edge{2}[37]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 48, 55, 17, 56, 51<br /><br />ROOT Edge{2}[48]"):::bucket
+    Bucket7("Bucket 7 (nullableBoundary)<br />Parent side effect step: 17<br />Deps: 4, 53<br /><br />ROOT __ValueᐸrootValueᐳ[4]"):::bucket
+    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 54, 17, 56<br /><br />ROOT PgSelectSingle{2}ᐸpersonᐳ[54]"):::bucket
+    Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 55, 17, 56<br /><br />ROOT PgSelectSingle{2}ᐸpersonᐳ[55]"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
@@ -29,22 +29,24 @@ graph TD
     __InputDynamicScalar13 --> __InputObject8
     __InputObject6{{"__InputObject[6∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]"}}:::plan
     __InputObject8 --> __InputObject6
-    Object20{{"Object[20∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 2"}}:::plan
-    Access18{{"Access[18∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access19{{"Access[19∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object20{{"Object[20∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access18{{"Access[18∈0] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access19{{"Access[19∈0] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access18 & Access19 --> Object20
-    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
-    __Value2 --> Access18
-    __Value2 --> Access19
     ApplyInput21{{"ApplyInput[21∈0] ➊"}}:::plan
     __InputObject6 --> ApplyInput21
-    PgInsertSingle17[["PgInsertSingle[17∈1] ➊<br />ᐸperson()ᐳ<br />More deps:<br />- Object[20]"]]:::sideeffectplan
-    ApplyInput21 --> PgInsertSingle17
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ<br />Dependents: 4"]:::plan
+    PgInsertSingle17[["PgInsertSingle[17∈1] ➊<br />ᐸperson()ᐳ"]]:::sideeffectplan
+    Object20 & ApplyInput21 --> PgInsertSingle17
     Object22{{"Object[22∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle17 --> Object22
-    PgSelect27[["PgSelect[27∈2] ➊<br />ᐸpersonᐳ<br />More deps:<br />- Object[20]"]]:::plan
+    PgSelect27[["PgSelect[27∈2] ➊<br />ᐸpersonᐳ"]]:::plan
+    Object30{{"Object[30∈2] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     PgClassExpression25{{"PgClassExpression[25∈2] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgClassExpression25 --> PgSelect27
+    Object30 & PgClassExpression25 --> PgSelect27
+    Access28{{"Access[28∈2] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access29{{"Access[29∈2] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access28 & Access29 --> Object30
     Edge37{{"Edge[37∈2] ➊"}}:::plan
     First33[["First[33∈2] ➊"]]:::plan
     PgCursor50{{"PgCursor[50∈2] ➊"}}:::plan
@@ -56,6 +58,8 @@ graph TD
     Access49{{"Access[49∈2] ➊<br />ᐸ27.cursorDetailsᐳ"}}:::plan
     First33 & Access49 --> PgCursor50
     First44 & Access49 --> PgCursor51
+    Access23{{"Access[23∈2] ➊<br />ᐸ17.m.clientMutationIdᐳ"}}:::plan
+    PgInsertSingle17 --> Access23
     Access26{{"Access[26∈2] ➊<br />ᐸ17.tᐳ"}}:::plan
     Access26 --> PgClassExpression25
     PgInsertSingle17 --> Access26
@@ -98,7 +102,7 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle17,Object22 bucket1
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgClassExpression25,Access26,PgSelect27,Connection32,First33,ConnectionItems34,Edge37,Connection43,First44,ConnectionItems45,Edge48,Access49,PgCursor50,PgCursor51,Lambda53,PgSelectSingle54,PgSelectSingle55 bucket2
+    class Bucket2,Access23,PgClassExpression25,Access26,PgSelect27,Access28,Access29,Object30,Connection32,First33,ConnectionItems34,Edge37,Connection43,First44,ConnectionItems45,Edge48,Access49,PgCursor50,PgCursor51,Lambda53,PgSelectSingle54,PgSelectSingle55 bucket2
     classDef bucket5 stroke:#7fff00
     class Bucket5 bucket5
     classDef bucket6 stroke:#ff1493
@@ -111,4 +115,7 @@ graph TD
     class Bucket9,PgClassExpression60,List61,Lambda62,PgClassExpression64 bucket9
 
     %% implicit side effects
+    PgInsertSingle17 -.-o Access28
+    PgInsertSingle17 -.-o Access29
+    PgInsertSingle17 -.-o Lambda53
 

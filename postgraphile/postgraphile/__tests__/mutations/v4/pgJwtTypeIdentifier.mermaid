@@ -10,7 +10,7 @@ graph TD
     subgraph "Buckets for mutations/v4/pgJwtTypeIdentifier"
     Bucket0("Bucket 0 (root)"):::bucket
     Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 15, 20<br /><br />1: PgSelect[11]<br />2: PgSelectRows[17]<br />3: First[16]<br />ᐳ: PgSelectSingle[18], Object[19]"):::bucket
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 18, 19<br /><br />ROOT Object{1}ᐸ{result}ᐳ[19]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 18, 11, 19<br /><br />ROOT Object{1}ᐸ{result}ᐳ[19]"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2

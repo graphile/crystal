@@ -9,10 +9,10 @@ graph TD
 
     subgraph "Buckets for mutations/v4/relay.defaultNodeIdCodec.createLeftArm"
     Bucket0("Bucket 0 (root)"):::bucket
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 15, 17, 32<br /><br />1: PgInsertSingle[11]<br />2: <br />ᐳ: Object[16]"):::bucket
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 11, 17, 14, 32<br /><br />ROOT Object{1}ᐸ{result}ᐳ[16]"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 11, 17, 14, 32<br /><br />ROOT PgInsertSingle{1}ᐸleft_arm()ᐳ[11]<br />1: <br />ᐳ: 19, 18, 20, 21, 22, 30, 31<br />2: PgSelect[23]<br />3: PgSelectRows[28]<br />4: First[27]<br />ᐳ: PgSelectSingle[29]"):::bucket
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 29, 32<br /><br />ROOT PgSelectSingle{3}ᐸpersonᐳ[29]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 15, 2, 17, 32<br /><br />1: PgInsertSingle[11]<br />2: <br />ᐳ: Object[16]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 2, 11, 16, 17, 32<br /><br />ROOT Object{1}ᐸ{result}ᐳ[16]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 11, 17, 26, 32<br /><br />ROOT PgInsertSingle{1}ᐸleft_arm()ᐳ[11]<br />1: <br />ᐳ: 19, 18, 20, 21, 22, 30, 31<br />2: PgSelect[23]<br />3: PgSelectRows[28]<br />4: First[27]<br />ᐳ: PgSelectSingle[29]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 29, 11, 32<br /><br />ROOT PgSelectSingle{3}ᐸpersonᐳ[29]"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
@@ -23,25 +23,27 @@ graph TD
     __InputObject8{{"__InputObject[8∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ0.69ᐳ[36]<br />- Constantᐸ'people|6'ᐳ[37]"}}:::plan
     __InputObject6{{"__InputObject[6∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]"}}:::plan
     __InputObject8 --> __InputObject6
-    Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 2"}}:::plan
-    Access12{{"Access[12∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access13{{"Access[13∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access12{{"Access[12∈0] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access13{{"Access[13∈0] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access12 & Access13 --> Object14
-    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
-    __Value2 --> Access12
-    __Value2 --> Access13
     ApplyInput15{{"ApplyInput[15∈0] ➊"}}:::plan
     __InputObject6 --> ApplyInput15
-    PgInsertSingle11[["PgInsertSingle[11∈1] ➊<br />ᐸleft_arm()ᐳ<br />More deps:<br />- Object[14]"]]:::sideeffectplan
-    ApplyInput15 --> PgInsertSingle11
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ<br />Dependents: 4"]:::plan
+    PgInsertSingle11[["PgInsertSingle[11∈1] ➊<br />ᐸleft_arm()ᐳ"]]:::sideeffectplan
+    Object14 & ApplyInput15 --> PgInsertSingle11
     Object16{{"Object[16∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle11 --> Object16
+    Object26{{"Object[26∈2] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access24{{"Access[24∈2] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access25{{"Access[25∈2] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access24 & Access25 --> Object26
     List20{{"List[20∈3] ➊<br />ᐸ17,18ᐳ<br />More deps:<br />- Constantᐸ'left_arms'ᐳ[17]"}}:::plan
     PgClassExpression18{{"PgClassExpression[18∈3] ➊<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
     PgClassExpression18 --> List20
-    PgSelect23[["PgSelect[23∈3] ➊<br />ᐸpersonᐳ<br />More deps:<br />- Object[14]"]]:::plan
+    PgSelect23[["PgSelect[23∈3] ➊<br />ᐸpersonᐳ"]]:::plan
     PgClassExpression22{{"PgClassExpression[22∈3] ➊<br />ᐸ__left_arm...person_id”ᐳ"}}:::plan
-    PgClassExpression22 --> PgSelect23
+    Object26 & PgClassExpression22 --> PgSelect23
     Access19{{"Access[19∈3] ➊<br />ᐸ11.tᐳ"}}:::plan
     Access19 --> PgClassExpression18
     PgInsertSingle11 --> Access19
@@ -71,11 +73,13 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle11,Object16 bucket1
     classDef bucket2 stroke:#7f007f
-    class Bucket2 bucket2
+    class Bucket2,Access24,Access25,Object26 bucket2
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression18,Access19,List20,Lambda21,PgClassExpression22,PgSelect23,First27,PgSelectRows28,PgSelectSingle29,PgClassExpression30,PgClassExpression31 bucket3
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgClassExpression33,List34,Lambda35 bucket4
 
     %% implicit side effects
+    PgInsertSingle11 -.-o Access24
+    PgInsertSingle11 -.-o Access25
 
