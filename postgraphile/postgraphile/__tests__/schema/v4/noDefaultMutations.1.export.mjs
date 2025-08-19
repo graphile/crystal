@@ -10884,16 +10884,6 @@ export const objects = {
       }
     }
   },
-  CompoundKeysEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
-      }
-    }
-  },
   CompoundType: {
     assertStep: assertPgClassSingleStep,
     plans: {
@@ -10915,16 +10905,6 @@ export const objects = {
     plans: {
       totalCount($connection) {
         return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
-    }
-  },
-  CompoundTypesEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
       }
     }
   },
@@ -10966,16 +10946,6 @@ export const objects = {
       }
     }
   },
-  EdgeCasesEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
-      }
-    }
-  },
   FuncOutComplexRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
@@ -10998,16 +10968,6 @@ export const objects = {
     plans: {
       totalCount($connection) {
         return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
-    }
-  },
-  FuncOutComplexSetofEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
       }
     }
   },
@@ -11058,16 +11018,6 @@ export const objects = {
       }
     }
   },
-  FuncOutOutSetofEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
-      }
-    }
-  },
   FuncOutOutSetofRecord: {
     assertStep: assertPgClassSingleStep
   },
@@ -11090,16 +11040,6 @@ export const objects = {
       }
     }
   },
-  FuncOutSetofEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
-      }
-    }
-  },
   FuncOutUnnamedOutOutUnnamedRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
@@ -11119,16 +11059,6 @@ export const objects = {
       }
     }
   },
-  FuncReturnsTableMultiColEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
-      }
-    }
-  },
   FuncReturnsTableMultiColRecord: {
     assertStep: assertPgClassSingleStep
   },
@@ -11137,16 +11067,6 @@ export const objects = {
     plans: {
       totalCount($connection) {
         return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
-    }
-  },
-  FuncReturnsTableOneColEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
       }
     }
   },
@@ -11173,16 +11093,6 @@ export const objects = {
     plans: {
       totalCount($connection) {
         return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
-    }
-  },
-  IntSetQueryEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
       }
     }
   },
@@ -11246,16 +11156,6 @@ export const objects = {
     plans: {
       totalCount($connection) {
         return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
-    }
-  },
-  Issue756SEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
       }
     }
   },
@@ -11410,16 +11310,6 @@ export const objects = {
     plans: {
       totalCount($connection) {
         return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
-    }
-  },
-  LeftArmsEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
       }
     }
   },
@@ -11813,16 +11703,6 @@ export const objects = {
       }
     }
   },
-  MyTablesEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
-      }
-    }
-  },
   NestedCompoundType: {
     assertStep: assertPgClassSingleStep,
     plans: {
@@ -11891,31 +11771,11 @@ export const objects = {
       }
     }
   },
-  NullTestRecordsEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
-      }
-    }
-  },
   PeopleConnection: {
     assertStep: ConnectionStep,
     plans: {
       totalCount($connection) {
         return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
-    }
-  },
-  PeopleEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
       }
     }
   },
@@ -12271,16 +12131,6 @@ export const objects = {
       }
     }
   },
-  PersonSecretsEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
-      }
-    }
-  },
   Post: {
     assertStep: assertPgClassSingleStep,
     plans: {
@@ -12413,16 +12263,6 @@ export const objects = {
     plans: {
       totalCount($connection) {
         return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
-    }
-  },
-  TypesEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
       }
     }
   },

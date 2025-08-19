@@ -875,16 +875,6 @@ export const objects = {
       }
     }
   },
-  NetworksEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
-      }
-    }
-  },
   UpdateNetworkPayload: {
     assertStep: ObjectStep,
     plans: {

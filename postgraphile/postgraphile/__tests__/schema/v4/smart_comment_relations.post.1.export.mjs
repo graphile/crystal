@@ -4700,16 +4700,6 @@ export const objects = {
       }
     }
   },
-  BuildingsEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
-      }
-    }
-  },
   CreateBuildingPayload: {
     assertStep: assertExecutableStep,
     plans: {
@@ -5321,16 +5311,6 @@ export const objects = {
       }
     }
   },
-  HousesEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
-      }
-    }
-  },
   Offer: {
     assertStep: assertPgClassSingleStep,
     plans: {
@@ -5358,16 +5338,6 @@ export const objects = {
       }
     }
   },
-  OffersEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
-      }
-    }
-  },
   Post: {
     assertStep: assertPgClassSingleStep,
     plans: {
@@ -5392,31 +5362,11 @@ export const objects = {
       }
     }
   },
-  PostsEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
-      }
-    }
-  },
   PropertiesConnection: {
     assertStep: ConnectionStep,
     plans: {
       totalCount($connection) {
         return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
-    }
-  },
-  PropertiesEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
       }
     }
   },
@@ -5702,16 +5652,6 @@ export const objects = {
       }
     }
   },
-  StreetPropertiesEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
-      }
-    }
-  },
   StreetProperty: {
     assertStep: assertPgClassSingleStep,
     plans: {
@@ -5758,16 +5698,6 @@ export const objects = {
     plans: {
       totalCount($connection) {
         return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
-    }
-  },
-  StreetsEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
       }
     }
   },

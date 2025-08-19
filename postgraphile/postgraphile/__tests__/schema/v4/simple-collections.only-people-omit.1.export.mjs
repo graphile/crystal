@@ -1478,16 +1478,6 @@ export const objects = {
       }
     }
   },
-  PeopleEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
-      }
-    }
-  },
   Person: {
     assertStep: assertPgClassSingleStep,
     plans: {

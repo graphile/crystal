@@ -5805,16 +5805,6 @@ export const objects = {
       }
     }
   },
-  ListsEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
-      }
-    }
-  },
   Mult1Payload: {
     assertStep: ObjectStep,
     plans: {
@@ -6041,16 +6031,6 @@ export const objects = {
       }
     }
   },
-  TypesEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
-      }
-    }
-  },
   UpdatableView: {
     assertStep: assertPgClassSingleStep,
     planType($specifier) {
@@ -6066,16 +6046,6 @@ export const objects = {
     plans: {
       totalCount($connection) {
         return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
-    }
-  },
-  UpdatableViewsEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
       }
     }
   },

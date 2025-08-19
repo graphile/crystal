@@ -2359,16 +2359,6 @@ where __l0__.${sql.identifier("book_id")} = ${$people.placeholder($record.get("i
       }
     }
   },
-  BookAuthorsEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
-      }
-    }
-  },
   BookEditor: {
     assertStep: assertPgClassSingleStep,
     plans: {
@@ -2409,31 +2399,11 @@ where __l0__.${sql.identifier("book_id")} = ${$people.placeholder($record.get("i
       }
     }
   },
-  BookEditorsEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
-      }
-    }
-  },
   BooksConnection: {
     assertStep: ConnectionStep,
     plans: {
       totalCount($connection) {
         return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
-    }
-  },
-  BooksEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
       }
     }
   },
@@ -2505,31 +2475,11 @@ where __l0__.${sql.identifier("book_id")} = ${$people.placeholder($record.get("i
       }
     }
   },
-  PenNamesEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
-      }
-    }
-  },
   PeopleConnection: {
     assertStep: ConnectionStep,
     plans: {
       totalCount($connection) {
         return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
-    }
-  },
-  PeopleEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
       }
     }
   },
@@ -2641,16 +2591,6 @@ where __l0__.${sql.identifier("book_id")} = ${$people.placeholder($record.get("i
     plans: {
       totalCount($connection) {
         return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
-    }
-  },
-  PostsEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
       }
     }
   }

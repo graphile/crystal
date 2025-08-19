@@ -1045,16 +1045,6 @@ export const objects = {
       }
     }
   },
-  GeomsEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
-      }
-    }
-  },
   UpdateGeomPayload: {
     assertStep: ObjectStep,
     plans: {

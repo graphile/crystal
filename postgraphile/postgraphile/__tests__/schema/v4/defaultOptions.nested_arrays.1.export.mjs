@@ -1042,16 +1042,6 @@ export const objects = {
       }
     }
   },
-  TSEdge: {
-    plans: {
-      cursor($edge) {
-        return get2($edge, "cursor");
-      },
-      node($edge) {
-        return get2($edge, "node");
-      }
-    }
-  },
   UpdateTPayload: {
     assertStep: ObjectStep,
     plans: {
