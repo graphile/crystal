@@ -1459,8 +1459,8 @@ const DONE_PROMISE: Promise<IteratorReturnResult<void>> = Promise.resolve({
  */
 export function asyncIteratorWithCleanup<T>(
   iterable: AsyncIterable<T, void, never>,
-  callback: () => void,
-): AsyncIterableIterator<T, void, never> & AsyncIteratorObject<T, void, never> {
+  callback: (error?: unknown) => void,
+): AsyncGenerator<T, void, never> & AsyncIteratorObject<T, void, never> {
   let iterator:
     | (AsyncIterator<T, void, never> &
         Partial<AsyncIteratorObject<T, void, never>>)
@@ -1469,7 +1469,7 @@ export function asyncIteratorWithCleanup<T>(
   function cleanup(e?: unknown) {
     if (!done) {
       done = true;
-      callback();
+      callback(e);
     }
   }
   function checkDone(result: IteratorResult<T, void>) {

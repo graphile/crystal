@@ -51,7 +51,11 @@ import type {
   StreamMoreableArray,
 } from "./interfaces.js";
 import { timeSource } from "./timeSource.js";
-import { arrayOfLength, isPromiseLike } from "./utils.js";
+import {
+  arrayOfLength,
+  asyncIteratorWithCleanup,
+  isPromiseLike,
+} from "./utils.js";
 
 const { GraphQLError } = graphql;
 
@@ -1187,34 +1191,14 @@ function handleMaybeIterator(
   result:
     | graphql.ExecutionResult
     | AsyncGenerator<graphql.AsyncExecutionResult, void, void>,
-) {
+):
+  | graphql.ExecutionResult
+  | AsyncGenerator<graphql.AsyncExecutionResult, void, void> {
   if (Symbol.asyncIterator in result) {
-    const iterator = result[Symbol.asyncIterator]();
-    const done = (e?: unknown) => abortController.abort(e);
-    const checkDone = (r: IteratorResult<any>) => {
-      if (r.done) done();
-    };
-    return {
-      [Symbol.asyncIterator]() {
-        return this;
-      },
-      [Symbol.asyncDispose]() {
-        return iterator[Symbol.asyncDispose]();
-      },
-      next() {
-        const v = iterator.next();
-        v.then(checkDone, done);
-        return v;
-      },
-      return() {
-        done();
-        return iterator.return();
-      },
-      throw(e: unknown) {
-        done(e);
-        return iterator.throw(e);
-      },
-    };
+    return asyncIteratorWithCleanup(
+      result,
+      abortController.abort.bind(abortController),
+    );
   } else {
     abortController.abort();
     return result;
