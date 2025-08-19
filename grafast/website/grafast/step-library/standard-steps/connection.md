@@ -84,24 +84,32 @@ a `PaginationParams` object containing:
 - `limit: number | null` — maximum rows to fetch, where `null` means no limit
 - `reverse: boolean` — whether to paginate backwards (always `false` if
   unsupported)
-- `offset: number | null` — rows to skip (applied after `after` if `cursor` is set); `null` (and `0`) means no offset
+- `offset: number | null` — rows to skip (applied after `after` if `cursor` is
+  set); `null` (and `0`) means no offset
 - `after: string | null` — exclusive lower bound cursor (or upper bound in
-  reverse mode); `null` if no cursor was provided, or if you didn't indicate
+  reverse mode); `null` if no cursor was provided, or if you didn’t indicate
   support for `cursor`
-- `stream: ExecutionDetailsStream | null` — streaming hints (e.g. `stream?.initialCount`)
+- `stream: ExecutionDetailsStream | null` — streaming hints (e.g.
+  `stream?.initialCount`)
 
-There are other properties in this object starting with `__` - these **must** be
+There are other properties in this object starting with `__` — these **must** be
 ignored, and may change over time. They're used internally by `connection()`.
 
 Your step must honour the subset of fields corresponding to the features you
 declared in `paginationSupport`.
 
-## Cursor support
+## `step.cursorForItem($item)`
 
-If you don’t support `cursor`, `connection()` falls back to numeric cursors
-(based on item indices). In this mode, queries like `last: 3` without a `before`
-cannot be satisfied without fetching the full collection, even if `limit` and
-`offset` are supported.
+If the step indicates `cursor: true` in `paginationSupport`, the step must
+implement a `cursorForItem($item: Step<TItem>): Step<string>` method. This is
+called for each item in the collection to produce its stable, opaque cursor
+string.
+
+Cursors must be consistent across forward and reverse pagination; the same item
+must always map to the same cursor value.
+
+If you don’t indicate support for `cursor`, `connection()` will automatically
+fall back to numeric cursors (based on the item’s index).
 
 ## Performance
 
