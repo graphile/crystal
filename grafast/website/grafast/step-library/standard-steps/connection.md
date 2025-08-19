@@ -32,62 +32,92 @@ unaffected.
 
 :::
 
-## Pagination support
+## `step.paginationSupport`
 
 If your underlying step can handle pagination directly, it should expose its
 capabilities via a `paginationSupport` object.
 
-If `paginationSupport` is
-present, support for `limit` is assumed. Support for other features is indicated
-via the flags:
+If `paginationSupport` is present, support for `limit` is assumed. Support for
+other features is indicated via the flags:
 
 - `offset?: boolean`
-  The step supports numeric offsets - specifically a count of the records to
-  skip over before returning results.
+  The step supports numeric offsets — i.e. skipping a fixed number of records
+  before returning results. If combined with `cursor`, the offset is applied
+  _after_ the cursor.
 
 - `cursor?: boolean`
-  The step supports cursor pagination (`after`). If you support `cursor` but not
-  `reverse`, then reverse queries (`last`, `before`) will result in an error, so
-  do not expose these via the GraphQL schema. (If combined with `offset`, offset
-  applies after the cursor. If you can’t support that combination, we recommend
-  that you keep `cursor: true` and set `offset: false`.)
+  The step supports cursor-based pagination (`after`).
+  If you support `cursor` but not `reverse`, then reverse queries (`last`,
+  `before`) will result in an error, so do not expose those arguments in your
+  GraphQL schema.
+  If you cannot handle `cursor + offset` together, set `cursor: true` and
+  `offset: false` (since cursor is more impactful than offset).
 
 - `reverse?: boolean`
-  The step support reverse pagination with cursors. **Requires `cursor`**.
-  Reverse means apply `limit`, `offset`, and `after` working backwards from the
-  end. One way to achieve this is to reverse the sort order, apply the parameters
-  as usual, then restore the original order. Do **not** return the final list in
-  reverse order.
+  Indicates support for reverse pagination (requires `cursor`).
+  In reverse mode, the step must apply `limit`, `offset`, and `after` starting
+  from the end of the collection and working backwards.
+  A typical strategy is: invert the sort order in your data source, apply the
+  arguments as usual, then restore the original order.
+  **Do not** return the final list reversed.
 
 - `full?: boolean`
-  **ADVANCED**. The step implements the complete `ConnectionHandlingStep`
-  interface. Instead of us slicing, you receive the raw GraphQL params directly
-  and must yield an object with `{ items, hasNextPage, hasPreviousPage }`.
+  **Advanced.** The step implements the full `ConnectionHandlingStep` contract.
+  In this case, the step itself receives the raw GraphQL pagination parameters
+  (`first`, `last`, `before`, `after`, `offset`, etc) via setters such as
+  `.setFirst(...)` and must yield an object of the form:
 
-### Cursor support
+  ```ts
+  {
+    items: ReadonlyArray<TItem> | AsyncIterable<TItem>,
+    hasNextPage: boolean,
+    hasPreviousPage: boolean
+  }
+  ```
 
-If you don’t support `cursor`, then we’ll fall back to numeric cursors (the item
-index). In that mode, queries like `last: 3` without a `before` would require
-fetching the entire collection to determine cursors - we recommend you forbid
-these.
+## `step.applyPagination($params)`
+
+When `step.paginationSupport` is present (but does not contain `full: true`),
+`connection()` will call `step.applyPagination($params)` with a step that yields
+a `PaginationParams` object containing:
+
+- `limit: number | null` — maximum rows to fetch, where `null` means no limit
+- `reverse: boolean` — whether to paginate backwards (always `false` if
+  unsupported)
+- `offset: number | null` — rows to skip (applied after `after` if `cursor` is set); `null` (and `0`) means no offset
+- `after: string | null` — exclusive lower bound cursor (or upper bound in
+  reverse mode); `null` if no cursor was provided, or if you didn't indicate
+  support for `cursor`
+- `stream: ExecutionDetailsStream | null` — streaming hints (e.g. `stream?.initialCount`)
+
+There are other properties in this object starting with `__` - these **must** be
+ignored, and may change over time. They're used internally by `connection()`.
+
+Your step must honour the subset of fields corresponding to the features you
+declared in `paginationSupport`.
+
+## Cursor support
+
+If you don’t support `cursor`, `connection()` falls back to numeric cursors
+(based on item indices). In this mode, queries like `last: 3` without a `before`
+cannot be satisfied without fetching the full collection, even if `limit` and
+`offset` are supported.
 
 ## Performance
 
-If you don’t indicate any `paginationSupport`, `connection()` will do all the
-pagination in memory. This requires fetching the full dataset, which is often
-expensive.
+Without `paginationSupport`, `connection()` handles everything in memory. That
+means fetching the entire dataset, which is usually inefficient.
 
-Adding `paginationSupport` lets you push a selection of supported pagination
-concerns to your data source for efficiency.
+Adding `paginationSupport` pushes supported concerns (`limit`, `offset`,
+`cursor`, `reverse`) down into your data source for efficiency.
 
 ## Other notes
 
-- If `reverse` is not supported, it’s recommended not to expose `before`/`last`
-  args in your schema, since we would otherwise need to fetch the entire
-  collection to emulate them.
+- If `reverse` is not supported, don’t expose `before`/`last` args in your schema,
+  or we may be forced to fetch the whole collection.
 - If `cursor` is supported, the step **must** also implement
-  `cursorForItem($item: Step<TItem>): Step<string>` to return stable cursors.
-- `nodeForItem`, `edgeForItem`, and `listItem` give finer control over how nodes
-  and edges are represented.
-- `connectionClone()` can be used to make an unpaginated copy of the step, e.g.
-  for `totalCount` and other aggregates.
+  `cursorForItem($item: Step<TItem>): Step<string>` to provide stable cursors.
+- Optional hooks `nodeForItem`, `edgeForItem`, and `listItem` give finer control
+  over how nodes and edges are represented.
+- `connectionClone()` can produce an unpaginated copy of the step, e.g. for
+  `totalCount` or aggregates.
