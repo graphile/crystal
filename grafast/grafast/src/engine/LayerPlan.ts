@@ -415,9 +415,6 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     // we set a `rootStep` later, if the root step is dependent on this step
     // (directly or indirectly) we will clear this property.
 
-    // There has yet to be any side effects created in this layer.
-    this.latestSideEffectStep = null;
-
     this.stepsByConstructor = new Map();
     if (reason.type === "root") {
       this.parentSideEffectStep = null;
@@ -505,6 +502,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
 
       parentLayerPlan.children.push(this);
     }
+    this.latestSideEffectStep = this.parentSideEffectStep;
   }
 
   toString() {
