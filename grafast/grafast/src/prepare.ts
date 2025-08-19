@@ -676,7 +676,7 @@ export function grafastPrepare(
         (v) => handleMaybeIterator(abortController, v),
         (e) => {
           abortController.abort(e);
-          return Promise.reject(e);
+          throw e;
         },
       );
     } else {
