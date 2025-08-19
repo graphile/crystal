@@ -407,6 +407,11 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
    */
   public outOfBoundsLayerPlanIds = new Set<number>();
 
+  private sideEffectRootLayerPlan:
+    | null
+    | LayerPlan<LayerPlanReasonRoot>
+    | LayerPlan<LayerPlanReasonMutationField>;
+
   constructor(
     public readonly operationPlan: OperationPlan,
     public readonly reason: TReason, //parentStep: ExecutableStep | null,
@@ -417,6 +422,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
 
     this.stepsByConstructor = new Map();
     if (reason.type === "root") {
+      this.sideEffectRootLayerPlan = null;
       this.parentSideEffectStep = null;
       this.depth = 0;
       this.ancestry = [this];
@@ -432,6 +438,17 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     } else if (reason.type === "combined") {
       this.parentSideEffectStep = null;
       const firstParentLayerPlan = reason.parentLayerPlans[0];
+      this.sideEffectRootLayerPlan =
+        firstParentLayerPlan.sideEffectRootLayerPlan;
+      if (isDev) {
+        for (const plp of reason.parentLayerPlans) {
+          assert.strictEqual(
+            plp.sideEffectRootLayerPlan,
+            this.sideEffectRootLayerPlan,
+            `Expected all parentLayerPlans to have the same sideEffectRootLayerPlan`,
+          );
+        }
+      }
       const rootLp = firstParentLayerPlan.ancestry[0];
       if (rootLp.reason.type !== "root") {
         throw new Error(
@@ -480,6 +497,16 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       }
     } else {
       const parentLayerPlan = reason.parentLayerPlan;
+      if (
+        parentLayerPlan.reason.type === "root" ||
+        parentLayerPlan.reason.type === "mutationField"
+      ) {
+        this.sideEffectRootLayerPlan = parentLayerPlan as
+          | LayerPlan<LayerPlanReasonRoot>
+          | LayerPlan<LayerPlanReasonMutationField>;
+      } else {
+        this.sideEffectRootLayerPlan = parentLayerPlan.sideEffectRootLayerPlan;
+      }
 
       if (reason.type === "polymorphicPartition") {
         if (parentLayerPlan.reason.type !== "polymorphic") {
@@ -502,7 +529,8 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
 
       parentLayerPlan.children.push(this);
     }
-    this.latestSideEffectStep = this.parentSideEffectStep;
+    this.latestSideEffectStep =
+      this.sideEffectRootLayerPlan?.latestSideEffectStep ?? null;
   }
 
   toString() {
