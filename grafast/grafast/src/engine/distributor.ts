@@ -1,4 +1,5 @@
-import type { Maybe } from "..";
+import { isDev, type Maybe } from "..";
+import * as assert from "../assert";
 import type { Deferred } from "../deferred";
 import { defer } from "../deferred";
 import type { Step } from "../step";
@@ -247,7 +248,13 @@ export function distributor<TData>(
 
     let result: Promise<IteratorResult<TData, void>>;
     if (bufferIndex >= bufferLength) {
-      // assert.equal(bufferIndex, bufferLength, "We've missed some indexes?!")
+      if (isDev) {
+        assert.strictEqual(
+          bufferIndex,
+          bufferLength,
+          "We've missed some indexes?!",
+        );
+      }
       // It's our job to pull the next value!
       // But first... did the source iterator already complete?
       if (finalResult !== null) {
@@ -307,7 +314,13 @@ export function distributor<TData>(
       );
     }
 
-    // assert.equal(deliveredIndex[stepIndex], index - 1);
+    if (isDev) {
+      assert.strictEqual(
+        deliveredIndex[stepIndex],
+        index - 1,
+        "Expectation of delivered index did not match",
+      );
+    }
     deliveredIndex[stepIndex] = index;
     maybeAdvanceLowWaterMark();
 
