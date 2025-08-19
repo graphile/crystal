@@ -157,66 +157,21 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
                 deprecationReason: tagToString(
                   resource.extensions?.tags?.deprecated,
                 ),
-                // ENHANCE: review this plan, it feels overly complex and somewhat hacky.
                 plan: EXPORTABLE(
-                  (
-                    EdgeStep,
-                    PgDeleteSingleStep,
-                    connection,
-                    constant,
-                    first,
-                    pgSelectFromRecord,
-                    pkAttributes,
-                    resource,
-                  ) =>
-                    function plan(
+                  (pgMutationPayloadEdge, pkAttributes, resource) =>
+                    (
                       $mutation: ObjectStep<{
                         result: PgClassSingleStep;
                       }>,
                       fieldArgs: FieldArgs,
-                    ) {
-                      const $result = $mutation.getStepForKey("result", true);
-                      if (!$result) {
-                        return constant(null);
-                      }
-
-                      const $select = (() => {
-                        if ($result instanceof PgDeleteSingleStep) {
-                          return pgSelectFromRecord(
-                            $result.resource,
-                            $result.record(),
-                          );
-                        } else {
-                          const spec = pkAttributes.reduce(
-                            (memo, attributeName) => {
-                              memo[attributeName] = $result.get(attributeName);
-                              return memo;
-                            },
-                            Object.create(null),
-                          );
-                          return resource.find(spec);
-                        }
-                      })();
-
-                      fieldArgs.apply($select, "orderBy");
-
-                      const $connection = connection($select) as any;
-                      // NOTE: you must not use `$single = $select.single()`
-                      // here because doing so will mark the row as unique, and
-                      // then the ordering logic (and thus cursor) will differ.
-                      const $single = first($connection);
-                      return new EdgeStep($connection, $single);
-                    },
-                  [
-                    EdgeStep,
-                    PgDeleteSingleStep,
-                    connection,
-                    constant,
-                    first,
-                    pgSelectFromRecord,
-                    pkAttributes,
-                    resource,
-                  ],
+                    ) =>
+                      pgMutationPayloadEdge(
+                        $mutation,
+                        pkAttributes,
+                        resource,
+                        fieldArgs,
+                      ),
+                  [pgMutationPayloadEdge, pkAttributes, resource],
                 ),
               }),
             ),
@@ -227,3 +182,65 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
     },
   },
 };
+
+const getPgSelectSingleFromMutationResult = EXPORTABLE(
+  (PgDeleteSingleStep, pgSelectFromRecord) =>
+    (
+      $mutation: ObjectStep<{
+        result: PgClassSingleStep;
+      }>,
+      pkAttributes: readonly string[],
+      resource: Exclude<
+        ReturnType<GraphileBuild.Build["pgTableResource"]>,
+        null | undefined
+      >,
+    ) => {
+      const $result = $mutation.getStepForKey("result", true);
+      if (!$result) return null;
+      if ($result instanceof PgDeleteSingleStep) {
+        return pgSelectFromRecord($result.resource, $result.record());
+      } else {
+        const spec = pkAttributes.reduce((memo, attributeName) => {
+          memo[attributeName] = $result.get(attributeName);
+          return memo;
+        }, Object.create(null));
+        return resource.find(spec);
+      }
+    },
+  [PgDeleteSingleStep, pgSelectFromRecord],
+  "getPgSelectSingleFromMutationResult",
+);
+
+// ENHANCE: review this plan, it feels overly complex and somewhat hacky.
+const pgMutationPayloadEdge = EXPORTABLE(
+  (
+    EdgeStep,
+    connection,
+    constant,
+    first,
+    getPgSelectSingleFromMutationResult,
+  ) =>
+    (
+      $mutation: ObjectStep<{
+        result: PgClassSingleStep;
+      }>,
+      pkAttributes: readonly string[],
+      resource: Exclude<
+        ReturnType<GraphileBuild.Build["pgTableResource"]>,
+        null | undefined
+      >,
+      fieldArgs: FieldArgs,
+    ) => {
+      const $select = getPgSelectSingleFromMutationResult(
+        $mutation,
+        pkAttributes,
+        resource,
+      );
+      if (!$select) return constant(null);
+      fieldArgs.apply($select, "orderBy");
+      const $connection = connection($select);
+      return new EdgeStep($connection, first($connection));
+    },
+  [EdgeStep, connection, constant, first, getPgSelectSingleFromMutationResult],
+  "pgMutationPayloadEdge",
+);
