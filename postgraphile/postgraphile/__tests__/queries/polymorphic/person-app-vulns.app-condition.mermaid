@@ -15,8 +15,8 @@ graph TD
     Bucket6("Bucket 6 (listItem)<br />Deps: 26, 43, 12<br /><br />ROOT __Item{6}ᐸ33ᐳ[36]"):::bucket
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 45, 37, 12, 47, 39<br /><br />ROOT Edge{6}[37]"):::bucket
     Bucket8("Bucket 8 (polymorphic)<br />__typename: Access[46]<br />Deps: 46, 12, 47"):::bucket
-    Bucket9("Bucket 9 (polymorphicPartition)<br />|AwsApplication<br />Deps: 12, 47<br />ᐳAwsApplication<br /><br />1: PgSelect[48]<br />2: PgSelectRows[53]<br />3: First[52]<br />ᐳ: 54, 63, 65"):::bucket
-    Bucket10("Bucket 10 (polymorphicPartition)<br />|GcpApplication<br />Deps: 12, 47<br />ᐳGcpApplication<br /><br />1: PgSelect[56]<br />2: PgSelectRows[61]<br />3: First[60]<br />ᐳ: 62, 64, 66"):::bucket
+    Bucket9("Bucket 9 (polymorphicPartition)<br />|AwsApplication<br />Deps: 12, 47<br />ᐳAwsApplication<br /><br />1: PgSelect[48]<br />2: PgSelectRows[53]<br />ᐳ: 52, 54, 63, 65"):::bucket
+    Bucket10("Bucket 10 (polymorphicPartition)<br />|GcpApplication<br />Deps: 12, 47<br />ᐳGcpApplication<br /><br />1: PgSelect[56]<br />2: PgSelectRows[61]<br />ᐳ: 60, 62, 64, 66"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket3
@@ -79,7 +79,7 @@ graph TD
     Lambda45 --> Access46
     PgSelect48[["PgSelect[48∈9]<br />ᐸaws_applicationsᐳ<br />ᐳAwsApplication<br />More deps:<br />- Object[12]"]]:::plan
     Access47 --> PgSelect48
-    First52[["First[52∈9]^"]]:::plan
+    First52{{"First[52∈9]^"}}:::plan
     PgSelectRows53[["PgSelectRows[53∈9]^"]]:::plan
     PgSelectRows53 --> First52
     PgSelect48 --> PgSelectRows53
@@ -91,7 +91,7 @@ graph TD
     PgSelectSingle54 --> PgClassExpression65
     PgSelect56[["PgSelect[56∈10]<br />ᐸgcp_applicationsᐳ<br />ᐳGcpApplication<br />More deps:<br />- Object[12]"]]:::plan
     Access47 --> PgSelect56
-    First60[["First[60∈10]^"]]:::plan
+    First60{{"First[60∈10]^"}}:::plan
     PgSelectRows61[["PgSelectRows[61∈10]^"]]:::plan
     PgSelectRows61 --> First60
     PgSelect56 --> PgSelectRows61

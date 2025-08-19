@@ -8,8 +8,8 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/functions/computed-column-user"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 25, 10<br />2: PgSelect[7]<br />3: PgSelectRows[12]<br />4: First[11]<br />ᐳ: PgSelectSingle[13]"):::bucket
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 10<br /><br />ROOT PgSelectSingleᐸforumsᐳ[13]<br />1: <br />ᐳ: 14, 19<br />2: PgSelect[15]<br />3: PgSelectRows[21]<br />4: First[20]<br />ᐳ: PgSelectSingle[22]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 25, 10<br />2: PgSelect[7]<br />3: PgSelectRows[12]<br />ᐳ: First[11], PgSelectSingle[13]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 10<br /><br />ROOT PgSelectSingleᐸforumsᐳ[13]<br />1: <br />ᐳ: 14, 19<br />2: PgSelect[15]<br />3: PgSelectRows[21]<br />ᐳ: First[20], PgSelectSingle[22]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 22<br /><br />ROOT PgSelectSingle{1}ᐸusersᐳ[22]"):::bucket
     end
     Bucket0 --> Bucket1
@@ -24,7 +24,7 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
-    First11[["First[11∈0] ➊"]]:::plan
+    First11{{"First[11∈0] ➊"}}:::plan
     PgSelectRows12[["PgSelectRows[12∈0] ➊"]]:::plan
     PgSelectRows12 --> First11
     PgSelect7 --> PgSelectRows12
@@ -36,7 +36,7 @@ graph TD
     PgClassExpression14{{"PgClassExpression[14∈1] ➊<br />ᐸ__forums__ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression14
     PgClassExpression14 --> PgFromExpression19
-    First20[["First[20∈1] ➊"]]:::plan
+    First20{{"First[20∈1] ➊"}}:::plan
     PgSelectRows21[["PgSelectRows[21∈1] ➊"]]:::plan
     PgSelectRows21 --> First20
     PgSelect15 --> PgSelectRows21

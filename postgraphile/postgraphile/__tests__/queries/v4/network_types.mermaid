@@ -8,7 +8,7 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/v4/network_types"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 6, 11, 12, 108, 109, 110, 7, 13, 15, 17, 23, 25, 31<br />2: 10, 20, 28, 36, 41, 46<br />ᐳ: Access[67], Access[70], Access[73]<br />3: 14, 22, 30, 38, 43, 48<br />4: 37, 42, 47, 51, 54, 57<br />ᐳ: 39, 40, 44, 45, 49, 50<br />5: 66, 69, 72, 75, 77, 79<br />ᐳ: 68, 71, 74, 76, 78, 80"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 6, 11, 12, 108, 109, 110, 7, 13, 15, 17, 23, 25, 31<br />2: 10, 20, 28, 36, 41, 46<br />ᐳ: Access[67], Access[70], Access[73]<br />3: 14, 22, 30, 38, 43, 48<br />ᐳ: 37, 39, 40, 42, 44, 45, 47, 49, 50<br />4: 51, 54, 57<br />ᐳ: 66, 68, 69, 71, 72, 74, 75, 76, 77, 78, 79, 80"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14, 67, 51, 40, 68, 76<br /><br />ROOT Connectionᐸ10ᐳ[14]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 22, 70, 54, 45, 71, 78<br /><br />ROOT Connectionᐸ20ᐳ[22]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 30, 73, 57, 50, 74, 80<br /><br />ROOT Connectionᐸ28ᐳ[30]"):::bucket
@@ -68,19 +68,19 @@ graph TD
     Connection30[["Connection[30∈0] ➊<br />ᐸ28ᐳ<br />Dependents: 2"]]:::plan
     PgSelect28 --> Connection30
     __InputObject25 --> ApplyInput31
-    First37[["First[37∈0] ➊"]]:::plan
+    First37{{"First[37∈0] ➊"}}:::plan
     PgSelectRows38[["PgSelectRows[38∈0] ➊"]]:::plan
     PgSelectRows38 --> First37
     PgSelect36 --> PgSelectRows38
     PgSelectSingle39{{"PgSelectSingle[39∈0] ➊<br />ᐸnetworkᐳ"}}:::plan
     First37 --> PgSelectSingle39
-    First42[["First[42∈0] ➊"]]:::plan
+    First42{{"First[42∈0] ➊"}}:::plan
     PgSelectRows43[["PgSelectRows[43∈0] ➊"]]:::plan
     PgSelectRows43 --> First42
     PgSelect41 --> PgSelectRows43
     PgSelectSingle44{{"PgSelectSingle[44∈0] ➊<br />ᐸnetworkᐳ"}}:::plan
     First42 --> PgSelectSingle44
-    First47[["First[47∈0] ➊"]]:::plan
+    First47{{"First[47∈0] ➊"}}:::plan
     PgSelectRows48[["PgSelectRows[48∈0] ➊"]]:::plan
     PgSelectRows48 --> First47
     PgSelect46 --> PgSelectRows48
@@ -89,18 +89,18 @@ graph TD
     ConnectionItems51[["ConnectionItems[51∈0] ➊<br />Dependents: 3<br />More deps:<br />- Connection[14]"]]:::plan
     ConnectionItems54[["ConnectionItems[54∈0] ➊<br />Dependents: 3<br />More deps:<br />- Connection[22]"]]:::plan
     ConnectionItems57[["ConnectionItems[57∈0] ➊<br />Dependents: 3<br />More deps:<br />- Connection[30]"]]:::plan
-    First66[["First[66∈0] ➊<br />More deps:<br />- ConnectionItems[51]"]]:::plan
+    First66{{"First[66∈0] ➊<br />More deps:<br />- ConnectionItems[51]"}}:::plan
     Access67{{"Access[67∈0] ➊<br />ᐸ10.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect10 --> Access67
-    First69[["First[69∈0] ➊<br />More deps:<br />- ConnectionItems[54]"]]:::plan
+    First69{{"First[69∈0] ➊<br />More deps:<br />- ConnectionItems[54]"}}:::plan
     Access70{{"Access[70∈0] ➊<br />ᐸ20.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect20 --> Access70
-    First72[["First[72∈0] ➊<br />More deps:<br />- ConnectionItems[57]"]]:::plan
+    First72{{"First[72∈0] ➊<br />More deps:<br />- ConnectionItems[57]"}}:::plan
     Access73{{"Access[73∈0] ➊<br />ᐸ28.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect28 --> Access73
-    Last75[["Last[75∈0] ➊<br />More deps:<br />- ConnectionItems[51]"]]:::plan
-    Last77[["Last[77∈0] ➊<br />More deps:<br />- ConnectionItems[54]"]]:::plan
-    Last79[["Last[79∈0] ➊<br />More deps:<br />- ConnectionItems[57]"]]:::plan
+    Last75{{"Last[75∈0] ➊<br />More deps:<br />- ConnectionItems[51]"}}:::plan
+    Last77{{"Last[77∈0] ➊<br />More deps:<br />- ConnectionItems[54]"}}:::plan
+    Last79{{"Last[79∈0] ➊<br />More deps:<br />- ConnectionItems[57]"}}:::plan
     PageInfo33{{"PageInfo[33∈1] ➊<br />More deps:<br />- Connection[14]"}}:::plan
     PageInfo34{{"PageInfo[34∈2] ➊<br />More deps:<br />- Connection[22]"}}:::plan
     PageInfo35{{"PageInfo[35∈3] ➊<br />More deps:<br />- Connection[30]"}}:::plan

@@ -17,10 +17,10 @@ graph TD
     Bucket10("Bucket 10 (listItem)<br />Deps: 118, 100<br /><br />ROOT __Item{10}ᐸ47ᐳ[58]"):::bucket
     Bucket11("Bucket 11 (listItem)<br />Deps: 126, 100<br /><br />ROOT __Item{11}ᐸ50ᐳ[60]"):::bucket
     Bucket12("Bucket 12 (listItem)<br />Deps: 122, 100<br /><br />ROOT __Item{12}ᐸ53ᐳ[62]"):::bucket
-    Bucket13("Bucket 13 (nullableBoundary)<br />Deps: 57, 114, 100<br /><br />ROOT PgSelectSingle{9}ᐸpostᐳ[57]<br />1: <br />ᐳ: 96, 115, 116<br />2: PgSelectRows[70]<br />3: First[69]<br />ᐳ: PgSelectSingle[71]"):::bucket
-    Bucket14("Bucket 14 (nullableBoundary)<br />Deps: 59, 118, 100<br /><br />ROOT PgSelectSingle{10}ᐸpostᐳ[59]<br />1: <br />ᐳ: 97, 119, 120<br />2: PgSelectRows[78]<br />3: First[77]<br />ᐳ: PgSelectSingle[79]"):::bucket
-    Bucket15("Bucket 15 (nullableBoundary)<br />Deps: 61, 126, 100<br /><br />ROOT PgSelectSingle{11}ᐸpostᐳ[61]<br />1: <br />ᐳ: 98, 127, 128<br />2: PgSelectRows[86]<br />3: First[85]<br />ᐳ: PgSelectSingle[87]"):::bucket
-    Bucket16("Bucket 16 (nullableBoundary)<br />Deps: 63, 122, 100<br /><br />ROOT PgSelectSingle{12}ᐸpostᐳ[63]<br />1: <br />ᐳ: 99, 123, 124<br />2: PgSelectRows[94]<br />3: First[93]<br />ᐳ: PgSelectSingle[95]"):::bucket
+    Bucket13("Bucket 13 (nullableBoundary)<br />Deps: 57, 114, 100<br /><br />ROOT PgSelectSingle{9}ᐸpostᐳ[57]<br />1: <br />ᐳ: 96, 115, 116<br />2: PgSelectRows[70]<br />ᐳ: First[69], PgSelectSingle[71]"):::bucket
+    Bucket14("Bucket 14 (nullableBoundary)<br />Deps: 59, 118, 100<br /><br />ROOT PgSelectSingle{10}ᐸpostᐳ[59]<br />1: <br />ᐳ: 97, 119, 120<br />2: PgSelectRows[78]<br />ᐳ: First[77], PgSelectSingle[79]"):::bucket
+    Bucket15("Bucket 15 (nullableBoundary)<br />Deps: 61, 126, 100<br /><br />ROOT PgSelectSingle{11}ᐸpostᐳ[61]<br />1: <br />ᐳ: 98, 127, 128<br />2: PgSelectRows[86]<br />ᐳ: First[85], PgSelectSingle[87]"):::bucket
+    Bucket16("Bucket 16 (nullableBoundary)<br />Deps: 63, 122, 100<br /><br />ROOT PgSelectSingle{12}ᐸpostᐳ[63]<br />1: <br />ᐳ: 99, 123, 124<br />2: PgSelectRows[94]<br />ᐳ: First[93], PgSelectSingle[95]"):::bucket
     Bucket17("Bucket 17 (nullableBoundary)<br />Deps: 71, 100<br /><br />ROOT PgSelectSingle{13}ᐸpersonᐳ[71]"):::bucket
     Bucket18("Bucket 18 (nullableBoundary)<br />Deps: 79, 100<br /><br />ROOT PgSelectSingle{14}ᐸpersonᐳ[79]"):::bucket
     Bucket19("Bucket 19 (nullableBoundary)<br />Deps: 87, 100<br /><br />ROOT PgSelectSingle{15}ᐸpersonᐳ[87]"):::bucket
@@ -124,7 +124,7 @@ graph TD
     __Item62 --> PgSelectSingle63
     List115{{"List[115∈13]<br />ᐸ114,57ᐳ"}}:::plan
     Access114 & PgSelectSingle57 --> List115
-    First69[["First[69∈13]"]]:::plan
+    First69{{"First[69∈13]"}}:::plan
     PgSelectRows70[["PgSelectRows[70∈13]"]]:::plan
     PgSelectRows70 --> First69
     Lambda116{{"Lambda[116∈13]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
@@ -136,7 +136,7 @@ graph TD
     List115 --> Lambda116
     List119{{"List[119∈14]<br />ᐸ118,59ᐳ"}}:::plan
     Access118 & PgSelectSingle59 --> List119
-    First77[["First[77∈14]"]]:::plan
+    First77{{"First[77∈14]"}}:::plan
     PgSelectRows78[["PgSelectRows[78∈14]"]]:::plan
     PgSelectRows78 --> First77
     Lambda120{{"Lambda[120∈14]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
@@ -148,7 +148,7 @@ graph TD
     List119 --> Lambda120
     List127{{"List[127∈15]<br />ᐸ126,61ᐳ"}}:::plan
     Access126 & PgSelectSingle61 --> List127
-    First85[["First[85∈15]"]]:::plan
+    First85{{"First[85∈15]"}}:::plan
     PgSelectRows86[["PgSelectRows[86∈15]"]]:::plan
     PgSelectRows86 --> First85
     Lambda128{{"Lambda[128∈15]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
@@ -160,7 +160,7 @@ graph TD
     List127 --> Lambda128
     List123{{"List[123∈16]<br />ᐸ122,63ᐳ"}}:::plan
     Access122 & PgSelectSingle63 --> List123
-    First93[["First[93∈16]"]]:::plan
+    First93{{"First[93∈16]"}}:::plan
     PgSelectRows94[["PgSelectRows[94∈16]"]]:::plan
     PgSelectRows94 --> First93
     Lambda124{{"Lambda[124∈16]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan

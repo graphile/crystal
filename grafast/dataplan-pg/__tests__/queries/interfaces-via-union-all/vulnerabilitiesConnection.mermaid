@@ -13,8 +13,8 @@ graph TD
     Bucket3("Bucket 3 (listItem)<br />Deps: 19, 24, 11<br /><br />ROOT __Item{3}ᐸ14ᐳ[17]"):::bucket
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 26, 18, 11, 28, 20<br /><br />ROOT Edge{3}[18]"):::bucket
     Bucket5("Bucket 5 (polymorphic)<br />__typename: Access[27]<br />Deps: 27, 11, 28"):::bucket
-    Bucket6("Bucket 6 (polymorphicPartition)<br />|FirstPartyVulnerability<br />Deps: 11, 28<br />ᐳFirstPartyVulnerability<br /><br />1: PgSelect[29]<br />2: PgSelectRows[34]<br />3: First[33]<br />ᐳ: 35, 44, 46, 48, 50"):::bucket
-    Bucket7("Bucket 7 (polymorphicPartition)<br />|ThirdPartyVulnerability<br />Deps: 11, 28<br />ᐳThirdPartyVulnerability<br /><br />1: PgSelect[37]<br />2: PgSelectRows[42]<br />3: First[41]<br />ᐳ: 43, 45, 47, 49, 51"):::bucket
+    Bucket6("Bucket 6 (polymorphicPartition)<br />|FirstPartyVulnerability<br />Deps: 11, 28<br />ᐳFirstPartyVulnerability<br /><br />1: PgSelect[29]<br />2: PgSelectRows[34]<br />ᐳ: 33, 35, 44, 46, 48, 50"):::bucket
+    Bucket7("Bucket 7 (polymorphicPartition)<br />|ThirdPartyVulnerability<br />Deps: 11, 28<br />ᐳThirdPartyVulnerability<br /><br />1: PgSelect[37]<br />2: PgSelectRows[42]<br />ᐳ: 41, 43, 45, 47, 49, 51"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket3
@@ -57,7 +57,7 @@ graph TD
     Lambda26 --> Access27
     PgSelect29[["PgSelect[29∈6]<br />ᐸfirst_party_vulnerabilitiesᐳ<br />ᐳFirstPartyVulnerability<br />More deps:<br />- Object[11]"]]:::plan
     Access28 --> PgSelect29
-    First33[["First[33∈6]^"]]:::plan
+    First33{{"First[33∈6]^"}}:::plan
     PgSelectRows34[["PgSelectRows[34∈6]^"]]:::plan
     PgSelectRows34 --> First33
     PgSelect29 --> PgSelectRows34
@@ -73,7 +73,7 @@ graph TD
     PgSelectSingle35 --> PgClassExpression50
     PgSelect37[["PgSelect[37∈7]<br />ᐸthird_party_vulnerabilitiesᐳ<br />ᐳThirdPartyVulnerability<br />More deps:<br />- Object[11]"]]:::plan
     Access28 --> PgSelect37
-    First41[["First[41∈7]^"]]:::plan
+    First41{{"First[41∈7]^"}}:::plan
     PgSelectRows42[["PgSelectRows[42∈7]^"]]:::plan
     PgSelectRows42 --> First41
     PgSelect37 --> PgSelectRows42

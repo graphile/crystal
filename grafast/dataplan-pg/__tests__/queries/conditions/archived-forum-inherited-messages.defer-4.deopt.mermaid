@@ -11,12 +11,12 @@ graph TD
     Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 9, 10, 77, 78, 11, 13, 28<br />2: PgSelect[8]<br />3: PgSelectRows[14]"):::bucket
     Bucket1("Bucket 1 (listItem)<br />Deps: 11, 28<br /><br />ROOT __Item{1}ᐸ14ᐳ[15]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 11, 28<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[16]<br />1: <br />ᐳ: 17, 19, 25<br />2: PgSelect[20]<br />3: Connection[24]"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 24, 11, 19, 25, 28, 20<br /><br />ROOT Connection{2}ᐸ20ᐳ[24]<br />1: ConnectionItems[29], PgSelect[35]<br />ᐳ: PageInfo[34], Access[46]<br />2: PgSelectRows[37], First[45], Last[48]<br />ᐳ: PgCursor[47], PgCursor[49]<br />3: First[36]<br />ᐳ: 38, 39"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 24, 11, 19, 25, 28, 20<br /><br />ROOT Connection{2}ᐸ20ᐳ[24]<br />1: ConnectionItems[29], PgSelect[35]<br />ᐳ: 34, 46, 45, 47, 48, 49<br />2: PgSelectRows[37]<br />ᐳ: 36, 38, 39"):::bucket
     Bucket6("Bucket 6 (listItem)<br />Deps: 46, 11<br /><br />ROOT __Item{6}ᐸ29ᐳ[40]"):::bucket
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 41, 11<br /><br />ROOT PgSelectSingle{6}ᐸmessagesᐳ[41]"):::bucket
     Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 42, 41, 11, 51<br /><br />ROOT Edge{6}[42]"):::bucket
-    Bucket9("Bucket 9 (defer)<br />Deps: 41, 11<br /><br />1: <br />ᐳ: 53, 54<br />2: PgSelect[55]<br />3: PgSelectRows[60]<br />4: First[59]<br />ᐳ: PgSelectSingle[61]"):::bucket
-    Bucket10("Bucket 10 (nullableBoundary)<br />Deps: 41, 11<br /><br />ROOT PgSelectSingle{6}ᐸmessagesᐳ[41]<br />1: <br />ᐳ: 62, 63<br />2: PgSelect[64]<br />3: PgSelectRows[69]<br />4: First[68]<br />ᐳ: PgSelectSingle[70]"):::bucket
+    Bucket9("Bucket 9 (defer)<br />Deps: 41, 11<br /><br />1: <br />ᐳ: 53, 54<br />2: PgSelect[55]<br />3: PgSelectRows[60]<br />ᐳ: First[59], PgSelectSingle[61]"):::bucket
+    Bucket10("Bucket 10 (nullableBoundary)<br />Deps: 41, 11<br /><br />ROOT PgSelectSingle{6}ᐸmessagesᐳ[41]<br />1: <br />ᐳ: 62, 63<br />2: PgSelect[64]<br />3: PgSelectRows[69]<br />ᐳ: First[68], PgSelectSingle[70]"):::bucket
     Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 61<br /><br />ROOT PgSelectSingle{9}ᐸusersᐳ[61]"):::bucket
     Bucket12("Bucket 12 (nullableBoundary)<br />Deps: 70<br /><br />ROOT PgSelectSingle{10}ᐸusersᐳ[70]"):::bucket
     end
@@ -61,17 +61,17 @@ graph TD
     PgSelect35[["PgSelect[35∈3]<br />ᐸmessages(aggregate)ᐳ<br />More deps:<br />- Object[11]<br />- Lambda[28]"]]:::plan
     PgClassExpression19 & PgClassExpression25 --> PgSelect35
     PgCursor47{{"PgCursor[47∈3]"}}:::plan
-    First45[["First[45∈3]"]]:::plan
+    First45{{"First[45∈3]"}}:::plan
     Access46{{"Access[46∈3]<br />ᐸ20.cursorDetailsᐳ"}}:::plan
     First45 & Access46 --> PgCursor47
     PgCursor49{{"PgCursor[49∈3]"}}:::plan
-    Last48[["Last[48∈3]"]]:::plan
+    Last48{{"Last[48∈3]"}}:::plan
     Last48 & Access46 --> PgCursor49
     ConnectionItems29[["ConnectionItems[29∈3]"]]:::plan
     Connection24 --> ConnectionItems29
     PageInfo34{{"PageInfo[34∈3]"}}:::plan
     Connection24 --> PageInfo34
-    First36[["First[36∈3]"]]:::plan
+    First36{{"First[36∈3]"}}:::plan
     PgSelectRows37[["PgSelectRows[37∈3]"]]:::plan
     PgSelectRows37 --> First36
     PgSelect35 --> PgSelectRows37
@@ -96,7 +96,7 @@ graph TD
     PgClassExpression53{{"PgClassExpression[53∈9]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
     PgSelectSingle41 --> PgClassExpression53
     PgSelectSingle41 --> PgClassExpression54
-    First59[["First[59∈9]"]]:::plan
+    First59{{"First[59∈9]"}}:::plan
     PgSelectRows60[["PgSelectRows[60∈9]"]]:::plan
     PgSelectRows60 --> First59
     PgSelect55 --> PgSelectRows60
@@ -108,7 +108,7 @@ graph TD
     PgClassExpression62{{"PgClassExpression[62∈10]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
     PgSelectSingle41 --> PgClassExpression62
     PgSelectSingle41 --> PgClassExpression63
-    First68[["First[68∈10]"]]:::plan
+    First68{{"First[68∈10]"}}:::plan
     PgSelectRows69[["PgSelectRows[69∈10]"]]:::plan
     PgSelectRows69 --> First68
     PgSelect64 --> PgSelectRows69

@@ -8,7 +8,7 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/v4/connections"
-    Bucket0("Bucket 0 (root)<br /><br />1: PgSelectInlineApply[771]<br />ᐳ: 6, 9, 10, 99, 626, 775, 776, 777, 778, 779, 780, 781, 782, 783, 11, 40, 58, 63, 65, 70, 73, 78, 92, 97, 105, 119, 124, 131, 137, 144, 150, 152, 158<br />2: 8, 16, 21, 26, 31, 37, 43, 49, 54, 60, 67, 75, 82, 88, 94, 102, 108, 114, 121, 127, 134, 140, 147, 155, 161, 200, 205, 225, 235, 240, 245, 250, 255, 260, 265, 275, 280, 285, 292, 297<br />ᐳ: 414, 417, 420, 423, 426, 429, 432, 435, 438, 441, 444, 447, 450, 453, 456, 459, 462, 465, 468, 471, 553, 555, 772<br />3: 12, 18, 23, 28, 33, 39, 45, 51, 56, 62, 69, 77, 84, 90, 96, 104, 110, 116, 123, 129, 136, 142, 149, 157, 163, 202, 207, 227, 237, 242, 247, 252, 257, 262, 267, 277, 282, 287, 294, 299<br />4: 172, 175, 183, 192, 197, 201, 206, 226, 236, 241, 246, 251, 256, 261, 266, 276, 281, 286, 293, 298, 302, 305, 308, 311, 314, 317, 320, 323, 326, 329, 332, 335, 338, 341, 344, 347, 350, 353, 356, 359<br />ᐳ: 203, 204, 208, 209, 228, 229, 238, 239, 243, 244, 248, 249, 253, 254, 258, 259, 263, 264, 268, 269, 278, 279, 283, 284, 288, 289, 295, 296, 300, 301<br />5: 413, 416, 419, 422, 425, 428, 431, 434, 437, 440, 443, 446, 449, 452, 455, 458, 461, 464, 467, 470, 473, 475, 477, 479, 481, 483, 485, 487, 489, 491, 493, 495, 497, 499, 501, 503, 505, 507, 509, 511<br />ᐳ: 415, 418, 421, 424, 427, 430, 433, 436, 439, 442, 445, 448, 451, 454, 457, 460, 463, 466, 469, 472, 474, 476, 478, 480, 482, 484, 486, 488, 490, 492, 494, 496, 498, 500, 502, 504, 506, 508, 510, 512"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: PgSelectInlineApply[771]<br />ᐳ: 6, 9, 10, 99, 626, 775, 776, 777, 778, 779, 780, 781, 782, 783, 11, 40, 58, 63, 65, 70, 73, 78, 92, 97, 105, 119, 124, 131, 137, 144, 150, 152, 158<br />2: 8, 16, 21, 26, 31, 37, 43, 49, 54, 60, 67, 75, 82, 88, 94, 102, 108, 114, 121, 127, 134, 140, 147, 155, 161, 200, 205, 225, 235, 240, 245, 250, 255, 260, 265, 275, 280, 285, 292, 297<br />ᐳ: 414, 417, 420, 423, 426, 429, 432, 435, 438, 441, 444, 447, 450, 453, 456, 459, 462, 465, 468, 471, 553, 555, 772<br />3: 12, 18, 23, 28, 33, 39, 45, 51, 56, 62, 69, 77, 84, 90, 96, 104, 110, 116, 123, 129, 136, 142, 149, 157, 163, 202, 207, 227, 237, 242, 247, 252, 257, 262, 267, 277, 282, 287, 294, 299<br />ᐳ: 201, 203, 204, 206, 208, 209, 226, 228, 229, 236, 238, 239, 241, 243, 244, 246, 248, 249, 251, 253, 254, 256, 258, 259, 261, 263, 264, 266, 268, 269, 276, 278, 279, 281, 283, 284, 286, 288, 289, 293, 295, 296, 298, 300, 301<br />4: 172, 175, 183, 192, 197, 302, 305, 308, 311, 314, 317, 320, 323, 326, 329, 332, 335, 338, 341, 344, 347, 350, 353, 356, 359<br />ᐳ: 413, 415, 416, 418, 419, 421, 422, 424, 425, 427, 428, 430, 431, 433, 434, 436, 437, 439, 440, 442, 443, 445, 446, 448, 449, 451, 452, 454, 455, 457, 458, 460, 461, 463, 464, 466, 467, 469, 470, 472, 473, 474, 475, 476, 477, 478, 479, 480, 481, 482, 483, 484, 485, 486, 487, 488, 489, 490, 491, 492, 493, 494, 495, 496, 497, 498, 499, 500, 501, 502, 503, 504, 505, 506, 507, 508, 509, 510, 511, 512"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 414, 302, 204, 415, 474<br /><br />ROOT Connectionᐸ8ᐳ[12]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 18, 417, 305, 209, 418, 476<br /><br />ROOT Connectionᐸ16ᐳ[18]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 23, 420, 308, 209, 421, 478<br /><br />ROOT Connectionᐸ21ᐳ[23]"):::bucket
@@ -84,7 +84,7 @@ graph TD
     Bucket99("Bucket 99 (nullableBoundary)<br />Deps: 407, 408, 596<br /><br />ROOT Edge{74}[408]"):::bucket
     Bucket100("Bucket 100 (nullableBoundary)<br />Deps: 409, 410, 598<br /><br />ROOT Edge{75}[410]"):::bucket
     Bucket101("Bucket 101 (nullableBoundary)<br />Deps: 411, 412, 600<br /><br />ROOT Edge{76}[412]"):::bucket
-    Bucket102("Bucket 102 (nullableBoundary)<br />Deps: 558, 626, 772<br /><br />ROOT PgSelectSingle{80}ᐸpostᐳ[558]<br />1: <br />ᐳ: 625, 631, 773, 627, 628, 774<br />2: PgSelectRows[658]<br />3: First[657]<br />ᐳ: PgSelectSingle[659]"):::bucket
+    Bucket102("Bucket 102 (nullableBoundary)<br />Deps: 558, 626, 772<br /><br />ROOT PgSelectSingle{80}ᐸpostᐳ[558]<br />1: <br />ᐳ: 625, 631, 773, 627, 628, 774<br />2: PgSelectRows[658]<br />ᐳ: First[657], PgSelectSingle[659]"):::bucket
     Bucket103("Bucket 103 (nullableBoundary)<br />Deps: 601<br /><br />ROOT PgSelectSingle{77}ᐸupdatable_viewᐳ[601]"):::bucket
     Bucket104("Bucket 104 (nullableBoundary)<br />Deps: 602<br /><br />ROOT PgSelectSingle{78}ᐸupdatable_viewᐳ[602]"):::bucket
     Bucket105("Bucket 105 (nullableBoundary)<br />Deps: 605<br /><br />ROOT PgSelectSingle{82}ᐸpersonᐳ[605]"):::bucket
@@ -360,91 +360,91 @@ graph TD
     Connection163 --> ConnectionItems197
     PgSelect200[["PgSelect[200∈0] ➊<br />ᐸperson(aggregate)ᐳ"]]:::plan
     Object11 --> PgSelect200
-    First201[["First[201∈0] ➊"]]:::plan
+    First201{{"First[201∈0] ➊"}}:::plan
     PgSelectRows202[["PgSelectRows[202∈0] ➊"]]:::plan
     PgSelectRows202 --> First201
     PgSelect200 --> PgSelectRows202
     PgSelectSingle203{{"PgSelectSingle[203∈0] ➊<br />ᐸpersonᐳ"}}:::plan
     First201 --> PgSelectSingle203
-    First206[["First[206∈0] ➊"]]:::plan
+    First206{{"First[206∈0] ➊"}}:::plan
     PgSelectRows207[["PgSelectRows[207∈0] ➊"]]:::plan
     PgSelectRows207 --> First206
     PgSelect205 --> PgSelectRows207
     PgSelectSingle208{{"PgSelectSingle[208∈0] ➊<br />ᐸpersonᐳ"}}:::plan
     First206 --> PgSelectSingle208
-    First226[["First[226∈0] ➊"]]:::plan
+    First226{{"First[226∈0] ➊"}}:::plan
     PgSelectRows227[["PgSelectRows[227∈0] ➊"]]:::plan
     PgSelectRows227 --> First226
     PgSelect225 --> PgSelectRows227
     PgSelectSingle228{{"PgSelectSingle[228∈0] ➊<br />ᐸpersonᐳ"}}:::plan
     First226 --> PgSelectSingle228
-    First236[["First[236∈0] ➊"]]:::plan
+    First236{{"First[236∈0] ➊"}}:::plan
     PgSelectRows237[["PgSelectRows[237∈0] ➊"]]:::plan
     PgSelectRows237 --> First236
     PgSelect235 --> PgSelectRows237
     PgSelectSingle238{{"PgSelectSingle[238∈0] ➊<br />ᐸpostᐳ"}}:::plan
     First236 --> PgSelectSingle238
-    First241[["First[241∈0] ➊"]]:::plan
+    First241{{"First[241∈0] ➊"}}:::plan
     PgSelectRows242[["PgSelectRows[242∈0] ➊"]]:::plan
     PgSelectRows242 --> First241
     PgSelect240 --> PgSelectRows242
     PgSelectSingle243{{"PgSelectSingle[243∈0] ➊<br />ᐸpostᐳ"}}:::plan
     First241 --> PgSelectSingle243
-    First246[["First[246∈0] ➊"]]:::plan
+    First246{{"First[246∈0] ➊"}}:::plan
     PgSelectRows247[["PgSelectRows[247∈0] ➊"]]:::plan
     PgSelectRows247 --> First246
     PgSelect245 --> PgSelectRows247
     PgSelectSingle248{{"PgSelectSingle[248∈0] ➊<br />ᐸpostᐳ"}}:::plan
     First246 --> PgSelectSingle248
-    First251[["First[251∈0] ➊"]]:::plan
+    First251{{"First[251∈0] ➊"}}:::plan
     PgSelectRows252[["PgSelectRows[252∈0] ➊"]]:::plan
     PgSelectRows252 --> First251
     PgSelect250 --> PgSelectRows252
     PgSelectSingle253{{"PgSelectSingle[253∈0] ➊<br />ᐸpersonᐳ"}}:::plan
     First251 --> PgSelectSingle253
-    First256[["First[256∈0] ➊"]]:::plan
+    First256{{"First[256∈0] ➊"}}:::plan
     PgSelectRows257[["PgSelectRows[257∈0] ➊"]]:::plan
     PgSelectRows257 --> First256
     PgSelect255 --> PgSelectRows257
     PgSelectSingle258{{"PgSelectSingle[258∈0] ➊<br />ᐸpersonᐳ"}}:::plan
     First256 --> PgSelectSingle258
-    First261[["First[261∈0] ➊"]]:::plan
+    First261{{"First[261∈0] ➊"}}:::plan
     PgSelectRows262[["PgSelectRows[262∈0] ➊"]]:::plan
     PgSelectRows262 --> First261
     PgSelect260 --> PgSelectRows262
     PgSelectSingle263{{"PgSelectSingle[263∈0] ➊<br />ᐸpersonᐳ"}}:::plan
     First261 --> PgSelectSingle263
-    First266[["First[266∈0] ➊"]]:::plan
+    First266{{"First[266∈0] ➊"}}:::plan
     PgSelectRows267[["PgSelectRows[267∈0] ➊"]]:::plan
     PgSelectRows267 --> First266
     PgSelect265 --> PgSelectRows267
     PgSelectSingle268{{"PgSelectSingle[268∈0] ➊<br />ᐸpersonᐳ"}}:::plan
     First266 --> PgSelectSingle268
-    First276[["First[276∈0] ➊"]]:::plan
+    First276{{"First[276∈0] ➊"}}:::plan
     PgSelectRows277[["PgSelectRows[277∈0] ➊"]]:::plan
     PgSelectRows277 --> First276
     PgSelect275 --> PgSelectRows277
     PgSelectSingle278{{"PgSelectSingle[278∈0] ➊<br />ᐸpersonᐳ"}}:::plan
     First276 --> PgSelectSingle278
-    First281[["First[281∈0] ➊"]]:::plan
+    First281{{"First[281∈0] ➊"}}:::plan
     PgSelectRows282[["PgSelectRows[282∈0] ➊"]]:::plan
     PgSelectRows282 --> First281
     PgSelect280 --> PgSelectRows282
     PgSelectSingle283{{"PgSelectSingle[283∈0] ➊<br />ᐸpostᐳ"}}:::plan
     First281 --> PgSelectSingle283
-    First286[["First[286∈0] ➊"]]:::plan
+    First286{{"First[286∈0] ➊"}}:::plan
     PgSelectRows287[["PgSelectRows[287∈0] ➊"]]:::plan
     PgSelectRows287 --> First286
     PgSelect285 --> PgSelectRows287
     PgSelectSingle288{{"PgSelectSingle[288∈0] ➊<br />ᐸpersonᐳ"}}:::plan
     First286 --> PgSelectSingle288
-    First293[["First[293∈0] ➊"]]:::plan
+    First293{{"First[293∈0] ➊"}}:::plan
     PgSelectRows294[["PgSelectRows[294∈0] ➊"]]:::plan
     PgSelectRows294 --> First293
     PgSelect292 --> PgSelectRows294
     PgSelectSingle295{{"PgSelectSingle[295∈0] ➊<br />ᐸpersonᐳ"}}:::plan
     First293 --> PgSelectSingle295
-    First298[["First[298∈0] ➊"]]:::plan
+    First298{{"First[298∈0] ➊"}}:::plan
     PgSelectRows299[["PgSelectRows[299∈0] ➊"]]:::plan
     PgSelectRows299 --> First298
     PgSelect297 --> PgSelectRows299
@@ -470,86 +470,86 @@ graph TD
     ConnectionItems353[["ConnectionItems[353∈0] ➊<br />Dependents: 3<br />More deps:<br />- Connection[136]"]]:::plan
     ConnectionItems356[["ConnectionItems[356∈0] ➊<br />Dependents: 3<br />More deps:<br />- Connection[149]"]]:::plan
     ConnectionItems359[["ConnectionItems[359∈0] ➊<br />Dependents: 3<br />More deps:<br />- Connection[157]"]]:::plan
-    First413[["First[413∈0] ➊<br />More deps:<br />- ConnectionItems[302]"]]:::plan
+    First413{{"First[413∈0] ➊<br />More deps:<br />- ConnectionItems[302]"}}:::plan
     Access414{{"Access[414∈0] ➊<br />ᐸ8.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect8 --> Access414
-    First416[["First[416∈0] ➊<br />More deps:<br />- ConnectionItems[305]"]]:::plan
+    First416{{"First[416∈0] ➊<br />More deps:<br />- ConnectionItems[305]"}}:::plan
     Access417{{"Access[417∈0] ➊<br />ᐸ16.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect16 --> Access417
-    First419[["First[419∈0] ➊<br />More deps:<br />- ConnectionItems[308]"]]:::plan
+    First419{{"First[419∈0] ➊<br />More deps:<br />- ConnectionItems[308]"}}:::plan
     Access420{{"Access[420∈0] ➊<br />ᐸ21.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect21 --> Access420
-    First422[["First[422∈0] ➊<br />More deps:<br />- ConnectionItems[311]"]]:::plan
+    First422{{"First[422∈0] ➊<br />More deps:<br />- ConnectionItems[311]"}}:::plan
     Access423{{"Access[423∈0] ➊<br />ᐸ26.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect26 --> Access423
-    First425[["First[425∈0] ➊<br />More deps:<br />- ConnectionItems[314]"]]:::plan
+    First425{{"First[425∈0] ➊<br />More deps:<br />- ConnectionItems[314]"}}:::plan
     Access426{{"Access[426∈0] ➊<br />ᐸ31.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect31 --> Access426
-    First428[["First[428∈0] ➊<br />More deps:<br />- ConnectionItems[317]"]]:::plan
+    First428{{"First[428∈0] ➊<br />More deps:<br />- ConnectionItems[317]"}}:::plan
     Access429{{"Access[429∈0] ➊<br />ᐸ37.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect37 --> Access429
-    First431[["First[431∈0] ➊<br />More deps:<br />- ConnectionItems[320]"]]:::plan
+    First431{{"First[431∈0] ➊<br />More deps:<br />- ConnectionItems[320]"}}:::plan
     Access432{{"Access[432∈0] ➊<br />ᐸ43.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect43 --> Access432
-    First434[["First[434∈0] ➊<br />More deps:<br />- ConnectionItems[323]"]]:::plan
+    First434{{"First[434∈0] ➊<br />More deps:<br />- ConnectionItems[323]"}}:::plan
     Access435{{"Access[435∈0] ➊<br />ᐸ60.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect60 --> Access435
-    First437[["First[437∈0] ➊<br />More deps:<br />- ConnectionItems[326]"]]:::plan
+    First437{{"First[437∈0] ➊<br />More deps:<br />- ConnectionItems[326]"}}:::plan
     Access438{{"Access[438∈0] ➊<br />ᐸ67.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect67 --> Access438
-    First440[["First[440∈0] ➊<br />More deps:<br />- ConnectionItems[329]"]]:::plan
+    First440{{"First[440∈0] ➊<br />More deps:<br />- ConnectionItems[329]"}}:::plan
     Access441{{"Access[441∈0] ➊<br />ᐸ75.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect75 --> Access441
-    First443[["First[443∈0] ➊<br />More deps:<br />- ConnectionItems[332]"]]:::plan
+    First443{{"First[443∈0] ➊<br />More deps:<br />- ConnectionItems[332]"}}:::plan
     Access444{{"Access[444∈0] ➊<br />ᐸ82.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect82 --> Access444
-    First446[["First[446∈0] ➊<br />More deps:<br />- ConnectionItems[335]"]]:::plan
+    First446{{"First[446∈0] ➊<br />More deps:<br />- ConnectionItems[335]"}}:::plan
     Access447{{"Access[447∈0] ➊<br />ᐸ88.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect88 --> Access447
-    First449[["First[449∈0] ➊<br />More deps:<br />- ConnectionItems[338]"]]:::plan
+    First449{{"First[449∈0] ➊<br />More deps:<br />- ConnectionItems[338]"}}:::plan
     Access450{{"Access[450∈0] ➊<br />ᐸ102.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect102 --> Access450
-    First452[["First[452∈0] ➊<br />More deps:<br />- ConnectionItems[341]"]]:::plan
+    First452{{"First[452∈0] ➊<br />More deps:<br />- ConnectionItems[341]"}}:::plan
     Access453{{"Access[453∈0] ➊<br />ᐸ108.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect108 --> Access453
-    First455[["First[455∈0] ➊<br />More deps:<br />- ConnectionItems[344]"]]:::plan
+    First455{{"First[455∈0] ➊<br />More deps:<br />- ConnectionItems[344]"}}:::plan
     Access456{{"Access[456∈0] ➊<br />ᐸ114.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect114 --> Access456
-    First458[["First[458∈0] ➊<br />More deps:<br />- ConnectionItems[347]"]]:::plan
+    First458{{"First[458∈0] ➊<br />More deps:<br />- ConnectionItems[347]"}}:::plan
     Access459{{"Access[459∈0] ➊<br />ᐸ121.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect121 --> Access459
-    First461[["First[461∈0] ➊<br />More deps:<br />- ConnectionItems[350]"]]:::plan
+    First461{{"First[461∈0] ➊<br />More deps:<br />- ConnectionItems[350]"}}:::plan
     Access462{{"Access[462∈0] ➊<br />ᐸ127.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect127 --> Access462
-    First464[["First[464∈0] ➊<br />More deps:<br />- ConnectionItems[353]"]]:::plan
+    First464{{"First[464∈0] ➊<br />More deps:<br />- ConnectionItems[353]"}}:::plan
     Access465{{"Access[465∈0] ➊<br />ᐸ134.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect134 --> Access465
-    First467[["First[467∈0] ➊<br />More deps:<br />- ConnectionItems[356]"]]:::plan
+    First467{{"First[467∈0] ➊<br />More deps:<br />- ConnectionItems[356]"}}:::plan
     Access468{{"Access[468∈0] ➊<br />ᐸ147.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect147 --> Access468
-    First470[["First[470∈0] ➊<br />More deps:<br />- ConnectionItems[359]"]]:::plan
+    First470{{"First[470∈0] ➊<br />More deps:<br />- ConnectionItems[359]"}}:::plan
     Access471{{"Access[471∈0] ➊<br />ᐸ155.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect155 --> Access471
-    Last473[["Last[473∈0] ➊<br />More deps:<br />- ConnectionItems[302]"]]:::plan
-    Last475[["Last[475∈0] ➊<br />More deps:<br />- ConnectionItems[305]"]]:::plan
-    Last477[["Last[477∈0] ➊<br />More deps:<br />- ConnectionItems[308]"]]:::plan
-    Last479[["Last[479∈0] ➊<br />More deps:<br />- ConnectionItems[311]"]]:::plan
-    Last481[["Last[481∈0] ➊<br />More deps:<br />- ConnectionItems[314]"]]:::plan
-    Last483[["Last[483∈0] ➊<br />More deps:<br />- ConnectionItems[317]"]]:::plan
-    Last485[["Last[485∈0] ➊<br />More deps:<br />- ConnectionItems[320]"]]:::plan
-    Last487[["Last[487∈0] ➊<br />More deps:<br />- ConnectionItems[323]"]]:::plan
-    Last489[["Last[489∈0] ➊<br />More deps:<br />- ConnectionItems[326]"]]:::plan
-    Last491[["Last[491∈0] ➊<br />More deps:<br />- ConnectionItems[329]"]]:::plan
-    Last493[["Last[493∈0] ➊<br />More deps:<br />- ConnectionItems[332]"]]:::plan
-    Last495[["Last[495∈0] ➊<br />More deps:<br />- ConnectionItems[335]"]]:::plan
-    Last497[["Last[497∈0] ➊<br />More deps:<br />- ConnectionItems[338]"]]:::plan
-    Last499[["Last[499∈0] ➊<br />More deps:<br />- ConnectionItems[341]"]]:::plan
-    Last501[["Last[501∈0] ➊<br />More deps:<br />- ConnectionItems[344]"]]:::plan
-    Last503[["Last[503∈0] ➊<br />More deps:<br />- ConnectionItems[347]"]]:::plan
-    Last505[["Last[505∈0] ➊<br />More deps:<br />- ConnectionItems[350]"]]:::plan
-    Last507[["Last[507∈0] ➊<br />More deps:<br />- ConnectionItems[353]"]]:::plan
-    Last509[["Last[509∈0] ➊<br />More deps:<br />- ConnectionItems[356]"]]:::plan
-    Last511[["Last[511∈0] ➊<br />More deps:<br />- ConnectionItems[359]"]]:::plan
+    Last473{{"Last[473∈0] ➊<br />More deps:<br />- ConnectionItems[302]"}}:::plan
+    Last475{{"Last[475∈0] ➊<br />More deps:<br />- ConnectionItems[305]"}}:::plan
+    Last477{{"Last[477∈0] ➊<br />More deps:<br />- ConnectionItems[308]"}}:::plan
+    Last479{{"Last[479∈0] ➊<br />More deps:<br />- ConnectionItems[311]"}}:::plan
+    Last481{{"Last[481∈0] ➊<br />More deps:<br />- ConnectionItems[314]"}}:::plan
+    Last483{{"Last[483∈0] ➊<br />More deps:<br />- ConnectionItems[317]"}}:::plan
+    Last485{{"Last[485∈0] ➊<br />More deps:<br />- ConnectionItems[320]"}}:::plan
+    Last487{{"Last[487∈0] ➊<br />More deps:<br />- ConnectionItems[323]"}}:::plan
+    Last489{{"Last[489∈0] ➊<br />More deps:<br />- ConnectionItems[326]"}}:::plan
+    Last491{{"Last[491∈0] ➊<br />More deps:<br />- ConnectionItems[329]"}}:::plan
+    Last493{{"Last[493∈0] ➊<br />More deps:<br />- ConnectionItems[332]"}}:::plan
+    Last495{{"Last[495∈0] ➊<br />More deps:<br />- ConnectionItems[335]"}}:::plan
+    Last497{{"Last[497∈0] ➊<br />More deps:<br />- ConnectionItems[338]"}}:::plan
+    Last499{{"Last[499∈0] ➊<br />More deps:<br />- ConnectionItems[341]"}}:::plan
+    Last501{{"Last[501∈0] ➊<br />More deps:<br />- ConnectionItems[344]"}}:::plan
+    Last503{{"Last[503∈0] ➊<br />More deps:<br />- ConnectionItems[347]"}}:::plan
+    Last505{{"Last[505∈0] ➊<br />More deps:<br />- ConnectionItems[350]"}}:::plan
+    Last507{{"Last[507∈0] ➊<br />More deps:<br />- ConnectionItems[353]"}}:::plan
+    Last509{{"Last[509∈0] ➊<br />More deps:<br />- ConnectionItems[356]"}}:::plan
+    Last511{{"Last[511∈0] ➊<br />More deps:<br />- ConnectionItems[359]"}}:::plan
     Access553{{"Access[553∈0] ➊<br />ᐸ49.cursorDetailsᐳ"}}:::plan
     PgSelect49 --> Access553
     Access555{{"Access[555∈0] ➊<br />ᐸ54.cursorDetailsᐳ"}}:::plan
@@ -762,7 +762,7 @@ graph TD
     List627 --> Lambda628
     PgClassExpression631{{"PgClassExpression[631∈102]<br />ᐸ__post__.”headline”ᐳ"}}:::plan
     PgSelectSingle558 --> PgClassExpression631
-    First657[["First[657∈102]"]]:::plan
+    First657{{"First[657∈102]"}}:::plan
     PgSelectRows658[["PgSelectRows[658∈102]"]]:::plan
     PgSelectRows658 --> First657
     Lambda774{{"Lambda[774∈102]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan

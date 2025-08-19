@@ -9,7 +9,7 @@ graph TD
 
     subgraph "Buckets for mutations/v4/rbac.leftArmIdentity"
     Bucket0("Bucket 0 (root)"):::bucket
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 17, 18, 23, 24<br /><br />1: PgSelect[14]<br />2: PgSelectRows[20]<br />3: First[19]<br />ᐳ: PgSelectSingle[21], Object[22]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 17, 18, 23, 24<br /><br />1: PgSelect[14]<br />2: PgSelectRows[20]<br />ᐳ: 19, 21, 22"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 22, 21, 14, 24<br /><br />ROOT Object{1}ᐸ{result}ᐳ[22]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 21, 14, 24<br /><br />ROOT PgSelectSingle{1}ᐸleft_arm_identityᐳ[21]"):::bucket
     end
@@ -36,7 +36,7 @@ graph TD
     __InputObject6 --> ApplyInput23
     PgSelect14[["PgSelect[14∈1] ➊<br />ᐸleft_arm_identity(mutation)ᐳ"]]:::sideeffectplan
     Object17 & PgFromExpression18 & ApplyInput23 --> PgSelect14
-    First19[["First[19∈1] ➊"]]:::plan
+    First19{{"First[19∈1] ➊"}}:::plan
     PgSelectRows20[["PgSelectRows[20∈1] ➊"]]:::plan
     PgSelectRows20 --> First19
     PgSelect14 --> PgSelectRows20

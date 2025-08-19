@@ -11,7 +11,7 @@ graph TD
     Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 9, 10, 46, 47, 48, 49, 11, 13, 18, 26, 30<br />2: 38, 42<br />3: PgSelect[8]<br />ᐳ: Access[39], Access[43]<br />4: PgSelectRows[14]"):::bucket
     Bucket1("Bucket 1 (listItem)<br />Deps: 48, 39, 43<br /><br />ROOT __Item{1}ᐸ14ᐳ[15]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 48, 39, 15, 43, 16<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[16]<br />1: <br />ᐳ: 40, 44, 41, 45<br />2: Connection[25]"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 25, 45<br /><br />ROOT Connection{2}ᐸ41ᐳ[25]<br />1: PgSelectRows[34]<br />ᐳ: PageInfo[31]<br />2: First[33]<br />ᐳ: 35, 36"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 25, 45<br /><br />ROOT Connection{2}ᐸ41ᐳ[25]"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
@@ -58,7 +58,7 @@ graph TD
     List44 --> Lambda45
     PageInfo31{{"PageInfo[31∈3]"}}:::plan
     Connection25 --> PageInfo31
-    First33[["First[33∈3]"]]:::plan
+    First33{{"First[33∈3]"}}:::plan
     PgSelectRows34[["PgSelectRows[34∈3]"]]:::plan
     PgSelectRows34 --> First33
     Lambda45 --> PgSelectRows34

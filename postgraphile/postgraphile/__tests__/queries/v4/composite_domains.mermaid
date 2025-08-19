@@ -11,7 +11,7 @@ graph TD
     Bucket0("Bucket 0 (root)<br /><br />1: 67, 71<br />ᐳ: 9, 10, 32, 46, 59, 11<br />2: PgSelect[8]<br />ᐳ: Access[68], Access[72]<br />3: Connection[12]<br />4: ConnectionItems[14]"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 14, 68, 72, 11, 46, 59<br /><br />ROOT Connectionᐸ8ᐳ[12]"):::bucket
     Bucket3("Bucket 3 (listItem)<br />Deps: 68, 72, 11, 46, 59<br /><br />ROOT __Item{3}ᐸ14ᐳ[17]"):::bucket
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 18, 68, 72, 17, 11, 46, 59<br /><br />ROOT PgSelectSingle{3}ᐸpostsᐳ[18]<br />1: <br />ᐳ: 19, 20, 33, 69, 73, 70, 74<br />2: PgSelectRows[27], PgSelectRows[34]<br />3: First[26]<br />ᐳ: 28, 37, 38"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 18, 68, 72, 17, 11, 46, 59<br /><br />ROOT PgSelectSingle{3}ᐸpostsᐳ[18]<br />1: <br />ᐳ: 19, 20, 33, 69, 73, 70, 74<br />2: PgSelectRows[27], PgSelectRows[34]<br />ᐳ: 26, 28, 37, 38"):::bucket
     Bucket5("Bucket 5 (listItem)<br />Deps: 11, 59<br /><br />ROOT __Item{5}ᐸ34ᐳ[35]"):::bucket
     Bucket7("Bucket 7 (listItem)<br />Deps: 11, 46<br /><br />ROOT __Item{7}ᐸ38ᐳ[41]<br />1: PgSelect[42]<br />2: PgSelectRows[51]"):::bucket
     Bucket9("Bucket 9 (listItem)<br /><br />ROOT __Item{9}ᐸ51ᐳ[52]"):::bucket
@@ -61,7 +61,7 @@ graph TD
     PgSelectSingle18 --> PgClassExpression19
     PgClassExpression20{{"PgClassExpression[20∈4]<br />ᐸ__posts__.”user_id”ᐳ"}}:::plan
     PgSelectSingle18 --> PgClassExpression20
-    First26[["First[26∈4]"]]:::plan
+    First26{{"First[26∈4]"}}:::plan
     PgSelectRows27[["PgSelectRows[27∈4]"]]:::plan
     PgSelectRows27 --> First26
     Lambda70{{"Lambda[70∈4]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan

@@ -8,7 +8,7 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/v4/large_bigint.issue491"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 9, 10, 35, 50, 51, 11, 15, 16, 24, 25<br />2: PgSelect[8], PgSelect[18], PgSelect[27]<br />3: 12, 21, 30<br />4: 20, 29, 32<br />ᐳ: PgSelectSingle[22], PgSelectSingle[31]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 9, 10, 35, 50, 51, 11, 15, 16, 24, 25<br />2: PgSelect[8], PgSelect[18], PgSelect[27]<br />3: 12, 21, 30<br />ᐳ: 20, 22, 29, 31<br />4: ConnectionItems[32]"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 32, 35<br /><br />ROOT Connectionᐸ8ᐳ[12]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 22, 35<br /><br />ROOT PgSelectSingleᐸlarge_node_idᐳ[22]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 31, 35<br /><br />ROOT PgSelectSingleᐸlarge_node_idᐳ[31]"):::bucket
@@ -41,7 +41,7 @@ graph TD
     PgSelect8 --> Connection12
     Lambda15{{"Lambda[15∈0] ➊<br />ᐸspecifier_LargeNodeId_base64JSONᐳ<br />More deps:<br />- Constantᐸ'WyJsYXJnZV9ub2RlX2lkcyIsOTAwNzE5OTI1NDc0MDk5MF0='ᐳ[50]"}}:::plan
     Lambda15 --> Access16
-    First20[["First[20∈0] ➊"]]:::plan
+    First20{{"First[20∈0] ➊"}}:::plan
     PgSelectRows21[["PgSelectRows[21∈0] ➊"]]:::plan
     PgSelectRows21 --> First20
     PgSelect18 --> PgSelectRows21
@@ -49,7 +49,7 @@ graph TD
     First20 --> PgSelectSingle22
     Lambda24{{"Lambda[24∈0] ➊<br />ᐸspecifier_LargeNodeId_base64JSONᐳ<br />More deps:<br />- Constantᐸ'WyJsYXJnZV9ub2RlX2lkcyIsIjIwOTgyODg2NjkyMTg1NzE3NjAiXQ=='ᐳ[51]"}}:::plan
     Lambda24 --> Access25
-    First29[["First[29∈0] ➊"]]:::plan
+    First29{{"First[29∈0] ➊"}}:::plan
     PgSelectRows30[["PgSelectRows[30∈0] ➊"]]:::plan
     PgSelectRows30 --> First29
     PgSelect27 --> PgSelectRows30

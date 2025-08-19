@@ -11,7 +11,7 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     Bucket1("Bucket 1 (mutationField)<br />Deps: 18, 13, 19, 2, 21, 36<br /><br />1: PgUpdateSingle[15]<br />2: <br />ᐳ: Object[20]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 2, 15, 20, 21, 36<br /><br />ROOT Object{1}ᐸ{result}ᐳ[20]"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 15, 21, 30, 36<br /><br />ROOT PgUpdateSingle{1}ᐸleft_arm(id;)ᐳ[15]<br />1: <br />ᐳ: 23, 22, 24, 25, 26, 34, 35<br />2: PgSelect[27]<br />3: PgSelectRows[32]<br />4: First[31]<br />ᐳ: PgSelectSingle[33]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 15, 21, 30, 36<br /><br />ROOT PgUpdateSingle{1}ᐸleft_arm(id;)ᐳ[15]<br />1: <br />ᐳ: 23, 22, 24, 25, 26, 34, 35<br />2: PgSelect[27]<br />3: PgSelectRows[32]<br />ᐳ: First[31], PgSelectSingle[33]"):::bucket
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 33, 15, 36<br /><br />ROOT PgSelectSingle{3}ᐸpersonᐳ[33]"):::bucket
     end
     Bucket0 --> Bucket1
@@ -54,7 +54,7 @@ graph TD
     Lambda25{{"Lambda[25∈3] ➊<br />ᐸpipeStringEncodeᐳ"}}:::plan
     List24 --> Lambda25
     Access23 --> PgClassExpression26
-    First31[["First[31∈3] ➊"]]:::plan
+    First31{{"First[31∈3] ➊"}}:::plan
     PgSelectRows32[["PgSelectRows[32∈3] ➊"]]:::plan
     PgSelectRows32 --> First31
     PgSelect27 --> PgSelectRows32

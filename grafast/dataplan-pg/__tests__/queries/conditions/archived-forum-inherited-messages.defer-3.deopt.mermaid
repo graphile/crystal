@@ -16,10 +16,10 @@ graph TD
     Bucket5("Bucket 5 (defer)<br />Deps: 39, 29, 11, 24"):::bucket
     Bucket8("Bucket 8 (listItem)<br />Deps: 11<br /><br />ROOT __Item{8}ᐸ29ᐳ[34]"):::bucket
     Bucket9("Bucket 9 (listItem)<br />Deps: 39, 11<br /><br />ROOT __Item{9}ᐸ29ᐳ[36]"):::bucket
-    Bucket10("Bucket 10 (nullableBoundary)<br />Deps: 35, 11<br /><br />ROOT PgSelectSingle{8}ᐸmessagesᐳ[35]<br />1: <br />ᐳ: 38, 41<br />2: PgSelect[42]<br />3: PgSelectRows[47]<br />4: First[46]<br />ᐳ: PgSelectSingle[48]"):::bucket
+    Bucket10("Bucket 10 (nullableBoundary)<br />Deps: 35, 11<br /><br />ROOT PgSelectSingle{8}ᐸmessagesᐳ[35]<br />1: <br />ᐳ: 38, 41<br />2: PgSelect[42]<br />3: PgSelectRows[47]<br />ᐳ: First[46], PgSelectSingle[48]"):::bucket
     Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 36, 37, 11, 40<br /><br />ROOT Edge{9}[37]"):::bucket
     Bucket12("Bucket 12 (nullableBoundary)<br />Deps: 48<br /><br />ROOT PgSelectSingle{10}ᐸusersᐳ[48]"):::bucket
-    Bucket13("Bucket 13 (nullableBoundary)<br />Deps: 49, 11<br /><br />ROOT PgSelectSingle{11}ᐸmessagesᐳ[49]<br />1: <br />ᐳ: 51, 53<br />2: PgSelect[54]<br />3: PgSelectRows[59]<br />4: First[58]<br />ᐳ: PgSelectSingle[60]"):::bucket
+    Bucket13("Bucket 13 (nullableBoundary)<br />Deps: 49, 11<br /><br />ROOT PgSelectSingle{11}ᐸmessagesᐳ[49]<br />1: <br />ᐳ: 51, 53<br />2: PgSelect[54]<br />3: PgSelectRows[59]<br />ᐳ: First[58], PgSelectSingle[60]"):::bucket
     Bucket14("Bucket 14 (nullableBoundary)<br />Deps: 60<br /><br />ROOT PgSelectSingle{13}ᐸusersᐳ[60]"):::bucket
     end
     Bucket0 --> Bucket1
@@ -82,7 +82,7 @@ graph TD
     PgClassExpression38{{"PgClassExpression[38∈10]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
     PgSelectSingle35 --> PgClassExpression38
     PgSelectSingle35 --> PgClassExpression41
-    First46[["First[46∈10]"]]:::plan
+    First46{{"First[46∈10]"}}:::plan
     PgSelectRows47[["PgSelectRows[47∈10]"]]:::plan
     PgSelectRows47 --> First46
     PgSelect42 --> PgSelectRows47
@@ -100,7 +100,7 @@ graph TD
     PgClassExpression51{{"PgClassExpression[51∈13]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
     PgSelectSingle49 --> PgClassExpression51
     PgSelectSingle49 --> PgClassExpression53
-    First58[["First[58∈13]"]]:::plan
+    First58{{"First[58∈13]"}}:::plan
     PgSelectRows59[["PgSelectRows[59∈13]"]]:::plan
     PgSelectRows59 --> First58
     PgSelect54 --> PgSelectRows59

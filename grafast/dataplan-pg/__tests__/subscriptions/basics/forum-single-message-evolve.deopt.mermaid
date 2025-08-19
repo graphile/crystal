@@ -10,8 +10,8 @@ graph TD
     subgraph "Buckets for subscriptions/basics/forum-single-message-evolve"
     Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 16, 17, 45, 7, 18<br />2: Listen[9]"):::bucket
     Bucket1("Bucket 1 (subscription)<br />Deps: 18, 4<br /><br />ROOT __Item{1}ᐸ9ᐳ[10]"):::bucket
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 11, 18<br /><br />ROOT JSONParse{1}ᐸ10ᐳ[11]<br />1: <br />ᐳ: Access[12], Access[14], Lambda[13]<br />2: PgSelect[15]<br />3: PgSelectRows[20]<br />4: First[19]<br />ᐳ: PgSelectSingle[21]"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 21, 18<br /><br />ROOT PgSelectSingle{2}ᐸmessagesᐳ[21]<br />1: <br />ᐳ: 22, 23, 24, 25, 26, 34<br />2: PgSelect[27], PgSelect[35]<br />3: PgSelectRows[32], PgSelectRows[38]<br />4: First[31], First[37]<br />ᐳ: PgSelectSingle[33], PgSelectSingle[39]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 11, 18<br /><br />ROOT JSONParse{1}ᐸ10ᐳ[11]<br />1: <br />ᐳ: Access[12], Access[14], Lambda[13]<br />2: PgSelect[15]<br />3: PgSelectRows[20]<br />ᐳ: First[19], PgSelectSingle[21]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 21, 18<br /><br />ROOT PgSelectSingle{2}ᐸmessagesᐳ[21]<br />1: <br />ᐳ: 22, 23, 24, 25, 26, 34<br />2: PgSelect[27], PgSelect[35]<br />3: PgSelectRows[32], PgSelectRows[38]<br />ᐳ: 31, 33, 37, 39"):::bucket
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 33, 26<br /><br />ROOT PgSelectSingle{3}ᐸforumsᐳ[33]"):::bucket
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 39<br /><br />ROOT PgSelectSingle{3}ᐸusersᐳ[39]"):::bucket
     end
@@ -45,7 +45,7 @@ graph TD
     Lambda13{{"Lambda[13∈2]"}}:::plan
     Access12 --> Lambda13
     JSONParse11 --> Access14
-    First19[["First[19∈2]"]]:::plan
+    First19{{"First[19∈2]"}}:::plan
     PgSelectRows20[["PgSelectRows[20∈2]"]]:::plan
     PgSelectRows20 --> First19
     PgSelect15 --> PgSelectRows20
@@ -66,14 +66,14 @@ graph TD
     PgClassExpression25{{"PgClassExpression[25∈3]<br />ᐸ(__message... not null)ᐳ"}}:::plan
     PgSelectSingle21 --> PgClassExpression25
     PgSelectSingle21 --> PgClassExpression26
-    First31[["First[31∈3]"]]:::plan
+    First31{{"First[31∈3]"}}:::plan
     PgSelectRows32[["PgSelectRows[32∈3]"]]:::plan
     PgSelectRows32 --> First31
     PgSelect27 --> PgSelectRows32
     PgSelectSingle33{{"PgSelectSingle[33∈3]<br />ᐸforumsᐳ"}}:::plan
     First31 --> PgSelectSingle33
     PgSelectSingle21 --> PgClassExpression34
-    First37[["First[37∈3]"]]:::plan
+    First37{{"First[37∈3]"}}:::plan
     PgSelectRows38[["PgSelectRows[38∈3]"]]:::plan
     PgSelectRows38 --> First37
     PgSelect35 --> PgSelectRows38

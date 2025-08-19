@@ -8,7 +8,7 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/v4/pg11.network_types"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 6, 11, 12, 145, 146, 147, 148, 7, 13, 15, 17, 23, 25, 31, 33, 39<br />2: 10, 20, 28, 36, 45, 50, 55, 60<br />ᐳ: 86, 89, 92, 95<br />3: 14, 22, 30, 38, 47, 52, 57, 62<br />4: 46, 51, 56, 61, 65, 68, 71, 74<br />ᐳ: 48, 49, 53, 54, 58, 59, 63, 64<br />5: 85, 88, 91, 94, 97, 99, 101, 103<br />ᐳ: 87, 90, 93, 96, 98, 100, 102, 104"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 6, 11, 12, 145, 146, 147, 148, 7, 13, 15, 17, 23, 25, 31, 33, 39<br />2: 10, 20, 28, 36, 45, 50, 55, 60<br />ᐳ: 86, 89, 92, 95<br />3: 14, 22, 30, 38, 47, 52, 57, 62<br />ᐳ: 46, 48, 49, 51, 53, 54, 56, 58, 59, 61, 63, 64<br />4: 65, 68, 71, 74<br />ᐳ: 85, 87, 88, 90, 91, 93, 94, 96, 97, 98, 99, 100, 101, 102, 103, 104"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14, 86, 65, 49, 87, 98<br /><br />ROOT Connectionᐸ10ᐳ[14]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 22, 89, 68, 54, 90, 100<br /><br />ROOT Connectionᐸ20ᐳ[22]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 30, 92, 71, 59, 93, 102<br /><br />ROOT Connectionᐸ28ᐳ[30]"):::bucket
@@ -84,25 +84,25 @@ graph TD
     Connection38[["Connection[38∈0] ➊<br />ᐸ36ᐳ<br />Dependents: 2"]]:::plan
     PgSelect36 --> Connection38
     __InputObject33 --> ApplyInput39
-    First46[["First[46∈0] ➊"]]:::plan
+    First46{{"First[46∈0] ➊"}}:::plan
     PgSelectRows47[["PgSelectRows[47∈0] ➊"]]:::plan
     PgSelectRows47 --> First46
     PgSelect45 --> PgSelectRows47
     PgSelectSingle48{{"PgSelectSingle[48∈0] ➊<br />ᐸnetworkᐳ"}}:::plan
     First46 --> PgSelectSingle48
-    First51[["First[51∈0] ➊"]]:::plan
+    First51{{"First[51∈0] ➊"}}:::plan
     PgSelectRows52[["PgSelectRows[52∈0] ➊"]]:::plan
     PgSelectRows52 --> First51
     PgSelect50 --> PgSelectRows52
     PgSelectSingle53{{"PgSelectSingle[53∈0] ➊<br />ᐸnetworkᐳ"}}:::plan
     First51 --> PgSelectSingle53
-    First56[["First[56∈0] ➊"]]:::plan
+    First56{{"First[56∈0] ➊"}}:::plan
     PgSelectRows57[["PgSelectRows[57∈0] ➊"]]:::plan
     PgSelectRows57 --> First56
     PgSelect55 --> PgSelectRows57
     PgSelectSingle58{{"PgSelectSingle[58∈0] ➊<br />ᐸnetworkᐳ"}}:::plan
     First56 --> PgSelectSingle58
-    First61[["First[61∈0] ➊"]]:::plan
+    First61{{"First[61∈0] ➊"}}:::plan
     PgSelectRows62[["PgSelectRows[62∈0] ➊"]]:::plan
     PgSelectRows62 --> First61
     PgSelect60 --> PgSelectRows62
@@ -112,22 +112,22 @@ graph TD
     ConnectionItems68[["ConnectionItems[68∈0] ➊<br />Dependents: 3<br />More deps:<br />- Connection[22]"]]:::plan
     ConnectionItems71[["ConnectionItems[71∈0] ➊<br />Dependents: 3<br />More deps:<br />- Connection[30]"]]:::plan
     ConnectionItems74[["ConnectionItems[74∈0] ➊<br />Dependents: 3<br />More deps:<br />- Connection[38]"]]:::plan
-    First85[["First[85∈0] ➊<br />More deps:<br />- ConnectionItems[65]"]]:::plan
+    First85{{"First[85∈0] ➊<br />More deps:<br />- ConnectionItems[65]"}}:::plan
     Access86{{"Access[86∈0] ➊<br />ᐸ10.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect10 --> Access86
-    First88[["First[88∈0] ➊<br />More deps:<br />- ConnectionItems[68]"]]:::plan
+    First88{{"First[88∈0] ➊<br />More deps:<br />- ConnectionItems[68]"}}:::plan
     Access89{{"Access[89∈0] ➊<br />ᐸ20.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect20 --> Access89
-    First91[["First[91∈0] ➊<br />More deps:<br />- ConnectionItems[71]"]]:::plan
+    First91{{"First[91∈0] ➊<br />More deps:<br />- ConnectionItems[71]"}}:::plan
     Access92{{"Access[92∈0] ➊<br />ᐸ28.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect28 --> Access92
-    First94[["First[94∈0] ➊<br />More deps:<br />- ConnectionItems[74]"]]:::plan
+    First94{{"First[94∈0] ➊<br />More deps:<br />- ConnectionItems[74]"}}:::plan
     Access95{{"Access[95∈0] ➊<br />ᐸ36.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect36 --> Access95
-    Last97[["Last[97∈0] ➊<br />More deps:<br />- ConnectionItems[65]"]]:::plan
-    Last99[["Last[99∈0] ➊<br />More deps:<br />- ConnectionItems[68]"]]:::plan
-    Last101[["Last[101∈0] ➊<br />More deps:<br />- ConnectionItems[71]"]]:::plan
-    Last103[["Last[103∈0] ➊<br />More deps:<br />- ConnectionItems[74]"]]:::plan
+    Last97{{"Last[97∈0] ➊<br />More deps:<br />- ConnectionItems[65]"}}:::plan
+    Last99{{"Last[99∈0] ➊<br />More deps:<br />- ConnectionItems[68]"}}:::plan
+    Last101{{"Last[101∈0] ➊<br />More deps:<br />- ConnectionItems[71]"}}:::plan
+    Last103{{"Last[103∈0] ➊<br />More deps:<br />- ConnectionItems[74]"}}:::plan
     PageInfo41{{"PageInfo[41∈1] ➊<br />More deps:<br />- Connection[14]"}}:::plan
     PageInfo42{{"PageInfo[42∈2] ➊<br />More deps:<br />- Connection[22]"}}:::plan
     PageInfo43{{"PageInfo[43∈3] ➊<br />More deps:<br />- Connection[30]"}}:::plan

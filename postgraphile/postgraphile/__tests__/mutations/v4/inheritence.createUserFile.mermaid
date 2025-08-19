@@ -14,7 +14,7 @@ graph TD
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16, 11, 26<br /><br />ROOT Object{1}ᐸ{result}ᐳ[16]"):::bucket
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 2, 20, 25<br /><br />ROOT Object{2}ᐸ{result}ᐳ[25]"):::bucket
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 11, 26<br /><br />ROOT PgInsertSingle{1}ᐸuser()ᐳ[11]"):::bucket
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 20, 40<br /><br />ROOT PgInsertSingle{2}ᐸuser_file()ᐳ[20]<br />1: <br />ᐳ: 32, 31, 34, 36<br />2: PgSelect[37]<br />3: PgSelectRows[42]<br />4: First[41]<br />ᐳ: PgSelectSingle[43]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 20, 40<br /><br />ROOT PgInsertSingle{2}ᐸuser_file()ᐳ[20]<br />1: <br />ᐳ: 32, 31, 34, 36<br />2: PgSelect[37]<br />3: PgSelectRows[42]<br />ᐳ: First[41], PgSelectSingle[43]"):::bucket
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 43, 20<br /><br />ROOT PgSelectSingle{6}ᐸuserᐳ[43]"):::bucket
     end
     Bucket0 --> Bucket1 & Bucket2
@@ -76,7 +76,7 @@ graph TD
     PgClassExpression34{{"PgClassExpression[34∈6] ➊<br />ᐸ__user_fil...”filename”ᐳ"}}:::plan
     Access32 --> PgClassExpression34
     Access32 --> PgClassExpression36
-    First41[["First[41∈6] ➊"]]:::plan
+    First41{{"First[41∈6] ➊"}}:::plan
     PgSelectRows42[["PgSelectRows[42∈6] ➊"]]:::plan
     PgSelectRows42 --> First41
     PgSelect37 --> PgSelectRows42

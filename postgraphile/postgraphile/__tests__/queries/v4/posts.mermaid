@@ -12,9 +12,9 @@ graph TD
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 19, 14, 105<br /><br />ROOT Connectionᐸ8ᐳ[12]"):::bucket
     Bucket3("Bucket 3 (listItem)<br />Deps: 19, 105<br /><br />ROOT __Item{3}ᐸ14ᐳ[17]"):::bucket
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 17, 18, 105, 20<br /><br />ROOT Edge{3}[18]"):::bucket
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 21, 105<br /><br />ROOT PgSelectSingle{4}ᐸpostᐳ[21]<br />1: <br />ᐳ: 22, 23, 26, 106, 107<br />2: PgSelectRows[33]<br />3: First[32]<br />ᐳ: PgSelectSingle[34]"):::bucket
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 34, 107, 32<br /><br />ROOT PgSelectSingle{5}ᐸpersonᐳ[34]<br />1: <br />ᐳ: 35, 36, 38, 93, 97, 101, 94, 95, 98, 99, 102, 103, 78<br />2: 46, 52, 60<br />ᐳ: PageInfo[66]<br />3: 45, 54, 59<br />ᐳ: 47, 61, 62<br />4: First[77]<br />ᐳ: PgCursor[79]"):::bucket
-    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 47, 95<br /><br />ROOT PgSelectSingle{6}ᐸperson_first_postᐳ[47]<br />1: <br />ᐳ: 53, 57, 65, 89, 90, 91<br />2: PgSelectRows[73]<br />3: First[72]<br />ᐳ: PgSelectSingle[74]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 21, 105<br /><br />ROOT PgSelectSingle{4}ᐸpostᐳ[21]<br />1: <br />ᐳ: 22, 23, 26, 106, 107<br />2: PgSelectRows[33]<br />ᐳ: First[32], PgSelectSingle[34]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 34, 107, 32<br /><br />ROOT PgSelectSingle{5}ᐸpersonᐳ[34]<br />1: <br />ᐳ: 35, 36, 38, 93, 97, 101, 94, 95, 98, 99, 102, 103, 78<br />2: 46, 52, 60<br />ᐳ: 45, 47, 59, 61, 62, 66<br />3: ConnectionItems[54]<br />ᐳ: First[77], PgCursor[79]"):::bucket
+    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 47, 95<br /><br />ROOT PgSelectSingle{6}ᐸperson_first_postᐳ[47]<br />1: <br />ᐳ: 53, 57, 65, 89, 90, 91<br />2: PgSelectRows[73]<br />ᐳ: First[72], PgSelectSingle[74]"):::bucket
     Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 74<br /><br />ROOT PgSelectSingle{7}ᐸpersonᐳ[74]"):::bucket
     Bucket10("Bucket 10 (listItem)<br /><br />ROOT __Item{10}ᐸ54ᐳ[75]"):::bucket
     Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 76<br /><br />ROOT PgSelectSingle{10}ᐸperson_friendsᐳ[76]"):::bucket
@@ -73,7 +73,7 @@ graph TD
     PgSelectSingle21 --> PgClassExpression23
     PgClassExpression26{{"PgClassExpression[26∈5]<br />ᐸ(1/0) /* E...ferred! */ᐳ"}}:::plan
     PgSelectSingle21 --> PgClassExpression26
-    First32[["First[32∈5]"]]:::plan
+    First32{{"First[32∈5]"}}:::plan
     PgSelectRows33[["PgSelectRows[33∈5]"]]:::plan
     PgSelectRows33 --> First32
     Lambda107{{"Lambda[107∈5]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
@@ -82,7 +82,7 @@ graph TD
     First32 --> PgSelectSingle34
     List106 --> Lambda107
     PgCursor79{{"PgCursor[79∈6]"}}:::plan
-    First77[["First[77∈6]"]]:::plan
+    First77{{"First[77∈6]"}}:::plan
     Access78{{"Access[78∈6]<br />ᐸ99.cursorDetailsᐳ"}}:::plan
     First77 & Access78 --> PgCursor79
     List94{{"List[94∈6]<br />ᐸ93,34ᐳ"}}:::plan
@@ -100,7 +100,7 @@ graph TD
     PgSelectSingle34 --> PgClassExpression36
     PgClassExpression38{{"PgClassExpression[38∈6]<br />ᐸ”c”.”perso..._person__)ᐳ"}}:::plan
     PgSelectSingle34 --> PgClassExpression38
-    First45[["First[45∈6]"]]:::plan
+    First45{{"First[45∈6]"}}:::plan
     PgSelectRows46[["PgSelectRows[46∈6]"]]:::plan
     PgSelectRows46 --> First45
     Lambda95{{"Lambda[95∈6]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
@@ -112,7 +112,7 @@ graph TD
     Lambda99 --> Connection52
     ConnectionItems54[["ConnectionItems[54∈6]"]]:::plan
     Connection52 --> ConnectionItems54
-    First59[["First[59∈6]"]]:::plan
+    First59{{"First[59∈6]"}}:::plan
     PgSelectRows60[["PgSelectRows[60∈6]"]]:::plan
     PgSelectRows60 --> First59
     Lambda103{{"Lambda[103∈6]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
@@ -140,7 +140,7 @@ graph TD
     PgSelectSingle47 --> PgClassExpression57
     PgClassExpression65{{"PgClassExpression[65∈7]<br />ᐸ(1/0) /* E...ferred! */ᐳ"}}:::plan
     PgSelectSingle47 --> PgClassExpression65
-    First72[["First[72∈7]"]]:::plan
+    First72{{"First[72∈7]"}}:::plan
     PgSelectRows73[["PgSelectRows[73∈7]"]]:::plan
     PgSelectRows73 --> First72
     Lambda91{{"Lambda[91∈7]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan

@@ -10,7 +10,7 @@ graph TD
     subgraph "Buckets for mutations/v4/mutation-create.single-hardcoded"
     Bucket0("Bucket 0 (root)"):::bucket
     Bucket1("Bucket 1 (mutationField)<br />Deps: 20, 21, 2, 52, 4, 56<br /><br />1: PgInsertSingle[17]<br />2: <br />ᐳ: Object[22]"):::bucket
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 2, 52, 22, 4, 56<br /><br />ROOT Object{1}ᐸ{result}ᐳ[22]<br />1: <br />ᐳ: 23, 26, 28, 29, 53, 25, 30<br />2: PgSelect[27]<br />ᐳ: Access[49]<br />3: Connection[32], Connection[43]<br />4: 34, 45<br />5: First[33], First[44]<br />ᐳ: 50, 51, 54, 55, 37, 48"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 2, 52, 22, 4, 56<br /><br />ROOT Object{1}ᐸ{result}ᐳ[22]<br />1: <br />ᐳ: 23, 26, 28, 29, 53, 25, 30<br />2: PgSelect[27]<br />ᐳ: Access[49]<br />3: Connection[32], Connection[43]<br />4: 34, 45<br />ᐳ: 33, 44, 50, 51, 54, 55, 37, 48"):::bucket
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 37, 54, 17, 56, 50<br /><br />ROOT Edge{2}[37]"):::bucket
     Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 48, 55, 17, 56, 51<br /><br />ROOT Edge{2}[48]"):::bucket
     Bucket7("Bucket 7 (nullableBoundary)<br />Parent side effect step: 17<br />Deps: 4, 53<br /><br />ROOT __ValueᐸrootValueᐳ[4]"):::bucket
@@ -48,11 +48,11 @@ graph TD
     Access29{{"Access[29∈2] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access28 & Access29 --> Object30
     Edge37{{"Edge[37∈2] ➊"}}:::plan
-    First33[["First[33∈2] ➊"]]:::plan
+    First33{{"First[33∈2] ➊"}}:::plan
     PgCursor50{{"PgCursor[50∈2] ➊"}}:::plan
     First33 & PgCursor50 --> Edge37
     Edge48{{"Edge[48∈2] ➊"}}:::plan
-    First44[["First[44∈2] ➊"]]:::plan
+    First44{{"First[44∈2] ➊"}}:::plan
     PgCursor51{{"PgCursor[51∈2] ➊"}}:::plan
     First44 & PgCursor51 --> Edge48
     Access49{{"Access[49∈2] ➊<br />ᐸ27.cursorDetailsᐳ"}}:::plan

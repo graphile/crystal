@@ -8,7 +8,7 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/connections/pagination-before-last-pagination-only.variables"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 9, 12, 13, 27, 28, 14, 17, 18<br />2: PgSelect[11], PgSelect[20]<br />3: Connection[15], PgSelectRows[22]<br />4: First[21]<br />ᐳ: 23, 24"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 9, 12, 13, 27, 28, 14, 17, 18<br />2: PgSelect[11], PgSelect[20]<br />3: Connection[15], PgSelectRows[22]<br />ᐳ: 21, 23, 24"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 15, 24<br /><br />ROOT Connectionᐸ11ᐳ[15]"):::bucket
     end
     Bucket0 --> Bucket1
@@ -33,7 +33,7 @@ graph TD
     __Value2 --> Access12
     __Value2 --> Access13
     Access9 --> Lambda18
-    First21[["First[21∈0] ➊"]]:::plan
+    First21{{"First[21∈0] ➊"}}:::plan
     PgSelectRows22[["PgSelectRows[22∈0] ➊"]]:::plan
     PgSelectRows22 --> First21
     PgSelect20 --> PgSelectRows22

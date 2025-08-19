@@ -8,7 +8,7 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/v4/js-reserved-pgreserved"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 53, 54, 55, 56, 10<br />2: 7, 12, 18, 24, 30<br />3: 15, 21, 27, 33, 35<br />4: 14, 20, 26, 32<br />ᐳ: 16, 22, 28, 34"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 53, 54, 55, 56, 10<br />2: 7, 12, 18, 24, 30<br />3: 15, 21, 27, 33, 35<br />ᐳ: 14, 16, 20, 22, 26, 28, 32, 34"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 16<br /><br />ROOT PgSelectSingleᐸreservedᐳ[16]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 22<br /><br />ROOT PgSelectSingleᐸreservedᐳ[22]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 28<br /><br />ROOT PgSelectSingleᐸreservedᐳ[28]"):::bucket
@@ -35,25 +35,25 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
-    First14[["First[14∈0] ➊"]]:::plan
+    First14{{"First[14∈0] ➊"}}:::plan
     PgSelectRows15[["PgSelectRows[15∈0] ➊"]]:::plan
     PgSelectRows15 --> First14
     PgSelect12 --> PgSelectRows15
     PgSelectSingle16{{"PgSelectSingle[16∈0] ➊<br />ᐸreservedᐳ"}}:::plan
     First14 --> PgSelectSingle16
-    First20[["First[20∈0] ➊"]]:::plan
+    First20{{"First[20∈0] ➊"}}:::plan
     PgSelectRows21[["PgSelectRows[21∈0] ➊"]]:::plan
     PgSelectRows21 --> First20
     PgSelect18 --> PgSelectRows21
     PgSelectSingle22{{"PgSelectSingle[22∈0] ➊<br />ᐸreservedᐳ"}}:::plan
     First20 --> PgSelectSingle22
-    First26[["First[26∈0] ➊"]]:::plan
+    First26{{"First[26∈0] ➊"}}:::plan
     PgSelectRows27[["PgSelectRows[27∈0] ➊"]]:::plan
     PgSelectRows27 --> First26
     PgSelect24 --> PgSelectRows27
     PgSelectSingle28{{"PgSelectSingle[28∈0] ➊<br />ᐸreservedᐳ"}}:::plan
     First26 --> PgSelectSingle28
-    First32[["First[32∈0] ➊"]]:::plan
+    First32{{"First[32∈0] ➊"}}:::plan
     PgSelectRows33[["PgSelectRows[33∈0] ➊"]]:::plan
     PgSelectRows33 --> First32
     PgSelect30 --> PgSelectRows33

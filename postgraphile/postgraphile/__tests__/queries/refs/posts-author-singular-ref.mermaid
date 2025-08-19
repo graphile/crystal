@@ -11,7 +11,7 @@ graph TD
     Bucket0("Bucket 0 (root)<br /><br />1: PgSelectInlineApply[28]<br />ᐳ: Access[9], Access[10], Object[11]<br />2: PgSelect[8]<br />ᐳ: Access[29]<br />3: Connection[12]<br />4: ConnectionItems[14]"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 14, 29<br /><br />ROOT Connectionᐸ8ᐳ[12]"):::bucket
     Bucket3("Bucket 3 (listItem)<br />Deps: 29<br /><br />ROOT __Item{3}ᐸ14ᐳ[17]"):::bucket
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 29, 18<br /><br />ROOT PgSelectSingle{3}ᐸpostsᐳ[18]<br />1: <br />ᐳ: List[30], Lambda[31]<br />2: PgSelectRows[25]<br />3: First[24]<br />ᐳ: PgSelectSingle[26]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 29, 18<br /><br />ROOT PgSelectSingle{3}ᐸpostsᐳ[18]<br />1: <br />ᐳ: List[30], Lambda[31]<br />2: PgSelectRows[25]<br />ᐳ: First[24], PgSelectSingle[26]"):::bucket
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 26<br /><br />ROOT PgSelectSingle{4}ᐸpeopleᐳ[26]"):::bucket
     end
     Bucket0 --> Bucket1
@@ -42,7 +42,7 @@ graph TD
     __Item17 --> PgSelectSingle18
     List30{{"List[30∈4]<br />ᐸ29,18ᐳ"}}:::plan
     Access29 & PgSelectSingle18 --> List30
-    First24[["First[24∈4]"]]:::plan
+    First24{{"First[24∈4]"}}:::plan
     PgSelectRows25[["PgSelectRows[25∈4]"]]:::plan
     PgSelectRows25 --> First24
     Lambda31{{"Lambda[31∈4]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan

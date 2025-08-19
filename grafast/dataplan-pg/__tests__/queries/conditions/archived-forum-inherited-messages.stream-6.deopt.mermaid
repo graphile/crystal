@@ -12,13 +12,13 @@ graph TD
     Bucket1("Bucket 1 (listItem)<br />Deps: 11, 28, 32, 29, 30, 6<br /><br />ROOT __Item{1}ᐸ14ᐳ[15]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 11, 28, 32, 29, 30, 6<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[16]<br />1: <br />ᐳ: 17, 19, 25<br />2: PgSelect[20]<br />3: Connection[24]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 24, 20, 11, 19, 25, 28, 32, 29, 30, 6<br /><br />ROOT Connection{2}ᐸ20ᐳ[24]<br />1: ConnectionItems[33]<br />ᐳ: Access[55]<br />2: __CloneStream[40], __CloneStream[41]"):::bucket
-    Bucket6("Bucket 6 (defer)<br />Deps: 24, 11, 19, 25, 28, 32<br /><br />1: PgSelect[43]<br />ᐳ: PageInfo[42]<br />2: PgSelectRows[45]<br />3: First[44]<br />ᐳ: 46, 47"):::bucket
+    Bucket6("Bucket 6 (defer)<br />Deps: 24, 11, 19, 25, 28, 32<br /><br />1: PgSelect[43]<br />ᐳ: PageInfo[42]<br />2: PgSelectRows[45]<br />ᐳ: 44, 46, 47"):::bucket
     Bucket7("Bucket 7 (listItem)<br />Deps: 11<br /><br />ROOT __Item{7}ᐸ40ᐳ[48]"):::bucket
     Bucket8("Bucket 8 (listItem)<br />Deps: 55, 11<br /><br />ROOT __Item{8}ᐸ41ᐳ[50]"):::bucket
-    Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 49, 11<br /><br />ROOT PgSelectSingle{7}ᐸmessagesᐳ[49]<br />1: <br />ᐳ: 54, 57<br />2: PgSelect[58]<br />3: PgSelectRows[63]<br />4: First[62]<br />ᐳ: PgSelectSingle[64]"):::bucket
+    Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 49, 11<br /><br />ROOT PgSelectSingle{7}ᐸmessagesᐳ[49]<br />1: <br />ᐳ: 54, 57<br />2: PgSelect[58]<br />3: PgSelectRows[63]<br />ᐳ: First[62], PgSelectSingle[64]"):::bucket
     Bucket10("Bucket 10 (nullableBoundary)<br />Deps: 50, 51, 11, 56<br /><br />ROOT Edge{8}[51]"):::bucket
     Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 64<br /><br />ROOT PgSelectSingle{9}ᐸusersᐳ[64]"):::bucket
-    Bucket12("Bucket 12 (nullableBoundary)<br />Deps: 65, 11<br /><br />ROOT PgSelectSingle{10}ᐸmessagesᐳ[65]<br />1: <br />ᐳ: 67, 69<br />2: PgSelect[70]<br />3: PgSelectRows[75]<br />4: First[74]<br />ᐳ: PgSelectSingle[76]"):::bucket
+    Bucket12("Bucket 12 (nullableBoundary)<br />Deps: 65, 11<br /><br />ROOT PgSelectSingle{10}ᐸmessagesᐳ[65]<br />1: <br />ᐳ: 67, 69<br />2: PgSelect[70]<br />3: PgSelectRows[75]<br />ᐳ: First[74], PgSelectSingle[76]"):::bucket
     Bucket13("Bucket 13 (nullableBoundary)<br />Deps: 76<br /><br />ROOT PgSelectSingle{12}ᐸusersᐳ[76]"):::bucket
     end
     Bucket0 --> Bucket1
@@ -72,7 +72,7 @@ graph TD
     PgClassExpression19 & PgClassExpression25 --> PgSelect43
     PageInfo42{{"PageInfo[42∈6]"}}:::plan
     Connection24 --> PageInfo42
-    First44[["First[44∈6]"]]:::plan
+    First44{{"First[44∈6]"}}:::plan
     PgSelectRows45[["PgSelectRows[45∈6]"]]:::plan
     PgSelectRows45 --> First44
     PgSelect43 --> PgSelectRows45
@@ -96,7 +96,7 @@ graph TD
     PgClassExpression54{{"PgClassExpression[54∈9]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
     PgSelectSingle49 --> PgClassExpression54
     PgSelectSingle49 --> PgClassExpression57
-    First62[["First[62∈9]"]]:::plan
+    First62{{"First[62∈9]"}}:::plan
     PgSelectRows63[["PgSelectRows[63∈9]"]]:::plan
     PgSelectRows63 --> First62
     PgSelect58 --> PgSelectRows63
@@ -114,7 +114,7 @@ graph TD
     PgClassExpression67{{"PgClassExpression[67∈12]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
     PgSelectSingle65 --> PgClassExpression67
     PgSelectSingle65 --> PgClassExpression69
-    First74[["First[74∈12]"]]:::plan
+    First74{{"First[74∈12]"}}:::plan
     PgSelectRows75[["PgSelectRows[75∈12]"]]:::plan
     PgSelectRows75 --> First74
     PgSelect70 --> PgSelectRows75

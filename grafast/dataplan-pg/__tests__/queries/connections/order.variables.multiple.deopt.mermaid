@@ -8,11 +8,11 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/connections/order.variables.multiple"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 10, 13, 14, 52, 15, 17, 19<br />2: PgSelect[12], PgSelect[24]<br />ᐳ: Access[34]<br />3: Connection[16], PgSelectRows[26]<br />4: ConnectionItems[20], First[25]<br />ᐳ: 27, 28<br />5: First[33], Last[36]<br />ᐳ: PgCursor[35], PgCursor[37]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 10, 13, 14, 52, 15, 17, 19<br />2: PgSelect[12], PgSelect[24]<br />ᐳ: Access[34]<br />3: Connection[16], PgSelectRows[26]<br />ᐳ: 25, 27, 28<br />4: ConnectionItems[20]<br />ᐳ: 33, 35, 36, 37"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 16, 34, 20, 15, 28, 35, 37<br /><br />ROOT Connectionᐸ12ᐳ[16]"):::bucket
     Bucket3("Bucket 3 (listItem)<br />Deps: 34, 15<br /><br />ROOT __Item{3}ᐸ20ᐳ[29]"):::bucket
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 29, 30, 15, 39<br /><br />ROOT Edge{3}[30]"):::bucket
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 40, 15<br /><br />ROOT PgSelectSingle{4}ᐸmessagesᐳ[40]<br />1: <br />ᐳ: 41, 42<br />2: PgSelect[43]<br />3: PgSelectRows[48]<br />4: First[47]<br />ᐳ: PgSelectSingle[49]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 40, 15<br /><br />ROOT PgSelectSingle{4}ᐸmessagesᐳ[40]<br />1: <br />ᐳ: 41, 42<br />2: PgSelect[43]<br />3: PgSelectRows[48]<br />ᐳ: First[47], PgSelectSingle[49]"):::bucket
     Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 49<br /><br />ROOT PgSelectSingle{5}ᐸusersᐳ[49]"):::bucket
     end
     Bucket0 --> Bucket1
@@ -44,16 +44,16 @@ graph TD
     __Value2 --> Access14
     Access10 --> ApplyInput17
     ConnectionItems20[["ConnectionItems[20∈0] ➊<br />Dependents: 3<br />More deps:<br />- Connection[16]"]]:::plan
-    First25[["First[25∈0] ➊"]]:::plan
+    First25{{"First[25∈0] ➊"}}:::plan
     PgSelectRows26[["PgSelectRows[26∈0] ➊"]]:::plan
     PgSelectRows26 --> First25
     PgSelect24 --> PgSelectRows26
     PgSelectSingle27{{"PgSelectSingle[27∈0] ➊<br />ᐸmessagesᐳ"}}:::plan
     First25 --> PgSelectSingle27
-    First33[["First[33∈0] ➊<br />More deps:<br />- ConnectionItems[20]"]]:::plan
+    First33{{"First[33∈0] ➊<br />More deps:<br />- ConnectionItems[20]"}}:::plan
     Access34{{"Access[34∈0] ➊<br />ᐸ12.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect12 --> Access34
-    Last36[["Last[36∈0] ➊<br />More deps:<br />- ConnectionItems[20]"]]:::plan
+    Last36{{"Last[36∈0] ➊<br />More deps:<br />- ConnectionItems[20]"}}:::plan
     PageInfo23{{"PageInfo[23∈1] ➊<br />More deps:<br />- Connection[16]"}}:::plan
     Edge30{{"Edge[30∈3]"}}:::plan
     __Item29[/"__Item[29∈3]<br />ᐸ20ᐳ<br />More deps:<br />- ConnectionItems[20]"\]:::itemplan
@@ -68,7 +68,7 @@ graph TD
     PgClassExpression41{{"PgClassExpression[41∈5]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
     PgSelectSingle40 --> PgClassExpression41
     PgSelectSingle40 --> PgClassExpression42
-    First47[["First[47∈5]"]]:::plan
+    First47{{"First[47∈5]"}}:::plan
     PgSelectRows48[["PgSelectRows[48∈5]"]]:::plan
     PgSelectRows48 --> First47
     PgSelect43 --> PgSelectRows48

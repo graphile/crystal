@@ -8,9 +8,9 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/super-simple/unique-forum-message"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 15, 36, 10<br />2: PgSelect[7]<br />3: PgSelectRows[12]<br />4: First[11]<br />ᐳ: PgSelectSingle[13]"):::bucket
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 10, 15<br /><br />ROOT PgSelectSingleᐸforumsᐳ[13]<br />1: <br />ᐳ: 14, 17<br />2: PgSelect[18]<br />3: PgSelectRows[23]<br />4: First[22]<br />ᐳ: PgSelectSingle[24]"):::bucket
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 24, 10<br /><br />ROOT PgSelectSingle{1}ᐸmessagesᐳ[24]<br />1: <br />ᐳ: 25, 26<br />2: PgSelect[27]<br />3: PgSelectRows[32]<br />4: First[31]<br />ᐳ: PgSelectSingle[33]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 15, 36, 10<br />2: PgSelect[7]<br />3: PgSelectRows[12]<br />ᐳ: First[11], PgSelectSingle[13]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 10, 15<br /><br />ROOT PgSelectSingleᐸforumsᐳ[13]<br />1: <br />ᐳ: 14, 17<br />2: PgSelect[18]<br />3: PgSelectRows[23]<br />ᐳ: First[22], PgSelectSingle[24]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 24, 10<br /><br />ROOT PgSelectSingle{1}ᐸmessagesᐳ[24]<br />1: <br />ᐳ: 25, 26<br />2: PgSelect[27]<br />3: PgSelectRows[32]<br />ᐳ: First[31], PgSelectSingle[33]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 33<br /><br />ROOT PgSelectSingle{2}ᐸusersᐳ[33]"):::bucket
     end
     Bucket0 --> Bucket1
@@ -26,7 +26,7 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
-    First11[["First[11∈0] ➊"]]:::plan
+    First11{{"First[11∈0] ➊"}}:::plan
     PgSelectRows12[["PgSelectRows[12∈0] ➊"]]:::plan
     PgSelectRows12 --> First11
     PgSelect7 --> PgSelectRows12
@@ -41,7 +41,7 @@ graph TD
     PgClassExpression14{{"PgClassExpression[14∈1] ➊<br />ᐸ__forums__.”name”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression14
     PgSelectSingle13 --> PgClassExpression17
-    First22[["First[22∈1] ➊"]]:::plan
+    First22{{"First[22∈1] ➊"}}:::plan
     PgSelectRows23[["PgSelectRows[23∈1] ➊"]]:::plan
     PgSelectRows23 --> First22
     PgSelect18 --> PgSelectRows23
@@ -53,7 +53,7 @@ graph TD
     PgClassExpression25{{"PgClassExpression[25∈2] ➊<br />ᐸ__messages__.”body”ᐳ"}}:::plan
     PgSelectSingle24 --> PgClassExpression25
     PgSelectSingle24 --> PgClassExpression26
-    First31[["First[31∈2] ➊"]]:::plan
+    First31{{"First[31∈2] ➊"}}:::plan
     PgSelectRows32[["PgSelectRows[32∈2] ➊"]]:::plan
     PgSelectRows32 --> First31
     PgSelect27 --> PgSelectRows32

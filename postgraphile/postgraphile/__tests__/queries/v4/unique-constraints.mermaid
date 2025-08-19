@@ -8,7 +8,7 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/v4/unique-constraints"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 49, 50, 51, 52, 53, 54, 10<br />2: 7, 15, 22, 28, 34<br />3: 12, 18, 25, 31, 37<br />4: 11, 17, 24, 30, 36<br />ᐳ: 13, 19, 26, 32, 38"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 49, 50, 51, 52, 53, 54, 10<br />2: 7, 15, 22, 28, 34<br />3: 12, 18, 25, 31, 37<br />ᐳ: 11, 13, 17, 19, 24, 26, 30, 32, 36, 38"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13<br /><br />ROOT PgSelectSingleᐸpersonᐳ[13]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 19<br /><br />ROOT PgSelectSingleᐸpersonᐳ[19]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 26<br /><br />ROOT PgSelectSingleᐸcompound_keyᐳ[26]"):::bucket
@@ -35,31 +35,31 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
-    First11[["First[11∈0] ➊"]]:::plan
+    First11{{"First[11∈0] ➊"}}:::plan
     PgSelectRows12[["PgSelectRows[12∈0] ➊"]]:::plan
     PgSelectRows12 --> First11
     PgSelect7 --> PgSelectRows12
     PgSelectSingle13{{"PgSelectSingle[13∈0] ➊<br />ᐸpersonᐳ"}}:::plan
     First11 --> PgSelectSingle13
-    First17[["First[17∈0] ➊"]]:::plan
+    First17{{"First[17∈0] ➊"}}:::plan
     PgSelectRows18[["PgSelectRows[18∈0] ➊"]]:::plan
     PgSelectRows18 --> First17
     PgSelect15 --> PgSelectRows18
     PgSelectSingle19{{"PgSelectSingle[19∈0] ➊<br />ᐸpersonᐳ"}}:::plan
     First17 --> PgSelectSingle19
-    First24[["First[24∈0] ➊"]]:::plan
+    First24{{"First[24∈0] ➊"}}:::plan
     PgSelectRows25[["PgSelectRows[25∈0] ➊"]]:::plan
     PgSelectRows25 --> First24
     PgSelect22 --> PgSelectRows25
     PgSelectSingle26{{"PgSelectSingle[26∈0] ➊<br />ᐸcompound_keyᐳ"}}:::plan
     First24 --> PgSelectSingle26
-    First30[["First[30∈0] ➊"]]:::plan
+    First30{{"First[30∈0] ➊"}}:::plan
     PgSelectRows31[["PgSelectRows[31∈0] ➊"]]:::plan
     PgSelectRows31 --> First30
     PgSelect28 --> PgSelectRows31
     PgSelectSingle32{{"PgSelectSingle[32∈0] ➊<br />ᐸcompound_keyᐳ"}}:::plan
     First30 --> PgSelectSingle32
-    First36[["First[36∈0] ➊"]]:::plan
+    First36{{"First[36∈0] ➊"}}:::plan
     PgSelectRows37[["PgSelectRows[37∈0] ➊"]]:::plan
     PgSelectRows37 --> First36
     PgSelect34 --> PgSelectRows37

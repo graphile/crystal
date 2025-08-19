@@ -13,8 +13,8 @@ graph TD
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 21, 27, 75<br /><br />ROOT Connectionᐸ19ᐳ[21]"):::bucket
     Bucket5("Bucket 5 (listItem)<br />Deps: 71<br /><br />ROOT __Item{5}ᐸ24ᐳ[30]"):::bucket
     Bucket6("Bucket 6 (listItem)<br />Deps: 75<br /><br />ROOT __Item{6}ᐸ27ᐳ[32]"):::bucket
-    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 71, 31<br /><br />ROOT PgSelectSingle{5}ᐸrelational_topicsᐳ[31]<br />1: <br />ᐳ: List[72], Lambda[73]<br />2: PgSelectRows[40]<br />3: First[39]<br />ᐳ: 41, 42, 57, 63, 69"):::bucket
-    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 75, 33<br /><br />ROOT PgSelectSingle{6}ᐸrelational_topicsᐳ[33]<br />1: <br />ᐳ: List[76], Lambda[77]<br />2: PgSelectRows[49]<br />3: First[48]<br />ᐳ: 50, 51"):::bucket
+    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 71, 31<br /><br />ROOT PgSelectSingle{5}ᐸrelational_topicsᐳ[31]<br />1: <br />ᐳ: List[72], Lambda[73]<br />2: PgSelectRows[40]<br />ᐳ: 39, 41, 42, 57, 63, 69"):::bucket
+    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 75, 33<br /><br />ROOT PgSelectSingle{6}ᐸrelational_topicsᐳ[33]<br />1: <br />ᐳ: List[76], Lambda[77]<br />2: PgSelectRows[49]<br />ᐳ: 48, 50, 51"):::bucket
     end
     Bucket0 --> Bucket1 & Bucket2
     Bucket1 --> Bucket5
@@ -64,7 +64,7 @@ graph TD
     __Item32 --> PgSelectSingle33
     List72{{"List[72∈7]<br />ᐸ71,31ᐳ"}}:::plan
     Access71 & PgSelectSingle31 --> List72
-    First39[["First[39∈7]"]]:::plan
+    First39{{"First[39∈7]"}}:::plan
     PgSelectRows40[["PgSelectRows[40∈7]"]]:::plan
     PgSelectRows40 --> First39
     Lambda73{{"Lambda[73∈7]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
@@ -82,7 +82,7 @@ graph TD
     List72 --> Lambda73
     List76{{"List[76∈8]<br />ᐸ75,33ᐳ"}}:::plan
     Access75 & PgSelectSingle33 --> List76
-    First48[["First[48∈8]"]]:::plan
+    First48{{"First[48∈8]"}}:::plan
     PgSelectRows49[["PgSelectRows[49∈8]"]]:::plan
     PgSelectRows49 --> First48
     Lambda77{{"Lambda[77∈8]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan

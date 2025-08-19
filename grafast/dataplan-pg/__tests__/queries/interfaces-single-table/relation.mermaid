@@ -8,7 +8,7 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/interfaces-single-table/relation"
-    Bucket0("Bucket 0 (root)<br /><br />1: PgSelectInlineApply[112]<br />ᐳ: 8, 9, 120, 10<br />2: PgSelectInlineApply[116]<br />3: PgSelect[7]<br />ᐳ: Access[117]<br />4: PgSelectRows[12]<br />5: First[11]<br />ᐳ: 13, 14, 16, 17, 18, 118, 119, 113<br />6: PgSelectRows[24]<br />7: First[23]<br />ᐳ: 25, 64, 65, 114, 115<br />8: PgSelectRows[77]<br />9: First[76]<br />ᐳ: PgSelectSingle[78]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: PgSelectInlineApply[112]<br />ᐳ: 8, 9, 120, 10<br />2: PgSelectInlineApply[116]<br />3: PgSelect[7]<br />ᐳ: Access[117]<br />4: PgSelectRows[12]<br />ᐳ: 11, 13, 14, 16, 17, 18, 118, 119, 113<br />5: PgSelectRows[24]<br />ᐳ: 23, 25, 64, 65, 114, 115<br />6: PgSelectRows[77]<br />ᐳ: First[76], PgSelectSingle[78]"):::bucket
     Bucket1("Bucket 1 (polymorphic)<br />__typename: Lambda[17]<br />Deps: 17, 65, 78, 13, 14, 25, 18"):::bucket
     Bucket2("Bucket 2 (polymorphic)<br />__typename: Lambda[65]<br />Deps: 65, 78, 25, 18"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 78<br /><br />ROOT PgSelectSingleᐸpeopleᐳ[78]"):::bucket
@@ -36,14 +36,14 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
-    First11[["First[11∈0] ➊"]]:::plan
+    First11{{"First[11∈0] ➊"}}:::plan
     PgSelectRows12[["PgSelectRows[12∈0] ➊"]]:::plan
     PgSelectRows12 --> First11
     PgSelect7 --> PgSelectRows12
     First11 --> PgSelectSingle13
     PgClassExpression16{{"PgClassExpression[16∈0] ➊<br />ᐸ__single_t...s__.”type”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression16
-    First23[["First[23∈0] ➊"]]:::plan
+    First23{{"First[23∈0] ➊"}}:::plan
     PgSelectRows24[["PgSelectRows[24∈0] ➊"]]:::plan
     PgSelectRows24 --> First23
     Lambda119{{"Lambda[119∈0] ➊<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
@@ -51,7 +51,7 @@ graph TD
     First23 --> PgSelectSingle25
     PgClassExpression64{{"PgClassExpression[64∈0] ➊<br />ᐸ__single_t...s__.”type”ᐳ"}}:::plan
     PgSelectSingle25 --> PgClassExpression64
-    First76[["First[76∈0] ➊"]]:::plan
+    First76{{"First[76∈0] ➊"}}:::plan
     PgSelectRows77[["PgSelectRows[77∈0] ➊"]]:::plan
     PgSelectRows77 --> First76
     Lambda115{{"Lambda[115∈0] ➊<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan

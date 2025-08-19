@@ -8,15 +8,15 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/unions-table/bookmarks"
-    Bucket0("Bucket 0 (root)<br /><br />1: PgSelectInlineApply[95]<br />ᐳ: 8, 9, 115, 10<br />2: PgSelectInlineApply[111]<br />3: PgSelect[7]<br />ᐳ: Access[112]<br />4: PgSelectRows[12]<br />5: First[11]<br />ᐳ: 13, 113, 114"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: PgSelectInlineApply[95]<br />ᐳ: 8, 9, 115, 10<br />2: PgSelectInlineApply[111]<br />3: PgSelect[7]<br />ᐳ: Access[112]<br />4: PgSelectRows[12]<br />ᐳ: 11, 13, 113, 114"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 114, 10<br /><br />ROOT PgSelectSingleᐸpeopleᐳ[13]"):::bucket
     Bucket2("Bucket 2 (listItem)<br />Deps: 96, 10<br /><br />ROOT __Item{2}ᐸ20ᐳ[21]"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 22, 96, 10<br /><br />ROOT PgSelectSingle{2}ᐸperson_bookmarksᐳ[22]<br />1: <br />ᐳ: 23, 33, 34, 35, 97, 36, 98<br />2: PgSelectRows[30], Lambda[37]<br />ᐳ: Access[38]<br />3: First[29]<br />ᐳ: PgSelectSingle[31]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 22, 96, 10<br /><br />ROOT PgSelectSingle{2}ᐸperson_bookmarksᐳ[22]<br />1: <br />ᐳ: 23, 33, 34, 35, 97, 36, 98<br />2: PgSelectRows[30], Lambda[37]<br />ᐳ: 29, 31, 38"):::bucket
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 31<br /><br />ROOT PgSelectSingle{3}ᐸpeopleᐳ[31]"):::bucket
     Bucket5("Bucket 5 (polymorphic)<br />__typename: Access[38]<br />Deps: 38, 37, 10"):::bucket
-    Bucket6("Bucket 6 (polymorphicPartition)<br />|Person<br />Deps: 37, 10<br />ᐳPerson<br /><br />1: <br />ᐳ: Access[39]<br />2: PgSelect[40]<br />3: PgSelectRows[45]<br />4: First[44]<br />ᐳ: 46, 64, 67"):::bucket
-    Bucket7("Bucket 7 (polymorphicPartition)<br />|Post<br />Deps: 37, 10<br />ᐳPost<br /><br />1: PgSelectInlineApply[99]<br />ᐳ: Access[47]<br />2: PgSelect[48]<br />ᐳ: Access[100]<br />3: PgSelectRows[53]<br />4: First[52]<br />ᐳ: 54, 65, 84, 101, 102<br />5: PgSelectRows[74]<br />6: First[73]<br />ᐳ: PgSelectSingle[75]"):::bucket
-    Bucket8("Bucket 8 (polymorphicPartition)<br />|Comment<br />Deps: 37, 10<br />ᐳComment<br /><br />1: 103, 107<br />ᐳ: Access[55]<br />2: PgSelect[56]<br />ᐳ: Access[104], Access[108]<br />3: PgSelectRows[61]<br />4: First[60]<br />ᐳ: 62, 66, 91, 105, 106, 109, 110<br />5: PgSelectRows[82], PgSelectRows[89]<br />6: First[81], First[88]<br />ᐳ: PgSelectSingle[83], PgSelectSingle[90]"):::bucket
+    Bucket6("Bucket 6 (polymorphicPartition)<br />|Person<br />Deps: 37, 10<br />ᐳPerson<br /><br />1: <br />ᐳ: Access[39]<br />2: PgSelect[40]<br />3: PgSelectRows[45]<br />ᐳ: 44, 46, 64, 67"):::bucket
+    Bucket7("Bucket 7 (polymorphicPartition)<br />|Post<br />Deps: 37, 10<br />ᐳPost<br /><br />1: PgSelectInlineApply[99]<br />ᐳ: Access[47]<br />2: PgSelect[48]<br />ᐳ: Access[100]<br />3: PgSelectRows[53]<br />ᐳ: 52, 54, 65, 84, 101, 102<br />4: PgSelectRows[74]<br />ᐳ: First[73], PgSelectSingle[75]"):::bucket
+    Bucket8("Bucket 8 (polymorphicPartition)<br />|Comment<br />Deps: 37, 10<br />ᐳComment<br /><br />1: 103, 107<br />ᐳ: Access[55]<br />2: PgSelect[56]<br />ᐳ: Access[104], Access[108]<br />3: PgSelectRows[61]<br />ᐳ: 60, 62, 66, 91, 105, 106, 109, 110<br />4: PgSelectRows[82], PgSelectRows[89]<br />ᐳ: 81, 83, 88, 90"):::bucket
     Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 75<br /><br />ROOT PgSelectSingle{7}ᐸpeopleᐳ[75]"):::bucket
     Bucket10("Bucket 10 (nullableBoundary)<br />Deps: 83<br /><br />ROOT PgSelectSingle{8}ᐸpeopleᐳ[83]"):::bucket
     Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 90<br /><br />ROOT PgSelectSingle{8}ᐸpostsᐳ[90]"):::bucket
@@ -39,7 +39,7 @@ graph TD
     Access8 & Access9 --> Object10
     List113{{"List[113∈0] ➊<br />ᐸ112,11ᐳ"}}:::plan
     Access112{{"Access[112∈0] ➊<br />ᐸ7.m.subqueryDetailsFor16ᐳ"}}:::plan
-    First11[["First[11∈0] ➊"]]:::plan
+    First11{{"First[11∈0] ➊"}}:::plan
     Access112 & First11 --> List113
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
@@ -75,7 +75,7 @@ graph TD
     Access96 & PgSelectSingle22 --> List97
     PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__person_b...rks__.”id”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression23
-    First29[["First[29∈3]"]]:::plan
+    First29{{"First[29∈3]"}}:::plan
     PgSelectRows30[["PgSelectRows[30∈3]"]]:::plan
     PgSelectRows30 --> First29
     Lambda98{{"Lambda[98∈3]<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
@@ -96,7 +96,7 @@ graph TD
     Access39{{"Access[39∈6]<br />ᐸ37.person_idᐳ<br />ᐳPerson"}}:::plan
     Access39 --> PgSelect40
     Lambda37 --> Access39
-    First44[["First[44∈6]^"]]:::plan
+    First44{{"First[44∈6]^"}}:::plan
     PgSelectRows45[["PgSelectRows[45∈6]^"]]:::plan
     PgSelectRows45 --> First44
     PgSelect40 --> PgSelectRows45
@@ -115,14 +115,14 @@ graph TD
     PgSelectSingle54{{"PgSelectSingle[54∈7]^<br />ᐸpostsᐳ"}}:::plan
     Access100 & PgSelectSingle54 --> List101
     Lambda37 --> Access47
-    First52[["First[52∈7]^"]]:::plan
+    First52{{"First[52∈7]^"}}:::plan
     PgSelectRows53[["PgSelectRows[53∈7]^"]]:::plan
     PgSelectRows53 --> First52
     PgSelect48 --> PgSelectRows53
     First52 --> PgSelectSingle54
     PgClassExpression65{{"PgClassExpression[65∈7]^<br />ᐸ__posts__.”post_id”ᐳ"}}:::plan
     PgSelectSingle54 --> PgClassExpression65
-    First73[["First[73∈7]^"]]:::plan
+    First73{{"First[73∈7]^"}}:::plan
     PgSelectRows74[["PgSelectRows[74∈7]^"]]:::plan
     PgSelectRows74 --> First73
     Lambda102{{"Lambda[102∈7]^<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
@@ -146,21 +146,21 @@ graph TD
     Access108{{"Access[108∈8]^<br />ᐸ56.m.joinDetailsFor86ᐳ"}}:::plan
     Access108 & PgSelectSingle62 --> List109
     Lambda37 --> Access55
-    First60[["First[60∈8]^"]]:::plan
+    First60{{"First[60∈8]^"}}:::plan
     PgSelectRows61[["PgSelectRows[61∈8]^"]]:::plan
     PgSelectRows61 --> First60
     PgSelect56 --> PgSelectRows61
     First60 --> PgSelectSingle62
     PgClassExpression66{{"PgClassExpression[66∈8]^<br />ᐸ__comments...omment_id”ᐳ"}}:::plan
     PgSelectSingle62 --> PgClassExpression66
-    First81[["First[81∈8]^"]]:::plan
+    First81{{"First[81∈8]^"}}:::plan
     PgSelectRows82[["PgSelectRows[82∈8]^"]]:::plan
     PgSelectRows82 --> First81
     Lambda106{{"Lambda[106∈8]^<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
     Lambda106 --> PgSelectRows82
     PgSelectSingle83{{"PgSelectSingle[83∈8]^<br />ᐸpeopleᐳ"}}:::plan
     First81 --> PgSelectSingle83
-    First88[["First[88∈8]^"]]:::plan
+    First88{{"First[88∈8]^"}}:::plan
     PgSelectRows89[["PgSelectRows[89∈8]^"]]:::plan
     PgSelectRows89 --> First88
     Lambda110{{"Lambda[110∈8]^<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan

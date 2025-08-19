@@ -9,7 +9,7 @@ graph TD
 
     subgraph "Buckets for mutations/v4/pgJwtTypeIdentifier-bigNumbers"
     Bucket0("Bucket 0 (root)"):::bucket
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 15, 20<br /><br />1: PgSelect[11]<br />2: PgSelectRows[17]<br />3: First[16]<br />ᐳ: PgSelectSingle[18], Object[19]"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 15, 20<br /><br />1: PgSelect[11]<br />2: PgSelectRows[17]<br />ᐳ: 16, 18, 19"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 18, 11, 19<br /><br />ROOT Object{1}ᐸ{result}ᐳ[19]"):::bucket
     end
     Bucket0 --> Bucket1
@@ -29,7 +29,7 @@ graph TD
     __InputObject6 --> ApplyInput20
     PgSelect11[["PgSelect[11∈1] ➊<br />ᐸauthenticate(mutation)ᐳ"]]:::sideeffectplan
     Object14 & PgFromExpression15 & ApplyInput20 --> PgSelect11
-    First16[["First[16∈1] ➊"]]:::plan
+    First16{{"First[16∈1] ➊"}}:::plan
     PgSelectRows17[["PgSelectRows[17∈1] ➊"]]:::plan
     PgSelectRows17 --> First16
     PgSelect11 --> PgSelectRows17

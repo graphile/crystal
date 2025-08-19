@@ -13,8 +13,8 @@ graph TD
     Bucket2("Bucket 2 (mutationField)<br />Deps: 31, 2<br /><br />1: Access[28]<br />2: Access[29]<br />3: Object[30]<br />4: PgInsertSingle[27]<br />5: <br />ᐳ: Object[32]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 2, 15, 20<br /><br />ROOT Object{1}ᐸ{result}ᐳ[20]"):::bucket
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 2, 27, 32<br /><br />ROOT Object{2}ᐸ{result}ᐳ[32]"):::bucket
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 15, 47<br /><br />ROOT PgUpdateSingle{1}ᐸtypes(id;)ᐳ[15]<br />1: <br />ᐳ: 34, 33, 37, 39, 41, 43<br />2: PgSelect[44]<br />3: PgSelectRows[49]<br />4: First[48]<br />ᐳ: PgSelectSingle[50]"):::bucket
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 27, 55<br /><br />ROOT PgInsertSingle{2}ᐸtypes()ᐳ[27]<br />1: <br />ᐳ: 36, 35, 38, 40, 42, 51<br />2: PgSelect[52]<br />3: PgSelectRows[57]<br />4: First[56]<br />ᐳ: PgSelectSingle[58]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 15, 47<br /><br />ROOT PgUpdateSingle{1}ᐸtypes(id;)ᐳ[15]<br />1: <br />ᐳ: 34, 33, 37, 39, 41, 43<br />2: PgSelect[44]<br />3: PgSelectRows[49]<br />ᐳ: First[48], PgSelectSingle[50]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 27, 55<br /><br />ROOT PgInsertSingle{2}ᐸtypes()ᐳ[27]<br />1: <br />ᐳ: 36, 35, 38, 40, 42, 51<br />2: PgSelect[52]<br />3: PgSelectRows[57]<br />ᐳ: First[56], PgSelectSingle[58]"):::bucket
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 50, 15<br /><br />ROOT PgSelectSingle{5}ᐸfrmcdc_domainConstrainedCompoundTypeᐳ[50]"):::bucket
     Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 58, 27<br /><br />ROOT PgSelectSingle{6}ᐸfrmcdc_domainConstrainedCompoundTypeᐳ[58]"):::bucket
     Bucket9("Bucket 9 (listItem)<br /><br />ROOT __Item{9}ᐸ41ᐳ[59]"):::bucket
@@ -82,7 +82,7 @@ graph TD
     PgClassExpression41{{"PgClassExpression[41∈5] ➊<br />ᐸ__types__....ay_domain”ᐳ"}}:::plan
     Access34 --> PgClassExpression41
     Access34 --> PgClassExpression43
-    First48[["First[48∈5] ➊"]]:::plan
+    First48{{"First[48∈5] ➊"}}:::plan
     PgSelectRows49[["PgSelectRows[49∈5] ➊"]]:::plan
     PgSelectRows49 --> First48
     PgSelect44 --> PgSelectRows49
@@ -102,7 +102,7 @@ graph TD
     PgClassExpression42{{"PgClassExpression[42∈6] ➊<br />ᐸ__types__....ay_domain”ᐳ"}}:::plan
     Access36 --> PgClassExpression42
     Access36 --> PgClassExpression51
-    First56[["First[56∈6] ➊"]]:::plan
+    First56{{"First[56∈6] ➊"}}:::plan
     PgSelectRows57[["PgSelectRows[57∈6] ➊"]]:::plan
     PgSelectRows57 --> First56
     PgSelect52 --> PgSelectRows57

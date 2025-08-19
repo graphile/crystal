@@ -8,7 +8,7 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/v4/connections-blankcursor"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 11, 12, 76, 77, 78, 13, 15, 22<br />2: 10, 19, 26, 31<br />ᐳ: Access[47], Access[50]<br />3: 14, 21, 28, 33<br />4: 27, 32, 36, 39<br />ᐳ: 29, 30, 34, 35<br />5: 46, 49, 52, 54<br />ᐳ: 48, 51, 53, 55"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 11, 12, 76, 77, 78, 13, 15, 22<br />2: 10, 19, 26, 31<br />ᐳ: Access[47], Access[50]<br />3: 14, 21, 28, 33<br />ᐳ: 27, 29, 30, 32, 34, 35<br />4: 36, 39<br />ᐳ: 46, 48, 49, 51, 52, 53, 54, 55"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14, 47, 36, 30, 48, 53<br /><br />ROOT Connectionᐸ10ᐳ[14]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 21, 50, 39, 35, 51, 55<br /><br />ROOT Connectionᐸ19ᐳ[21]"):::bucket
     Bucket5("Bucket 5 (listItem)<br />Deps: 47<br /><br />ROOT __Item{5}ᐸ36ᐳ[42]"):::bucket
@@ -48,13 +48,13 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access11
     __Value2 --> Access12
-    First27[["First[27∈0] ➊"]]:::plan
+    First27{{"First[27∈0] ➊"}}:::plan
     PgSelectRows28[["PgSelectRows[28∈0] ➊"]]:::plan
     PgSelectRows28 --> First27
     PgSelect26 --> PgSelectRows28
     PgSelectSingle29{{"PgSelectSingle[29∈0] ➊<br />ᐸpersonᐳ"}}:::plan
     First27 --> PgSelectSingle29
-    First32[["First[32∈0] ➊"]]:::plan
+    First32{{"First[32∈0] ➊"}}:::plan
     PgSelectRows33[["PgSelectRows[33∈0] ➊"]]:::plan
     PgSelectRows33 --> First32
     PgSelect31 --> PgSelectRows33
@@ -62,14 +62,14 @@ graph TD
     First32 --> PgSelectSingle34
     ConnectionItems36[["ConnectionItems[36∈0] ➊<br />Dependents: 3<br />More deps:<br />- Connection[14]"]]:::plan
     ConnectionItems39[["ConnectionItems[39∈0] ➊<br />Dependents: 3<br />More deps:<br />- Connection[21]"]]:::plan
-    First46[["First[46∈0] ➊<br />More deps:<br />- ConnectionItems[36]"]]:::plan
+    First46{{"First[46∈0] ➊<br />More deps:<br />- ConnectionItems[36]"}}:::plan
     Access47{{"Access[47∈0] ➊<br />ᐸ10.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect10 --> Access47
-    First49[["First[49∈0] ➊<br />More deps:<br />- ConnectionItems[39]"]]:::plan
+    First49{{"First[49∈0] ➊<br />More deps:<br />- ConnectionItems[39]"}}:::plan
     Access50{{"Access[50∈0] ➊<br />ᐸ19.cursorDetailsᐳ<br />Dependents: 3"}}:::plan
     PgSelect19 --> Access50
-    Last52[["Last[52∈0] ➊<br />More deps:<br />- ConnectionItems[36]"]]:::plan
-    Last54[["Last[54∈0] ➊<br />More deps:<br />- ConnectionItems[39]"]]:::plan
+    Last52{{"Last[52∈0] ➊<br />More deps:<br />- ConnectionItems[36]"}}:::plan
+    Last54{{"Last[54∈0] ➊<br />More deps:<br />- ConnectionItems[39]"}}:::plan
     PageInfo24{{"PageInfo[24∈1] ➊<br />More deps:<br />- Connection[14]"}}:::plan
     PageInfo25{{"PageInfo[25∈2] ➊<br />More deps:<br />- Connection[21]"}}:::plan
     Edge43{{"Edge[43∈5]"}}:::plan

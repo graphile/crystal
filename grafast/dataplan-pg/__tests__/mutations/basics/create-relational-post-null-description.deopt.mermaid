@@ -10,7 +10,7 @@ graph TD
     subgraph "Buckets for mutations/basics/create-relational-post-null-description"
     Bucket0("Bucket 0 (root)"):::bucket
     Bucket1("Bucket 1 (mutationField)<br />Deps: 15, 10, 11, 37, 8, 38, 2<br /><br />1: PgInsertSingle[12]<br />2: Access[19]<br />3: Access[20]<br />4: Object[21]<br />5: Access[17]<br />6: PgClassExpression[16]<br />7: PgInsertSingle[18]<br />8: <br />ᐳ: Access[23], PgClassExpression[22]"):::bucket
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 23, 18, 2, 22<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[22]<br />1: <br />ᐳ: 24, 27, 28, 29<br />2: PgSelect[26]<br />3: PgSelectRows[31]<br />4: First[30]<br />ᐳ: PgSelectSingle[32]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 23, 18, 2, 22<br /><br />ROOT PgClassExpression{1}ᐸ__relational_posts__ᐳ[22]<br />1: <br />ᐳ: 24, 27, 28, 29<br />2: PgSelect[26]<br />3: PgSelectRows[31]<br />ᐳ: First[30], PgSelectSingle[32]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 32, 18<br /><br />ROOT PgSelectSingle{2}ᐸrelational_postsᐳ[32]"):::bucket
     end
     Bucket0 --> Bucket1
@@ -47,7 +47,7 @@ graph TD
     Access28{{"Access[28∈2] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access27 & Access28 --> Object29
     Access23 --> PgClassExpression24
-    First30[["First[30∈2] ➊"]]:::plan
+    First30{{"First[30∈2] ➊"}}:::plan
     PgSelectRows31[["PgSelectRows[31∈2] ➊"]]:::plan
     PgSelectRows31 --> First30
     PgSelect26 --> PgSelectRows31

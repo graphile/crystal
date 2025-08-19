@@ -8,15 +8,15 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/v4/rbac.basic"
-    Bucket0("Bucket 0 (root)<br /><br />1: 214, 218, 222, 226, 230<br />ᐳ: 8, 9, 82, 89, 99, 109, 234, 235, 236, 237, 238, 239, 240, 10, 27, 28, 36, 37<br />2: 7, 16, 21, 30, 39, 45, 51, 56, 62, 68, 72, 77<br />ᐳ: 215, 219, 223, 227, 231<br />3: 12, 18, 24, 33, 42, 48, 53, 59, 65, 70, 75, 80<br />4: 11, 23, 32, 41, 47, 58, 64, 74, 79, 86, 103, 113<br />ᐳ: 13, 25, 34, 43, 49, 60, 66, 76, 81, 232, 233"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: 214, 218, 222, 226, 230<br />ᐳ: 8, 9, 82, 89, 99, 109, 234, 235, 236, 237, 238, 239, 240, 10, 27, 28, 36, 37<br />2: 7, 16, 21, 30, 39, 45, 51, 56, 62, 68, 72, 77<br />ᐳ: 215, 219, 223, 227, 231<br />3: 12, 18, 24, 33, 42, 48, 53, 59, 65, 70, 75, 80<br />ᐳ: 11, 13, 23, 25, 32, 34, 41, 43, 47, 49, 58, 60, 64, 66, 74, 76, 79, 81, 232, 233<br />4: 86, 103, 113"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 82<br /><br />ROOT PgSelectSingleᐸperson_secretᐳ[13]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 18, 86, 82<br /><br />ROOT Connectionᐸ16ᐳ[18]"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 25, 89, 215, 82<br /><br />ROOT PgSelectSingleᐸpersonᐳ[25]<br />1: <br />ᐳ: 90, 216, 91, 92, 217<br />2: PgSelectRows[126]<br />3: First[125]<br />ᐳ: PgSelectSingle[127]"):::bucket
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 34, 89, 219, 82<br /><br />ROOT PgSelectSingleᐸpersonᐳ[34]<br />1: <br />ᐳ: 93, 220, 94, 95, 221<br />2: PgSelectRows[133]<br />3: First[132]<br />ᐳ: PgSelectSingle[134]"):::bucket
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 43, 89, 223, 82<br /><br />ROOT PgSelectSingleᐸpersonᐳ[43]<br />1: <br />ᐳ: 96, 224, 97, 98, 225<br />2: PgSelectRows[140]<br />3: First[139]<br />ᐳ: PgSelectSingle[141]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 25, 89, 215, 82<br /><br />ROOT PgSelectSingleᐸpersonᐳ[25]<br />1: <br />ᐳ: 90, 216, 91, 92, 217<br />2: PgSelectRows[126]<br />ᐳ: First[125], PgSelectSingle[127]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 34, 89, 219, 82<br /><br />ROOT PgSelectSingleᐸpersonᐳ[34]<br />1: <br />ᐳ: 93, 220, 94, 95, 221<br />2: PgSelectRows[133]<br />ᐳ: First[132], PgSelectSingle[134]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 43, 89, 223, 82<br /><br />ROOT PgSelectSingleᐸpersonᐳ[43]<br />1: <br />ᐳ: 96, 224, 97, 98, 225<br />2: PgSelectRows[140]<br />ᐳ: First[139], PgSelectSingle[141]"):::bucket
     Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 49, 99<br /><br />ROOT PgSelectSingleᐸleft_armᐳ[49]"):::bucket
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 53, 103, 99<br /><br />ROOT Connectionᐸ51ᐳ[53]"):::bucket
-    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 60, 89, 227, 99<br /><br />ROOT PgSelectSingleᐸpersonᐳ[60]<br />1: <br />ᐳ: 106, 228, 107, 108, 229<br />2: PgSelectRows[147]<br />3: First[146]<br />ᐳ: PgSelectSingle[148]"):::bucket
+    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 60, 89, 227, 99<br /><br />ROOT PgSelectSingleᐸpersonᐳ[60]<br />1: <br />ᐳ: 106, 228, 107, 108, 229<br />2: PgSelectRows[147]<br />ᐳ: First[146], PgSelectSingle[148]"):::bucket
     Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 66, 109<br /><br />ROOT PgSelectSingleᐸpostᐳ[66]"):::bucket
     Bucket10("Bucket 10 (nullableBoundary)<br />Deps: 70, 113, 109<br /><br />ROOT Connectionᐸ68ᐳ[70]"):::bucket
     Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 76, 89, 233, 109<br /><br />ROOT PgSelectSingleᐸpersonᐳ[76]<br />1: Connection[153]<br />ᐳ: 116, 117, 118<br />2: ConnectionItems[181]"):::bucket
@@ -80,12 +80,12 @@ graph TD
     Object10 --> PgSelect62
     List232{{"List[232∈0] ➊<br />ᐸ231,74ᐳ"}}:::plan
     Access231{{"Access[231∈0] ➊<br />ᐸ72.m.subqueryDetailsFor149ᐳ"}}:::plan
-    First74[["First[74∈0] ➊"]]:::plan
+    First74{{"First[74∈0] ➊"}}:::plan
     Access231 & First74 --> List232
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
-    First11[["First[11∈0] ➊"]]:::plan
+    First11{{"First[11∈0] ➊"}}:::plan
     PgSelectRows12[["PgSelectRows[12∈0] ➊"]]:::plan
     PgSelectRows12 --> First11
     PgSelect7 --> PgSelectRows12
@@ -95,7 +95,7 @@ graph TD
     Object10 --> PgSelect16
     Connection18[["Connection[18∈0] ➊<br />ᐸ16ᐳ"]]:::plan
     PgSelect16 --> Connection18
-    First23[["First[23∈0] ➊"]]:::plan
+    First23{{"First[23∈0] ➊"}}:::plan
     PgSelectRows24[["PgSelectRows[24∈0] ➊"]]:::plan
     PgSelectRows24 --> First23
     PgSelect21 --> PgSelectRows24
@@ -103,7 +103,7 @@ graph TD
     First23 --> PgSelectSingle25
     Lambda27{{"Lambda[27∈0] ➊<br />ᐸspecifier_Person_base64JSONᐳ<br />More deps:<br />- Constantᐸ'fa4f3e13-456c-4a9e-8c1e-37a6e3177d0b'ᐳ[236]"}}:::plan
     Lambda27 --> Access28
-    First32[["First[32∈0] ➊"]]:::plan
+    First32{{"First[32∈0] ➊"}}:::plan
     PgSelectRows33[["PgSelectRows[33∈0] ➊"]]:::plan
     PgSelectRows33 --> First32
     PgSelect30 --> PgSelectRows33
@@ -111,13 +111,13 @@ graph TD
     First32 --> PgSelectSingle34
     Lambda36{{"Lambda[36∈0] ➊<br />ᐸspecifier_Person_base64JSONᐳ<br />More deps:<br />- Constantᐸ'WyJwZW9wbGUiLDBd'ᐳ[237]"}}:::plan
     Lambda36 --> Access37
-    First41[["First[41∈0] ➊"]]:::plan
+    First41{{"First[41∈0] ➊"}}:::plan
     PgSelectRows42[["PgSelectRows[42∈0] ➊"]]:::plan
     PgSelectRows42 --> First41
     PgSelect39 --> PgSelectRows42
     PgSelectSingle43{{"PgSelectSingle[43∈0] ➊<br />ᐸpersonᐳ"}}:::plan
     First41 --> PgSelectSingle43
-    First47[["First[47∈0] ➊"]]:::plan
+    First47{{"First[47∈0] ➊"}}:::plan
     PgSelectRows48[["PgSelectRows[48∈0] ➊"]]:::plan
     PgSelectRows48 --> First47
     PgSelect45 --> PgSelectRows48
@@ -127,13 +127,13 @@ graph TD
     Object10 --> PgSelect51
     Connection53[["Connection[53∈0] ➊<br />ᐸ51ᐳ"]]:::plan
     PgSelect51 --> Connection53
-    First58[["First[58∈0] ➊"]]:::plan
+    First58{{"First[58∈0] ➊"}}:::plan
     PgSelectRows59[["PgSelectRows[59∈0] ➊"]]:::plan
     PgSelectRows59 --> First58
     PgSelect56 --> PgSelectRows59
     PgSelectSingle60{{"PgSelectSingle[60∈0] ➊<br />ᐸpersonᐳ"}}:::plan
     First58 --> PgSelectSingle60
-    First64[["First[64∈0] ➊"]]:::plan
+    First64{{"First[64∈0] ➊"}}:::plan
     PgSelectRows65[["PgSelectRows[65∈0] ➊"]]:::plan
     PgSelectRows65 --> First64
     PgSelect62 --> PgSelectRows65
@@ -150,7 +150,7 @@ graph TD
     First74 --> PgSelectSingle76
     PgSelect77[["PgSelect[77∈0] ➊<br />ᐸreturn_table_without_grantsᐳ"]]:::plan
     Object10 --> PgSelect77
-    First79[["First[79∈0] ➊"]]:::plan
+    First79{{"First[79∈0] ➊"}}:::plan
     PgSelectRows80[["PgSelectRows[80∈0] ➊"]]:::plan
     PgSelectRows80 --> First79
     PgSelect77 --> PgSelectRows80
@@ -189,7 +189,7 @@ graph TD
     PgSelectSingle25 --> PgClassExpression90
     Lambda92{{"Lambda[92∈3] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List91 --> Lambda92
-    First125[["First[125∈3] ➊"]]:::plan
+    First125{{"First[125∈3] ➊"}}:::plan
     PgSelectRows126[["PgSelectRows[126∈3] ➊"]]:::plan
     PgSelectRows126 --> First125
     Lambda217{{"Lambda[217∈3] ➊<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
@@ -205,7 +205,7 @@ graph TD
     PgSelectSingle34 --> PgClassExpression93
     Lambda95{{"Lambda[95∈4] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List94 --> Lambda95
-    First132[["First[132∈4] ➊"]]:::plan
+    First132{{"First[132∈4] ➊"}}:::plan
     PgSelectRows133[["PgSelectRows[133∈4] ➊"]]:::plan
     PgSelectRows133 --> First132
     Lambda221{{"Lambda[221∈4] ➊<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
@@ -221,7 +221,7 @@ graph TD
     PgSelectSingle43 --> PgClassExpression96
     Lambda98{{"Lambda[98∈5] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List97 --> Lambda98
-    First139[["First[139∈5] ➊"]]:::plan
+    First139{{"First[139∈5] ➊"}}:::plan
     PgSelectRows140[["PgSelectRows[140∈5] ➊"]]:::plan
     PgSelectRows140 --> First139
     Lambda225{{"Lambda[225∈5] ➊<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan
@@ -249,7 +249,7 @@ graph TD
     PgSelectSingle60 --> PgClassExpression106
     Lambda108{{"Lambda[108∈8] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List107 --> Lambda108
-    First146[["First[146∈8] ➊"]]:::plan
+    First146{{"First[146∈8] ➊"}}:::plan
     PgSelectRows147[["PgSelectRows[147∈8] ➊"]]:::plan
     PgSelectRows147 --> First146
     Lambda229{{"Lambda[229∈8] ➊<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan

@@ -8,13 +8,13 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/unions-table/by-id-1"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 68, 10<br />2: PgSelect[7]<br />3: PgSelectRows[12]<br />4: First[11]<br />ᐳ: 13, 14, 16, 17"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 9, 68, 10<br />2: PgSelect[7]<br />3: PgSelectRows[12]<br />ᐳ: 11, 13, 14, 16, 17"):::bucket
     Bucket1("Bucket 1 (polymorphic)<br />__typename: Lambda[16]<br />Deps: 16, 10, 17"):::bucket
-    Bucket2("Bucket 2 (polymorphicPartition)<br />|UnionTopic<br />Deps: 10, 17<br />ᐳUnionTopic<br /><br />1: PgSelect[19]<br />2: PgSelectRows[24]<br />3: First[23]<br />ᐳ: 25, 54, 59"):::bucket
-    Bucket3("Bucket 3 (polymorphicPartition)<br />|UnionPost<br />Deps: 10, 17<br />ᐳUnionPost<br /><br />1: PgSelect[26]<br />2: PgSelectRows[31]<br />3: First[30]<br />ᐳ: 32, 55, 60, 64, 67"):::bucket
-    Bucket4("Bucket 4 (polymorphicPartition)<br />|UnionDivider<br />Deps: 10, 17<br />ᐳUnionDivider<br /><br />1: PgSelect[33]<br />2: PgSelectRows[38]<br />3: First[37]<br />ᐳ: 39, 56, 61, 65"):::bucket
-    Bucket5("Bucket 5 (polymorphicPartition)<br />|UnionChecklist<br />Deps: 10, 17<br />ᐳUnionChecklist<br /><br />1: PgSelect[40]<br />2: PgSelectRows[45]<br />3: First[44]<br />ᐳ: 46, 57, 62"):::bucket
-    Bucket6("Bucket 6 (polymorphicPartition)<br />|UnionChecklistItem<br />Deps: 10, 17<br />ᐳUnionChecklistItem<br /><br />1: PgSelect[47]<br />2: PgSelectRows[52]<br />3: First[51]<br />ᐳ: 53, 58, 63, 66"):::bucket
+    Bucket2("Bucket 2 (polymorphicPartition)<br />|UnionTopic<br />Deps: 10, 17<br />ᐳUnionTopic<br /><br />1: PgSelect[19]<br />2: PgSelectRows[24]<br />ᐳ: 23, 25, 54, 59"):::bucket
+    Bucket3("Bucket 3 (polymorphicPartition)<br />|UnionPost<br />Deps: 10, 17<br />ᐳUnionPost<br /><br />1: PgSelect[26]<br />2: PgSelectRows[31]<br />ᐳ: 30, 32, 55, 60, 64, 67"):::bucket
+    Bucket4("Bucket 4 (polymorphicPartition)<br />|UnionDivider<br />Deps: 10, 17<br />ᐳUnionDivider<br /><br />1: PgSelect[33]<br />2: PgSelectRows[38]<br />ᐳ: 37, 39, 56, 61, 65"):::bucket
+    Bucket5("Bucket 5 (polymorphicPartition)<br />|UnionChecklist<br />Deps: 10, 17<br />ᐳUnionChecklist<br /><br />1: PgSelect[40]<br />2: PgSelectRows[45]<br />ᐳ: 44, 46, 57, 62"):::bucket
+    Bucket6("Bucket 6 (polymorphicPartition)<br />|UnionChecklistItem<br />Deps: 10, 17<br />ᐳUnionChecklistItem<br /><br />1: PgSelect[47]<br />2: PgSelectRows[52]<br />ᐳ: 51, 53, 58, 63, 66"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2 & Bucket3 & Bucket4 & Bucket5 & Bucket6
@@ -28,7 +28,7 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
-    First11[["First[11∈0] ➊"]]:::plan
+    First11{{"First[11∈0] ➊"}}:::plan
     PgSelectRows12[["PgSelectRows[12∈0] ➊"]]:::plan
     PgSelectRows12 --> First11
     PgSelect7 --> PgSelectRows12
@@ -40,7 +40,7 @@ graph TD
     PgSelectSingle13 --> PgClassExpression17
     PgSelect19[["PgSelect[19∈2] ➊<br />ᐸunion_topicsᐳ<br />ᐳUnionTopic<br />More deps:<br />- Object[10]"]]:::plan
     PgClassExpression17 --> PgSelect19
-    First23[["First[23∈2] ➊^"]]:::plan
+    First23{{"First[23∈2] ➊^"}}:::plan
     PgSelectRows24[["PgSelectRows[24∈2] ➊^"]]:::plan
     PgSelectRows24 --> First23
     PgSelect19 --> PgSelectRows24
@@ -52,7 +52,7 @@ graph TD
     PgSelectSingle25 --> PgClassExpression59
     PgSelect26[["PgSelect[26∈3] ➊<br />ᐸunion_postsᐳ<br />ᐳUnionPost<br />More deps:<br />- Object[10]"]]:::plan
     PgClassExpression17 --> PgSelect26
-    First30[["First[30∈3] ➊^"]]:::plan
+    First30{{"First[30∈3] ➊^"}}:::plan
     PgSelectRows31[["PgSelectRows[31∈3] ➊^"]]:::plan
     PgSelectRows31 --> First30
     PgSelect26 --> PgSelectRows31
@@ -68,7 +68,7 @@ graph TD
     PgSelectSingle32 --> PgClassExpression67
     PgSelect33[["PgSelect[33∈4] ➊<br />ᐸunion_dividersᐳ<br />ᐳUnionDivider<br />More deps:<br />- Object[10]"]]:::plan
     PgClassExpression17 --> PgSelect33
-    First37[["First[37∈4] ➊^"]]:::plan
+    First37{{"First[37∈4] ➊^"}}:::plan
     PgSelectRows38[["PgSelectRows[38∈4] ➊^"]]:::plan
     PgSelectRows38 --> First37
     PgSelect33 --> PgSelectRows38
@@ -82,7 +82,7 @@ graph TD
     PgSelectSingle39 --> PgClassExpression65
     PgSelect40[["PgSelect[40∈5] ➊<br />ᐸunion_checklistsᐳ<br />ᐳUnionChecklist<br />More deps:<br />- Object[10]"]]:::plan
     PgClassExpression17 --> PgSelect40
-    First44[["First[44∈5] ➊^"]]:::plan
+    First44{{"First[44∈5] ➊^"}}:::plan
     PgSelectRows45[["PgSelectRows[45∈5] ➊^"]]:::plan
     PgSelectRows45 --> First44
     PgSelect40 --> PgSelectRows45
@@ -94,7 +94,7 @@ graph TD
     PgSelectSingle46 --> PgClassExpression62
     PgSelect47[["PgSelect[47∈6] ➊<br />ᐸunion_checklist_itemsᐳ<br />ᐳUnionChecklistItem<br />More deps:<br />- Object[10]"]]:::plan
     PgClassExpression17 --> PgSelect47
-    First51[["First[51∈6] ➊^"]]:::plan
+    First51{{"First[51∈6] ➊^"}}:::plan
     PgSelectRows52[["PgSelectRows[52∈6] ➊^"]]:::plan
     PgSelectRows52 --> First51
     PgSelect47 --> PgSelectRows52

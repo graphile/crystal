@@ -13,8 +13,8 @@ graph TD
     Bucket2("Bucket 2 (mutationField)<br />Deps: 56, 57, 26, 2<br /><br />1: Access[23]<br />2: Access[24]<br />3: Object[25]<br />4: PgUpdateSingle[22]<br />5: <br />ᐳ: Object[27]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 2, 13, 18<br /><br />ROOT Object{1}ᐸ{result}ᐳ[18]"):::bucket
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 2, 22, 27<br /><br />ROOT Object{2}ᐸ{result}ᐳ[27]"):::bucket
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 13, 40<br /><br />ROOT PgInsertSingle{1}ᐸmeasurements()ᐳ[13]<br />1: <br />ᐳ: 29, 28, 32, 34, 36<br />2: PgSelect[37]<br />3: PgSelectRows[42]<br />4: First[41]<br />ᐳ: PgSelectSingle[43]"):::bucket
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 22, 48<br /><br />ROOT PgUpdateSingle{2}ᐸmeasurements(timestamp,key;)ᐳ[22]<br />1: <br />ᐳ: 31, 30, 33, 35, 44<br />2: PgSelect[45]<br />3: PgSelectRows[50]<br />4: First[49]<br />ᐳ: PgSelectSingle[51]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 13, 40<br /><br />ROOT PgInsertSingle{1}ᐸmeasurements()ᐳ[13]<br />1: <br />ᐳ: 29, 28, 32, 34, 36<br />2: PgSelect[37]<br />3: PgSelectRows[42]<br />ᐳ: First[41], PgSelectSingle[43]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 22, 48<br /><br />ROOT PgUpdateSingle{2}ᐸmeasurements(timestamp,key;)ᐳ[22]<br />1: <br />ᐳ: 31, 30, 33, 35, 44<br />2: PgSelect[45]<br />3: PgSelectRows[50]<br />ᐳ: First[49], PgSelectSingle[51]"):::bucket
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 43, 13<br /><br />ROOT PgSelectSingle{5}ᐸusersᐳ[43]"):::bucket
     Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 51, 22<br /><br />ROOT PgSelectSingle{6}ᐸusersᐳ[51]"):::bucket
     end
@@ -74,7 +74,7 @@ graph TD
     PgClassExpression34{{"PgClassExpression[34∈5] ➊<br />ᐸ__measurem...__.”value”ᐳ"}}:::plan
     Access29 --> PgClassExpression34
     Access29 --> PgClassExpression36
-    First41[["First[41∈5] ➊"]]:::plan
+    First41{{"First[41∈5] ➊"}}:::plan
     PgSelectRows42[["PgSelectRows[42∈5] ➊"]]:::plan
     PgSelectRows42 --> First41
     PgSelect37 --> PgSelectRows42
@@ -92,7 +92,7 @@ graph TD
     PgClassExpression35{{"PgClassExpression[35∈6] ➊<br />ᐸ__measurem...__.”value”ᐳ"}}:::plan
     Access31 --> PgClassExpression35
     Access31 --> PgClassExpression44
-    First49[["First[49∈6] ➊"]]:::plan
+    First49{{"First[49∈6] ➊"}}:::plan
     PgSelectRows50[["PgSelectRows[50∈6] ➊"]]:::plan
     PgSelectRows50 --> First49
     PgSelect45 --> PgSelectRows50

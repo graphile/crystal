@@ -11,7 +11,7 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 51, 13<br /><br />1: PgDeleteSingle[9]<br />2: <br />ᐳ: Object[14]"):::bucket
     Bucket2("Bucket 2 (mutationField)<br />Deps: 22, 2<br /><br />1: Access[19]<br />2: Access[20]<br />3: Object[21]<br />4: PgInsertSingle[18]<br />5: <br />ᐳ: Object[23]"):::bucket
-    Bucket3("Bucket 3 (mutationField)<br />Deps: 41, 2, 30<br /><br />1: Access[32]<br />2: Access[33]<br />3: Object[34]<br />4: PgFromExpression[35]<br />5: PgSelect[31]<br />6: PgSelectRows[37]<br />7: First[36]<br />ᐳ: 38, 39, 40"):::bucket
+    Bucket3("Bucket 3 (mutationField)<br />Deps: 41, 2, 30<br /><br />1: Access[32]<br />2: Access[33]<br />3: Object[34]<br />4: PgFromExpression[35]<br />5: PgSelect[31]<br />6: PgSelectRows[37]<br />ᐳ: 36, 38, 39, 40"):::bucket
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 14, 9<br /><br />ROOT Object{1}ᐸ{result}ᐳ[14]"):::bucket
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 23, 18<br /><br />ROOT Object{2}ᐸ{result}ᐳ[23]"):::bucket
     Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 40, 39<br /><br />ROOT Object{3}ᐸ{result}ᐳ[40]"):::bucket
@@ -66,7 +66,7 @@ graph TD
     Access33{{"Access[33∈3] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access32 & Access33 --> Object34
     BakedInput30 --> PgFromExpression35
-    First36[["First[36∈3] ➊"]]:::plan
+    First36{{"First[36∈3] ➊"}}:::plan
     PgSelectRows37[["PgSelectRows[37∈3] ➊"]]:::plan
     PgSelectRows37 --> First36
     PgSelect31 --> PgSelectRows37

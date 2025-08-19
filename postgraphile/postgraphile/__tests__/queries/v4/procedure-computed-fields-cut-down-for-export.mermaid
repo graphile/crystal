@@ -8,7 +8,7 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/v4/procedure-computed-fields-cut-down-for-export"
-    Bucket0("Bucket 0 (root)<br /><br />1: PgSelectInlineApply[28]<br />ᐳ: 8, 9, 16, 32, 10, 15, 17, 27<br />2: PgSelect[7]<br />ᐳ: Access[29]<br />3: PgSelectRows[12]<br />4: First[11]<br />ᐳ: 13, 30, 31"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: PgSelectInlineApply[28]<br />ᐳ: 8, 9, 16, 32, 10, 15, 17, 27<br />2: PgSelect[7]<br />ᐳ: Access[29]<br />3: PgSelectRows[12]<br />ᐳ: 11, 13, 30, 31"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 31<br /><br />ROOT PgSelectSingleᐸpostᐳ[13]"):::bucket
     Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ24ᐳ[25]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 26<br /><br />ROOT PgSelectSingle{2}ᐸpost_computed_compound_type_arrayᐳ[26]"):::bucket
@@ -28,7 +28,7 @@ graph TD
     Access8 & Access9 --> Object10
     List30{{"List[30∈0] ➊<br />ᐸ29,11ᐳ"}}:::plan
     Access29{{"Access[29∈0] ➊<br />ᐸ7.m.subqueryDetailsFor19ᐳ"}}:::plan
-    First11[["First[11∈0] ➊"]]:::plan
+    First11{{"First[11∈0] ➊"}}:::plan
     Access29 & First11 --> List30
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8

@@ -8,7 +8,7 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/v4/nodeId-earlyExit"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 13, 14, 57, 61, 67, 68, 69, 70, 9, 15, 17, 20, 21, 28, 34, 37, 38<br />2: 12, 23, 31, 40<br />3: 16, 26, 33, 43<br />4: 25, 42, 45, 49<br />ᐳ: PgSelectSingle[27], PgSelectSingle[44]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 8, 13, 14, 57, 61, 67, 68, 69, 70, 9, 15, 17, 20, 21, 28, 34, 37, 38<br />2: 12, 23, 31, 40<br />3: 16, 26, 33, 43<br />ᐳ: 25, 27, 42, 44<br />4: 45, 49"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 16, 45, 57<br /><br />ROOT Connectionᐸ12ᐳ[16]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 27<br /><br />ROOT PgSelectSingleᐸpersonᐳ[27]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 33, 49, 61<br /><br />ROOT Connectionᐸ31ᐳ[33]"):::bucket
@@ -53,7 +53,7 @@ graph TD
     __InputObject9 --> ApplyInput17
     Lambda20{{"Lambda[20∈0] ➊<br />ᐸspecifier_Person_base64JSONᐳ<br />More deps:<br />- Constantᐸ'WyJwZW9wbGUiLDZd'ᐳ[68]"}}:::plan
     Lambda20 --> Access21
-    First25[["First[25∈0] ➊"]]:::plan
+    First25{{"First[25∈0] ➊"}}:::plan
     PgSelectRows26[["PgSelectRows[26∈0] ➊"]]:::plan
     PgSelectRows26 --> First25
     PgSelect23 --> PgSelectRows26
@@ -64,7 +64,7 @@ graph TD
     __InputObject28 --> ApplyInput34
     Lambda37{{"Lambda[37∈0] ➊<br />ᐸspecifier_Person_base64JSONᐳ<br />More deps:<br />- Constantᐸ'WyJwb3N0cyIsM10='ᐳ[70]"}}:::plan
     Lambda37 --> Access38
-    First42[["First[42∈0] ➊"]]:::plan
+    First42{{"First[42∈0] ➊"}}:::plan
     PgSelectRows43[["PgSelectRows[43∈0] ➊"]]:::plan
     PgSelectRows43 --> First42
     PgSelect40 --> PgSelectRows43

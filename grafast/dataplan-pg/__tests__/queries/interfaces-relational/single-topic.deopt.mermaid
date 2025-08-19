@@ -8,8 +8,8 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/interfaces-relational/single-topic"
-    Bucket0("Bucket 0 (root)<br /><br />1: PgSelectInlineApply[60]<br />ᐳ: 8, 9, 64, 10<br />2: PgSelect[7]<br />ᐳ: Access[61]<br />3: PgSelectRows[12]<br />4: First[11]<br />ᐳ: PgSelectSingle[13]"):::bucket
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 61<br /><br />ROOT PgSelectSingleᐸrelational_topicsᐳ[13]<br />1: <br />ᐳ: 14, 59, 62, 63<br />2: PgSelectRows[20]<br />3: First[19]<br />ᐳ: 21, 22, 28, 34, 40, 46, 52, 58"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: PgSelectInlineApply[60]<br />ᐳ: 8, 9, 64, 10<br />2: PgSelect[7]<br />ᐳ: Access[61]<br />3: PgSelectRows[12]<br />ᐳ: First[11], PgSelectSingle[13]"):::bucket
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 61<br /><br />ROOT PgSelectSingleᐸrelational_topicsᐳ[13]<br />1: <br />ᐳ: 14, 59, 62, 63<br />2: PgSelectRows[20]<br />ᐳ: 19, 21, 22, 28, 34, 40, 46, 52, 58"):::bucket
     end
     Bucket0 --> Bucket1
 
@@ -24,7 +24,7 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
-    First11[["First[11∈0] ➊"]]:::plan
+    First11{{"First[11∈0] ➊"}}:::plan
     PgSelectRows12[["PgSelectRows[12∈0] ➊"]]:::plan
     PgSelectRows12 --> First11
     PgSelect7 --> PgSelectRows12
@@ -36,7 +36,7 @@ graph TD
     Access61 & PgSelectSingle13 --> List62
     PgClassExpression14{{"PgClassExpression[14∈1] ➊<br />ᐸ__relation...ics__.”id”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression14
-    First19[["First[19∈1] ➊"]]:::plan
+    First19{{"First[19∈1] ➊"}}:::plan
     PgSelectRows20[["PgSelectRows[20∈1] ➊"]]:::plan
     PgSelectRows20 --> First19
     Lambda63{{"Lambda[63∈1] ➊<br />ᐸpgInlineViaJoinTransformᐳ"}}:::plan

@@ -8,7 +8,7 @@ graph TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
     subgraph "Buckets for queries/functions/custom-query-user"
-    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: Access[7], Access[8], Object[9]<br />2: PgSelect[6]<br />3: PgSelectRows[11]<br />4: First[10]<br />ᐳ: PgSelectSingle[12]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: Access[7], Access[8], Object[9]<br />2: PgSelect[6]<br />3: PgSelectRows[11]<br />ᐳ: First[10], PgSelectSingle[12]"):::bucket
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12<br /><br />ROOT PgSelectSingleᐸusersᐳ[12]"):::bucket
     end
     Bucket0 --> Bucket1
@@ -23,7 +23,7 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access7
     __Value2 --> Access8
-    First10[["First[10∈0] ➊"]]:::plan
+    First10{{"First[10∈0] ➊"}}:::plan
     PgSelectRows11[["PgSelectRows[11∈0] ➊"]]:::plan
     PgSelectRows11 --> First10
     PgSelect6 --> PgSelectRows11
