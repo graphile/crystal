@@ -8,6 +8,7 @@
 #! await waitFor(() => payloads.length >= 1, 15000);
 #! await pgClient.query(query, ["b"]);
 #! await waitFor(() => payloads.length >= 2, 15000);
+## expect(payloads[0].listen.relatedNode).toBeTruthy()
 subscription Sub {
   listen(topic: "x") {
     __typename
