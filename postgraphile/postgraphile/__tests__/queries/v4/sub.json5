@@ -1,0 +1,20 @@
+[
+  {
+    data: {
+      listen: {
+        __typename: "ListenPayload",
+        relatedNodeId: "WyJYIiwxXQ==",
+        relatedNode: null,
+      },
+    },
+  },
+  {
+    data: {
+      listen: {
+        __typename: "ListenPayload",
+        relatedNodeId: "WyJYIiwyXQ==",
+        relatedNode: null,
+      },
+    },
+  },
+]

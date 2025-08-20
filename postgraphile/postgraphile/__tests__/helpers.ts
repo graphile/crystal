@@ -575,7 +575,7 @@ export async function runTestQuery(
               payloads,
               errors,
               queries,
-              extensions: payloads[0].extensions,
+              extensions: payloads[0]?.extensions,
             };
           } else {
             // Throw away symbol keys/etc
