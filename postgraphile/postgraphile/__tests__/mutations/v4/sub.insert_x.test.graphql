@@ -1,0 +1,11 @@
+## expect(errors).toBeFalsy();
+#> schema: ["sub"]
+mutation InsertX {
+  insertX(name: "Foo") {
+    x {
+      nodeId
+      id
+      name
+    }
+  }
+}
