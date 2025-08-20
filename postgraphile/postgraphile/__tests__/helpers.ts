@@ -566,10 +566,13 @@ export async function runTestQuery(
                 "en-US",
               );
             };
-            const payloads: AsyncExecutionResult[] = [
-              originalPayloads[0],
-              ...originalPayloads.slice(1).sort(sortPayloads),
-            ];
+            const payloads: AsyncExecutionResult[] =
+              operationType === "subscription"
+                ? (originalPayloads as AsyncExecutionResult[])
+                : ([
+                    originalPayloads[0],
+                    ...originalPayloads.slice(1).sort(sortPayloads),
+                  ] as AsyncExecutionResult[]);
 
             return {
               payloads,
