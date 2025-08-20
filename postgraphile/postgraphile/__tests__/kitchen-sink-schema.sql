@@ -2185,7 +2185,7 @@ begin
         'postgraphile:x',
         json_build_object(
             '__node__', json_build_array(
-                'X', new_x.id
+                'xes', new_x.id
             )
         )::text
     );
