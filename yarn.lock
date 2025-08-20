@@ -5262,7 +5262,7 @@ __metadata:
     dataloader: "npm:^2.2.3"
     grafast: "workspace:^"
     graphql: "npm:^16.1.0-experimental-stream-defer.6"
-    mermaid: "npm:^11.8.1"
+    mermaid: "npm:^11.10.0"
     prism-react-renderer: "npm:^2.4.1"
     react: "npm:^19.1.0"
     react-dom: "npm:^19.1.0"
@@ -5449,6 +5449,15 @@ __metadata:
   dependencies:
     langium: "npm:3.3.1"
   checksum: 10/b7e71c16e8c6baab17bbe39f0e4353221a4bc86642b45fadfbd442f859ba0d4606db245dcc82c6b24c5baec193cf9bec59661558699c49df485a28b5eb20d15b
+  languageName: node
+  linkType: hard
+
+"@mermaid-js/parser@npm:^0.6.2":
+  version: 0.6.2
+  resolution: "@mermaid-js/parser@npm:0.6.2"
+  dependencies:
+    langium: "npm:3.3.1"
+  checksum: 10/b8174ef3e205e499cd315ab0bddb8ad752d767a6fa371d8d3c2e2317bb80d4375607162a15082101024088f94a52c1339a26f0cbb97314c71cabbd3fa0e6cc91
   languageName: node
   linkType: hard
 
@@ -13836,7 +13845,7 @@ __metadata:
     iterall: "npm:^1.3.0"
     jest: "npm:^30.0.4"
     lodash: "npm:^4.17.21"
-    mermaid: "npm:^11.8.1"
+    mermaid: "npm:^11.10.0"
     mocha: "npm:^11.7.1"
     nodemon: "npm:^3.1.10"
     pg-sql2: "workspace:^"
@@ -16701,7 +16710,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"katex@npm:^0.16.9":
+"katex@npm:^0.16.22, katex@npm:^0.16.9":
   version: 0.16.22
   resolution: "katex@npm:0.16.22"
   dependencies:
@@ -17437,6 +17446,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"marked@npm:^16.0.0":
+  version: 16.2.0
+  resolution: "marked@npm:16.2.0"
+  bin:
+    marked: bin/marked.js
+  checksum: 10/0a73dcfbe500514d2f1106da99708beed8a31de586e2826e1aa47ca0e0a4850b1e9598569b09d5366d4f4dee2d279a13f32616ed1ee75c832068eb7dd660f66f
+  languageName: node
+  linkType: hard
+
 "marked@npm:^4.3.0":
   version: 4.3.0
   resolution: "marked@npm:4.3.0"
@@ -17765,7 +17783,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mermaid@npm:*, mermaid@npm:>=11.6.0, mermaid@npm:^11.0.2, mermaid@npm:^11.8.1":
+"mermaid@npm:*, mermaid@npm:>=11.6.0, mermaid@npm:^11.0.2":
   version: 11.8.1
   resolution: "mermaid@npm:11.8.1"
   dependencies:
@@ -17790,6 +17808,34 @@ __metadata:
     ts-dedent: "npm:^2.2.0"
     uuid: "npm:^11.1.0"
   checksum: 10/925ea7bc0f5d72f856a73502182ebc8e94caf219a91f03d4d7acc836c62696cb649a13b4cd67ae1a325ab04e35f2f007913615b3c01d05973a0ddad1361b074e
+  languageName: node
+  linkType: hard
+
+"mermaid@npm:^11.10.0":
+  version: 11.10.0
+  resolution: "mermaid@npm:11.10.0"
+  dependencies:
+    "@braintree/sanitize-url": "npm:^7.0.4"
+    "@iconify/utils": "npm:^2.1.33"
+    "@mermaid-js/parser": "npm:^0.6.2"
+    "@types/d3": "npm:^7.4.3"
+    cytoscape: "npm:^3.29.3"
+    cytoscape-cose-bilkent: "npm:^4.1.0"
+    cytoscape-fcose: "npm:^2.2.0"
+    d3: "npm:^7.9.0"
+    d3-sankey: "npm:^0.12.3"
+    dagre-d3-es: "npm:7.0.11"
+    dayjs: "npm:^1.11.13"
+    dompurify: "npm:^3.2.5"
+    katex: "npm:^0.16.22"
+    khroma: "npm:^2.1.0"
+    lodash-es: "npm:^4.17.21"
+    marked: "npm:^16.0.0"
+    roughjs: "npm:^4.6.6"
+    stylis: "npm:^4.3.6"
+    ts-dedent: "npm:^2.2.0"
+    uuid: "npm:^11.1.0"
+  checksum: 10/c9a87f1aded9b3782efc7932a9232bed111b0447190eb904e5b723ef3201e602f38e9a6bbf2d30291fb2646d18c374b87decd70c80f012f12d93910328e0a93e
   languageName: node
   linkType: hard
 
@@ -22399,7 +22445,7 @@ __metadata:
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     graphql-ws: "npm:^6.0.5"
     jest: "npm:^30.0.4"
-    mermaid: "npm:^11.8.1"
+    mermaid: "npm:^11.10.0"
     nodemon: "npm:^3.1.10"
     prettier: "npm:^3.6.2"
     react: "npm:^19.1.0"
