@@ -1,7 +1,7 @@
 ## expect(errors).toBeFalsy();
 #> schema: ["sub"]
 mutation InsertX {
-  insertX(name: "Foo") {
+  insertX(input: { name: "Foo" }) {
     x {
       nodeId
       id
