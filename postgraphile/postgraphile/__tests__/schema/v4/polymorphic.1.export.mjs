@@ -5718,7 +5718,12 @@ const argDetailsSimple_relational_item_by_id_fn = [{
 }];
 const makeArgs_relational_item_by_id_fn = (args, path = []) => argDetailsSimple_relational_item_by_id_fn.map(details => makeArg(path, args, details));
 const resource_relational_item_by_id_fnPgResource = registry.pgResources["relational_item_by_id_fn"];
+const specForHandlerCache = new Map();
 function specForHandler(handler) {
+  const existing = specForHandlerCache.get(handler);
+  if (existing) {
+    return existing;
+  }
   function spec(nodeId) {
     // We only want to return the specifier if it matches
     // this handler; otherwise return null.
@@ -5735,6 +5740,7 @@ function specForHandler(handler) {
   }
   spec.displayName = `specifier_${handler.typeName}_${handler.codec.name}`;
   spec.isSyncAndSafe = true; // Optimization
+  specForHandlerCache.set(handler, spec);
   return spec;
 }
 const nodeFetcher_SingleTableTopic = $nodeId => {
