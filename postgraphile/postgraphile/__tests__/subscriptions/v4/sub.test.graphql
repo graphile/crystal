@@ -3,11 +3,12 @@
 #> simpleSubscriptions: true
 #> directPg: true
 #> checkErrorSnapshots: false
+#! await sleep(500); // Allow subscription to settle.
 #! const query = 'select sub.insert_x($1)';
 #! await pgClient.query(query, ["a"]);
-#! await waitFor(() => payloads.length >= 1, 15000);
+#! await waitFor(() => payloads.length >= 1, 1000);
 #! await pgClient.query(query, ["b"]);
-#! await waitFor(() => payloads.length >= 2, 15000);
+#! await waitFor(() => payloads.length >= 2, 1000);
 ## expect(payloads[0].data.listen.relatedNodeId).toBeTruthy()
 ## expect(payloads[0].data.listen.relatedNode).toBeTruthy()
 subscription Sub {
