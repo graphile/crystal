@@ -1,10 +1,10 @@
 select
   __messages__."body" as "0",
-  __messages__."id" as "1",
-  __users__."username" as "2",
-  __users__."gravatar_url" as "3",
-  __author__.username as "4",
-  __messages__.body as "5"
+  __users__."username" as "1",
+  __users__."gravatar_url" as "2",
+  __author__.username as "3",
+  __messages__.body as "4",
+  __messages__."id" as "5"
 from app_public.messages as __messages__
 left outer join app_public.users as __author__
 on (__messages__."author_id" = __author__."id")

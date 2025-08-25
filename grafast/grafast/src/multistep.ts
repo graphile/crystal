@@ -1,3 +1,4 @@
+import type { Thunk } from "./interfaces.js";
 import { Step } from "./step.js";
 import { constant } from "./steps/constant.js";
 import { list } from "./steps/list.js";
@@ -44,9 +45,10 @@ interface MultistepCacheConfig {
 }
 
 export function multistep<const TMultistepSpec extends Multistep>(
-  spec: TMultistepSpec,
+  specOrThunk: Thunk<TMultistepSpec>,
   stable?: string | true | MultistepCacheConfig,
 ): Step<UnwrapMultistep<TMultistepSpec>> {
+  const spec = typeof specOrThunk === "function" ? specOrThunk() : specOrThunk;
   if (spec == null) {
     return constant(spec) as any;
   } else if (spec instanceof Step) {

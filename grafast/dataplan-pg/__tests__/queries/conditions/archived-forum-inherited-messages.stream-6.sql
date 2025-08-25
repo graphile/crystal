@@ -16,18 +16,9 @@ begin; /*fake*/
 declare __SNAPSHOT_CURSOR_0__ insensitive no scroll cursor without hold for
 select
   __messages__."body" as "0",
-  __users__."username" as "1",
-  __users__."gravatar_url" as "2"
+  __messages__."author_id" as "1",
+  __messages__."id" as "2"
 from app_public.messages as __messages__
-left outer join app_public.users as __users__
-on (
-/* WHERE becoming ON */
-  (
-    __users__."id" = __messages__."author_id"
-  ) and (
-    true /* authorization checks */
-  )
-)
 where
   (
     __messages__."forum_id" = $1::"uuid"
@@ -42,48 +33,6 @@ close __SNAPSHOT_CURSOR_0__
 
 commit; /*fake*/
 
-begin; /*fake*/
-
-declare __SNAPSHOT_CURSOR_1__ insensitive no scroll cursor without hold for
-select
-  __messages__."body" as "0",
-  __users__."username" as "1",
-  __users__."gravatar_url" as "2",
-  __messages__."id" as "3"
-from app_public.messages as __messages__
-left outer join app_public.users as __users__
-on (
-/* WHERE becoming ON */
-  (
-    __users__."id" = __messages__."author_id"
-  ) and (
-    true /* authorization checks */
-  )
-)
-where
-  (
-    __messages__."forum_id" = $1::"uuid"
-  ) and (
-    (__messages__.archived_at is null) = ($2::"timestamptz" is null)
-  )
-order by __messages__."id" asc;
-
-fetch forward 100 from __SNAPSHOT_CURSOR_1__
-
-close __SNAPSHOT_CURSOR_1__
-
-commit; /*fake*/
-
-select /* NOTHING?! */
-from app_public.messages as __messages__
-where
-  (
-    __messages__."forum_id" = $1::"uuid"
-  ) and (
-    (__messages__.archived_at is null) = ($2::"timestamptz" is null)
-  )
-order by __messages__."id" asc;
-
 select
   (count(*))::text as "0"
 from app_public.messages as __messages__
@@ -93,3 +42,19 @@ where
   ) and (
     (__messages__.archived_at is null) = ($2::"timestamptz" is null)
   );
+
+select __users_result__.*
+from (select ids.ordinality - 1 as idx, (ids.value->>0)::"uuid" as "id0" from json_array_elements($1::json) with ordinality as ids) as __users_identifiers__,
+lateral (
+  select
+    __users__."username" as "0",
+    __users__."gravatar_url" as "1",
+    __users_identifiers__.idx as "2"
+  from app_public.users as __users__
+  where
+    (
+      __users__."id" = __users_identifiers__."id0"
+    ) and (
+      true /* authorization checks */
+    )
+) as __users_result__;

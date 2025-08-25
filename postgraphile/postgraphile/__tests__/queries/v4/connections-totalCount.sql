@@ -1,8 +1,4 @@
 select
-  (count(*))::text as "0"
-from "c"."person" as __person__;
-
-select
   __person__."id"::text as "0",
   array(
     select array[
@@ -12,6 +8,10 @@ select
   )::text as "1"
 from "c"."person" as __person__
 order by __person__."id" asc;
+
+select
+  (count(*))::text as "0"
+from "c"."person" as __person__;
 
 select
   (count(*))::text as "0"

@@ -141,7 +141,6 @@ import {
   PgInsertSingleQueryBuilder,
   PgInsertSingleStep,
 } from "./steps/pgInsertSingle.js";
-import { pgPageInfo, PgPageInfoStep } from "./steps/pgPageInfo.js";
 import {
   generatePgParameterAnalysis,
   pgFromExpression,
@@ -296,8 +295,6 @@ export {
   PgManyFilter,
   PgOrderSpec,
   PgOrFilter,
-  pgPageInfo,
-  PgPageInfoStep,
   PgPath,
   PgPoint,
   PgPolygon,
@@ -398,8 +395,6 @@ exportAsMany("@dataplan/pg", {
   PgDeleteSingleStep,
   pgInsertSingle,
   PgInsertSingleStep,
-  pgPageInfo,
-  PgPageInfoStep,
   pgSelect,
   pgFromExpressionRuntime,
   pgFromExpression,

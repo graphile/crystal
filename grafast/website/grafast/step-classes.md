@@ -463,7 +463,7 @@ zero or more times.
 ```ts
 import { access } from "grafast";
 
-class MyCollectionStep extends Step /* implements ConnectionCapableStep */ {
+class MyCollectionStep extends Step {
   // ...
 
   items() {

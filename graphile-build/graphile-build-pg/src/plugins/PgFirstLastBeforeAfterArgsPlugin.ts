@@ -1,11 +1,7 @@
 import "./PgTablesPlugin.js";
 import "graphile-config";
 
-import type {
-  PgSelectParsedCursorStep,
-  PgSelectSingleStep,
-  PgSelectStep,
-} from "@dataplan/pg";
+import type { PgSelectSingleStep, PgSelectStep } from "@dataplan/pg";
 import type { ConnectionStep, GrafastFieldConfigArgumentMap } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 
@@ -109,8 +105,11 @@ function commonFn(
             function plan(
               _: any,
               $connection: ConnectionStep<
+                any,
                 PgSelectSingleStep,
-                PgSelectParsedCursorStep,
+                any,
+                any,
+                null | readonly any[],
                 PgSelectStep
               >,
               arg,
@@ -133,8 +132,11 @@ function commonFn(
                   function plan(
                     _: any,
                     $connection: ConnectionStep<
+                      any,
                       PgSelectSingleStep,
-                      PgSelectParsedCursorStep,
+                      any,
+                      any,
+                      null | readonly any[],
                       PgSelectStep
                     >,
                     val,
@@ -159,8 +161,11 @@ function commonFn(
             function plan(
               _: any,
               $connection: ConnectionStep<
+                any,
                 PgSelectSingleStep,
-                PgSelectParsedCursorStep,
+                any,
+                any,
+                null | readonly any[],
                 PgSelectStep
               >,
               val,
@@ -183,8 +188,11 @@ function commonFn(
                   function plan(
                     _: any,
                     $connection: ConnectionStep<
+                      any,
                       PgSelectSingleStep,
-                      PgSelectParsedCursorStep,
+                      any,
+                      any,
+                      null | readonly any[],
                       PgSelectStep
                     >,
                     val,
@@ -209,8 +217,11 @@ function commonFn(
                   function plan(
                     _: any,
                     $connection: ConnectionStep<
+                      any,
                       PgSelectSingleStep,
-                      PgSelectParsedCursorStep,
+                      any,
+                      any,
+                      null | readonly any[],
                       PgSelectStep
                     >,
                     val,

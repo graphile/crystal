@@ -9,12 +9,18 @@ import {
   FORBIDDEN_BY_NULLABLE_BOUNDARY_FLAGS,
   NO_FLAGS,
 } from "../constants.js";
+import { isDev } from "../dev.js";
 import { isFlaggedValue } from "../error.js";
 import { inspect } from "../inspect.js";
-import type { ExecutionValue, UnaryExecutionValue } from "../interfaces.js";
+import type {
+  BatchExecutionValue,
+  ExecutionValue,
+  UnaryExecutionValue,
+} from "../interfaces.js";
 import type { Step, UnbatchedStep } from "../step";
 import type { __ValueStep } from "../steps/index.js";
 import { arrayOfLength, arraysMatch, setsMatch } from "../utils.js";
+import { isDistributor } from "./distributor.js";
 import { batchExecutionValue, newBucket } from "./executeBucket.js";
 import type { OperationPlan } from "./OperationPlan";
 
@@ -323,6 +329,11 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
   /** @internal */
   public children: LayerPlan[] = [];
 
+  public distributorDependencies: null | {
+    // Map of all the dependent stepIds for a given distributor step
+    [distributorStepId: number]: number[];
+  } = null;
+
   /** @internal */
   steps: Step[] = [];
   /** @internal */
@@ -396,6 +407,11 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
    */
   public outOfBoundsLayerPlanIds = new Set<number>();
 
+  private sideEffectRootLayerPlan:
+    | null
+    | LayerPlan<LayerPlanReasonRoot>
+    | LayerPlan<LayerPlanReasonMutationField>;
+
   constructor(
     public readonly operationPlan: OperationPlan,
     public readonly reason: TReason, //parentStep: ExecutableStep | null,
@@ -404,11 +420,9 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     // we set a `rootStep` later, if the root step is dependent on this step
     // (directly or indirectly) we will clear this property.
 
-    // There has yet to be any side effects created in this layer.
-    this.latestSideEffectStep = null;
-
     this.stepsByConstructor = new Map();
     if (reason.type === "root") {
+      this.sideEffectRootLayerPlan = null;
       this.parentSideEffectStep = null;
       this.depth = 0;
       this.ancestry = [this];
@@ -424,6 +438,17 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     } else if (reason.type === "combined") {
       this.parentSideEffectStep = null;
       const firstParentLayerPlan = reason.parentLayerPlans[0];
+      this.sideEffectRootLayerPlan =
+        firstParentLayerPlan.sideEffectRootLayerPlan;
+      if (isDev) {
+        for (const plp of reason.parentLayerPlans) {
+          assert.strictEqual(
+            plp.sideEffectRootLayerPlan,
+            this.sideEffectRootLayerPlan,
+            `Expected all parentLayerPlans to have the same sideEffectRootLayerPlan`,
+          );
+        }
+      }
       const rootLp = firstParentLayerPlan.ancestry[0];
       if (rootLp.reason.type !== "root") {
         throw new Error(
@@ -472,6 +497,16 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       }
     } else {
       const parentLayerPlan = reason.parentLayerPlan;
+      if (
+        parentLayerPlan.reason.type === "root" ||
+        parentLayerPlan.reason.type === "mutationField"
+      ) {
+        this.sideEffectRootLayerPlan = parentLayerPlan as
+          | LayerPlan<LayerPlanReasonRoot>
+          | LayerPlan<LayerPlanReasonMutationField>;
+      } else {
+        this.sideEffectRootLayerPlan = parentLayerPlan.sideEffectRootLayerPlan;
+      }
 
       if (reason.type === "polymorphicPartition") {
         if (parentLayerPlan.reason.type !== "polymorphic") {
@@ -494,6 +529,8 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
 
       parentLayerPlan.children.push(this);
     }
+    this.latestSideEffectStep =
+      this.sideEffectRootLayerPlan?.latestSideEffectStep ?? null;
   }
 
   toString() {
@@ -598,6 +635,13 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       parentSideEffectValue = null;
     }
 
+    const skippedIndicies =
+      this.distributorDependencies === null ? null : ([] as number[]);
+    const skipIndex =
+      skippedIndicies === null
+        ? null
+        : skippedIndicies.push.bind(skippedIndicies);
+
     let size = 0;
     switch (this.reason.type) {
       case "nullableBoundary": {
@@ -623,8 +667,17 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             size = 0;
           } else {
             store.set(itemStepId, fieldValue);
+            const batchCopy: BatchCopy = [];
             for (const stepId of copyStepIds) {
-              store.set(stepId, parentBucket.store.get(stepId)!);
+              const orig = parentBucket.store.get(stepId)!;
+              if (orig.isBatch) {
+                // Prepare store with an empty list for each copyPlanId
+                const ev = batchExecutionValue([]);
+                store.set(stepId, ev);
+                batchCopy.push({ orig, ev });
+              } else {
+                store.set(stepId, orig);
+              }
             }
             const parentBucketSize = parentBucket.size;
             for (
@@ -641,6 +694,11 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
                 polymorphicPathList[newIndex] =
                   parentBucket.polymorphicPathList[originalIndex];
                 iterators[newIndex] = parentBucket.iterators[originalIndex];
+                for (const { orig, ev } of batchCopy) {
+                  ev._copyResult(newIndex, orig, originalIndex);
+                }
+              } else {
+                skipIndex?.(originalIndex);
               }
             }
           }
@@ -671,14 +729,17 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         } else {
           const ev = batchExecutionValue([]);
           store.set(itemStepId, ev);
+          const batchCopy: BatchCopy = [];
 
           for (const stepId of copyStepIds) {
-            const ev = parentBucket.store.get(stepId)!;
-            if (ev.isBatch) {
+            const orig = parentBucket.store.get(stepId)!;
+            if (orig.isBatch) {
               // Prepare store with an empty list for each copyPlanId
-              store.set(stepId, batchExecutionValue([]));
-            } else {
+              const ev = batchExecutionValue([]);
               store.set(stepId, ev);
+              batchCopy.push({ orig, ev });
+            } else {
+              store.set(stepId, orig);
             }
           }
 
@@ -713,13 +774,11 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
               polymorphicPathList[newIndex] =
                 parentBucket.polymorphicPathList[originalIndex];
               iterators[newIndex] = parentBucket.iterators[originalIndex];
-              for (const stepId of copyStepIds) {
-                const ev = store.get(stepId)!;
-                if (ev.isBatch) {
-                  const orig = parentBucket.store.get(stepId)!;
-                  ev._copyResult(newIndex, orig, originalIndex);
-                }
+              for (const { orig, ev } of batchCopy) {
+                ev._copyResult(newIndex, orig, originalIndex);
               }
+            } else {
+              skipIndex?.(originalIndex);
             }
           }
         }
@@ -749,15 +808,18 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         }
         const ev = batchExecutionValue([] as any[]);
         store.set(itemStepId, ev);
+        const batchCopy: BatchCopy = [];
 
         for (const stepId of copyStepIds) {
           // Deliberate shadowing
-          const ev = parentBucket.store.get(stepId)!;
-          if (ev.isBatch) {
+          const orig = parentBucket.store.get(stepId)!;
+          if (orig.isBatch) {
             // Prepare store with an empty list for each copyPlanId
-            store.set(stepId, batchExecutionValue([]));
-          } else {
+            const ev = batchExecutionValue([]);
             store.set(stepId, ev);
+            batchCopy.push({ orig, ev });
+          } else {
+            store.set(stepId, orig);
           }
         }
 
@@ -796,14 +858,12 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
               polymorphicPathList[newIndex] =
                 parentBucket.polymorphicPathList[originalIndex];
               iterators[newIndex] = parentBucket.iterators[originalIndex];
-              for (const stepId of copyStepIds) {
-                const ev = store.get(stepId)!;
-                if (ev.isBatch) {
-                  const orig = parentBucket.store.get(stepId)!;
-                  ev._copyResult(newIndex, orig, originalIndex);
-                }
+              for (const { orig, ev } of batchCopy) {
+                ev._copyResult(newIndex, orig, originalIndex);
               }
             }
+          } else {
+            skipIndex?.(originalIndex);
           }
         }
 
@@ -832,10 +892,10 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           );
         }
 
-        const batchCopyStepIds = [];
+        const batchCopy: BatchCopy = [];
         for (const stepId of copyStepIds) {
-          const ev = parentBucket.store.get(stepId);
-          if (!ev) {
+          const orig = parentBucket.store.get(stepId);
+          if (!orig) {
             throw new Error(
               `GrafastInternalError<548f0d84-4556-4189-8655-fb16aa3345a6>: new bucket for ${this} wants to copy ${this.operationPlan.dangerouslyGetStep(
                 stepId,
@@ -844,11 +904,12 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
               } doesn't contain that plan`,
             );
           }
-          if (ev.isBatch) {
-            batchCopyStepIds.push(stepId);
-            store.set(stepId, batchExecutionValue([]));
-          } else {
+          if (orig.isBatch) {
+            const ev = batchExecutionValue([]);
             store.set(stepId, ev);
+            batchCopy.push({ orig, ev });
+          } else {
+            store.set(stepId, orig);
           }
         }
 
@@ -859,18 +920,21 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         ) {
           const flags = typenameEV._flagsAt(originalIndex);
           if ((flags & NO_TYPENAME_FLAGS) !== 0) {
+            skipIndex?.(originalIndex);
             continue;
           }
           if (
             parentSideEffectValue !== null &&
             parentSideEffectValue._flagsAt(originalIndex) & FLAG_ERROR
           ) {
+            skipIndex?.(originalIndex);
             continue;
           }
           const polymorphicPath =
             parentBucket.polymorphicPathList.at(originalIndex);
           const typeName = typenameEV.at(originalIndex);
           if (!this.reason.typeNames.includes(typeName)) {
+            skipIndex?.(originalIndex);
             // Search: InvalidConcreteTypeName
             // TODO: should we throw an error?
 
@@ -883,9 +947,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             (polymorphicPath ?? "") + ">" + typeName;
           polymorphicType![newIndex] = typeName;
           iterators[newIndex] = parentBucket.iterators[originalIndex];
-          for (const planId of batchCopyStepIds) {
-            const ev = store.get(planId)!;
-            const orig = parentBucket.store.get(planId)!;
+          for (const { orig, ev } of batchCopy) {
             ev._copyResult(newIndex, orig, originalIndex);
           }
         }
@@ -894,10 +956,10 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       }
       case "polymorphicPartition": {
         // Similar to polymorphic
-        const batchCopyStepIds = [];
+        const batchCopy: BatchCopy = [];
         for (const stepId of copyStepIds) {
-          const ev = parentBucket.store.get(stepId);
-          if (!ev) {
+          const orig = parentBucket.store.get(stepId);
+          if (!orig) {
             throw new Error(
               `GrafastInternalError<548f0d84-4556-4189-8655-fb16aa3345a6>: new bucket for ${this} wants to copy ${this.operationPlan.dangerouslyGetStep(
                 stepId,
@@ -906,11 +968,12 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
               } doesn't contain that plan`,
             );
           }
-          if (ev.isBatch) {
-            batchCopyStepIds.push(stepId);
-            store.set(stepId, batchExecutionValue([]));
-          } else {
+          if (orig.isBatch) {
+            const ev = batchExecutionValue([]);
             store.set(stepId, ev);
+            batchCopy.push({ orig, ev });
+          } else {
+            store.set(stepId, orig);
           }
         }
 
@@ -923,10 +986,12 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             parentSideEffectValue !== null &&
             parentSideEffectValue._flagsAt(originalIndex) & FLAG_ERROR
           ) {
+            skipIndex?.(originalIndex);
             continue;
           }
           const typeName = parentBucket.polymorphicType!.at(originalIndex)!;
           if (!this.reason.typeNames.includes(typeName)) {
+            skipIndex?.(originalIndex);
             continue;
           }
           const newIndex = size++;
@@ -934,9 +999,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           polymorphicPathList[newIndex] =
             parentBucket.polymorphicPathList.at(originalIndex)!;
           iterators[newIndex] = parentBucket.iterators[originalIndex];
-          for (const planId of batchCopyStepIds) {
-            const ev = store.get(planId)!;
-            const orig = parentBucket.store.get(planId)!;
+          for (const { orig, ev } of batchCopy) {
             ev._copyResult(newIndex, orig, originalIndex);
           }
         }
@@ -971,6 +1034,38 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     }
 
     if (size > 0) {
+      if (this.distributorDependencies !== null) {
+        if (isDev) {
+          if (this.reason.type === "listItem") {
+            throw new Error(
+              `distributorDependencies should not be set on ${this}`,
+            );
+          }
+          assert.strictEqual(
+            skippedIndicies?.length,
+            parentBucket.size - size,
+            "Incorrectly populated skippedIndicies",
+          );
+        }
+        if (skippedIndicies !== null && skippedIndicies.length > 0) {
+          for (const [distributorStepId, consumerStepIds] of Object.entries(
+            this.distributorDependencies,
+          )) {
+            const distribEV = parentBucket.store.get(
+              Number(distributorStepId),
+            )!;
+            for (const originalIndex of skippedIndicies) {
+              const v = distribEV.at(originalIndex);
+              if (isDistributor(v)) {
+                for (const consumerStepId of consumerStepIds) {
+                  v.releaseIfUnused(consumerStepId);
+                }
+              }
+            }
+          }
+        }
+      }
+
       // Reference
       const childBucket = newBucket(parentBucket, {
         layerPlan: this,
@@ -989,6 +1084,27 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
 
       return childBucket;
     } else {
+      if (this.distributorDependencies !== null) {
+        const parentBucketSize = parentBucket.size;
+        for (const [distributorStepId, consumerStepIds] of Object.entries(
+          this.distributorDependencies!,
+        )) {
+          const distribEV = parentBucket.store.get(Number(distributorStepId))!;
+          for (
+            let originalIndex = 0;
+            originalIndex < parentBucketSize;
+            originalIndex++
+          ) {
+            const v = distribEV.at(originalIndex);
+            if (isDistributor(v)) {
+              for (const consumerStepId of consumerStepIds) {
+                v.releaseIfUnused(consumerStepId);
+              }
+            }
+          }
+        }
+      }
+
       return null;
     }
   }
@@ -1222,3 +1338,15 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     });
   }
 }
+
+/**
+ * When we're copying from an `orig` execution to a new `ev` we store them both
+ * like this to avoid having to look up the underlying values via their
+ * `stepId` over and over again.
+ */
+type BatchCopy = Array<{
+  // We could add the `stepId` here, but nothing ever needs it.
+  // stepId: number
+  orig: BatchExecutionValue;
+  ev: BatchExecutionValue;
+}>;

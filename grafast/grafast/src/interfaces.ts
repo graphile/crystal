@@ -845,3 +845,5 @@ export interface AbstractTypePlanner {
    */
   planForType?(t: GraphQLObjectType): Step | null;
 }
+
+export type Thunk<T> = T | (() => T);

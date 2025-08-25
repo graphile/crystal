@@ -56,7 +56,10 @@ import { defer, Deferred } from "./deferred.js";
 // Handy for debugging
 import { isDev, noop } from "./dev.js";
 import { defaultPlanResolver } from "./engine/lib/defaultPlanResolver.js";
-import { isUnaryStep } from "./engine/lib/withGlobalLayerPlan.js";
+import {
+  currentFieldStreamDetails,
+  isUnaryStep,
+} from "./engine/lib/withGlobalLayerPlan.js";
 import { OperationPlan } from "./engine/OperationPlan.js";
 import { $$inhibit, flagError, isSafeError, SafeError } from "./error.js";
 import { execute } from "./execute.js";
@@ -161,10 +164,8 @@ import {
   ApplyInputStep,
   applyTransforms,
   ApplyTransformsStep,
-  assertEdgeCapableStep,
   assertModifier,
   assertNotNull,
-  assertPageInfoCapableStep,
   bakedInput,
   bakedInputRuntime,
   BakedInputStep,
@@ -173,13 +174,14 @@ import {
   condition,
   ConditionStep,
   connection,
-  ConnectionCapableStep,
+  ConnectionHandlingResult,
+  ConnectionHandlingStep,
+  ConnectionOptimizedStep,
   ConnectionStep,
   constant,
   ConstantStep,
   createObjectAndApplyChildren,
   each,
-  EdgeCapableStep,
   EdgeStep,
   error,
   ErrorStep,
@@ -210,11 +212,17 @@ import {
   loadMany,
   LoadManyCallback,
   loadManyCallback,
+  LoadManyInfo,
+  LoadManyLoader,
+  loadManyLoader,
+  LoadManyStep,
   loadOne,
   LoadOneCallback,
   loadOneCallback,
-  LoadOptions,
-  LoadStep,
+  LoadOneInfo,
+  LoadOneLoader,
+  loadOneLoader,
+  LoadOneStep,
   makeDecodeNodeId,
   makeDecodeNodeIdRuntime,
   Modifier,
@@ -224,7 +232,8 @@ import {
   object,
   ObjectPlanMeta,
   ObjectStep,
-  PageInfoCapableStep,
+  PaginationFeatures,
+  PaginationParams,
   partitionByIndex,
   proxy,
   ProxyStep,
@@ -239,6 +248,7 @@ import {
   sideEffect,
   SideEffectStep,
   specFromNodeId,
+  StepRepresentingList,
   trap,
   TRAP_ERROR,
   TRAP_ERROR_OR_INHIBITED,
@@ -250,6 +260,7 @@ import { subscribe } from "./subscribe.js";
 import {
   arrayOfLength,
   arraysMatch,
+  asyncIteratorWithCleanup,
   getEnumValueConfig,
   getEnumValueConfigs,
   GrafastInputFieldConfigMap,
@@ -259,6 +270,7 @@ import {
   InputObjectTypeSpec,
   isPromiseLike,
   mapsMatch,
+  maybeArraysMatch,
   newGrafastFieldConfigBuilder,
   newInputObjectTypeBuilder,
   newObjectTypeBuilder,
@@ -303,13 +315,12 @@ export {
   ApplyTransformsStep,
   arrayOfLength,
   arraysMatch,
-  assertEdgeCapableStep,
   assertExecutableStep,
   assertListCapableStep,
   assertModifier,
   assertNotNull,
-  assertPageInfoCapableStep,
   assertStep,
+  asyncIteratorWithCleanup,
   bakedInput,
   bakedInputRuntime,
   BakedInputStep,
@@ -323,12 +334,15 @@ export {
   condition,
   ConditionStep,
   connection,
-  ConnectionCapableStep,
+  ConnectionHandlingResult,
+  ConnectionHandlingStep,
+  ConnectionOptimizedStep,
   ConnectionStep,
   constant,
   ConstantStep,
   context,
   createObjectAndApplyChildren,
+  currentFieldStreamDetails,
   DataFromObjectSteps,
   DataFromStep,
   debugPlans,
@@ -339,7 +353,6 @@ export {
   DeprecatedInputObjectPlan,
   DeprecatedObjectPlan,
   each,
-  EdgeCapableStep,
   EdgeStep,
   EnumPlan,
   EnumValueConfig,
@@ -441,16 +454,23 @@ export {
   loadMany,
   LoadManyCallback,
   loadManyCallback,
+  LoadManyInfo,
+  LoadManyLoader,
+  loadManyLoader,
+  LoadManyStep,
   loadOne,
   LoadOneCallback,
   loadOneCallback,
-  LoadOptions,
-  LoadStep,
+  LoadOneInfo,
+  LoadOneLoader,
+  loadOneLoader,
+  LoadOneStep,
   makeDecodeNodeId,
   makeDecodeNodeIdRuntime,
   makeGrafastSchema,
   mapsMatch,
   Maybe,
+  maybeArraysMatch,
   Modifier,
   Multistep,
   multistep,
@@ -475,7 +495,8 @@ export {
   ObjectTypeSpec,
   OperationPlan,
   operationPlan,
-  PageInfoCapableStep,
+  PaginationFeatures,
+  PaginationParams,
   partitionByIndex,
   PlanTypeInfo,
   PromiseOrDirect,
@@ -503,6 +524,7 @@ export {
   stepAMayDependOnStepB,
   stepAShouldTryAndInlineIntoStepB,
   StepOptimizeOptions,
+  StepRepresentingList,
   stepsAreInSamePhase,
   StepStreamOptions,
   stringifyPayload,
@@ -562,8 +584,6 @@ exportAsMany("grafast", {
   BakedInputStep,
   operationPlan,
   connection,
-  assertEdgeCapableStep,
-  assertPageInfoCapableStep,
   ConnectionStep,
   EdgeStep,
   condition,
@@ -625,6 +645,7 @@ exportAsMany("grafast", {
   ListenStep,
   stripAnsi,
   arraysMatch,
+  maybeArraysMatch,
   mapsMatch,
   recordsMatch,
   setsMatch,
@@ -638,6 +659,7 @@ exportAsMany("grafast", {
   stepADependsOnStepB,
   stepAMayDependOnStepB,
   stepsAreInSamePhase,
+  asyncIteratorWithCleanup,
   stepAShouldTryAndInlineIntoStepB,
   isPromiseLike,
   isDev,
@@ -647,14 +669,18 @@ exportAsMany("grafast", {
   loadOne,
   loadMany,
   loadOneCallback,
+  loadOneLoader,
   loadManyCallback,
+  loadManyLoader,
   LoadedRecordStep,
-  LoadStep,
+  LoadManyStep,
+  LoadOneStep,
   isSafeError,
   $$inhibit,
   flagError,
   SafeError,
   isUnaryStep,
+  currentFieldStreamDetails,
   defaultPlanResolver,
   multistep,
 });
@@ -928,6 +954,41 @@ declare global {
        * limit should be set quite high - e.g. 6x the selection set depth.
        */
       maxPlanningDepth?: number;
+
+      /**
+       * This supports the `$step.cloneStreams = true` option, allowing
+       * multiple consumers to consume the same underlying stream, but tries to
+       * avoid any one consumer getting more than `distributorTargetBufferSize`
+       * items ahead of any other. When a fast consumer gets this far ahead of
+       * the slowest consumer, it will be paused for `distributorPauseDuration`
+       * milliseconds to allow the slowest consumer to advance. Should the
+       * slowest consumer not advance in time, the fast consumer will be
+       * allowed to continue and all intermediary results will be cached - so
+       * beware of memory exhaustion and be sure to place sensible limits on
+       * your queries (and construct them wisely).
+       *
+       * This must be set higher than the largest `@stream(initialCount:)`
+       * argument you want to support.
+       */
+      distributorTargetBufferSize?: number;
+
+      /**
+       * When the `distributorTargetBufferSize` is exceeded, every time we get
+       * `distributorTargetBufferSizeIncrement` items further ahead, we'll
+       * pause again.
+       *
+       * Must be at least 1. Recommend you set this fairly large.
+       */
+      distributorTargetBufferSizeIncrement?: number;
+
+      /**
+       * Duration (in milliseconds) for the distributor to pause whilst waiting
+       * for the slowest consumer to advance once the
+       * `distributorTargetBufferSize` has been reached.
+       *
+       * Must be at least 0.
+       */
+      distributorPauseDuration?: number;
     }
     interface Preset {
       /**

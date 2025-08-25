@@ -1,5 +1,11 @@
-import type { __InputStaticLeafStep, ExecutionDetails, Maybe } from "grafast";
-import { access, applyTransforms, lambda, SafeError, Step } from "grafast";
+import type {
+  __InputStaticLeafStep,
+  ConnectionHandlingResult,
+  ConnectionHandlingStep,
+  ExecutionDetails,
+  Maybe,
+} from "grafast";
+import { applyTransforms, lambda, SafeError, Step } from "grafast";
 import { type SQL, sql } from "pg-sql2";
 
 import type {
@@ -10,7 +16,9 @@ import type {
 } from "../interfaces.js";
 import type { PgLocker } from "../pgLocker.js";
 import { makeScopedSQL } from "../utils.js";
+import type { PgCursorStep } from "./pgCursor.js";
 import type { PgSelectParsedCursorStep } from "./pgSelect.js";
+import type { PgSelectSingleStep } from "./pgSelectSingle.js";
 
 export interface QueryValue {
   dependencyIndex: number;
@@ -44,8 +52,15 @@ const UNHANDLED_PLACEHOLDER = sql`(1/0) /* ERROR! Unhandled placeholder! */`;
 const UNHANDLED_DEFERRED = sql`(1/0) /* ERROR! Unhandled deferred! */`;
 
 export abstract class PgStmtBaseStep<T>
-  extends Step<T>
-  implements PgQueryRootStep
+  extends Step<Maybe<ConnectionHandlingResult<T>>>
+  implements
+    PgQueryRootStep,
+    ConnectionHandlingStep<
+      any,
+      PgSelectSingleStep<any>,
+      any,
+      null | readonly any[]
+    >
 {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -219,11 +234,11 @@ export abstract class PgStmtBaseStep<T>
     return this;
   }
 
-  setAfter($parsedCursorPlan: PgSelectParsedCursorStep): void {
+  setAfter($parsedCursorPlan: Step<null | readonly any[]>): void {
     this.afterStepId = this.addUnaryDependency($parsedCursorPlan);
   }
 
-  setBefore($parsedCursorPlan: PgSelectParsedCursorStep): void {
+  setBefore($parsedCursorPlan: Step<null | readonly any[]>): void {
     this.beforeStepId = this.addUnaryDependency($parsedCursorPlan);
   }
 
@@ -234,14 +249,21 @@ export abstract class PgStmtBaseStep<T>
     const $parsedCursorPlan = lambda($cursorPlan, parseCursor);
     return $parsedCursorPlan;
   }
+  abstract cursorForItem($item: Step): PgCursorStep;
+
+  paginationSupport = {
+    reverse: true,
+    cursor: true,
+    offset: true,
+    full: true as const,
+  };
 
   /**
    * Someone (probably pageInfo) wants to know if there's more records. To
    * determine this we fetch one extra record and then throw it away.
    */
-  public hasMore(): Step<boolean> {
+  public setNeedsHasMore() {
     this.fetchOneExtra = true;
-    return access(this, "hasMore", false);
   }
 
   public getPgRoot() {

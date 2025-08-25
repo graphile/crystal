@@ -260,12 +260,10 @@ const LeftArmPlugin = extendSchema((build) => {
                 $edge: EdgeStep<
                   any,
                   any,
-                  any,
                   ObjectStep<{
                     arm: PgSelectSingleStep;
                     person: PgSelectSingleStep;
-                  }>,
-                  any
+                  }>
                 >,
               ) => {
                 const $obj = $edge.data();

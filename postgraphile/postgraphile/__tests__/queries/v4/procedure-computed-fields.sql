@@ -1,4 +1,74 @@
 select
+  __post__."headline" as "0",
+  "a"."post_headline_trimmed"(__post__) as "1",
+  "a"."post_headline_trimmed"(
+    __post__,
+    $1::"int4"
+  ) as "2",
+  "a"."post_headline_trimmed"(
+    __post__,
+    $2::"int4",
+    $3::"text"
+  ) as "3",
+  "a"."post_headline_trimmed_strict"(__post__) as "4",
+  "a"."post_headline_trimmed_strict"(
+    __post__,
+    $4::"int4"
+  ) as "5",
+  "a"."post_headline_trimmed_strict"(
+    __post__,
+    $5::"int4",
+    $6::"text"
+  ) as "6",
+  "a"."post_headline_trimmed_no_defaults"(
+    __post__,
+    $7::"int4",
+    $8::"text"
+  ) as "7",
+  "a"."post_headline_trimmed_no_defaults"(
+    __post__,
+    $9::"int4",
+    $10::"text"
+  ) as "8",
+  ("a"."post_computed_text_array"(__post__))::text as "9",
+  (case when ("a"."post_computed_interval_array"(__post__)) is not distinct from null then null::text else array(
+    select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
+    from unnest("a"."post_computed_interval_array"(__post__)) __entry__
+  )::text end) as "10",
+  array(
+    select array[
+      __post_computed_compound_type_array__."a"::text,
+      __post_computed_compound_type_array__."b",
+      __post_computed_compound_type_array__."c"::text,
+      __post_computed_compound_type_array__."d",
+      __post_computed_compound_type_array__."e"::text,
+      __post_computed_compound_type_array__."f"::text,
+      to_char(__post_computed_compound_type_array__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text),
+      __post_computed_compound_type_array__."foo_bar"::text,
+      (not (__post_computed_compound_type_array__ is null))::text
+    ]::text[]
+    from unnest("a"."post_computed_compound_type_array"(
+      __post__,
+      $11::"c"."compound_type"
+    )) as __post_computed_compound_type_array__
+  )::text as "11",
+  array(
+    select array[
+      to_char(__post_computed_interval_set__.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text),
+      (row_number() over (partition by 1))::text
+    ]::text[]
+    from "a"."post_computed_interval_set"(__post__) as __post_computed_interval_set__(v)
+  )::text as "12"
+from "a"."post" as __post__
+order by __post__."id" asc;
+
+select
+  __edge_case__."not_null_has_default"::text as "0",
+  __edge_case__."wont_cast_easy"::text as "1",
+  "c"."edge_case_computed"(__edge_case__) as "2"
+from "c"."edge_case" as __edge_case__;
+
+select
   ("c"."person_optional_missing_middle_1"(
     __person__,
     $1::"int4",
@@ -86,74 +156,8 @@ on TRUE
 order by __types__."id" asc;
 
 select
-  __post__."headline" as "0",
-  "a"."post_headline_trimmed"(__post__) as "1",
-  "a"."post_headline_trimmed"(
-    __post__,
-    $1::"int4"
-  ) as "2",
-  "a"."post_headline_trimmed"(
-    __post__,
-    $2::"int4",
-    $3::"text"
-  ) as "3",
-  "a"."post_headline_trimmed_strict"(__post__) as "4",
-  "a"."post_headline_trimmed_strict"(
-    __post__,
-    $4::"int4"
-  ) as "5",
-  "a"."post_headline_trimmed_strict"(
-    __post__,
-    $5::"int4",
-    $6::"text"
-  ) as "6",
-  "a"."post_headline_trimmed_no_defaults"(
-    __post__,
-    $7::"int4",
-    $8::"text"
-  ) as "7",
-  "a"."post_headline_trimmed_no_defaults"(
-    __post__,
-    $9::"int4",
-    $10::"text"
-  ) as "8",
-  ("a"."post_computed_text_array"(__post__))::text as "9",
-  (case when ("a"."post_computed_interval_array"(__post__)) is not distinct from null then null::text else array(
-    select to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text)
-    from unnest("a"."post_computed_interval_array"(__post__)) __entry__
-  )::text end) as "10",
-  array(
-    select array[
-      __post_computed_compound_type_array__."a"::text,
-      __post_computed_compound_type_array__."b",
-      __post_computed_compound_type_array__."c"::text,
-      __post_computed_compound_type_array__."d",
-      __post_computed_compound_type_array__."e"::text,
-      __post_computed_compound_type_array__."f"::text,
-      to_char(__post_computed_compound_type_array__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text),
-      __post_computed_compound_type_array__."foo_bar"::text,
-      (not (__post_computed_compound_type_array__ is null))::text
-    ]::text[]
-    from unnest("a"."post_computed_compound_type_array"(
-      __post__,
-      $11::"c"."compound_type"
-    )) as __post_computed_compound_type_array__
-  )::text as "11",
-  array(
-    select array[
-      to_char(__post_computed_interval_set__.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text),
-      (row_number() over (partition by 1))::text
-    ]::text[]
-    from "a"."post_computed_interval_set"(__post__) as __post_computed_interval_set__(v)
-  )::text as "12"
-from "a"."post" as __post__
-order by __post__."id" asc;
-
-select
   __person__."person_full_name" as "0",
   "c"."person_first_name"(__person__) as "1",
-  __person_first_post__."id"::text as "2",
-  __person_first_post__."headline" as "3",
   array(
     select array[
       __person_friends__."person_full_name",
@@ -168,14 +172,10 @@ select
       )::text
     ]::text[]
     from "c"."person_friends"(__person__) as __person_friends__
-  )::text as "4"
+  )::text as "2",
+  __person_first_post__."id"::text as "3",
+  __person_first_post__."headline" as "4"
 from "c"."person" as __person__
 left outer join "c"."person_first_post"(__person__) as __person_first_post__
 on TRUE
 order by __person__."id" asc;
-
-select
-  __edge_case__."not_null_has_default"::text as "0",
-  __edge_case__."wont_cast_easy"::text as "1",
-  "c"."edge_case_computed"(__edge_case__) as "2"
-from "c"."edge_case" as __edge_case__;

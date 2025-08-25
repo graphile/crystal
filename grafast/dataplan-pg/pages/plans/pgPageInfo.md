@@ -1,5 +1,7 @@
 # GraphQL Cursor Connection Pagination in @dataplan/pg
 
+**THIS STEP IS NO LONGER SUPPORTED**
+
 _Please familiarize yourself with the
 [GraphQL Cursor Connections Specification](https://relay.dev/graphql/connections.htm)
 before reading this._
