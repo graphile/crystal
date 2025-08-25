@@ -48,16 +48,31 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
   schema: {
     hooks: {
       build(build) {
-        const nodeFetcherByTypeNameCache = new Map<
-          string,
-          ($id: ExecutableStep<Maybe<string>>) => ExecutableStep<any>
-        >();
+        const { EXPORTABLE } = build;
+        const nodeFetcherByTypeNameCache = EXPORTABLE(
+          () =>
+            new Map<
+              string,
+              ($id: ExecutableStep<Maybe<string>>) => ExecutableStep<any>
+            >(),
+          [],
+          "nodeFetcherByTypeNameCache",
+        );
+        const specForHandlerCache = EXPORTABLE(
+          () => new Map<NodeIdHandler, (nodeId: Maybe<string>) => any>(),
+          [],
+          "specForHandlerCache",
+        );
         return build.extend(
           build,
           {
             specForHandler: EXPORTABLE(
-              () =>
+              (specForHandlerCache) =>
                 function (handler) {
+                  const existing = specForHandlerCache.get(handler);
+                  if (existing) {
+                    return existing;
+                  }
                   function spec(nodeId: Maybe<string>) {
                     // We only want to return the specifier if it matches
                     // this handler; otherwise return null.
@@ -74,9 +89,10 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
                   }
                   spec.displayName = `specifier_${handler.typeName}_${handler.codec.name}`;
                   spec.isSyncAndSafe = true; // Optimization
+                  specForHandlerCache.set(handler, spec);
                   return spec;
                 },
-              [],
+              [specForHandlerCache],
             ),
             nodeFetcherByTypeName(typeName) {
               const existing = nodeFetcherByTypeNameCache.get(typeName);
