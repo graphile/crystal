@@ -1,9 +1,7 @@
 import "graphile-config";
 
-import type { Step } from "grafast";
 import { ConnectionStep } from "grafast";
 
-import { EXPORTABLE } from "../utils.js";
 import { version } from "../version.js";
 
 declare global {
@@ -44,10 +42,7 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
   schema: {
     hooks: {
       build(build) {
-        const {
-          nullableIf,
-          grafast: { get },
-        } = build;
+        const { nullableIf } = build;
         return build.extend(
           build,
           {
