@@ -1,6 +1,6 @@
 import { jsonParse } from "@dataplan/json";
 import type { ObjectPlan, Step } from "grafast";
-import { context, get, lambda, listen, node } from "grafast";
+import { context, get, lambda, listen } from "grafast";
 import { EXPORTABLE, extendSchema, gql } from "graphile-utils";
 
 export const PgV4SimpleSubscriptionsPlugin = extendSchema((build) => {
@@ -74,12 +74,10 @@ export const PgV4SimpleSubscriptionsPlugin = extendSchema((build) => {
                   [nodeIdFromEvent],
                 ),
                 relatedNode: EXPORTABLE(
-                  (node, nodeIdFromEvent, nodeIdHandlerByTypeName) =>
-                    ($event) => {
-                      const $nodeId = nodeIdFromEvent($event);
-                      return node(nodeIdHandlerByTypeName, $nodeId);
-                    },
-                  [node, nodeIdFromEvent, nodeIdHandlerByTypeName],
+                  (nodeIdFromEvent) => ($event) => {
+                    return nodeIdFromEvent($event);
+                  },
+                  [nodeIdFromEvent],
                 ),
               }
             : null),
