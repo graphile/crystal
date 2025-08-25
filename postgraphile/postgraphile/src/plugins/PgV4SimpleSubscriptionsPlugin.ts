@@ -67,18 +67,8 @@ export const PgV4SimpleSubscriptionsPlugin = extendSchema((build) => {
           ),
           ...(nodeIdHandlerByTypeName
             ? {
-                relatedNodeId: EXPORTABLE(
-                  (nodeIdFromEvent) => ($event) => {
-                    return nodeIdFromEvent($event);
-                  },
-                  [nodeIdFromEvent],
-                ),
-                relatedNode: EXPORTABLE(
-                  (nodeIdFromEvent) => ($event) => {
-                    return nodeIdFromEvent($event);
-                  },
-                  [nodeIdFromEvent],
-                ),
+                relatedNodeId: nodeIdFromEvent,
+                relatedNode: nodeIdFromEvent,
               }
             : null),
         },
