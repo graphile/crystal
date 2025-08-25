@@ -24,6 +24,7 @@ import type {
   AsyncExecutionResult,
   ExecutionArgs,
   ExecutionPatchResult,
+  ExecutionResult,
   GraphQLError,
   GraphQLSchema,
   SubscriptionArgs,
@@ -489,7 +490,7 @@ export async function runTestQuery(
               if (!config.directPg) {
                 throw new Error("Can only use callback in directPg mode");
               }
-              const poolClient = await pgPool.connect();
+              const poolClient = await pgPool!.connect();
               try {
                 await options.callback(poolClient, originalPayloads);
               } catch (e) {
@@ -517,7 +518,7 @@ export async function runTestQuery(
             const sortPayloads = (
               payload1: ExecutionPatchResult,
               payload2: ExecutionPatchResult,
-            ) => {
+            ): number => {
               const ONE_AFTER_TWO = 1;
               const ONE_BEFORE_TWO = -1;
               if (!payload1.path) {
@@ -566,12 +567,14 @@ export async function runTestQuery(
                 "en-US",
               );
             };
-            const payloads: AsyncExecutionResult[] =
+            const payloads =
               operationType === "subscription"
-                ? (originalPayloads as AsyncExecutionResult[])
+                ? (originalPayloads as ExecutionResult[])
                 : ([
                     originalPayloads[0],
-                    ...originalPayloads.slice(1).sort(sortPayloads),
+                    ...(
+                      originalPayloads.slice(1) as ExecutionPatchResult[]
+                    ).sort(sortPayloads),
                   ] as AsyncExecutionResult[]);
 
             return {
