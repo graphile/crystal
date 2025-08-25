@@ -2765,6 +2765,7 @@ __metadata:
     "@dataplan/json": "workspace:^"
     grafast: "workspace:^"
     graphile-config: "workspace:^"
+    graphql: ^16.1.0-experimental-stream-defer.6
     pg: ^8.7.1
     pg-sql2: "workspace:^"
   peerDependenciesMeta:
@@ -13833,7 +13834,6 @@ __metadata:
   peerDependencies:
     "@envelop/core": ^5.0.0
     graphql: ^16.1.0-experimental-stream-defer.6
-    tamedevil: "workspace:^"
   peerDependenciesMeta:
     "@envelop/core":
       optional: true
@@ -20952,8 +20952,6 @@ __metadata:
   peerDependenciesMeta:
     "@envelop/core":
       optional: true
-    pg:
-      optional: true
   bin:
     postgraphile: ./dist/cli-run.js
   languageName: unknown
@@ -22375,11 +22373,6 @@ __metadata:
   peerDependencies:
     graphile-config: "workspace:^"
     graphql: ^16.1.0-experimental-stream-defer.6
-  peerDependenciesMeta:
-    graphile-config:
-      optional: true
-    graphql:
-      optional: true
   bin:
     ruru: ./dist/cli-run.js
   languageName: unknown
