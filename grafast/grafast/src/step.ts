@@ -34,6 +34,7 @@ import type {
   ExecutionResults,
   GrafastResultsList,
   JSONValue,
+  Maybe,
   PromiseOrDirect,
   StepOptimizeOptions,
   StepOptions,
@@ -282,6 +283,37 @@ export /* abstract */ class Step<TData = any> {
   public hasSideEffects: boolean;
 
   /**
+   * Set this to `true` if this step might return an iterable or async iterable
+   * that cannot be consumed more than once. Grafast will wrap such values in a
+   * "distributor" to allow multiple downstream steps to independently[^1]
+   * consume clones of the stream. Grafast will not wrap arrays in this way as
+   * doing so is unnecessary.
+   *
+   * [^1]: To avoid excessive memory consumption, if a clone gets
+   * `distributorTargetBufferSize` items further ahead than another clone, it
+   * will be temporarily paused (for up to `distributorPauseDuration`
+   * milliseconds) to give the slowest clone a chance to catch up.
+   *
+   * WARNING: Cloning an async iterable only clones its iterable behavior;
+   * other methods and properties are not preserved. For example, if you return
+   * a `Map` with `cloneStreams: true`, downstream consumers will not have
+   * access to `.get(key)`, `.size`, or similar methods/properties.
+   *
+   * WARNING: This transform always produces _async_ iterables, even if the
+   * original was synchronous. This enables pausing of fast consumers whilst
+   * slower consumers catch up, minimizing memory pressure.
+   */
+  public cloneStreams: boolean;
+
+  /**
+   * True if one of our dependencies has cloneStreams set. Only populated
+   * during `operationPlan.finalize()`.
+   *
+   * @internal
+   **/
+  public _dependsOnDistributor = false;
+
+  /**
    * DO NOT USE! (Specifically exists so that very VERY special steps could
    * override it if they so wished.)
    *
@@ -303,8 +335,9 @@ export /* abstract */ class Step<TData = any> {
     // Populated in `OperationPlan` during `finalizeLayerPlans`
     this._isSelectiveStep = false;
 
-    this.implicitSideEffectStep = null;
+    this.implicitSideEffectStep = layerPlan.latestSideEffectStep;
     this.hasSideEffects ??= false;
+    this.cloneStreams = false;
     let hasSideEffects = false;
     const stepTracker = this.layerPlan.operationPlan.stepTracker;
     Object.defineProperty(this, "hasSideEffects", {
@@ -326,6 +359,8 @@ export /* abstract */ class Step<TData = any> {
           // them, that's fine too.
           for (let id = this.id + 1; id <= maxStepId; id++) {
             const step = stepTracker.getStepById(id);
+            // Allow steps that aren't in our layer plan
+            if (step.layerPlan !== this.layerPlan) continue;
             if (stepADependsOnStepB(this, step)) continue;
             if (nonDependentSteps === null) {
               nonDependentSteps = [step];
@@ -381,22 +416,24 @@ export /* abstract */ class Step<TData = any> {
   }
 
   protected withMyLayerPlan<T>(callback: () => T): T {
-    return withGlobalLayerPlan(
-      this.layerPlan,
-      this.polymorphicPaths,
-      null,
-      callback,
-    );
+    const $sideEffect = this.layerPlan.latestSideEffectStep;
+    try {
+      this.layerPlan.latestSideEffectStep = this.implicitSideEffectStep;
+      return withGlobalLayerPlan(
+        this.layerPlan,
+        this.polymorphicPaths,
+        null,
+        null,
+        callback,
+      );
+    } finally {
+      this.layerPlan.latestSideEffectStep = $sideEffect;
+    }
   }
 
   /** @experimental */
   public withLayerPlan<T>(callback: () => T): T {
-    return withGlobalLayerPlan(
-      this.layerPlan,
-      this.polymorphicPaths,
-      null,
-      callback,
-    );
+    return this.withMyLayerPlan(callback);
   }
 
   protected getStep(id: number): Step {
@@ -792,7 +829,6 @@ ${printDeps(step, 1)}
   public toRecord?(): Step;
   public toSpecifier?(): Step;
   public toTypename?(): Step<string>;
-  public cursor?(): Step;
   // public itemPlan?($item: Step): Step;
 }
 
@@ -974,18 +1010,19 @@ export function isListLikeStep<TData extends [...Step[]] = [...Step[]]>(
 export interface ListCapableStep<
   TOutputData,
   TItemStep extends Step<TOutputData> = Step<TOutputData>,
-> extends Step<ReadonlyArray<any>> {
-  listItem(itemPlan: __ItemStep<this>): TItemStep;
+  TInputData = any,
+> extends Step<Maybe<ReadonlyArray<TInputData>>> {
+  listItem(itemPlan: __ItemStep<TInputData>): TItemStep;
 }
 
 export function isListCapableStep<TData, TItemStep extends Step<TData>>(
-  plan: Step<ReadonlyArray<TData>>,
+  plan: Step<Maybe<ReadonlyArray<TData>>>,
 ): plan is ListCapableStep<TData, TItemStep> {
   return "listItem" in plan && typeof (plan as any).listItem === "function";
 }
 
 export function assertListCapableStep<TData, TItemStep extends Step<TData>>(
-  plan: Step<ReadonlyArray<TData>>,
+  plan: Step<Maybe<ReadonlyArray<TData>>>,
   pathDescription: string,
 ): asserts plan is ListCapableStep<TData, TItemStep> {
   if (!isListCapableStep(plan)) {

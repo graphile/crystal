@@ -1,0 +1,24 @@
+# Ref friends.md
+
+{
+  crawler(id: 101) {
+    id
+    name
+    ... on ActiveCrawler {
+      friendsConnection(first: 3) {
+        nodes {
+          id
+          name
+          ... on HasInventory {
+            itemsConnection(first: 5) {
+              nodes {
+                __typename
+                id
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

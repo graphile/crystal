@@ -51,7 +51,11 @@ import type {
   StreamMoreableArray,
 } from "./interfaces.js";
 import { timeSource } from "./timeSource.js";
-import { arrayOfLength, isPromiseLike } from "./utils.js";
+import {
+  arrayOfLength,
+  asyncIteratorWithCleanup,
+  isPromiseLike,
+} from "./utils.js";
 
 const { GraphQLError } = graphql;
 
@@ -322,6 +326,7 @@ function executePreemptive(
   rootValue: any,
   outputDataAsString: boolean,
   executionTimeout: number | null,
+  abortSignal: AbortSignal,
 ): PromiseOrDirect<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {
@@ -357,6 +362,7 @@ function executePreemptive(
     stopTime,
     // toSerialize: [],
     eventEmitter: rootValue?.[$$eventEmitter],
+    abortSignal,
     insideGraphQL: false,
   };
 
@@ -398,6 +404,7 @@ function executePreemptive(
     });
     const bucketPromise = executeBucket(subscriptionBucket, requestContext);
     function outputStreamBucket() {
+      // NOTE: this is the root output plan for a subscription operation.
       const [ctx, result] = outputBucket(
         operationPlan.rootOutputPlan,
         subscriptionBucket,
@@ -527,6 +534,7 @@ function executePreemptive(
       return iterator;
     }
 
+    // NOTE: this is the root output plan of a query/mutation operation
     const [ctx, result] = outputBucket(
       operationPlan.rootOutputPlan,
       rootBucket,
@@ -651,15 +659,33 @@ export function grafastPrepare(
   }
 
   const executionTimeout = options.timeouts?.execution ?? null;
-  return executePreemptive(
-    args,
-    operationPlan,
-    variableValues,
-    context,
-    rootValue,
-    options.outputDataAsString ?? false,
-    executionTimeout,
-  );
+  const abortController = new AbortController();
+  try {
+    const result = executePreemptive(
+      args,
+      operationPlan,
+      variableValues,
+      context,
+      rootValue,
+      options.outputDataAsString ?? false,
+      executionTimeout,
+      abortController.signal,
+    );
+    if (isPromiseLike(result)) {
+      return result.then(
+        (v) => handleMaybeIterator(abortController, v),
+        (e) => {
+          abortController.abort(e);
+          throw e;
+        },
+      );
+    } else {
+      return handleMaybeIterator(abortController, result);
+    }
+  } catch (e) {
+    abortController.abort(e);
+    throw e;
+  }
 }
 
 interface PushableAsyncGenerator<T> extends AsyncGenerator<T, void, undefined> {
@@ -846,6 +872,7 @@ async function processStream(
       const promises: PromiseLike<any>[] = [];
       for (let bucketIndex = 0; bucketIndex < size; bucketIndex++) {
         const actualIndex = entries[bucketIndex][1];
+        // NOTE: this is a stream, so rootBucket.reason.type === 'listItem'
         const [ctx, result] = outputBucket(
           spec.outputPlan,
           rootBucket,
@@ -1014,6 +1041,8 @@ function processSingleDeferred(
     const promises: PromiseLike<any>[] = [];
     for (let bucketIndex = 0; bucketIndex < size; bucketIndex++) {
       const [iterator, spec] = specs[bucketIndex];
+      // NOTE: this is a deferred output plan, so it'll be a `defer` bucket and
+      // an `object` outputPlan
       const [ctx, result] = outputBucket(
         spec.outputPlan,
         rootBucket,
@@ -1150,5 +1179,28 @@ function processDeferred(
       setTimeout(processBatchNotAsString, 1);
     }
     return nextBatchNotAsString;
+  }
+}
+
+/**
+ * The promise has been resolved, but this may still be an AsyncGenerator.
+ * If so, wrap it so that we know when the generator completes.
+ */
+function handleMaybeIterator(
+  abortController: AbortController,
+  result:
+    | graphql.ExecutionResult
+    | AsyncGenerator<graphql.AsyncExecutionResult, void, void>,
+):
+  | graphql.ExecutionResult
+  | AsyncGenerator<graphql.AsyncExecutionResult, void, void> {
+  if (Symbol.asyncIterator in result) {
+    return asyncIteratorWithCleanup(
+      result,
+      abortController.abort.bind(abortController),
+    );
+  } else {
+    abortController.abort();
+    return result;
   }
 }

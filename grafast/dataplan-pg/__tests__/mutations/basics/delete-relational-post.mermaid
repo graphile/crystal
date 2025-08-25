@@ -9,14 +9,14 @@ graph TD
 
     subgraph "Buckets for mutations/basics/delete-relational-post"
     Bucket0("Bucket 0 (root)"):::bucket
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 11, 118"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 11, 118, 2"):::bucket
     Bucket2("Bucket 2 (mutationField)<br />Deps: 119, 2<br /><br />1: Access[15]<br />2: Access[16]<br />3: Object[17]<br />4: PgDeleteSingle[14]"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 8, 11<br /><br />ROOT PgDeleteSingle{1}ᐸrelational_posts(id)ᐳ[8]<br />1: 92, 101<br />ᐳ: 19, 100, 18, 22<br />2: PgSelectInlineApply[96]<br />3: PgSelect[23]<br />ᐳ: Access[97], Access[102]<br />4: PgSelectRows[28]<br />ᐳ: First[27], PgSelectSingle[29]"):::bucket
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 14, 17<br /><br />ROOT PgDeleteSingle{2}ᐸrelational_posts(id)ᐳ[14]<br />1: 105, 114<br />ᐳ: 21, 113, 20, 30<br />2: PgSelectInlineApply[109]<br />3: PgSelect[31]<br />ᐳ: Access[110], Access[115]<br />4: PgSelectRows[36]<br />ᐳ: First[35], PgSelectSingle[37]"):::bucket
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 29, 97, 102<br /><br />ROOT PgSelectSingle{3}ᐸrelational_postsᐳ[29]<br />1: <br />ᐳ: 38, 40, 42, 44, 98, 103, 99, 104, 93<br />2: PgSelectRows[53], PgSelectRows[69]<br />ᐳ: 52, 54, 55, 68, 70, 94, 95<br />3: PgSelectRows[75]<br />ᐳ: First[74], PgSelectSingle[76]"):::bucket
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 37, 110, 115<br /><br />ROOT PgSelectSingle{4}ᐸrelational_postsᐳ[37]<br />1: <br />ᐳ: 39, 41, 43, 45, 111, 116, 112, 117, 106<br />2: PgSelectRows[63], PgSelectRows[80]<br />ᐳ: 62, 64, 65, 79, 81, 107, 108<br />3: PgSelectRows[86]<br />ᐳ: First[85], PgSelectSingle[87]"):::bucket
-    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 76<br /><br />ROOT PgSelectSingle{5}ᐸpeopleᐳ[76]"):::bucket
-    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 87<br /><br />ROOT PgSelectSingle{6}ᐸpeopleᐳ[87]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 8, 2<br /><br />ROOT PgDeleteSingle{1}ᐸrelational_posts(id)ᐳ[8]<br />1: 92, 101<br />ᐳ: 19, 24, 25, 100, 18, 22, 26<br />2: PgSelectInlineApply[96]<br />3: PgSelect[23]<br />ᐳ: Access[97], Access[102]<br />4: PgSelectRows[28]<br />ᐳ: First[27], PgSelectSingle[29]"):::bucket
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 14, 2<br /><br />ROOT PgDeleteSingle{2}ᐸrelational_posts(id)ᐳ[14]<br />1: 105, 114<br />ᐳ: 21, 32, 33, 113, 20, 30, 34<br />2: PgSelectInlineApply[109]<br />3: PgSelect[31]<br />ᐳ: Access[110], Access[115]<br />4: PgSelectRows[36]<br />ᐳ: First[35], PgSelectSingle[37]"):::bucket
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 29, 8, 97, 102<br /><br />ROOT PgSelectSingle{3}ᐸrelational_postsᐳ[29]<br />1: <br />ᐳ: 38, 40, 42, 44, 98, 103, 99, 104, 93<br />2: PgSelectRows[53], PgSelectRows[69]<br />ᐳ: 52, 54, 55, 68, 70, 94, 95<br />3: PgSelectRows[75]<br />ᐳ: First[74], PgSelectSingle[76]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 37, 14, 110, 115<br /><br />ROOT PgSelectSingle{4}ᐸrelational_postsᐳ[37]<br />1: <br />ᐳ: 39, 41, 43, 45, 111, 116, 112, 117, 106<br />2: PgSelectRows[63], PgSelectRows[80]<br />ᐳ: 62, 64, 65, 79, 81, 107, 108<br />3: PgSelectRows[86]<br />ᐳ: First[85], PgSelectSingle[87]"):::bucket
+    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 76, 8<br /><br />ROOT PgSelectSingle{5}ᐸpeopleᐳ[76]"):::bucket
+    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 87, 14<br /><br />ROOT PgSelectSingle{6}ᐸpeopleᐳ[87]"):::bucket
     end
     Bucket0 --> Bucket1 & Bucket2
     Bucket1 --> Bucket3
@@ -27,24 +27,29 @@ graph TD
     Bucket6 --> Bucket8
 
     %% plan dependencies
-    Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 2"}}:::plan
+    Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access9 & Access10 --> Object11
-    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ<br />Dependents: 4"]:::plan
-    PgDeleteSingle8[["PgDeleteSingle[8∈1] ➊<br />ᐸrelational_posts(id)ᐳ<br />More deps:<br />- Object[11]<br />- Constantᐸ4ᐳ[118]"]]:::sideeffectplan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ<br />Dependents: 8"]:::plan
+    PgDeleteSingle8[["PgDeleteSingle[8∈1] ➊<br />ᐸrelational_posts(id)ᐳ<br />More deps:<br />- Constantᐸ4ᐳ[118]"]]:::sideeffectplan
+    Object11 --> PgDeleteSingle8
     PgDeleteSingle14[["PgDeleteSingle[14∈2] ➊<br />ᐸrelational_posts(id)ᐳ<br />More deps:<br />- Constantᐸ3141592ᐳ[119]"]]:::sideeffectplan
     Object17{{"Object[17∈2] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object17 --> PgDeleteSingle14
     Access15{{"Access[15∈2] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access16{{"Access[16∈2] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access15 & Access16 --> Object17
-    PgSelect23[["PgSelect[23∈3] ➊<br />ᐸrelational_postsᐳ<br />More deps:<br />- Object[11]"]]:::plan
+    PgSelect23[["PgSelect[23∈3] ➊<br />ᐸrelational_postsᐳ"]]:::plan
+    Object26{{"Object[26∈3] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     PgClassExpression22{{"PgClassExpression[22∈3] ➊<br />ᐸ__relational_posts__ᐳ"}}:::plan
     PgSelectInlineApply96["PgSelectInlineApply[96∈3] ➊"]:::plan
     PgFromExpression100{{"PgFromExpression[100∈3] ➊"}}:::plan
     PgSelectInlineApply101["PgSelectInlineApply[101∈3] ➊"]:::plan
-    PgClassExpression22 & PgSelectInlineApply96 & PgFromExpression100 & PgSelectInlineApply101 --> PgSelect23
+    Object26 & PgClassExpression22 & PgSelectInlineApply96 & PgFromExpression100 & PgSelectInlineApply101 --> PgSelect23
+    Access24{{"Access[24∈3] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access25{{"Access[25∈3] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access24 & Access25 --> Object26
     PgClassExpression18{{"PgClassExpression[18∈3] ➊<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
     Access19{{"Access[19∈3] ➊<br />ᐸ8.tᐳ"}}:::plan
     Access19 --> PgClassExpression18
@@ -63,11 +68,15 @@ graph TD
     Access102{{"Access[102∈3] ➊<br />ᐸ23.m.joinDetailsFor47ᐳ"}}:::plan
     PgSelect23 --> Access102
     PgSelect31[["PgSelect[31∈4] ➊<br />ᐸrelational_postsᐳ"]]:::plan
+    Object34{{"Object[34∈4] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     PgClassExpression30{{"PgClassExpression[30∈4] ➊<br />ᐸ__relational_posts__ᐳ"}}:::plan
     PgSelectInlineApply109["PgSelectInlineApply[109∈4] ➊"]:::plan
     PgFromExpression113{{"PgFromExpression[113∈4] ➊"}}:::plan
     PgSelectInlineApply114["PgSelectInlineApply[114∈4] ➊"]:::plan
-    Object17 & PgClassExpression30 & PgSelectInlineApply109 & PgFromExpression113 & PgSelectInlineApply114 --> PgSelect31
+    Object34 & PgClassExpression30 & PgSelectInlineApply109 & PgFromExpression113 & PgSelectInlineApply114 --> PgSelect31
+    Access32{{"Access[32∈4] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access33{{"Access[33∈4] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
+    Access32 & Access33 --> Object34
     PgClassExpression20{{"PgClassExpression[20∈4] ➊<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
     Access21{{"Access[21∈4] ➊<br />ᐸ14.tᐳ"}}:::plan
     Access21 --> PgClassExpression20
@@ -186,9 +195,9 @@ graph TD
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgDeleteSingle14,Access15,Access16,Object17 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression18,Access19,PgClassExpression22,PgSelect23,First27,PgSelectRows28,PgSelectSingle29,PgSelectInlineApply92,PgSelectInlineApply96,Access97,PgFromExpression100,PgSelectInlineApply101,Access102 bucket3
+    class Bucket3,PgClassExpression18,Access19,PgClassExpression22,PgSelect23,Access24,Access25,Object26,First27,PgSelectRows28,PgSelectSingle29,PgSelectInlineApply92,PgSelectInlineApply96,Access97,PgFromExpression100,PgSelectInlineApply101,Access102 bucket3
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgClassExpression20,Access21,PgClassExpression30,PgSelect31,First35,PgSelectRows36,PgSelectSingle37,PgSelectInlineApply105,PgSelectInlineApply109,Access110,PgFromExpression113,PgSelectInlineApply114,Access115 bucket4
+    class Bucket4,PgClassExpression20,Access21,PgClassExpression30,PgSelect31,Access32,Access33,Object34,First35,PgSelectRows36,PgSelectSingle37,PgSelectInlineApply105,PgSelectInlineApply109,Access110,PgFromExpression113,PgSelectInlineApply114,Access115 bucket4
     classDef bucket5 stroke:#7fff00
     class Bucket5,PgClassExpression38,PgClassExpression40,PgClassExpression42,PgClassExpression44,First52,PgSelectRows53,PgSelectSingle54,PgClassExpression55,First68,PgSelectRows69,PgSelectSingle70,First74,PgSelectRows75,PgSelectSingle76,Access93,List94,Lambda95,List98,Lambda99,List103,Lambda104 bucket5
     classDef bucket6 stroke:#ff1493
@@ -197,4 +206,16 @@ graph TD
     class Bucket7,PgClassExpression88,PgClassExpression90 bucket7
     classDef bucket8 stroke:#dda0dd
     class Bucket8,PgClassExpression89,PgClassExpression91 bucket8
+
+    %% implicit side effects
+    PgDeleteSingle8 -.-o Access24
+    PgDeleteSingle8 -.-o Access25
+    PgDeleteSingle8 -.-o PgSelectInlineApply92
+    PgDeleteSingle8 -.-o PgFromExpression100
+    PgDeleteSingle8 -.-o PgSelectInlineApply101
+    PgDeleteSingle14 -.-o Access32
+    PgDeleteSingle14 -.-o Access33
+    PgDeleteSingle14 -.-o PgSelectInlineApply105
+    PgDeleteSingle14 -.-o PgFromExpression113
+    PgDeleteSingle14 -.-o PgSelectInlineApply114
 

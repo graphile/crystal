@@ -11,16 +11,16 @@ import {
 import type { LayerPlanReasonSubroutine } from "../engine/LayerPlan.js";
 import { LayerPlan } from "../engine/LayerPlan.js";
 import { withGlobalLayerPlan } from "../engine/lib/withGlobalLayerPlan.js";
-import type {
-  __FlagStep,
-  ConnectionCapableStep,
-  ExecutionDetails,
-} from "../index.js";
-import type { GrafastResultsList } from "../interfaces.js";
+import type { __FlagStep, ExecutionDetails } from "../index.js";
+import type { GrafastResultsList, Maybe } from "../interfaces.js";
 import type { ListCapableStep } from "../step.js";
 import { isListCapableStep, Step } from "../step.js";
 import { __ItemStep } from "./__item.js";
-import type { ItemsStep } from "./connection.js";
+import type {
+  ConnectionOptimizedStep,
+  ItemsStep,
+  StepRepresentingList,
+} from "./connection.js";
 import { itemsOrStep } from "./connection.js";
 
 export type ListTransformReduce<TMemo, TItemPlanData> = (
@@ -30,7 +30,7 @@ export type ListTransformReduce<TMemo, TItemPlanData> = (
 ) => TMemo;
 
 export type ListTransformItemPlanCallback<
-  TListStep extends Step<readonly any[]>,
+  TListStep extends Step<Maybe<readonly any[]>>,
   TDepsStep extends Step,
 > = (
   listItemPlan: ItemsStep<TListStep> extends ListCapableStep<any, any>
@@ -39,9 +39,7 @@ export type ListTransformItemPlanCallback<
 ) => TDepsStep;
 
 export interface ListTransformOptions<
-  TListStep extends
-    | Step<readonly any[]>
-    | ConnectionCapableStep<Step<any>, any>,
+  TListStep extends StepRepresentingList<any>,
   TDepsStep extends Step,
   TMemo,
   TItemStep extends Step | undefined = undefined,
@@ -62,7 +60,12 @@ export interface ListTransformOptions<
   optimize?: (
     this: __ListTransformStep<TListStep, TDepsStep, TMemo, TItemStep>,
   ) => Step;
-  connectionClone?: ConnectionCapableStep<TListStep, any>["connectionClone"];
+  connectionClone?: ConnectionOptimizedStep<
+    any,
+    any,
+    any,
+    any
+  >["connectionClone"];
 }
 
 /**
@@ -75,9 +78,7 @@ export interface ListTransformOptions<
  * functions that uses this under the hood such as `filter()`.
  */
 export class __ListTransformStep<
-  TListStep extends Step<readonly any[]> | ConnectionCapableStep<any, any> =
-    | Step<readonly any[]>
-    | ConnectionCapableStep<any, any>,
+  TListStep extends StepRepresentingList<any> = StepRepresentingList<any>,
   TDepsStep extends Step = Step,
   TMemo = any,
   TItemStep extends Step | undefined = Step | undefined,
@@ -103,8 +104,10 @@ export class __ListTransformStep<
   public finalizeCallback?: (data: TMemo) => TMemo;
   public listItem?: (itemPlan: __ItemStep<this>) => TItemStep;
   private meta: string | null;
-  public connectionClone?: ConnectionCapableStep<
-    TListStep,
+  public connectionClone?: ConnectionOptimizedStep<
+    any,
+    any,
+    any,
     any
   >["connectionClone"];
 
@@ -156,6 +159,7 @@ export class __ListTransformStep<
     const itemPlan = withGlobalLayerPlan(
       this.subroutineLayer,
       listStep.polymorphicPaths,
+      null,
       null,
       () => {
         // This does NOT use `itemPlanFor` because __ListTransformPlans are special.
@@ -371,7 +375,7 @@ export class __ListTransformStep<
  * {@page ~grafast/steps/listTransform.md}
  */
 export function listTransform<
-  TListStep extends Step<readonly any[]> | ConnectionCapableStep<any, any>,
+  TListStep extends StepRepresentingList<any>,
   TDepsStep extends Step,
   TMemo,
   TItemStep extends Step | undefined = undefined,

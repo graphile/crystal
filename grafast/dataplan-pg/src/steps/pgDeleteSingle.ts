@@ -118,7 +118,6 @@ export class PgDeleteSingleStep<
     >,
   ) {
     super();
-    this.hasSideEffects = true;
     this.resource = resource;
     this.name = resource.name;
     this.symbol = Symbol(this.name);
@@ -161,6 +160,9 @@ export class PgDeleteSingleStep<
       const pgCodec = attribute.codec;
       this.getBys.push({ name, depId, pgCodec });
     });
+
+    // Must be the last action
+    this.hasSideEffects = true;
   }
 
   public toStringMeta(): string | null {

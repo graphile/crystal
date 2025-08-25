@@ -1,4 +1,4 @@
-import type { EdgeCapableStep, Step, UnbatchedExecutionExtra } from "grafast";
+import type { Step, UnbatchedExecutionExtra } from "grafast";
 import { exportAs, UnbatchedStep } from "grafast";
 import type { SQL, SQLable } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
@@ -22,7 +22,6 @@ import {
   pgClassExpression,
   PgClassExpressionStep,
 } from "./pgClassExpression.js";
-import { PgCursorStep } from "./pgCursor.js";
 import type { PgSelectMode } from "./pgSelect.js";
 import { PgSelectStep } from "./pgSelect.js";
 // import debugFactory from "debug";
@@ -74,7 +73,6 @@ export class PgSelectSingleStep<
         ? UCodec
         : never
     >,
-    EdgeCapableStep<any>,
     SQLable
 {
   static $$export = {
@@ -463,26 +461,6 @@ export class PgSelectSingleStep<
 
   public toRecord(): Step {
     return this.record();
-  }
-
-  /**
-   * When selecting a connection we need to be able to get the cursor. The
-   * cursor is built from the values of the `ORDER BY` clause so that we can
-   * find nodes before/after it.
-   */
-  public cursor(): PgCursorStep<this> {
-    const cursorPlan = new PgCursorStep<this>(
-      this,
-      this.getClassStep().getCursorDetails(),
-    );
-    return cursorPlan;
-  }
-
-  /**
-   * For compatibility with EdgeCapableStep.
-   */
-  public node(): this {
-    return this;
   }
 
   deduplicate(

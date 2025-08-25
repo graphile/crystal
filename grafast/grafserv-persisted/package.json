@@ -57,7 +57,7 @@
     }
   },
   "devDependencies": {
-    "@types/node": "^24.0.13",
+    "@types/node": "^22.16.3",
     "grafast": "workspace:^",
     "grafserv": "workspace:^",
     "graphile-config": "workspace:^",
