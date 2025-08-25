@@ -226,3 +226,62 @@ use a simpler expression for comparisons which is not null-capable, and this
 will break cursor pagination when nulls occur.
 
 :::
+
+### Using context or other steps in the addPgTableOrderBy plugin
+
+You can use the `applyScope` method to access the context of the query. This
+method is called with the `PgSelectQueryBuilder` and can be used to apply
+additional filtering or ordering based on the context.
+
+```ts
+import { addPgTableOrderBy, orderByAscDesc } from "postgraphile/utils";
+
+// Apply scope for the specific type.
+const applyScopePlugin: GraphileConfig.Plugin = {
+  name: "applyScopePlugin",
+  schema: {
+    hooks: {
+      GraphQLEnumType(config, build) {
+        const { TYPES } = build.dataplanPg;
+        if (config.name === "CityOrderBy") {
+          const {
+            grafast: { context },
+          } = build;
+          config.extensions ??= {};
+          // @ts-expect-error The type is readonly by types you may get an error here.
+          config.extensions.grafast ??= {};
+          config.extensions.grafast.applyScope = () => context(); // Or any other unary step.
+        }
+        return config;
+      },
+    },
+  },
+};
+
+export default addPgTableOrderBy(
+  { schemaName: "app_public", tableName: "users" },
+  ({ sql }) => {
+    return orderByAscDesc(
+      "CITY_NAME",
+      (queryBuilder, info) => {
+        const { scope } = info;
+
+        const context = scope; // As we applied context as scope.
+
+        const orderByFrag = sql`(
+          select coalesce(
+            (select value from public.transactions t where t.key = ${queryBuilder.alias}.name and language = ${sqlValueWithCodec(
+              context?.locale,
+              TYPES.text,
+            )}),
+            ${queryBuilder.alias}.name
+          )
+        )`;
+
+        return { fragment: orderByFrag, codec: TYPES.text };
+      },
+      { nulls: "last-iff-ascending" },
+    );
+  },
+);
+```

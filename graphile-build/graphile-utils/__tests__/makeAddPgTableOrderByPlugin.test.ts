@@ -1,6 +1,6 @@
-import { TYPES } from "@dataplan/pg";
+import { sqlValueWithCodec, TYPES } from "@dataplan/pg";
 import { makePgService } from "@dataplan/pg/adaptors/pg";
-import { grafast } from "grafast";
+import { constant, grafast, object } from "grafast";
 import type { ExecutionResult } from "grafast/graphql";
 import type { SchemaResult } from "graphile-build";
 import type { Pool } from "pg";
@@ -67,6 +67,46 @@ const makePetsPlugin = (nullsSortMethod: NullsSortMethod) =>
     },
   );
 
+const makeScopeApplyPlugin = (nullsSortMethod: NullsSortMethod) =>
+  makeAddPgTableOrderByPlugin(
+    { schemaName: "graphile_utils", tableName: "users" },
+    (build) => {
+      const { sql } = build;
+
+      const customOrderBy = orderByAscDesc(
+        "NAME_FAV_CHAR", // this is a ridiculous and unrealistic attribute but it will serve for testing purposes
+        ($select, info) => {
+          const { scope } = info;
+          const favChar = (scope as { favChar: number }).favChar;
+          const orderByFrag = sql`(select substring(${$select.alias}.name, ${sqlValueWithCodec(favChar, TYPES.int)}, 1))`;
+
+          return { fragment: orderByFrag, codec: TYPES.int };
+        },
+        { nulls: nullsSortMethod },
+      );
+
+      return customOrderBy;
+    },
+  );
+
+const AddApplyScopeToUserOrderByPlugin: GraphileConfig.Plugin = {
+  name: "AddApplyScopeToUserOrderByPlugin",
+  schema: {
+    hooks: {
+      GraphQLEnumType(config, build) {
+        if (config.name === "UsersOrderBy") {
+          config.extensions ??= {};
+          // @ts-expect-error The type is readonly, so we get an error here.
+          config.extensions.grafast ??= {};
+          config.extensions.grafast.applyScope = () =>
+            object({ favChar: constant(2) });
+        }
+        return config;
+      },
+    },
+  },
+};
+
 const getResultingOrderFromUserNodes = (userNodes: { name?: string }[]) =>
   userNodes.map((node) => node.name);
 
@@ -80,7 +120,11 @@ const getSchema = async (nullsSortMethod?: NullsSortMethod) => {
       makeV4Preset({
         disableDefaultMutations: true,
         simpleCollections: "both",
-        appendPlugins: [makePetsPlugin(nullsSortMethod)],
+        appendPlugins: [
+          makePetsPlugin(nullsSortMethod),
+          makeScopeApplyPlugin(nullsSortMethod),
+          AddApplyScopeToUserOrderByPlugin,
+        ],
       }),
     ],
     pgServices: [makePgService({ pool: pgPool!, schemas: ["graphile_utils"] })],
@@ -137,16 +181,39 @@ const getAscDescData = async (schemaResult: SchemaResult) => {
     {},
   )) as ExecutionResult;
 
+  const { data: dataFavChar, errors: errorsFavChar } = (await grafast(
+    {
+      schema,
+      source: `
+      query {
+        allUsers(orderBy: NAME_FAV_CHAR_ASC) {
+          nodes {
+            nodeId
+            id
+            name
+          }
+        }
+      }
+    `,
+    },
+    resolvedPreset,
+    {},
+  )) as ExecutionResult;
+
   const userNodesAsc = (dataAsc?.allUsers as any)?.nodes;
   const userNodesDesc = (dataDesc?.allUsers as any)?.nodes;
+  const userNodesFavChar = (dataFavChar?.allUsers as any)?.nodes;
 
   return {
     dataAsc,
     dataDesc,
+    dataFavChar,
     errorsAsc,
     errorsDesc,
+    errorsFavChar,
     userNodesAsc,
     userNodesDesc,
+    userNodesFavChar,
   };
 };
 
@@ -341,4 +408,23 @@ it('allows creating a "order by" plugin with NULLS LAST IFF ASCENDING asc/desc o
   expect(errorsDesc).toBeFalsy();
   expect(dataDesc).toBeTruthy();
   expect(descOrdersAreEqual).toBeTruthy();
+});
+
+it("order by plugin should be able to access scope applied to it", async () => {
+  const schemaResult = await getSchema("last-iff-ascending");
+  const { userNodesFavChar, errorsFavChar } =
+    await getAscDescData(schemaResult);
+
+  // Sorted from the second character onwards, so: `aroline, lice, ob`
+  const correctOrderAsc = ["Caroline", "Alice", "Bob"];
+  const resultingOrderAsc = getResultingOrderFromUserNodes(userNodesFavChar);
+
+  const ascOrdersAreEqual = checkArraysAreEqual(
+    correctOrderAsc,
+    resultingOrderAsc,
+  );
+
+  expect(errorsFavChar).toBeFalsy();
+  expect(userNodesFavChar).toBeTruthy();
+  expect(ascOrdersAreEqual).toBeTruthy();
 });
