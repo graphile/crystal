@@ -84,6 +84,12 @@ Schema extension plugins for PostGraphile:
   foreign relationships to be created. :question:_(Not yet ported to V5, but use the "relay" preset instead?)_
 - [postgraphile-plugin-timestamp-format](https://github.com/RedShift1/postgraphile-plugin-timestamp-format) -
   Format timestamps with PostgreSQL’s to*char function. Supports timezones too :question:*(Not yet ported to V5)\_
+- [@haathie/postgraphile-fancy-mutations](https://github.com/haathie/graphile-tools/tree/main/packages/fancy-mutations) - Plugin for performant bulk upserts with nested relations, bulk updates, and deletes. :white_check_mark:
+- [@haathie/postgraphile-targeted-conditions](https://github.com/haathie/graphile-tools/tree/main/packages/targeted-conditions) - Plugin for advanced filtering, including relational conditions, [ParadeDB](https://github.com/paradedb/paradedb) support, and more. :white_check_mark:
+- [@haathie/postgraphile-realtime](https://github.com/haathie/graphile-tools/tree/main/packages/realtime) - Plugin for performant, conditional subscriptions, allowing real-time updates from any table in your Postgres database. :white_check_mark:
+- [@haathie/postgraphile-rate-limits](https://github.com/haathie/graphile-tools/tree/main/packages/rate-limits) - Plugin for rate limiting queries and mutations. Add rate limits using smart tags and get reasonably friendly error messages. :white_check_mark:
+- [@haathie/postgraphile-otel](https://github.com/haathie/graphile-tools/tree/main/packages/otel) - Plugin for OpenTelemetry Tracing Capabilities for GraphQL Requests. :white_check_mark:
+- [@haathie/postgraphile-reasonable-limits](https://github.com/haathie/graphile-tools/tree/main/packages/reasonable-limits) - Plugin to enforce reasonable limits on queries, preventing excessive data retrieval. :white_check_mark:
 
 Examples of using these plugins:
 

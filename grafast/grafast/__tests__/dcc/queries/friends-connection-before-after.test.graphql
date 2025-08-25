@@ -1,0 +1,19 @@
+# Ref friends.md
+
+query BeforeAfter @expectError {
+  crawler(id: 101) {
+    id
+    name
+    ... on ActiveCrawler {
+      friendsConnection(first: 2, before: "Mg==") {
+        nodes {
+          id
+          name
+        }
+        pageInfo {
+          endCursor
+        }
+      }
+    }
+  }
+}

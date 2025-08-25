@@ -1,5 +1,5 @@
 import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, PgSelectStep, TYPES, assertPgClassSingleStep, domainOfCodec, enumCodec, listOfCodec, makeRegistry, pgClassExpression, pgFromExpression, pgSelectFromRecord, pgSelectFromRecords, pgSelectSingleFromRecord, rangeOfCodec, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, operationPlan, rootValue, stepAMayDependOnStepB, trap } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertExecutableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, operationPlan, rootValue, stepAMayDependOnStepB, trap } from "grafast";
 import { GraphQLError, GraphQLInt, GraphQLString, Kind, valueFromASTUntyped } from "graphql";
 import { sql } from "pg-sql2";
 const nodeIdHandler_Query = {
@@ -6465,6 +6465,26 @@ const resource_mutation_out_complex_setofPgResource = registry.pgResources["muta
 const resource_mutation_out_tablePgResource = registry.pgResources["mutation_out_table"];
 const resource_mutation_out_table_setofPgResource = registry.pgResources["mutation_out_table_setof"];
 const resource_table_set_mutationPgResource = registry.pgResources["table_set_mutation"];
+const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) => {
+  const $result = $mutation.getStepForKey("result", true);
+  if (!$result) return null;
+  if ($result instanceof PgDeleteSingleStep) {
+    return pgSelectFromRecord($result.resource, $result.record());
+  } else {
+    const spec = pkAttributes.reduce((memo, attributeName) => {
+      memo[attributeName] = $result.get(attributeName);
+      return memo;
+    }, Object.create(null));
+    return resource.find(spec);
+  }
+};
+const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => {
+  const $select = getPgSelectSingleFromMutationResult(resource, pkAttributes, $mutation);
+  if (!$select) return constant(null);
+  fieldArgs.apply($select, "orderBy");
+  const $connection = connection($select);
+  return new EdgeStep($connection, first($connection));
+};
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
   """
@@ -9694,11 +9714,7 @@ export const objects = {
       badlyBehavedFunction: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs8($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -9734,11 +9750,7 @@ export const objects = {
       compoundTypeSetQuery: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs6($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -9781,11 +9793,7 @@ export const objects = {
       funcOutComplexSetof: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs7($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -9816,11 +9824,7 @@ export const objects = {
       funcOutOutSetof: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs3($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -9847,11 +9851,7 @@ export const objects = {
       funcOutSetof: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -9878,11 +9878,7 @@ export const objects = {
       funcOutTableSetof: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs9($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -9913,11 +9909,7 @@ export const objects = {
       funcReturnsTableMultiCol: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs5($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -9940,11 +9932,7 @@ export const objects = {
       funcReturnsTableOneCol: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs2($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -9967,11 +9955,7 @@ export const objects = {
       intSetQuery: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs4($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -10122,11 +10106,7 @@ export const objects = {
       tableSetQuery: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs10($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -10157,11 +10137,7 @@ export const objects = {
       tableSetQueryPlpgsql: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs11($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -10928,17 +10904,6 @@ export const objects = {
       }
     }
   },
-  CompoundKeysEdge: {
-    assertStep: assertEdgeCapableStep,
-    plans: {
-      cursor($edge) {
-        return $edge.cursor();
-      },
-      node($edge) {
-        return $edge.node();
-      }
-    }
-  },
   CompoundType: {
     assertStep: assertPgClassSingleStep,
     plans: {
@@ -10960,17 +10925,6 @@ export const objects = {
     plans: {
       totalCount($connection) {
         return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
-    }
-  },
-  CompoundTypesEdge: {
-    assertStep: assertEdgeCapableStep,
-    plans: {
-      cursor($edge) {
-        return $edge.cursor();
-      },
-      node($edge) {
-        return $edge.node();
       }
     }
   },
@@ -11012,17 +10966,6 @@ export const objects = {
       }
     }
   },
-  EdgeCasesEdge: {
-    assertStep: assertEdgeCapableStep,
-    plans: {
-      cursor($edge) {
-        return $edge.cursor();
-      },
-      node($edge) {
-        return $edge.node();
-      }
-    }
-  },
   FuncOutComplexRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
@@ -11045,17 +10988,6 @@ export const objects = {
     plans: {
       totalCount($connection) {
         return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
-    }
-  },
-  FuncOutComplexSetofEdge: {
-    assertStep: assertEdgeCapableStep,
-    plans: {
-      cursor($edge) {
-        return $edge.cursor();
-      },
-      node($edge) {
-        return $edge.node();
       }
     }
   },
@@ -11106,17 +11038,6 @@ export const objects = {
       }
     }
   },
-  FuncOutOutSetofEdge: {
-    assertStep: assertEdgeCapableStep,
-    plans: {
-      cursor($edge) {
-        return $edge.cursor();
-      },
-      node($edge) {
-        return $edge.node();
-      }
-    }
-  },
   FuncOutOutSetofRecord: {
     assertStep: assertPgClassSingleStep
   },
@@ -11139,17 +11060,6 @@ export const objects = {
       }
     }
   },
-  FuncOutSetofEdge: {
-    assertStep: assertEdgeCapableStep,
-    plans: {
-      cursor($edge) {
-        return $edge.cursor();
-      },
-      node($edge) {
-        return $edge.node();
-      }
-    }
-  },
   FuncOutUnnamedOutOutUnnamedRecord: {
     assertStep: assertPgClassSingleStep,
     plans: {
@@ -11169,17 +11079,6 @@ export const objects = {
       }
     }
   },
-  FuncReturnsTableMultiColEdge: {
-    assertStep: assertEdgeCapableStep,
-    plans: {
-      cursor($edge) {
-        return $edge.cursor();
-      },
-      node($edge) {
-        return $edge.node();
-      }
-    }
-  },
   FuncReturnsTableMultiColRecord: {
     assertStep: assertPgClassSingleStep
   },
@@ -11188,17 +11087,6 @@ export const objects = {
     plans: {
       totalCount($connection) {
         return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
-    }
-  },
-  FuncReturnsTableOneColEdge: {
-    assertStep: assertEdgeCapableStep,
-    plans: {
-      cursor($edge) {
-        return $edge.cursor();
-      },
-      node($edge) {
-        return $edge.node();
       }
     }
   },
@@ -11225,17 +11113,6 @@ export const objects = {
     plans: {
       totalCount($connection) {
         return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
-    }
-  },
-  IntSetQueryEdge: {
-    assertStep: assertEdgeCapableStep,
-    plans: {
-      cursor($edge) {
-        return $edge.cursor();
-      },
-      node($edge) {
-        return $edge.node();
       }
     }
   },
@@ -11266,28 +11143,7 @@ export const objects = {
         return $object.get("result");
       },
       issue756Edge($mutation, fieldArgs) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = issue756Uniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return resource_issue756PgResource.find(spec);
-          }
-        })();
-        fieldArgs.apply($select, "orderBy");
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
+        return pgMutationPayloadEdge(resource_issue756PgResource, issue756Uniques[0].attributes, $mutation, fieldArgs);
       },
       query() {
         return rootValue();
@@ -11299,17 +11155,6 @@ export const objects = {
     plans: {
       totalCount($connection) {
         return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
-    }
-  },
-  Issue756SEdge: {
-    assertStep: assertEdgeCapableStep,
-    plans: {
-      cursor($edge) {
-        return $edge.cursor();
-      },
-      node($edge) {
-        return $edge.node();
       }
     }
   },
@@ -11426,28 +11271,7 @@ export const objects = {
         return $object.get("result");
       },
       leftArmEdge($mutation, fieldArgs) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = left_armUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return resource_left_armPgResource.find(spec);
-          }
-        })();
-        fieldArgs.apply($select, "orderBy");
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
+        return pgMutationPayloadEdge(resource_left_armPgResource, left_armUniques[0].attributes, $mutation, fieldArgs);
       },
       personByPersonId($record) {
         return resource_personPgResource.get({
@@ -11464,17 +11288,6 @@ export const objects = {
     plans: {
       totalCount($connection) {
         return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
-    }
-  },
-  LeftArmsEdge: {
-    assertStep: assertEdgeCapableStep,
-    plans: {
-      cursor($edge) {
-        return $edge.cursor();
-      },
-      node($edge) {
-        return $edge.node();
       }
     }
   },
@@ -11724,28 +11537,7 @@ export const objects = {
         return $object.get("result");
       },
       personEdge($mutation, fieldArgs) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = personUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return resource_personPgResource.find(spec);
-          }
-        })();
-        fieldArgs.apply($select, "orderBy");
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
+        return pgMutationPayloadEdge(resource_personPgResource, personUniques[0].attributes, $mutation, fieldArgs);
       },
       query() {
         return rootValue();
@@ -11868,17 +11660,6 @@ export const objects = {
       }
     }
   },
-  MyTablesEdge: {
-    assertStep: assertEdgeCapableStep,
-    plans: {
-      cursor($edge) {
-        return $edge.cursor();
-      },
-      node($edge) {
-        return $edge.node();
-      }
-    }
-  },
   NestedCompoundType: {
     assertStep: assertPgClassSingleStep,
     plans: {
@@ -11947,50 +11728,11 @@ export const objects = {
       }
     }
   },
-  NullTestRecordsEdge: {
-    assertStep: assertEdgeCapableStep,
-    plans: {
-      cursor($edge) {
-        return $edge.cursor();
-      },
-      node($edge) {
-        return $edge.node();
-      }
-    }
-  },
-  PageInfo: {
-    assertStep: assertPageInfoCapableStep,
-    plans: {
-      endCursor($pageInfo) {
-        return $pageInfo.endCursor();
-      },
-      hasNextPage($pageInfo) {
-        return $pageInfo.hasNextPage();
-      },
-      hasPreviousPage($pageInfo) {
-        return $pageInfo.hasPreviousPage();
-      },
-      startCursor($pageInfo) {
-        return $pageInfo.startCursor();
-      }
-    }
-  },
   PeopleConnection: {
     assertStep: ConnectionStep,
     plans: {
       totalCount($connection) {
         return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
-    }
-  },
-  PeopleEdge: {
-    assertStep: assertEdgeCapableStep,
-    plans: {
-      cursor($edge) {
-        return $edge.cursor();
-      },
-      node($edge) {
-        return $edge.node();
       }
     }
   },
@@ -12137,11 +11879,7 @@ export const objects = {
       friends: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs12($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -12243,11 +11981,7 @@ export const objects = {
       typeFunctionConnection: {
         plan($parent, args, info) {
           const $select = getSelectPlanFromParentAndArgs13($parent, args, info);
-          return connection($select, {
-            cursorPlan($item) {
-              return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
-            }
-          });
+          return connection($select);
         },
         args: {
           first(_, $connection, arg) {
@@ -12351,17 +12085,6 @@ export const objects = {
     plans: {
       totalCount($connection) {
         return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
-    }
-  },
-  PersonSecretsEdge: {
-    assertStep: assertEdgeCapableStep,
-    plans: {
-      cursor($edge) {
-        return $edge.cursor();
-      },
-      node($edge) {
-        return $edge.node();
       }
     }
   },
@@ -12497,17 +12220,6 @@ export const objects = {
     plans: {
       totalCount($connection) {
         return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
-    }
-  },
-  TypesEdge: {
-    assertStep: assertEdgeCapableStep,
-    plans: {
-      cursor($edge) {
-        return $edge.cursor();
-      },
-      node($edge) {
-        return $edge.node();
       }
     }
   },

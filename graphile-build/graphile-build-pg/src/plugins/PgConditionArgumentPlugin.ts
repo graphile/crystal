@@ -3,7 +3,6 @@ import "graphile-config";
 
 import type {
   PgCodecWithAttributes,
-  PgSelectParsedCursorStep,
   PgSelectQueryBuilder,
   PgSelectSingleStep,
   PgSelectStep,
@@ -180,8 +179,11 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                       (
                         _condition,
                         $connection: ConnectionStep<
+                          any,
                           PgSelectSingleStep,
-                          PgSelectParsedCursorStep,
+                          any,
+                          any,
+                          null | readonly any[],
                           PgSelectStep
                         >,
                         arg,

@@ -1,38 +1,70 @@
 import { $$deepDepSkip } from "../constants.js";
-import type { UnbatchedExecutionExtra } from "../interfaces.js";
-import type { Step } from "../step.js";
-import { UnbatchedStep } from "../step.js";
-import type { ConnectionCapableStep } from "./connection.js";
+import type {
+  ExecutionDetails,
+  GrafastResultsList,
+  Maybe,
+  UnbatchedExecutionExtra,
+} from "../interfaces.js";
+import { Step } from "../step.js";
+import type { StepRepresentingList } from "./connection.js";
 import { itemsOrStep } from "./connection.js";
 import { ListStep } from "./list.js";
 
-export class LastStep<TData> extends UnbatchedStep<TData> {
+function unbatchedExecute(_extra: UnbatchedExecutionExtra, list: any[]) {
+  return list?.[list.length - 1];
+}
+function optimalExecute<TData>({
+  indexMap,
+  values: [values0],
+}: ExecutionDetails<[ReadonlyArray<TData>]>): GrafastResultsList<TData> {
+  return indexMap((i) => {
+    const list = values0.at(i);
+    return list?.[list.length - 1];
+  });
+}
+
+export class LastStep<TData> extends Step<Maybe<TData>> {
   static $$export = {
     moduleName: "grafast",
     exportName: "LastStep",
   };
-  isSyncAndSafe = true;
   allowMultipleOptimizations = true;
+  unbatchedExecute?: typeof unbatchedExecute;
 
-  constructor(
-    parentPlan:
-      | Step<ReadonlyArray<TData>>
-      | ConnectionCapableStep<Step<TData>, any>,
-  ) {
+  constructor(parentPlan: StepRepresentingList<TData>, isArray = true) {
     super();
     this.addDependency(itemsOrStep(parentPlan));
+    if (isArray) {
+      this.unbatchedExecute = unbatchedExecute;
+      this.execute = optimalExecute<TData>;
+      this.isSyncAndSafe = true;
+    } else {
+      this.isSyncAndSafe = false;
+    }
   }
 
   [$$deepDepSkip](): Step {
     return this.getDepOptions(0).step;
   }
 
-  unbatchedExecute = (
-    _extra: UnbatchedExecutionExtra,
-    list: ReadonlyArray<TData>,
-  ): TData => {
-    return list?.[list?.length - 1];
-  };
+  execute({
+    indexMap,
+    values: [values0],
+  }: ExecutionDetails<[ReadonlyArray<TData>]>): GrafastResultsList<TData> {
+    return indexMap((i) => {
+      const val = values0.at(i);
+      if (val == null) return val;
+      if (Array.isArray(val)) return val[val.length - 1];
+      // Iterable? Return the last entry
+      return (async () => {
+        let last: any = undefined;
+        for await (const e of val) {
+          last = e;
+        }
+        return last;
+      })();
+    });
+  }
 
   deduplicate(peers: LastStep<TData>[]): LastStep<TData>[] {
     return peers;
@@ -51,14 +83,20 @@ export class LastStep<TData> extends UnbatchedStep<TData> {
 /**
  * A plan that resolves to the last entry in the list returned by the given
  * plan.
+ *
+ * @param plan - the list plan
+ * @param array - set this true if the plan represents an array (or
+ * null/undefined) - i.e. it' won't be an (async) iterable - to enable greater
+ * optimization
  */
 export function last<TData>(
-  plan: Step<ReadonlyArray<TData>> | ConnectionCapableStep<Step<TData>, any>,
+  plan: StepRepresentingList<TData>,
+  array = true,
 ): LastStep<TData> {
   return plan.operationPlan.cacheStep(
     plan,
     "GrafastInternal:last()",
-    "",
-    () => new LastStep(plan),
+    array,
+    () => new LastStep(plan, array),
   );
 }

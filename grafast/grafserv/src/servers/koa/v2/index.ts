@@ -22,6 +22,9 @@ declare global {
       koav2: {
         ctx: Context;
       };
+      koav3: {
+        ctx: Context;
+      };
     }
   }
 }
@@ -55,6 +58,9 @@ function getDigest(
         res: ctx.res,
       },
       koav2: {
+        ctx,
+      },
+      koav3: {
         ctx,
       },
     },

@@ -16,7 +16,8 @@ begin; /*fake*/
 declare __SNAPSHOT_CURSOR_0__ insensitive no scroll cursor without hold for
 select
   __messages__."body" as "0",
-  __messages__."author_id" as "1"
+  __messages__."author_id" as "1",
+  __messages__."id" as "2"
 from app_public.messages as __messages__
 where
   (
@@ -31,38 +32,6 @@ fetch forward 100 from __SNAPSHOT_CURSOR_0__
 close __SNAPSHOT_CURSOR_0__
 
 commit; /*fake*/
-
-begin; /*fake*/
-
-declare __SNAPSHOT_CURSOR_1__ insensitive no scroll cursor without hold for
-select
-  __messages__."body" as "0",
-  __messages__."author_id" as "1",
-  __messages__."id" as "2"
-from app_public.messages as __messages__
-where
-  (
-    __messages__."forum_id" = $1::"uuid"
-  ) and (
-    (__messages__.archived_at is null) = ($2::"timestamptz" is null)
-  )
-order by __messages__."id" asc;
-
-fetch forward 100 from __SNAPSHOT_CURSOR_1__
-
-close __SNAPSHOT_CURSOR_1__
-
-commit; /*fake*/
-
-select /* NOTHING?! */
-from app_public.messages as __messages__
-where
-  (
-    __messages__."forum_id" = $1::"uuid"
-  ) and (
-    (__messages__.archived_at is null) = ($2::"timestamptz" is null)
-  )
-order by __messages__."id" asc;
 
 select
   (count(*))::text as "0"

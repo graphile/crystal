@@ -1,5 +1,5 @@
 import { PgDeleteSingleStep, PgExecutor, TYPES, assertPgClassSingleStep, domainOfCodec, enumCodec, listOfCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, recordCodec, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertExecutableStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 const nodeIdHandler_Query = {
@@ -845,6 +845,26 @@ const specFromArgs_Network2 = args => {
 const specFromArgs_Type2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_Type, $nodeId);
+};
+const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) => {
+  const $result = $mutation.getStepForKey("result", true);
+  if (!$result) return null;
+  if ($result instanceof PgDeleteSingleStep) {
+    return pgSelectFromRecord($result.resource, $result.record());
+  } else {
+    const spec = pkAttributes.reduce((memo, attributeName) => {
+      memo[attributeName] = $result.get(attributeName);
+      return memo;
+    }, Object.create(null));
+    return resource.find(spec);
+  }
+};
+const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => {
+  const $select = getPgSelectSingleFromMutationResult(resource, pkAttributes, $mutation);
+  if (!$select) return constant(null);
+  fieldArgs.apply($select, "orderBy");
+  const $connection = connection($select);
+  return new EdgeStep($connection, first($connection));
 };
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
@@ -2727,17 +2747,6 @@ export const objects = {
       }
     }
   },
-  AlwaysAsIdentitiesEdge: {
-    assertStep: assertEdgeCapableStep,
-    plans: {
-      cursor($edge) {
-        return $edge.cursor();
-      },
-      node($edge) {
-        return $edge.node();
-      }
-    }
-  },
   AlwaysAsIdentity: {
     assertStep: assertPgClassSingleStep,
     plans: {
@@ -2759,17 +2768,6 @@ export const objects = {
     plans: {
       totalCount($connection) {
         return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
-      }
-    }
-  },
-  ByDefaultAsIdentitiesEdge: {
-    assertStep: assertEdgeCapableStep,
-    plans: {
-      cursor($edge) {
-        return $edge.cursor();
-      },
-      node($edge) {
-        return $edge.node();
       }
     }
   },
@@ -2796,28 +2794,7 @@ export const objects = {
         return $object.get("result");
       },
       alwaysAsIdentityEdge($mutation, fieldArgs) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = always_as_identityUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return resource_always_as_identityPgResource.find(spec);
-          }
-        })();
-        fieldArgs.apply($select, "orderBy");
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
+        return pgMutationPayloadEdge(resource_always_as_identityPgResource, always_as_identityUniques[0].attributes, $mutation, fieldArgs);
       },
       clientMutationId($mutation) {
         const $insert = $mutation.getStepForKey("result");
@@ -2835,28 +2812,7 @@ export const objects = {
         return $object.get("result");
       },
       byDefaultAsIdentityEdge($mutation, fieldArgs) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = by_default_as_identityUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return resource_by_default_as_identityPgResource.find(spec);
-          }
-        })();
-        fieldArgs.apply($select, "orderBy");
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
+        return pgMutationPayloadEdge(resource_by_default_as_identityPgResource, by_default_as_identityUniques[0].attributes, $mutation, fieldArgs);
       },
       clientMutationId($mutation) {
         const $insert = $mutation.getStepForKey("result");
@@ -2878,28 +2834,7 @@ export const objects = {
         return $object.get("result");
       },
       networkEdge($mutation, fieldArgs) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = networkUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return resource_networkPgResource.find(spec);
-          }
-        })();
-        fieldArgs.apply($select, "orderBy");
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
+        return pgMutationPayloadEdge(resource_networkPgResource, networkUniques[0].attributes, $mutation, fieldArgs);
       },
       query() {
         return rootValue();
@@ -2920,28 +2855,7 @@ export const objects = {
         return $object.get("result");
       },
       typeEdge($mutation, fieldArgs) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = typesUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return resource_typesPgResource.find(spec);
-          }
-        })();
-        fieldArgs.apply($select, "orderBy");
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
+        return pgMutationPayloadEdge(resource_typesPgResource, typesUniques[0].attributes, $mutation, fieldArgs);
       }
     }
   },
@@ -2952,28 +2866,7 @@ export const objects = {
         return $object.get("result");
       },
       alwaysAsIdentityEdge($mutation, fieldArgs) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = always_as_identityUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return resource_always_as_identityPgResource.find(spec);
-          }
-        })();
-        fieldArgs.apply($select, "orderBy");
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
+        return pgMutationPayloadEdge(resource_always_as_identityPgResource, always_as_identityUniques[0].attributes, $mutation, fieldArgs);
       },
       clientMutationId($mutation) {
         const $result = $mutation.getStepForKey("result");
@@ -2996,28 +2889,7 @@ export const objects = {
         return $object.get("result");
       },
       byDefaultAsIdentityEdge($mutation, fieldArgs) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = by_default_as_identityUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return resource_by_default_as_identityPgResource.find(spec);
-          }
-        })();
-        fieldArgs.apply($select, "orderBy");
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
+        return pgMutationPayloadEdge(resource_by_default_as_identityPgResource, by_default_as_identityUniques[0].attributes, $mutation, fieldArgs);
       },
       clientMutationId($mutation) {
         const $result = $mutation.getStepForKey("result");
@@ -3049,28 +2921,7 @@ export const objects = {
         return $object.get("result");
       },
       networkEdge($mutation, fieldArgs) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = networkUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return resource_networkPgResource.find(spec);
-          }
-        })();
-        fieldArgs.apply($select, "orderBy");
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
+        return pgMutationPayloadEdge(resource_networkPgResource, networkUniques[0].attributes, $mutation, fieldArgs);
       },
       query() {
         return rootValue();
@@ -3096,28 +2947,7 @@ export const objects = {
         return $object.get("result");
       },
       typeEdge($mutation, fieldArgs) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = typesUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return resource_typesPgResource.find(spec);
-          }
-        })();
-        fieldArgs.apply($select, "orderBy");
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
+        return pgMutationPayloadEdge(resource_typesPgResource, typesUniques[0].attributes, $mutation, fieldArgs);
       }
     }
   },
@@ -3156,34 +2986,6 @@ export const objects = {
       }
     }
   },
-  NetworksEdge: {
-    assertStep: assertEdgeCapableStep,
-    plans: {
-      cursor($edge) {
-        return $edge.cursor();
-      },
-      node($edge) {
-        return $edge.node();
-      }
-    }
-  },
-  PageInfo: {
-    assertStep: assertPageInfoCapableStep,
-    plans: {
-      endCursor($pageInfo) {
-        return $pageInfo.endCursor();
-      },
-      hasNextPage($pageInfo) {
-        return $pageInfo.hasNextPage();
-      },
-      hasPreviousPage($pageInfo) {
-        return $pageInfo.hasPreviousPage();
-      },
-      startCursor($pageInfo) {
-        return $pageInfo.startCursor();
-      }
-    }
-  },
   Type: {
     assertStep: assertPgClassSingleStep,
     plans: {
@@ -3217,17 +3019,6 @@ export const objects = {
       }
     }
   },
-  TypesEdge: {
-    assertStep: assertEdgeCapableStep,
-    plans: {
-      cursor($edge) {
-        return $edge.cursor();
-      },
-      node($edge) {
-        return $edge.node();
-      }
-    }
-  },
   UpdateAlwaysAsIdentityPayload: {
     assertStep: ObjectStep,
     plans: {
@@ -3235,28 +3026,7 @@ export const objects = {
         return $object.get("result");
       },
       alwaysAsIdentityEdge($mutation, fieldArgs) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = always_as_identityUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return resource_always_as_identityPgResource.find(spec);
-          }
-        })();
-        fieldArgs.apply($select, "orderBy");
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
+        return pgMutationPayloadEdge(resource_always_as_identityPgResource, always_as_identityUniques[0].attributes, $mutation, fieldArgs);
       },
       clientMutationId($mutation) {
         const $result = $mutation.getStepForKey("result");
@@ -3274,28 +3044,7 @@ export const objects = {
         return $object.get("result");
       },
       byDefaultAsIdentityEdge($mutation, fieldArgs) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = by_default_as_identityUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return resource_by_default_as_identityPgResource.find(spec);
-          }
-        })();
-        fieldArgs.apply($select, "orderBy");
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
+        return pgMutationPayloadEdge(resource_by_default_as_identityPgResource, by_default_as_identityUniques[0].attributes, $mutation, fieldArgs);
       },
       clientMutationId($mutation) {
         const $result = $mutation.getStepForKey("result");
@@ -3317,28 +3066,7 @@ export const objects = {
         return $object.get("result");
       },
       networkEdge($mutation, fieldArgs) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = networkUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return resource_networkPgResource.find(spec);
-          }
-        })();
-        fieldArgs.apply($select, "orderBy");
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
+        return pgMutationPayloadEdge(resource_networkPgResource, networkUniques[0].attributes, $mutation, fieldArgs);
       },
       query() {
         return rootValue();
@@ -3359,28 +3087,7 @@ export const objects = {
         return $object.get("result");
       },
       typeEdge($mutation, fieldArgs) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = typesUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return resource_typesPgResource.find(spec);
-          }
-        })();
-        fieldArgs.apply($select, "orderBy");
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
+        return pgMutationPayloadEdge(resource_typesPgResource, typesUniques[0].attributes, $mutation, fieldArgs);
       }
     }
   }

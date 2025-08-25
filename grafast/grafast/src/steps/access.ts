@@ -154,7 +154,7 @@ export class AccessStep<TData> extends UnbatchedStep<TData> {
     this.path = path;
     this.hasSymbols = this.path.some((k) => typeof k === "symbol");
     this.peerKey =
-      (this.fallback === "undefined" ? "U" : "D") +
+      (this.fallback === undefined ? "U" : "D") +
       (this.hasSymbols ? "§" : ".") +
       digestKeys(this.path);
     this.addStrongDependency(parentPlan);
@@ -249,6 +249,27 @@ export class AccessStep<TData> extends UnbatchedStep<TData> {
  * Access the property at path `path` in the value returned from `parentPlan`,
  * falling back to `fallback` if it were null-ish.
  */
+export function access<
+  TData,
+  TKey extends keyof Exclude<TData, null | undefined>,
+  TFallback = undefined,
+>(
+  parentPlan: Step<TData>,
+  key: TKey,
+  fallback?: TFallback,
+): AccessStep<
+  | Exclude<Exclude<TData, null | undefined>[TKey], null | undefined>
+  | (TData extends Exclude<TData, null | undefined> // Is non-nullable
+      ? TData[TKey] extends Exclude<TData[TKey], null | undefined> // Key is also non-nullable
+        ? never
+        : TFallback
+      : TFallback)
+>;
+export function access<TData>(
+  parentPlan: Step<unknown>,
+  rawPath?: (string | number | symbol)[] | string | number | symbol,
+  fallback?: any,
+): AccessStep<TData>;
 export function access<TData>(
   parentPlan: Step<unknown>,
   rawPath?: (string | number | symbol)[] | string | number | symbol,

@@ -99,6 +99,11 @@
       "node": "./fwd/grafserv/koa/v2/index.js",
       "default": "./fwd/grafserv/koa/v2/index.js"
     },
+    "./grafserv/koa/v3": {
+      "types": "./fwd/grafserv/koa/v3/index.d.ts",
+      "node": "./fwd/grafserv/koa/v3/index.js",
+      "default": "./fwd/grafserv/koa/v3/index.js"
+    },
     "./grafserv/fastify/v4": {
       "types": "./fwd/grafserv/fastify/v4/index.d.ts",
       "node": "./fwd/grafserv/fastify/v4/index.js",
@@ -129,15 +134,15 @@
       "node": "./fwd/grafserv/ruru/server/index.js",
       "default": "./fwd/grafserv/ruru/server/index.js"
     },
+    "./grafserv/ruru/static": {
+      "types": "./fwd/grafserv/ruru/static/index.d.ts",
+      "node": "./fwd/grafserv/ruru/static/index.js",
+      "default": "./fwd/grafserv/ruru/static/index.js"
+    },
     "./grafserv/ruru/cli": {
       "types": "./fwd/grafserv/ruru/cli/index.d.ts",
       "node": "./fwd/grafserv/ruru/cli/index.js",
       "default": "./fwd/grafserv/ruru/cli/index.js"
-    },
-    "./grafserv/ruru/bundle": {
-      "types": "./fwd/grafserv/ruru/bundle/index.d.ts",
-      "node": "./fwd/grafserv/ruru/bundle/index.js",
-      "default": "./fwd/grafserv/ruru/bundle/index.js"
     },
     "./graphile-build": {
       "types": "./fwd/graphile-build/index.d.ts",

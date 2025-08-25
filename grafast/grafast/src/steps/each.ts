@@ -5,12 +5,12 @@ import type { ListCapableStep, Step } from "../step.js";
 import { isListCapableStep } from "../step.js";
 import { __ItemStep } from "./__item.js";
 import type {
-  ConnectionCapableStep,
-  ConnectionStep,
+  ConnectionHandlingStep,
+  ConnectionOptimizedStep,
   ItemsStep,
+  StepRepresentingList,
 } from "./connection.js";
-import type { __ListTransformStep } from "./listTransform.js";
-import { listTransform } from "./listTransform.js";
+import { __ListTransformStep, listTransform } from "./listTransform.js";
 
 const eachReduceCallback = (memo: any[], item: any) => {
   memo.push(item);
@@ -38,13 +38,28 @@ const eachCallbackForListPlan = (
   return result;
 };
 
+function eachOptimize(this: __ListTransformStep<any>) {
+  const layerPlan = this.subroutineLayer;
+  const rootStep = layerPlan.rootStep;
+  if (
+    rootStep instanceof __ItemStep &&
+    rootStep.getParentStep().layerPlan !== layerPlan
+  ) {
+    // We don't do anything; replace ourself with our parent
+    return this.getListStep();
+  }
+  return this;
+}
+
 /**
  * Transforms a list by wrapping each element in the list with the given mapper.
  */
 export function each<
-  TListStep extends
-    | (Step<readonly any[]> & Partial<ConnectionCapableStep<any, any>>)
-    | ConnectionCapableStep<any, any>,
+  TListStep extends StepRepresentingList<any> &
+    Partial<
+      | ConnectionOptimizedStep<any, any, any, any>
+      | ConnectionHandlingStep<any, any, any, any>
+    >,
   TResultItemStep extends Step,
 >(
   listStep: TListStep,
@@ -65,35 +80,35 @@ export function each<
     meta: `each:${chalk.yellow(listStep.id)}${
       mapper.name ? `/${mapper.name}` : ""
     }`,
-    optimize(this: __ListTransformStep<any>) {
-      const layerPlan = this.subroutineLayer;
-      const rootStep = layerPlan.rootStep;
-      if (
-        rootStep instanceof __ItemStep &&
-        rootStep.getParentStep().layerPlan !== layerPlan
-      ) {
-        // We don't do anything; replace ourself with our parent
-        return this.getListStep();
-      }
-      return this;
-    },
+    optimize: eachOptimize,
     ...(listStep.connectionClone != null
       ? {
           connectionClone(
             this: __ListTransformStep<TListStep>,
-            $connection: ConnectionStep<any, any, any, any>,
             ...args: any[]
-          ): ConnectionCapableStep<any, any> {
+          ) {
             const $list = this.getListStep() as TListStep &
-              ConnectionCapableStep<any, any>;
-            const $clonedList = $list.connectionClone(
-              $connection,
-              ...args,
-            ) as TListStep & ConnectionCapableStep<any, any>;
+              ConnectionOptimizedStep<any, any>;
+            const $clonedList = $list.connectionClone!(...args) as TListStep &
+              ConnectionOptimizedStep<any, any>;
             return each($clonedList, mapper) as __ListTransformStep<TListStep> &
-              ConnectionCapableStep<any, any>;
+              // TYPES: this should also include ConnectionHandlingStep
+              ConnectionOptimizedStep<any, any>;
           },
         }
       : null),
   });
+}
+
+export function isSkippableEach($step: Step): $step is __ListTransformStep {
+  if ($step instanceof __ListTransformStep) {
+    return (
+      $step.itemPlanCallback === eachItemPlanCallback &&
+      $step.initialState === eachInitialState &&
+      $step.reduceCallback === eachReduceCallback &&
+      $step.optimize === eachOptimize &&
+      $step.optimize() === $step.getListStep()
+    );
+  }
+  return false;
 }
