@@ -191,12 +191,15 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
       _getBaseNameFromKeys(preset, detailedKeys) {
         if (detailedKeys.length === 1) {
           const key = detailedKeys[0];
-          const attributeName = this._attributeName(key);
+          const attributeName = this._attributeName({
+            ...key,
+            skipRowId: true,
+          });
           return this._getBaseName(attributeName);
         }
         if (preset.schema?.pgSimplifyMultikeyRelations) {
           const attributeNames = detailedKeys.map((key) =>
-            this._attributeName(key),
+            this._attributeName({ ...key, skipRowId: true }),
           );
           const baseNames = attributeNames.map((attributeName) =>
             this._getBaseName(attributeName),
