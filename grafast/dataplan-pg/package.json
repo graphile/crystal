@@ -72,19 +72,7 @@
     "pg-sql2": "workspace:^"
   },
   "peerDependenciesMeta": {
-    "@dataplan/json": {
-      "optional": true
-    },
-    "grafast": {
-      "optional": true
-    },
-    "graphile-config": {
-      "optional": true
-    },
     "pg": {
-      "optional": true
-    },
-    "pg-sql2": {
       "optional": true
     }
   },

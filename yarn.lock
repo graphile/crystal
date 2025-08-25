@@ -2768,15 +2768,7 @@ __metadata:
     pg: ^8.7.1
     pg-sql2: "workspace:^"
   peerDependenciesMeta:
-    "@dataplan/json":
-      optional: true
-    grafast:
-      optional: true
-    graphile-config:
-      optional: true
     pg:
-      optional: true
-    pg-sql2:
       optional: true
   languageName: unknown
   linkType: soft
@@ -13845,10 +13837,6 @@ __metadata:
   peerDependenciesMeta:
     "@envelop/core":
       optional: true
-    graphql:
-      optional: true
-    tamedevil:
-      optional: true
   languageName: unknown
   linkType: soft
 
@@ -13902,8 +13890,6 @@ __metadata:
     "@envelop/core":
       optional: true
     "@whatwg-node/server":
-      optional: true
-    graphile-config:
       optional: true
     h3:
       optional: true
@@ -13965,11 +13951,7 @@ __metadata:
     pg-sql2: "workspace:^"
     tamedevil: "workspace:^"
   peerDependenciesMeta:
-    graphile-config:
-      optional: true
     pg:
-      optional: true
-    pg-sql2:
       optional: true
   languageName: unknown
   linkType: soft
@@ -14001,11 +13983,6 @@ __metadata:
     grafast: "workspace:^"
     graphile-config: "workspace:^"
     graphql: ^16.1.0-experimental-stream-defer.6
-  peerDependenciesMeta:
-    graphile-config:
-      optional: true
-    graphql:
-      optional: true
   languageName: unknown
   linkType: soft
 
@@ -14092,8 +14069,6 @@ __metadata:
     graphql: ^16.1.0-experimental-stream-defer.6
     tamedevil: "workspace:^"
   peerDependenciesMeta:
-    "@dataplan/pg":
-      optional: true
     graphile-build-pg:
       optional: true
   languageName: unknown
@@ -14118,8 +14093,6 @@ __metadata:
     postgraphile: "workspace:^"
   peerDependenciesMeta:
     graphile-build:
-      optional: true
-    graphile-config:
       optional: true
     postgraphile:
       optional: true
@@ -20977,29 +20950,9 @@ __metadata:
     pg-sql2: "workspace:^"
     tamedevil: "workspace:^"
   peerDependenciesMeta:
-    "@dataplan/json":
-      optional: true
-    "@dataplan/pg":
-      optional: true
     "@envelop/core":
       optional: true
-    grafast:
-      optional: true
-    grafserv:
-      optional: true
-    graphile-build:
-      optional: true
-    graphile-build-pg:
-      optional: true
-    graphile-config:
-      optional: true
-    graphql:
-      optional: true
     pg:
-      optional: true
-    pg-sql2:
-      optional: true
-    tamedevil:
       optional: true
   bin:
     postgraphile: ./dist/cli-run.js
@@ -22392,10 +22345,6 @@ __metadata:
     typescript: "npm:^5.8.3"
   peerDependencies:
     graphql: ^16.1.0-experimental-stream-defer.6
-    tamedevil: "workspace:^"
-  peerDependenciesMeta:
-    tamedevil:
-      optional: true
   languageName: unknown
   linkType: soft
 

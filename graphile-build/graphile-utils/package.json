@@ -54,9 +54,6 @@
     "tamedevil": "workspace:^"
   },
   "peerDependenciesMeta": {
-    "@dataplan/pg": {
-      "optional": true
-    },
     "graphile-build-pg": {
       "optional": true
     }
