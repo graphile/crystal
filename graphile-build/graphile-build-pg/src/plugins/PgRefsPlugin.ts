@@ -77,20 +77,14 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
   inflection: {
     add: {
       refSingle(stuff, { refDefinition, identifier }) {
-        return (
-          refDefinition.singleRecordFieldName ?? this.singularize(identifier)
-        );
+        return refDefinition.singleRecordFieldName ?? identifier;
       },
       refList(stuff, { refDefinition, identifier }) {
-        return (
-          refDefinition.listFieldName ??
-          this.listField(this.pluralize(this.singularize(identifier)))
-        );
+        return refDefinition.listFieldName ?? this.listField(identifier);
       },
       refConnection(stuff, { refDefinition, identifier }) {
         return (
-          refDefinition.connectionFieldName ??
-          this.connectionField(this.pluralize(this.singularize(identifier)))
+          refDefinition.connectionFieldName ?? this.connectionField(identifier)
         );
       },
     },
