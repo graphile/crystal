@@ -10,8 +10,8 @@ graph TD
     subgraph "Buckets for mutations/v4/sub.insert_x"
     Bucket0("Bucket 0 (root)"):::bucket
     Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 13, 18, 19<br /><br />1: PgSelect[9]<br />2: PgSelectRows[15]<br />ᐳ: 14, 16, 17"):::bucket
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 16, 19<br /><br />ROOT Object{1}ᐸ{result}ᐳ[17]"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16, 19<br /><br />ROOT PgSelectSingle{1}ᐸinsert_xᐳ[16]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 16, 9, 19<br /><br />ROOT Object{1}ᐸ{result}ᐳ[17]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16, 9, 19<br /><br />ROOT PgSelectSingle{1}ᐸinsert_xᐳ[16]"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
