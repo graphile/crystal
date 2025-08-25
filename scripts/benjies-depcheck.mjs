@@ -155,9 +155,9 @@ for (const module of Object.values(all)) {
     }
     for (const depModuleName in dependencies) {
       if (!isPeer && peerDependencies?.[depModuleName]) {
-        if (peerDependenciesMeta?.[depModuleName]?.optional !== true) {
+        if (peerDependenciesMeta?.[depModuleName]?.optional === true) {
           fails.push(
-            `${name} has dual dependency (direct and peer) on ${depModuleName}; this must be marked as an optional peer dependency.`,
+            `${name} has dual dependency (direct and peer) on ${depModuleName}; this mustn't be marked as an optional peer dependency.`,
           );
         }
       }
