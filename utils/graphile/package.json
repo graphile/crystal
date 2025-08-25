@@ -47,9 +47,6 @@
     "graphile-build": {
       "optional": true
     },
-    "graphile-config": {
-      "optional": true
-    },
     "postgraphile": {
       "optional": true
     }

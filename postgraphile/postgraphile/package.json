@@ -258,40 +258,7 @@
     "tamedevil": "workspace:^"
   },
   "peerDependenciesMeta": {
-    "@dataplan/json": {
-      "optional": true
-    },
-    "@dataplan/pg": {
-      "optional": true
-    },
     "@envelop/core": {
-      "optional": true
-    },
-    "grafast": {
-      "optional": true
-    },
-    "grafserv": {
-      "optional": true
-    },
-    "graphile-build": {
-      "optional": true
-    },
-    "graphile-build-pg": {
-      "optional": true
-    },
-    "graphile-config": {
-      "optional": true
-    },
-    "graphql": {
-      "optional": true
-    },
-    "pg": {
-      "optional": true
-    },
-    "pg-sql2": {
-      "optional": true
-    },
-    "tamedevil": {
       "optional": true
     }
   },

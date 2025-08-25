@@ -57,13 +57,7 @@
     "node": ">=16"
   },
   "peerDependencies": {
-    "graphql": "^16.1.0-experimental-stream-defer.6",
-    "tamedevil": "workspace:^"
-  },
-  "peerDependenciesMeta": {
-    "tamedevil": {
-      "optional": true
-    }
+    "graphql": "^16.1.0-experimental-stream-defer.6"
   },
   "files": [
     "dist",

@@ -76,17 +76,10 @@
   },
   "peerDependencies": {
     "@envelop/core": "^5.0.0",
-    "graphql": "^16.1.0-experimental-stream-defer.6",
-    "tamedevil": "workspace:^"
+    "graphql": "^16.1.0-experimental-stream-defer.6"
   },
   "peerDependenciesMeta": {
     "@envelop/core": {
-      "optional": true
-    },
-    "graphql": {
-      "optional": true
-    },
-    "tamedevil": {
       "optional": true
     }
   },
