@@ -30,6 +30,10 @@
       "types": "./dist/servers/koa/v2/index.d.ts",
       "default": "./dist/servers/koa/v2/index.js"
     },
+    "./koa/v3": {
+      "types": "./dist/servers/koa/v2/index.d.ts",
+      "default": "./dist/servers/koa/v2/index.js"
+    },
     "./fastify/v4": {
       "types": "./dist/servers/fastify/v4/index.d.ts",
       "default": "./dist/servers/fastify/v4/index.js"
@@ -56,15 +60,15 @@
       "node": "./fwd/ruru/server/index.js",
       "default": "./fwd/ruru/server/index.js"
     },
+    "./ruru/static": {
+      "types": "./fwd/ruru/static/index.d.ts",
+      "node": "./fwd/ruru/static/index.js",
+      "default": "./fwd/ruru/static/index.js"
+    },
     "./ruru/cli": {
       "types": "./fwd/ruru/cli/index.d.ts",
       "node": "./fwd/ruru/cli/index.js",
       "default": "./fwd/ruru/cli/index.js"
-    },
-    "./ruru/bundle": {
-      "types": "./fwd/ruru/bundle/index.d.ts",
-      "node": "./fwd/ruru/bundle/index.js",
-      "default": "./fwd/ruru/bundle/index.js"
     }
   },
   "scripts": {
@@ -152,7 +156,7 @@
     "hono": "^4.8.4",
     "jest": "^30.0.4",
     "jest-serializer-graphql-schema": "workspace:^",
-    "koa": "^2.16.1",
+    "koa": "^3.0.1",
     "koa-bodyparser": "^4.4.1",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",

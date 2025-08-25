@@ -1,6 +1,7 @@
 {
   "private": true,
   "scripts": {
+    "fwd:update": "node ./scripts/fwd.mjs",
     "check": "yarn clean && yarn lint && yarn prepack:all && yarn test",
     "lint:fix": "yarn run eslint --fix . && yarn prettier:fix",
     "pretest": "tsc -b && ./scripts/pretest && yarn workspaces foreach --all --topological run pretest",
