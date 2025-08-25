@@ -1147,7 +1147,12 @@ const nodeIdHandler_Film = {
     return obj[0] === "films";
   }
 };
+const specForHandlerCache = new Map();
 function specForHandler(handler) {
+  const existing = specForHandlerCache.get(handler);
+  if (existing) {
+    return existing;
+  }
   function spec(nodeId) {
     // We only want to return the specifier if it matches
     // this handler; otherwise return null.
@@ -1164,6 +1169,7 @@ function specForHandler(handler) {
   }
   spec.displayName = `specifier_${handler.typeName}_${handler.codec.name}`;
   spec.isSyncAndSafe = true; // Optimization
+  specForHandlerCache.set(handler, spec);
   return spec;
 }
 const nodeFetcher_Film = $nodeId => {
