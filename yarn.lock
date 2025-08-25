@@ -5443,15 +5443,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mermaid-js/parser@npm:^0.6.1":
-  version: 0.6.1
-  resolution: "@mermaid-js/parser@npm:0.6.1"
-  dependencies:
-    langium: "npm:3.3.1"
-  checksum: 10/b7e71c16e8c6baab17bbe39f0e4353221a4bc86642b45fadfbd442f859ba0d4606db245dcc82c6b24c5baec193cf9bec59661558699c49df485a28b5eb20d15b
-  languageName: node
-  linkType: hard
-
 "@mermaid-js/parser@npm:^0.6.2":
   version: 0.6.2
   resolution: "@mermaid-js/parser@npm:0.6.2"
@@ -16710,7 +16701,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"katex@npm:^0.16.22, katex@npm:^0.16.9":
+"katex@npm:^0.16.22":
   version: 0.16.22
   resolution: "katex@npm:0.16.22"
   dependencies:
@@ -17437,15 +17428,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"marked@npm:^15.0.7":
-  version: 15.0.12
-  resolution: "marked@npm:15.0.12"
-  bin:
-    marked: bin/marked.js
-  checksum: 10/deeb619405c0c46af00c99b18b3365450abeb309104b24e3658f46142344f6b7c4117608c3b5834084d8738e92f81240c19f596e6ee369260f96e52b3457eaee
-  languageName: node
-  linkType: hard
-
 "marked@npm:^16.0.0":
   version: 16.2.0
   resolution: "marked@npm:16.2.0"
@@ -17783,37 +17765,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mermaid@npm:*, mermaid@npm:>=11.6.0, mermaid@npm:^11.0.2":
-  version: 11.8.1
-  resolution: "mermaid@npm:11.8.1"
-  dependencies:
-    "@braintree/sanitize-url": "npm:^7.0.4"
-    "@iconify/utils": "npm:^2.1.33"
-    "@mermaid-js/parser": "npm:^0.6.1"
-    "@types/d3": "npm:^7.4.3"
-    cytoscape: "npm:^3.29.3"
-    cytoscape-cose-bilkent: "npm:^4.1.0"
-    cytoscape-fcose: "npm:^2.2.0"
-    d3: "npm:^7.9.0"
-    d3-sankey: "npm:^0.12.3"
-    dagre-d3-es: "npm:7.0.11"
-    dayjs: "npm:^1.11.13"
-    dompurify: "npm:^3.2.5"
-    katex: "npm:^0.16.9"
-    khroma: "npm:^2.1.0"
-    lodash-es: "npm:^4.17.21"
-    marked: "npm:^15.0.7"
-    roughjs: "npm:^4.6.6"
-    stylis: "npm:^4.3.6"
-    ts-dedent: "npm:^2.2.0"
-    uuid: "npm:^11.1.0"
-  checksum: 10/925ea7bc0f5d72f856a73502182ebc8e94caf219a91f03d4d7acc836c62696cb649a13b4cd67ae1a325ab04e35f2f007913615b3c01d05973a0ddad1361b074e
-  languageName: node
-  linkType: hard
-
-"mermaid@npm:^11.10.0":
-  version: 11.10.0
-  resolution: "mermaid@npm:11.10.0"
+"mermaid@npm:*, mermaid@npm:>=11.6.0, mermaid@npm:^11.0.2, mermaid@npm:^11.10.0":
+  version: 11.10.1
+  resolution: "mermaid@npm:11.10.1"
   dependencies:
     "@braintree/sanitize-url": "npm:^7.0.4"
     "@iconify/utils": "npm:^2.1.33"
@@ -17835,7 +17789,7 @@ __metadata:
     stylis: "npm:^4.3.6"
     ts-dedent: "npm:^2.2.0"
     uuid: "npm:^11.1.0"
-  checksum: 10/c9a87f1aded9b3782efc7932a9232bed111b0447190eb904e5b723ef3201e602f38e9a6bbf2d30291fb2646d18c374b87decd70c80f012f12d93910328e0a93e
+  checksum: 10/6e02d1e9431459f0db65f8f08e09a7dec097957e637e8667e0003c8fe1776f43ec5b82386c08adeb6e1f2aa2d4805dac872b93bdead3f663c6a8f30405ff47ee
   languageName: node
   linkType: hard
 
