@@ -1,5 +1,5 @@
 import type { JSONValue } from "grafast";
-import { exportAs } from "grafast";
+import { exportAs, isDev, Step } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 import { parse as rangeParse } from "postgres-range";
@@ -1363,6 +1363,11 @@ export function getInnerCodec<
 exportAs("@dataplan/pg", getInnerCodec, "getInnerCodec");
 
 export function sqlValueWithCodec(value: unknown, codec: PgCodec) {
+  if (isDev && value instanceof Step) {
+    throw new Error(
+      `sqlValueWithCodec(value, codec) is meant to be called at _execution_ time with runtime values; you've called it with a Step indicating maybe you called it at planning time? You probably want to call something like \`$pgSelect.placeholder($value, codec)\` instead.`,
+    );
+  }
   return sql`${sql.value(value == null ? null : codec.toPg(value))}::${
     codec.sqlType
   }`;
