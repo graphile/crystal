@@ -4,7 +4,10 @@
       listen: {
         __typename: "ListenPayload",
         relatedNodeId: "WyJ4ZXMiLDFd",
-        relatedNode: null,
+        relatedNode: {
+          __typename: "X",
+          name: "a",
+        },
       },
     },
   },
@@ -13,7 +16,10 @@
       listen: {
         __typename: "ListenPayload",
         relatedNodeId: "WyJ4ZXMiLDJd",
-        relatedNode: null,
+        relatedNode: {
+          __typename: "X",
+          name: "b",
+        },
       },
     },
   },
