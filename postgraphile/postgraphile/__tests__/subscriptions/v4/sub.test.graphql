@@ -1,0 +1,24 @@
+#> schema: ["sub"]
+#> subscriptions: true
+#> simpleSubscriptions: true
+#> directPg: true
+#> checkErrorSnapshots: false
+#! const query = 'select sub.insert_x($1)';
+#! await pgClient.query(query, ["a"]);
+#! await waitFor(() => payloads.length >= 1, 15000);
+#! await pgClient.query(query, ["b"]);
+#! await waitFor(() => payloads.length >= 2, 15000);
+## expect(payloads[0].data.listen.relatedNodeId).toBeTruthy()
+## expect(payloads[0].data.listen.relatedNode).toBeTruthy()
+subscription Sub {
+  listen(topic: "x") {
+    __typename
+    relatedNodeId
+    relatedNode {
+      __typename
+      ... on X {
+        name
+      }
+    }
+  }
+}

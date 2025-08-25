@@ -2169,3 +2169,26 @@ $$ language sql stable;
 
 comment on function relay.users_max_reading_distance is
   E'Reading distance in metres with the given pair of spectacles (or specify null for no spectacles). If null then that combination hasn''t been measured.';
+
+create schema sub;
+create table sub.x (
+    id serial primary key,
+    name text not null
+);
+
+create function sub.insert_x(name text) returns sub.x as $$
+declare
+    new_x sub.x;
+begin
+    insert into sub.x (name) values (name) returning * into new_x;
+    perform pg_notify(
+        'postgraphile:x',
+        json_build_object(
+            '__node__', json_build_array(
+                'xes', new_x.id
+            )
+        )::text
+    );
+    return new_x;
+end;
+$$ language plpgsql;

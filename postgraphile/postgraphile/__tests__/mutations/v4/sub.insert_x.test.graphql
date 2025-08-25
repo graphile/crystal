@@ -1,0 +1,13 @@
+## expect(errors).toBeFalsy();
+#> schema: ["sub"]
+#> subscriptions: true
+#> simpleSubscriptions: true
+mutation InsertX {
+  insertX(input: { name: "Foo" }) {
+    x {
+      nodeId
+      id
+      name
+    }
+  }
+}
