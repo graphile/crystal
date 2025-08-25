@@ -260,9 +260,6 @@
   "peerDependenciesMeta": {
     "@envelop/core": {
       "optional": true
-    },
-    "pg": {
-      "optional": true
     }
   },
   "engines": {
