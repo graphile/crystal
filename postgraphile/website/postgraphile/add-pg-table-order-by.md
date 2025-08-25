@@ -235,7 +235,6 @@ additional filtering or ordering based on the context.
 
 ```ts
 import { addPgTableOrderBy, orderByAscDesc } from "postgraphile/utils";
-import { TYPES } from "postgraphile/@dataplan/pg";
 
 // Apply scope for the specific type.
 const applyScopePlugin: GraphileConfig.Plugin = {
@@ -243,6 +242,7 @@ const applyScopePlugin: GraphileConfig.Plugin = {
   schema: {
     hooks: {
       GraphQLEnumType(config, build) {
+        const { TYPES } = build.dataplanPg;
         if (config.name === "CityOrderBy") {
           const {
             grafast: { context },
@@ -250,7 +250,7 @@ const applyScopePlugin: GraphileConfig.Plugin = {
           config.extensions ??= {};
           // @ts-expect-error The type is readonly by types you may get an error here.
           config.extensions.grafast ??= {};
-          config.extensions.grafast.applyScope = () => context(); // Or any other step.
+          config.extensions.grafast.applyScope = () => context(); // Or any other unary step.
         }
         return config;
       },

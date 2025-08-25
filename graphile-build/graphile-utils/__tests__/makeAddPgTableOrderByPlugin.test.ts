@@ -415,7 +415,7 @@ it("order by plugin should be able to access scope applied to it", async () => {
   const { userNodesFavChar, errorsFavChar } =
     await getAscDescData(schemaResult);
 
-  // nulls last, so ascending, then Alice
+  // Sorted from the second character onwards, so: `aroline, lice, ob`
   const correctOrderAsc = ["Caroline", "Alice", "Bob"];
   const resultingOrderAsc = getResultingOrderFromUserNodes(userNodesFavChar);
 
