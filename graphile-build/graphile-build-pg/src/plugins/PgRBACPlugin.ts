@@ -209,24 +209,26 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
           provides: ["postInferred"],
           callback(behavior, relation) {
             const resource = relation.remoteResource;
-            let canInsert = true;
-            let canUpdate = true;
-            for (const attrName of relation.localAttributes) {
-              const attr = relation.localCodec.attributes[attrName];
-              if (attr.extensions?.canInsert === false) {
-                canInsert = false;
+            const newBehavior = [...modBehaviorForResource(behavior, resource)];
+
+            if (relation.isUnique) {
+              // Check column permissions for insert/update mutations using relational IDs
+              let canInsert = true;
+              let canUpdate = true;
+              for (const attrName of relation.localAttributes) {
+                const attr = relation.localCodec.attributes[attrName];
+                if (attr.extensions?.canInsert === false) {
+                  canInsert = false;
+                }
+                if (attr.extensions?.canUpdate === false) {
+                  canUpdate = false;
+                }
               }
-              if (attr.extensions?.canUpdate === false) {
-                canUpdate = false;
-              }
+              if (!canInsert) newBehavior.push("-nodeId:insert");
+              if (!canUpdate) newBehavior.push("-nodeId:update");
             }
-            const nodeIdMods: string[] = [];
-            if (!canInsert) nodeIdMods.push("-nodeId:insert");
-            if (!canUpdate) nodeIdMods.push("-nodeId:update");
-            const newBehavior = nodeIdMods.length
-              ? [behavior, ...nodeIdMods]
-              : behavior;
-            return modBehaviorForResource(newBehavior, resource);
+
+            return newBehavior;
           },
         },
       },
