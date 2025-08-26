@@ -1618,6 +1618,12 @@ export class PgSelectStep<
       }
     }
 
+    if ($pgSelect != null && $pgSelect.mode === "mutation") {
+      // ABORT! Unsafe!
+      $pgSelect = undefined;
+      $pgSelectSingle = undefined;
+    }
+
     // Check the contexts are the same
     if ($pgSelect != null && $pgSelectSingle != null) {
       const myContext = this.getDep(this.contextId);
