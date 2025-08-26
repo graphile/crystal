@@ -619,13 +619,16 @@ export function pgSelectSingleFromRecord<
     | Step,
 ): PgSelectSingleStep<TResource> {
   // OPTIMIZE: we should be able to optimise this so that `plan.record()` returns the original record again.
-  const $pgSelect = operationPlan().cacheStep(
+  return operationPlan().cacheStep(
     $record,
     "pgSelectSingleFromRecord",
     null,
-    () => pgSelectFromRecord(resource, $record),
+    () =>
+      pgSelectFromRecord(
+        resource,
+        $record,
+      ).single() as PgSelectSingleStep<TResource>,
   );
-  return $pgSelect.single() as PgSelectSingleStep<TResource>;
 }
 
 exportAs("@dataplan/pg", pgSelectFromRecord, "pgSelectFromRecord");
