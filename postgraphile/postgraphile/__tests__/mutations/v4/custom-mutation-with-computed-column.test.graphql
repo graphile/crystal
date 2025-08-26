@@ -1,4 +1,7 @@
 ## expect(errors).toBeFalsy();
+## expect(data.upsertSetting.user.first).toEqual('True')
+## expect(data.upsertSetting.user.second).toEqual('AlsoTrue')
+## expect(data.upsertSetting.user.dnx).toEqual(null)
 #> schema: ["issue_2287"]
 mutation {
   upsertSetting(input: { userId: 1, name: "Second", value: "AlsoTrue" }) {
