@@ -1,0 +1,11 @@
+{
+  upsertSetting: {
+    user: {
+      id: 1,
+      username: "Alice",
+      first: "True",
+      second: "AlsoTrue",
+      dnx: null,
+    },
+  },
+}

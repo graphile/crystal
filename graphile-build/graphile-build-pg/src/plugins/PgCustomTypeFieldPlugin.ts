@@ -945,6 +945,7 @@ const pgFunctionArgumentsFromArgs = EXPORTABLE(
        */
       const canUseExpressionDirectly =
         $in instanceof PgSelectSingleStep &&
+        $in.getClassStep().mode !== "mutation" &&
         extraSelectArgs.every((a) =>
           stepAMayDependOnStepB($in.getClassStep(), a.step),
         );

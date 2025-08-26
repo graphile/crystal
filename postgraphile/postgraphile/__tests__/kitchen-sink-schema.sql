@@ -23,6 +23,7 @@ drop schema if exists
   refs,
   space,
   issue_2210,
+  issue_2287,
   relay
 cascade;
 drop extension if exists tablefunc;
@@ -2192,3 +2193,42 @@ begin
     return new_x;
 end;
 $$ language plpgsql;
+
+create schema issue_2287;
+create table issue_2287.users (
+  id serial primary key,
+  username text not null
+);
+create table issue_2287.settings(
+  id serial primary key,
+  user_id int not null references issue_2287.users,
+  name text,
+  value text,
+  unique (user_id, name)
+);
+create index on issue_2287.settings (user_id);
+create function issue_2287.users_setting(
+  u issue_2287.users,
+  name text
+) returns text as $$
+  select value
+  from issue_2287.settings
+  where settings.name = users_setting.name
+  and settings.user_id = u.id
+$$ language sql stable;
+create function issue_2287.upsert_setting(
+  user_id int,
+  name text,
+  value text
+) returns issue_2287.users as $$
+with result as (
+  insert into issue_2287.settings (user_id, name, value)
+  values ($1, $2, $3)
+  on conflict (user_id, name)
+  do update set value = excluded.value
+  returning settings.user_id
+)
+select users.*
+from issue_2287.users
+where id = (select result.user_id from result);
+$$ language sql volatile;

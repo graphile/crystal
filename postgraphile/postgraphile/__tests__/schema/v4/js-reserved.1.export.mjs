@@ -2206,7 +2206,7 @@ const pgFunctionArgumentsFromArgs = (() => {
      * can inline ourselves into that, otherwise we must
      * issue the query separately.
      */
-    const canUseExpressionDirectly = $in instanceof PgSelectSingleStep && extraSelectArgs.every(a => stepAMayDependOnStepB($in.getClassStep(), a.step));
+    const canUseExpressionDirectly = $in instanceof PgSelectSingleStep && $in.getClassStep().mode !== "mutation" && extraSelectArgs.every(a => stepAMayDependOnStepB($in.getClassStep(), a.step));
     const $row = canUseExpressionDirectly ? $in : pgSelectSingleFromRecord($in.resource, $in.record());
     const selectArgs = [{
       step: $row.record()

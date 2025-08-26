@@ -86,6 +86,8 @@ delete from refs.book_editors cascade;
 delete from refs.book_authors cascade;
 delete from refs.pen_names cascade;
 delete from refs.books cascade;
+delete from issue_2287.settings cascade;
+delete from issue_2287.users cascade;
 
 alter table b.types enable trigger user;
 
@@ -1100,3 +1102,8 @@ alter sequence refs.people_id_seq restart with 100;
 alter sequence refs.posts_id_seq restart with 100;
 alter sequence refs.books_id_seq restart with 100;
 alter sequence refs.pen_names_id_seq restart with 100;
+
+alter sequence issue_2287.users_id_seq restart with 1;
+alter sequence issue_2287.settings_id_seq restart with 1;
+insert into issue_2287.users (username) values ('Alice');
+insert into issue_2287.settings (user_id, name, value) values (1, 'First', 'True');

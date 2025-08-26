@@ -1618,6 +1618,12 @@ export class PgSelectStep<
       }
     }
 
+    if ($pgSelect != null && $pgSelect.mode === "mutation") {
+      // ABORT! Unsafe!
+      $pgSelect = undefined;
+      $pgSelectSingle = undefined;
+    }
+
     // Check the contexts are the same
     if ($pgSelect != null && $pgSelectSingle != null) {
       const myContext = this.getDep(this.contextId);
@@ -2000,6 +2006,29 @@ export class PgSelectStep<
    * one record then you're potentially in for a Bad Time.
    */
   single(
+    options?: PgSelectSinglePlanOptions,
+  ): TResource extends PgResource<
+    any,
+    PgCodec<any, infer UAttributes, any, any, any, any, any>,
+    any,
+    any,
+    any
+  >
+    ? UAttributes extends PgCodecAttributes
+      ? PgSelectSingleStep<TResource>
+      : PgClassExpressionStep<
+          PgCodec<string, undefined, any, any, any, any, any>,
+          TResource
+        >
+    : never {
+    if (!options) {
+      return this.cacheStep("single", "", () => this._singleUncached());
+    } else {
+      return this._singleUncached(options);
+    }
+  }
+
+  private _singleUncached(
     options?: PgSelectSinglePlanOptions,
   ): TResource extends PgResource<
     any,
