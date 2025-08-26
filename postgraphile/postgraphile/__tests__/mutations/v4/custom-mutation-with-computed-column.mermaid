@@ -9,17 +9,17 @@ graph TD
 
     subgraph "Buckets for mutations/v4/custom-mutation-with-computed-column"
     Bucket0("Bucket 0 (root)"):::bucket
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 15, 20, 2, 57, 55, 58<br /><br />1: PgSelect[11]<br />2: PgSelectRows[17]<br />ᐳ: 16, 18, 19"):::bucket
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 2, 11, 57, 55, 58, 19, 18<br /><br />ROOT Object{1}ᐸ{result}ᐳ[19]"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 18, 11, 28, 33, 42, 52<br /><br />ROOT PgSelectSingle{1}ᐸupsert_settingᐳ[18]<br />1: <br />ᐳ: 21, 22, 24<br />2: 25, 36, 46<br />3: 30, 39, 49<br />ᐳ: 29, 31, 34, 38, 40, 43, 48, 50, 53"):::bucket
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 15, 20, 2, 43, 41, 44<br /><br />1: PgSelect[11]<br />2: PgSelectRows[17]<br />ᐳ: 16, 18, 19"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 2, 11, 43, 41, 44, 19, 18<br /><br />ROOT Object{1}ᐸ{result}ᐳ[19]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 18, 11, 28, 33, 35, 38<br /><br />ROOT PgSelectSingle{1}ᐸupsert_settingᐳ[18]<br />1: <br />ᐳ: 21, 22, 24<br />2: PgSelect[25]<br />3: PgSelectRows[30]<br />ᐳ: 29, 31, 34, 36, 39"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
 
     %% plan dependencies
-    __InputObject6{{"__InputObject[6∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ1ᐳ[54]<br />- Constantᐸ'Second'ᐳ[55]<br />- Constantᐸ'AlsoTrue'ᐳ[56]"}}:::plan
-    PgFromExpression15{{"PgFromExpression[15∈0] ➊<br />More deps:<br />- Constantᐸ1ᐳ[54]<br />- Constantᐸ'Second'ᐳ[55]<br />- Constantᐸ'AlsoTrue'ᐳ[56]"}}:::plan
+    __InputObject6{{"__InputObject[6∈0] ➊<br />More deps:<br />- Constantᐸundefinedᐳ[7]<br />- Constantᐸ1ᐳ[40]<br />- Constantᐸ'Second'ᐳ[41]<br />- Constantᐸ'AlsoTrue'ᐳ[42]"}}:::plan
+    PgFromExpression15{{"PgFromExpression[15∈0] ➊<br />More deps:<br />- Constantᐸ1ᐳ[40]<br />- Constantᐸ'Second'ᐳ[41]<br />- Constantᐸ'AlsoTrue'ᐳ[42]"}}:::plan
     Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access13{{"Access[13∈0] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
@@ -41,16 +41,12 @@ graph TD
     Access26{{"Access[26∈2] ➊<br />ᐸ2.pgSettingsᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access27{{"Access[27∈2] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access26 & Access27 --> Object28
-    PgFromExpression33{{"PgFromExpression[33∈2] ➊<br />More deps:<br />- Constantᐸ'First'ᐳ[57]"}}:::plan
-    PgFromExpression42{{"PgFromExpression[42∈2] ➊<br />More deps:<br />- Constantᐸ'Second'ᐳ[55]"}}:::plan
-    PgFromExpression52{{"PgFromExpression[52∈2] ➊<br />More deps:<br />- Constantᐸ'DoesNotExist'ᐳ[58]"}}:::plan
+    PgFromExpression33{{"PgFromExpression[33∈2] ➊<br />More deps:<br />- Constantᐸ'First'ᐳ[43]"}}:::plan
+    PgFromExpression35{{"PgFromExpression[35∈2] ➊<br />More deps:<br />- Constantᐸ'Second'ᐳ[41]"}}:::plan
+    PgFromExpression38{{"PgFromExpression[38∈2] ➊<br />More deps:<br />- Constantᐸ'DoesNotExist'ᐳ[44]"}}:::plan
     PgSelect25[["PgSelect[25∈3] ➊<br />ᐸupsert_settingᐳ"]]:::plan
     PgClassExpression24{{"PgClassExpression[24∈3] ➊<br />ᐸ__upsert_setting__ᐳ"}}:::plan
-    Object28 & PgClassExpression24 & PgFromExpression33 --> PgSelect25
-    PgSelect36[["PgSelect[36∈3] ➊<br />ᐸupsert_settingᐳ"]]:::plan
-    Object28 & PgClassExpression24 & PgFromExpression42 --> PgSelect36
-    PgSelect46[["PgSelect[46∈3] ➊<br />ᐸupsert_settingᐳ"]]:::plan
-    Object28 & PgClassExpression24 & PgFromExpression52 --> PgSelect46
+    Object28 & PgClassExpression24 & PgFromExpression33 & PgFromExpression35 & PgFromExpression38 --> PgSelect25
     PgClassExpression21{{"PgClassExpression[21∈3] ➊<br />ᐸ__upsert_setting__.”id”ᐳ"}}:::plan
     PgSelectSingle18 --> PgClassExpression21
     PgClassExpression22{{"PgClassExpression[22∈3] ➊<br />ᐸ__upsert_s...”username”ᐳ"}}:::plan
@@ -64,22 +60,10 @@ graph TD
     First29 --> PgSelectSingle31
     PgClassExpression34{{"PgClassExpression[34∈3] ➊<br />ᐸ(1/0) /* E...ferred! */ᐳ"}}:::plan
     PgSelectSingle31 --> PgClassExpression34
-    First38{{"First[38∈3] ➊"}}:::plan
-    PgSelectRows39[["PgSelectRows[39∈3] ➊"]]:::plan
-    PgSelectRows39 --> First38
-    PgSelect36 --> PgSelectRows39
-    PgSelectSingle40{{"PgSelectSingle[40∈3] ➊<br />ᐸupsert_settingᐳ"}}:::plan
-    First38 --> PgSelectSingle40
-    PgClassExpression43{{"PgClassExpression[43∈3] ➊<br />ᐸ(1/0) /* E...ferred! */ᐳ"}}:::plan
-    PgSelectSingle40 --> PgClassExpression43
-    First48{{"First[48∈3] ➊"}}:::plan
-    PgSelectRows49[["PgSelectRows[49∈3] ➊"]]:::plan
-    PgSelectRows49 --> First48
-    PgSelect46 --> PgSelectRows49
-    PgSelectSingle50{{"PgSelectSingle[50∈3] ➊<br />ᐸupsert_settingᐳ"}}:::plan
-    First48 --> PgSelectSingle50
-    PgClassExpression53{{"PgClassExpression[53∈3] ➊<br />ᐸ(1/0) /* E...ferred! */ᐳ"}}:::plan
-    PgSelectSingle50 --> PgClassExpression53
+    PgClassExpression36{{"PgClassExpression[36∈3] ➊<br />ᐸ(1/0) /* E...ferred! */ᐳ"}}:::plan
+    PgSelectSingle31 --> PgClassExpression36
+    PgClassExpression39{{"PgClassExpression[39∈3] ➊<br />ᐸ(1/0) /* E...ferred! */ᐳ"}}:::plan
+    PgSelectSingle31 --> PgClassExpression39
 
     %% define steps
     classDef bucket0 stroke:#696969
@@ -87,14 +71,14 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect11,First16,PgSelectRows17,PgSelectSingle18,Object19 bucket1
     classDef bucket2 stroke:#7f007f
-    class Bucket2,Access26,Access27,Object28,PgFromExpression33,PgFromExpression42,PgFromExpression52 bucket2
+    class Bucket2,Access26,Access27,Object28,PgFromExpression33,PgFromExpression35,PgFromExpression38 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression21,PgClassExpression22,PgClassExpression24,PgSelect25,First29,PgSelectRows30,PgSelectSingle31,PgClassExpression34,PgSelect36,First38,PgSelectRows39,PgSelectSingle40,PgClassExpression43,PgSelect46,First48,PgSelectRows49,PgSelectSingle50,PgClassExpression53 bucket3
+    class Bucket3,PgClassExpression21,PgClassExpression22,PgClassExpression24,PgSelect25,First29,PgSelectRows30,PgSelectSingle31,PgClassExpression34,PgClassExpression36,PgClassExpression39 bucket3
 
     %% implicit side effects
     PgSelect11 -.-o Access26
     PgSelect11 -.-o Access27
     PgSelect11 -.-o PgFromExpression33
-    PgSelect11 -.-o PgFromExpression42
-    PgSelect11 -.-o PgFromExpression52
+    PgSelect11 -.-o PgFromExpression35
+    PgSelect11 -.-o PgFromExpression38
 
