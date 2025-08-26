@@ -1,5 +1,5 @@
 import type { Step, UnbatchedExecutionExtra } from "grafast";
-import { exportAs, UnbatchedStep } from "grafast";
+import { exportAs, operationPlan, UnbatchedStep } from "grafast";
 import type { SQL, SQLable } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 
@@ -452,11 +452,16 @@ export class PgSelectSingleStep<
     GetPgResourceCodec<TResource>,
     TResource
   > {
-    return pgClassExpression<GetPgResourceCodec<TResource>, TResource>(
-      this,
-      this.resource.codec as GetPgResourceCodec<TResource>,
-      undefined,
-    )`${this.getClassStep().alias}`;
+    return this.cacheStep(
+      "record",
+      "",
+      () =>
+        pgClassExpression<GetPgResourceCodec<TResource>, TResource>(
+          this,
+          this.resource.codec as GetPgResourceCodec<TResource>,
+          undefined,
+        )`${this.getClassStep().alias}`,
+    );
   }
 
   public toRecord(): Step {
@@ -614,10 +619,13 @@ export function pgSelectSingleFromRecord<
     | Step,
 ): PgSelectSingleStep<TResource> {
   // OPTIMIZE: we should be able to optimise this so that `plan.record()` returns the original record again.
-  return pgSelectFromRecord(
-    resource,
+  const $pgSelect = operationPlan().cacheStep(
     $record,
-  ).single() as PgSelectSingleStep<TResource>;
+    "pgSelectSingleFromRecord",
+    null,
+    () => pgSelectFromRecord(resource, $record),
+  );
+  return $pgSelect.single() as PgSelectSingleStep<TResource>;
 }
 
 exportAs("@dataplan/pg", pgSelectFromRecord, "pgSelectFromRecord");

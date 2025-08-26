@@ -2021,6 +2021,29 @@ export class PgSelectStep<
           TResource
         >
     : never {
+    if (!options) {
+      return this.cacheStep("single", "", () => this._singleUncached());
+    } else {
+      return this._singleUncached(options);
+    }
+  }
+
+  private _singleUncached(
+    options?: PgSelectSinglePlanOptions,
+  ): TResource extends PgResource<
+    any,
+    PgCodec<any, infer UAttributes, any, any, any, any, any>,
+    any,
+    any,
+    any
+  >
+    ? UAttributes extends PgCodecAttributes
+      ? PgSelectSingleStep<TResource>
+      : PgClassExpressionStep<
+          PgCodec<string, undefined, any, any, any, any, any>,
+          TResource
+        >
+    : never {
     const $single = this.singleAsRecord(options);
     const isScalar = !this.resource.codec.attributes;
     return (isScalar ? $single.getSelfNamed() : $single) as any;
