@@ -24,6 +24,7 @@ drop schema if exists
   space,
   issue_2210,
   issue_2287,
+  issue_2334,
   relay
 cascade;
 drop extension if exists tablefunc;
@@ -2232,3 +2233,7 @@ select users.*
 from issue_2287.users
 where id = (select result.user_id from result);
 $$ language sql volatile;
+
+create schema issue_2334;
+create table issue_2334.foo (id int primary key, col text);
+create table issue_2334.bar (id int primary key references issue_2334.foo, col text);

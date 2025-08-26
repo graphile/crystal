@@ -209,7 +209,27 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
           provides: ["postInferred"],
           callback(behavior, relation) {
             const resource = relation.remoteResource;
-            return modBehaviorForResource(behavior, resource);
+            const newBehavior = [...modBehaviorForResource(behavior, resource)];
+
+            if (relation.isUnique) {
+              // Check column permissions for insert/update mutations using
+              // relational IDs.
+              let canInsert = true;
+              let canUpdate = true;
+              for (const attrName of relation.localAttributes) {
+                const attr = relation.localCodec.attributes[attrName];
+                if (attr.extensions?.canInsert === false) {
+                  canInsert = false;
+                }
+                if (attr.extensions?.canUpdate === false) {
+                  canUpdate = false;
+                }
+              }
+              if (!canInsert) newBehavior.push("-nodeId:insert");
+              if (!canUpdate) newBehavior.push("-nodeId:update");
+            }
+
+            return newBehavior;
           },
         },
       },
