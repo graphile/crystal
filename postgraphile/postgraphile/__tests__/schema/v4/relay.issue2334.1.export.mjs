@@ -467,20 +467,6 @@ const getIdentifiers2 = nodeId => {
   }
   return null;
 };
-const handlers3 = [nodeIdHandler_Foo];
-const decodeNodeId4 = makeDecodeNodeIdRuntime(handlers3);
-const getIdentifiers3 = nodeId => {
-  const specifier = decodeNodeId4(nodeId);
-  if (specifier == null) return null;
-  for (const handler of handlers3) {
-    const value = specifier?.[handler.codec.name];
-    const match = value != null ? handler.match(value) : false;
-    if (match) {
-      return handler.getIdentifiers(value);
-    }
-  }
-  return null;
-};
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
   """
@@ -886,7 +872,6 @@ input UpdateBarInput {
 """Represents an update to a \`Bar\`. Fields that are set will be updated."""
 input BarPatch {
   col: String
-  fooByRowId: ID
 }
 
 """The output of our update \`Foo\` mutation."""
@@ -1484,27 +1469,6 @@ export const inputObjects = {
         schema
       }) {
         obj.set("col", bakedInputRuntime(schema, field.type, val));
-      },
-      fooByRowId(record, nodeId) {
-        if (nodeId === undefined) {
-          return;
-        } else if (nodeId === null) {
-          for (const localName of registryConfig.pgRelations.bar.fooByMyId.localAttributes) {
-            record.set(localName, null);
-          }
-          return;
-        } else if (typeof nodeId !== "string") {
-          throw new Error(`Invalid node identifier for '${"Foo"}'; expected string`);
-        } else {
-          const identifiers = getIdentifiers3(nodeId);
-          if (identifiers == null) {
-            throw new Error(`Invalid node identifier for '${"Foo"}': ${JSON.stringify(nodeId)}`);
-          }
-          for (let i = 0; i < 1; i++) {
-            const localName = registryConfig.pgRelations.bar.fooByMyId.localAttributes[i];
-            record.set(localName, identifiers[i]);
-          }
-        }
       }
     }
   },
