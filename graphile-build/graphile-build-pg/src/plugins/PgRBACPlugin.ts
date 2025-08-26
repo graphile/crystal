@@ -255,10 +255,10 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
 };
 
 function modBehaviorForResource(
-  behavior: GraphileBuild.BehaviorString | string[],
+  behavior: GraphileBuild.BehaviorString,
   resource: PgResource<any, any, any, any, any>,
 ): GraphileBuild.BehaviorString[] {
-  const newBehavior = Array.isArray(behavior) ? [...behavior] : [behavior];
+  const newBehavior = [behavior];
   const {
     canSelect = true,
     canInsert = true,
