@@ -1,0 +1,13 @@
+## expect(errors).toBeFalsy();
+#> schema: ["issue_2287"]
+mutation {
+  upsertSetting(input: { userId: 1, name: "Second", value: "AlsoTrue" }) {
+    user {
+      id
+      username
+      first: setting(name: "First")
+      second: setting(name: "Second")
+      dnx: setting(name: "DoesNotExist")
+    }
+  }
+}
