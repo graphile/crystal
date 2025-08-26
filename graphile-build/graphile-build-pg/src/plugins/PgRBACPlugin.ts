@@ -209,7 +209,24 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
           provides: ["postInferred"],
           callback(behavior, relation) {
             const resource = relation.remoteResource;
-            return modBehaviorForResource(behavior, resource);
+            let canInsert = true;
+            let canUpdate = true;
+            for (const attrName of relation.localAttributes) {
+              const attr = relation.localCodec.attributes[attrName];
+              if (attr.extensions?.canInsert === false) {
+                canInsert = false;
+              }
+              if (attr.extensions?.canUpdate === false) {
+                canUpdate = false;
+              }
+            }
+            const nodeIdMods: string[] = [];
+            if (!canInsert) nodeIdMods.push("-nodeId:insert");
+            if (!canUpdate) nodeIdMods.push("-nodeId:update");
+            const newBehavior = nodeIdMods.length
+              ? [behavior, ...nodeIdMods]
+              : behavior;
+            return modBehaviorForResource(newBehavior, resource);
           },
         },
       },
@@ -236,10 +253,10 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
 };
 
 function modBehaviorForResource(
-  behavior: GraphileBuild.BehaviorString,
+  behavior: GraphileBuild.BehaviorString | string[],
   resource: PgResource<any, any, any, any, any>,
 ): GraphileBuild.BehaviorString[] {
-  const newBehavior = [behavior];
+  const newBehavior = Array.isArray(behavior) ? [...behavior] : [behavior];
   const {
     canSelect = true,
     canInsert = true,
