@@ -28,7 +28,6 @@ input BarInput {
 """Represents an update to a `Bar`. Fields that are set will be updated."""
 input BarPatch {
   col: String
-  fooByRowId: ID
 }
 
 """A connection to a list of `Bar` values."""
