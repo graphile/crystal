@@ -212,7 +212,8 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
             const newBehavior = [...modBehaviorForResource(behavior, resource)];
 
             if (relation.isUnique) {
-              // Check column permissions for insert/update mutations using relational IDs
+              // Check column permissions for insert/update mutations using
+              // relational IDs.
               let canInsert = true;
               let canUpdate = true;
               for (const attrName of relation.localAttributes) {
