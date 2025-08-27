@@ -123,6 +123,9 @@ export default function makeNewBuild(
   }
 
   const build: GraphileBuild.BuildBase = {
+    // FORBID EXPORTING!
+    ...({ $$export: false } as {}),
+
     lib,
 
     // Legacy support for things from lib
