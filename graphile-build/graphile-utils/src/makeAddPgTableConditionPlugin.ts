@@ -11,13 +11,19 @@ export function addPgTableCondition(
   conditionFieldSpecGenerator: (
     build: GraphileBuild.Build,
   ) => GrafastInputFieldConfig,
+  // DEPRECATED! Use `apply` instead.
   conditionGenerator?: (
     value: unknown,
     helpers: {
       sql: typeof sql;
       sqlTableAlias: SQL;
       sqlValueWithCodec: typeof sqlValueWithCodec;
-      build: GraphileBuild.Build;
+      // We can't afford to make the entire of build EXPORTABLE, and people
+      // really ought to move to using the `apply` method, so...
+      build: Pick<
+        GraphileBuild.Build,
+        "sql" | "grafast" | "graphql" | "dataplanPg" | "input"
+      >;
       /** @internal We might expose this in future if needed */
       condition: PgCondition;
     },
@@ -85,21 +91,51 @@ export function addPgTableCondition(
               );
             }
             // build applyPlan
+            const {
+              sql,
+              grafast,
+              graphql,
+              dataplanPg,
+              input: { pgRegistry },
+            } = build;
             conditionFieldSpec.apply = EXPORTABLE(
-              (build, conditionGenerator, sql, sqlValueWithCodec) =>
+              (
+                conditionGenerator,
+                dataplanPg,
+                grafast,
+                graphql,
+                pgRegistry,
+                sql,
+                sqlValueWithCodec,
+              ) =>
                 function apply(condition: PgCondition, val) {
                   const expression = conditionGenerator!(val, {
                     sql,
                     sqlTableAlias: condition.alias,
                     sqlValueWithCodec,
-                    build,
+                    build: {
+                      sql,
+                      grafast,
+                      graphql,
+                      dataplanPg,
+                      input: { pgRegistry },
+                    },
                     condition,
                   });
                   if (expression) {
                     condition.where(expression);
                   }
                 },
-              [build, conditionGenerator, sql, sqlValueWithCodec],
+              [
+                conditionGenerator,
+                dataplanPg,
+                grafast,
+                graphql,
+                pgRegistry,
+                sql,
+                sqlValueWithCodec,
+              ],
+              "addPgTableCondition_generator",
             );
           }
           const meta = build._pluginMeta[displayName]!;
