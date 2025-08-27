@@ -964,7 +964,7 @@ function _convertToAST(
 ): t.Expression {
   if (isForbidden(thing)) {
     throw new Error(
-      `The value at ${locationHint} is forbidden from being exported; please be more explicit in your EXPORTABLE factories!`,
+      `The value at ${locationHint} is forbidden from being exported; please be more specific in your EXPORTABLE factories!`,
     );
   }
   const handleSubvalue = (
