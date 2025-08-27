@@ -5627,6 +5627,15 @@ type NonUpdatableView {
   column: Int
 }
 
+"""
+A condition to be used against `NonUpdatableView` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input NonUpdatableViewCondition {
+  """Checks for equality with the object’s `column` field."""
+  column: Int
+}
+
 """A connection to a list of `NonUpdatableView` values."""
 type NonUpdatableViewsConnection {
   """
@@ -5657,6 +5666,8 @@ type NonUpdatableViewsEdge {
 
 """Methods to use when ordering `NonUpdatableView`."""
 enum NonUpdatableViewsOrderBy {
+  COLUMN_ASC
+  COLUMN_DESC
   NATURAL
 }
 
@@ -6716,6 +6727,11 @@ type Query implements Node {
     """Read all values in the set before (above) this cursor."""
     before: Cursor
 
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: NonUpdatableViewCondition
+
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -7030,6 +7046,11 @@ type Query implements Node {
     """Read all values in the set before (above) this cursor."""
     before: Cursor
 
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: TestviewCondition
+
     """Only read the first `n` values of the set."""
     first: Int
 
@@ -7082,6 +7103,11 @@ type Query implements Node {
 
     """Read all values in the set before (above) this cursor."""
     before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: UpdatableViewCondition
 
     """Only read the first `n` values of the set."""
     first: Int
@@ -8226,6 +8252,21 @@ type Testview {
   testviewid: Int
 }
 
+"""
+A condition to be used against `Testview` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input TestviewCondition {
+  """Checks for equality with the object’s `col1` field."""
+  col1: Int
+
+  """Checks for equality with the object’s `col2` field."""
+  col2: Int
+
+  """Checks for equality with the object’s `testviewid` field."""
+  testviewid: Int
+}
+
 """An input for mutations affecting `Testview`"""
 input TestviewInput {
   col1: Int
@@ -8261,7 +8302,13 @@ type TestviewsEdge {
 
 """Methods to use when ordering `Testview`."""
 enum TestviewsOrderBy {
+  COL1_ASC
+  COL1_DESC
+  COL2_ASC
+  COL2_DESC
   NATURAL
+  TESTVIEWID_ASC
+  TESTVIEWID_DESC
 }
 
 """
@@ -8625,6 +8672,24 @@ type UpdatableView {
   x: Int
 }
 
+"""
+A condition to be used against `UpdatableView` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input UpdatableViewCondition {
+  """Checks for equality with the object’s `constant` field."""
+  constant: Int
+
+  """Checks for equality with the object’s `description` field."""
+  description: String
+
+  """Checks for equality with the object’s `name` field."""
+  name: String
+
+  """Checks for equality with the object’s `x` field."""
+  x: Int
+}
+
 """An input for mutations affecting `UpdatableView`"""
 input UpdatableViewInput {
   """This is constantly 2"""
@@ -8662,7 +8727,15 @@ type UpdatableViewsEdge {
 
 """Methods to use when ordering `UpdatableView`."""
 enum UpdatableViewsOrderBy {
+  CONSTANT_ASC
+  CONSTANT_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  NAME_ASC
+  NAME_DESC
   NATURAL
+  X_ASC
+  X_DESC
 }
 
 """All input for the `updateCompoundKeyByPersonId1AndPersonId2` mutation."""
