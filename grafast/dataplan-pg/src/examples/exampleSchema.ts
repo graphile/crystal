@@ -123,7 +123,7 @@ import type {
 import { pgUnionAll } from "../steps/pgUnionAll.js";
 import {
   SideEffectWithPgClientStep,
-  withPgClientTransaction,
+  sideEffectWithPgClientTransaction,
 } from "../steps/withPgClient.js";
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -5187,9 +5187,8 @@ export function makeExampleSchema(
         },
         type: MultipleActionsPayload,
         plan: EXPORTABLE(
-          (executor, object, sleep, sql, withPgClientTransaction) =>
-            function plan(_$root, { $input: { $a } }) {
-              const $transactionResult = withPgClientTransaction<
+          (executor, object, sideEffectWithPgClientTransaction, sleep, sql) => function plan(_$root, { $input: { $a } }) {
+              const $transactionResult = sideEffectWithPgClientTransaction<
                 { a: number | null | undefined },
                 number[]
               >(
@@ -5238,7 +5237,7 @@ export function makeExampleSchema(
 
               return $transactionResult;
             },
-          [executor, object, sleep, sql, withPgClientTransaction],
+          [executor, object, sideEffectWithPgClientTransaction, sleep, sql],
         ),
       },
     },
