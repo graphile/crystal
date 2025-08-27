@@ -47,9 +47,11 @@ import {
 import type { GraphQLSchemaNormalizedConfig } from "graphql/type/schema";
 import type { PgSQL, SQL } from "pg-sql2";
 
+import { isForbidden } from "./helpers.js";
 import type { ExportOptions } from "./interfaces.js";
 import { optimize } from "./optimize/index.js";
 import { reservedWords } from "./reservedWords.js";
+import { isImportable, isNotNullish } from "./utils.js";
 import { wellKnown } from "./wellKnown.js";
 
 // Cannot import sql because it's optional
@@ -173,20 +175,6 @@ const reallyGenerate = generate;
 const templateOptions: TemplateBuilderOptions = {
   plugins: ["typescript"],
 };
-
-export function isNotNullish<T>(input: T | null | undefined): input is T {
-  return input != null;
-}
-
-function isImportable(
-  thing: unknown,
-): thing is { $$export: { moduleName: string; exportName: string } } {
-  return (
-    (typeof thing === "object" || typeof thing === "function") &&
-    thing !== null &&
-    "$$export" in (thing as object | AnyFunction)
-  );
-}
 
 type AnyFunction = {
   (...args: any[]): any;
@@ -974,6 +962,11 @@ function _convertToAST(
   depth: number,
   reference: t.Expression,
 ): t.Expression {
+  if (isForbidden(thing)) {
+    throw new Error(
+      `The value at ${locationHint} is forbidden from being exported; please be more explicit in your EXPORTABLE factories!`,
+    );
+  }
   const handleSubvalue = (
     value: any,
     tKey: t.Expression,
