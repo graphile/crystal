@@ -1,0 +1,20 @@
+## expect(errors).toBeFalsy()
+#> schema: ["issue_2212"]
+#> extends: ["./Issue2212.ts:preset"]
+
+{
+  allUsers {
+    nodes {
+      id
+      username
+      orders {
+        nodes {
+          id
+          phoneE164
+          amountCents
+        }
+      }
+      lifetimeOrderTotal
+    }
+  }
+}

@@ -122,8 +122,8 @@ import type {
 } from "../steps/pgUnionAll.js";
 import { pgUnionAll } from "../steps/pgUnionAll.js";
 import {
-  WithPgClientStep,
-  withPgClientTransaction,
+  SideEffectWithPgClientStep,
+  sideEffectWithPgClientTransaction,
 } from "../steps/withPgClient.js";
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -4951,23 +4951,24 @@ export function makeExampleSchema(
     },
   });
 
-  const MultipleActionsPayload = newObjectTypeBuilder<WithPgClientStep>(
-    WithPgClientStep,
-  )({
-    name: "MultipleActionsPayload",
-    fields: {
-      i: {
-        type: new GraphQLList(new GraphQLNonNull(GraphQLInt)),
-        plan: EXPORTABLE(
-          () =>
-            function plan($parent) {
-              return $parent;
-            },
-          [],
-        ),
+  const MultipleActionsPayload =
+    newObjectTypeBuilder<SideEffectWithPgClientStep>(
+      SideEffectWithPgClientStep,
+    )({
+      name: "MultipleActionsPayload",
+      fields: {
+        i: {
+          type: new GraphQLList(new GraphQLNonNull(GraphQLInt)),
+          plan: EXPORTABLE(
+            () =>
+              function plan($parent) {
+                return $parent;
+              },
+            [],
+          ),
+        },
       },
-    },
-  });
+    });
 
   const Mutation = newObjectTypeBuilder<__ValueStep<BaseGraphQLRootValue>>(
     __ValueStep,
@@ -5186,9 +5187,9 @@ export function makeExampleSchema(
         },
         type: MultipleActionsPayload,
         plan: EXPORTABLE(
-          (executor, object, sleep, sql, withPgClientTransaction) =>
+          (executor, object, sideEffectWithPgClientTransaction, sleep, sql) =>
             function plan(_$root, { $input: { $a } }) {
-              const $transactionResult = withPgClientTransaction<
+              const $transactionResult = sideEffectWithPgClientTransaction<
                 { a: number | null | undefined },
                 number[]
               >(
@@ -5237,7 +5238,7 @@ export function makeExampleSchema(
 
               return $transactionResult;
             },
-          [executor, object, sleep, sql, withPgClientTransaction],
+          [executor, object, sideEffectWithPgClientTransaction, sleep, sql],
         ),
       },
     },

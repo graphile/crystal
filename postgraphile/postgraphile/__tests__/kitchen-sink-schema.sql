@@ -23,6 +23,7 @@ drop schema if exists
   refs,
   space,
   issue_2210,
+  issue_2212,
   issue_2287,
   issue_2334,
   relay
@@ -2237,3 +2238,20 @@ $$ language sql volatile;
 create schema issue_2334;
 create table issue_2334.foo (id int primary key, col text);
 create table issue_2334.bar (id int primary key references issue_2334.foo, col text);
+
+create schema issue_2212;
+create table issue_2212.users (
+  id serial primary key,
+  username text not null
+);
+create table issue_2212.user_contacts (
+  id serial primary key,
+  user_id int not null references issue_2212.users,
+  phone text
+);
+create table issue_2212.orders (
+  id serial primary key,
+  phone_e164 text,
+  amount_cents int
+);
+

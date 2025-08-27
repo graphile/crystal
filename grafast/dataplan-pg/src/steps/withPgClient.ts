@@ -1,9 +1,29 @@
-import type { ExecutionDetails, GrafastResultsList } from "grafast";
-import { constant, Step } from "grafast";
+import type {
+  ExecutionDetails,
+  GrafastResultsList,
+  LoadManyInfo,
+  LoadManyLoader,
+  LoadManyStep,
+  LoadOneInfo,
+  LoadOneLoader,
+  LoadOneStep,
+  Maybe,
+  Multistep,
+  ObjectStep,
+  PromiseOrDirect,
+  Thunk,
+  UnwrapMultistep,
+} from "grafast";
+import { constant, loadMany, loadOne, Step } from "grafast";
 
-import type { PgClient, PgExecutor, WithPgClient } from "../executor";
+import type {
+  PgClient,
+  PgExecutor,
+  PgExecutorContextPlans,
+  WithPgClient,
+} from "../executor";
 
-export type WithPgClientStepCallback<
+export type SideEffectWithPgClientStepCallback<
   TData,
   TResult,
   TPgClient extends PgClient = PgClient,
@@ -14,14 +34,14 @@ export type WithPgClientStepCallback<
  * from `$data` (which can be `constant(null)` if you don't need it). Typically
  * useful for running custom transactions.
  */
-export class WithPgClientStep<
+export class SideEffectWithPgClientStep<
   TData = any,
   TResult = any,
   TPgClient extends PgClient = PgClient,
 > extends Step<TResult> {
   static $$export = {
     moduleName: "@dataplan/pg",
-    exportName: "WithPgClientStep",
+    exportName: "SideEffectWithPgClientStep",
   };
 
   isSyncAndSafe = false;
@@ -45,7 +65,11 @@ export class WithPgClientStep<
   constructor(
     executor: PgExecutor,
     $data: Step<TData>,
-    private callback: WithPgClientStepCallback<TData, TResult, TPgClient>,
+    private callback: SideEffectWithPgClientStepCallback<
+      TData,
+      TResult,
+      TPgClient
+    >,
   ) {
     super();
     this.executor = executor;
@@ -73,7 +97,7 @@ export class WithPgClientStep<
   }
 }
 
-export function withPgClient<
+export function sideEffectWithPgClient<
   TData,
   TResult,
   TPgClient extends PgClient = PgClient,
@@ -82,16 +106,16 @@ export function withPgClient<
   $data:
     | Step<TData>
     | (TData extends null | undefined ? null | undefined : never),
-  callback: WithPgClientStepCallback<TData, TResult, TPgClient>,
+  callback: SideEffectWithPgClientStepCallback<TData, TResult, TPgClient>,
 ) {
-  return new WithPgClientStep(
+  return new SideEffectWithPgClientStep(
     executor,
     $data ?? constant($data as TData),
     callback,
   );
 }
 
-export function withPgClientTransaction<
+export function sideEffectWithPgClientTransaction<
   TData,
   TResult,
   TPgClient extends PgClient = PgClient,
@@ -100,12 +124,237 @@ export function withPgClientTransaction<
   $data:
     | Step<TData>
     | (TData extends null | undefined ? null | undefined : never),
-  callback: WithPgClientStepCallback<TData, TResult, TPgClient>,
+  callback: SideEffectWithPgClientStepCallback<TData, TResult, TPgClient>,
 ) {
-  return withPgClient<TData, TResult, TPgClient>(
+  return sideEffectWithPgClient<TData, TResult, TPgClient>(
     executor,
     $data ?? constant($data as TData),
     (client, data) =>
       client.withTransaction((txClient) => callback(txClient, data)),
   );
+}
+/** @deprecated Use `sideEffectWithPgClient` or `loadOneWithPgClient` or `loadManyWithPgClient` instead */
+export const withPgClient = sideEffectWithPgClient;
+/** @deprecated Use `sideEffectWithPgClientTransaction` instead (or `loadOneWithPgClient`/`loadManyWithPgClient` if you're not doing a mutation) */
+export const withPgClientTransaction = sideEffectWithPgClientTransaction;
+
+export function loadOneWithPgClient<
+  const TLookup extends Multistep,
+  TItem,
+  TData extends Maybe<TItem> = Maybe<TItem>,
+  TParams extends Record<string, any> = Record<string, any>,
+  const TShared extends Record<string, Step> = Record<string, never>,
+>(
+  executor: PgExecutor,
+  lookup: TLookup,
+  loader: LoadOneWithPgClientLoader<
+    UnwrapMultistep<TLookup>,
+    TItem,
+    TData,
+    TParams,
+    TShared
+  >,
+): LoadOneStep<UnwrapMultistep<TLookup>, TItem, TData, TParams, TShared> {
+  const newLoader = transformLoadOneLoader(executor, loader);
+  return loadOne(lookup, newLoader);
+}
+
+export type LoadOneWithPgClientCallback<
+  TSpec,
+  TItem,
+  TData extends Maybe<TItem> = Maybe<TItem>,
+  TParams extends Record<string, any> = Record<string, any>,
+  TUnarySpec = never,
+> = {
+  (
+    pgClient: PgClient,
+    lookups: ReadonlyArray<TSpec>,
+    info: LoadOneInfo<TItem, TParams, TUnarySpec>,
+  ): PromiseOrDirect<ReadonlyArray<TData>>;
+  displayName?: string;
+};
+
+type LoadOneWithPgClientLoader<
+  TSpec,
+  TItem,
+  TData extends Maybe<TItem>,
+  TParams extends Record<string, any>,
+  TShared extends Record<string, Step>,
+> =
+  | LoadOneWithPgClientCallback<TSpec, TItem, TData, TParams, never>
+  | (Omit<LoadOneLoader<TSpec, TItem, TData, TParams, TShared>, "load"> & {
+      load: LoadOneWithPgClientCallback<TSpec, TItem, TData, TParams, TShared>;
+    });
+const transformedLoaderCache = new WeakMap<PgExecutor, WeakMap<any, any>>();
+
+// Identical, other than types, to transformLoadManyLoader
+function transformLoadOneLoader<
+  TLookup extends Multistep,
+  TItem,
+  TData extends Maybe<TItem>,
+  TParams extends Record<string, any>,
+  TShared extends Record<string, Step>,
+>(
+  executor: PgExecutor,
+  loader: LoadOneWithPgClientLoader<
+    UnwrapMultistep<TLookup>,
+    TItem,
+    TData,
+    TParams,
+    TShared
+  >,
+) {
+  let cacheByExecutor = transformedLoaderCache.get(executor);
+  if (!cacheByExecutor) {
+    cacheByExecutor = new WeakMap();
+    transformedLoaderCache.set(executor, cacheByExecutor);
+  }
+  const existing = cacheByExecutor.get(loader);
+  if (existing) {
+    return existing;
+  } else {
+    const loaderObject =
+      typeof loader === "function"
+        ? { load: loader, shared: undefined }
+        : loader;
+    const transformedLoader: LoadOneLoader<
+      UnwrapMultistep<TLookup>,
+      TItem,
+      TData,
+      TParams,
+      TShared & { pgExecutorContext: ObjectStep<PgExecutorContextPlans> }
+    > = {
+      ...loaderObject,
+      shared: () => ({
+        ...unthunk(loaderObject.shared as Thunk<TShared>),
+        pgExecutorContext: executor.context(),
+      }),
+      load(lookups, info) {
+        const {
+          shared: { pgExecutorContext },
+        } = info;
+        return pgExecutorContext.withPgClient(
+          pgExecutorContext.pgSettings,
+          (pgClient) =>
+            Promise.resolve(loaderObject.load(pgClient, lookups, info as any)),
+        );
+      },
+    };
+    cacheByExecutor.set(loader, transformedLoader);
+    return transformedLoader;
+  }
+}
+
+// Identical, other than types, to transformLoadOneLoader
+function transformLoadManyLoader<
+  TLookup extends Multistep,
+  TItem,
+  TData extends Maybe<ReadonlyArray<Maybe<TItem>>>,
+  TParams extends Record<string, any>,
+  TShared extends Record<string, Step>,
+>(
+  executor: PgExecutor,
+  loader: LoadManyWithPgClientLoader<
+    UnwrapMultistep<TLookup>,
+    TItem,
+    TData,
+    TParams,
+    TShared
+  >,
+) {
+  let cacheByExecutor = transformedLoaderCache.get(executor);
+  if (!cacheByExecutor) {
+    cacheByExecutor = new WeakMap();
+    transformedLoaderCache.set(executor, cacheByExecutor);
+  }
+  const existing = cacheByExecutor.get(loader);
+  if (existing) {
+    return existing;
+  } else {
+    const loaderObject =
+      typeof loader === "function"
+        ? { load: loader, shared: undefined }
+        : loader;
+    const transformedLoader: LoadManyLoader<
+      UnwrapMultistep<TLookup>,
+      TItem,
+      TData,
+      TParams,
+      TShared & { pgExecutorContext: ObjectStep<PgExecutorContextPlans> }
+    > = {
+      ...loaderObject,
+      shared: () => ({
+        ...unthunk(loaderObject.shared as Thunk<TShared>),
+        pgExecutorContext: executor.context(),
+      }),
+      load(lookups, info) {
+        const {
+          shared: { pgExecutorContext },
+        } = info;
+        return pgExecutorContext.withPgClient(
+          pgExecutorContext.pgSettings,
+          (pgClient) =>
+            Promise.resolve(loaderObject.load(pgClient, lookups, info as any)),
+        );
+      },
+    };
+    cacheByExecutor.set(loader, transformedLoader);
+    return transformedLoader;
+  }
+}
+
+function unthunk<T>(t: Thunk<T>): T {
+  return typeof t === "function" ? (t as () => T)() : t;
+}
+
+export type LoadManyWithPgClientCallback<
+  TSpec,
+  TItem,
+  TData extends Maybe<ReadonlyArray<Maybe<TItem>>> = Maybe<
+    ReadonlyArray<Maybe<TItem>>
+  >,
+  TParams extends Record<string, any> = Record<string, any>,
+  TUnarySpec = never,
+> = {
+  (
+    pgClient: PgClient,
+    lookups: ReadonlyArray<TSpec>,
+    info: LoadManyInfo<TItem, TParams, TUnarySpec>,
+  ): PromiseOrDirect<ReadonlyArray<TData>>;
+  displayName?: string;
+};
+
+type LoadManyWithPgClientLoader<
+  TSpec,
+  TItem,
+  TData extends Maybe<ReadonlyArray<Maybe<TItem>>>,
+  TParams extends Record<string, any>,
+  TShared extends Record<string, Step>,
+> =
+  | LoadManyWithPgClientCallback<TSpec, TItem, TData, TParams, never>
+  | (Omit<LoadManyLoader<TSpec, TItem, TData, TParams, TShared>, "load"> & {
+      load: LoadManyWithPgClientCallback<TSpec, TItem, TData, TParams, TShared>;
+    });
+
+export function loadManyWithPgClient<
+  const TLookup extends Multistep,
+  TItem,
+  TData extends Maybe<ReadonlyArray<Maybe<TItem>>> = Maybe<
+    ReadonlyArray<Maybe<TItem>>
+  >,
+  TParams extends Record<string, any> = Record<string, any>,
+  const TShared extends Record<string, Step> = Record<string, never>,
+>(
+  executor: PgExecutor,
+  lookup: TLookup,
+  loader: LoadManyWithPgClientLoader<
+    UnwrapMultistep<TLookup>,
+    TItem,
+    TData,
+    TParams,
+    TShared
+  >,
+): LoadManyStep<UnwrapMultistep<TLookup>, TItem, TData, TParams, TShared> {
+  const newLoader = transformLoadManyLoader(executor, loader);
+  return loadMany(lookup, newLoader);
 }

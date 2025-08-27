@@ -88,6 +88,9 @@ delete from refs.pen_names cascade;
 delete from refs.books cascade;
 delete from issue_2287.settings cascade;
 delete from issue_2287.users cascade;
+delete from issue_2212.orders cascade;
+delete from issue_2212.user_contacts cascade;
+delete from issue_2212.users cascade;
 
 alter table b.types enable trigger user;
 
@@ -1107,3 +1110,17 @@ alter sequence issue_2287.users_id_seq restart with 1;
 alter sequence issue_2287.settings_id_seq restart with 1;
 insert into issue_2287.users (username) values ('Alice');
 insert into issue_2287.settings (user_id, name, value) values (1, 'First', 'True');
+
+alter sequence issue_2212.users_id_seq restart with 1;
+alter sequence issue_2212.user_contacts_id_seq restart with 1;
+alter sequence issue_2212.orders_id_seq restart with 1;
+insert into issue_2212.users(username) values ('Alice'),('Bob'),('Carl');
+insert into issue_2212.user_contacts(user_id, phone) values
+  (1,'(415) 555-0100'), (1,'+1 415 555 0100'),
+  (2,'020 7946 0018'), (2,'+44 (0)20 7946 0019'),
+  (3,null);
+
+insert into issue_2212.orders(phone_e164, amount_cents) values
+  ('+14155550100', 1234), ('+14155550100', 5432),
+  ('+442079460018', 2323), ('+442079460019', 1982),
+  ('+442079460018', 1337);
