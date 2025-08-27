@@ -45,8 +45,16 @@ export function isResolvedPreset(
   if (!preset.plugins) return false;
   if (!preset.disablePlugins) return false;
   if (typeof preset.lib !== "object" || preset.lib === null) return false;
+  const seenPluginNames = new Set<string>();
   for (const plugin of preset.plugins) {
     if (preset.disablePlugins.includes(plugin.name)) return false;
+
+    if (seenPluginNames.has(plugin.name)) {
+      // Contains duplicate; handle on default path
+      return false;
+    } else {
+      seenPluginNames.add(plugin.name);
+    }
   }
   return true;
 }
