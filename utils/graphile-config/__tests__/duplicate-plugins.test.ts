@@ -50,7 +50,9 @@ it("throws an error if two different plugins with the same name are loaded (dire
   try {
     resolvePreset({
       plugins: [SomePluginA, SomePluginB],
-    });
+      disablePlugins: [],
+      lib: { versions: {} },
+    } as GraphileConfig.ResolvedPreset);
   } catch (e) {
     error = e;
   }
