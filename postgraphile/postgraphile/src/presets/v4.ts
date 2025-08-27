@@ -114,8 +114,32 @@ function isNotNullish<T>(arg: T | undefined | null): arg is T {
   return arg != null;
 }
 
-const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
+const makeV4Plugin = (
+  options: Pick<
+    V4Options,
+    "simpleCollections" | "skipPlugins" | "classicIds" | "defaultRole"
+  >,
+): GraphileConfig.Plugin => {
   const { classicIds = false, defaultRole } = options;
+  const skipNodeIdPlugin =
+    options.skipPlugins?.some((p) => p.name === "NodePlugin") ?? false;
+  const parts: string[] = [];
+  if (classicIds) {
+    parts.push("classicIds");
+  }
+  if (skipNodeIdPlugin) {
+    parts.push("skipNodeIdPlugin");
+  }
+  if (options.simpleCollections) {
+    parts.push(`simpleCollections=${options.simpleCollections}`);
+  }
+  if (defaultRole) {
+    parts.push(`defaultRole=${defaultRole}`);
+  }
+  const name = `PostGraphileV4CompatibilityPlugin${
+    parts.length ? `_${parts.join("_")}` : ""
+  }`;
+
   if (defaultRole) {
     throw new Error(
       `The 'defaultRole' V4 option is not currently supported in V5; please use the \`preset.grafast.context\` callback instead.`,
@@ -138,7 +162,7 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
     }
   })();
   return {
-    name: "PostGraphileV4CompatibilityPlugin",
+    name,
     version: "0.0.0",
     after: ["PgAttributesPlugin", "PgMutationUpdateDeletePlugin"],
     inflection: {
@@ -162,8 +186,7 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
                 return name;
               },
             }),
-        ...(classicIds ||
-        options.skipPlugins?.some((p) => p.name === "NodePlugin")
+        ...(classicIds || skipNodeIdPlugin
           ? null
           : {
               // Rename GraphQL Global Object Identification 'id' to 'nodeId'
