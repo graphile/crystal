@@ -4,7 +4,6 @@ import type {
   LoadManyInfo,
   LoadManyLoader,
   LoadManyStep,
-  LoadOneCallback,
   LoadOneInfo,
   LoadOneLoader,
   LoadOneStep,
