@@ -51,7 +51,7 @@ export function handleWebSocketKeepalive(
     socket.terminate();
   };
   /** Terminal handler, due to natural socket close */
-  const handleClose = (code: number, reason: Buffer) => {
+  const handleClose = (_code: number, _reason: Buffer) => {
     stopTimer();
     releaseListeners();
   };

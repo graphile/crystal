@@ -149,7 +149,7 @@ declare global {
       /**
        * Duration (in milliseconds) between pings. Set to `-1` to disable.
        *
-       * @defaultValue {12_000}
+       * @defaultValue `12_000`
        */
       websocketKeepalive?: number;
 
