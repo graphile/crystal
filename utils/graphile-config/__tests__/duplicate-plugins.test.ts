@@ -26,6 +26,18 @@ it("allows the same plugin to be referenced multiple times", () => {
   expect(p.plugins[0]).to.equal(SomePluginA);
 });
 
+it("still only returns each plugin once, even if duplicated", () => {
+  const p = resolvePreset({
+    extends: [
+      { plugins: [SomePluginA] },
+      { extends: [{ plugins: [SomePluginA] }] },
+    ],
+    plugins: [SomePluginA, SomePluginA],
+  });
+  expect(p.plugins).to.have.length(1);
+  expect(p.plugins[0]).to.equal(SomePluginA);
+});
+
 it("throws an error if two different plugins with the same name are loaded", () => {
   let error: Error | undefined;
   try {
