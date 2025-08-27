@@ -427,6 +427,7 @@ const preset: GraphileConfig.Preset = {
         extend type Subscription {
           sub(topic: String!): Int
           gql: Int
+          slow: String
         }
       `,
       objects: {
@@ -467,6 +468,26 @@ const preset: GraphileConfig.Preset = {
                     for (let i = 0; i < 10; i++) {
                       yield i;
                       await sleep(300);
+                    }
+                  },
+                [sleep],
+              ),
+            },
+            slow: {
+              resolve: EXPORTABLE(
+                () =>
+                  function resolve(e) {
+                    return e;
+                  },
+                [],
+              ),
+              subscribe: EXPORTABLE(
+                (sleep) =>
+                  async function* subscribe() {
+                    while (true) {
+                      yield new Date().toISOString();
+                      // Wait two minutes between ticks
+                      await sleep(120000);
                     }
                   },
                 [sleep],
