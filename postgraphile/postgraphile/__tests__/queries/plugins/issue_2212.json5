@@ -1,0 +1,21 @@
+{
+  allUsers: {
+    nodes: [
+      {
+        id: "WyJVc2VyIiwxXQ==",
+        username: "Alice",
+        lifetimeOrderTotal: 1,
+      },
+      {
+        id: "WyJVc2VyIiwyXQ==",
+        username: "Bob",
+        lifetimeOrderTotal: 2,
+      },
+      {
+        id: "WyJVc2VyIiwzXQ==",
+        username: "Carl",
+        lifetimeOrderTotal: 3,
+      },
+    ],
+  },
+}
