@@ -106,15 +106,17 @@ const plugin = extendSchema((build) => {
 
                   // Step 2 - normalize the phone numbers
                   const phoneNumbers = new Set<string>();
-                  const phoneNumbersByUserId: Record<string, string[]> =
-                    Object.create(null);
+                  const phoneNumbersByUserId: Record<
+                    string,
+                    Set<string>
+                  > = Object.create(null);
                   for (const row of userContacts) {
                     const userId = row.user_id;
                     const rawPhone = row.phone;
                     const phone = normalizePhone(rawPhone);
 
-                    phoneNumbersByUserId[userId] ??= [];
-                    phoneNumbersByUserId[userId].push(phone);
+                    phoneNumbersByUserId[userId] ??= new Set();
+                    phoneNumbersByUserId[userId].add(phone);
                     phoneNumbers.add(phone);
                   }
 
@@ -129,7 +131,8 @@ const plugin = extendSchema((build) => {
 
                   // Finally - match the inputs to the outputs
                   return userIds.map((userId) => {
-                    const phoneNumbers = phoneNumbersByUserId[userId] ?? [];
+                    const phoneNumbers =
+                      phoneNumbersByUserId[userId] ?? new Set();
                     let total = 0;
                     for (const phoneNumber of phoneNumbers) {
                       const userOrders = orders.filter(
@@ -164,7 +167,6 @@ const normalizePhone = EXPORTABLE(
     },
   [],
 );
-
 export const preset: GraphileConfig.Preset = {
   plugins: [plugin],
 };
