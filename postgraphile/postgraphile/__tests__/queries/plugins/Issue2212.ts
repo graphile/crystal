@@ -32,7 +32,7 @@ const plugin = extendSchema((build) => {
                 user_id: string;
                 phone: string;
               }>({
-                text: `select user_id::text, phone from issue_2212.user_contacts where id = any($1::int[]);`,
+                text: `select user_id::text, phone from issue_2212.user_contacts where user_id = any($1::int[]);`,
                 values: [userIds],
               });
 
@@ -43,6 +43,7 @@ const plugin = extendSchema((build) => {
               for (const row of userContacts) {
                 const userId = row.user_id;
                 const rawPhone = row.phone;
+                if (!rawPhone) continue;
                 const phone = normalizePhone(rawPhone);
 
                 phoneNumbersByUserId[userId] ??= [];
