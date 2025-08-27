@@ -4,16 +4,52 @@
       {
         id: "WyJVc2VyIiwxXQ==",
         username: "Alice",
+        orders: {
+          nodes: [
+            {
+              id: "WyJPcmRlciIsMV0=",
+              phoneE164: "+14155550100",
+              amountCents: 1234,
+            },
+            {
+              id: "WyJPcmRlciIsMl0=",
+              phoneE164: "+14155550100",
+              amountCents: 5432,
+            },
+          ],
+        },
         lifetimeOrderTotal: 13332,
       },
       {
         id: "WyJVc2VyIiwyXQ==",
         username: "Bob",
+        orders: {
+          nodes: [
+            {
+              id: "WyJPcmRlciIsM10=",
+              phoneE164: "+442079460018",
+              amountCents: 2323,
+            },
+            {
+              id: "WyJPcmRlciIsNF0=",
+              phoneE164: "+442079460018",
+              amountCents: 1982,
+            },
+            {
+              id: "WyJPcmRlciIsNV0=",
+              phoneE164: "+442079460018",
+              amountCents: 1337,
+            },
+          ],
+        },
         lifetimeOrderTotal: 5642,
       },
       {
         id: "WyJVc2VyIiwzXQ==",
         username: "Carl",
+        orders: {
+          nodes: [],
+        },
         lifetimeOrderTotal: 0,
       },
     ],

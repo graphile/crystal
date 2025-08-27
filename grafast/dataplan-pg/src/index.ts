@@ -190,6 +190,7 @@ import {
 } from "./steps/pgValidateParsedCursor.js";
 import { toPg, ToPgStep } from "./steps/toPg.js";
 import {
+  loadManyWithPgClient,
   loadOneWithPgClient,
   sideEffectWithPgClient,
   SideEffectWithPgClientStep,
@@ -220,6 +221,7 @@ export {
   isEnumCodec,
   KeysOfType,
   listOfCodec,
+  loadManyWithPgClient,
   loadOneWithPgClient,
   makePgResourceOptions,
   MakePgServiceOptions,
@@ -424,6 +426,7 @@ exportAsMany("@dataplan/pg", {
   toPg,
   ToPgStep,
   loadOneWithPgClient,
+  loadManyWithPgClient,
   sideEffectWithPgClient,
   sideEffectWithPgClientTransaction,
   SideEffectWithPgClientStep,
