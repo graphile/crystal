@@ -3,9 +3,15 @@ export function EXPORTABLE<T, TScope extends any[]>(
   args: [...TScope],
   nameHint?: string,
 ): T {
+  const forbiddenIndex = args.findIndex(isForbidden);
+  if (forbiddenIndex >= 0) {
+    throw new Error(
+      `${nameHint ?? "Anonymous"} EXPORTABLE call's args[${forbiddenIndex}] is not allowed to be exported.`,
+    );
+  }
   const fn: T = factory(...args);
   if (
-    (typeof fn === "function" || (typeof fn === "object" && fn !== null)) &&
+    ((typeof fn === "object" && fn !== null) || typeof fn === "function") &&
     !("$exporter$factory" in fn)
   ) {
     Object.defineProperties(fn, {
@@ -15,4 +21,13 @@ export function EXPORTABLE<T, TScope extends any[]>(
     });
   }
   return fn;
+}
+
+export function isForbidden(thing: unknown): thing is { $$export: false } {
+  return (
+    (typeof thing === "object" || typeof thing === "function") &&
+    thing !== null &&
+    "$$export" in thing &&
+    thing.$$export === false
+  );
 }
