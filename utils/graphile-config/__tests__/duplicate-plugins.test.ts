@@ -44,3 +44,18 @@ it("throws an error if two different plugins with the same name are loaded", () 
     /different plugins.*same name.*PluginWithSameName/,
   );
 });
+
+it("throws an error if two different plugins with the same name are loaded (directly)", () => {
+  let error: Error | undefined;
+  try {
+    resolvePreset({
+      plugins: [SomePluginA, SomePluginB],
+    });
+  } catch (e) {
+    error = e;
+  }
+  expect(error).to.exist;
+  expect(error!.message).to.match(
+    /different plugins.*same name.*PluginWithSameName/,
+  );
+});
