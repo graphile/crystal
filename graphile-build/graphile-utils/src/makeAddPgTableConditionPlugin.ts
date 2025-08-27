@@ -20,10 +20,7 @@ export function addPgTableCondition(
       sqlValueWithCodec: typeof sqlValueWithCodec;
       // We can't afford to make the entire of build EXPORTABLE, and people
       // really ought to move to using the `apply` method, so...
-      build: Pick<
-        GraphileBuild.Build,
-        "sql" | "grafast" | "graphql" | "dataplanPg" | "input"
-      >;
+      build: ReturnType<typeof pruneBuild>;
       /** @internal We might expose this in future if needed */
       condition: PgCondition;
     },
@@ -91,50 +88,22 @@ export function addPgTableCondition(
               );
             }
             // build applyPlan
-            const {
-              sql,
-              grafast,
-              graphql,
-              dataplanPg,
-              input: { pgRegistry },
-            } = build;
+            const _build = pruneBuild(build);
             conditionFieldSpec.apply = EXPORTABLE(
-              (
-                conditionGenerator,
-                dataplanPg,
-                grafast,
-                graphql,
-                pgRegistry,
-                sql,
-                sqlValueWithCodec,
-              ) =>
+              (_build, conditionGenerator, sql, sqlValueWithCodec) =>
                 function apply(condition: PgCondition, val) {
                   const expression = conditionGenerator!(val, {
                     sql,
                     sqlTableAlias: condition.alias,
                     sqlValueWithCodec,
-                    build: {
-                      sql,
-                      grafast,
-                      graphql,
-                      dataplanPg,
-                      input: { pgRegistry },
-                    },
+                    build: _build,
                     condition,
                   });
                   if (expression) {
                     condition.where(expression);
                   }
                 },
-              [
-                conditionGenerator,
-                dataplanPg,
-                grafast,
-                graphql,
-                pgRegistry,
-                sql,
-                sqlValueWithCodec,
-              ],
+              [_build, conditionGenerator, sql, sqlValueWithCodec],
               "addPgTableCondition_generator",
             );
           }
@@ -161,3 +130,23 @@ export function addPgTableCondition(
 
 /** @deprecated renamed to addPgTableCondition */
 export const makeAddPgTableConditionPlugin = addPgTableCondition;
+
+function pruneBuild(build: GraphileBuild.Build) {
+  const {
+    sql,
+    grafast,
+    graphql,
+    dataplanPg,
+    input: { pgRegistry },
+  } = build;
+  return EXPORTABLE(
+    (dataplanPg, grafast, graphql, pgRegistry, sql) => ({
+      sql,
+      grafast,
+      graphql,
+      dataplanPg,
+      input: { pgRegistry },
+    }),
+    [dataplanPg, grafast, graphql, pgRegistry, sql],
+  );
+}
