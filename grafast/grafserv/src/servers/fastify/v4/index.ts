@@ -19,6 +19,7 @@ import type {
   Result,
 } from "../../../interfaces.js";
 import {
+  DEFAULT_WEBSOCKET_KEEPALIVE,
   getBodyFromFrameworkBody,
   makeGraphQLWSConfig,
   normalizeRequest,
@@ -202,8 +203,11 @@ export class FastifyGrafserv extends GrafservBase {
     };
 
     // Build websocket handler.
+    const keepaliveInterval =
+      this.getPreset().grafserv?.websocketKeepalive ??
+      DEFAULT_WEBSOCKET_KEEPALIVE;
     const wsHandler = websockets
-      ? makeHandler(makeGraphQLWSConfig(this))
+      ? makeHandler(makeGraphQLWSConfig(this), keepaliveInterval)
       : undefined;
 
     // Attach HTTP handler for POST requests.

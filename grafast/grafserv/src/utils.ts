@@ -30,7 +30,7 @@ import { validateGraphQLBody } from "./middleware/graphql.js";
 
 const { GraphQLError } = graphql;
 
-const DEFAULT_WEBSOCKET_KEEPALIVE = 12_000;
+export const DEFAULT_WEBSOCKET_KEEPALIVE = 12_000;
 
 export const sleep = (ms: number) => {
   let _timeout: NodeJS.Timeout;
