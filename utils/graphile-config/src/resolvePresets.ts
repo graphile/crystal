@@ -41,15 +41,14 @@ try {
 export function isResolvedPreset(
   preset: GraphileConfig.Preset,
 ): preset is GraphileConfig.ResolvedPreset {
-  return (
-    (preset.extends == null &&
-      preset.plugins &&
-      preset.disablePlugins &&
-      typeof preset.lib === "object" &&
-      preset.lib !== null &&
-      !preset.plugins.some((p) => preset.disablePlugins!.includes(p.name))) ||
-    false
-  );
+  if (preset.extends != null) return false;
+  if (!preset.plugins) return false;
+  if (!preset.disablePlugins) return false;
+  if (typeof preset.lib !== "object" || preset.lib === null) return false;
+  for (const plugin of preset.plugins) {
+    if (preset.disablePlugins.includes(plugin.name)) return false;
+  }
+  return true;
 }
 
 /** @deprecated Use `resolvePreset({ extends: presets })` instead */
