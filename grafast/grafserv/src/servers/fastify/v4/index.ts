@@ -24,6 +24,7 @@ import {
   normalizeRequest,
   processHeaders,
 } from "../../../utils.js";
+import { DEFAULT_WEBSOCKET_KEEPALIVE } from "../../../websocketKeepalive.js";
 
 declare global {
   namespace Grafast {
@@ -202,8 +203,11 @@ export class FastifyGrafserv extends GrafservBase {
     };
 
     // Build websocket handler.
+    const keepaliveInterval =
+      this.getPreset().grafserv?.websocketKeepalive ??
+      DEFAULT_WEBSOCKET_KEEPALIVE;
     const wsHandler = websockets
-      ? makeHandler(makeGraphQLWSConfig(this))
+      ? makeHandler(makeGraphQLWSConfig(this), keepaliveInterval)
       : undefined;
 
     // Attach HTTP handler for POST requests.

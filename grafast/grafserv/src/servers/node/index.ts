@@ -20,6 +20,7 @@ import {
   makeGraphQLWSConfig,
   processHeaders,
 } from "../../utils.js";
+import { handleWebSocketKeepalive } from "../../websocketKeepalive.js";
 
 declare global {
   namespace Grafast {
@@ -352,6 +353,8 @@ export async function makeNodeUpgradeHandler(instance: GrafservBase) {
     });
   };
   const onConnection = (socket: WebSocket, request: IncomingMessage) => {
+    handleWebSocketKeepalive(socket, instance.getPreset());
+
     // a new socket opened, let graphql-ws take over
     const closed = graphqlWsServer.opened(
       {

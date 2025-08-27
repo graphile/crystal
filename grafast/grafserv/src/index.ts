@@ -147,6 +147,13 @@ declare global {
       websockets?: boolean;
 
       /**
+       * Duration (in milliseconds) between pings. Set to `-1` to disable.
+       *
+       * @defaultValue `12_000`
+       */
+      websocketKeepalive?: number;
+
+      /**
        * If you would like to customize the way in which errors are masked, you may
        * pass your own error masking function here. You can also import
        * `defaultMaskError` from `grafserv`.
