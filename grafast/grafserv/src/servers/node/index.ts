@@ -17,6 +17,7 @@ import type { GrafservConfig, RequestDigest } from "../../interfaces.js";
 import type { OptionsFromConfig } from "../../options.js";
 import {
   getBodyFromRequest,
+  handleWebSocketKeepalive,
   makeGraphQLWSConfig,
   processHeaders,
 } from "../../utils.js";
@@ -352,6 +353,8 @@ export async function makeNodeUpgradeHandler(instance: GrafservBase) {
     });
   };
   const onConnection = (socket: WebSocket, request: IncomingMessage) => {
+    handleWebSocketKeepalive(socket, instance.getPreset());
+
     // a new socket opened, let graphql-ws take over
     const closed = graphqlWsServer.opened(
       {
