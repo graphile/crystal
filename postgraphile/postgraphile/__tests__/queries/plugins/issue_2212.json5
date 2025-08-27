@@ -4,17 +4,17 @@
       {
         id: "WyJVc2VyIiwxXQ==",
         username: "Alice",
-        lifetimeOrderTotal: 1,
+        lifetimeOrderTotal: 13332,
       },
       {
         id: "WyJVc2VyIiwyXQ==",
         username: "Bob",
-        lifetimeOrderTotal: 2,
+        lifetimeOrderTotal: 5642,
       },
       {
         id: "WyJVc2VyIiwzXQ==",
         username: "Carl",
-        lifetimeOrderTotal: 3,
+        lifetimeOrderTotal: 0,
       },
     ],
   },
