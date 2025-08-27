@@ -1,7 +1,23 @@
-import type { ExecutionDetails, GrafastResultsList } from "grafast";
-import { constant, Step } from "grafast";
+import type {
+  ExecutionDetails,
+  GrafastResultsList,
+  LoadOneCallback,
+  LoadOneLoader,
+  LoadOneStep,
+  Maybe,
+  Multistep,
+  ObjectStep,
+  Thunk,
+  UnwrapMultistep,
+} from "grafast";
+import { constant, loadOne, Step } from "grafast";
 
-import type { PgClient, PgExecutor, WithPgClient } from "../executor";
+import type {
+  PgClient,
+  PgExecutor,
+  PgExecutorContextPlans,
+  WithPgClient,
+} from "../executor";
 
 export type SideEffectWithPgClientStepCallback<
   TData,
@@ -117,3 +133,120 @@ export function sideEffectWithPgClientTransaction<
 export const withPgClient = sideEffectWithPgClient;
 /** @deprecated Use `sideEffectWithPgClientTransaction` instead (or `loadOneWithPgClient`/`loadManyWithPgClient` if you're not doing a mutation) */
 export const withPgClientTransaction = sideEffectWithPgClientTransaction;
+
+export function loadOneWithPgClient<
+  const TLookup extends Multistep,
+  TItem,
+  TData extends Maybe<TItem> = Maybe<TItem>,
+  TParams extends Record<string, any> = Record<string, any>,
+  const TShared extends Record<string, Step> = never,
+>(
+  executor: PgExecutor,
+  lookup: TLookup,
+  loader: LoaderOrCallback<
+    UnwrapMultistep<TLookup>,
+    TItem,
+    TData,
+    TParams,
+    TShared & { pgClient: Step<PgClient> }
+  >,
+): LoadOneStep<
+  UnwrapMultistep<TLookup>,
+  TItem,
+  TData,
+  TParams,
+  TShared & { pgClient: Step<PgClient> }
+> {
+  const newLoader = getLoader(executor, loader);
+  return loadOne(lookup, newLoader);
+}
+
+type LoaderOrCallback<
+  TLookup extends Multistep,
+  TItem,
+  TData extends Maybe<TItem>,
+  TParams extends Record<string, any>,
+  TShared extends Record<string, Step>,
+> =
+  | LoadOneCallback<UnwrapMultistep<TLookup>, TItem, TData, TParams, TShared>
+  | LoadOneLoader<UnwrapMultistep<TLookup>, TItem, TData, TParams, TShared>;
+const transformedLoaderCache = new WeakMap<PgExecutor, WeakMap<any, any>>();
+
+function getLoader<
+  TLookup extends Multistep,
+  TItem,
+  TData extends Maybe<TItem>,
+  TParams extends Record<string, any>,
+  TShared extends Record<string, Step>,
+>(
+  executor: PgExecutor,
+  loader: LoaderOrCallback<
+    UnwrapMultistep<TLookup>,
+    TItem,
+    TData,
+    TParams,
+    TShared & { pgClient: Step<PgClient> }
+  >,
+) {
+  let cacheByExecutor = transformedLoaderCache.get(executor);
+  if (!cacheByExecutor) {
+    cacheByExecutor = new WeakMap();
+    transformedLoaderCache.set(executor, cacheByExecutor);
+  }
+  const existing = cacheByExecutor.get(loader);
+  if (existing) {
+    return existing;
+  } else {
+    const loaderObject = (
+      typeof loader === "function" ? { load: loader } : loader
+    ) as LoadOneLoader<
+      UnwrapMultistep<TLookup>,
+      TItem,
+      TData,
+      TParams,
+      TShared & { pgClient: Step<PgClient> }
+    >;
+    const transformedLoader: LoadOneLoader<
+      UnwrapMultistep<TLookup>,
+      TItem,
+      TData,
+      TParams,
+      TShared & { pgExecutorContext: ObjectStep<PgExecutorContextPlans> }
+    > = {
+      ...loaderObject,
+      shared: () => ({
+        ...unthunk(loaderObject.shared as TShared),
+        pgExecutorContext: executor.context(),
+      }),
+      load(specs, info) {
+        const {
+          shared: { pgExecutorContext, ...moreShared },
+          ...moreInfo
+        } = info;
+        return pgExecutorContext.withPgClient(
+          pgExecutorContext.pgSettings,
+          (pgClient) =>
+            Promise.resolve(
+              loaderObject.load(specs, {
+                ...moreInfo,
+                shared: {
+                  ...(moreShared as unknown as TShared),
+                  pgClient,
+                } as any,
+                unary: {
+                  ...(moreShared as unknown as TShared),
+                  pgClient,
+                } as any,
+              }),
+            ),
+        );
+      },
+    };
+    cacheByExecutor.set(loader, transformedLoader);
+    return transformedLoader;
+  }
+}
+
+function unthunk<T>(t: Thunk<T>): T {
+  return typeof t === "function" ? (t as () => T)() : t;
+}
