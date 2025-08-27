@@ -100,7 +100,7 @@ const plugin = extendSchema((build) => {
                     user_id: string;
                     phone: string;
                   }>({
-                    text: `select user_id::text, phone from issue_2212.user_contacts where id = any($1::int[]);`,
+                    text: `select user_id::text, phone from issue_2212.user_contacts where user_id = any($1::int[]);`,
                     values: [userIds],
                   });
 
@@ -113,6 +113,7 @@ const plugin = extendSchema((build) => {
                   for (const row of userContacts) {
                     const userId = row.user_id;
                     const rawPhone = row.phone;
+                    if (!rawPhone) continue;
                     const phone = normalizePhone(rawPhone);
 
                     phoneNumbersByUserId[userId] ??= new Set();
@@ -159,6 +160,7 @@ const normalizePhone = EXPORTABLE(
     (raw: string): string => {
       // toy normalizer for tests; in app, use libphonenumber-js
       let s = raw.replace(/[^\d+]/g, "").replace(/^\+00/, "+"); // handle +00
+      if (s.startsWith("+440")) return "+44" + s.slice(4);
       if (s.startsWith("+")) return s;
       // heuristic: if starts with "00" treat like +; "0" assume UK; else assume US
       if (s.startsWith("00")) return "+" + s.slice(2);
