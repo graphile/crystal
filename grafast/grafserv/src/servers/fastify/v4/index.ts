@@ -19,12 +19,12 @@ import type {
   Result,
 } from "../../../interfaces.js";
 import {
-  DEFAULT_WEBSOCKET_KEEPALIVE,
   getBodyFromFrameworkBody,
   makeGraphQLWSConfig,
   normalizeRequest,
   processHeaders,
 } from "../../../utils.js";
+import { DEFAULT_WEBSOCKET_KEEPALIVE } from "../../../websocketKeepalive.js";
 
 declare global {
   namespace Grafast {

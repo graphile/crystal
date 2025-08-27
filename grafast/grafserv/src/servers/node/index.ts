@@ -17,10 +17,10 @@ import type { GrafservConfig, RequestDigest } from "../../interfaces.js";
 import type { OptionsFromConfig } from "../../options.js";
 import {
   getBodyFromRequest,
-  handleWebSocketKeepalive,
   makeGraphQLWSConfig,
   processHeaders,
 } from "../../utils.js";
+import { handleWebSocketKeepalive } from "../../websocketKeepalive.js";
 
 declare global {
   namespace Grafast {
