@@ -285,6 +285,15 @@ function mergePreset(
   if (sourcePreset.plugins) {
     for (const plugin of sourcePreset.plugins) {
       assertPlugin(plugin);
+
+      // Check that we don't have two different plugins with the same name
+      const existing = targetPreset.plugins.find((p) => p.name === plugin.name);
+      if (existing && existing !== plugin) {
+        throw new Error(
+          `Two different plugins have been registered with the same name '${existing.name}'; this is likely an issue where you are using the same preset or plugin factory function more than once, though it could also be caused by duplicate dependencies in your 'node_modules' folder.`,
+        );
+      }
+
       seenPluginNames.add(plugin.name);
       sourcePluginNames.push(plugin.name);
     }
