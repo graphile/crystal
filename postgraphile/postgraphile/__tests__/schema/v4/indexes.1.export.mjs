@@ -491,8 +491,7 @@ const nonUpdatableViewCodec = recordCodec({
       notNull: false,
       hasDefault: false,
       extensions: {
-        tags: {},
-        isIndexed: false
+        tags: {}
       }
     }
   },
@@ -803,8 +802,7 @@ const testviewCodec = recordCodec({
       notNull: false,
       hasDefault: false,
       extensions: {
-        tags: {},
-        isIndexed: false
+        tags: {}
       }
     },
     col1: {
@@ -813,8 +811,7 @@ const testviewCodec = recordCodec({
       notNull: false,
       hasDefault: false,
       extensions: {
-        tags: {},
-        isIndexed: false
+        tags: {}
       }
     },
     col2: {
@@ -823,8 +820,7 @@ const testviewCodec = recordCodec({
       notNull: false,
       hasDefault: false,
       extensions: {
-        tags: {},
-        isIndexed: false
+        tags: {}
       }
     }
   },
@@ -1241,8 +1237,7 @@ const updatableViewCodec = recordCodec({
       notNull: false,
       hasDefault: false,
       extensions: {
-        tags: {},
-        isIndexed: false
+        tags: {}
       }
     },
     name: {
@@ -1251,8 +1246,7 @@ const updatableViewCodec = recordCodec({
       notNull: false,
       hasDefault: false,
       extensions: {
-        tags: {},
-        isIndexed: false
+        tags: {}
       }
     },
     description: {
@@ -1261,8 +1255,7 @@ const updatableViewCodec = recordCodec({
       notNull: false,
       hasDefault: false,
       extensions: {
-        tags: {},
-        isIndexed: false
+        tags: {}
       }
     },
     constant: {
@@ -1271,8 +1264,7 @@ const updatableViewCodec = recordCodec({
       notNull: false,
       hasDefault: false,
       extensions: {
-        tags: {},
-        isIndexed: false
+        tags: {}
       }
     }
   },
@@ -12089,6 +12081,11 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: NonUpdatableViewCondition
+
     """The method to use when ordering \`NonUpdatableView\`."""
     orderBy: [NonUpdatableViewsOrderBy!] = [NATURAL]
   ): NonUpdatableViewsConnection
@@ -12340,6 +12337,11 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: TestviewCondition
+
     """The method to use when ordering \`Testview\`."""
     orderBy: [TestviewsOrderBy!] = [NATURAL]
   ): TestviewsConnection
@@ -12537,6 +12539,11 @@ type Query implements Node {
 
     """Read all values in the set after (below) this cursor."""
     after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: UpdatableViewCondition
 
     """The method to use when ordering \`UpdatableView\`."""
     orderBy: [UpdatableViewsOrderBy!] = [NATURAL]
@@ -14174,9 +14181,20 @@ type NonUpdatableViewsEdge {
   node: NonUpdatableView
 }
 
+"""
+A condition to be used against \`NonUpdatableView\` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input NonUpdatableViewCondition {
+  """Checks for equality with the object’s \`column\` field."""
+  column: Int
+}
+
 """Methods to use when ordering \`NonUpdatableView\`."""
 enum NonUpdatableViewsOrderBy {
   NATURAL
+  COLUMN_ASC
+  COLUMN_DESC
 }
 
 """A connection to a list of \`Input\` values."""
@@ -14562,9 +14580,30 @@ type TestviewsEdge {
   node: Testview
 }
 
+"""
+A condition to be used against \`Testview\` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input TestviewCondition {
+  """Checks for equality with the object’s \`testviewid\` field."""
+  testviewid: Int
+
+  """Checks for equality with the object’s \`col1\` field."""
+  col1: Int
+
+  """Checks for equality with the object’s \`col2\` field."""
+  col2: Int
+}
+
 """Methods to use when ordering \`Testview\`."""
 enum TestviewsOrderBy {
   NATURAL
+  TESTVIEWID_ASC
+  TESTVIEWID_DESC
+  COL1_ASC
+  COL1_DESC
+  COL2_ASC
+  COL2_DESC
 }
 
 """A connection to a list of \`MyTable\` values."""
@@ -14822,9 +14861,35 @@ type UpdatableViewsEdge {
   node: UpdatableView
 }
 
+"""
+A condition to be used against \`UpdatableView\` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input UpdatableViewCondition {
+  """Checks for equality with the object’s \`x\` field."""
+  x: Int
+
+  """Checks for equality with the object’s \`name\` field."""
+  name: String
+
+  """Checks for equality with the object’s \`description\` field."""
+  description: String
+
+  """Checks for equality with the object’s \`constant\` field."""
+  constant: Int
+}
+
 """Methods to use when ordering \`UpdatableView\`."""
 enum UpdatableViewsOrderBy {
   NATURAL
+  X_ASC
+  X_DESC
+  NAME_ASC
+  NAME_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  CONSTANT_ASC
+  CONSTANT_DESC
 }
 
 """A connection to a list of \`NullTestRecord\` values."""
@@ -21667,6 +21732,10 @@ export const objects = {
           after(_, $connection, val) {
             $connection.setAfter(val.getRaw());
           },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
+          },
           orderBy(parent, $connection, value) {
             const $select = $connection.getSubplan();
             value.apply($select);
@@ -22023,6 +22092,10 @@ export const objects = {
           after(_, $connection, val) {
             $connection.setAfter(val.getRaw());
           },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
+          },
           orderBy(parent, $connection, value) {
             const $select = $connection.getSubplan();
             value.apply($select);
@@ -22078,6 +22151,10 @@ export const objects = {
           },
           after(_, $connection, val) {
             $connection.setAfter(val.getRaw());
+          },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
           },
           orderBy(parent, $connection, value) {
             const $select = $connection.getSubplan();
@@ -31189,6 +31266,19 @@ export const inputObjects = {
       }
     }
   },
+  NonUpdatableViewCondition: {
+    plans: {
+      column($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "?column?",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      }
+    }
+  },
   NoPrimaryKeyCondition: {
     plans: {
       id($condition, val) {
@@ -31959,6 +32049,37 @@ export const inputObjects = {
       }
     }
   },
+  TestviewCondition: {
+    plans: {
+      col1($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col1",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      },
+      col2($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "col2",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      },
+      testviewid($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "testviewid",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      }
+    }
+  },
   TestviewInput: {
     baked: createObjectAndApplyChildren,
     plans: {
@@ -32630,6 +32751,46 @@ export const inputObjects = {
     plans: {
       clientMutationId(qb, val) {
         qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  UpdatableViewCondition: {
+    plans: {
+      constant($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "constant",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      },
+      description($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "description",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
+          }
+        });
+      },
+      name($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "name",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.varchar)}`;
+          }
+        });
+      },
+      x($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "x",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
       }
     }
   },
@@ -33909,6 +34070,22 @@ export const enums = {
       }
     }
   },
+  NonUpdatableViewsOrderBy: {
+    values: {
+      COLUMN_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "?column?",
+          direction: "ASC"
+        });
+      },
+      COLUMN_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "?column?",
+          direction: "DESC"
+        });
+      }
+    }
+  },
   NoPrimaryKeysOrderBy: {
     values: {
       ID_ASC(queryBuilder) {
@@ -34391,6 +34568,46 @@ export const enums = {
       }
     }
   },
+  TestviewsOrderBy: {
+    values: {
+      COL1_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col1",
+          direction: "ASC"
+        });
+      },
+      COL1_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col1",
+          direction: "DESC"
+        });
+      },
+      COL2_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col2",
+          direction: "ASC"
+        });
+      },
+      COL2_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "col2",
+          direction: "DESC"
+        });
+      },
+      TESTVIEWID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "testviewid",
+          direction: "ASC"
+        });
+      },
+      TESTVIEWID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "testviewid",
+          direction: "DESC"
+        });
+      }
+    }
+  },
   TypesOrderBy: {
     values: {
       ID_ASC(queryBuilder) {
@@ -34422,6 +34639,60 @@ export const enums = {
             attribute: attributeName,
             direction: "DESC"
           });
+        });
+        queryBuilder.setOrderIsUnique();
+      }
+    }
+  },
+  UpdatableViewsOrderBy: {
+    values: {
+      CONSTANT_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "constant",
+          direction: "ASC"
+        });
+      },
+      CONSTANT_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "constant",
+          direction: "DESC"
+        });
+      },
+      DESCRIPTION_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "description",
+          direction: "ASC"
+        });
+      },
+      DESCRIPTION_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "description",
+          direction: "DESC"
+        });
+      },
+      NAME_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "name",
+          direction: "ASC"
+        });
+      },
+      NAME_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "name",
+          direction: "DESC"
+        });
+      },
+      X_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "x",
+          direction: "ASC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      X_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "x",
+          direction: "DESC"
         });
         queryBuilder.setOrderIsUnique();
       }

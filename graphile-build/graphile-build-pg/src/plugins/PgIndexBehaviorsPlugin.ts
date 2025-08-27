@@ -42,8 +42,12 @@ export const PgIndexBehaviorsPlugin: GraphileConfig.Plugin = {
           const referencedAttributes = pgConstraint
             .getAttributes()!
             .map((att) => att.attname);
-          const remoteIndexes = pgConstraint
-            .getClass()!
+          const remoteTable = pgConstraint.getClass()!;
+          if (remoteTable.relkind === "v") {
+            // Views can't have indexes; give them the benefit of the doubt
+            return;
+          }
+          const remoteIndexes = remoteTable
             .getIndexes()
             .filter((idx) => !idx.indpred);
 
@@ -72,16 +76,18 @@ export const PgIndexBehaviorsPlugin: GraphileConfig.Plugin = {
         const { attribute, pgAttribute } = event;
 
         // If this attribute isn't indexed, remove the filter and order behaviors
-        const isIndexed = pgAttribute
-          .getClass()!
-          .getIndexes()
-          .some((idx) => {
-            if (idx.indpred) {
-              return false;
-            }
-            const keys = idx.getKeys();
-            return keys[0]?.attname === pgAttribute.attname;
-          });
+        const tbl = pgAttribute.getClass()!;
+        if (tbl.relkind === "v") {
+          // Views can't have indexes; so stop
+          return;
+        }
+        const isIndexed = tbl.getIndexes().some((idx) => {
+          if (idx.indpred) {
+            return false;
+          }
+          const keys = idx.getKeys();
+          return keys[0]?.attname === pgAttribute.attname;
+        });
         if (!isIndexed) {
           if (!attribute.extensions) {
             attribute.extensions = Object.create(null);
