@@ -223,7 +223,7 @@ function getLoader<
     > = {
       ...loaderObject,
       shared: () => ({
-        ...unthunk(loaderObject.shared as TShared),
+        ...unthunk(loaderObject.shared as Thunk<TShared>),
         pgExecutorContext: executor.context(),
       }),
       load(specs, info) {
