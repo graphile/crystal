@@ -190,9 +190,12 @@ import {
 } from "./steps/pgValidateParsedCursor.js";
 import { toPg, ToPgStep } from "./steps/toPg.js";
 import {
+  loadOneWithPgClient,
+  sideEffectWithPgClient,
+  SideEffectWithPgClientStep,
+  SideEffectWithPgClientStepCallback,
+  sideEffectWithPgClientTransaction,
   withPgClient,
-  WithPgClientStep,
-  WithPgClientStepCallback,
   withPgClientTransaction,
 } from "./steps/withPgClient.js";
 import { assertPgClassSingleStep } from "./utils.js";
@@ -217,6 +220,7 @@ export {
   isEnumCodec,
   KeysOfType,
   listOfCodec,
+  loadOneWithPgClient,
   makePgResourceOptions,
   MakePgServiceOptions,
   makeRegistry,
@@ -350,6 +354,10 @@ export {
   PlanByUniques,
   rangeOfCodec,
   recordCodec,
+  sideEffectWithPgClient,
+  SideEffectWithPgClientStep,
+  SideEffectWithPgClientStepCallback,
+  sideEffectWithPgClientTransaction,
   sqlFromArgDigests,
   sqlValueWithCodec,
   toPg,
@@ -359,8 +367,6 @@ export {
   WithPgClient,
   withPgClient,
   withPgClientFromPgService,
-  WithPgClientStep,
-  WithPgClientStepCallback,
   withPgClientTransaction,
   withSuperuserPgClientFromPgService,
 };
@@ -417,9 +423,10 @@ exportAsMany("@dataplan/pg", {
   PgTempTable,
   toPg,
   ToPgStep,
-  withPgClient,
-  withPgClientTransaction,
-  WithPgClientStep,
+  loadOneWithPgClient,
+  sideEffectWithPgClient,
+  sideEffectWithPgClientTransaction,
+  SideEffectWithPgClientStep,
   getWithPgClientFromPgService,
   withPgClientFromPgService,
   withSuperuserPgClientFromPgService,

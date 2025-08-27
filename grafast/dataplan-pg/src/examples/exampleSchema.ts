@@ -122,7 +122,7 @@ import type {
 } from "../steps/pgUnionAll.js";
 import { pgUnionAll } from "../steps/pgUnionAll.js";
 import {
-  WithPgClientStep,
+  SideEffectWithPgClientStep,
   withPgClientTransaction,
 } from "../steps/withPgClient.js";
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -4951,23 +4951,24 @@ export function makeExampleSchema(
     },
   });
 
-  const MultipleActionsPayload = newObjectTypeBuilder<WithPgClientStep>(
-    WithPgClientStep,
-  )({
-    name: "MultipleActionsPayload",
-    fields: {
-      i: {
-        type: new GraphQLList(new GraphQLNonNull(GraphQLInt)),
-        plan: EXPORTABLE(
-          () =>
-            function plan($parent) {
-              return $parent;
-            },
-          [],
-        ),
+  const MultipleActionsPayload =
+    newObjectTypeBuilder<SideEffectWithPgClientStep>(
+      SideEffectWithPgClientStep,
+    )({
+      name: "MultipleActionsPayload",
+      fields: {
+        i: {
+          type: new GraphQLList(new GraphQLNonNull(GraphQLInt)),
+          plan: EXPORTABLE(
+            () =>
+              function plan($parent) {
+                return $parent;
+              },
+            [],
+          ),
+        },
       },
-    },
-  });
+    });
 
   const Mutation = newObjectTypeBuilder<__ValueStep<BaseGraphQLRootValue>>(
     __ValueStep,

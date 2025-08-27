@@ -3,7 +3,7 @@ import { constant, Step } from "grafast";
 
 import type { PgClient, PgExecutor, WithPgClient } from "../executor";
 
-export type WithPgClientStepCallback<
+export type SideEffectWithPgClientStepCallback<
   TData,
   TResult,
   TPgClient extends PgClient = PgClient,
@@ -14,14 +14,14 @@ export type WithPgClientStepCallback<
  * from `$data` (which can be `constant(null)` if you don't need it). Typically
  * useful for running custom transactions.
  */
-export class WithPgClientStep<
+export class SideEffectWithPgClientStep<
   TData = any,
   TResult = any,
   TPgClient extends PgClient = PgClient,
 > extends Step<TResult> {
   static $$export = {
     moduleName: "@dataplan/pg",
-    exportName: "WithPgClientStep",
+    exportName: "SideEffectWithPgClientStep",
   };
 
   isSyncAndSafe = false;
@@ -45,7 +45,11 @@ export class WithPgClientStep<
   constructor(
     executor: PgExecutor,
     $data: Step<TData>,
-    private callback: WithPgClientStepCallback<TData, TResult, TPgClient>,
+    private callback: SideEffectWithPgClientStepCallback<
+      TData,
+      TResult,
+      TPgClient
+    >,
   ) {
     super();
     this.executor = executor;
@@ -73,7 +77,7 @@ export class WithPgClientStep<
   }
 }
 
-export function withPgClient<
+export function sideEffectWithPgClient<
   TData,
   TResult,
   TPgClient extends PgClient = PgClient,
@@ -82,16 +86,16 @@ export function withPgClient<
   $data:
     | Step<TData>
     | (TData extends null | undefined ? null | undefined : never),
-  callback: WithPgClientStepCallback<TData, TResult, TPgClient>,
+  callback: SideEffectWithPgClientStepCallback<TData, TResult, TPgClient>,
 ) {
-  return new WithPgClientStep(
+  return new SideEffectWithPgClientStep(
     executor,
     $data ?? constant($data as TData),
     callback,
   );
 }
 
-export function withPgClientTransaction<
+export function sideEffectWithPgClientTransaction<
   TData,
   TResult,
   TPgClient extends PgClient = PgClient,
@@ -100,12 +104,16 @@ export function withPgClientTransaction<
   $data:
     | Step<TData>
     | (TData extends null | undefined ? null | undefined : never),
-  callback: WithPgClientStepCallback<TData, TResult, TPgClient>,
+  callback: SideEffectWithPgClientStepCallback<TData, TResult, TPgClient>,
 ) {
-  return withPgClient<TData, TResult, TPgClient>(
+  return sideEffectWithPgClient<TData, TResult, TPgClient>(
     executor,
     $data ?? constant($data as TData),
     (client, data) =>
       client.withTransaction((txClient) => callback(txClient, data)),
   );
 }
+/** @deprecated Use `sideEffectWithPgClient` or `loadOneWithPgClient` or `loadManyWithPgClient` instead */
+export const withPgClient = sideEffectWithPgClient;
+/** @deprecated Use `sideEffectWithPgClientTransaction` instead (or `loadOneWithPgClient`/`loadManyWithPgClient` if you're not doing a mutation) */
+export const withPgClientTransaction = sideEffectWithPgClientTransaction;
