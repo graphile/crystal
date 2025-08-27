@@ -45,7 +45,7 @@ import JSON5 from "json5";
 import type { JwtPayload } from "jsonwebtoken";
 import * as jsonwebtoken from "jsonwebtoken";
 import { decode } from "jsonwebtoken";
-import { relative } from "path";
+import { dirname, relative, resolve } from "path";
 import type { PoolClient } from "pg";
 import { Pool } from "pg";
 
@@ -312,7 +312,10 @@ export async function runTestQuery(
   const presets = await Promise.all(
     extendsRaw.map(async (extendRaw) => {
       const [modulePath, name = "default"] = extendRaw.split(":");
-      const mod = await import(modulePath);
+      const absModulePath = modulePath.startsWith(".")
+        ? resolve(dirname(path), modulePath)
+        : modulePath;
+      const mod = await import(absModulePath);
       const imported = mod[name];
       if (!imported) {
         throw new Error(
