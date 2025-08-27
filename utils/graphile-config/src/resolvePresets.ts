@@ -2,6 +2,8 @@ import "./interfaces.js";
 
 import { sortWithBeforeAfterProvides } from "./sort.js";
 
+type SeenPlugins = Map<string, GraphileConfig.Plugin | null>;
+
 const PROBABLY_A_PLUGIN_NOT_A_PRESET_KEYS = [
   "name", // If we want to give presets a name, we should use 'id', 'label', 'title' or similar.
   "experimental",
@@ -45,15 +47,15 @@ export function isResolvedPreset(
   if (!preset.plugins) return false;
   if (!preset.disablePlugins) return false;
   if (typeof preset.lib !== "object" || preset.lib === null) return false;
-  const seenPluginNames = new Set<string>();
+  const seenPlugins: SeenPlugins = new Map();
   for (const plugin of preset.plugins) {
     if (preset.disablePlugins.includes(plugin.name)) return false;
 
-    if (seenPluginNames.has(plugin.name)) {
+    if (seenPlugins.has(plugin.name)) {
       // Contains duplicate; handle on default path
       return false;
     } else {
-      seenPluginNames.add(plugin.name);
+      seenPlugins.set(plugin.name, plugin);
     }
   }
   return true;
@@ -82,18 +84,18 @@ export function resolvePreset(
     return preset;
   }
 
-  const seenPluginNames = new Set<string>();
-  const resolvedPreset = resolvePresetsInternal([preset], seenPluginNames, 0);
+  const seenPlugins: SeenPlugins = new Map();
+  const resolvedPreset = resolvePresetsInternal([preset], seenPlugins, 0);
 
   const disabledButNotSeen = resolvedPreset.disablePlugins?.filter(
-    (n) => !seenPluginNames.has(n),
+    (n) => !seenPlugins.has(n),
   );
   if (disabledButNotSeen?.length) {
     console.warn(
       `One or more of the plugin(s) entered in your preset's 'disablePlugins' list was never seen - perhaps you have misspelled them?\n${disabledButNotSeen
         .map((p) => `  - ${p}`)
         .join("\n")}\nThe list of know plugins is:\n  ${
-        [...seenPluginNames].join(", ") ?? "-"
+        [...seenPlugins.keys()].join(", ") ?? "-"
       }`,
     );
   }
@@ -103,22 +105,24 @@ export function resolvePreset(
 
 function resolvePresetsInternal(
   presets: ReadonlyArray<GraphileConfig.Preset>,
-  seenPluginNames: Set<string>,
+  seenPlugins: SeenPlugins,
   depth: number,
 ): GraphileConfig.ResolvedPreset {
   const finalPreset = blankResolvedPreset();
   for (const preset of presets) {
     if (isResolvedPreset(preset) && preset.disablePlugins) {
       for (const p of preset.disablePlugins) {
-        seenPluginNames.add(p);
+        if (!seenPlugins.has(p)) {
+          seenPlugins.set(p, null);
+        }
       }
     }
     const resolvedPreset = resolvePresetInternal(
       preset,
-      seenPluginNames,
+      seenPlugins,
       depth + 1,
     );
-    mergePreset(finalPreset, resolvedPreset, seenPluginNames, depth);
+    mergePreset(finalPreset, resolvedPreset, seenPlugins, depth);
   }
 
   if (finalPreset.plugins) {
@@ -210,7 +214,7 @@ function isForbiddenPluginKey(key: string): boolean {
  */
 function resolvePresetInternal(
   preset: GraphileConfig.Preset,
-  seenPluginNames: Set<string>,
+  seenPlugins: SeenPlugins,
   depth: number,
 ): GraphileConfig.ResolvedPreset {
   if (!isGraphileConfigPreset(preset)) {
@@ -254,14 +258,10 @@ function resolvePresetInternal(
   }
 
   const { extends: presets = [], ...rest } = preset;
-  const basePreset = resolvePresetsInternal(
-    presets,
-    seenPluginNames,
-    depth + 1,
-  );
+  const basePreset = resolvePresetsInternal(presets, seenPlugins, depth + 1);
 
   try {
-    mergePreset(basePreset, rest, seenPluginNames, depth);
+    mergePreset(basePreset, rest, seenPlugins, depth);
     return basePreset;
   } catch (e) {
     throw new Error(
@@ -285,7 +285,7 @@ function resolvePresetInternal(
 function mergePreset(
   targetPreset: GraphileConfig.ResolvedPreset,
   sourcePreset: Omit<GraphileConfig.Preset, "extends">,
-  seenPluginNames: Set<string>,
+  seenPlugins: SeenPlugins,
   _depth: number,
 ): void {
   const sourcePluginNames: string[] = [];
@@ -294,14 +294,14 @@ function mergePreset(
       assertPlugin(plugin);
 
       // Check that we don't have two different plugins with the same name
-      const existing = targetPreset.plugins.find((p) => p.name === plugin.name);
+      const existing = seenPlugins.get(plugin.name);
       if (existing && existing !== plugin) {
         throw new Error(
           `Two different plugins have been registered with the same name '${existing.name}'; this is likely an issue where you are using the same preset or plugin factory function more than once, though it could also be caused by duplicate dependencies in your 'node_modules' folder.`,
         );
       }
 
-      seenPluginNames.add(plugin.name);
+      seenPlugins.set(plugin.name, plugin);
       sourcePluginNames.push(plugin.name);
     }
   }
