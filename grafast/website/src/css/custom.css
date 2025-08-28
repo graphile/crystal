@@ -59,6 +59,14 @@ figure iframe {
   display: inline-block;
 }
 
+.mdx-wrapper {
+  article > :not(.wide) {
+    max-width: 49rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
 sup a {
   font-weight: bold;
   color: var(--grafast-color-pink);

@@ -206,6 +206,11 @@ const config = {
             position: "right",
           },
           {
+            to: "support",
+            label: "Support",
+            position: "right",
+          },
+          {
             href: "https://github.com/grafast/wg",
             label: "WG",
             position: "right",
