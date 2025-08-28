@@ -11,13 +11,16 @@ export function addPgTableCondition(
   conditionFieldSpecGenerator: (
     build: GraphileBuild.Build,
   ) => GrafastInputFieldConfig,
+  // DEPRECATED! Use `apply` instead.
   conditionGenerator?: (
     value: unknown,
     helpers: {
       sql: typeof sql;
       sqlTableAlias: SQL;
       sqlValueWithCodec: typeof sqlValueWithCodec;
-      build: GraphileBuild.Build;
+      // We can't afford to make the entire of build EXPORTABLE, and people
+      // really ought to move to using the `apply` method, so...
+      build: ReturnType<typeof pruneBuild>;
       /** @internal We might expose this in future if needed */
       condition: PgCondition;
     },
@@ -85,21 +88,23 @@ export function addPgTableCondition(
               );
             }
             // build applyPlan
+            const _build = pruneBuild(build);
             conditionFieldSpec.apply = EXPORTABLE(
-              (build, conditionGenerator, sql, sqlValueWithCodec) =>
+              (_build, conditionGenerator, sql, sqlValueWithCodec) =>
                 function apply(condition: PgCondition, val) {
                   const expression = conditionGenerator!(val, {
                     sql,
                     sqlTableAlias: condition.alias,
                     sqlValueWithCodec,
-                    build,
+                    build: _build,
                     condition,
                   });
                   if (expression) {
                     condition.where(expression);
                   }
                 },
-              [build, conditionGenerator, sql, sqlValueWithCodec],
+              [_build, conditionGenerator, sql, sqlValueWithCodec],
+              "addPgTableCondition_generator",
             );
           }
           const meta = build._pluginMeta[displayName]!;
@@ -125,3 +130,23 @@ export function addPgTableCondition(
 
 /** @deprecated renamed to addPgTableCondition */
 export const makeAddPgTableConditionPlugin = addPgTableCondition;
+
+function pruneBuild(build: GraphileBuild.Build) {
+  const {
+    sql,
+    grafast,
+    graphql,
+    dataplanPg,
+    input: { pgRegistry },
+  } = build;
+  return EXPORTABLE(
+    (dataplanPg, grafast, graphql, pgRegistry, sql) => ({
+      sql,
+      grafast,
+      graphql,
+      dataplanPg,
+      input: { pgRegistry },
+    }),
+    [dataplanPg, grafast, graphql, pgRegistry, sql],
+  );
+}
