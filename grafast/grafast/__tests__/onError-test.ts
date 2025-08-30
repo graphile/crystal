@@ -5,11 +5,13 @@ import { type ExecutionResult } from "graphql";
 import { it } from "mocha";
 
 import {
+  constant,
   context,
   get,
   grafast,
   GraphQLSpecifiedErrorBehaviors,
   lambda,
+  list,
   makeGrafastSchema,
   Step,
 } from "../dist/index.js";
@@ -46,6 +48,7 @@ const schema = makeGrafastSchema({
       nullableList: [Int]
       throwNonNullable: Int!
       throwNullable: Int
+      friends: [User!]
     }
   `,
   objects: {
@@ -58,6 +61,17 @@ const schema = makeGrafastSchema({
     },
     User: {
       plans: {
+        friends($user) {
+          return list([
+            constant({
+              id: 99,
+              name: "Test",
+              nonNullable: 99,
+              nonNullableList: [],
+            }),
+            $user,
+          ]);
+        },
         throwNonNullable($user: Step) {
           return lambda($user, () => {
             throw new Error("Threw in non-nullable field");
@@ -441,6 +455,93 @@ GraphQLSpecifiedErrorBehaviors.forEach((onError) => {
                 nonNullableList: [1, 1, 2, null, 5],
                 nullableList: null,
                 name: "Benjie",
+              },
+            });
+            break;
+          }
+          case "HALT": {
+            expect(result.data).to.equal(null);
+            break;
+          }
+          default: {
+            const never: never = onError;
+            throw new Error(`Unexpected onError: ${never}`);
+          }
+        }
+      }),
+    );
+
+    it(
+      "handles null in non-nullable position inside a non-nullable list position",
+      throwOnUnhandledRejections(async () => {
+        const source = /* GraphQL */ `
+          {
+            me {
+              id
+              name
+              friends {
+                id
+                name
+                nonNullableList
+                nullableList
+              }
+            }
+          }
+        `;
+        const result = (await grafast({
+          schema,
+          source,
+          onError,
+          contextValue: {
+            me: {
+              id: 42,
+              nonNullableList: [1, 1, 2, null, 5],
+              nullableList: null,
+              name: "Benjie",
+            },
+          },
+          requestContext,
+          resolvedPreset,
+        })) as ExecutionResult;
+
+        // All error modes expect the same errors:
+        expect(result.errors).to.have.length(1);
+        expect(result.errors![0]).to.deep.include({
+          message:
+            "Cannot return null for non-nullable field User.nonNullableList.",
+          path: ["me", "friends", 1, "nonNullableList", 3],
+        });
+
+        switch (onError) {
+          case "PROPAGATE": {
+            expect(result.data).to.deep.equal({
+              me: {
+                id: 42,
+                name: "Benjie",
+                friends: null,
+              },
+            });
+            break;
+          }
+          case "NULL": {
+            expect(result.data).to.deep.equal({
+              me: {
+                id: 42,
+                name: "Benjie",
+                friends: [
+                  {
+                    id: 99,
+                    name: "Test",
+                    nonNullableList: [],
+                    nullableList: null,
+                  },
+                  {
+                    id: 42,
+                    name: "Benjie",
+                    nonNullableList: [1, 1, 2, null, 5],
+                    nullableList: null,
+                  },
+                ],
               },
             });
             break;
