@@ -521,6 +521,42 @@ const preset: GraphileConfig.Preset = {
         },
       },
     }),
+    // Testing errors
+    extendSchema({
+      typeDefs: /* GraphQL */ `
+        extend type Query {
+          errorTests: ErrorTests
+        }
+        type ErrorTests {
+          fourtyTwo: Int!
+          nonNullableReturningNull: Int!
+          coercionFailure: Int
+        }
+      `,
+      objects: {
+        Query: {
+          plans: {
+            errorTests: EXPORTABLE(
+              (constant) => () => constant({}),
+              [constant],
+            ),
+          },
+        },
+        ErrorTests: {
+          plans: {
+            fourtyTwo: EXPORTABLE((constant) => () => constant(42), [constant]),
+            nonNullableReturningNull: EXPORTABLE(
+              (constant) => () => constant(null),
+              [constant],
+            ),
+            coercionFailure: EXPORTABLE(
+              (constant) => () => constant("NOT A NUMBER"),
+              [constant],
+            ),
+          },
+        },
+      },
+    }),
     // PrimaryKeyMutationsOnlyPlugin,
     PersistedPlugin,
     ruruTitle("<New title text here!>"),
