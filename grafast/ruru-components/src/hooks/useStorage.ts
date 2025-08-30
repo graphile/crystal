@@ -8,11 +8,11 @@ export interface StoredKeys {
   explainSize: string;
   verbose: "true" | "";
   condensed: "true" | "";
-  onError: "PROPAGATE" | "NULL" | "HALT";
+  onError: "PROPAGATE" | "NULL" | "HALT" | "";
 }
 
 const storageDefault: { [key in keyof StoredKeys]?: StoredKeys[key] } = {
-  onError: "PROPAGATE",
+  onError: "",
 };
 
 const KEYS: { [key in keyof StoredKeys]: string } = {

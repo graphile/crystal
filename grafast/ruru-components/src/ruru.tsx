@@ -223,7 +223,13 @@ export const RuruInner: FC<{
             </ToolbarMenu.Item>
             <ToolbarMenu.Item
               title="Traditional GraphQL error handling"
-              onSelect={() => storage.set("onError", "PROPAGATE")}
+              onSelect={() => {
+                if (storage.get("onError") === "PROPAGATE") {
+                  storage.set("onError", "");
+                } else {
+                  storage.set("onError", "PROPAGATE");
+                }
+              }}
             >
               <span>
                 {storage.get("onError") === "PROPAGATE" ? check : nocheck}

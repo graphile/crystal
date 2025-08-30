@@ -242,7 +242,7 @@ export const useFetcher = (
       const [params, ...rest] = inArgs;
       const onError = storage.get("onError");
       const args = [
-        onError !== "PROPAGATE" ? { ...params, onError } : params,
+        onError ? { ...params, onError } : params,
         ...rest,
       ] as const;
 
