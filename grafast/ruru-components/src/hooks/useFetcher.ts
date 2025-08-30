@@ -15,6 +15,7 @@ import { getOperationAST, parse } from "graphql";
 import { useEffect, useMemo, useState } from "react";
 
 import type { RuruProps } from "../interfaces.js";
+import { useStorage } from "./useStorage.js";
 
 export interface IExplainedOperation {
   type: string;
@@ -102,6 +103,7 @@ export const useFetcher = (
   props: RuruProps,
   options: { explain?: boolean; verbose?: boolean } = {},
 ) => {
+  const storage = useStorage();
   const [streamEndpoint, setStreamEndpoint] = useState<string | null>(null);
   const endpoint = props.endpoint ?? "/graphql";
   const url = endpoint.startsWith("/")
@@ -235,8 +237,15 @@ export const useFetcher = (
       return result;
     };
     return async function (
-      ...args: Parameters<Fetcher>
+      ...inArgs: Parameters<Fetcher>
     ): Promise<Awaited<FetcherReturnType>> {
+      const [params, ...rest] = inArgs;
+      const onError = storage.get("onError");
+      const args = [
+        onError !== "PROPAGATE" ? { ...params, onError } : params,
+        ...rest,
+      ] as const;
+
       const result = await fetcher(...args);
 
       // Short circuit the introspection query so as to not confuse people
@@ -275,7 +284,7 @@ export const useFetcher = (
         return processPayload(result) as any;
       }
     };
-  }, [fetcher, verbose]);
+  }, [fetcher, storage, verbose]);
 
   return { fetcher: wrappedFetcher, explainResults, streamEndpoint };
 };
