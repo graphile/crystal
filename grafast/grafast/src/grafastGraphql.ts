@@ -13,6 +13,7 @@ import { SafeError } from "./error.js";
 import { execute } from "./execute.js";
 import { hookArgs } from "./index.js";
 import type {
+  ErrorBehavior,
   GrafastArgs,
   GrafastExecutionArgs,
   ParseAndValidateEvent,
@@ -160,6 +161,8 @@ export function grafast(
     contextValue,
     variableValues,
     operationName,
+    onError,
+    extensions,
     fieldResolver,
     typeResolver,
     resolvedPreset,
@@ -207,6 +210,8 @@ export function grafast(
     contextValue,
     variableValues,
     operationName,
+    onError,
+    extensions,
     fieldResolver,
     typeResolver,
     middleware,

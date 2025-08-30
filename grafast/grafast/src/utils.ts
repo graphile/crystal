@@ -33,6 +33,7 @@ import { SafeError } from "./error.js";
 import { inspect } from "./inspect.js";
 import type {
   BaseGraphQLArguments,
+  ErrorBehavior,
   ExecutionEntryFlags,
   GrafastFieldConfig,
   GrafastInputFieldConfig,
@@ -1512,3 +1513,9 @@ export function terminateIterable(
     iterable.return();
   }
 }
+
+export const GraphQLSpecifiedErrorBehaviors = Object.freeze([
+  "PROPAGATE",
+  "NULL",
+  "HALT",
+]) as readonly ErrorBehavior[];

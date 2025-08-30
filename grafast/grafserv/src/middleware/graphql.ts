@@ -2,8 +2,18 @@ import { parse as parseGraphQLQueryString } from "node:querystring";
 
 import { LRU } from "@graphile/lru";
 import { createHash } from "crypto";
-import type { GrafastExecutionArgs, PromiseOrDirect } from "grafast";
-import { $$extensions, hookArgs, isAsyncIterable, SafeError } from "grafast";
+import type {
+  ErrorBehavior,
+  GrafastExecutionArgs,
+  PromiseOrDirect,
+} from "grafast";
+import {
+  $$extensions,
+  GraphQLSpecifiedErrorBehaviors,
+  hookArgs,
+  isAsyncIterable,
+  SafeError,
+} from "grafast";
 import type { DocumentNode, GraphQLSchema } from "grafast/graphql";
 import * as graphql from "grafast/graphql";
 
@@ -98,6 +108,7 @@ function parseGraphQLQueryParams(
     typeof variablesString === "string"
       ? JSON.parse(variablesString)
       : undefined;
+  const onError = params.onError ?? undefined;
   const extensionsString = params.extensions ?? undefined;
   const extensions =
     typeof extensionsString === "string"
@@ -109,6 +120,7 @@ function parseGraphQLQueryParams(
     query,
     operationName,
     variableValues,
+    onError,
     extensions,
   };
 }
@@ -207,6 +219,7 @@ function parseGraphQLBody(
             query: body.text,
             operationName: undefined,
             variableValues: undefined,
+            onError: undefined,
             extensions: undefined,
           };
         }
@@ -217,6 +230,7 @@ function parseGraphQLBody(
             query: body.buffer.toString("utf8"),
             operationName: undefined,
             variableValues: undefined,
+            onError: undefined,
             extensions: undefined,
           };
         }
@@ -260,7 +274,7 @@ const graphqlOrHTMLAcceptMatcher = makeAcceptMatcher([
 export function validateGraphQLBody(
   parsed: ParsedGraphQLBody,
 ): ValidatedGraphQLBody {
-  const { query, operationName, variableValues, extensions } = parsed;
+  const { query, operationName, variableValues, onError, extensions } = parsed;
 
   if (typeof query !== "string") {
     throw httpError(400, "query must be a string");
@@ -273,6 +287,15 @@ export function validateGraphQLBody(
     (typeof variableValues !== "object" || Array.isArray(variableValues))
   ) {
     throw httpError(400, "Invalid variables; expected JSON-encoded object");
+  }
+  if (
+    onError != null &&
+    !GraphQLSpecifiedErrorBehaviors.includes(onError as ErrorBehavior)
+  ) {
+    throw httpError(
+      400,
+      `Invalid onError; supported error behaviors are: ${GraphQLSpecifiedErrorBehaviors.join(", ")}`,
+    );
   }
   if (
     extensions != null &&
@@ -414,7 +437,7 @@ const _makeGraphQLHandlerInternal = (instance: GrafservBase) => {
     const outputDataAsString = dynamicOptions.outputDataAsString;
     const { maskIterator, maskPayload, maskError } = dynamicOptions;
 
-    const { query, operationName, variableValues } = body;
+    const { query, operationName, variableValues, onError } = body;
     const { errors, document } = parseAndValidate(query);
 
     if (errors !== undefined) {
@@ -458,6 +481,7 @@ const _makeGraphQLHandlerInternal = (instance: GrafservBase) => {
       contextValue,
       variableValues,
       operationName,
+      onError,
       resolvedPreset,
       requestContext: grafastCtx,
       middleware: grafastMiddleware,

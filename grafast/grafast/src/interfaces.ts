@@ -735,6 +735,11 @@ export type StreamMoreableArray<T = any> = Array<T> & {
 };
 
 export interface GrafastArgs extends GraphQLArgs {
+  // This should ultimately come from graphql
+  onError?: ErrorBehavior;
+
+  // These are ours
+  extensions?: Record<string, unknown>;
   resolvedPreset?: GraphileConfig.ResolvedPreset;
   requestContext?: Partial<Grafast.RequestContext>;
   middleware?: Middleware<GraphileConfig.GrafastMiddleware> | null;
@@ -774,6 +779,11 @@ export type DataFromStep<TStep extends Step> =
   TStep extends Step<infer TData> ? TData : never;
 
 export interface GrafastExecutionArgs extends ExecutionArgs {
+  // This should ultimately come from graphql
+  onError?: ErrorBehavior;
+
+  // These are ours
+  extensions?: Record<string, unknown>;
   resolvedPreset?: GraphileConfig.ResolvedPreset;
   middleware?: Middleware<GraphileConfig.GrafastMiddleware> | null;
   requestContext?: Partial<Grafast.RequestContext>;
@@ -847,3 +857,8 @@ export interface AbstractTypePlanner {
 }
 
 export type Thunk<T> = T | (() => T);
+
+/**
+ * GraphQL error behavior, as per https://github.com/graphql/graphql-spec/pull/1163
+ */
+export type ErrorBehavior = "PROPAGATE" | "NULL" | "HALT";

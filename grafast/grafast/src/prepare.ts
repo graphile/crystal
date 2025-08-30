@@ -571,6 +571,13 @@ function establishOperationPlanFromEvent(event: EstablishOperationPlanEvent) {
   );
 }
 
+// TODO: upstream this
+declare module "graphql/execution/execute.js" {
+  interface ExecutionContext {
+    onError: "PROPAGATE" | "NULL" | "HALT";
+  }
+}
+
 /**
  * @internal
  */
@@ -596,6 +603,9 @@ export function grafastPrepare(
       errors: exeContext,
       extensions: rootValue[$$extensions],
     });
+  }
+  if (!exeContext.onError) {
+    exeContext.onError = args.onError ?? "PROPAGATE";
   }
 
   const { operation, fragments, variableValues } = exeContext;

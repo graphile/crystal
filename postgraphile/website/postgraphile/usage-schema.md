@@ -103,7 +103,7 @@ Here's a full example:
 
 ```ts
 import { postgraphile } from "postgraphile";
-import { grafast } from "postgraphile/grafast";
+import { grafast, type ErrorBehavior } from "postgraphile/grafast";
 import preset from "./graphile.config.js";
 
 // Make a new PostGraphile instance:
@@ -121,6 +121,7 @@ export async function executeQuery(
   source: string,
   variableValues?: Record<string, unknown> | null,
   operationName?: string,
+  onError?: ErrorBehavior,
 ) {
   const { schema, resolvedPreset } = await pgl.getSchemaResult();
   return await grafast({
@@ -128,6 +129,7 @@ export async function executeQuery(
     source,
     variableValues,
     operationName,
+    onError,
     resolvedPreset,
     requestContext,
   });
@@ -158,7 +160,7 @@ Here's an example using hookArgs:
 ```ts
 import { postgraphile } from "postgraphile";
 import { parse, validate } from "postgraphile/graphql";
-import { execute, hookArgs } from "postgraphile/grafast";
+import { execute, hookArgs, type ErrorBehavior } from "postgraphile/grafast";
 import preset from "./graphile.config.js";
 
 // Build a `pgl` instance, with helpers and schema based on our preset.
@@ -174,6 +176,7 @@ export async function executeQuery(
   source: string,
   variableValues?: Record<string, unknown> | null,
   operationName?: string,
+  onError?: ErrorBehavior,
 ) {
   // We might get a newer schema in "watch" mode
   const { schema, resolvedPreset } = await pgl.getSchemaResult();
@@ -193,6 +196,7 @@ export async function executeQuery(
     document,
     variableValues,
     operationName,
+    onError,
     resolvedPreset,
     requestContext,
   });
@@ -218,7 +222,7 @@ import type {
   ResultOf,
 } from "@graphql-typed-document-node/core";
 import { postgraphile } from "postgraphile";
-import { execute, hookArgs } from "postgraphile/grafast";
+import { execute, hookArgs, type ErrorBehavior } from "postgraphile/grafast";
 import { validate } from "postgraphile/graphql";
 import preset from "./graphile.config.js";
 
@@ -232,6 +236,7 @@ export async function executeDocument<
   document: TDoc,
   variableValues?: VariablesOf<TDoc>,
   operationName?: string,
+  onError?: ErrorBehavior,
 ): Promise<ExecutionResult<ResultOf<TDoc>, TExtensions>> {
   const { schema, resolvedPreset } = await pgl.getSchemaResult();
 
@@ -247,6 +252,7 @@ export async function executeDocument<
     document,
     variableValues,
     operationName,
+    onError,
     resolvedPreset,
     requestContext,
   } as any);

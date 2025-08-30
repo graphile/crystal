@@ -1,6 +1,12 @@
 import "graphile-config";
 
-import type { execute, PromiseOrDirect, SafeError, subscribe } from "grafast";
+import type {
+  ErrorBehavior,
+  execute,
+  PromiseOrDirect,
+  SafeError,
+  subscribe,
+} from "grafast";
 import type {
   AsyncExecutionResult,
   FormattedExecutionResult,
@@ -41,6 +47,12 @@ export interface ParsedGraphQLBody {
   query: unknown;
   operationName: unknown;
   variableValues: unknown;
+  /**
+   * For customizing the error behavior as per https://github.com/graphql/graphql-spec/pull/1163
+   *
+   * @experimental
+   */
+  onError: unknown;
   extensions: unknown;
 }
 
@@ -52,6 +64,7 @@ export interface ValidatedGraphQLBody {
   query: string;
   operationName: string | undefined;
   variableValues: Record<string, any> | undefined;
+  onError: ErrorBehavior | undefined;
   extensions: Record<string, any> | undefined;
 }
 

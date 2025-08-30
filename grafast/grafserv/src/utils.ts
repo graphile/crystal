@@ -1,6 +1,11 @@
 import type { Readable } from "node:stream";
 
-import type { execute, GrafastExecutionArgs, subscribe } from "grafast";
+import type {
+  ErrorBehavior,
+  execute,
+  GrafastExecutionArgs,
+  subscribe,
+} from "grafast";
 import { hookArgs, SafeError, stripAnsi } from "grafast";
 import type {
   ExecutionArgs,
@@ -281,7 +286,7 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
         );
       }
 
-      const { query, operationName, variableValues } =
+      const { query, operationName, variableValues, onError, extensions } =
         validateGraphQLBody(parsedBody);
       const { errors, document } = parseAndValidate(query);
       if (errors !== undefined) {
@@ -296,6 +301,8 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
         contextValue,
         variableValues,
         operationName,
+        onError,
+        extensions,
         resolvedPreset,
         requestContext: grafastCtx,
         middleware: grafastMiddleware,
@@ -361,6 +368,7 @@ export function parseGraphQLJSONBody(
   const query = params.query;
   const operationName = params.operationName ?? undefined;
   const variableValues = params.variables ?? undefined;
+  const onError = (params as any).onError ?? undefined;
   const extensions = params.extensions ?? undefined;
   return {
     id,
@@ -368,6 +376,7 @@ export function parseGraphQLJSONBody(
     query,
     operationName,
     variableValues,
+    onError,
     extensions,
   };
 }
