@@ -1,6 +1,7 @@
 ---
 "postgraphile": patch
 "ruru-components": patch
+"ruru": patch
 "grafserv": patch
 "grafast": patch
 ---
