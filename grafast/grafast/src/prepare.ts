@@ -576,13 +576,6 @@ function establishOperationPlanFromEvent(event: EstablishOperationPlanEvent) {
   );
 }
 
-// TODO: upstream this
-declare module "graphql/execution/execute.js" {
-  interface ExecutionContext {
-    onError: "PROPAGATE" | "NULL" | "HALT";
-  }
-}
-
 /**
  * @internal
  */
@@ -609,11 +602,11 @@ export function grafastPrepare(
       extensions: rootValue[$$extensions],
     });
   }
-  if (!exeContext.onError) {
-    exeContext.onError = args.onError ?? "PROPAGATE";
-  }
 
-  const { operation, fragments, variableValues, onError } = exeContext;
+  const { operation, fragments, variableValues } = exeContext;
+  // TODO: update this when GraphQL.js gets support for onError
+  const onError = args.onError ?? "PROPAGATE";
+
   let operationPlan!: OperationPlan;
   try {
     if (middleware != null) {
