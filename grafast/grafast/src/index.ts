@@ -77,6 +77,7 @@ import type {
   CacheByOperationEntry,
   DataFromStep,
   EnumValueApplyResolver,
+  ErrorBehavior,
   EstablishOperationPlanEvent,
   EventCallback,
   EventMapKey,
@@ -267,6 +268,7 @@ import {
   GrafastInputFieldConfigMap,
   GrafastInputObjectType,
   GrafastObjectType,
+  GraphQLSpecifiedErrorBehaviors,
   inputObjectFieldSpec,
   InputObjectTypeSpec,
   isPromiseLike,
@@ -359,6 +361,7 @@ export {
   EnumValueConfig,
   EnumValueInput,
   error,
+  ErrorBehavior,
   ErrorStep,
   EventCallback,
   EventMapKey,
@@ -410,6 +413,7 @@ export {
   GrafastValuesList,
   graphqlResolver,
   GraphQLResolverStep,
+  GraphQLSpecifiedErrorBehaviors,
   groupBy,
   GroupByPlanMemo,
   inhibitOnNull,
@@ -704,6 +708,8 @@ declare global {
       | "rootValue"
       | "variableValues"
       | "operationName"
+      | "onError"
+      | "extensions"
       | "resolvedPreset"
       | "middleware"
       | "requestContext"

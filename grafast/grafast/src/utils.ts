@@ -1512,3 +1512,9 @@ export function terminateIterable(
     iterable.return();
   }
 }
+
+export const GraphQLSpecifiedErrorBehaviors = Object.freeze([
+  "PROPAGATE",
+  "NULL",
+  "HALT",
+] as const);

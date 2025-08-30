@@ -972,135 +972,86 @@ function executeChildPlan(
   rawBucketRootValue: any,
   bucketRootFlags: ExecutionEntryFlags,
 ) {
-  const $sideEffect = childOutputPlan.layerPlan.parentSideEffectStep;
-  if ($sideEffect !== null) {
-    // Check if there's an error
-    const sideEffectBucketDetails = getChildBucketAndIndex(
-      $sideEffect.layerPlan,
-      null,
-      bucket,
-      bucketIndex,
-    );
-    if (sideEffectBucketDetails) {
-      const [sideEffectBucket, sideEffectBucketIndex] = sideEffectBucketDetails;
-      const ev = sideEffectBucket.store.get($sideEffect.id);
-      if (!ev) {
-        throw new Error(
-          `GrafastInternalError<d18d52b5-f5bf-42df-a2dd-80e522310b8e>: ${stripAnsi(
-            String($sideEffect),
-          )} has no entry in ${bucket}`,
-        );
-      }
-      const flags = ev._flagsAt(sideEffectBucketIndex);
-      if (flags & FLAG_ERROR) {
-        const e = coerceError(
-          ev.at(sideEffectBucketIndex),
-          locationDetails,
-          mutablePath.slice(1),
-        );
-        if (isNonNull) {
-          throw e;
-        } else {
-          const streamCount = root.streams.length;
-          const queueCount = root.queue.length;
-          commonErrorHandler(
-            e,
-            locationDetails,
-            mutablePath,
-            mutablePathIndex,
-            root,
-            streamCount,
-            queueCount,
+  const streamCount = root.streams.length;
+  const queueCount = root.queue.length;
+  try {
+    const $sideEffect = childOutputPlan.layerPlan.parentSideEffectStep;
+    if ($sideEffect !== null) {
+      // Check if there's an error
+      const sideEffectBucketDetails = getChildBucketAndIndex(
+        $sideEffect.layerPlan,
+        null,
+        bucket,
+        bucketIndex,
+      );
+      if (sideEffectBucketDetails) {
+        const [sideEffectBucket, sideEffectBucketIndex] =
+          sideEffectBucketDetails;
+        const ev = sideEffectBucket.store.get($sideEffect.id);
+        if (!ev) {
+          throw new Error(
+            `GrafastInternalError<d18d52b5-f5bf-42df-a2dd-80e522310b8e>: ${stripAnsi(
+              String($sideEffect),
+            )} has no entry in ${bucket}`,
           );
-          return asString ? "null" : null;
+        }
+        const flags = ev._flagsAt(sideEffectBucketIndex);
+        if (flags & FLAG_ERROR) {
+          throw coerceError(
+            ev.at(sideEffectBucketIndex),
+            locationDetails,
+            mutablePath.slice(1),
+          );
         }
       }
     }
-  }
-  // This is the code that changes based on if the field is nullable or not
-  if (isNonNull) {
-    // No need to catch error
-    if (childBucket === bucket) {
-      //noop
-    } else {
-      if (childBucket == null) {
+    if (childBucket !== bucket && childBucket == null) {
+      if (isNonNull) {
         throw nonNullError(locationDetails, mutablePath.slice(1));
       }
-    }
-    const fieldResult = childOutputPlan[asString ? "executeString" : "execute"](
-      root,
-      mutablePath,
-      childBucket,
-      childBucketIndex!,
-      // NOTE: the previous code may have had a bug here, it referenced childBucket.rootStep
-      childOutputPlan.rootStep === that.rootStep
-        ? rawBucketRootValue
-        : undefined,
-      childOutputPlan.rootStep === that.rootStep ? bucketRootFlags : undefined,
-    );
-    if (fieldResult == (asString ? "null" : null)) {
-      throw nonNullError(locationDetails, mutablePath.slice(1));
-    }
-    return fieldResult;
-  } else {
-    // Need to catch error and set null
-    const streamCount = root.streams.length;
-    const queueCount = root.queue.length;
-    try {
-      if (childBucket !== bucket && childBucket == null) {
-        return asString ? "null" : null;
-      } else {
-        return childOutputPlan[asString ? "executeString" : "execute"](
-          root,
-          mutablePath,
-          childBucket,
-          childBucketIndex!,
-          // NOTE: the previous code may have had a bug here, it referenced childBucket.rootStep
-          childOutputPlan.rootStep === that.rootStep
-            ? rawBucketRootValue
-            : undefined,
-          childOutputPlan.rootStep === that.rootStep
-            ? bucketRootFlags
-            : undefined,
-        );
-      }
-    } catch (e) {
-      commonErrorHandler(
-        e,
-        locationDetails,
-        mutablePath,
-        mutablePathIndex,
-        root,
-        streamCount,
-        queueCount,
-      );
       return asString ? "null" : null;
+    } else {
+      const fieldResult = childOutputPlan[
+        asString ? "executeString" : "execute"
+      ](
+        root,
+        mutablePath,
+        childBucket,
+        childBucketIndex!,
+        // NOTE: the previous code may have had a bug here, it referenced childBucket.rootStep
+        childOutputPlan.rootStep === that.rootStep
+          ? rawBucketRootValue
+          : undefined,
+        childOutputPlan.rootStep === that.rootStep
+          ? bucketRootFlags
+          : undefined,
+      );
+      if (isNonNull && fieldResult == (asString ? "null" : null)) {
+        throw nonNullError(locationDetails, mutablePath.slice(1));
+      }
+      return fieldResult;
     }
+  } catch (e) {
+    const error = coerceError(e, locationDetails, mutablePath.slice(1));
+    if (root.errorBehavior === "HALT") throw error;
+    if (isNonNull && root.errorBehavior !== "NULL") throw error;
+    if (root.streams.length > streamCount) {
+      root.streams.splice(streamCount);
+    }
+    if (root.queue.length > queueCount) {
+      root.queue.splice(queueCount);
+    }
+    const pathLengthTarget = mutablePathIndex + 1;
+    const overSize = mutablePath.length - pathLengthTarget;
+    if (overSize > 0) {
+      (mutablePath as Array<string | number>).splice(
+        pathLengthTarget,
+        overSize,
+      );
+    }
+    root.errors.push(error);
+    return asString ? "null" : null;
   }
-}
-
-function commonErrorHandler(
-  e: Error,
-  locationDetails: LocationDetails,
-  mutablePath: ReadonlyArray<string | number>,
-  mutablePathIndex: number,
-  root: PayloadRoot,
-  streamCount: number,
-  queueCount: number,
-) {
-  if (root.streams.length > streamCount) {
-    root.streams.splice(streamCount);
-  }
-  if (root.queue.length > queueCount) {
-    root.queue.splice(queueCount);
-  }
-  const error = coerceError(e, locationDetails, mutablePath.slice(1));
-  const pathLengthTarget = mutablePathIndex + 1;
-  const overSize = mutablePath.length - pathLengthTarget;
-  if (overSize > 0) {
-    (mutablePath as Array<string | number>).splice(pathLengthTarget, overSize);
-  }
-  root.errors.push(error);
 }
 
 const nullExecutor = makeExecutor({

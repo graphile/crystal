@@ -521,6 +521,84 @@ const preset: GraphileConfig.Preset = {
         },
       },
     }),
+    // Testing errors
+    extendSchema({
+      typeDefs: /* GraphQL */ `
+        extend type Query {
+          errorTests: ErrorTests
+        }
+        extend type Subscription {
+          errorTests: ErrorTests
+        }
+        type ErrorTests {
+          index: Int
+          errorOnOddNumbers: Int!
+          fourtyTwo: Int!
+          nonNullableReturningNull: Int!
+          coercionFailure: Int
+        }
+      `,
+      objects: {
+        Query: {
+          plans: {
+            errorTests: EXPORTABLE(
+              (constant) => () => constant({}),
+              [constant],
+            ),
+          },
+        },
+        Subscription: {
+          plans: {
+            errorTests: {
+              subscribePlan: EXPORTABLE(
+                (lambda, sleep) => () => {
+                  return lambda(null, () => {
+                    return (async function* () {
+                      for (let index = 0; ; index++) {
+                        yield { index };
+                        await sleep(1000);
+                      }
+                    })();
+                  });
+                },
+                [lambda, sleep],
+              ),
+              plan: EXPORTABLE(
+                () =>
+                  function plan($event) {
+                    return $event;
+                  },
+                [],
+              ),
+            },
+          },
+        },
+        ErrorTests: {
+          plans: {
+            errorOnOddNumbers: EXPORTABLE(
+              (lambda) => ($payload) =>
+                lambda($payload, (p: any) => {
+                  if (p.index % 2 === 1) {
+                    throw new Error(`ODD! ${p.index}`);
+                  } else {
+                    return p.index;
+                  }
+                }),
+              [lambda],
+            ),
+            fourtyTwo: EXPORTABLE((constant) => () => constant(42), [constant]),
+            nonNullableReturningNull: EXPORTABLE(
+              (constant) => () => constant(null),
+              [constant],
+            ),
+            coercionFailure: EXPORTABLE(
+              (constant) => () => constant("NOT A NUMBER"),
+              [constant],
+            ),
+          },
+        },
+      },
+    }),
     // PrimaryKeyMutationsOnlyPlugin,
     PersistedPlugin,
     ruruTitle("<New title text here!>"),

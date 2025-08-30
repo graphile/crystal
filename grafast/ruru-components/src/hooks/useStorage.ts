@@ -8,7 +8,12 @@ export interface StoredKeys {
   explainSize: string;
   verbose: "true" | "";
   condensed: "true" | "";
+  onError: "PROPAGATE" | "NULL" | "HALT" | "";
 }
+
+const storageDefault: { [key in keyof StoredKeys]?: StoredKeys[key] } = {
+  onError: "",
+};
 
 const KEYS: { [key in keyof StoredKeys]: string } = {
   explain: "Ruru:explain",
@@ -18,14 +23,19 @@ const KEYS: { [key in keyof StoredKeys]: string } = {
   explorerIsOpen: "graphiql:explorerIsOpen",
   verbose: "Ruru:verbose",
   condensed: "Ruru:condensed",
+  onError: "Ruru:onError",
 };
+
+type ToggleableKey = {
+  [K in keyof StoredKeys]: StoredKeys[K] extends "true" | "" ? K : never;
+}[keyof StoredKeys];
 
 const up = (v: number) => v + 1;
 
 export interface RuruStorage {
   get<TKey extends keyof StoredKeys>(key: TKey): StoredKeys[TKey] | null;
   set<TKey extends keyof StoredKeys>(key: TKey, value: StoredKeys[TKey]): void;
-  toggle<TKey extends keyof StoredKeys>(key: TKey): void;
+  toggle(key: ToggleableKey): void;
 }
 
 export const useStorage = (): RuruStorage => {
@@ -39,7 +49,7 @@ export const useStorage = (): RuruStorage => {
       return {
         _revision: revision,
         get(key) {
-          return cache[key] ?? null;
+          return cache[key] ?? storageDefault[key] ?? null;
         },
         set(key, value) {
           cache[key] = value;
@@ -57,7 +67,7 @@ export const useStorage = (): RuruStorage => {
           storage.removeItem(KEYS[key]);
           return null;
         }
-        return val ?? null;
+        return val ?? storageDefault[key] ?? null;
       },
       set(key, value) {
         storage.setItem(KEYS[key], value);

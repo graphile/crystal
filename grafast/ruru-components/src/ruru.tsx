@@ -221,6 +221,39 @@ export const RuruInner: FC<{
                 Condensed
               </span>
             </ToolbarMenu.Item>
+            <ToolbarMenu.Item
+              title="Traditional GraphQL error handling"
+              onSelect={() => {
+                if (storage.get("onError") === "PROPAGATE") {
+                  storage.set("onError", "");
+                } else {
+                  storage.set("onError", "PROPAGATE");
+                }
+              }}
+            >
+              <span>
+                {storage.get("onError") === "PROPAGATE" ? check : nocheck}
+                onError: PROPAGATE
+              </span>
+            </ToolbarMenu.Item>
+            <ToolbarMenu.Item
+              title="Client becomes responsible for error handling"
+              onSelect={() => storage.set("onError", "NULL")}
+            >
+              <span>
+                {storage.get("onError") === "NULL" ? check : nocheck}
+                onError: NULL
+              </span>
+            </ToolbarMenu.Item>
+            <ToolbarMenu.Item
+              title="Stop execution on the first error"
+              onSelect={() => storage.set("onError", "HALT")}
+            >
+              <span>
+                {storage.get("onError") === "HALT" ? check : nocheck}
+                onError: HALT
+              </span>
+            </ToolbarMenu.Item>
           </ToolbarMenu>
         </GraphiQL.Toolbar>
 
