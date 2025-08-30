@@ -1018,13 +1018,29 @@ function executeChildPlan(
     }
   }
   // This is the code that changes based on if the field is nullable or not
-  if (isNonNull) {
+  if (isNonNull || root.errorBehavior === "HALT") {
     // No need to catch error
     if (childBucket === bucket) {
       //noop
     } else {
       if (childBucket == null) {
-        throw nonNullError(locationDetails, mutablePath.slice(1));
+        const error = nonNullError(locationDetails, mutablePath.slice(1));
+        if (root.errorBehavior === "NULL") {
+          const streamCount = root.streams.length;
+          const queueCount = root.queue.length;
+          commonErrorHandler(
+            error,
+            locationDetails,
+            mutablePath,
+            mutablePathIndex,
+            root,
+            streamCount,
+            queueCount,
+          );
+          return asString ? "null" : null;
+        } else {
+          throw error;
+        }
       }
     }
     const fieldResult = childOutputPlan[asString ? "executeString" : "execute"](
@@ -1038,7 +1054,7 @@ function executeChildPlan(
         : undefined,
       childOutputPlan.rootStep === that.rootStep ? bucketRootFlags : undefined,
     );
-    if (fieldResult == (asString ? "null" : null)) {
+    if (isNonNull && fieldResult == (asString ? "null" : null)) {
       const error = nonNullError(locationDetails, mutablePath.slice(1));
       if (root.errorBehavior === "NULL") {
         // Just set to null
