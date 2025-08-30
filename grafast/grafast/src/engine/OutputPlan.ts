@@ -998,116 +998,63 @@ function executeChildPlan(
           locationDetails,
           mutablePath.slice(1),
         );
-        if (isNonNull) {
-          throw e;
-        } else {
-          const streamCount = root.streams.length;
-          const queueCount = root.queue.length;
-          commonErrorHandler(
-            e,
-            locationDetails,
-            mutablePath,
-            mutablePathIndex,
-            root,
-            streamCount,
-            queueCount,
-          );
-          return asString ? "null" : null;
-        }
-      }
-    }
-  }
-  // This is the code that changes based on if the field is nullable or not
-  if (isNonNull || root.errorBehavior === "HALT") {
-    // No need to catch error
-    if (childBucket === bucket) {
-      //noop
-    } else {
-      if (childBucket == null) {
-        const error = nonNullError(locationDetails, mutablePath.slice(1));
-        if (root.errorBehavior === "NULL") {
-          const streamCount = root.streams.length;
-          const queueCount = root.queue.length;
-          commonErrorHandler(
-            error,
-            locationDetails,
-            mutablePath,
-            mutablePathIndex,
-            root,
-            streamCount,
-            queueCount,
-          );
-          return asString ? "null" : null;
-        } else {
-          throw error;
-        }
-      }
-    }
-    const fieldResult = childOutputPlan[asString ? "executeString" : "execute"](
-      root,
-      mutablePath,
-      childBucket,
-      childBucketIndex!,
-      // NOTE: the previous code may have had a bug here, it referenced childBucket.rootStep
-      childOutputPlan.rootStep === that.rootStep
-        ? rawBucketRootValue
-        : undefined,
-      childOutputPlan.rootStep === that.rootStep ? bucketRootFlags : undefined,
-    );
-    if (isNonNull && fieldResult == (asString ? "null" : null)) {
-      const error = nonNullError(locationDetails, mutablePath.slice(1));
-      if (root.errorBehavior === "NULL") {
-        // Just set to null
         const streamCount = root.streams.length;
         const queueCount = root.queue.length;
-        commonErrorHandler(
-          error,
+        return commonErrorHandler(
+          e,
           locationDetails,
           mutablePath,
           mutablePathIndex,
           root,
           streamCount,
           queueCount,
+          asString,
+          isNonNull,
         );
-      } else {
-        throw error;
       }
     }
-    return fieldResult;
-  } else {
-    // Need to catch error and set null
-    const streamCount = root.streams.length;
-    const queueCount = root.queue.length;
-    try {
-      if (childBucket !== bucket && childBucket == null) {
-        return asString ? "null" : null;
-      } else {
-        return childOutputPlan[asString ? "executeString" : "execute"](
-          root,
-          mutablePath,
-          childBucket,
-          childBucketIndex!,
-          // NOTE: the previous code may have had a bug here, it referenced childBucket.rootStep
-          childOutputPlan.rootStep === that.rootStep
-            ? rawBucketRootValue
-            : undefined,
-          childOutputPlan.rootStep === that.rootStep
-            ? bucketRootFlags
-            : undefined,
-        );
+  }
+  const streamCount = root.streams.length;
+  const queueCount = root.queue.length;
+  try {
+    if (childBucket !== bucket && childBucket == null) {
+      if (isNonNull) {
+        throw nonNullError(locationDetails, mutablePath.slice(1));
       }
-    } catch (e) {
-      commonErrorHandler(
-        e,
-        locationDetails,
-        mutablePath,
-        mutablePathIndex,
-        root,
-        streamCount,
-        queueCount,
-      );
       return asString ? "null" : null;
+    } else {
+      const fieldResult = childOutputPlan[
+        asString ? "executeString" : "execute"
+      ](
+        root,
+        mutablePath,
+        childBucket,
+        childBucketIndex!,
+        // NOTE: the previous code may have had a bug here, it referenced childBucket.rootStep
+        childOutputPlan.rootStep === that.rootStep
+          ? rawBucketRootValue
+          : undefined,
+        childOutputPlan.rootStep === that.rootStep
+          ? bucketRootFlags
+          : undefined,
+      );
+      if (isNonNull && fieldResult == (asString ? "null" : null)) {
+        throw nonNullError(locationDetails, mutablePath.slice(1));
+      }
+      return fieldResult;
     }
+  } catch (e) {
+    return commonErrorHandler(
+      e,
+      locationDetails,
+      mutablePath,
+      mutablePathIndex,
+      root,
+      streamCount,
+      queueCount,
+      asString,
+      isNonNull,
+    );
   }
 }
 
@@ -1119,6 +1066,8 @@ function commonErrorHandler(
   root: PayloadRoot,
   streamCount: number,
   queueCount: number,
+  asString: boolean,
+  isNonNull: boolean,
 ) {
   if (root.streams.length > streamCount) {
     root.streams.splice(streamCount);
@@ -1127,12 +1076,15 @@ function commonErrorHandler(
     root.queue.splice(queueCount);
   }
   const error = coerceError(e, locationDetails, mutablePath.slice(1));
+  if (root.errorBehavior === "HALT") throw error;
+  if (isNonNull && root.errorBehavior !== "NULL") throw error;
   const pathLengthTarget = mutablePathIndex + 1;
   const overSize = mutablePath.length - pathLengthTarget;
   if (overSize > 0) {
     (mutablePath as Array<string | number>).splice(pathLengthTarget, overSize);
   }
   root.errors.push(error);
+  return asString ? "null" : null;
 }
 
 const nullExecutor = makeExecutor({
