@@ -972,51 +972,40 @@ function executeChildPlan(
   rawBucketRootValue: any,
   bucketRootFlags: ExecutionEntryFlags,
 ) {
-  const $sideEffect = childOutputPlan.layerPlan.parentSideEffectStep;
-  if ($sideEffect !== null) {
-    // Check if there's an error
-    const sideEffectBucketDetails = getChildBucketAndIndex(
-      $sideEffect.layerPlan,
-      null,
-      bucket,
-      bucketIndex,
-    );
-    if (sideEffectBucketDetails) {
-      const [sideEffectBucket, sideEffectBucketIndex] = sideEffectBucketDetails;
-      const ev = sideEffectBucket.store.get($sideEffect.id);
-      if (!ev) {
-        throw new Error(
-          `GrafastInternalError<d18d52b5-f5bf-42df-a2dd-80e522310b8e>: ${stripAnsi(
-            String($sideEffect),
-          )} has no entry in ${bucket}`,
-        );
-      }
-      const flags = ev._flagsAt(sideEffectBucketIndex);
-      if (flags & FLAG_ERROR) {
-        const e = coerceError(
-          ev.at(sideEffectBucketIndex),
-          locationDetails,
-          mutablePath.slice(1),
-        );
-        const streamCount = root.streams.length;
-        const queueCount = root.queue.length;
-        return commonErrorHandler(
-          e,
-          locationDetails,
-          mutablePath,
-          mutablePathIndex,
-          root,
-          streamCount,
-          queueCount,
-          asString,
-          isNonNull,
-        );
-      }
-    }
-  }
   const streamCount = root.streams.length;
   const queueCount = root.queue.length;
   try {
+    const $sideEffect = childOutputPlan.layerPlan.parentSideEffectStep;
+    if ($sideEffect !== null) {
+      // Check if there's an error
+      const sideEffectBucketDetails = getChildBucketAndIndex(
+        $sideEffect.layerPlan,
+        null,
+        bucket,
+        bucketIndex,
+      );
+      if (sideEffectBucketDetails) {
+        const [sideEffectBucket, sideEffectBucketIndex] =
+          sideEffectBucketDetails;
+        const ev = sideEffectBucket.store.get($sideEffect.id);
+        if (!ev) {
+          throw new Error(
+            `GrafastInternalError<d18d52b5-f5bf-42df-a2dd-80e522310b8e>: ${stripAnsi(
+              String($sideEffect),
+            )} has no entry in ${bucket}`,
+          );
+        }
+        const flags = ev._flagsAt(sideEffectBucketIndex);
+        if (flags & FLAG_ERROR) {
+          const e = coerceError(
+            ev.at(sideEffectBucketIndex),
+            locationDetails,
+            mutablePath.slice(1),
+          );
+          throw e;
+        }
+      }
+    }
     if (childBucket !== bucket && childBucket == null) {
       if (isNonNull) {
         throw nonNullError(locationDetails, mutablePath.slice(1));
@@ -1044,47 +1033,26 @@ function executeChildPlan(
       return fieldResult;
     }
   } catch (e) {
-    return commonErrorHandler(
-      e,
-      locationDetails,
-      mutablePath,
-      mutablePathIndex,
-      root,
-      streamCount,
-      queueCount,
-      asString,
-      isNonNull,
-    );
+    if (root.streams.length > streamCount) {
+      root.streams.splice(streamCount);
+    }
+    if (root.queue.length > queueCount) {
+      root.queue.splice(queueCount);
+    }
+    const error = coerceError(e, locationDetails, mutablePath.slice(1));
+    if (root.errorBehavior === "HALT") throw error;
+    if (isNonNull && root.errorBehavior !== "NULL") throw error;
+    const pathLengthTarget = mutablePathIndex + 1;
+    const overSize = mutablePath.length - pathLengthTarget;
+    if (overSize > 0) {
+      (mutablePath as Array<string | number>).splice(
+        pathLengthTarget,
+        overSize,
+      );
+    }
+    root.errors.push(error);
+    return asString ? "null" : null;
   }
-}
-
-function commonErrorHandler(
-  e: Error,
-  locationDetails: LocationDetails,
-  mutablePath: ReadonlyArray<string | number>,
-  mutablePathIndex: number,
-  root: PayloadRoot,
-  streamCount: number,
-  queueCount: number,
-  asString: boolean,
-  isNonNull: boolean,
-) {
-  if (root.streams.length > streamCount) {
-    root.streams.splice(streamCount);
-  }
-  if (root.queue.length > queueCount) {
-    root.queue.splice(queueCount);
-  }
-  const error = coerceError(e, locationDetails, mutablePath.slice(1));
-  if (root.errorBehavior === "HALT") throw error;
-  if (isNonNull && root.errorBehavior !== "NULL") throw error;
-  const pathLengthTarget = mutablePathIndex + 1;
-  const overSize = mutablePath.length - pathLengthTarget;
-  if (overSize > 0) {
-    (mutablePath as Array<string | number>).splice(pathLengthTarget, overSize);
-  }
-  root.errors.push(error);
-  return asString ? "null" : null;
 }
 
 const nullExecutor = makeExecutor({
