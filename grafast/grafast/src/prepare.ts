@@ -42,6 +42,7 @@ import {
 } from "./engine/OutputPlan.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
 import type {
+  ErrorBehavior,
   EstablishOperationPlanEvent,
   GrafastExecutionArgs,
   GrafastTimeouts,
@@ -265,6 +266,7 @@ function outputBucket(
 >*/ {
   const operationPlan = rootBucket.layerPlan.operationPlan;
   const root: PayloadRoot = {
+    errorBehavior: requestContext.args.onError ?? "PROPAGATE",
     insideGraphQL: false,
     errors: [],
     queue: [],
@@ -324,6 +326,7 @@ function executePreemptive(
   variableValues: any,
   context: any,
   rootValue: any,
+  onError: ErrorBehavior,
   outputDataAsString: boolean,
   executionTimeout: number | null,
   abortSignal: AbortSignal,
@@ -358,6 +361,7 @@ function executePreemptive(
     executionTimeout !== null ? startTime + executionTimeout : null;
   const requestContext: RequestTools = {
     args,
+    onError,
     startTime,
     stopTime,
     // toSerialize: [],
@@ -567,6 +571,7 @@ function establishOperationPlanFromEvent(event: EstablishOperationPlanEvent) {
     event.variableValues,
     event.context as any,
     event.rootValue,
+    event.onError,
     event.options,
   );
 }
@@ -608,7 +613,7 @@ export function grafastPrepare(
     exeContext.onError = args.onError ?? "PROPAGATE";
   }
 
-  const { operation, fragments, variableValues } = exeContext;
+  const { operation, fragments, variableValues, onError } = exeContext;
   let operationPlan!: OperationPlan;
   try {
     if (middleware != null) {
@@ -621,6 +626,7 @@ export function grafastPrepare(
           variableValues,
           context: context as any,
           rootValue,
+          onError,
           args,
           options,
         },
@@ -634,6 +640,7 @@ export function grafastPrepare(
         variableValues,
         context as any,
         rootValue,
+        onError,
         options,
       );
     }
@@ -677,6 +684,7 @@ export function grafastPrepare(
       variableValues,
       context,
       rootValue,
+      onError,
       options.outputDataAsString ?? false,
       executionTimeout,
       abortController.signal,

@@ -10,6 +10,7 @@ import { OperationPlan, SafeError } from "./index.js";
 import type {
   BaseGraphQLRootValue,
   BaseGraphQLVariables,
+  ErrorBehavior,
   EstablishOperationPlanResult,
   Fragments,
   LinkedList,
@@ -75,16 +76,18 @@ function isOperationPlanResultCompatible<
   TContext extends Grafast.Context = Grafast.Context,
   TRootValue extends BaseGraphQLRootValue = BaseGraphQLRootValue,
 >(
-  operationPlan: EstablishOperationPlanResult,
+  operationPlanResult: EstablishOperationPlanResult,
   variableValues: TVariables,
   context: TContext,
   rootValue: TRootValue,
+  errorBehavior: ErrorBehavior,
 ): boolean {
+  if (operationPlanResult.errorBehavior !== errorBehavior) return false;
   const {
     variableValuesConstraints,
     contextConstraints,
     rootValueConstraints,
-  } = operationPlan;
+  } = operationPlanResult;
   if (!matchesConstraints(variableValuesConstraints, variableValues)) {
     return false;
   }
@@ -115,6 +118,7 @@ export function establishOperationPlan<
   variableValues: TVariables,
   context: TContext,
   rootValue: TRootValue,
+  onError: ErrorBehavior,
   options: GrafastOperationOptions,
 ): OperationPlan {
   const planningTimeout = options.timeouts?.planning;
@@ -141,6 +145,7 @@ export function establishOperationPlan<
           variableValues,
           context,
           rootValue,
+          onError,
         )
       ) {
         const { error, operationPlan } = value;
@@ -214,6 +219,7 @@ export function establishOperationPlan<
       context,
       rootValueConstraints,
       rootValue,
+      onError,
       options,
     );
   } catch (e) {
@@ -234,6 +240,7 @@ export function establishOperationPlan<
     variableValuesConstraints,
     contextConstraints,
     rootValueConstraints,
+    errorBehavior: onError,
     ...(operationPlan ? { operationPlan } : { error: error! }),
   };
   if (!cache) {

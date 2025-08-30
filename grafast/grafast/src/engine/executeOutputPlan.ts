@@ -4,7 +4,7 @@ import type { GraphQLError } from "graphql";
 import * as assert from "../assert.js";
 import type { Bucket, RequestTools } from "../bucket.js";
 import { isDev } from "../dev.js";
-import type { JSONValue } from "../interfaces.js";
+import type { ErrorBehavior, JSONValue } from "../interfaces.js";
 import type { OutputPlan } from "./OutputPlan.js";
 
 const debug = debugFactory("grafast:OutputPlan");
@@ -30,6 +30,8 @@ export interface OutputStream {
  * @internal
  */
 export interface PayloadRoot {
+  errorBehavior: ErrorBehavior;
+
   /**
    * Serialization works differently if we're running inside GraphQL. (Namely:
    * we don't serialize - that's GraphQL's job.)

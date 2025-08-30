@@ -88,6 +88,7 @@ export interface IEstablishOperationPlanResult {
   variableValuesConstraints: Constraint[];
   contextConstraints: Constraint[];
   rootValueConstraints: Constraint[];
+  errorBehavior: ErrorBehavior;
 }
 export interface EstablishOperationPlanResultSuccess
   extends IEstablishOperationPlanResult {
@@ -815,6 +816,7 @@ export interface EstablishOperationPlanEvent {
   variableValues: Record<string, any>;
   context: any;
   rootValue: any;
+  onError: ErrorBehavior;
   args: GrafastExecutionArgs;
   options: GrafastOperationOptions;
 }

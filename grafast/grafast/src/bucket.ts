@@ -1,6 +1,8 @@
 // import type { GraphQLScalarType } from "graphql";
 
-import type { GrafastExecutionArgs, Step } from ".";
+import { ExecutionContext } from "graphql/execution/execute.js";
+
+import type { ErrorBehavior, GrafastExecutionArgs, Step } from ".";
 import type { LayerPlan } from "./engine/LayerPlan";
 import type { MetaByMetaKey } from "./engine/OperationPlan";
 import type {
@@ -15,6 +17,8 @@ import type {
 export interface RequestTools {
   /** @internal */
   args: GrafastExecutionArgs;
+  /** @internal */
+  onError: ErrorBehavior;
   /** The `timeSource.now()` at which the request started executing */
   startTime: number;
   /** The `timeSource.now()` at which the request should stop executing (if a timeout was configured) */

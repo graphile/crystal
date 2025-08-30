@@ -31,7 +31,11 @@ import {
   newSelectionSetDigest,
 } from "../graphqlCollectFields.js";
 import { fieldSelectionsForType } from "../graphqlMergeSelectionSets.js";
-import type { GrafastPlanJSON, StepStreamOptions } from "../index.js";
+import type {
+  ErrorBehavior,
+  GrafastPlanJSON,
+  StepStreamOptions,
+} from "../index.js";
 import {
   __FlagStep,
   __ItemStep,
@@ -371,6 +375,7 @@ export class OperationPlan {
     public readonly context: { [key: string]: any },
     rootValueConstraints: Constraint[],
     public readonly rootValue: any,
+    public readonly errorBehavior: ErrorBehavior,
     options: GrafastOperationOptions,
   ) {
     this.planningTimeout = options?.timeouts?.planning ?? null;

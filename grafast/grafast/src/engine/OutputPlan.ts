@@ -1039,7 +1039,23 @@ function executeChildPlan(
       childOutputPlan.rootStep === that.rootStep ? bucketRootFlags : undefined,
     );
     if (fieldResult == (asString ? "null" : null)) {
-      throw nonNullError(locationDetails, mutablePath.slice(1));
+      const error = nonNullError(locationDetails, mutablePath.slice(1));
+      if (root.errorBehavior === "NULL") {
+        // Just set to null
+        const streamCount = root.streams.length;
+        const queueCount = root.queue.length;
+        commonErrorHandler(
+          error,
+          locationDetails,
+          mutablePath,
+          mutablePathIndex,
+          root,
+          streamCount,
+          queueCount,
+        );
+      } else {
+        throw error;
+      }
     }
     return fieldResult;
   } else {
