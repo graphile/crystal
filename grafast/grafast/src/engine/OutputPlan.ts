@@ -997,12 +997,11 @@ function executeChildPlan(
         }
         const flags = ev._flagsAt(sideEffectBucketIndex);
         if (flags & FLAG_ERROR) {
-          const e = coerceError(
+          throw coerceError(
             ev.at(sideEffectBucketIndex),
             locationDetails,
             mutablePath.slice(1),
           );
-          throw e;
         }
       }
     }
