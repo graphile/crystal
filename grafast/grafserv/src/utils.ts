@@ -1,11 +1,6 @@
 import type { Readable } from "node:stream";
 
-import type {
-  ErrorBehavior,
-  execute,
-  GrafastExecutionArgs,
-  subscribe,
-} from "grafast";
+import type { execute, GrafastExecutionArgs, subscribe } from "grafast";
 import { hookArgs, SafeError, stripAnsi } from "grafast";
 import type {
   ExecutionArgs,

@@ -33,7 +33,6 @@ import { SafeError } from "./error.js";
 import { inspect } from "./inspect.js";
 import type {
   BaseGraphQLArguments,
-  ErrorBehavior,
   ExecutionEntryFlags,
   GrafastFieldConfig,
   GrafastInputFieldConfig,

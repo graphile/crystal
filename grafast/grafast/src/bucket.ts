@@ -1,7 +1,5 @@
 // import type { GraphQLScalarType } from "graphql";
 
-import { ExecutionContext } from "graphql/execution/execute.js";
-
 import type { ErrorBehavior, GrafastExecutionArgs, Step } from ".";
 import type { LayerPlan } from "./engine/LayerPlan";
 import type { MetaByMetaKey } from "./engine/OperationPlan";
