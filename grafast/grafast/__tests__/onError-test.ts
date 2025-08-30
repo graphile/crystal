@@ -25,6 +25,8 @@ declare global {
         name: string;
         nonNullable: unknown;
         nullable: unknown;
+        nonNullableList: unknown;
+        nullableList: unknown;
       };
     }
   }
@@ -40,6 +42,8 @@ const schema = makeGrafastSchema({
       name: String!
       nonNullable: Int!
       nullable: Int
+      nonNullableList: [Int!]!
+      nullableList: [Int]
       throwNonNullable: Int!
       throwNullable: Int
     }
@@ -371,6 +375,73 @@ GraphQLSpecifiedErrorBehaviors.forEach((onError) => {
           case "PROPAGATE": {
             expect(result.data).to.deep.equal({
               me: null,
+            });
+            break;
+          }
+          case "HALT": {
+            expect(result.data).to.equal(null);
+            break;
+          }
+          default: {
+            const never: never = onError;
+            throw new Error(`Unexpected onError: ${never}`);
+          }
+        }
+      }),
+    );
+
+    it(
+      "handles null in non-nullable list position",
+      throwOnUnhandledRejections(async () => {
+        const source = /* GraphQL */ `
+          {
+            me {
+              id
+              nonNullableList
+              nullableList
+              name
+            }
+          }
+        `;
+        const result = (await grafast({
+          schema,
+          source,
+          onError,
+          contextValue: {
+            me: {
+              id: 42,
+              nonNullableList: [1, 1, 2, null, 5],
+              nullableList: null,
+              name: "Benjie",
+            },
+          },
+          requestContext,
+          resolvedPreset,
+        })) as ExecutionResult;
+
+        // All error modes expect the same errors:
+        expect(result.errors).to.have.length(1);
+        expect(result.errors![0]).to.deep.include({
+          message:
+            "Cannot return null for non-nullable field User.nonNullableList.",
+          path: ["me", "nonNullableList", 3],
+        });
+
+        switch (onError) {
+          case "PROPAGATE": {
+            expect(result.data).to.deep.equal({
+              me: null,
+            });
+            break;
+          }
+          case "NULL": {
+            expect(result.data).to.deep.equal({
+              me: {
+                id: 42,
+                nonNullableList: [1, 1, 2, null, 5],
+                nullableList: null,
+                name: "Benjie",
+              },
             });
             break;
           }
