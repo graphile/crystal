@@ -1033,15 +1033,15 @@ function executeChildPlan(
       return fieldResult;
     }
   } catch (e) {
+    const error = coerceError(e, locationDetails, mutablePath.slice(1));
+    if (root.errorBehavior === "HALT") throw error;
+    if (isNonNull && root.errorBehavior !== "NULL") throw error;
     if (root.streams.length > streamCount) {
       root.streams.splice(streamCount);
     }
     if (root.queue.length > queueCount) {
       root.queue.splice(queueCount);
     }
-    const error = coerceError(e, locationDetails, mutablePath.slice(1));
-    if (root.errorBehavior === "HALT") throw error;
-    if (isNonNull && root.errorBehavior !== "NULL") throw error;
     const pathLengthTarget = mutablePathIndex + 1;
     const overSize = mutablePath.length - pathLengthTarget;
     if (overSize > 0) {
