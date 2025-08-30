@@ -563,9 +563,13 @@ const preset: GraphileConfig.Preset = {
                 },
                 [lambda, sleep],
               ),
-              plan: EXPORTABLE(() => function plan($event) {
-                return $event;
-              }, []),
+              plan: EXPORTABLE(
+                () =>
+                  function plan($event) {
+                    return $event;
+                  },
+                [],
+              ),
             },
           },
         },
