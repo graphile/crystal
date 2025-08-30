@@ -1518,4 +1518,4 @@ export const GraphQLSpecifiedErrorBehaviors = Object.freeze([
   "PROPAGATE",
   "NULL",
   "HALT",
-]) as readonly ErrorBehavior[];
+] as const);
