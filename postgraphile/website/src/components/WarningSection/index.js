@@ -21,9 +21,9 @@ export default function WarningContent({
               <div className={v5betaStyles.progressBackground}>
                 <div
                   className={v5betaStyles.progressForeground}
-                  style={{ width: "90%" }}
+                  style={{ width: "95%" }}
                 >
-                  <div className={v5betaStyles.progressLabel}>90%</div>
+                  <div className={v5betaStyles.progressLabel}>95%</div>
                 </div>
               </div>
             </div>
