@@ -71,12 +71,14 @@ function isESMError(e: unknown) {
 
 async function loadDefaultExport(resolvedPath: string, extension: string) {
   // Attempt to import using native TypeScript support if appropriate
+  let originalError: any;
   if (process.features.typescript && /\.[cm]?tsx?$/.test(extension)) {
     try {
       // Node has `require(esm)` support, but also for a `.cjsx` file it should
       // still use `require()`
       return fixESMShenanigans(require(resolvedPath));
     } catch (e) {
+      originalError = e;
       if (isESMError(e)) {
         // This is the most likely result, since TypeScript uses ESM syntax.
         try {
@@ -94,6 +96,7 @@ async function loadDefaultExport(resolvedPath: string, extension: string) {
     registerLoader(jsVariants[extension]);
   } catch (e) {
     console.error(`No loader could be loaded for ${extension} files: ${e}`);
+    throw originalError;
   }
 
   // And now lets attempt to import
@@ -117,16 +120,28 @@ export async function loadConfig(
 
     const resolvedPath = resolve(process.cwd(), configPath);
 
+    /**
+     * When attempting to load multiple matching extensions, if all fail we
+     * want to throw the first non-ESM error raised - it might well be an
+     * application error.
+     */
+    let firstError: any;
     // First try one of the supported loaders.
     for (const extension of extensions) {
       if (resolvedPath.endsWith(extension)) {
         try {
           return await loadDefaultExport(resolvedPath, extension);
-        } catch {
+        } catch (e) {
+          if (!isESMError(e)) {
+            firstError = e;
+          }
           // Multiple extensions might match - e.g. both `.swc.tsx` and `.tsx`;
           // continue to the next one.
         }
       }
+    }
+    if (firstError) {
+      throw firstError;
     }
 
     // Fallback to direct import
@@ -141,9 +156,13 @@ export async function loadConfig(
         // This file exists; whatever happens, we will try this file only.
         try {
           return await loadDefaultExport(resolvedPath, extension);
-        } catch {
-          // Fallback to direct import
-          return (await import(pathToFileURL(resolvedPath).href)).default;
+        } catch (e) {
+          if (isESMError(e)) {
+            // Fallback to direct import
+            return (await import(pathToFileURL(resolvedPath).href)).default;
+          } else {
+            throw e;
+          }
         }
       }
     }
