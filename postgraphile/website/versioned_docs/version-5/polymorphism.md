@@ -227,6 +227,16 @@ comment on table polymorphic.gcp_applications is $$
   $$;
 ```
 
+:::warning[Cannot return mode:union from functions]
+
+You will not be able to return the `mode:union` type from a PostgreSQL function.
+Consider the above example - if we receive
+`{id: 1, name: "Foo", last_deployed: null}` how can we know if this came from
+`aws_applications` or `gcp_applications`? Instead, consider using
+[`extendSchema`](./extend-schema.md).
+
+:::
+
 ## @unionMember
 
 For cases where you want multiple tables that don't necessarily share any
