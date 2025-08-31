@@ -1166,7 +1166,9 @@ export function extendSchema(
     if (type.kind === "NamedType") {
       const Type = build.getTypeByName(getName(type.name));
       if (!Type) {
-        throw new Error(`Could not find type named '${getName(type.name)}'.`);
+        throw new Error(
+          `${uniquePluginName} could not find type named '${getName(type.name)}'.`,
+        );
       }
       return Type;
     } else if (type.kind === "NonNullType") {
