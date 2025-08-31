@@ -1,6 +1,5 @@
 /* eslint-disable import/no-unresolved */
 import type { PgSelectSingleStep } from "@dataplan/pg";
-import { TYPES } from "@dataplan/pg";
 import PersistedPlugin from "@grafserv/persisted";
 import { EXPORTABLE, exportSchema } from "graphile-export";
 import { extendSchema, wrapPlans } from "graphile-utils";
@@ -16,6 +15,7 @@ import {
   error,
   isAsyncIterable,
   lambda,
+  list,
   listen,
   object,
   sideEffect,
@@ -344,7 +344,10 @@ const preset: GraphileConfig.Preset = {
   plugins: [
     StreamDeferPlugin,
     extendSchema((build) => {
-      const { sql } = build;
+      const {
+        sql,
+        dataplanPg: { TYPES },
+      } = build;
       return {
         typeDefs: /* GraphQL */ `
           extend type Person {
@@ -531,11 +534,14 @@ const preset: GraphileConfig.Preset = {
           errorTests: ErrorTests
         }
         type ErrorTests {
+          nested: ErrorTests
+          nestedList: [ErrorTests]
           index: Int
           errorOnOddNumbers: Int!
           fourtyTwo: Int!
           nonNullableReturningNull: Int!
           coercionFailure: Int
+          planningError: Int
         }
       `,
       objects: {
@@ -575,6 +581,14 @@ const preset: GraphileConfig.Preset = {
         },
         ErrorTests: {
           plans: {
+            planningError: EXPORTABLE(
+              () => () => {
+                throw new Error(`This error occurred during planning!`);
+              },
+              [],
+            ),
+            nested: EXPORTABLE(() => ($test) => $test, []),
+            nestedList: EXPORTABLE((list) => ($test) => list([$test]), [list]),
             errorOnOddNumbers: EXPORTABLE(
               (lambda) => ($payload) =>
                 lambda($payload, (p: any) => {
