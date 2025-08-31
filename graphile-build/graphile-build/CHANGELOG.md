@@ -1,5 +1,39 @@
 # graphile-build
 
+## 5.0.0-beta.38
+
+### Patch Changes
+
+- [#2692](https://github.com/graphile/crystal/pull/2692)
+  [`3d5c464`](https://github.com/graphile/crystal/commit/3d5c4641df66b431066efd6c74b67ca0d38ba7f4)
+  Thanks [@benjie](https://github.com/benjie)! - Allow forbidding certain
+  objects/functions from being exported, and raise error as early as possible.
+
+- [#2684](https://github.com/graphile/crystal/pull/2684)
+  [`87a4c92`](https://github.com/graphile/crystal/commit/87a4c92dc89093a8bd601dcd692910eadf0c4cd3)
+  Thanks [@benjie](https://github.com/benjie)! - Enable deduplication of node
+  accessor calls
+
+- [#2678](https://github.com/graphile/crystal/pull/2678)
+  [`6dafac1`](https://github.com/graphile/crystal/commit/6dafac162955291e5147c21e57734b44e30acb98)
+  Thanks [@benjie](https://github.com/benjie)! - Remove peer dependency
+  optionality in an attempt to satisfy pnpm's installation algorithms
+- Updated dependencies
+  [[`cfd4c3c`](https://github.com/graphile/crystal/commit/cfd4c3cff0ef40ed87a2c700b7719c1ca0e73588),
+  [`c3f9c38`](https://github.com/graphile/crystal/commit/c3f9c38cb00ad4553e4bc3c04e16a7c77bd16142),
+  [`3d5c464`](https://github.com/graphile/crystal/commit/3d5c4641df66b431066efd6c74b67ca0d38ba7f4),
+  [`13513dd`](https://github.com/graphile/crystal/commit/13513ddaea15ad9498a77de7c4e92679498f99ca),
+  [`bc2b188`](https://github.com/graphile/crystal/commit/bc2b188a50e00f153dc68df6955399c5917130bd),
+  [`c13813e`](https://github.com/graphile/crystal/commit/c13813eecb42c0d9a6703540c022e318e18c5751),
+  [`4a9072b`](https://github.com/graphile/crystal/commit/4a9072bfa3d3e86c6013caf2b89a31e87f2bb421),
+  [`6dafac1`](https://github.com/graphile/crystal/commit/6dafac162955291e5147c21e57734b44e30acb98),
+  [`e15f886`](https://github.com/graphile/crystal/commit/e15f886cae1041416b44b74b75426f8d43000dcf),
+  [`34efed0`](https://github.com/graphile/crystal/commit/34efed09892d4b6533f40026de4a6b0a8a35035d),
+  [`185d449`](https://github.com/graphile/crystal/commit/185d449ed30d29c9134cc898b50a1473ab2910a2)]:
+  - graphile-config@0.0.1-beta.18
+  - grafast@0.1.1-beta.26
+  - tamedevil@0.0.0-beta.9
+
 ## 5.0.0-beta.37
 
 ### Patch Changes

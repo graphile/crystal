@@ -1,5 +1,35 @@
 # ruru-components
 
+## 2.0.0-beta.36
+
+### Patch Changes
+
+- [#2694](https://github.com/graphile/crystal/pull/2694)
+  [`13513dd`](https://github.com/graphile/crystal/commit/13513ddaea15ad9498a77de7c4e92679498f99ca)
+  Thanks [@benjie](https://github.com/benjie)! - Add support for `onError` RFC
+  with `PROPAGATE`, `NULL` and `HALT` behaviors implemented.
+
+- [#2678](https://github.com/graphile/crystal/pull/2678)
+  [`6dafac1`](https://github.com/graphile/crystal/commit/6dafac162955291e5147c21e57734b44e30acb98)
+  Thanks [@benjie](https://github.com/benjie)! - Remove peer dependency
+  optionality in an attempt to satisfy pnpm's installation algorithms
+
+- [#2676](https://github.com/graphile/crystal/pull/2676)
+  [`34efed0`](https://github.com/graphile/crystal/commit/34efed09892d4b6533f40026de4a6b0a8a35035d)
+  Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump mermaid from
+  11.8.1 to 11.10.0
+
+- Updated dependencies
+  [[`c3f9c38`](https://github.com/graphile/crystal/commit/c3f9c38cb00ad4553e4bc3c04e16a7c77bd16142),
+  [`13513dd`](https://github.com/graphile/crystal/commit/13513ddaea15ad9498a77de7c4e92679498f99ca),
+  [`bc2b188`](https://github.com/graphile/crystal/commit/bc2b188a50e00f153dc68df6955399c5917130bd),
+  [`c13813e`](https://github.com/graphile/crystal/commit/c13813eecb42c0d9a6703540c022e318e18c5751),
+  [`4a9072b`](https://github.com/graphile/crystal/commit/4a9072bfa3d3e86c6013caf2b89a31e87f2bb421),
+  [`6dafac1`](https://github.com/graphile/crystal/commit/6dafac162955291e5147c21e57734b44e30acb98),
+  [`34efed0`](https://github.com/graphile/crystal/commit/34efed09892d4b6533f40026de4a6b0a8a35035d),
+  [`185d449`](https://github.com/graphile/crystal/commit/185d449ed30d29c9134cc898b50a1473ab2910a2)]:
+  - grafast@0.1.1-beta.26
+
 ## 2.0.0-beta.35
 
 ### Patch Changes

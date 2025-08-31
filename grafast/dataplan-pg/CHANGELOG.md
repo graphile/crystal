@@ -1,5 +1,59 @@
 # @dataplan/pg
 
+## 0.0.1-beta.37
+
+### Patch Changes
+
+- [#2686](https://github.com/graphile/crystal/pull/2686)
+  [`5dbb9e8`](https://github.com/graphile/crystal/commit/5dbb9e87850ce8de29ab4fec18c9d06333b642de)
+  Thanks [@benjie](https://github.com/benjie)! - Fix a bug with mutations where
+  the results of computed columns were calculated using the snapshot from before
+  the mutation (due to the way Postgres works). Solved by breaking the
+  post-mutation function calls out into a separate post-mutation statement.
+
+- [#2692](https://github.com/graphile/crystal/pull/2692)
+  [`3d5c464`](https://github.com/graphile/crystal/commit/3d5c4641df66b431066efd6c74b67ca0d38ba7f4)
+  Thanks [@benjie](https://github.com/benjie)! - Allow forbidding certain
+  objects/functions from being exported, and raise error as early as possible.
+
+- [#2679](https://github.com/graphile/crystal/pull/2679)
+  [`05b971e`](https://github.com/graphile/crystal/commit/05b971e2d63cb5c946512bb83e6c255a7d9ec93f)
+  Thanks [@benjie](https://github.com/benjie)! - Warns user if sqlValueWithCodec
+  is called with a Step
+
+- [#2691](https://github.com/graphile/crystal/pull/2691)
+  [`703d162`](https://github.com/graphile/crystal/commit/703d162df2cc148ac343c1339b8e7df750aa781d)
+  Thanks [@benjie](https://github.com/benjie)! - Deprecate
+  `withPgClient`/`withPgClientTransaction` because people are using them
+  incorrectly and causing themselves N+1 issues. Instead, rename to
+  `sideEffectWithPgClient` and introduce new `loadOneWithPgClient` and
+  `loadManyWithPgClient` helpers that people should use instead of
+  `withPgClient`.
+
+- [#2678](https://github.com/graphile/crystal/pull/2678)
+  [`6dafac1`](https://github.com/graphile/crystal/commit/6dafac162955291e5147c21e57734b44e30acb98)
+  Thanks [@benjie](https://github.com/benjie)! - Remove peer dependency
+  optionality in an attempt to satisfy pnpm's installation algorithms
+
+- [#2695](https://github.com/graphile/crystal/pull/2695)
+  [`e2048e2`](https://github.com/graphile/crystal/commit/e2048e260bf99ed946f92d6ea579e08f126ba4d5)
+  Thanks [@benjie](https://github.com/benjie)! - Don't allow `EXPLAIN ANALYZE`
+  of mutations
+
+- Updated dependencies
+  [[`cfd4c3c`](https://github.com/graphile/crystal/commit/cfd4c3cff0ef40ed87a2c700b7719c1ca0e73588),
+  [`c3f9c38`](https://github.com/graphile/crystal/commit/c3f9c38cb00ad4553e4bc3c04e16a7c77bd16142),
+  [`13513dd`](https://github.com/graphile/crystal/commit/13513ddaea15ad9498a77de7c4e92679498f99ca),
+  [`bc2b188`](https://github.com/graphile/crystal/commit/bc2b188a50e00f153dc68df6955399c5917130bd),
+  [`c13813e`](https://github.com/graphile/crystal/commit/c13813eecb42c0d9a6703540c022e318e18c5751),
+  [`4a9072b`](https://github.com/graphile/crystal/commit/4a9072bfa3d3e86c6013caf2b89a31e87f2bb421),
+  [`6dafac1`](https://github.com/graphile/crystal/commit/6dafac162955291e5147c21e57734b44e30acb98),
+  [`e15f886`](https://github.com/graphile/crystal/commit/e15f886cae1041416b44b74b75426f8d43000dcf),
+  [`34efed0`](https://github.com/graphile/crystal/commit/34efed09892d4b6533f40026de4a6b0a8a35035d),
+  [`185d449`](https://github.com/graphile/crystal/commit/185d449ed30d29c9134cc898b50a1473ab2910a2)]:
+  - graphile-config@0.0.1-beta.18
+  - grafast@0.1.1-beta.26
+
 ## 0.0.1-beta.36
 
 ### Patch Changes

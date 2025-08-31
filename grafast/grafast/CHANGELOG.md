@@ -1,5 +1,132 @@
 # grafast
 
+## 0.1.1-beta.26
+
+### Patch Changes
+
+- [#2691](https://github.com/graphile/crystal/pull/2691)
+  [`c3f9c38`](https://github.com/graphile/crystal/commit/c3f9c38cb00ad4553e4bc3c04e16a7c77bd16142)
+  Thanks [@benjie](https://github.com/benjie)! - Export Thunk type
+
+- [#2694](https://github.com/graphile/crystal/pull/2694)
+  [`13513dd`](https://github.com/graphile/crystal/commit/13513ddaea15ad9498a77de7c4e92679498f99ca)
+  Thanks [@benjie](https://github.com/benjie)! - Add support for `onError` RFC
+  with `PROPAGATE`, `NULL` and `HALT` behaviors implemented.
+
+- [#2659](https://github.com/graphile/crystal/pull/2659)
+  [`bc2b188`](https://github.com/graphile/crystal/commit/bc2b188a50e00f153dc68df6955399c5917130bd)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 Tracking of side effects has
+  been completely overhauled, the main difference for users is that if you hit
+  issues you may need to ensure that **this.hasSideEffects = true**, if set, is
+  the last thing that your step does in its constructor (previously, doing this
+  anywhere in the constructor was okay). This should fix a number of oddities
+  around side effects and their impact on the operation plan - essentially it's
+  a lot stricter now.
+
+- [#2659](https://github.com/graphile/crystal/pull/2659)
+  [`c13813e`](https://github.com/graphile/crystal/commit/c13813eecb42c0d9a6703540c022e318e18c5751)
+  Thanks [@benjie](https://github.com/benjie)! - `loadMany()` and `loadOne()`'s
+  `unary` property in the callback has been renamed to `shared`. `unary` is
+  still passed for backwards compatibility, but it is deprecated.
+
+- [#2659](https://github.com/graphile/crystal/pull/2659)
+  [`4a9072b`](https://github.com/graphile/crystal/commit/4a9072bfa3d3e86c6013caf2b89a31e87f2bb421)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 **Building connections
+  overhauled** - `connection()` has been overhauled, please re-read the docs on
+  this and adjust your plans as necessary.
+  - If your custom steps have the `connectionClone` method, the first argument
+    (`$connection`) has been removed because connection depends on your
+    collection step (rather than the other way around as it was previously) -
+    this should simplify implementation.
+  - Custom steps that are used with `connection()` are now just assumed to be
+    simple lists unless they indicate otherwise using `paginationSupport` (see
+    the `connection()` docs) - this means you can use any (list-returning) step
+    with `connection()`! 🎉
+  - `PgPageInfoStep` is no more. Various other steps have been rearranged and
+    had (mostly internal, or at least extremely rarely used) methods renamed,
+    replaced or removed. (E.g. `PgSelectSingleStep` no longer has `.node()` or
+    `.cursor()` methods since it is no longer implicitly an "edge step".)
+  - `@stream` has been optimized somewhat, no longer requiring multiple
+    independent streams from the database as required previously (and as would
+    be required by GraphQL.js under the same circumstances)
+
+- [#2678](https://github.com/graphile/crystal/pull/2678)
+  [`6dafac1`](https://github.com/graphile/crystal/commit/6dafac162955291e5147c21e57734b44e30acb98)
+  Thanks [@benjie](https://github.com/benjie)! - Remove peer dependency
+  optionality in an attempt to satisfy pnpm's installation algorithms
+
+- [#2676](https://github.com/graphile/crystal/pull/2676)
+  [`34efed0`](https://github.com/graphile/crystal/commit/34efed09892d4b6533f40026de4a6b0a8a35035d)
+  Thanks [@dependabot](https://github.com/apps/dependabot)! - Bump mermaid from
+  11.8.1 to 11.10.0
+
+- [#2659](https://github.com/graphile/crystal/pull/2659)
+  [`185d449`](https://github.com/graphile/crystal/commit/185d449ed30d29c9134cc898b50a1473ab2910a2)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 `loadOne` and `loadMany` no
+  longer accept 2-4 arguments; instead exactly two arguments are accepted.
+  **There is a codeshift available** in the repository
+  (`shifts/loadArguments.ts`) that you can execute with `jscodeshift` (see
+  comment at top of file) to do this rewrite for you across your codebase. Be
+  sure to check the results carefully!
+
+  The first argument is unchanged, the second argument is either the loader
+  callback (as before) or a "loader object":
+  - `shared` (optional) - replaces the `unary` argument, and works as before
+    except you may now also use a thunk! (See below)
+  - `ioEquivalence` (optional) - as before
+  - `load` (required) - the loader callback
+  - `name` (optional) - display name for the callback (will appear in plan
+    diagrams)
+  - `paginationSupport` (optional) - only relevant to loadMany, add this to
+    indicate which optimizations your loader callback supports (see the
+    documentation) - for example, does it support applying a `limit`?
+
+  **The motivation for the "loader object"** is that every step that calls a
+  given load function should have the same `ioEquivalence`, `shared`, `name` and
+  `paginationSupport` - so rather than defining them in each of your plan
+  resolvers, we should **associate the metadata with the callback directly**.
+
+  To make this practical, `shared` (previously: `unary`) can now be a callback
+  so that you can create steps to provide any shared details, e.g. database or
+  API clients from `context()`.
+
+  Ultimately the aim is to move this boilerplate out of your plan resolvers and
+  instead to co-locate it with your data loading callbacks:
+
+  ```diff
+   function User_friends($user, { $first }) {
+     const $userId = get($user, "id");
+  -  const $apiClient = context().get("apiClient");
+  -  const $collection = loadMany(
+  -    $userId,
+  -    null, // ioEquivalence
+  -    $apiClient, // shared (previously 'unary')
+  -    batchGetFriendsByUserId // load callback
+  -  );
+  +  const $collection = loadMany($userId, batchGetFriendIdsByUserId);
+     $collection.setParam("limit", $first);
+     return $collection;
+   }
+
+   const batchGetFriendsByUserId =
+  +  {
+  +    shared: () => context().get("apiClient"),
+  +    load:
+         (userIds, info) => {
+  -        const apiClient = info.unary;
+  +        const apiClient = info.shared;
+           /* ... */
+         }
+  +  }
+  ```
+
+- Updated dependencies
+  [[`cfd4c3c`](https://github.com/graphile/crystal/commit/cfd4c3cff0ef40ed87a2c700b7719c1ca0e73588),
+  [`3d5c464`](https://github.com/graphile/crystal/commit/3d5c4641df66b431066efd6c74b67ca0d38ba7f4),
+  [`e15f886`](https://github.com/graphile/crystal/commit/e15f886cae1041416b44b74b75426f8d43000dcf)]:
+  - graphile-config@0.0.1-beta.18
+  - tamedevil@0.0.0-beta.9
+
 ## 0.1.1-beta.25
 
 ### Patch Changes

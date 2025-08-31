@@ -1,5 +1,62 @@
 # graphile-utils
 
+## 5.0.0-beta.44
+
+### Patch Changes
+
+- [#2692](https://github.com/graphile/crystal/pull/2692)
+  [`3d5c464`](https://github.com/graphile/crystal/commit/3d5c4641df66b431066efd6c74b67ca0d38ba7f4)
+  Thanks [@benjie](https://github.com/benjie)! - Allow forbidding certain
+  objects/functions from being exported, and raise error as early as possible.
+
+- [#2655](https://github.com/graphile/crystal/pull/2655)
+  [`5bea9c1`](https://github.com/graphile/crystal/commit/5bea9c14b7b20609eec1593fe3109f8d6c170b44)
+  Thanks [@hos](https://github.com/hos)! - Fix handling of empty string in
+  `changeNullability()`
+
+- [#2678](https://github.com/graphile/crystal/pull/2678)
+  [`6dafac1`](https://github.com/graphile/crystal/commit/6dafac162955291e5147c21e57734b44e30acb98)
+  Thanks [@benjie](https://github.com/benjie)! - Remove peer dependency
+  optionality in an attempt to satisfy pnpm's installation algorithms
+
+- [#2692](https://github.com/graphile/crystal/pull/2692)
+  [`aa8fb3d`](https://github.com/graphile/crystal/commit/aa8fb3dbd23b0c3b6b8039922cb4ab7293b51844)
+  Thanks [@benjie](https://github.com/benjie)! - Forbid export of 'build', this
+  has required a slight degradation of the
+  makeAddPgTableConditionPlugin/addPgTableCondition signature for people using
+  the legacy signature - namely the entire build object is no longer available
+  in the callback that is the fourth argument. (Only have 3 arguments to your
+  call? You're not impacted!) In the unlikely event this causes you any issues,
+  your best bet is to move to the `apply()` approach (only use the 3 documented
+  arguments), but we can also potentially expand the parts of build that are
+  made available.
+- Updated dependencies
+  [[`5dbb9e8`](https://github.com/graphile/crystal/commit/5dbb9e87850ce8de29ab4fec18c9d06333b642de),
+  [`cfd4c3c`](https://github.com/graphile/crystal/commit/cfd4c3cff0ef40ed87a2c700b7719c1ca0e73588),
+  [`c3f9c38`](https://github.com/graphile/crystal/commit/c3f9c38cb00ad4553e4bc3c04e16a7c77bd16142),
+  [`68a1243`](https://github.com/graphile/crystal/commit/68a1243f104227ebf7d1f3cedcbec49dc3c8e258),
+  [`3d5c464`](https://github.com/graphile/crystal/commit/3d5c4641df66b431066efd6c74b67ca0d38ba7f4),
+  [`6762c70`](https://github.com/graphile/crystal/commit/6762c7005c56d17c06cebb6857e8d295d86399eb),
+  [`05b971e`](https://github.com/graphile/crystal/commit/05b971e2d63cb5c946512bb83e6c255a7d9ec93f),
+  [`13513dd`](https://github.com/graphile/crystal/commit/13513ddaea15ad9498a77de7c4e92679498f99ca),
+  [`bc2b188`](https://github.com/graphile/crystal/commit/bc2b188a50e00f153dc68df6955399c5917130bd),
+  [`87a4c92`](https://github.com/graphile/crystal/commit/87a4c92dc89093a8bd601dcd692910eadf0c4cd3),
+  [`703d162`](https://github.com/graphile/crystal/commit/703d162df2cc148ac343c1339b8e7df750aa781d),
+  [`c13813e`](https://github.com/graphile/crystal/commit/c13813eecb42c0d9a6703540c022e318e18c5751),
+  [`4a9072b`](https://github.com/graphile/crystal/commit/4a9072bfa3d3e86c6013caf2b89a31e87f2bb421),
+  [`7766c19`](https://github.com/graphile/crystal/commit/7766c19ecefd3aebc965306db90ba29b3b05200c),
+  [`6dafac1`](https://github.com/graphile/crystal/commit/6dafac162955291e5147c21e57734b44e30acb98),
+  [`e15f886`](https://github.com/graphile/crystal/commit/e15f886cae1041416b44b74b75426f8d43000dcf),
+  [`34efed0`](https://github.com/graphile/crystal/commit/34efed09892d4b6533f40026de4a6b0a8a35035d),
+  [`185d449`](https://github.com/graphile/crystal/commit/185d449ed30d29c9134cc898b50a1473ab2910a2),
+  [`e2048e2`](https://github.com/graphile/crystal/commit/e2048e260bf99ed946f92d6ea579e08f126ba4d5)]:
+  - graphile-build-pg@5.0.0-beta.45
+  - @dataplan/pg@0.0.1-beta.37
+  - graphile-config@0.0.1-beta.18
+  - grafast@0.1.1-beta.26
+  - graphile-build@5.0.0-beta.38
+  - tamedevil@0.0.0-beta.9
+
 ## 5.0.0-beta.43
 
 ### Patch Changes

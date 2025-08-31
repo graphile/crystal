@@ -1,5 +1,23 @@
 # ruru
 
+## 2.0.0-beta.30
+
+### Patch Changes
+
+- [#2694](https://github.com/graphile/crystal/pull/2694)
+  [`13513dd`](https://github.com/graphile/crystal/commit/13513ddaea15ad9498a77de7c4e92679498f99ca)
+  Thanks [@benjie](https://github.com/benjie)! - Add support for `onError` RFC
+  with `PROPAGATE`, `NULL` and `HALT` behaviors implemented.
+
+- [#2678](https://github.com/graphile/crystal/pull/2678)
+  [`6dafac1`](https://github.com/graphile/crystal/commit/6dafac162955291e5147c21e57734b44e30acb98)
+  Thanks [@benjie](https://github.com/benjie)! - Remove peer dependency
+  optionality in an attempt to satisfy pnpm's installation algorithms
+- Updated dependencies
+  [[`cfd4c3c`](https://github.com/graphile/crystal/commit/cfd4c3cff0ef40ed87a2c700b7719c1ca0e73588),
+  [`e15f886`](https://github.com/graphile/crystal/commit/e15f886cae1041416b44b74b75426f8d43000dcf)]:
+  - graphile-config@0.0.1-beta.18
+
 ## 2.0.0-beta.29
 
 ### Patch Changes

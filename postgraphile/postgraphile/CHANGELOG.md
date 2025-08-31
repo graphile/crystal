@@ -1,5 +1,208 @@
 # postgraphile
 
+## 5.0.0-beta.47
+
+### Patch Changes
+
+- [#2675](https://github.com/graphile/crystal/pull/2675)
+  [`b09719f`](https://github.com/graphile/crystal/commit/b09719f5107eada15104c2bbfa4f1290af0a4465)
+  Thanks [@slaskis](https://github.com/slaskis)! - Fix "simple subscriptions"
+  `ListenPayload.relatedNode` following the overhaul of polymorphism (thanks
+  @slaskis for the reproduction in the test suite!)
+
+- [#2686](https://github.com/graphile/crystal/pull/2686)
+  [`5dbb9e8`](https://github.com/graphile/crystal/commit/5dbb9e87850ce8de29ab4fec18c9d06333b642de)
+  Thanks [@benjie](https://github.com/benjie)! - Fix a bug with mutations where
+  the results of computed columns were calculated using the snapshot from before
+  the mutation (due to the way Postgres works). Solved by breaking the
+  post-mutation function calls out into a separate post-mutation statement.
+
+- [#2690](https://github.com/graphile/crystal/pull/2690)
+  [`208364f`](https://github.com/graphile/crystal/commit/208364f9423abd240a0772b661986aae6e185c47)
+  Thanks [@benjie](https://github.com/benjie)! - Add keepalive to grafserv
+  websocket connections.
+
+- [#2689](https://github.com/graphile/crystal/pull/2689)
+  [`6762c70`](https://github.com/graphile/crystal/commit/6762c7005c56d17c06cebb6857e8d295d86399eb)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug in
+  PgIndexBehaviorsPlugin that would treat all view attributes as unindexed.
+  Views can't have indexes, so we must give them the benefit of the doubt.
+
+- [#2694](https://github.com/graphile/crystal/pull/2694)
+  [`13513dd`](https://github.com/graphile/crystal/commit/13513ddaea15ad9498a77de7c4e92679498f99ca)
+  Thanks [@benjie](https://github.com/benjie)! - Add support for `onError` RFC
+  with `PROPAGATE`, `NULL` and `HALT` behaviors implemented.
+
+- [#2659](https://github.com/graphile/crystal/pull/2659)
+  [`bc2b188`](https://github.com/graphile/crystal/commit/bc2b188a50e00f153dc68df6955399c5917130bd)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 Tracking of side effects has
+  been completely overhauled, the main difference for users is that if you hit
+  issues you may need to ensure that **this.hasSideEffects = true**, if set, is
+  the last thing that your step does in its constructor (previously, doing this
+  anywhere in the constructor was okay). This should fix a number of oddities
+  around side effects and their impact on the operation plan - essentially it's
+  a lot stricter now.
+
+- [#2691](https://github.com/graphile/crystal/pull/2691)
+  [`703d162`](https://github.com/graphile/crystal/commit/703d162df2cc148ac343c1339b8e7df750aa781d)
+  Thanks [@benjie](https://github.com/benjie)! - Deprecate
+  `withPgClient`/`withPgClientTransaction` because people are using them
+  incorrectly and causing themselves N+1 issues. Instead, rename to
+  `sideEffectWithPgClient` and introduce new `loadOneWithPgClient` and
+  `loadManyWithPgClient` helpers that people should use instead of
+  `withPgClient`.
+
+- [#2659](https://github.com/graphile/crystal/pull/2659)
+  [`4a9072b`](https://github.com/graphile/crystal/commit/4a9072bfa3d3e86c6013caf2b89a31e87f2bb421)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 **Building connections
+  overhauled** - `connection()` has been overhauled, please re-read the docs on
+  this and adjust your plans as necessary.
+  - If your custom steps have the `connectionClone` method, the first argument
+    (`$connection`) has been removed because connection depends on your
+    collection step (rather than the other way around as it was previously) -
+    this should simplify implementation.
+  - Custom steps that are used with `connection()` are now just assumed to be
+    simple lists unless they indicate otherwise using `paginationSupport` (see
+    the `connection()` docs) - this means you can use any (list-returning) step
+    with `connection()`! 🎉
+  - `PgPageInfoStep` is no more. Various other steps have been rearranged and
+    had (mostly internal, or at least extremely rarely used) methods renamed,
+    replaced or removed. (E.g. `PgSelectSingleStep` no longer has `.node()` or
+    `.cursor()` methods since it is no longer implicitly an "edge step".)
+  - `@stream` has been optimized somewhat, no longer requiring multiple
+    independent streams from the database as required previously (and as would
+    be required by GraphQL.js under the same circumstances)
+
+- [#2687](https://github.com/graphile/crystal/pull/2687)
+  [`7766c19`](https://github.com/graphile/crystal/commit/7766c19ecefd3aebc965306db90ba29b3b05200c)
+  Thanks [@benjie](https://github.com/benjie)! - Fix issue whereby
+  nodeId:insert/nodeId:update permissions were not rejected by PgRBACPlugin when
+  the underlying columns were not writable.
+
+- [#2678](https://github.com/graphile/crystal/pull/2678)
+  [`6dafac1`](https://github.com/graphile/crystal/commit/6dafac162955291e5147c21e57734b44e30acb98)
+  Thanks [@benjie](https://github.com/benjie)! - Remove peer dependency
+  optionality in an attempt to satisfy pnpm's installation algorithms
+
+- [#2692](https://github.com/graphile/crystal/pull/2692)
+  [`aa8fb3d`](https://github.com/graphile/crystal/commit/aa8fb3dbd23b0c3b6b8039922cb4ab7293b51844)
+  Thanks [@benjie](https://github.com/benjie)! - Forbid export of 'build', this
+  has required a slight degradation of the
+  makeAddPgTableConditionPlugin/addPgTableCondition signature for people using
+  the legacy signature - namely the entire build object is no longer available
+  in the callback that is the fourth argument. (Only have 3 arguments to your
+  call? You're not impacted!) In the unlikely event this causes you any issues,
+  your best bet is to move to the `apply()` approach (only use the 3 documented
+  arguments), but we can also potentially expand the parts of build that are
+  made available.
+
+- [#2688](https://github.com/graphile/crystal/pull/2688)
+  [`e15f886`](https://github.com/graphile/crystal/commit/e15f886cae1041416b44b74b75426f8d43000dcf)
+  Thanks [@benjie](https://github.com/benjie)! - Fixes bug where two different
+  plugins with the same name would be allowed to exist in the same (resolved)
+  preset. Users of dynamically created presets and plugins (e.g.
+  `makeV4Preset(...)` in PostGraphile) should be wary not to include two calls
+  to the same factory in their preset (directly or indirectly).
+
+- [#2659](https://github.com/graphile/crystal/pull/2659)
+  [`185d449`](https://github.com/graphile/crystal/commit/185d449ed30d29c9134cc898b50a1473ab2910a2)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 `loadOne` and `loadMany` no
+  longer accept 2-4 arguments; instead exactly two arguments are accepted.
+  **There is a codeshift available** in the repository
+  (`shifts/loadArguments.ts`) that you can execute with `jscodeshift` (see
+  comment at top of file) to do this rewrite for you across your codebase. Be
+  sure to check the results carefully!
+
+  The first argument is unchanged, the second argument is either the loader
+  callback (as before) or a "loader object":
+  - `shared` (optional) - replaces the `unary` argument, and works as before
+    except you may now also use a thunk! (See below)
+  - `ioEquivalence` (optional) - as before
+  - `load` (required) - the loader callback
+  - `name` (optional) - display name for the callback (will appear in plan
+    diagrams)
+  - `paginationSupport` (optional) - only relevant to loadMany, add this to
+    indicate which optimizations your loader callback supports (see the
+    documentation) - for example, does it support applying a `limit`?
+
+  **The motivation for the "loader object"** is that every step that calls a
+  given load function should have the same `ioEquivalence`, `shared`, `name` and
+  `paginationSupport` - so rather than defining them in each of your plan
+  resolvers, we should **associate the metadata with the callback directly**.
+
+  To make this practical, `shared` (previously: `unary`) can now be a callback
+  so that you can create steps to provide any shared details, e.g. database or
+  API clients from `context()`.
+
+  Ultimately the aim is to move this boilerplate out of your plan resolvers and
+  instead to co-locate it with your data loading callbacks:
+
+  ```diff
+   function User_friends($user, { $first }) {
+     const $userId = get($user, "id");
+  -  const $apiClient = context().get("apiClient");
+  -  const $collection = loadMany(
+  -    $userId,
+  -    null, // ioEquivalence
+  -    $apiClient, // shared (previously 'unary')
+  -    batchGetFriendsByUserId // load callback
+  -  );
+  +  const $collection = loadMany($userId, batchGetFriendIdsByUserId);
+     $collection.setParam("limit", $first);
+     return $collection;
+   }
+
+   const batchGetFriendsByUserId =
+  +  {
+  +    shared: () => context().get("apiClient"),
+  +    load:
+         (userIds, info) => {
+  -        const apiClient = info.unary;
+  +        const apiClient = info.shared;
+           /* ... */
+         }
+  +  }
+  ```
+
+- [#2657](https://github.com/graphile/crystal/pull/2657)
+  [`f83b191`](https://github.com/graphile/crystal/commit/f83b191f39c9d521fd12563cca6aa20d1a6f0494)
+  Thanks [@dependabot](https://github.com/apps/dependabot)! - Add support for
+  Koa v3 (via v2 code) and update package exports.
+
+- Updated dependencies
+  [[`5dbb9e8`](https://github.com/graphile/crystal/commit/5dbb9e87850ce8de29ab4fec18c9d06333b642de),
+  [`cfd4c3c`](https://github.com/graphile/crystal/commit/cfd4c3cff0ef40ed87a2c700b7719c1ca0e73588),
+  [`c3f9c38`](https://github.com/graphile/crystal/commit/c3f9c38cb00ad4553e4bc3c04e16a7c77bd16142),
+  [`68a1243`](https://github.com/graphile/crystal/commit/68a1243f104227ebf7d1f3cedcbec49dc3c8e258),
+  [`3d5c464`](https://github.com/graphile/crystal/commit/3d5c4641df66b431066efd6c74b67ca0d38ba7f4),
+  [`208364f`](https://github.com/graphile/crystal/commit/208364f9423abd240a0772b661986aae6e185c47),
+  [`6762c70`](https://github.com/graphile/crystal/commit/6762c7005c56d17c06cebb6857e8d295d86399eb),
+  [`05b971e`](https://github.com/graphile/crystal/commit/05b971e2d63cb5c946512bb83e6c255a7d9ec93f),
+  [`13513dd`](https://github.com/graphile/crystal/commit/13513ddaea15ad9498a77de7c4e92679498f99ca),
+  [`bc2b188`](https://github.com/graphile/crystal/commit/bc2b188a50e00f153dc68df6955399c5917130bd),
+  [`5bea9c1`](https://github.com/graphile/crystal/commit/5bea9c14b7b20609eec1593fe3109f8d6c170b44),
+  [`87a4c92`](https://github.com/graphile/crystal/commit/87a4c92dc89093a8bd601dcd692910eadf0c4cd3),
+  [`703d162`](https://github.com/graphile/crystal/commit/703d162df2cc148ac343c1339b8e7df750aa781d),
+  [`c13813e`](https://github.com/graphile/crystal/commit/c13813eecb42c0d9a6703540c022e318e18c5751),
+  [`4a9072b`](https://github.com/graphile/crystal/commit/4a9072bfa3d3e86c6013caf2b89a31e87f2bb421),
+  [`7766c19`](https://github.com/graphile/crystal/commit/7766c19ecefd3aebc965306db90ba29b3b05200c),
+  [`6dafac1`](https://github.com/graphile/crystal/commit/6dafac162955291e5147c21e57734b44e30acb98),
+  [`aa8fb3d`](https://github.com/graphile/crystal/commit/aa8fb3dbd23b0c3b6b8039922cb4ab7293b51844),
+  [`e15f886`](https://github.com/graphile/crystal/commit/e15f886cae1041416b44b74b75426f8d43000dcf),
+  [`34efed0`](https://github.com/graphile/crystal/commit/34efed09892d4b6533f40026de4a6b0a8a35035d),
+  [`185d449`](https://github.com/graphile/crystal/commit/185d449ed30d29c9134cc898b50a1473ab2910a2),
+  [`e2048e2`](https://github.com/graphile/crystal/commit/e2048e260bf99ed946f92d6ea579e08f126ba4d5),
+  [`33c7784`](https://github.com/graphile/crystal/commit/33c7784a8c81ac29c1e2e4a8733d04c30ef7035b),
+  [`f83b191`](https://github.com/graphile/crystal/commit/f83b191f39c9d521fd12563cca6aa20d1a6f0494)]:
+  - graphile-build-pg@5.0.0-beta.45
+  - @dataplan/pg@0.0.1-beta.37
+  - graphile-config@0.0.1-beta.18
+  - grafast@0.1.1-beta.26
+  - graphile-build@5.0.0-beta.38
+  - graphile-utils@5.0.0-beta.44
+  - tamedevil@0.0.0-beta.9
+  - grafserv@0.1.1-beta.28
+
 ## 5.0.0-beta.46
 
 ### Patch Changes

@@ -1,5 +1,23 @@
 # graphile-config
 
+## 0.0.1-beta.18
+
+### Patch Changes
+
+- [#2697](https://github.com/graphile/crystal/pull/2697)
+  [`cfd4c3c`](https://github.com/graphile/crystal/commit/cfd4c3cff0ef40ed87a2c700b7719c1ca0e73588)
+  Thanks [@benjie](https://github.com/benjie)! - Be more selective about the
+  errors caught whilst loading a config file; a bug/throw in the config file
+  should still be raised.
+
+- [#2688](https://github.com/graphile/crystal/pull/2688)
+  [`e15f886`](https://github.com/graphile/crystal/commit/e15f886cae1041416b44b74b75426f8d43000dcf)
+  Thanks [@benjie](https://github.com/benjie)! - Fixes bug where two different
+  plugins with the same name would be allowed to exist in the same (resolved)
+  preset. Users of dynamically created presets and plugins (e.g.
+  `makeV4Preset(...)` in PostGraphile) should be wary not to include two calls
+  to the same factory in their preset (directly or indirectly).
+
 ## 0.0.1-beta.17
 
 ### Patch Changes
@@ -114,7 +132,6 @@
   accepts `resolvedPreset` and `requestContext` directly; passing these through
   additional arguments is now deprecated and support will be removed in a future
   revision. This affects:
-
   - `grafast()`
   - `execute()`
   - `subscribe()`
@@ -160,14 +177,12 @@
   `plugin.grafserv.hooks.*` are still supported but deprecated; instead use
   middleware `plugin.grafserv.middleware.*` (note that call signatures have
   changed slightly, similar to the diff above):
-
   - `hooks.init` -> `middleware.setPreset`
   - `hooks.processGraphQLRequestBody` -> `middleware.processGraphQLRequestBody`
   - `hooks.ruruHTMLParts` -> `middleware.ruruHTMLParts`
 
   A few TypeScript types related to Hooks have been renamed, but their old names
   are still available, just deprecated. They will be removed in a future update:
-
   - `HookObject` -> `FunctionalityObject`
   - `PluginHook` -> `CallbackOrDescriptor`
   - `PluginHookObject` -> `CallbackDescriptor`

@@ -1,5 +1,14 @@
 # tamedevil
 
+## 0.0.0-beta.9
+
+### Patch Changes
+
+- [#2692](https://github.com/graphile/crystal/pull/2692)
+  [`3d5c464`](https://github.com/graphile/crystal/commit/3d5c4641df66b431066efd6c74b67ca0d38ba7f4)
+  Thanks [@benjie](https://github.com/benjie)! - Allow forbidding certain
+  objects/functions from being exported, and raise error as early as possible.
+
 ## 0.0.0-beta.8
 
 ### Patch Changes

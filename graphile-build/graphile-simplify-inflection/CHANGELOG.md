@@ -1,5 +1,53 @@
 # v8.0.0
 
+## 8.0.0-beta.8
+
+### Patch Changes
+
+- [#2682](https://github.com/graphile/crystal/pull/2682)
+  [`88146e2`](https://github.com/graphile/crystal/commit/88146e2914e6026644e1ec82da6cf963ed9b6d15)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 Fix bug where names were
+  incorrectly derived for AmberPreset/RelayPreset.
+
+  If you need to restore the old (broken) behavior, use something this plugin
+  (untested):
+
+  ```ts
+  const ShinyFlowersBeamUndoPlugin = {
+    name: "ShinyFlowersBeamUndoPlugin",
+    inflection: {
+      replace: {
+        _getBaseNameFromKeys(original, preset, detailedKeys) {
+          if (detailedKeys.length === 1) {
+            const key = detailedKeys[0];
+            const attributeName = this._attributeName({
+              ...key,
+              skipRowId: false, // HACK: deliberately opt in to poor naming
+            });
+            return this._getBaseName(attributeName);
+          }
+          if (preset.schema?.pgSimplifyMultikeyRelations) {
+            const attributeNames = detailedKeys.map((key) =>
+              this._attributeName({
+                ...key,
+                skipRowId: true, // HACK: deliberately opt in to poor naming
+              }),
+            );
+            const baseNames = attributeNames.map((attributeName) =>
+              this._getBaseName(attributeName),
+            );
+            // Check none are null
+            if (baseNames.every((n) => n)) {
+              return baseNames.join("-");
+            }
+          }
+          return null;
+        },
+      },
+    },
+  };
+  ```
+
 ## 8.0.0-beta.7
 
 ### Patch Changes
@@ -163,7 +211,6 @@
   resources, and more. So, we've renamed lots of things as part of the API
   stabilization work. You're probably only affected by the first 2 bullet
   points.
-
   - `pgConfigs` -> `pgServices` (also applies to related `pgConfig` terms such
     as `makePgConfig` -> `makePgService`, `MakePgConfigOptions` ->
     `MakePgServiceOptions`, etc) - see your `graphile.config.ts` or equivalent

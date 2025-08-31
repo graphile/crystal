@@ -1,5 +1,50 @@
 # grafserv
 
+## 0.1.1-beta.28
+
+### Patch Changes
+
+- [#2690](https://github.com/graphile/crystal/pull/2690)
+  [`208364f`](https://github.com/graphile/crystal/commit/208364f9423abd240a0772b661986aae6e185c47)
+  Thanks [@benjie](https://github.com/benjie)! - Add keepalive to grafserv
+  websocket connections.
+
+- [#2694](https://github.com/graphile/crystal/pull/2694)
+  [`13513dd`](https://github.com/graphile/crystal/commit/13513ddaea15ad9498a77de7c4e92679498f99ca)
+  Thanks [@benjie](https://github.com/benjie)! - Add support for `onError` RFC
+  with `PROPAGATE`, `NULL` and `HALT` behaviors implemented.
+
+- [#2678](https://github.com/graphile/crystal/pull/2678)
+  [`6dafac1`](https://github.com/graphile/crystal/commit/6dafac162955291e5147c21e57734b44e30acb98)
+  Thanks [@benjie](https://github.com/benjie)! - Remove peer dependency
+  optionality in an attempt to satisfy pnpm's installation algorithms
+
+- [#2666](https://github.com/graphile/crystal/pull/2666)
+  [`33c7784`](https://github.com/graphile/crystal/commit/33c7784a8c81ac29c1e2e4a8733d04c30ef7035b)
+  Thanks [@valerii15298](https://github.com/valerii15298)! - Fix support for
+  HTTP 304 in @whatwg/node adaptor, thereby fixing serving of static assets with
+  ETag headers (thanks @valerii15298!)
+
+- [#2657](https://github.com/graphile/crystal/pull/2657)
+  [`f83b191`](https://github.com/graphile/crystal/commit/f83b191f39c9d521fd12563cca6aa20d1a6f0494)
+  Thanks [@dependabot](https://github.com/apps/dependabot)! - Add support for
+  Koa v3 (via v2 code) and update package exports.
+
+- Updated dependencies
+  [[`cfd4c3c`](https://github.com/graphile/crystal/commit/cfd4c3cff0ef40ed87a2c700b7719c1ca0e73588),
+  [`c3f9c38`](https://github.com/graphile/crystal/commit/c3f9c38cb00ad4553e4bc3c04e16a7c77bd16142),
+  [`13513dd`](https://github.com/graphile/crystal/commit/13513ddaea15ad9498a77de7c4e92679498f99ca),
+  [`bc2b188`](https://github.com/graphile/crystal/commit/bc2b188a50e00f153dc68df6955399c5917130bd),
+  [`c13813e`](https://github.com/graphile/crystal/commit/c13813eecb42c0d9a6703540c022e318e18c5751),
+  [`4a9072b`](https://github.com/graphile/crystal/commit/4a9072bfa3d3e86c6013caf2b89a31e87f2bb421),
+  [`6dafac1`](https://github.com/graphile/crystal/commit/6dafac162955291e5147c21e57734b44e30acb98),
+  [`e15f886`](https://github.com/graphile/crystal/commit/e15f886cae1041416b44b74b75426f8d43000dcf),
+  [`34efed0`](https://github.com/graphile/crystal/commit/34efed09892d4b6533f40026de4a6b0a8a35035d),
+  [`185d449`](https://github.com/graphile/crystal/commit/185d449ed30d29c9134cc898b50a1473ab2910a2)]:
+  - graphile-config@0.0.1-beta.18
+  - grafast@0.1.1-beta.26
+  - ruru@2.0.0-beta.30
+
 ## 0.1.1-beta.27
 
 ### Patch Changes
