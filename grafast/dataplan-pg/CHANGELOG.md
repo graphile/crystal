@@ -1,5 +1,14 @@
 # @dataplan/pg
 
+## 0.0.1-beta.38
+
+### Patch Changes
+
+- [#2700](https://github.com/graphile/crystal/pull/2700)
+  [`dcd3583`](https://github.com/graphile/crystal/commit/dcd35835d86eb2758bbbc8e24ce647e97dee42b6)
+  Thanks [@benjie](https://github.com/benjie)! - Switch to consistently using
+  workspace:^ dependencies (in an attempt to appease pnpm)
+
 ## 0.0.1-beta.37
 
 ### Patch Changes
