@@ -169,6 +169,7 @@ export class PgExecutor<const TName extends string = string, TSettings = any> {
     values: ReadonlyArray<SQLRawValue>,
     name?: string,
     publish?: PublishFunction,
+    isMutation = false,
   ): Promise<PgClientResult<TData>> {
     let queryResult: PgClientResult<TData> | null = null,
       error: any = null;
@@ -186,7 +187,8 @@ export class PgExecutor<const TName extends string = string, TSettings = any> {
     const end = process.hrtime.bigint();
     // TODO: this should be based on the headers of the incoming request
     const shouldExplain = debugExplain.enabled;
-    const explainAnalyzeSafe = shouldExplain && /^\s*select/i.test(text);
+    const explainAnalyzeSafe =
+      shouldExplain && !isMutation && /^\s*select/i.test(text);
     let explain: string | undefined = undefined;
     if (shouldExplain && !error) {
       const explainResult = await client.query<{ 0: string }>({
@@ -869,7 +871,14 @@ ${duration}
 
     // We don't explicitly need a transaction for mutations
     const queryResult = await withPgClient(pgSettings, (client) =>
-      this._executeWithClient<TData>(client, text, values),
+      this._executeWithClient<TData>(
+        client,
+        text,
+        values,
+        undefined,
+        undefined,
+        true,
+      ),
     );
     // PERF: we could probably make this more efficient rather than blowing away the entire cache!
     // Wipe the cache since a mutation succeeded.
