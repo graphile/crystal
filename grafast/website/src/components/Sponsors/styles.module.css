@@ -1,4 +1,5 @@
 .sponsorContainer {
+  composes: wide from global;
   display: flex;
   flex-wrap: wrap;
   align-items: space-around;
