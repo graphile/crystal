@@ -150,7 +150,7 @@
     "graphql": "^16.1.0-experimental-stream-defer.6",
     "graphql-http": "^1.22.4",
     "h3": "^1.15.3",
-    "hono": "^4.8.4",
+    "hono": "^4.9.6",
     "jest": "^30.0.4",
     "jest-serializer-graphql-schema": "workspace:^",
     "koa": "^3.0.1",
