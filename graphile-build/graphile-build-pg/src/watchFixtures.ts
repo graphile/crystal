@@ -21,30 +21,37 @@ drop schema if exists postgraphile_watch cascade;
 create schema postgraphile_watch;
 
 create function postgraphile_watch.notify_watchers_ddl() returns event_trigger as $$
+declare
+  ddl_commands json;
 begin
-  perform pg_notify(
-    'postgraphile_watch',
-    json_build_object(
-      'type',
-      'ddl',
-      'payload',
-      (select json_agg(json_build_object('schema', schema_name, 'command', command_tag)) from pg_event_trigger_ddl_commands() as x)
-    )::text
-  );
+  select json_agg(
+    json_build_object('schema', schema_name, 'command', command_tag)
+  ) into ddl_commands
+  from pg_event_trigger_ddl_commands();
+
+  if json_array_length(ddl_commands) > 0 then
+    perform pg_notify(
+      'postgraphile_watch',
+      json_build_object('type', 'ddl', 'payload', ddl_commands)::text
+    );
+  end if;
 end;
 $$ language plpgsql;
 
 create function postgraphile_watch.notify_watchers_drop() returns event_trigger as $$
+declare
+  objects json;
 begin
-  perform pg_notify(
-    'postgraphile_watch',
-    json_build_object(
-      'type',
-      'drop',
-      'payload',
-      (select json_agg(distinct x.schema_name) from pg_event_trigger_dropped_objects() as x)
-    )::text
-  );
+  select json_agg(distinct schema_name) into objects
+  from pg_event_trigger_dropped_objects()
+  where schema_name <> 'pg_temp';
+
+  if json_array_length(objects) > 0 then
+    perform pg_notify(
+      'postgraphile_watch',
+      json_build_object('type', 'drop', 'payload', objects)::text
+    );
+  end if;
 end;
 $$ language plpgsql;
 
