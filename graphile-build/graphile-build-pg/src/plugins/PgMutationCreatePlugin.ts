@@ -29,6 +29,9 @@ declare global {
     interface ScopeObject {
       isPgCreatePayloadType?: boolean;
     }
+    interface ScopeObjectFieldsField {
+      isPgCreateMutation?: boolean;
+    }
     interface Inflection {
       createField(
         this: Inflection,
@@ -302,6 +305,8 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
                   {
                     fieldName: createFieldName,
                     fieldBehaviorScope: "resource:insert",
+                    isPgCreateMutation: true,
+                    pgFieldResource: resource,
                   },
                   {
                     args: {
