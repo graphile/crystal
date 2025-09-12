@@ -817,12 +817,11 @@ export class OperationPlan {
     }
     const planningPath = rootType.name + ".";
     const selectionSet = this.operation.selectionSet;
-    const stepStreamOptions = {};
     const groupedFieldSet = withGlobalLayerPlan(
       this.rootLayerPlan,
       POLYMORPHIC_ROOT_PATHS,
       planningPath,
-      stepStreamOptions,
+      null,
       graphqlCollectFields,
       null,
       this,
@@ -871,7 +870,7 @@ export class OperationPlan {
             this.rootLayerPlan,
             POLYMORPHIC_ROOT_PATHS,
             planningPath,
-            stepStreamOptions,
+            null,
             this.getTrackedArguments,
             this,
             fieldArgsSpec,
@@ -980,7 +979,7 @@ export class OperationPlan {
           );
         },
       );
-      subscribeStep._stepOptions.stream = stepStreamOptions;
+      subscribeStep._stepOptions.stream = null;
       // Note this should only have one dependent, so it should not be a
       // distributor
       subscribeStep._stepOptions.walkIterable = true;
@@ -3008,7 +3007,7 @@ export class OperationPlan {
       let stepStreamOptions: Maybe<StepStreamOptions> = undefined;
       if (streamDetails === true) {
         // subscription
-        stepStreamOptions = {};
+        stepStreamOptions = null;
       } else if (streamDetails === false) {
         // Simple list, no action necessary
         stepStreamOptions = null;
