@@ -5236,9 +5236,11 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
           typeof (step as any).unbatchedExecute === "function" || undefined,
         hasSideEffects: step.hasSideEffects || undefined,
         stream:
-          stream && stream !== true
-            ? { initialCountStepId: stream.initialCountStepId }
-            : undefined,
+          stream === true
+            ? {}
+            : stream
+              ? { initialCountStepId: stream.initialCountStepId }
+              : undefined,
         extra: step.planJSONExtra(),
       };
     }
