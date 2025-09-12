@@ -459,8 +459,12 @@ export interface StepStreamOptions extends LayerPlanReasonListItemStream {}
 export interface StepOptions {
   /**
    * Details for the `@stream` directive.
+   *
+   * null - no stream directive
+   *
+   * false - no stream directive, but is inside a subscription field
    */
-  stream: StepStreamOptions | null;
+  stream: StepStreamOptions | false | null;
   /**
    * Should we walk an iterable if presented. This is important because we
    * don't want to walk things like Map/Set except if we're doing it as part of

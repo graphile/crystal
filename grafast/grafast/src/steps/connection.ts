@@ -328,7 +328,7 @@ export interface ConnectionHandlingStep<
    * WARNING: This may be called more than once!
    */
   addStreamDetails?(
-    $streamDetails: Step<ExecutionDetailsStream | null> | null,
+    $streamDetails: Step<ExecutionDetailsStream | null> | false | null,
   ): void;
 }
 
@@ -1292,7 +1292,9 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
   setNeedsHasMore() {
     this.needsHasMore = true;
   }
-  addStreamDetails($details: Step<ExecutionDetailsStream | null> | null) {
+  addStreamDetails(
+    $details: Step<ExecutionDetailsStream | null> | false | null,
+  ) {
     if ($details) {
       this.streamDetailsDepIds?.push(this.addUnaryDependency($details));
     } else {

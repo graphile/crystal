@@ -651,7 +651,7 @@ export class PgSelectStep<
 
   constructor(options: PgSelectOptions<TResource>) {
     super();
-    this._fieldMightStream = currentFieldStreamDetails() != null;
+    this._fieldMightStream = Boolean(currentFieldStreamDetails());
     const {
       resource,
       parameters = resource.parameters,
@@ -1783,7 +1783,9 @@ export class PgSelectStep<
   }
 
   private streamDetailsDepIds: number[] | null = [];
-  addStreamDetails($details: Step<ExecutionDetailsStream | null> | null) {
+  addStreamDetails(
+    $details: Step<ExecutionDetailsStream | null> | false | null,
+  ) {
     if ($details) {
       this.streamDetailsDepIds?.push(this.addUnaryDependency($details));
     } else {
