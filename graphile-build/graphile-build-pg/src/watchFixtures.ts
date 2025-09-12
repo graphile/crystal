@@ -24,15 +24,24 @@ create function postgraphile_watch.notify_watchers_ddl() returns event_trigger a
 declare
   ddl_commands json;
 begin
-  select json_agg(
-    json_build_object('schema', schema_name, 'command', command_tag)
-  ) into ddl_commands
-  from pg_event_trigger_ddl_commands();
+  ddl_commands := (
+    select json_agg(
+      json_build_object(
+        'schema', ddlc.schema_name,
+        'command', ddlc.command_tag
+      )
+    )
+    from pg_event_trigger_ddl_commands() ddlc
+    where ddlc.schema_name <> 'pg_temp'
+  );
 
   if json_array_length(ddl_commands) > 0 then
     perform pg_notify(
       'postgraphile_watch',
-      json_build_object('type', 'ddl', 'payload', ddl_commands)::text
+      json_build_object(
+        'type', 'ddl',
+        'payload', ddl_commands
+      )::text
     );
   end if;
 end;
@@ -40,16 +49,21 @@ $$ language plpgsql;
 
 create function postgraphile_watch.notify_watchers_drop() returns event_trigger as $$
 declare
-  objects json;
+  schemas json;
 begin
-  select json_agg(distinct schema_name) into objects
-  from pg_event_trigger_dropped_objects()
-  where schema_name <> 'pg_temp';
+  schemas := (
+    select json_agg(distinct dobjs.schema_name)
+    from pg_event_trigger_dropped_objects() dobjs
+    where dobjs.schema_name <> 'pg_temp'
+  );
 
-  if json_array_length(objects) > 0 then
+  if json_array_length(schemas) > 0 then
     perform pg_notify(
       'postgraphile_watch',
-      json_build_object('type', 'drop', 'payload', objects)::text
+      json_build_object(
+        'type', 'drop',
+        'payload', schemas
+      )::text
     );
   end if;
 end;
