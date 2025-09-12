@@ -651,7 +651,8 @@ export class PgSelectStep<
 
   constructor(options: PgSelectOptions<TResource>) {
     super();
-    this._fieldMightStream = Boolean(currentFieldStreamDetails());
+    const $streamDetails = currentFieldStreamDetails();
+    this._fieldMightStream = $streamDetails != null && $streamDetails !== true;
     const {
       resource,
       parameters = resource.parameters,
