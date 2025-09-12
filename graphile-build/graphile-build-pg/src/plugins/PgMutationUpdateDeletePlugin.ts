@@ -51,6 +51,8 @@ declare global {
     }
 
     interface ScopeObjectFieldsField {
+      isPgUpdateMutation?: boolean;
+      isPgDeleteMutation?: boolean;
       isPgMutationPayloadDeletedNodeIdField?: boolean;
     }
 
@@ -812,7 +814,14 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                   fields,
                   {
                     [fieldName]: fieldWithHooks(
-                      { fieldName, fieldBehaviorScope },
+                      {
+                        fieldName,
+                        fieldBehaviorScope,
+                        pgFieldResource: resource,
+                        ...(mode === "resource:update"
+                          ? { isPgUpdateMutation: true }
+                          : { isPgDeleteMutation: true }),
+                      },
                       {
                         args: {
                           input: {
