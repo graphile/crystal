@@ -651,8 +651,6 @@ export class PgSelectStep<
 
   constructor(options: PgSelectOptions<TResource>) {
     super();
-    const $streamDetails = currentFieldStreamDetails();
-    this._fieldMightStream = $streamDetails != null && $streamDetails !== true;
     const {
       resource,
       parameters = resource.parameters,
@@ -670,6 +668,13 @@ export class PgSelectStep<
       _internalCloneSymbol,
       _internalCloneAlias,
     } = options;
+
+    const $streamDetails = currentFieldStreamDetails();
+    this._fieldMightStream =
+      $streamDetails != null &&
+      $streamDetails !== true &&
+      !resource.isMutation &&
+      !resource.isUnique;
 
     this.mode = mode ?? "normal";
 
