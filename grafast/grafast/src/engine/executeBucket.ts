@@ -1783,13 +1783,13 @@ function evaluateStream(
   if (stream === null) return null;
 
   const shouldStream =
-    stream === false || stream.ifStepId == null
+    stream === true || stream.ifStepId == null
       ? true
       : (bucket.store.get(stream.ifStepId)?.unaryValue() ?? true);
   if (!shouldStream) return null;
 
   const initialCount =
-    stream === false || stream.initialCountStepId == null
+    stream === true || stream.initialCountStepId == null
       ? 0
       : (bucket.store.get(stream.initialCountStepId)?.unaryValue() ?? 0);
   if (initialCount >= distributorOptions.distributorTargetBufferSize) {

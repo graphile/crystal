@@ -460,11 +460,13 @@ export interface StepOptions {
   /**
    * Details for the `@stream` directive.
    *
-   * null - no stream directive
+   * object - @stream details
    *
-   * false - no stream directive, but is inside a subscription field
+   * true - no stream directive, but is inside a subscription field
+   *
+   * null - no stream directive
    */
-  stream: StepStreamOptions | false | null;
+  stream: StepStreamOptions | true | null;
   /**
    * Should we walk an iterable if presented. This is important because we
    * don't want to walk things like Map/Set except if we're doing it as part of

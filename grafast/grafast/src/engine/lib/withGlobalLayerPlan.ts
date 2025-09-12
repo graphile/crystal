@@ -14,7 +14,7 @@ let globalData_layerPlan: LayerPlan | undefined = undefined;
 let globalData_polymorphicPaths: ReadonlySet<string> | null | undefined =
   undefined;
 let globalData_planningPath: string | undefined = undefined;
-let globalData_stepStreamOptions: StepStreamOptions | false | null | undefined =
+let globalData_stepStreamOptions: StepStreamOptions | true | null | undefined =
   undefined;
 
 export function withGlobalLayerPlan<
@@ -25,7 +25,7 @@ export function withGlobalLayerPlan<
   layerPlan: LayerPlan,
   polymorphicPaths: ReadonlySet<string> | null,
   planningPath: string | null,
-  stepStreamOptions: StepStreamOptions | false | null,
+  stepStreamOptions: StepStreamOptions | true | null,
   callback: (this: TThis, ...args: TArgs) => T,
   callbackThis?: TThis,
   ...callbackArgs: TArgs
@@ -84,20 +84,20 @@ export function currentPlanningPath(): string | undefined {
 
 /**
  * Step - stream details.
- * false - Not a stream, but it is a subscription.
+ * true - Not a stream, but it is a subscription.
  * null - neither stream nor subscription
  *
  * @experimental
  */
 export function currentFieldStreamDetails():
   | Step<ExecutionDetailsStream | null>
-  | false
+  | true
   | null {
   if (globalData_stepStreamOptions == null) {
     return null;
   }
-  if (globalData_stepStreamOptions === false) {
-    return false;
+  if (globalData_stepStreamOptions === true) {
+    return true;
   }
   const { ifStepId, initialCountStepId } = globalData_stepStreamOptions;
   return operationPlan().withRootLayerPlan(() => {

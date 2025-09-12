@@ -328,7 +328,7 @@ export interface ConnectionHandlingStep<
    * WARNING: This may be called more than once!
    */
   addStreamDetails?(
-    $streamDetails: Step<ExecutionDetailsStream | null> | false | null,
+    $streamDetails: Step<ExecutionDetailsStream | null> | null,
   ): void;
 }
 
@@ -702,12 +702,17 @@ export class ConnectionStep<
 
   private captureStream() {
     const $streamDetails = currentFieldStreamDetails();
-    this.getHandler().addStreamDetails?.($streamDetails);
-    if ($streamDetails === null) {
+    if ($streamDetails === null || $streamDetails === true) {
+      this.getHandler().addStreamDetails?.(null);
+
       this._mightStream = false;
-    } else if (this._mightStream === null) {
-      // Only override if it was unknown
-      this._mightStream = true;
+    } else {
+      this.getHandler().addStreamDetails?.($streamDetails);
+
+      if (this._mightStream === null) {
+        // Only override if it was unknown
+        this._mightStream = true;
+      }
     }
   }
 
@@ -1292,9 +1297,7 @@ export class ConnectionParamsStep<TCursorValue> extends UnbatchedStep<
   setNeedsHasMore() {
     this.needsHasMore = true;
   }
-  addStreamDetails(
-    $details: Step<ExecutionDetailsStream | null> | false | null,
-  ) {
+  addStreamDetails($details: Step<ExecutionDetailsStream | null> | null) {
     if ($details) {
       this.streamDetailsDepIds?.push(this.addUnaryDependency($details));
     } else {

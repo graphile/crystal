@@ -817,7 +817,7 @@ export class OperationPlan {
     }
     const planningPath = rootType.name + ".";
     const selectionSet = this.operation.selectionSet;
-    const stepStreamOptions = false;
+    const stepStreamOptions = true;
     const groupedFieldSet = withGlobalLayerPlan(
       this.rootLayerPlan,
       POLYMORPHIC_ROOT_PATHS,
@@ -3005,10 +3005,10 @@ export class OperationPlan {
 
     if (this.loc !== null) this.loc.push(`planField(${path.join(".")})`);
     try {
-      let stepStreamOptions: Maybe<StepStreamOptions> | false = undefined;
+      let stepStreamOptions: Maybe<StepStreamOptions> | true = undefined;
       if (streamDetails === true) {
         // subscription
-        stepStreamOptions = false;
+        stepStreamOptions = true;
       } else if (streamDetails === false) {
         // Simple list, no action necessary
         stepStreamOptions = null;
@@ -5214,6 +5214,7 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
     function printStep(step: Step): GrafastPlanStepJSONv1 {
       const metaString = step.toStringMeta();
       const sstep = sudo(step);
+      const { stream } = step._stepOptions;
       return {
         id: step.id,
         stepClass: step.constructor.name,
@@ -5234,9 +5235,10 @@ But ${p} is not in ${winner.layerPlan}'s expected polymorphic paths:
         supportsUnbatched:
           typeof (step as any).unbatchedExecute === "function" || undefined,
         hasSideEffects: step.hasSideEffects || undefined,
-        stream: step._stepOptions.stream
-          ? { initialCountStepId: step._stepOptions.stream.initialCountStepId }
-          : undefined,
+        stream:
+          stream && stream !== true
+            ? { initialCountStepId: stream.initialCountStepId }
+            : undefined,
         extra: step.planJSONExtra(),
       };
     }
