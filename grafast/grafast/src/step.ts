@@ -345,6 +345,11 @@ export /* abstract */ class Step<TData = any> {
         return hasSideEffects;
       },
       set(this: Step<TData>, value) {
+        if (value === hasSideEffects) {
+          // No change necessary
+          return;
+        }
+
         /**
          * If steps were created after this step, an this step doesn't depend
          * on them, then it's no longer safe to change hasSideEffects.
@@ -379,7 +384,7 @@ export /* abstract */ class Step<TData = any> {
               `Cannot mark ${this} as having no side effects after having set it to have side effects.`,
             );
           }
-        } else {
+        } else if (value) {
           throw new Error(
             `Attempted to mark ${this} as having side effects, but other non-dependent steps (${nonDependentSteps
               .map(String)
