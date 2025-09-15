@@ -551,7 +551,7 @@ ${duration}
                     name,
                     publishExecute,
                   );
-              const { rows, notices } = queryResult;
+              const { rows } = queryResult;
               const groups: { [valueIndex: number]: any[] } =
                 Object.create(null);
               for (let i = 0, l = rows.length; i < l; i++) {

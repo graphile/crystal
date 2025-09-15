@@ -19,6 +19,8 @@ import type {
   QueryConfig,
 } from "pg";
 import * as pg from "pg";
+/** @internal */
+import type { NoticeMessage } from "pg-protocol/dist/messages.js";
 
 import type {
   PgClient,
@@ -202,9 +204,6 @@ function newNodePostgresPgClient(
     },
   };
 }
-
-/** @internal */
-type NoticeMessage = import("pg-protocol/dist/messages.js").NoticeMessage;
 
 const EMPTY_ARRAY = Object.freeze([]) as never[];
 
