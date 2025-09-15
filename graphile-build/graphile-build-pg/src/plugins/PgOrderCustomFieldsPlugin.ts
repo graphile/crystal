@@ -93,13 +93,13 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
           return values;
         }
 
-        const functionSources = Object.values(
-          build.input.pgRegistry.pgResources,
-        ).filter((resource) => {
-          if (!isSimpleScalarComputedColumnLike(resource)) return false;
-          if (resource.parameters![0].codec !== pgCodec) return false;
-          return !!build.behavior.pgResourceMatches(resource, "proc:orderBy");
-        });
+        const functionSources = Object.values(build.pgResources).filter(
+          (resource) => {
+            if (!isSimpleScalarComputedColumnLike(resource)) return false;
+            if (resource.parameters![0].codec !== pgCodec) return false;
+            return !!build.behavior.pgResourceMatches(resource, "proc:orderBy");
+          },
+        );
 
         return build.extend(
           values,

@@ -90,14 +90,14 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
           return fields;
         }
 
-        const resources = Object.values(
-          build.input.pgRegistry.pgResources,
-        ).filter((resource) => {
-          if (resource.parameters) return false;
-          if (!resource.codec.attributes) return false;
-          if (!resource.uniques || resource.uniques.length < 1) return false;
-          return true;
-        });
+        const resources = Object.values(build.pgResources).filter(
+          (resource) => {
+            if (resource.parameters) return false;
+            if (!resource.codec.attributes) return false;
+            if (!resource.uniques || resource.uniques.length < 1) return false;
+            return true;
+          },
+        );
 
         return resources.reduce(
           (outerMemo, rawResource) =>

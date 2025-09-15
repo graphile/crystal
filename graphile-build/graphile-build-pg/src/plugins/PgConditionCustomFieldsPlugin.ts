@@ -91,13 +91,13 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
           return fields;
         }
 
-        const functionSources = Object.values(
-          build.input.pgRegistry.pgResources,
-        ).filter((resource) => {
-          if (!isSimpleScalarComputedColumnLike(resource)) return false;
-          if (resource.parameters![0].codec !== pgCodec) return false;
-          return build.behavior.pgResourceMatches(resource, "proc:filterBy");
-        });
+        const functionSources = Object.values(build.pgResources).filter(
+          (resource) => {
+            if (!isSimpleScalarComputedColumnLike(resource)) return false;
+            if (resource.parameters![0].codec !== pgCodec) return false;
+            return build.behavior.pgResourceMatches(resource, "proc:filterBy");
+          },
+        );
 
         return build.extend(
           fields,

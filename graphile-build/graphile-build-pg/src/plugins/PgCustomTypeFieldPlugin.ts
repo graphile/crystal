@@ -641,9 +641,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
           // anyway but using the previously declared mutation payload for a
           // different field - this is why we later use this information in the
           // fields hook to determine which fields to add.
-          for (const someSource of Object.values(
-            build.input.pgRegistry.pgResources,
-          )) {
+          for (const someSource of Object.values(build.pgResources)) {
             build.recoverable(null, () => {
               // Add connection type for functions that need it
               const isFunctionSourceRequiringConnection =

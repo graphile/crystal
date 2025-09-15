@@ -510,9 +510,7 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
           if (resourceByCodecCache.has(codec)) {
             return resourceByCodecCache.get(codec)!;
           }
-          const resources = Object.values(
-            build.input.pgRegistry.pgResources,
-          ).filter(
+          const resources = Object.values(build.pgResources!).filter(
             (
               r: PgResource<any, any, any, any>,
             ): r is PgResource<string, TCodec, any, undefined> =>
