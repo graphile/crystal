@@ -404,16 +404,15 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
         const {
           graphql: { GraphQLList, GraphQLNonNull },
           lib: { dataplanPg, sql },
+          input: { pgRegistry },
         } = build;
 
         // Implement DX shortcuts
-        build.pgExecutor =
-          build.input.pgRegistry.pgExecutors[
-            Object.keys(build.input.pgRegistry.pgExecutors)[0]
-          ];
-        build.pgResources = build.input.pgRegistry.pgResources;
-        build.pgCodecs = build.input.pgRegistry.pgCodecs;
-        build.pgRelations = build.input.pgRegistry.pgRelations;
+        const firstExecutorName = Object.keys(pgRegistry.pgExecutors)[0];
+        build.pgExecutor = pgRegistry.pgExecutors[firstExecutorName];
+        build.pgResources = pgRegistry.pgResources;
+        build.pgCodecs = pgRegistry.pgCodecs;
+        build.pgRelations = pgRegistry.pgRelations;
 
         const pgCodecMetaLookup = getCodecMetaLookupFromInput(build.input);
 
