@@ -114,8 +114,6 @@ function doIt(
       return nullableType;
     }
   }
-
-  return inType;
 }
 
 export function changeNullability(
@@ -129,7 +127,7 @@ export function changeNullability(
           return `${typeName}.${fieldName}`;
         } else {
           const results: string[] = [];
-          if (r.type) {
+          if (r.type != null) {
             results.push(`${typeName}.${fieldName}`);
           }
           if (r.args) {
@@ -158,7 +156,7 @@ export function changeNullability(
       scope: { fieldName },
     } = context;
     const typeRules = rules[Self.name];
-    if (!typeRules) {
+    if (typeRules == null) {
       return field;
     }
     const rawRule = typeRules[fieldName];
@@ -188,7 +186,7 @@ export function changeNullability(
       scope: { fieldName, argName },
     } = context;
     const typeRules = rules[Self.name];
-    if (!typeRules) {
+    if (typeRules == null) {
       return arg;
     }
     const rawRule = typeRules[fieldName];
@@ -221,7 +219,7 @@ export function changeNullability(
             scope: { fieldName },
           } = context;
           const typeRules = rules[Self.name];
-          if (!typeRules) {
+          if (typeRules == null) {
             return field;
           }
           const rawRule = typeRules[fieldName];
@@ -258,11 +256,11 @@ export function changeNullability(
           if (pendingMatches.size > 0) {
             const { graphql } = build;
             throw new Error(
-              `The following entries in your changeNullability(...) didn't match anything in your GraphQL schema; please check your spelling: ${[
+              `The following entries in your changeNullability(...) didn't match anything in your GraphQL schema; please check your spelling:\n- ${[
                 ...pendingMatches,
               ]
                 .map((match) => explainCoordinate(graphql, schema, match))
-                .join(", ")}`,
+                .join("\n- ")}`,
             );
           }
           return schema;
@@ -300,7 +298,11 @@ function explainCoordinate(
   if (graphql.isInputObjectType(type)) {
     const field = type.getFields()[fieldName];
     if (field) {
-      return `${coord} (inputType='${typeName}',field='${fieldName}' was not processed??)`;
+      if (argName) {
+        return `${coord} (inputType='${typeName}',field='${fieldName}' has no arguments as it is an input field)`;
+      } else {
+        return `${coord} (inputType='${typeName}',field='${fieldName}' was not processed??)`;
+      }
     } else {
       return `${coord} (inputType='${typeName}' has no field '${fieldName}')`;
     }

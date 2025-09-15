@@ -159,3 +159,106 @@ describe("object, interface and input", () => {
     }
   });
 });
+
+describe("errors", () => {
+  it("handles outputs helpful messages", async () => {
+    let error;
+    try {
+      makeSchema([
+        changeNullability({
+          NxType: {
+            field1: "",
+            field2: "!",
+            field3: {},
+            field4: {
+              type: "",
+            },
+            field5: {
+              type: "!",
+            },
+            field6: {
+              args: {
+                arg1: "",
+                arg2: "!",
+              },
+            },
+          },
+          Query: {
+            field1: "",
+            field2: "!",
+            field3: {},
+            field4: {
+              type: "",
+            },
+            field5: {
+              type: "!",
+            },
+            field6: {
+              args: {
+                arg1: "",
+                arg2: "!",
+              },
+            },
+            echo: {
+              args: {
+                nxArg: "!",
+              },
+            },
+          },
+          EchoCapable: {
+            nxField1: "",
+            nxField2: "!",
+            nxField3: {},
+            nxField4: {
+              type: "",
+            },
+            nxField5: {
+              type: "!",
+            },
+            nxField6: {
+              args: {
+                arg1: "",
+                arg2: "!",
+              },
+            },
+            echo: {
+              args: {
+                nxArg: "!",
+              },
+            },
+          },
+          MyInput: {
+            nxField: "!",
+          },
+        }),
+      ]);
+    } catch (e) {
+      error = e;
+    }
+    expect(error).toBeTruthy();
+    expect(error.message).toMatchInlineSnapshot(`
+      "The following entries in your changeNullability(...) didn't match anything in your GraphQL schema; please check your spelling:
+      - NxType.field1 (type 'NxType' does not exist)
+      - NxType.field2 (type 'NxType' does not exist)
+      - NxType.field4 (type 'NxType' does not exist)
+      - NxType.field5 (type 'NxType' does not exist)
+      - NxType.field6(arg1:) (type 'NxType' does not exist)
+      - NxType.field6(arg2:) (type 'NxType' does not exist)
+      - Query.field1 (type='Query' has no field 'field1')
+      - Query.field2 (type='Query' has no field 'field2')
+      - Query.field4 (type='Query' has no field 'field4')
+      - Query.field5 (type='Query' has no field 'field5')
+      - Query.field6(arg1:) (type='Query' has no field 'field6')
+      - Query.field6(arg2:) (type='Query' has no field 'field6')
+      - Query.echo(nxArg:) (type='Query',field='echo' has no argument named 'nxArg')
+      - EchoCapable.nxField1 (type='EchoCapable' has no field 'nxField1')
+      - EchoCapable.nxField2 (type='EchoCapable' has no field 'nxField2')
+      - EchoCapable.nxField4 (type='EchoCapable' has no field 'nxField4')
+      - EchoCapable.nxField5 (type='EchoCapable' has no field 'nxField5')
+      - EchoCapable.nxField6(arg1:) (type='EchoCapable' has no field 'nxField6')
+      - EchoCapable.nxField6(arg2:) (type='EchoCapable' has no field 'nxField6')
+      - EchoCapable.echo(nxArg:) (type='EchoCapable',field='echo' has no argument named 'nxArg')
+      - MyInput.nxField (inputType='MyInput' has no field 'nxField')"
+    `);
+  });
+});
