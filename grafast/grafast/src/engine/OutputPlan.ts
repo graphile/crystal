@@ -27,7 +27,6 @@ import type {
   LocationDetails,
 } from "../interfaces.js";
 import type { Step } from "../step.js";
-import { expressionSymbol } from "../steps/access.js";
 import { pathsFromAncestorToTargetLayerPlan } from "../utils.js";
 import type { PayloadRoot } from "./executeOutputPlan.js";
 import type { LayerPlan, LayerPlanReasonListItem } from "./LayerPlan.js";
@@ -481,44 +480,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     throw new Error(`OutputPlan.executeString has yet to be built!`);
   }
 
-  optimize(): void {
-    // This optimization works by ridding us of access steps at the very end of
-    // paths and just accessing properties directly. In rare circumstances
-    // involving untethered side effects in earlier versions this could lead to
-    // errors being skipped and data generated previous to the error being
-    // returned; but OutputPlans now check the latestSideEffectStep so this
-    // should be safe aga.
-    const $root = this.layerPlan.operationPlan.dangerouslyGetStep(
-      this.rootStep.id,
-    );
-    if (
-      $root instanceof AccessStep &&
-      $root.isSyncAndSafe && // Make sure we're not using it for streaming!
-      $root.fallback === undefined &&
-      $root.implicitSideEffectStep === null &&
-      (!this.sideEffectStep || !stepADependsOnStepB($root, this.sideEffectStep))
-    ) {
-      const expressionDetails:
-        | [ReadonlyArray<string | number>, any]
-        | undefined = ($root.unbatchedExecute! as any)[expressionSymbol];
-      // @ts-ignore
-      const { step: $parent, onReject, acceptFlags } = $root._getDepOptions(0);
-      if (
-        expressionDetails !== undefined &&
-        onReject == null &&
-        acceptFlags === DEFAULT_ACCEPT_FLAGS
-      ) {
-        this.layerPlan.operationPlan.stepTracker.setOutputPlanRootStep(
-          this,
-          $parent,
-        );
-        const [path, fallback] = expressionDetails;
-        withFastExpression(path, fallback, (fn) => {
-          this.processRoot = fn;
-        });
-      }
-    }
-  }
+  optimize(): void {}
 
   finalize(): void {
     // Clear the sideEffectStep if the rootStep explicitly depends on it.
