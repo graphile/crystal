@@ -10,7 +10,6 @@
     { "path": "../codegen-plugin" },
     { "path": "../../utils/lru" },
     { "path": "../../utils/pg-sql2" },
-    { "path": "../../utils/graphile-config" },
-    { "path": "../../utils/tamedevil" }
+    { "path": "../../utils/graphile-config" }
   ]
 }
