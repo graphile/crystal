@@ -123,7 +123,23 @@ export function changeNullability(
 ): GraphileConfig.Plugin {
   const expectedMatches = Object.entries(rules).flatMap(
     ([typeName, typeRules]) =>
-      Object.keys(typeRules).map((fieldName) => `${typeName}.${fieldName}`),
+      Object.keys(typeRules).flatMap((fieldName) => {
+        const r = typeRules[fieldName];
+        if (typeof r === "string" || typeof r === "boolean") {
+          return `${typeName}.${fieldName}`;
+        } else {
+          const results: string[] = [];
+          if (r.type) {
+            results.push(`${typeName}.${fieldName}`);
+          }
+          if (r.args) {
+            for (const argName of Object.keys(r.args)) {
+              results.push(`${typeName}.${fieldName}(${argName}:)`);
+            }
+          }
+          return results;
+        }
+      }),
   );
   let pendingMatches = new Set<string>();
 
@@ -136,6 +152,7 @@ export function changeNullability(
       | GraphileBuild.ContextObjectFieldsField
       | GraphileBuild.ContextInterfaceFieldsField,
   ) {
+    const { graphql } = build;
     const {
       Self,
       scope: { fieldName },
@@ -149,14 +166,11 @@ export function changeNullability(
       return field;
     }
     const rule = typeof rawRule !== "object" ? { type: rawRule } : rawRule;
-    pendingMatches.delete(`${Self.name}.${fieldName}`);
-    if (rule.type != null) {
-      field.type = doIt(
-        field.type,
-        rule.type,
-        build.graphql,
-        `${Self.name}.${fieldName}`,
-      ) as GraphQLOutputType;
+    const spec = rule.type;
+    const coord = `${Self.name}.${fieldName}`;
+    pendingMatches.delete(coord);
+    if (spec != null) {
+      field.type = doIt(field.type, spec, graphql, coord) as GraphQLOutputType;
     }
     return field;
   }
@@ -168,6 +182,7 @@ export function changeNullability(
       | GraphileBuild.ContextObjectFieldsFieldArgsArg
       | GraphileBuild.ContextInterfaceFieldsFieldArgsArg,
   ) {
+    const { graphql } = build;
     const {
       Self,
       scope: { fieldName, argName },
@@ -182,13 +197,10 @@ export function changeNullability(
     }
     const rule = typeof rawRule !== "object" ? { type: rawRule } : rawRule;
     const spec = rule.args?.[argName];
+    const coord = `${Self.name}.${fieldName}(${argName}:)`;
+    pendingMatches.delete(coord);
     if (spec != null) {
-      arg.type = doIt(
-        arg.type,
-        spec,
-        build.graphql,
-        `${Self.name}.${fieldName}(${argName}:)`,
-      ) as GraphQLInputType;
+      arg.type = doIt(arg.type, spec, graphql, coord) as GraphQLInputType;
     }
     return arg;
   }
@@ -203,6 +215,7 @@ export function changeNullability(
           return _;
         },
         GraphQLInputObjectType_fields_field(field, build, context) {
+          const { graphql } = build;
           const {
             Self,
             scope: { fieldName },
@@ -217,13 +230,15 @@ export function changeNullability(
           }
           const rule =
             typeof rawRule !== "object" ? { type: rawRule } : rawRule;
-          pendingMatches.delete(`${Self.name}.${fieldName}`);
-          if (rule.type != null) {
+          const spec = rule.type;
+          const coord = `${Self.name}.${fieldName}`;
+          pendingMatches.delete(coord);
+          if (spec != null) {
             field.type = doIt(
               field.type,
-              rule.type,
-              build.graphql,
-              `${Self.name}.${fieldName}`,
+              spec,
+              graphql,
+              coord,
             ) as GraphQLInputType;
           }
           if (rule.args) {
@@ -239,12 +254,15 @@ export function changeNullability(
         GraphQLObjectType_fields_field: objectOrInterfaceFieldCallback,
         GraphQLObjectType_fields_field_args_arg:
           objectOrInterfaceArgsArgCallback,
-        finalize(schema) {
+        finalize(schema, build) {
           if (pendingMatches.size > 0) {
+            const { graphql } = build;
             throw new Error(
               `The following entries in your changeNullability(...) didn't match anything in your GraphQL schema; please check your spelling: ${[
                 ...pendingMatches,
-              ].join(", ")}`,
+              ]
+                .map((match) => explainCoordinate(graphql, schema, match))
+                .join(", ")}`,
             );
           }
           return schema;
@@ -254,5 +272,53 @@ export function changeNullability(
   };
 }
 
+function explainCoordinate(
+  graphql: typeof AllGraphQL,
+  schema: AllGraphQL.GraphQLSchema,
+  coord: string,
+): string {
+  const matches = coord.match(
+    /^([A-Za-z0-9_]+)\.([A-Za-z0-9_]+)(?:\(([A-Za-z0-9_]+):\))?$/,
+  );
+  if (!matches) {
+    return `${coord} (invalid schema coordinate; check your spelling)`;
+  }
+  const [_, typeName, fieldName, argName] = matches;
+  const type = schema.getType(typeName);
+  if (!type) {
+    return `${coord} (type '${typeName}' does not exist)`;
+  }
+  if (graphql.isScalarType(type)) {
+    return `${coord} (type '${typeName}' is a scalar, which has no fields)`;
+  }
+  if (graphql.isEnumType(type)) {
+    return `${coord} (type '${typeName}' is an enum, which has no fields)`;
+  }
+  if (graphql.isUnionType(type)) {
+    return `${coord} (type '${typeName}' is a union, which has no fields)`;
+  }
+  if (graphql.isInputObjectType(type)) {
+    const field = type.getFields()[fieldName];
+    if (field) {
+      return `${coord} (inputType='${typeName}',field='${fieldName}' was not processed??)`;
+    } else {
+      return `${coord} (inputType='${typeName}' has no field '${fieldName}')`;
+    }
+  }
+  const field = type.getFields()[fieldName];
+  if (!field) {
+    return `${coord} (type='${typeName}' has no field '${fieldName}')`;
+  }
+  if (argName) {
+    const arg = field.args.find((a) => a.name === argName);
+    if (arg) {
+      return `${coord} (type='${typeName}',field='${fieldName}',argument='${argName}' was not processed??)`;
+    } else {
+      return `${coord} (type='${typeName}',field='${fieldName}' has no argument named '${argName}')`;
+    }
+  } else {
+    return `${coord} (type='${typeName}',field='${fieldName}' was not processed??)`;
+  }
+}
 /** @deprecated renamed to changeNullability */
 export const makeChangeNullabilityPlugin = changeNullability;
