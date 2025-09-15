@@ -5,6 +5,7 @@ import type {
   PgCodec,
   PgCodecRelation,
   PgCodecWithAttributes,
+  PgExecutor,
   PgRefDefinition,
   PgResource,
   PgResourceUnique,
@@ -125,6 +126,19 @@ declare global {
         ReadonlyArray<PgResourceUnique>,
         undefined
       > | null;
+
+      // DX shortcuts
+      /**
+       * Shortcut to primary executor; equivalent for most users to `build.input.pgRegistry.pgExecutors.main`.
+       * (strictly it's `build.input.pgRegistry.pgExecutors[Object.keys(build.input.pgRegistry.pgExecutors)[0]]`)
+       */
+      pgExecutor: PgExecutor;
+      /** Shortcut to the resources in the registry */
+      pgResources: GraphileBuild.Build["input"]["pgRegistry"]["pgResources"];
+      /** Shortcut to the codecs in the registry */
+      pgCodecs: GraphileBuild.Build["input"]["pgRegistry"]["pgCodecs"];
+      /** Shortcut to the relations in the registry */
+      pgRelations: GraphileBuild.Build["input"]["pgRegistry"]["pgRelations"];
     }
 
     interface BehaviorEntities {
@@ -391,6 +405,16 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
           graphql: { GraphQLList, GraphQLNonNull },
           lib: { dataplanPg, sql },
         } = build;
+
+        // Implement DX shortcuts
+        build.pgExecutor =
+          build.input.pgRegistry.pgExecutors[
+            Object.keys(build.input.pgRegistry.pgExecutors)[0]
+          ];
+        build.pgResources = build.input.pgRegistry.pgResources;
+        build.pgCodecs = build.input.pgRegistry.pgCodecs;
+        build.pgRelations = build.input.pgRegistry.pgRelations;
+
         const pgCodecMetaLookup = getCodecMetaLookupFromInput(build.input);
 
         const getGraphQLTypeNameByPgCodec: GraphileBuild.GetGraphQLTypeNameByPgCodec =
