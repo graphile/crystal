@@ -13,7 +13,6 @@ import type {
   OperationDefinitionNode,
 } from "graphql";
 import * as graphql from "graphql";
-import te from "tamedevil";
 
 import * as assert from "../assert.js";
 import {
@@ -480,9 +479,7 @@ export class OperationPlan {
     this.lap("treeShakeSteps", "optimize");
 
     // Replace/inline/optimise steps
-    te.batch(() => {
-      this.optimizeSteps();
-    });
+    this.optimizeSteps();
 
     this.checkTimeout();
     this.lap("optimizeSteps");
@@ -511,16 +508,12 @@ export class OperationPlan {
 
     // Plans are expected to execute later; they may take steps here to prepare
     // themselves (e.g. compiling SQL queries ahead of time).
-    te.batch(() => {
-      this.finalizeSteps();
-    });
+    this.finalizeSteps();
 
     this.lap("finalizeSteps");
 
     // Replace access plans with direct access, etc (must come after finalizeSteps)
-    te.batch(() => {
-      this.optimizeOutputPlans();
-    });
+    this.optimizeOutputPlans();
 
     this.checkTimeout();
     this.lap("optimizeOutputPlans");
@@ -533,15 +526,11 @@ export class OperationPlan {
 
     this.stepTracker.finalizeOutputPlans();
 
-    te.batch(() => {
-      this.finalizeLayerPlans();
-    });
+    this.finalizeLayerPlans();
 
     this.lap("finalizeLayerPlans");
 
-    te.batch(() => {
-      this.finalizeOutputPlans();
-    });
+    this.finalizeOutputPlans();
 
     this.lap("finalizeOutputPlans");
 
