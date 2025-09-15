@@ -10,7 +10,7 @@ export default function SponsorButtons() {
           "button button--primary button--lg",
           styles.sponsorbutton,
         )}
-        to="https://github.com/users/benjie/sponsorship"
+        to="https://github.com/sponsors/benjie/sponsorships?tier_id=531702"
       ></Link>
       <Link
         className={clsx(
