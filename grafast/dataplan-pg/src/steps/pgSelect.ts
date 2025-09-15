@@ -651,7 +651,6 @@ export class PgSelectStep<
 
   constructor(options: PgSelectOptions<TResource>) {
     super();
-    this._fieldMightStream = currentFieldStreamDetails() != null;
     const {
       resource,
       parameters = resource.parameters,
@@ -669,6 +668,13 @@ export class PgSelectStep<
       _internalCloneSymbol,
       _internalCloneAlias,
     } = options;
+
+    const $streamDetails = currentFieldStreamDetails();
+    this._fieldMightStream =
+      $streamDetails != null &&
+      $streamDetails !== true &&
+      !resource.isMutation &&
+      !resource.isUnique;
 
     this.mode = mode ?? "normal";
 
@@ -1783,7 +1789,9 @@ export class PgSelectStep<
   }
 
   private streamDetailsDepIds: number[] | null = [];
-  addStreamDetails($details: Step<ExecutionDetailsStream | null> | null) {
+  addStreamDetails(
+    $details: Step<ExecutionDetailsStream | null> | false | null,
+  ) {
     if ($details) {
       this.streamDetailsDepIds?.push(this.addUnaryDependency($details));
     } else {

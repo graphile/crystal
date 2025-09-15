@@ -702,12 +702,17 @@ export class ConnectionStep<
 
   private captureStream() {
     const $streamDetails = currentFieldStreamDetails();
-    this.getHandler().addStreamDetails?.($streamDetails);
-    if ($streamDetails === null) {
+    if ($streamDetails === null || $streamDetails === true) {
+      this.getHandler().addStreamDetails?.(null);
+
       this._mightStream = false;
-    } else if (this._mightStream === null) {
-      // Only override if it was unknown
-      this._mightStream = true;
+    } else {
+      this.getHandler().addStreamDetails?.($streamDetails);
+
+      if (this._mightStream === null) {
+        // Only override if it was unknown
+        this._mightStream = true;
+      }
     }
   }
 

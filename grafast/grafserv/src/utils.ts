@@ -334,9 +334,16 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
         ? instance.middleware.run("onSubscribe", event, onSubscribeWithEvent)
         : onSubscribeWithEvent(event);
     },
-    // TODO: validate that this actually does mask every error
     onError(_ctx, _id, _payload, errors) {
       return errors.map(instance.dynamicOptions.maskError);
+    },
+    onNext(ctx, id, payload, args, result) {
+      if (result.errors) {
+        return {
+          ...result,
+          errors: result.errors.map(instance.dynamicOptions.maskError),
+        };
+      }
     },
     async execute(args: ExecutionArgs) {
       const eargs = args as ExtendedExecutionArgs;
