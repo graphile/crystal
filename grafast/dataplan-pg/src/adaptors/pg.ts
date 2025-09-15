@@ -197,20 +197,21 @@ function newNodePostgresPgClient(
           }
         }
 
-        return pgClientQuery(pgClient, queryObj);
+        return pgClientQuery<TData>(pgClient, queryObj);
       }
     },
   };
 }
 
+/** @internal */
 type NoticeMessage = import("pg-protocol/dist/messages.js").NoticeMessage;
 
 const EMPTY_ARRAY = Object.freeze([]) as never[];
 
-async function pgClientQuery(
+async function pgClientQuery<TData>(
   pgClient: PoolClient,
   queryObj: QueryArrayConfig<any[]> | QueryConfig<any[]>,
-) {
+): Promise<PgClientResult<TData>> {
   let notices: PgNotice[] | null = null;
   const addNotice = (n: NoticeMessage) => {
     const converted = convertNotice(n);
