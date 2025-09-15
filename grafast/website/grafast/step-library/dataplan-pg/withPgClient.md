@@ -15,8 +15,7 @@ steps respectively, with the following differences:
 
 - There's an additional initial argument, the `executor` which details the
   database being connected to (PostGraphile users: you probably want
-  `build.input.pgRegistry.pgExecutors.main` unless you're using multiple
-  databases)
+  `build.pgExecutor` unless you're using multiple databases)
 - The callback (`load`) is passed an additional initial parameter: `pgClient`
 - The `shared` parameter, if specified, must be an object containing steps (not
   a direct step or list of steps)
@@ -94,7 +93,7 @@ import { constant } from "grafast";
 import { registry } from "./myRegistry";
 
 // Grab executor from the registry
-const executor = pgRegistry.pgExecutors.main;
+const executor = registry.pgExecutors.main;
 
 function meaningOfLifePlan() {
   // Arbitrary data for our callback to use

@@ -5,6 +5,7 @@ import type {
   PgCodec,
   PgCodecRelation,
   PgCodecWithAttributes,
+  PgExecutor,
   PgRefDefinition,
   PgResource,
   PgResourceUnique,
@@ -125,6 +126,19 @@ declare global {
         ReadonlyArray<PgResourceUnique>,
         undefined
       > | null;
+
+      // DX shortcuts
+      /**
+       * Shortcut to primary executor; equivalent for most users to `build.input.pgRegistry.pgExecutors.main`.
+       * (strictly it's `build.input.pgRegistry.pgExecutors[Object.keys(build.input.pgRegistry.pgExecutors)[0]]`)
+       */
+      pgExecutor: PgExecutor;
+      /** Shortcut to the resources in the registry */
+      pgResources: GraphileBuild.Build["input"]["pgRegistry"]["pgResources"];
+      /** Shortcut to the codecs in the registry */
+      pgCodecs: GraphileBuild.Build["input"]["pgRegistry"]["pgCodecs"];
+      /** Shortcut to the relations in the registry */
+      pgRelations: GraphileBuild.Build["input"]["pgRegistry"]["pgRelations"];
     }
 
     interface BehaviorEntities {
@@ -390,7 +404,16 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
         const {
           graphql: { GraphQLList, GraphQLNonNull },
           lib: { dataplanPg, sql },
+          input: { pgRegistry },
         } = build;
+
+        // Implement DX shortcuts
+        const firstExecutorName = Object.keys(pgRegistry.pgExecutors)[0];
+        build.pgExecutor = pgRegistry.pgExecutors[firstExecutorName];
+        build.pgResources = pgRegistry.pgResources;
+        build.pgCodecs = pgRegistry.pgCodecs;
+        build.pgRelations = pgRegistry.pgRelations;
+
         const pgCodecMetaLookup = getCodecMetaLookupFromInput(build.input);
 
         const getGraphQLTypeNameByPgCodec: GraphileBuild.GetGraphQLTypeNameByPgCodec =
@@ -486,9 +509,7 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
           if (resourceByCodecCache.has(codec)) {
             return resourceByCodecCache.get(codec)!;
           }
-          const resources = Object.values(
-            build.input.pgRegistry.pgResources,
-          ).filter(
+          const resources = Object.values(build.pgResources!).filter(
             (
               r: PgResource<any, any, any, any>,
             ): r is PgResource<string, TCodec, any, undefined> =>

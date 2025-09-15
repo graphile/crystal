@@ -614,9 +614,13 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
           }
         };
 
-        const allResources = Object.values(
-          build.input.pgRegistry.pgResources,
-        ) as PgResource<any, any, any, any, any>[];
+        const allResources = Object.values(build.pgResources) as PgResource<
+          any,
+          any,
+          any,
+          any,
+          any
+        >[];
         const updatableResources = allResources.filter(
           (
             resource,
@@ -665,7 +669,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
           return fields;
         }
 
-        const allSources = Object.values(build.input.pgRegistry.pgResources);
+        const allSources = Object.values(build.pgResources);
         const updatableSources = allSources.filter((resource) =>
           isUpdatable(build, resource),
         );

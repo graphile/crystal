@@ -76,7 +76,7 @@ export const PgLtreePlugin: GraphileConfig.Plugin = {
   schema: {
     hooks: {
       init(_, build) {
-        const codec = build.input.pgRegistry.pgCodecs.ltree;
+        const codec = build.pgCodecs.ltree;
         if (codec) {
           const ltreeTypeName = build.inflection.builtin("LTree");
           build.registerScalarType(

@@ -84,20 +84,20 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
         const {
           grafast: { access, constant, inhibitOnNull, list },
         } = build;
-        const tableResources = Object.values(
-          build.input.pgRegistry.pgResources,
-        ).filter((resource) => {
-          // TODO: if (!resourceCanSupportNode(resource)) return false;
+        const tableResources = Object.values(build.pgResources).filter(
+          (resource) => {
+            // TODO: if (!resourceCanSupportNode(resource)) return false;
 
-          // Needs the 'select' and 'node' behaviours for compatibility
-          return (
-            !resource.parameters &&
-            !resource.isUnique &&
-            !resource.isVirtual &&
-            !!build.behavior.pgCodecMatches(resource.codec, "type:node") &&
-            !!build.behavior.pgResourceMatches(resource, "resource:select")
-          );
-        });
+            // Needs the 'select' and 'node' behaviours for compatibility
+            return (
+              !resource.parameters &&
+              !resource.isUnique &&
+              !resource.isVirtual &&
+              !!build.behavior.pgCodecMatches(resource.codec, "type:node") &&
+              !!build.behavior.pgResourceMatches(resource, "resource:select")
+            );
+          },
+        );
 
         const resourcesByCodec = new Map<
           PgCodec,

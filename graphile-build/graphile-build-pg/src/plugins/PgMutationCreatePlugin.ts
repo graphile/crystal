@@ -132,9 +132,9 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
           inflection,
           graphql: { GraphQLString, GraphQLNonNull, isInputType },
         } = build;
-        const insertableResources = Object.values(
-          build.input.pgRegistry.pgResources,
-        ).filter((resource) => isInsertable(build, resource));
+        const insertableResources = Object.values(build.pgResources).filter(
+          (resource) => isInsertable(build, resource),
+        );
 
         insertableResources.forEach((resource) => {
           build.recoverable(null, () => {
@@ -286,9 +286,9 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
           return fields;
         }
 
-        const insertableSources = Object.values(
-          build.input.pgRegistry.pgResources,
-        ).filter((resource) => isInsertable(build, resource));
+        const insertableSources = Object.values(build.pgResources).filter(
+          (resource) => isInsertable(build, resource),
+        );
         return insertableSources.reduce((memo, resource) => {
           return build.recoverable(memo, () => {
             const createFieldName = inflection.createField(resource);

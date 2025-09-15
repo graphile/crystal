@@ -681,9 +681,9 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             }
 
             if (isTable) {
-              const resource = Object.values(
-                build.input.pgRegistry.pgResources,
-              ).find((r) => !r.parameters && r.codec === codec);
+              const resource = Object.values(build.pgResources).find(
+                (r) => !r.parameters && r.codec === codec,
+              );
               const pk =
                 resource?.uniques.find((u) => u.isPrimary) ??
                 resource?.uniques[0];

@@ -96,9 +96,7 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
         if (!context.scope.isRootQuery) {
           return fields;
         }
-        for (const resource of Object.values(
-          build.input.pgRegistry.pgResources,
-        )) {
+        for (const resource of Object.values(build.pgResources)) {
           if (resource.parameters) {
             // Skip functions
             continue;
