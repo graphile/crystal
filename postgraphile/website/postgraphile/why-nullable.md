@@ -205,7 +205,7 @@ const NonNullRelationsPlugin: GraphileConfig.Plugin = {
       GraphQLObjectType_fields_field(field, build, context) {
         const {
           graphql: { GraphQLNonNull, getNullableType },
-          input: { pgRegistry },
+          pgRelations,
         } = build;
         // Extract details about why this field was defined.
         const { isPgSingleRelationField, pgRelationDetails } = context.scope;
@@ -214,7 +214,7 @@ const NonNullRelationsPlugin: GraphileConfig.Plugin = {
           // If so, extract details about the relation
           const { codec, relationName } = pgRelationDetails;
           // Look up the relation in the registry
-          const relation = pgRegistry.pgRelations[codec.name][relationName];
+          const relation = pgRelations[codec.name][relationName];
           // Determine if every column is non-null
           const everyColumnIsNonNull = relation.localAttributes.every(
             (attrName) => codec.attributes[attrName].notNull,

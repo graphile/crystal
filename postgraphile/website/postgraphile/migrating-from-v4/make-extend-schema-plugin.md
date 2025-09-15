@@ -200,7 +200,7 @@ function, passing through the `searchText` argument.
 ```diff
 -module.exports = makeExtendSchemaPlugin((build) => {
 +module.exports = extendSchema((build) => {
-+  const matchUser = build.input.pgRegistry.pgResources.match_user;
++  const matchUser = build.pgResources.match_user;
    return {
      typeDefs: /* GraphQL */ `
        type Query {
@@ -238,7 +238,7 @@ that use the `type` keyword in GraphQL) with the plans within that:
 ```diff
 -module.exports = makeExtendSchemaPlugin((build) => {
 +module.exports = extendSchema((build) => {
-+  const matchUser = build.input.pgRegistry.pgResources.match_user;
++  const matchUser = build.pgResources.match_user;
    return {
      typeDefs: /* GraphQL */ `
        type Query {
@@ -304,7 +304,7 @@ a client that's already in a transaction. Note that this pgClient is a generic
 adaptor, so if you want to deal with your Postgres client of choice here (`pg`,
 `postgres`, `pg-promise`, etc) you can do so!
 
-```js
+````js
 import { object } from "postgraphile/grafast";
 // highlight-next-line
 import { withPgClientTransaction } from "postgraphile/@dataplan/pg";
@@ -313,12 +313,18 @@ import { extendSchema } from "postgraphile/utils";
 export default extendSchema((build) => {
   const { sql } = build;
   /**
-   * The 'executor' tells us which database we're talking to.
-   * You can get this from the registry, the default executor name is `main`
-   * but you can override this and add extra sources/executors via the
-   * `pgServices` configuration option.
+   * The 'executor' tells us which database we're talking to. This is the
+   * default executor.
+   *
+   * If you're talking to multiple databases, you can get this from the
+   * registry, the default executor name is `main` but you can override this and
+   * add extra sources/executors via the `pgServices` configuration option:
+   *
+   * ```
+   * const executor = build.input.pgRegistry.pgExecutors.main;
+   * ```
    */
-  const executor = build.input.pgRegistry.pgExecutors.main;
+  const executor = build.pgExecutor;
 
   return {
     typeDefs: /* GraphQL */ `
@@ -399,7 +405,7 @@ export default extendSchema((build) => {
     },
   };
 });
-```
+````
 
 Another example of extendSchema being used can be found [`here`](https://gist.github.com/jamesallain/ca09979840c4530f72ce16378e49b927).
 

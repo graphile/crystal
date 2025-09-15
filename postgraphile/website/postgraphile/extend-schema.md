@@ -233,7 +233,7 @@ For example:
 import { extendSchema } from "postgraphile/utils";
 
 const schema = extendSchema((build) => {
-  const { users } = build.input.pgRegistry.pgResources;
+  const { users } = build.pgResources;
   return {
     typeDefs: /* GraphQL */ `
       type MyObject {
@@ -307,12 +307,12 @@ const $userId = context().get("userId");
 ```
 
 Data from the database can be retrieved using “resources.” Resources can be
-found on `build.input.pgRegistry.pgResources`, keyed by their name. For
+found on `build.pgResources`, keyed by their name. For
 example, if you have `organizations`, `users` and `channels` tables, you can
 get the resources for them via:
 
 ```ts
-const { organizations, users, channels } = build.input.pgRegistry.pgResources;
+const { organizations, users, channels } = build.pgResources;
 ```
 
 Now that you have a reference to the `users` resource, inside a plan resolver
@@ -354,7 +354,7 @@ import { extendSchema } from "postgraphile/utils";
 import { context } from "postgraphile/grafast";
 
 export const MyChannelsPlugin = extendSchema((build) => {
-  const { users, channels } = build.input.pgRegistry.pgResources;
+  const { users, channels } = build.pgResources;
   return {
     typeDefs: /* GraphQL */ `
       extend type Query {
@@ -448,20 +448,29 @@ database.
 
 **How do I get an executor?**
 
-Executors are available in the registry; by default there’s one executor called
-`main` which you can access like this:
-
-```ts
-const executor = build.input.pgRegistry.pgExecutors.main;
-```
-
-However, PostGraphile can handle multiple sources, or custom source/executor
-names, via `preset.pgServices`. If you don’t know the name of the executor but
-you do have a resource representing the target database, you can extract the
-executor for that DB from the resource, for example:
+Typically you would want to extract the executor from the resource that you are
+dealing with, for example:
 
 ```ts
 const executor = channels.executor;
+```
+
+This is the safest approach. However, if you're not specifically dealing with a
+resource and wish to communicate with the database directly (e.g. for
+`loadOneWithPgClient()`), then you can access the default/primary/main executor via:
+
+```ts
+const executor = build.pgExecutor;
+```
+
+PostGraphile has support for multiple Postgres databases and custom
+source/executor names via `preset.pgServices`. All executors are available via
+the registry; typically (if a user did not rename the default) there’s an
+executor called `main` which you can access like this:
+
+```ts
+// Normally equivalent to `build.pgExecutor`:
+const executor = build.input.pgRegistry.pgExecutors.main;
 ```
 
 ### Example
@@ -476,9 +485,9 @@ import { context } from "postgraphile/grafast";
 import { withPgClient } from "postgraphile/@dataplan/pg";
 
 export const MyChannelsPlugin = extendSchema((build) => {
-  const { channels } = build.input.pgRegistry.pgResources;
-  const executor = build.input.pgRegistry.pgExecutors.main;
-  // or: `const executor = channels.executor;`
+  const { channels } = build.pgResources;
+  const executor = channels.executor;
+  // Or `const executor = build.pgExecutor` if you only have one DB
 
   return {
     typeDefs: /* GraphQL */ `
@@ -621,7 +630,7 @@ import { extendSchema } from "postgraphile/utils";
 import { connection } from "postgraphile/grafast";
 
 export const MyProductReviewsPlugin = extendSchema((build) => {
-  const { reviews } = build.input.pgRegistry.pgResources;
+  const { reviews } = build.pgResources;
 
   return {
     typeDefs: /* GraphQL */ `
@@ -658,10 +667,12 @@ import { access, constant, object } from "postgraphile/grafast";
 import { withPgClientTransaction } from "postgraphile/@dataplan/pg";
 
 export const MyRegisterUserMutationPlugin = extendSchema((build) => {
-  const { sql } = build;
-  const { users } = build.input.pgRegistry.pgResources;
+  const { sql, pgResources } = build;
+
+  // Get the executor from the "users" DB table:
+  const { users } = pgResources;
   const { executor } = users;
-  // Or: `const executor = build.input.pgRegistry.pgExecutors.main;`
+
   return {
     typeDefs: /* GraphQL */ `
       input RegisterUserInput {
@@ -766,9 +777,9 @@ const DeleteItemByNodeIdPlugin = extendSchema((build) => {
   const handler = build.getNodeIdHandler("Item")!;
 
   // Extract the executor from the items resource
-  const { items } = build.input.pgRegistry.pgResources;
-  const { executor } = items;
-  // Or: `const executor = build.input.pgRegistry.pgExecutors.main;`
+  const executor = build.pgResources.items.executor;
+  // Or `build.pgExecutor` if you know you only have one DB
+  // Or `build.input.pgRegistry.pgExecutors.main` for a named executor
 
   return {
     typeDefs: /* GraphQL */ `
@@ -854,7 +865,7 @@ import {
 import { DatabaseError } from "pg";
 
 export const RegisterUserPlugin = extendSchema((build) => {
-  const { users } = build.input.pgRegistry.pgResources;
+  const { users } = build.pgResources;
   const { executor } = users;
   // Or: `const executor = build.input.pgRegistry.pgExecutors.main;`
   return {
