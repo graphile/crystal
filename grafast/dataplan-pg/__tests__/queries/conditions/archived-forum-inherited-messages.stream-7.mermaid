@@ -12,7 +12,7 @@ graph TD
     Bucket1("Bucket 1 (listItem)<br />Deps: 79, 11, 28, 32, 29, 30, 6<br /><br />ROOT __Item{1}ᐸ14ᐳ[15]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 79, 15, 11, 28, 32, 29, 30, 6<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[16]<br />1: <br />ᐳ: 17, 80, 81<br />2: Connection[24]"):::bucket
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16, 24, 81, 11, 28, 32, 29, 30, 6<br /><br />ROOT Connection{2}ᐸ81ᐳ[24]<br />1: ConnectionItems[33]<br />ᐳ: 19, 25, 52, 75<br />2: __CloneStream[38]"):::bucket
-    Bucket6("Bucket 6 (defer)<br />Deps: 24, 11, 19, 25, 28, 32<br /><br />1: PgSelect[40]<br />ᐳ: PageInfo[39]<br />2: PgSelectRows[42]<br />ᐳ: 41, 43, 44"):::bucket
+    Bucket6("Bucket 6 (defer)<br />Deps: 24, 11, 19, 25, 28, 32<br /><br />1: PgSelect[40]<br />ᐳ: PageInfo[39], Access[49], Access[50]<br />2: PgSelectRows[42]<br />ᐳ: 41, 43, 44"):::bucket
     Bucket7("Bucket 7 (listItem)<br />Deps: 11<br /><br />ROOT __Item{7}ᐸ38ᐳ[45]"):::bucket
     Bucket8("Bucket 8 (listItem)<br />Deps: 52, 75<br /><br />ROOT __Item{8}ᐸ33ᐳ[47]"):::bucket
     Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 46, 11<br /><br />ROOT PgSelectSingle{7}ᐸmessagesᐳ[46]<br />1: <br />ᐳ: 51, 54<br />2: PgSelect[55]<br />3: PgSelectRows[60]<br />ᐳ: First[59], PgSelectSingle[61]"):::bucket
@@ -87,6 +87,10 @@ graph TD
     First41 --> PgSelectSingle43
     PgClassExpression44{{"PgClassExpression[44∈6]<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle43 --> PgClassExpression44
+    Access49{{"Access[49∈6]<br />ᐸ24.hasNextPageᐳ"}}:::plan
+    Connection24 --> Access49
+    Access50{{"Access[50∈6]<br />ᐸ24.hasPreviousPageᐳ"}}:::plan
+    Connection24 --> Access50
     __Item45[/"__Item[45∈7]<br />ᐸ38ᐳ"\]:::itemplan
     __CloneStream38 ==> __Item45
     PgSelectSingle46{{"PgSelectSingle[46∈7]<br />ᐸmessagesᐳ"}}:::plan
@@ -138,7 +142,7 @@ graph TD
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression19,PgClassExpression25,ConnectionItems33,__CloneStream38,Access52,Access75 bucket3
     classDef bucket6 stroke:#ff1493
-    class Bucket6,PageInfo39,PgSelect40,First41,PgSelectRows42,PgSelectSingle43,PgClassExpression44 bucket6
+    class Bucket6,PageInfo39,PgSelect40,First41,PgSelectRows42,PgSelectSingle43,PgClassExpression44,Access49,Access50 bucket6
     classDef bucket7 stroke:#808000
     class Bucket7,__Item45,PgSelectSingle46 bucket7
     classDef bucket8 stroke:#dda0dd

@@ -88,6 +88,10 @@ graph TD
     First36 --> PgSelectSingle38
     PgClassExpression39{{"PgClassExpression[39∈3]<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle38 --> PgClassExpression39
+    Access43{{"Access[43∈3]<br />ᐸ24.hasNextPageᐳ"}}:::plan
+    Connection24 --> Access43
+    Access44{{"Access[44∈3]<br />ᐸ24.hasPreviousPageᐳ"}}:::plan
+    Connection24 --> Access44
     ConnectionItems29 --> First45
     Lambda82 --> Access46
     ConnectionItems29 --> Last48
@@ -142,7 +146,7 @@ graph TD
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression17,Connection24,List81,Lambda82,List85,Lambda86 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,ConnectionItems29,PageInfo34,First36,PgSelectRows37,PgSelectSingle38,PgClassExpression39,First45,Access46,PgCursor47,Last48,PgCursor49,Access76 bucket3
+    class Bucket3,ConnectionItems29,PageInfo34,First36,PgSelectRows37,PgSelectSingle38,PgClassExpression39,Access43,Access44,First45,Access46,PgCursor47,Last48,PgCursor49,Access76 bucket3
     classDef bucket6 stroke:#ff1493
     class Bucket6,__Item40,PgSelectSingle41,Edge42,PgCursor51 bucket6
     classDef bucket7 stroke:#808000

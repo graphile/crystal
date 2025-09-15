@@ -11,7 +11,7 @@ graph TD
     Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 6, 9, 10, 29, 30, 81, 82, 83, 11, 13, 28, 32<br />2: PgSelect[8]<br />3: PgSelectRows[14]"):::bucket
     Bucket1("Bucket 1 (listItem)<br />Deps: 11, 28, 32, 29, 30, 6<br /><br />ROOT __Item{1}ᐸ14ᐳ[15]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 11, 28, 32, 29, 30, 6<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[16]<br />1: <br />ᐳ: 17, 19, 25<br />2: PgSelect[20]<br />3: Connection[24]"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 24, 11, 19, 25, 28, 32, 20, 29, 30, 6<br /><br />ROOT Connection{2}ᐸ20ᐳ[24]<br />1: ConnectionItems[33], PgSelect[41]<br />ᐳ: PageInfo[40], Access[55]<br />2: 43, 46, 47<br />ᐳ: 42, 44, 45"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 24, 11, 19, 25, 28, 32, 20, 29, 30, 6<br /><br />ROOT Connection{2}ᐸ20ᐳ[24]<br />1: ConnectionItems[33], PgSelect[41]<br />ᐳ: 40, 52, 53, 55<br />2: 43, 46, 47<br />ᐳ: 42, 44, 45"):::bucket
     Bucket6("Bucket 6 (listItem)<br />Deps: 11<br /><br />ROOT __Item{6}ᐸ46ᐳ[48]"):::bucket
     Bucket7("Bucket 7 (listItem)<br />Deps: 55, 11<br /><br />ROOT __Item{7}ᐸ47ᐳ[50]"):::bucket
     Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 49, 11<br /><br />ROOT PgSelectSingle{6}ᐸmessagesᐳ[49]<br />1: <br />ᐳ: 54, 57<br />2: PgSelect[58]<br />3: PgSelectRows[63]<br />ᐳ: First[62], PgSelectSingle[64]"):::bucket
@@ -77,6 +77,10 @@ graph TD
     ConnectionItems33 --> __CloneStream46
     __CloneStream47[["__CloneStream[47∈3@s]"]]:::plan
     ConnectionItems33 --> __CloneStream47
+    Access52{{"Access[52∈3]<br />ᐸ24.hasNextPageᐳ"}}:::plan
+    Connection24 --> Access52
+    Access53{{"Access[53∈3]<br />ᐸ24.hasPreviousPageᐳ"}}:::plan
+    Connection24 --> Access53
     Access55{{"Access[55∈3]<br />ᐸ20.cursorDetailsᐳ"}}:::plan
     PgSelect20 --> Access55
     __Item48[/"__Item[48∈6]<br />ᐸ46ᐳ"\]:::itemplan
@@ -132,7 +136,7 @@ graph TD
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression17,PgClassExpression19,PgSelect20,Connection24,PgClassExpression25 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,ConnectionItems33,PageInfo40,PgSelect41,First42,PgSelectRows43,PgSelectSingle44,PgClassExpression45,__CloneStream46,__CloneStream47,Access55 bucket3
+    class Bucket3,ConnectionItems33,PageInfo40,PgSelect41,First42,PgSelectRows43,PgSelectSingle44,PgClassExpression45,__CloneStream46,__CloneStream47,Access52,Access53,Access55 bucket3
     classDef bucket6 stroke:#ff1493
     class Bucket6,__Item48,PgSelectSingle49 bucket6
     classDef bucket7 stroke:#808000

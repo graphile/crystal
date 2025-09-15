@@ -383,6 +383,18 @@ graph TD
     PgSelectSingle158 --> PgClassExpression223
     PgClassExpression224{{"PgClassExpression[224∈24]<br />ᐸ__post_com....”foo_bar”ᐳ"}}:::plan
     PgSelectSingle158 --> PgClassExpression224
+    Access212{{"Access[212∈25]<br />ᐸ160.secondsᐳ"}}:::plan
+    __Item160 --> Access212
+    Access214{{"Access[214∈25]<br />ᐸ160.minutesᐳ"}}:::plan
+    __Item160 --> Access214
+    Access216{{"Access[216∈25]<br />ᐸ160.hoursᐳ"}}:::plan
+    __Item160 --> Access216
+    Access218{{"Access[218∈25]<br />ᐸ160.daysᐳ"}}:::plan
+    __Item160 --> Access218
+    Access220{{"Access[220∈25]<br />ᐸ160.monthsᐳ"}}:::plan
+    __Item160 --> Access220
+    Access222{{"Access[222∈25]<br />ᐸ160.yearsᐳ"}}:::plan
+    __Item160 --> Access222
     PgClassExpression225{{"PgClassExpression[225∈29]<br />ᐸ__frmcdc_c...type__.”a”ᐳ"}}:::plan
     PgSelectSingle167 --> PgClassExpression225
     PgClassExpression229{{"PgClassExpression[229∈29]<br />ᐸ__frmcdc_c....”foo_bar”ᐳ"}}:::plan
@@ -437,6 +449,30 @@ graph TD
     ConnectionItems264[["ConnectionItems[264∈35]"]]:::plan
     Connection257 --> ConnectionItems264
     List316 --> Lambda317
+    Access242{{"Access[242∈36]<br />ᐸ209.secondsᐳ"}}:::plan
+    PgClassExpression209 --> Access242
+    Access248{{"Access[248∈36]<br />ᐸ209.minutesᐳ"}}:::plan
+    PgClassExpression209 --> Access248
+    Access258{{"Access[258∈36]<br />ᐸ209.hoursᐳ"}}:::plan
+    PgClassExpression209 --> Access258
+    Access260{{"Access[260∈36]<br />ᐸ209.daysᐳ"}}:::plan
+    PgClassExpression209 --> Access260
+    Access261{{"Access[261∈36]<br />ᐸ209.monthsᐳ"}}:::plan
+    PgClassExpression209 --> Access261
+    Access262{{"Access[262∈36]<br />ᐸ209.yearsᐳ"}}:::plan
+    PgClassExpression209 --> Access262
+    Access245{{"Access[245∈38]<br />ᐸ223.secondsᐳ"}}:::plan
+    PgClassExpression223 --> Access245
+    Access251{{"Access[251∈38]<br />ᐸ223.minutesᐳ"}}:::plan
+    PgClassExpression223 --> Access251
+    Access259{{"Access[259∈38]<br />ᐸ223.hoursᐳ"}}:::plan
+    PgClassExpression223 --> Access259
+    Access263{{"Access[263∈39]<br />ᐸ209.secondsᐳ"}}:::plan
+    PgClassExpression209 --> Access263
+    Access267{{"Access[267∈39]<br />ᐸ209.minutesᐳ"}}:::plan
+    PgClassExpression209 --> Access267
+    Access268{{"Access[268∈39]<br />ᐸ209.hoursᐳ"}}:::plan
+    PgClassExpression209 --> Access268
     __Item269[/"__Item[269∈41]<br />ᐸ264ᐳ"\]:::itemplan
     ConnectionItems264 ==> __Item269
     PgSelectSingle270{{"PgSelectSingle[270∈41]<br />ᐸperson_friendsᐳ"}}:::plan
@@ -490,7 +526,7 @@ graph TD
     classDef bucket24 stroke:#808000
     class Bucket24,PgClassExpression211,PgClassExpression213,PgClassExpression215,PgClassExpression217,PgClassExpression219,PgClassExpression221,PgClassExpression223,PgClassExpression224 bucket24
     classDef bucket25 stroke:#dda0dd
-    class Bucket25 bucket25
+    class Bucket25,Access212,Access214,Access216,Access218,Access220,Access222 bucket25
     classDef bucket29 stroke:#4169e1
     class Bucket29,PgClassExpression225,PgClassExpression229,PgClassExpression234 bucket29
     classDef bucket30 stroke:#3cb371
@@ -506,13 +542,13 @@ graph TD
     classDef bucket35 stroke:#00bfff
     class Bucket35,PgClassExpression241,PgClassExpression247,Connection257,ConnectionItems264,List316,Lambda317 bucket35
     classDef bucket36 stroke:#7f007f
-    class Bucket36 bucket36
+    class Bucket36,Access242,Access248,Access258,Access260,Access261,Access262 bucket36
     classDef bucket37 stroke:#ffa500
     class Bucket37 bucket37
     classDef bucket38 stroke:#0000ff
-    class Bucket38 bucket38
+    class Bucket38,Access245,Access251,Access259 bucket38
     classDef bucket39 stroke:#7fff00
-    class Bucket39 bucket39
+    class Bucket39,Access263,Access267,Access268 bucket39
     classDef bucket41 stroke:#808000
     class Bucket41,__Item269,PgSelectSingle270 bucket41
     classDef bucket42 stroke:#dda0dd

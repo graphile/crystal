@@ -35,7 +35,7 @@ graph TD
     PgUnionAll19[["PgUnionAll[19∈0] ➊<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ<br />More deps:<br />- Object[13]<br />- Constantᐸ3ᐳ[106]<br />- Constantᐸ1ᐳ[108]<br />- Constantᐸ[Function: applyInputConstant]ᐳ[21]"]]:::plan
     PgUnionAll28[["PgUnionAll[28∈0] ➊<br />ᐸFirstPartyVulnerability,ThirdPartyVulnerabilityᐳ<br />More deps:<br />- Object[13]<br />- Constantᐸ3ᐳ[106]<br />- Constantᐸ[Function: applyInputConstant]ᐳ[16]"]]:::plan
     Lambda15 --> PgUnionAll28
-    Connection14[["Connection[14∈0] ➊<br />ᐸ10ᐳ<br />Dependents: 2<br />More deps:<br />- Constantᐸ3ᐳ[106]"]]:::plan
+    Connection14[["Connection[14∈0] ➊<br />ᐸ10ᐳ<br />Dependents: 4<br />More deps:<br />- Constantᐸ3ᐳ[106]"]]:::plan
     PgUnionAll10 & Lambda15 --> Connection14
     Object13{{"Object[13∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />Dependents: 7"}}:::plan
     Access11{{"Access[11∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
@@ -56,6 +56,8 @@ graph TD
     PgUnionAll19 --> Access104
     PgUnionAll28 --> Access105
     PageInfo33{{"PageInfo[33∈1] ➊<br />More deps:<br />- Connection[14]"}}:::plan
+    Access69{{"Access[69∈1] ➊<br />ᐸ14.hasNextPageᐳ<br />More deps:<br />- Connection[14]"}}:::plan
+    Access71{{"Access[71∈1] ➊<br />ᐸ14.hasPreviousPageᐳ<br />More deps:<br />- Connection[14]"}}:::plan
     List37{{"List[37∈2]<br />ᐸ34,35,36ᐳ<br />More deps:<br />- Constantᐸ[HIDDEN]ᐳ[36]"}}:::plan
     Access34{{"Access[34∈2]<br />ᐸ23.0ᐳ"}}:::plan
     Access35{{"Access[35∈2]<br />ᐸ23.1ᐳ"}}:::plan
@@ -152,7 +154,7 @@ graph TD
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,PgUnionAll10,Access11,Access12,Object13,Connection14,Lambda15,PgUnionAll19,ConnectionItems25,PgUnionAll28,First29,First60,Access61,Last65,Access104,Access105 bucket0
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PageInfo33 bucket1
+    class Bucket1,PageInfo33,Access69,Access71 bucket1
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item23,Access34,Access35,List37,Lambda38,Access39,Access40 bucket2
     classDef bucket4 stroke:#0000ff

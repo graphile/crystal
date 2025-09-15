@@ -32,7 +32,7 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10
-    Connection12[["Connection[12∈0] ➊<br />ᐸ8ᐳ<br />Dependents: 2"]]:::plan
+    Connection12[["Connection[12∈0] ➊<br />ᐸ8ᐳ<br />Dependents: 4"]]:::plan
     PgSelect8 --> Connection12
     ConnectionItems14[["ConnectionItems[14∈0] ➊<br />Dependents: 3<br />More deps:<br />- Connection[12]"]]:::plan
     PgSelect17[["PgSelect[17∈0] ➊<br />ᐸmeasurements(aggregate)ᐳ"]]:::plan
@@ -50,6 +50,8 @@ graph TD
     Access49{{"Access[49∈0] ➊<br />ᐸ8.m.joinDetailsFor39ᐳ"}}:::plan
     PgSelect8 --> Access49
     PageInfo22{{"PageInfo[22∈1] ➊<br />More deps:<br />- Connection[12]"}}:::plan
+    Access30{{"Access[30∈1] ➊<br />ᐸ12.hasNextPageᐳ<br />More deps:<br />- Connection[12]"}}:::plan
+    Access31{{"Access[31∈1] ➊<br />ᐸ12.hasPreviousPageᐳ<br />More deps:<br />- Connection[12]"}}:::plan
     Edge24{{"Edge[24∈3]"}}:::plan
     __Item23[/"__Item[23∈3]<br />ᐸ14ᐳ<br />More deps:<br />- ConnectionItems[14]"\]:::itemplan
     PgCursor33{{"PgCursor[33∈3]<br />More deps:<br />- Access[26]"}}:::plan
@@ -82,7 +84,7 @@ graph TD
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,PgSelect8,Access9,Access10,Object11,Connection12,ConnectionItems14,PgSelect17,First18,PgSelectRows19,PgSelectSingle20,First25,Access26,Last28,PgSelectInlineApply48,Access49 bucket0
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PageInfo22 bucket1
+    class Bucket1,PageInfo22,Access30,Access31 bucket1
     classDef bucket3 stroke:#ffa500
     class Bucket3,__Item23,Edge24,PgCursor33 bucket3
     classDef bucket4 stroke:#0000ff
