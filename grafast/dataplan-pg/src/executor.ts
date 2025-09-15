@@ -60,7 +60,11 @@ export interface PgClientQuery {
 
 export type PgRaiseSeverity = "DEBUG" | "LOG" | "INFO" | "NOTICE" | "WARNING";
 
-/** Shape mirrors Postgres diagnostics fields so different clients can map in. */
+/**
+ * Shape mirrors Postgres diagnostics fields so different clients can map in.
+ *
+ * @see {@link https://www.postgresql.org/docs/current/protocol-error-fields.html}
+ */
 export interface PgNotice {
   severity: PgRaiseSeverity; // e.g. 'NOTICE'
   message: string; // primary message
