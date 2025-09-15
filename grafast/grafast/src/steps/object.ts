@@ -172,61 +172,121 @@ export class ObjectStep<
   ): void {
     const keysAreSafe = this.keys.every(isSafeObjectPropertyName);
     // Optimize common cases
-    if (keysAreSafe && this.cacheSize === 0) {
-      switch (this.keys.length) {
-        case 0: {
-          return callback(() => EMPTY_OBJECT);
+    if (keysAreSafe) {
+      if (this.cacheSize === 0 || this.keys.length === 0) {
+        switch (this.keys.length) {
+          case 0: {
+            return callback(() => EMPTY_OBJECT);
+          }
+          case 1: {
+            const [k0] = this.keys;
+            return callback((_, val0) => ({ [k0]: val0 }) as any);
+          }
+          case 2: {
+            const [k0, k1] = this.keys;
+            return callback(
+              (_, val0, val1) => ({ [k0]: val0, [k1]: val1 }) as any,
+            );
+          }
+          case 3: {
+            const [k0, k1, k2] = this.keys;
+            return callback(
+              (_, val0, val1, val2) =>
+                ({ [k0]: val0, [k1]: val1, [k2]: val2 }) as any,
+            );
+          }
+          case 4: {
+            const [k0, k1, k2, k3] = this.keys;
+            return callback(
+              (_, val0, val1, val2, val3) =>
+                ({ [k0]: val0, [k1]: val1, [k2]: val2, [k3]: val3 }) as any,
+            );
+          }
+          case 5: {
+            const [k0, k1, k2, k3, k4] = this.keys;
+            return callback(
+              (_, val0, val1, val2, val3, val4) =>
+                ({
+                  [k0]: val0,
+                  [k1]: val1,
+                  [k2]: val2,
+                  [k3]: val3,
+                  [k4]: val4,
+                }) as any,
+            );
+          }
+          case 6: {
+            const [k0, k1, k2, k3, k4, k5] = this.keys;
+            return callback(
+              (_, val0, val1, val2, val3, val4, val5) =>
+                ({
+                  [k0]: val0,
+                  [k1]: val1,
+                  [k2]: val2,
+                  [k3]: val3,
+                  [k4]: val4,
+                  [k5]: val5,
+                }) as any,
+            );
+          }
         }
-        case 1: {
-          const [k1] = this.keys;
-          return callback((_, val1) => ({ [k1]: val1 }) as any);
-        }
-        case 2: {
-          const [k1, k2] = this.keys;
-          return callback(
-            (_, val1, val2) => ({ [k1]: val1, [k2]: val2 }) as any,
-          );
-        }
-        case 3: {
-          const [k1, k2, k3] = this.keys;
-          return callback(
-            (_, val1, val2, val3) =>
-              ({ [k1]: val1, [k2]: val2, [k3]: val3 }) as any,
-          );
-        }
-        case 4: {
-          const [k1, k2, k3, k4] = this.keys;
-          return callback(
-            (_, val1, val2, val3, val4) =>
-              ({ [k1]: val1, [k2]: val2, [k3]: val3, [k4]: val4 }) as any,
-          );
-        }
-        case 5: {
-          const [k1, k2, k3, k4, k5] = this.keys;
-          return callback(
-            (_, val1, val2, val3, val4, val5) =>
-              ({
-                [k1]: val1,
-                [k2]: val2,
-                [k3]: val3,
-                [k4]: val4,
-                [k5]: val5,
-              }) as any,
-          );
-        }
-        case 6: {
-          const [k1, k2, k3, k4, k5, k6] = this.keys;
-          return callback(
-            (_, val1, val2, val3, val4, val5, val6) =>
-              ({
-                [k1]: val1,
-                [k2]: val2,
-                [k3]: val3,
-                [k4]: val4,
-                [k5]: val5,
-                [k6]: val6,
-              }) as any,
-          );
+      } else {
+        const maxIdx = this.cacheSize - 1;
+        switch (this.keys.length) {
+          case 1: {
+            const [k0] = this.keys;
+            return callback((extra, val0) => {
+              const meta = extra.meta as { nextIndex?: number; results: any[] };
+              if (meta.nextIndex == null) {
+                meta.nextIndex = 0;
+                meta.results = [];
+              } else {
+                const cacheLen = meta.results.length;
+                for (let cacheIdx = 0; cacheIdx < cacheLen; cacheIdx++) {
+                  const [cache0, obj] = meta.results[cacheIdx];
+                  if (cache0 === val0) {
+                    return obj;
+                  }
+                }
+              }
+
+              const obj = { [k0]: val0 } as any;
+
+              meta.results[meta.nextIndex] = [val0, obj];
+              // Only cache `this.cacheSize` results, use a round-robin
+              meta.nextIndex =
+                meta.nextIndex >= maxIdx ? 0 : meta.nextIndex + 1;
+
+              return obj;
+            });
+          }
+          case 2: {
+            const [k0, k1] = this.keys;
+            return callback((extra, val0, val1) => {
+              const meta = extra.meta as { nextIndex?: number; results: any[] };
+              if (meta.nextIndex == null) {
+                meta.nextIndex = 0;
+                meta.results = [];
+              } else {
+                const cacheLen = meta.results.length;
+                for (let cacheIdx = 0; cacheIdx < cacheLen; cacheIdx++) {
+                  const [cache0, cache1, obj] = meta.results[cacheIdx];
+                  if (cache0 === val0 && cache1 === val1) {
+                    return obj;
+                  }
+                }
+              }
+
+              const obj = { [k0]: val0, [k1]: val1 } as any;
+
+              meta.results[meta.nextIndex] = [val0, val1, obj];
+              // Only cache `this.cacheSize` results, use a round-robin
+              meta.nextIndex =
+                meta.nextIndex >= maxIdx ? 0 : meta.nextIndex + 1;
+
+              return obj;
+            });
+          }
         }
       }
     }
@@ -242,9 +302,9 @@ export class ObjectStep<
             metaResultIndex < metaResultLength;
             metaResultIndex++
           ) {
-            const [values, obj] = meta.results[metaResultIndex];
+            const [cacheValues, obj] = meta.results[metaResultIndex];
             for (let keyIndex = 0; keyIndex < keyCount; keyIndex++) {
-              if (values[keyIndex] !== vals[keyIndex]) {
+              if (cacheValues[keyIndex] !== vals[keyIndex]) {
                 continue nextMetaResult;
               }
             }
@@ -264,6 +324,7 @@ export class ObjectStep<
         // Only cache `this.cacheSize` results, use a round-robin
         meta.nextIndex =
           meta.nextIndex >= this.cacheSize - 1 ? 0 : meta.nextIndex + 1;
+
         return obj;
       });
     } else {
