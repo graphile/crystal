@@ -270,6 +270,10 @@ export class PgUpdateSingleStep<
     return access(this, ["m", key]);
   }
 
+  public getNotices() {
+    return access(this, "n");
+  }
+
   public record(): PgClassExpressionStep<
     GetPgResourceCodec<TResource>,
     TResource
@@ -430,7 +434,7 @@ export class PgUpdateSingleStep<
             }
           })
         : rawSqlValues;
-      const { rows, rowCount } = await this.resource.executeMutation({
+      const { rows, rowCount, notices } = await this.resource.executeMutation({
         context,
         text,
         values: sqlValues,
@@ -443,6 +447,8 @@ export class PgUpdateSingleStep<
         __proto__: null,
         m: meta,
         t: rows[0] ?? [],
+        c: rowCount,
+        n: notices,
       };
     });
   }

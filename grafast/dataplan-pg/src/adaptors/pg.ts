@@ -19,11 +19,15 @@ import type {
   QueryConfig,
 } from "pg";
 import * as pg from "pg";
+/** @internal */
+import type { NoticeMessage } from "pg-protocol/dist/messages.js";
 
 import type {
   PgClient,
   PgClientQuery,
   PgClientResult,
+  PgNotice,
+  PgRaiseSeverity,
   WithPgClient,
 } from "../executor.js";
 import type { MakePgServiceOptions } from "../interfaces.js";
@@ -162,15 +166,8 @@ function newNodePostgresPgClient(
       function doIt() {
         const { text, name, values, arrayMode } = opts;
         const queryObj: QueryConfig | QueryArrayConfig = arrayMode
-          ? {
-              text,
-              values,
-              rowMode: "array",
-            }
-          : {
-              text,
-              values,
-            };
+          ? { text, values, rowMode: "array" }
+          : { text, values };
 
         if (PREPARED_STATEMENT_CACHE_SIZE > 0 && name != null) {
           // Hacking into pgClient internals - this is dangerous, but it's the only way I know to get a prepared statement LRU
@@ -202,9 +199,56 @@ function newNodePostgresPgClient(
           }
         }
 
-        return pgClient.query<any>(queryObj);
+        return pgClientQuery<TData>(pgClient, queryObj);
       }
     },
+  };
+}
+
+const EMPTY_ARRAY = Object.freeze([]) as never[];
+
+async function pgClientQuery<TData>(
+  pgClient: PoolClient,
+  queryObj: QueryArrayConfig<any[]> | QueryConfig<any[]>,
+): Promise<PgClientResult<TData>> {
+  let notices: PgNotice[] | null = null;
+  const addNotice = (n: NoticeMessage) => {
+    const converted = convertNotice(n);
+    if (notices === null) {
+      notices = [converted];
+    } else {
+      notices.push(converted);
+    }
+  };
+  pgClient.addListener("notice", addNotice);
+  try {
+    const { rows, rowCount } = await pgClient.query<any>(queryObj);
+    return { rows, rowCount, notices: notices ?? EMPTY_ARRAY };
+  } finally {
+    pgClient.removeListener("notice", addNotice);
+  }
+}
+
+function convertNotice(n: NoticeMessage): PgNotice {
+  return {
+    severity: (n.severity ?? "NOTICE") as PgRaiseSeverity,
+    message: n.message ?? "",
+    code: n.code,
+    detail: n.detail,
+    hint: n.hint,
+    position: n.position != null ? parseInt(n.position, 10) : undefined,
+    internalPosition:
+      n.internalPosition != null ? parseInt(n.internalPosition, 10) : undefined,
+    internalQuery: n.internalQuery,
+    where: n.where,
+    schema: n.schema,
+    table: n.table,
+    column: n.column,
+    dataType: n.dataType,
+    constraint: n.constraint,
+    file: n.file,
+    line: n.line != null ? parseInt(n.line, 10) : undefined,
+    routine: n.routine,
   };
 }
 

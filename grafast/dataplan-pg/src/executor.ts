@@ -58,17 +58,51 @@ export interface PgClientQuery {
   name?: string;
 }
 
+export type PgRaiseSeverity = "DEBUG" | "LOG" | "INFO" | "NOTICE" | "WARNING";
+
+/**
+ * Shape mirrors Postgres diagnostics fields so different clients can map in.
+ *
+ * @see {@link https://www.postgresql.org/docs/current/protocol-error-fields.html}
+ */
+export interface PgNotice {
+  severity: PgRaiseSeverity; // e.g. 'NOTICE'
+  message: string; // primary message
+  code?: string; // SQLSTATE, e.g. '00000'
+  detail?: string;
+  hint?: string;
+  position?: number; // 1-based character position
+  internalPosition?: number;
+  internalQuery?: string;
+  where?: string; // context
+  schema?: string;
+  table?: string;
+  column?: string;
+  dataType?: string;
+  constraint?: string;
+  file?: string; // server source file
+  line?: number; // server source line
+  routine?: string; // server source function
+}
+
 export interface PgClientResult<TData> {
   /**
    * For `SELECT` or `INSERT/UPDATE/DELETE ... RETURNING` this will be the list
    * of rows returned.
    */
   rows: readonly TData[];
+
   /**
    * For `INSERT/UPDATE/DELETE` without `RETURNING`, this will be the number of
    * rows created/updated/deleted.
    */
   rowCount: number | null;
+
+  /**
+   * Any non-exception server messages (e.g. RAISE NOTICE/INFO/WARNING).
+   * Empty if none were raised.
+   */
+  notices?: readonly PgNotice[];
 }
 
 /**
@@ -211,6 +245,7 @@ export class PgExecutor<const TName extends string = string, TSettings = any> {
     if (debug.enabled || debugVerbose.enabled || debugExplain.enabled) {
       const duration = (Number((end - start) / 10000n) / 100).toFixed(2) + "ms";
       const rows = queryResult?.rows;
+      const notices = queryResult?.notices;
       const rowResults =
         rows && rows.length > 10
           ? "[\n  " +
@@ -248,9 +283,12 @@ ${
   error
     ? `\
 # ERROR:
-%o`
+%o%s`
     : `\
 # RESULT:
+%s
+
+# NOTICES:
 %s`
 }
 
@@ -268,6 +306,18 @@ ${duration}
         formatSQLForDebugging(text, error),
         values,
         error ? error : rowResults,
+        error
+          ? ""
+          : notices?.length
+            ? notices
+                .map((n) =>
+                  `${n.severity}${n.code ? `[${n.code}]` : ""}: ${n.message}`.replace(
+                    /\n/g,
+                    "\n  ",
+                  ),
+                )
+                .join("\n- ")
+            : `-none-`,
         LOOK_UP,
         explain ??
           (shouldExplain

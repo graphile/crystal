@@ -235,6 +235,10 @@ export class PgInsertSingleStep<
     return access(this, ["m", key]);
   }
 
+  public getNotices() {
+    return access(this, "n");
+  }
+
   public record(): PgClassExpressionStep<
     GetPgResourceCodec<TResource>,
     TResource
@@ -385,12 +389,18 @@ export class PgInsertSingleStep<
       }
 
       const { text, values: stmtValues } = compileResult;
-      const { rows } = await this.resource.executeMutation({
+      const { rows, notices, rowCount } = await this.resource.executeMutation({
         context,
         text,
         values: stmtValues,
       });
-      return { __proto__: null, m: meta, t: rows[0] ?? [] };
+      return {
+        __proto__: null,
+        m: meta,
+        t: rows[0] ?? [],
+        c: rowCount,
+        n: notices,
+      };
     });
   }
 
