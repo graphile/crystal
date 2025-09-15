@@ -460,7 +460,7 @@ export interface StepOptions {
   /**
    * Details for the `@stream` directive.
    *
-   * object - @stream details
+   * object - `@stream` details
    *
    * true - no stream directive, but is inside a subscription field
    *

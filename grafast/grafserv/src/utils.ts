@@ -19,7 +19,6 @@ import type { GrafservBase } from "./index.js";
 import type {
   GrafservBody,
   JSONValue,
-  MaskErrorFn,
   NormalizedRequestDigest,
   OnSubscribeEvent,
   ParsedGraphQLBody,
