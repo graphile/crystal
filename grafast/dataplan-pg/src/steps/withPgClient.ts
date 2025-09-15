@@ -183,7 +183,13 @@ type LoadOneWithPgClientLoader<
 > =
   | LoadOneWithPgClientCallback<TSpec, TItem, TData, TParams, never>
   | (Omit<LoadOneLoader<TSpec, TItem, TData, TParams, TShared>, "load"> & {
-      load: LoadOneWithPgClientCallback<TSpec, TItem, TData, TParams, TShared>;
+      load: LoadOneWithPgClientCallback<
+        TSpec,
+        TItem,
+        TData,
+        TParams,
+        UnwrapMultistep<TShared>
+      >;
     });
 const transformedLoaderCache = new WeakMap<PgExecutor, WeakMap<any, any>>();
 
@@ -333,7 +339,13 @@ type LoadManyWithPgClientLoader<
 > =
   | LoadManyWithPgClientCallback<TSpec, TItem, TData, TParams, never>
   | (Omit<LoadManyLoader<TSpec, TItem, TData, TParams, TShared>, "load"> & {
-      load: LoadManyWithPgClientCallback<TSpec, TItem, TData, TParams, TShared>;
+      load: LoadManyWithPgClientCallback<
+        TSpec,
+        TItem,
+        TData,
+        TParams,
+        UnwrapMultistep<TShared>
+      >;
     });
 
 export function loadManyWithPgClient<
