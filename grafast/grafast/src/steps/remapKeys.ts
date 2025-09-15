@@ -1,5 +1,4 @@
 import chalk from "chalk";
-import te, { isSafeObjectPropertyName } from "tamedevil";
 
 import type {
   ExecutionDetails,
@@ -17,38 +16,15 @@ function makeMapper(
   callback: (fn: (obj: object | null) => object | null) => void,
 ) {
   const entries = Object.entries(actualKeyByDesiredKey);
-  if (
-    entries.every(
-      ([key, val]) =>
-        isSafeObjectPropertyName(key) && isSafeObjectPropertyName(val),
-    )
-  ) {
-    // We can do a fast custom conversion
-    return te.runInBatch<any>(
-      te`(function(obj) {
-  return (obj == null ? obj : { ${te.join(
-    entries.map(
-      ([key, val]) => te`${te.safeKeyOrThrow(key)}: obj${te.get(val)}`,
-    ),
-    ", ",
-  )} });
-})`,
-      callback,
-    );
-  }
   // Fallback to slow conversion
   return callback(
     (obj: Record<string, any> | null): Record<string, any> | null => {
-      if (obj == null) {
-        return obj;
+      if (obj == null) return obj;
+      const result = Object.create(null);
+      for (const [desiredKey, actualKey] of entries) {
+        result[desiredKey] = obj[actualKey];
       }
-      return Object.keys(actualKeyByDesiredKey).reduce(
-        (memo, desiredKey) => {
-          memo[desiredKey] = obj[actualKeyByDesiredKey[desiredKey]];
-          return memo;
-        },
-        Object.create(null) as Record<string, any>,
-      );
+      return result;
     },
   );
 }
