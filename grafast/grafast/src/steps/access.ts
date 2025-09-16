@@ -16,36 +16,36 @@ function constructDestructureFunction(
 ): void {
   const n = path.length;
   if (n === 0) {
-    if (fallback !== undefined) {
-      callback((_meta, value) => value ?? fallback);
-    } else {
+    if (fallback === undefined) {
       callback((_meta, value) => value);
+    } else {
+      callback((_meta, value) => value ?? fallback);
     }
   } else if (n === 1) {
     const [p0] = path;
-    if (fallback !== undefined) {
-      callback((_meta, value) => value?.[p0] ?? fallback);
-    } else {
+    if (fallback === undefined) {
       callback((_meta, value) => value?.[p0]);
+    } else {
+      callback((_meta, value) => value?.[p0] ?? fallback);
     }
   } else if (n === 2) {
     const [p0, p1] = path;
-    if (fallback !== undefined) {
-      callback((_meta, value) => value?.[p0]?.[p1] ?? fallback);
-    } else {
+    if (fallback === undefined) {
       callback((_meta, value) => value?.[p0]?.[p1]);
+    } else {
+      callback((_meta, value) => value?.[p0]?.[p1] ?? fallback);
     }
   } else if (n === 3) {
     const [p0, p1, p2] = path;
-    if (fallback !== undefined) {
-      callback((_meta, value) => value?.[p0]?.[p1]?.[p2] ?? fallback);
-    } else {
+    if (fallback === undefined) {
       callback((_meta, value) => value?.[p0]?.[p1]?.[p2]);
+    } else {
+      callback((_meta, value) => value?.[p0]?.[p1]?.[p2] ?? fallback);
     }
   } else {
     callback(function slowlyExtractValueAtPath(_meta: any, value: any): any {
       let current = value;
-      for (let i = 0, l = path.length; i < l && current != null; i++) {
+      for (let i = 0; i < n && current != null; i++) {
         const pathItem = path[i];
         current = current[pathItem];
       }
