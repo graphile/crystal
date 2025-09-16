@@ -59,13 +59,13 @@ graph TD
     __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access11
     __Value2 --> Access12
-    Connection14[["Connection[14∈0] ➊<br />ᐸ10ᐳ<br />Dependents: 2"]]:::plan
+    Connection14[["Connection[14∈0] ➊<br />ᐸ10ᐳ<br />Dependents: 4"]]:::plan
     PgSelect10 --> Connection14
     __InputObject7 --> ApplyInput15
-    Connection22[["Connection[22∈0] ➊<br />ᐸ20ᐳ<br />Dependents: 2"]]:::plan
+    Connection22[["Connection[22∈0] ➊<br />ᐸ20ᐳ<br />Dependents: 4"]]:::plan
     PgSelect20 --> Connection22
     __InputObject17 --> ApplyInput23
-    Connection30[["Connection[30∈0] ➊<br />ᐸ28ᐳ<br />Dependents: 2"]]:::plan
+    Connection30[["Connection[30∈0] ➊<br />ᐸ28ᐳ<br />Dependents: 4"]]:::plan
     PgSelect28 --> Connection30
     __InputObject25 --> ApplyInput31
     First37{{"First[37∈0] ➊"}}:::plan
@@ -102,8 +102,14 @@ graph TD
     Last77{{"Last[77∈0] ➊<br />More deps:<br />- ConnectionItems[54]"}}:::plan
     Last79{{"Last[79∈0] ➊<br />More deps:<br />- ConnectionItems[57]"}}:::plan
     PageInfo33{{"PageInfo[33∈1] ➊<br />More deps:<br />- Connection[14]"}}:::plan
+    Access81{{"Access[81∈1] ➊<br />ᐸ14.hasNextPageᐳ<br />More deps:<br />- Connection[14]"}}:::plan
+    Access84{{"Access[84∈1] ➊<br />ᐸ14.hasPreviousPageᐳ<br />More deps:<br />- Connection[14]"}}:::plan
     PageInfo34{{"PageInfo[34∈2] ➊<br />More deps:<br />- Connection[22]"}}:::plan
+    Access82{{"Access[82∈2] ➊<br />ᐸ22.hasNextPageᐳ<br />More deps:<br />- Connection[22]"}}:::plan
+    Access85{{"Access[85∈2] ➊<br />ᐸ22.hasPreviousPageᐳ<br />More deps:<br />- Connection[22]"}}:::plan
     PageInfo35{{"PageInfo[35∈3] ➊<br />More deps:<br />- Connection[30]"}}:::plan
+    Access83{{"Access[83∈3] ➊<br />ᐸ30.hasNextPageᐳ<br />More deps:<br />- Connection[30]"}}:::plan
+    Access86{{"Access[86∈3] ➊<br />ᐸ30.hasPreviousPageᐳ<br />More deps:<br />- Connection[30]"}}:::plan
     Edge61{{"Edge[61∈7]"}}:::plan
     __Item60[/"__Item[60∈7]<br />ᐸ51ᐳ<br />More deps:<br />- ConnectionItems[51]"\]:::itemplan
     PgCursor88{{"PgCursor[88∈7]<br />More deps:<br />- Access[67]"}}:::plan
@@ -154,11 +160,11 @@ graph TD
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__InputObject7,PgSelect10,Access11,Access12,Object13,Connection14,ApplyInput15,__InputObject17,PgSelect20,Connection22,ApplyInput23,__InputObject25,PgSelect28,Connection30,ApplyInput31,PgSelect36,First37,PgSelectRows38,PgSelectSingle39,PgSelect41,First42,PgSelectRows43,PgSelectSingle44,PgSelect46,First47,PgSelectRows48,PgSelectSingle49,ConnectionItems51,ConnectionItems54,ConnectionItems57,First66,Access67,First69,Access70,First72,Access73,Last75,Last77,Last79 bucket0
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PageInfo33 bucket1
+    class Bucket1,PageInfo33,Access81,Access84 bucket1
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PageInfo34 bucket2
+    class Bucket2,PageInfo34,Access82,Access85 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PageInfo35 bucket3
+    class Bucket3,PageInfo35,Access83,Access86 bucket3
     classDef bucket7 stroke:#808000
     class Bucket7,__Item60,Edge61,PgCursor88 bucket7
     classDef bucket8 stroke:#dda0dd

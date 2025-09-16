@@ -134,12 +134,34 @@ graph TD
     PgSelectSingle38 --> PgClassExpression53
     PgClassExpression54{{"PgClassExpression[54∈10]<br />ᐸ__table_se...full_name”ᐳ"}}:::plan
     PgSelectSingle40 --> PgClassExpression54
+    Access55{{"Access[55∈11]<br />ᐸ49.secondsᐳ"}}:::plan
+    PgClassExpression49 --> Access55
+    Access58{{"Access[58∈11]<br />ᐸ49.minutesᐳ"}}:::plan
+    PgClassExpression49 --> Access58
+    Access66{{"Access[66∈11]<br />ᐸ49.hoursᐳ"}}:::plan
+    PgClassExpression49 --> Access66
+    Access68{{"Access[68∈11]<br />ᐸ49.daysᐳ"}}:::plan
+    PgClassExpression49 --> Access68
+    Access70{{"Access[70∈11]<br />ᐸ49.monthsᐳ"}}:::plan
+    PgClassExpression49 --> Access70
+    Access72{{"Access[72∈11]<br />ᐸ49.yearsᐳ"}}:::plan
+    PgClassExpression49 --> Access72
+    Access78{{"Access[78∈12]<br />ᐸ73.hoursᐳ"}}:::plan
+    PgClassExpression73 --> Access78
+    Access79{{"Access[79∈12]<br />ᐸ73.minutesᐳ"}}:::plan
+    PgClassExpression73 --> Access79
+    Access80{{"Access[80∈12]<br />ᐸ73.secondsᐳ"}}:::plan
+    PgClassExpression73 --> Access80
     __Item75[/"__Item[75∈13]<br />ᐸ74ᐳ"\]:::itemplan
     PgSelectRows74 ==> __Item75
     PgSelectSingle76{{"PgSelectSingle[76∈13]<br />ᐸpost_computed_interval_setᐳ"}}:::plan
     __Item75 --> PgSelectSingle76
     PgClassExpression77{{"PgClassExpression[77∈13]<br />ᐸ__post_com...al_set__.vᐳ"}}:::plan
     PgSelectSingle76 --> PgClassExpression77
+    Access81{{"Access[81∈14]<br />ᐸ77.secondsᐳ"}}:::plan
+    PgClassExpression77 --> Access81
+    Access82{{"Access[82∈14]<br />ᐸ77.minutesᐳ"}}:::plan
+    PgClassExpression77 --> Access82
 
     %% define steps
     classDef bucket0 stroke:#696969
@@ -165,11 +187,11 @@ graph TD
     classDef bucket10 stroke:#ffff00
     class Bucket10,PgClassExpression54 bucket10
     classDef bucket11 stroke:#00ffff
-    class Bucket11 bucket11
+    class Bucket11,Access55,Access58,Access66,Access68,Access70,Access72 bucket11
     classDef bucket12 stroke:#4169e1
-    class Bucket12 bucket12
+    class Bucket12,Access78,Access79,Access80 bucket12
     classDef bucket13 stroke:#3cb371
     class Bucket13,__Item75,PgSelectSingle76,PgClassExpression77 bucket13
     classDef bucket14 stroke:#a52a2a
-    class Bucket14 bucket14
+    class Bucket14,Access81,Access82 bucket14
 

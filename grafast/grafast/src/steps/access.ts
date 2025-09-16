@@ -1,127 +1,56 @@
 import chalk from "chalk";
-import type { TE } from "tamedevil";
-import te from "tamedevil";
 
-import { inspect } from "../inspect.js";
 import type { ExecutionExtra, UnbatchedExecutionExtra } from "../interfaces.js";
 import type { Step } from "../step.js";
 import { UnbatchedStep } from "../step.js";
 import { arraysMatch, digestKeys } from "../utils.js";
 
-/** @internal */
-export const expressionSymbol = Symbol("expression");
-
-// We could use an LRU here, but there's no need - there's only 100 possible values;
-type Factory = (
-  fallback: any,
-  ...path: Array<string | number | symbol>
-) => (_extra: ExecutionExtra, value: any) => any;
-const makeDestructureCache: { [signature: string]: Factory | undefined } =
-  Object.create(null);
-const makingDestructureCache: {
-  [signature: string]: Array<(factory: Factory) => void> | undefined;
-} = Object.create(null);
-
 /**
  * Returns a function that will extract the value at the given path from an
- * incoming object. If possible it will return a dynamically constructed
- * function which will enable V8 to optimise the function over time via the
- * JIT.
+ * incoming object. Optimized functions for common cases
  */
 function constructDestructureFunction(
-  path: (string | number | symbol)[],
+  path: ReadonlyArray<PropertyKey>,
   fallback: any,
   callback: (fn: (_extra: ExecutionExtra, value: any) => any) => void,
 ): void {
   const n = path.length;
-  /** 0 - slow mode; 1 - middle mode; 2 - turbo mode */
-  let mode: 0 | 1 | 2 = n > 50 || n < 1 ? 0 : n > 5 ? 1 : 2;
-
-  for (let i = 0; i < n; i++) {
-    const pathItem = path[i];
-    const t = typeof pathItem;
-    if (t === "symbol") {
-      // Cannot use in superfast mode (because cannot create signature)
-      if (mode === 2) mode = 1;
-    } else if (t === "string") {
-      // Cannot use in superfast mode (because signature becomes ambiguous)
-      if (mode === 2 && (pathItem as string).includes("|")) mode = 1;
-    } else if (t === "number") {
-      if (!Number.isFinite(pathItem)) {
-        mode = 0;
-      }
-    } else if (pathItem == null) {
-      // Slow mode required
-      mode = 0;
+  if (n === 0) {
+    if (fallback === undefined) {
+      callback((_meta, value) => value);
     } else {
-      throw new Error(
-        `Invalid path item: ${inspect(pathItem)} in path '${JSON.stringify(
-          path,
-        )}'`,
-      );
+      callback((_meta, value) => value ?? fallback);
     }
-  }
-
-  if (mode === 0) {
-    // Slow mode
+  } else if (n === 1) {
+    const [p0] = path;
+    if (fallback === undefined) {
+      callback((_meta, value) => value?.[p0]);
+    } else {
+      callback((_meta, value) => value?.[p0] ?? fallback);
+    }
+  } else if (n === 2) {
+    const [p0, p1] = path;
+    if (fallback === undefined) {
+      callback((_meta, value) => value?.[p0]?.[p1]);
+    } else {
+      callback((_meta, value) => value?.[p0]?.[p1] ?? fallback);
+    }
+  } else if (n === 3) {
+    const [p0, p1, p2] = path;
+    if (fallback === undefined) {
+      callback((_meta, value) => value?.[p0]?.[p1]?.[p2]);
+    } else {
+      callback((_meta, value) => value?.[p0]?.[p1]?.[p2] ?? fallback);
+    }
+  } else {
     callback(function slowlyExtractValueAtPath(_meta: any, value: any): any {
       let current = value;
-      for (let i = 0, l = path.length; i < l && current != null; i++) {
+      for (let i = 0; i < n && current != null; i++) {
         const pathItem = path[i];
         current = current[pathItem];
       }
       return current ?? fallback;
     });
-  } else {
-    const signature = (fallback !== undefined ? "f" : "n") + n;
-
-    const done =
-      mode === 2
-        ? (factory: Factory) => {
-            const fn = factory(fallback, ...path);
-            // ?.blah?.bog?.["!!!"]?.[0]
-            const expressionDetail = [path, fallback];
-            (fn as any)[expressionSymbol] = expressionDetail;
-            callback(fn);
-          }
-        : (factory: Factory) => callback(factory(fallback, ...path));
-
-    const fn = makeDestructureCache[signature];
-    if (fn !== undefined) {
-      done(fn);
-      return;
-    }
-    const making = makingDestructureCache[signature];
-    if (making !== undefined) {
-      making.push(done);
-      return;
-    }
-    const doneHandlers: Array<(fn: Factory) => void> = [done];
-    makingDestructureCache[signature] = doneHandlers;
-
-    // DO NOT REFERENCE 'path' BELOW HERE!
-
-    const names: TE[] = [];
-    const access: TE[] = [];
-    for (let i = 0; i < n; i++) {
-      const te_name = te.identifier(`p${i}`);
-      names.push(te_name);
-      access.push(te`[${te_name}]`);
-    }
-    te.runInBatch<Factory>(
-      te`function (fallback, ${te.join(names, ", ")}) {
-return (_meta, value) => value?.${te.join(access, "?.")}${
-        fallback === undefined ? te.blank : te.cache` ?? fallback`
-      };
-}`,
-      (factory) => {
-        makeDestructureCache[signature] = factory;
-        delete makingDestructureCache[signature];
-        for (const doneHandler of doneHandlers) {
-          doneHandler(factory);
-        }
-      },
-    );
   }
 }
 

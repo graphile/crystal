@@ -49,6 +49,10 @@ graph TD
     List33 --> Lambda34
     PageInfo28{{"PageInfo[28∈3]"}}:::plan
     Connection23 --> PageInfo28
+    Access29{{"Access[29∈3]<br />ᐸ23.hasNextPageᐳ"}}:::plan
+    Connection23 --> Access29
+    Access30{{"Access[30∈3]<br />ᐸ23.hasPreviousPageᐳ"}}:::plan
+    Connection23 --> Access30
 
     %% define steps
     classDef bucket0 stroke:#696969
@@ -58,5 +62,5 @@ graph TD
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression17,Connection23,List33,Lambda34 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PageInfo28 bucket3
+    class Bucket3,PageInfo28,Access29,Access30 bucket3
 

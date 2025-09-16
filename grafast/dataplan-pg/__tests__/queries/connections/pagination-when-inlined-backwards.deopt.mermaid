@@ -11,7 +11,7 @@ graph TD
     Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 10, 11, 76, 79, 80, 12, 14, 29<br />2: PgSelect[9]<br />3: PgSelectRows[15]"):::bucket
     Bucket1("Bucket 1 (listItem)<br />Deps: 12, 76, 29<br /><br />ROOT __Item{1}ᐸ15ᐳ[16]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 17, 12, 76, 29<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[17]<br />1: <br />ᐳ: 18, 20, 26<br />2: PgSelect[21]<br />3: Connection[25]"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 25, 12, 20, 76, 26, 29, 21<br /><br />ROOT Connection{2}ᐸ21ᐳ[25]<br />1: ConnectionItems[30], PgSelect[36]<br />ᐳ: 35, 47, 46, 48, 49, 50<br />2: PgSelectRows[38]<br />ᐳ: 37, 39, 40"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 25, 12, 20, 76, 26, 29, 21<br /><br />ROOT Connection{2}ᐸ21ᐳ[25]<br />1: ConnectionItems[30], PgSelect[36]<br />ᐳ: 35, 44, 45, 47, 46, 48, 49, 50<br />2: PgSelectRows[38]<br />ᐳ: 37, 39, 40"):::bucket
     Bucket6("Bucket 6 (listItem)<br />Deps: 47, 12<br /><br />ROOT __Item{6}ᐸ30ᐳ[41]"):::bucket
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 42, 12<br /><br />ROOT PgSelectSingle{6}ᐸmessagesᐳ[42]<br />1: <br />ᐳ: 51, 54<br />2: PgSelect[55]<br />3: PgSelectRows[60]<br />ᐳ: First[59], PgSelectSingle[61]"):::bucket
     Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 43, 42, 12, 53<br /><br />ROOT Edge{6}[43]"):::bucket
@@ -77,6 +77,10 @@ graph TD
     First37 --> PgSelectSingle39
     PgClassExpression40{{"PgClassExpression[40∈3]<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle39 --> PgClassExpression40
+    Access44{{"Access[44∈3]<br />ᐸ25.hasNextPageᐳ"}}:::plan
+    Connection25 --> Access44
+    Access45{{"Access[45∈3]<br />ᐸ25.hasPreviousPageᐳ"}}:::plan
+    Connection25 --> Access45
     ConnectionItems30 --> First46
     PgSelect21 --> Access47
     ConnectionItems30 --> Last49
@@ -129,7 +133,7 @@ graph TD
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression18,PgClassExpression20,PgSelect21,Connection25,PgClassExpression26 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,ConnectionItems30,PageInfo35,PgSelect36,First37,PgSelectRows38,PgSelectSingle39,PgClassExpression40,First46,Access47,PgCursor48,Last49,PgCursor50 bucket3
+    class Bucket3,ConnectionItems30,PageInfo35,PgSelect36,First37,PgSelectRows38,PgSelectSingle39,PgClassExpression40,Access44,Access45,First46,Access47,PgCursor48,Last49,PgCursor50 bucket3
     classDef bucket6 stroke:#ff1493
     class Bucket6,__Item41,PgSelectSingle42,Edge43,PgCursor53 bucket6
     classDef bucket7 stroke:#808000

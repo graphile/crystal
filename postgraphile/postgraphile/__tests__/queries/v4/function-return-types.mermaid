@@ -793,6 +793,10 @@ graph TD
     PgSelectSingle282 --> PgClassExpression382
     PgClassExpression393{{"PgClassExpression[393∈45]<br />ᐸ__func_ret...l__.”col2”ᐳ"}}:::plan
     PgSelectSingle282 --> PgClassExpression393
+    Access383{{"Access[383∈46]<br />ᐸ287.hoursᐳ"}}:::plan
+    PgClassExpression287 --> Access383
+    Access394{{"Access[394∈46]<br />ᐸ287.minutesᐳ"}}:::plan
+    PgClassExpression287 --> Access394
     PgClassExpression401{{"PgClassExpression[401∈47] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgSelectSingle308 --> PgClassExpression401
     PgClassExpression413{{"PgClassExpression[413∈47] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
@@ -1008,7 +1012,7 @@ graph TD
     classDef bucket45 stroke:#00ffff
     class Bucket45,PgClassExpression382,PgClassExpression393 bucket45
     classDef bucket46 stroke:#4169e1
-    class Bucket46 bucket46
+    class Bucket46,Access383,Access394 bucket46
     classDef bucket47 stroke:#3cb371
     class Bucket47,PgClassExpression401,PgClassExpression413 bucket47
     classDef bucket48 stroke:#a52a2a

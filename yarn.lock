@@ -13825,7 +13825,6 @@ __metadata:
     pg-sql2: "workspace:^"
     spec-md: "npm:^3.1.0"
     sqlite3: "npm:^5.1.7"
-    tamedevil: "workspace:^"
     ts-node: "npm:^10.9.2"
     tsafe: "npm:^1.8.5"
     tslib: "npm:^2.8.1"

@@ -66,6 +66,8 @@ graph TD
     First33 --> PgSelectSingle35
     PgClassExpression36{{"PgClassExpression[36∈3]<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle35 --> PgClassExpression36
+    Access37{{"Access[37∈3]<br />ᐸ25.hasNextPageᐳ"}}:::plan
+    Connection25 --> Access37
 
     %% define steps
     classDef bucket0 stroke:#696969
@@ -75,5 +77,5 @@ graph TD
     classDef bucket2 stroke:#7f007f
     class Bucket2,Connection25,List40,Lambda41,List44,Lambda45 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PageInfo31,First33,PgSelectRows34,PgSelectSingle35,PgClassExpression36 bucket3
+    class Bucket3,PageInfo31,First33,PgSelectRows34,PgSelectSingle35,PgClassExpression36,Access37 bucket3
 

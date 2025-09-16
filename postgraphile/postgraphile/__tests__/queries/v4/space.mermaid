@@ -13,8 +13,8 @@ graph TD
     Bucket3("Bucket 3 (listItem)<br /><br />ROOT __Item{3}ᐸ14ᐳ[17]"):::bucket
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 18<br /><br />ROOT PgSelectSingle{3}ᐸspacecraftᐳ[18]"):::bucket
     Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 27<br /><br />ROOT PgClassExpression{4}ᐸ(1/0) /* E...ferred! */ᐳ[27]"):::bucket
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 28, 27<br /><br />ROOT Access{5}ᐸ27.startᐳ[28]"):::bucket
-    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 29, 27<br /><br />ROOT Access{5}ᐸ27.endᐳ[29]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 27, 28<br /><br />ROOT Access{5}ᐸ27.startᐳ[28]"):::bucket
+    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 27, 29<br /><br />ROOT Access{5}ᐸ27.endᐳ[29]"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket3
@@ -55,6 +55,14 @@ graph TD
     PgClassExpression27 --> Access28
     Access29{{"Access[29∈5]<br />ᐸ27.endᐳ"}}:::plan
     PgClassExpression27 --> Access29
+    Access30{{"Access[30∈6]<br />ᐸ27.start.valueᐳ"}}:::plan
+    PgClassExpression27 --> Access30
+    Access32{{"Access[32∈6]<br />ᐸ27.start.inclusiveᐳ"}}:::plan
+    PgClassExpression27 --> Access32
+    Access31{{"Access[31∈7]<br />ᐸ27.end.valueᐳ"}}:::plan
+    PgClassExpression27 --> Access31
+    Access33{{"Access[33∈7]<br />ᐸ27.end.inclusiveᐳ"}}:::plan
+    PgClassExpression27 --> Access33
 
     %% define steps
     classDef bucket0 stroke:#696969
@@ -68,7 +76,7 @@ graph TD
     classDef bucket5 stroke:#7fff00
     class Bucket5,Access28,Access29 bucket5
     classDef bucket6 stroke:#ff1493
-    class Bucket6 bucket6
+    class Bucket6,Access30,Access32 bucket6
     classDef bucket7 stroke:#808000
-    class Bucket7 bucket7
+    class Bucket7,Access31,Access33 bucket7
 

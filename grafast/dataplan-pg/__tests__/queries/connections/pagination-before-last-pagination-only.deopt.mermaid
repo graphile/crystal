@@ -37,10 +37,14 @@ graph TD
     First20 --> PgSelectSingle22
     PageInfo18{{"PageInfo[18∈1] ➊"}}:::plan
     Connection14 --> PageInfo18
+    Access24{{"Access[24∈1] ➊<br />ᐸ14.hasNextPageᐳ"}}:::plan
+    Connection14 --> Access24
+    Access25{{"Access[25∈1] ➊<br />ᐸ14.hasPreviousPageᐳ"}}:::plan
+    Connection14 --> Access25
 
     %% define steps
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,PgSelect10,Access11,Access12,Object13,Connection14,Lambda16,Lambda17,PgSelect19,First20,PgSelectRows21,PgSelectSingle22 bucket0
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PageInfo18 bucket1
+    class Bucket1,PageInfo18,Access24,Access25 bucket1
 

@@ -1,7 +1,5 @@
 // import debugFactory from "debug";
 
-import te, { isSafeObjectPropertyName } from "tamedevil";
-
 import { isDev } from "../dev.js";
 import type {
   DataFromStep,
@@ -12,6 +10,7 @@ import type {
 } from "../interfaces.js";
 import type { Step } from "../step.js";
 import { UnbatchedStep } from "../step.js";
+import { isSafeObjectPropertyName } from "../tamedevilUtils";
 import { digestKeys } from "../utils.js";
 import { constant, ConstantStep } from "./constant.js";
 
@@ -171,78 +170,171 @@ export class ObjectStep<
       ) => DataFromObjectSteps<TPlans>,
     ) => void,
   ): void {
-    if (this.keys.length === 0) {
-      // Shortcut simple case
-      return callback(() => EMPTY_OBJECT);
-    }
     const keysAreSafe = this.keys.every(isSafeObjectPropertyName);
-    const inner = keysAreSafe
-      ? te`\
-  const newObj = {
-${te.join(
-  this.keys.map(
-    (key, i) => te`    ${te.safeKeyOrThrow(key)}: ${te.identifier(`val${i}`)}`,
-  ),
-  ",\n",
-)}
-  };
-`
-      : te`\
-  const newObj = Object.create(null);
-${te.join(
-  this.keys.map(
-    (key, i) =>
-      te`  newObj${te.set(key, true)} = ${te.identifier(`val${i}`)};\n`,
-  ),
-  "",
-)}\
-`;
-    const vals = te.join(
-      this.keys.map((_k, i) => te.identifier(`val${i}`)),
-      ", ",
-    );
-    if (this.cacheSize > 0) {
-      return te.runInBatch<Parameters<typeof callback>[0]>(
-        te`\
-(function ({ meta }, ${vals}) {
-  if (meta.nextIndex != null) {
-    for (let i = 0, l = meta.results.length; i < l; i++) {
-      const [values, obj] = meta.results[i];
-      if (${te.join(
-        this.keys.map(
-          (_key, i) => te`values[${te.lit(i)}] === ${te.identifier(`val${i}`)}`,
-        ),
-        " && ",
-      )}) {
-        return obj;
+    // Optimize common cases
+    if (keysAreSafe) {
+      if (this.cacheSize === 0 || this.keys.length === 0) {
+        switch (this.keys.length) {
+          case 0: {
+            return callback(() => EMPTY_OBJECT);
+          }
+          case 1: {
+            const [k0] = this.keys;
+            return callback((_, val0) => ({ [k0]: val0 }) as any);
+          }
+          case 2: {
+            const [k0, k1] = this.keys;
+            return callback(
+              (_, val0, val1) => ({ [k0]: val0, [k1]: val1 }) as any,
+            );
+          }
+          case 3: {
+            const [k0, k1, k2] = this.keys;
+            return callback(
+              (_, val0, val1, val2) =>
+                ({ [k0]: val0, [k1]: val1, [k2]: val2 }) as any,
+            );
+          }
+          case 4: {
+            const [k0, k1, k2, k3] = this.keys;
+            return callback(
+              (_, val0, val1, val2, val3) =>
+                ({ [k0]: val0, [k1]: val1, [k2]: val2, [k3]: val3 }) as any,
+            );
+          }
+          case 5: {
+            const [k0, k1, k2, k3, k4] = this.keys;
+            return callback(
+              (_, val0, val1, val2, val3, val4) =>
+                ({
+                  [k0]: val0,
+                  [k1]: val1,
+                  [k2]: val2,
+                  [k3]: val3,
+                  [k4]: val4,
+                }) as any,
+            );
+          }
+          case 6: {
+            const [k0, k1, k2, k3, k4, k5] = this.keys;
+            return callback(
+              (_, val0, val1, val2, val3, val4, val5) =>
+                ({
+                  [k0]: val0,
+                  [k1]: val1,
+                  [k2]: val2,
+                  [k3]: val3,
+                  [k4]: val4,
+                  [k5]: val5,
+                }) as any,
+            );
+          }
+        }
+      } else {
+        const maxIdx = this.cacheSize - 1;
+        switch (this.keys.length) {
+          case 1: {
+            const [k0] = this.keys;
+            return callback((extra, val0) => {
+              const meta = extra.meta as { nextIndex?: number; results: any[] };
+              if (meta.nextIndex == null) {
+                meta.nextIndex = 0;
+                meta.results = [];
+              } else {
+                const cacheLen = meta.results.length;
+                for (let cacheIdx = 0; cacheIdx < cacheLen; cacheIdx++) {
+                  const [cache0, obj] = meta.results[cacheIdx];
+                  if (cache0 === val0) {
+                    return obj;
+                  }
+                }
+              }
+
+              const obj = { [k0]: val0 } as any;
+
+              meta.results[meta.nextIndex] = [val0, obj];
+              // Only cache `this.cacheSize` results, use a round-robin
+              meta.nextIndex =
+                meta.nextIndex >= maxIdx ? 0 : meta.nextIndex + 1;
+
+              return obj;
+            });
+          }
+          case 2: {
+            const [k0, k1] = this.keys;
+            return callback((extra, val0, val1) => {
+              const meta = extra.meta as { nextIndex?: number; results: any[] };
+              if (meta.nextIndex == null) {
+                meta.nextIndex = 0;
+                meta.results = [];
+              } else {
+                const cacheLen = meta.results.length;
+                for (let cacheIdx = 0; cacheIdx < cacheLen; cacheIdx++) {
+                  const [cache0, cache1, obj] = meta.results[cacheIdx];
+                  if (cache0 === val0 && cache1 === val1) {
+                    return obj;
+                  }
+                }
+              }
+
+              const obj = { [k0]: val0, [k1]: val1 } as any;
+
+              meta.results[meta.nextIndex] = [val0, val1, obj];
+              // Only cache `this.cacheSize` results, use a round-robin
+              meta.nextIndex =
+                meta.nextIndex >= maxIdx ? 0 : meta.nextIndex + 1;
+
+              return obj;
+            });
+          }
+        }
       }
     }
-  } else {
-    meta.nextIndex = 0;
-    meta.results = [];
-  }
-${inner}
-  meta.results[meta.nextIndex] = [[${te.join(
-    this.keys.map((_key, i) => te.identifier(`val${i}`)),
-    ",",
-  )}], newObj];
-  // Only cache ${te.lit(this.cacheSize)} results, use a round-robin
-  meta.nextIndex = meta.nextIndex === ${te.lit(
-    this.cacheSize - 1,
-  )} ? 0 : meta.nextIndex + 1;
-  return newObj;
-})`,
-        callback,
-      );
+    const keys = this.keys;
+    const keyCount = keys.length;
+    if (this.cacheSize > 0) {
+      // NOTE: `peerKey` ensures that the keys match, so we only need to check values
+      return callback((extra, ...vals) => {
+        const meta = extra.meta as { nextIndex?: number; results: any[] };
+        if (meta.nextIndex != null) {
+          nextMetaResult: for (
+            let metaResultIndex = 0, metaResultLength = meta.results.length;
+            metaResultIndex < metaResultLength;
+            metaResultIndex++
+          ) {
+            const [cacheValues, obj] = meta.results[metaResultIndex];
+            for (let keyIndex = 0; keyIndex < keyCount; keyIndex++) {
+              if (cacheValues[keyIndex] !== vals[keyIndex]) {
+                continue nextMetaResult;
+              }
+            }
+            return obj;
+          }
+        } else {
+          meta.nextIndex = 0;
+          meta.results = [];
+        }
+
+        const obj = Object.create(null);
+        for (let keyIndex = 0; keyIndex < keyCount; keyIndex++) {
+          obj[keys[keyIndex]] = vals[keyIndex];
+        }
+
+        meta.results[meta.nextIndex] = [vals, obj];
+        // Only cache `this.cacheSize` results, use a round-robin
+        meta.nextIndex =
+          meta.nextIndex >= this.cacheSize - 1 ? 0 : meta.nextIndex + 1;
+
+        return obj;
+      });
     } else {
-      return te.runInBatch<Parameters<typeof callback>[0]>(
-        te`\
-(function (_, ${vals}) {
-${inner}
-  return newObj;
-})`,
-        callback,
-      );
+      return callback((_, ...values) => {
+        const obj = Object.create(null);
+        for (let keyIndex = 0; keyIndex < keyCount; keyIndex++) {
+          obj[keys[keyIndex]] = values[keyIndex];
+        }
+        return obj;
+      });
     }
   }
 

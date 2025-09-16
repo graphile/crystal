@@ -11,7 +11,7 @@ graph TD
     Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 9, 10, 38, 39, 40, 41, 11, 13, 18, 26, 30<br />2: PgSelect[8]<br />3: PgSelectRows[14]"):::bucket
     Bucket1("Bucket 1 (listItem)<br />Deps: 11, 40, 26, 30<br /><br />ROOT __Item{1}ᐸ14ᐳ[15]"):::bucket
     Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 11, 40, 26, 30<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[16]<br />1: <br />ᐳ: 20, 27<br />2: PgSelect[21]<br />3: Connection[25]"):::bucket
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 25, 11, 20, 40, 26, 27, 30<br /><br />ROOT Connection{2}ᐸ21ᐳ[25]<br />1: PgSelect[32]<br />ᐳ: PageInfo[31]<br />2: PgSelectRows[34]<br />ᐳ: 33, 35, 36"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 25, 11, 20, 40, 26, 27, 30<br /><br />ROOT Connection{2}ᐸ21ᐳ[25]<br />1: PgSelect[32]<br />ᐳ: PageInfo[31], Access[37]<br />2: PgSelectRows[34]<br />ᐳ: 33, 35, 36"):::bucket
     end
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
@@ -58,6 +58,8 @@ graph TD
     First33 --> PgSelectSingle35
     PgClassExpression36{{"PgClassExpression[36∈3]<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle35 --> PgClassExpression36
+    Access37{{"Access[37∈3]<br />ᐸ25.hasNextPageᐳ"}}:::plan
+    Connection25 --> Access37
 
     %% define steps
     classDef bucket0 stroke:#696969
@@ -67,5 +69,5 @@ graph TD
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression20,PgSelect21,Connection25,PgClassExpression27 bucket2
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PageInfo31,PgSelect32,First33,PgSelectRows34,PgSelectSingle35,PgClassExpression36 bucket3
+    class Bucket3,PageInfo31,PgSelect32,First33,PgSelectRows34,PgSelectSingle35,PgClassExpression36,Access37 bucket3
 

@@ -29,7 +29,7 @@ graph TD
     Access11{{"Access[11∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
     Access12{{"Access[12∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access11 & Access12 --> Object13
-    Connection14[["Connection[14∈0] ➊<br />ᐸ10ᐳ<br />Dependents: 2<br />More deps:<br />- Constantᐸ3ᐳ[39]"]]:::plan
+    Connection14[["Connection[14∈0] ➊<br />ᐸ10ᐳ<br />Dependents: 4<br />More deps:<br />- Constantᐸ3ᐳ[39]"]]:::plan
     PgSelect10 --> Connection14
     Access8{{"Access[8∈0] ➊<br />ᐸ0.orderByᐳ"}}:::plan
     __Value0["__Value[0∈0] ➊<br />ᐸvariableValuesᐳ"]:::plan
@@ -50,6 +50,8 @@ graph TD
     PgSelect10 --> Access28
     Last30{{"Last[30∈0] ➊<br />More deps:<br />- ConnectionItems[22]"}}:::plan
     PageInfo16{{"PageInfo[16∈1] ➊<br />More deps:<br />- Connection[14]"}}:::plan
+    Access32{{"Access[32∈1] ➊<br />ᐸ14.hasNextPageᐳ<br />More deps:<br />- Connection[14]"}}:::plan
+    Access33{{"Access[33∈1] ➊<br />ᐸ14.hasPreviousPageᐳ<br />More deps:<br />- Connection[14]"}}:::plan
     Edge26{{"Edge[26∈3]"}}:::plan
     __Item25[/"__Item[25∈3]<br />ᐸ22ᐳ<br />More deps:<br />- ConnectionItems[22]"\]:::itemplan
     PgCursor35{{"PgCursor[35∈3]<br />More deps:<br />- Access[28]"}}:::plan
@@ -66,7 +68,7 @@ graph TD
     classDef bucket0 stroke:#696969
     class Bucket0,__Value0,__Value2,Access8,PgSelect10,Access11,Access12,Object13,Connection14,ApplyInput15,PgSelect17,First18,PgSelectRows19,PgSelectSingle20,ConnectionItems22,First27,Access28,Last30 bucket0
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PageInfo16 bucket1
+    class Bucket1,PageInfo16,Access32,Access33 bucket1
     classDef bucket3 stroke:#ffa500
     class Bucket3,__Item25,Edge26,PgCursor35 bucket3
     classDef bucket4 stroke:#0000ff
