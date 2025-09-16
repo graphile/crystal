@@ -665,11 +665,11 @@ if (!disallowedKeys.includes("__proto__")) {
  * null prototype), false otherwise.
  */
 export const isSafeObjectPropertyName = (key: string | symbol | number) =>
-  (typeof key === "number" ||
-    typeof key === "symbol" ||
+  typeof key === "number" ||
+  ((typeof key === "symbol" ||
     (typeof key === "string" &&
       /^(?:[0-9a-z$]|_[a-z0-9$])[a-z0-9_$]*$/i.test(key))) &&
-  !disallowedKeys.includes(key);
+    !disallowedKeys.includes(key));
 
 /**
  * Returns true if you can use the given key as the key to a POJO without

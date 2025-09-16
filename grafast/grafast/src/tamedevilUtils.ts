@@ -57,7 +57,7 @@ export const stringifyJSON = (value: any): string => {
  * Values that cannot safely be used as the keys on a POJO (`{}`) due to
  * security or similar concerns. For example `__proto__` is disallowed.
  */
-const disallowedKeys: Array<string | symbol | number> = [
+const disallowedKeys: Array<string | symbol> = [
   ...Object.getOwnPropertyNames(Object.prototype),
   ...Object.getOwnPropertySymbols(Object.prototype),
 ];
@@ -72,8 +72,8 @@ if (!disallowedKeys.includes("__proto__")) {
  * null prototype), false otherwise.
  */
 export const isSafeObjectPropertyName = (key: string | symbol | number) =>
-  (typeof key === "number" ||
-    typeof key === "symbol" ||
+  typeof key === "number" ||
+  ((typeof key === "symbol" ||
     (typeof key === "string" &&
       /^(?:[0-9a-z$]|_[a-z0-9$])[a-z0-9_$]*$/i.test(key))) &&
-  !disallowedKeys.includes(key);
+    !disallowedKeys.includes(key));
