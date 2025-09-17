@@ -91,6 +91,7 @@ delete from issue_2287.users cascade;
 delete from issue_2212.orders cascade;
 delete from issue_2212.user_contacts cascade;
 delete from issue_2212.users cascade;
+delete from function_returning_enum.applicants cascade;
 
 alter table b.types enable trigger user;
 
