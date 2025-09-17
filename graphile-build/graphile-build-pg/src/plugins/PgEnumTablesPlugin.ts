@@ -396,6 +396,14 @@ Original error: ${e.message}
           attribute.codec = replacementCodec;
         }
       },
+      // Make sure all our codecs are registered, even if they're not
+      // referenced via relations
+      async pgRegistry_PgRegistryBuilder_pgCodecs(info, event) {
+        const { registryBuilder } = event;
+        for (const enumCodec of info.state.codecByPgConstraint.values()) {
+          registryBuilder.addCodec(enumCodec);
+        }
+      },
     },
   }),
   schema: {
