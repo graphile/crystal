@@ -140,7 +140,7 @@ export const CommonTypesPlugin: GraphileConfig.Plugin = {
                     )
                   ) {
                     throw new GraphQLError(
-                      "Invalid UUID, expected 32 hexadecimal characters, optionally with hypens",
+                      "Invalid UUID, expected 32 hexadecimal characters, optionally with hyphens",
                     );
                   }
                   return string;

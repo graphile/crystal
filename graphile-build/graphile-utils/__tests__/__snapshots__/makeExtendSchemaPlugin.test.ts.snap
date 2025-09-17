@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`enables overriding scope 1`] = `
 """"The root query type which gives access points into the data universe."""
@@ -864,6 +864,110 @@ input DeleteUserByRowIdInput {
   clientMutationId: String
   rowId: Int!
 }"
+`;
+
+exports[`exposes types even if they're not directly referenced 1`] = `
+type A implements Named {
+  name: String!
+  a: Int!
+  nameLanguage: String
+}
+
+union ABC = A | B | C
+
+type B implements Named {
+  name(suffix: String): String!
+  b: Int!
+  nameLanguage: String
+}
+
+type C {
+  c: Int!
+}
+
+type D implements Named {
+  name: String!
+  d: Int!
+  nameLanguage: String
+}
+
+interface Named {
+  name: String!
+  nameLanguage: String
+}
+
+"""An object with a globally unique \`ID\`."""
+interface Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  id: ID!
+}
+
+"""The root query type which gives access points into the data universe."""
+type Query implements Node {
+  """
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  """
+  query: Query!
+
+  """
+  The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
+  """
+  id: ID!
+
+  """Fetches an object given its globally unique \`ID\`."""
+  node(
+    """The globally unique \`ID\`."""
+    id: ID!
+  ): Node
+  abc: [ABC!]
+  named: [Named!]
+}
+`;
+
+exports[`exposes types even if they're not directly referenced 2`] = `
+{
+  "abc": [
+    {
+      "__typename": "A",
+      "a": 1,
+      "name": "A-one",
+      "nameLanguage": "en",
+    },
+    {
+      "__typename": "B",
+      "b": 2,
+      "name": "B-two",
+      "nameLanguage": "en",
+    },
+    {
+      "__typename": "C",
+      "c": 3,
+    },
+  ],
+  "named": [
+    {
+      "__typename": "A",
+      "a": 1,
+      "name": "A-one",
+      "nameLanguage": "en",
+    },
+    {
+      "__typename": "B",
+      "b": 2,
+      "name": "B-two",
+      "nameLanguage": "en",
+    },
+    {
+      "__typename": "D",
+      "d": 3,
+      "name": "D-three",
+      "nameLanguage": "en",
+    },
+  ],
+}
 `;
 
 exports[`infers scope 1`] = `

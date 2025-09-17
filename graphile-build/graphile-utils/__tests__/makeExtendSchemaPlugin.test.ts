@@ -1,6 +1,6 @@
 import { pgSelect, TYPES } from "@dataplan/pg";
 import { makePgService } from "@dataplan/pg/adaptors/pg";
-import { connection, constant, grafast } from "grafast";
+import { connection, constant, grafast, grafastGraphql, lambda } from "grafast";
 import type { GraphQLObjectType } from "grafast/graphql";
 import { GraphQLScalarType, printSchema } from "grafast/graphql";
 import { buildSchema, QueryPlugin } from "graphile-build";
@@ -644,4 +644,149 @@ it("scope", async () => {
       test10: 10,
     },
   });
+});
+
+it("exposes types even if they're not directly referenced", async () => {
+  const preset: GraphileConfig.Preset = {
+    extends: [PostGraphileAmberPreset],
+    plugins: [
+      extendSchema((_build) => ({
+        typeDefs: gql`
+          interface Named {
+            name: String!
+          }
+          type A implements Named {
+            name: String!
+            a: Int!
+          }
+          type B implements Named {
+            name(suffix: String): String!
+            b: Int!
+          }
+          type C {
+            c: Int!
+          }
+          # A child type that has no explicit references
+          type D implements Named {
+            name: String!
+            d: Int!
+          }
+          union ABC = A | B | C
+          extend type Query {
+            abc: [ABC!]
+            named: [Named!]
+          }
+          extend interface Named {
+            nameLanguage: String
+          }
+          extend type A {
+            nameLanguage: String
+          }
+          extend type B {
+            nameLanguage: String
+          }
+          extend type D {
+            nameLanguage: String
+          }
+        `,
+        objects: {
+          Query: {
+            plans: {
+              abc: () =>
+                constant([
+                  { name: "A-one", a: 1, nameLanguage: "en" },
+                  { name: "B-two", b: 2, nameLanguage: "en" },
+                  { c: 3 },
+                ]),
+              named: () =>
+                constant([
+                  { name: "A-one", a: 1, nameLanguage: "en" },
+                  { name: "B-two", b: 2, nameLanguage: "en" },
+                  { name: "D-three", d: 3, nameLanguage: "en" },
+                ]),
+            },
+          },
+        },
+        unions: {
+          ABC: {
+            planType: EXPORTABLE(
+              (lambda) =>
+                function planType($specifier) {
+                  const $__typename = lambda($specifier, (obj: any) => {
+                    if (obj.a != null) return "A";
+                    if (obj.b != null) return "B";
+                    if (obj.c != null) return "C";
+                    return null;
+                  });
+                  return { $__typename };
+                },
+              [lambda],
+            ),
+          },
+        },
+        interfaces: {
+          Named: {
+            planType: EXPORTABLE(
+              (lambda) =>
+                function planType($specifier) {
+                  const $__typename = lambda($specifier, (obj: any) => {
+                    if (obj.a != null) return "A";
+                    if (obj.b != null) return "B";
+                    if (obj.d != null) return "D";
+                    return null;
+                  });
+                  return { $__typename };
+                },
+              [lambda],
+            ),
+          },
+        },
+      })),
+    ],
+  };
+  const { schema, resolvedPreset } = await makeSchema(preset);
+  expect(schema).toMatchSnapshot();
+  const result = await grafastGraphql({
+    resolvedPreset,
+    requestContext: {},
+    schema,
+    source: `
+      query {
+        abc {
+          __typename
+          ... on A {
+            name
+            nameLanguage
+            a
+          }
+          ... on B {
+            name
+            nameLanguage
+            b
+          }
+          ... on C {
+            c
+          }
+        }
+        named {
+          __typename
+          name
+          nameLanguage
+          ... on A {
+            a
+          }
+          ... on B {
+            b
+          }
+          ... on D {
+            d
+          }
+        }
+      }
+    `,
+  });
+  if (!("data" in result)) throw new Error(`Invalid result type`);
+  const { data, errors } = result;
+  expect(errors).toBeFalsy();
+  expect(data).toMatchSnapshot();
 });

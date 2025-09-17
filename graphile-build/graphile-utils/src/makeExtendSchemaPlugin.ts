@@ -923,8 +923,9 @@ export function extendSchema(
 
         GraphQLSchema(schema, build, _context) {
           const {
+            inflection,
             makeExtendSchemaPlugin: {
-              [uniquePluginName]: { typeExtensions },
+              [uniquePluginName]: { typeExtensions, newTypes },
             },
           } = build;
           return {
@@ -936,6 +937,14 @@ export function extendSchema(
             types: [
               ...(schema.types || []),
               ...typeExtensions.GraphQLSchema.types,
+              ...[
+                build.getTypeByName(inflection.builtin("Query")),
+                build.getTypeByName(inflection.builtin("Mutation")),
+                build.getTypeByName(inflection.builtin("Subscription")),
+              ].filter((_) => _),
+              ...newTypes.map(({ definition }) =>
+                build.getTypeByName(definition.name.value),
+              ),
             ],
           };
         },
