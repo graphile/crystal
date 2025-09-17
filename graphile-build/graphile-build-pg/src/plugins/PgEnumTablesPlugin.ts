@@ -68,6 +68,13 @@ declare global {
   namespace DataplanPg {
     interface PgCodecExtensions {
       isEnumTableEnum?: boolean;
+      enumTableEnumDetails?: {
+        serviceName: string;
+        schemaName: string;
+        tableName: string;
+        constraintName: string;
+        constraintType: PgConstraint["contype"];
+      };
     }
   }
 }
@@ -326,6 +333,13 @@ Original error: ${e.message}
               const extensions: PgCodecExtensions = {
                 // ENHANCE: more extensions/tags?
                 isEnumTableEnum: true,
+                enumTableEnumDetails: {
+                  serviceName,
+                  schemaName: pgClass.getNamespace()!.nspname,
+                  tableName: pgClass.relname,
+                  constraintType: pgConstraint.contype,
+                  constraintName: pgConstraint.conname,
+                },
                 tags: {
                   name: info.inflection.enumTableEnum({
                     serviceName,
