@@ -21,7 +21,7 @@ type CitationsConnection {
   """
   A list of edges which contains the `Citation` and cursor to aid in pagination.
   """
-  edges: [CitationsEdge!]!
+  edges: [CitationsEdge]!
 
   """A list of `Citation` objects."""
   nodes: [Citation]!
@@ -68,7 +68,7 @@ type CreateCitationPayload {
   """An edge for our `Citation`. May be used by Relay 1."""
   citationEdge(
     """The method to use when ordering `Citation`."""
-    orderBy: [CitationsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [CitationsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): CitationsEdge
 
   """
@@ -118,7 +118,7 @@ type DeleteCitationPayload {
   """An edge for our `Citation`. May be used by Relay 1."""
   citationEdge(
     """The method to use when ordering `Citation`."""
-    orderBy: [CitationsOrderBy!] = [PRIMARY_KEY_ASC]
+    orderBy: [CitationsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): CitationsEdge
 
   """
@@ -222,8 +222,9 @@ type Query implements Node {
     """The globally unique `ID` to be used in selecting a single `Citation`."""
     nodeId: ID!
   ): Citation
+
+  """Get a single `Citation`."""
   citationById(id: Int!): Citation
-  extended: Boolean
 
   """Fetches an object given its globally unique `ID`."""
   node(
