@@ -469,7 +469,7 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
 
         const setGraphQLTypeForPgCodec: GraphileBuild.SetGraphQLTypeForPgCodec =
           (codec, variants, typeName) => {
-            build.assertTypeName(typeName);
+            build.assertTypeName(typeName, true);
 
             let meta = pgCodecMetaLookup.get(codec);
             if (!meta) {
