@@ -129,19 +129,48 @@ export function listen<
   );
 }
 
+const DONE = Object.freeze({ value: undefined as any, done: true });
+
 const withInitialValue = <T>(
   initialVal: T,
-  asyncIterator: AsyncIterableIterator<T>,
-): AsyncIterable<T> => {
-  // TODO: should convert this to manual iterator so we can stop before the
-  // next result resolves (which may never happen)
-  return {
-    [Symbol.asyncIterator]: async function* (): AsyncIterator<T> {
-      yield initialVal;
+  source: AsyncIterable<T>,
+): AsyncIterable<T> => ({
+  [Symbol.asyncIterator](): AsyncIterator<T> {
+    const sourceIterator = source[Symbol.asyncIterator]();
+    let first = true;
+    let done: IteratorResult<T> | null = null;
 
-      for await (const val of asyncIterator) {
-        yield val;
-      }
-    },
-  };
-};
+    return {
+      async next(): Promise<IteratorResult<T>> {
+        if (done) return done;
+        if (first) {
+          first = false;
+          return { value: initialVal, done: false };
+        }
+        const res = await sourceIterator.next();
+        if (res.done) done = res;
+        return res;
+      },
+
+      async return(value?: unknown): Promise<IteratorResult<T>> {
+        done ??= { value: value as T, done: true };
+        if (typeof sourceIterator.return === "function") {
+          try {
+            await sourceIterator.return();
+          } catch {
+            /* noop */
+          }
+        }
+        return done;
+      },
+
+      async throw(err?: unknown): Promise<IteratorResult<T>> {
+        done ??= DONE;
+        if (typeof sourceIterator.throw === "function") {
+          return sourceIterator.throw(err);
+        }
+        throw err;
+      },
+    };
+  },
+});
