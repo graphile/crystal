@@ -42,7 +42,8 @@ export const PgV4SimpleSubscriptionsPlugin = extendSchema((build) => {
         plans: {
           listen: {
             subscribePlan: EXPORTABLE(
-              (context, initialEvent, jsonParse, lambda, listen) => function subscribePlan(
+              (context, initialEvent, jsonParse, lambda, listen) =>
+                function subscribePlan(
                   _$root,
                   { $topic, $initialEvent: $includeInitialEvent },
                 ) {
