@@ -64,6 +64,12 @@ declare global {
       ): string;
     }
   }
+
+  namespace DataplanPg {
+    interface PgCodecExtensions {
+      isEnumTableEnum?: boolean;
+    }
+  }
 }
 
 interface State {

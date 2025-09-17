@@ -520,7 +520,6 @@ declare global {
     interface PgCodecExtensions {
       oid?: string;
       listItemNonNull?: boolean;
-      isEnumTableEnum?: boolean;
     }
 
     /**
