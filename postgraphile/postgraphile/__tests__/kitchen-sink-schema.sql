@@ -2282,7 +2282,7 @@ comment on constraint transportation_enum on function_returning_enum.enum_table 
 insert into function_returning_enum.enum_table (transportation) values ('CAR'), ('BIKE'), ('SUBWAY');
 
 create table function_returning_enum.applicants (
-  id int,
+  id int primary key,
   first_name text,
   last_name text,
   favorite_pet function_returning_enum.animal_type,
