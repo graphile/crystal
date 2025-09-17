@@ -27,7 +27,7 @@ export const PgEnumDomainsPlugin: GraphileConfig.Plugin = {
             // table
             const enumDetails = getEnumDetails(codec);
             if (!enumDetails) continue;
-            const { serviceName, schemaName, tableName } = enumDetails;
+            const { serviceName, schemaName, tableName, match } = enumDetails;
 
             // Find the table
             const tableEnumCodec = Object.values(pgCodecs).find(
@@ -35,8 +35,14 @@ export const PgEnumDomainsPlugin: GraphileConfig.Plugin = {
                 c.extensions?.enumTableEnumDetails?.serviceName ===
                   serviceName &&
                 c.extensions.enumTableEnumDetails.schemaName === schemaName &&
-                c.extensions.enumTableEnumDetails.tableName === tableName &&
-                c.extensions.enumTableEnumDetails.constraintType === "p",
+                (tableName
+                  ? c.extensions.enumTableEnumDetails.tableName === tableName &&
+                    c.extensions.enumTableEnumDetails.constraintType === "p"
+                  : (c.extensions.enumTableEnumDetails.tableName === match &&
+                      c.extensions.enumTableEnumDetails.constraintType ===
+                        "p") ||
+                    match ===
+                      `${c.extensions.enumTableEnumDetails.tableName}_${c.extensions.enumTableEnumDetails.constraintName}`),
             );
             // Use the enum type for this domain
             if (tableEnumCodec) {
@@ -63,7 +69,7 @@ function getEnumDetails(codec: PgCodec) {
   const enumTagValue = codec.extensions?.tags?.enum;
   if (enumTagValue) {
     if (typeof enumTagValue !== "string") return null;
-    return { serviceName, schemaName, tableName: enumTagValue };
+    return { serviceName, schemaName, match: enumTagValue };
   }
   if (!domainName.endsWith(ENUM_DOMAIN_SUFFIX)) return null;
   const keepCount = domainName.length - ENUM_DOMAIN_SUFFIX.length;
