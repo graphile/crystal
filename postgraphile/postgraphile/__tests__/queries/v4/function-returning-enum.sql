@@ -1,260 +1,65 @@
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        'id'::text,
-        (__local_1__."id"),
-        'firstName'::text,
-        (__local_1__."first_name"),
-        'lastName'::text,
-        (__local_1__."last_name"),
-        'stage'::text,
-        (__local_1__."stage"),
-        '@nextStage'::text,
-        (
-          select to_json(__local_2__) as "value"
-          from "function_returning_enum"."applicants_next_stage"(__local_1__) as __local_2__
-          where (TRUE) and (TRUE)
-        ),
-        'favoritePet'::text,
-        (__local_1__."favorite_pet"),
-        '@petFood'::text,
-        (
-          select to_json(__local_3__) as "value"
-          from "function_returning_enum"."applicants_pet_food"(__local_1__) as __local_3__
-          where (TRUE) and (TRUE)
-        ),
-        '@nameLength'::text,
-        (
-          select to_json(__local_4__) as "value"
-          from "function_returning_enum"."applicants_name_length"(__local_1__) as __local_4__
-          where (TRUE) and (TRUE)
-        ),
-        'transportation'::text,
-        (__local_1__."transportation"),
-        '@favoritePetTransportation'::text,
-        (
-          select to_json(__local_5__) as "value"
-          from "function_returning_enum"."applicants_favorite_pet_transportation"(__local_1__) as __local_5__
-          where (TRUE) and (TRUE)
-        )
-      )
-    )
-  ) as "@nodes"
-  from (
-    select __local_1__.*
-    from "function_returning_enum"."applicants" as __local_1__
-    where (
-      "function_returning_enum"."applicants_name_length"(__local_1__) = $1
-    )
-    and (
-      "function_returning_enum"."applicants_next_stage"(__local_1__) = $2
-    ) and (TRUE) and (TRUE)
-  ) __local_1__
-),
-__local_6__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
+select
+  __applicants__."id"::text as "0",
+  __applicants__."first_name" as "1",
+  __applicants__."last_name" as "2",
+  __applicants__."stage"::text as "3",
+  "function_returning_enum"."applicants_next_stage"(__applicants__) as "4",
+  __applicants__."favorite_pet"::text as "5",
+  ("function_returning_enum"."applicants_pet_food"(__applicants__))::text as "6",
+  "function_returning_enum"."applicants_name_length"(__applicants__) as "7",
+  __applicants__."transportation"::text as "8",
+  "function_returning_enum"."applicants_favorite_pet_transportation"(__applicants__) as "9"
+from "function_returning_enum"."applicants" as __applicants__
+where
   (
-    select __local_6__.data
-    from __local_6__
-  ),
-  '[]'::json
-) as "data"
+    "function_returning_enum"."applicants_name_length"(__applicants__) = $1::"function_returning_enum"."length"
+  ) and (
+    "function_returning_enum"."applicants_next_stage"(__applicants__) = $2::"function_returning_enum"."stage_options_enum_domain"
+  )
+order by __applicants__."id" asc;
 
-select to_json(__local_0__) as "value"
+select
+  __text_length__.v as "0"
 from "function_returning_enum"."text_length"(
-  $1,
-  $2
-) as __local_0__
-where (TRUE) and (TRUE)
+  $1::"text",
+  $2::"int4"
+) as __text_length__(v);
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        'id'::text,
-        (__local_1__."id"),
-        'firstName'::text,
-        (__local_1__."first_name"),
-        'lastName'::text,
-        (__local_1__."last_name"),
-        'stage'::text,
-        (__local_1__."stage"),
-        '@nextStage'::text,
-        (
-          select to_json(__local_2__) as "value"
-          from "function_returning_enum"."applicants_next_stage"(__local_1__) as __local_2__
-          where (TRUE) and (TRUE)
-        ),
-        'favoritePet'::text,
-        (__local_1__."favorite_pet"),
-        '@petFood'::text,
-        (
-          select to_json(__local_3__) as "value"
-          from "function_returning_enum"."applicants_pet_food"(__local_1__) as __local_3__
-          where (TRUE) and (TRUE)
-        ),
-        '@nameLength'::text,
-        (
-          select to_json(__local_4__) as "value"
-          from "function_returning_enum"."applicants_name_length"(__local_1__) as __local_4__
-          where (TRUE) and (TRUE)
-        ),
-        'transportation'::text,
-        (__local_1__."transportation"),
-        '@favoritePetTransportation'::text,
-        (
-          select to_json(__local_5__) as "value"
-          from "function_returning_enum"."applicants_favorite_pet_transportation"(__local_1__) as __local_5__
-          where (TRUE) and (TRUE)
-        )
-      )
-    )
-  ) as "@nodes"
-  from "function_returning_enum"."applicants_by_stage"(
-    $1
-  ) as __local_1__
-  where (TRUE) and (TRUE)
-),
-__local_6__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_6__.data
-    from __local_6__
-  ),
-  '[]'::json
-) as "data"
+select
+  __applicants_by_stage__."id"::text as "0",
+  __applicants_by_stage__."first_name" as "1",
+  __applicants_by_stage__."last_name" as "2",
+  __applicants_by_stage__."stage"::text as "3",
+  "function_returning_enum"."applicants_next_stage"(__applicants_by_stage__) as "4",
+  __applicants_by_stage__."favorite_pet"::text as "5",
+  ("function_returning_enum"."applicants_pet_food"(__applicants_by_stage__))::text as "6",
+  "function_returning_enum"."applicants_name_length"(__applicants_by_stage__) as "7",
+  __applicants_by_stage__."transportation"::text as "8",
+  "function_returning_enum"."applicants_favorite_pet_transportation"(__applicants_by_stage__) as "9"
+from "function_returning_enum"."applicants_by_stage"($1::"function_returning_enum"."stage_options_enum_domain") as __applicants_by_stage__;
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        'id'::text,
-        (__local_1__."id"),
-        'firstName'::text,
-        (__local_1__."first_name"),
-        'lastName'::text,
-        (__local_1__."last_name"),
-        'stage'::text,
-        (__local_1__."stage"),
-        '@nextStage'::text,
-        (
-          select to_json(__local_2__) as "value"
-          from "function_returning_enum"."applicants_next_stage"(__local_1__) as __local_2__
-          where (TRUE) and (TRUE)
-        ),
-        'favoritePet'::text,
-        (__local_1__."favorite_pet"),
-        '@petFood'::text,
-        (
-          select to_json(__local_3__) as "value"
-          from "function_returning_enum"."applicants_pet_food"(__local_1__) as __local_3__
-          where (TRUE) and (TRUE)
-        ),
-        '@nameLength'::text,
-        (
-          select to_json(__local_4__) as "value"
-          from "function_returning_enum"."applicants_name_length"(__local_1__) as __local_4__
-          where (TRUE) and (TRUE)
-        ),
-        'transportation'::text,
-        (__local_1__."transportation"),
-        '@favoritePetTransportation'::text,
-        (
-          select to_json(__local_5__) as "value"
-          from "function_returning_enum"."applicants_favorite_pet_transportation"(__local_1__) as __local_5__
-          where (TRUE) and (TRUE)
-        )
-      )
-    )
-  ) as "@nodes"
-  from "function_returning_enum"."applicants_by_favorite_pet"(
-    $1
-  ) as __local_1__
-  where (TRUE) and (TRUE)
-),
-__local_6__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_6__.data
-    from __local_6__
-  ),
-  '[]'::json
-) as "data"
+select
+  __applicants_by_favorite_pet__."id"::text as "0",
+  __applicants_by_favorite_pet__."first_name" as "1",
+  __applicants_by_favorite_pet__."last_name" as "2",
+  __applicants_by_favorite_pet__."stage"::text as "3",
+  "function_returning_enum"."applicants_next_stage"(__applicants_by_favorite_pet__) as "4",
+  __applicants_by_favorite_pet__."favorite_pet"::text as "5",
+  ("function_returning_enum"."applicants_pet_food"(__applicants_by_favorite_pet__))::text as "6",
+  "function_returning_enum"."applicants_name_length"(__applicants_by_favorite_pet__) as "7",
+  __applicants_by_favorite_pet__."transportation"::text as "8",
+  "function_returning_enum"."applicants_favorite_pet_transportation"(__applicants_by_favorite_pet__) as "9"
+from "function_returning_enum"."applicants_by_favorite_pet"($1::"function_returning_enum"."animal_type") as __applicants_by_favorite_pet__;
 
-with __local_0__ as (
-  select to_json(
-    (
-      json_build_object(
-        'id'::text,
-        (__local_1__."id"),
-        'firstName'::text,
-        (__local_1__."first_name"),
-        'lastName'::text,
-        (__local_1__."last_name"),
-        'stage'::text,
-        (__local_1__."stage"),
-        '@nextStage'::text,
-        (
-          select to_json(__local_2__) as "value"
-          from "function_returning_enum"."applicants_next_stage"(__local_1__) as __local_2__
-          where (TRUE) and (TRUE)
-        ),
-        'favoritePet'::text,
-        (__local_1__."favorite_pet"),
-        '@petFood'::text,
-        (
-          select to_json(__local_3__) as "value"
-          from "function_returning_enum"."applicants_pet_food"(__local_1__) as __local_3__
-          where (TRUE) and (TRUE)
-        ),
-        '@nameLength'::text,
-        (
-          select to_json(__local_4__) as "value"
-          from "function_returning_enum"."applicants_name_length"(__local_1__) as __local_4__
-          where (TRUE) and (TRUE)
-        ),
-        'transportation'::text,
-        (__local_1__."transportation"),
-        '@favoritePetTransportation'::text,
-        (
-          select to_json(__local_5__) as "value"
-          from "function_returning_enum"."applicants_favorite_pet_transportation"(__local_1__) as __local_5__
-          where (TRUE) and (TRUE)
-        )
-      )
-    )
-  ) as "@nodes"
-  from "function_returning_enum"."applicants_by_transportation"(
-    $1
-  ) as __local_1__
-  where (TRUE) and (TRUE)
-),
-__local_6__ as (
-  select json_agg(
-    to_json(__local_0__)
-  ) as data
-  from __local_0__
-)
-select coalesce(
-  (
-    select __local_6__.data
-    from __local_6__
-  ),
-  '[]'::json
-) as "data"
+select
+  __applicants_by_transportation__."id"::text as "0",
+  __applicants_by_transportation__."first_name" as "1",
+  __applicants_by_transportation__."last_name" as "2",
+  __applicants_by_transportation__."stage"::text as "3",
+  "function_returning_enum"."applicants_next_stage"(__applicants_by_transportation__) as "4",
+  __applicants_by_transportation__."favorite_pet"::text as "5",
+  ("function_returning_enum"."applicants_pet_food"(__applicants_by_transportation__))::text as "6",
+  "function_returning_enum"."applicants_name_length"(__applicants_by_transportation__) as "7",
+  __applicants_by_transportation__."transportation"::text as "8",
+  "function_returning_enum"."applicants_favorite_pet_transportation"(__applicants_by_transportation__) as "9"
+from "function_returning_enum"."applicants_by_transportation"($1::"function_returning_enum"."transportation") as __applicants_by_transportation__;
