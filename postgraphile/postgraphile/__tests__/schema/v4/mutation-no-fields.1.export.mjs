@@ -1,5 +1,5 @@
-import { PgExecutor, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, recordCodec, sqlValueWithCodec } from "@dataplan/pg";
-import { ConnectionStep, access, connection, constant, context, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue } from "grafast";
+import { PgDeleteSingleStep, PgExecutor, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, recordCodec, sqlValueWithCodec } from "@dataplan/pg";
+import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertExecutableStep, connection, constant, context, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 const nodeIdHandler_Query = {
@@ -78,10 +78,10 @@ const executor = new PgExecutor({
     });
   }
 });
-const employeeIdentifier = sql.identifier("index_expressions", "employee");
-const employeeCodec = recordCodec({
-  name: "employee",
-  identifier: employeeIdentifier,
+const citationIdentifier = sql.identifier("no_fields", "citation");
+const citationCodec = recordCodec({
+  name: "citation",
+  identifier: citationIdentifier,
   attributes: {
     __proto__: null,
     id: {
@@ -90,25 +90,9 @@ const employeeCodec = recordCodec({
       notNull: true,
       hasDefault: true,
       extensions: {
-        tags: {}
-      }
-    },
-    first_name: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
-    },
-    last_name: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
+        tags: {},
+        isInsertable: false,
+        isUpdatable: false
       }
     }
   },
@@ -117,8 +101,8 @@ const employeeCodec = recordCodec({
     isTableLike: true,
     pg: {
       serviceName: "main",
-      schemaName: "index_expressions",
-      name: "employee"
+      schemaName: "no_fields",
+      name: "citation"
     },
     tags: {
       __proto__: null
@@ -126,7 +110,7 @@ const employeeCodec = recordCodec({
   },
   executor: executor
 });
-const employeeUniques = [{
+const citationUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -136,7 +120,7 @@ const employeeUniques = [{
     }
   }
 }];
-const resource_employeePgResource = makeRegistry({
+const resource_citationPgResource = makeRegistry({
   pgExecutors: {
     __proto__: null,
     main: executor
@@ -147,7 +131,7 @@ const resource_employeePgResource = makeRegistry({
     varchar: TYPES.varchar,
     bpchar: TYPES.bpchar,
     int4: TYPES.int,
-    employee: employeeCodec,
+    citation: citationCodec,
     LetterAToDEnum: enumCodec({
       name: "LetterAToDEnum",
       identifier: TYPES.text.sqlType,
@@ -445,21 +429,21 @@ const resource_employeePgResource = makeRegistry({
   },
   pgResources: {
     __proto__: null,
-    employee: {
+    citation: {
       executor: executor,
-      name: "employee",
-      identifier: "main.index_expressions.employee",
-      from: employeeIdentifier,
-      codec: employeeCodec,
-      uniques: employeeUniques,
+      name: "citation",
+      identifier: "main.no_fields.citation",
+      from: citationIdentifier,
+      codec: citationCodec,
+      uniques: citationUniques,
       isVirtual: false,
       description: undefined,
       extensions: {
         description: undefined,
         pg: {
           serviceName: "main",
-          schemaName: "index_expressions",
-          name: "employee"
+          schemaName: "no_fields",
+          name: "citation"
         },
         isInsertable: true,
         isUpdatable: true,
@@ -471,13 +455,13 @@ const resource_employeePgResource = makeRegistry({
   pgRelations: {
     __proto__: null
   }
-}).pgResources["employee"];
-const nodeIdHandler_Employee = {
-  typeName: "Employee",
+}).pgResources["citation"];
+const nodeIdHandler_Citation = {
+  typeName: "Citation",
   codec: nodeIdCodecs_base64JSON_base64JSON,
   deprecationReason: undefined,
   plan($record) {
-    return list([constant("employees", false), $record.get("id")]);
+    return list([constant("citations", false), $record.get("id")]);
   },
   getSpec($list) {
     return {
@@ -488,10 +472,10 @@ const nodeIdHandler_Employee = {
     return value.slice(1);
   },
   get(spec) {
-    return resource_employeePgResource.get(spec);
+    return resource_citationPgResource.get(spec);
   },
   match(obj) {
-    return obj[0] === "employees";
+    return obj[0] === "citations";
   }
 };
 const specForHandlerCache = new Map();
@@ -519,9 +503,9 @@ function specForHandler(handler) {
   specForHandlerCache.set(handler, spec);
   return spec;
 }
-const nodeFetcher_Employee = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Employee));
-  return nodeIdHandler_Employee.get(nodeIdHandler_Employee.getSpec($decoded));
+const nodeFetcher_Citation = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Citation));
+  return nodeIdHandler_Citation.get(nodeIdHandler_Citation.getSpec($decoded));
 };
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
@@ -529,7 +513,7 @@ function qbWhereBuilder(qb) {
 const nodeIdHandlerByTypeName = {
   __proto__: null,
   Query: nodeIdHandler_Query,
-  Employee: nodeIdHandler_Employee
+  Citation: nodeIdHandler_Citation
 };
 const decodeNodeId = makeDecodeNodeId(Object.values(nodeIdHandlerByTypeName));
 function findTypeNameMatch(specifier) {
@@ -545,6 +529,30 @@ function findTypeNameMatch(specifier) {
 function CursorSerialize(value) {
   return "" + value;
 }
+const specFromArgs_Citation = args => {
+  const $nodeId = args.getRaw(["input", "nodeId"]);
+  return specFromNodeId(nodeIdHandler_Citation, $nodeId);
+};
+const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) => {
+  const $result = $mutation.getStepForKey("result", true);
+  if (!$result) return null;
+  if ($result instanceof PgDeleteSingleStep) {
+    return pgSelectFromRecord($result.resource, $result.record());
+  } else {
+    const spec = pkAttributes.reduce((memo, attributeName) => {
+      memo[attributeName] = $result.get(attributeName);
+      return memo;
+    }, Object.create(null));
+    return resource.find(spec);
+  }
+};
+const pgMutationPayloadEdge = (resource, pkAttributes, $mutation, fieldArgs) => {
+  const $select = getPgSelectSingleFromMutationResult(resource, pkAttributes, $mutation);
+  if (!$select) return constant(null);
+  fieldArgs.apply($select, "orderBy");
+  const $connection = connection($select);
+  return new EdgeStep($connection, first($connection));
+};
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
   """
@@ -564,17 +572,17 @@ type Query implements Node {
     nodeId: ID!
   ): Node
 
-  """Get a single \`Employee\`."""
-  employeeById(id: Int!): Employee
+  """Get a single \`Citation\`."""
+  citationById(id: Int!): Citation
 
-  """Reads a single \`Employee\` using its globally unique \`ID\`."""
-  employee(
-    """The globally unique \`ID\` to be used in selecting a single \`Employee\`."""
+  """Reads a single \`Citation\` using its globally unique \`ID\`."""
+  citation(
+    """The globally unique \`ID\` to be used in selecting a single \`Citation\`."""
     nodeId: ID!
-  ): Employee
+  ): Citation
 
-  """Reads and enables pagination through a set of \`Employee\`."""
-  allEmployees(
+  """Reads and enables pagination through a set of \`Citation\`."""
+  allCitations(
     """Only read the first \`n\` values of the set."""
     first: Int
 
@@ -596,11 +604,11 @@ type Query implements Node {
     """
     A condition to be used in determining which values should be returned by the collection.
     """
-    condition: EmployeeCondition
+    condition: CitationCondition
 
-    """The method to use when ordering \`Employee\`."""
-    orderBy: [EmployeesOrderBy!] = [PRIMARY_KEY_ASC]
-  ): EmployeesConnection
+    """The method to use when ordering \`Citation\`."""
+    orderBy: [CitationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): CitationsConnection
 }
 
 """An object with a globally unique \`ID\`."""
@@ -611,40 +619,38 @@ interface Node {
   nodeId: ID!
 }
 
-type Employee implements Node {
+type Citation implements Node {
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
   nodeId: ID!
   id: Int!
-  firstName: String!
-  lastName: String!
 }
 
-"""A connection to a list of \`Employee\` values."""
-type EmployeesConnection {
-  """A list of \`Employee\` objects."""
-  nodes: [Employee]!
+"""A connection to a list of \`Citation\` values."""
+type CitationsConnection {
+  """A list of \`Citation\` objects."""
+  nodes: [Citation]!
 
   """
-  A list of edges which contains the \`Employee\` and cursor to aid in pagination.
+  A list of edges which contains the \`Citation\` and cursor to aid in pagination.
   """
-  edges: [EmployeesEdge]!
+  edges: [CitationsEdge]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """The count of *all* \`Employee\` you could get from the connection."""
+  """The count of *all* \`Citation\` you could get from the connection."""
   totalCount: Int!
 }
 
-"""A \`Employee\` edge in the connection."""
-type EmployeesEdge {
+"""A \`Citation\` edge in the connection."""
+type CitationsEdge {
   """A cursor for use in pagination."""
   cursor: Cursor
 
-  """The \`Employee\` at the end of the edge."""
-  node: Employee
+  """The \`Citation\` at the end of the edge."""
+  node: Citation
 }
 
 """A location in a connection that can be used for resuming pagination."""
@@ -666,31 +672,130 @@ type PageInfo {
 }
 
 """
-A condition to be used against \`Employee\` object types. All fields are tested
+A condition to be used against \`Citation\` object types. All fields are tested
 for equality and combined with a logical ‘and.’
 """
-input EmployeeCondition {
+input CitationCondition {
   """Checks for equality with the object’s \`id\` field."""
   id: Int
-
-  """Checks for equality with the object’s \`firstName\` field."""
-  firstName: String
-
-  """Checks for equality with the object’s \`lastName\` field."""
-  lastName: String
 }
 
-"""Methods to use when ordering \`Employee\`."""
-enum EmployeesOrderBy {
+"""Methods to use when ordering \`Citation\`."""
+enum CitationsOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
   ID_ASC
   ID_DESC
-  FIRST_NAME_ASC
-  FIRST_NAME_DESC
-  LAST_NAME_ASC
-  LAST_NAME_DESC
+}
+
+"""
+The root mutation type which contains root level fields which mutate data.
+"""
+type Mutation {
+  """Creates a single \`Citation\`."""
+  createCitation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateCitationInput!
+  ): CreateCitationPayload
+
+  """Deletes a single \`Citation\` using its globally unique id."""
+  deleteCitation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteCitationInput!
+  ): DeleteCitationPayload
+
+  """Deletes a single \`Citation\` using a unique key."""
+  deleteCitationById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteCitationByIdInput!
+  ): DeleteCitationPayload
+}
+
+"""The output of our create \`Citation\` mutation."""
+type CreateCitationPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`Citation\` that was created by this mutation."""
+  citation: Citation
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`Citation\`. May be used by Relay 1."""
+  citationEdge(
+    """The method to use when ordering \`Citation\`."""
+    orderBy: [CitationsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): CitationsEdge
+}
+
+"""All input for the create \`Citation\` mutation."""
+input CreateCitationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our delete \`Citation\` mutation."""
+type DeleteCitationPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`Citation\` that was deleted by this mutation."""
+  citation: Citation
+  deletedCitationId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`Citation\`. May be used by Relay 1."""
+  citationEdge(
+    """The method to use when ordering \`Citation\`."""
+    orderBy: [CitationsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): CitationsEdge
+}
+
+"""All input for the \`deleteCitation\` mutation."""
+input DeleteCitationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique \`ID\` which will identify a single \`Citation\` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""All input for the \`deleteCitationById\` mutation."""
+input DeleteCitationByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
 }`;
 export const objects = {
   Query: {
@@ -698,9 +803,9 @@ export const objects = {
       return true;
     },
     plans: {
-      allEmployees: {
+      allCitations: {
         plan() {
-          return connection(resource_employeePgResource.find());
+          return connection(resource_citationPgResource.find());
         },
         args: {
           first(_, $connection, arg) {
@@ -728,14 +833,14 @@ export const objects = {
           }
         }
       },
-      employee(_$parent, args) {
+      citation(_$parent, args) {
         const $nodeId = args.getRaw("nodeId");
-        return nodeFetcher_Employee($nodeId);
+        return nodeFetcher_Citation($nodeId);
       },
-      employeeById(_$root, {
+      citationById(_$root, {
         $id
       }) {
-        return resource_employeePgResource.get({
+        return resource_citationPgResource.get({
           id: $id
         });
       },
@@ -751,33 +856,118 @@ export const objects = {
       }
     }
   },
-  Employee: {
+  Mutation: {
+    assertStep: __ValueStep,
+    plans: {
+      createCitation: {
+        plan(_, args) {
+          const $insert = pgInsertSingle(resource_citationPgResource, Object.create(null));
+          args.apply($insert);
+          const plan = object({
+            result: $insert
+          });
+          return plan;
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deleteCitation: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_citationPgResource, specFromArgs_Citation(args));
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deleteCitationById: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_citationPgResource, {
+            id: args.getRaw(['input', "id"])
+          });
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      }
+    }
+  },
+  Citation: {
     assertStep: assertPgClassSingleStep,
     plans: {
-      firstName($record) {
-        return $record.get("first_name");
-      },
-      lastName($record) {
-        return $record.get("last_name");
-      },
       nodeId($parent) {
-        const specifier = nodeIdHandler_Employee.plan($parent);
-        return lambda(specifier, nodeIdCodecs[nodeIdHandler_Employee.codec.name].encode);
+        const specifier = nodeIdHandler_Citation.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_Citation.codec.name].encode);
       }
     },
     planType($specifier) {
       const spec = Object.create(null);
-      for (const pkCol of employeeUniques[0].attributes) {
+      for (const pkCol of citationUniques[0].attributes) {
         spec[pkCol] = get2($specifier, pkCol);
       }
-      return resource_employeePgResource.get(spec);
+      return resource_citationPgResource.get(spec);
     }
   },
-  EmployeesConnection: {
+  CitationsConnection: {
     assertStep: ConnectionStep,
     plans: {
       totalCount($connection) {
         return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+      }
+    }
+  },
+  CreateCitationPayload: {
+    assertStep: assertExecutableStep,
+    plans: {
+      citation($object) {
+        return $object.get("result");
+      },
+      citationEdge($mutation, fieldArgs) {
+        return pgMutationPayloadEdge(resource_citationPgResource, citationUniques[0].attributes, $mutation, fieldArgs);
+      },
+      clientMutationId($mutation) {
+        const $insert = $mutation.getStepForKey("result");
+        return $insert.getMeta("clientMutationId");
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  DeleteCitationPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      citation($object) {
+        return $object.get("result");
+      },
+      citationEdge($mutation, fieldArgs) {
+        return pgMutationPayloadEdge(resource_citationPgResource, citationUniques[0].attributes, $mutation, fieldArgs);
+      },
+      clientMutationId($mutation) {
+        const $result = $mutation.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      deletedCitationId($object) {
+        const $record = $object.getStepForKey("result");
+        const specifier = nodeIdHandler_Citation.plan($record);
+        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+      },
+      query() {
+        return rootValue();
       }
     }
   }
@@ -802,17 +992,8 @@ export const interfaces = {
   }
 };
 export const inputObjects = {
-  EmployeeCondition: {
+  CitationCondition: {
     plans: {
-      firstName($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "first_name",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
-      },
       id($condition, val) {
         $condition.where({
           type: "attribute",
@@ -821,15 +1002,27 @@ export const inputObjects = {
             return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
           }
         });
-      },
-      lastName($condition, val) {
-        $condition.where({
-          type: "attribute",
-          attribute: "last_name",
-          callback(expression) {
-            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.text)}`;
-          }
-        });
+      }
+    }
+  },
+  CreateCitationInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  DeleteCitationByIdInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  DeleteCitationInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
       }
     }
   }
@@ -847,20 +1040,8 @@ export const scalars = {
   }
 };
 export const enums = {
-  EmployeesOrderBy: {
+  CitationsOrderBy: {
     values: {
-      FIRST_NAME_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "first_name",
-          direction: "ASC"
-        });
-      },
-      FIRST_NAME_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "first_name",
-          direction: "DESC"
-        });
-      },
       ID_ASC(queryBuilder) {
         queryBuilder.orderBy({
           attribute: "id",
@@ -875,20 +1056,8 @@ export const enums = {
         });
         queryBuilder.setOrderIsUnique();
       },
-      LAST_NAME_ASC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "last_name",
-          direction: "ASC"
-        });
-      },
-      LAST_NAME_DESC(queryBuilder) {
-        queryBuilder.orderBy({
-          attribute: "last_name",
-          direction: "DESC"
-        });
-      },
       PRIMARY_KEY_ASC(queryBuilder) {
-        employeeUniques[0].attributes.forEach(attributeName => {
+        citationUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
             attribute: attributeName,
             direction: "ASC"
@@ -897,7 +1066,7 @@ export const enums = {
         queryBuilder.setOrderIsUnique();
       },
       PRIMARY_KEY_DESC(queryBuilder) {
-        employeeUniques[0].attributes.forEach(attributeName => {
+        citationUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
             attribute: attributeName,
             direction: "DESC"

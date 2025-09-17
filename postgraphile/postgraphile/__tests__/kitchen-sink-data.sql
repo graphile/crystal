@@ -91,6 +91,7 @@ delete from issue_2287.users cascade;
 delete from issue_2212.orders cascade;
 delete from issue_2212.user_contacts cascade;
 delete from issue_2212.users cascade;
+delete from function_returning_enum.applicants cascade;
 
 alter table b.types enable trigger user;
 
@@ -1124,3 +1125,12 @@ insert into issue_2212.orders(phone_e164, amount_cents) values
   ('+14155550100', 1234), ('+14155550100', 5432),
   ('+442079460018', 2323), ('+442079460019', 1982),
   ('+442079460018', 1337);
+
+--------------------------------------------------------------------------------
+
+insert into function_returning_enum.applicants(
+  id, first_name, last_name, stage, favorite_pet, transportation
+) values 
+  (1, 'John', 'Doe', 'round 2', 'CAT', 'BIKE' ),
+  (2, 'David', 'Bowie', 'round 2', 'DOG', 'SUBWAY'),
+  (3, 'John', 'Lennon', 'round 1', 'CAT', 'CAR');

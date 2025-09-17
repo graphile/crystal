@@ -247,6 +247,9 @@ class SchemaBuilder<
     };
     this.applyHooks("init", INIT_OBJECT, build, initContext);
     build.status.isInitPhaseComplete = true;
+    for (const assertion of build.__postInitAssertions) {
+      assertion();
+    }
     return build;
   }
 

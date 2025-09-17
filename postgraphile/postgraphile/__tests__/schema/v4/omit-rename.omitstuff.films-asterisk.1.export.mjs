@@ -1,4 +1,4 @@
-import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, PgSelectStep, TYPES, assertPgClassSingleStep, makeRegistry, pgClassExpression, pgDeleteSingle, pgFromExpression, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
+import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, PgSelectStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgFromExpression, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests, sqlValueWithCodec } from "@dataplan/pg";
 import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertExecutableStep, bakedInput, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, operationPlan, rootValue, specFromNodeId, stepAMayDependOnStepB, trap } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
@@ -737,7 +737,301 @@ const registry = makeRegistry({
     tvShows: tvShowsCodec,
     jwtToken: jwtTokenCodec,
     person: personCodec,
-    bpchar: TYPES.bpchar
+    bpchar: TYPES.bpchar,
+    LetterAToDEnum: enumCodec({
+      name: "LetterAToDEnum",
+      identifier: TYPES.text.sqlType,
+      values: [{
+        value: "A",
+        description: "The letter A"
+      }, {
+        value: "B",
+        description: "The letter B"
+      }, {
+        value: "C",
+        description: "The letter C"
+      }, {
+        value: "D",
+        description: "The letter D"
+      }],
+      extensions: {
+        isEnumTableEnum: true,
+        enumTableEnumDetails: {
+          serviceName: "main",
+          schemaName: "enum_tables",
+          tableName: "abcd",
+          constraintType: "p",
+          constraintName: "abcd_pkey"
+        },
+        tags: {
+          name: "LetterAToD"
+        }
+      }
+    }),
+    LetterAToDViaViewEnum: enumCodec({
+      name: "LetterAToDViaViewEnum",
+      identifier: TYPES.text.sqlType,
+      values: [{
+        value: "A",
+        description: "The letter A"
+      }, {
+        value: "B",
+        description: "The letter B"
+      }, {
+        value: "C",
+        description: "The letter C"
+      }, {
+        value: "D",
+        description: "The letter D"
+      }],
+      extensions: {
+        isEnumTableEnum: true,
+        enumTableEnumDetails: {
+          serviceName: "main",
+          schemaName: "enum_tables",
+          tableName: "abcd_view",
+          constraintType: "p",
+          constraintName: "FAKE_enum_tables_abcd_view_primaryKey_5"
+        },
+        tags: {
+          name: "LetterAToDViaView"
+        }
+      }
+    }),
+    EnumTheFirstEnum: enumCodec({
+      name: "EnumTheFirstEnum",
+      identifier: TYPES.text.sqlType,
+      values: [{
+        value: "a1",
+        description: "Desc A1"
+      }, {
+        value: "a2",
+        description: "Desc A2"
+      }, {
+        value: "a3",
+        description: "Desc A3"
+      }, {
+        value: "a4",
+        description: "Desc A4"
+      }],
+      extensions: {
+        isEnumTableEnum: true,
+        enumTableEnumDetails: {
+          serviceName: "main",
+          schemaName: "enum_tables",
+          tableName: "lots_of_enums",
+          constraintType: "u",
+          constraintName: "enum_1"
+        },
+        tags: {
+          name: "EnumTheFirst"
+        }
+      }
+    }),
+    EnumTheSecondEnum: enumCodec({
+      name: "EnumTheSecondEnum",
+      identifier: TYPES.varchar.sqlType,
+      values: [{
+        value: "b1",
+        description: "Desc B1"
+      }, {
+        value: "b2",
+        description: "Desc B2"
+      }, {
+        value: "b3",
+        description: "Desc B3"
+      }, {
+        value: "b4",
+        description: "Desc B4"
+      }],
+      extensions: {
+        isEnumTableEnum: true,
+        enumTableEnumDetails: {
+          serviceName: "main",
+          schemaName: "enum_tables",
+          tableName: "lots_of_enums",
+          constraintType: "u",
+          constraintName: "enum_2"
+        },
+        tags: {
+          name: "EnumTheSecond"
+        }
+      }
+    }),
+    LotsOfEnumsEnum3Enum: enumCodec({
+      name: "LotsOfEnumsEnum3Enum",
+      identifier: TYPES.bpchar.sqlType,
+      values: [{
+        value: "c1",
+        description: "Desc C1"
+      }, {
+        value: "c2",
+        description: "Desc C2"
+      }, {
+        value: "c3",
+        description: "Desc C3"
+      }, {
+        value: "c4",
+        description: "Desc C4"
+      }],
+      extensions: {
+        isEnumTableEnum: true,
+        enumTableEnumDetails: {
+          serviceName: "main",
+          schemaName: "enum_tables",
+          tableName: "lots_of_enums",
+          constraintType: "u",
+          constraintName: "enum_3"
+        },
+        tags: {
+          name: "LotsOfEnumsEnum3"
+        }
+      }
+    }),
+    LotsOfEnumsEnum4Enum: enumCodec({
+      name: "LotsOfEnumsEnum4Enum",
+      identifier: TYPES.text.sqlType,
+      values: [{
+        value: "d1",
+        description: "Desc D1"
+      }, {
+        value: "d2",
+        description: "Desc D2"
+      }, {
+        value: "d3",
+        description: "Desc D3"
+      }, {
+        value: "d4",
+        description: "Desc D4"
+      }],
+      extensions: {
+        isEnumTableEnum: true,
+        enumTableEnumDetails: {
+          serviceName: "main",
+          schemaName: "enum_tables",
+          tableName: "lots_of_enums",
+          constraintType: "u",
+          constraintName: "enum_4"
+        },
+        tags: {
+          name: "LotsOfEnumsEnum4"
+        }
+      }
+    }),
+    SimpleEnumEnum: enumCodec({
+      name: "SimpleEnumEnum",
+      identifier: TYPES.text.sqlType,
+      values: [{
+        value: "Foo",
+        description: "The first metasyntactic variable"
+      }, {
+        value: "Bar",
+        description: null
+      }, {
+        value: "Baz",
+        description: "The third metasyntactic variable, very similar to its predecessor"
+      }, {
+        value: "Qux",
+        description: null
+      }],
+      extensions: {
+        isEnumTableEnum: true,
+        enumTableEnumDetails: {
+          serviceName: "main",
+          schemaName: "enum_tables",
+          tableName: "simple_enum",
+          constraintType: "p",
+          constraintName: "simple_enum_pkey"
+        },
+        tags: {
+          name: "SimpleEnum"
+        }
+      }
+    }),
+    EnumTableTransportationEnum: enumCodec({
+      name: "EnumTableTransportationEnum",
+      identifier: TYPES.text.sqlType,
+      values: [{
+        value: "CAR",
+        description: undefined
+      }, {
+        value: "BIKE",
+        description: undefined
+      }, {
+        value: "SUBWAY",
+        description: undefined
+      }],
+      extensions: {
+        isEnumTableEnum: true,
+        enumTableEnumDetails: {
+          serviceName: "main",
+          schemaName: "function_returning_enum",
+          tableName: "enum_table",
+          constraintType: "u",
+          constraintName: "transportation_enum"
+        },
+        tags: {
+          name: "EnumTableTransportation"
+        }
+      }
+    }),
+    LengthStatusEnum: enumCodec({
+      name: "LengthStatusEnum",
+      identifier: TYPES.text.sqlType,
+      values: [{
+        value: "ok",
+        description: undefined
+      }, {
+        value: "too_short",
+        description: undefined
+      }],
+      extensions: {
+        isEnumTableEnum: true,
+        enumTableEnumDetails: {
+          serviceName: "main",
+          schemaName: "function_returning_enum",
+          tableName: "length_status",
+          constraintType: "p",
+          constraintName: "length_status_pkey"
+        },
+        tags: {
+          name: "LengthStatus"
+        }
+      }
+    }),
+    StageOptionsEnum: enumCodec({
+      name: "StageOptionsEnum",
+      identifier: TYPES.text.sqlType,
+      values: [{
+        value: "pending",
+        description: undefined
+      }, {
+        value: "round 1",
+        description: undefined
+      }, {
+        value: "round 2",
+        description: undefined
+      }, {
+        value: "rejected",
+        description: undefined
+      }, {
+        value: "hired",
+        description: undefined
+      }],
+      extensions: {
+        isEnumTableEnum: true,
+        enumTableEnumDetails: {
+          serviceName: "main",
+          schemaName: "function_returning_enum",
+          tableName: "stage_options",
+          constraintType: "p",
+          constraintName: "stage_options_pkey"
+        },
+        tags: {
+          name: "StageOptions"
+        }
+      }
+    })
   },
   pgResources: {
     __proto__: null,

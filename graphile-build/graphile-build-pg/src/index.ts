@@ -10,6 +10,7 @@ export { PgConnectionArgOrderByDefaultValuePlugin } from "./plugins/PgConnection
 export { PgConnectionArgOrderByPlugin } from "./plugins/PgConnectionArgOrderByPlugin.js";
 export { PgConnectionTotalCountPlugin } from "./plugins/PgConnectionTotalCountPlugin.js";
 export { PgCustomTypeFieldPlugin } from "./plugins/PgCustomTypeFieldPlugin.js";
+export { PgEnumDomainsPlugin } from "./plugins/PgEnumDomainsPlugin.js";
 export { PgEnumTablesPlugin } from "./plugins/PgEnumTablesPlugin.js";
 export { PgFakeConstraintsPlugin } from "./plugins/PgFakeConstraintsPlugin.js";
 export { PgFirstLastBeforeAfterArgsPlugin } from "./plugins/PgFirstLastBeforeAfterArgsPlugin.js";

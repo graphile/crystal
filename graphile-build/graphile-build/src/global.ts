@@ -472,11 +472,14 @@ declare global {
         origin: string | null | undefined,
       ) => void;
 
+      /** @internal */
+      __postInitAssertions: Array<() => void>;
+
       /**
        * Asserts that the given typeName is registered; throws if this isn't
        * the case.
        */
-      assertTypeName(typeName: string): void;
+      assertTypeName(typeName: string, deferrable?: boolean): void;
 
       /**
        * Returns details of the type name's registration (if it has been

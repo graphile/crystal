@@ -288,7 +288,9 @@ export default function makeNewBuild(
       );
     },
 
-    assertTypeName(typeName) {
+    __postInitAssertions: [],
+
+    assertTypeName(typeName, deferrable = false) {
       if (!this.status.isBuildPhaseComplete) {
         throw new Error(
           "Must not call build.assertTypeName before 'build' phase is complete; use 'init' phase instead",
@@ -297,9 +299,18 @@ export default function makeNewBuild(
       if (typeName in allTypesSources) {
         return true;
       } else {
-        throw new Error(
+        const error = new Error(
           `Type name '${typeName}' is not registered - be sure to register the type before you attempt to reference it.`,
         );
+        if (deferrable && !this.status.isInitPhaseComplete) {
+          this.__postInitAssertions.push(() => {
+            if (!(typeName in allTypesSources)) {
+              throw error;
+            }
+          });
+        } else {
+          throw error;
+        }
       }
     },
 

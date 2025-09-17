@@ -15,6 +15,7 @@ import { PgConnectionArgOrderByDefaultValuePlugin } from "./plugins/PgConnection
 import { PgConnectionArgOrderByPlugin } from "./plugins/PgConnectionArgOrderByPlugin.js";
 import { PgConnectionTotalCountPlugin } from "./plugins/PgConnectionTotalCountPlugin.js";
 import { PgCustomTypeFieldPlugin } from "./plugins/PgCustomTypeFieldPlugin.js";
+import { PgEnumDomainsPlugin } from "./plugins/PgEnumDomainsPlugin.js";
 import { PgEnumTablesPlugin } from "./plugins/PgEnumTablesPlugin.js";
 import { PgFakeConstraintsPlugin } from "./plugins/PgFakeConstraintsPlugin.js";
 import { PgFirstLastBeforeAfterArgsPlugin } from "./plugins/PgFirstLastBeforeAfterArgsPlugin.js";
@@ -73,6 +74,7 @@ export const defaultPreset: GraphileConfig.Preset = {
   plugins: [
     PgBasicsPlugin,
     PgLtreePlugin,
+    PgEnumDomainsPlugin,
     PgCodecsPlugin,
     PgContextPlugin,
     PgTypesPlugin,

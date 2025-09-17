@@ -1,0 +1,62 @@
+## expect(errors).toBeFalsy();
+#> schema: ["function_returning_enum"]
+#> subscriptions: true
+{
+  allApplicants(condition: { nextStage: HIRED, nameLength: OK }) {
+    nodes {
+      id
+      firstName
+      lastName
+      stage
+      nextStage
+      favoritePet
+      petFood
+      nameLength
+      transportation
+      favoritePetTransportation
+    }
+  }
+  textLength(text: "hello", minLength: 3)
+  applicantsByStage(wantedStage: ROUND_2) {
+    nodes {
+      id
+      firstName
+      lastName
+      stage
+      nextStage
+      favoritePet
+      petFood
+      nameLength
+      transportation
+      favoritePetTransportation
+    }
+  }
+  applicantsByFavoritePet(pet: CAT) {
+    nodes {
+      id
+      firstName
+      lastName
+      stage
+      nextStage
+      favoritePet
+      petFood
+      nameLength
+      transportation
+      favoritePetTransportation
+    }
+  }
+  applicantsByTransportation(transportation: CAR) {
+    nodes {
+      id
+      firstName
+      lastName
+      stage
+      nextStage
+      favoritePet
+      petFood
+      nameLength
+      transportation
+      favoritePetTransportation
+    }
+  }
+}
