@@ -1,4 +1,4 @@
-import type { PgCodec } from "@dataplan/pg";
+import type { PgCodec, PgCodecAnyScalar } from "@dataplan/pg";
 import type {} from "graphile-config";
 
 import { version } from "../version.js";
@@ -20,41 +20,53 @@ export const PgEnumDomainsPlugin: GraphileConfig.Plugin = {
             pgCodecs,
             dataplanPg: { TYPES },
           } = build;
-          for (const codec of Object.values(pgCodecs)) {
-            if (codec.domainOfCodec !== TYPES.text) continue;
-            // There's two types of enum domains - either name ends with
-            // `_enum_domain` or it uses the `@enum` smart tag to identify the
-            // table
-            const enumDetails = getEnumDetails(codec);
-            if (!enumDetails) continue;
-            const { serviceName, schemaName, tableName, match } = enumDetails;
 
-            // Find the table
-            const tableEnumCodec = Object.values(pgCodecs).find(
-              (c) =>
-                c.extensions?.enumTableEnumDetails?.serviceName ===
-                  serviceName &&
-                c.extensions.enumTableEnumDetails.schemaName === schemaName &&
-                (tableName
-                  ? c.extensions.enumTableEnumDetails.tableName === tableName &&
-                    c.extensions.enumTableEnumDetails.constraintType === "p"
-                  : (c.extensions.enumTableEnumDetails.tableName === match &&
-                      c.extensions.enumTableEnumDetails.constraintType ===
-                        "p") ||
-                    match ===
-                      `${c.extensions.enumTableEnumDetails.tableName}_${c.extensions.enumTableEnumDetails.constraintName}`),
-            );
-            // Use the enum type for this domain
-            if (tableEnumCodec) {
-              const typeName = build.inflection.scalarCodecTypeName(
-                tableEnumCodec as any,
-              );
-              build.setGraphQLTypeForPgCodec(
-                codec,
-                ["input", "output"],
-                typeName,
-              );
+          // For performance, we're pre-calculating so we can match quickly
+          const enumByFullIdentifier = Object.create(null) as Record<
+            string,
+            PgCodecAnyScalar
+          >;
+          for (const codec of Object.values(pgCodecs)) {
+            if (!codec.extensions?.enumTableEnumDetails) continue;
+            const {
+              serviceName,
+              schemaName,
+              tableName,
+              constraintName,
+              constraintType,
+            } = codec.extensions.enumTableEnumDetails;
+
+            // Primary key always wins
+            if (constraintType === "p") {
+              enumByFullIdentifier[
+                `${tableName}|${schemaName}|${serviceName}`
+              ] = codec as PgCodecAnyScalar;
             }
+            // Secondary constraints are added as available
+            const key = `${tableName}_${constraintName}|${schemaName}|${serviceName}`;
+            if (!enumByFullIdentifier[key]) {
+              enumByFullIdentifier[key] = codec as PgCodecAnyScalar;
+            }
+          }
+
+          // Now use the underlying enum GraphQL type for each of the suitable domains
+          for (const codec of Object.values(pgCodecs)) {
+            // We only care about `create domain ... as text;`
+            if (codec.domainOfCodec !== TYPES.text) continue;
+
+            const fullIdentifier = getFullIdentifier(codec);
+            if (!fullIdentifier) continue;
+
+            const enumCodec = enumByFullIdentifier[fullIdentifier];
+            if (!enumCodec) continue;
+
+            // Use the enum type for this domain
+            const typeName = build.inflection.scalarCodecTypeName(enumCodec);
+            build.setGraphQLTypeForPgCodec(
+              codec,
+              ["input", "output"],
+              typeName,
+            );
           }
           return _;
         },
@@ -63,16 +75,25 @@ export const PgEnumDomainsPlugin: GraphileConfig.Plugin = {
   },
 };
 
-function getEnumDetails(codec: PgCodec) {
+/**
+ * There's two ways of marking a domain as an enum table domain:
+ * 1. use the `@enum` smart tag (passing the identifier as the value)
+ * 2. name it `{identifier}_enum_domain`
+ *
+ * Once we've extracted the identifier from this, there's further two forms:
+ * - identifier identifies a table name exactly (impliying primary key)
+ * - identifier identifies a `{tableName}_{constraintName}` combo
+ */
+function getFullIdentifier(codec: PgCodec) {
   if (!codec.extensions?.pg) return null;
   const { schemaName, serviceName, name: domainName } = codec.extensions.pg;
   const enumTagValue = codec.extensions?.tags?.enum;
   if (enumTagValue) {
     if (typeof enumTagValue !== "string") return null;
-    return { serviceName, schemaName, match: enumTagValue };
+    return `${enumTagValue}|${schemaName}|${serviceName}`;
   }
   if (!domainName.endsWith(ENUM_DOMAIN_SUFFIX)) return null;
   const keepCount = domainName.length - ENUM_DOMAIN_SUFFIX.length;
-  const tableName = domainName.substring(0, keepCount);
-  return { serviceName, schemaName, tableName };
+  const identifier = domainName.substring(0, keepCount);
+  return `${identifier}|${schemaName}|${serviceName}`;
 }
