@@ -77,6 +77,11 @@ export interface PrintPlanGraphOptions {
   includePaths?: boolean;
   concise?: boolean;
   skipBuckets?: boolean;
+  /**
+   * Should the leaves render as a vertical chain to save horizontal space?
+   * Set false to disable
+   */
+  collapseLeaves?: boolean;
 }
 
 function isGrafastPlanJSONv1(json: GrafastPlanJSON): json is GrafastPlanJSONv1 {
@@ -88,6 +93,7 @@ export function planToMermaid(
   {
     // printPathRelations = false,
     concise = false,
+    collapseLeaves = true,
     skipBuckets = (global as any).grafastExplainMermaidSkipBuckets ?? false,
   }: PrintPlanGraphOptions = {},
 ): string {
@@ -125,7 +131,7 @@ export function planToMermaid(
         if (!dependentsByStepId[depId]) {
           dependentsByStepId[depId] = [step];
         } else {
-          dependentsByStepId[depId]!.push(step);
+          dependentsByStepId[depId].push(step);
         }
       }
     }
@@ -140,7 +146,7 @@ export function planToMermaid(
     if (
       step.bucketId === 0 &&
       step.isSyncAndSafe &&
-      (dependentsByStepId[step.id]?.length ?? 0) === 0
+      !dependentsByStepId[step.id]
     ) {
       return true;
     }
@@ -377,6 +383,7 @@ export function planToMermaid(
     (plan) => {
       if (shouldHideStep(plan)) return;
       const planNode = planId(plan);
+      /** `plan`'s dependencies as rendered step ids */
       const depNodes = plan.dependencyIds.map((depId) => {
         const step = stepById[depId];
         if (shouldHideStep(step) || isExcessivelyReferenced(depId)) {
@@ -416,7 +423,7 @@ export function planToMermaid(
           }
         } else {
           if (
-            concise &&
+            collapseLeaves !== false &&
             !dependentsByStepId[plan.id] &&
             depNodes.length === 1
           ) {
