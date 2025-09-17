@@ -66,7 +66,7 @@ graph TD
     PgClassExpression19{{"PgClassExpression[19∈1]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgSelectSingle16 --> PgClassExpression19
     PgClassExpression21{{"PgClassExpression[21∈1]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle16 --> PgClassExpression21
+    PgClassExpression19 o--o PgClassExpression21
     PgSelectRows37[["PgSelectRows[37∈1]"]]:::plan
     Lambda60{{"Lambda[60∈1]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda60 --> PgSelectRows37
@@ -90,7 +90,7 @@ graph TD
     PgClassExpression20{{"PgClassExpression[20∈2]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
     PgSelectSingle18 --> PgClassExpression20
     PgClassExpression22{{"PgClassExpression[22∈2]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
-    PgSelectSingle18 --> PgClassExpression22
+    PgClassExpression20 o--o PgClassExpression22
     __Item41[/"__Item[41∈3]<br />ᐸ37ᐳ"\]:::itemplan
     PgSelectRows37 ==> __Item41
     PgSelectSingle42{{"PgSelectSingle[42∈3]<br />ᐸpostᐳ"}}:::plan
@@ -98,7 +98,7 @@ graph TD
     PgClassExpression49{{"PgClassExpression[49∈3]<br />ᐸ__post__.”headline”ᐳ"}}:::plan
     PgSelectSingle42 --> PgClassExpression49
     PgClassExpression53{{"PgClassExpression[53∈3]<br />ᐸ__post__.”author_id”ᐳ"}}:::plan
-    PgSelectSingle42 --> PgClassExpression53
+    PgClassExpression49 o--o PgClassExpression53
     __Item43[/"__Item[43∈4]<br />ᐸ38ᐳ"\]:::itemplan
     PgSelectRows38 ==> __Item43
     PgSelectSingle44{{"PgSelectSingle[44∈4]<br />ᐸpostᐳ"}}:::plan
@@ -106,7 +106,7 @@ graph TD
     PgClassExpression50{{"PgClassExpression[50∈4]<br />ᐸ__post__.”headline”ᐳ"}}:::plan
     PgSelectSingle44 --> PgClassExpression50
     PgClassExpression54{{"PgClassExpression[54∈4]<br />ᐸ__post__.”author_id”ᐳ"}}:::plan
-    PgSelectSingle44 --> PgClassExpression54
+    PgClassExpression50 o--o PgClassExpression54
     __Item45[/"__Item[45∈5]<br />ᐸ39ᐳ"\]:::itemplan
     PgSelectRows39 ==> __Item45
     PgSelectSingle46{{"PgSelectSingle[46∈5]<br />ᐸcompound_keyᐳ"}}:::plan
@@ -114,7 +114,7 @@ graph TD
     PgClassExpression51{{"PgClassExpression[51∈5]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
     PgSelectSingle46 --> PgClassExpression51
     PgClassExpression55{{"PgClassExpression[55∈5]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
-    PgSelectSingle46 --> PgClassExpression55
+    PgClassExpression51 o--o PgClassExpression55
     __Item47[/"__Item[47∈6]<br />ᐸ40ᐳ"\]:::itemplan
     PgSelectRows40 ==> __Item47
     PgSelectSingle48{{"PgSelectSingle[48∈6]<br />ᐸcompound_keyᐳ"}}:::plan
@@ -122,7 +122,7 @@ graph TD
     PgClassExpression52{{"PgClassExpression[52∈6]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
     PgSelectSingle48 --> PgClassExpression52
     PgClassExpression56{{"PgClassExpression[56∈6]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
-    PgSelectSingle48 --> PgClassExpression56
+    PgClassExpression52 o--o PgClassExpression56
 
     %% define steps
     classDef bucket0 stroke:#696969

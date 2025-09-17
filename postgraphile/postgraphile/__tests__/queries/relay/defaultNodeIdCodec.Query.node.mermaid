@@ -69,7 +69,7 @@ graph TD
     PgClassExpression97{{"PgClassExpression[97∈4] ➊^<br />ᐸ__person__.”first_name”ᐳ"}}:::plan
     PgSelectSingle30 --> PgClassExpression97
     PgClassExpression98{{"PgClassExpression[98∈4] ➊^<br />ᐸ__person__.”last_name”ᐳ"}}:::plan
-    PgSelectSingle30 --> PgClassExpression98
+    PgClassExpression97 o--o PgClassExpression98
     PgSelect34[["PgSelect[34∈5] ➊<br />ᐸfilmsᐳ<br />ᐳFilm"]]:::plan
     Access99 -->|rejectNull| PgSelect34
     Object17 --> PgSelect34

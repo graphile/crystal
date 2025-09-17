@@ -88,9 +88,9 @@ graph TD
     PgClassExpression44{{"PgClassExpression[44∈6]<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle43 --> PgClassExpression44
     Access49{{"Access[49∈6]<br />ᐸ24.hasNextPageᐳ"}}:::plan
-    Connection24 --> Access49
+    PageInfo39 o--o Access49
     Access50{{"Access[50∈6]<br />ᐸ24.hasPreviousPageᐳ"}}:::plan
-    Connection24 --> Access50
+    Access49 o--o Access50
     __Item45[/"__Item[45∈7]<br />ᐸ38ᐳ"\]:::itemplan
     __CloneStream38 ==> __Item45
     PgSelectSingle46{{"PgSelectSingle[46∈7]<br />ᐸmessagesᐳ"}}:::plan
@@ -118,7 +118,7 @@ graph TD
     PgClassExpression63{{"PgClassExpression[63∈11]<br />ᐸ__users__.”username”ᐳ"}}:::plan
     PgSelectSingle61 --> PgClassExpression63
     PgClassExpression72{{"PgClassExpression[72∈11]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
-    PgSelectSingle61 --> PgClassExpression72
+    PgClassExpression63 o--o PgClassExpression72
     List76{{"List[76∈12]<br />ᐸ75,62ᐳ"}}:::plan
     Access75 & PgSelectSingle62 --> List76
     First69{{"First[69∈12]"}}:::plan

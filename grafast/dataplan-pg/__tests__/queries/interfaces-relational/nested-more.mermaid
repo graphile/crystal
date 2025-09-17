@@ -109,15 +109,15 @@ graph TD
     PgSelectSingle127{{"PgSelectSingle[127∈3]<br />ᐸpeopleᐳ"}}:::plan
     First125 --> PgSelectSingle127
     PgClassExpression152{{"PgClassExpression[152∈3]<br />ᐸ__relation...”position”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression152
+    PgClassExpression117 o--o PgClassExpression152
     PgClassExpression157{{"PgClassExpression[157∈3]<br />ᐸ__relation...reated_at”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression157
+    PgClassExpression152 o--o PgClassExpression157
     PgClassExpression162{{"PgClassExpression[162∈3]<br />ᐸ__relation...pdated_at”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression162
+    PgClassExpression157 o--o PgClassExpression162
     PgClassExpression167{{"PgClassExpression[167∈3]<br />ᐸ__relation..._archived”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression167
+    PgClassExpression162 o--o PgClassExpression167
     PgClassExpression172{{"PgClassExpression[172∈3]<br />ᐸ__relation...chived_at”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression172
+    PgClassExpression167 o--o PgClassExpression172
     Lambda326 --> Access320
     List321 --> Lambda322
     PgSelect28[["PgSelect[28∈5]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic<br />More deps:<br />- Object[10]"]]:::plan
@@ -163,13 +163,13 @@ graph TD
     PgClassExpression221{{"PgClassExpression[221∈10]<br />ᐸ__people__.”username”ᐳ<br />ᐳRelationalTopic"}}:::plan
     PgSelectSingle127 --> PgClassExpression221
     PgClassExpression222{{"PgClassExpression[222∈11]<br />ᐸ__people__.”username”ᐳ<br />ᐳRelationalPost"}}:::plan
-    PgSelectSingle127 --> PgClassExpression222
+    PgClassExpression221 o--o PgClassExpression222
     PgClassExpression223{{"PgClassExpression[223∈12]<br />ᐸ__people__.”username”ᐳ<br />ᐳRelationalDivider"}}:::plan
-    PgSelectSingle127 --> PgClassExpression223
+    PgClassExpression222 o--o PgClassExpression223
     PgClassExpression224{{"PgClassExpression[224∈13]<br />ᐸ__people__.”username”ᐳ<br />ᐳRelationalChecklist"}}:::plan
-    PgSelectSingle127 --> PgClassExpression224
+    PgClassExpression223 o--o PgClassExpression224
     PgClassExpression225{{"PgClassExpression[225∈14]<br />ᐸ__people__.”username”ᐳ<br />ᐳRelationalChecklistItem"}}:::plan
-    PgSelectSingle127 --> PgClassExpression225
+    PgClassExpression224 o--o PgClassExpression225
     List313{{"List[313∈15]<br />ᐸ312,74ᐳ<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem"}}:::plan
     Access312{{"Access[312∈15]<br />ᐸ318.m.joinDetailsFor242ᐳ<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem"}}:::plan
     PgSelectSingle74{{"PgSelectSingle[74∈15]<br />ᐸrelational_itemsᐳ"}}:::plan
@@ -199,15 +199,15 @@ graph TD
     PgSelectSingle248{{"PgSelectSingle[248∈15]^<br />ᐸpeopleᐳ"}}:::plan
     First246 --> PgSelectSingle248
     PgClassExpression281{{"PgClassExpression[281∈15]<br />ᐸ__relation...”position”ᐳ<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem"}}:::plan
-    PgSelectSingle74 --> PgClassExpression281
+    PgClassExpression236 o--o PgClassExpression281
     PgClassExpression286{{"PgClassExpression[286∈15]<br />ᐸ__relation...reated_at”ᐳ<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem"}}:::plan
-    PgSelectSingle74 --> PgClassExpression286
+    PgClassExpression281 o--o PgClassExpression286
     PgClassExpression291{{"PgClassExpression[291∈15]<br />ᐸ__relation...pdated_at”ᐳ<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem"}}:::plan
-    PgSelectSingle74 --> PgClassExpression291
+    PgClassExpression286 o--o PgClassExpression291
     PgClassExpression296{{"PgClassExpression[296∈15]<br />ᐸ__relation..._archived”ᐳ<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem"}}:::plan
-    PgSelectSingle74 --> PgClassExpression296
+    PgClassExpression291 o--o PgClassExpression296
     PgClassExpression301{{"PgClassExpression[301∈15]<br />ᐸ__relation...chived_at”ᐳ<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem"}}:::plan
-    PgSelectSingle74 --> PgClassExpression301
+    PgClassExpression296 o--o PgClassExpression301
     Lambda318 --> Access312
     List313 --> Lambda314
     Lambda326 --> Access316
@@ -255,13 +255,13 @@ graph TD
     PgClassExpression306{{"PgClassExpression[306∈22]<br />ᐸ__people__.”username”ᐳ<br />(5) ...ᐳRelationalTopic"}}:::plan
     PgSelectSingle248 --> PgClassExpression306
     PgClassExpression307{{"PgClassExpression[307∈23]<br />ᐸ__people__.”username”ᐳ<br />(5) ...ᐳRelationalPost"}}:::plan
-    PgSelectSingle248 --> PgClassExpression307
+    PgClassExpression306 o--o PgClassExpression307
     PgClassExpression308{{"PgClassExpression[308∈24]<br />ᐸ__people__.”username”ᐳ<br />(5) ...ᐳRelationalDivider"}}:::plan
-    PgSelectSingle248 --> PgClassExpression308
+    PgClassExpression307 o--o PgClassExpression308
     PgClassExpression309{{"PgClassExpression[309∈25]<br />ᐸ__people__.”username”ᐳ<br />(5) ...ᐳRelationalChecklist"}}:::plan
-    PgSelectSingle248 --> PgClassExpression309
+    PgClassExpression308 o--o PgClassExpression309
     PgClassExpression310{{"PgClassExpression[310∈26]<br />ᐸ__people__.”username”ᐳ<br />(5) ...ᐳRelationalChecklistItem"}}:::plan
-    PgSelectSingle248 --> PgClassExpression310
+    PgClassExpression309 o--o PgClassExpression310
 
     %% define steps
     classDef bucket0 stroke:#696969

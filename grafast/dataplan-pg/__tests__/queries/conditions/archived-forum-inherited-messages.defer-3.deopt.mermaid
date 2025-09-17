@@ -93,7 +93,7 @@ graph TD
     PgClassExpression50{{"PgClassExpression[50∈12]<br />ᐸ__users__.”username”ᐳ"}}:::plan
     PgSelectSingle48 --> PgClassExpression50
     PgClassExpression52{{"PgClassExpression[52∈12]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
-    PgSelectSingle48 --> PgClassExpression52
+    PgClassExpression50 o--o PgClassExpression52
     PgSelect54[["PgSelect[54∈13]<br />ᐸusersᐳ<br />More deps:<br />- Object[11]"]]:::plan
     PgClassExpression53{{"PgClassExpression[53∈13]<br />ᐸ__messages...author_id”ᐳ"}}:::plan
     PgClassExpression53 --> PgSelect54
@@ -109,7 +109,7 @@ graph TD
     PgClassExpression61{{"PgClassExpression[61∈14]<br />ᐸ__users__.”username”ᐳ"}}:::plan
     PgSelectSingle60 --> PgClassExpression61
     PgClassExpression62{{"PgClassExpression[62∈14]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
-    PgSelectSingle60 --> PgClassExpression62
+    PgClassExpression61 o--o PgClassExpression62
 
     %% define steps
     classDef bucket0 stroke:#696969

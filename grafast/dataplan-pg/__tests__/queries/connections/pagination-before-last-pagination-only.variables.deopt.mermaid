@@ -42,9 +42,9 @@ graph TD
     PageInfo19{{"PageInfo[19∈1] ➊"}}:::plan
     Connection15 --> PageInfo19
     Access25{{"Access[25∈1] ➊<br />ᐸ15.hasNextPageᐳ"}}:::plan
-    Connection15 --> Access25
+    PageInfo19 o--o Access25
     Access26{{"Access[26∈1] ➊<br />ᐸ15.hasPreviousPageᐳ"}}:::plan
-    Connection15 --> Access26
+    Access25 o--o Access26
 
     %% define steps
     classDef bucket0 stroke:#696969

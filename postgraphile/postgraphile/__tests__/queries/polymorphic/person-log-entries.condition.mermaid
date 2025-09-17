@@ -54,7 +54,7 @@ graph TD
     PgClassExpression24{{"PgClassExpression[24∈5]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression24
     PgClassExpression30{{"PgClassExpression[30∈5]<br />ᐸ__people__.”username”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression30
+    PgClassExpression24 o--o PgClassExpression30
     PgSelectRows31[["PgSelectRows[31∈5]"]]:::plan
     Lambda39 --> PgSelectRows31
     __Item32[/"__Item[32∈6]<br />ᐸ31ᐳ"\]:::itemplan
@@ -64,7 +64,7 @@ graph TD
     PgClassExpression34{{"PgClassExpression[34∈6]<br />ᐸ__log_entries__.”text”ᐳ"}}:::plan
     PgSelectSingle33 --> PgClassExpression34
     PgClassExpression35{{"PgClassExpression[35∈6]<br />ᐸ__log_entries__.”id”ᐳ"}}:::plan
-    PgSelectSingle33 --> PgClassExpression35
+    PgClassExpression34 o--o PgClassExpression35
 
     %% define steps
     classDef bucket0 stroke:#696969

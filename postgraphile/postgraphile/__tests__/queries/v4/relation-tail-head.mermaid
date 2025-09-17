@@ -75,9 +75,9 @@ graph TD
     PgClassExpression29{{"PgClassExpression[29∈7]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
     PgSelectSingle26 --> PgClassExpression29
     PgClassExpression31{{"PgClassExpression[31∈7]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
-    PgSelectSingle26 --> PgClassExpression31
+    PgClassExpression29 o--o PgClassExpression31
     PgClassExpression33{{"PgClassExpression[33∈7]<br />ᐸ__compound...__.”extra”ᐳ"}}:::plan
-    PgSelectSingle26 --> PgClassExpression33
+    PgClassExpression31 o--o PgClassExpression33
     First39{{"First[39∈7]"}}:::plan
     PgSelectRows40[["PgSelectRows[40∈7]"]]:::plan
     PgSelectRows40 --> First39
@@ -101,9 +101,9 @@ graph TD
     PgClassExpression30{{"PgClassExpression[30∈8]<br />ᐸ__foreign_...person_id”ᐳ"}}:::plan
     PgSelectSingle28 --> PgClassExpression30
     PgClassExpression32{{"PgClassExpression[32∈8]<br />ᐸ__foreign_...und_key_1”ᐳ"}}:::plan
-    PgSelectSingle28 --> PgClassExpression32
+    PgClassExpression30 o--o PgClassExpression32
     PgClassExpression34{{"PgClassExpression[34∈8]<br />ᐸ__foreign_...und_key_2”ᐳ"}}:::plan
-    PgSelectSingle28 --> PgClassExpression34
+    PgClassExpression32 o--o PgClassExpression34
     First46{{"First[46∈8]"}}:::plan
     PgSelectRows47[["PgSelectRows[47∈8]"]]:::plan
     PgSelectRows47 --> First46
@@ -123,21 +123,21 @@ graph TD
     PgClassExpression59{{"PgClassExpression[59∈9]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle41 --> PgClassExpression59
     PgClassExpression63{{"PgClassExpression[63∈9]<br />ᐸ__person__.”email”ᐳ"}}:::plan
-    PgSelectSingle41 --> PgClassExpression63
+    PgClassExpression59 o--o PgClassExpression63
     PgClassExpression60{{"PgClassExpression[60∈10]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle48 --> PgClassExpression60
     PgClassExpression64{{"PgClassExpression[64∈10]<br />ᐸ__person__.”email”ᐳ"}}:::plan
-    PgSelectSingle48 --> PgClassExpression64
+    PgClassExpression60 o--o PgClassExpression64
     PgClassExpression61{{"PgClassExpression[61∈11]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle53 --> PgClassExpression61
     PgClassExpression65{{"PgClassExpression[65∈11]<br />ᐸ__person__.”email”ᐳ"}}:::plan
-    PgSelectSingle53 --> PgClassExpression65
+    PgClassExpression61 o--o PgClassExpression65
     PgClassExpression62{{"PgClassExpression[62∈12]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
     PgSelectSingle58 --> PgClassExpression62
     PgClassExpression66{{"PgClassExpression[66∈12]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
-    PgSelectSingle58 --> PgClassExpression66
+    PgClassExpression62 o--o PgClassExpression66
     PgClassExpression67{{"PgClassExpression[67∈12]<br />ᐸ__compound...__.”extra”ᐳ"}}:::plan
-    PgSelectSingle58 --> PgClassExpression67
+    PgClassExpression66 o--o PgClassExpression67
 
     %% define steps
     classDef bucket0 stroke:#696969

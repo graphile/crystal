@@ -65,17 +65,17 @@ graph TD
     PgSelectSingle36{{"PgSelectSingle[36∈3] ➊<br />ᐸfrmcdc_jwtTokenᐳ"}}:::plan
     First34 --> PgSelectSingle36
     PgClassExpression40{{"PgClassExpression[40∈3] ➊<br />ᐸ__authenti...__.”admin”ᐳ"}}:::plan
-    PgSelectSingle18 --> PgClassExpression40
+    Object19 o--o PgClassExpression40
     PgClassExpression46{{"PgClassExpression[46∈3] ➊<br />ᐸ__frmcdc_jwt_token__ᐳ"}}:::plan
     PgSelectSingle36 --> PgClassExpression46
     PgClassExpression37{{"PgClassExpression[37∈4] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgSelectSingle28 --> PgClassExpression37
     PgClassExpression39{{"PgClassExpression[39∈4] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle28 --> PgClassExpression39
+    PgClassExpression37 o--o PgClassExpression39
     PgClassExpression47{{"PgClassExpression[47∈5] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgSelectSingle28 --> PgClassExpression47
+    PgClassExpression39 o--o PgClassExpression47
     PgClassExpression48{{"PgClassExpression[48∈5] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle28 --> PgClassExpression48
+    PgClassExpression47 o--o PgClassExpression48
 
     %% define steps
     classDef bucket0 stroke:#696969

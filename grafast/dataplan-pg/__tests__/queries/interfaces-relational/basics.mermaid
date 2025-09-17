@@ -65,15 +65,15 @@ graph TD
     PgClassExpression77{{"PgClassExpression[77∈3]<br />ᐸ__relation...__.”type2”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression77
     PgClassExpression82{{"PgClassExpression[82∈3]<br />ᐸ__relation...”position”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression82
+    PgClassExpression77 o--o PgClassExpression82
     PgClassExpression87{{"PgClassExpression[87∈3]<br />ᐸ__relation...reated_at”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression87
+    PgClassExpression82 o--o PgClassExpression87
     PgClassExpression92{{"PgClassExpression[92∈3]<br />ᐸ__relation...pdated_at”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression92
+    PgClassExpression87 o--o PgClassExpression92
     PgClassExpression97{{"PgClassExpression[97∈3]<br />ᐸ__relation..._archived”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression97
+    PgClassExpression92 o--o PgClassExpression97
     PgClassExpression102{{"PgClassExpression[102∈3]<br />ᐸ__relation...chived_at”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression102
+    PgClassExpression97 o--o PgClassExpression102
     PgSelect28[["PgSelect[28∈5]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic<br />More deps:<br />- Object[10]"]]:::plan
     PgClassExpression23 --> PgSelect28
     First32{{"First[32∈5]^"}}:::plan

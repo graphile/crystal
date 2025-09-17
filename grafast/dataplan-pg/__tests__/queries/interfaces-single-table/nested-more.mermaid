@@ -77,7 +77,7 @@ graph TD
     Lambda26{{"Lambda[26∈3]"}}:::plan
     PgClassExpression25 --> Lambda26
     PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__single_t...parent_id”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression27
+    PgClassExpression23 o--o PgClassExpression27
     First32{{"First[32∈3]"}}:::plan
     PgSelectRows33[["PgSelectRows[33∈3]"]]:::plan
     PgSelectRows33 --> First32
@@ -85,7 +85,7 @@ graph TD
     Lambda229 --> PgSelectRows33
     First32 --> PgSelectSingle34
     PgClassExpression77{{"PgClassExpression[77∈3]<br />ᐸ__single_t...__.”type2”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression77
+    PgClassExpression27 o--o PgClassExpression77
     First85{{"First[85∈3]"}}:::plan
     PgSelectRows86[["PgSelectRows[86∈3]"]]:::plan
     PgSelectRows86 --> First85
@@ -94,15 +94,15 @@ graph TD
     PgSelectSingle87{{"PgSelectSingle[87∈3]<br />ᐸpeopleᐳ"}}:::plan
     First85 --> PgSelectSingle87
     PgClassExpression112{{"PgClassExpression[112∈3]<br />ᐸ__single_t...”position”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression112
+    PgClassExpression77 o--o PgClassExpression112
     PgClassExpression117{{"PgClassExpression[117∈3]<br />ᐸ__single_t...reated_at”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression117
+    PgClassExpression112 o--o PgClassExpression117
     PgClassExpression122{{"PgClassExpression[122∈3]<br />ᐸ__single_t...pdated_at”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression122
+    PgClassExpression117 o--o PgClassExpression122
     PgClassExpression127{{"PgClassExpression[127∈3]<br />ᐸ__single_t..._archived”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression127
+    PgClassExpression122 o--o PgClassExpression127
     PgClassExpression132{{"PgClassExpression[132∈3]<br />ᐸ__single_t...chived_at”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression132
+    PgClassExpression127 o--o PgClassExpression132
     PgClassExpression138{{"PgClassExpression[138∈3]<br />ᐸ__single_t...s__.”type”ᐳ"}}:::plan
     PgSelectSingle34 --> PgClassExpression138
     Lambda139{{"Lambda[139∈3]"}}:::plan
@@ -117,15 +117,15 @@ graph TD
     PgSelectSingle163{{"PgSelectSingle[163∈3]<br />ᐸpeopleᐳ"}}:::plan
     First161 --> PgSelectSingle163
     PgClassExpression196{{"PgClassExpression[196∈3]<br />ᐸ__single_t...”position”ᐳ"}}:::plan
-    PgSelectSingle34 --> PgClassExpression196
+    PgClassExpression151 o--o PgClassExpression196
     PgClassExpression201{{"PgClassExpression[201∈3]<br />ᐸ__single_t...reated_at”ᐳ"}}:::plan
-    PgSelectSingle34 --> PgClassExpression201
+    PgClassExpression196 o--o PgClassExpression201
     PgClassExpression206{{"PgClassExpression[206∈3]<br />ᐸ__single_t...pdated_at”ᐳ"}}:::plan
-    PgSelectSingle34 --> PgClassExpression206
+    PgClassExpression201 o--o PgClassExpression206
     PgClassExpression211{{"PgClassExpression[211∈3]<br />ᐸ__single_t..._archived”ᐳ"}}:::plan
-    PgSelectSingle34 --> PgClassExpression211
+    PgClassExpression206 o--o PgClassExpression211
     PgClassExpression216{{"PgClassExpression[216∈3]<br />ᐸ__single_t...chived_at”ᐳ"}}:::plan
-    PgSelectSingle34 --> PgClassExpression216
+    PgClassExpression211 o--o PgClassExpression216
     Lambda229 --> Access223
     List224 --> Lambda225
     Lambda237 --> Access227

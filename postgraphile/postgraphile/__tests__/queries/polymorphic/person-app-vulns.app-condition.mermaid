@@ -88,7 +88,7 @@ graph TD
     PgClassExpression63{{"PgClassExpression[63∈9]^<br />ᐸ__aws_appl...ons__.”id”ᐳ"}}:::plan
     PgSelectSingle54 --> PgClassExpression63
     PgClassExpression65{{"PgClassExpression[65∈9]^<br />ᐸ__aws_appl...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle54 --> PgClassExpression65
+    PgClassExpression63 o--o PgClassExpression65
     PgSelect56[["PgSelect[56∈10]<br />ᐸgcp_applicationsᐳ<br />ᐳGcpApplication<br />More deps:<br />- Object[12]"]]:::plan
     Access47 --> PgSelect56
     First60{{"First[60∈10]^"}}:::plan
@@ -100,7 +100,7 @@ graph TD
     PgClassExpression64{{"PgClassExpression[64∈10]^<br />ᐸ__gcp_appl...ons__.”id”ᐳ"}}:::plan
     PgSelectSingle62 --> PgClassExpression64
     PgClassExpression66{{"PgClassExpression[66∈10]^<br />ᐸ__gcp_appl...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle62 --> PgClassExpression66
+    PgClassExpression64 o--o PgClassExpression66
 
     %% define steps
     classDef bucket0 stroke:#696969

@@ -60,11 +60,11 @@ graph TD
     PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__messages__.”id”ᐳ"}}:::plan
     PgSelectSingle21 --> PgClassExpression22
     PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__messages__.”featured”ᐳ"}}:::plan
-    PgSelectSingle21 --> PgClassExpression23
+    PgClassExpression22 o--o PgClassExpression23
     PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
-    PgSelectSingle21 --> PgClassExpression24
+    PgClassExpression23 o--o PgClassExpression24
     PgClassExpression25{{"PgClassExpression[25∈3]<br />ᐸ(__message... not null)ᐳ"}}:::plan
-    PgSelectSingle21 --> PgClassExpression25
+    PgClassExpression24 o--o PgClassExpression25
     PgSelectSingle21 --> PgClassExpression26
     First31{{"First[31∈3]"}}:::plan
     PgSelectRows32[["PgSelectRows[32∈3]"]]:::plan
@@ -82,11 +82,11 @@ graph TD
     PgClassExpression42{{"PgClassExpression[42∈4]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
     PgSelectSingle33 --> PgClassExpression42
     PgClassExpression44{{"PgClassExpression[44∈4]<br />ᐸ(__forums_... not null)ᐳ"}}:::plan
-    PgSelectSingle33 --> PgClassExpression44
+    PgClassExpression42 o--o PgClassExpression44
     PgClassExpression41{{"PgClassExpression[41∈5]<br />ᐸ__users__.”username”ᐳ"}}:::plan
     PgSelectSingle39 --> PgClassExpression41
     PgClassExpression43{{"PgClassExpression[43∈5]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
-    PgSelectSingle39 --> PgClassExpression43
+    PgClassExpression41 o--o PgClassExpression43
 
     %% define steps
     classDef bucket0 stroke:#696969

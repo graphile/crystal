@@ -46,19 +46,19 @@ graph TD
     PgClassExpression22{{"PgClassExpression[22∈1] ➊<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
     PgSelectSingle21 --> PgClassExpression22
     PgClassExpression28{{"PgClassExpression[28∈1] ➊<br />ᐸ__relation...__.”type2”ᐳ"}}:::plan
-    PgSelectSingle21 --> PgClassExpression28
+    PgClassExpression22 o--o PgClassExpression28
     PgClassExpression34{{"PgClassExpression[34∈1] ➊<br />ᐸ__relation...”position”ᐳ"}}:::plan
-    PgSelectSingle21 --> PgClassExpression34
+    PgClassExpression28 o--o PgClassExpression34
     PgClassExpression40{{"PgClassExpression[40∈1] ➊<br />ᐸ__relation...reated_at”ᐳ"}}:::plan
-    PgSelectSingle21 --> PgClassExpression40
+    PgClassExpression34 o--o PgClassExpression40
     PgClassExpression46{{"PgClassExpression[46∈1] ➊<br />ᐸ__relation...pdated_at”ᐳ"}}:::plan
-    PgSelectSingle21 --> PgClassExpression46
+    PgClassExpression40 o--o PgClassExpression46
     PgClassExpression52{{"PgClassExpression[52∈1] ➊<br />ᐸ__relation..._archived”ᐳ"}}:::plan
-    PgSelectSingle21 --> PgClassExpression52
+    PgClassExpression46 o--o PgClassExpression52
     PgClassExpression58{{"PgClassExpression[58∈1] ➊<br />ᐸ__relation...chived_at”ᐳ"}}:::plan
-    PgSelectSingle21 --> PgClassExpression58
+    PgClassExpression52 o--o PgClassExpression58
     PgClassExpression59{{"PgClassExpression[59∈1] ➊<br />ᐸ__relation...__.”title”ᐳ"}}:::plan
-    PgSelectSingle13 --> PgClassExpression59
+    PgClassExpression14 o--o PgClassExpression59
     List62 --> Lambda63
 
     %% define steps

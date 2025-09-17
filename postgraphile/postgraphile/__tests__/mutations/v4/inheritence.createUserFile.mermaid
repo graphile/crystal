@@ -74,7 +74,7 @@ graph TD
     Access32 --> PgClassExpression31
     PgInsertSingle20 --> Access32
     PgClassExpression34{{"PgClassExpression[34∈6] ➊<br />ᐸ__user_fil...”filename”ᐳ"}}:::plan
-    Access32 --> PgClassExpression34
+    PgClassExpression31 o--o PgClassExpression34
     Access32 --> PgClassExpression36
     First41{{"First[41∈6] ➊"}}:::plan
     PgSelectRows42[["PgSelectRows[42∈6] ➊"]]:::plan
@@ -85,7 +85,7 @@ graph TD
     PgClassExpression44{{"PgClassExpression[44∈7] ➊<br />ᐸ__user__.”id”ᐳ"}}:::plan
     PgSelectSingle43 --> PgClassExpression44
     PgClassExpression45{{"PgClassExpression[45∈7] ➊<br />ᐸ__user__.”name”ᐳ"}}:::plan
-    PgSelectSingle43 --> PgClassExpression45
+    PgClassExpression44 o--o PgClassExpression45
 
     %% define steps
     classDef bucket0 stroke:#696969

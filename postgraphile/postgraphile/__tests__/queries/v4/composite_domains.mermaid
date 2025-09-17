@@ -60,7 +60,7 @@ graph TD
     PgClassExpression19{{"PgClassExpression[19∈4]<br />ᐸ__posts__.”id”ᐳ"}}:::plan
     PgSelectSingle18 --> PgClassExpression19
     PgClassExpression20{{"PgClassExpression[20∈4]<br />ᐸ__posts__.”user_id”ᐳ"}}:::plan
-    PgSelectSingle18 --> PgClassExpression20
+    PgClassExpression19 o--o PgClassExpression20
     First26{{"First[26∈4]"}}:::plan
     PgSelectRows27[["PgSelectRows[27∈4]"]]:::plan
     PgSelectRows27 --> First26
@@ -69,7 +69,7 @@ graph TD
     PgSelectSingle28{{"PgSelectSingle[28∈4]<br />ᐸfrmcdc_userUpdateContentᐳ"}}:::plan
     First26 --> PgSelectSingle28
     PgClassExpression33{{"PgClassExpression[33∈4]<br />ᐸ__posts__.”created_at”ᐳ"}}:::plan
-    PgSelectSingle18 --> PgClassExpression33
+    PgClassExpression20 o--o PgClassExpression33
     PgSelectRows34[["PgSelectRows[34∈4]"]]:::plan
     Lambda74{{"Lambda[74∈4]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda74 --> PgSelectRows34
@@ -100,7 +100,7 @@ graph TD
     PgClassExpression63{{"PgClassExpression[63∈9]<br />ᐸ__frmcdc_u...node_type”ᐳ"}}:::plan
     PgSelectSingle53 --> PgClassExpression63
     PgClassExpression64{{"PgClassExpression[64∈9]<br />ᐸ__frmcdc_u...node_text”ᐳ"}}:::plan
-    PgSelectSingle53 --> PgClassExpression64
+    PgClassExpression63 o--o PgClassExpression64
     PgSelect55[["PgSelect[55∈10]<br />ᐸfrmcdc_userUpdateContentLineNodeᐳ<br />More deps:<br />- Object[11]"]]:::plan
     __Item54[/"__Item[54∈10]<br />ᐸ48ᐳ"\]:::itemplan
     __Item54 & PgFromExpression59 --> PgSelect55
@@ -114,7 +114,7 @@ graph TD
     PgClassExpression65{{"PgClassExpression[65∈11]<br />ᐸ__frmcdc_u...node_type”ᐳ"}}:::plan
     PgSelectSingle62 --> PgClassExpression65
     PgClassExpression66{{"PgClassExpression[66∈11]<br />ᐸ__frmcdc_u...node_text”ᐳ"}}:::plan
-    PgSelectSingle62 --> PgClassExpression66
+    PgClassExpression65 o--o PgClassExpression66
 
     %% define steps
     classDef bucket0 stroke:#696969

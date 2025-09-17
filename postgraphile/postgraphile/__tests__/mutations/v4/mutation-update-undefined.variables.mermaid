@@ -45,11 +45,11 @@ graph TD
     Access21 --> PgClassExpression20
     PgUpdateSingle14 --> Access21
     PgClassExpression22{{"PgClassExpression[22∈3] ➊<br />ᐸ__similar_...1__.”col1”ᐳ"}}:::plan
-    Access21 --> PgClassExpression22
+    PgClassExpression20 o--o PgClassExpression22
     PgClassExpression23{{"PgClassExpression[23∈3] ➊<br />ᐸ__similar_...1__.”col2”ᐳ"}}:::plan
-    Access21 --> PgClassExpression23
+    PgClassExpression22 o--o PgClassExpression23
     PgClassExpression24{{"PgClassExpression[24∈3] ➊<br />ᐸ__similar_...1__.”col3”ᐳ"}}:::plan
-    Access21 --> PgClassExpression24
+    PgClassExpression23 o--o PgClassExpression24
 
     %% define steps
     classDef bucket0 stroke:#696969

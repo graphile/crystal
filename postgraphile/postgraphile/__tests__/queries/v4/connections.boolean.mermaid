@@ -92,15 +92,15 @@ graph TD
     PgClassExpression64{{"PgClassExpression[64∈9]<br />ᐸ__compound...__.”extra”ᐳ"}}:::plan
     PgSelectSingle62 --> PgClassExpression64
     PgClassExpression66{{"PgClassExpression[66∈9]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
-    PgSelectSingle62 --> PgClassExpression66
+    PgClassExpression64 o--o PgClassExpression66
     PgClassExpression68{{"PgClassExpression[68∈9]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
-    PgSelectSingle62 --> PgClassExpression68
+    PgClassExpression66 o--o PgClassExpression68
     PgClassExpression65{{"PgClassExpression[65∈10]<br />ᐸ__compound...__.”extra”ᐳ"}}:::plan
     PgSelectSingle63 --> PgClassExpression65
     PgClassExpression67{{"PgClassExpression[67∈10]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
-    PgSelectSingle63 --> PgClassExpression67
+    PgClassExpression65 o--o PgClassExpression67
     PgClassExpression69{{"PgClassExpression[69∈10]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
-    PgSelectSingle63 --> PgClassExpression69
+    PgClassExpression67 o--o PgClassExpression69
 
     %% define steps
     classDef bucket0 stroke:#696969

@@ -40,15 +40,15 @@ graph TD
     Object19{{"Object[19∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgSelectSingle18 --> Object19
     PgClassExpression21{{"PgClassExpression[21∈3] ➊<br />ᐸ__authenticate__.”role”ᐳ"}}:::plan
-    PgSelectSingle18 --> PgClassExpression21
+    Object19 o--o PgClassExpression21
     PgClassExpression22{{"PgClassExpression[22∈3] ➊<br />ᐸ__authenticate__.”exp”ᐳ"}}:::plan
-    PgSelectSingle18 --> PgClassExpression22
+    PgClassExpression21 o--o PgClassExpression22
     PgClassExpression23{{"PgClassExpression[23∈3] ➊<br />ᐸ__authenticate__.”a”ᐳ"}}:::plan
-    PgSelectSingle18 --> PgClassExpression23
+    PgClassExpression22 o--o PgClassExpression23
     PgClassExpression24{{"PgClassExpression[24∈3] ➊<br />ᐸ__authenticate__.”b”ᐳ"}}:::plan
-    PgSelectSingle18 --> PgClassExpression24
+    PgClassExpression23 o--o PgClassExpression24
     PgClassExpression25{{"PgClassExpression[25∈3] ➊<br />ᐸ__authenticate__.”c”ᐳ"}}:::plan
-    PgSelectSingle18 --> PgClassExpression25
+    PgClassExpression24 o--o PgClassExpression25
 
     %% define steps
     classDef bucket0 stroke:#696969

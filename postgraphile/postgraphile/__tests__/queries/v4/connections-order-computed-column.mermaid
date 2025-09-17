@@ -53,11 +53,11 @@ graph TD
     PgClassExpression29{{"PgClassExpression[29∈7]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgSelectSingle26 --> PgClassExpression29
     PgClassExpression31{{"PgClassExpression[31∈7]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle26 --> PgClassExpression31
+    PgClassExpression29 o--o PgClassExpression31
     PgClassExpression30{{"PgClassExpression[30∈8]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgSelectSingle28 --> PgClassExpression30
     PgClassExpression32{{"PgClassExpression[32∈8]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle28 --> PgClassExpression32
+    PgClassExpression30 o--o PgClassExpression32
 
     %% define steps
     classDef bucket0 stroke:#696969

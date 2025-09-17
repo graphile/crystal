@@ -93,23 +93,23 @@ graph TD
     PgClassExpression66{{"PgClassExpression[66∈9]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgSelectSingle64 --> PgClassExpression66
     PgClassExpression68{{"PgClassExpression[68∈9]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle64 --> PgClassExpression68
+    PgClassExpression66 o--o PgClassExpression68
     PgClassExpression70{{"PgClassExpression[70∈9]<br />ᐸ__person__.”email”ᐳ"}}:::plan
-    PgSelectSingle64 --> PgClassExpression70
+    PgClassExpression68 o--o PgClassExpression70
     PgClassExpression72{{"PgClassExpression[72∈9]<br />ᐸ__person__.”config”ᐳ"}}:::plan
-    PgSelectSingle64 --> PgClassExpression72
+    PgClassExpression70 o--o PgClassExpression72
     PgClassExpression74{{"PgClassExpression[74∈9]<br />ᐸ__person__...n_from_ip”ᐳ"}}:::plan
-    PgSelectSingle64 --> PgClassExpression74
+    PgClassExpression72 o--o PgClassExpression74
     PgClassExpression67{{"PgClassExpression[67∈10]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgSelectSingle65 --> PgClassExpression67
     PgClassExpression69{{"PgClassExpression[69∈10]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle65 --> PgClassExpression69
+    PgClassExpression67 o--o PgClassExpression69
     PgClassExpression71{{"PgClassExpression[71∈10]<br />ᐸ__person__.”email”ᐳ"}}:::plan
-    PgSelectSingle65 --> PgClassExpression71
+    PgClassExpression69 o--o PgClassExpression71
     PgClassExpression73{{"PgClassExpression[73∈10]<br />ᐸ__person__.”config”ᐳ"}}:::plan
-    PgSelectSingle65 --> PgClassExpression73
+    PgClassExpression71 o--o PgClassExpression73
     PgClassExpression75{{"PgClassExpression[75∈10]<br />ᐸ__person__...n_from_ip”ᐳ"}}:::plan
-    PgSelectSingle65 --> PgClassExpression75
+    PgClassExpression73 o--o PgClassExpression75
 
     %% define steps
     classDef bucket0 stroke:#696969

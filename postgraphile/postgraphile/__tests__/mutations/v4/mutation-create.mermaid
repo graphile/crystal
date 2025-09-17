@@ -360,7 +360,7 @@ graph TD
     Access748{{"Access[748∈12] ➊<br />ᐸ2.withPgClientᐳ<br />More deps:<br />- __Value[2]"}}:::plan
     Access747 & Access748 --> Object749
     Access192{{"Access[192∈12] ➊<br />ᐸ74.m.clientMutationIdᐳ"}}:::plan
-    PgInsertSingle74 --> Access192
+    Object79 o--o Access192
     Lambda546{{"Lambda[546∈12] ➊<br />ᐸrawEncodeᐳ<br />More deps:<br />- Constantᐸ'query'ᐳ[531]"}}:::plan
     PgSelectInlineApply975["PgSelectInlineApply[975∈12] ➊"]:::plan
     PgSelectInlineApply979["PgSelectInlineApply[979∈12] ➊"]:::plan
@@ -434,7 +434,7 @@ graph TD
     Access592{{"Access[592∈13] ➊<br />ᐸ460.cursorDetailsᐳ"}}:::plan
     First464 & Access592 --> PgCursor593
     Access193{{"Access[193∈13] ➊<br />ᐸ91.m.clientMutationIdᐳ"}}:::plan
-    PgInsertSingle91 --> Access193
+    Object96 o--o Access193
     Access200{{"Access[200∈13] ➊<br />ᐸ91.tᐳ"}}:::plan
     Access200 --> PgClassExpression199
     PgInsertSingle91 --> Access200
@@ -506,17 +506,17 @@ graph TD
     PgClassExpression646{{"PgClassExpression[646∈13] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     Access200 --> PgClassExpression646
     PgClassExpression657{{"PgClassExpression[657∈13] ➊<br />ᐸ__person__.”email”ᐳ"}}:::plan
-    Access200 --> PgClassExpression657
+    PgClassExpression646 o--o PgClassExpression657
     PgClassExpression662{{"PgClassExpression[662∈13] ➊<br />ᐸ__person__.”about”ᐳ"}}:::plan
-    Access200 --> PgClassExpression662
+    PgClassExpression657 o--o PgClassExpression662
     PgClassExpression674{{"PgClassExpression[674∈13] ➊<br />ᐸ__person__.”config”ᐳ"}}:::plan
-    Access200 --> PgClassExpression674
+    PgClassExpression662 o--o PgClassExpression674
     PgClassExpression684{{"PgClassExpression[684∈13] ➊<br />ᐸ__person__...n_from_ip”ᐳ"}}:::plan
-    Access200 --> PgClassExpression684
+    PgClassExpression674 o--o PgClassExpression684
     PgClassExpression688{{"PgClassExpression[688∈13] ➊<br />ᐸ__person__...om_subnet”ᐳ"}}:::plan
-    Access200 --> PgClassExpression688
+    PgClassExpression684 o--o PgClassExpression688
     PgClassExpression692{{"PgClassExpression[692∈13] ➊<br />ᐸ__person__.”user_mac”ᐳ"}}:::plan
-    Access200 --> PgClassExpression692
+    PgClassExpression688 o--o PgClassExpression692
     Access200 --> PgClassExpression696
     First701{{"First[701∈13] ➊"}}:::plan
     PgSelectRows702[["PgSelectRows[702∈13] ➊"]]:::plan
@@ -596,7 +596,7 @@ graph TD
     Access594{{"Access[594∈14] ➊<br />ᐸ470.cursorDetailsᐳ"}}:::plan
     First474 & Access594 --> PgCursor595
     Access194{{"Access[194∈14] ➊<br />ᐸ106.m.clientMutationIdᐳ"}}:::plan
-    PgInsertSingle106 --> Access194
+    Object111 o--o Access194
     Access213{{"Access[213∈14] ➊<br />ᐸ106.tᐳ"}}:::plan
     Access213 --> PgClassExpression212
     PgInsertSingle106 --> Access213
@@ -668,17 +668,17 @@ graph TD
     PgClassExpression647{{"PgClassExpression[647∈14] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     Access213 --> PgClassExpression647
     PgClassExpression658{{"PgClassExpression[658∈14] ➊<br />ᐸ__person__.”email”ᐳ"}}:::plan
-    Access213 --> PgClassExpression658
+    PgClassExpression647 o--o PgClassExpression658
     PgClassExpression663{{"PgClassExpression[663∈14] ➊<br />ᐸ__person__.”about”ᐳ"}}:::plan
-    Access213 --> PgClassExpression663
+    PgClassExpression658 o--o PgClassExpression663
     PgClassExpression675{{"PgClassExpression[675∈14] ➊<br />ᐸ__person__.”config”ᐳ"}}:::plan
-    Access213 --> PgClassExpression675
+    PgClassExpression663 o--o PgClassExpression675
     PgClassExpression685{{"PgClassExpression[685∈14] ➊<br />ᐸ__person__...n_from_ip”ᐳ"}}:::plan
-    Access213 --> PgClassExpression685
+    PgClassExpression675 o--o PgClassExpression685
     PgClassExpression689{{"PgClassExpression[689∈14] ➊<br />ᐸ__person__...om_subnet”ᐳ"}}:::plan
-    Access213 --> PgClassExpression689
+    PgClassExpression685 o--o PgClassExpression689
     PgClassExpression693{{"PgClassExpression[693∈14] ➊<br />ᐸ__person__.”user_mac”ᐳ"}}:::plan
-    Access213 --> PgClassExpression693
+    PgClassExpression689 o--o PgClassExpression693
     Access213 --> PgClassExpression707
     First712{{"First[712∈14] ➊"}}:::plan
     PgSelectRows713[["PgSelectRows[713∈14] ➊"]]:::plan
@@ -701,7 +701,7 @@ graph TD
     PgSelect282[["PgSelect[282∈15] ➊<br />ᐸpersonᐳ"]]:::plan
     Object230 & PgClassExpression281 --> PgSelect282
     Access195{{"Access[195∈15] ➊<br />ᐸ115.m.clientMutationIdᐳ"}}:::plan
-    PgInsertSingle115 --> Access195
+    Object120 o--o Access195
     Access226{{"Access[226∈15] ➊<br />ᐸ115.tᐳ"}}:::plan
     Access226 --> PgClassExpression225
     PgInsertSingle115 --> Access226
@@ -795,7 +795,7 @@ graph TD
     Access596{{"Access[596∈18] ➊<br />ᐸ480.cursorDetailsᐳ"}}:::plan
     First484 & Access596 --> PgCursor597
     Access196{{"Access[196∈18] ➊<br />ᐸ146.m.clientMutationIdᐳ"}}:::plan
-    PgInsertSingle146 --> Access196
+    Object151 o--o Access196
     Access235{{"Access[235∈18] ➊<br />ᐸ146.tᐳ"}}:::plan
     Access235 --> PgClassExpression234
     PgInsertSingle146 --> Access235
@@ -867,17 +867,17 @@ graph TD
     PgClassExpression649{{"PgClassExpression[649∈18] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     Access235 --> PgClassExpression649
     PgClassExpression660{{"PgClassExpression[660∈18] ➊<br />ᐸ__person__.”email”ᐳ"}}:::plan
-    Access235 --> PgClassExpression660
+    PgClassExpression649 o--o PgClassExpression660
     PgClassExpression672{{"PgClassExpression[672∈18] ➊<br />ᐸ__person__.”about”ᐳ"}}:::plan
-    Access235 --> PgClassExpression672
+    PgClassExpression660 o--o PgClassExpression672
     PgClassExpression682{{"PgClassExpression[682∈18] ➊<br />ᐸ__person__.”config”ᐳ"}}:::plan
-    Access235 --> PgClassExpression682
+    PgClassExpression672 o--o PgClassExpression682
     PgClassExpression686{{"PgClassExpression[686∈18] ➊<br />ᐸ__person__...n_from_ip”ᐳ"}}:::plan
-    Access235 --> PgClassExpression686
+    PgClassExpression682 o--o PgClassExpression686
     PgClassExpression690{{"PgClassExpression[690∈18] ➊<br />ᐸ__person__...om_subnet”ᐳ"}}:::plan
-    Access235 --> PgClassExpression690
+    PgClassExpression686 o--o PgClassExpression690
     PgClassExpression694{{"PgClassExpression[694∈18] ➊<br />ᐸ__person__.”user_mac”ᐳ"}}:::plan
-    Access235 --> PgClassExpression694
+    PgClassExpression690 o--o PgClassExpression694
     Access235 --> PgClassExpression718
     First723{{"First[723∈18] ➊"}}:::plan
     PgSelectRows724[["PgSelectRows[724∈18] ➊"]]:::plan
@@ -974,7 +974,7 @@ graph TD
     Access506 --> PgClassExpression505
     PgInsertSingle166 --> Access506
     PgClassExpression601{{"PgClassExpression[601∈51] ➊<br />ᐸ__default_...ull_value”ᐳ"}}:::plan
-    Access506 --> PgClassExpression601
+    PgClassExpression505 o--o PgClassExpression601
     PgSelect636[["PgSelect[636∈52] ➊<br />ᐸfrmcdc_comptypeᐳ"]]:::plan
     PgFromExpression640{{"PgFromExpression[640∈52] ➊"}}:::plan
     Object639 & PgFromExpression640 --> PgSelect636
@@ -983,7 +983,7 @@ graph TD
     Access508 --> PgClassExpression507
     PgInsertSingle176 --> Access508
     PgClassExpression602{{"PgClassExpression[602∈52] ➊<br />ᐸ__post__.”headline”ᐳ"}}:::plan
-    Access508 --> PgClassExpression602
+    PgClassExpression507 o--o PgClassExpression602
     PgClassExpression635{{"PgClassExpression[635∈52] ➊<br />ᐸ__post__.”comptypes”ᐳ"}}:::plan
     Access508 --> PgClassExpression635
     PgClassExpression635 --> PgFromExpression640
@@ -1013,29 +1013,29 @@ graph TD
     PgClassExpression645{{"PgClassExpression[645∈54] ➊<br />ᐸ__types__.”smallint”ᐳ"}}:::plan
     Access513 --> PgClassExpression645
     PgClassExpression656{{"PgClassExpression[656∈54] ➊<br />ᐸ__types__.”bigint”ᐳ"}}:::plan
-    Access513 --> PgClassExpression656
+    PgClassExpression645 o--o PgClassExpression656
     PgClassExpression661{{"PgClassExpression[661∈54] ➊<br />ᐸ__types__.”numeric”ᐳ"}}:::plan
-    Access513 --> PgClassExpression661
+    PgClassExpression656 o--o PgClassExpression661
     PgClassExpression673{{"PgClassExpression[673∈54] ➊<br />ᐸ__types__.”decimal”ᐳ"}}:::plan
-    Access513 --> PgClassExpression673
+    PgClassExpression661 o--o PgClassExpression673
     PgClassExpression683{{"PgClassExpression[683∈54] ➊<br />ᐸ__types__.”boolean”ᐳ"}}:::plan
-    Access513 --> PgClassExpression683
+    PgClassExpression673 o--o PgClassExpression683
     PgClassExpression687{{"PgClassExpression[687∈54] ➊<br />ᐸ__types__.”varchar”ᐳ"}}:::plan
-    Access513 --> PgClassExpression687
+    PgClassExpression683 o--o PgClassExpression687
     PgClassExpression691{{"PgClassExpression[691∈54] ➊<br />ᐸ__types__.”enum”ᐳ"}}:::plan
-    Access513 --> PgClassExpression691
+    PgClassExpression687 o--o PgClassExpression691
     PgClassExpression695{{"PgClassExpression[695∈54] ➊<br />ᐸ__types__.”enum_array”ᐳ"}}:::plan
     Access513 --> PgClassExpression695
     PgClassExpression729{{"PgClassExpression[729∈54] ➊<br />ᐸ__types__.”domain”ᐳ"}}:::plan
-    Access513 --> PgClassExpression729
+    PgClassExpression691 o--o PgClassExpression729
     PgClassExpression730{{"PgClassExpression[730∈54] ➊<br />ᐸ__types__.”domain2”ᐳ"}}:::plan
-    Access513 --> PgClassExpression730
+    PgClassExpression729 o--o PgClassExpression730
     PgClassExpression731{{"PgClassExpression[731∈54] ➊<br />ᐸ__types__.”text_array”ᐳ"}}:::plan
     Access513 --> PgClassExpression731
     PgClassExpression732{{"PgClassExpression[732∈54] ➊<br />ᐸ__types__.”json”ᐳ"}}:::plan
-    Access513 --> PgClassExpression732
+    PgClassExpression730 o--o PgClassExpression732
     PgClassExpression733{{"PgClassExpression[733∈54] ➊<br />ᐸ__types__.”jsonb”ᐳ"}}:::plan
-    Access513 --> PgClassExpression733
+    PgClassExpression732 o--o PgClassExpression733
     PgClassExpression734{{"PgClassExpression[734∈54] ➊<br />ᐸ__types__.”numrange”ᐳ"}}:::plan
     Access513 --> PgClassExpression734
     PgClassExpression735{{"PgClassExpression[735∈54] ➊<br />ᐸ__types__.”daterange”ᐳ"}}:::plan
@@ -1043,21 +1043,21 @@ graph TD
     PgClassExpression736{{"PgClassExpression[736∈54] ➊<br />ᐸ__types__....int_range”ᐳ"}}:::plan
     Access513 --> PgClassExpression736
     PgClassExpression737{{"PgClassExpression[737∈54] ➊<br />ᐸ__types__.”timestamp”ᐳ"}}:::plan
-    Access513 --> PgClassExpression737
+    PgClassExpression733 o--o PgClassExpression737
     PgClassExpression738{{"PgClassExpression[738∈54] ➊<br />ᐸ__types__.”timestamptz”ᐳ"}}:::plan
-    Access513 --> PgClassExpression738
+    PgClassExpression737 o--o PgClassExpression738
     PgClassExpression739{{"PgClassExpression[739∈54] ➊<br />ᐸ__types__.”date”ᐳ"}}:::plan
-    Access513 --> PgClassExpression739
+    PgClassExpression738 o--o PgClassExpression739
     PgClassExpression740{{"PgClassExpression[740∈54] ➊<br />ᐸ__types__.”time”ᐳ"}}:::plan
-    Access513 --> PgClassExpression740
+    PgClassExpression739 o--o PgClassExpression740
     PgClassExpression741{{"PgClassExpression[741∈54] ➊<br />ᐸ__types__.”timetz”ᐳ"}}:::plan
-    Access513 --> PgClassExpression741
+    PgClassExpression740 o--o PgClassExpression741
     PgClassExpression742{{"PgClassExpression[742∈54] ➊<br />ᐸ__types__.”interval”ᐳ"}}:::plan
     Access513 --> PgClassExpression742
     PgClassExpression743{{"PgClassExpression[743∈54] ➊<br />ᐸ__types__....val_array”ᐳ"}}:::plan
     Access513 --> PgClassExpression743
     PgClassExpression744{{"PgClassExpression[744∈54] ➊<br />ᐸ__types__.”money”ᐳ"}}:::plan
-    Access513 --> PgClassExpression744
+    PgClassExpression741 o--o PgClassExpression744
     Access513 --> PgClassExpression745
     First750{{"First[750∈54] ➊"}}:::plan
     PgSelectRows751[["PgSelectRows[751∈54] ➊"]]:::plan
@@ -1076,11 +1076,11 @@ graph TD
     PgClassExpression760{{"PgClassExpression[760∈54] ➊<br />ᐸ__types__....ablePoint”ᐳ"}}:::plan
     Access513 --> PgClassExpression760
     PgClassExpression761{{"PgClassExpression[761∈54] ➊<br />ᐸ__types__.”inet”ᐳ"}}:::plan
-    Access513 --> PgClassExpression761
+    PgClassExpression744 o--o PgClassExpression761
     PgClassExpression762{{"PgClassExpression[762∈54] ➊<br />ᐸ__types__.”cidr”ᐳ"}}:::plan
-    Access513 --> PgClassExpression762
+    PgClassExpression761 o--o PgClassExpression762
     PgClassExpression763{{"PgClassExpression[763∈54] ➊<br />ᐸ__types__.”macaddr”ᐳ"}}:::plan
-    Access513 --> PgClassExpression763
+    PgClassExpression762 o--o PgClassExpression763
     PgClassExpression764{{"PgClassExpression[764∈54] ➊<br />ᐸ__types__....ay_domain”ᐳ"}}:::plan
     Access513 --> PgClassExpression764
     PgClassExpression765{{"PgClassExpression[765∈54] ➊<br />ᐸ__types__....ay_domain”ᐳ"}}:::plan
@@ -1105,15 +1105,15 @@ graph TD
     Access869{{"Access[869∈54] ➊<br />ᐸ759.xᐳ"}}:::plan
     PgClassExpression759 --> Access869
     Access898{{"Access[898∈54] ➊<br />ᐸ734.endᐳ"}}:::plan
-    PgClassExpression734 --> Access898
+    Access858 o--o Access898
     Access899{{"Access[899∈54] ➊<br />ᐸ735.endᐳ"}}:::plan
-    PgClassExpression735 --> Access899
+    Access859 o--o Access899
     Access900{{"Access[900∈54] ➊<br />ᐸ736.endᐳ"}}:::plan
-    PgClassExpression736 --> Access900
+    Access860 o--o Access900
     Access901{{"Access[901∈54] ➊<br />ᐸ742.minutesᐳ"}}:::plan
-    PgClassExpression742 --> Access901
+    Access861 o--o Access901
     PgClassExpression902{{"PgClassExpression[902∈54] ➊<br />ᐸ__frmcdc_c...type__.”b”ᐳ"}}:::plan
-    PgSelectSingle752 --> PgClassExpression902
+    PgClassExpression862 o--o PgClassExpression902
     First906{{"First[906∈54] ➊"}}:::plan
     PgSelectRows907[["PgSelectRows[907∈54] ➊"]]:::plan
     PgSelectRows907 --> First906
@@ -1122,51 +1122,51 @@ graph TD
     PgSelectSingle908{{"PgSelectSingle[908∈54] ➊<br />ᐸfrmcdc_compoundTypeᐳ"}}:::plan
     First906 --> PgSelectSingle908
     Access909{{"Access[909∈54] ➊<br />ᐸ759.yᐳ"}}:::plan
-    PgClassExpression759 --> Access909
+    Access869 o--o Access909
     Access917{{"Access[917∈54] ➊<br />ᐸ742.hoursᐳ"}}:::plan
-    PgClassExpression742 --> Access917
+    Access901 o--o Access917
     PgClassExpression918{{"PgClassExpression[918∈54] ➊<br />ᐸ__frmcdc_c...type__.”c”ᐳ"}}:::plan
-    PgSelectSingle752 --> PgClassExpression918
+    PgClassExpression902 o--o PgClassExpression918
     PgClassExpression919{{"PgClassExpression[919∈54] ➊<br />ᐸ__frmcdc_n....”baz_buz”ᐳ"}}:::plan
     PgSelectSingle758 --> PgClassExpression919
     Access926{{"Access[926∈54] ➊<br />ᐸ742.daysᐳ"}}:::plan
-    PgClassExpression742 --> Access926
+    Access917 o--o Access926
     PgClassExpression927{{"PgClassExpression[927∈54] ➊<br />ᐸ__frmcdc_c...type__.”d”ᐳ"}}:::plan
-    PgSelectSingle752 --> PgClassExpression927
+    PgClassExpression918 o--o PgClassExpression927
     Access928{{"Access[928∈54] ➊<br />ᐸ742.monthsᐳ"}}:::plan
-    PgClassExpression742 --> Access928
+    Access926 o--o Access928
     PgClassExpression929{{"PgClassExpression[929∈54] ➊<br />ᐸ__frmcdc_c...type__.”e”ᐳ"}}:::plan
-    PgSelectSingle752 --> PgClassExpression929
+    PgClassExpression927 o--o PgClassExpression929
     Access930{{"Access[930∈54] ➊<br />ᐸ742.yearsᐳ"}}:::plan
-    PgClassExpression742 --> Access930
+    Access928 o--o Access930
     PgClassExpression931{{"PgClassExpression[931∈54] ➊<br />ᐸ__frmcdc_c...type__.”f”ᐳ"}}:::plan
-    PgSelectSingle752 --> PgClassExpression931
+    PgClassExpression929 o--o PgClassExpression931
     PgClassExpression932{{"PgClassExpression[932∈54] ➊<br />ᐸ__frmcdc_c....”foo_bar”ᐳ"}}:::plan
-    PgSelectSingle752 --> PgClassExpression932
+    PgClassExpression931 o--o PgClassExpression932
     Access946{{"Access[946∈54] ➊<br />ᐸ734.start.valueᐳ"}}:::plan
-    PgClassExpression734 --> Access946
+    Access898 o--o Access946
     Access947{{"Access[947∈54] ➊<br />ᐸ735.start.valueᐳ"}}:::plan
-    PgClassExpression735 --> Access947
+    Access899 o--o Access947
     Access948{{"Access[948∈54] ➊<br />ᐸ736.start.valueᐳ"}}:::plan
-    PgClassExpression736 --> Access948
+    Access900 o--o Access948
     Access950{{"Access[950∈54] ➊<br />ᐸ734.end.valueᐳ"}}:::plan
-    PgClassExpression734 --> Access950
+    Access946 o--o Access950
     Access951{{"Access[951∈54] ➊<br />ᐸ735.end.valueᐳ"}}:::plan
-    PgClassExpression735 --> Access951
+    Access947 o--o Access951
     Access952{{"Access[952∈54] ➊<br />ᐸ736.end.valueᐳ"}}:::plan
-    PgClassExpression736 --> Access952
+    Access948 o--o Access952
     Access955{{"Access[955∈54] ➊<br />ᐸ734.start.inclusiveᐳ"}}:::plan
-    PgClassExpression734 --> Access955
+    Access950 o--o Access955
     Access956{{"Access[956∈54] ➊<br />ᐸ735.start.inclusiveᐳ"}}:::plan
-    PgClassExpression735 --> Access956
+    Access951 o--o Access956
     Access957{{"Access[957∈54] ➊<br />ᐸ736.start.inclusiveᐳ"}}:::plan
-    PgClassExpression736 --> Access957
+    Access952 o--o Access957
     Access959{{"Access[959∈54] ➊<br />ᐸ734.end.inclusiveᐳ"}}:::plan
-    PgClassExpression734 --> Access959
+    Access955 o--o Access959
     Access960{{"Access[960∈54] ➊<br />ᐸ735.end.inclusiveᐳ"}}:::plan
-    PgClassExpression735 --> Access960
+    Access956 o--o Access960
     Access961{{"Access[961∈54] ➊<br />ᐸ736.end.inclusiveᐳ"}}:::plan
-    PgClassExpression736 --> Access961
+    Access957 o--o Access961
     PgSelect754 --> Access976
     List977 --> Lambda978
     PgSelect754 --> Access980
@@ -1190,15 +1190,15 @@ graph TD
     PgClassExpression566{{"PgClassExpression[566∈71] ➊<br />ᐸ__person__.”created_at”ᐳ"}}:::plan
     PgSelectSingle302 --> PgClassExpression566
     PgClassExpression777{{"PgClassExpression[777∈94] ➊<br />ᐸ__person__.”email”ᐳ"}}:::plan
-    PgSelectSingle302 --> PgClassExpression777
+    PgClassExpression566 o--o PgClassExpression777
     PgClassExpression851{{"PgClassExpression[851∈94] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgSelectSingle302 --> PgClassExpression851
+    PgClassExpression777 o--o PgClassExpression851
     List990{{"List[990∈95] ➊<br />ᐸ989,556ᐳ"}}:::plan
     Access989 & PgSelectSingle556 --> List990
     PgClassExpression778{{"PgClassExpression[778∈95] ➊<br />ᐸ__post__.”id”ᐳ"}}:::plan
     PgSelectSingle556 --> PgClassExpression778
     PgClassExpression871{{"PgClassExpression[871∈95] ➊<br />ᐸ__post__.”headline”ᐳ"}}:::plan
-    PgSelectSingle556 --> PgClassExpression871
+    PgClassExpression778 o--o PgClassExpression871
     First923{{"First[923∈95] ➊"}}:::plan
     PgSelectRows924[["PgSelectRows[924∈95] ➊"]]:::plan
     PgSelectRows924 --> First923
@@ -1408,7 +1408,7 @@ graph TD
     Lambda854{{"Lambda[854∈120] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List853 --> Lambda854
     PgClassExpression896{{"PgClassExpression[896∈120] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle233 --> PgClassExpression896
+    PgClassExpression611 o--o PgClassExpression896
     List856{{"List[856∈121] ➊<br />ᐸ516,855ᐳ<br />More deps:<br />- Constantᐸ'people'ᐳ[516]"}}:::plan
     PgClassExpression855{{"PgClassExpression[855∈121] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgClassExpression855 --> List856
@@ -1416,11 +1416,11 @@ graph TD
     Lambda857{{"Lambda[857∈121] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List856 --> Lambda857
     PgClassExpression897{{"PgClassExpression[897∈121] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle286 --> PgClassExpression897
+    PgClassExpression615 o--o PgClassExpression897
     Access870{{"Access[870∈122] ➊<br />ᐸ760.xᐳ"}}:::plan
     PgClassExpression760 --> Access870
     Access910{{"Access[910∈122] ➊<br />ᐸ760.yᐳ"}}:::plan
-    PgClassExpression760 --> Access910
+    Access870 o--o Access910
     __Item768[/"__Item[768∈123]<br />ᐸ766ᐳ"\]:::itemplan
     PgSelectRows766 ==> __Item768
     PgSelectSingle769{{"PgSelectSingle[769∈123]<br />ᐸfrmcdc_comptypeᐳ"}}:::plan
@@ -1442,51 +1442,51 @@ graph TD
     PgClassExpression936{{"PgClassExpression[936∈130]<br />ᐸ__frmcdc_c...”schedule”ᐳ"}}:::plan
     PgSelectSingle769 --> PgClassExpression936
     PgClassExpression939{{"PgClassExpression[939∈130]<br />ᐸ__frmcdc_c...optimised”ᐳ"}}:::plan
-    PgSelectSingle769 --> PgClassExpression939
+    PgClassExpression936 o--o PgClassExpression939
     PgClassExpression937{{"PgClassExpression[937∈131]<br />ᐸ__frmcdc_c...”schedule”ᐳ"}}:::plan
     PgSelectSingle771 --> PgClassExpression937
     PgClassExpression940{{"PgClassExpression[940∈131]<br />ᐸ__frmcdc_c...optimised”ᐳ"}}:::plan
-    PgSelectSingle771 --> PgClassExpression940
+    PgClassExpression937 o--o PgClassExpression940
     Access938{{"Access[938∈132]<br />ᐸ774.secondsᐳ"}}:::plan
     __Item774 --> Access938
     Access941{{"Access[941∈132]<br />ᐸ774.minutesᐳ"}}:::plan
-    __Item774 --> Access941
+    Access938 o--o Access941
     Access942{{"Access[942∈132]<br />ᐸ774.hoursᐳ"}}:::plan
-    __Item774 --> Access942
+    Access941 o--o Access942
     Access943{{"Access[943∈132]<br />ᐸ774.daysᐳ"}}:::plan
-    __Item774 --> Access943
+    Access942 o--o Access943
     Access944{{"Access[944∈132]<br />ᐸ774.monthsᐳ"}}:::plan
-    __Item774 --> Access944
+    Access943 o--o Access944
     Access945{{"Access[945∈132]<br />ᐸ774.yearsᐳ"}}:::plan
-    __Item774 --> Access945
+    Access944 o--o Access945
     PgClassExpression949{{"PgClassExpression[949∈136] ➊<br />ᐸ__frmcdc_c...type__.”a”ᐳ"}}:::plan
     PgSelectSingle868 --> PgClassExpression949
     PgClassExpression958{{"PgClassExpression[958∈136] ➊<br />ᐸ__frmcdc_c...type__.”b”ᐳ"}}:::plan
-    PgSelectSingle868 --> PgClassExpression958
+    PgClassExpression949 o--o PgClassExpression958
     PgClassExpression963{{"PgClassExpression[963∈136] ➊<br />ᐸ__frmcdc_c...type__.”c”ᐳ"}}:::plan
-    PgSelectSingle868 --> PgClassExpression963
+    PgClassExpression958 o--o PgClassExpression963
     PgClassExpression965{{"PgClassExpression[965∈136] ➊<br />ᐸ__frmcdc_c...type__.”d”ᐳ"}}:::plan
-    PgSelectSingle868 --> PgClassExpression965
+    PgClassExpression963 o--o PgClassExpression965
     PgClassExpression967{{"PgClassExpression[967∈136] ➊<br />ᐸ__frmcdc_c...type__.”e”ᐳ"}}:::plan
-    PgSelectSingle868 --> PgClassExpression967
+    PgClassExpression965 o--o PgClassExpression967
     PgClassExpression969{{"PgClassExpression[969∈136] ➊<br />ᐸ__frmcdc_c...type__.”f”ᐳ"}}:::plan
-    PgSelectSingle868 --> PgClassExpression969
+    PgClassExpression967 o--o PgClassExpression969
     PgClassExpression971{{"PgClassExpression[971∈136] ➊<br />ᐸ__frmcdc_c....”foo_bar”ᐳ"}}:::plan
-    PgSelectSingle868 --> PgClassExpression971
+    PgClassExpression969 o--o PgClassExpression971
     PgClassExpression953{{"PgClassExpression[953∈140] ➊<br />ᐸ__frmcdc_c...type__.”a”ᐳ"}}:::plan
     PgSelectSingle908 --> PgClassExpression953
     PgClassExpression962{{"PgClassExpression[962∈140] ➊<br />ᐸ__frmcdc_c...type__.”b”ᐳ"}}:::plan
-    PgSelectSingle908 --> PgClassExpression962
+    PgClassExpression953 o--o PgClassExpression962
     PgClassExpression964{{"PgClassExpression[964∈140] ➊<br />ᐸ__frmcdc_c...type__.”c”ᐳ"}}:::plan
-    PgSelectSingle908 --> PgClassExpression964
+    PgClassExpression962 o--o PgClassExpression964
     PgClassExpression966{{"PgClassExpression[966∈140] ➊<br />ᐸ__frmcdc_c...type__.”d”ᐳ"}}:::plan
-    PgSelectSingle908 --> PgClassExpression966
+    PgClassExpression964 o--o PgClassExpression966
     PgClassExpression968{{"PgClassExpression[968∈140] ➊<br />ᐸ__frmcdc_c...type__.”e”ᐳ"}}:::plan
-    PgSelectSingle908 --> PgClassExpression968
+    PgClassExpression966 o--o PgClassExpression968
     PgClassExpression970{{"PgClassExpression[970∈140] ➊<br />ᐸ__frmcdc_c...type__.”f”ᐳ"}}:::plan
-    PgSelectSingle908 --> PgClassExpression970
+    PgClassExpression968 o--o PgClassExpression970
     PgClassExpression972{{"PgClassExpression[972∈140] ➊<br />ᐸ__frmcdc_c....”foo_bar”ᐳ"}}:::plan
-    PgSelectSingle908 --> PgClassExpression972
+    PgClassExpression970 o--o PgClassExpression972
     PgClassExpression954{{"PgClassExpression[954∈141] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle925 --> PgClassExpression954
     __Item934[/"__Item[934∈142]<br />ᐸ933ᐳ"\]:::itemplan
@@ -1496,7 +1496,7 @@ graph TD
     PgClassExpression973{{"PgClassExpression[973∈143]<br />ᐸ__frmcdc_c...”schedule”ᐳ"}}:::plan
     PgSelectSingle935 --> PgClassExpression973
     PgClassExpression974{{"PgClassExpression[974∈143]<br />ᐸ__frmcdc_c...optimised”ᐳ"}}:::plan
-    PgSelectSingle935 --> PgClassExpression974
+    PgClassExpression973 o--o PgClassExpression974
 
     %% define steps
     classDef bucket0 stroke:#696969

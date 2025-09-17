@@ -134,9 +134,9 @@ graph TD
     PgClassExpression96{{"PgClassExpression[96∈13]^<br />ᐸ__first_pa...ies__.”id”ᐳ"}}:::plan
     PgSelectSingle87 --> PgClassExpression96
     PgClassExpression98{{"PgClassExpression[98∈13]^<br />ᐸ__first_pa...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle87 --> PgClassExpression98
+    PgClassExpression96 o--o PgClassExpression98
     PgClassExpression100{{"PgClassExpression[100∈13]^<br />ᐸ__first_pa...team_name”ᐳ"}}:::plan
-    PgSelectSingle87 --> PgClassExpression100
+    PgClassExpression98 o--o PgClassExpression100
     PgSelect89[["PgSelect[89∈14]<br />ᐸthird_party_vulnerabilitiesᐳ<br />(2) ...ᐳThirdPartyVulnerability<br />More deps:<br />- Object[11]"]]:::plan
     Access80 --> PgSelect89
     First93{{"First[93∈14]^"}}:::plan
@@ -148,9 +148,9 @@ graph TD
     PgClassExpression97{{"PgClassExpression[97∈14]^<br />ᐸ__third_pa...ies__.”id”ᐳ"}}:::plan
     PgSelectSingle95 --> PgClassExpression97
     PgClassExpression99{{"PgClassExpression[99∈14]^<br />ᐸ__third_pa...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle95 --> PgClassExpression99
+    PgClassExpression97 o--o PgClassExpression99
     PgClassExpression101{{"PgClassExpression[101∈14]^<br />ᐸ__third_pa...ndor_name”ᐳ"}}:::plan
-    PgSelectSingle95 --> PgClassExpression101
+    PgClassExpression99 o--o PgClassExpression101
 
     %% define steps
     classDef bucket0 stroke:#696969

@@ -79,7 +79,7 @@ graph TD
     PgSelectSingle34{{"PgSelectSingle[34∈1] ➊<br />ᐸbuildingᐳ"}}:::plan
     First32 --> PgSelectSingle34
     PgClassExpression46{{"PgClassExpression[46∈1] ➊<br />ᐸ__machine__.”input”ᐳ"}}:::plan
-    PgSelectSingle13 --> PgClassExpression46
+    PgClassExpression27 o--o PgClassExpression46
     List89 --> Lambda90
     Connection40[["Connection[40∈2] ➊<br />ᐸ94ᐳ"]]:::plan
     Lambda94 --> Connection40
@@ -90,7 +90,7 @@ graph TD
     PgClassExpression49{{"PgClassExpression[49∈5] ➊<br />ᐸ__building__.”id”ᐳ"}}:::plan
     PgSelectSingle34 --> PgClassExpression49
     PgClassExpression53{{"PgClassExpression[53∈5] ➊<br />ᐸ__building...nstructor”ᐳ"}}:::plan
-    PgSelectSingle34 --> PgClassExpression53
+    PgClassExpression49 o--o PgClassExpression53
     __Item47[/"__Item[47∈6]<br />ᐸ42ᐳ"\]:::itemplan
     ConnectionItems42 ==> __Item47
     PgSelectSingle48{{"PgSelectSingle[48∈6]<br />ᐸrelational_itemsᐳ"}}:::plan
@@ -130,9 +130,9 @@ graph TD
     PgClassExpression84{{"PgClassExpression[84∈12]<br />ᐸ__machine__.”id”ᐳ"}}:::plan
     PgSelectSingle75 --> PgClassExpression84
     PgClassExpression85{{"PgClassExpression[85∈12]<br />ᐸ__machine_...nstructor”ᐳ"}}:::plan
-    PgSelectSingle75 --> PgClassExpression85
+    PgClassExpression84 o--o PgClassExpression85
     PgClassExpression86{{"PgClassExpression[86∈12]<br />ᐸ__machine__.”input”ᐳ"}}:::plan
-    PgSelectSingle75 --> PgClassExpression86
+    PgClassExpression85 o--o PgClassExpression86
 
     %% define steps
     classDef bucket0 stroke:#696969

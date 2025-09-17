@@ -64,25 +64,25 @@ graph TD
     PgClassExpression38{{"PgClassExpression[38∈1] ➊<br />ᐸ__reserved__.”do”ᐳ"}}:::plan
     PgSelectSingle16 --> PgClassExpression38
     PgClassExpression42{{"PgClassExpression[42∈1] ➊<br />ᐸ__reserved__.”id”ᐳ"}}:::plan
-    PgSelectSingle16 --> PgClassExpression42
+    PgClassExpression38 o--o PgClassExpression42
     PgClassExpression46{{"PgClassExpression[46∈1] ➊<br />ᐸ__reserved__.”null”ᐳ"}}:::plan
-    PgSelectSingle16 --> PgClassExpression46
+    PgClassExpression42 o--o PgClassExpression46
     PgClassExpression39{{"PgClassExpression[39∈2] ➊<br />ᐸ__reserved__.”case”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression39
     PgClassExpression43{{"PgClassExpression[43∈2] ➊<br />ᐸ__reserved__.”id”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression43
+    PgClassExpression39 o--o PgClassExpression43
     PgClassExpression47{{"PgClassExpression[47∈2] ➊<br />ᐸ__reserved__.”null”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression47
+    PgClassExpression43 o--o PgClassExpression47
     PgClassExpression40{{"PgClassExpression[40∈3] ➊<br />ᐸ__reserved__.”case”ᐳ"}}:::plan
     PgSelectSingle28 --> PgClassExpression40
     PgClassExpression44{{"PgClassExpression[44∈3] ➊<br />ᐸ__reserved__.”do”ᐳ"}}:::plan
-    PgSelectSingle28 --> PgClassExpression44
+    PgClassExpression40 o--o PgClassExpression44
     PgClassExpression48{{"PgClassExpression[48∈3] ➊<br />ᐸ__reserved__.”null”ᐳ"}}:::plan
-    PgSelectSingle28 --> PgClassExpression48
+    PgClassExpression44 o--o PgClassExpression48
     PgClassExpression41{{"PgClassExpression[41∈4] ➊<br />ᐸ__reserved__.”case”ᐳ"}}:::plan
     PgSelectSingle34 --> PgClassExpression41
     PgClassExpression45{{"PgClassExpression[45∈4] ➊<br />ᐸ__reserved__.”do”ᐳ"}}:::plan
-    PgSelectSingle34 --> PgClassExpression45
+    PgClassExpression41 o--o PgClassExpression45
     __Item36[/"__Item[36∈5]<br />ᐸ35ᐳ"\]:::itemplan
     PgSelectRows35 ==> __Item36
     PgSelectSingle37{{"PgSelectSingle[37∈5]<br />ᐸreservedᐳ"}}:::plan
@@ -90,11 +90,11 @@ graph TD
     PgClassExpression49{{"PgClassExpression[49∈5]<br />ᐸ__reserved__.”case”ᐳ"}}:::plan
     PgSelectSingle37 --> PgClassExpression49
     PgClassExpression50{{"PgClassExpression[50∈5]<br />ᐸ__reserved__.”do”ᐳ"}}:::plan
-    PgSelectSingle37 --> PgClassExpression50
+    PgClassExpression49 o--o PgClassExpression50
     PgClassExpression51{{"PgClassExpression[51∈5]<br />ᐸ__reserved__.”id”ᐳ"}}:::plan
-    PgSelectSingle37 --> PgClassExpression51
+    PgClassExpression50 o--o PgClassExpression51
     PgClassExpression52{{"PgClassExpression[52∈5]<br />ᐸ__reserved__.”null”ᐳ"}}:::plan
-    PgSelectSingle37 --> PgClassExpression52
+    PgClassExpression51 o--o PgClassExpression52
 
     %% define steps
     classDef bucket0 stroke:#696969

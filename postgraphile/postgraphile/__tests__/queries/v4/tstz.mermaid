@@ -38,9 +38,9 @@ graph TD
     Access15{{"Access[15∈2] ➊<br />ᐸ14.startᐳ"}}:::plan
     PgClassExpression14 --> Access15
     Access16{{"Access[16∈2] ➊<br />ᐸ14.start.valueᐳ"}}:::plan
-    PgClassExpression14 --> Access16
+    Access15 o--o Access16
     Access17{{"Access[17∈2] ➊<br />ᐸ14.start.inclusiveᐳ"}}:::plan
-    PgClassExpression14 --> Access17
+    Access16 o--o Access17
 
     %% define steps
     classDef bucket0 stroke:#696969

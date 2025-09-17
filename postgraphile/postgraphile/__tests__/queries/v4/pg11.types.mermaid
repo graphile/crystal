@@ -70,9 +70,9 @@ graph TD
     PgClassExpression35{{"PgClassExpression[35∈5]<br />ᐸ__types__.”id”ᐳ"}}:::plan
     PgSelectSingle26 --> PgClassExpression35
     PgClassExpression37{{"PgClassExpression[37∈5]<br />ᐸ__types__.”regrole”ᐳ"}}:::plan
-    PgSelectSingle26 --> PgClassExpression37
+    PgClassExpression35 o--o PgClassExpression37
     PgClassExpression38{{"PgClassExpression[38∈5]<br />ᐸ__types__....namespace”ᐳ"}}:::plan
-    PgSelectSingle26 --> PgClassExpression38
+    PgClassExpression37 o--o PgClassExpression38
     PgClassExpression39{{"PgClassExpression[39∈5]<br />ᐸ__types__....ay_domain”ᐳ"}}:::plan
     PgSelectSingle26 --> PgClassExpression39
     First45{{"First[45∈5]"}}:::plan
@@ -86,11 +86,11 @@ graph TD
     List82{{"List[82∈7]<br />ᐸ81,26ᐳ"}}:::plan
     Access81 & PgSelectSingle26 --> List82
     PgClassExpression49{{"PgClassExpression[49∈7]<br />ᐸ__types__.”id”ᐳ"}}:::plan
-    PgSelectSingle26 --> PgClassExpression49
+    PgClassExpression38 o--o PgClassExpression49
     PgClassExpression51{{"PgClassExpression[51∈7]<br />ᐸ__types__.”regrole”ᐳ"}}:::plan
-    PgSelectSingle26 --> PgClassExpression51
+    PgClassExpression49 o--o PgClassExpression51
     PgClassExpression53{{"PgClassExpression[53∈7]<br />ᐸ__types__....namespace”ᐳ"}}:::plan
-    PgSelectSingle26 --> PgClassExpression53
+    PgClassExpression51 o--o PgClassExpression53
     PgClassExpression55{{"PgClassExpression[55∈7]<br />ᐸ__types__....ay_domain”ᐳ"}}:::plan
     PgSelectSingle26 --> PgClassExpression55
     First62{{"First[62∈7]"}}:::plan
@@ -104,33 +104,33 @@ graph TD
     PgClassExpression50{{"PgClassExpression[50∈8]<br />ᐸ__frmcdc_d...type__.”a”ᐳ"}}:::plan
     PgSelectSingle47 --> PgClassExpression50
     PgClassExpression52{{"PgClassExpression[52∈8]<br />ᐸ__frmcdc_d...type__.”b”ᐳ"}}:::plan
-    PgSelectSingle47 --> PgClassExpression52
+    PgClassExpression50 o--o PgClassExpression52
     PgClassExpression54{{"PgClassExpression[54∈8]<br />ᐸ__frmcdc_d...type__.”c”ᐳ"}}:::plan
-    PgSelectSingle47 --> PgClassExpression54
+    PgClassExpression52 o--o PgClassExpression54
     PgClassExpression56{{"PgClassExpression[56∈8]<br />ᐸ__frmcdc_d...type__.”d”ᐳ"}}:::plan
-    PgSelectSingle47 --> PgClassExpression56
+    PgClassExpression54 o--o PgClassExpression56
     PgClassExpression65{{"PgClassExpression[65∈8]<br />ᐸ__frmcdc_d...type__.”e”ᐳ"}}:::plan
-    PgSelectSingle47 --> PgClassExpression65
+    PgClassExpression56 o--o PgClassExpression65
     PgClassExpression66{{"PgClassExpression[66∈8]<br />ᐸ__frmcdc_d...type__.”f”ᐳ"}}:::plan
-    PgSelectSingle47 --> PgClassExpression66
+    PgClassExpression65 o--o PgClassExpression66
     PgClassExpression67{{"PgClassExpression[67∈8]<br />ᐸ__frmcdc_d....”foo_bar”ᐳ"}}:::plan
-    PgSelectSingle47 --> PgClassExpression67
+    PgClassExpression66 o--o PgClassExpression67
     __Item48[/"__Item[48∈9]<br />ᐸ39ᐳ"\]:::itemplan
     PgClassExpression39 ==> __Item48
     PgClassExpression69{{"PgClassExpression[69∈10]<br />ᐸ__frmcdc_d...type__.”a”ᐳ"}}:::plan
     PgSelectSingle64 --> PgClassExpression69
     PgClassExpression70{{"PgClassExpression[70∈10]<br />ᐸ__frmcdc_d...type__.”b”ᐳ"}}:::plan
-    PgSelectSingle64 --> PgClassExpression70
+    PgClassExpression69 o--o PgClassExpression70
     PgClassExpression71{{"PgClassExpression[71∈10]<br />ᐸ__frmcdc_d...type__.”c”ᐳ"}}:::plan
-    PgSelectSingle64 --> PgClassExpression71
+    PgClassExpression70 o--o PgClassExpression71
     PgClassExpression72{{"PgClassExpression[72∈10]<br />ᐸ__frmcdc_d...type__.”d”ᐳ"}}:::plan
-    PgSelectSingle64 --> PgClassExpression72
+    PgClassExpression71 o--o PgClassExpression72
     PgClassExpression73{{"PgClassExpression[73∈10]<br />ᐸ__frmcdc_d...type__.”e”ᐳ"}}:::plan
-    PgSelectSingle64 --> PgClassExpression73
+    PgClassExpression72 o--o PgClassExpression73
     PgClassExpression74{{"PgClassExpression[74∈10]<br />ᐸ__frmcdc_d...type__.”f”ᐳ"}}:::plan
-    PgSelectSingle64 --> PgClassExpression74
+    PgClassExpression73 o--o PgClassExpression74
     PgClassExpression75{{"PgClassExpression[75∈10]<br />ᐸ__frmcdc_d....”foo_bar”ᐳ"}}:::plan
-    PgSelectSingle64 --> PgClassExpression75
+    PgClassExpression74 o--o PgClassExpression75
     __Item68[/"__Item[68∈11]<br />ᐸ55ᐳ"\]:::itemplan
     PgClassExpression55 ==> __Item68
 

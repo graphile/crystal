@@ -53,7 +53,7 @@ graph TD
     PgClassExpression19{{"PgClassExpression[19∈4]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
     PgSelectSingle18 --> PgClassExpression19
     PgClassExpression20{{"PgClassExpression[20∈4]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
-    PgSelectSingle18 --> PgClassExpression20
+    PgClassExpression19 o--o PgClassExpression20
     First25{{"First[25∈4]"}}:::plan
     PgSelectRows26[["PgSelectRows[26∈4]"]]:::plan
     PgSelectRows26 --> First25
@@ -68,7 +68,7 @@ graph TD
     PgClassExpression28{{"PgClassExpression[28∈5]<br />ᐸ__unique_f...und_key_1”ᐳ"}}:::plan
     PgSelectSingle27 --> PgClassExpression28
     PgClassExpression29{{"PgClassExpression[29∈5]<br />ᐸ__unique_f...und_key_2”ᐳ"}}:::plan
-    PgSelectSingle27 --> PgClassExpression29
+    PgClassExpression28 o--o PgClassExpression29
     First34{{"First[34∈5]"}}:::plan
     PgSelectRows35[["PgSelectRows[35∈5]"]]:::plan
     PgSelectRows35 --> First34
@@ -84,7 +84,7 @@ graph TD
     PgClassExpression37{{"PgClassExpression[37∈6]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
     PgSelectSingle36 --> PgClassExpression37
     PgClassExpression38{{"PgClassExpression[38∈6]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
-    PgSelectSingle36 --> PgClassExpression38
+    PgClassExpression37 o--o PgClassExpression38
     First43{{"First[43∈6]"}}:::plan
     PgSelectRows44[["PgSelectRows[44∈6]"]]:::plan
     PgSelectRows44 --> First43
@@ -97,7 +97,7 @@ graph TD
     PgClassExpression46{{"PgClassExpression[46∈7]<br />ᐸ__unique_f...und_key_1”ᐳ"}}:::plan
     PgSelectSingle45 --> PgClassExpression46
     PgClassExpression47{{"PgClassExpression[47∈7]<br />ᐸ__unique_f...und_key_2”ᐳ"}}:::plan
-    PgSelectSingle45 --> PgClassExpression47
+    PgClassExpression46 o--o PgClassExpression47
 
     %% define steps
     classDef bucket0 stroke:#696969

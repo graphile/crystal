@@ -119,15 +119,15 @@ graph TD
     PgClassExpression52{{"PgClassExpression[52∈8]<br />ᐸ__compound...uery__.”a”ᐳ"}}:::plan
     PgSelectSingle36 --> PgClassExpression52
     PgClassExpression57{{"PgClassExpression[57∈8]<br />ᐸ__compound...uery__.”b”ᐳ"}}:::plan
-    PgSelectSingle36 --> PgClassExpression57
+    PgClassExpression52 o--o PgClassExpression57
     PgClassExpression65{{"PgClassExpression[65∈8]<br />ᐸ__compound...uery__.”c”ᐳ"}}:::plan
-    PgSelectSingle36 --> PgClassExpression65
+    PgClassExpression57 o--o PgClassExpression65
     PgClassExpression67{{"PgClassExpression[67∈8]<br />ᐸ__compound...uery__.”d”ᐳ"}}:::plan
-    PgSelectSingle36 --> PgClassExpression67
+    PgClassExpression65 o--o PgClassExpression67
     PgClassExpression69{{"PgClassExpression[69∈8]<br />ᐸ__compound...uery__.”e”ᐳ"}}:::plan
-    PgSelectSingle36 --> PgClassExpression69
+    PgClassExpression67 o--o PgClassExpression69
     PgClassExpression71{{"PgClassExpression[71∈8]<br />ᐸ__compound...uery__.”f”ᐳ"}}:::plan
-    PgSelectSingle36 --> PgClassExpression71
+    PgClassExpression69 o--o PgClassExpression71
     PgClassExpression73{{"PgClassExpression[73∈8]<br />ᐸ__compound...uery__.”g”ᐳ"}}:::plan
     PgSelectSingle36 --> PgClassExpression73
     PgClassExpression53{{"PgClassExpression[53∈9]<br />ᐸ__table_se...full_name”ᐳ"}}:::plan
@@ -137,21 +137,21 @@ graph TD
     Access55{{"Access[55∈11]<br />ᐸ49.secondsᐳ"}}:::plan
     PgClassExpression49 --> Access55
     Access58{{"Access[58∈11]<br />ᐸ49.minutesᐳ"}}:::plan
-    PgClassExpression49 --> Access58
+    Access55 o--o Access58
     Access66{{"Access[66∈11]<br />ᐸ49.hoursᐳ"}}:::plan
-    PgClassExpression49 --> Access66
+    Access58 o--o Access66
     Access68{{"Access[68∈11]<br />ᐸ49.daysᐳ"}}:::plan
-    PgClassExpression49 --> Access68
+    Access66 o--o Access68
     Access70{{"Access[70∈11]<br />ᐸ49.monthsᐳ"}}:::plan
-    PgClassExpression49 --> Access70
+    Access68 o--o Access70
     Access72{{"Access[72∈11]<br />ᐸ49.yearsᐳ"}}:::plan
-    PgClassExpression49 --> Access72
+    Access70 o--o Access72
     Access78{{"Access[78∈12]<br />ᐸ73.hoursᐳ"}}:::plan
     PgClassExpression73 --> Access78
     Access79{{"Access[79∈12]<br />ᐸ73.minutesᐳ"}}:::plan
-    PgClassExpression73 --> Access79
+    Access78 o--o Access79
     Access80{{"Access[80∈12]<br />ᐸ73.secondsᐳ"}}:::plan
-    PgClassExpression73 --> Access80
+    Access79 o--o Access80
     __Item75[/"__Item[75∈13]<br />ᐸ74ᐳ"\]:::itemplan
     PgSelectRows74 ==> __Item75
     PgSelectSingle76{{"PgSelectSingle[76∈13]<br />ᐸpost_computed_interval_setᐳ"}}:::plan
@@ -161,7 +161,7 @@ graph TD
     Access81{{"Access[81∈14]<br />ᐸ77.secondsᐳ"}}:::plan
     PgClassExpression77 --> Access81
     Access82{{"Access[82∈14]<br />ᐸ77.minutesᐳ"}}:::plan
-    PgClassExpression77 --> Access82
+    Access81 o--o Access82
 
     %% define steps
     classDef bucket0 stroke:#696969

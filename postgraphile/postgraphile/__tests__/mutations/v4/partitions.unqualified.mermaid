@@ -70,9 +70,9 @@ graph TD
     Access29 --> PgClassExpression28
     PgInsertSingle13 --> Access29
     PgClassExpression32{{"PgClassExpression[32∈5] ➊<br />ᐸ__measurements__.”key”ᐳ"}}:::plan
-    Access29 --> PgClassExpression32
+    PgClassExpression28 o--o PgClassExpression32
     PgClassExpression34{{"PgClassExpression[34∈5] ➊<br />ᐸ__measurem...__.”value”ᐳ"}}:::plan
-    Access29 --> PgClassExpression34
+    PgClassExpression32 o--o PgClassExpression34
     Access29 --> PgClassExpression36
     First41{{"First[41∈5] ➊"}}:::plan
     PgSelectRows42[["PgSelectRows[42∈5] ➊"]]:::plan
@@ -88,9 +88,9 @@ graph TD
     Access31 --> PgClassExpression30
     PgUpdateSingle22 --> Access31
     PgClassExpression33{{"PgClassExpression[33∈6] ➊<br />ᐸ__measurements__.”key”ᐳ"}}:::plan
-    Access31 --> PgClassExpression33
+    PgClassExpression30 o--o PgClassExpression33
     PgClassExpression35{{"PgClassExpression[35∈6] ➊<br />ᐸ__measurem...__.”value”ᐳ"}}:::plan
-    Access31 --> PgClassExpression35
+    PgClassExpression33 o--o PgClassExpression35
     Access31 --> PgClassExpression44
     First49{{"First[49∈6] ➊"}}:::plan
     PgSelectRows50[["PgSelectRows[50∈6] ➊"]]:::plan
@@ -101,11 +101,11 @@ graph TD
     PgClassExpression52{{"PgClassExpression[52∈7] ➊<br />ᐸ__users__.”id”ᐳ"}}:::plan
     PgSelectSingle43 --> PgClassExpression52
     PgClassExpression54{{"PgClassExpression[54∈7] ➊<br />ᐸ__users__.”name”ᐳ"}}:::plan
-    PgSelectSingle43 --> PgClassExpression54
+    PgClassExpression52 o--o PgClassExpression54
     PgClassExpression53{{"PgClassExpression[53∈8] ➊<br />ᐸ__users__.”id”ᐳ"}}:::plan
     PgSelectSingle51 --> PgClassExpression53
     PgClassExpression55{{"PgClassExpression[55∈8] ➊<br />ᐸ__users__.”name”ᐳ"}}:::plan
-    PgSelectSingle51 --> PgClassExpression55
+    PgClassExpression53 o--o PgClassExpression55
 
     %% define steps
     classDef bucket0 stroke:#696969

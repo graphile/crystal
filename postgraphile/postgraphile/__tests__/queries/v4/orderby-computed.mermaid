@@ -38,9 +38,9 @@ graph TD
     PgClassExpression20{{"PgClassExpression[20∈4]<br />ᐸ”c”.”edge_...ge_case__)ᐳ"}}:::plan
     PgSelectSingle18 --> PgClassExpression20
     PgClassExpression21{{"PgClassExpression[21∈4]<br />ᐸ__edge_cas...cast_easy”ᐳ"}}:::plan
-    PgSelectSingle18 --> PgClassExpression21
+    PgClassExpression20 o--o PgClassExpression21
     PgClassExpression22{{"PgClassExpression[22∈4]<br />ᐸ__edge_case__.”row_id”ᐳ"}}:::plan
-    PgSelectSingle18 --> PgClassExpression22
+    PgClassExpression21 o--o PgClassExpression22
 
     %% define steps
     classDef bucket0 stroke:#696969

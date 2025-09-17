@@ -39,21 +39,21 @@ graph TD
     Access21 --> PgClassExpression20
     PgUpdateSingle14 --> Access21
     PgClassExpression22{{"PgClassExpression[22∈3] ➊<br />ᐸ__person__.”first_name”ᐳ"}}:::plan
-    Access21 --> PgClassExpression22
+    PgClassExpression20 o--o PgClassExpression22
     PgClassExpression23{{"PgClassExpression[23∈3] ➊<br />ᐸ__person__.”last_name”ᐳ"}}:::plan
-    Access21 --> PgClassExpression23
+    PgClassExpression22 o--o PgClassExpression23
     PgClassExpression24{{"PgClassExpression[24∈3] ➊<br />ᐸ__person__...no_create”ᐳ"}}:::plan
-    Access21 --> PgClassExpression24
+    PgClassExpression23 o--o PgClassExpression24
     PgClassExpression25{{"PgClassExpression[25∈3] ➊<br />ᐸ__person__...no_update”ᐳ"}}:::plan
-    Access21 --> PgClassExpression25
+    PgClassExpression24 o--o PgClassExpression25
     PgClassExpression26{{"PgClassExpression[26∈3] ➊<br />ᐸ__person__..._no_order”ᐳ"}}:::plan
-    Access21 --> PgClassExpression26
+    PgClassExpression25 o--o PgClassExpression26
     PgClassExpression27{{"PgClassExpression[27∈3] ➊<br />ᐸ__person__...no_filter”ᐳ"}}:::plan
-    Access21 --> PgClassExpression27
+    PgClassExpression26 o--o PgClassExpression27
     PgClassExpression28{{"PgClassExpression[28∈3] ➊<br />ᐸ__person__...te_update”ᐳ"}}:::plan
-    Access21 --> PgClassExpression28
+    PgClassExpression27 o--o PgClassExpression28
     PgClassExpression29{{"PgClassExpression[29∈3] ➊<br />ᐸ__person__...er_filter”ᐳ"}}:::plan
-    Access21 --> PgClassExpression29
+    PgClassExpression28 o--o PgClassExpression29
 
     %% define steps
     classDef bucket0 stroke:#696969

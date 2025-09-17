@@ -67,9 +67,9 @@ graph TD
     PgClassExpression22{{"PgClassExpression[22∈5]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgSelectSingle21 --> PgClassExpression22
     PgClassExpression23{{"PgClassExpression[23∈5]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle21 --> PgClassExpression23
+    PgClassExpression22 o--o PgClassExpression23
     PgClassExpression25{{"PgClassExpression[25∈5]<br />ᐸ”c”.”perso..._person__)ᐳ"}}:::plan
-    PgSelectSingle21 --> PgClassExpression25
+    PgClassExpression23 o--o PgClassExpression25
     First30{{"First[30∈5]"}}:::plan
     PgSelectRows31[["PgSelectRows[31∈5]"]]:::plan
     PgSelectRows31 --> First30
@@ -105,7 +105,7 @@ graph TD
     PgSelectSingle60{{"PgSelectSingle[60∈6]<br />ᐸpersonᐳ"}}:::plan
     First58 --> PgSelectSingle60
     PgClassExpression62{{"PgClassExpression[62∈6]<br />ᐸ__left_arm...in_metres”ᐳ"}}:::plan
-    PgSelectSingle32 --> PgClassExpression62
+    PgClassExpression46 o--o PgClassExpression62
     Lambda78 --> Access72
     List73 --> Lambda74
     List44{{"List[44∈7]<br />ᐸ42,43ᐳ<br />More deps:<br />- Constantᐸ'person_secrets'ᐳ[42]"}}:::plan
@@ -131,15 +131,15 @@ graph TD
     PgClassExpression63{{"PgClassExpression[63∈8]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgSelectSingle53 --> PgClassExpression63
     PgClassExpression65{{"PgClassExpression[65∈8]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle53 --> PgClassExpression65
+    PgClassExpression63 o--o PgClassExpression65
     PgClassExpression68{{"PgClassExpression[68∈8]<br />ᐸ”c”.”perso..._person__)ᐳ"}}:::plan
-    PgSelectSingle53 --> PgClassExpression68
+    PgClassExpression65 o--o PgClassExpression68
     PgClassExpression64{{"PgClassExpression[64∈9]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgSelectSingle60 --> PgClassExpression64
     PgClassExpression66{{"PgClassExpression[66∈9]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle60 --> PgClassExpression66
+    PgClassExpression64 o--o PgClassExpression66
     PgClassExpression70{{"PgClassExpression[70∈9]<br />ᐸ”c”.”perso..._person__)ᐳ"}}:::plan
-    PgSelectSingle60 --> PgClassExpression70
+    PgClassExpression66 o--o PgClassExpression70
 
     %% define steps
     classDef bucket0 stroke:#696969

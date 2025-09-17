@@ -89,7 +89,7 @@ graph TD
     PgClassExpression257{{"PgClassExpression[257∈2] ➊<br />ᐸ__single_t...s__.”type”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression257
     PgClassExpression258{{"PgClassExpression[258∈2] ➊<br />ᐸ__single_t..._topic_id”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression258
+    PgClassExpression257 o--o PgClassExpression258
     First263{{"First[263∈2] ➊"}}:::plan
     PgSelectRows264[["PgSelectRows[264∈2] ➊"]]:::plan
     PgSelectRows264 --> First263
@@ -122,7 +122,7 @@ graph TD
     PgClassExpression269{{"PgClassExpression[269∈4] ➊<br />ᐸ__single_t...s__.”type”ᐳ<br />ᐳSingleTableDivider"}}:::plan
     PgSelectSingle34 --> PgClassExpression269
     PgClassExpression270{{"PgClassExpression[270∈4] ➊<br />ᐸ__single_t..._topic_id”ᐳ<br />ᐳSingleTableDivider"}}:::plan
-    PgSelectSingle34 --> PgClassExpression270
+    PgClassExpression269 o--o PgClassExpression270
     First275{{"First[275∈4] ➊^"}}:::plan
     PgSelectRows276[["PgSelectRows[276∈4] ➊^"]]:::plan
     PgSelectRows276 --> First275
@@ -273,7 +273,7 @@ graph TD
     PgClassExpression280{{"PgClassExpression[280∈24] ➊<br />ᐸ__single_t...ems__.”id”ᐳ"}}:::plan
     PgSelectSingle265 --> PgClassExpression280
     PgClassExpression281{{"PgClassExpression[281∈24] ➊<br />ᐸ__single_t...__.”title”ᐳ"}}:::plan
-    PgSelectSingle265 --> PgClassExpression281
+    PgClassExpression280 o--o PgClassExpression281
     List356{{"List[356∈25]<br />ᐸ355,279ᐳ"}}:::plan
     PgSelectSingle279{{"PgSelectSingle[279∈25]<br />ᐸsingle_table_itemsᐳ"}}:::plan
     Access355 & PgSelectSingle279 --> List356
@@ -299,7 +299,7 @@ graph TD
     PgClassExpression286{{"PgClassExpression[286∈26] ➊<br />ᐸ__single_t...ems__.”id”ᐳ<br />ᐳSingleTableDivider"}}:::plan
     PgSelectSingle277 --> PgClassExpression286
     PgClassExpression287{{"PgClassExpression[287∈26] ➊<br />ᐸ__single_t...__.”title”ᐳ<br />ᐳSingleTableDivider"}}:::plan
-    PgSelectSingle277 --> PgClassExpression287
+    PgClassExpression286 o--o PgClassExpression287
     List294{{"List[294∈27]<br />ᐸ293,282ᐳ<br />ᐳSingleTableTopic<br />More deps:<br />- Constantᐸ'SingleTableTopic'ᐳ[293]"}}:::plan
     PgClassExpression282 --> List294
     List297{{"List[297∈27]<br />ᐸ296,282ᐳ<br />ᐳSingleTablePost<br />More deps:<br />- Constantᐸ'SingleTablePost'ᐳ[296]"}}:::plan
@@ -323,7 +323,7 @@ graph TD
     PgClassExpression352{{"PgClassExpression[352∈28]<br />ᐸ__single_t...ems__.”id”ᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"}}:::plan
     PgSelectSingle323 --> PgClassExpression352
     PgClassExpression353{{"PgClassExpression[353∈28]<br />ᐸ__single_t...__.”title”ᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"}}:::plan
-    PgSelectSingle323 --> PgClassExpression353
+    PgClassExpression352 o--o PgClassExpression353
 
     %% define steps
     classDef bucket0 stroke:#696969

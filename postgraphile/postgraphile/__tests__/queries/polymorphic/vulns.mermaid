@@ -83,9 +83,9 @@ graph TD
     PgClassExpression58{{"PgClassExpression[58∈5]^<br />ᐸ__first_pa...ies__.”id”ᐳ"}}:::plan
     PgSelectSingle47 --> PgClassExpression58
     PgClassExpression63{{"PgClassExpression[63∈5]^<br />ᐸ__first_pa...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle47 --> PgClassExpression63
+    PgClassExpression58 o--o PgClassExpression63
     PgClassExpression67{{"PgClassExpression[67∈5]^<br />ᐸ__first_pa...vss_score”ᐳ"}}:::plan
-    PgSelectSingle47 --> PgClassExpression67
+    PgClassExpression63 o--o PgClassExpression67
     PgSelect49[["PgSelect[49∈6]<br />ᐸthird_party_vulnerabilitiesᐳ<br />ᐳThirdPartyVulnerability<br />More deps:<br />- Object[13]"]]:::plan
     Access40 --> PgSelect49
     First53{{"First[53∈6]^"}}:::plan
@@ -97,11 +97,11 @@ graph TD
     PgClassExpression59{{"PgClassExpression[59∈6]^<br />ᐸ__third_pa...ies__.”id”ᐳ"}}:::plan
     PgSelectSingle55 --> PgClassExpression59
     PgClassExpression64{{"PgClassExpression[64∈6]^<br />ᐸ__third_pa...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle55 --> PgClassExpression64
+    PgClassExpression59 o--o PgClassExpression64
     PgClassExpression68{{"PgClassExpression[68∈6]^<br />ᐸ__third_pa...vss_score”ᐳ"}}:::plan
-    PgSelectSingle55 --> PgClassExpression68
+    PgClassExpression64 o--o PgClassExpression68
     PgClassExpression70{{"PgClassExpression[70∈6]^<br />ᐸ__third_pa...ndor_name”ᐳ"}}:::plan
-    PgSelectSingle55 --> PgClassExpression70
+    PgClassExpression68 o--o PgClassExpression70
     List78{{"List[78∈7]<br />ᐸ75,76,77ᐳ<br />More deps:<br />- Constantᐸ[HIDDEN]ᐳ[77]"}}:::plan
     Access75{{"Access[75∈7]<br />ᐸ56.0ᐳ"}}:::plan
     Access76{{"Access[76∈7]<br />ᐸ56.1ᐳ"}}:::plan
@@ -130,9 +130,9 @@ graph TD
     PgClassExpression97{{"PgClassExpression[97∈10]^<br />ᐸ__first_pa...ies__.”id”ᐳ"}}:::plan
     PgSelectSingle88 --> PgClassExpression97
     PgClassExpression99{{"PgClassExpression[99∈10]^<br />ᐸ__first_pa...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle88 --> PgClassExpression99
+    PgClassExpression97 o--o PgClassExpression99
     PgClassExpression101{{"PgClassExpression[101∈10]^<br />ᐸ__first_pa...vss_score”ᐳ"}}:::plan
-    PgSelectSingle88 --> PgClassExpression101
+    PgClassExpression99 o--o PgClassExpression101
     PgSelect90[["PgSelect[90∈11]<br />ᐸthird_party_vulnerabilitiesᐳ<br />ᐳThirdPartyVulnerability<br />More deps:<br />- Object[13]"]]:::plan
     Access81 --> PgSelect90
     First94{{"First[94∈11]^"}}:::plan
@@ -144,11 +144,11 @@ graph TD
     PgClassExpression98{{"PgClassExpression[98∈11]^<br />ᐸ__third_pa...ies__.”id”ᐳ"}}:::plan
     PgSelectSingle96 --> PgClassExpression98
     PgClassExpression100{{"PgClassExpression[100∈11]^<br />ᐸ__third_pa...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle96 --> PgClassExpression100
+    PgClassExpression98 o--o PgClassExpression100
     PgClassExpression102{{"PgClassExpression[102∈11]^<br />ᐸ__third_pa...vss_score”ᐳ"}}:::plan
-    PgSelectSingle96 --> PgClassExpression102
+    PgClassExpression100 o--o PgClassExpression102
     PgClassExpression103{{"PgClassExpression[103∈11]^<br />ᐸ__third_pa...ndor_name”ᐳ"}}:::plan
-    PgSelectSingle96 --> PgClassExpression103
+    PgClassExpression102 o--o PgClassExpression103
 
     %% define steps
     classDef bucket0 stroke:#696969
