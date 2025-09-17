@@ -81,9 +81,9 @@ graph TD
     PgClassExpression47{{"PgClassExpression[47∈6]<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle46 --> PgClassExpression47
     Access52{{"Access[52∈6]<br />ᐸ24.hasNextPageᐳ"}}:::plan
-    Connection24 --> Access52
+    PageInfo42 o--o Access52
     Access53{{"Access[53∈6]<br />ᐸ24.hasPreviousPageᐳ"}}:::plan
-    Connection24 --> Access53
+    Access52 o--o Access53
     __Item48[/"__Item[48∈7]<br />ᐸ40ᐳ"\]:::itemplan
     __CloneStream40 ==> __Item48
     PgSelectSingle49{{"PgSelectSingle[49∈7]<br />ᐸmessagesᐳ"}}:::plan
@@ -111,7 +111,7 @@ graph TD
     PgClassExpression66{{"PgClassExpression[66∈11]<br />ᐸ__users__.”username”ᐳ"}}:::plan
     PgSelectSingle64 --> PgClassExpression66
     PgClassExpression68{{"PgClassExpression[68∈11]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
-    PgSelectSingle64 --> PgClassExpression68
+    PgClassExpression66 o--o PgClassExpression68
     PgSelect70[["PgSelect[70∈12]<br />ᐸusersᐳ<br />More deps:<br />- Object[11]"]]:::plan
     PgClassExpression69{{"PgClassExpression[69∈12]<br />ᐸ__messages...author_id”ᐳ"}}:::plan
     PgClassExpression69 --> PgSelect70
@@ -127,7 +127,7 @@ graph TD
     PgClassExpression77{{"PgClassExpression[77∈13]<br />ᐸ__users__.”username”ᐳ"}}:::plan
     PgSelectSingle76 --> PgClassExpression77
     PgClassExpression78{{"PgClassExpression[78∈13]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
-    PgSelectSingle76 --> PgClassExpression78
+    PgClassExpression77 o--o PgClassExpression78
 
     %% define steps
     classDef bucket0 stroke:#696969

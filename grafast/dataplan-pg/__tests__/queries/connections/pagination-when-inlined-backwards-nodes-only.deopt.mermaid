@@ -73,9 +73,9 @@ graph TD
     PgClassExpression38{{"PgClassExpression[38∈3]<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle37 --> PgClassExpression38
     Access41{{"Access[41∈3]<br />ᐸ25.hasNextPageᐳ"}}:::plan
-    Connection25 --> Access41
+    PageInfo33 o--o Access41
     Access42{{"Access[42∈3]<br />ᐸ25.hasPreviousPageᐳ"}}:::plan
-    Connection25 --> Access42
+    Access41 o--o Access42
     ConnectionItems30 --> First43
     PgSelect21 --> Access44
     ConnectionItems30 --> Last46
@@ -98,7 +98,7 @@ graph TD
     PgClassExpression57{{"PgClassExpression[57∈7]<br />ᐸ__users__.”username”ᐳ"}}:::plan
     PgSelectSingle56 --> PgClassExpression57
     PgClassExpression58{{"PgClassExpression[58∈7]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
-    PgSelectSingle56 --> PgClassExpression58
+    PgClassExpression57 o--o PgClassExpression58
 
     %% define steps
     classDef bucket0 stroke:#696969

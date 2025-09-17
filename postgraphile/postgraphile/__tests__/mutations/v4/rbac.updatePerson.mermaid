@@ -49,13 +49,13 @@ graph TD
     Access23 --> PgClassExpression22
     PgUpdateSingle16 --> Access23
     PgClassExpression24{{"PgClassExpression[24∈3] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    Access23 --> PgClassExpression24
+    PgClassExpression22 o--o PgClassExpression24
     PgClassExpression25{{"PgClassExpression[25∈3] ➊<br />ᐸ__person__.”aliases”ᐳ"}}:::plan
     Access23 --> PgClassExpression25
     PgClassExpression26{{"PgClassExpression[26∈3] ➊<br />ᐸ__person__.”about”ᐳ"}}:::plan
-    Access23 --> PgClassExpression26
+    PgClassExpression24 o--o PgClassExpression26
     PgClassExpression27{{"PgClassExpression[27∈3] ➊<br />ᐸ__person__.”email”ᐳ"}}:::plan
-    Access23 --> PgClassExpression27
+    PgClassExpression26 o--o PgClassExpression27
     Access23 --> PgClassExpression28
     First33{{"First[33∈3] ➊"}}:::plan
     PgSelectRows34[["PgSelectRows[34∈3] ➊"]]:::plan

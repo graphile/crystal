@@ -38,21 +38,21 @@ graph TD
     PgClassExpression19{{"PgClassExpression[19∈4]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgSelectSingle18 --> PgClassExpression19
     PgClassExpression20{{"PgClassExpression[20∈4]<br />ᐸ__person__.”first_name”ᐳ"}}:::plan
-    PgSelectSingle18 --> PgClassExpression20
+    PgClassExpression19 o--o PgClassExpression20
     PgClassExpression21{{"PgClassExpression[21∈4]<br />ᐸ__person__.”last_name”ᐳ"}}:::plan
-    PgSelectSingle18 --> PgClassExpression21
+    PgClassExpression20 o--o PgClassExpression21
     PgClassExpression22{{"PgClassExpression[22∈4]<br />ᐸ__person__...no_create”ᐳ"}}:::plan
-    PgSelectSingle18 --> PgClassExpression22
+    PgClassExpression21 o--o PgClassExpression22
     PgClassExpression23{{"PgClassExpression[23∈4]<br />ᐸ__person__...no_update”ᐳ"}}:::plan
-    PgSelectSingle18 --> PgClassExpression23
+    PgClassExpression22 o--o PgClassExpression23
     PgClassExpression24{{"PgClassExpression[24∈4]<br />ᐸ__person__..._no_order”ᐳ"}}:::plan
-    PgSelectSingle18 --> PgClassExpression24
+    PgClassExpression23 o--o PgClassExpression24
     PgClassExpression25{{"PgClassExpression[25∈4]<br />ᐸ__person__...no_filter”ᐳ"}}:::plan
-    PgSelectSingle18 --> PgClassExpression25
+    PgClassExpression24 o--o PgClassExpression25
     PgClassExpression26{{"PgClassExpression[26∈4]<br />ᐸ__person__...te_update”ᐳ"}}:::plan
-    PgSelectSingle18 --> PgClassExpression26
+    PgClassExpression25 o--o PgClassExpression26
     PgClassExpression27{{"PgClassExpression[27∈4]<br />ᐸ__person__...er_filter”ᐳ"}}:::plan
-    PgSelectSingle18 --> PgClassExpression27
+    PgClassExpression26 o--o PgClassExpression27
 
     %% define steps
     classDef bucket0 stroke:#696969

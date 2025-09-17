@@ -68,11 +68,11 @@ graph TD
     PgClassExpression47{{"PgClassExpression[47∈6]^<br />ᐸ__first_pa...vss_score”ᐳ"}}:::plan
     PgSelectSingle38 --> PgClassExpression47
     PgClassExpression49{{"PgClassExpression[49∈6]^<br />ᐸ__first_pa...ies__.”id”ᐳ"}}:::plan
-    PgSelectSingle38 --> PgClassExpression49
+    PgClassExpression47 o--o PgClassExpression49
     PgClassExpression51{{"PgClassExpression[51∈6]^<br />ᐸ__first_pa...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle38 --> PgClassExpression51
+    PgClassExpression49 o--o PgClassExpression51
     PgClassExpression53{{"PgClassExpression[53∈6]^<br />ᐸ__first_pa...team_name”ᐳ"}}:::plan
-    PgSelectSingle38 --> PgClassExpression53
+    PgClassExpression51 o--o PgClassExpression53
     PgSelect40[["PgSelect[40∈7]<br />ᐸthird_party_vulnerabilitiesᐳ<br />ᐳThirdPartyVulnerability<br />More deps:<br />- Object[13]"]]:::plan
     Access31 --> PgSelect40
     First44{{"First[44∈7]^"}}:::plan
@@ -84,11 +84,11 @@ graph TD
     PgClassExpression48{{"PgClassExpression[48∈7]^<br />ᐸ__third_pa...vss_score”ᐳ"}}:::plan
     PgSelectSingle46 --> PgClassExpression48
     PgClassExpression50{{"PgClassExpression[50∈7]^<br />ᐸ__third_pa...ies__.”id”ᐳ"}}:::plan
-    PgSelectSingle46 --> PgClassExpression50
+    PgClassExpression48 o--o PgClassExpression50
     PgClassExpression52{{"PgClassExpression[52∈7]^<br />ᐸ__third_pa...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle46 --> PgClassExpression52
+    PgClassExpression50 o--o PgClassExpression52
     PgClassExpression54{{"PgClassExpression[54∈7]^<br />ᐸ__third_pa...ndor_name”ᐳ"}}:::plan
-    PgSelectSingle46 --> PgClassExpression54
+    PgClassExpression52 o--o PgClassExpression54
 
     %% define steps
     classDef bucket0 stroke:#696969

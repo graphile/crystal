@@ -48,21 +48,21 @@ graph TD
     PgClassExpression19{{"PgClassExpression[19∈4]<br />ᐸ__spacecraft__.”id”ᐳ"}}:::plan
     PgSelectSingle18 --> PgClassExpression19
     PgClassExpression20{{"PgClassExpression[20∈4]<br />ᐸ__spacecraft__.”name”ᐳ"}}:::plan
-    PgSelectSingle18 --> PgClassExpression20
+    PgClassExpression19 o--o PgClassExpression20
     PgClassExpression27{{"PgClassExpression[27∈4]<br />ᐸ(1/0) /* E...ferred! */ᐳ"}}:::plan
     PgSelectSingle18 --> PgClassExpression27
     Access28{{"Access[28∈5]<br />ᐸ27.startᐳ"}}:::plan
     PgClassExpression27 --> Access28
     Access29{{"Access[29∈5]<br />ᐸ27.endᐳ"}}:::plan
-    PgClassExpression27 --> Access29
+    Access28 o--o Access29
     Access30{{"Access[30∈6]<br />ᐸ27.start.valueᐳ"}}:::plan
-    PgClassExpression27 --> Access30
+    Access29 o--o Access30
     Access32{{"Access[32∈6]<br />ᐸ27.start.inclusiveᐳ"}}:::plan
-    PgClassExpression27 --> Access32
+    Access30 o--o Access32
     Access31{{"Access[31∈7]<br />ᐸ27.end.valueᐳ"}}:::plan
-    PgClassExpression27 --> Access31
+    Access32 o--o Access31
     Access33{{"Access[33∈7]<br />ᐸ27.end.inclusiveᐳ"}}:::plan
-    PgClassExpression27 --> Access33
+    Access31 o--o Access33
 
     %% define steps
     classDef bucket0 stroke:#696969

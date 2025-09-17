@@ -100,11 +100,11 @@ graph TD
     PgClassExpression38{{"PgClassExpression[38∈5] ➊<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
     PgSelectSingle29 --> PgClassExpression38
     PgClassExpression40{{"PgClassExpression[40∈5] ➊<br />ᐸ__relation...__.”title”ᐳ"}}:::plan
-    PgSelectSingle29 --> PgClassExpression40
+    PgClassExpression38 o--o PgClassExpression40
     PgClassExpression42{{"PgClassExpression[42∈5] ➊<br />ᐸ__relation...scription”ᐳ"}}:::plan
-    PgSelectSingle29 --> PgClassExpression42
+    PgClassExpression40 o--o PgClassExpression42
     PgClassExpression44{{"PgClassExpression[44∈5] ➊<br />ᐸ__relation...s__.”note”ᐳ"}}:::plan
-    PgSelectSingle29 --> PgClassExpression44
+    PgClassExpression42 o--o PgClassExpression44
     First52{{"First[52∈5] ➊"}}:::plan
     PgSelectRows53[["PgSelectRows[53∈5] ➊"]]:::plan
     PgSelectRows53 --> First52
@@ -140,11 +140,11 @@ graph TD
     PgClassExpression39{{"PgClassExpression[39∈6] ➊<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
     PgSelectSingle37 --> PgClassExpression39
     PgClassExpression41{{"PgClassExpression[41∈6] ➊<br />ᐸ__relation...__.”title”ᐳ"}}:::plan
-    PgSelectSingle37 --> PgClassExpression41
+    PgClassExpression39 o--o PgClassExpression41
     PgClassExpression43{{"PgClassExpression[43∈6] ➊<br />ᐸ__relation...scription”ᐳ"}}:::plan
-    PgSelectSingle37 --> PgClassExpression43
+    PgClassExpression41 o--o PgClassExpression43
     PgClassExpression45{{"PgClassExpression[45∈6] ➊<br />ᐸ__relation...s__.”note”ᐳ"}}:::plan
-    PgSelectSingle37 --> PgClassExpression45
+    PgClassExpression43 o--o PgClassExpression45
     First62{{"First[62∈6] ➊"}}:::plan
     PgSelectRows63[["PgSelectRows[63∈6] ➊"]]:::plan
     PgSelectRows63 --> First62
@@ -173,11 +173,11 @@ graph TD
     PgClassExpression88{{"PgClassExpression[88∈7] ➊<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
     PgSelectSingle76 --> PgClassExpression88
     PgClassExpression90{{"PgClassExpression[90∈7] ➊<br />ᐸ__people__.”username”ᐳ"}}:::plan
-    PgSelectSingle76 --> PgClassExpression90
+    PgClassExpression88 o--o PgClassExpression90
     PgClassExpression89{{"PgClassExpression[89∈8] ➊<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
     PgSelectSingle87 --> PgClassExpression89
     PgClassExpression91{{"PgClassExpression[91∈8] ➊<br />ᐸ__people__.”username”ᐳ"}}:::plan
-    PgSelectSingle87 --> PgClassExpression91
+    PgClassExpression89 o--o PgClassExpression91
 
     %% define steps
     classDef bucket0 stroke:#696969

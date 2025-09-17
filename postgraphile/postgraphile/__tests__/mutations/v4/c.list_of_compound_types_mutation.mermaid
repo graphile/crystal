@@ -53,25 +53,25 @@ graph TD
     PgClassExpression21{{"PgClassExpression[21∈4]<br />ᐸ__list_of_...tion__.”a”ᐳ"}}:::plan
     PgSelectSingle20 --> PgClassExpression21
     PgClassExpression22{{"PgClassExpression[22∈4]<br />ᐸ__list_of_...tion__.”b”ᐳ"}}:::plan
-    PgSelectSingle20 --> PgClassExpression22
+    PgClassExpression21 o--o PgClassExpression22
     PgClassExpression23{{"PgClassExpression[23∈4]<br />ᐸ__list_of_...tion__.”c”ᐳ"}}:::plan
-    PgSelectSingle20 --> PgClassExpression23
+    PgClassExpression22 o--o PgClassExpression23
     PgClassExpression24{{"PgClassExpression[24∈4]<br />ᐸ__list_of_...tion__.”d”ᐳ"}}:::plan
-    PgSelectSingle20 --> PgClassExpression24
+    PgClassExpression23 o--o PgClassExpression24
     PgClassExpression25{{"PgClassExpression[25∈4]<br />ᐸ__list_of_...tion__.”e”ᐳ"}}:::plan
-    PgSelectSingle20 --> PgClassExpression25
+    PgClassExpression24 o--o PgClassExpression25
     PgClassExpression26{{"PgClassExpression[26∈4]<br />ᐸ__list_of_...tion__.”f”ᐳ"}}:::plan
-    PgSelectSingle20 --> PgClassExpression26
+    PgClassExpression25 o--o PgClassExpression26
     PgClassExpression27{{"PgClassExpression[27∈4]<br />ᐸ__list_of_...tion__.”g”ᐳ"}}:::plan
     PgSelectSingle20 --> PgClassExpression27
     PgClassExpression28{{"PgClassExpression[28∈4]<br />ᐸ__list_of_....”foo_bar”ᐳ"}}:::plan
-    PgSelectSingle20 --> PgClassExpression28
+    PgClassExpression26 o--o PgClassExpression28
     Access29{{"Access[29∈5]<br />ᐸ27.secondsᐳ"}}:::plan
     PgClassExpression27 --> Access29
     Access30{{"Access[30∈5]<br />ᐸ27.minutesᐳ"}}:::plan
-    PgClassExpression27 --> Access30
+    Access29 o--o Access30
     Access31{{"Access[31∈5]<br />ᐸ27.hoursᐳ"}}:::plan
-    PgClassExpression27 --> Access31
+    Access30 o--o Access31
 
     %% define steps
     classDef bucket0 stroke:#696969

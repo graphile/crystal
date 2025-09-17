@@ -64,7 +64,7 @@ graph TD
     Lambda26{{"Lambda[26∈3]"}}:::plan
     PgClassExpression25 --> Lambda26
     PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__single_t...parent_id”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression27
+    PgClassExpression23 o--o PgClassExpression27
     First32{{"First[32∈3]"}}:::plan
     PgSelectRows33[["PgSelectRows[33∈3]"]]:::plan
     PgSelectRows33 --> First32
@@ -73,7 +73,7 @@ graph TD
     PgSelectSingle34{{"PgSelectSingle[34∈3]<br />ᐸsingle_table_itemsᐳ"}}:::plan
     First32 --> PgSelectSingle34
     PgClassExpression77{{"PgClassExpression[77∈3]<br />ᐸ__single_t...__.”type2”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression77
+    PgClassExpression27 o--o PgClassExpression77
     PgClassExpression83{{"PgClassExpression[83∈3]<br />ᐸ__single_t...s__.”type”ᐳ"}}:::plan
     PgSelectSingle34 --> PgClassExpression83
     Lambda84{{"Lambda[84∈3]"}}:::plan

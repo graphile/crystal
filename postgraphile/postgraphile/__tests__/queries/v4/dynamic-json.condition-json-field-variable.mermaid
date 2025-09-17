@@ -88,15 +88,15 @@ graph TD
     PgClassExpression51{{"PgClassExpression[51∈10]<br />ᐸ__my_table__.”id”ᐳ"}}:::plan
     PgSelectSingle46 --> PgClassExpression51
     PgClassExpression54{{"PgClassExpression[54∈10]<br />ᐸ__my_table...json_data”ᐳ"}}:::plan
-    PgSelectSingle46 --> PgClassExpression54
+    PgClassExpression51 o--o PgClassExpression54
     PgClassExpression52{{"PgClassExpression[52∈11]<br />ᐸ__my_table__.”id”ᐳ"}}:::plan
     PgSelectSingle48 --> PgClassExpression52
     PgClassExpression55{{"PgClassExpression[55∈11]<br />ᐸ__my_table...json_data”ᐳ"}}:::plan
-    PgSelectSingle48 --> PgClassExpression55
+    PgClassExpression52 o--o PgClassExpression55
     PgClassExpression53{{"PgClassExpression[53∈12]<br />ᐸ__my_table__.”id”ᐳ"}}:::plan
     PgSelectSingle50 --> PgClassExpression53
     PgClassExpression56{{"PgClassExpression[56∈12]<br />ᐸ__my_table...json_data”ᐳ"}}:::plan
-    PgSelectSingle50 --> PgClassExpression56
+    PgClassExpression53 o--o PgClassExpression56
 
     %% define steps
     classDef bucket0 stroke:#696969

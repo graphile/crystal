@@ -39,11 +39,11 @@ graph TD
     Access18 --> PgClassExpression17
     PgInsertSingle11 --> Access18
     PgClassExpression19{{"PgClassExpression[19∈3] ➊<br />ᐸ__referenc..._.”enum_1”ᐳ"}}:::plan
-    Access18 --> PgClassExpression19
+    PgClassExpression17 o--o PgClassExpression19
     PgClassExpression20{{"PgClassExpression[20∈3] ➊<br />ᐸ__referenc..._.”enum_2”ᐳ"}}:::plan
-    Access18 --> PgClassExpression20
+    PgClassExpression19 o--o PgClassExpression20
     PgClassExpression21{{"PgClassExpression[21∈3] ➊<br />ᐸ__referenc..._.”enum_3”ᐳ"}}:::plan
-    Access18 --> PgClassExpression21
+    PgClassExpression20 o--o PgClassExpression21
 
     %% define steps
     classDef bucket0 stroke:#696969

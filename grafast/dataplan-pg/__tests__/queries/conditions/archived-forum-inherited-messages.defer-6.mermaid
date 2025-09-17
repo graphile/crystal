@@ -87,11 +87,11 @@ graph TD
     PgSelectSingle48{{"PgSelectSingle[48∈9]<br />ᐸusersᐳ"}}:::plan
     First46 --> PgSelectSingle48
     PgClassExpression49{{"PgClassExpression[49∈10]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
-    PgSelectSingle35 --> PgClassExpression49
+    PgClassExpression37 o--o PgClassExpression49
     PgClassExpression50{{"PgClassExpression[50∈11]<br />ᐸ__users__.”username”ᐳ"}}:::plan
     PgSelectSingle48 --> PgClassExpression50
     PgClassExpression59{{"PgClassExpression[59∈11]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
-    PgSelectSingle48 --> PgClassExpression59
+    PgClassExpression50 o--o PgClassExpression59
     PgSelect52[["PgSelect[52∈12]<br />ᐸusersᐳ<br />More deps:<br />- Object[11]"]]:::plan
     PgClassExpression51{{"PgClassExpression[51∈12]<br />ᐸ__messages...author_id”ᐳ"}}:::plan
     PgClassExpression51 --> PgSelect52
@@ -105,7 +105,7 @@ graph TD
     PgClassExpression60{{"PgClassExpression[60∈13]<br />ᐸ__users__.”username”ᐳ"}}:::plan
     PgSelectSingle58 --> PgClassExpression60
     PgClassExpression61{{"PgClassExpression[61∈13]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
-    PgSelectSingle58 --> PgClassExpression61
+    PgClassExpression60 o--o PgClassExpression61
 
     %% define steps
     classDef bucket0 stroke:#696969

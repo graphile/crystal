@@ -238,9 +238,9 @@ graph TD
     PgClassExpression157{{"PgClassExpression[157∈6] ➊<br />ᐸ__left_arm...person_id”ᐳ"}}:::plan
     PgSelectSingle49 --> PgClassExpression157
     PgClassExpression159{{"PgClassExpression[159∈6] ➊<br />ᐸ__left_arm...in_metres”ᐳ"}}:::plan
-    PgSelectSingle49 --> PgClassExpression159
+    PgClassExpression157 o--o PgClassExpression159
     PgClassExpression161{{"PgClassExpression[161∈6] ➊<br />ᐸ__left_arm__.”mood”ᐳ"}}:::plan
-    PgSelectSingle49 --> PgClassExpression161
+    PgClassExpression159 o--o PgClassExpression161
     List107{{"List[107∈8] ➊<br />ᐸ89,106ᐳ<br />More deps:<br />- Constantᐸ'people'ᐳ[89]"}}:::plan
     PgClassExpression106{{"PgClassExpression[106∈8] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgClassExpression106 --> List107
@@ -266,9 +266,9 @@ graph TD
     PgClassExpression158{{"PgClassExpression[158∈9] ➊<br />ᐸ__post__.”headline”ᐳ"}}:::plan
     PgSelectSingle66 --> PgClassExpression158
     PgClassExpression160{{"PgClassExpression[160∈9] ➊<br />ᐸ__post__.”body”ᐳ"}}:::plan
-    PgSelectSingle66 --> PgClassExpression160
+    PgClassExpression158 o--o PgClassExpression160
     PgClassExpression162{{"PgClassExpression[162∈9] ➊<br />ᐸ__post__.”author_id”ᐳ"}}:::plan
-    PgSelectSingle66 --> PgClassExpression162
+    PgClassExpression160 o--o PgClassExpression162
     List117{{"List[117∈11] ➊<br />ᐸ89,116ᐳ<br />More deps:<br />- Constantᐸ'people'ᐳ[89]"}}:::plan
     PgClassExpression116{{"PgClassExpression[116∈11] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgClassExpression116 --> List117
@@ -282,7 +282,7 @@ graph TD
     PgClassExpression119{{"PgClassExpression[119∈12] ➊<br />ᐸ__return_t...rson_id_1”ᐳ"}}:::plan
     PgSelectSingle81 --> PgClassExpression119
     PgClassExpression155{{"PgClassExpression[155∈12] ➊<br />ᐸ__return_t...rson_id_2”ᐳ"}}:::plan
-    PgSelectSingle81 --> PgClassExpression155
+    PgClassExpression119 o--o PgClassExpression155
     List170{{"List[170∈16] ➊<br />ᐸ82,169ᐳ<br />More deps:<br />- Constantᐸ'person_secrets'ᐳ[82]"}}:::plan
     PgClassExpression169{{"PgClassExpression[169∈16] ➊<br />ᐸ__person_s...person_id”ᐳ"}}:::plan
     PgClassExpression169 --> List170
@@ -316,9 +316,9 @@ graph TD
     PgClassExpression187{{"PgClassExpression[187∈19] ➊<br />ᐸ__left_arm...person_id”ᐳ"}}:::plan
     PgSelectSingle148 --> PgClassExpression187
     PgClassExpression188{{"PgClassExpression[188∈19] ➊<br />ᐸ__left_arm...in_metres”ᐳ"}}:::plan
-    PgSelectSingle148 --> PgClassExpression188
+    PgClassExpression187 o--o PgClassExpression188
     PgClassExpression189{{"PgClassExpression[189∈19] ➊<br />ᐸ__left_arm__.”mood”ᐳ"}}:::plan
-    PgSelectSingle148 --> PgClassExpression189
+    PgClassExpression188 o--o PgClassExpression189
     __Item163[/"__Item[163∈20]<br />ᐸ86ᐳ"\]:::itemplan
     ConnectionItems86 ==> __Item163
     PgSelectSingle164{{"PgSelectSingle[164∈20]<br />ᐸperson_secretᐳ"}}:::plan
@@ -348,9 +348,9 @@ graph TD
     PgClassExpression202{{"PgClassExpression[202∈24]<br />ᐸ__left_arm...person_id”ᐳ"}}:::plan
     PgSelectSingle166 --> PgClassExpression202
     PgClassExpression204{{"PgClassExpression[204∈24]<br />ᐸ__left_arm...in_metres”ᐳ"}}:::plan
-    PgSelectSingle166 --> PgClassExpression204
+    PgClassExpression202 o--o PgClassExpression204
     PgClassExpression206{{"PgClassExpression[206∈24]<br />ᐸ__left_arm__.”mood”ᐳ"}}:::plan
-    PgSelectSingle166 --> PgClassExpression206
+    PgClassExpression204 o--o PgClassExpression206
     List199{{"List[199∈25]<br />ᐸ109,198ᐳ<br />More deps:<br />- Constantᐸ'posts'ᐳ[109]"}}:::plan
     PgClassExpression198{{"PgClassExpression[198∈25]<br />ᐸ__post__.”id”ᐳ"}}:::plan
     PgClassExpression198 --> List199
@@ -360,9 +360,9 @@ graph TD
     PgClassExpression203{{"PgClassExpression[203∈25]<br />ᐸ__post__.”headline”ᐳ"}}:::plan
     PgSelectSingle168 --> PgClassExpression203
     PgClassExpression205{{"PgClassExpression[205∈25]<br />ᐸ__post__.”body”ᐳ"}}:::plan
-    PgSelectSingle168 --> PgClassExpression205
+    PgClassExpression203 o--o PgClassExpression205
     PgClassExpression207{{"PgClassExpression[207∈25]<br />ᐸ__post__.”author_id”ᐳ"}}:::plan
-    PgSelectSingle168 --> PgClassExpression207
+    PgClassExpression205 o--o PgClassExpression207
     __Item190[/"__Item[190∈27]<br />ᐸ181ᐳ"\]:::itemplan
     ConnectionItems181 ==> __Item190
     PgSelectSingle191{{"PgSelectSingle[191∈27]<br />ᐸpostᐳ"}}:::plan
@@ -376,9 +376,9 @@ graph TD
     PgClassExpression211{{"PgClassExpression[211∈28]<br />ᐸ__post__.”headline”ᐳ"}}:::plan
     PgSelectSingle191 --> PgClassExpression211
     PgClassExpression212{{"PgClassExpression[212∈28]<br />ᐸ__post__.”body”ᐳ"}}:::plan
-    PgSelectSingle191 --> PgClassExpression212
+    PgClassExpression211 o--o PgClassExpression212
     PgClassExpression213{{"PgClassExpression[213∈28]<br />ᐸ__post__.”author_id”ᐳ"}}:::plan
-    PgSelectSingle191 --> PgClassExpression213
+    PgClassExpression212 o--o PgClassExpression213
 
     %% define steps
     classDef bucket0 stroke:#696969

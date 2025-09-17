@@ -71,7 +71,7 @@ graph TD
     PgClassExpression105{{"PgClassExpression[105∈3] ➊^<br />ᐸ__union_topics__.”id”ᐳ"}}:::plan
     PgSelectSingle30 --> PgClassExpression105
     PgClassExpression115{{"PgClassExpression[115∈3] ➊^<br />ᐸ__union_to...__.”title”ᐳ"}}:::plan
-    PgSelectSingle30 --> PgClassExpression115
+    PgClassExpression105 o--o PgClassExpression115
     PgSelect31[["PgSelect[31∈4] ➊<br />ᐸunion_postsᐳ<br />ᐳUnionPost<br />More deps:<br />- Object[10]"]]:::plan
     PgClassExpression17 --> PgSelect31
     First35{{"First[35∈4] ➊^"}}:::plan
@@ -83,11 +83,11 @@ graph TD
     PgClassExpression106{{"PgClassExpression[106∈4] ➊^<br />ᐸ__union_posts__.”id”ᐳ"}}:::plan
     PgSelectSingle37 --> PgClassExpression106
     PgClassExpression116{{"PgClassExpression[116∈4] ➊^<br />ᐸ__union_posts__.”title”ᐳ"}}:::plan
-    PgSelectSingle37 --> PgClassExpression116
+    PgClassExpression106 o--o PgClassExpression116
     PgClassExpression125{{"PgClassExpression[125∈4] ➊^<br />ᐸ__union_po...scription”ᐳ"}}:::plan
-    PgSelectSingle37 --> PgClassExpression125
+    PgClassExpression116 o--o PgClassExpression125
     PgClassExpression131{{"PgClassExpression[131∈4] ➊^<br />ᐸ__union_posts__.”note”ᐳ"}}:::plan
-    PgSelectSingle37 --> PgClassExpression131
+    PgClassExpression125 o--o PgClassExpression131
     PgSelect38[["PgSelect[38∈5] ➊<br />ᐸunion_dividersᐳ<br />ᐳUnionDivider<br />More deps:<br />- Object[10]"]]:::plan
     PgClassExpression17 --> PgSelect38
     First42{{"First[42∈5] ➊^"}}:::plan
@@ -99,9 +99,9 @@ graph TD
     PgClassExpression107{{"PgClassExpression[107∈5] ➊^<br />ᐸ__union_dividers__.”id”ᐳ"}}:::plan
     PgSelectSingle44 --> PgClassExpression107
     PgClassExpression117{{"PgClassExpression[117∈5] ➊^<br />ᐸ__union_di...__.”title”ᐳ"}}:::plan
-    PgSelectSingle44 --> PgClassExpression117
+    PgClassExpression107 o--o PgClassExpression117
     PgClassExpression126{{"PgClassExpression[126∈5] ➊^<br />ᐸ__union_di...__.”color”ᐳ"}}:::plan
-    PgSelectSingle44 --> PgClassExpression126
+    PgClassExpression117 o--o PgClassExpression126
     PgSelect45[["PgSelect[45∈6] ➊<br />ᐸunion_checklistsᐳ<br />ᐳUnionChecklist<br />More deps:<br />- Object[10]"]]:::plan
     PgClassExpression17 --> PgSelect45
     First49{{"First[49∈6] ➊^"}}:::plan
@@ -113,7 +113,7 @@ graph TD
     PgClassExpression108{{"PgClassExpression[108∈6] ➊^<br />ᐸ__union_ch...sts__.”id”ᐳ"}}:::plan
     PgSelectSingle51 --> PgClassExpression108
     PgClassExpression118{{"PgClassExpression[118∈6] ➊^<br />ᐸ__union_ch...__.”title”ᐳ"}}:::plan
-    PgSelectSingle51 --> PgClassExpression118
+    PgClassExpression108 o--o PgClassExpression118
     PgSelect52[["PgSelect[52∈7] ➊<br />ᐸunion_checklist_itemsᐳ<br />ᐳUnionChecklistItem<br />More deps:<br />- Object[10]"]]:::plan
     PgClassExpression17 --> PgSelect52
     First56{{"First[56∈7] ➊^"}}:::plan
@@ -125,9 +125,9 @@ graph TD
     PgClassExpression109{{"PgClassExpression[109∈7] ➊^<br />ᐸ__union_ch...ems__.”id”ᐳ"}}:::plan
     PgSelectSingle58 --> PgClassExpression109
     PgClassExpression119{{"PgClassExpression[119∈7] ➊^<br />ᐸ__union_ch...scription”ᐳ"}}:::plan
-    PgSelectSingle58 --> PgClassExpression119
+    PgClassExpression109 o--o PgClassExpression119
     PgClassExpression127{{"PgClassExpression[127∈7] ➊^<br />ᐸ__union_ch...s__.”note”ᐳ"}}:::plan
-    PgSelectSingle58 --> PgClassExpression127
+    PgClassExpression119 o--o PgClassExpression127
     PgSelect66[["PgSelect[66∈8] ➊<br />ᐸunion_topicsᐳ<br />ᐳUnionTopic<br />More deps:<br />- Object[10]"]]:::plan
     Access65 --> PgSelect66
     First70{{"First[70∈8] ➊^"}}:::plan
@@ -139,7 +139,7 @@ graph TD
     PgClassExpression110{{"PgClassExpression[110∈8] ➊^<br />ᐸ__union_topics__.”id”ᐳ"}}:::plan
     PgSelectSingle72 --> PgClassExpression110
     PgClassExpression120{{"PgClassExpression[120∈8] ➊^<br />ᐸ__union_to...__.”title”ᐳ"}}:::plan
-    PgSelectSingle72 --> PgClassExpression120
+    PgClassExpression110 o--o PgClassExpression120
     PgSelect74[["PgSelect[74∈9] ➊<br />ᐸunion_postsᐳ<br />ᐳUnionPost<br />More deps:<br />- Object[10]"]]:::plan
     Access65 --> PgSelect74
     First78{{"First[78∈9] ➊^"}}:::plan
@@ -151,11 +151,11 @@ graph TD
     PgClassExpression111{{"PgClassExpression[111∈9] ➊^<br />ᐸ__union_posts__.”id”ᐳ"}}:::plan
     PgSelectSingle80 --> PgClassExpression111
     PgClassExpression121{{"PgClassExpression[121∈9] ➊^<br />ᐸ__union_posts__.”title”ᐳ"}}:::plan
-    PgSelectSingle80 --> PgClassExpression121
+    PgClassExpression111 o--o PgClassExpression121
     PgClassExpression128{{"PgClassExpression[128∈9] ➊^<br />ᐸ__union_po...scription”ᐳ"}}:::plan
-    PgSelectSingle80 --> PgClassExpression128
+    PgClassExpression121 o--o PgClassExpression128
     PgClassExpression132{{"PgClassExpression[132∈9] ➊^<br />ᐸ__union_posts__.”note”ᐳ"}}:::plan
-    PgSelectSingle80 --> PgClassExpression132
+    PgClassExpression128 o--o PgClassExpression132
     PgSelect82[["PgSelect[82∈10] ➊<br />ᐸunion_dividersᐳ<br />ᐳUnionDivider<br />More deps:<br />- Object[10]"]]:::plan
     Access65 --> PgSelect82
     First86{{"First[86∈10] ➊^"}}:::plan
@@ -167,9 +167,9 @@ graph TD
     PgClassExpression112{{"PgClassExpression[112∈10] ➊^<br />ᐸ__union_dividers__.”id”ᐳ"}}:::plan
     PgSelectSingle88 --> PgClassExpression112
     PgClassExpression122{{"PgClassExpression[122∈10] ➊^<br />ᐸ__union_di...__.”title”ᐳ"}}:::plan
-    PgSelectSingle88 --> PgClassExpression122
+    PgClassExpression112 o--o PgClassExpression122
     PgClassExpression129{{"PgClassExpression[129∈10] ➊^<br />ᐸ__union_di...__.”color”ᐳ"}}:::plan
-    PgSelectSingle88 --> PgClassExpression129
+    PgClassExpression122 o--o PgClassExpression129
     PgSelect90[["PgSelect[90∈11] ➊<br />ᐸunion_checklistsᐳ<br />ᐳUnionChecklist<br />More deps:<br />- Object[10]"]]:::plan
     Access65 --> PgSelect90
     First94{{"First[94∈11] ➊^"}}:::plan
@@ -181,7 +181,7 @@ graph TD
     PgClassExpression113{{"PgClassExpression[113∈11] ➊^<br />ᐸ__union_ch...sts__.”id”ᐳ"}}:::plan
     PgSelectSingle96 --> PgClassExpression113
     PgClassExpression123{{"PgClassExpression[123∈11] ➊^<br />ᐸ__union_ch...__.”title”ᐳ"}}:::plan
-    PgSelectSingle96 --> PgClassExpression123
+    PgClassExpression113 o--o PgClassExpression123
     PgSelect98[["PgSelect[98∈12] ➊<br />ᐸunion_checklist_itemsᐳ<br />ᐳUnionChecklistItem<br />More deps:<br />- Object[10]"]]:::plan
     Access65 --> PgSelect98
     First102{{"First[102∈12] ➊^"}}:::plan
@@ -193,9 +193,9 @@ graph TD
     PgClassExpression114{{"PgClassExpression[114∈12] ➊^<br />ᐸ__union_ch...ems__.”id”ᐳ"}}:::plan
     PgSelectSingle104 --> PgClassExpression114
     PgClassExpression124{{"PgClassExpression[124∈12] ➊^<br />ᐸ__union_ch...scription”ᐳ"}}:::plan
-    PgSelectSingle104 --> PgClassExpression124
+    PgClassExpression114 o--o PgClassExpression124
     PgClassExpression130{{"PgClassExpression[130∈12] ➊^<br />ᐸ__union_ch...s__.”note”ᐳ"}}:::plan
-    PgSelectSingle104 --> PgClassExpression130
+    PgClassExpression124 o--o PgClassExpression130
 
     %% define steps
     classDef bucket0 stroke:#696969

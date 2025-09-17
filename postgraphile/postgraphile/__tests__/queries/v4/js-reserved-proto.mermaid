@@ -52,11 +52,11 @@ graph TD
     PgClassExpression26{{"PgClassExpression[26∈1] ➊<br />ᐸ__project__.”brand”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression26
     PgClassExpression31{{"PgClassExpression[31∈1] ➊<br />ᐸ__project__.”id”ᐳ"}}:::plan
-    PgSelectSingle13 --> PgClassExpression31
+    PgClassExpression26 o--o PgClassExpression31
     PgClassExpression27{{"PgClassExpression[27∈2] ➊<br />ᐸ__project__.”brand”ᐳ"}}:::plan
     PgSelectSingle19 --> PgClassExpression27
     PgClassExpression32{{"PgClassExpression[32∈2] ➊<br />ᐸ__project__.”__proto__”ᐳ"}}:::plan
-    PgSelectSingle19 --> PgClassExpression32
+    PgClassExpression27 o--o PgClassExpression32
     __Item33[/"__Item[33∈5]<br />ᐸ28ᐳ"\]:::itemplan
     ConnectionItems28 ==> __Item33
     PgSelectSingle34{{"PgSelectSingle[34∈5]<br />ᐸprojectᐳ"}}:::plan
@@ -64,9 +64,9 @@ graph TD
     PgClassExpression35{{"PgClassExpression[35∈6]<br />ᐸ__project__.”__proto__”ᐳ"}}:::plan
     PgSelectSingle34 --> PgClassExpression35
     PgClassExpression36{{"PgClassExpression[36∈6]<br />ᐸ__project__.”brand”ᐳ"}}:::plan
-    PgSelectSingle34 --> PgClassExpression36
+    PgClassExpression35 o--o PgClassExpression36
     PgClassExpression37{{"PgClassExpression[37∈6]<br />ᐸ__project__.”id”ᐳ"}}:::plan
-    PgSelectSingle34 --> PgClassExpression37
+    PgClassExpression36 o--o PgClassExpression37
 
     %% define steps
     classDef bucket0 stroke:#696969

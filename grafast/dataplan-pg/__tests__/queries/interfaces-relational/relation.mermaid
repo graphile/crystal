@@ -177,13 +177,13 @@ graph TD
     PgClassExpression192{{"PgClassExpression[192∈14] ➊<br />ᐸ__people__.”username”ᐳ<br />(5) ...ᐳRelationalTopic"}}:::plan
     PgSelectSingle159 --> PgClassExpression192
     PgClassExpression193{{"PgClassExpression[193∈15] ➊<br />ᐸ__people__.”username”ᐳ<br />(5) ...ᐳRelationalPost"}}:::plan
-    PgSelectSingle159 --> PgClassExpression193
+    PgClassExpression192 o--o PgClassExpression193
     PgClassExpression194{{"PgClassExpression[194∈16] ➊<br />ᐸ__people__.”username”ᐳ<br />(5) ...ᐳRelationalDivider"}}:::plan
-    PgSelectSingle159 --> PgClassExpression194
+    PgClassExpression193 o--o PgClassExpression194
     PgClassExpression195{{"PgClassExpression[195∈17] ➊<br />ᐸ__people__.”username”ᐳ<br />(5) ...ᐳRelationalChecklist"}}:::plan
-    PgSelectSingle159 --> PgClassExpression195
+    PgClassExpression194 o--o PgClassExpression195
     PgClassExpression196{{"PgClassExpression[196∈18] ➊<br />ᐸ__people__.”username”ᐳ<br />(5) ...ᐳRelationalChecklistItem"}}:::plan
-    PgSelectSingle159 --> PgClassExpression196
+    PgClassExpression195 o--o PgClassExpression196
 
     %% define steps
     classDef bucket0 stroke:#696969

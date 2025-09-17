@@ -100,7 +100,7 @@ graph TD
     PgClassExpression29{{"PgClassExpression[29∈7]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgSelectSingle26 --> PgClassExpression29
     PgClassExpression31{{"PgClassExpression[31∈7]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle26 --> PgClassExpression31
+    PgClassExpression29 o--o PgClassExpression31
     Connection53[["Connection[53∈7]<br />ᐸ109ᐳ"]]:::plan
     Lambda109{{"Lambda[109∈7]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda109 --> Connection53
@@ -127,7 +127,7 @@ graph TD
     PgClassExpression30{{"PgClassExpression[30∈8]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
     PgSelectSingle28 --> PgClassExpression30
     PgClassExpression32{{"PgClassExpression[32∈8]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
-    PgSelectSingle28 --> PgClassExpression32
+    PgClassExpression30 o--o PgClassExpression32
     Connection46[["Connection[46∈8]<br />ᐸ121ᐳ"]]:::plan
     Lambda121{{"Lambda[121∈8]<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     Lambda121 --> Connection46
@@ -157,25 +157,25 @@ graph TD
     PgClassExpression91{{"PgClassExpression[91∈19]<br />ᐸ__post__.”headline”ᐳ"}}:::plan
     PgSelectSingle82 --> PgClassExpression91
     PgClassExpression96{{"PgClassExpression[96∈19]<br />ᐸ__post__.”author_id”ᐳ"}}:::plan
-    PgSelectSingle82 --> PgClassExpression96
+    PgClassExpression91 o--o PgClassExpression96
     PgClassExpression92{{"PgClassExpression[92∈20]<br />ᐸ__foreign_...person_id”ᐳ"}}:::plan
     PgSelectSingle84 --> PgClassExpression92
     PgClassExpression97{{"PgClassExpression[97∈20]<br />ᐸ__foreign_...und_key_1”ᐳ"}}:::plan
-    PgSelectSingle84 --> PgClassExpression97
+    PgClassExpression92 o--o PgClassExpression97
     PgClassExpression101{{"PgClassExpression[101∈20]<br />ᐸ__foreign_...und_key_2”ᐳ"}}:::plan
-    PgSelectSingle84 --> PgClassExpression101
+    PgClassExpression97 o--o PgClassExpression101
     PgClassExpression93{{"PgClassExpression[93∈21]<br />ᐸ__post__.”headline”ᐳ"}}:::plan
     PgSelectSingle86 --> PgClassExpression93
     PgClassExpression98{{"PgClassExpression[98∈21]<br />ᐸ__post__.”author_id”ᐳ"}}:::plan
-    PgSelectSingle86 --> PgClassExpression98
+    PgClassExpression93 o--o PgClassExpression98
     PgClassExpression94{{"PgClassExpression[94∈22]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
     PgSelectSingle88 --> PgClassExpression94
     PgClassExpression99{{"PgClassExpression[99∈22]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
-    PgSelectSingle88 --> PgClassExpression99
+    PgClassExpression94 o--o PgClassExpression99
     PgClassExpression95{{"PgClassExpression[95∈23]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
     PgSelectSingle90 --> PgClassExpression95
     PgClassExpression100{{"PgClassExpression[100∈23]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
-    PgSelectSingle90 --> PgClassExpression100
+    PgClassExpression95 o--o PgClassExpression100
 
     %% define steps
     classDef bucket0 stroke:#696969

@@ -45,9 +45,9 @@ graph TD
     PgClassExpression22{{"PgClassExpression[22∈3] ➊<br />ᐸ__left_arm...person_id”ᐳ"}}:::plan
     Access18 --> PgClassExpression22
     PgClassExpression23{{"PgClassExpression[23∈3] ➊<br />ᐸ__left_arm...in_metres”ᐳ"}}:::plan
-    Access18 --> PgClassExpression23
+    PgClassExpression22 o--o PgClassExpression23
     PgClassExpression24{{"PgClassExpression[24∈3] ➊<br />ᐸ__left_arm__.”mood”ᐳ"}}:::plan
-    Access18 --> PgClassExpression24
+    PgClassExpression23 o--o PgClassExpression24
 
     %% define steps
     classDef bucket0 stroke:#696969

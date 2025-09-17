@@ -92,43 +92,43 @@ graph TD
     Access61{{"Access[61∈4] ➊<br />ᐸ53.xᐳ"}}:::plan
     PgClassExpression53 --> Access61
     Access69{{"Access[69∈4] ➊<br />ᐸ53.yᐳ"}}:::plan
-    PgClassExpression53 --> Access69
+    Access61 o--o Access69
     Access62{{"Access[62∈5] ➊<br />ᐸ54.aᐳ"}}:::plan
     PgClassExpression54 --> Access62
     Access70{{"Access[70∈5] ➊<br />ᐸ54.bᐳ"}}:::plan
-    PgClassExpression54 --> Access70
+    Access62 o--o Access70
     Access79{{"Access[79∈5] ➊<br />ᐸ54.a.xᐳ"}}:::plan
-    PgClassExpression54 --> Access79
+    Access70 o--o Access79
     Access83{{"Access[83∈5] ➊<br />ᐸ54.b.xᐳ"}}:::plan
-    PgClassExpression54 --> Access83
+    Access79 o--o Access83
     Access86{{"Access[86∈5] ➊<br />ᐸ54.a.yᐳ"}}:::plan
-    PgClassExpression54 --> Access86
+    Access83 o--o Access86
     Access90{{"Access[90∈5] ➊<br />ᐸ54.b.yᐳ"}}:::plan
-    PgClassExpression54 --> Access90
+    Access86 o--o Access90
     Access63{{"Access[63∈6] ➊<br />ᐸ55.aᐳ"}}:::plan
     PgClassExpression55 --> Access63
     Access71{{"Access[71∈6] ➊<br />ᐸ55.bᐳ"}}:::plan
-    PgClassExpression55 --> Access71
+    Access63 o--o Access71
     Access80{{"Access[80∈6] ➊<br />ᐸ55.a.xᐳ"}}:::plan
-    PgClassExpression55 --> Access80
+    Access71 o--o Access80
     Access84{{"Access[84∈6] ➊<br />ᐸ55.b.xᐳ"}}:::plan
-    PgClassExpression55 --> Access84
+    Access80 o--o Access84
     Access87{{"Access[87∈6] ➊<br />ᐸ55.a.yᐳ"}}:::plan
-    PgClassExpression55 --> Access87
+    Access84 o--o Access87
     Access91{{"Access[91∈6] ➊<br />ᐸ55.b.yᐳ"}}:::plan
-    PgClassExpression55 --> Access91
+    Access87 o--o Access91
     Access64{{"Access[64∈7] ➊<br />ᐸ56.aᐳ"}}:::plan
     PgClassExpression56 --> Access64
     Access72{{"Access[72∈7] ➊<br />ᐸ56.bᐳ"}}:::plan
-    PgClassExpression56 --> Access72
+    Access64 o--o Access72
     Access81{{"Access[81∈7] ➊<br />ᐸ56.a.xᐳ"}}:::plan
-    PgClassExpression56 --> Access81
+    Access72 o--o Access81
     Access85{{"Access[85∈7] ➊<br />ᐸ56.b.xᐳ"}}:::plan
-    PgClassExpression56 --> Access85
+    Access81 o--o Access85
     Access88{{"Access[88∈7] ➊<br />ᐸ56.a.yᐳ"}}:::plan
-    PgClassExpression56 --> Access88
+    Access85 o--o Access88
     Access92{{"Access[92∈7] ➊<br />ᐸ56.b.yᐳ"}}:::plan
-    PgClassExpression56 --> Access92
+    Access88 o--o Access92
     Access65{{"Access[65∈8] ➊<br />ᐸ57.isOpenᐳ"}}:::plan
     PgClassExpression57 --> Access65
     Access73{{"Access[73∈8] ➊<br />ᐸ57.pointsᐳ"}}:::plan
@@ -142,29 +142,29 @@ graph TD
     Access68{{"Access[68∈11] ➊<br />ᐸ60.centerᐳ"}}:::plan
     PgClassExpression60 --> Access68
     Access75{{"Access[75∈11] ➊<br />ᐸ60.radiusᐳ"}}:::plan
-    PgClassExpression60 --> Access75
+    Access68 o--o Access75
     Access82{{"Access[82∈11] ➊<br />ᐸ60.center.xᐳ"}}:::plan
-    PgClassExpression60 --> Access82
+    Access75 o--o Access82
     Access89{{"Access[89∈11] ➊<br />ᐸ60.center.yᐳ"}}:::plan
-    PgClassExpression60 --> Access89
+    Access82 o--o Access89
     __Item76[/"__Item[76∈12]<br />ᐸ67ᐳ"\]:::itemplan
     Access67 ==> __Item76
     Access93{{"Access[93∈12]<br />ᐸ76.xᐳ"}}:::plan
     __Item76 --> Access93
     Access96{{"Access[96∈12]<br />ᐸ76.yᐳ"}}:::plan
-    __Item76 --> Access96
+    Access93 o--o Access96
     __Item77[/"__Item[77∈13]<br />ᐸ73ᐳ"\]:::itemplan
     Access73 ==> __Item77
     Access94{{"Access[94∈13]<br />ᐸ77.xᐳ"}}:::plan
     __Item77 --> Access94
     Access97{{"Access[97∈13]<br />ᐸ77.yᐳ"}}:::plan
-    __Item77 --> Access97
+    Access94 o--o Access97
     __Item78[/"__Item[78∈14]<br />ᐸ74ᐳ"\]:::itemplan
     Access74 ==> __Item78
     Access95{{"Access[95∈14]<br />ᐸ78.xᐳ"}}:::plan
     __Item78 --> Access95
     Access98{{"Access[98∈14]<br />ᐸ78.yᐳ"}}:::plan
-    __Item78 --> Access98
+    Access95 o--o Access98
 
     %% define steps
     classDef bucket0 stroke:#696969

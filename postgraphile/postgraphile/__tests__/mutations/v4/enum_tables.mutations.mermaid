@@ -81,19 +81,19 @@ graph TD
     Access43 --> PgClassExpression42
     PgDeleteSingle9 --> Access43
     PgClassExpression46{{"PgClassExpression[46∈7] ➊<br />ᐸ__letter_d..._.”letter”ᐳ"}}:::plan
-    Access43 --> PgClassExpression46
+    PgClassExpression42 o--o PgClassExpression46
     PgClassExpression48{{"PgClassExpression[48∈7] ➊<br />ᐸ__letter_d..._via_view”ᐳ"}}:::plan
-    Access43 --> PgClassExpression48
+    PgClassExpression46 o--o PgClassExpression48
     PgClassExpression44{{"PgClassExpression[44∈8] ➊<br />ᐸ__letter_d...ons__.”id”ᐳ"}}:::plan
     Access45{{"Access[45∈8] ➊<br />ᐸ18.tᐳ"}}:::plan
     Access45 --> PgClassExpression44
     PgInsertSingle18 --> Access45
     PgClassExpression47{{"PgClassExpression[47∈8] ➊<br />ᐸ__letter_d..._.”letter”ᐳ"}}:::plan
-    Access45 --> PgClassExpression47
+    PgClassExpression44 o--o PgClassExpression47
     PgClassExpression49{{"PgClassExpression[49∈8] ➊<br />ᐸ__letter_d..._via_view”ᐳ"}}:::plan
-    Access45 --> PgClassExpression49
+    PgClassExpression47 o--o PgClassExpression49
     PgClassExpression50{{"PgClassExpression[50∈8] ➊<br />ᐸ__letter_d...scription”ᐳ"}}:::plan
-    Access45 --> PgClassExpression50
+    PgClassExpression49 o--o PgClassExpression50
 
     %% define steps
     classDef bucket0 stroke:#696969

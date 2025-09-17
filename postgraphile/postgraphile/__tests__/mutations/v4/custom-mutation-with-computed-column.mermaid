@@ -48,9 +48,9 @@ graph TD
     PgClassExpression24{{"PgClassExpression[24∈3] ➊<br />ᐸ__upsert_setting__ᐳ"}}:::plan
     Object28 & PgClassExpression24 & PgFromExpression33 & PgFromExpression35 & PgFromExpression38 --> PgSelect25
     PgClassExpression21{{"PgClassExpression[21∈3] ➊<br />ᐸ__upsert_setting__.”id”ᐳ"}}:::plan
-    PgSelectSingle18 --> PgClassExpression21
+    Object19 o--o PgClassExpression21
     PgClassExpression22{{"PgClassExpression[22∈3] ➊<br />ᐸ__upsert_s...”username”ᐳ"}}:::plan
-    PgSelectSingle18 --> PgClassExpression22
+    PgClassExpression21 o--o PgClassExpression22
     PgSelectSingle18 --> PgClassExpression24
     First29{{"First[29∈3] ➊"}}:::plan
     PgSelectRows30[["PgSelectRows[30∈3] ➊"]]:::plan
@@ -61,9 +61,9 @@ graph TD
     PgClassExpression34{{"PgClassExpression[34∈3] ➊<br />ᐸ(1/0) /* E...ferred! */ᐳ"}}:::plan
     PgSelectSingle31 --> PgClassExpression34
     PgClassExpression36{{"PgClassExpression[36∈3] ➊<br />ᐸ(1/0) /* E...ferred! */ᐳ"}}:::plan
-    PgSelectSingle31 --> PgClassExpression36
+    PgClassExpression34 o--o PgClassExpression36
     PgClassExpression39{{"PgClassExpression[39∈3] ➊<br />ᐸ(1/0) /* E...ferred! */ᐳ"}}:::plan
-    PgSelectSingle31 --> PgClassExpression39
+    PgClassExpression36 o--o PgClassExpression39
 
     %% define steps
     classDef bucket0 stroke:#696969

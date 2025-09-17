@@ -57,17 +57,17 @@ graph TD
     Lambda26{{"Lambda[26∈3]"}}:::plan
     PgClassExpression25 --> Lambda26
     PgClassExpression37{{"PgClassExpression[37∈3]<br />ᐸ__single_t...__.”type2”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression37
+    PgClassExpression23 o--o PgClassExpression37
     PgClassExpression42{{"PgClassExpression[42∈3]<br />ᐸ__single_t...”position”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression42
+    PgClassExpression37 o--o PgClassExpression42
     PgClassExpression47{{"PgClassExpression[47∈3]<br />ᐸ__single_t...reated_at”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression47
+    PgClassExpression42 o--o PgClassExpression47
     PgClassExpression52{{"PgClassExpression[52∈3]<br />ᐸ__single_t...pdated_at”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression52
+    PgClassExpression47 o--o PgClassExpression52
     PgClassExpression57{{"PgClassExpression[57∈3]<br />ᐸ__single_t..._archived”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression57
+    PgClassExpression52 o--o PgClassExpression57
     PgClassExpression62{{"PgClassExpression[62∈3]<br />ᐸ__single_t...chived_at”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression62
+    PgClassExpression57 o--o PgClassExpression62
 
     %% define steps
     classDef bucket0 stroke:#696969

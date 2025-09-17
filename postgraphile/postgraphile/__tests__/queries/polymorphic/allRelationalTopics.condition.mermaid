@@ -74,11 +74,11 @@ graph TD
     PgClassExpression42{{"PgClassExpression[42∈7]<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
     PgSelectSingle41 --> PgClassExpression42
     PgClassExpression57{{"PgClassExpression[57∈7]<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
-    PgSelectSingle41 --> PgClassExpression57
+    PgClassExpression42 o--o PgClassExpression57
     PgClassExpression63{{"PgClassExpression[63∈7]<br />ᐸ__relation...reated_at”ᐳ"}}:::plan
-    PgSelectSingle41 --> PgClassExpression63
+    PgClassExpression57 o--o PgClassExpression63
     PgClassExpression69{{"PgClassExpression[69∈7]<br />ᐸ__relation...chived_at”ᐳ"}}:::plan
-    PgSelectSingle41 --> PgClassExpression69
+    PgClassExpression63 o--o PgClassExpression69
     List72 --> Lambda73
     List76{{"List[76∈8]<br />ᐸ75,33ᐳ"}}:::plan
     Access75 & PgSelectSingle33 --> List76

@@ -45,9 +45,9 @@ graph TD
     PgClassExpression24{{"PgClassExpression[24∈3] ➊<br />ᐸ__network__.”inet”ᐳ"}}:::plan
     Access20 --> PgClassExpression24
     PgClassExpression25{{"PgClassExpression[25∈3] ➊<br />ᐸ__network__.”cidr”ᐳ"}}:::plan
-    Access20 --> PgClassExpression25
+    PgClassExpression24 o--o PgClassExpression25
     PgClassExpression26{{"PgClassExpression[26∈3] ➊<br />ᐸ__network__.”macaddr”ᐳ"}}:::plan
-    Access20 --> PgClassExpression26
+    PgClassExpression25 o--o PgClassExpression26
 
     %% define steps
     classDef bucket0 stroke:#696969

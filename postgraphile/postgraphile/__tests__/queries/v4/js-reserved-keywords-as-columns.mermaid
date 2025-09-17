@@ -75,19 +75,19 @@ graph TD
     PgClassExpression46{{"PgClassExpression[46∈2] ➊<br />ᐸ__material__.”class”ᐳ"}}:::plan
     PgSelectSingle19 --> PgClassExpression46
     PgClassExpression50{{"PgClassExpression[50∈2] ➊<br />ᐸ__material__.”id”ᐳ"}}:::plan
-    PgSelectSingle19 --> PgClassExpression50
+    PgClassExpression46 o--o PgClassExpression50
     PgClassExpression47{{"PgClassExpression[47∈3] ➊<br />ᐸ__material__.”class”ᐳ"}}:::plan
     PgSelectSingle25 --> PgClassExpression47
     PgClassExpression51{{"PgClassExpression[51∈3] ➊<br />ᐸ__material__.”id”ᐳ"}}:::plan
-    PgSelectSingle25 --> PgClassExpression51
+    PgClassExpression47 o--o PgClassExpression51
     PgClassExpression48{{"PgClassExpression[48∈4] ➊<br />ᐸ__crop__.”yield”ᐳ"}}:::plan
     PgSelectSingle33 --> PgClassExpression48
     PgClassExpression52{{"PgClassExpression[52∈4] ➊<br />ᐸ__crop__.”amount”ᐳ"}}:::plan
-    PgSelectSingle33 --> PgClassExpression52
+    PgClassExpression48 o--o PgClassExpression52
     PgClassExpression49{{"PgClassExpression[49∈5] ➊<br />ᐸ__crop__.”amount”ᐳ"}}:::plan
     PgSelectSingle39 --> PgClassExpression49
     PgClassExpression53{{"PgClassExpression[53∈5] ➊<br />ᐸ__crop__.”id”ᐳ"}}:::plan
-    PgSelectSingle39 --> PgClassExpression53
+    PgClassExpression49 o--o PgClassExpression53
     __Item41[/"__Item[41∈6]<br />ᐸ40ᐳ"\]:::itemplan
     PgSelectRows40 ==> __Item41
     PgSelectSingle42{{"PgSelectSingle[42∈6]<br />ᐸcropᐳ"}}:::plan
@@ -95,9 +95,9 @@ graph TD
     PgClassExpression56{{"PgClassExpression[56∈6]<br />ᐸ__crop__.”id”ᐳ"}}:::plan
     PgSelectSingle42 --> PgClassExpression56
     PgClassExpression57{{"PgClassExpression[57∈6]<br />ᐸ__crop__.”amount”ᐳ"}}:::plan
-    PgSelectSingle42 --> PgClassExpression57
+    PgClassExpression56 o--o PgClassExpression57
     PgClassExpression58{{"PgClassExpression[58∈6]<br />ᐸ__crop__.”yield”ᐳ"}}:::plan
-    PgSelectSingle42 --> PgClassExpression58
+    PgClassExpression57 o--o PgClassExpression58
     __Item54[/"__Item[54∈8]<br />ᐸ43ᐳ"\]:::itemplan
     ConnectionItems43 ==> __Item54
     PgSelectSingle55{{"PgSelectSingle[55∈8]<br />ᐸmaterialᐳ"}}:::plan
@@ -105,9 +105,9 @@ graph TD
     PgClassExpression59{{"PgClassExpression[59∈9]<br />ᐸ__material__.”valueOf”ᐳ"}}:::plan
     PgSelectSingle55 --> PgClassExpression59
     PgClassExpression60{{"PgClassExpression[60∈9]<br />ᐸ__material__.”class”ᐳ"}}:::plan
-    PgSelectSingle55 --> PgClassExpression60
+    PgClassExpression59 o--o PgClassExpression60
     PgClassExpression61{{"PgClassExpression[61∈9]<br />ᐸ__material__.”id”ᐳ"}}:::plan
-    PgSelectSingle55 --> PgClassExpression61
+    PgClassExpression60 o--o PgClassExpression61
 
     %% define steps
     classDef bucket0 stroke:#696969

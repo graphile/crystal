@@ -91,11 +91,11 @@ graph TD
     PgClassExpression49{{"PgClassExpression[49∈10]<br />ᐸ__users__.”username”ᐳ"}}:::plan
     PgSelectSingle47 --> PgClassExpression49
     PgClassExpression51{{"PgClassExpression[51∈10]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
-    PgSelectSingle47 --> PgClassExpression51
+    PgClassExpression49 o--o PgClassExpression51
     List68{{"List[68∈11]<br />ᐸ67,35ᐳ"}}:::plan
     Access67 & PgSelectSingle35 --> List68
     PgClassExpression50{{"PgClassExpression[50∈11]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
-    PgSelectSingle35 --> PgClassExpression50
+    PgClassExpression37 o--o PgClassExpression50
     First57{{"First[57∈11]"}}:::plan
     PgSelectRows58[["PgSelectRows[58∈11]"]]:::plan
     PgSelectRows58 --> First57
@@ -107,7 +107,7 @@ graph TD
     PgClassExpression60{{"PgClassExpression[60∈12]<br />ᐸ__users__.”username”ᐳ"}}:::plan
     PgSelectSingle59 --> PgClassExpression60
     PgClassExpression61{{"PgClassExpression[61∈12]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
-    PgSelectSingle59 --> PgClassExpression61
+    PgClassExpression60 o--o PgClassExpression61
 
     %% define steps
     classDef bucket0 stroke:#696969

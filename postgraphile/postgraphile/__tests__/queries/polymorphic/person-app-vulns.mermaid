@@ -144,7 +144,7 @@ graph TD
     PgSelectSingle53 --> PgClassExpression65
     PgSelectSingle53 --> PgClassExpression67
     PgClassExpression69{{"PgClassExpression[69∈10]^<br />ᐸ__aws_appl...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle53 --> PgClassExpression69
+    PgClassExpression65 o--o PgClassExpression69
     PgSelectSingle53 --> PgClassExpression71
     PgSelectSingle53 --> PgClassExpression72
     First77{{"First[77∈10]^"}}:::plan
@@ -194,7 +194,7 @@ graph TD
     PgSelectSingle61 --> PgClassExpression66
     PgSelectSingle61 --> PgClassExpression68
     PgClassExpression70{{"PgClassExpression[70∈11]^<br />ᐸ__gcp_appl...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle61 --> PgClassExpression70
+    PgClassExpression66 o--o PgClassExpression70
     PgSelectSingle61 --> PgClassExpression80
     PgSelectSingle61 --> PgClassExpression81
     First86{{"First[86∈11]^"}}:::plan
@@ -273,7 +273,7 @@ graph TD
     PgClassExpression201{{"PgClassExpression[201∈19]^<br />ᐸ__organiza...zation_id”ᐳ"}}:::plan
     PgSelectSingle142 --> PgClassExpression201
     PgClassExpression203{{"PgClassExpression[203∈19]^<br />ᐸ__organiza...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle142 --> PgClassExpression203
+    PgClassExpression201 o--o PgClassExpression203
     PgSelect144[["PgSelect[144∈20]^<br />ᐸpeopleᐳ<br />More deps:<br />- Object[12]"]]:::plan
     Access143{{"Access[143∈20]<br />ᐸ133.person_idᐳ<br />(2) ...ᐳPerson"}}:::plan
     Access143 --> PgSelect144
@@ -287,7 +287,7 @@ graph TD
     PgClassExpression202{{"PgClassExpression[202∈20]^<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
     PgSelectSingle150 --> PgClassExpression202
     PgClassExpression204{{"PgClassExpression[204∈20]^<br />ᐸ__people__.”username”ᐳ"}}:::plan
-    PgSelectSingle150 --> PgClassExpression204
+    PgClassExpression202 o--o PgClassExpression204
     Access184{{"Access[184∈23]^<br />ᐸ183.__typenameᐳ"}}:::plan
     __Value183:::plan@{shape: docs, label: "__Combined[183∈23]<br />ᐳAwsApplication<br />ᐳGcpApplication"}
     __Value183 --> Access184
@@ -304,11 +304,11 @@ graph TD
     PgClassExpression209{{"PgClassExpression[209∈25]^<br />ᐸ__first_pa...team_name”ᐳ"}}:::plan
     PgSelectSingle192 --> PgClassExpression209
     PgClassExpression211{{"PgClassExpression[211∈25]^<br />ᐸ__first_pa...ies__.”id”ᐳ"}}:::plan
-    PgSelectSingle192 --> PgClassExpression211
+    PgClassExpression209 o--o PgClassExpression211
     PgClassExpression213{{"PgClassExpression[213∈25]^<br />ᐸ__first_pa...vss_score”ᐳ"}}:::plan
-    PgSelectSingle192 --> PgClassExpression213
+    PgClassExpression211 o--o PgClassExpression213
     PgClassExpression215{{"PgClassExpression[215∈25]^<br />ᐸ__first_pa...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle192 --> PgClassExpression215
+    PgClassExpression213 o--o PgClassExpression215
     PgSelect194[["PgSelect[194∈26]<br />ᐸthird_party_vulnerabilitiesᐳ<br />(2) ...ᐳThirdPartyVulnerability<br />More deps:<br />- Object[12]"]]:::plan
     Access185 --> PgSelect194
     First198{{"First[198∈26]^"}}:::plan
@@ -320,11 +320,11 @@ graph TD
     PgClassExpression210{{"PgClassExpression[210∈26]^<br />ᐸ__third_pa...ndor_name”ᐳ"}}:::plan
     PgSelectSingle200 --> PgClassExpression210
     PgClassExpression212{{"PgClassExpression[212∈26]^<br />ᐸ__third_pa...ies__.”id”ᐳ"}}:::plan
-    PgSelectSingle200 --> PgClassExpression212
+    PgClassExpression210 o--o PgClassExpression212
     PgClassExpression214{{"PgClassExpression[214∈26]^<br />ᐸ__third_pa...vss_score”ᐳ"}}:::plan
-    PgSelectSingle200 --> PgClassExpression214
+    PgClassExpression212 o--o PgClassExpression214
     PgClassExpression216{{"PgClassExpression[216∈26]^<br />ᐸ__third_pa...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle200 --> PgClassExpression216
+    PgClassExpression214 o--o PgClassExpression216
     Edge206{{"Edge[206∈27]^"}}:::plan
     __Item205[/"__Item[205∈27]<br />ᐸ167ᐳ<br />ᐳAwsApplication"\]:::itemplan
     PgCursor218{{"PgCursor[218∈27]^"}}:::plan
@@ -373,9 +373,9 @@ graph TD
     PgClassExpression251{{"PgClassExpression[251∈33]^<br />ᐸ__first_pa...vss_score”ᐳ"}}:::plan
     PgSelectSingle242 --> PgClassExpression251
     PgClassExpression253{{"PgClassExpression[253∈33]^<br />ᐸ__first_pa...ies__.”id”ᐳ"}}:::plan
-    PgSelectSingle242 --> PgClassExpression253
+    PgClassExpression251 o--o PgClassExpression253
     PgClassExpression255{{"PgClassExpression[255∈33]^<br />ᐸ__first_pa...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle242 --> PgClassExpression255
+    PgClassExpression253 o--o PgClassExpression255
     PgSelect244[["PgSelect[244∈34]<br />ᐸthird_party_vulnerabilitiesᐳ<br />(2) ...ᐳThirdPartyVulnerability<br />More deps:<br />- Object[12]"]]:::plan
     Access235 --> PgSelect244
     First248{{"First[248∈34]^"}}:::plan
@@ -387,9 +387,9 @@ graph TD
     PgClassExpression252{{"PgClassExpression[252∈34]^<br />ᐸ__third_pa...vss_score”ᐳ"}}:::plan
     PgSelectSingle250 --> PgClassExpression252
     PgClassExpression254{{"PgClassExpression[254∈34]^<br />ᐸ__third_pa...ies__.”id”ᐳ"}}:::plan
-    PgSelectSingle250 --> PgClassExpression254
+    PgClassExpression252 o--o PgClassExpression254
     PgClassExpression256{{"PgClassExpression[256∈34]^<br />ᐸ__third_pa...s__.”name”ᐳ"}}:::plan
-    PgSelectSingle250 --> PgClassExpression256
+    PgClassExpression254 o--o PgClassExpression256
 
     %% define steps
     classDef bucket0 stroke:#696969

@@ -39,9 +39,9 @@ graph TD
     PgClassExpression14{{"PgClassExpression[14∈1] ➊<br />ᐸ__messages__.”id”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression14
     PgClassExpression15{{"PgClassExpression[15∈1] ➊<br />ᐸ__messages__.”body”ᐳ"}}:::plan
-    PgSelectSingle13 --> PgClassExpression15
+    PgClassExpression14 o--o PgClassExpression15
     PgClassExpression16{{"PgClassExpression[16∈1] ➊<br />ᐸ__messages__.”forum_id”ᐳ"}}:::plan
-    PgSelectSingle13 --> PgClassExpression16
+    PgClassExpression15 o--o PgClassExpression16
     First21{{"First[21∈1] ➊"}}:::plan
     PgSelectRows22[["PgSelectRows[22∈1] ➊"]]:::plan
     PgSelectRows22 --> First21

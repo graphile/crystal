@@ -59,7 +59,7 @@ graph TD
     PgClassExpression30{{"PgClassExpression[30∈3] ➊<br />ᐸ__left_arm...in_metres”ᐳ"}}:::plan
     Access19 --> PgClassExpression30
     PgClassExpression31{{"PgClassExpression[31∈3] ➊<br />ᐸ__left_arm__.”mood”ᐳ"}}:::plan
-    Access19 --> PgClassExpression31
+    PgClassExpression30 o--o PgClassExpression31
     List34{{"List[34∈4] ➊<br />ᐸ32,33ᐳ<br />More deps:<br />- Constantᐸ'people'ᐳ[32]"}}:::plan
     PgClassExpression33{{"PgClassExpression[33∈4] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgClassExpression33 --> List34

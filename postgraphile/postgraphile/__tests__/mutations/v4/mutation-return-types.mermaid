@@ -398,7 +398,7 @@ graph TD
     First216{{"First[216∈33] ➊"}}:::plan
     Access291 & First216 --> List292
     PgClassExpression185{{"PgClassExpression[185∈33] ➊<br />ᐸ__mutation...plex__.”x”ᐳ"}}:::plan
-    PgSelectSingle54 --> PgClassExpression185
+    Object55 o--o PgClassExpression185
     PgSelectSingle54 --> PgClassExpression194
     First199{{"First[199∈33] ➊"}}:::plan
     PgSelectRows200[["PgSelectRows[200∈33] ➊"]]:::plan
@@ -416,14 +416,14 @@ graph TD
     Lambda293{{"Lambda[293∈33] ➊<br />ᐸpgInlineViaSubqueryTransformᐳ"}}:::plan
     List292 --> Lambda293
     PgClassExpression186{{"PgClassExpression[186∈34] ➊<br />ᐸ__mutation...first_out”ᐳ"}}:::plan
-    PgSelectSingle72 --> PgClassExpression186
+    Object73 o--o PgClassExpression186
     PgClassExpression202{{"PgClassExpression[202∈34] ➊<br />ᐸ__mutation...econd_out”ᐳ"}}:::plan
-    PgSelectSingle72 --> PgClassExpression202
+    PgClassExpression186 o--o PgClassExpression202
     PgSelect204[["PgSelect[204∈35] ➊<br />ᐸfrmcdc_compoundTypeᐳ"]]:::plan
     PgClassExpression203{{"PgClassExpression[203∈35] ➊<br />ᐸ__mutation...ype__.”o2”ᐳ"}}:::plan
     Object207 & PgClassExpression203 --> PgSelect204
     PgClassExpression187{{"PgClassExpression[187∈35] ➊<br />ᐸ__mutation...ype__.”o1”ᐳ"}}:::plan
-    PgSelectSingle83 --> PgClassExpression187
+    Object84 o--o PgClassExpression187
     PgSelectSingle83 --> PgClassExpression203
     First208{{"First[208∈35] ➊"}}:::plan
     PgSelectRows209[["PgSelectRows[209∈35] ➊"]]:::plan
@@ -432,9 +432,9 @@ graph TD
     PgSelectSingle210{{"PgSelectSingle[210∈35] ➊<br />ᐸfrmcdc_compoundTypeᐳ"}}:::plan
     First208 --> PgSelectSingle210
     PgClassExpression188{{"PgClassExpression[188∈36] ➊<br />ᐸ__mutation....”column1”ᐳ"}}:::plan
-    PgSelectSingle100 --> PgClassExpression188
+    Object101 o--o PgClassExpression188
     PgClassExpression211{{"PgClassExpression[211∈36] ➊<br />ᐸ__mutation....”column2”ᐳ"}}:::plan
-    PgSelectSingle100 --> PgClassExpression211
+    PgClassExpression188 o--o PgClassExpression211
     List191{{"List[191∈37] ➊<br />ᐸ189,190ᐳ<br />More deps:<br />- Constantᐸ'people'ᐳ[189]"}}:::plan
     PgClassExpression190{{"PgClassExpression[190∈37] ➊<br />ᐸ__mutation...ble__.”id”ᐳ"}}:::plan
     PgClassExpression190 --> List191
@@ -442,11 +442,11 @@ graph TD
     Lambda192{{"Lambda[192∈37] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List191 --> Lambda192
     PgClassExpression193{{"PgClassExpression[193∈38] ➊<br />ᐸ__mutation....”column1”ᐳ"}}:::plan
-    PgSelectSingle145 --> PgClassExpression193
+    Object146 o--o PgClassExpression193
     PgClassExpression212{{"PgClassExpression[212∈38] ➊<br />ᐸ__mutation....”column3”ᐳ"}}:::plan
-    PgSelectSingle145 --> PgClassExpression212
+    PgClassExpression193 o--o PgClassExpression212
     PgClassExpression219{{"PgClassExpression[219∈38] ➊<br />ᐸ__mutation...med__.”o2”ᐳ"}}:::plan
-    PgSelectSingle145 --> PgClassExpression219
+    PgClassExpression212 o--o PgClassExpression219
     __Item171[/"__Item[171∈39]<br />ᐸ165ᐳ"\]:::itemplan
     PgSelectRows165 ==> __Item171
     PgSelectSingle172{{"PgSelectSingle[172∈39]<br />ᐸmutation_out_complex_setofᐳ"}}:::plan
@@ -500,7 +500,7 @@ graph TD
     PgClassExpression221{{"PgClassExpression[221∈46]<br />ᐸ__mutation...tof__.”o1”ᐳ"}}:::plan
     PgSelectSingle174 --> PgClassExpression221
     PgClassExpression234{{"PgClassExpression[234∈46]<br />ᐸ__mutation...tof__.”o2”ᐳ"}}:::plan
-    PgSelectSingle174 --> PgClassExpression234
+    PgClassExpression221 o--o PgClassExpression234
     List223{{"List[223∈47]<br />ᐸ189,222ᐳ<br />More deps:<br />- Constantᐸ'people'ᐳ[189]"}}:::plan
     PgClassExpression222{{"PgClassExpression[222∈47]<br />ᐸ__mutation...tof__.”id”ᐳ"}}:::plan
     PgClassExpression222 --> List223
@@ -510,19 +510,19 @@ graph TD
     PgClassExpression225{{"PgClassExpression[225∈48]<br />ᐸ__mutation...l__.”col1”ᐳ"}}:::plan
     PgSelectSingle181 --> PgClassExpression225
     PgClassExpression235{{"PgClassExpression[235∈48]<br />ᐸ__mutation...l__.”col2”ᐳ"}}:::plan
-    PgSelectSingle181 --> PgClassExpression235
+    PgClassExpression225 o--o PgClassExpression235
     PgClassExpression242{{"PgClassExpression[242∈49] ➊<br />ᐸ__frmcdc_c...type__.”a”ᐳ"}}:::plan
     PgSelectSingle201 --> PgClassExpression242
     PgClassExpression247{{"PgClassExpression[247∈49] ➊<br />ᐸ__frmcdc_c...type__.”b”ᐳ"}}:::plan
-    PgSelectSingle201 --> PgClassExpression247
+    PgClassExpression242 o--o PgClassExpression247
     PgClassExpression249{{"PgClassExpression[249∈49] ➊<br />ᐸ__frmcdc_c...type__.”c”ᐳ"}}:::plan
-    PgSelectSingle201 --> PgClassExpression249
+    PgClassExpression247 o--o PgClassExpression249
     PgClassExpression243{{"PgClassExpression[243∈50] ➊<br />ᐸ__frmcdc_c...type__.”a”ᐳ"}}:::plan
     PgSelectSingle210 --> PgClassExpression243
     PgClassExpression248{{"PgClassExpression[248∈50] ➊<br />ᐸ__frmcdc_c...type__.”b”ᐳ"}}:::plan
-    PgSelectSingle210 --> PgClassExpression248
+    PgClassExpression243 o--o PgClassExpression248
     PgClassExpression250{{"PgClassExpression[250∈50] ➊<br />ᐸ__frmcdc_c...type__.”c”ᐳ"}}:::plan
-    PgSelectSingle210 --> PgClassExpression250
+    PgClassExpression248 o--o PgClassExpression250
     List245{{"List[245∈51] ➊<br />ᐸ189,244ᐳ<br />More deps:<br />- Constantᐸ'people'ᐳ[189]"}}:::plan
     PgClassExpression244{{"PgClassExpression[244∈51] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgClassExpression244 --> List245
@@ -538,9 +538,9 @@ graph TD
     PgClassExpression259{{"PgClassExpression[259∈52]<br />ᐸ__frmcdc_c...type__.”a”ᐳ"}}:::plan
     PgSelectSingle233 --> PgClassExpression259
     PgClassExpression263{{"PgClassExpression[263∈52]<br />ᐸ__frmcdc_c...type__.”b”ᐳ"}}:::plan
-    PgSelectSingle233 --> PgClassExpression263
+    PgClassExpression259 o--o PgClassExpression263
     PgClassExpression264{{"PgClassExpression[264∈52]<br />ᐸ__frmcdc_c...type__.”c”ᐳ"}}:::plan
-    PgSelectSingle233 --> PgClassExpression264
+    PgClassExpression263 o--o PgClassExpression264
     List261{{"List[261∈53]<br />ᐸ189,260ᐳ<br />More deps:<br />- Constantᐸ'people'ᐳ[189]"}}:::plan
     PgClassExpression260{{"PgClassExpression[260∈53]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgClassExpression260 --> List261

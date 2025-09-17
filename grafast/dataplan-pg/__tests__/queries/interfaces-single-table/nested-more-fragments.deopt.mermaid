@@ -74,7 +74,7 @@ graph TD
     PgSelectSingle34{{"PgSelectSingle[34∈3]<br />ᐸsingle_table_itemsᐳ"}}:::plan
     First32 --> PgSelectSingle34
     PgClassExpression77{{"PgClassExpression[77∈3]<br />ᐸ__single_t...__.”type2”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression77
+    PgClassExpression23 o--o PgClassExpression77
     PgSelectSingle22 --> PgClassExpression82
     First85{{"First[85∈3]"}}:::plan
     PgSelectRows86[["PgSelectRows[86∈3]"]]:::plan
@@ -83,15 +83,15 @@ graph TD
     PgSelectSingle87{{"PgSelectSingle[87∈3]<br />ᐸpeopleᐳ"}}:::plan
     First85 --> PgSelectSingle87
     PgClassExpression112{{"PgClassExpression[112∈3]<br />ᐸ__single_t...”position”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression112
+    PgClassExpression77 o--o PgClassExpression112
     PgClassExpression117{{"PgClassExpression[117∈3]<br />ᐸ__single_t...reated_at”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression117
+    PgClassExpression112 o--o PgClassExpression117
     PgClassExpression122{{"PgClassExpression[122∈3]<br />ᐸ__single_t...pdated_at”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression122
+    PgClassExpression117 o--o PgClassExpression122
     PgClassExpression127{{"PgClassExpression[127∈3]<br />ᐸ__single_t..._archived”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression127
+    PgClassExpression122 o--o PgClassExpression127
     PgClassExpression132{{"PgClassExpression[132∈3]<br />ᐸ__single_t...chived_at”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression132
+    PgClassExpression127 o--o PgClassExpression132
     PgClassExpression147{{"PgClassExpression[147∈3]<br />ᐸ__single_t...s__.”type”ᐳ"}}:::plan
     PgSelectSingle34 --> PgClassExpression147
     Lambda148{{"Lambda[148∈3]"}}:::plan
@@ -106,33 +106,33 @@ graph TD
     PgSelectSingle172{{"PgSelectSingle[172∈3]<br />ᐸpeopleᐳ"}}:::plan
     First170 --> PgSelectSingle172
     PgClassExpression205{{"PgClassExpression[205∈3]<br />ᐸ__single_t...”position”ᐳ"}}:::plan
-    PgSelectSingle34 --> PgClassExpression205
+    PgClassExpression160 o--o PgClassExpression205
     PgClassExpression210{{"PgClassExpression[210∈3]<br />ᐸ__single_t...reated_at”ᐳ"}}:::plan
-    PgSelectSingle34 --> PgClassExpression210
+    PgClassExpression205 o--o PgClassExpression210
     PgClassExpression215{{"PgClassExpression[215∈3]<br />ᐸ__single_t...pdated_at”ᐳ"}}:::plan
-    PgSelectSingle34 --> PgClassExpression215
+    PgClassExpression210 o--o PgClassExpression215
     PgClassExpression220{{"PgClassExpression[220∈3]<br />ᐸ__single_t..._archived”ᐳ"}}:::plan
-    PgSelectSingle34 --> PgClassExpression220
+    PgClassExpression215 o--o PgClassExpression220
     PgClassExpression225{{"PgClassExpression[225∈3]<br />ᐸ__single_t...chived_at”ᐳ"}}:::plan
-    PgSelectSingle34 --> PgClassExpression225
+    PgClassExpression220 o--o PgClassExpression225
     PgClassExpression137{{"PgClassExpression[137∈4]<br />ᐸ__single_t...__.”title”ᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist"}}:::plan
-    PgSelectSingle22 --> PgClassExpression137
+    PgClassExpression132 o--o PgClassExpression137
     PgClassExpression141{{"PgClassExpression[141∈4]<br />ᐸ__single_t...scription”ᐳ<br />ᐳSingleTableChecklistItem<br />ᐳSingleTablePost"}}:::plan
-    PgSelectSingle22 --> PgClassExpression141
+    PgClassExpression137 o--o PgClassExpression141
     PgClassExpression143{{"PgClassExpression[143∈4]<br />ᐸ__single_t...__.”color”ᐳ<br />ᐳSingleTableDivider"}}:::plan
-    PgSelectSingle22 --> PgClassExpression143
+    PgClassExpression141 o--o PgClassExpression143
     PgClassExpression144{{"PgClassExpression[144∈4]<br />ᐸ__single_t...s__.”note”ᐳ<br />ᐳSingleTableChecklistItem<br />ᐳSingleTablePost"}}:::plan
-    PgSelectSingle22 --> PgClassExpression144
+    PgClassExpression143 o--o PgClassExpression144
     PgClassExpression149{{"PgClassExpression[149∈5]<br />ᐸ__people__.”username”ᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"}}:::plan
     PgSelectSingle87 --> PgClassExpression149
     PgClassExpression230{{"PgClassExpression[230∈6]<br />ᐸ__single_t...__.”title”ᐳ<br />(5) ...ᐳSingleTableTopic<br />(5) ...ᐳSingleTablePost<br />(5) ...ᐳSingleTableDivider<br />(5) ...ᐳSingleTableChecklist"}}:::plan
-    PgSelectSingle34 --> PgClassExpression230
+    PgClassExpression225 o--o PgClassExpression230
     PgClassExpression234{{"PgClassExpression[234∈6]<br />ᐸ__single_t...scription”ᐳ<br />(5) ...ᐳSingleTableChecklistItem<br />(5) ...ᐳSingleTablePost"}}:::plan
-    PgSelectSingle34 --> PgClassExpression234
+    PgClassExpression230 o--o PgClassExpression234
     PgClassExpression236{{"PgClassExpression[236∈6]<br />ᐸ__single_t...__.”color”ᐳ<br />(5) ...ᐳSingleTableDivider"}}:::plan
-    PgSelectSingle34 --> PgClassExpression236
+    PgClassExpression234 o--o PgClassExpression236
     PgClassExpression237{{"PgClassExpression[237∈6]<br />ᐸ__single_t...s__.”note”ᐳ<br />(5) ...ᐳSingleTableChecklistItem<br />(5) ...ᐳSingleTablePost"}}:::plan
-    PgSelectSingle34 --> PgClassExpression237
+    PgClassExpression236 o--o PgClassExpression237
     PgClassExpression239{{"PgClassExpression[239∈7]<br />ᐸ__people__.”username”ᐳ<br />(5) ...ᐳSingleTableTopic<br />(5) ...ᐳSingleTablePost<br />(5) ...ᐳSingleTableDivider<br />(5) ...ᐳSingleTableChecklist<br />(5) ...ᐳSingleTableChecklistItem"}}:::plan
     PgSelectSingle172 --> PgClassExpression239
 
