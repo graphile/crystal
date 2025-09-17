@@ -39,3 +39,8 @@ grant select on enum_tables.lots_of_enums to postgraphile_test_authenticator;
 grant usage on schema issue_2334 to postgraphile_test_visitor;
 grant select, insert (id, col), update (col), delete on issue_2334.foo to postgraphile_test_visitor;
 grant select, insert (id, col), update (col), delete on issue_2334.bar to postgraphile_test_visitor;
+
+grant usage on schema function_returning_enum to postgraphile_test_authenticator;
+grant select on function_returning_enum.enum_table to postgraphile_test_authenticator;
+grant select on function_returning_enum.length_status to postgraphile_test_authenticator;
+grant select on function_returning_enum.stage_options to postgraphile_test_authenticator;
