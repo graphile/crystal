@@ -12,7 +12,13 @@ export const PgV4SimpleSubscriptionsPlugin = extendSchema((build) => {
     typeDefs: [
       gql`
         extend type Subscription {
-          listen(topic: String!): ListenPayload
+          listen(
+            """
+            If true, this subscription will trigger an event as soon as it initiates.
+            """
+            initialEvent: Boolean! = false
+            topic: String!
+          ): ListenPayload
         }
 
         type ListenPayload {
@@ -36,16 +42,31 @@ export const PgV4SimpleSubscriptionsPlugin = extendSchema((build) => {
         plans: {
           listen: {
             subscribePlan: EXPORTABLE(
-              (context, jsonParse, lambda, listen) =>
-                function subscribePlan(_$root, { $topic }) {
+              (context, initialEvent, jsonParse, lambda, listen) => function subscribePlan(
+                  _$root,
+                  { $topic, $initialEvent: $includeInitialEvent },
+                ) {
                   const $pgSubscriber = context().get("pgSubscriber");
                   const $derivedTopic = lambda(
                     $topic,
                     (topic) => `postgraphile:${topic}`,
                   );
-                  return listen($pgSubscriber, $derivedTopic, jsonParse);
+
+                  // Create an initial event if enabled
+                  const $initialEvent = lambda(
+                    $includeInitialEvent,
+                    initialEvent,
+                    true,
+                  );
+
+                  return listen(
+                    $pgSubscriber,
+                    $derivedTopic,
+                    jsonParse,
+                    $initialEvent,
+                  );
                 },
-              [context, jsonParse, lambda, listen],
+              [context, initialEvent, jsonParse, lambda, listen],
             ),
             plan: EXPORTABLE(
               () =>
@@ -99,3 +120,7 @@ const nodeIdFromEvent = EXPORTABLE(
   [get, lambda, nodeObjToNodeId],
   "nodeIdFromEvent",
 );
+
+function initialEvent(obj: boolean) {
+  return obj ? `{"event":"initial"}` : undefined;
+}

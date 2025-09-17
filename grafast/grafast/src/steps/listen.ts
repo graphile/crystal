@@ -35,6 +35,8 @@ export class ListenStep<
    */
   private topicDep: number;
 
+  private initialEventDep: number | null = null;
+
   constructor(
     pubsubOrPlan:
       | Step<GrafastSubscriber<TTopics> | null>
@@ -44,6 +46,7 @@ export class ListenStep<
     public itemPlan: (itemPlan: __ItemStep<TTopics[TTopic]>) => TPayloadStep = (
       $item,
     ) => $item as any,
+    $initialEvent?: Step<TTopics[TTopic]>,
   ) {
     super();
     const $topic =
@@ -53,6 +56,9 @@ export class ListenStep<
       : constant(pubsubOrPlan, false);
     this.pubsubDep = this.addDependency($pubsub);
     this.topicDep = this.addDependency($topic);
+    if ($initialEvent) {
+      this.initialEventDep = this.addDependency($initialEvent);
+    }
   }
 
   execute({
@@ -67,6 +73,8 @@ export class ListenStep<
     }
     const pubsubValue = values[this.pubsubDep as 0];
     const topicValue = values[this.topicDep as 1];
+    const initialEventValue =
+      this.initialEventDep !== null ? values[this.initialEventDep] : null;
     return indexMap((i) => {
       const pubsub = pubsubValue.at(i);
       if (!pubsub) {
@@ -82,7 +90,15 @@ export class ListenStep<
         );
       }
       const topic = topicValue.at(i);
-      return pubsub.subscribe(topic);
+      const stream = pubsub.subscribe(topic);
+      const initialEvent = initialEventValue?.at(i);
+      if (initialEvent === undefined) {
+        return stream;
+      } else {
+        return Promise.resolve(stream).then((stream) =>
+          withInitialValue(initialEvent as any, stream),
+        );
+      }
     });
   }
 }
@@ -103,10 +119,29 @@ export function listen<
     | null,
   topicOrPlan: Step<TTopic> | string,
   itemPlan?: (itemPlan: __ItemStep<TTopics[TTopic]>) => TPayloadStep,
+  $initialEvent?: Step<TTopics[TTopic]>,
 ): ListenStep<TTopics, TTopic, TPayloadStep> {
   return new ListenStep<TTopics, TTopic, TPayloadStep>(
     pubsubOrPlan,
     topicOrPlan,
     itemPlan,
+    $initialEvent,
   );
 }
+
+const withInitialValue = <T>(
+  initialVal: T,
+  asyncIterator: AsyncIterableIterator<T>,
+): AsyncIterable<T> => {
+  // TODO: should convert this to manual iterator so we can stop before the
+  // next result resolves (which may never happen)
+  return {
+    [Symbol.asyncIterator]: async function* (): AsyncIterator<T> {
+      yield initialVal;
+
+      for await (const val of asyncIterator) {
+        yield val;
+      }
+    },
+  };
+};
