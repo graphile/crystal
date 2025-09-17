@@ -10157,7 +10157,7 @@ function UUIDSerialize(value) {
 }
 const coerce = string => {
   if (!/^[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}$/i.test(string)) {
-    throw new GraphQLError("Invalid UUID, expected 32 hexadecimal characters, optionally with hypens");
+    throw new GraphQLError("Invalid UUID, expected 32 hexadecimal characters, optionally with hyphens");
   }
   return string;
 };
