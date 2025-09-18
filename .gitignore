@@ -45,6 +45,7 @@ grafast/grafast/__tests__/dcc/**/*.mermaid
 /postgraphile/postgraphile/latestSchema.json
 /postgraphile/postgraphile/exported-schema.mjs
 /postgraphile/postgraphile/exported-schema.webpacked.js
+/grafast/dataplan-pg/src/examples/smallExample/schema-generated.ts
 /grafast/ruru/bundle/ruru.min.js
 /grafast/ruru/bundle/ruru.min.js.LICENSE.txt
 
