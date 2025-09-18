@@ -11,9 +11,9 @@ import { inspect } from "node:util";
 
 import type { PgExecutorContext, PgRegistry, WithPgClient } from "@dataplan/pg";
 import {
-  makePgResourceOptions,
   makeRegistryBuilder,
   PgExecutor,
+  pgResourceOptions,
   recordCodec,
   sqlFromArgDigests,
   TYPES,
@@ -90,15 +90,7 @@ async function main() {
   });
 
   const pgRegistry = EXPORTABLE(
-    (
-      TYPES,
-      executor,
-      makePgResourceOptions,
-      makeRegistryBuilder,
-      recordCodec,
-      sql,
-      sqlFromArgDigests,
-    ) => {
+    (TYPES, executor, makeRegistryBuilder, pgResourceOptions, recordCodec, sql, sqlFromArgDigests) => {
       const usersCodec = recordCodec({
         executor,
         name: `app_public.users`,
@@ -209,7 +201,7 @@ async function main() {
         },
       });
 
-      const usersResourceOptions = makePgResourceOptions({
+      const usersResourceOptions = pgResourceOptions({
         name: "users",
         executor,
         from: usersCodec.sqlType,
@@ -217,7 +209,7 @@ async function main() {
         uniques: [{ attributes: ["id"], isPrimary: true }],
       });
 
-      const forumsResourceOptions = makePgResourceOptions({
+      const forumsResourceOptions = pgResourceOptions({
         //name: "main.app_public.forums",
         name: "forums",
         executor,
@@ -226,7 +218,7 @@ async function main() {
         uniques: [{ attributes: ["id"], isPrimary: true }],
       });
 
-      const messagesResourceOptions = makePgResourceOptions({
+      const messagesResourceOptions = pgResourceOptions({
         name: "messages",
         executor,
         from: messagesCodec.sqlType,
@@ -234,7 +226,7 @@ async function main() {
         uniques: [{ attributes: ["id"], isPrimary: true }],
       });
 
-      const uniqueAuthorCountResourceOptions = makePgResourceOptions({
+      const uniqueAuthorCountResourceOptions = pgResourceOptions({
         executor,
         codec: TYPES.int,
         from: (...args) =>
@@ -254,7 +246,7 @@ async function main() {
         },
       });
 
-      const forumsUniqueAuthorCountResourceOptions = makePgResourceOptions({
+      const forumsUniqueAuthorCountResourceOptions = pgResourceOptions({
         executor,
         codec: TYPES.int,
         isUnique: true,
@@ -285,7 +277,7 @@ async function main() {
         },
       });
 
-      const forumsRandomUserResourceOptions = makePgResourceOptions({
+      const forumsRandomUserResourceOptions = pgResourceOptions({
         executor,
         codec: usersCodec,
         isUnique: true,
@@ -308,7 +300,7 @@ async function main() {
         },
       });
 
-      const forumsFeaturedMessagesResourceOptions = makePgResourceOptions({
+      const forumsFeaturedMessagesResourceOptions = pgResourceOptions({
         executor,
         codec: messagesCodec,
         isUnique: false,
@@ -385,15 +377,7 @@ async function main() {
         )
         .build();
     },
-    [
-      TYPES,
-      executor,
-      makePgResourceOptions,
-      makeRegistryBuilder,
-      recordCodec,
-      sql,
-      sqlFromArgDigests,
-    ],
+    [TYPES, executor, makeRegistryBuilder, pgResourceOptions, recordCodec, sql, sqlFromArgDigests],
   );
 
   // We're crafting our own input

@@ -1535,13 +1535,13 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}, {}> {
 
 exportAs("@dataplan/pg", makeRegistryBuilder, "makeRegistryBuilder");
 
-export function makePgResourceOptions<
+export function pgResourceOptions<
   const TResourceOptions extends PgResourceOptions<any, any, any, any>,
 >(options: TResourceOptions) {
   return options;
 }
 
-exportAs("@dataplan/pg", makePgResourceOptions, "makePgResourceOptions");
+exportAs("@dataplan/pg", pgResourceOptions, "pgResourceOptions");
 
 function printResourceFrom(resource: PgResourceOptions): string {
   if (typeof resource.from === "function") {
