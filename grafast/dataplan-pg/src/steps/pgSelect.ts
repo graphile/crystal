@@ -46,7 +46,7 @@ import type {
   PgResourceParameter,
   PgResourceUnique,
 } from "../datasource.js";
-import type { PgExecutorContextPlans, PgExecutorInput } from "../executor.js";
+import type { PgExecutorContext, PgExecutorInput } from "../executor.js";
 import type {
   GetPgResourceAttributes,
   GetPgResourceCodec,
@@ -290,7 +290,7 @@ export interface PgSelectOptions<
   joinAsLateral?: boolean;
 
   /** @internal @experimental */
-  context?: Step<PgExecutorContextPlans<any>>;
+  context?: Step<PgExecutorContext<any>>;
   /** @internal */
   _internalCloneSymbol?: symbol | string;
   /** @internal */

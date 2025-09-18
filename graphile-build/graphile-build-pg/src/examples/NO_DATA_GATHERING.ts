@@ -9,11 +9,7 @@ import { readFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import { inspect } from "node:util";
 
-import type {
-  PgExecutorContextPlans,
-  PgRegistry,
-  WithPgClient,
-} from "@dataplan/pg";
+import type { PgExecutorContext, PgRegistry, WithPgClient } from "@dataplan/pg";
 import {
   makePgResourceOptions,
   makeRegistryBuilder,
@@ -24,6 +20,7 @@ import {
 } from "@dataplan/pg";
 import { makePgAdaptorWithPgClient } from "@dataplan/pg/adaptors/pg";
 import chalk from "chalk";
+import type { Step } from "grafast";
 import { context, object } from "grafast";
 import { graphql, printSchema } from "grafast/graphql";
 import {
@@ -61,7 +58,7 @@ async function main() {
           object({
             pgSettings: context().get("pgSettings"),
             withPgClient: context().get("withPgClient"),
-          } as PgExecutorContextPlans<any>),
+          }) as Step<PgExecutorContext<any>>,
       }),
     [PgExecutor, context, object],
   );

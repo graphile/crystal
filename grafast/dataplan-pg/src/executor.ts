@@ -6,8 +6,8 @@ import type {
   ExecutableStep,
   ExecutionEventEmitter,
   GrafastValuesList,
-  ObjectStep,
   PromiseOrDirect,
+  Step,
 } from "grafast";
 import {
   asyncIteratorWithCleanup,
@@ -133,6 +133,7 @@ export type PgExecutorContext<
   withPgClient: WithPgClient<TPgClient>;
 };
 
+/** @deprecated Please use `Step<PgExecutorContext<TSettings>>` instead */
 export type PgExecutorContextPlans<
   TSettings = any,
   TPgClient extends PgClient = PgClient,
@@ -175,12 +176,12 @@ export type PgExecutorSubscribeOptions = {
  */
 export class PgExecutor<const TName extends string = string, TSettings = any> {
   public name: TName;
-  private contextCallback: () => ObjectStep<PgExecutorContextPlans<TSettings>>;
+  private contextCallback: () => Step<PgExecutorContext<TSettings>>;
   private $$cache: symbol;
 
   constructor(options: {
     name: TName;
-    context: () => ObjectStep<PgExecutorContextPlans<TSettings>>;
+    context: () => Step<PgExecutorContext<TSettings>>;
   }) {
     const { name, context } = options;
     this.name = name;
@@ -193,7 +194,7 @@ export class PgExecutor<const TName extends string = string, TSettings = any> {
   }
 
   // public context(): ExecutableStep
-  public context(): ObjectStep<PgExecutorContextPlans<TSettings>> {
+  public context(): Step<PgExecutorContext<TSettings>> {
     return this.contextCallback();
   }
 

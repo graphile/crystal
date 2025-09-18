@@ -1,10 +1,10 @@
-import type { KeysOfType, WithPgClient } from "@dataplan/pg";
+import type { KeysOfType, PgExecutorContext } from "@dataplan/pg";
 import {
   PgExecutor,
   withPgClientFromPgService,
   withSuperuserPgClientFromPgService,
 } from "@dataplan/pg";
-import type { ExecutableStep, PromiseOrDirect } from "grafast";
+import type { PromiseOrDirect, Step } from "grafast";
 import { constant, context, defer, object } from "grafast";
 import type { GatherPluginContext } from "graphile-build";
 import { EXPORTABLE, gatherConfig } from "graphile-build";
@@ -253,11 +253,6 @@ interface State {
   };
 }
 
-type PgExecutorContextPlans<TSettings = any> = {
-  pgSettings: ExecutableStep<TSettings>;
-  withPgClient: ExecutableStep<WithPgClient>;
-};
-
 async function getDb(
   info: GatherPluginContext<State, Cache>,
   serviceName: string,
@@ -375,7 +370,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
                       ? ctx.get(pgSettingsKey)
                       : constant(null),
                   withPgClient: ctx.get(withPgClientKey),
-                } as PgExecutorContextPlans<any>);
+                }) as Step<PgExecutorContext<any>>;
               },
             }),
           [

@@ -76,7 +76,7 @@ import type {
   PgCodecAttribute,
   PgCodecAttributeVia,
   PgCondition,
-  PgExecutorContextPlans,
+  PgExecutorContext,
   PgInsertSingleStep,
   PgSelectStep,
   WithPgClient,
@@ -186,10 +186,10 @@ export function makeExampleSchema(
         name: "main",
         context: () => {
           const $context = context();
-          return object<PgExecutorContextPlans<Grafast.Context["pgSettings"]>>({
+          return object({
             pgSettings: $context.get("pgSettings"),
             withPgClient: $context.get("withPgClient"),
-          });
+          }) as Step<PgExecutorContext<Grafast.Context["pgSettings"]>>;
         },
       }),
     [PgExecutor, context, object],

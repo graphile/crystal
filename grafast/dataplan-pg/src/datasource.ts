@@ -1,6 +1,6 @@
 /* eslint-disable graphile-export/export-instances */
 import chalk from "chalk";
-import type { GrafastValuesList, ObjectStep } from "grafast";
+import type { GrafastValuesList, Step } from "grafast";
 import {
   __ValueStep,
   arraysMatch,
@@ -21,7 +21,7 @@ import { TYPES } from "./codecs.js";
 import type {
   PgClientResult,
   PgExecutor,
-  PgExecutorContextPlans,
+  PgExecutorContext,
   PgExecutorInput,
   PgExecutorMutationOptions,
   PgExecutorOptions,
@@ -794,7 +794,7 @@ export class PgResource<
    * same executor must use the same context to allow for SQL inlining, unions,
    * etc.
    */
-  public context(): ObjectStep<PgExecutorContextPlans> {
+  public context(): Step<PgExecutorContext> {
     return this.executor.context();
   }
 
@@ -910,7 +910,7 @@ export interface PgRegistryBuilder<
     Expand<TExecutors>
   >;
   addExecutor<const TExecutor extends PgExecutor>(
-    codec: TExecutor,
+    executor: TExecutor,
   ): PgRegistryBuilder<
     TCodecs,
     TResources,
