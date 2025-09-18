@@ -8,6 +8,7 @@ import type {
   GraphQLSchema,
 } from "graphql";
 import {
+  getNamedType,
   getNullableType,
   isEnumType,
   isInputObjectType,
@@ -75,7 +76,7 @@ class GrafastGenerator {
     if (isNonNullType(type)) {
       return `NonNullStep<${this.expect(type.ofType)}>`;
     } else if (isListType(type)) {
-      return `StepRepresentingList<${this.expect(type.ofType)}>`;
+      return `Get<${JSON.stringify(getNamedType(type.ofType).name)}, "list", ListOfStep<${this.expect(type.ofType)}>>`;
     } else {
       return this.nullable(type);
     }
@@ -197,6 +198,7 @@ type Overrides = {}`,
         `\
 type NoArguments = Record<string, never>;
 type NonNullStep<TStep extends Step> = TStep & Step<TStep extends Step<infer U> ? NonNullable<U> : any>;
+type ListOfStep<TStep extends Step> = StepRepresentingList<TStep extends Step<infer U> ? U : any, TStep>;
 
 type Get<
   TTypeName extends string,
