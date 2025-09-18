@@ -10,10 +10,30 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./@dataplan/pg": {
+      "types": "./fwd/@dataplan/pg/index.d.ts",
+      "node": "./fwd/@dataplan/pg/index.js",
+      "default": "./fwd/@dataplan/pg/index.js"
+    },
+    "./@dataplan/pg/adaptors/pg": {
+      "types": "./fwd/@dataplan/pg/adaptors/pg/index.d.ts",
+      "node": "./fwd/@dataplan/pg/adaptors/pg/index.js",
+      "default": "./fwd/@dataplan/pg/adaptors/pg/index.js"
+    },
+    "./@dataplan/pg/pg-sql2": {
+      "types": "./fwd/@dataplan/pg/pg-sql2/index.d.ts",
+      "node": "./fwd/@dataplan/pg/pg-sql2/index.js",
+      "default": "./fwd/@dataplan/pg/pg-sql2/index.js"
+    },
     "./pg-introspection": {
       "types": "./fwd/pg-introspection/index.d.ts",
       "node": "./fwd/pg-introspection/index.js",
       "default": "./fwd/pg-introspection/index.js"
+    },
+    "./pg-sql2": {
+      "types": "./fwd/pg-sql2/index.d.ts",
+      "node": "./fwd/pg-sql2/index.js",
+      "default": "./fwd/pg-sql2/index.js"
     }
   },
   "scripts": {

@@ -49,6 +49,11 @@
       "node": "./fwd/@dataplan/pg/adaptors/pg/index.js",
       "default": "./fwd/@dataplan/pg/adaptors/pg/index.js"
     },
+    "./@dataplan/pg/pg-sql2": {
+      "types": "./fwd/@dataplan/pg/pg-sql2/index.d.ts",
+      "node": "./fwd/@dataplan/pg/pg-sql2/index.js",
+      "default": "./fwd/@dataplan/pg/pg-sql2/index.js"
+    },
     "./grafast": {
       "types": "./fwd/grafast/index.d.ts",
       "node": "./fwd/grafast/index.js",
@@ -154,10 +159,30 @@
       "node": "./fwd/graphile-build-pg/index.js",
       "default": "./fwd/graphile-build-pg/index.js"
     },
+    "./graphile-build-pg/@dataplan/pg": {
+      "types": "./fwd/graphile-build-pg/@dataplan/pg/index.d.ts",
+      "node": "./fwd/graphile-build-pg/@dataplan/pg/index.js",
+      "default": "./fwd/graphile-build-pg/@dataplan/pg/index.js"
+    },
+    "./graphile-build-pg/@dataplan/pg/adaptors/pg": {
+      "types": "./fwd/graphile-build-pg/@dataplan/pg/adaptors/pg/index.d.ts",
+      "node": "./fwd/graphile-build-pg/@dataplan/pg/adaptors/pg/index.js",
+      "default": "./fwd/graphile-build-pg/@dataplan/pg/adaptors/pg/index.js"
+    },
+    "./graphile-build-pg/@dataplan/pg/pg-sql2": {
+      "types": "./fwd/graphile-build-pg/@dataplan/pg/pg-sql2/index.d.ts",
+      "node": "./fwd/graphile-build-pg/@dataplan/pg/pg-sql2/index.js",
+      "default": "./fwd/graphile-build-pg/@dataplan/pg/pg-sql2/index.js"
+    },
     "./graphile-build-pg/pg-introspection": {
       "types": "./fwd/graphile-build-pg/pg-introspection/index.d.ts",
       "node": "./fwd/graphile-build-pg/pg-introspection/index.js",
       "default": "./fwd/graphile-build-pg/pg-introspection/index.js"
+    },
+    "./graphile-build-pg/pg-sql2": {
+      "types": "./fwd/graphile-build-pg/pg-sql2/index.d.ts",
+      "node": "./fwd/graphile-build-pg/pg-sql2/index.js",
+      "default": "./fwd/graphile-build-pg/pg-sql2/index.js"
     },
     "./pg-sql2": {
       "types": "./fwd/pg-sql2/index.d.ts",

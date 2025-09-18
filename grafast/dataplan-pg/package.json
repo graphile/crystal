@@ -15,6 +15,11 @@
       "types": "./dist/adaptors/pg.d.ts",
       "node": "./dist/adaptors/pg.js",
       "default": "./dist/adaptors/pg.js"
+    },
+    "./pg-sql2": {
+      "types": "./fwd/pg-sql2/index.d.ts",
+      "node": "./fwd/pg-sql2/index.js",
+      "default": "./fwd/pg-sql2/index.js"
     }
   },
   "scripts": {
@@ -78,7 +83,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "fwd"
   ],
   "devDependencies": {
     "@mermaid-js/mermaid-cli": "^11.6.0",
