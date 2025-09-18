@@ -1,10 +1,8 @@
 /* eslint-disable graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses */
-import { pgRegistry } from "./registry.mts";
+import { pgResources } from "./registry.mts";
 import { typedMakeGrafastSchema } from "./schema-generated.mts";
 
-const {
-  pgResources: { users, posts },
-} = pgRegistry;
+const { users, posts } = pgResources;
 
 export const schema = typedMakeGrafastSchema({
   typeDefs: /* GraphQL */ `
