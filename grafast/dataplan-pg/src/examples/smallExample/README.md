@@ -1,16 +1,16 @@
 # Small hand-written @dataplan/pg example
 
-Registry (representing the database) is in `registry.ts`
+Registry (representing the database) is in `registry.mts`
 
-Schema is in `schema.ts`
+Schema is in `schema.mts`
 
 This uses `graphql-codegen-grafast` to make for strong(ish) types, to generate
 the types run `yarn codegen` in the `grafast/dataplan-pg` folder.
 
 Each GraphQL type that represents a PgSelectSingleStep is defined in
-`schema-manual-types.ts`
+`schema-manual-types.mts`
 
-The `index.ts` file runs a simple GraphQL query against the schema.
+The `index.mts` file runs a simple GraphQL query against the schema.
 
 This schema assumes you have a local database called `dataplanpg-example` with
 the following schema:
@@ -46,3 +46,9 @@ insert into posts (author_id, body) values
 Note that this example does not include any authentication/authorization - for
 guidance there we recommend that you read the relevant parts of the PostGraphile
 documentation.
+
+You can run this code using Node 24+ from the `grafast/dataplan-pg` folder, as:
+
+```
+node --experimental-strip-types src/examples/smallExample/index.mts
+```

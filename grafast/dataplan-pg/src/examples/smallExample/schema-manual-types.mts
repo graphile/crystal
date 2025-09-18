@@ -1,6 +1,6 @@
 import type { PgSelectSingleStep, PgSelectStep } from "@dataplan/pg";
 
-import { pgRegistry } from "./registry";
+import { pgRegistry } from "./registry.mts";
 
 const { users, posts } = pgRegistry.pgResources;
 

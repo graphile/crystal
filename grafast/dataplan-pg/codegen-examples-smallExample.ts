@@ -1,13 +1,13 @@
 import type { CodegenConfig } from "@graphql-codegen/cli";
 
 const config: CodegenConfig = {
-  schema: "./src/examples/smallExample/schema.ts",
+  schema: "./src/examples/smallExample/schema.mts",
   ignoreNoDocuments: true,
   generates: {
-    "./src/examples/smallExample/schema-generated.ts": {
+    "./src/examples/smallExample/schema-generated.mts": {
       plugins: ["typescript", "grafast"],
       config: {
-        overridesFile: "./schema-manual-types",
+        overridesFile: "./schema-manual-types.mts",
       },
     },
   },

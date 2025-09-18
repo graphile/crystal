@@ -1,6 +1,6 @@
 /* eslint-disable graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses */
-import { pgRegistry } from "./registry";
-import { typedMakeGrafastSchema } from "./schema-generated";
+import { pgRegistry } from "./registry.mts";
+import { typedMakeGrafastSchema } from "./schema-generated.mts";
 
 const {
   pgResources: { users, posts },
