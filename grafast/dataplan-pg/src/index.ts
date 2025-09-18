@@ -1,5 +1,6 @@
 import type { GrafastSubscriber } from "grafast";
 import { exportAsMany } from "grafast";
+export { sql } from "pg-sql2";
 
 import {
   domainOfCodec,
