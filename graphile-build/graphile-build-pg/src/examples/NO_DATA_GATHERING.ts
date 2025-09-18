@@ -90,7 +90,15 @@ async function main() {
   });
 
   const pgRegistry = EXPORTABLE(
-    (TYPES, executor, makeRegistryBuilder, pgResourceOptions, recordCodec, sql, sqlFromArgDigests) => {
+    (
+      TYPES,
+      executor,
+      makeRegistryBuilder,
+      pgResourceOptions,
+      recordCodec,
+      sql,
+      sqlFromArgDigests,
+    ) => {
       const usersCodec = recordCodec({
         executor,
         name: `app_public.users`,
@@ -377,7 +385,15 @@ async function main() {
         )
         .build();
     },
-    [TYPES, executor, makeRegistryBuilder, pgResourceOptions, recordCodec, sql, sqlFromArgDigests],
+    [
+      TYPES,
+      executor,
+      makeRegistryBuilder,
+      pgResourceOptions,
+      recordCodec,
+      sql,
+      sqlFromArgDigests,
+    ],
   );
 
   // We're crafting our own input

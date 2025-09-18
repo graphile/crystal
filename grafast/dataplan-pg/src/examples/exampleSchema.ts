@@ -208,7 +208,19 @@ export function makeExampleSchema(
   );
 
   const registryConfig = EXPORTABLE(
-    (PgResource, TYPES, enumCodec, executor, listOfCodec, makeRegistryBuilder, pgResourceOptions, recordCodec, selectAuth, sql, sqlFromArgDigests) => {
+    (
+      PgResource,
+      TYPES,
+      enumCodec,
+      executor,
+      listOfCodec,
+      makeRegistryBuilder,
+      pgResourceOptions,
+      recordCodec,
+      selectAuth,
+      sql,
+      sqlFromArgDigests,
+    ) => {
       const col = <
         TOptions extends {
           codec: PgCodec;
@@ -1628,7 +1640,19 @@ export function makeExampleSchema(
         )
         .getRegistryConfig();
     },
-    [PgResource, TYPES, enumCodec, executor, listOfCodec, makeRegistryBuilder, pgResourceOptions, recordCodec, selectAuth, sql, sqlFromArgDigests],
+    [
+      PgResource,
+      TYPES,
+      enumCodec,
+      executor,
+      listOfCodec,
+      makeRegistryBuilder,
+      pgResourceOptions,
+      recordCodec,
+      selectAuth,
+      sql,
+      sqlFromArgDigests,
+    ],
     "registryConfig",
   );
 
