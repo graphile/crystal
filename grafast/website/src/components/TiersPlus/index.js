@@ -13,7 +13,7 @@ const TierList = [
     buttonText: "Start Monthly Plan",
     frequency: "/mo",
     comparison: "Cancel any time",
-    badge: "Updated August 2025",
+    badge: "Updated September 2025",
     description: (
       <>
         <ul>

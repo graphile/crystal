@@ -82,10 +82,11 @@
 [data-theme="dark"] .badge {
   background-color: var(--ifm-color-primary);
   border-color: var(--ifm-color-primary);
-  color: white;
+  color: black;
   .featured & {
     background-color: var(--grafast-color-pink);
     border-color: var(--grafast-color-pink);
+    color: white;
   }
 }
 
