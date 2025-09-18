@@ -1,16 +1,14 @@
 import type { PgSelectSingleStep, PgSelectStep } from "@dataplan/pg";
 
-import { pgRegistry } from "./registry.mts";
-
-const { users, posts } = pgRegistry.pgResources;
+import type { pgResources } from "./registry.mts";
 
 export type Overrides = {
   User: {
-    nullable: PgSelectSingleStep<typeof users>;
-    list: PgSelectStep<typeof users>;
+    nullable: PgSelectSingleStep<typeof pgResources.users>;
+    list: PgSelectStep<typeof pgResources.users>;
   };
   Post: {
-    nullable: PgSelectSingleStep<typeof posts>;
-    list: PgSelectStep<typeof posts>;
+    nullable: PgSelectSingleStep<typeof pgResources.posts>;
+    list: PgSelectStep<typeof pgResources.posts>;
   };
 };

@@ -110,3 +110,6 @@ export const pgRegistry = makeRegistryBuilder()
     remoteAttributes: ["author_id"],
   })
   .build();
+
+export const pgCodecs = pgRegistry.pgCodecs;
+export const pgResources = pgRegistry.pgResources;
