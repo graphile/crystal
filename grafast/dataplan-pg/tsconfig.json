@@ -7,6 +7,7 @@
     "moduleResolution": "nodenext"
   },
   "include": ["src"],
+  "exclude": ["src/examples"],
   "references": [
     { "path": "../dataplan-json" },
     { "path": "../grafast" },
