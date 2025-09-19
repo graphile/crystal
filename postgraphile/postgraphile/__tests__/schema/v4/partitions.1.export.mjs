@@ -174,6 +174,177 @@ const measurementsCodec = recordCodec({
   },
   executor: executor
 });
+const measurementsY2022Identifier = sql.identifier("partitions", "measurements_y2022");
+const measurementsY2022Codec = recordCodec({
+  name: "measurementsY2022",
+  identifier: measurementsY2022Identifier,
+  attributes: {
+    __proto__: null,
+    timestamp: {
+      description: undefined,
+      codec: TYPES.timestamptz,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    key: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    value: {
+      description: undefined,
+      codec: TYPES.float,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    user_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  },
+  description: undefined,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "partitions",
+      name: "measurements_y2022"
+    },
+    tags: {
+      __proto__: null
+    }
+  },
+  executor: executor
+});
+const measurementsY2023Identifier = sql.identifier("partitions", "measurements_y2023");
+const measurementsY2023Codec = recordCodec({
+  name: "measurementsY2023",
+  identifier: measurementsY2023Identifier,
+  attributes: {
+    __proto__: null,
+    timestamp: {
+      description: undefined,
+      codec: TYPES.timestamptz,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    key: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    value: {
+      description: undefined,
+      codec: TYPES.float,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    user_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  },
+  description: undefined,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "partitions",
+      name: "measurements_y2023"
+    },
+    tags: {
+      __proto__: null
+    }
+  },
+  executor: executor
+});
+const measurementsY2024Identifier = sql.identifier("partitions", "measurements_y2024");
+const measurementsY2024Codec = recordCodec({
+  name: "measurementsY2024",
+  identifier: measurementsY2024Identifier,
+  attributes: {
+    __proto__: null,
+    timestamp: {
+      description: undefined,
+      codec: TYPES.timestamptz,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    key: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    value: {
+      description: undefined,
+      codec: TYPES.float,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    user_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  },
+  description: undefined,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "partitions",
+      name: "measurements_y2024"
+    },
+    tags: {
+      __proto__: null
+    }
+  },
+  executor: executor
+});
 const usersUniques = [{
   isPrimary: true,
   attributes: ["id"],
@@ -235,6 +406,112 @@ const registryConfig_pgResources_measurements_measurements = {
     isInsertable: true,
     isUpdatable: true,
     isDeletable: true,
+    hasPartitions: true,
+    tags: {}
+  }
+};
+const registryConfig_pgResources_measurements_y2022_measurements_y2022 = {
+  executor: executor,
+  name: "measurements_y2022",
+  identifier: "main.partitions.measurements_y2022",
+  from: measurementsY2022Identifier,
+  codec: measurementsY2022Codec,
+  uniques: [{
+    isPrimary: true,
+    attributes: ["timestamp", "key"],
+    description: undefined,
+    extensions: {
+      tags: {
+        __proto__: null
+      }
+    }
+  }],
+  isVirtual: false,
+  description: undefined,
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "partitions",
+      name: "measurements_y2022"
+    },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
+    partitionParent: {
+      schemaName: "partitions",
+      name: "measurements"
+    },
+    tags: {}
+  }
+};
+const registryConfig_pgResources_measurements_y2023_measurements_y2023 = {
+  executor: executor,
+  name: "measurements_y2023",
+  identifier: "main.partitions.measurements_y2023",
+  from: measurementsY2023Identifier,
+  codec: measurementsY2023Codec,
+  uniques: [{
+    isPrimary: true,
+    attributes: ["timestamp", "key"],
+    description: undefined,
+    extensions: {
+      tags: {
+        __proto__: null
+      }
+    }
+  }],
+  isVirtual: false,
+  description: undefined,
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "partitions",
+      name: "measurements_y2023"
+    },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
+    partitionParent: {
+      schemaName: "partitions",
+      name: "measurements"
+    },
+    tags: {}
+  }
+};
+const registryConfig_pgResources_measurements_y2024_measurements_y2024 = {
+  executor: executor,
+  name: "measurements_y2024",
+  identifier: "main.partitions.measurements_y2024",
+  from: measurementsY2024Identifier,
+  codec: measurementsY2024Codec,
+  uniques: [{
+    isPrimary: true,
+    attributes: ["timestamp", "key"],
+    description: undefined,
+    extensions: {
+      tags: {
+        __proto__: null
+      }
+    }
+  }],
+  isVirtual: false,
+  description: undefined,
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "partitions",
+      name: "measurements_y2024"
+    },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
+    partitionParent: {
+      schemaName: "partitions",
+      name: "measurements"
+    },
     tags: {}
   }
 };
@@ -253,6 +530,9 @@ const registry = makeRegistry({
     timestamptz: TYPES.timestamptz,
     float8: TYPES.float,
     measurements: measurementsCodec,
+    measurementsY2022: measurementsY2022Codec,
+    measurementsY2023: measurementsY2023Codec,
+    measurementsY2024: measurementsY2024Codec,
     LetterAToDEnum: enumCodec({
       name: "LetterAToDEnum",
       identifier: TYPES.text.sqlType,
@@ -551,7 +831,10 @@ const registry = makeRegistry({
   pgResources: {
     __proto__: null,
     users: registryConfig_pgResources_users_users,
-    measurements: registryConfig_pgResources_measurements_measurements
+    measurements: registryConfig_pgResources_measurements_measurements,
+    measurements_y2022: registryConfig_pgResources_measurements_y2022_measurements_y2022,
+    measurements_y2023: registryConfig_pgResources_measurements_y2023_measurements_y2023,
+    measurements_y2024: registryConfig_pgResources_measurements_y2024_measurements_y2024
   },
   pgRelations: {
     __proto__: null,
@@ -573,11 +856,110 @@ const registry = makeRegistry({
         }
       }
     },
+    measurementsY2022: {
+      __proto__: null,
+      usersByMyUserId: {
+        localCodec: measurementsY2022Codec,
+        remoteResourceOptions: registryConfig_pgResources_users_users,
+        localCodecPolymorphicTypes: undefined,
+        localAttributes: ["user_id"],
+        remoteAttributes: ["id"],
+        isUnique: true,
+        isReferencee: false,
+        description: undefined,
+        extensions: {
+          tags: {
+            behavior: []
+          }
+        }
+      }
+    },
+    measurementsY2023: {
+      __proto__: null,
+      usersByMyUserId: {
+        localCodec: measurementsY2023Codec,
+        remoteResourceOptions: registryConfig_pgResources_users_users,
+        localCodecPolymorphicTypes: undefined,
+        localAttributes: ["user_id"],
+        remoteAttributes: ["id"],
+        isUnique: true,
+        isReferencee: false,
+        description: undefined,
+        extensions: {
+          tags: {
+            behavior: []
+          }
+        }
+      }
+    },
+    measurementsY2024: {
+      __proto__: null,
+      usersByMyUserId: {
+        localCodec: measurementsY2024Codec,
+        remoteResourceOptions: registryConfig_pgResources_users_users,
+        localCodecPolymorphicTypes: undefined,
+        localAttributes: ["user_id"],
+        remoteAttributes: ["id"],
+        isUnique: true,
+        isReferencee: false,
+        description: undefined,
+        extensions: {
+          tags: {
+            behavior: []
+          }
+        }
+      }
+    },
     users: {
       __proto__: null,
       measurementsByTheirUserId: {
         localCodec: usersCodec,
         remoteResourceOptions: registryConfig_pgResources_measurements_measurements,
+        localCodecPolymorphicTypes: undefined,
+        localAttributes: ["id"],
+        remoteAttributes: ["user_id"],
+        isUnique: false,
+        isReferencee: true,
+        description: undefined,
+        extensions: {
+          tags: {
+            behavior: []
+          }
+        }
+      },
+      measurementsY2022SByTheirUserId: {
+        localCodec: usersCodec,
+        remoteResourceOptions: registryConfig_pgResources_measurements_y2022_measurements_y2022,
+        localCodecPolymorphicTypes: undefined,
+        localAttributes: ["id"],
+        remoteAttributes: ["user_id"],
+        isUnique: false,
+        isReferencee: true,
+        description: undefined,
+        extensions: {
+          tags: {
+            behavior: []
+          }
+        }
+      },
+      measurementsY2023SByTheirUserId: {
+        localCodec: usersCodec,
+        remoteResourceOptions: registryConfig_pgResources_measurements_y2023_measurements_y2023,
+        localCodecPolymorphicTypes: undefined,
+        localAttributes: ["id"],
+        remoteAttributes: ["user_id"],
+        isUnique: false,
+        isReferencee: true,
+        description: undefined,
+        extensions: {
+          tags: {
+            behavior: []
+          }
+        }
+      },
+      measurementsY2024SByTheirUserId: {
+        localCodec: usersCodec,
+        remoteResourceOptions: registryConfig_pgResources_measurements_y2024_measurements_y2024,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
         remoteAttributes: ["user_id"],
