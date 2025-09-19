@@ -220,6 +220,13 @@ declare global {
       isUpdatable?: boolean;
       /** Checks capabilities of this resource to see if DELETE is even possible */
       isDeletable?: boolean;
+      /** Is this a partitioned table (i.e. doesn't store data locally) */
+      hasPartitions?: boolean;
+      /** If this table _is_ a partition, details of its parent */
+      partitionParent?: {
+        schemaName: string;
+        name: string;
+      };
     }
   }
 }
