@@ -133,6 +133,10 @@ declare global {
           serviceName: string,
           classId: string,
         ): Promise<PgInherits[]>;
+        getInheritanceChildrenForClass(
+          serviceName: string,
+          classId: string,
+        ): Promise<PgInherits[]>;
         getNamespaceByName(
           serviceName: string,
           namespaceName: string,
@@ -446,6 +450,13 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
         const list = relevant.introspection.inherits;
         // PERF: cache
         return list.filter((entity) => entity.inhrelid === classId);
+      },
+
+      async getInheritanceChildrenForClass(info, serviceName, classId) {
+        const relevant = await getDb(info, serviceName);
+        const list = relevant.introspection.inherits;
+        // PERF: cache
+        return list.filter((entity) => entity.inhparent === classId);
       },
 
       async getNamespaceByName(info, serviceName, name) {
