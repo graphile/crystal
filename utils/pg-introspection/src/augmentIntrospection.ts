@@ -522,5 +522,12 @@ export function augmentIntrospection(
     entity.getSubType = memo(() => getType(entity.rngsubtype));
   });
 
+  introspection.inherits.forEach((entity) => {
+    entity.getParent = () =>
+      introspection.classes.find((child) => child._id === entity.inhparent);
+    entity.getChild = () =>
+      introspection.classes.find((child) => child._id === entity.inhrelid);
+  });
+
   return introspection;
 }

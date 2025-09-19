@@ -222,4 +222,8 @@ declare module "./introspection.js" {
     getType(): PgType | undefined;
     getSubType(): PgType | undefined;
   }
+  interface PgInherits {
+    getParent(): PgClass | undefined;
+    getChild(): PgClass | undefined;
+  }
 }
