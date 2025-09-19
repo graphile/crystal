@@ -660,6 +660,9 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           provides: ["default"],
           before: ["inferred", "override"],
           callback(behavior, resource) {
+            if (resource.extensions?.partitionParent) {
+              return [behavior, "-*"];
+            }
             const ext = resource.extensions;
             return [
               ...(ext?.isInsertable === false ? ["-resource:insert"] : []),
