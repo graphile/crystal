@@ -403,11 +403,17 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
               );
             }),
           );
-          const constraints = [
-            // TODO: handle multiple inheritance
-            ...inheritedConstraints.flatMap((list) => list),
-            ...directConstraints,
-          ];
+          const constraints =
+            // Partitions only have their own local constraints
+            pgClass.relispartition
+              ? directConstraints
+              : // Table inheritance, on the other hand, needs to manually inherit constraints (?)
+                // TODO: Check this, I'm unconvinced.
+                [
+                  // TODO: handle multiple inheritance
+                  ...inheritedConstraints.flatMap((list) => list),
+                  ...directConstraints,
+                ];
           const uniqueAttributeOnlyConstraints = constraints.filter(
             (c) =>
               ["u", "p"].includes(c.contype) && c.conkey?.every((k) => k > 0),
