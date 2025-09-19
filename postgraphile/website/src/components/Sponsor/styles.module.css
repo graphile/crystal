@@ -7,17 +7,28 @@
   margin: 0.5rem;
   padding: 1rem;
   flex: 0 0 18rem;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
 }
+
+.leaders {
+  flex: 0 0 12rem;
+}
+
+.featured,
+.leaders {
+  border: 3px solid var(--ifm-color-primary-dark);
+  background: white;
+  border-radius: 12px;
+}
+
 .featured .name {
   font-size: 2rem;
   padding-top: 1rem;
 }
 
-.featured {
-  border: 3px solid var(--ifm-color-primary-dark);
-  background: white;
-  border-radius: 12px;
+.leaders .name {
+  font-size: 1.2rem;
+  padding-top: 0.8rem;
 }
 
 .name {
@@ -41,10 +52,16 @@
   color: var(--ifm-color-primary);
 }
 
-img.avatar {
+.featured .avatar {
   border-radius: 10rem;
   width: 10rem;
   height: 10rem;
+}
+
+.leaders .avatar {
+  border-radius: 4rem;
+  width: 4rem;
+  height: 4rem;
 }
 
 .business {
@@ -57,4 +74,24 @@ img.avatar {
   background-color: inherit;
   border-radius: inherit;
   border: inherit;
+}
+
+.backers:last-child {
+  display: none;
+}
+
+.backers:first-child {
+  display: flex;
+}
+
+@media screen and (max-width: 995px) {
+  .leaders {
+    display: none;
+  }
+  .backers:first-child {
+    display: none;
+  }
+  .backers:last-child {
+    display: flex;
+  }
 }

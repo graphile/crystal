@@ -27,6 +27,7 @@
 }
 
 .pricingTable {
+  composes: wide from global;
   overflow-x: visible;
   overflow-y: visible;
 }
@@ -126,12 +127,10 @@
   border-top: 1px solid var(--ifm-color-primary-darker);
 }
 
-.showFull {
-  display: contents;
-}
-
-.showMobile {
-  display: none;
+@media screen and (min-width: 927px) {
+  .showMobile {
+    display: none;
+  }
 }
 
 @media screen and (max-width: 926px) {
@@ -204,8 +203,5 @@
   }
   .showFull {
     display: none;
-  }
-  .showMobile {
-    display: contents;
   }
 }

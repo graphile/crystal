@@ -134,3 +134,10 @@ figure figcaption {
 [data-theme="dark"] img[src$="#light-mode-only"] {
   display: none;
 }
+.mdx-wrapper {
+  article > :not(.wide) {
+    max-width: 49rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
