@@ -362,10 +362,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           }
 
           // TODO: check compatibility with 'foreign' tables
-          if (
-            !["r", "v", "m", "f", "p", "c"].includes(pgClass.relkind) ||
-            pgClass.relispartition
-          ) {
+          if (!["r", "v", "m", "f", "p", "c"].includes(pgClass.relkind)) {
             return null;
           }
 
@@ -473,6 +470,20 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           const isVirtual = !["r", "v", "m", "f", "p"].includes(
             pgClass.relkind,
           );
+
+          const partitionParent = pgClass.relispartition
+            ? inheritance[0].getParent()
+            : undefined;
+          if (
+            pgClass.relispartition &&
+            (!partitionParent || inheritance.length > 1)
+          ) {
+            throw new Error(
+              `graphile-build-pg bug: our understanding of table inheritance is incomplete`,
+            );
+          }
+          const hasPartitions = pgClass.relkind === "p";
+
           const extensions: DataplanPg.PgResourceExtensions = {
             description,
             pg: {
@@ -480,14 +491,21 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
               schemaName: pgClass.getNamespace()!.nspname,
               name: pgClass.relname,
               ...(pgClass.relpersistence !== "p"
-                ? {
-                    persistence: pgClass.relpersistence,
-                  }
+                ? { persistence: pgClass.relpersistence }
                 : null),
             },
             isInsertable,
             isUpdatable,
             isDeletable,
+            ...(hasPartitions ? { hasPartitions } : null),
+            ...(partitionParent
+              ? {
+                  partitionParent: {
+                    schemaName: partitionParent.getNamespace()!.nspname,
+                    name: partitionParent.relname,
+                  },
+                }
+              : null),
             tags: {
               ...tags,
             },
