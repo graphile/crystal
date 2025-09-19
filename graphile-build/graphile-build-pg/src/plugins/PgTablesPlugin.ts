@@ -656,35 +656,58 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
         },
       },
       pgResource: {
-        inferred: {
-          provides: ["default"],
-          before: ["inferred", "override"],
-          callback(behavior, resource) {
-            if (resource.extensions?.partitionParent) {
-              return [behavior, "-*"];
-            }
-            const ext = resource.extensions;
-            return [
-              ...(ext?.isInsertable === false ? ["-resource:insert"] : []),
-              ...(ext?.isUpdatable === false ? ["-resource:update"] : []),
-              ...(ext?.isDeletable === false ? ["-resource:delete"] : []),
-              ...unloggedOrTempBehaviors(ext, behavior, resource),
-            ] as GraphileBuild.BehaviorString[];
+        inferred: [
+          {
+            provides: ["default"],
+            before: ["inferred", "override"],
+            callback(behavior, resource) {
+              const ext = resource.extensions;
+              return [
+                ...(ext?.isInsertable === false ? ["-resource:insert"] : []),
+                ...(ext?.isUpdatable === false ? ["-resource:update"] : []),
+                ...(ext?.isDeletable === false ? ["-resource:delete"] : []),
+                ...unloggedOrTempBehaviors(ext, behavior, resource),
+              ] as GraphileBuild.BehaviorString[];
+            },
           },
-        },
+          {
+            provides: ["inferred"],
+            after: ["default"],
+            before: ["override"],
+            callback(behavior, resource) {
+              if (resource.extensions?.partitionParent) {
+                return [behavior, "-*"];
+              }
+              return behavior;
+            },
+          },
+        ],
       },
       pgResourceUnique: {
-        inferred: {
-          provides: ["default"],
-          before: ["inferred", "override"],
-          callback(behavior, [resource, _unique]) {
-            return unloggedOrTempBehaviors(
-              resource.extensions,
-              behavior,
-              resource,
-            );
+        inferred: [
+          {
+            provides: ["default"],
+            before: ["inferred", "override"],
+            callback(behavior, [resource, _unique]) {
+              return unloggedOrTempBehaviors(
+                resource.extensions,
+                behavior,
+                resource,
+              );
+            },
           },
-        },
+          {
+            provides: ["inferred"],
+            after: ["default"],
+            before: ["override"],
+            callback(behavior, [resource, _unique]) {
+              if (resource.extensions?.partitionParent) {
+                return [behavior, "-*"];
+              }
+              return behavior;
+            },
+          },
+        ],
       },
     },
     hooks: {

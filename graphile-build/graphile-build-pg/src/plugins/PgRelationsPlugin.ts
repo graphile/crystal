@@ -570,6 +570,9 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
     entityBehavior: {
       pgCodecRelation: {
         inferred(behavior, entity): GraphileBuild.BehaviorString[] {
+          if (entity.remoteResource.extensions?.partitionParent) {
+            return [behavior, "-*"];
+          }
           if (entity.isUnique) {
             return [
               "resource:select",
