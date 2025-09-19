@@ -7,9 +7,11 @@
     "moduleResolution": "nodenext"
   },
   "include": ["src"],
+  "exclude": ["src/examples"],
   "references": [
     { "path": "../dataplan-json" },
     { "path": "../grafast" },
+    { "path": "../codegen-plugin" },
     { "path": "../../utils/pg-sql2" },
     { "path": "../../utils/jest-serializer-simple" }
   ]

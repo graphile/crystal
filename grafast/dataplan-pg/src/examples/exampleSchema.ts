@@ -76,7 +76,7 @@ import type {
   PgCodecAttribute,
   PgCodecAttributeVia,
   PgCondition,
-  PgExecutorContextPlans,
+  PgExecutorContext,
   PgInsertSingleStep,
   PgSelectStep,
   WithPgClient,
@@ -84,9 +84,9 @@ import type {
 import type { NodePostgresPgClient, PgSubscriber } from "../adaptors/pg";
 import { listOfCodec, sqlValueWithCodec } from "../codecs.js";
 import {
-  makePgResourceOptions,
   makeRegistry,
   makeRegistryBuilder,
+  pgResourceOptions,
 } from "../datasource.js";
 import {
   enumCodec,
@@ -186,10 +186,10 @@ export function makeExampleSchema(
         name: "main",
         context: () => {
           const $context = context();
-          return object<PgExecutorContextPlans<Grafast.Context["pgSettings"]>>({
+          return object({
             pgSettings: $context.get("pgSettings"),
             withPgClient: $context.get("withPgClient"),
-          });
+          }) as Step<PgExecutorContext<Grafast.Context["pgSettings"]>>;
         },
       }),
     [PgExecutor, context, object],
@@ -214,8 +214,8 @@ export function makeExampleSchema(
       enumCodec,
       executor,
       listOfCodec,
-      makePgResourceOptions,
       makeRegistryBuilder,
+      pgResourceOptions,
       recordCodec,
       selectAuth,
       sql,
@@ -296,7 +296,7 @@ export function makeExampleSchema(
         },
       });
 
-      const uniqueAuthorCountResourceOptions = makePgResourceOptions({
+      const uniqueAuthorCountResourceOptions = pgResourceOptions({
         executor,
         selectAuth,
         codec: TYPES.int,
@@ -313,7 +313,7 @@ export function makeExampleSchema(
         isUnique: true,
       });
 
-      const forumNamesArrayResourceOptions = makePgResourceOptions({
+      const forumNamesArrayResourceOptions = pgResourceOptions({
         executor,
         selectAuth,
         codec: listOfCodec(TYPES.text),
@@ -324,7 +324,7 @@ export function makeExampleSchema(
         isUnique: true, // No setof
       });
 
-      const forumNamesCasesResourceOptions = makePgResourceOptions({
+      const forumNamesCasesResourceOptions = pgResourceOptions({
         executor,
         selectAuth,
         codec: listOfCodec(TYPES.text),
@@ -334,7 +334,7 @@ export function makeExampleSchema(
         parameters: [],
       });
 
-      const forumsUniqueAuthorCountResourceOptions = makePgResourceOptions({
+      const forumsUniqueAuthorCountResourceOptions = pgResourceOptions({
         executor,
         selectAuth,
         codec: TYPES.int,
@@ -358,7 +358,7 @@ export function makeExampleSchema(
         isUnique: true,
       });
 
-      const scalarTextResourceOptions = makePgResourceOptions({
+      const scalarTextResourceOptions = pgResourceOptions({
         executor,
         selectAuth,
         codec: TYPES.text,
@@ -366,7 +366,7 @@ export function makeExampleSchema(
         name: "text",
       });
 
-      const messageResourceOptions = makePgResourceOptions({
+      const messageResourceOptions = pgResourceOptions({
         executor,
         selectAuth,
         codec: messagesCodec,
@@ -375,7 +375,7 @@ export function makeExampleSchema(
         uniques: [{ attributes: ["id"], isPrimary: true }],
       });
 
-      const userResourceOptions = makePgResourceOptions({
+      const userResourceOptions = pgResourceOptions({
         executor,
         selectAuth,
         codec: userCodec,
@@ -387,7 +387,7 @@ export function makeExampleSchema(
         ],
       });
 
-      const forumResourceOptions = makePgResourceOptions({
+      const forumResourceOptions = pgResourceOptions({
         executor,
         selectAuth,
         codec: forumCodec,
@@ -516,7 +516,7 @@ export function makeExampleSchema(
         },
       });
 
-      const personBookmarksResourceOptions = makePgResourceOptions({
+      const personBookmarksResourceOptions = pgResourceOptions({
         executor,
         selectAuth,
         codec: personBookmarksCodec,
@@ -535,7 +535,7 @@ export function makeExampleSchema(
         },
       });
 
-      const personResourceOptions = makePgResourceOptions({
+      const personResourceOptions = pgResourceOptions({
         executor,
         selectAuth,
         codec: personCodec,
@@ -562,7 +562,7 @@ export function makeExampleSchema(
         },
       });
 
-      const postResourceOptions = makePgResourceOptions({
+      const postResourceOptions = pgResourceOptions({
         executor,
         selectAuth,
         codec: postCodec,
@@ -591,7 +591,7 @@ export function makeExampleSchema(
         },
       });
 
-      const commentResourceOptions = makePgResourceOptions({
+      const commentResourceOptions = pgResourceOptions({
         executor,
         selectAuth,
         codec: commentCodec,
@@ -622,7 +622,7 @@ export function makeExampleSchema(
         },
       });
 
-      const enumTableItemTypeResourceOptions = makePgResourceOptions({
+      const enumTableItemTypeResourceOptions = pgResourceOptions({
         executor,
         selectAuth,
         codec: enumTableItemTypeCodec,
@@ -678,7 +678,7 @@ export function makeExampleSchema(
         },
       });
 
-      const singleTableItemsResourceOptions = makePgResourceOptions({
+      const singleTableItemsResourceOptions = pgResourceOptions({
         executor,
         selectAuth,
         codec: singleTableItemsCodec,
@@ -723,7 +723,7 @@ export function makeExampleSchema(
         },
       });
 
-      const relationalItemsResourceOptions = makePgResourceOptions({
+      const relationalItemsResourceOptions = pgResourceOptions({
         executor,
         selectAuth,
         codec: relationalItemsCodec,
@@ -749,7 +749,7 @@ export function makeExampleSchema(
         },
       });
 
-      const relationalCommentableResourceOptions = makePgResourceOptions({
+      const relationalCommentableResourceOptions = pgResourceOptions({
         executor,
         selectAuth,
         codec: relationalCommentableCodec,
@@ -808,7 +808,7 @@ export function makeExampleSchema(
         },
       });
 
-      const relationalTopicsResourceOptions = makePgResourceOptions({
+      const relationalTopicsResourceOptions = pgResourceOptions({
         executor,
         selectAuth,
         codec: relationalTopicsCodec,
@@ -829,7 +829,7 @@ export function makeExampleSchema(
         },
       });
 
-      const relationalPostsResourceOptions = makePgResourceOptions({
+      const relationalPostsResourceOptions = pgResourceOptions({
         executor,
         selectAuth,
         codec: relationalPostsCodec,
@@ -849,7 +849,7 @@ export function makeExampleSchema(
         },
       });
 
-      const relationalDividersResourceOptions = makePgResourceOptions({
+      const relationalDividersResourceOptions = pgResourceOptions({
         executor,
         selectAuth,
         codec: relationalDividersCodec,
@@ -868,7 +868,7 @@ export function makeExampleSchema(
         },
       });
 
-      const relationalChecklistsResourceOptions = makePgResourceOptions({
+      const relationalChecklistsResourceOptions = pgResourceOptions({
         executor,
         selectAuth,
         codec: relationalChecklistsCodec,
@@ -888,7 +888,7 @@ export function makeExampleSchema(
         },
       });
 
-      const relationalChecklistItemsResourceOptions = makePgResourceOptions({
+      const relationalChecklistItemsResourceOptions = pgResourceOptions({
         executor,
         selectAuth,
         codec: relationalChecklistItemsCodec,
@@ -916,7 +916,7 @@ export function makeExampleSchema(
         },
       });
 
-      const unionItemsResourceOptions = makePgResourceOptions({
+      const unionItemsResourceOptions = pgResourceOptions({
         executor,
         selectAuth,
         codec: unionItemsCodec,
@@ -935,7 +935,7 @@ export function makeExampleSchema(
         },
       });
 
-      const unionTopicsResourceOptions = makePgResourceOptions({
+      const unionTopicsResourceOptions = pgResourceOptions({
         executor,
         selectAuth,
         codec: unionTopicsCodec,
@@ -956,7 +956,7 @@ export function makeExampleSchema(
         },
       });
 
-      const unionPostsResource = makePgResourceOptions({
+      const unionPostsResource = pgResourceOptions({
         executor,
         selectAuth,
         codec: unionPostsCodec,
@@ -976,7 +976,7 @@ export function makeExampleSchema(
         },
       });
 
-      const unionDividersResourceOptions = makePgResourceOptions({
+      const unionDividersResourceOptions = pgResourceOptions({
         executor,
         selectAuth,
         codec: unionDividersCodec,
@@ -995,7 +995,7 @@ export function makeExampleSchema(
         },
       });
 
-      const unionChecklistsResourceOptions = makePgResourceOptions({
+      const unionChecklistsResourceOptions = pgResourceOptions({
         executor,
         selectAuth,
         codec: unionChecklistsCodec,
@@ -1015,7 +1015,7 @@ export function makeExampleSchema(
         },
       });
 
-      const unionChecklistItemsResourceOptions = makePgResourceOptions({
+      const unionChecklistItemsResourceOptions = pgResourceOptions({
         executor,
         selectAuth,
         codec: unionChecklistItemsCodec,
@@ -1024,7 +1024,7 @@ export function makeExampleSchema(
         uniques: [{ attributes: ["id"], isPrimary: true }],
       });
 
-      const unionEntityResourceOptions = makePgResourceOptions({
+      const unionEntityResourceOptions = pgResourceOptions({
         executor,
         selectAuth,
         codec: unionEntityCodec,
@@ -1070,7 +1070,7 @@ export function makeExampleSchema(
         },
       });
 
-      const awsApplicationsResourceOptions = makePgResourceOptions({
+      const awsApplicationsResourceOptions = pgResourceOptions({
         executor,
         selectAuth,
         codec: awsApplicationsCodec,
@@ -1097,7 +1097,7 @@ export function makeExampleSchema(
         },
       });
 
-      const gcpApplicationsResourceOptions = makePgResourceOptions({
+      const gcpApplicationsResourceOptions = pgResourceOptions({
         executor,
         selectAuth,
         codec: gcpApplicationsCodec,
@@ -1121,7 +1121,7 @@ export function makeExampleSchema(
         },
       });
 
-      const firstPartyVulnerabilitiesResourceOptions = makePgResourceOptions({
+      const firstPartyVulnerabilitiesResourceOptions = pgResourceOptions({
         executor,
         selectAuth,
         codec: firstPartyVulnerabilitiesCodec,
@@ -1145,7 +1145,7 @@ export function makeExampleSchema(
         },
       });
 
-      const thirdPartyVulnerabilitiesResourceOptions = makePgResourceOptions({
+      const thirdPartyVulnerabilitiesResourceOptions = pgResourceOptions({
         executor,
         selectAuth,
         codec: thirdPartyVulnerabilitiesCodec,
@@ -1646,8 +1646,8 @@ export function makeExampleSchema(
       enumCodec,
       executor,
       listOfCodec,
-      makePgResourceOptions,
       makeRegistryBuilder,
+      pgResourceOptions,
       recordCodec,
       selectAuth,
       sql,

@@ -5,7 +5,7 @@ import type {
   PgResourceOptions,
   PgResourceUnique,
 } from "@dataplan/pg";
-import { assertPgClassSingleStep, makePgResourceOptions } from "@dataplan/pg";
+import { assertPgClassSingleStep, pgResourceOptions } from "@dataplan/pg";
 import { createObjectAndApplyChildren } from "grafast";
 import {
   EXPORTABLE,
@@ -509,9 +509,9 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           const finalOptions = EXPORTABLE_OBJECT_CLONE(options);
 
           const resourceOptions = EXPORTABLE(
-            (finalOptions, makePgResourceOptions) =>
-              makePgResourceOptions(finalOptions),
-            [finalOptions, makePgResourceOptions],
+            (finalOptions, pgResourceOptions) =>
+              pgResourceOptions(finalOptions),
+            [finalOptions, pgResourceOptions],
           );
 
           const registryBuilder =

@@ -15,15 +15,21 @@
       "types": "./dist/adaptors/pg.d.ts",
       "node": "./dist/adaptors/pg.js",
       "default": "./dist/adaptors/pg.js"
+    },
+    "./pg-sql2": {
+      "types": "./fwd/pg-sql2/index.d.ts",
+      "node": "./fwd/pg-sql2/index.js",
+      "default": "./fwd/pg-sql2/index.js"
     }
   },
   "scripts": {
+    "codegen": "yarn graphql-codegen -c codegen-examples-smallExample.ts",
     "update-schema": "ts-node ./src/examples/exampleSchema.ts",
     "test": "GRAPHILE_ENV=test jest",
     "posttest": "yarn test:exportSchema:graphql-js && yarn test:exportSchema:typeDefs",
     "test:exportSchema:graphql-js": "ts-node ./scripts/exportExampleSchema.ts graphql-js && node ./scripts/runExampleSchema.mjs",
     "test:exportSchema:typeDefs": "ts-node ./scripts/exportExampleSchema.ts typeDefs && node ./scripts/runExampleSchema.mjs",
-    "prepack": "tsc -b && cp src/.npmignore dist/.npmignore",
+    "prepack": "yarn codegen && tsc -b && cp src/.npmignore dist/.npmignore",
     "serve:example": "GRAPHILE_ENV=development NODE_ENV=development yarn nodemon --watch serve-example-schema.js --watch dist --watch ../grafast/dist/ -x 'node --inspect --enable-source-maps serve-example-schema.js'"
   },
   "repository": {
@@ -78,9 +84,11 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "fwd"
   ],
   "devDependencies": {
+    "@graphql-codegen/cli": "^5.0.7",
     "@mermaid-js/mermaid-cli": "^11.6.0",
     "@types/jest": "^30.0.0",
     "@types/json5": "^2.2.0",
@@ -91,6 +99,7 @@
     "grafserv": "workspace:^",
     "graphile-export": "workspace:^",
     "graphql": "16.1.0-experimental-stream-defer.6",
+    "graphql-codegen-grafast": "workspace:^",
     "iterall": "^1.3.0",
     "jest": "^30.0.4",
     "jest-serializer-simple": "workspace:^",

@@ -9,7 +9,6 @@ import type {
   LoadOneStep,
   Maybe,
   Multistep,
-  ObjectStep,
   PromiseOrDirect,
   Thunk,
   UnwrapMultistep,
@@ -19,7 +18,7 @@ import { constant, loadMany, loadOne, Step } from "grafast";
 import type {
   PgClient,
   PgExecutor,
-  PgExecutorContextPlans,
+  PgExecutorContext,
   WithPgClient,
 } from "../executor";
 
@@ -228,7 +227,7 @@ function transformLoadOneLoader<
       TItem,
       TData,
       TParams,
-      TShared & { pgExecutorContext: ObjectStep<PgExecutorContextPlans> }
+      TShared & { pgExecutorContext: Step<PgExecutorContext> }
     > = {
       ...loaderObject,
       shared: () => ({
@@ -286,7 +285,7 @@ function transformLoadManyLoader<
       TItem,
       TData,
       TParams,
-      TShared & { pgExecutorContext: ObjectStep<PgExecutorContextPlans> }
+      TShared & { pgExecutorContext: Step<PgExecutorContext> }
     > = {
       ...loaderObject,
       shared: () => ({

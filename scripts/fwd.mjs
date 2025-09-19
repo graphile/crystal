@@ -10,6 +10,9 @@ const __dirname = fileURLToPath(new URL(".", import.meta.url)).replace(
 );
 
 const todo = {
+  "@dataplan/pg": {
+    "pg-sql2": true,
+  },
   grafast: {
     graphql: true,
   },
@@ -17,7 +20,9 @@ const todo = {
     ruru: true,
   },
   "graphile-build-pg": {
+    "@dataplan/pg": true,
     "pg-introspection": true,
+    "pg-sql2": true,
   },
   postgraphile: {
     "@dataplan/pg/adaptors/pg": "./adaptors/pg",

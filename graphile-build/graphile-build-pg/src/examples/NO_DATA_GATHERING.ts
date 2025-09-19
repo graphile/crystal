@@ -9,21 +9,18 @@ import { readFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import { inspect } from "node:util";
 
-import type {
-  PgExecutorContextPlans,
-  PgRegistry,
-  WithPgClient,
-} from "@dataplan/pg";
+import type { PgExecutorContext, PgRegistry, WithPgClient } from "@dataplan/pg";
 import {
-  makePgResourceOptions,
   makeRegistryBuilder,
   PgExecutor,
+  pgResourceOptions,
   recordCodec,
   sqlFromArgDigests,
   TYPES,
 } from "@dataplan/pg";
 import { makePgAdaptorWithPgClient } from "@dataplan/pg/adaptors/pg";
 import chalk from "chalk";
+import type { Step } from "grafast";
 import { context, object } from "grafast";
 import { graphql, printSchema } from "grafast/graphql";
 import {
@@ -61,7 +58,7 @@ async function main() {
           object({
             pgSettings: context().get("pgSettings"),
             withPgClient: context().get("withPgClient"),
-          } as PgExecutorContextPlans<any>),
+          }) as Step<PgExecutorContext<any>>,
       }),
     [PgExecutor, context, object],
   );
@@ -96,8 +93,8 @@ async function main() {
     (
       TYPES,
       executor,
-      makePgResourceOptions,
       makeRegistryBuilder,
+      pgResourceOptions,
       recordCodec,
       sql,
       sqlFromArgDigests,
@@ -212,7 +209,7 @@ async function main() {
         },
       });
 
-      const usersResourceOptions = makePgResourceOptions({
+      const usersResourceOptions = pgResourceOptions({
         name: "users",
         executor,
         from: usersCodec.sqlType,
@@ -220,7 +217,7 @@ async function main() {
         uniques: [{ attributes: ["id"], isPrimary: true }],
       });
 
-      const forumsResourceOptions = makePgResourceOptions({
+      const forumsResourceOptions = pgResourceOptions({
         //name: "main.app_public.forums",
         name: "forums",
         executor,
@@ -229,7 +226,7 @@ async function main() {
         uniques: [{ attributes: ["id"], isPrimary: true }],
       });
 
-      const messagesResourceOptions = makePgResourceOptions({
+      const messagesResourceOptions = pgResourceOptions({
         name: "messages",
         executor,
         from: messagesCodec.sqlType,
@@ -237,7 +234,7 @@ async function main() {
         uniques: [{ attributes: ["id"], isPrimary: true }],
       });
 
-      const uniqueAuthorCountResourceOptions = makePgResourceOptions({
+      const uniqueAuthorCountResourceOptions = pgResourceOptions({
         executor,
         codec: TYPES.int,
         from: (...args) =>
@@ -257,7 +254,7 @@ async function main() {
         },
       });
 
-      const forumsUniqueAuthorCountResourceOptions = makePgResourceOptions({
+      const forumsUniqueAuthorCountResourceOptions = pgResourceOptions({
         executor,
         codec: TYPES.int,
         isUnique: true,
@@ -288,7 +285,7 @@ async function main() {
         },
       });
 
-      const forumsRandomUserResourceOptions = makePgResourceOptions({
+      const forumsRandomUserResourceOptions = pgResourceOptions({
         executor,
         codec: usersCodec,
         isUnique: true,
@@ -311,7 +308,7 @@ async function main() {
         },
       });
 
-      const forumsFeaturedMessagesResourceOptions = makePgResourceOptions({
+      const forumsFeaturedMessagesResourceOptions = pgResourceOptions({
         executor,
         codec: messagesCodec,
         isUnique: false,
@@ -391,8 +388,8 @@ async function main() {
     [
       TYPES,
       executor,
-      makePgResourceOptions,
       makeRegistryBuilder,
+      pgResourceOptions,
       recordCodec,
       sql,
       sqlFromArgDigests,

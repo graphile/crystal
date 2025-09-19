@@ -12,8 +12,8 @@ import type {
   PgSelectArgumentDigest,
 } from "@dataplan/pg";
 import {
-  makePgResourceOptions,
   PgResource,
+  pgResourceOptions,
   recordCodec,
   sqlFromArgDigests,
 } from "@dataplan/pg";
@@ -545,9 +545,9 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             });
 
             return EXPORTABLE(
-              (finalResourceOptions, makePgResourceOptions) =>
-                makePgResourceOptions(finalResourceOptions),
-              [finalResourceOptions, makePgResourceOptions],
+              (finalResourceOptions, pgResourceOptions) =>
+                pgResourceOptions(finalResourceOptions),
+              [finalResourceOptions, pgResourceOptions],
             );
           } else {
             const options: PgResourceOptions = EXPORTABLE(
@@ -599,9 +599,8 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             });
 
             return EXPORTABLE(
-              (makePgResourceOptions, options) =>
-                makePgResourceOptions(options),
-              [makePgResourceOptions, options],
+              (options, pgResourceOptions) => pgResourceOptions(options),
+              [options, pgResourceOptions],
             );
           }
         })().then((resourceOptions) => {

@@ -16,7 +16,7 @@ import { context, object } from "grafast";
 import {
   PgExecutor,
   TYPES,
-  makePgResourceOptions,
+  pgResourceOptions,
   makeRegistry,
   makeRegistryBuilder,
   recordCodec,
@@ -49,7 +49,7 @@ const forumsCodec = recordCodec({
 });
 
 // Represents the 'forums' table, including knowledge of its primary key:
-const forumsResourceOptions = makePgResourceOptions({
+const forumsResourceOptions = pgResourceOptions({
   name: "forums",
   executor,
   codec: forumsCodec,
@@ -79,7 +79,7 @@ const messagesCodec = recordCodec({
 });
 
 // Represents the 'messages' table:
-const messagesResourceOptions = makePgResourceOptions({
+const messagesResourceOptions = pgResourceOptions({
   name: "messages",
   executor,
   codec: messagesCodec,

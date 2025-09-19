@@ -1,5 +1,6 @@
 import type { GrafastSubscriber } from "grafast";
 import { exportAsMany } from "grafast";
+export { sql } from "pg-sql2";
 
 import {
   domainOfCodec,
@@ -33,7 +34,6 @@ import {
   PgPolygon,
 } from "./codecUtils/index.js";
 import {
-  makePgResourceOptions,
   makeRegistry,
   makeRegistryBuilder,
   PgCodecRef,
@@ -46,6 +46,7 @@ import {
   PgResource,
   PgResourceExtensions,
   PgResourceOptions,
+  pgResourceOptions,
   PgResourceParameter,
   PgResourceUnique,
   PgResourceUniqueExtensions,
@@ -223,7 +224,7 @@ export {
   listOfCodec,
   loadManyWithPgClient,
   loadOneWithPgClient,
-  makePgResourceOptions,
+  pgResourceOptions as makePgResourceOptions,
   MakePgServiceOptions,
   makeRegistry,
   makeRegistryBuilder,
@@ -313,6 +314,7 @@ export {
   PgResource,
   PgResourceExtensions,
   PgResourceOptions,
+  pgResourceOptions,
   PgResourceParameter,
   PgResourceUnique,
   PgResourceUniqueExtensions,
@@ -386,7 +388,7 @@ exportAsMany("@dataplan/pg", {
   sqlValueWithCodec,
   makeRegistryBuilder,
   makeRegistry,
-  makePgResourceOptions,
+  pgResourceOptions,
   TYPES,
   PgResource,
   PgExecutor,

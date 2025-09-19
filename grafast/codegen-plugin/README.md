@@ -15,6 +15,10 @@ Types only.
 
 TODO
 
+```
+yarn add --dev @graphql-codegen/cli graphql-codegen-grafast
+```
+
 ```ts
 // codegen.ts
 import type { CodegenConfig } from "@graphql-codegen/cli";
@@ -93,6 +97,10 @@ export type Overrides = {
     nullable: Step<Maybe<CharacterData>>;
   };
 };
+```
+
+```
+yarn graphql-codegen
 ```
 
 <!-- SPONSORS_BEGIN -->

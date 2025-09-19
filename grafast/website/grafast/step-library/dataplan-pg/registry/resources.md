@@ -65,7 +65,7 @@ Resources are not constructed directly, instead a resource configuration object
 is passed (optionally via the registry builder) to `makeRegistry` which then
 builds the final resources including their relations.
 
-The `makePgResourceOptions` function is a TypeScript Identity Function (i.e. it
+The `pgResourceOptions` function is a TypeScript Identity Function (i.e. it
 just returns the input, but is used to ensure that the type conforms according
 to TypeScript) so usage of it is entirely optional.
 
@@ -83,7 +83,7 @@ The resource options have the following properties (all are optional unless note
 ### Example
 
 ```ts
-const forumsResourceOptions = makePgResourceOptions({
+const forumsResourceOptions = pgResourceOptions({
   name: "forums",
   executor,
   codec: forumsCodec,

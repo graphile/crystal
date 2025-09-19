@@ -8,6 +8,7 @@ import type {
   GraphQLSchema,
 } from "graphql";
 import {
+  getNamedType,
   getNullableType,
   isEnumType,
   isInputObjectType,
@@ -75,7 +76,7 @@ class GrafastGenerator {
     if (isNonNullType(type)) {
       return `NonNullStep<${this.expect(type.ofType)}>`;
     } else if (isListType(type)) {
-      return `ListOfStep<${this.expect(type.ofType)}>`;
+      return `Get<${JSON.stringify(getNamedType(type.ofType).name)}, "list", ListOfStep<${this.expect(type.ofType)}>>`;
     } else {
       return this.nullable(type);
     }
@@ -187,7 +188,7 @@ ${Object.entries(type.getFields())
       [
         "// Generated GraphQL SDK (auto-generated – do not edit)",
         "",
-        `import type { EnumPlan, EnumValueInput, FieldPlan, InputFieldPlan, GrafastSchemaConfig, InputObjectPlan, InterfacePlan, ObjectPlan, ScalarPlan, Step, UnionPlan } from '${this.config.grafastModule ?? "grafast"}';`,
+        `import type { EnumPlan, EnumValueInput, FieldPlan, InputFieldPlan, GrafastSchemaConfig, InputObjectPlan, InterfacePlan, ObjectPlan, ScalarPlan, Step, UnionPlan, StepRepresentingList } from '${this.config.grafastModule ?? "grafast"}';`,
         `import { makeGrafastSchema } from '${this.config.grafastModule ?? "grafast"}';`,
         this.config.overridesFile
           ? `import type { Overrides } from '${this.config.overridesFile ?? "./grafastTypeOverrides.ts"}';`
@@ -197,7 +198,7 @@ type Overrides = {}`,
         `\
 type NoArguments = Record<string, never>;
 type NonNullStep<TStep extends Step> = TStep & Step<TStep extends Step<infer U> ? NonNullable<U> : any>;
-type ListOfStep<TStep extends Step> = TStep extends Step<infer U> ? Step<ReadonlyArray<U> | null | undefined> : TStep;
+type ListOfStep<TStep extends Step> = StepRepresentingList<TStep extends Step<infer U> ? U : any, TStep>;
 
 type Get<
   TTypeName extends string,
