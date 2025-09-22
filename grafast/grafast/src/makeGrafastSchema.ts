@@ -263,7 +263,7 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
             definitions: typeDefs.flatMap((t) => t.definitions),
           }
         : typeDefs;
-  const document: graphql.DocumentNode = graphqlHasStreamDefer
+  const document: graphql.DocumentNode = graphqlHasStreamDefer || !enableDeferStream
     ? baseDocument
     : {
         ...baseDocument,
