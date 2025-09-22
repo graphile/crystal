@@ -2,7 +2,6 @@ import type { BaseGraphQLArguments, GrafastFieldConfig, Step } from "grafast";
 import { inputObjectFieldSpec, objectSpec } from "grafast";
 import type {
   GraphQLEnumTypeConfig,
-  GraphQLEnumValueConfigMap,
   GraphQLFieldConfig,
   GraphQLInputFieldConfig,
   GraphQLInputFieldConfigMap,

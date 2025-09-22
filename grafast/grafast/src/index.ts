@@ -1090,7 +1090,9 @@ declare module "graphql" {
 
 declare module "graphql/execution/execute" {
   interface ExecutionResult<
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     TData = ObjMap<unknown>,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     TExtensions = ObjMap<unknown>,
   > {
     hasNext?: never;

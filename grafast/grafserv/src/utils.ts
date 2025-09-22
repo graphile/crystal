@@ -43,7 +43,7 @@ interface ObjMap<T> {
 
 /**
  * `FormattedExecutionPatchResult` type definition copied from
- * {@url https://github.com/graphql/graphql-js/blob/v16.1.0-experimental-stream-defer.6/src/execution/execute.ts#L177-L187};
+ * {@link https://github.com/graphql/graphql-js/blob/v16.1.0-experimental-stream-defer.6/src/execution/execute.ts#L177-L187};
  * MIT license, copyright GraphQL Contributors
  */
 interface FormattedExecutionPatchResult<
