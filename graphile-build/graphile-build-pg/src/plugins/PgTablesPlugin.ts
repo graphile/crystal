@@ -935,9 +935,8 @@ function partitionExclude(
   }
   const DEFAULT_PARTITION_PARENT_MODE: PartitionExpose =
     build.options.pgDefaultPartitionedTableExpose ?? "parent";
-  const parentMode = getPartitionParentMode(build, resource);
   if (hasPartitions) {
-    const directMode = partitionMode(resource);
+    const directMode = getPartitionMode(resource);
     // NOTE: despite having partitions, this doesn't mean we're the root
     switch (directMode) {
       case "both":
@@ -949,19 +948,40 @@ function partitionExclude(
       }
       case null: {
         // Not explicit, use default behavior, which may come from the parent
-        const fallbackMode = parentMode ?? DEFAULT_PARTITION_PARENT_MODE;
-        switch (fallbackMode) {
-          case "child":
-          case "both": {
-            return INCLUDE;
+        // (if there is one)
+        const parentResource = getPartitionParent(build, resource);
+        if (parentResource) {
+          const parentMode =
+            getPartitionMode(parentResource) ?? DEFAULT_PARTITION_PARENT_MODE;
+          switch (parentMode) {
+            case "both":
+            case "child": {
+              // Parent is configured to include children, we are a children,
+              // include.
+              return INCLUDE;
+            }
+            case "parent": {
+              return EXCLUDE;
+            }
+            default: {
+              const never: never = parentMode;
+              throw new Error(`Partition mode '${never}' not understood`);
+            }
           }
-          case "parent": {
-            const isRoot = !pp;
-            return isRoot ? INCLUDE : EXCLUDE;
-          }
-          default: {
-            const never: never = fallbackMode;
-            throw new Error(`Partition mode '${never}' not understood`);
+        } else {
+          // We are the root, and we have no default mode
+          switch (DEFAULT_PARTITION_PARENT_MODE) {
+            case "both":
+            case "parent": {
+              return INCLUDE;
+            }
+            case "child": {
+              return EXCLUDE;
+            }
+            default: {
+              const never: never = DEFAULT_PARTITION_PARENT_MODE;
+              throw new Error(`Partition mode '${never}' not understood`);
+            }
           }
         }
       }
@@ -972,7 +992,13 @@ function partitionExclude(
     }
   } else {
     // Must be a child, use parent behavior
-    const parentMode = getPartitionParentMode(build, resource);
+    const parentResource = getPartitionParent(build, resource);
+    if (!parentResource) {
+      throw new Error(
+        `${resource.name} is partition child of ${resource.extensions?.partitionParent?.name}; but couldn't find that resource!`,
+      );
+    }
+    const parentMode = parentResource ? getPartitionMode(parentResource) : null;
     switch (parentMode) {
       case "child":
       case "both": {
@@ -990,6 +1016,7 @@ function partitionExclude(
           DEFAULT_PARTITION_PARENT_MODE === "both"
         ) {
           const partitionParent = getPartitionParent(build, resource);
+          // Root if there is no grandparent
           const parentIsRoot = !partitionParent?.extensions?.partitionParent;
           if (parentIsRoot) {
             return INCLUDE;
@@ -1014,7 +1041,7 @@ function getPartitionParent(
 ): PgResource<any, any, any, any, any> | null {
   const pp = resource.extensions?.partitionParent;
   if (pp) {
-    const serviceName = resource.extensions?.pg?.schemaName;
+    const serviceName = resource.extensions?.pg?.serviceName;
     const { schemaName, name } = pp;
     const parentResource = serviceName
       ? Object.values(build.input.pgRegistry.pgResources).find((r) => {
@@ -1033,15 +1060,7 @@ function getPartitionParent(
   return null;
 }
 
-function getPartitionParentMode(
-  build: GraphileBuild.Build,
-  resource: PgResource,
-): PartitionExpose | null {
-  const parentResource = getPartitionParent(build, resource);
-  return parentResource ? partitionMode(parentResource) : null;
-}
-
-function partitionMode(
+function getPartitionMode(
   resource: PgResource<any, any, any, any, any>,
 ): PartitionExpose | null {
   const partitionTag = resource.extensions?.tags?.partitionExpose;
