@@ -17,6 +17,75 @@ query {
       hasPreviousPage
     }
   }
+  allLocationTags {
+    nodes {
+      nodeId
+      entityId
+      entityKind
+      tag
+      locationByEntityId {
+        nodeId
+        id
+      }
+    }
+  }
+  allLocations {
+    nodes {
+      nodeId
+      id
+      locationTagsByEntityId {
+        nodes {
+          tag
+        }
+      }
+    }
+  }
+  allPhotoTags {
+    nodes {
+      nodeId
+      entityId
+      entityKind
+      tag
+      photoByEntityId {
+        nodeId
+        id
+      }
+    }
+  }
+  allPhotos {
+    nodes {
+      nodeId
+      id
+      photoTagsByEntityId {
+        nodes {
+          tag
+        }
+      }
+    }
+  }
+  allProfileTags {
+    nodes {
+      nodeId
+      entityId
+      entityKind
+      tag
+      profileByEntityId {
+        nodeId
+        id
+      }
+    }
+  }
+  allProfiles {
+    nodes {
+      nodeId
+      id
+      profileTagsByEntityId {
+        nodes {
+          tag
+        }
+      }
+    }
+  }
 }
 
 fragment Measurement on Measurement {

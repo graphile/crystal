@@ -70,4 +70,232 @@
       hasPreviousPage: false,
     },
   },
+  allLocationTags: {
+    nodes: [
+      {
+        nodeId: "WyJsb2NhdGlvbl90YWdzIiwibG9jYXRpb25zIiwiMDM5Yjg2M2QtNzNjNi00NGY3LWJlZjMtMmUwMDU4YTg1NTUyIiwiYm9hdHMiXQ==",
+        entityId: "<UUID 1>",
+        entityKind: "LOCATIONS",
+        tag: "boats",
+        locationByEntityId: {
+          nodeId: "WyJsb2NhdGlvbnMiLCIwMzliODYzZC03M2M2LTQ0ZjctYmVmMy0yZTAwNThhODU1NTIiXQ==",
+          id: "<UUID 1>",
+        },
+      },
+      {
+        nodeId: "WyJsb2NhdGlvbl90YWdzIiwibG9jYXRpb25zIiwiMDM5Yjg2M2QtNzNjNi00NGY3LWJlZjMtMmUwMDU4YTg1NTUyIiwiY2FuYWwiXQ==",
+        entityId: "<UUID 1>",
+        entityKind: "LOCATIONS",
+        tag: "canal",
+        locationByEntityId: {
+          nodeId: "WyJsb2NhdGlvbnMiLCIwMzliODYzZC03M2M2LTQ0ZjctYmVmMy0yZTAwNThhODU1NTIiXQ==",
+          id: "<UUID 1>",
+        },
+      },
+      {
+        nodeId: "WyJsb2NhdGlvbl90YWdzIiwibG9jYXRpb25zIiwiNGI3YzExODgtOTRlOS00YWUxLTg0OWMtZTA4ODk2NGE5OTExIiwibW91bnRhaW4iXQ==",
+        entityId: "<UUID 2>",
+        entityKind: "LOCATIONS",
+        tag: "mountain",
+        locationByEntityId: {
+          nodeId: "WyJsb2NhdGlvbnMiLCI0YjdjMTE4OC05NGU5LTRhZTEtODQ5Yy1lMDg4OTY0YTk5MTEiXQ==",
+          id: "<UUID 2>",
+        },
+      },
+    ],
+  },
+  allLocations: {
+    nodes: [
+      {
+        nodeId: "WyJsb2NhdGlvbnMiLCIwMzliODYzZC03M2M2LTQ0ZjctYmVmMy0yZTAwNThhODU1NTIiXQ==",
+        id: "<UUID 1>",
+        locationTagsByEntityId: {
+          nodes: [
+            {
+              tag: "boats",
+            },
+            {
+              tag: "canal",
+            },
+          ],
+        },
+      },
+      {
+        nodeId: "WyJsb2NhdGlvbnMiLCI0YjdjMTE4OC05NGU5LTRhZTEtODQ5Yy1lMDg4OTY0YTk5MTEiXQ==",
+        id: "<UUID 2>",
+        locationTagsByEntityId: {
+          nodes: [
+            {
+              tag: "mountain",
+            },
+          ],
+        },
+      },
+    ],
+  },
+  allPhotoTags: {
+    nodes: [
+      {
+        nodeId: "WyJwaG90b190YWdzIiwicGhvdG9zIiwiMjhiZTEwMDctZTYyNC00NmM4LWJmYTAtNmI3ZTVhMmM2MzBlIiwiYmVhY2giXQ==",
+        entityId: "<UUID 3>",
+        entityKind: "PHOTOS",
+        tag: "beach",
+        photoByEntityId: {
+          nodeId: "WyJwaG90b3MiLCIyOGJlMTAwNy1lNjI0LTQ2YzgtYmZhMC02YjdlNWEyYzYzMGUiXQ==",
+          id: "<UUID 3>",
+        },
+      },
+      {
+        nodeId: "WyJwaG90b190YWdzIiwicGhvdG9zIiwiMjhiZTEwMDctZTYyNC00NmM4LWJmYTAtNmI3ZTVhMmM2MzBlIiwiaG9saWRheSJd",
+        entityId: "<UUID 3>",
+        entityKind: "PHOTOS",
+        tag: "holiday",
+        photoByEntityId: {
+          nodeId: "WyJwaG90b3MiLCIyOGJlMTAwNy1lNjI0LTQ2YzgtYmZhMC02YjdlNWEyYzYzMGUiXQ==",
+          id: "<UUID 3>",
+        },
+      },
+      {
+        nodeId: "WyJwaG90b190YWdzIiwicGhvdG9zIiwiMjhiZTEwMDctZTYyNC00NmM4LWJmYTAtNmI3ZTVhMmM2MzBlIiwic3BmNTAiXQ==",
+        entityId: "<UUID 3>",
+        entityKind: "PHOTOS",
+        tag: "spf50",
+        photoByEntityId: {
+          nodeId: "WyJwaG90b3MiLCIyOGJlMTAwNy1lNjI0LTQ2YzgtYmZhMC02YjdlNWEyYzYzMGUiXQ==",
+          id: "<UUID 3>",
+        },
+      },
+      {
+        nodeId: "WyJwaG90b190YWdzIiwicGhvdG9zIiwiMjhiZTEwMDctZTYyNC00NmM4LWJmYTAtNmI3ZTVhMmM2MzBlIiwic3VubnkiXQ==",
+        entityId: "<UUID 3>",
+        entityKind: "PHOTOS",
+        tag: "sunny",
+        photoByEntityId: {
+          nodeId: "WyJwaG90b3MiLCIyOGJlMTAwNy1lNjI0LTQ2YzgtYmZhMC02YjdlNWEyYzYzMGUiXQ==",
+          id: "<UUID 3>",
+        },
+      },
+      {
+        nodeId: "WyJwaG90b190YWdzIiwicGhvdG9zIiwiMzZhOWNjMzUtZjE1OC00NjQ4LTgzZjQtZDhmYTA0ZWU3NTI3IiwiZGVzc2VydCJd",
+        entityId: "<UUID 4>",
+        entityKind: "PHOTOS",
+        tag: "dessert",
+        photoByEntityId: {
+          nodeId: "WyJwaG90b3MiLCIzNmE5Y2MzNS1mMTU4LTQ2NDgtODNmNC1kOGZhMDRlZTc1MjciXQ==",
+          id: "<UUID 4>",
+        },
+      },
+      {
+        nodeId: "WyJwaG90b190YWdzIiwicGhvdG9zIiwiMzZhOWNjMzUtZjE1OC00NjQ4LTgzZjQtZDhmYTA0ZWU3NTI3Iiwic3VuZGFlIl0=",
+        entityId: "<UUID 4>",
+        entityKind: "PHOTOS",
+        tag: "sundae",
+        photoByEntityId: {
+          nodeId: "WyJwaG90b3MiLCIzNmE5Y2MzNS1mMTU4LTQ2NDgtODNmNC1kOGZhMDRlZTc1MjciXQ==",
+          id: "<UUID 4>",
+        },
+      },
+      {
+        nodeId: "WyJwaG90b190YWdzIiwicGhvdG9zIiwiMzZhOWNjMzUtZjE1OC00NjQ4LTgzZjQtZDhmYTA0ZWU3NTI3IiwieXVtbXkiXQ==",
+        entityId: "<UUID 4>",
+        entityKind: "PHOTOS",
+        tag: "yummy",
+        photoByEntityId: {
+          nodeId: "WyJwaG90b3MiLCIzNmE5Y2MzNS1mMTU4LTQ2NDgtODNmNC1kOGZhMDRlZTc1MjciXQ==",
+          id: "<UUID 4>",
+        },
+      },
+    ],
+  },
+  allPhotos: {
+    nodes: [
+      {
+        nodeId: "WyJwaG90b3MiLCIyOGJlMTAwNy1lNjI0LTQ2YzgtYmZhMC02YjdlNWEyYzYzMGUiXQ==",
+        id: "<UUID 3>",
+        photoTagsByEntityId: {
+          nodes: [
+            {
+              tag: "beach",
+            },
+            {
+              tag: "holiday",
+            },
+            {
+              tag: "spf50",
+            },
+            {
+              tag: "sunny",
+            },
+          ],
+        },
+      },
+      {
+        nodeId: "WyJwaG90b3MiLCIzNmE5Y2MzNS1mMTU4LTQ2NDgtODNmNC1kOGZhMDRlZTc1MjciXQ==",
+        id: "<UUID 4>",
+        photoTagsByEntityId: {
+          nodes: [
+            {
+              tag: "dessert",
+            },
+            {
+              tag: "sundae",
+            },
+            {
+              tag: "yummy",
+            },
+          ],
+        },
+      },
+    ],
+  },
+  allProfileTags: {
+    nodes: [
+      {
+        nodeId: "WyJwcm9maWxlX3RhZ3MiLCJwcm9maWxlcyIsIjhjYzE3MGVkLTc4NjktNGNkOS1hZTRiLThkM2I1MjhkZTYwNiIsImFkbWluIl0=",
+        entityId: "<UUID 5>",
+        entityKind: "PROFILES",
+        tag: "admin",
+        profileByEntityId: {
+          nodeId: "WyJwcm9maWxlcyIsIjhjYzE3MGVkLTc4NjktNGNkOS1hZTRiLThkM2I1MjhkZTYwNiJd",
+          id: "<UUID 5>",
+        },
+      },
+      {
+        nodeId: "WyJwcm9maWxlX3RhZ3MiLCJwcm9maWxlcyIsImUzZjg5ZjMyLWU5NjMtNDI1ZS1iMDhmLWE0YzZiZTIxNjFiNiIsIm1vZGVyYXRvciJd",
+        entityId: "<UUID 6>",
+        entityKind: "PROFILES",
+        tag: "moderator",
+        profileByEntityId: {
+          nodeId: "WyJwcm9maWxlcyIsImUzZjg5ZjMyLWU5NjMtNDI1ZS1iMDhmLWE0YzZiZTIxNjFiNiJd",
+          id: "<UUID 6>",
+        },
+      },
+    ],
+  },
+  allProfiles: {
+    nodes: [
+      {
+        nodeId: "WyJwcm9maWxlcyIsIjhjYzE3MGVkLTc4NjktNGNkOS1hZTRiLThkM2I1MjhkZTYwNiJd",
+        id: "<UUID 5>",
+        profileTagsByEntityId: {
+          nodes: [
+            {
+              tag: "admin",
+            },
+          ],
+        },
+      },
+      {
+        nodeId: "WyJwcm9maWxlcyIsImUzZjg5ZjMyLWU5NjMtNDI1ZS1iMDhmLWE0YzZiZTIxNjFiNiJd",
+        id: "<UUID 6>",
+        profileTagsByEntityId: {
+          nodes: [
+            {
+              tag: "moderator",
+            },
+          ],
+        },
+      },
+    ],
+  },
 }

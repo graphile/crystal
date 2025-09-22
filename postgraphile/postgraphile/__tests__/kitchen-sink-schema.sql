@@ -1917,7 +1917,8 @@ create table partitions.measurements_y2024 partition of partitions.measurements 
 
 create table partitions.entity_kinds (kind text primary key);
 comment on table partitions.entity_kinds is '@enum';
-insert into partitions.entity_kinds (kind) values ('photos'), ('locations'), ('profiles');
+insert into partitions.entity_kinds (kind)
+  values ('photos'), ('locations'), ('profiles');
 
 create table partitions.photos (
   id uuid primary key
@@ -1955,29 +1956,6 @@ create table partitions.profile_tags
 alter table partitions.profile_tags
   add constraint profile_tags_entity_fk
   foreign key (entity_id) references partitions.profiles(id) on delete cascade;
-
-insert into partitions.photos (id) values 
-  ('28be1007-e624-46c8-bfa0-6b7e5a2c630e'),
-  ('36a9cc35-f158-4648-83f4-d8fa04ee7527');
-insert into partitions.locations (id) values 
-  ('039b863d-73c6-44f7-bef3-2e0058a85552'),
-  ('4b7c1188-94e9-4ae1-849c-e088964a9911');
-insert into partitions.profiles (id) values 
-  ('8cc170ed-7869-4cd9-ae4b-8d3b528de606'),
-  ('e3f89f32-e963-425e-b08f-a4c6be2161b6');
-insert into partitions.tags (entity_kind, entity_id, tag) values 
-  ('photos', '28be1007-e624-46c8-bfa0-6b7e5a2c630e', 'sunny'),
-  ('photos', '28be1007-e624-46c8-bfa0-6b7e5a2c630e', 'beach'),
-  ('photos', '28be1007-e624-46c8-bfa0-6b7e5a2c630e', 'spf50'),
-  ('photos', '28be1007-e624-46c8-bfa0-6b7e5a2c630e', 'holiday'),
-  ('photos', '36a9cc35-f158-4648-83f4-d8fa04ee7527', 'yummy'),
-  ('photos', '36a9cc35-f158-4648-83f4-d8fa04ee7527', 'sundae'),
-  ('photos', '36a9cc35-f158-4648-83f4-d8fa04ee7527', 'dessert'),
-  ('locations', '039b863d-73c6-44f7-bef3-2e0058a85552', 'canal'),
-  ('locations', '039b863d-73c6-44f7-bef3-2e0058a85552', 'boats'),
-  ('locations', '4b7c1188-94e9-4ae1-849c-e088964a9911', 'mountain'),
-  ('profiles', '8cc170ed-7869-4cd9-ae4b-8d3b528de606', 'admin'),
-  ('profiles', 'e3f89f32-e963-425e-b08f-a4c6be2161b6', 'moderator');
 
 --------------------------------------------------------------------------------
 
