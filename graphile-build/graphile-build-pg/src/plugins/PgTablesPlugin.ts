@@ -15,8 +15,8 @@ import {
 import type { PgClass, PgConstraint, PgNamespace } from "pg-introspection";
 
 import {
-  PARTITION_PARENT_MODES,
-  type PartitionParentMode,
+  PARTITION_EXPOSE_OPTIONS,
+  type PartitionExpose,
 } from "../interfaces.js";
 import { exportNameHint } from "../utils.js";
 import { version } from "../version.js";
@@ -933,8 +933,8 @@ function partitionExclude(
   if (!pp && !hasPartitions) {
     return INCLUDE;
   }
-  const DEFAULT_PARTITION_PARENT_MODE: PartitionParentMode =
-    build.options.pgDefaultPartitionedTableMode ?? "parent";
+  const DEFAULT_PARTITION_PARENT_MODE: PartitionExpose =
+    build.options.pgDefaultPartitionedTableExpose ?? "parent";
   const parentMode = getPartitionParentMode(build, resource);
   if (hasPartitions) {
     const directMode = partitionMode(resource);
@@ -1036,26 +1036,26 @@ function getPartitionParent(
 function getPartitionParentMode(
   build: GraphileBuild.Build,
   resource: PgResource,
-): PartitionParentMode | null {
+): PartitionExpose | null {
   const parentResource = getPartitionParent(build, resource);
   return parentResource ? partitionMode(parentResource) : null;
 }
 
 function partitionMode(
   resource: PgResource<any, any, any, any, any>,
-): PartitionParentMode | null {
+): PartitionExpose | null {
   const partitionTag = resource.extensions?.tags?.partition;
   if (typeof partitionTag === "string") {
-    if (PARTITION_PARENT_MODES.includes(partitionTag as PartitionParentMode)) {
-      return partitionTag as PartitionParentMode;
+    if (PARTITION_EXPOSE_OPTIONS.includes(partitionTag as PartitionExpose)) {
+      return partitionTag as PartitionExpose;
     } else {
       throw new Error(
-        `"@partition ${partitionTag}" on resource '${resource.name}' not understood; must be one of: '${PARTITION_PARENT_MODES.join("', '")}'`,
+        `"@partition ${partitionTag}" on resource '${resource.name}' not understood; must be one of: '${PARTITION_EXPOSE_OPTIONS.join("', '")}'`,
       );
     }
   } else if (partitionTag != null) {
     throw new Error(
-      `@partition on resource '${resource.name}' not understood; must be one of: '${PARTITION_PARENT_MODES.join("', '")}'`,
+      `@partition on resource '${resource.name}' not understood; must be one of: '${PARTITION_EXPOSE_OPTIONS.join("', '")}'`,
     );
   } else {
     return null;

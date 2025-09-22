@@ -1,6 +1,6 @@
 import type { PgRegistry } from "@dataplan/pg";
 
-import type { PartitionParentMode } from "./interfaces.js";
+import type { PartitionExpose } from "./interfaces.js";
 export { PgAllRowsPlugin } from "./plugins/PgAllRowsPlugin.js";
 export { PgAttributeDeprecationPlugin } from "./plugins/PgAttributeDeprecationPlugin.js";
 export { PgAttributesPlugin } from "./plugins/PgAttributesPlugin.js";
@@ -109,7 +109,17 @@ declare global {
     }
 
     interface SchemaOptions {
-      pgDefaultPartitionedTableMode?: PartitionParentMode;
+      /**
+       * What to expose when we see a partitioned table (or its child partitions).
+       *
+       * - `parent` - only expose the parent (partitioned) table, not the
+       *   children (partitions)
+       * - `child` - only expose the children (partitions), not the parent
+       *   partitioned table
+       * - `both` - expose both the parent (partitioned) table and all of its
+       *   partitions
+       */
+      pgDefaultPartitionedTableExpose?: PartitionExpose;
     }
   }
 
