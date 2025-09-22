@@ -1,9 +1,11 @@
 import type {
   BooleanValueNode,
   DefinitionNode,
+  FloatValueNode,
   GraphQLArgument,
   GraphQLType,
   InputValueDefinitionNode,
+  IntValueNode,
   ListTypeNode,
   NamedTypeNode,
   StringValueNode,
@@ -148,12 +150,21 @@ function toDescription(
   return value != null ? { kind: Kind.STRING, value } : undefined;
 }
 
-function toValue(value: unknown): undefined | BooleanValueNode {
+function toValue(
+  value: unknown,
+): undefined | BooleanValueNode | IntValueNode | FloatValueNode {
   if (value === undefined) {
     return undefined;
   } else if (typeof value === "boolean") {
     return { kind: Kind.BOOLEAN, value };
+  } else if (typeof value === "number") {
+    if (parseInt(String(value), 10) === value) {
+      return { kind: Kind.INT, value: String(value) };
+    } else {
+      return { kind: Kind.FLOAT, value: String(value) };
+    }
   } else {
+    console.dir(value);
     throw new Error(`Not yet supported`);
   }
 }
