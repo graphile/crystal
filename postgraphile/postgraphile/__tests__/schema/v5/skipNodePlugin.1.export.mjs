@@ -4460,6 +4460,33 @@ const registry = makeRegistry({
         }
       }
     }),
+    PartitionsEntityKindEnum: enumCodec({
+      name: "PartitionsEntityKindEnum",
+      identifier: TYPES.text.sqlType,
+      values: [{
+        value: "photos",
+        description: undefined
+      }, {
+        value: "locations",
+        description: undefined
+      }, {
+        value: "profiles",
+        description: undefined
+      }],
+      extensions: {
+        isEnumTableEnum: true,
+        enumTableEnumDetails: {
+          serviceName: "main",
+          schemaName: "partitions",
+          tableName: "entity_kinds",
+          constraintType: "p",
+          constraintName: "entity_kinds_pkey"
+        },
+        tags: {
+          name: "PartitionsEntityKind"
+        }
+      }
+    }),
     FunctionReturningEnumEnumTableTransportationEnum: enumCodec({
       name: "FunctionReturningEnumEnumTableTransportationEnum",
       identifier: TYPES.text.sqlType,
