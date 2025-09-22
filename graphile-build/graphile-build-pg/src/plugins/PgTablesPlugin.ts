@@ -14,6 +14,10 @@ import {
 } from "graphile-build";
 import type { PgClass, PgConstraint, PgNamespace } from "pg-introspection";
 
+import {
+  PARTITION_EXPOSE_OPTIONS,
+  type PartitionExpose,
+} from "../interfaces.js";
 import { exportNameHint } from "../utils.js";
 import { version } from "../version.js";
 
@@ -220,6 +224,13 @@ declare global {
       isUpdatable?: boolean;
       /** Checks capabilities of this resource to see if DELETE is even possible */
       isDeletable?: boolean;
+      /** Is this a partitioned table (i.e. doesn't store data locally) */
+      hasPartitions?: boolean;
+      /** If this table _is_ a partition, details of its parent */
+      partitionParent?: {
+        schemaName: string;
+        name: string;
+      };
     }
   }
 }
@@ -362,10 +373,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           }
 
           // TODO: check compatibility with 'foreign' tables
-          if (
-            !["r", "v", "m", "f", "p", "c"].includes(pgClass.relkind) ||
-            pgClass.relispartition
-          ) {
+          if (!["r", "v", "m", "f", "p", "c"].includes(pgClass.relkind)) {
             return null;
           }
 
@@ -403,11 +411,42 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
               );
             }),
           );
-          const constraints = [
-            // TODO: handle multiple inheritance
-            ...inheritedConstraints.flatMap((list) => list),
-            ...directConstraints,
-          ];
+          const constraints =
+            // Partitions only have their own local constraints
+            pgClass.relispartition
+              ? directConstraints
+              : // Table inheritance, on the other hand, needs to manually
+                // inherit constraints.
+                // And even when it does, they're kind of a lie.
+                // Even a primary key constraint is kind of a lie in table
+                // inheritance. Table inheritance SUCKS! DO NOT USE!
+                /*
+```sql
+create table a (
+  id serial primary key,
+  value int not null check (value > 0)
+);
+
+create table b (
+  extra_text text not null check (length(extra_text) > 0)
+) inherits (a);
+
+insert into a (id, value) values (1, 10), (2, 20), (3, 30);
+
+insert into b (id, value, extra_text) values (1, 5, 'Hello!');
+
+-- Wait, duplicate records despite primary key? Yep! PK only applies to `a`'s
+-- direct data, not the data imported from `b`.
+select * from a where id = 1;
+```
+                */
+                [
+                  // Inherit the "no inherit" constraints from parent table, such as primary key.
+                  ...inheritedConstraints.flatMap((list) =>
+                    list.filter((l) => l.connoinherit === true),
+                  ),
+                  ...directConstraints,
+                ];
           const uniqueAttributeOnlyConstraints = constraints.filter(
             (c) =>
               ["u", "p"].includes(c.contype) && c.conkey?.every((k) => k > 0),
@@ -467,6 +506,20 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           const isVirtual = !["r", "v", "m", "f", "p"].includes(
             pgClass.relkind,
           );
+
+          const partitionParent = pgClass.relispartition
+            ? inheritance[0].getParent()
+            : undefined;
+          if (
+            pgClass.relispartition &&
+            (!partitionParent || inheritance.length > 1)
+          ) {
+            throw new Error(
+              `graphile-build-pg bug: our understanding of table inheritance is incomplete`,
+            );
+          }
+          const hasPartitions = pgClass.relkind === "p";
+
           const extensions: DataplanPg.PgResourceExtensions = {
             description,
             pg: {
@@ -474,14 +527,21 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
               schemaName: pgClass.getNamespace()!.nspname,
               name: pgClass.relname,
               ...(pgClass.relpersistence !== "p"
-                ? {
-                    persistence: pgClass.relpersistence,
-                  }
+                ? { persistence: pgClass.relpersistence }
                 : null),
             },
             isInsertable,
             isUpdatable,
             isDeletable,
+            ...(hasPartitions ? { hasPartitions } : null),
+            ...(partitionParent
+              ? {
+                  partitionParent: {
+                    schemaName: partitionParent.getNamespace()!.nspname,
+                    name: partitionParent.relname,
+                  },
+                }
+              : null),
             tags: {
               ...tags,
             },
@@ -625,35 +685,72 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
         },
       },
       pgResource: {
-        inferred: {
-          provides: ["default"],
-          before: ["inferred", "override"],
-          callback(behavior, resource) {
-            const ext = resource.extensions;
-            return [
-              ...(ext?.isInsertable === false ? ["-resource:insert"] : []),
-              ...(ext?.isUpdatable === false ? ["-resource:update"] : []),
-              ...(ext?.isDeletable === false ? ["-resource:delete"] : []),
-              ...unloggedOrTempBehaviors(ext, behavior, resource),
-            ] as GraphileBuild.BehaviorString[];
+        inferred: [
+          {
+            provides: ["default"],
+            before: ["inferred", "override"],
+            callback(behavior, resource) {
+              const ext = resource.extensions;
+              return [
+                ...(ext?.isInsertable === false ? ["-resource:insert"] : []),
+                ...(ext?.isUpdatable === false ? ["-resource:update"] : []),
+                ...(ext?.isDeletable === false ? ["-resource:delete"] : []),
+                ...unloggedOrTempBehaviors(ext, behavior, resource),
+              ] as GraphileBuild.BehaviorString[];
+            },
           },
-        },
+          {
+            provides: ["inferred"],
+            after: ["default"],
+            before: ["override"],
+            callback(behavior, resource, build) {
+              if (build.pgExcludeDueToPartitioning(resource)) {
+                return [behavior, "-*"];
+              }
+              return behavior;
+            },
+          },
+        ],
       },
       pgResourceUnique: {
-        inferred: {
-          provides: ["default"],
-          before: ["inferred", "override"],
-          callback(behavior, [resource, _unique]) {
-            return unloggedOrTempBehaviors(
-              resource.extensions,
-              behavior,
-              resource,
-            );
+        inferred: [
+          {
+            provides: ["default"],
+            before: ["inferred", "override"],
+            callback(behavior, [resource, _unique]) {
+              return unloggedOrTempBehaviors(
+                resource.extensions,
+                behavior,
+                resource,
+              );
+            },
           },
-        },
+          {
+            provides: ["inferred"],
+            after: ["default"],
+            before: ["override"],
+            callback(behavior, [resource, _unique], build) {
+              if (build.pgExcludeDueToPartitioning(resource)) {
+                return [behavior, "-*"];
+              }
+              return behavior;
+            },
+          },
+        ],
       },
     },
     hooks: {
+      build(build) {
+        return build.extend(
+          build,
+          {
+            pgExcludeDueToPartitioning(resource) {
+              return partitionExclude(this, resource);
+            },
+          },
+          "adding partitioning helpers",
+        );
+      },
       init(_, build, _context) {
         const {
           grafast: { get },
@@ -847,4 +944,164 @@ function unloggedOrTempBehaviors(
         ] as const)
       : []),
   ];
+}
+
+const EXCLUDE = true;
+const INCLUDE = false;
+
+function partitionExclude(
+  build: GraphileBuild.Build,
+  resource: PgResource,
+): boolean {
+  const pp = resource.extensions?.partitionParent;
+  const hasPartitions = resource.extensions?.hasPartitions ?? false;
+  if (!pp && !hasPartitions) {
+    return INCLUDE;
+  }
+  const DEFAULT_PARTITION_PARENT_MODE: PartitionExpose =
+    build.options.pgDefaultPartitionedTableExpose ?? "parent";
+  if (hasPartitions) {
+    const directMode = getPartitionMode(resource);
+    // NOTE: despite having partitions, this doesn't mean we're the root
+    switch (directMode) {
+      case "both":
+      case "parent": {
+        return INCLUDE;
+      }
+      case "child": {
+        return EXCLUDE;
+      }
+      case null: {
+        // Not explicit, use default behavior, which may come from the parent
+        // (if there is one)
+        const parentResource = getPartitionParent(build, resource);
+        if (parentResource) {
+          const parentMode =
+            getPartitionMode(parentResource) ?? DEFAULT_PARTITION_PARENT_MODE;
+          switch (parentMode) {
+            case "both":
+            case "child": {
+              // Parent is configured to include children, we are a children,
+              // include.
+              return INCLUDE;
+            }
+            case "parent": {
+              return EXCLUDE;
+            }
+            default: {
+              const never: never = parentMode;
+              throw new Error(`Partition mode '${never}' not understood`);
+            }
+          }
+        } else {
+          // We are the root, and we have no default mode
+          switch (DEFAULT_PARTITION_PARENT_MODE) {
+            case "both":
+            case "parent": {
+              return INCLUDE;
+            }
+            case "child": {
+              return EXCLUDE;
+            }
+            default: {
+              const never: never = DEFAULT_PARTITION_PARENT_MODE;
+              throw new Error(`Partition mode '${never}' not understood`);
+            }
+          }
+        }
+      }
+      default: {
+        const never: never = directMode;
+        throw new Error(`Partition mode '${never}' not understood`);
+      }
+    }
+  } else {
+    // Must be a child, use parent behavior
+    const parentResource = getPartitionParent(build, resource);
+    if (!parentResource) {
+      throw new Error(
+        `${resource.name} is partition child of ${resource.extensions?.partitionParent?.name}; but couldn't find that resource!`,
+      );
+    }
+    const parentMode = parentResource ? getPartitionMode(parentResource) : null;
+    switch (parentMode) {
+      case "child":
+      case "both": {
+        return INCLUDE;
+      }
+      case "parent": {
+        return EXCLUDE;
+      }
+      case null: {
+        // Only included if:
+        // 1. DEFAULT_MODE = child or both, and
+        // 2. parent is root
+        if (
+          DEFAULT_PARTITION_PARENT_MODE === "child" ||
+          DEFAULT_PARTITION_PARENT_MODE === "both"
+        ) {
+          const partitionParent = getPartitionParent(build, resource);
+          // Root if there is no grandparent
+          const parentIsRoot = !partitionParent?.extensions?.partitionParent;
+          if (parentIsRoot) {
+            return INCLUDE;
+          } else {
+            return EXCLUDE;
+          }
+        } else {
+          return EXCLUDE;
+        }
+      }
+      default: {
+        const never: never = parentMode;
+        throw new Error(`Partition mode '${never}' not understood`);
+      }
+    }
+  }
+}
+
+function getPartitionParent(
+  build: GraphileBuild.Build,
+  resource: PgResource,
+): PgResource<any, any, any, any, any> | null {
+  const pp = resource.extensions?.partitionParent;
+  if (pp) {
+    const serviceName = resource.extensions?.pg?.serviceName;
+    const { schemaName, name } = pp;
+    const parentResource = serviceName
+      ? Object.values(build.input.pgRegistry.pgResources).find((r) => {
+          if (r.parameters) return false;
+          const deets = r.extensions?.pg;
+          if (!deets) return false;
+          return (
+            deets.serviceName === serviceName &&
+            deets.schemaName === schemaName &&
+            deets.name === name
+          );
+        })
+      : null;
+    return parentResource ?? null;
+  }
+  return null;
+}
+
+function getPartitionMode(
+  resource: PgResource<any, any, any, any, any>,
+): PartitionExpose | null {
+  const partitionTag = resource.extensions?.tags?.partitionExpose;
+  if (typeof partitionTag === "string") {
+    if (PARTITION_EXPOSE_OPTIONS.includes(partitionTag as PartitionExpose)) {
+      return partitionTag as PartitionExpose;
+    } else {
+      throw new Error(
+        `"@partitionExpose ${partitionTag}" on resource '${resource.name}' not understood; must be one of: '${PARTITION_EXPOSE_OPTIONS.join("', '")}'`,
+      );
+    }
+  } else if (partitionTag != null) {
+    throw new Error(
+      `@partitionExpose on resource '${resource.name}' not understood; must be one of: '${PARTITION_EXPOSE_OPTIONS.join("', '")}'`,
+    );
+  } else {
+    return null;
+  }
 }

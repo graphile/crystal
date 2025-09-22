@@ -44,3 +44,6 @@ grant usage on schema function_returning_enum to postgraphile_test_authenticator
 grant select on function_returning_enum.enum_table to postgraphile_test_authenticator;
 grant select on function_returning_enum.length_status to postgraphile_test_authenticator;
 grant select on function_returning_enum.stage_options to postgraphile_test_authenticator;
+
+grant usage on schema partitions to postgraphile_test_authenticator;
+grant select on partitions.entity_kinds to postgraphile_test_authenticator;

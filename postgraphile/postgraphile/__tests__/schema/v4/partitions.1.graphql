@@ -1,3 +1,76 @@
+"""All input for the create `Location` mutation."""
+input CreateLocationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Location` to be created by this mutation."""
+  location: LocationInput!
+}
+
+"""The output of our create `Location` mutation."""
+type CreateLocationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Location` that was created by this mutation."""
+  location: Location
+
+  """An edge for our `Location`. May be used by Relay 1."""
+  locationEdge(
+    """The method to use when ordering `Location`."""
+    orderBy: [LocationsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): LocationsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `LocationTag` mutation."""
+input CreateLocationTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `LocationTag` to be created by this mutation."""
+  locationTag: LocationTagInput!
+}
+
+"""The output of our create `LocationTag` mutation."""
+type CreateLocationTagPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """Reads a single `Location` that is related to this `LocationTag`."""
+  locationByEntityId: Location
+
+  """The `LocationTag` that was created by this mutation."""
+  locationTag: LocationTag
+
+  """An edge for our `LocationTag`. May be used by Relay 1."""
+  locationTagEdge(
+    """The method to use when ordering `LocationTag`."""
+    orderBy: [LocationTagsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): LocationTagsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the create `Measurement` mutation."""
 input CreateMeasurementInput {
   """
@@ -34,6 +107,152 @@ type CreateMeasurementPayload {
 
   """Reads a single `User` that is related to this `Measurement`."""
   userByUserId: User
+}
+
+"""All input for the create `Photo` mutation."""
+input CreatePhotoInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Photo` to be created by this mutation."""
+  photo: PhotoInput!
+}
+
+"""The output of our create `Photo` mutation."""
+type CreatePhotoPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Photo` that was created by this mutation."""
+  photo: Photo
+
+  """An edge for our `Photo`. May be used by Relay 1."""
+  photoEdge(
+    """The method to use when ordering `Photo`."""
+    orderBy: [PhotosOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PhotosEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `PhotoTag` mutation."""
+input CreatePhotoTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `PhotoTag` to be created by this mutation."""
+  photoTag: PhotoTagInput!
+}
+
+"""The output of our create `PhotoTag` mutation."""
+type CreatePhotoTagPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """Reads a single `Photo` that is related to this `PhotoTag`."""
+  photoByEntityId: Photo
+
+  """The `PhotoTag` that was created by this mutation."""
+  photoTag: PhotoTag
+
+  """An edge for our `PhotoTag`. May be used by Relay 1."""
+  photoTagEdge(
+    """The method to use when ordering `PhotoTag`."""
+    orderBy: [PhotoTagsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PhotoTagsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `Profile` mutation."""
+input CreateProfileInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `Profile` to be created by this mutation."""
+  profile: ProfileInput!
+}
+
+"""The output of our create `Profile` mutation."""
+type CreateProfilePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Profile` that was created by this mutation."""
+  profile: Profile
+
+  """An edge for our `Profile`. May be used by Relay 1."""
+  profileEdge(
+    """The method to use when ordering `Profile`."""
+    orderBy: [ProfilesOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ProfilesEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create `ProfileTag` mutation."""
+input CreateProfileTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `ProfileTag` to be created by this mutation."""
+  profileTag: ProfileTagInput!
+}
+
+"""The output of our create `ProfileTag` mutation."""
+type CreateProfileTagPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """Reads a single `Profile` that is related to this `ProfileTag`."""
+  profileByEntityId: Profile
+
+  """The `ProfileTag` that was created by this mutation."""
+  profileTag: ProfileTag
+
+  """An edge for our `ProfileTag`. May be used by Relay 1."""
+  profileTagEdge(
+    """The method to use when ordering `ProfileTag`."""
+    orderBy: [ProfileTagsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ProfileTagsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
 }
 
 """All input for the create `User` mutation."""
@@ -82,6 +301,109 @@ that do not conform to both ISO 8601 and RFC 3339 may be coerced, which may lead
 to unexpected results.
 """
 scalar Datetime
+
+"""All input for the `deleteLocationById` mutation."""
+input DeleteLocationByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""All input for the `deleteLocation` mutation."""
+input DeleteLocationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Location` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `Location` mutation."""
+type DeleteLocationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedLocationId: ID
+
+  """The `Location` that was deleted by this mutation."""
+  location: Location
+
+  """An edge for our `Location`. May be used by Relay 1."""
+  locationEdge(
+    """The method to use when ordering `Location`."""
+    orderBy: [LocationsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): LocationsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""
+All input for the `deleteLocationTagByEntityKindAndEntityIdAndTag` mutation.
+"""
+input DeleteLocationTagByEntityKindAndEntityIdAndTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  entityId: UUID!
+  entityKind: EntityKinds!
+  tag: String!
+}
+
+"""All input for the `deleteLocationTag` mutation."""
+input DeleteLocationTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `LocationTag` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `LocationTag` mutation."""
+type DeleteLocationTagPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedLocationTagId: ID
+
+  """Reads a single `Location` that is related to this `LocationTag`."""
+  locationByEntityId: Location
+
+  """The `LocationTag` that was deleted by this mutation."""
+  locationTag: LocationTag
+
+  """An edge for our `LocationTag`. May be used by Relay 1."""
+  locationTagEdge(
+    """The method to use when ordering `LocationTag`."""
+    orderBy: [LocationTagsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): LocationTagsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
 
 """All input for the `deleteMeasurementByTimestampAndKey` mutation."""
 input DeleteMeasurementByTimestampAndKeyInput {
@@ -135,6 +457,212 @@ type DeleteMeasurementPayload {
   userByUserId: User
 }
 
+"""All input for the `deletePhotoById` mutation."""
+input DeletePhotoByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""All input for the `deletePhoto` mutation."""
+input DeletePhotoInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Photo` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `Photo` mutation."""
+type DeletePhotoPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedPhotoId: ID
+
+  """The `Photo` that was deleted by this mutation."""
+  photo: Photo
+
+  """An edge for our `Photo`. May be used by Relay 1."""
+  photoEdge(
+    """The method to use when ordering `Photo`."""
+    orderBy: [PhotosOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PhotosEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""
+All input for the `deletePhotoTagByEntityKindAndEntityIdAndTag` mutation.
+"""
+input DeletePhotoTagByEntityKindAndEntityIdAndTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  entityId: UUID!
+  entityKind: EntityKinds!
+  tag: String!
+}
+
+"""All input for the `deletePhotoTag` mutation."""
+input DeletePhotoTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `PhotoTag` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `PhotoTag` mutation."""
+type DeletePhotoTagPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedPhotoTagId: ID
+
+  """Reads a single `Photo` that is related to this `PhotoTag`."""
+  photoByEntityId: Photo
+
+  """The `PhotoTag` that was deleted by this mutation."""
+  photoTag: PhotoTag
+
+  """An edge for our `PhotoTag`. May be used by Relay 1."""
+  photoTagEdge(
+    """The method to use when ordering `PhotoTag`."""
+    orderBy: [PhotoTagsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PhotoTagsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `deleteProfileById` mutation."""
+input DeleteProfileByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+}
+
+"""All input for the `deleteProfile` mutation."""
+input DeleteProfileInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Profile` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `Profile` mutation."""
+type DeleteProfilePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedProfileId: ID
+
+  """The `Profile` that was deleted by this mutation."""
+  profile: Profile
+
+  """An edge for our `Profile`. May be used by Relay 1."""
+  profileEdge(
+    """The method to use when ordering `Profile`."""
+    orderBy: [ProfilesOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ProfilesEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""
+All input for the `deleteProfileTagByEntityKindAndEntityIdAndTag` mutation.
+"""
+input DeleteProfileTagByEntityKindAndEntityIdAndTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  entityId: UUID!
+  entityKind: EntityKinds!
+  tag: String!
+}
+
+"""All input for the `deleteProfileTag` mutation."""
+input DeleteProfileTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `ProfileTag` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""The output of our delete `ProfileTag` mutation."""
+type DeleteProfileTagPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  deletedProfileTagId: ID
+
+  """Reads a single `Profile` that is related to this `ProfileTag`."""
+  profileByEntityId: Profile
+
+  """The `ProfileTag` that was deleted by this mutation."""
+  profileTag: ProfileTag
+
+  """An edge for our `ProfileTag`. May be used by Relay 1."""
+  profileTagEdge(
+    """The method to use when ordering `ProfileTag`."""
+    orderBy: [ProfileTagsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ProfileTagsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
 """All input for the `deleteUserById` mutation."""
 input DeleteUserByIdInput {
   """
@@ -181,6 +709,190 @@ type DeleteUserPayload {
     """The method to use when ordering `User`."""
     orderBy: [UsersOrderBy!]! = [PRIMARY_KEY_ASC]
   ): UsersEdge
+}
+
+enum EntityKinds {
+  LOCATIONS
+  PHOTOS
+  PROFILES
+}
+
+type Location implements Node {
+  id: UUID!
+
+  """Reads and enables pagination through a set of `LocationTag`."""
+  locationTagsByEntityId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: LocationTagCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `LocationTag`."""
+    orderBy: [LocationTagsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): LocationTagsConnection!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+"""
+A condition to be used against `Location` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input LocationCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: UUID
+}
+
+"""An input for mutations affecting `Location`"""
+input LocationInput {
+  id: UUID!
+}
+
+"""
+Represents an update to a `Location`. Fields that are set will be updated.
+"""
+input LocationPatch {
+  id: UUID
+}
+
+type LocationTag implements Node {
+  entityId: UUID!
+  entityKind: EntityKinds!
+
+  """Reads a single `Location` that is related to this `LocationTag`."""
+  locationByEntityId: Location
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  tag: String!
+}
+
+"""
+A condition to be used against `LocationTag` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input LocationTagCondition {
+  """Checks for equality with the object’s `entityId` field."""
+  entityId: UUID
+
+  """Checks for equality with the object’s `entityKind` field."""
+  entityKind: EntityKinds
+
+  """Checks for equality with the object’s `tag` field."""
+  tag: String
+}
+
+"""An input for mutations affecting `LocationTag`"""
+input LocationTagInput {
+  entityId: UUID!
+  entityKind: EntityKinds!
+  tag: String!
+}
+
+"""
+Represents an update to a `LocationTag`. Fields that are set will be updated.
+"""
+input LocationTagPatch {
+  entityId: UUID
+  entityKind: EntityKinds
+  tag: String
+}
+
+"""A connection to a list of `LocationTag` values."""
+type LocationTagsConnection {
+  """
+  A list of edges which contains the `LocationTag` and cursor to aid in pagination.
+  """
+  edges: [LocationTagsEdge]!
+
+  """A list of `LocationTag` objects."""
+  nodes: [LocationTag]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `LocationTag` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `LocationTag` edge in the connection."""
+type LocationTagsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `LocationTag` at the end of the edge."""
+  node: LocationTag
+}
+
+"""Methods to use when ordering `LocationTag`."""
+enum LocationTagsOrderBy {
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+  ENTITY_KIND_ASC
+  ENTITY_KIND_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  TAG_ASC
+  TAG_DESC
+}
+
+"""A connection to a list of `Location` values."""
+type LocationsConnection {
+  """
+  A list of edges which contains the `Location` and cursor to aid in pagination.
+  """
+  edges: [LocationsEdge]!
+
+  """A list of `Location` objects."""
+  nodes: [Location]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Location` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Location` edge in the connection."""
+type LocationsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Location` at the end of the edge."""
+  node: Location
+}
+
+"""Methods to use when ordering `Location`."""
+enum LocationsOrderBy {
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
 }
 
 type Measurement implements Node {
@@ -279,6 +991,22 @@ enum MeasurementsOrderBy {
 The root mutation type which contains root level fields which mutate data.
 """
 type Mutation {
+  """Creates a single `Location`."""
+  createLocation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateLocationInput!
+  ): CreateLocationPayload
+
+  """Creates a single `LocationTag`."""
+  createLocationTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateLocationTagInput!
+  ): CreateLocationTagPayload
+
   """Creates a single `Measurement`."""
   createMeasurement(
     """
@@ -287,6 +1015,38 @@ type Mutation {
     input: CreateMeasurementInput!
   ): CreateMeasurementPayload
 
+  """Creates a single `Photo`."""
+  createPhoto(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePhotoInput!
+  ): CreatePhotoPayload
+
+  """Creates a single `PhotoTag`."""
+  createPhotoTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePhotoTagInput!
+  ): CreatePhotoTagPayload
+
+  """Creates a single `Profile`."""
+  createProfile(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateProfileInput!
+  ): CreateProfilePayload
+
+  """Creates a single `ProfileTag`."""
+  createProfileTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateProfileTagInput!
+  ): CreateProfileTagPayload
+
   """Creates a single `User`."""
   createUser(
     """
@@ -294,6 +1054,38 @@ type Mutation {
     """
     input: CreateUserInput!
   ): CreateUserPayload
+
+  """Deletes a single `Location` using its globally unique id."""
+  deleteLocation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteLocationInput!
+  ): DeleteLocationPayload
+
+  """Deletes a single `Location` using a unique key."""
+  deleteLocationById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteLocationByIdInput!
+  ): DeleteLocationPayload
+
+  """Deletes a single `LocationTag` using its globally unique id."""
+  deleteLocationTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteLocationTagInput!
+  ): DeleteLocationTagPayload
+
+  """Deletes a single `LocationTag` using a unique key."""
+  deleteLocationTagByEntityKindAndEntityIdAndTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteLocationTagByEntityKindAndEntityIdAndTagInput!
+  ): DeleteLocationTagPayload
 
   """Deletes a single `Measurement` using its globally unique id."""
   deleteMeasurement(
@@ -311,6 +1103,70 @@ type Mutation {
     input: DeleteMeasurementByTimestampAndKeyInput!
   ): DeleteMeasurementPayload
 
+  """Deletes a single `Photo` using its globally unique id."""
+  deletePhoto(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePhotoInput!
+  ): DeletePhotoPayload
+
+  """Deletes a single `Photo` using a unique key."""
+  deletePhotoById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePhotoByIdInput!
+  ): DeletePhotoPayload
+
+  """Deletes a single `PhotoTag` using its globally unique id."""
+  deletePhotoTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePhotoTagInput!
+  ): DeletePhotoTagPayload
+
+  """Deletes a single `PhotoTag` using a unique key."""
+  deletePhotoTagByEntityKindAndEntityIdAndTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePhotoTagByEntityKindAndEntityIdAndTagInput!
+  ): DeletePhotoTagPayload
+
+  """Deletes a single `Profile` using its globally unique id."""
+  deleteProfile(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteProfileInput!
+  ): DeleteProfilePayload
+
+  """Deletes a single `Profile` using a unique key."""
+  deleteProfileById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteProfileByIdInput!
+  ): DeleteProfilePayload
+
+  """Deletes a single `ProfileTag` using its globally unique id."""
+  deleteProfileTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteProfileTagInput!
+  ): DeleteProfileTagPayload
+
+  """Deletes a single `ProfileTag` using a unique key."""
+  deleteProfileTagByEntityKindAndEntityIdAndTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteProfileTagByEntityKindAndEntityIdAndTagInput!
+  ): DeleteProfileTagPayload
+
   """Deletes a single `User` using its globally unique id."""
   deleteUser(
     """
@@ -326,6 +1182,40 @@ type Mutation {
     """
     input: DeleteUserByIdInput!
   ): DeleteUserPayload
+
+  """Updates a single `Location` using its globally unique id and a patch."""
+  updateLocation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateLocationInput!
+  ): UpdateLocationPayload
+
+  """Updates a single `Location` using a unique key and a patch."""
+  updateLocationById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateLocationByIdInput!
+  ): UpdateLocationPayload
+
+  """
+  Updates a single `LocationTag` using its globally unique id and a patch.
+  """
+  updateLocationTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateLocationTagInput!
+  ): UpdateLocationTagPayload
+
+  """Updates a single `LocationTag` using a unique key and a patch."""
+  updateLocationTagByEntityKindAndEntityIdAndTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateLocationTagByEntityKindAndEntityIdAndTagInput!
+  ): UpdateLocationTagPayload
 
   """
   Updates a single `Measurement` using its globally unique id and a patch.
@@ -344,6 +1234,72 @@ type Mutation {
     """
     input: UpdateMeasurementByTimestampAndKeyInput!
   ): UpdateMeasurementPayload
+
+  """Updates a single `Photo` using its globally unique id and a patch."""
+  updatePhoto(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePhotoInput!
+  ): UpdatePhotoPayload
+
+  """Updates a single `Photo` using a unique key and a patch."""
+  updatePhotoById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePhotoByIdInput!
+  ): UpdatePhotoPayload
+
+  """Updates a single `PhotoTag` using its globally unique id and a patch."""
+  updatePhotoTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePhotoTagInput!
+  ): UpdatePhotoTagPayload
+
+  """Updates a single `PhotoTag` using a unique key and a patch."""
+  updatePhotoTagByEntityKindAndEntityIdAndTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePhotoTagByEntityKindAndEntityIdAndTagInput!
+  ): UpdatePhotoTagPayload
+
+  """Updates a single `Profile` using its globally unique id and a patch."""
+  updateProfile(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateProfileInput!
+  ): UpdateProfilePayload
+
+  """Updates a single `Profile` using a unique key and a patch."""
+  updateProfileById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateProfileByIdInput!
+  ): UpdateProfilePayload
+
+  """
+  Updates a single `ProfileTag` using its globally unique id and a patch.
+  """
+  updateProfileTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateProfileTagInput!
+  ): UpdateProfileTagPayload
+
+  """Updates a single `ProfileTag` using a unique key and a patch."""
+  updateProfileTagByEntityKindAndEntityIdAndTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateProfileTagByEntityKindAndEntityIdAndTagInput!
+  ): UpdateProfileTagPayload
 
   """Updates a single `User` using its globally unique id and a patch."""
   updateUser(
@@ -385,8 +1341,420 @@ type PageInfo {
   startCursor: Cursor
 }
 
+type Photo implements Node {
+  id: UUID!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+
+  """Reads and enables pagination through a set of `PhotoTag`."""
+  photoTagsByEntityId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PhotoTagCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PhotoTag`."""
+    orderBy: [PhotoTagsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PhotoTagsConnection!
+}
+
+"""
+A condition to be used against `Photo` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input PhotoCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: UUID
+}
+
+"""An input for mutations affecting `Photo`"""
+input PhotoInput {
+  id: UUID!
+}
+
+"""
+Represents an update to a `Photo`. Fields that are set will be updated.
+"""
+input PhotoPatch {
+  id: UUID
+}
+
+type PhotoTag implements Node {
+  entityId: UUID!
+  entityKind: EntityKinds!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+
+  """Reads a single `Photo` that is related to this `PhotoTag`."""
+  photoByEntityId: Photo
+  tag: String!
+}
+
+"""
+A condition to be used against `PhotoTag` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input PhotoTagCondition {
+  """Checks for equality with the object’s `entityId` field."""
+  entityId: UUID
+
+  """Checks for equality with the object’s `entityKind` field."""
+  entityKind: EntityKinds
+
+  """Checks for equality with the object’s `tag` field."""
+  tag: String
+}
+
+"""An input for mutations affecting `PhotoTag`"""
+input PhotoTagInput {
+  entityId: UUID!
+  entityKind: EntityKinds!
+  tag: String!
+}
+
+"""
+Represents an update to a `PhotoTag`. Fields that are set will be updated.
+"""
+input PhotoTagPatch {
+  entityId: UUID
+  entityKind: EntityKinds
+  tag: String
+}
+
+"""A connection to a list of `PhotoTag` values."""
+type PhotoTagsConnection {
+  """
+  A list of edges which contains the `PhotoTag` and cursor to aid in pagination.
+  """
+  edges: [PhotoTagsEdge]!
+
+  """A list of `PhotoTag` objects."""
+  nodes: [PhotoTag]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `PhotoTag` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `PhotoTag` edge in the connection."""
+type PhotoTagsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PhotoTag` at the end of the edge."""
+  node: PhotoTag
+}
+
+"""Methods to use when ordering `PhotoTag`."""
+enum PhotoTagsOrderBy {
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+  ENTITY_KIND_ASC
+  ENTITY_KIND_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  TAG_ASC
+  TAG_DESC
+}
+
+"""A connection to a list of `Photo` values."""
+type PhotosConnection {
+  """
+  A list of edges which contains the `Photo` and cursor to aid in pagination.
+  """
+  edges: [PhotosEdge]!
+
+  """A list of `Photo` objects."""
+  nodes: [Photo]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Photo` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Photo` edge in the connection."""
+type PhotosEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Photo` at the end of the edge."""
+  node: Photo
+}
+
+"""Methods to use when ordering `Photo`."""
+enum PhotosOrderBy {
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+type Profile implements Node {
+  id: UUID!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+
+  """Reads and enables pagination through a set of `ProfileTag`."""
+  profileTagsByEntityId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ProfileTagCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `ProfileTag`."""
+    orderBy: [ProfileTagsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ProfileTagsConnection!
+}
+
+"""
+A condition to be used against `Profile` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input ProfileCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: UUID
+}
+
+"""An input for mutations affecting `Profile`"""
+input ProfileInput {
+  id: UUID!
+}
+
+"""
+Represents an update to a `Profile`. Fields that are set will be updated.
+"""
+input ProfilePatch {
+  id: UUID
+}
+
+type ProfileTag implements Node {
+  entityId: UUID!
+  entityKind: EntityKinds!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+
+  """Reads a single `Profile` that is related to this `ProfileTag`."""
+  profileByEntityId: Profile
+  tag: String!
+}
+
+"""
+A condition to be used against `ProfileTag` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input ProfileTagCondition {
+  """Checks for equality with the object’s `entityId` field."""
+  entityId: UUID
+
+  """Checks for equality with the object’s `entityKind` field."""
+  entityKind: EntityKinds
+
+  """Checks for equality with the object’s `tag` field."""
+  tag: String
+}
+
+"""An input for mutations affecting `ProfileTag`"""
+input ProfileTagInput {
+  entityId: UUID!
+  entityKind: EntityKinds!
+  tag: String!
+}
+
+"""
+Represents an update to a `ProfileTag`. Fields that are set will be updated.
+"""
+input ProfileTagPatch {
+  entityId: UUID
+  entityKind: EntityKinds
+  tag: String
+}
+
+"""A connection to a list of `ProfileTag` values."""
+type ProfileTagsConnection {
+  """
+  A list of edges which contains the `ProfileTag` and cursor to aid in pagination.
+  """
+  edges: [ProfileTagsEdge]!
+
+  """A list of `ProfileTag` objects."""
+  nodes: [ProfileTag]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `ProfileTag` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `ProfileTag` edge in the connection."""
+type ProfileTagsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `ProfileTag` at the end of the edge."""
+  node: ProfileTag
+}
+
+"""Methods to use when ordering `ProfileTag`."""
+enum ProfileTagsOrderBy {
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+  ENTITY_KIND_ASC
+  ENTITY_KIND_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  TAG_ASC
+  TAG_DESC
+}
+
+"""A connection to a list of `Profile` values."""
+type ProfilesConnection {
+  """
+  A list of edges which contains the `Profile` and cursor to aid in pagination.
+  """
+  edges: [ProfilesEdge]!
+
+  """A list of `Profile` objects."""
+  nodes: [Profile]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Profile` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Profile` edge in the connection."""
+type ProfilesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Profile` at the end of the edge."""
+  node: Profile
+}
+
+"""Methods to use when ordering `Profile`."""
+enum ProfilesOrderBy {
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
 """The root query type which gives access points into the data universe."""
 type Query implements Node {
+  """Reads and enables pagination through a set of `LocationTag`."""
+  allLocationTags(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: LocationTagCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `LocationTag`."""
+    orderBy: [LocationTagsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): LocationTagsConnection
+
+  """Reads and enables pagination through a set of `Location`."""
+  allLocations(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: LocationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Location`."""
+    orderBy: [LocationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): LocationsConnection
+
   """Reads and enables pagination through a set of `Measurement`."""
   allMeasurements(
     """Read all values in the set after (below) this cursor."""
@@ -415,6 +1783,122 @@ type Query implements Node {
     """The method to use when ordering `Measurement`."""
     orderBy: [MeasurementsOrderBy!] = [PRIMARY_KEY_ASC]
   ): MeasurementsConnection
+
+  """Reads and enables pagination through a set of `PhotoTag`."""
+  allPhotoTags(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PhotoTagCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `PhotoTag`."""
+    orderBy: [PhotoTagsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PhotoTagsConnection
+
+  """Reads and enables pagination through a set of `Photo`."""
+  allPhotos(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PhotoCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Photo`."""
+    orderBy: [PhotosOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PhotosConnection
+
+  """Reads and enables pagination through a set of `ProfileTag`."""
+  allProfileTags(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ProfileTagCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `ProfileTag`."""
+    orderBy: [ProfileTagsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ProfileTagsConnection
+
+  """Reads and enables pagination through a set of `Profile`."""
+  allProfiles(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ProfileCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Profile`."""
+    orderBy: [ProfilesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ProfilesConnection
 
   """Reads and enables pagination through a set of `User`."""
   allUsers(
@@ -445,6 +1929,26 @@ type Query implements Node {
     orderBy: [UsersOrderBy!] = [PRIMARY_KEY_ASC]
   ): UsersConnection
 
+  """Reads a single `Location` using its globally unique `ID`."""
+  location(
+    """The globally unique `ID` to be used in selecting a single `Location`."""
+    nodeId: ID!
+  ): Location
+
+  """Get a single `Location`."""
+  locationById(id: UUID!): Location
+
+  """Reads a single `LocationTag` using its globally unique `ID`."""
+  locationTag(
+    """
+    The globally unique `ID` to be used in selecting a single `LocationTag`.
+    """
+    nodeId: ID!
+  ): LocationTag
+
+  """Get a single `LocationTag`."""
+  locationTagByEntityKindAndEntityIdAndTag(entityId: UUID!, entityKind: EntityKinds!, tag: String!): LocationTag
+
   """Reads a single `Measurement` using its globally unique `ID`."""
   measurement(
     """
@@ -467,6 +1971,44 @@ type Query implements Node {
   """
   nodeId: ID!
 
+  """Reads a single `Photo` using its globally unique `ID`."""
+  photo(
+    """The globally unique `ID` to be used in selecting a single `Photo`."""
+    nodeId: ID!
+  ): Photo
+
+  """Get a single `Photo`."""
+  photoById(id: UUID!): Photo
+
+  """Reads a single `PhotoTag` using its globally unique `ID`."""
+  photoTag(
+    """The globally unique `ID` to be used in selecting a single `PhotoTag`."""
+    nodeId: ID!
+  ): PhotoTag
+
+  """Get a single `PhotoTag`."""
+  photoTagByEntityKindAndEntityIdAndTag(entityId: UUID!, entityKind: EntityKinds!, tag: String!): PhotoTag
+
+  """Reads a single `Profile` using its globally unique `ID`."""
+  profile(
+    """The globally unique `ID` to be used in selecting a single `Profile`."""
+    nodeId: ID!
+  ): Profile
+
+  """Get a single `Profile`."""
+  profileById(id: UUID!): Profile
+
+  """Reads a single `ProfileTag` using its globally unique `ID`."""
+  profileTag(
+    """
+    The globally unique `ID` to be used in selecting a single `ProfileTag`.
+    """
+    nodeId: ID!
+  ): ProfileTag
+
+  """Get a single `ProfileTag`."""
+  profileTagByEntityKindAndEntityIdAndTag(entityId: UUID!, entityKind: EntityKinds!, tag: String!): ProfileTag
+
   """
   Exposes the root query type nested one level down. This is helpful for Relay 1
   which can only query top level fields if they are in a particular form.
@@ -481,6 +2023,132 @@ type Query implements Node {
 
   """Get a single `User`."""
   userById(id: Int!): User
+}
+
+"""
+A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
+"""
+scalar UUID
+
+"""All input for the `updateLocationById` mutation."""
+input UpdateLocationByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `Location` being updated.
+  """
+  locationPatch: LocationPatch!
+}
+
+"""All input for the `updateLocation` mutation."""
+input UpdateLocationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `Location` being updated.
+  """
+  locationPatch: LocationPatch!
+
+  """
+  The globally unique `ID` which will identify a single `Location` to be updated.
+  """
+  nodeId: ID!
+}
+
+"""The output of our update `Location` mutation."""
+type UpdateLocationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Location` that was updated by this mutation."""
+  location: Location
+
+  """An edge for our `Location`. May be used by Relay 1."""
+  locationEdge(
+    """The method to use when ordering `Location`."""
+    orderBy: [LocationsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): LocationsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""
+All input for the `updateLocationTagByEntityKindAndEntityIdAndTag` mutation.
+"""
+input UpdateLocationTagByEntityKindAndEntityIdAndTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  entityId: UUID!
+  entityKind: EntityKinds!
+
+  """
+  An object where the defined keys will be set on the `LocationTag` being updated.
+  """
+  locationTagPatch: LocationTagPatch!
+  tag: String!
+}
+
+"""All input for the `updateLocationTag` mutation."""
+input UpdateLocationTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `LocationTag` being updated.
+  """
+  locationTagPatch: LocationTagPatch!
+
+  """
+  The globally unique `ID` which will identify a single `LocationTag` to be updated.
+  """
+  nodeId: ID!
+}
+
+"""The output of our update `LocationTag` mutation."""
+type UpdateLocationTagPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """Reads a single `Location` that is related to this `LocationTag`."""
+  locationByEntityId: Location
+
+  """The `LocationTag` that was updated by this mutation."""
+  locationTag: LocationTag
+
+  """An edge for our `LocationTag`. May be used by Relay 1."""
+  locationTagEdge(
+    """The method to use when ordering `LocationTag`."""
+    orderBy: [LocationTagsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): LocationTagsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
 }
 
 """All input for the `updateMeasurementByTimestampAndKey` mutation."""
@@ -542,6 +2210,248 @@ type UpdateMeasurementPayload {
 
   """Reads a single `User` that is related to this `Measurement`."""
   userByUserId: User
+}
+
+"""All input for the `updatePhotoById` mutation."""
+input UpdatePhotoByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `Photo` being updated.
+  """
+  photoPatch: PhotoPatch!
+}
+
+"""All input for the `updatePhoto` mutation."""
+input UpdatePhotoInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Photo` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `Photo` being updated.
+  """
+  photoPatch: PhotoPatch!
+}
+
+"""The output of our update `Photo` mutation."""
+type UpdatePhotoPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Photo` that was updated by this mutation."""
+  photo: Photo
+
+  """An edge for our `Photo`. May be used by Relay 1."""
+  photoEdge(
+    """The method to use when ordering `Photo`."""
+    orderBy: [PhotosOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PhotosEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""
+All input for the `updatePhotoTagByEntityKindAndEntityIdAndTag` mutation.
+"""
+input UpdatePhotoTagByEntityKindAndEntityIdAndTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  entityId: UUID!
+  entityKind: EntityKinds!
+
+  """
+  An object where the defined keys will be set on the `PhotoTag` being updated.
+  """
+  photoTagPatch: PhotoTagPatch!
+  tag: String!
+}
+
+"""All input for the `updatePhotoTag` mutation."""
+input UpdatePhotoTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `PhotoTag` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `PhotoTag` being updated.
+  """
+  photoTagPatch: PhotoTagPatch!
+}
+
+"""The output of our update `PhotoTag` mutation."""
+type UpdatePhotoTagPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """Reads a single `Photo` that is related to this `PhotoTag`."""
+  photoByEntityId: Photo
+
+  """The `PhotoTag` that was updated by this mutation."""
+  photoTag: PhotoTag
+
+  """An edge for our `PhotoTag`. May be used by Relay 1."""
+  photoTagEdge(
+    """The method to use when ordering `PhotoTag`."""
+    orderBy: [PhotoTagsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PhotoTagsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the `updateProfileById` mutation."""
+input UpdateProfileByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: UUID!
+
+  """
+  An object where the defined keys will be set on the `Profile` being updated.
+  """
+  profilePatch: ProfilePatch!
+}
+
+"""All input for the `updateProfile` mutation."""
+input UpdateProfileInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `Profile` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `Profile` being updated.
+  """
+  profilePatch: ProfilePatch!
+}
+
+"""The output of our update `Profile` mutation."""
+type UpdateProfilePayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The `Profile` that was updated by this mutation."""
+  profile: Profile
+
+  """An edge for our `Profile`. May be used by Relay 1."""
+  profileEdge(
+    """The method to use when ordering `Profile`."""
+    orderBy: [ProfilesOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ProfilesEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""
+All input for the `updateProfileTagByEntityKindAndEntityIdAndTag` mutation.
+"""
+input UpdateProfileTagByEntityKindAndEntityIdAndTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  entityId: UUID!
+  entityKind: EntityKinds!
+
+  """
+  An object where the defined keys will be set on the `ProfileTag` being updated.
+  """
+  profileTagPatch: ProfileTagPatch!
+  tag: String!
+}
+
+"""All input for the `updateProfileTag` mutation."""
+input UpdateProfileTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique `ID` which will identify a single `ProfileTag` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the `ProfileTag` being updated.
+  """
+  profileTagPatch: ProfileTagPatch!
+}
+
+"""The output of our update `ProfileTag` mutation."""
+type UpdateProfileTagPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """Reads a single `Profile` that is related to this `ProfileTag`."""
+  profileByEntityId: Profile
+
+  """The `ProfileTag` that was updated by this mutation."""
+  profileTag: ProfileTag
+
+  """An edge for our `ProfileTag`. May be used by Relay 1."""
+  profileTagEdge(
+    """The method to use when ordering `ProfileTag`."""
+    orderBy: [ProfileTagsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ProfileTagsEdge
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
 }
 
 """All input for the `updateUserById` mutation."""

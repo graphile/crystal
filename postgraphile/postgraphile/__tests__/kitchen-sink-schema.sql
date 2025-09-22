@@ -1913,6 +1913,50 @@ create table partitions.measurements_y2022 partition of partitions.measurements 
 create table partitions.measurements_y2023 partition of partitions.measurements for values from ('2023-01-01T00:00:00Z') to ('2024-01-01T00:00:00Z');
 create table partitions.measurements_y2024 partition of partitions.measurements for values from ('2024-01-01T00:00:00Z') to ('2025-01-01T00:00:00Z');
 
+-- More partitions, this time where we want to see the subtables and not the supertable
+
+create table partitions.entity_kinds (kind text primary key);
+comment on table partitions.entity_kinds is '@enum';
+insert into partitions.entity_kinds (kind)
+  values ('photos'), ('locations'), ('profiles');
+
+create table partitions.photos (
+  id uuid primary key
+);
+create table partitions.locations (
+  id uuid primary key
+);
+create table partitions.profiles (
+  id uuid primary key
+);
+
+create table partitions.tags (
+  entity_kind text    not null references partitions.entity_kinds(kind),
+  entity_id   uuid    not null,
+  tag         citext  not null,
+  primary key (entity_kind, entity_id, tag)
+) partition by list (entity_kind);
+
+comment on table partitions.tags is '@partitionExpose child';
+
+create table partitions.photo_tags
+  partition of partitions.tags for values in ('photos');
+alter table partitions.photo_tags
+  add constraint photo_tags_entity_fk
+  foreign key (entity_id) references partitions.photos(id) on delete cascade;
+
+create table partitions.location_tags
+  partition of partitions.tags for values in ('locations');
+alter table partitions.location_tags
+  add constraint location_tags_entity_fk
+  foreign key (entity_id) references partitions.locations(id) on delete cascade;
+
+create table partitions.profile_tags
+  partition of partitions.tags for values in ('profiles');
+alter table partitions.profile_tags
+  add constraint profile_tags_entity_fk
+  foreign key (entity_id) references partitions.profiles(id) on delete cascade;
+
 --------------------------------------------------------------------------------
 
 create schema nested_arrays;

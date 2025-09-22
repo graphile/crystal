@@ -74,6 +74,10 @@ delete from js_reserved.reserved cascade;
 
 delete from partitions.measurements cascade;
 delete from partitions.users cascade;
+delete from partitions.photos cascade;
+delete from partitions.locations cascade;
+delete from partitions.profiles cascade;
+delete from partitions.tags cascade;
 
 delete from d.post cascade;
 delete from d.person cascade;
@@ -921,6 +925,30 @@ insert into partitions.measurements
   ('2023-02-04T11:02:03Z', 'temp', '18.3', 1),
   ('2023-08-04T11:02:03Z', 'temp', '39.2', 3),
   ('2023-08-04T11:02:03Z', 'humidity', '100', 2);
+
+insert into partitions.photos (id) values 
+  ('28be1007-e624-46c8-bfa0-6b7e5a2c630e'),
+  ('36a9cc35-f158-4648-83f4-d8fa04ee7527');
+insert into partitions.locations (id) values 
+  ('039b863d-73c6-44f7-bef3-2e0058a85552'),
+  ('4b7c1188-94e9-4ae1-849c-e088964a9911');
+insert into partitions.profiles (id) values 
+  ('8cc170ed-7869-4cd9-ae4b-8d3b528de606'),
+  ('e3f89f32-e963-425e-b08f-a4c6be2161b6');
+insert into partitions.tags (entity_kind, entity_id, tag) values 
+  ('photos', '28be1007-e624-46c8-bfa0-6b7e5a2c630e', 'sunny'),
+  ('photos', '28be1007-e624-46c8-bfa0-6b7e5a2c630e', 'beach'),
+  ('photos', '28be1007-e624-46c8-bfa0-6b7e5a2c630e', 'spf50'),
+  ('photos', '28be1007-e624-46c8-bfa0-6b7e5a2c630e', 'holiday'),
+  ('photos', '36a9cc35-f158-4648-83f4-d8fa04ee7527', 'yummy'),
+  ('photos', '36a9cc35-f158-4648-83f4-d8fa04ee7527', 'sundae'),
+  ('photos', '36a9cc35-f158-4648-83f4-d8fa04ee7527', 'dessert'),
+  ('locations', '039b863d-73c6-44f7-bef3-2e0058a85552', 'canal'),
+  ('locations', '039b863d-73c6-44f7-bef3-2e0058a85552', 'boats'),
+  ('locations', '4b7c1188-94e9-4ae1-849c-e088964a9911', 'mountain'),
+  ('profiles', '8cc170ed-7869-4cd9-ae4b-8d3b528de606', 'admin'),
+  ('profiles', 'e3f89f32-e963-425e-b08f-a4c6be2161b6', 'moderator');
+
 
 insert into nested_arrays.t
   (k, v) values

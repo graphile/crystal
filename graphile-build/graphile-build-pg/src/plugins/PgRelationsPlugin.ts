@@ -34,6 +34,12 @@ const ref_sql = te.ref(sql, "sql");
 
 declare global {
   namespace GraphileBuild {
+    interface Build {
+      pgExcludeDueToPartitioning(
+        this: GraphileBuild.Build,
+        resource: PgResource<any, any, any, any, any>,
+      ): boolean;
+    }
     interface BehaviorStrings {
       "singularRelation:resource:single": true;
       "singularRelation:resource:list": true;
@@ -297,8 +303,15 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         const foreignClass = isReferencee
           ? pgConstraint.getClass()
           : pgConstraint.getForeignClass();
-        if (!pgClass || !foreignClass) {
-          throw new Error(`Invalid introspection`);
+        if (!pgClass) {
+          throw new Error(
+            `Invalid introspection: ${pgConstraint.contype} constraint ${pgConstraint.conname} can't read class ${pgConstraint.conrelid}`,
+          );
+        }
+        if (!foreignClass) {
+          throw new Error(
+            `Invalid introspection: ${pgConstraint.contype} constraint ${pgConstraint.conname} on ${pgClass.relname}; can't read foreign class ${pgConstraint.confrelid}`,
+          );
         }
         const localAttributeNumbers = isReferencee
           ? pgConstraint.confkey!
@@ -562,7 +575,10 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
     },
     entityBehavior: {
       pgCodecRelation: {
-        inferred(behavior, entity): GraphileBuild.BehaviorString[] {
+        inferred(behavior, entity, build): GraphileBuild.BehaviorString[] {
+          if (build.pgExcludeDueToPartitioning(entity.remoteResource)) {
+            return [behavior, "-*"];
+          }
           if (entity.isUnique) {
             return [
               "resource:select",
