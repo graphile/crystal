@@ -415,11 +415,36 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             // Partitions only have their own local constraints
             pgClass.relispartition
               ? directConstraints
-              : // Table inheritance, on the other hand, needs to manually inherit constraints (?)
-                // TODO: Check this, I'm unconvinced.
+              : // Table inheritance, on the other hand, needs to manually
+                // inherit constraints.
+                // And even when it does, they're kind of a lie.
+                // Even a primary key constraint is kind of a lie in table
+                // inheritance. Table inheritance SUCKS! DO NOT USE!
+                /*
+```sql
+create table a (
+  id serial primary key,
+  value int not null check (value > 0)
+);
+
+create table b (
+  extra_text text not null check (length(extra_text) > 0)
+) inherits (a);
+
+insert into a (id, value) values (1, 10), (2, 20), (3, 30);
+
+insert into b (id, value, extra_text) values (1, 5, 'Hello!');
+
+-- Wait, duplicate records despite primary key? Yep! PK only applies to `a`'s
+-- direct data, not the data imported from `b`.
+select * from a where id = 1;
+```
+                */
                 [
-                  // TODO: handle multiple inheritance
-                  ...inheritedConstraints.flatMap((list) => list),
+                  // Inherit the "no inherit" constraints from parent table, such as primary key.
+                  ...inheritedConstraints.flatMap((list) =>
+                    list.filter((l) => l.connoinherit === true),
+                  ),
                   ...directConstraints,
                 ];
           const uniqueAttributeOnlyConstraints = constraints.filter(
