@@ -14,6 +14,10 @@ import {
 } from "graphile-build";
 import type { PgClass, PgConstraint, PgNamespace } from "pg-introspection";
 
+import {
+  PARTITION_PARENT_MODES,
+  type PartitionParentMode,
+} from "../interfaces.js";
 import { exportNameHint } from "../utils.js";
 import { version } from "../version.js";
 
@@ -674,8 +678,8 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             provides: ["inferred"],
             after: ["default"],
             before: ["override"],
-            callback(behavior, resource) {
-              if (resource.extensions?.partitionParent) {
+            callback(behavior, resource, build) {
+              if (build.pgExcludeDueToPartitioning(resource)) {
                 return [behavior, "-*"];
               }
               return behavior;
@@ -700,8 +704,8 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             provides: ["inferred"],
             after: ["default"],
             before: ["override"],
-            callback(behavior, [resource, _unique]) {
-              if (resource.extensions?.partitionParent) {
+            callback(behavior, [resource, _unique], build) {
+              if (build.pgExcludeDueToPartitioning(resource)) {
                 return [behavior, "-*"];
               }
               return behavior;
@@ -711,6 +715,17 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
       },
     },
     hooks: {
+      build(build) {
+        return build.extend(
+          build,
+          {
+            pgExcludeDueToPartitioning(resource) {
+              return partitionExclude(this, resource);
+            },
+          },
+          "adding partitioning helpers",
+        );
+      },
       init(_, build, _context) {
         const {
           grafast: { get },
@@ -904,4 +919,145 @@ function unloggedOrTempBehaviors(
         ] as const)
       : []),
   ];
+}
+
+const EXCLUDE = true;
+const INCLUDE = false;
+
+function partitionExclude(
+  build: GraphileBuild.Build,
+  resource: PgResource,
+): boolean {
+  const pp = resource.extensions?.partitionParent;
+  const hasPartitions = resource.extensions?.hasPartitions ?? false;
+  if (!pp && !hasPartitions) {
+    return INCLUDE;
+  }
+  const DEFAULT_PARTITION_PARENT_MODE: PartitionParentMode =
+    build.options.pgDefaultPartitionedTableMode ?? "parent";
+  const parentMode = getPartitionParentMode(build, resource);
+  if (hasPartitions) {
+    const directMode = partitionMode(resource);
+    // NOTE: despite having partitions, this doesn't mean we're the root
+    switch (directMode) {
+      case "both":
+      case "parent": {
+        return INCLUDE;
+      }
+      case "child": {
+        return EXCLUDE;
+      }
+      case null: {
+        // Not explicit, use default behavior, which may come from the parent
+        const fallbackMode = parentMode ?? DEFAULT_PARTITION_PARENT_MODE;
+        switch (fallbackMode) {
+          case "child":
+          case "both": {
+            return INCLUDE;
+          }
+          case "parent": {
+            const isRoot = !pp;
+            return isRoot ? INCLUDE : EXCLUDE;
+          }
+          default: {
+            const never: never = fallbackMode;
+            throw new Error(`Partition mode '${never}' not understood`);
+          }
+        }
+      }
+      default: {
+        const never: never = directMode;
+        throw new Error(`Partition mode '${never}' not understood`);
+      }
+    }
+  } else {
+    // Must be a child, use parent behavior
+    const parentMode = getPartitionParentMode(build, resource);
+    switch (parentMode) {
+      case "child":
+      case "both": {
+        return INCLUDE;
+      }
+      case "parent": {
+        return EXCLUDE;
+      }
+      case null: {
+        // Only included if:
+        // 1. DEFAULT_MODE = child or both, and
+        // 2. parent is root
+        if (
+          DEFAULT_PARTITION_PARENT_MODE === "child" ||
+          DEFAULT_PARTITION_PARENT_MODE === "both"
+        ) {
+          const partitionParent = getPartitionParent(build, resource);
+          const parentIsRoot = !partitionParent?.extensions?.partitionParent;
+          if (parentIsRoot) {
+            return INCLUDE;
+          } else {
+            return EXCLUDE;
+          }
+        } else {
+          return EXCLUDE;
+        }
+      }
+      default: {
+        const never: never = parentMode;
+        throw new Error(`Partition mode '${never}' not understood`);
+      }
+    }
+  }
+}
+
+function getPartitionParent(
+  build: GraphileBuild.Build,
+  resource: PgResource,
+): PgResource<any, any, any, any, any> | null {
+  const pp = resource.extensions?.partitionParent;
+  if (pp) {
+    const serviceName = resource.extensions?.pg?.schemaName;
+    const { schemaName, name } = pp;
+    const parentResource = serviceName
+      ? Object.values(build.input.pgRegistry.pgResources).find((r) => {
+          if (r.parameters) return false;
+          const deets = r.extensions?.pg;
+          if (!deets) return false;
+          return (
+            deets.serviceName === serviceName &&
+            deets.schemaName === schemaName &&
+            deets.name === name
+          );
+        })
+      : null;
+    return parentResource ?? null;
+  }
+  return null;
+}
+
+function getPartitionParentMode(
+  build: GraphileBuild.Build,
+  resource: PgResource,
+): PartitionParentMode | null {
+  const parentResource = getPartitionParent(build, resource);
+  return parentResource ? partitionMode(parentResource) : null;
+}
+
+function partitionMode(
+  resource: PgResource<any, any, any, any, any>,
+): PartitionParentMode | null {
+  const partitionTag = resource.extensions?.tags?.partition;
+  if (typeof partitionTag === "string") {
+    if (PARTITION_PARENT_MODES.includes(partitionTag as PartitionParentMode)) {
+      return partitionTag as PartitionParentMode;
+    } else {
+      throw new Error(
+        `"@partition ${partitionTag}" on resource '${resource.name}' not understood; must be one of: '${PARTITION_PARENT_MODES.join("', '")}'`,
+      );
+    }
+  } else if (partitionTag != null) {
+    throw new Error(
+      `@partition on resource '${resource.name}' not understood; must be one of: '${PARTITION_PARENT_MODES.join("', '")}'`,
+    );
+  } else {
+    return null;
+  }
 }
