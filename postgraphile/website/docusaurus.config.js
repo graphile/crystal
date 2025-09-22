@@ -170,7 +170,7 @@ const config = {
             dropdownActiveClassDisabled: true,
           },
           {
-            href: "https://www.graphile.org/support/",
+            to: "support",
             label: "Support",
             position: "right",
           },

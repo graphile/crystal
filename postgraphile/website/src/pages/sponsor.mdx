@@ -3,17 +3,24 @@ title: "Sponsor Graphile Open Source Software"
 hide_table_of_contents: true
 ---
 
+import clsx from "clsx";
+
 import Sponsor from "@site/src/components/Sponsor";
 import Sponsors from "@site/src/components/Sponsors";
 import SponsorButtons from "@site/src/components/SponsorButtons";
 import Link from "@docusaurus/Link";
+import styles from "@site/src/css/common.module.css";
+import sponsorStyles from "@site/src/components/TiersPlus/styles.module.css";
+import TierList from "@site/src/components/Tiers";
 
 ## Sponsor Graphile’s Open Source Software
 
-We’re extremely grateful to the following individuals and businesses that help
-to fund ongoing development on PostGraphile through sponsorship. THANK YOU!
+<h3 className={styles.tagline}>
+  We’re extremely grateful to the following individuals and businesses that help
+  to fund ongoing development on PostGraphile through sponsorship. THANK YOU!
+</h3>
 
-<!-- SPONSORS_BEGIN -->
+{/* SPONSORS_BEGIN */}
 
 <Sponsors level="featured">
   <Sponsor
@@ -29,16 +36,103 @@ to fund ongoing development on PostGraphile through sponsorship. THANK YOU!
     business
   />
 </Sponsors>
+<Sponsors level="leaders">
+  <Sponsor name="Robert Claypool" />
+  <Sponsor name="nigelrmtaylor" />
+  <Sponsor
+    name="Principia Mentis"
+    avatar="/images/sponsors/principiamentis.png"
+    business
+  />
+  <Sponsor
+    name="Trigger.dev"
+    avatar="/images/sponsors/triggerdev.png"
+    business
+  />
+  <Sponsor name="Axinom" avatar="/images/sponsors/axinom.png" business />
+  <Sponsor name="Taiste" avatar="/images/sponsors/taiste-sq.svg" business />
+  <Sponsor
+    name="BairesDev"
+    avatar="/images/sponsors/BairesDev.png"
+    href="https://www.bairesdev.com/sponsoring-open-source-projects/"
+    business
+  />
+  <Sponsor
+    name="Two Bit Solutions"
+    avatar="/images/sponsors/two-bits.svg"
+    business
+  />
+  <Sponsor name="Apollo" avatar="/images/sponsors/apollo.png" business />
+  <Sponsor name="Dimply" avatar="/images/sponsors/dimply.svg" business />
+  <Sponsor name="Ndustrial" avatar="/images/sponsors/ndustrial.png" business />
+  <Sponsor name="Cintra" avatar="/images/sponsors/cintra.svg" business />
+  <Sponsor name="Beacon" avatar="/images/sponsors/beaconbio.jpg" business />
+  <Sponsor
+    name="deliver.media"
+    avatar="/images/sponsors/deliverdotmedia.jpg"
+    business
+  />
+  <Sponsor name="Ravio" avatar="/images/sponsors/Ravio.svg" business />
+  <Sponsor name="prodready" />
+  <Sponsor name="Locomote" avatar="/images/sponsors/locomote.svg" />
+</Sponsors>
 <Sponsors level="backers">
+  <Sponsor name="plus 67 more backers..." plain />
   <Sponsor name="plus 84 more backers..." plain />
 </Sponsors>
 
-<!-- SPONSORS_END -->
+{/* SPONSORS_END */}
 
-Graphile has a number of crowd-funded open-source projects, licensed under the
-permissive MIT license, including PostGraphile, Gra<em>fast</em>, Graphile Worker,
-Graphile Migrate and Graphile Starter. Sponsorship increases
-the rate of fixes, documentation improvements, and feature development on these
-and other projects.
+## Sponsor tiers &amp; benefits
+
+<TierList />
+
+{
+
+<div className={sponsorStyles.tiers}>
+  <div className={sponsorStyles.tierRow}>
+    <div className={clsx(sponsorStyles.tierSupport, sponsorStyles.featured)}>
+      <div className={sponsorStyles.banner}>
+        <div className={sponsorStyles.info}>
+          <div className={sponsorStyles.title}>Development Support</div>
+          <div className={sponsorStyles.pricelineSupport}>
+            <span className={sponsorStyles.note}>From</span>&nbsp;
+            <span className={sponsorStyles.price}>$899</span>
+            <span className={sponsorStyles.note}>/mo</span>
+          </div>
+        </div>
+        <Link
+          className={clsx(
+            "button button--primary button--lg",
+            sponsorStyles.button,
+          )}
+          to="/support"
+        >
+          Find out more
+        </Link>
+      </div>
+    </div>
+  </div>
+</div>
+}
+
+As well as ensuring the sustainability and longevity of PostGraphile and the
+wider Graphile suite of developer tooling, sponsorship also gives you or your
+company some additional benefits such as access to security announcements and being
+featured in the README files of Graphile’s main open source projects. Choose the tier
+which matches your funding goal, higher tiers come with more benefits.
+
+## Why are Graphile projects &ldquo;crowd-funded open-source&rdquo;?
+
+Many of our projects are open-source under the permissive MIT license to give users great freedom in how they use
+the software, and to enable the community to have influence over how the projects
+progress to make it appropriate for a wide range of use-cases. To ensure users can
+rely on these projects for years to come, they need to be well directed and
+financially sustainable.
+
+**The best way to ensure that Graphile software is something you can depend on for
+years to come is through monthly sponsorship.** Crowd-sourced funding enables us to
+spend the most time directly working on improving the software, which you and other
+users then benefit from.
 
 <SponsorButtons></SponsorButtons>

@@ -3,7 +3,26 @@ import styles from "@site/src/components/Sponsor/styles.module.css";
 import clsx from "clsx";
 import React, { useContext } from "react";
 
+import FallbackAvatar from "@site/static/img/avatar.svg";
 import { SponsorContext } from "../../contexts/sponsor";
+
+function Avatar({ src }) {
+  return src ? (
+    <img className={styles.avatar} src={src} />
+  ) : (
+    <FallbackAvatar className={styles.avatar} />
+  );
+}
+
+function LinkTo({ href, name }) {
+  return href ? (
+    <Link className={styles.name} to={href}>
+      {name}
+    </Link>
+  ) : (
+    <div className={styles.name}>{name}</div>
+  );
+}
 
 export default function Sponsor({
   name,
@@ -15,6 +34,7 @@ export default function Sponsor({
 }) {
   const level = useContext(SponsorContext);
   const showAvatar = level === "featured" || level === "leaders";
+
   return (
     <div
       className={clsx(
@@ -27,18 +47,10 @@ export default function Sponsor({
       )}
     >
       {showAvatar ? (
-        <img
-          className={styles.avatar}
-          src={"https://www.graphile.org" + avatar}
-        />
+        <Avatar src={avatar ? "https://www.graphile.org" + avatar : null} />
       ) : null}
 
-      <Link
-        className={styles.name}
-        to={href ?? "https://www.graphile.org/sponsor"}
-      >
-        {name}
-      </Link>
+      <LinkTo href={href} name={name} />
     </div>
   );
 }

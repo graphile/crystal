@@ -8,17 +8,18 @@
 .borderbutton {
   composes: comicFont from from "@site/src/css/common.module.css";
   font-size: 1.5rem;
-  color: var(--grafast-color-pink);
+  color: white;
   max-width: 100%;
   margin-left: 1rem;
   border: 1px solid var(--grafast-color-pink);
   border-radius: 7px;
+  background-color: var(--grafast-color-pink);
 }
 
 .borderbutton:hover {
-  border-radius: 7px;
-  border: 1px solid var(--grafast-color-purple);
-  color: var(--grafast-color-purple);
+  color: white;
+  background-color: var(--ifm-color-primary-darkest);
+  border: 1px solid var(--ifm-color-primary-darkest);
 }
 
 .sponsorbutton {
@@ -31,11 +32,11 @@
 }
 
 .sponsorbutton:before {
-  content: "Sponsor Graphile";
+  content: "Start Monthly Plan";
 }
 
 .borderbutton:before {
-  content: "Find out more on Graphile.org";
+  content: "Contact Graphile";
 }
 
 .sponsorbutton:hover {
@@ -69,12 +70,6 @@
     margin-left: 0rem;
   }
   .borderbutton:before {
-    content: "Graphile.org";
-  }
-}
-
-@media screen and (max-width: 400px) {
-  .sponsorbutton:before {
-    content: "Sponsor";
+    content: "Contact";
   }
 }

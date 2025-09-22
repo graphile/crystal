@@ -1,0 +1,161 @@
+.tiers {
+  composes: wide from global;
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.tierRow {
+  justify-content: center;
+  gap: 2rem;
+  display: flex;
+}
+
+.tier {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 30%;
+  justify-content: flex-start;
+  align-items: flex-start;
+  font-weight: normal;
+  font-size: 0.9rem;
+  padding: 1rem;
+  border: 2px solid var(--grafast-color-purple);
+  border-radius: 12px;
+}
+
+[data-theme="dark"] .tier {
+  border: 2px solid var(--ifm-color-primary);
+}
+
+.tier:nth-child(2) {
+  border: 3px solid var(--grafast-color-pink);
+}
+
+.tier ul a {
+  color: var(--grafast-color-purple);
+}
+
+.tier:nth-child(2) ul a {
+  color: var(--grafast-color-pink);
+}
+
+[data-theme="dark"] .tier ul a {
+  color: var(--ifm-color-primary);
+}
+
+[data-theme="dark"] .tier:nth-child(2) ul a {
+  color: var(--grafast-color-pink);
+}
+
+.banner {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  > * {
+    text-align: center;
+  }
+}
+
+.title {
+  composes: comicFont from "@site/src/css/common.module.css";
+  color: var(--grafast-color-purple);
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.note {
+  composes: comicFont from "@site/src/css/common.module.css";
+  font-size: 1rem;
+  color: var(--grafast-color-purple);
+  font-weight: var(--ifm-font-weight-base);
+}
+
+[data-theme="dark"] .title,
+[data-theme="dark"] .note {
+  color: var(--ifm-color-primary);
+}
+
+.tier:nth-child(2) .title,
+.tier:nth-child(2) .note {
+  color: var(--grafast-color-pink);
+}
+
+.tagline {
+  composes: comicFont from "@site/src/css/common.module.css";
+  font-weight: var(--ifm-heading-font-weight);
+}
+
+.priceline {
+  composes: comicFont from "@site/src/css/common.module.css";
+  font-weight: var(--ifm-heading-font-weight);
+  font-size: 2rem;
+}
+
+.price {
+  font-weight: bold;
+}
+
+.button {
+  composes: comicFont from "@site/src/css/common.module.css";
+  width: 100%;
+  margin: 1rem 0 1rem 0;
+}
+
+.tier .button {
+  background-color: var(--grafast-color-purple);
+  border-color: var(--grafast-color-purple);
+}
+
+.tier .button:hover {
+  background-color: var(--ifm-color-primary-darkest);
+  border-color: var(--ifm-color-primary-darkest);
+}
+
+[data-theme="dark"] .tier .button {
+  background-color: var(--ifm-color-primary);
+  border-color: var(--ifm-color-primary);
+}
+
+[data-theme="dark"] .tier .button:hover {
+  border: 1px solid var(--ifm-color-primary-lightest);
+  background-color: var(--ifm-color-primary-lightest);
+}
+
+.tier:nth-child(2) .button {
+  background-color: var(--grafast-color-pink);
+  border-color: var(--grafast-color-pink);
+}
+
+.tier:nth-child(2) .button:hover {
+  background-color: var(--ifm-color-primary-darkest);
+  border-color: var(--ifm-color-primary-darkest);
+}
+
+[data-theme="dark"] .tier:nth-child(2) .button:hover {
+  border: 1px solid var(--ifm-color-primary-lightest);
+  background-color: var(--ifm-color-primary-lightest);
+}
+
+.button:before {
+  content: "Join on GitHub Sponsors";
+}
+
+@media screen and (max-width: 1200px) {
+  .tierRow {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .tier {
+    flex: 0 0 auto;
+    font-size: 1rem;
+    margin: 0;
+  }
+  .button:before {
+    content: "GitHub Sponsors";
+  }
+}
