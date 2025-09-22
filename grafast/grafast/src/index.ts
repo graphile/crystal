@@ -290,7 +290,11 @@ import {
   stepAShouldTryAndInlineIntoStepB,
   stepsAreInSamePhase,
 } from "./utils.js";
-
+export {
+  GraphQLDeferDirective,
+  graphqlHasStreamDefer,
+  GraphQLStreamDirective,
+} from "./incremental.js";
 export { isAsyncIterable } from "iterall";
 export {
   __FlagStep,

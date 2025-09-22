@@ -41,6 +41,9 @@ import {
   filter,
   get,
   getNullableInputTypeAtPath,
+  GraphQLDeferDirective,
+  graphqlHasStreamDefer,
+  GraphQLStreamDirective,
   groupBy,
   inhibitOnNull,
   lambda,
@@ -5364,7 +5367,9 @@ export function makeExampleSchema(
       },
     },
     // @ts-ignore
-    enableDeferStream: true,
+    ...(graphqlHasStreamDefer
+      ? { enableDeferStream: true }
+      : { directives: [GraphQLStreamDirective, GraphQLDeferDirective] }),
   });
 }
 

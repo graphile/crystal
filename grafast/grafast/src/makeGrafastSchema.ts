@@ -2,7 +2,11 @@ import type { GraphQLFieldExtensions, GraphQLFieldResolver } from "graphql";
 import { GraphQLSchema } from "graphql";
 import * as graphql from "graphql";
 
-import { deferDefinition, streamDefinition } from "./incremental.js";
+import {
+  deferDefinition,
+  graphqlHasStreamDefer,
+  streamDefinition,
+} from "./incremental.js";
 import type {
   AbstractTypePlanner,
   ArgumentApplyPlanResolver,
@@ -26,10 +30,6 @@ const {
   isUnionType,
   parse,
 } = graphql;
-
-const graphqlHasStreamDefer =
-  (graphql as any).GraphQLStreamDirective &&
-  (graphql as any).GraphQLDeferDirective;
 
 export interface ObjectFieldConfig<
   TSource extends Step = Step,

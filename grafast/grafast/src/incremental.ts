@@ -3,6 +3,7 @@ import type {
   DefinitionNode,
   FloatValueNode,
   GraphQLArgument,
+  GraphQLDirective,
   GraphQLType,
   InputValueDefinitionNode,
   IntValueNode,
@@ -11,16 +12,21 @@ import type {
   StringValueNode,
   TypeNode,
 } from "graphql";
-import {
+import * as graphql from "graphql";
+
+const {
   DirectiveLocation,
   GraphQLBoolean,
-  GraphQLDirective,
   GraphQLInt,
   GraphQLList,
   GraphQLNonNull,
   GraphQLString,
   Kind,
-} from "graphql";
+} = graphql;
+
+export const graphqlHasStreamDefer =
+  (graphql as any).GraphQLStreamDirective &&
+  (graphql as any).GraphQLDeferDirective;
 
 // This file contains the Stream/Defer directives, to be used when GraphQL itself doesn't provide them.
 
@@ -53,25 +59,27 @@ SOFTWARE.
 /**
  * Used to conditionally defer fragments.
  */
-export const GraphQLDeferDirective = new GraphQLDirective({
-  name: "defer",
-  description:
-    "Directs the executor to defer this fragment when the `if` argument is true or undefined.",
-  locations: [
-    DirectiveLocation.FRAGMENT_SPREAD,
-    DirectiveLocation.INLINE_FRAGMENT,
-  ],
-  args: {
-    if: {
-      type: GraphQLBoolean,
-      description: "Deferred when true or undefined.",
+export const GraphQLDeferDirective =
+  ((graphql as any).GraphQLDeferDirective as undefined) ||
+  new graphql.GraphQLDirective({
+    name: "defer",
+    description:
+      "Directs the executor to defer this fragment when the `if` argument is true or undefined.",
+    locations: [
+      DirectiveLocation.FRAGMENT_SPREAD,
+      DirectiveLocation.INLINE_FRAGMENT,
+    ],
+    args: {
+      if: {
+        type: GraphQLBoolean,
+        description: "Deferred when true or undefined.",
+      },
+      label: {
+        type: GraphQLString,
+        description: "Unique name",
+      },
     },
-    label: {
-      type: GraphQLString,
-      description: "Unique name",
-    },
-  },
-});
+  });
 export const deferDefinition: DefinitionNode = toDirectiveDef(
   GraphQLDeferDirective,
 );
@@ -79,27 +87,29 @@ export const deferDefinition: DefinitionNode = toDirectiveDef(
 /**
  * Used to conditionally stream list fields.
  */
-export const GraphQLStreamDirective = new GraphQLDirective({
-  name: "stream",
-  description:
-    "Directs the executor to stream plural fields when the `if` argument is true or undefined.",
-  locations: [DirectiveLocation.FIELD],
-  args: {
-    if: {
-      type: GraphQLBoolean,
-      description: "Stream when true or undefined.",
+export const GraphQLStreamDirective =
+  ((graphql as any).GraphQLStreamDirective as undefined) ||
+  new graphql.GraphQLDirective({
+    name: "stream",
+    description:
+      "Directs the executor to stream plural fields when the `if` argument is true or undefined.",
+    locations: [DirectiveLocation.FIELD],
+    args: {
+      if: {
+        type: GraphQLBoolean,
+        description: "Stream when true or undefined.",
+      },
+      label: {
+        type: GraphQLString,
+        description: "Unique name",
+      },
+      initialCount: {
+        defaultValue: 0,
+        type: GraphQLInt,
+        description: "Number of items to return immediately",
+      },
     },
-    label: {
-      type: GraphQLString,
-      description: "Unique name",
-    },
-    initialCount: {
-      defaultValue: 0,
-      type: GraphQLInt,
-      description: "Number of items to return immediately",
-    },
-  },
-});
+  });
 export const streamDefinition: DefinitionNode = toDirectiveDef(
   GraphQLStreamDirective,
 );
