@@ -1085,6 +1085,12 @@ declare module "graphql" {
 }
 
 declare module "graphql/execution/execute" {
+  interface ExecutionResult<
+    TData = ObjMap<unknown>,
+    TExtensions = ObjMap<unknown>,
+  > {
+    hasNext?: never;
+  }
   interface ExecutionPatchResult<
     TData = ObjMap<unknown> | unknown,
     TExtensions = ObjMap<unknown>,
