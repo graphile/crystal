@@ -966,7 +966,7 @@ export function executeBucket(
       ) {
         indexFlags |= FLAG_POLY_SKIPPED;
         forceIndexValue = null;
-      } else if (extra._bucket.flagUnion !== 0) {
+      } else if (extra._bucket.flagUnion !== NO_FLAGS) {
         for (let i = 0; i < dependenciesIncludingSideEffectsCount; i++) {
           const depExecutionVal = dependenciesIncludingSideEffects[i];
           const forbiddenFlags = dependencyForbiddenFlags[i];
@@ -1550,7 +1550,7 @@ export function newBucket(
           `GrafastInternalError<9465db89-cc9d-415c-97e7-57bb19ddebe0>: attempt to write to out of bounds index ${index} for bucket of size ${size} for step ${step}`,
         );
       }
-      if (flags !== 0) {
+      if (flags !== NO_FLAGS) {
         this.flagUnion |= flags;
       }
       if (step._isUnary) {
