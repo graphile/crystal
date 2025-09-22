@@ -263,16 +263,17 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
             definitions: typeDefs.flatMap((t) => t.definitions),
           }
         : typeDefs;
-  const document: graphql.DocumentNode = graphqlHasStreamDefer || !enableDeferStream
-    ? baseDocument
-    : {
-        ...baseDocument,
-        definitions: [
-          ...baseDocument.definitions,
-          deferDefinition,
-          streamDefinition,
-        ],
-      };
+  const document: graphql.DocumentNode =
+    graphqlHasStreamDefer || !enableDeferStream
+      ? baseDocument
+      : {
+          ...baseDocument,
+          definitions: [
+            ...baseDocument.definitions,
+            deferDefinition,
+            streamDefinition,
+          ],
+        };
   if (!document || document.kind !== "Document") {
     throw new Error(
       "The first argument to makeGrafastSchema must be an object containing a `typeDefs` field; the value for this field should be a parsed GraphQL document, array of these, or a string.",
