@@ -2,11 +2,7 @@ import type { Readable } from "node:stream";
 
 import type { execute, GrafastExecutionArgs, subscribe } from "grafast";
 import { hookArgs, SafeError, stripAnsi } from "grafast";
-import type {
-  ExecutionArgs,
-  FormattedExecutionPatchResult,
-  FormattedExecutionResult,
-} from "grafast/graphql";
+import type { ExecutionArgs, FormattedExecutionResult } from "grafast/graphql";
 import * as graphql from "grafast/graphql";
 import type {
   OperationResult,
@@ -40,6 +36,27 @@ export const sleep = (ms: number) => {
     },
   };
 };
+
+interface ObjMap<T> {
+  [key: string]: T;
+}
+
+/**
+ * `FormattedExecutionPatchResult` type definition copied from
+ * {@url https://github.com/graphql/graphql-js/blob/v16.1.0-experimental-stream-defer.6/src/execution/execute.ts#L177-L187};
+ * MIT license, copyright GraphQL Contributors
+ */
+interface FormattedExecutionPatchResult<
+  TData = ObjMap<unknown> | unknown,
+  TExtensions = ObjMap<unknown>,
+> {
+  errors?: ReadonlyArray<graphql.GraphQLFormattedError>;
+  data?: TData | null;
+  path?: ReadonlyArray<string | number>;
+  label?: string;
+  hasNext: boolean;
+  extensions?: TExtensions;
+}
 
 // TODO: remove this ANSI-removal hack!
 export function handleErrors(
