@@ -1044,18 +1044,18 @@ function getPartitionParentMode(
 function partitionMode(
   resource: PgResource<any, any, any, any, any>,
 ): PartitionExpose | null {
-  const partitionTag = resource.extensions?.tags?.partition;
+  const partitionTag = resource.extensions?.tags?.partitionExpose;
   if (typeof partitionTag === "string") {
     if (PARTITION_EXPOSE_OPTIONS.includes(partitionTag as PartitionExpose)) {
       return partitionTag as PartitionExpose;
     } else {
       throw new Error(
-        `"@partition ${partitionTag}" on resource '${resource.name}' not understood; must be one of: '${PARTITION_EXPOSE_OPTIONS.join("', '")}'`,
+        `"@partitionExpose ${partitionTag}" on resource '${resource.name}' not understood; must be one of: '${PARTITION_EXPOSE_OPTIONS.join("', '")}'`,
       );
     }
   } else if (partitionTag != null) {
     throw new Error(
-      `@partition on resource '${resource.name}' not understood; must be one of: '${PARTITION_EXPOSE_OPTIONS.join("', '")}'`,
+      `@partitionExpose on resource '${resource.name}' not understood; must be one of: '${PARTITION_EXPOSE_OPTIONS.join("', '")}'`,
     );
   } else {
     return null;

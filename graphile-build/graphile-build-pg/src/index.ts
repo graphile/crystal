@@ -64,6 +64,9 @@ declare global {
 
       /** For enum tables; we shouldn't expose these through GraphQL */
       enum: string | true;
+
+      /** For partitioned tables */
+      partitionExpose: PartitionExpose;
     }
 
     interface PgResourceUniqueTags extends PgSmartTagsDict {
