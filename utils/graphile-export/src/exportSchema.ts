@@ -43,6 +43,7 @@ import {
   isNamedType,
   isSchema,
   printSchema,
+  specifiedDirectives,
 } from "grafast/graphql";
 import type { GraphQLSchemaNormalizedConfig } from "graphql/type/schema";
 import type { PgSQL, SQL } from "pg-sql2";
@@ -2030,6 +2031,8 @@ function exportSchemaTypeDefs({
   );
 }
 
+const specifiedDirectiveNames = specifiedDirectives.map((d) => d.name);
+
 export async function exportSchemaAsString(
   schema: GraphQLSchema,
   options: ExportOptions,
@@ -2038,21 +2041,10 @@ export async function exportSchemaAsString(
 
   const customTypes = config.types.filter((type) => !isBuiltinType(type));
   const customDirectives = config.directives.filter(
-    (d) =>
-      ![
-        "skip",
-        "include",
-        "deprecated",
-        "specifiedBy",
-        "defer",
-        "stream",
-      ].includes(d.name),
+    (d) => !specifiedDirectiveNames.includes(d.name),
   );
 
-  if (
-    process.env.ENABLE_DEFER_STREAM === "1" ||
-    config.directives.some((d) => d.name === "defer" || d.name === "skip")
-  ) {
+  if (config.directives.some((d) => d.name === "defer" || d.name === "skip")) {
     // Ref: https://github.com/graphql/graphql-js/pull/3450
     // @ts-ignore
     config.enableDeferStream = true;
