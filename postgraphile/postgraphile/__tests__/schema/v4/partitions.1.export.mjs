@@ -680,7 +680,8 @@ const tagsCodec = recordCodec({
       name: "tags"
     },
     tags: {
-      __proto__: null
+      __proto__: null,
+      partitionExpose: "child"
     }
   },
   executor: executor
@@ -879,23 +880,22 @@ const registryConfig_pgResources_measurements_measurements = {
     tags: {}
   }
 };
-const tagsUniques = [{
-  isPrimary: true,
-  attributes: ["entity_kind", "entity_id", "tag"],
-  description: undefined,
-  extensions: {
-    tags: {
-      __proto__: null
-    }
-  }
-}];
 const registryConfig_pgResources_tags_tags = {
   executor: executor,
   name: "tags",
   identifier: "main.partitions.tags",
   from: tagsIdentifier,
   codec: tagsCodec,
-  uniques: tagsUniques,
+  uniques: [{
+    isPrimary: true,
+    attributes: ["entity_kind", "entity_id", "tag"],
+    description: undefined,
+    extensions: {
+      tags: {
+        __proto__: null
+      }
+    }
+  }],
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -909,7 +909,9 @@ const registryConfig_pgResources_tags_tags = {
     isUpdatable: true,
     isDeletable: true,
     hasPartitions: true,
-    tags: {}
+    tags: {
+      partitionExpose: "child"
+    }
   }
 };
 const registryConfig_pgResources_measurements_y2022_measurements_y2022 = {
@@ -1017,22 +1019,23 @@ const registryConfig_pgResources_measurements_y2024_measurements_y2024 = {
     tags: {}
   }
 };
+const location_tagsUniques = [{
+  isPrimary: true,
+  attributes: ["entity_kind", "entity_id", "tag"],
+  description: undefined,
+  extensions: {
+    tags: {
+      __proto__: null
+    }
+  }
+}];
 const registryConfig_pgResources_location_tags_location_tags = {
   executor: executor,
   name: "location_tags",
   identifier: "main.partitions.location_tags",
   from: locationTagsIdentifier,
   codec: locationTagsCodec,
-  uniques: [{
-    isPrimary: true,
-    attributes: ["entity_kind", "entity_id", "tag"],
-    description: undefined,
-    extensions: {
-      tags: {
-        __proto__: null
-      }
-    }
-  }],
+  uniques: location_tagsUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -1052,22 +1055,23 @@ const registryConfig_pgResources_location_tags_location_tags = {
     tags: {}
   }
 };
+const photo_tagsUniques = [{
+  isPrimary: true,
+  attributes: ["entity_kind", "entity_id", "tag"],
+  description: undefined,
+  extensions: {
+    tags: {
+      __proto__: null
+    }
+  }
+}];
 const registryConfig_pgResources_photo_tags_photo_tags = {
   executor: executor,
   name: "photo_tags",
   identifier: "main.partitions.photo_tags",
   from: photoTagsIdentifier,
   codec: photoTagsCodec,
-  uniques: [{
-    isPrimary: true,
-    attributes: ["entity_kind", "entity_id", "tag"],
-    description: undefined,
-    extensions: {
-      tags: {
-        __proto__: null
-      }
-    }
-  }],
+  uniques: photo_tagsUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -1087,22 +1091,23 @@ const registryConfig_pgResources_photo_tags_photo_tags = {
     tags: {}
   }
 };
+const profile_tagsUniques = [{
+  isPrimary: true,
+  attributes: ["entity_kind", "entity_id", "tag"],
+  description: undefined,
+  extensions: {
+    tags: {
+      __proto__: null
+    }
+  }
+}];
 const registryConfig_pgResources_profile_tags_profile_tags = {
   executor: executor,
   name: "profile_tags",
   identifier: "main.partitions.profile_tags",
   from: profileTagsIdentifier,
   codec: profileTagsCodec,
-  uniques: [{
-    isPrimary: true,
-    attributes: ["entity_kind", "entity_id", "tag"],
-    description: undefined,
-    extensions: {
-      tags: {
-        __proto__: null
-      }
-    }
-  }],
+  uniques: profile_tagsUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -1840,7 +1845,9 @@ const resource_photosPgResource = registry.pgResources["photos"];
 const resource_profilesPgResource = registry.pgResources["profiles"];
 const resource_usersPgResource = registry.pgResources["users"];
 const resource_measurementsPgResource = registry.pgResources["measurements"];
-const resource_tagsPgResource = registry.pgResources["tags"];
+const resource_location_tagsPgResource = registry.pgResources["location_tags"];
+const resource_photo_tagsPgResource = registry.pgResources["photo_tags"];
+const resource_profile_tagsPgResource = registry.pgResources["profile_tags"];
 const nodeIdHandler_Location = {
   typeName: "Location",
   codec: nodeIdCodecs_base64JSON_base64JSON,
@@ -1997,12 +2004,12 @@ const nodeFetcher_Measurement = $nodeId => {
   const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Measurement));
   return nodeIdHandler_Measurement.get(nodeIdHandler_Measurement.getSpec($decoded));
 };
-const nodeIdHandler_Tag = {
-  typeName: "Tag",
+const nodeIdHandler_LocationTag = {
+  typeName: "LocationTag",
   codec: nodeIdCodecs_base64JSON_base64JSON,
   deprecationReason: undefined,
   plan($record) {
-    return list([constant("tags", false), $record.get("entity_kind"), $record.get("entity_id"), $record.get("tag")]);
+    return list([constant("location_tags", false), $record.get("entity_kind"), $record.get("entity_id"), $record.get("tag")]);
   },
   getSpec($list) {
     return {
@@ -2015,15 +2022,71 @@ const nodeIdHandler_Tag = {
     return value.slice(1);
   },
   get(spec) {
-    return resource_tagsPgResource.get(spec);
+    return resource_location_tagsPgResource.get(spec);
   },
   match(obj) {
-    return obj[0] === "tags";
+    return obj[0] === "location_tags";
   }
 };
-const nodeFetcher_Tag = $nodeId => {
-  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_Tag));
-  return nodeIdHandler_Tag.get(nodeIdHandler_Tag.getSpec($decoded));
+const nodeFetcher_LocationTag = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_LocationTag));
+  return nodeIdHandler_LocationTag.get(nodeIdHandler_LocationTag.getSpec($decoded));
+};
+const nodeIdHandler_PhotoTag = {
+  typeName: "PhotoTag",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("photo_tags", false), $record.get("entity_kind"), $record.get("entity_id"), $record.get("tag")]);
+  },
+  getSpec($list) {
+    return {
+      entity_kind: inhibitOnNull(access($list, [1])),
+      entity_id: inhibitOnNull(access($list, [2])),
+      tag: inhibitOnNull(access($list, [3]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_photo_tagsPgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "photo_tags";
+  }
+};
+const nodeFetcher_PhotoTag = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_PhotoTag));
+  return nodeIdHandler_PhotoTag.get(nodeIdHandler_PhotoTag.getSpec($decoded));
+};
+const nodeIdHandler_ProfileTag = {
+  typeName: "ProfileTag",
+  codec: nodeIdCodecs_base64JSON_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("profile_tags", false), $record.get("entity_kind"), $record.get("entity_id"), $record.get("tag")]);
+  },
+  getSpec($list) {
+    return {
+      entity_kind: inhibitOnNull(access($list, [1])),
+      entity_id: inhibitOnNull(access($list, [2])),
+      tag: inhibitOnNull(access($list, [3]))
+    };
+  },
+  getIdentifiers(value) {
+    return value.slice(1);
+  },
+  get(spec) {
+    return resource_profile_tagsPgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "profile_tags";
+  }
+};
+const nodeFetcher_ProfileTag = $nodeId => {
+  const $decoded = lambda($nodeId, specForHandler(nodeIdHandler_ProfileTag));
+  return nodeIdHandler_ProfileTag.get(nodeIdHandler_ProfileTag.getSpec($decoded));
 };
 function qbWhereBuilder(qb) {
   return qb.whereBuilder();
@@ -2036,7 +2099,9 @@ const nodeIdHandlerByTypeName = {
   Profile: nodeIdHandler_Profile,
   User: nodeIdHandler_User,
   Measurement: nodeIdHandler_Measurement,
-  Tag: nodeIdHandler_Tag
+  LocationTag: nodeIdHandler_LocationTag,
+  PhotoTag: nodeIdHandler_PhotoTag,
+  ProfileTag: nodeIdHandler_ProfileTag
 };
 const decodeNodeId = makeDecodeNodeId(Object.values(nodeIdHandlerByTypeName));
 function findTypeNameMatch(specifier) {
@@ -2078,9 +2143,17 @@ const specFromArgs_Measurement = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_Measurement, $nodeId);
 };
-const specFromArgs_Tag = args => {
+const specFromArgs_LocationTag = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Tag, $nodeId);
+  return specFromNodeId(nodeIdHandler_LocationTag, $nodeId);
+};
+const specFromArgs_PhotoTag = args => {
+  const $nodeId = args.getRaw(["input", "nodeId"]);
+  return specFromNodeId(nodeIdHandler_PhotoTag, $nodeId);
+};
+const specFromArgs_ProfileTag = args => {
+  const $nodeId = args.getRaw(["input", "nodeId"]);
+  return specFromNodeId(nodeIdHandler_ProfileTag, $nodeId);
 };
 const specFromArgs_Location2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
@@ -2102,9 +2175,17 @@ const specFromArgs_Measurement2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandler_Measurement, $nodeId);
 };
-const specFromArgs_Tag2 = args => {
+const specFromArgs_LocationTag2 = args => {
   const $nodeId = args.getRaw(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandler_Tag, $nodeId);
+  return specFromNodeId(nodeIdHandler_LocationTag, $nodeId);
+};
+const specFromArgs_PhotoTag2 = args => {
+  const $nodeId = args.getRaw(["input", "nodeId"]);
+  return specFromNodeId(nodeIdHandler_PhotoTag, $nodeId);
+};
+const specFromArgs_ProfileTag2 = args => {
+  const $nodeId = args.getRaw(["input", "nodeId"]);
+  return specFromNodeId(nodeIdHandler_ProfileTag, $nodeId);
 };
 const getPgSelectSingleFromMutationResult = (resource, pkAttributes, $mutation) => {
   const $result = $mutation.getStepForKey("result", true);
@@ -2160,8 +2241,14 @@ type Query implements Node {
   """Get a single \`Measurement\`."""
   measurementByTimestampAndKey(timestamp: Datetime!, key: String!): Measurement
 
-  """Get a single \`Tag\`."""
-  tagByEntityKindAndEntityIdAndTag(entityKind: EntityKinds!, entityId: UUID!, tag: String!): Tag
+  """Get a single \`LocationTag\`."""
+  locationTagByEntityKindAndEntityIdAndTag(entityKind: EntityKinds!, entityId: UUID!, tag: String!): LocationTag
+
+  """Get a single \`PhotoTag\`."""
+  photoTagByEntityKindAndEntityIdAndTag(entityKind: EntityKinds!, entityId: UUID!, tag: String!): PhotoTag
+
+  """Get a single \`ProfileTag\`."""
+  profileTagByEntityKindAndEntityIdAndTag(entityKind: EntityKinds!, entityId: UUID!, tag: String!): ProfileTag
 
   """Reads a single \`Location\` using its globally unique \`ID\`."""
   location(
@@ -2195,11 +2282,27 @@ type Query implements Node {
     nodeId: ID!
   ): Measurement
 
-  """Reads a single \`Tag\` using its globally unique \`ID\`."""
-  tag(
-    """The globally unique \`ID\` to be used in selecting a single \`Tag\`."""
+  """Reads a single \`LocationTag\` using its globally unique \`ID\`."""
+  locationTag(
+    """
+    The globally unique \`ID\` to be used in selecting a single \`LocationTag\`.
+    """
     nodeId: ID!
-  ): Tag
+  ): LocationTag
+
+  """Reads a single \`PhotoTag\` using its globally unique \`ID\`."""
+  photoTag(
+    """The globally unique \`ID\` to be used in selecting a single \`PhotoTag\`."""
+    nodeId: ID!
+  ): PhotoTag
+
+  """Reads a single \`ProfileTag\` using its globally unique \`ID\`."""
+  profileTag(
+    """
+    The globally unique \`ID\` to be used in selecting a single \`ProfileTag\`.
+    """
+    nodeId: ID!
+  ): ProfileTag
 
   """Reads and enables pagination through a set of \`Location\`."""
   allLocations(
@@ -2346,8 +2449,8 @@ type Query implements Node {
     orderBy: [MeasurementsOrderBy!] = [PRIMARY_KEY_ASC]
   ): MeasurementsConnection
 
-  """Reads and enables pagination through a set of \`Tag\`."""
-  allTags(
+  """Reads and enables pagination through a set of \`LocationTag\`."""
+  allLocationTags(
     """Only read the first \`n\` values of the set."""
     first: Int
 
@@ -2369,11 +2472,69 @@ type Query implements Node {
     """
     A condition to be used in determining which values should be returned by the collection.
     """
-    condition: TagCondition
+    condition: LocationTagCondition
 
-    """The method to use when ordering \`Tag\`."""
-    orderBy: [TagsOrderBy!] = [PRIMARY_KEY_ASC]
-  ): TagsConnection
+    """The method to use when ordering \`LocationTag\`."""
+    orderBy: [LocationTagsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): LocationTagsConnection
+
+  """Reads and enables pagination through a set of \`PhotoTag\`."""
+  allPhotoTags(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PhotoTagCondition
+
+    """The method to use when ordering \`PhotoTag\`."""
+    orderBy: [PhotoTagsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PhotoTagsConnection
+
+  """Reads and enables pagination through a set of \`ProfileTag\`."""
+  allProfileTags(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ProfileTagCondition
+
+    """The method to use when ordering \`ProfileTag\`."""
+    orderBy: [ProfileTagsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ProfileTagsConnection
 }
 
 """An object with a globally unique \`ID\`."""
@@ -2390,6 +2551,35 @@ type Location implements Node {
   """
   nodeId: ID!
   id: UUID!
+
+  """Reads and enables pagination through a set of \`LocationTag\`."""
+  locationTagsByEntityId(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: LocationTagCondition
+
+    """The method to use when ordering \`LocationTag\`."""
+    orderBy: [LocationTagsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): LocationTagsConnection!
 }
 
 """
@@ -2397,12 +2587,199 @@ A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/
 """
 scalar UUID
 
+"""A connection to a list of \`LocationTag\` values."""
+type LocationTagsConnection {
+  """A list of \`LocationTag\` objects."""
+  nodes: [LocationTag]!
+
+  """
+  A list of edges which contains the \`LocationTag\` and cursor to aid in pagination.
+  """
+  edges: [LocationTagsEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`LocationTag\` you could get from the connection."""
+  totalCount: Int!
+}
+
+type LocationTag implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  entityKind: EntityKinds!
+  entityId: UUID!
+  tag: String!
+
+  """Reads a single \`Location\` that is related to this \`LocationTag\`."""
+  locationByEntityId: Location
+}
+
+enum EntityKinds {
+  PHOTOS
+  LOCATIONS
+  PROFILES
+}
+
+"""A \`LocationTag\` edge in the connection."""
+type LocationTagsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`LocationTag\` at the end of the edge."""
+  node: LocationTag
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+}
+
+"""
+A condition to be used against \`LocationTag\` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input LocationTagCondition {
+  """Checks for equality with the object’s \`entityKind\` field."""
+  entityKind: EntityKinds
+
+  """Checks for equality with the object’s \`entityId\` field."""
+  entityId: UUID
+
+  """Checks for equality with the object’s \`tag\` field."""
+  tag: String
+}
+
+"""Methods to use when ordering \`LocationTag\`."""
+enum LocationTagsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ENTITY_KIND_ASC
+  ENTITY_KIND_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+  TAG_ASC
+  TAG_DESC
+}
+
 type Photo implements Node {
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
   nodeId: ID!
   id: UUID!
+
+  """Reads and enables pagination through a set of \`PhotoTag\`."""
+  photoTagsByEntityId(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PhotoTagCondition
+
+    """The method to use when ordering \`PhotoTag\`."""
+    orderBy: [PhotoTagsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PhotoTagsConnection!
+}
+
+"""A connection to a list of \`PhotoTag\` values."""
+type PhotoTagsConnection {
+  """A list of \`PhotoTag\` objects."""
+  nodes: [PhotoTag]!
+
+  """
+  A list of edges which contains the \`PhotoTag\` and cursor to aid in pagination.
+  """
+  edges: [PhotoTagsEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`PhotoTag\` you could get from the connection."""
+  totalCount: Int!
+}
+
+type PhotoTag implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  entityKind: EntityKinds!
+  entityId: UUID!
+  tag: String!
+
+  """Reads a single \`Photo\` that is related to this \`PhotoTag\`."""
+  photoByEntityId: Photo
+}
+
+"""A \`PhotoTag\` edge in the connection."""
+type PhotoTagsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`PhotoTag\` at the end of the edge."""
+  node: PhotoTag
+}
+
+"""
+A condition to be used against \`PhotoTag\` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input PhotoTagCondition {
+  """Checks for equality with the object’s \`entityKind\` field."""
+  entityKind: EntityKinds
+
+  """Checks for equality with the object’s \`entityId\` field."""
+  entityId: UUID
+
+  """Checks for equality with the object’s \`tag\` field."""
+  tag: String
+}
+
+"""Methods to use when ordering \`PhotoTag\`."""
+enum PhotoTagsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ENTITY_KIND_ASC
+  ENTITY_KIND_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+  TAG_ASC
+  TAG_DESC
 }
 
 type Profile implements Node {
@@ -2411,6 +2788,102 @@ type Profile implements Node {
   """
   nodeId: ID!
   id: UUID!
+
+  """Reads and enables pagination through a set of \`ProfileTag\`."""
+  profileTagsByEntityId(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ProfileTagCondition
+
+    """The method to use when ordering \`ProfileTag\`."""
+    orderBy: [ProfileTagsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ProfileTagsConnection!
+}
+
+"""A connection to a list of \`ProfileTag\` values."""
+type ProfileTagsConnection {
+  """A list of \`ProfileTag\` objects."""
+  nodes: [ProfileTag]!
+
+  """
+  A list of edges which contains the \`ProfileTag\` and cursor to aid in pagination.
+  """
+  edges: [ProfileTagsEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`ProfileTag\` you could get from the connection."""
+  totalCount: Int!
+}
+
+type ProfileTag implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  entityKind: EntityKinds!
+  entityId: UUID!
+  tag: String!
+
+  """Reads a single \`Profile\` that is related to this \`ProfileTag\`."""
+  profileByEntityId: Profile
+}
+
+"""A \`ProfileTag\` edge in the connection."""
+type ProfileTagsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`ProfileTag\` at the end of the edge."""
+  node: ProfileTag
+}
+
+"""
+A condition to be used against \`ProfileTag\` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input ProfileTagCondition {
+  """Checks for equality with the object’s \`entityKind\` field."""
+  entityKind: EntityKinds
+
+  """Checks for equality with the object’s \`entityId\` field."""
+  entityId: UUID
+
+  """Checks for equality with the object’s \`tag\` field."""
+  tag: String
+}
+
+"""Methods to use when ordering \`ProfileTag\`."""
+enum ProfileTagsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ENTITY_KIND_ASC
+  ENTITY_KIND_DESC
+  ENTITY_ID_ASC
+  ENTITY_ID_DESC
+  TAG_ASC
+  TAG_DESC
 }
 
 type User implements Node {
@@ -2500,24 +2973,6 @@ type MeasurementsEdge {
   node: Measurement
 }
 
-"""A location in a connection that can be used for resuming pagination."""
-scalar Cursor
-
-"""Information about pagination in a connection."""
-type PageInfo {
-  """When paginating forwards, are there more items?"""
-  hasNextPage: Boolean!
-
-  """When paginating backwards, are there more items?"""
-  hasPreviousPage: Boolean!
-
-  """When paginating backwards, the cursor to continue."""
-  startCursor: Cursor
-
-  """When paginating forwards, the cursor to continue."""
-  endCursor: Cursor
-}
-
 """
 A condition to be used against \`Measurement\` object types. All fields are tested
 for equality and combined with a logical ‘and.’
@@ -2549,22 +3004,6 @@ enum MeasurementsOrderBy {
   VALUE_DESC
   USER_ID_ASC
   USER_ID_DESC
-}
-
-type Tag implements Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  nodeId: ID!
-  entityKind: EntityKinds!
-  entityId: UUID!
-  tag: String!
-}
-
-enum EntityKinds {
-  PHOTOS
-  LOCATIONS
-  PROFILES
 }
 
 """A connection to a list of \`Location\` values."""
@@ -2745,59 +3184,6 @@ enum UsersOrderBy {
   NAME_DESC
 }
 
-"""A connection to a list of \`Tag\` values."""
-type TagsConnection {
-  """A list of \`Tag\` objects."""
-  nodes: [Tag]!
-
-  """
-  A list of edges which contains the \`Tag\` and cursor to aid in pagination.
-  """
-  edges: [TagsEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* \`Tag\` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A \`Tag\` edge in the connection."""
-type TagsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`Tag\` at the end of the edge."""
-  node: Tag
-}
-
-"""
-A condition to be used against \`Tag\` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input TagCondition {
-  """Checks for equality with the object’s \`entityKind\` field."""
-  entityKind: EntityKinds
-
-  """Checks for equality with the object’s \`entityId\` field."""
-  entityId: UUID
-
-  """Checks for equality with the object’s \`tag\` field."""
-  tag: String
-}
-
-"""Methods to use when ordering \`Tag\`."""
-enum TagsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ENTITY_KIND_ASC
-  ENTITY_KIND_DESC
-  ENTITY_ID_ASC
-  ENTITY_ID_DESC
-  TAG_ASC
-  TAG_DESC
-}
-
 """
 The root mutation type which contains root level fields which mutate data.
 """
@@ -2842,13 +3228,29 @@ type Mutation {
     input: CreateMeasurementInput!
   ): CreateMeasurementPayload
 
-  """Creates a single \`Tag\`."""
-  createTag(
+  """Creates a single \`LocationTag\`."""
+  createLocationTag(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: CreateTagInput!
-  ): CreateTagPayload
+    input: CreateLocationTagInput!
+  ): CreateLocationTagPayload
+
+  """Creates a single \`PhotoTag\`."""
+  createPhotoTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePhotoTagInput!
+  ): CreatePhotoTagPayload
+
+  """Creates a single \`ProfileTag\`."""
+  createProfileTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateProfileTagInput!
+  ): CreateProfileTagPayload
 
   """Updates a single \`Location\` using its globally unique id and a patch."""
   updateLocation(
@@ -2932,21 +3334,57 @@ type Mutation {
     input: UpdateMeasurementByTimestampAndKeyInput!
   ): UpdateMeasurementPayload
 
-  """Updates a single \`Tag\` using its globally unique id and a patch."""
-  updateTag(
+  """
+  Updates a single \`LocationTag\` using its globally unique id and a patch.
+  """
+  updateLocationTag(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: UpdateTagInput!
-  ): UpdateTagPayload
+    input: UpdateLocationTagInput!
+  ): UpdateLocationTagPayload
 
-  """Updates a single \`Tag\` using a unique key and a patch."""
-  updateTagByEntityKindAndEntityIdAndTag(
+  """Updates a single \`LocationTag\` using a unique key and a patch."""
+  updateLocationTagByEntityKindAndEntityIdAndTag(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: UpdateTagByEntityKindAndEntityIdAndTagInput!
-  ): UpdateTagPayload
+    input: UpdateLocationTagByEntityKindAndEntityIdAndTagInput!
+  ): UpdateLocationTagPayload
+
+  """Updates a single \`PhotoTag\` using its globally unique id and a patch."""
+  updatePhotoTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePhotoTagInput!
+  ): UpdatePhotoTagPayload
+
+  """Updates a single \`PhotoTag\` using a unique key and a patch."""
+  updatePhotoTagByEntityKindAndEntityIdAndTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePhotoTagByEntityKindAndEntityIdAndTagInput!
+  ): UpdatePhotoTagPayload
+
+  """
+  Updates a single \`ProfileTag\` using its globally unique id and a patch.
+  """
+  updateProfileTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateProfileTagInput!
+  ): UpdateProfileTagPayload
+
+  """Updates a single \`ProfileTag\` using a unique key and a patch."""
+  updateProfileTagByEntityKindAndEntityIdAndTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateProfileTagByEntityKindAndEntityIdAndTagInput!
+  ): UpdateProfileTagPayload
 
   """Deletes a single \`Location\` using its globally unique id."""
   deleteLocation(
@@ -3028,21 +3466,53 @@ type Mutation {
     input: DeleteMeasurementByTimestampAndKeyInput!
   ): DeleteMeasurementPayload
 
-  """Deletes a single \`Tag\` using its globally unique id."""
-  deleteTag(
+  """Deletes a single \`LocationTag\` using its globally unique id."""
+  deleteLocationTag(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeleteTagInput!
-  ): DeleteTagPayload
+    input: DeleteLocationTagInput!
+  ): DeleteLocationTagPayload
 
-  """Deletes a single \`Tag\` using a unique key."""
-  deleteTagByEntityKindAndEntityIdAndTag(
+  """Deletes a single \`LocationTag\` using a unique key."""
+  deleteLocationTagByEntityKindAndEntityIdAndTag(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     """
-    input: DeleteTagByEntityKindAndEntityIdAndTagInput!
-  ): DeleteTagPayload
+    input: DeleteLocationTagByEntityKindAndEntityIdAndTagInput!
+  ): DeleteLocationTagPayload
+
+  """Deletes a single \`PhotoTag\` using its globally unique id."""
+  deletePhotoTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePhotoTagInput!
+  ): DeletePhotoTagPayload
+
+  """Deletes a single \`PhotoTag\` using a unique key."""
+  deletePhotoTagByEntityKindAndEntityIdAndTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePhotoTagByEntityKindAndEntityIdAndTagInput!
+  ): DeletePhotoTagPayload
+
+  """Deletes a single \`ProfileTag\` using its globally unique id."""
+  deleteProfileTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteProfileTagInput!
+  ): DeleteProfileTagPayload
+
+  """Deletes a single \`ProfileTag\` using a unique key."""
+  deleteProfileTagByEntityKindAndEntityIdAndTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteProfileTagByEntityKindAndEntityIdAndTagInput!
+  ): DeleteProfileTagPayload
 }
 
 """The output of our create \`Location\` mutation."""
@@ -3252,43 +3722,136 @@ input MeasurementInput {
   userId: Int!
 }
 
-"""The output of our create \`Tag\` mutation."""
-type CreateTagPayload {
+"""The output of our create \`LocationTag\` mutation."""
+type CreateLocationTagPayload {
   """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The \`Tag\` that was created by this mutation."""
-  tag: Tag
+  """The \`LocationTag\` that was created by this mutation."""
+  locationTag: LocationTag
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our \`Tag\`. May be used by Relay 1."""
-  tagEdge(
-    """The method to use when ordering \`Tag\`."""
-    orderBy: [TagsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): TagsEdge
+  """An edge for our \`LocationTag\`. May be used by Relay 1."""
+  locationTagEdge(
+    """The method to use when ordering \`LocationTag\`."""
+    orderBy: [LocationTagsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): LocationTagsEdge
+
+  """Reads a single \`Location\` that is related to this \`LocationTag\`."""
+  locationByEntityId: Location
 }
 
-"""All input for the create \`Tag\` mutation."""
-input CreateTagInput {
+"""All input for the create \`LocationTag\` mutation."""
+input CreateLocationTagInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
 
-  """The \`Tag\` to be created by this mutation."""
-  tag: TagInput!
+  """The \`LocationTag\` to be created by this mutation."""
+  locationTag: LocationTagInput!
 }
 
-"""An input for mutations affecting \`Tag\`"""
-input TagInput {
+"""An input for mutations affecting \`LocationTag\`"""
+input LocationTagInput {
+  entityKind: EntityKinds!
+  entityId: UUID!
+  tag: String!
+}
+
+"""The output of our create \`PhotoTag\` mutation."""
+type CreatePhotoTagPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`PhotoTag\` that was created by this mutation."""
+  photoTag: PhotoTag
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`PhotoTag\`. May be used by Relay 1."""
+  photoTagEdge(
+    """The method to use when ordering \`PhotoTag\`."""
+    orderBy: [PhotoTagsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PhotoTagsEdge
+
+  """Reads a single \`Photo\` that is related to this \`PhotoTag\`."""
+  photoByEntityId: Photo
+}
+
+"""All input for the create \`PhotoTag\` mutation."""
+input CreatePhotoTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The \`PhotoTag\` to be created by this mutation."""
+  photoTag: PhotoTagInput!
+}
+
+"""An input for mutations affecting \`PhotoTag\`"""
+input PhotoTagInput {
+  entityKind: EntityKinds!
+  entityId: UUID!
+  tag: String!
+}
+
+"""The output of our create \`ProfileTag\` mutation."""
+type CreateProfileTagPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`ProfileTag\` that was created by this mutation."""
+  profileTag: ProfileTag
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`ProfileTag\`. May be used by Relay 1."""
+  profileTagEdge(
+    """The method to use when ordering \`ProfileTag\`."""
+    orderBy: [ProfileTagsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ProfileTagsEdge
+
+  """Reads a single \`Profile\` that is related to this \`ProfileTag\`."""
+  profileByEntityId: Profile
+}
+
+"""All input for the create \`ProfileTag\` mutation."""
+input CreateProfileTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The \`ProfileTag\` to be created by this mutation."""
+  profileTag: ProfileTagInput!
+}
+
+"""An input for mutations affecting \`ProfileTag\`"""
+input ProfileTagInput {
   entityKind: EntityKinds!
   entityId: UUID!
   tag: String!
@@ -3620,31 +4183,34 @@ input UpdateMeasurementByTimestampAndKeyInput {
   measurementPatch: MeasurementPatch!
 }
 
-"""The output of our update \`Tag\` mutation."""
-type UpdateTagPayload {
+"""The output of our update \`LocationTag\` mutation."""
+type UpdateLocationTagPayload {
   """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The \`Tag\` that was updated by this mutation."""
-  tag: Tag
+  """The \`LocationTag\` that was updated by this mutation."""
+  locationTag: LocationTag
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our \`Tag\`. May be used by Relay 1."""
-  tagEdge(
-    """The method to use when ordering \`Tag\`."""
-    orderBy: [TagsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): TagsEdge
+  """An edge for our \`LocationTag\`. May be used by Relay 1."""
+  locationTagEdge(
+    """The method to use when ordering \`LocationTag\`."""
+    orderBy: [LocationTagsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): LocationTagsEdge
+
+  """Reads a single \`Location\` that is related to this \`LocationTag\`."""
+  locationByEntityId: Location
 }
 
-"""All input for the \`updateTag\` mutation."""
-input UpdateTagInput {
+"""All input for the \`updateLocationTag\` mutation."""
+input UpdateLocationTagInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -3652,25 +4218,29 @@ input UpdateTagInput {
   clientMutationId: String
 
   """
-  The globally unique \`ID\` which will identify a single \`Tag\` to be updated.
+  The globally unique \`ID\` which will identify a single \`LocationTag\` to be updated.
   """
   nodeId: ID!
 
   """
-  An object where the defined keys will be set on the \`Tag\` being updated.
+  An object where the defined keys will be set on the \`LocationTag\` being updated.
   """
-  tagPatch: TagPatch!
+  locationTagPatch: LocationTagPatch!
 }
 
-"""Represents an update to a \`Tag\`. Fields that are set will be updated."""
-input TagPatch {
+"""
+Represents an update to a \`LocationTag\`. Fields that are set will be updated.
+"""
+input LocationTagPatch {
   entityKind: EntityKinds
   entityId: UUID
   tag: String
 }
 
-"""All input for the \`updateTagByEntityKindAndEntityIdAndTag\` mutation."""
-input UpdateTagByEntityKindAndEntityIdAndTagInput {
+"""
+All input for the \`updateLocationTagByEntityKindAndEntityIdAndTag\` mutation.
+"""
+input UpdateLocationTagByEntityKindAndEntityIdAndTagInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -3681,9 +4251,155 @@ input UpdateTagByEntityKindAndEntityIdAndTagInput {
   tag: String!
 
   """
-  An object where the defined keys will be set on the \`Tag\` being updated.
+  An object where the defined keys will be set on the \`LocationTag\` being updated.
   """
-  tagPatch: TagPatch!
+  locationTagPatch: LocationTagPatch!
+}
+
+"""The output of our update \`PhotoTag\` mutation."""
+type UpdatePhotoTagPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`PhotoTag\` that was updated by this mutation."""
+  photoTag: PhotoTag
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`PhotoTag\`. May be used by Relay 1."""
+  photoTagEdge(
+    """The method to use when ordering \`PhotoTag\`."""
+    orderBy: [PhotoTagsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PhotoTagsEdge
+
+  """Reads a single \`Photo\` that is related to this \`PhotoTag\`."""
+  photoByEntityId: Photo
+}
+
+"""All input for the \`updatePhotoTag\` mutation."""
+input UpdatePhotoTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique \`ID\` which will identify a single \`PhotoTag\` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the \`PhotoTag\` being updated.
+  """
+  photoTagPatch: PhotoTagPatch!
+}
+
+"""
+Represents an update to a \`PhotoTag\`. Fields that are set will be updated.
+"""
+input PhotoTagPatch {
+  entityKind: EntityKinds
+  entityId: UUID
+  tag: String
+}
+
+"""
+All input for the \`updatePhotoTagByEntityKindAndEntityIdAndTag\` mutation.
+"""
+input UpdatePhotoTagByEntityKindAndEntityIdAndTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  entityKind: EntityKinds!
+  entityId: UUID!
+  tag: String!
+
+  """
+  An object where the defined keys will be set on the \`PhotoTag\` being updated.
+  """
+  photoTagPatch: PhotoTagPatch!
+}
+
+"""The output of our update \`ProfileTag\` mutation."""
+type UpdateProfileTagPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`ProfileTag\` that was updated by this mutation."""
+  profileTag: ProfileTag
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`ProfileTag\`. May be used by Relay 1."""
+  profileTagEdge(
+    """The method to use when ordering \`ProfileTag\`."""
+    orderBy: [ProfileTagsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ProfileTagsEdge
+
+  """Reads a single \`Profile\` that is related to this \`ProfileTag\`."""
+  profileByEntityId: Profile
+}
+
+"""All input for the \`updateProfileTag\` mutation."""
+input UpdateProfileTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique \`ID\` which will identify a single \`ProfileTag\` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the \`ProfileTag\` being updated.
+  """
+  profileTagPatch: ProfileTagPatch!
+}
+
+"""
+Represents an update to a \`ProfileTag\`. Fields that are set will be updated.
+"""
+input ProfileTagPatch {
+  entityKind: EntityKinds
+  entityId: UUID
+  tag: String
+}
+
+"""
+All input for the \`updateProfileTagByEntityKindAndEntityIdAndTag\` mutation.
+"""
+input UpdateProfileTagByEntityKindAndEntityIdAndTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  entityKind: EntityKinds!
+  entityId: UUID!
+  tag: String!
+
+  """
+  An object where the defined keys will be set on the \`ProfileTag\` being updated.
+  """
+  profileTagPatch: ProfileTagPatch!
 }
 
 """The output of our delete \`Location\` mutation."""
@@ -3930,32 +4646,35 @@ input DeleteMeasurementByTimestampAndKeyInput {
   key: String!
 }
 
-"""The output of our delete \`Tag\` mutation."""
-type DeleteTagPayload {
+"""The output of our delete \`LocationTag\` mutation."""
+type DeleteLocationTagPayload {
   """
   The exact same \`clientMutationId\` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """The \`Tag\` that was deleted by this mutation."""
-  tag: Tag
-  deletedTagId: ID
+  """The \`LocationTag\` that was deleted by this mutation."""
+  locationTag: LocationTag
+  deletedLocationTagId: ID
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
 
-  """An edge for our \`Tag\`. May be used by Relay 1."""
-  tagEdge(
-    """The method to use when ordering \`Tag\`."""
-    orderBy: [TagsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): TagsEdge
+  """An edge for our \`LocationTag\`. May be used by Relay 1."""
+  locationTagEdge(
+    """The method to use when ordering \`LocationTag\`."""
+    orderBy: [LocationTagsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): LocationTagsEdge
+
+  """Reads a single \`Location\` that is related to this \`LocationTag\`."""
+  locationByEntityId: Location
 }
 
-"""All input for the \`deleteTag\` mutation."""
-input DeleteTagInput {
+"""All input for the \`deleteLocationTag\` mutation."""
+input DeleteLocationTagInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -3963,13 +4682,125 @@ input DeleteTagInput {
   clientMutationId: String
 
   """
-  The globally unique \`ID\` which will identify a single \`Tag\` to be deleted.
+  The globally unique \`ID\` which will identify a single \`LocationTag\` to be deleted.
   """
   nodeId: ID!
 }
 
-"""All input for the \`deleteTagByEntityKindAndEntityIdAndTag\` mutation."""
-input DeleteTagByEntityKindAndEntityIdAndTagInput {
+"""
+All input for the \`deleteLocationTagByEntityKindAndEntityIdAndTag\` mutation.
+"""
+input DeleteLocationTagByEntityKindAndEntityIdAndTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  entityKind: EntityKinds!
+  entityId: UUID!
+  tag: String!
+}
+
+"""The output of our delete \`PhotoTag\` mutation."""
+type DeletePhotoTagPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`PhotoTag\` that was deleted by this mutation."""
+  photoTag: PhotoTag
+  deletedPhotoTagId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`PhotoTag\`. May be used by Relay 1."""
+  photoTagEdge(
+    """The method to use when ordering \`PhotoTag\`."""
+    orderBy: [PhotoTagsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PhotoTagsEdge
+
+  """Reads a single \`Photo\` that is related to this \`PhotoTag\`."""
+  photoByEntityId: Photo
+}
+
+"""All input for the \`deletePhotoTag\` mutation."""
+input DeletePhotoTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique \`ID\` which will identify a single \`PhotoTag\` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""
+All input for the \`deletePhotoTagByEntityKindAndEntityIdAndTag\` mutation.
+"""
+input DeletePhotoTagByEntityKindAndEntityIdAndTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  entityKind: EntityKinds!
+  entityId: UUID!
+  tag: String!
+}
+
+"""The output of our delete \`ProfileTag\` mutation."""
+type DeleteProfileTagPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`ProfileTag\` that was deleted by this mutation."""
+  profileTag: ProfileTag
+  deletedProfileTagId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`ProfileTag\`. May be used by Relay 1."""
+  profileTagEdge(
+    """The method to use when ordering \`ProfileTag\`."""
+    orderBy: [ProfileTagsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): ProfileTagsEdge
+
+  """Reads a single \`Profile\` that is related to this \`ProfileTag\`."""
+  profileByEntityId: Profile
+}
+
+"""All input for the \`deleteProfileTag\` mutation."""
+input DeleteProfileTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique \`ID\` which will identify a single \`ProfileTag\` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""
+All input for the \`deleteProfileTagByEntityKindAndEntityIdAndTag\` mutation.
+"""
+input DeleteProfileTagByEntityKindAndEntityIdAndTagInput {
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
@@ -3988,6 +4819,36 @@ export const objects = {
       allLocations: {
         plan() {
           return connection(resource_locationsPgResource.find());
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          last(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          before(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          },
+          after(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $connection, value) {
+            const $select = $connection.getSubplan();
+            value.apply($select);
+          }
+        }
+      },
+      allLocationTags: {
+        plan() {
+          return connection(resource_location_tagsPgResource.find());
         },
         args: {
           first(_, $connection, arg) {
@@ -4075,6 +4936,36 @@ export const objects = {
           }
         }
       },
+      allPhotoTags: {
+        plan() {
+          return connection(resource_photo_tagsPgResource.find());
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          last(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          before(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          },
+          after(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $connection, value) {
+            const $select = $connection.getSubplan();
+            value.apply($select);
+          }
+        }
+      },
       allProfiles: {
         plan() {
           return connection(resource_profilesPgResource.find());
@@ -4105,9 +4996,9 @@ export const objects = {
           }
         }
       },
-      allTags: {
+      allProfileTags: {
         plan() {
-          return connection(resource_tagsPgResource.find());
+          return connection(resource_profile_tagsPgResource.find());
         },
         args: {
           first(_, $connection, arg) {
@@ -4176,6 +5067,21 @@ export const objects = {
           id: $id
         });
       },
+      locationTag(_$parent, args) {
+        const $nodeId = args.getRaw("nodeId");
+        return nodeFetcher_LocationTag($nodeId);
+      },
+      locationTagByEntityKindAndEntityIdAndTag(_$root, {
+        $entityKind,
+        $entityId,
+        $tag
+      }) {
+        return resource_location_tagsPgResource.get({
+          entity_kind: $entityKind,
+          entity_id: $entityId,
+          tag: $tag
+        });
+      },
       measurement(_$parent, args) {
         const $nodeId = args.getRaw("nodeId");
         return nodeFetcher_Measurement($nodeId);
@@ -4207,6 +5113,21 @@ export const objects = {
           id: $id
         });
       },
+      photoTag(_$parent, args) {
+        const $nodeId = args.getRaw("nodeId");
+        return nodeFetcher_PhotoTag($nodeId);
+      },
+      photoTagByEntityKindAndEntityIdAndTag(_$root, {
+        $entityKind,
+        $entityId,
+        $tag
+      }) {
+        return resource_photo_tagsPgResource.get({
+          entity_kind: $entityKind,
+          entity_id: $entityId,
+          tag: $tag
+        });
+      },
       profile(_$parent, args) {
         const $nodeId = args.getRaw("nodeId");
         return nodeFetcher_Profile($nodeId);
@@ -4218,23 +5139,23 @@ export const objects = {
           id: $id
         });
       },
-      query() {
-        return rootValue();
-      },
-      tag(_$parent, args) {
+      profileTag(_$parent, args) {
         const $nodeId = args.getRaw("nodeId");
-        return nodeFetcher_Tag($nodeId);
+        return nodeFetcher_ProfileTag($nodeId);
       },
-      tagByEntityKindAndEntityIdAndTag(_$root, {
+      profileTagByEntityKindAndEntityIdAndTag(_$root, {
         $entityKind,
         $entityId,
         $tag
       }) {
-        return resource_tagsPgResource.get({
+        return resource_profile_tagsPgResource.get({
           entity_kind: $entityKind,
           entity_id: $entityId,
           tag: $tag
         });
+      },
+      query() {
+        return rootValue();
       },
       user(_$parent, args) {
         const $nodeId = args.getRaw("nodeId");
@@ -4255,6 +5176,21 @@ export const objects = {
       createLocation: {
         plan(_, args) {
           const $insert = pgInsertSingle(resource_locationsPgResource, Object.create(null));
+          args.apply($insert);
+          const plan = object({
+            result: $insert
+          });
+          return plan;
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      createLocationTag: {
+        plan(_, args) {
+          const $insert = pgInsertSingle(resource_location_tagsPgResource, Object.create(null));
           args.apply($insert);
           const plan = object({
             result: $insert
@@ -4297,6 +5233,21 @@ export const objects = {
           }
         }
       },
+      createPhotoTag: {
+        plan(_, args) {
+          const $insert = pgInsertSingle(resource_photo_tagsPgResource, Object.create(null));
+          args.apply($insert);
+          const plan = object({
+            result: $insert
+          });
+          return plan;
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
       createProfile: {
         plan(_, args) {
           const $insert = pgInsertSingle(resource_profilesPgResource, Object.create(null));
@@ -4312,9 +5263,9 @@ export const objects = {
           }
         }
       },
-      createTag: {
+      createProfileTag: {
         plan(_, args) {
-          const $insert = pgInsertSingle(resource_tagsPgResource, Object.create(null));
+          const $insert = pgInsertSingle(resource_profile_tagsPgResource, Object.create(null));
           args.apply($insert);
           const plan = object({
             result: $insert
@@ -4360,6 +5311,38 @@ export const objects = {
         plan(_$root, args) {
           const $delete = pgDeleteSingle(resource_locationsPgResource, {
             id: args.getRaw(['input', "id"])
+          });
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deleteLocationTag: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_location_tagsPgResource, specFromArgs_LocationTag2(args));
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deleteLocationTagByEntityKindAndEntityIdAndTag: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_location_tagsPgResource, {
+            entity_kind: args.getRaw(['input', "entityKind"]),
+            entity_id: args.getRaw(['input', "entityId"]),
+            tag: args.getRaw(['input', "tag"])
           });
           args.apply($delete);
           return object({
@@ -4433,6 +5416,38 @@ export const objects = {
           }
         }
       },
+      deletePhotoTag: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_photo_tagsPgResource, specFromArgs_PhotoTag2(args));
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      deletePhotoTagByEntityKindAndEntityIdAndTag: {
+        plan(_$root, args) {
+          const $delete = pgDeleteSingle(resource_photo_tagsPgResource, {
+            entity_kind: args.getRaw(['input', "entityKind"]),
+            entity_id: args.getRaw(['input', "entityId"]),
+            tag: args.getRaw(['input', "tag"])
+          });
+          args.apply($delete);
+          return object({
+            result: $delete
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
       deleteProfile: {
         plan(_$root, args) {
           const $delete = pgDeleteSingle(resource_profilesPgResource, specFromArgs_Profile2(args));
@@ -4463,9 +5478,9 @@ export const objects = {
           }
         }
       },
-      deleteTag: {
+      deleteProfileTag: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_tagsPgResource, specFromArgs_Tag2(args));
+          const $delete = pgDeleteSingle(resource_profile_tagsPgResource, specFromArgs_ProfileTag2(args));
           args.apply($delete);
           return object({
             result: $delete
@@ -4477,9 +5492,9 @@ export const objects = {
           }
         }
       },
-      deleteTagByEntityKindAndEntityIdAndTag: {
+      deleteProfileTagByEntityKindAndEntityIdAndTag: {
         plan(_$root, args) {
-          const $delete = pgDeleteSingle(resource_tagsPgResource, {
+          const $delete = pgDeleteSingle(resource_profile_tagsPgResource, {
             entity_kind: args.getRaw(['input', "entityKind"]),
             entity_id: args.getRaw(['input', "entityId"]),
             tag: args.getRaw(['input', "tag"])
@@ -4555,6 +5570,38 @@ export const objects = {
           }
         }
       },
+      updateLocationTag: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_location_tagsPgResource, specFromArgs_LocationTag(args));
+          args.apply($update);
+          return object({
+            result: $update
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      updateLocationTagByEntityKindAndEntityIdAndTag: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_location_tagsPgResource, {
+            entity_kind: args.getRaw(['input', "entityKind"]),
+            entity_id: args.getRaw(['input', "entityId"]),
+            tag: args.getRaw(['input', "tag"])
+          });
+          args.apply($update);
+          return object({
+            result: $update
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
       updateMeasurement: {
         plan(_$root, args) {
           const $update = pgUpdateSingle(resource_measurementsPgResource, specFromArgs_Measurement(args));
@@ -4616,6 +5663,38 @@ export const objects = {
           }
         }
       },
+      updatePhotoTag: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_photo_tagsPgResource, specFromArgs_PhotoTag(args));
+          args.apply($update);
+          return object({
+            result: $update
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
+      updatePhotoTagByEntityKindAndEntityIdAndTag: {
+        plan(_$root, args) {
+          const $update = pgUpdateSingle(resource_photo_tagsPgResource, {
+            entity_kind: args.getRaw(['input', "entityKind"]),
+            entity_id: args.getRaw(['input', "entityId"]),
+            tag: args.getRaw(['input', "tag"])
+          });
+          args.apply($update);
+          return object({
+            result: $update
+          });
+        },
+        args: {
+          input(_, $object) {
+            return $object;
+          }
+        }
+      },
       updateProfile: {
         plan(_$root, args) {
           const $update = pgUpdateSingle(resource_profilesPgResource, specFromArgs_Profile(args));
@@ -4646,9 +5725,9 @@ export const objects = {
           }
         }
       },
-      updateTag: {
+      updateProfileTag: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(resource_tagsPgResource, specFromArgs_Tag(args));
+          const $update = pgUpdateSingle(resource_profile_tagsPgResource, specFromArgs_ProfileTag(args));
           args.apply($update);
           return object({
             result: $update
@@ -4660,9 +5739,9 @@ export const objects = {
           }
         }
       },
-      updateTagByEntityKindAndEntityIdAndTag: {
+      updateProfileTagByEntityKindAndEntityIdAndTag: {
         plan(_$root, args) {
-          const $update = pgUpdateSingle(resource_tagsPgResource, {
+          const $update = pgUpdateSingle(resource_profile_tagsPgResource, {
             entity_kind: args.getRaw(['input', "entityKind"]),
             entity_id: args.getRaw(['input', "entityId"]),
             tag: args.getRaw(['input', "tag"])
@@ -4728,6 +5807,29 @@ export const objects = {
       }
     }
   },
+  CreateLocationTagPayload: {
+    assertStep: assertExecutableStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $insert = $mutation.getStepForKey("result");
+        return $insert.getMeta("clientMutationId");
+      },
+      locationByEntityId($record) {
+        return resource_locationsPgResource.get({
+          id: $record.get("result").get("entity_id")
+        });
+      },
+      locationTag($object) {
+        return $object.get("result");
+      },
+      locationTagEdge($mutation, fieldArgs) {
+        return pgMutationPayloadEdge(resource_location_tagsPgResource, location_tagsUniques[0].attributes, $mutation, fieldArgs);
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
   CreateMeasurementPayload: {
     assertStep: assertExecutableStep,
     plans: {
@@ -4769,6 +5871,29 @@ export const objects = {
       }
     }
   },
+  CreatePhotoTagPayload: {
+    assertStep: assertExecutableStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $insert = $mutation.getStepForKey("result");
+        return $insert.getMeta("clientMutationId");
+      },
+      photoByEntityId($record) {
+        return resource_photosPgResource.get({
+          id: $record.get("result").get("entity_id")
+        });
+      },
+      photoTag($object) {
+        return $object.get("result");
+      },
+      photoTagEdge($mutation, fieldArgs) {
+        return pgMutationPayloadEdge(resource_photo_tagsPgResource, photo_tagsUniques[0].attributes, $mutation, fieldArgs);
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
   CreateProfilePayload: {
     assertStep: assertExecutableStep,
     plans: {
@@ -4787,21 +5912,26 @@ export const objects = {
       }
     }
   },
-  CreateTagPayload: {
+  CreateProfileTagPayload: {
     assertStep: assertExecutableStep,
     plans: {
       clientMutationId($mutation) {
         const $insert = $mutation.getStepForKey("result");
         return $insert.getMeta("clientMutationId");
       },
-      query() {
-        return rootValue();
+      profileByEntityId($record) {
+        return resource_profilesPgResource.get({
+          id: $record.get("result").get("entity_id")
+        });
       },
-      tag($object) {
+      profileTag($object) {
         return $object.get("result");
       },
-      tagEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_tagsPgResource, tagsUniques[0].attributes, $mutation, fieldArgs);
+      profileTagEdge($mutation, fieldArgs) {
+        return pgMutationPayloadEdge(resource_profile_tagsPgResource, profile_tagsUniques[0].attributes, $mutation, fieldArgs);
+      },
+      query() {
+        return rootValue();
       }
     }
   },
@@ -4840,6 +5970,34 @@ export const objects = {
       },
       locationEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_locationsPgResource, locationsUniques[0].attributes, $mutation, fieldArgs);
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  DeleteLocationTagPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $result = $mutation.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      deletedLocationTagId($object) {
+        const $record = $object.getStepForKey("result");
+        const specifier = nodeIdHandler_LocationTag.plan($record);
+        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+      },
+      locationByEntityId($record) {
+        return resource_locationsPgResource.get({
+          id: $record.get("result").get("entity_id")
+        });
+      },
+      locationTag($object) {
+        return $object.get("result");
+      },
+      locationTagEdge($mutation, fieldArgs) {
+        return pgMutationPayloadEdge(resource_location_tagsPgResource, location_tagsUniques[0].attributes, $mutation, fieldArgs);
       },
       query() {
         return rootValue();
@@ -4897,6 +6055,34 @@ export const objects = {
       }
     }
   },
+  DeletePhotoTagPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $result = $mutation.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      deletedPhotoTagId($object) {
+        const $record = $object.getStepForKey("result");
+        const specifier = nodeIdHandler_PhotoTag.plan($record);
+        return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+      },
+      photoByEntityId($record) {
+        return resource_photosPgResource.get({
+          id: $record.get("result").get("entity_id")
+        });
+      },
+      photoTag($object) {
+        return $object.get("result");
+      },
+      photoTagEdge($mutation, fieldArgs) {
+        return pgMutationPayloadEdge(resource_photo_tagsPgResource, photo_tagsUniques[0].attributes, $mutation, fieldArgs);
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
   DeleteProfilePayload: {
     assertStep: ObjectStep,
     plans: {
@@ -4920,26 +6106,31 @@ export const objects = {
       }
     }
   },
-  DeleteTagPayload: {
+  DeleteProfileTagPayload: {
     assertStep: ObjectStep,
     plans: {
       clientMutationId($mutation) {
         const $result = $mutation.getStepForKey("result");
         return $result.getMeta("clientMutationId");
       },
-      deletedTagId($object) {
+      deletedProfileTagId($object) {
         const $record = $object.getStepForKey("result");
-        const specifier = nodeIdHandler_Tag.plan($record);
+        const specifier = nodeIdHandler_ProfileTag.plan($record);
         return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+      },
+      profileByEntityId($record) {
+        return resource_profilesPgResource.get({
+          id: $record.get("result").get("entity_id")
+        });
+      },
+      profileTag($object) {
+        return $object.get("result");
+      },
+      profileTagEdge($mutation, fieldArgs) {
+        return pgMutationPayloadEdge(resource_profile_tagsPgResource, profile_tagsUniques[0].attributes, $mutation, fieldArgs);
       },
       query() {
         return rootValue();
-      },
-      tag($object) {
-        return $object.get("result");
-      },
-      tagEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_tagsPgResource, tagsUniques[0].attributes, $mutation, fieldArgs);
       }
     }
   },
@@ -4969,6 +6160,39 @@ export const objects = {
   Location: {
     assertStep: assertPgClassSingleStep,
     plans: {
+      locationTagsByEntityId: {
+        plan($record) {
+          const $records = resource_location_tagsPgResource.find({
+            entity_id: $record.get("id")
+          });
+          return connection($records);
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          last(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          before(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          },
+          after(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $connection, value) {
+            const $select = $connection.getSubplan();
+            value.apply($select);
+          }
+        }
+      },
       nodeId($parent) {
         const specifier = nodeIdHandler_Location.plan($parent);
         return lambda(specifier, nodeIdCodecs[nodeIdHandler_Location.codec.name].encode);
@@ -4983,6 +6207,41 @@ export const objects = {
     }
   },
   LocationsConnection: {
+    assertStep: ConnectionStep,
+    plans: {
+      totalCount($connection) {
+        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+      }
+    }
+  },
+  LocationTag: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      entityId($record) {
+        return $record.get("entity_id");
+      },
+      entityKind($record) {
+        return $record.get("entity_kind");
+      },
+      locationByEntityId($record) {
+        return resource_locationsPgResource.get({
+          id: $record.get("entity_id")
+        });
+      },
+      nodeId($parent) {
+        const specifier = nodeIdHandler_LocationTag.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_LocationTag.codec.name].encode);
+      }
+    },
+    planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of location_tagsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_location_tagsPgResource.get(spec);
+    }
+  },
+  LocationTagsConnection: {
     assertStep: ConnectionStep,
     plans: {
       totalCount($connection) {
@@ -5028,6 +6287,39 @@ export const objects = {
       nodeId($parent) {
         const specifier = nodeIdHandler_Photo.plan($parent);
         return lambda(specifier, nodeIdCodecs[nodeIdHandler_Photo.codec.name].encode);
+      },
+      photoTagsByEntityId: {
+        plan($record) {
+          const $records = resource_photo_tagsPgResource.find({
+            entity_id: $record.get("id")
+          });
+          return connection($records);
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          last(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          before(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          },
+          after(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $connection, value) {
+            const $select = $connection.getSubplan();
+            value.apply($select);
+          }
+        }
       }
     },
     planType($specifier) {
@@ -5046,12 +6338,80 @@ export const objects = {
       }
     }
   },
+  PhotoTag: {
+    assertStep: assertPgClassSingleStep,
+    plans: {
+      entityId($record) {
+        return $record.get("entity_id");
+      },
+      entityKind($record) {
+        return $record.get("entity_kind");
+      },
+      nodeId($parent) {
+        const specifier = nodeIdHandler_PhotoTag.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_PhotoTag.codec.name].encode);
+      },
+      photoByEntityId($record) {
+        return resource_photosPgResource.get({
+          id: $record.get("entity_id")
+        });
+      }
+    },
+    planType($specifier) {
+      const spec = Object.create(null);
+      for (const pkCol of photo_tagsUniques[0].attributes) {
+        spec[pkCol] = get2($specifier, pkCol);
+      }
+      return resource_photo_tagsPgResource.get(spec);
+    }
+  },
+  PhotoTagsConnection: {
+    assertStep: ConnectionStep,
+    plans: {
+      totalCount($connection) {
+        return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint, false);
+      }
+    }
+  },
   Profile: {
     assertStep: assertPgClassSingleStep,
     plans: {
       nodeId($parent) {
         const specifier = nodeIdHandler_Profile.plan($parent);
         return lambda(specifier, nodeIdCodecs[nodeIdHandler_Profile.codec.name].encode);
+      },
+      profileTagsByEntityId: {
+        plan($record) {
+          const $records = resource_profile_tagsPgResource.find({
+            entity_id: $record.get("id")
+          });
+          return connection($records);
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          last(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          before(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          },
+          after(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $connection, value) {
+            const $select = $connection.getSubplan();
+            value.apply($select);
+          }
+        }
       }
     },
     planType($specifier) {
@@ -5070,7 +6430,7 @@ export const objects = {
       }
     }
   },
-  Tag: {
+  ProfileTag: {
     assertStep: assertPgClassSingleStep,
     plans: {
       entityId($record) {
@@ -5080,19 +6440,24 @@ export const objects = {
         return $record.get("entity_kind");
       },
       nodeId($parent) {
-        const specifier = nodeIdHandler_Tag.plan($parent);
-        return lambda(specifier, nodeIdCodecs[nodeIdHandler_Tag.codec.name].encode);
+        const specifier = nodeIdHandler_ProfileTag.plan($parent);
+        return lambda(specifier, nodeIdCodecs[nodeIdHandler_ProfileTag.codec.name].encode);
+      },
+      profileByEntityId($record) {
+        return resource_profilesPgResource.get({
+          id: $record.get("entity_id")
+        });
       }
     },
     planType($specifier) {
       const spec = Object.create(null);
-      for (const pkCol of tagsUniques[0].attributes) {
+      for (const pkCol of profile_tagsUniques[0].attributes) {
         spec[pkCol] = get2($specifier, pkCol);
       }
-      return resource_tagsPgResource.get(spec);
+      return resource_profile_tagsPgResource.get(spec);
     }
   },
-  TagsConnection: {
+  ProfileTagsConnection: {
     assertStep: ConnectionStep,
     plans: {
       totalCount($connection) {
@@ -5112,6 +6477,29 @@ export const objects = {
       },
       locationEdge($mutation, fieldArgs) {
         return pgMutationPayloadEdge(resource_locationsPgResource, locationsUniques[0].attributes, $mutation, fieldArgs);
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
+  UpdateLocationTagPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $result = $mutation.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      locationByEntityId($record) {
+        return resource_locationsPgResource.get({
+          id: $record.get("result").get("entity_id")
+        });
+      },
+      locationTag($object) {
+        return $object.get("result");
+      },
+      locationTagEdge($mutation, fieldArgs) {
+        return pgMutationPayloadEdge(resource_location_tagsPgResource, location_tagsUniques[0].attributes, $mutation, fieldArgs);
       },
       query() {
         return rootValue();
@@ -5159,6 +6547,29 @@ export const objects = {
       }
     }
   },
+  UpdatePhotoTagPayload: {
+    assertStep: ObjectStep,
+    plans: {
+      clientMutationId($mutation) {
+        const $result = $mutation.getStepForKey("result");
+        return $result.getMeta("clientMutationId");
+      },
+      photoByEntityId($record) {
+        return resource_photosPgResource.get({
+          id: $record.get("result").get("entity_id")
+        });
+      },
+      photoTag($object) {
+        return $object.get("result");
+      },
+      photoTagEdge($mutation, fieldArgs) {
+        return pgMutationPayloadEdge(resource_photo_tagsPgResource, photo_tagsUniques[0].attributes, $mutation, fieldArgs);
+      },
+      query() {
+        return rootValue();
+      }
+    }
+  },
   UpdateProfilePayload: {
     assertStep: ObjectStep,
     plans: {
@@ -5177,21 +6588,26 @@ export const objects = {
       }
     }
   },
-  UpdateTagPayload: {
+  UpdateProfileTagPayload: {
     assertStep: ObjectStep,
     plans: {
       clientMutationId($mutation) {
         const $result = $mutation.getStepForKey("result");
         return $result.getMeta("clientMutationId");
       },
-      query() {
-        return rootValue();
+      profileByEntityId($record) {
+        return resource_profilesPgResource.get({
+          id: $record.get("result").get("entity_id")
+        });
       },
-      tag($object) {
+      profileTag($object) {
         return $object.get("result");
       },
-      tagEdge($mutation, fieldArgs) {
-        return pgMutationPayloadEdge(resource_tagsPgResource, tagsUniques[0].attributes, $mutation, fieldArgs);
+      profileTagEdge($mutation, fieldArgs) {
+        return pgMutationPayloadEdge(resource_profile_tagsPgResource, profile_tagsUniques[0].attributes, $mutation, fieldArgs);
+      },
+      query() {
+        return rootValue();
       }
     }
   },
@@ -5303,6 +6719,18 @@ export const inputObjects = {
       }
     }
   },
+  CreateLocationTagInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      locationTag(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
   CreateMeasurementInput: {
     plans: {
       clientMutationId(qb, val) {
@@ -5327,6 +6755,18 @@ export const inputObjects = {
       }
     }
   },
+  CreatePhotoTagInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      photoTag(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
   CreateProfileInput: {
     plans: {
       clientMutationId(qb, val) {
@@ -5339,12 +6779,12 @@ export const inputObjects = {
       }
     }
   },
-  CreateTagInput: {
+  CreateProfileTagInput: {
     plans: {
       clientMutationId(qb, val) {
         qb.setMeta("clientMutationId", val);
       },
-      tag(qb, arg) {
+      profileTag(qb, arg) {
         if (arg != null) {
           return qb.setBuilder();
         }
@@ -5371,6 +6811,20 @@ export const inputObjects = {
     }
   },
   DeleteLocationInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  DeleteLocationTagByEntityKindAndEntityIdAndTagInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  DeleteLocationTagInput: {
     plans: {
       clientMutationId(qb, val) {
         qb.setMeta("clientMutationId", val);
@@ -5405,6 +6859,20 @@ export const inputObjects = {
       }
     }
   },
+  DeletePhotoTagByEntityKindAndEntityIdAndTagInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
+  DeletePhotoTagInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      }
+    }
+  },
   DeleteProfileByIdInput: {
     plans: {
       clientMutationId(qb, val) {
@@ -5419,14 +6887,14 @@ export const inputObjects = {
       }
     }
   },
-  DeleteTagByEntityKindAndEntityIdAndTagInput: {
+  DeleteProfileTagByEntityKindAndEntityIdAndTagInput: {
     plans: {
       clientMutationId(qb, val) {
         qb.setMeta("clientMutationId", val);
       }
     }
   },
-  DeleteTagInput: {
+  DeleteProfileTagInput: {
     plans: {
       clientMutationId(qb, val) {
         qb.setMeta("clientMutationId", val);
@@ -5479,6 +6947,83 @@ export const inputObjects = {
         schema
       }) {
         obj.set("id", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
+  LocationTagCondition: {
+    plans: {
+      entityId($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "entity_id",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.uuid)}`;
+          }
+        });
+      },
+      entityKind($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "entity_kind",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, spec_locationTags_attributes_entity_kind_codec_EntityKindsEnum)}`;
+          }
+        });
+      },
+      tag($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "tag",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.citext)}`;
+          }
+        });
+      }
+    }
+  },
+  LocationTagInput: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      entityId(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("entity_id", bakedInputRuntime(schema, field.type, val));
+      },
+      entityKind(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("entity_kind", bakedInputRuntime(schema, field.type, val));
+      },
+      tag(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("tag", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
+  LocationTagPatch: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      entityId(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("entity_id", bakedInputRuntime(schema, field.type, val));
+      },
+      entityKind(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("entity_kind", bakedInputRuntime(schema, field.type, val));
+      },
+      tag(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("tag", bakedInputRuntime(schema, field.type, val));
       }
     }
   },
@@ -5615,6 +7160,83 @@ export const inputObjects = {
       }
     }
   },
+  PhotoTagCondition: {
+    plans: {
+      entityId($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "entity_id",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.uuid)}`;
+          }
+        });
+      },
+      entityKind($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "entity_kind",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, spec_locationTags_attributes_entity_kind_codec_EntityKindsEnum)}`;
+          }
+        });
+      },
+      tag($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "tag",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.citext)}`;
+          }
+        });
+      }
+    }
+  },
+  PhotoTagInput: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      entityId(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("entity_id", bakedInputRuntime(schema, field.type, val));
+      },
+      entityKind(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("entity_kind", bakedInputRuntime(schema, field.type, val));
+      },
+      tag(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("tag", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
+  PhotoTagPatch: {
+    baked: createObjectAndApplyChildren,
+    plans: {
+      entityId(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("entity_id", bakedInputRuntime(schema, field.type, val));
+      },
+      entityKind(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("entity_kind", bakedInputRuntime(schema, field.type, val));
+      },
+      tag(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("tag", bakedInputRuntime(schema, field.type, val));
+      }
+    }
+  },
   ProfileCondition: {
     plans: {
       id($condition, val) {
@@ -5650,7 +7272,7 @@ export const inputObjects = {
       }
     }
   },
-  TagCondition: {
+  ProfileTagCondition: {
     plans: {
       entityId($condition, val) {
         $condition.where({
@@ -5681,7 +7303,7 @@ export const inputObjects = {
       }
     }
   },
-  TagInput: {
+  ProfileTagInput: {
     baked: createObjectAndApplyChildren,
     plans: {
       entityId(obj, val, {
@@ -5704,7 +7326,7 @@ export const inputObjects = {
       }
     }
   },
-  TagPatch: {
+  ProfileTagPatch: {
     baked: createObjectAndApplyChildren,
     plans: {
       entityId(obj, val, {
@@ -5745,6 +7367,30 @@ export const inputObjects = {
         qb.setMeta("clientMutationId", val);
       },
       locationPatch(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  UpdateLocationTagByEntityKindAndEntityIdAndTagInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      locationTagPatch(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  UpdateLocationTagInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      locationTagPatch(qb, arg) {
         if (arg != null) {
           return qb.setBuilder();
         }
@@ -5799,6 +7445,30 @@ export const inputObjects = {
       }
     }
   },
+  UpdatePhotoTagByEntityKindAndEntityIdAndTagInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      photoTagPatch(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
+  UpdatePhotoTagInput: {
+    plans: {
+      clientMutationId(qb, val) {
+        qb.setMeta("clientMutationId", val);
+      },
+      photoTagPatch(qb, arg) {
+        if (arg != null) {
+          return qb.setBuilder();
+        }
+      }
+    }
+  },
   UpdateProfileByIdInput: {
     plans: {
       clientMutationId(qb, val) {
@@ -5823,24 +7493,24 @@ export const inputObjects = {
       }
     }
   },
-  UpdateTagByEntityKindAndEntityIdAndTagInput: {
+  UpdateProfileTagByEntityKindAndEntityIdAndTagInput: {
     plans: {
       clientMutationId(qb, val) {
         qb.setMeta("clientMutationId", val);
       },
-      tagPatch(qb, arg) {
+      profileTagPatch(qb, arg) {
         if (arg != null) {
           return qb.setBuilder();
         }
       }
     }
   },
-  UpdateTagInput: {
+  UpdateProfileTagInput: {
     plans: {
       clientMutationId(qb, val) {
         qb.setMeta("clientMutationId", val);
       },
-      tagPatch(qb, arg) {
+      profileTagPatch(qb, arg) {
         if (arg != null) {
           return qb.setBuilder();
         }
@@ -6013,6 +7683,66 @@ export const enums = {
       }
     }
   },
+  LocationTagsOrderBy: {
+    values: {
+      ENTITY_ID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "entity_id",
+          direction: "ASC"
+        });
+      },
+      ENTITY_ID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "entity_id",
+          direction: "DESC"
+        });
+      },
+      ENTITY_KIND_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "entity_kind",
+          direction: "ASC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      ENTITY_KIND_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "entity_kind",
+          direction: "DESC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        location_tagsUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        location_tagsUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      TAG_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "tag",
+          direction: "ASC"
+        });
+      },
+      TAG_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "tag",
+          direction: "DESC"
+        });
+      }
+    }
+  },
   MeasurementsOrderBy: {
     values: {
       KEY_ASC(queryBuilder) {
@@ -6121,6 +7851,66 @@ export const enums = {
       }
     }
   },
+  PhotoTagsOrderBy: {
+    values: {
+      ENTITY_ID_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "entity_id",
+          direction: "ASC"
+        });
+      },
+      ENTITY_ID_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "entity_id",
+          direction: "DESC"
+        });
+      },
+      ENTITY_KIND_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "entity_kind",
+          direction: "ASC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      ENTITY_KIND_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "entity_kind",
+          direction: "DESC"
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_ASC(queryBuilder) {
+        photo_tagsUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "ASC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      PRIMARY_KEY_DESC(queryBuilder) {
+        photo_tagsUniques[0].attributes.forEach(attributeName => {
+          queryBuilder.orderBy({
+            attribute: attributeName,
+            direction: "DESC"
+          });
+        });
+        queryBuilder.setOrderIsUnique();
+      },
+      TAG_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "tag",
+          direction: "ASC"
+        });
+      },
+      TAG_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "tag",
+          direction: "DESC"
+        });
+      }
+    }
+  },
   ProfilesOrderBy: {
     values: {
       ID_ASC(queryBuilder) {
@@ -6157,7 +7947,7 @@ export const enums = {
       }
     }
   },
-  TagsOrderBy: {
+  ProfileTagsOrderBy: {
     values: {
       ENTITY_ID_ASC(queryBuilder) {
         queryBuilder.orderBy({
@@ -6186,7 +7976,7 @@ export const enums = {
         queryBuilder.setOrderIsUnique();
       },
       PRIMARY_KEY_ASC(queryBuilder) {
-        tagsUniques[0].attributes.forEach(attributeName => {
+        profile_tagsUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
             attribute: attributeName,
             direction: "ASC"
@@ -6195,7 +7985,7 @@ export const enums = {
         queryBuilder.setOrderIsUnique();
       },
       PRIMARY_KEY_DESC(queryBuilder) {
-        tagsUniques[0].attributes.forEach(attributeName => {
+        profile_tagsUniques[0].attributes.forEach(attributeName => {
           queryBuilder.orderBy({
             attribute: attributeName,
             direction: "DESC"

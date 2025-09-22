@@ -1936,6 +1936,8 @@ create table partitions.tags (
   primary key (entity_kind, entity_id, tag)
 ) partition by list (entity_kind);
 
+comment on table partitions.tags is '@partitionExpose child';
+
 create table partitions.photo_tags
   partition of partitions.tags for values in ('photos');
 alter table partitions.photo_tags
