@@ -1,9 +1,23 @@
+import type {
+  BooleanValueNode,
+  DefinitionNode,
+  GraphQLArgument,
+  GraphQLType,
+  InputValueDefinitionNode,
+  ListTypeNode,
+  NamedTypeNode,
+  StringValueNode,
+  TypeNode,
+} from "graphql";
 import {
   DirectiveLocation,
   GraphQLBoolean,
   GraphQLDirective,
   GraphQLInt,
+  GraphQLList,
+  GraphQLNonNull,
   GraphQLString,
+  Kind,
 } from "graphql";
 
 // This file contains the Stream/Defer directives, to be used when GraphQL itself doesn't provide them.
@@ -56,6 +70,9 @@ export const GraphQLDeferDirective = new GraphQLDirective({
     },
   },
 });
+export const deferDefinition: DefinitionNode = toDirectiveDef(
+  GraphQLDeferDirective,
+);
 
 /**
  * Used to conditionally stream list fields.
@@ -81,3 +98,62 @@ export const GraphQLStreamDirective = new GraphQLDirective({
     },
   },
 });
+export const streamDefinition: DefinitionNode = toDirectiveDef(
+  GraphQLStreamDirective,
+);
+
+function toDirectiveDef(directive: GraphQLDirective): DefinitionNode {
+  return {
+    kind: Kind.DIRECTIVE_DEFINITION,
+    description: toDescription(directive.description),
+    name: { kind: Kind.NAME, value: directive.name },
+    arguments: directive.args.map(toDirectiveArgDef),
+    repeatable: directive.isRepeatable,
+    locations: directive.locations.map((n) => ({ kind: Kind.NAME, value: n })),
+  };
+}
+
+function toDirectiveArgDef(arg: GraphQLArgument): InputValueDefinitionNode {
+  return {
+    kind: Kind.INPUT_VALUE_DEFINITION,
+    description: toDescription(arg.description),
+    name: { kind: Kind.NAME, value: arg.name },
+    type: toTypeDef(arg.type),
+    defaultValue: toValue(arg.defaultValue),
+  };
+}
+
+function toTypeDef(type: GraphQLType): TypeNode {
+  if (type instanceof GraphQLNonNull) {
+    return {
+      kind: Kind.NON_NULL_TYPE,
+      type: toTypeDef(type.ofType) as NamedTypeNode | ListTypeNode,
+    };
+  } else if (type instanceof GraphQLList) {
+    return {
+      kind: Kind.LIST_TYPE,
+      type: toTypeDef(type.ofType),
+    };
+  } else {
+    return {
+      kind: Kind.NAMED_TYPE,
+      name: { kind: Kind.NAME, value: type.name },
+    };
+  }
+}
+
+function toDescription(
+  value: string | null | undefined,
+): StringValueNode | undefined {
+  return value != null ? { kind: Kind.STRING, value } : undefined;
+}
+
+function toValue(value: unknown): undefined | BooleanValueNode {
+  if (value === undefined) {
+    return undefined;
+  } else if (typeof value === "boolean") {
+    return { kind: Kind.BOOLEAN, value };
+  } else {
+    throw new Error(`Not yet supported`);
+  }
+}
