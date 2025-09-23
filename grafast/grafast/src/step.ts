@@ -172,8 +172,13 @@ export /* abstract */ class Step<TData = any> {
     DEFAULT_FORBIDDEN_FLAGS;
   /**
    * The plan this plan will need data from in order to execute.
+   *
+   * @internal
    */
   protected readonly dependencies: ReadonlyArray<Step>;
+  get dependencyCount(): number {
+    return this.dependencies.length;
+  }
   /** @internal */
   protected readonly _refs: Array<number> = [];
   /**

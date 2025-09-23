@@ -570,14 +570,13 @@ export class PgSelectStep<
       _internalCloneAlias: cloneFrom.alias,
     });
 
-    if ($clone.dependencies.length !== 1) {
+    if ($clone.dependencyCount !== 1) {
       throw new Error(
         "Should not have any dependencies other than context yet",
       );
     }
 
-    cloneFrom.dependencies.forEach((planId, idx) => {
-      if (idx === 0) return;
+    for (let idx = 1; idx < cloneFrom.dependencyCount; idx++) {
       const myIdx = $clone.addDependency({
         ...cloneFrom.getDepOptions(idx),
         skipDeduplication: true,
@@ -587,7 +586,7 @@ export class PgSelectStep<
           `Failed to clone ${cloneFrom}; dependency indexes did not match: ${myIdx} !== ${idx}`,
         );
       }
-    });
+    }
 
     $clone.applyDepIds = [...cloneFrom.applyDepIds];
     $clone.isTrusted = cloneFrom.isTrusted;
@@ -1529,7 +1528,7 @@ export class PgSelectStep<
 
     // Scan through the dependencies to find a suitable ancestor step to merge with
     for (
-      let dependencyIndex = 0, l = this.dependencies.length;
+      let dependencyIndex = 0, l = this.dependencyCount;
       dependencyIndex < l;
       dependencyIndex++
     ) {
@@ -1640,7 +1639,7 @@ export class PgSelectStep<
           this,
           myContext,
           tsContext,
-          $pgSelect.dependencies[$pgSelect.contextId],
+          $pgSelect.getDepOptions($pgSelect.contextId).step,
           $pgSelect,
         );
         $pgSelect = null;
