@@ -98,6 +98,55 @@ const preset = {
 export default preset;
 ```
 
+### Common plugins
+
+V5 plugins often use the `@beta` tag on npm during the beta phase. Also many are
+now technically "presets" rather than "plugins" - plugins go into the `plugins`
+list, but presets go into the `extends` list:
+
+```ts title="graphile.config.ts"
+const preset: GraphileConfig.Preset = {
+  extends: [
+    makeV4Preset({ /* ... */ }),
+    SomePreset,
+  ],
+  plugins: [
+    SomePlugin,
+  ]
+};
+export default preset;
+```
+
+Ported:
+
+- `import { PgAggregatesPreset } from '@graphile/pg-aggregates';`
+- `import { PgManyToManyPreset } from '@graphile-contrib/pg-many-to-many';`
+- `import { PgOmitArchivedPlugin } from '@graphile-contrib/pg-omit-archived';`
+- `import { PgOrderByRelatedPlugin } from '@graphile-contrib/pg-order-by-related';`
+- `import { PostGraphileConnectionFilterPreset } from 'postgraphile-plugin-connection-filter';`
+- `import { PostGraphileFulltextFilterPlugin } from '@graphile-contrib/postgraphile-plugin-fulltext-filter';`
+
+Changed:
+
+- ~~`@graphile/pg-pubsub`~~ is now built in; see [the subscriptions
+  docs](../subscriptions.mdx) for more details. Users of the V4 preset can use
+  `simpleSubscriptions: true` as before; those not using it can use the
+  [PgV4SimpleSubscriptionsPlugin](https://github.com/graphile/crystal/blob/main/postgraphile/postgraphile/src/plugins/PgV4SimpleSubscriptionsPlugin.ts).
+- ~~`@graphile-contrib/pg-simplify-inflector`~~ is renamed:  
+  `import { PgSimplifyInflectionPreset } from '@graphile/simplify-inflection';`
+
+Not yet ported:
+
+- `@graphile/postgis`
+- `@graphile/operation-hooks`
+
+:::tip[Get in touch!]
+
+Need more plugins ported? We need financial support! I'm sure there's a mutually
+beneficial agreement to be found...
+
+:::
+
 ### Larger example
 
 Here's a larger documented preset with more details:
