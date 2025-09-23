@@ -70,6 +70,7 @@ import {
   GraphQLUnionType,
   printSchema,
 } from "grafast/graphql";
+import { specifiedDirectives } from "graphql";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
@@ -128,7 +129,6 @@ import {
   SideEffectWithPgClientStep,
   sideEffectWithPgClientTransaction,
 } from "../steps/withPgClient.js";
-import { specifiedDirectives } from "graphql";
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export function EXPORTABLE<T, TScope extends any[]>(
