@@ -21,8 +21,23 @@ export const StreamDeferPlugin: GraphileConfig.Plugin = {
   schema: {
     hooks: {
       GraphQLSchema: {
-        callback: (schema) => {
-          schema.enableDeferStream = true;
+        callback: (schema, build) => {
+          const {
+            GraphQLStreamDirective,
+            GraphQLDeferDirective,
+            graphqlHasStreamDefer,
+          } = build.grafast;
+          const { specifiedDirectives } = build.graphql;
+          if (graphqlHasStreamDefer) {
+            // @ts-ignore
+            schema.enableDeferStream = true;
+          } else {
+            schema.directives = [
+              ...(schema.directives ?? specifiedDirectives),
+              GraphQLStreamDirective,
+              GraphQLDeferDirective,
+            ];
+          }
           return schema;
         },
       },

@@ -41,6 +41,9 @@ import {
   filter,
   get,
   getNullableInputTypeAtPath,
+  GraphQLDeferDirective,
+  graphqlHasStreamDefer,
+  GraphQLStreamDirective,
   groupBy,
   inhibitOnNull,
   lambda,
@@ -67,6 +70,7 @@ import {
   GraphQLUnionType,
   printSchema,
 } from "grafast/graphql";
+import { specifiedDirectives } from "graphql";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
@@ -5363,7 +5367,16 @@ export function makeExampleSchema(
         ],
       },
     },
-    enableDeferStream: true,
+    // @ts-ignore
+    ...(graphqlHasStreamDefer
+      ? { enableDeferStream: true }
+      : {
+          directives: [
+            ...specifiedDirectives,
+            GraphQLStreamDirective,
+            GraphQLDeferDirective,
+          ],
+        }),
   });
 }
 

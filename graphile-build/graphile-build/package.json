@@ -42,7 +42,7 @@
     "chalk": "^4.1.2",
     "debug": "^4.4.1",
     "graphile-config": "workspace:^",
-    "graphql": "^16.1.0-experimental-stream-defer.6",
+    "graphql": "^16.9.0",
     "lodash": "^4.17.21",
     "pluralize": "^7.0.0",
     "semver": "^7.7.2",
@@ -55,7 +55,7 @@
   "peerDependencies": {
     "grafast": "workspace:^",
     "graphile-config": "workspace:^",
-    "graphql": "^16.1.0-experimental-stream-defer.6"
+    "graphql": "^16.9.0"
   },
   "files": [
     "dist",
@@ -66,7 +66,7 @@
     "@types/jest": "^30.0.0",
     "grafast": "workspace:^",
     "graphile-export": "workspace:^",
-    "graphql": "16.1.0-experimental-stream-defer.6",
+    "graphql": "^16.9.0",
     "jest": "^30.0.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"

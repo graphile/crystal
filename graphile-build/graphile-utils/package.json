@@ -50,7 +50,7 @@
     "graphile-build": "workspace:^",
     "graphile-build-pg": "workspace:^",
     "graphile-config": "workspace:^",
-    "graphql": "^16.1.0-experimental-stream-defer.6",
+    "graphql": "^16.9.0",
     "tamedevil": "workspace:^"
   },
   "peerDependenciesMeta": {
@@ -65,7 +65,7 @@
     "graphile-build": "workspace:^",
     "graphile-build-pg": "workspace:^",
     "graphile-config": "workspace:^",
-    "graphql": "^16.1.0-experimental-stream-defer.6",
+    "graphql": "^16.9.0",
     "jest": "^30.0.4",
     "jest-serializer-graphql-schema": "workspace:^",
     "nodemon": "^3.1.10",

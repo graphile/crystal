@@ -43,6 +43,7 @@ import {
   isNamedType,
   isSchema,
   printSchema,
+  specifiedDirectives,
 } from "grafast/graphql";
 import type { GraphQLSchemaNormalizedConfig } from "graphql/type/schema";
 import type { PgSQL, SQL } from "pg-sql2";
@@ -745,6 +746,9 @@ class CodegenFile {
             `${config.name}.extensions`,
             `${config.name}.extensions`,
           ),
+          isOneOf: config.isOneOf
+            ? t.booleanLiteral(true)
+            : t.identifier("undefined"),
           fields: t.arrowFunctionExpression(
             [],
             this.makeInputObjectFields(config.fields, config.name),
@@ -1513,6 +1517,7 @@ function exportSchemaGraphQLJS({
   const types = customTypes.map((type) => {
     return file.declareType(type);
   });
+  const specifiedDirectivesAST = file.import("graphql", "specifiedDirectives");
 
   file.addStatements(
     declareGraphQLEntity(file, schemaExportName, "GraphQLSchema", {
@@ -1525,11 +1530,12 @@ function exportSchemaGraphQLJS({
       types: t.arrayExpression(types),
       directives:
         customDirectives.length > 0
-          ? t.arrayExpression(
-              customDirectives.map((directive) =>
+          ? t.arrayExpression([
+              t.spreadElement(specifiedDirectivesAST),
+              ...customDirectives.map((directive) =>
                 file.declareDirective(directive),
               ),
-            )
+            ])
           : null,
       extensions: extensions(
         file,
@@ -1537,9 +1543,12 @@ function exportSchemaGraphQLJS({
         "schema.extensions",
         "schema.extensions",
       ),
+      // @ts-ignore
       enableDeferStream:
+        // @ts-ignore
         config.enableDeferStream != null
-          ? t.booleanLiteral(config.enableDeferStream)
+          ? // @ts-ignore
+            t.booleanLiteral(config.enableDeferStream)
           : null,
       assumeValid: null, // TODO: t.booleanLiteral(true),
     }),
@@ -2024,6 +2033,8 @@ function exportSchemaTypeDefs({
   );
 }
 
+const specifiedDirectiveNames = specifiedDirectives.map((d) => d.name);
+
 export async function exportSchemaAsString(
   schema: GraphQLSchema,
   options: ExportOptions,
@@ -2032,22 +2043,12 @@ export async function exportSchemaAsString(
 
   const customTypes = config.types.filter((type) => !isBuiltinType(type));
   const customDirectives = config.directives.filter(
-    (d) =>
-      ![
-        "skip",
-        "include",
-        "deprecated",
-        "specifiedBy",
-        "defer",
-        "stream",
-      ].includes(d.name),
+    (d) => !specifiedDirectiveNames.includes(d.name),
   );
 
-  if (
-    process.env.ENABLE_DEFER_STREAM === "1" ||
-    config.directives.some((d) => d.name === "defer" || d.name === "skip")
-  ) {
+  if (config.directives.some((d) => d.name === "defer" || d.name === "skip")) {
     // Ref: https://github.com/graphql/graphql-js/pull/3450
+    // @ts-ignore
     config.enableDeferStream = true;
   }
 

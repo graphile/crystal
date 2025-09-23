@@ -2,6 +2,11 @@ import type { GraphQLFieldExtensions, GraphQLFieldResolver } from "graphql";
 import { GraphQLSchema } from "graphql";
 import * as graphql from "graphql";
 
+import {
+  deferDefinition,
+  graphqlHasStreamDefer,
+  streamDefinition,
+} from "./incremental.js";
 import type {
   AbstractTypePlanner,
   ArgumentApplyPlanResolver,
@@ -249,7 +254,7 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
     enableDeferStream = false,
   } = details;
 
-  const document: graphql.DocumentNode =
+  const baseDocument: graphql.DocumentNode =
     typeof typeDefs === "string"
       ? parse(typeDefs)
       : Array.isArray(typeDefs)
@@ -258,6 +263,17 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
             definitions: typeDefs.flatMap((t) => t.definitions),
           }
         : typeDefs;
+  const document: graphql.DocumentNode =
+    graphqlHasStreamDefer || !enableDeferStream
+      ? baseDocument
+      : {
+          ...baseDocument,
+          definitions: [
+            ...baseDocument.definitions,
+            deferDefinition,
+            streamDefinition,
+          ],
+        };
   if (!document || document.kind !== "Document") {
     throw new Error(
       "The first argument to makeGrafastSchema must be an object containing a `typeDefs` field; the value for this field should be a parsed GraphQL document, array of these, or a string.",
@@ -265,7 +281,8 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
   }
 
   const astSchema = buildASTSchema(document, {
-    enableDeferStream,
+    // @ts-ignore
+    enableDeferStream: enableDeferStream && graphqlHasStreamDefer,
   });
 
   let plans: GrafastPlans;

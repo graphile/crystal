@@ -57,7 +57,7 @@
     "node": ">=16"
   },
   "peerDependencies": {
-    "graphql": "^16.1.0-experimental-stream-defer.6"
+    "graphql": "^16.9.0"
   },
   "files": [
     "dist",
@@ -71,7 +71,7 @@
     "@types/nodemon": "3.1.1",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
-    "graphql": "16.1.0-experimental-stream-defer.6",
+    "graphql": "^16.9.0",
     "jest": "^30.0.4",
     "nodemon": "^3.1.10",
     "typescript": "^5.8.3"

@@ -5,9 +5,11 @@ import debugFactory from "debug";
 import type { MiddlewareHandlers } from "graphile-config";
 import type {
   DocumentNode,
+  ExecutionResult,
   GraphQLError,
   OperationDefinitionNode,
 } from "graphql";
+import type { ObjMap } from "graphql/jsutils/ObjMap";
 
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import type { DataFromObjectSteps } from "./steps/object.js";
@@ -288,7 +290,11 @@ import {
   stepAShouldTryAndInlineIntoStepB,
   stepsAreInSamePhase,
 } from "./utils.js";
-
+export {
+  GraphQLDeferDirective,
+  graphqlHasStreamDefer,
+  GraphQLStreamDirective,
+} from "./incremental.js";
 export { isAsyncIterable } from "iterall";
 export {
   __FlagStep,
@@ -1080,4 +1086,42 @@ declare module "graphql" {
   interface GraphQLSchemaExtensions {
     grafast?: Grafast.SchemaExtensions;
   }
+}
+
+declare module "graphql/execution/execute" {
+  interface ExecutionResult<
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    TData = ObjMap<unknown>,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    TExtensions = ObjMap<unknown>,
+  > {
+    hasNext?: never;
+  }
+  interface ExecutionPatchResult<
+    TData = ObjMap<unknown> | unknown,
+    TExtensions = ObjMap<unknown>,
+  > {
+    errors?: ReadonlyArray<GraphQLError>;
+    data?: TData | null;
+    path?: ReadonlyArray<string | number>;
+    label?: string;
+    hasNext: boolean;
+    extensions?: TExtensions;
+  }
+  type AsyncExecutionResult = ExecutionResult | ExecutionPatchResult;
+}
+
+declare module "graphql" {
+  interface ExecutionPatchResult<
+    TData = ObjMap<unknown> | unknown,
+    TExtensions = ObjMap<unknown>,
+  > {
+    errors?: ReadonlyArray<GraphQLError>;
+    data?: TData | null;
+    path?: ReadonlyArray<string | number>;
+    label?: string;
+    hasNext: boolean;
+    extensions?: TExtensions;
+  }
+  type AsyncExecutionResult = ExecutionResult | ExecutionPatchResult;
 }
