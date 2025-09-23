@@ -14,12 +14,13 @@ as [connections](./connections) or lists, depending on the behavior configuratio
 
 We inline these function calls into the original `SELECT` statement for
 efficiency, so no additional SQL queries need to be issued to the database.
-That said, SQL function calls do have a performance overhead, which can build
+That said, SQL function calls can have a performance overhead, which can build
 up if you’re doing this on thousands of rows. PostgreSQL can [sometimes inline
 your SQL functions](https://wiki.postgresql.org/wiki/Inlining_of_SQL_functions)
 for great performance, but if this fails and you’re seeing performance issues
 you might want to investigate using
-[`extendSchema`](./extend-schema) instead.
+[`extendSchema`](./extend-schema) instead - see the related note in
+[Understanding function performance](./functions.md#example-computed-column-function).
 
 :::
 
