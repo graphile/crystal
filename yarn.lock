@@ -16198,7 +16198,7 @@ __metadata:
     tslib: "npm:^2.8.1"
     typescript: "npm:^5.8.3"
   peerDependencies:
-    graphql: ^16.9.0
+    graphql: ">=15 <17"
   languageName: unknown
   linkType: soft
 
