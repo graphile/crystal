@@ -1,5 +1,6 @@
 ---
 title: Database Functions
+toc_max_heading_level: 4
 ---
 
 One of the easiest ways to add more capabilities to your PostGraphile schema is
@@ -28,7 +29,11 @@ For some function examples, you can refer to the [forum example SQL schema][].
 
 Well written business logic in the database will often be significantly more
 performant then writing the business logic in the application layer. This is
-because PostgreSQL is finely tuned for data intensive uses.
+because PostgreSQL is finely tuned for data intensive uses (with statistics and
+indexes to guide it) and because the round-trip time is minimized. However, it's
+very easy to write poorly performing code in any environment if you're not
+familiar with how that environment will execute your logic, and the database is
+no exception to this.
 
 :::info[Take care to adapt your coding pattern to the new paradigm-shift]
 
@@ -43,16 +48,19 @@ database should not be used.
 
 :::
 
-JavaScript programmers will likely be tempted to use the `FOR`, `FOREACH` and
-`LOOP` constructs to manipulate rows, since that’s what they would do in their
-JavaScript code. But doing so might result in PostgreSQL having to perform
-hundreds, thousands, or even millions of SQL queries and function calls under
-the hood of your function.
+### Avoid looping
+
+Procedural language programmers (people who write JS/TS, C, Java, Ruby, Python,
+PHP, ...) will likely be tempted to use the `FOR`, `FOREACH` and `LOOP`
+constructs to manipulate rows, since that’s what they would do in their
+procedural code. But doing so might result in PostgreSQL having to perform
+hundreds, thousands, or even millions of individual SQL queries and function
+calls under the hood of your function.
 
 In PostgreSQL you should **almost never** use these looping constructs, instead
-you should perform set operations where possible.
+you should perform **set operations** where possible.
 
-### Example: archiving forums
+#### Example: archiving forums
 
 Imagine you want a function capable of archiving a number of forums, and thus
 set the `is_archived` for each post in that forum. You might do it like this:
@@ -101,10 +109,64 @@ create function archive_forums(forum_ids int[]) returns void as $$
 $$ language sql volatile;
 ```
 
-### Example: row-level security function
+### Function inlining (or lack thereof!)
 
-Another common mistake that we see people make is passing row values to
-function calls in RLS policies. For example:
+From the PostgreSQL planner point of view, _most_ functions (see exceptions
+below) are a "black box" in terms of optimization: Postgres is forced to call
+each function for each set of parameters and execute them separately from the
+parent query &mdash; it can't turn the function body into a subquery or rewrite
+it as a join, it can't push "order by" or "where" clauses down into the function
+body, etc. If you were to apply an "order by" to such a "black box" function,
+Postgres must first compute the entire results of the function, store them into
+temporary storage (which may or may not result in writing them to disk) and then
+apply ordering to this result set.
+
+When functions are written by developers unfamiliar with how PostgreSQL function
+execution works, this can result in incredibly poor performance, and often leads
+to the mantra of "don't put business logic in the database" &mdash; but this
+mantra is misguided. If you embrace the declarative nature of the database you
+can typically create business logic that is much more performant than the
+equivalent in the application layer, and enables you to reach a much larger
+scale before you have to worry about managing your own caches (and cache
+invalidation!) manually.
+
+Not all functions are a "black box" from a PostgreSQL optimization point of view
+&mdash; if you're careful with how you write a function, you can make it
+"inlineable" such that PostgreSQL will insert the body of the function into the
+query and forget that it even came from a function in the first place. To see a
+rough set of rules that must hold for your function to be inlined, please see
+[Inlining of SQL
+functions](https://wiki.postgresql.org/wiki/Inlining_of_SQL_functions) in the
+PostgreSQL wiki; but the most important part is it must be `LANGUAGE sql`;
+functions written in other languages, including `plpgsql`, can never be inlined.
+
+:::tip[Move expensive "presentational" functions to plugins]
+
+Functions in the database can be generally split into two categories: business
+logic (typically security-critical functionality e.g. RLS policies, custom
+mutations, etc) and presentational (e.g. exposing interfaces for search,
+summarizing data, and other concerns that aren't security-critical).
+
+Presentational logic that is expensive to build in the database can typically
+be moved to an [`extendSchema()`](./extend-schema.md) plugin (or similar)
+in order to massively improve performance. Plugins inject SQL directly into the
+query, and since the SQL is explicitly in the query issued to the database,
+PostgreSQL can do its normal query rewriting and plan optimization against it.
+As such, from the PostgreSQL's planner perspective, SQL added by plugins is an
+open book, ripe for optimization.
+
+When you're hitting performance issues with SQL functions, and in particular
+with "computed column" SQL functions, your best bet is typically to move them
+from database functions into schema plugins &mdash; see the example below.
+
+:::
+
+#### Example: row-level security function
+
+**DO NOT PASS ROW DATA TO RLS FUNCTIONS!**
+
+A common mistake that we see people make is passing data from rows as input to
+functions called in RLS policies. For example:
 
 ```sql title="BAD! Uses row data in function call"
 create function current_user_is_member_of(target_organization_id int) returns boolean as $$
@@ -119,16 +181,19 @@ $$ language sql stable security definer;
 create policy select_members
   for select on members
   using (
+    -- DO NOT DO THIS!!
     /* highlight-next-line */
     current_user_is_member_of(members.organization_id)
   );
 ```
 
-Here each new value for `members.organization_id` is passed to the
-`current_user_is_member_of` function, meaning that (depending on the other
-filters used in the query) we may be calling the `current_user_is_member_of`
-function for every unique `organization_id` in the database. And that’s the best
-case, at worst PostgreSQL may call the function for every row. Ouch!
+This function is `security definer` so it cannot be inlined; thus each new value
+for `members.organization_id` requires the `current_user_is_member_of` function
+to be executed independently, meaning that (depending on the other filters used
+in the query) we may be calling the `current_user_is_member_of` function for
+every unique `organization_id` in the database. And that’s the best case, at
+worst PostgreSQL may invoke the overhead of the function call for every row.
+Ouch!
 
 Instead, we should ensure that functions called in RLS policies never accept a
 row value as argument. We can do this by restructuring the logic:
@@ -148,16 +213,124 @@ create policy select_members
   );
 ```
 
-Here, PostgreSQL can call the function once at the start and then can use a
-simple index check to select the rows that are visible according to the RLS
-policy. This can be **literally thousands of times faster** than the previous
-example.
+Since the function accepts no arguments (or only constant arguments), PostgreSQL
+can call the function once at the start and reuse the result without
+recomputing. When applying the RLS policy, the `organization_id` restriction can
+be accomplished with excellent performance using a database index. This can be
+**literally thousands of times faster** than the previous example.
 
 You might think that this is likely to be _less performant_ when you’re
 fetching individual rows, but as a general rule of thumb PostgreSQL can read
 millions of rows per second (and even more if it just needs index values), so
 determining the list of `organization_id`s a user is a member of is so trivial
 you can almost ignore it.
+
+#### Example: computed column function
+
+If your [SQL function can be
+inlined](https://wiki.postgresql.org/wiki/Inlining_of_SQL_functions) as
+discussed above, it's typically fine to use it as a [computed column
+function](./computed-columns.md).
+
+However, for functions that cannot be inlined, the "computed column function"
+pattern can result in very poor performance. If you notice such a function is
+problematic in your queries, you can move it into the application layer such
+that the SQL is injected directly into the query, allowing PostgreSQL to
+optimize it. This is particularly useful if you need to dynamically construct
+the SQL to be executed. This can be done without a breaking change to the
+GraphQL schema.
+
+Here's a very simple example:
+
+```sql title="BAD! Cannot be inlined!"
+create function users_filtered_things(u users, include_archived boolean)
+returns setof things as $$
+declare
+  sql text;
+begin
+  -- Dynamically construct our SQL
+  sql := format(
+    'select t.* from things t where t.user_id = $1%s',
+    case when include_archived then '' else ' and archived_at is null' end
+  );
+
+  -- Execute the SQL
+  return query execute sql using u.id;
+end;
+$$ language plpgsql stable;
+comment on function users_filtered_things is E'@behavior +filter';
+```
+
+PostgreSQL can't inline the above (since it uses `plpgsql`) so it can end up
+very expensive.
+
+However, we can do the same work in an `extendSchema()` plugin, and the
+resulting SQL will be fully inlined and optimized with identical GraphQL schema
+produced:
+
+```ts title="Plugins inline even dynamically generated SQL"
+export const MyPlugin = extendSchema((build) => {
+  const {
+    sql,
+    grafast: { lambda },
+    pgResources: { things },
+  } = build;
+  return {
+    typeDefs: /* GraphQL */ `
+      extend type User {
+        filteredThings(includeArchived: Boolean): ThingsConnection!
+      }
+    `,
+    objects: {
+      User: {
+        plans: {
+          filteredThings($user, { $includeArchived }) {
+            // Create a pgSelect step representing all things owned by this user:
+            const $things = things.find({ user_id: $user.get("id") });
+
+            // Apply dynamic changes to the query based on runtime values:
+            $things.apply(
+              lambda(
+                $includeArchived /* ← plan-time step */,
+                (includeArchived /* ← runtime value */) =>
+                  // At runtime, this callback will be called to manipulate the
+                  // SQL query before it is executed
+                  (queryBuilder) => {
+                    if (!includeArchived) {
+                      queryBuilder.where(sql`archived_at is null`);
+                    }
+                  },
+              ),
+            );
+
+            // Wrap this collection in a connection
+            return connection($things);
+          },
+        },
+      },
+    },
+  };
+});
+```
+
+:::note[PostGraphile will add the connection arguments automatically]
+
+Since this example adds a field returning `ThingsConnection`, PostGraphile
+will automatically add the `first`/`last`/`before`/`after`/etc arguments.
+You can disable this through use of scope:
+
+```ts
+        plans: {
+          filteredThings: {
+            scope: {
+              // Disable the connection-related arguments being auto-added
+              isPgFieldConnection: false,
+            },
+            plan($user, { $includeArchived }) {
+              // ...
+```
+
+:::
 
 ## Recommended Reading
 
