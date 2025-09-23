@@ -1517,6 +1517,7 @@ function exportSchemaGraphQLJS({
   const types = customTypes.map((type) => {
     return file.declareType(type);
   });
+  const specifiedDirectivesAST = file.import("graphql", "specifiedDirectives");
 
   file.addStatements(
     declareGraphQLEntity(file, schemaExportName, "GraphQLSchema", {
@@ -1529,11 +1530,12 @@ function exportSchemaGraphQLJS({
       types: t.arrayExpression(types),
       directives:
         customDirectives.length > 0
-          ? t.arrayExpression(
-              customDirectives.map((directive) =>
+          ? t.arrayExpression([
+              t.spreadElement(specifiedDirectivesAST),
+              ...customDirectives.map((directive) =>
                 file.declareDirective(directive),
               ),
-            )
+            ])
           : null,
       extensions: extensions(
         file,

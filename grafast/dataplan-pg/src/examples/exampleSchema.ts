@@ -128,6 +128,7 @@ import {
   SideEffectWithPgClientStep,
   sideEffectWithPgClientTransaction,
 } from "../steps/withPgClient.js";
+import { specifiedDirectives } from "graphql";
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export function EXPORTABLE<T, TScope extends any[]>(
@@ -5369,7 +5370,13 @@ export function makeExampleSchema(
     // @ts-ignore
     ...(graphqlHasStreamDefer
       ? { enableDeferStream: true }
-      : { directives: [GraphQLStreamDirective, GraphQLDeferDirective] }),
+      : {
+          directives: [
+            ...specifiedDirectives,
+            GraphQLStreamDirective,
+            GraphQLDeferDirective,
+          ],
+        }),
   });
 }
 

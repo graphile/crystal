@@ -931,7 +931,7 @@ export function extendSchema(
           return {
             ...schema,
             directives: [
-              ...(schema.directives || build.graphql.specifiedDirectives || []),
+              ...(schema.directives || build.graphql.specifiedDirectives),
               ...typeExtensions.GraphQLSchema.directives,
             ],
             types: [
