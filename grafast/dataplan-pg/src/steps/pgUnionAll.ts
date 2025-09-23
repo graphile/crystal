@@ -516,13 +516,11 @@ export class PgUnionAllStep<
       _internalCloneAlias: cloneFrom.alias,
     });
 
-    if ($clone.dependencies.length !== 0) {
-      throw new Error(
-        `Should not have any dependencies yet: ${$clone.dependencies}`,
-      );
+    if ($clone.dependencyCount !== 0) {
+      throw new Error(`Should not have any dependencies yet: ${$clone}`);
     }
 
-    cloneFrom.dependencies.forEach((planId, idx) => {
+    for (let idx = 0; idx < cloneFrom.dependencyCount; idx++) {
       const myIdx = $clone.addDependency({
         ...cloneFrom.getDepOptions(idx),
         skipDeduplication: true,
@@ -532,7 +530,7 @@ export class PgUnionAllStep<
           `Failed to clone ${cloneFrom}; dependency indexes did not match: ${myIdx} !== ${idx}`,
         );
       }
-    });
+    }
 
     $clone.applyDepIds = [...cloneFrom.applyDepIds];
     $clone.contextId = cloneFrom.contextId;
