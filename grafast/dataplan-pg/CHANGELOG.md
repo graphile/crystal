@@ -1,5 +1,134 @@
 # @dataplan/pg
 
+## 0.0.1-beta.39
+
+### Patch Changes
+
+- [#2730](https://github.com/graphile/crystal/pull/2730)
+  [`4c3cf22`](https://github.com/graphile/crystal/commit/4c3cf22592f44cb28e399434474ca5fcef0e1a3b)
+  Thanks [@benjie](https://github.com/benjie)! - Update `graphql` version range
+
+- [#2716](https://github.com/graphile/crystal/pull/2716)
+  [`a0a6082`](https://github.com/graphile/crystal/commit/a0a6082173247caf8f76df925a9d8e7926792663)
+  Thanks [@benjie](https://github.com/benjie)! - Add ability for Postgres client
+  to capture `RAISE NOTIFY` issued during an SQL query. An example follows:
+
+  Database:
+
+  ```sql
+  create table foo (id serial primary key, bar text);
+  create function tg_foo() returns trigger language plpgsql volatile as $
+  begin
+    raise notice 'Hello World' using hint = 'Hi, ' || NEW.bar;
+    return NEW;
+  end;
+  $;
+  create trigger _insert before insert on foo for each row execute function tg_foo();
+  ```
+
+  Plugin:
+
+  ```ts
+  const plugin = extendSchema({
+    typeDefs: /* GraphQL */ `
+      type PgNotice {
+        severity: String
+        message: String
+        code: String
+        detail: String
+        hint: String
+      }
+      extend type CreateFooPayload {
+        messages: [PgNotice]
+      }
+    `,
+    plans: {
+      CreateFooPayload: {
+        messages($payload: any) {
+          const $result = get($payload, "result") as PgInsertSingleStep;
+          return $result.getNotices();
+        },
+      },
+    },
+  });
+  ```
+
+  Result:
+
+  ```json
+  {
+    "data": {
+      "createFoo": {
+        "clientMutationId": null,
+        "foo": {
+          "id": "WyJmb29zIiwzXQ==",
+          "bar": "inputvalue"
+        },
+        "messages": [
+          {
+            "severity": "NOTICE",
+            "message": "Hello World",
+            "code": "00000",
+            "detail": null,
+            "hint": "Hi, inputvalue"
+          }
+        ]
+      }
+    }
+  }
+  ```
+
+- [#2713](https://github.com/graphile/crystal/pull/2713)
+  [`278b4d3`](https://github.com/graphile/crystal/commit/278b4d398eb7db1935caba4155e1d1727284a370)
+  Thanks [@benjie](https://github.com/benjie)! - Correctly differentiate
+  subscriptions from @stream, a subscription stream will never need a
+  distributor
+
+- [#2728](https://github.com/graphile/crystal/pull/2728)
+  [`eaa771b`](https://github.com/graphile/crystal/commit/eaa771b34dbdac1c4d701faa8fb5947e9cf1d1be)
+  Thanks [@benjie](https://github.com/benjie)! - `Step::dependencies` is now
+  explicitly internal (removed from API), no longer simply protected. Use
+  `Step::dependencyCount` along with `Step::getDep()`/`Step::getDepOptions()`
+  instead.
+
+- [#2723](https://github.com/graphile/crystal/pull/2723)
+  [`e790f7a`](https://github.com/graphile/crystal/commit/e790f7ac7933c8ed01465688e20c2af76d2a79e8)
+  Thanks [@benjie](https://github.com/benjie)! - `@dataplan/pg` now exports
+  `sql` from `pg-sql2` and also adds forwards to the whole module
+  (`import ... from '@dataplan/pg/pg-sql2'`)
+
+- [#2714](https://github.com/graphile/crystal/pull/2714)
+  [`c8412aa`](https://github.com/graphile/crystal/commit/c8412aa73875aafe64317cc4c655654a86486047)
+  Thanks [@benjie](https://github.com/benjie)! - Fixes type error in
+  `loadOneWithPgClient()`/`loadManyWithPgClient()`
+
+- [#2718](https://github.com/graphile/crystal/pull/2718)
+  [`b20a63f`](https://github.com/graphile/crystal/commit/b20a63f5ee77734ce2e3aa71f9f4de3c00e27e55)
+  Thanks [@benjie](https://github.com/benjie)! - Move a `graphile-build-pg` type
+  out of `@dataplan/pg`
+
+- [#2723](https://github.com/graphile/crystal/pull/2723)
+  [`05f3e44`](https://github.com/graphile/crystal/commit/05f3e449a771aefcd9a81c6275a376ad87e3d316)
+  Thanks [@benjie](https://github.com/benjie)! -
+  `ObjectStep<PgExecutorContextPlans<...>>` is deprecated; please use
+  `Step<PgExecutorContext<...>>` instead.
+
+- [#2723](https://github.com/graphile/crystal/pull/2723)
+  [`81c62bb`](https://github.com/graphile/crystal/commit/81c62bb9f9b05f7ff1251695712e1777de7315f9)
+  Thanks [@benjie](https://github.com/benjie)! - makePgResourceOptions() is now
+  simply pgResourceOptions()
+
+- Updated dependencies
+  [[`4c3cf22`](https://github.com/graphile/crystal/commit/4c3cf22592f44cb28e399434474ca5fcef0e1a3b),
+  [`71e0af2`](https://github.com/graphile/crystal/commit/71e0af265c90e9d9d0dc764cc552f7470e860251),
+  [`ab96e5f`](https://github.com/graphile/crystal/commit/ab96e5f58aa3315db9b85b452b048f600cb8353e),
+  [`278b4d3`](https://github.com/graphile/crystal/commit/278b4d398eb7db1935caba4155e1d1727284a370),
+  [`eaa771b`](https://github.com/graphile/crystal/commit/eaa771b34dbdac1c4d701faa8fb5947e9cf1d1be),
+  [`d0c15cc`](https://github.com/graphile/crystal/commit/d0c15ccc32ed8dec19ff068f851529132dc93302),
+  [`bffbb77`](https://github.com/graphile/crystal/commit/bffbb775ea76d1add85422866a6b7e904d2311af),
+  [`c48ca48`](https://github.com/graphile/crystal/commit/c48ca4840227b8e5e6a1dc198a189cfd911a602b)]:
+  - grafast@0.1.1-beta.27
+
 ## 0.0.1-beta.38
 
 ### Patch Changes

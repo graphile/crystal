@@ -1,5 +1,18 @@
 # graphql-codegen-grafast
 
+## 0.0.1-beta.3
+
+### Patch Changes
+
+- [#2730](https://github.com/graphile/crystal/pull/2730)
+  [`4c3cf22`](https://github.com/graphile/crystal/commit/4c3cf22592f44cb28e399434474ca5fcef0e1a3b)
+  Thanks [@benjie](https://github.com/benjie)! - Update `graphql` version range
+
+- [#2723](https://github.com/graphile/crystal/pull/2723)
+  [`f2dca50`](https://github.com/graphile/crystal/commit/f2dca50c48f86eaf832d11570a46362ae67e9170)
+  Thanks [@benjie](https://github.com/benjie)! - List types now have a more
+  correct type generated.
+
 ## 0.0.1-beta.2
 
 ### Patch Changes

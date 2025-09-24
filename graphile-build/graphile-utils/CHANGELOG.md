@@ -1,5 +1,52 @@
 # graphile-utils
 
+## 5.0.0-beta.45
+
+### Patch Changes
+
+- [#2720](https://github.com/graphile/crystal/pull/2720)
+  [`2814c63`](https://github.com/graphile/crystal/commit/2814c639983437e9883de040c64cceda433a2687)
+  Thanks [@benjie](https://github.com/benjie)! - Ensure types that implement an
+  interface defined in extendSchema are added to the schema.
+
+- [#2730](https://github.com/graphile/crystal/pull/2730)
+  [`4c3cf22`](https://github.com/graphile/crystal/commit/4c3cf22592f44cb28e399434474ca5fcef0e1a3b)
+  Thanks [@benjie](https://github.com/benjie)! - Update `graphql` version range
+
+- [#2712](https://github.com/graphile/crystal/pull/2712)
+  [`32ba479`](https://github.com/graphile/crystal/commit/32ba479160eb5b9ceb5dbb10161a37b62a20f3aa)
+  Thanks [@benjie](https://github.com/benjie)! - Improve errors around
+  changeNullability() plugin
+
+- Updated dependencies
+  [[`4c3cf22`](https://github.com/graphile/crystal/commit/4c3cf22592f44cb28e399434474ca5fcef0e1a3b),
+  [`7ce4d41`](https://github.com/graphile/crystal/commit/7ce4d41f9befce7c26e52cbfd7bf98febc764968),
+  [`0465b4a`](https://github.com/graphile/crystal/commit/0465b4a038cc8d7ef4a857fb929a3c3b0104441c),
+  [`71e0af2`](https://github.com/graphile/crystal/commit/71e0af265c90e9d9d0dc764cc552f7470e860251),
+  [`a0a6082`](https://github.com/graphile/crystal/commit/a0a6082173247caf8f76df925a9d8e7926792663),
+  [`ab96e5f`](https://github.com/graphile/crystal/commit/ab96e5f58aa3315db9b85b452b048f600cb8353e),
+  [`278b4d3`](https://github.com/graphile/crystal/commit/278b4d398eb7db1935caba4155e1d1727284a370),
+  [`eaa771b`](https://github.com/graphile/crystal/commit/eaa771b34dbdac1c4d701faa8fb5947e9cf1d1be),
+  [`b539002`](https://github.com/graphile/crystal/commit/b539002a627bf3d595ffb994e871dfc2eb5c2b64),
+  [`e28e4d9`](https://github.com/graphile/crystal/commit/e28e4d9b651a8ee40582006de34dd011309ba4e1),
+  [`020b579`](https://github.com/graphile/crystal/commit/020b5791b57282d6fcbd42d0cbfd8be9e95cee47),
+  [`e790f7a`](https://github.com/graphile/crystal/commit/e790f7ac7933c8ed01465688e20c2af76d2a79e8),
+  [`c8412aa`](https://github.com/graphile/crystal/commit/c8412aa73875aafe64317cc4c655654a86486047),
+  [`13eb44b`](https://github.com/graphile/crystal/commit/13eb44b0c8fb56252f1ecb3aea99d8f0fe10e3fa),
+  [`d0c15cc`](https://github.com/graphile/crystal/commit/d0c15ccc32ed8dec19ff068f851529132dc93302),
+  [`74e15d5`](https://github.com/graphile/crystal/commit/74e15d5bf2c6aada713711722aa31fb8b2da232d),
+  [`3488ac0`](https://github.com/graphile/crystal/commit/3488ac0e0e3ffe0dd2a072858390df51e0ebaf39),
+  [`b20a63f`](https://github.com/graphile/crystal/commit/b20a63f5ee77734ce2e3aa71f9f4de3c00e27e55),
+  [`bffbb77`](https://github.com/graphile/crystal/commit/bffbb775ea76d1add85422866a6b7e904d2311af),
+  [`d414491`](https://github.com/graphile/crystal/commit/d41449156d4983466fee4f34e3e361df4d561b3e),
+  [`c48ca48`](https://github.com/graphile/crystal/commit/c48ca4840227b8e5e6a1dc198a189cfd911a602b),
+  [`05f3e44`](https://github.com/graphile/crystal/commit/05f3e449a771aefcd9a81c6275a376ad87e3d316),
+  [`81c62bb`](https://github.com/graphile/crystal/commit/81c62bb9f9b05f7ff1251695712e1777de7315f9)]:
+  - graphile-build-pg@5.0.0-beta.47
+  - graphile-build@5.0.0-beta.39
+  - @dataplan/pg@0.0.1-beta.39
+  - grafast@0.1.1-beta.27
+
 ## 5.0.0-beta.44
 
 ### Patch Changes

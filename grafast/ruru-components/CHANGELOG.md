@@ -1,5 +1,24 @@
 # ruru-components
 
+## 2.0.0-beta.37
+
+### Patch Changes
+
+- [#2730](https://github.com/graphile/crystal/pull/2730)
+  [`4c3cf22`](https://github.com/graphile/crystal/commit/4c3cf22592f44cb28e399434474ca5fcef0e1a3b)
+  Thanks [@benjie](https://github.com/benjie)! - Update `graphql` version range
+
+- Updated dependencies
+  [[`4c3cf22`](https://github.com/graphile/crystal/commit/4c3cf22592f44cb28e399434474ca5fcef0e1a3b),
+  [`71e0af2`](https://github.com/graphile/crystal/commit/71e0af265c90e9d9d0dc764cc552f7470e860251),
+  [`ab96e5f`](https://github.com/graphile/crystal/commit/ab96e5f58aa3315db9b85b452b048f600cb8353e),
+  [`278b4d3`](https://github.com/graphile/crystal/commit/278b4d398eb7db1935caba4155e1d1727284a370),
+  [`eaa771b`](https://github.com/graphile/crystal/commit/eaa771b34dbdac1c4d701faa8fb5947e9cf1d1be),
+  [`d0c15cc`](https://github.com/graphile/crystal/commit/d0c15ccc32ed8dec19ff068f851529132dc93302),
+  [`bffbb77`](https://github.com/graphile/crystal/commit/bffbb775ea76d1add85422866a6b7e904d2311af),
+  [`c48ca48`](https://github.com/graphile/crystal/commit/c48ca4840227b8e5e6a1dc198a189cfd911a602b)]:
+  - grafast@0.1.1-beta.27
+
 ## 2.0.0-beta.36
 
 ### Patch Changes

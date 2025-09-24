@@ -1,5 +1,14 @@
 # pg-introspection
 
+## 0.0.1-beta.13
+
+### Patch Changes
+
+- [#2725](https://github.com/graphile/crystal/pull/2725)
+  [`1ec7ee5`](https://github.com/graphile/crystal/commit/1ec7ee55ed08f09e8a8721510778fd76b300c44b)
+  Thanks [@benjie](https://github.com/benjie)! - Make it easier to get parent
+  and child from PgInherits
+
 ## 0.0.1-beta.12
 
 ### Patch Changes

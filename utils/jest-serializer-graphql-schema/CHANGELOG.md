@@ -1,5 +1,13 @@
 # jest-serializer-graphql-schema
 
+## 5.0.0-beta.5
+
+### Patch Changes
+
+- [#2730](https://github.com/graphile/crystal/pull/2730)
+  [`4c3cf22`](https://github.com/graphile/crystal/commit/4c3cf22592f44cb28e399434474ca5fcef0e1a3b)
+  Thanks [@benjie](https://github.com/benjie)! - Update `graphql` version range
+
 ## 5.0.0-beta.4
 
 ### Patch Changes
