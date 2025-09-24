@@ -41,7 +41,7 @@ export type User = {
 
 import type { EnumPlan, EnumValueInput, FieldPlan, InputFieldPlan, GrafastSchemaConfig, InputObjectPlan, InterfacePlan, ObjectPlan, ScalarPlan, Step, UnionPlan, StepRepresentingList } from 'grafast';
 import { makeGrafastSchema } from 'grafast';
-import type { Overrides } from './schema-manual-types.mjs';
+import type { Overrides } from './schema-manual-types.mts';
 
 type NoArguments = Record<string, never>;
 type NonNullStep<TStep extends Step> = TStep & Step<TStep extends Step<infer U> ? NonNullable<U> : any>;
