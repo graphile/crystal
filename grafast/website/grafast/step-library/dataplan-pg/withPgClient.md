@@ -21,41 +21,47 @@ steps respectively, with the following differences:
   a direct step or list of steps)
 
 ```ts
-const plans = {
+const objects = {
   User: {
-    e164PhoneNumbers($user) {
-      const $id = get($user, "id");
-      return loadManyWithPgClient(executor, $id, async (pgClient, userIds) => {
-        // NOTE: We're doing batched processing across all the userIds that
-        // we'd like to load the orders for.
+    plans: {
+      e164PhoneNumbers($user) {
+        const $id = get($user, "id");
+        return loadManyWithPgClient(
+          executor,
+          $id,
+          async (pgClient, userIds) => {
+            // NOTE: We're doing batched processing across all the userIds,
+            // fetching all their phone numbers at once and converting them.
 
-        // Step 1 - load the user's phone numbers
-        const { rows: userContacts } = await pgClient.query<{
-          user_id: string;
-          phone: string;
-        }>({
-          text: `
+            // Step 1 - load the user's phone numbers
+            const { rows: userContacts } = await pgClient.query<{
+              user_id: string;
+              phone: string;
+            }>({
+              text: `
               select user_id, phone
               from user_contacts
               where user_id = any($1::int[]);
             `,
-          values: [userIds],
-        });
+              values: [userIds],
+            });
 
-        // Step 2 - normalize the phone numbers
-        const phoneNumbersByUserId: Record<string, string[]> =
-          Object.create(null);
-        for (const row of userContacts) {
-          const { user_id: userId, phone: rawPhone } = row;
-          const phone = normalizePhone(rawPhone);
-          (phoneNumbersByUserId[userId] ??= []).push(phone);
-        }
+            // Step 2 - normalize the phone numbers
+            const phoneNumbersByUserId: Record<string, string[]> =
+              Object.create(null);
+            for (const row of userContacts) {
+              const { user_id: userId, phone: rawPhone } = row;
+              const phone = normalizePhone(rawPhone);
+              (phoneNumbersByUserId[userId] ??= []).push(phone);
+            }
 
-        // Optionally: query pgClient again using these normalized phone numbers
+            // Optionally: query pgClient again using these normalized phone numbers
 
-        // Finally - match the inputs to the outputs
-        return userIds.map((userId) => phoneNumbersByUserId[userId] ?? []);
-      });
+            // Finally - match the inputs to the outputs
+            return userIds.map((userId) => phoneNumbersByUserId[userId] ?? []);
+          },
+        );
+      },
     },
   },
 };

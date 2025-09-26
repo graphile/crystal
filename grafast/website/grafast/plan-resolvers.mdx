@@ -2,6 +2,9 @@
 sidebar_position: 5
 ---
 
+import Mermaid from "@theme/Mermaid";
+import init from "./mermaid-init.mermaid?raw";
+
 # Plan resolvers
 
 When planning a GraphQL operation, we combine the plans from every field
@@ -75,6 +78,81 @@ with a `$`.
 
 Of course the actual body of the plan resolver function will vary based on your
 own application's needs.
+
+## Execution order &amp; side effects
+
+Grafast is **declarative**: steps form a directed acyclic graph (DAG) and only dependencies determine order. There is no implicit procedural sequencing. Two rules matter:
+
+1. Dependencies before dependents.
+2. Steps **implicitly** depend on the previous side effect step, if any.
+
+This can be surprising during mutations: steps created before a mutation might
+execute **after** the mutation unless one of the rules above says otherwise.
+
+### Example
+
+```ts
+const $before = users.get({ id: $rowId });
+const $valueBefore = $before.get("value1");
+
+const $after = updateUser($rowId);
+const $valueAfter = $after.get("value1");
+
+const $log = sideEffect(
+  [$valueBefore, $valueAfter],
+  ([before, after]) => void console.log({ before, after })
+);
+```
+
+**Default graph (no extra side effects):**
+
+<Mermaid chart={`
+${init}
+  $log:::plan
+  $before:::plan --> $valueBefore:::plan --> $log
+  $after:::plan --> $valueAfter:::plan --> $log
+  class $log,$after sideeffectplan
+  class $before,$valueBefore,$after,$valueAfter,$log bucket0
+`} />
+
+The engine may execute `$after` (mutation) before `$valueBefore`, because
+nothing forbids it according to the two rules above.
+
+**Force “read-before-write” by marking `$valueBefore` as a side effect:**
+
+```diff
+ const $before = users.get({ id: $rowId });
+ const $valueBefore = $before.get("value1");
++$valueBefore.hasSideEffect = true;
+
+ const $after = updateUser($rowId);
+ const $valueAfter = $after.get("value1");
+
+ const $log = sideEffect(
+   [$valueBefore, $valueAfter],
+   ([before, after]) => void console.log({ before, after })
+ );
+```
+
+This adds an _implicit_ edge from `$valueBefore` to later steps (including `$after`):
+
+<Mermaid chart={`
+${init}
+  $log:::plan
+  $before:::plan --> $valueBefore:::plan --> $log
+  $after:::plan --> $valueAfter:::plan --> $log
+  $valueBefore -.-o $after
+  class $log,$after,$valueBefore sideeffectplan
+  class $before,$valueBefore,$after,$valueAfter,$log bucket0
+`} />
+
+Now `$valueBefore` must run before `$after`, so your log shows the true “before” and “after”.
+
+### When to use which
+
+- Prefer **explicit data deps** when possible (e.g. make the read feed the write).
+- Use `hasSideEffect = true` when you need **ordering without data flow** (logging, metrics, authorization gates, idempotency checks).
+- Don’t sprinkle `hasSideEffect` on hot paths unnecessarily; it reduces reordering freedom.
 
 ## Specifying a field plan resolver
 
