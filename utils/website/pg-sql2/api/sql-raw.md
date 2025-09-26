@@ -21,16 +21,9 @@ sql.raw(text: string): SQL
 
 **⚠️ EXTREME DANGER: YOU ARE INVITING SQL INJECTION**
 
-This function embeds raw SQL text directly into a query with **NO escaping, validation, or safety checks whatsoever**. By using this function, you are explicitly bypassing all of pg-sql2's SQL injection protections.
+Embeds raw SQL with **zero safety checks**. This bypasses all SQL injection protections.
 
 **This is an escape hatch only.** The number of valid use cases for this function are vanishingly small. In 99.9% of cases, there is a safer alternative using other pg-sql2 functions.
-
-**DO NOT USE unless you are absolutely certain:**
-
-- The text contains zero dynamic content
-- The text is completely hard-coded
-- No user input can influence the text in any way
-- You have exhausted all other safer alternatives
 
 ## What NOT To Do (and what to do instead)
 

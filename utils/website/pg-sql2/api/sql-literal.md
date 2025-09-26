@@ -23,117 +23,31 @@ sql.literal(val: string | number | boolean | null): SQL
 
 ## Description
 
-Similar to [`sql.value`](./sql-value.md), but for simple values, writes them directly to the SQL statement rather than using a placeholder when it's safe to do so. This makes the generated SQL more readable for debugging and provides performance benefits by reducing the number of parameters.
-
-If pg-sql2 determines that the value is unsafe to use as a literal, it will automatically fall back to using `sql.value()` instead, ensuring your queries remain secure.
-
-**Recommended for constant values** - Use this for known constants rather than consuming placeholders unnecessarily.
-
-- Not sensitive
-- Known to be safe at development time
+Embeds simple values directly in SQL instead of using placeholders when safe. Automatically falls back to `sql.value()` if unsafe. More readable and efficient than placeholders for constants.
 
 ## Examples
 
-### Safe Usage with Known Values
-
 ```js
-import sql from "pg-sql2";
+// Constants - more efficient than sql.value()
+sql`LIMIT ${sql.literal(50)}`; // -> LIMIT 50
+sql`WHERE active = ${sql.literal(true)}`; // -> WHERE active = TRUE
 
-// Building JSON objects with known keys
-const fields = ["name", "email", "age"];
-const jsonQuery = sql`
-  SELECT json_build_object(
-    ${sql.join(
-      fields.map(
-        (field) =>
-          sql`${sql.literal(field)}, ${sql.identifier("users", field)}`,
-      ),
-      ", ",
-    )}
-  ) FROM users
-`;
-// Generates more readable SQL:
-// SELECT json_build_object('name', "users"."name", 'email', "users"."email", 'age', "users"."age") FROM users
-
-// vs with sql.value (less readable):
-// SELECT json_build_object($1, "users"."name", $2, "users"."email", $3, "users"."age") FROM users
+// JSON object keys
+const fields = ["name", "email"];
+sql`json_build_object(${sql.join(
+  fields.map((f) => sql`${sql.literal(f)}, ${sql.identifier(f)}`),
+  ", ",
+)})`;
 ```
 
-### Constants and Known Values
+## Use Cases
 
-```js
-// Boolean constants
-sql`SELECT * FROM users WHERE active = ${sql.literal(true)}`;
-// -> SELECT * FROM users WHERE active = TRUE
+- **Constants:** `LIMIT ${sql.literal(50)}`, `OFFSET ${sql.literal(0)}`
+- **JSON keys:** `json_build_object(${sql.literal("key")}, value)`
+- **Known booleans:** `${sql.literal(true)}`, `${sql.literal(false)}`
+- **Application constants and enums**
 
-// Numeric constants - no need to waste a placeholder
-sql`SELECT * FROM posts LIMIT ${sql.literal(50)}`;
-// -> SELECT * FROM posts LIMIT 50
-
-// String constants for known values
-sql`SELECT ${sql.literal("admin")} as role FROM users`;
-// -> SELECT 'admin' as role FROM users
-
-// Null constants
-sql`UPDATE users SET deleted_at = ${sql.literal(null)} WHERE id = 1`;
-// -> UPDATE users SET deleted_at = NULL WHERE id = 1
-```
-
-### JSON Building
-
-```js
-const reportConfig = {
-  title: "User Report",
-  format: "pdf",
-  includeCharts: true,
-};
-
-// Safe because these are application-controlled values
-const configSql = sql`
-  json_build_object(
-    ${sql.literal("title")}, ${sql.value(reportConfig.title)},
-    ${sql.literal("format")}, ${sql.value(reportConfig.format)}, 
-    ${sql.literal("includeCharts")}, ${sql.literal(reportConfig.includeCharts)}
-  )
-`;
-```
-
-## Comparison with sql.value()
-
-| Aspect          | `sql.literal()`                             | `sql.value()`                |
-| --------------- | ------------------------------------------- | ---------------------------- |
-| **Security**    | ✅ Safe - falls back to sql.value if unsafe | ✅ Always safe               |
-| **Performance** | Better (fewer parameters)                   | Standard                     |
-| **Debugging**   | More readable SQL output                    | Less readable (placeholders) |
-| **Use Case**    | Constants and known values                  | Dynamic/user values          |
-
-## When to Use
-
-### ✅ Recommended Uses
-
-- Constant numbers: `LIMIT ${sql.literal(50)}`, `OFFSET ${sql.literal(0)}`
-- Hard-coded string keys for `json_build_object()`
-- Application constants and enums
-- Boolean flags: `sql.literal(true)`, `sql.literal(false)`
-- Known null values: `sql.literal(null)`
-
-### ❌ Not Recommended
-
-```js
-// Use sql.value() for user input instead
-const userInput = getUserInput();
-sql`SELECT * FROM users WHERE name = ${sql.value(userInput)}`; // Recommended
-
-// ✅ Always use sql.value() for user data
-sql`SELECT * FROM users WHERE name = ${sql.value(userInput)}`;
-
-// ❌ NEVER with sensitive data
-const password = getPassword();
-sql`SELECT * FROM users WHERE password = ${sql.literal(password)}`; // Exposes password in logs!
-
-// ✅ Use sql.value() to keep sensitive data in parameters
-sql`SELECT * FROM users WHERE password = ${sql.value(password)}`;
-```
+For user input or sensitive data, use `sql.value()` instead.
 
 ## Return Value
 
