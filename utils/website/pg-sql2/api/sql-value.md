@@ -51,7 +51,7 @@ sql`SELECT * FROM users WHERE active = ${sql.value(active)}`;
 // Compiles to: SELECT * FROM users WHERE active = $1
 // Values: [true]
 
-// Null values
+// Null values (though sql.literal(null) would be more efficient for constants)
 sql`SELECT * FROM users WHERE deleted_at = ${sql.value(null)}`;
 // Compiles to: SELECT * FROM users WHERE deleted_at = $1
 // Values: [null]

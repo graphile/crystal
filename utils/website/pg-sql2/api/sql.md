@@ -9,7 +9,7 @@ The core template literal function that builds SQL queries by safely interpretin
 ## Syntax
 
 ```typescript
-sql`template string with ${expressions}`
+sql`template string with ${expressions}`;
 ```
 
 ## Description
@@ -21,7 +21,7 @@ The `sql` template literal builds part of (or the whole of) an SQL query, safely
 ### Basic Usage
 
 ```js
-import sql from 'pg-sql2';
+import sql from "pg-sql2";
 
 // Simple query
 const query = sql`SELECT * FROM users`;
@@ -31,19 +31,22 @@ const userId = 123;
 const userQuery = sql`SELECT * FROM users WHERE id = ${sql.value(userId)}`;
 
 // With identifier
-const tableName = 'users';
+const tableName = "users";
 const tableQuery = sql`SELECT * FROM ${sql.identifier(tableName)}`;
 ```
 
 ### Composing Fragments
 
 ```js
-const conditions = sql`age > ${sql.value(18)} AND status = ${sql.value('active')}`;
-const fields = sql.join(['name', 'email', 'age'].map(f => sql.identifier(f)), ', ');
+const conditions = sql`age > ${sql.literal(18)} AND status = ${sql.value("active")}`;
+const fields = sql.join(
+  ["name", "email", "age"].map((f) => sql.identifier(f)),
+  ", ",
+);
 
 const query = sql`
   SELECT ${fields}
-  FROM ${sql.identifier('users')}  
+  FROM ${sql.identifier("users")}  
   WHERE ${conditions}
 `;
 ```
@@ -52,10 +55,10 @@ const query = sql`
 
 ```js
 // ❌ This will throw an error - prevents SQL injection
-sql`SELECT * FROM users WHERE name = ${'Bobby Tables'}`;
+sql`SELECT * FROM users WHERE name = ${"Bobby Tables"}`;
 
-// ✅ This is safe - value is properly parameterized  
-sql`SELECT * FROM users WHERE name = ${sql.value('Bobby Tables')}`;
+// ✅ This is safe - value is properly parameterized
+sql`SELECT * FROM users WHERE name = ${sql.value("Bobby Tables")}`;
 ```
 
 ## Error Handling
@@ -71,6 +74,7 @@ then an error will be thrown. This prevents SQL injection, as all values must go
 ## Return Value
 
 Returns a `SQL` fragment that can be:
+
 - Embedded in other `sql` template literals
 - Compiled using `sql.compile()`
 - Used with other pg-sql2 functions

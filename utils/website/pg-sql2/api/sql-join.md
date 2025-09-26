@@ -59,11 +59,19 @@ sql`SELECT * FROM users WHERE ${sql.join(conditions, " AND ")}`;
 
 ```js
 const arrayOfSqlConditions = [sql`a = 1`, sql`b = 2`, sql`c = 3`];
-sql`WHERE (${sql.join(arrayOfSqlConditions, ") AND (")})`;
+
+// Better: map conditions and use proper parentheses
+sql`WHERE ${sql.join(
+  arrayOfSqlConditions.map((c) => sql.parens(c)),
+  " AND ",
+)}`;
 // -> WHERE (a = 1) AND (b = 2) AND (c = 3)
 
 // For OR conditions with parentheses
-sql`WHERE (${sql.join(arrayOfSqlConditions, ") OR (")})`;
+sql`WHERE ${sql.join(
+  arrayOfSqlConditions.map((c) => sql.parens(c)),
+  " OR ",
+)}`;
 // -> WHERE (a = 1) OR (b = 2) OR (c = 3)
 ```
 
@@ -109,6 +117,8 @@ sql`INSERT INTO users (name, email) VALUES ${valueRows}`;
 // -> INSERT INTO users (name, email) VALUES ($1, $2), ($3, $4)
 ```
 
+**⚠️ PostgreSQL Parameter Limit:** For large numbers of rows/columns, you may hit PostgreSQL's parameter limit (~65,535). For bulk inserts, consider using PostgreSQL's `json_populate_recordset()`, `json_array_elements()`, or similar JSON-based approaches instead of `sql.join()`.
+
 ### JOIN Clauses
 
 ```js
@@ -141,6 +151,9 @@ const updates = [
 
 sql`UPDATE users SET ${sql.join(updates, ", ")} WHERE id = ${sql.value(123)}`;
 // -> UPDATE users SET name = $1, email = $2, updated_at = NOW() WHERE id = $3
+
+// Note: For constant values, prefer sql.literal() to avoid wasting parameters:
+// WHERE id = ${sql.literal(123)} -> WHERE id = 123 (no parameter used)
 ```
 
 ### Empty Arrays

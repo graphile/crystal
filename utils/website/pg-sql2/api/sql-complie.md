@@ -126,7 +126,7 @@ Array of parameter values corresponding to the placeholders in order
 
 ### `[$$symbolToIdentifier]: Map<symbol, string>`
 
-Internal mapping of symbols to their generated identifiers (rarely needed in application code)
+**Internal use only** - mapping of symbols to their generated identifiers. This is for internal pg-sql2 use and should not be used in application code.
 
 ## Complex Example
 
@@ -149,7 +149,7 @@ const query = sql`
     AND age >= ${sql.value(filters.minAge)}
     AND role = ANY(${sql.value(filters.roles)})
   ORDER BY ${sql.identifier("created_at")} DESC
-  LIMIT ${sql.value(50)}
+  LIMIT ${sql.literal(50)}
 `;
 
 const compiled = sql.compile(query);
@@ -159,10 +159,10 @@ console.log(compiled.text);
 //    FROM "users"
 //    WHERE status = $1 AND age >= $2 AND role = ANY($3)
 //    ORDER BY "created_at" DESC
-//    LIMIT $4
+//    LIMIT 50
 
 console.log(compiled.values);
-// -> ['active', 18, ['admin', 'user', 'moderator'], 50]
+// -> ['active', 18, ['admin', 'user', 'moderator']]
 ```
 
 ## Error Handling

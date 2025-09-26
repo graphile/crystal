@@ -5,7 +5,7 @@ title: "sql.raw()"
 
 # `sql.raw(text)`
 
-Embeds raw SQL text directly into a query without any escaping or safety checks.
+**DO NOT USE** - This function invites SQL injection vulnerabilities.
 
 ## Syntax
 
@@ -19,42 +19,20 @@ sql.raw(text: string): SQL
 
 ## Description
 
-Creates a SQL fragment for raw SQL text. The text is inserted verbatim into the query with **no escaping or validation**. This method is extremely dangerous and should be avoided in almost all cases.
+**⚠️ EXTREME DANGER: YOU ARE INVITING SQL INJECTION**
 
-**⚠️ DANGER: EXTREME CAUTION REQUIRED** - This function completely bypasses all SQL injection protection. Only use when you are absolutely certain the text:
+This function embeds raw SQL text directly into a query with **NO escaping, validation, or safety checks whatsoever**. By using this function, you are explicitly bypassing all of pg-sql2's SQL injection protections.
 
-- Is not user-provided
-- Is completely trusted
-- Cannot contain any dynamic content
-- Is verified to be valid SQL
+**This is an escape hatch only.** The number of valid use cases for this function are vanishingly small. In 99.9% of cases, there is a safer alternative using other pg-sql2 functions.
 
-## Examples
+**DO NOT USE unless you are absolutely certain:**
 
-### Valid (but dangerous) usage
+- The text contains zero dynamic content
+- The text is completely hard-coded
+- No user input can influence the text in any way
+- You have exhausted all other safer alternatives
 
-```js
-import sql from "pg-sql2";
-
-// Hard-coded SQL fragments (still risky)
-const orderClause = sql.raw("ORDER BY created_at DESC, id ASC");
-const query = sql`
-  SELECT * FROM users 
-  WHERE status = ${sql.value("active")}
-  ${orderClause}
-`;
-
-// Complex expressions that can't be built otherwise
-const windowFunction = sql.raw(`
-  ROW_NUMBER() OVER (
-    PARTITION BY department_id 
-    ORDER BY salary DESC
-  ) as rank
-`);
-
-sql`SELECT name, salary, ${windowFunction} FROM employees`;
-```
-
-### Dangerous usage (DO NOT DO THIS)
+## What NOT To Do (and what to do instead)
 
 ```js
 // ❌ NEVER with user input - SQL injection vulnerability!
