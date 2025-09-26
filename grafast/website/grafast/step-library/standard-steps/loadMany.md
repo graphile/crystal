@@ -288,7 +288,7 @@ being defined inline at the callsite. This is important for several reasons:
    for all `loadMany` calls using that function, so it makes sense to configure
    it alongside the function, rather than duplicating configuration inline each
    time. Similarly, the function typically needs the same `shared` information
-   and pagination support.
+   and has specific pagination support.
 3. **Separation of concerns:** Keeping loader functions and their configuration
    separate from plan definitions helps maintain a clear distinction between
    planning (which relates to data flow and happens at planning time) and
