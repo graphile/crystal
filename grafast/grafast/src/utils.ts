@@ -1057,6 +1057,7 @@ export function stepADependsOnStepB(
     }
   }
   if (stepA.implicitSideEffectStep) {
+    if (stepA.implicitSideEffectStep === stepB) return true;
     return stepADependsOnStepB(stepA.implicitSideEffectStep, stepB);
   } else {
     return false;
