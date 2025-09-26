@@ -89,53 +89,131 @@ execute(details: ExecutionDetails): PromiseOrDirect<GrafastResultsList>
 ```ts
 // These are simplified types
 interface ExecutionDetails {
+  /** The size of the batch being processed */
   count: number;
+  /** An "execution value" for each dependency of the step */
   values: [...ExecutionValue[]];
-  indexMap<T>(callback: (i: number) => T): ReadonlyArray<T>;
-  indexForEach(callback: (i: number) => any): void;
+
+  /** Helper; makes array from `callback(batchIndex)` for each 0 <= batchIndex < count */
+  indexMap<T>(callback: (batchIndex: number) => T): ReadonlyArray<T>;
+  /** Helper; calls `callback` for each batchIndex in the batch; no return value */
+  indexForEach(callback: (batchIndex: number) => any): void;
+
+  /** Currently experimental, use it at your own risk (and see the source for docs) */
   extra: ExecutionExtra;
 }
 
-type ExecutionValue<TData> =
-  | { at(i: number): TData; isBatch: true; entries: ReadonlyArray<TData> }
-  | { at(i: number): TData; isBatch: false; value: TData };
-
+type ExecutionValue<TData> = { at(batchIndex: number): TData };
 type GrafastResultsList<T> = ReadonlyArray<PromiseOrDirect<T>>;
 ```
 
-`execute` is the one method that your step class must define, and it has very
-strict rules.
+The one method that your step class must define is `execute`. It uses a similar
+approach to
+[DataLoader's batch function](https://github.com/graphql/dataloader#batch-function),
+but Gra*fast* steps are much more powerful thanks to the additional dependencies
+and lifecycle methods.
 
-It is passed one argument, the "execution details", which is an object containing:
+A single argument is passed to `execute`, the "execution details", which is an
+object describing the size (`count`) of the batch, along with the execution
+value for each dependency (`values`).
 
-- `count` — the size of the batch being processed (and thus the length of the list that must be returned)
-- `values` — the "values tuple", an n-tuple (a tuple with `n` entries), where
-  `n` is the number of dependencies the step has. Each of the entries in the
-  tuple will be an "execution value" containing the data that relates to the
-  corresponding dependency
-- `indexMap(callback)` - a helper function that builds an array of length
-  `count` by calling `callback` for each index in the batch (from `0` to
-  `count-1`); equivalent to `Array.from({ length: count }, (_, i) => callback(i))`
-- `indexForEach(callback)` - a helper function that calls `callback` for each
-  index in the batch (from `0` to `count-1`) but does not return anything
-- `extra` — currently experimental, use it at your own risk (and see the source
-  for documentation)
+`execute` **must** return a list of length `count`, such that each entry in
+this list corresponds with the values in the batch at the same batch index.
 
-An "execution value", `dep`, is an object containing the data for a given
-dependency. It will either be a "batch" value (`dep.isBatch === true`) in which
-case `dep.entries` will be an array containing `count` entries (the order of
-which is significant), or it will be a "unary" value (`dep.isBatch === false`)
-in which case `dep.value` will be the common value for this dependency across
-all entries in the batch. Either way, `dep.at(i)` will return the value for
-this dependency corresponding with the i'th entry in the batch (`dep.at(i)` is
-equivalent to `dep.isBatch ? dep.entries[i] : dep.value`).
+For each dependency index, `depIndex`, the value for the batch index,
+`batchIndex`, can be retrieved via `values[depIndex].at(batchIndex)` whether the
+underlying execution value is a "batch execution value" or a "unary execution
+value".
 
-Execute must return a list (or a promise to a list) of size `count`, where the
-i'th entry in this list corresponds to the `dep.at(i)` value for each `dep` in
-the "values tuple". The result of `execute` may or may not be a promise, and
-each entry in the resulting list may or may not be a promise.
+**Critically**, the execute method should never do async actions whilst looping
+over the values, otherwise you introduce the N+1 problem. Most `execute` methods
+should only perform a single async action. Typically it looks like this:
 
-:::danger If your step has no dependencies
+1. Extract and identify the execution value for each dependency.
+2. Map over the indicies to prepare the input for your async task.
+3. Execute the async task via a **single `await`** (or promise). **NOT IN A LOOP**.
+4. Map over the input values again, for each index finding the value from step 3 that correlates.
+
+Here's a hypothetical example, concentrate on the `execute()` method and see how
+the steps outline above play out:
+
+```ts
+import { languageService } from "./services/language";
+
+class TranslationStep extends Step {
+  langDepIndex: number;
+  textDepIndex: number;
+  constructor($language: Step<string>, $phrase: Step<string>) {
+    super();
+    // Add our dependencies
+    this.langDepIndex = this.addDependency($language);
+    this.textDepIndex = this.addDependency($text);
+  }
+  execute(details) {
+    // highlight-start
+    // 1. Extract and identify the execution value for each dependency:
+    // highlight-end
+    const langEv = details.values[this.langDepIndex];
+    const textEv = details.values[this.textDepIndex];
+
+    // highlight-start
+    // 2. Map over the indicies to prepare the input for our translation API:
+    // highlight-end
+    const specs = details.indexMap((batchIndex) => {
+      const language = langEv.at(batchIndex);
+      const sourceText = textEv.at(batchIndex);
+      return { language, sourceText };
+    });
+
+    // highlight-start
+    // 3. Execute the translations via a single `await`, not in a loop:
+    // highlight-end
+    const translations = await languageService.batchTranslate(specs);
+
+    // highlight-start
+    // 4. Finally, return results that correlate with the inputs:
+    // highlight-end
+    return indexMap((batchIndex) => {
+      const language = langEv.at(batchIndex);
+      const sourceText = textEv.at(batchIndex);
+      const match = translations.find(
+        (t) => t.language === language && t.sourceText === sourceText,
+      );
+      return match?.translation;
+    });
+  }
+}
+```
+
+#### Caveats
+
+:::tip[Unary dependencies]
+
+For dependencies added via `const depIndex = this.addUnaryDependency($step)`,
+the single (unary) value can be retrieved via `values[depIndex].unaryValue()`.
+This is roughly equivalent to `values[depIndex].at(0)` except it additionally
+asserts that the value _is_ a unary value, helping to catch bugs early.
+
+Unary dependencies are useful for request-global concerns such as pagination
+arguments, authentication credentials, database clients and the like.
+
+:::
+
+:::note[Batch vs unary execution values]
+
+Grafast tracks which steps will always represent exactly one value (e.g. the
+GraphQL context, and input values passed as field arguments), and which will
+represent a batch (e.g. values inside of a list). The former are stored in
+"unary execution values", and the latter in "batch execution values". For
+convenience, these both expose the `.at(batchIndex)` method so most of the time
+you do not need to know the difference and can just think of them all as simply
+"execution values". `ev.at(batchIndex)` is roughly equivalent to `ev.isBatch ?
+ev.entries[i] : ev.value` since a batch execution value stores many entries,
+whereas a unary execution value always stores exactly one value.
+
+:::
+
+:::danger[Step with no dependencies]
 
 If the step has no dependencies then `values` will be a 0-tuple (an empty
 tuple), but that doesn't mean the batch is empty or has size one, `count` may
@@ -148,7 +226,7 @@ return indexMap((i) => 42);
 
 :::
 
-:::info
+:::info[Tuple of values, rather than list of tuples?]
 
 You might wonder why the `values` input is a tuple of execution values, rather
 than a list of tuples. The reason comes down to efficiency, by using a tuple of
@@ -160,7 +238,7 @@ can easily be in the thousands.
 
 :::
 
-:::tip
+:::tip[Raising errors for a subset of values]
 
 If you want one of your entries to throw an error, but the others shouldn't,
 then an easy way to achieve this is to set the corresponding entry in the
@@ -170,28 +248,6 @@ method is not marked as `async`. You **must not** do this if you have marked
 your step class with `isSyncAndSafe = true`.
 
 :::
-
-#### Example
-
-In the [getting started][] guide we built an `AddStep` step class that adds two
-numbers together. It's `execute` method looked like this:
-
-```ts
-  execute({ indexMap, values: [aDep, bDep] }) {
-    return indexMap((i) => {
-      const a = aDep.at(i);
-      const b = bDep.at(i);
-      return a + b;
-    });
-  }
-```
-
-Imagine at runtime <Grafast /> needed to execute this operation for three
-(`count = 3`) pairs of values: `[1, 2]`, `[3, 4]` and `[5, 6]`. The values for
-`$a` accessible through `aDep.get(i)` would be `1`, `3` and `5`; and the values
-for `$b` accessible through `bDep.get(i)` would be `2`, `4` and `6`. The
-execute method then returns the same number of results in the same order: `[3,
-7, 11]`.
 
 ### stream
 
