@@ -20,6 +20,7 @@ pg-sql2 provides a comprehensive API for building SQL queries safely and dynamic
 - [`sql.join(fragments, delimiter)`](./sql-join.md) - Join multiple SQL fragments
 - [`sql.parens(fragment, force?)`](./sql-parens.md) - Add parentheses when needed
 - [`sql.indent(fragment)`](./sql-indent.md) - Indent SQL for readability
+- [`sql.indentIf(condition, fragment)`](./sql-indent-if.md) - Conditionally indent SQL
 - [`sql.comment(text)`](./sql-comment.md) - Add SQL comments
 
 ### Compilation
