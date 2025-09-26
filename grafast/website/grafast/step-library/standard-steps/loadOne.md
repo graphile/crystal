@@ -187,8 +187,8 @@ type LoadOneCallback = (
 
 interface LoadOneInfo {
   shared: UnwrapMultistep<TShared>;
-  attributes: string[];
-  params: Readonly<string, any>;
+  attributes: ReadonlyArray<keyof TItem>;
+  params: Partial<TParams>;
 }
 ```
 

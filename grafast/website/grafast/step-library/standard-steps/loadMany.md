@@ -320,8 +320,8 @@ type LoadManyCallback = (
 
 interface LoadManyInfo {
   shared: UnwrapMultistep<TShared>;
-  attributes: string[];
-  params: Readonly<string, any>;
+  attributes: ReadonlyArray<keyof TItem>;
+  params: Partial<TParams>;
 }
 ```
 
