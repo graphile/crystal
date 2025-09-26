@@ -48,7 +48,14 @@ interface PlanWrapperRules {
 }
 
 interface PlanWrapperRule {
+  /** The plan wrapper function */
   plan?: PlanWrapperFn;
+
+  /**
+   * Set false if you don't want us to ensure the fieldArgs have been applied
+   * when your plan wrapper calls the underlying plan.
+   */
+  autoApplyFieldArgs?: boolean;
 }
 
 type PlanWrapperFn = (
