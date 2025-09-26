@@ -17,8 +17,8 @@ are not possible in DataLoader.
 
 ### Attribute and parameter tracking
 
-A `loadOne` step (technically a `LoadedRecordStep`) keeps track of the attribute
-names accessed via `.get(attrName)` and any parameters set via
+A `loadOne` step (technically a `LoadedRecordStep`) keeps track of the
+attribute names accessed via `.get(attrName)` and any parameters set via
 `.setParam(key, value)`. This information will be passed through to your
 callback function such that you may make more optimal calls to your backend
 business logic, only retrieving the data you need.
@@ -75,9 +75,14 @@ In its current state the system doesn't know that the `$user.get("id")` is
 equivalent to the `context().get("userId")`, so this would result in a chained
 fetch:
 
-<Mermaid
-chart={`\ stateDiagram   direction LR   state "batchGetUserById" as currentUser   state "batchGetFriendsByUserId" as friends   [*] --> currentUser   currentUser --> friends `}
-/>
+<Mermaid chart={`\
+stateDiagram
+  direction LR
+  state "batchGetUserById" as currentUser
+  state "batchGetFriendsByUserId" as friends
+  [*] --> currentUser
+  currentUser --> friends
+`} />
 
 However, we can indicate that the output of the `loadOne` step's `id` property
 (`$user.get("id")`) is equivalent to its input (`context().get("userId")`):
@@ -107,12 +112,17 @@ However, we can indicate that the output of the `loadOne` step's `id` property
 ```
 
 Now the access to `$user.get("id")` will be equivalent to
-`context().get("userId")` - we no longer need to wait for the `$user` to load in
-order to fetch the friends:
+`context().get("userId")` - we no longer need to wait for the `$user` to load
+in order to fetch the friends:
 
-<Mermaid
-chart={`\ stateDiagram   direction LR   state "batchGetUserById" as currentUser   state "batchGetFriendsByUserId" as friends   [*] --> currentUser   [*] --> friends `}
-/>
+<Mermaid chart={`\
+stateDiagram
+  direction LR
+  state "batchGetUserById" as currentUser
+  state "batchGetFriendsByUserId" as friends
+  [*] --> currentUser
+  [*] --> friends
+`} />
 
 ## Usage
 
@@ -200,8 +210,7 @@ may affect the fetching of the records.
 
 For optimal results, we strongly recommend that the callback function is defined
 in a common location so that it can be reused over and over again, rather than
-defined inline. This will allow the underlying steps to optimize calls to this
-function.
+defined inline. This will allow the underlying steps to optimize calls to this function.
 
 :::
 
@@ -215,16 +224,16 @@ Within this definition of `callback`:
   - `params`: the params set via `$record.setParam('<key>', <value>)`
 
 `specs` is deduplicated using strict equality; so it is best to keep `$spec`
-simple - typically it should only represent a single scalar value - which is why
-`$shared` exists.
+simple - typically it should only represent a single scalar value - which is
+why `$shared` exists.
 
 `options.shared` is very useful to keep specs simple (so that fetch
 deduplication can work optimally) whilst passing in global values that you may
 need such as a database or API client.
 
-`options.attributes` is useful for optimizing your fetch - e.g. if the user only
-ever requested `$record.get('id')` and `$record.get('avatarUrl')` then there's
-no need to fetch all the other attributes from your datasource.
+`options.attributes` is useful for optimizing your fetch - e.g. if the user
+only ever requested `$record.get('id')` and `$record.get('avatarUrl')` then
+there's no need to fetch all the other attributes from your datasource.
 
 `options.params` can be used to pass additional context to your callback
 function, perhaps options like "should we include archived records" or "should
@@ -261,14 +270,13 @@ async function batchGetUserById(ids, { attributes }) {
 
 :::info
 
-A unary step is a step that only ever represents one value, e.g. simple
-derivatives of `context()`, `fieldArgs`, or `constant()`.
+A unary step is a step that only ever represents one value, e.g. simple derivatives of `context()`, `fieldArgs`, or `constant()`.
 
 :::
 
 In addition to the forms seen in "Basic usage" above, you can pass an additional
-`shared` step to `loadOne`. This step must be a
-[**unary step**](../../step-classes.md#addunarydependency), meaning that it must
+`shared` step to `loadOne`. This step must be a [**unary
+step**](../../step-classes.md#addunarydependency), meaning that it must
 represent exactly one value across the entire request (not a batch of values
 like most steps), and is useful for representing values from the GraphQL context
 or from input values (arguments, variables, etc).
@@ -284,9 +292,9 @@ const $user = loadOne($userId, {
 });
 ```
 
-Since we know it will have exactly one value, we can pass it into the callback
-as a single value and our callback will be able to use it directly without
-having to perform any manual grouping.
+Since we know it will have exactly one value, we can pass it into the
+callback as a single value and our callback will be able to use it directly
+without having to perform any manual grouping.
 
 This shared dependency is useful for fixed values (for example, those from
 GraphQL field arguments) and values on the GraphQL context such as clients to
@@ -317,9 +325,9 @@ The `ioEquivalence` optional parameter can accept the following values:
 - if the step is a `list()` (or similar) plan, an array containing a list of
   keys (or null for no relation) on the output that are equivalent to the same
   entry in the input
-- if the step is a `object()` (or similar) plan, an object that maps between the
-  attributes of the object and the key(s) in the output that are equivalent to
-  the given entry on the input
+- if the step is a `object()` (or similar) plan, an object that maps between
+  the attributes of the object and the key(s) in the output that are equivalent
+  to the given entry on the input
 
 ```ts title="Example for a list step"
 const $member = loadOne([$organizationId, $userId], {
@@ -355,8 +363,8 @@ const $member = loadOne(
 
 ### Passing multiple steps
 
-The [`list()`](./list) or [`object()`](./object) step can be used if you need to
-pass the value of more than one step into your callback:
+The [`list()`](./list) or [`object()`](./object) step can be used if you need
+to pass the value of more than one step into your callback:
 
 ```ts
 const $isAdmin = $user.get("admin");
@@ -366,8 +374,8 @@ const $last4 = loadOne([$isAdmin, $stripeId], getLast4FromStripeIfAdmin);
 
 The first argument to the `getLast4FromStripeIfAdmin` callback will then be an
 array of all the tuples of values from these plans:
-`ReadonlyArray<readonly [isAdmin: boolean, stripeId: string]>`. The callback
-might look something like:
+`ReadonlyArray<readonly [isAdmin: boolean, stripeId: string]>`.
+The callback might look something like:
 
 ```ts
 async function getLast4FromStripeIfAdmin(tuples) {
