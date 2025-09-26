@@ -121,9 +121,7 @@ value for each dependency (`values`).
 this list corresponds with the values in the batch at the same batch index.
 
 For each dependency index, `depIndex`, the value for the batch index,
-`batchIndex`, can be retrieved via `values[depIndex].at(batchIndex)` whether the
-underlying execution value is a "batch execution value" or a "unary execution
-value".
+`batchIndex`, can be retrieved via `values[depIndex].at(batchIndex)`.
 
 **Critically**, the execute method should never do async actions whilst looping
 over the values, otherwise you introduce the N+1 problem. Most `execute` methods
