@@ -183,7 +183,7 @@ that augment its behavior in Grafast:
 type LoadOneCallback = (
   specs: TLookup[],
   info: LoadOneInfo,
-) => PromiseOrDirect<TResult[]>;
+) => PromiseOrDirect<TData[]>;
 
 interface LoadOneInfo {
   shared: UnwrapMultistep<TShared>;
@@ -195,17 +195,6 @@ interface LoadOneInfo {
 The `load` callback function is called with two arguments, the first is a list
 of the values from the _specifier step_ `$spec` and the second is options that
 may affect the fetching of the records.
-
-```ts
-function callback(
-  specs: ReadonlyArray<unknown>,
-  options: {
-    shared: UnwrapMultistep<TShared>;
-    attributes: ReadonlyArray<string>;
-    params: Record<string, unknown>;
-  },
-): PromiseOrDirect<ReadonlyArray<TItem>>;
-```
 
 :::tip
 
