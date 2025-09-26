@@ -623,6 +623,20 @@ const preset: GraphileConfig.Preset = {
     ...(Math.random() > 2 ? [LeftArmPlugin] : []),
     TestSideEffectCancellingPlugin,
     AddToResponseExtensionsPropertyPlugin,
+    wrapPlans(
+      () => true,
+      () => ({
+        autoApplyFieldArgs: false,
+        plan: EXPORTABLE(
+          (sideEffect) => (plan, _) => {
+            const $result = plan();
+            sideEffect($result, (r) => void console.dir(r));
+            return $result;
+          },
+          [sideEffect],
+        ),
+      }),
+    ),
   ],
   extends: [
     PostGraphileAmberPreset,
