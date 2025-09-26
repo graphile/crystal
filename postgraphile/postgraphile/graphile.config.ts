@@ -626,7 +626,7 @@ const preset: GraphileConfig.Preset = {
     wrapPlans(
       () => true,
       () => ({
-        autoApplyFieldArgs: false,
+        // autoApplyFieldArgs: false,
         plan: EXPORTABLE(
           (sideEffect) => (plan, _) => {
             const $result = plan();
