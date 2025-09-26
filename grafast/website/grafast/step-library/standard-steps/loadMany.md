@@ -43,7 +43,7 @@ async function friendsByUserId(userIds) {
 }
 ```
 
-:::tip Don't declare your `loader` inline
+:::tip[Don't declare your `loader` inline]
 
 The `loader` function acts as a gateway between the Grafast plan execution and
 your business logic; you should keep it in a centralized location so that it may
@@ -272,7 +272,7 @@ function loadMany(
 - `loader` – either a callback function or an object containing the callback and
   optional properties - see "Loader object" below.
 
-:::info[]`loader` should be a global variable]
+:::info[`loader` should be a global variable]
 
 The `loader` argument (either a callback function or a loader object) should be
 passed as a reference from a global variable (such as an import), rather than
@@ -492,7 +492,7 @@ function User_friends($user, fieldArgs) {
   you from manually calling `$connection.setFirst(fieldArgs.getRaw('first'))` for
   each of the pagination arguments in turn.
 
-:::warning Without `paginationSupport`, the entire list will be fetched
+:::warning[Without `paginationSupport`, the entire list will be fetched]
 
 If you **don’t** set `paginationSupport`, `connection()` will handle cursors and
 pagination for you, which requires the entire collection to be downloaded.

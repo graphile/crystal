@@ -396,7 +396,7 @@ async function getLast4FromStripeIfAdmin(tuples) {
 
 This technique can also be used with the shared step in advanced usage.
 
-:::tip Performance impact from using list/object
+:::tip[Performance impact from using list/object]
 
 Using `list()` / `object()` like this will likely reduce the effectiveness of
 `loadOne`'s built in deduplication; to address this a stable object/list is
