@@ -11,7 +11,7 @@ more other steps, and through these dependencies ultimately form a directed
 acyclic graph which we refer to as the _execution plan_. Thus the steps are the
 building blocks of an execution plan.
 
-A modest range of [standard step classes][standard steps] are available for you
+A range of [standard step classes][standard steps] are available for you
 to use; but when these aren't enough you are encouraged to write your own (or
 pull down third party step classes from npm or similar).
 
@@ -130,8 +130,8 @@ over the values, otherwise you introduce the N+1 problem. Most `execute` methods
 should only perform a single async action. Typically it looks like this:
 
 1. Extract and identify the execution value for each dependency.
-2. Map over the indicies to prepare the input for your async task.
-3. Execute the async task via a **single `await`** (or promise). **NOT IN A LOOP**.
+2. Map over the indices to prepare the input for your async task.
+3. Execute the async task via a **single `await`** (or promise), not in a loop.
 4. Map over the input values again, for each index finding the value from step 3 that correlates.
 
 Here's a hypothetical example, concentrate on the `execute()` method and see how
@@ -143,7 +143,7 @@ import { languageService } from "./services/language";
 class TranslationStep extends Step {
   langDepIndex: number;
   textDepIndex: number;
-  constructor($language: Step<string>, $phrase: Step<string>) {
+  constructor($language: Step<string>, $text: Step<string>) {
     super();
     // Add our dependencies
     this.langDepIndex = this.addDependency($language);
@@ -157,7 +157,7 @@ class TranslationStep extends Step {
     const textEv = details.values[this.textDepIndex];
 
     // highlight-start
-    // 2. Map over the indicies to prepare the input for our translation API:
+    // 2. Map over the indices to prepare the input for our translation API:
     // highlight-end
     const specs = details.indexMap((batchIndex) => {
       const language = langEv.at(batchIndex);
