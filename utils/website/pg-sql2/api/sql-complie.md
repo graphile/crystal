@@ -27,7 +27,7 @@ sql.compile(query: SQL, options?: {
 
 ## Description
 
-Compiles the query into an SQL statement and a list of values, ready to be executed with a PostgreSQL client. This function converts the pg-sql2 internal representation into the format expected by database drivers.
+Compiles SQL fragments into executable SQL text and parameter values for database drivers.
 
 ## Basic Usage
 
@@ -53,52 +53,19 @@ console.log(values);
 // -> [123, 'active']
 ```
 
-## Using with Database Clients
-
-### With node-postgres (pg)
+## Usage
 
 ```js
-import { Client } from "pg";
-
-const client = new Client(/* connection config */);
-
-const query = sql`SELECT * FROM users WHERE age > ${sql.value(21)}`;
 const { text, values } = sql.compile(query);
-
-const result = await client.query(text, values);
-console.log(result.rows);
+await client.query(text, values);
 ```
 
-### With a Query Helper
+## With Placeholders
 
 ```js
-async function executeQuery(sqlFragment) {
-  const { text, values } = sql.compile(sqlFragment);
-  return await client.query(text, values);
-}
-
-// Usage
-const users = await executeQuery(
-  sql`SELECT * FROM users WHERE status = ${sql.value("active")}`,
-);
-```
-
-## Advanced Usage with Placeholders
-
-The advanced form of `sql.compile` accepts options for replacing placeholders:
-
-```js
-import sql from "pg-sql2";
-
-// Define placeholder symbols
-const TABLE_NAME = Symbol("tableName");
-const ORDER_BY = Symbol("orderBy");
-
-// Create query with placeholders
-const baseQuery = sql`
-  SELECT * FROM ${sql.placeholder(TABLE_NAME)}
-  ${sql.placeholder(ORDER_BY, sql`ORDER BY id`)}
-`;
+sql.compile(query, {
+  placeholderValues: new Map([[TABLE_SYMBOL, sql.identifier("users")]]),
+});
 
 // Compile with placeholder values
 const { text, values } = sql.compile(baseQuery, {

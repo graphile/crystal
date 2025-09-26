@@ -25,83 +25,28 @@ Embeds raw SQL with **zero safety checks**. This bypasses all SQL injection prot
 
 **This is an escape hatch only.** The number of valid use cases for this function are vanishingly small. In 99.9% of cases, there is a safer alternative using other pg-sql2 functions.
 
-## What NOT To Do (and what to do instead)
-
-```js
-// ❌ NEVER with user input - SQL injection vulnerability!
-const userInput = req.query.sort; // Could be "; DROP TABLE users; --"
-const badQuery = sql`SELECT * FROM users ${sql.raw(userInput)}`; // DANGEROUS!
-
-// ❌ NEVER with dynamic content
-const tableName = getUserSelectedTable(); // User controlled = dangerous
-const badQuery2 = sql`SELECT * FROM ${sql.raw(tableName)}`; // DANGEROUS!
-
-// ❌ NEVER for values
-const username = req.body.username;
-const badQuery3 = sql`SELECT * FROM users WHERE name = ${sql.raw(`'${username}'`)}`; // DANGEROUS!
-```
-
 ## Safer Alternatives
 
-Instead of `sql.raw()`, use these safer alternatives:
-
-### For Identifiers
-
 ```js
-// ❌ Dangerous
-sql`SELECT * FROM ${sql.raw(tableName)}`;
-
-// ✅ Safe
-sql`SELECT * FROM ${sql.identifier(tableName)}`;
+// ❌ sql.raw(userInput) -> SQL injection!
+// ✅ sql.identifier(tableName) for tables/columns
+// ✅ sql.value(userInput) for values
+// ✅ sql.literal("ASC") for constants
 ```
 
-### For Values
-
-```js
-// ❌ Dangerous
-sql`WHERE id = ${sql.raw(userId.toString())}`;
-
-// ✅ Safe
-sql`WHERE id = ${sql.value(userId)}`;
-```
-
-### For Dynamic SQL Parts
-
-```js
-// ❌ Dangerous
-const sortDirection = userInput; // "ASC" or "DESC"
-sql`SELECT * FROM users ORDER BY name ${sql.raw(sortDirection)}`;
-
-// ✅ Safe with validation
-const sortDirection = userInput === "DESC" ? "DESC" : "ASC";
-sql`SELECT * FROM users ORDER BY name ${sql.raw(sortDirection)}`;
-
-// ✅ Even better - use literals for known values
-const isDescending = userInput === "DESC";
-sql`SELECT * FROM users ORDER BY name ${sql.literal(isDescending ? "DESC" : "ASC")}`;
-```
-
-### For Complex Expressions
-
-```js
-// If you must use raw SQL, validate it extensively first
-function createOrderClause(column, direction) {
-  // Strict validation
-  const allowedColumns = ["name", "email", "created_at", "updated_at"];
-  const allowedDirections = ["ASC", "DESC"];
-
-  if (!allowedColumns.includes(column)) {
-    throw new Error(`Invalid column: ${column}`);
-  }
-
-  if (!allowedDirections.includes(direction)) {
-    throw new Error(`Invalid direction: ${direction}`);
-  }
-
-  // Now safe to use raw (but identifier would be even better)
-  return sql.raw(`ORDER BY ${column} ${direction}`);
+Use `sql.identifier()`, `sql.value()`, or `sql.literal()` instead.
+throw new Error(`Invalid column: ${column}`);
 }
-```
+
+if (!allowedDirections.includes(direction)) {
+throw new Error(`Invalid direction: ${direction}`);
+}
+
+// Now safe to use raw (but identifier would be even better)
+return sql.raw(`ORDER BY ${column} ${direction}`);
+}
+
+````
 
 ## Return Value
 
@@ -150,6 +95,6 @@ function buildSortClause(options) {
 
   return sql`ORDER BY ${column} ${direction}`;
 }
-```
+````
 
 Remember: If you find yourself needing `sql.raw()` frequently, consider whether pg-sql2 is the right tool for your use case, or whether the library needs additional features to support your patterns safely.
