@@ -247,29 +247,10 @@ chart={`\ stateDiagram   direction LR   state "$id" as Z   state "batchGetUsersB
 ## Usage
 
 ```ts
-function loadMany<TLookup, TItem, TData, TParams, TShared>(
+function loadMany(
   lookup: TLookup,
   loader: LoadManyCallback | LoadManyLoader,
 ): Step;
-
-type LoadManyCallback = (
-  lookups: TLookup[],
-  info: LoadManyInfo,
-) => PromiseOrDirect<TResult[]>;
-
-interface LoadManyLoader {
-  load: LoadManyCallback;
-  name?: string;
-  shared?: Thunk<Step<TShared>>;
-  ioEquivalence?: IOEquivalence<TLookup>;
-  paginationSupport?: PaginationFeatures; // see "Pagination interop"
-}
-
-interface LoadManyInfo {
-  shared: TShared;
-  attributes: string[];
-  params: Readonly<string, any>;
-}
 ```
 
 `loadMany` accepts two arguments (both required):
@@ -279,23 +260,7 @@ interface LoadManyInfo {
 - `loader` – either a callback function or an object containing the callback and
   optional properties - see "Loader object" below.
 
-### Loader object
-
-The loader object contains a `load` callback function and additional properties
-that augment its behavior in Grafast:
-
-- `load` (required) – the callback function called with the values from lookup
-  responsible for loading the associated records
-- `shared` (optional) – a thunk (callback) yielding a step or multistep to
-  provide shared data/utilities to use across all inputs (e.g. database client,
-  API credentials, etc)
-- `ioEquivalence` (optional, advanced) – a string, an array of strings, or a
-  string-string object map used to indicate which attributes on output are
-  equivalent to those on input
-- `paginationSupport` (optional) – enables pagination interop with
-  `connection()`
-
-### `loader` should be a global variable
+:::info[]`loader` should be a global variable]
 
 The `loader` argument (either a callback function or a loader object) should be
 passed as a reference from a global variable (such as an import), rather than
@@ -317,7 +282,48 @@ being defined inline at the callsite. This is important for several reasons:
    planning (which relates to data flow and happens at planning time) and
    loading (which fetches data at execution time).
 
+:::
+
+### Loader object
+
+```ts
+interface LoadManyLoader {
+  load: LoadManyCallback;
+  name?: string;
+  shared?: Thunk<TShared>;
+  ioEquivalence?: IOEquivalence<TLookup>;
+  paginationSupport?: PaginationFeatures; // see "Pagination interop"
+}
+```
+
+The loader object contains a `load` callback function and additional properties
+that augment its behavior in Grafast:
+
+- `load` (required) – the callback function called with the values from lookup
+  responsible for loading the associated records
+- `shared` (optional) – a thunk (callback) yielding a step or multistep to
+  provide shared data/utilities to use across all inputs (e.g. database client,
+  API credentials, etc)
+- `ioEquivalence` (optional, advanced) – a string, an array of strings, or a
+  string-string object map used to indicate which attributes on output are
+  equivalent to those on input
+- `paginationSupport` (optional) – enables pagination interop with
+  `connection()`
+
 ## Load callback
+
+```ts
+type LoadManyCallback = (
+  lookups: TLookup[],
+  info: LoadManyInfo,
+) => PromiseOrDirect<TResult[]>;
+
+interface LoadManyInfo {
+  shared: UnwrapMultistep<TShared>;
+  attributes: string[];
+  params: Readonly<string, any>;
+}
+```
 
 Whether passed directly or specified in a loader object, the `load` callback
 will be passed two arguments: `lookups` and `info`, and it must return one

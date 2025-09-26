@@ -117,28 +117,10 @@ chart={`\ stateDiagram   direction LR   state "batchGetUserById" as currentUser 
 ## Usage
 
 ```ts
-function loadOne<TLookup, TItem, TData, TParams, TShared>(
+function loadOne(
   lookup: TLookup,
   loader: LoadOneCallback | LoadOneLoader,
 ): Step;
-
-type LoadOneCallback = (
-  specs: TLookup[],
-  info: LoadOneInfo,
-) => PromiseOrDirect<TResult[]>;
-
-interface LoadOneLoader {
-  load: LoadOneCallback;
-  name?: string;
-  shared?: Step | Step[] | Record<string, Step>;
-  ioEquivalence?: string | string[] | Record<string, string>;
-}
-
-interface LoadOneInfo {
-  shared: TShared;
-  attributes: string[];
-  params: Readonly<string, any>;
-}
 ```
 
 `loadOne` accepts two arguments (both required):
@@ -148,22 +130,7 @@ interface LoadOneInfo {
 - `loader` – either a callback function or an object containing the callback and
   optional properties - see "Loader object" below.
 
-### Loader object
-
-The loader object contains a `load` callback function and additional properties
-that augment its behavior in Grafast:
-
-- `load` (required) – the callback function called with the values from lookup
-  responsible for loading the associated records
-- `shared` (optional) – a callback yielding a step or multistep to provide
-  shared data/utilities to use across all inputs (e.g. database client, API
-  credentials, etc). See [Shared step usage](#shared-step-usage) below
-- `ioEquivalence` (optional, advanced) – a string, an array of strings, or a
-  string-string object map used to indicate which attributes on output are
-  equivalent to those on input; see [ioEquivalence usage](#ioequivalence-usage)
-  below
-
-### `loader` should be a global variable
+:::info[`loader` should be a global variable]
 
 The `loader` argument (either a callback function or a loader object) should be
 passed as a reference from a global variable (such as an import), rather than
@@ -184,7 +151,46 @@ being defined inline at the callsite. This is important for several reasons:
    planning (which relates to data flow and happens at planning time) and
    loading (which fetches data at execution time).
 
+:::
+
+### Loader object
+
+```ts
+interface LoadOneLoader {
+  load: LoadOneCallback;
+  name?: string;
+  shared?: Thunk<TShared>;
+  ioEquivalence?: IOEquivalence<TLookup>;
+}
+```
+
+The loader object contains a `load` callback function and additional properties
+that augment its behavior in Grafast:
+
+- `load` (required) – the callback function called with the values from lookup
+  responsible for loading the associated records
+- `shared` (optional) – a callback yielding a step or multistep to provide
+  shared data/utilities to use across all inputs (e.g. database client, API
+  credentials, etc). See [Shared step usage](#shared-step-usage) below
+- `ioEquivalence` (optional, advanced) – a string, an array of strings, or a
+  string-string object map used to indicate which attributes on output are
+  equivalent to those on input; see [ioEquivalence usage](#ioequivalence-usage)
+  below
+
 ### Load callback
+
+```ts
+type LoadOneCallback = (
+  specs: TLookup[],
+  info: LoadOneInfo,
+) => PromiseOrDirect<TResult[]>;
+
+interface LoadOneInfo {
+  shared: UnwrapMultistep<TShared>;
+  attributes: string[];
+  params: Readonly<string, any>;
+}
+```
 
 The `load` callback function is called with two arguments, the first is a list
 of the values from the _specifier step_ `$spec` and the second is options that
@@ -194,11 +200,11 @@ may affect the fetching of the records.
 function callback(
   specs: ReadonlyArray<unknown>,
   options: {
-    shared: unknown;
+    shared: UnwrapMultistep<TShared>;
     attributes: ReadonlyArray<string>;
     params: Record<string, unknown>;
   },
-): PromiseOrDirect<ReadonlyArray<unknown>>;
+): PromiseOrDirect<ReadonlyArray<TItem>>;
 ```
 
 :::tip
