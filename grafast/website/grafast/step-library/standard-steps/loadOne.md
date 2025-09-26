@@ -127,16 +127,23 @@ stateDiagram
 ## Usage
 
 ```ts
-function loadOne(options: {
-  lookup: Step | Step[] | Record<string, Step>;
-  load: LoadOneCallback;
-  ioEquivalence?: string | Record<string, string>;
-  shared?: Step | Step[] | Record<string, Step>;
-}): Step;
+function loadOne<TLookup, TItem, TData, TParams, TShared>(
+  lookup: TLookup,
+  loader: LoadOneCallback | LoadOneLoader,
+): Step;
+
 type LoadOneCallback = (
   specs: TLookup[],
   info: LoadOneInfo,
 ) => PromiseOrDirect<TResult[]>;
+
+interface LoadOneLoader {
+  load: LoadOneCallback;
+  name?: string;
+  shared?: Step | Step[] | Record<string, Step>;
+  ioEquivalence?: string | string[] | Record<string, string>;
+}
+
 interface LoadOneInfo {
   shared: TShared;
   attributes: string[];
@@ -144,24 +151,30 @@ interface LoadOneInfo {
 }
 ```
 
-`loadOne` accepts an options object accepting 2-4 attributes:
+`loadOne` accepts two arguments (both required):
 
-- `lookup` (mostly required) - the step (or multistep) that specifies which
-  records to load - only not required when the load function can load data without
-  requiring identification.
-- `load` (required) - the callback function called with the values from lookup
-  responsible for loading the associated records
-- `$shared` (optional) - any _unary_ step (or multistep), useful for passing
-  things from context or arguments without complicating the lookup; see [Shared
-  step usage](#shared-step-usage) below
-- `ioEquivalence` (optional, advanced) - a string, an array of strings, or a
-  string-string object map used to indicate which attributes on output are
-  equivalent of those on input - see [ioEquivalence usage](#ioequivalence-usage)
-  below
+- `lookup` – the step (or multistep) that specifies which records to load, or `null` if no data is required.
+- `loader` – either a callback function or an object containing the callback and optional properties - see "Loader object" below.
 
-### Callback
+### Loader object
 
-The `callback` function is called with two arguments, the first is
+The loader object contains a `load` callback function and additional properties that augment its behavior in Grafast:
+
+- `load` (required) – the callback function called with the values from lookup responsible for loading the associated records
+- `shared` (optional) – a callback yielding a step or multistep to provide shared data/utilities to use across all inputs (e.g. database client, API credentials, etc). See [Shared step usage](#shared-step-usage) below
+- `ioEquivalence` (optional, advanced) – a string, an array of strings, or a string-string object map used to indicate which attributes on output are equivalent to those on input; see [ioEquivalence usage](#ioequivalence-usage) below
+
+### `loader` should be a global variable
+
+The `loader` argument (either a callback function or a loader object) should be passed as a reference from a global variable (such as an import), rather than being defined inline at the callsite. This is important for several reasons:
+
+1. **Optimization via reference equality:** Grafast uses `===` checks to optimize and deduplicate calls. If you define the `load` function inline, each call will have a different function reference, preventing optimization. By referencing a global function, multiple `loadOne` steps using the same loader can be optimized together.
+2. **Configuration belongs with the loader:** The `ioEquivalence` property is a feature of the loader function itself, not of the callsite. It should hold for all `loadOne` calls using that function, so it makes sense to configure it alongside the function, rather than duplicating configuration inline each time. Similarly, the function typically needs the same `shared` information.
+3. **Separation of concerns:** Keeping loader functions and their configuration separate from plan definitions helps maintain a clear distinction between planning (which relates to data flow and happens at planning time) and loading (which fetches data at execution time).
+
+### Load callback
+
+The `load` callback function is called with two arguments, the first is
 a list of the values from the _specifier step_ `$spec` and the second is options that
 may affect the fetching of the records.
 
