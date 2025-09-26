@@ -22,6 +22,7 @@ export type PlanWrapperFn = (
 ) => any;
 
 export interface PlanWrapperRule {
+  autoApplyFieldArgs?: boolean;
   plan?: PlanWrapperFn;
   // subscribePlan?: PlanWrapperFn;
 }
@@ -132,10 +133,11 @@ export function wrapPlans<T>(
           if (!planWrapperOrSpec) {
             return field;
           }
-          const planWrapper: PlanWrapperFn | undefined =
+          const ruleObject: PlanWrapperRule =
             typeof planWrapperOrSpec === "function"
-              ? planWrapperOrSpec
-              : planWrapperOrSpec.plan;
+              ? { plan: planWrapperOrSpec }
+              : planWrapperOrSpec;
+          const { plan: planWrapper, autoApplyFieldArgs = true } = ruleObject;
           if (!planWrapper) {
             return field;
           }
@@ -146,6 +148,7 @@ export function wrapPlans<T>(
             plan: EXPORTABLE(
               (
                 ExecutableStep,
+                autoApplyFieldArgs,
                 fieldName,
                 inspect,
                 isExecutableStep,
@@ -153,15 +156,15 @@ export function wrapPlans<T>(
                 planWrapper,
                 typeName,
               ) =>
-                (...planParams) => {
+                function wrappedPlan(this: any, ...planParams) {
                   // A replacement for `oldPlan` that automatically passes through arguments that weren't replaced
                   const smartPlan = (...overrideParams: Array<any>) => {
-                    const $prev = oldPlan(
-                      // @ts-ignore We're calling it dynamically, allowing the parent to override args.
+                    const args = [
                       ...overrideParams.concat(
                         planParams.slice(overrideParams.length),
                       ),
-                    );
+                    ] as typeof planParams;
+                    const $prev = oldPlan.apply(this, args);
                     if (!($prev instanceof ExecutableStep)) {
                       console.error(
                         `Wrapped a plan function at ${typeName}.${fieldName}, but that function did not return a step!\n${String(
@@ -172,6 +175,9 @@ export function wrapPlans<T>(
                       throw new Error(
                         "Wrapped a plan function, but that function did not return a step!",
                       );
+                    }
+                    if (autoApplyFieldArgs) {
+                      args[1].autoApply($prev);
                     }
                     return $prev;
                   };
@@ -198,6 +204,7 @@ export function wrapPlans<T>(
                 },
               [
                 ExecutableStep,
+                autoApplyFieldArgs,
                 fieldName,
                 inspect,
                 isExecutableStep,

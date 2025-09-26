@@ -1056,7 +1056,12 @@ export function stepADependsOnStepB(
       return true;
     }
   }
-  return false;
+  if (stepA.implicitSideEffectStep) {
+    if (stepA.implicitSideEffectStep === stepB) return true;
+    return stepADependsOnStepB(stepA.implicitSideEffectStep, stepB);
+  } else {
+    return false;
+  }
 }
 
 function stepAIsOrDependsOnStepB(stepA: Step, stepB: Step): boolean {

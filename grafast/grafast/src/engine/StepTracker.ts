@@ -8,7 +8,12 @@ import type {
 } from "../interfaces.js";
 import { Step } from "../step.js";
 import { __FlagStep } from "../steps/__flag.js";
-import { sudo, writeableArray } from "../utils.js";
+import {
+  stepADependsOnStepB,
+  stepAMayDependOnStepB,
+  sudo,
+  writeableArray,
+} from "../utils.js";
 import type {
   LayerPlan,
   LayerPlanReasonCombined,
@@ -359,6 +364,41 @@ export class StepTracker {
           `Attempted to add '${$dependency}' (${$dependency.layerPlan}) as a dependency of '${$dependent}' (${$dependent.layerPlan}), but we cannot because that LayerPlan isn't an ancestor. (phase = ${this.operationPlan.phase})`,
         );
       }
+    }
+
+    if (!stepAMayDependOnStepB($dependent, $dependency)) {
+      if (isDev) {
+        if ($dependent.isFinalized) {
+          throw new Error(
+            `${$dependent} is finalized and thus may not add a dependency on ${$dependency}.`,
+          );
+        }
+        if (
+          !$dependency._isUnary &&
+          $dependent._isUnary &&
+          $dependent._isUnaryLocked
+        ) {
+          throw new Error(
+            `Unary step ${$dependent} may not depend on non-unary step ${$dependency}.`,
+          );
+        }
+        if (stepADependsOnStepB($dependency, $dependent)) {
+          if (
+            $dependency.implicitSideEffectStep &&
+            stepADependsOnStepB($dependency.implicitSideEffectStep, $dependent)
+          ) {
+            throw new Error(
+              `${$dependent} may not depend on ${$dependency} as the latter was created after ${$dependency.implicitSideEffectStep} (has side effects) which already depends on ${$dependent}; this would form a cycle.`,
+            );
+          }
+          throw new Error(
+            `${$dependent} may not depend on ${$dependency}, as doing so would form a dependency cycle.`,
+          );
+        }
+      }
+      throw new Error(
+        `${$dependent} may not depend on ${$dependency} as it would create an invalid heirarchy (for example a cycle or an unreachable path through the graph).`,
+      );
     }
 
     const dependentDependencies = writeableArray($dependent.dependencies);

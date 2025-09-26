@@ -219,6 +219,13 @@ export type FieldArgs<TObj extends BaseGraphQLArguments = any> = {
     // TYPES: Really not sure why TypeScript requires this here?
     justTargetFromParent?: never,
   ): void;
+  /**
+   * Applies the arguments to $target if they haven't already been applied.
+   * Called automatically by the system once the `plan()` returns, but may be
+   * called manually (e.g. by a plan wrapper) to ensure args are applied at any
+   * point.
+   */
+  autoApply($target: Step): void;
 } & {
   [key in keyof TObj & string as `$${key}`]: Step<TObj[key]> &
     ([unknown] extends [TObj[key]]
