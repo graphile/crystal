@@ -59,8 +59,8 @@ are not possible in DataLoader.
 
 ### Only requesting the required attributes
 
-One such feature is the ability to only request the attributes that are read
-by our downstream consumers. The list of requested attributes are automatically
+One such feature is the ability to only request the attributes that are read by
+our downstream consumers. The list of requested attributes are automatically
 passed to your `load` callback via `attributes` property of the `info` object
 passed as the second argument to your load callback.
 
@@ -216,19 +216,13 @@ In its current state the system doesn't know that the
 `$user.get("organization_id")` is equivalent to the `id` argument to our
 `usersByOrganizationId` field, so this would result in a chained fetch:
 
-<Mermaid chart={`\
-stateDiagram
-  direction LR
-  state "$id" as Z
-  state "batchGetUsersByOrganizationId" as A
-  state "batchGetOrganizationById" as B
-  Z --> A
-  A --> B: .get("organizationId")
-`} />
+<Mermaid
+chart={`\ stateDiagram   direction LR   state "$id" as Z   state "batchGetUsersByOrganizationId" as A   state "batchGetOrganizationById" as B   Z --> A   A --> B: .get("organizationId") `}
+/>
 
 However, we can indicate that the output of the `loadMany` step's records'
-`organization_id` property (`$user.get("organization_id")`) is equivalent to its input
-(`$id`):
+`organization_id` property (`$user.get("organization_id")`) is equivalent to its
+input (`$id`):
 
 ```ts
 const batchGetUsersByOrganizationId = {
@@ -246,15 +240,9 @@ to the `Query.usersByOrganizationId(id:)` argument (the `id` argument on the
 to load the users in order to fetch their organization - it can fetch both in
 parallel:
 
-<Mermaid chart={`\
-stateDiagram
-  direction LR
-  state "$id" as Z
-  state "batchGetUsersByOrganizationId" as A
-  state "batchGetOrganizationById" as B
-  Z --> A
-  Z --> B
-`} />
+<Mermaid
+chart={`\ stateDiagram   direction LR   state "$id" as Z   state "batchGetUsersByOrganizationId" as A   state "batchGetOrganizationById" as B   Z --> A   Z --> B `}
+/>
 
 ## Usage
 
@@ -286,40 +274,62 @@ interface LoadManyInfo {
 
 `loadMany` accepts two arguments (both required):
 
-- `lookup` – the step (or multistep) that specifies which records to look up, or `null` if no data is required.
-- `loader` – either a callback function or an object containing the callback and optional properties - see "Loader object" below.
+- `lookup` – the step (or multistep) that specifies which records to look up, or
+  `null` if no data is required.
+- `loader` – either a callback function or an object containing the callback and
+  optional properties - see "Loader object" below.
 
 ### Loader object
 
-The loader object contains a `load` callback function and additional properties that augment its behavior in Grafast:
+The loader object contains a `load` callback function and additional properties
+that augment its behavior in Grafast:
 
-- `load` (required) – the callback function called with the values from lookup responsible for loading the associated records
-- `shared` (optional) – a thunk (callback) yielding a step or multistep to provide shared data/utilities to use across all inputs (e.g. database client, API credentials, etc)
-- `ioEquivalence` (optional, advanced) – a string, an array of strings, or a string-string object map used to indicate which attributes on output are equivalent to those on input
-- `paginationSupport` (optional) – enables pagination interop with `connection()`
+- `load` (required) – the callback function called with the values from lookup
+  responsible for loading the associated records
+- `shared` (optional) – a thunk (callback) yielding a step or multistep to
+  provide shared data/utilities to use across all inputs (e.g. database client,
+  API credentials, etc)
+- `ioEquivalence` (optional, advanced) – a string, an array of strings, or a
+  string-string object map used to indicate which attributes on output are
+  equivalent to those on input
+- `paginationSupport` (optional) – enables pagination interop with
+  `connection()`
 
 ### `loader` should be a global variable
 
-The `loader` argument (either a callback function or a loader object) should be passed as a reference from a global variable (such as an import), rather than being defined inline at the callsite. This is important for several reasons:
+The `loader` argument (either a callback function or a loader object) should be
+passed as a reference from a global variable (such as an import), rather than
+being defined inline at the callsite. This is important for several reasons:
 
-1. **Optimization via reference equality:** Grafast uses `===` checks to optimize and deduplicate calls. If you define the `load` function inline, each call will have a different function reference, preventing optimization. By referencing a global function, multiple `loadMany` steps using the same loader can be optimized together.
-2. **Configuration belongs with the loader:** The `ioEquivalence` property is a feature of the loader function itself, not of the callsite. It should hold for all `loadMany` calls using that function, so it makes sense to configure it alongside the function, rather than duplicating configuration inline each time. Similarly, the function typically needs the same `shared` information and pagination support.
-3. **Separation of concerns:** Keeping loader functions and their configuration separate from plan definitions helps maintain a clear distinction between planning (which relates to data flow and happens at planning time) and loading (which fetches data at execution time).
+1. **Optimization via reference equality:** Grafast uses `===` checks to
+   optimize and deduplicate calls. If you define the `load` function inline,
+   each call will have a different function reference, preventing optimization.
+   By referencing a global function, multiple `loadMany` steps using the same
+   loader can be optimized together.
+2. **Configuration belongs with the loader:** The `ioEquivalence` property is a
+   feature of the loader function itself, not of the callsite. It should hold
+   for all `loadMany` calls using that function, so it makes sense to configure
+   it alongside the function, rather than duplicating configuration inline each
+   time. Similarly, the function typically needs the same `shared` information
+   and pagination support.
+3. **Separation of concerns:** Keeping loader functions and their configuration
+   separate from plan definitions helps maintain a clear distinction between
+   planning (which relates to data flow and happens at planning time) and
+   loading (which fetches data at execution time).
 
 ## Load callback
 
 Whether passed directly or specified in a loader object, the `load` callback
-will be passed two arguments: `lookups` and `info`, and it must return
-one result collection per lookup value. Each
-collection may be an array or an async iterable; items may be `null`:
+will be passed two arguments: `lookups` and `info`, and it must return one
+result collection per lookup value. Each collection may be an array or an async
+iterable; items may be `null`:
 `PromiseOrDirect<ReadonlyArray<Maybe<ReadonlyArrayOrAsyncIterable<Maybe<TItem>>>>>`.
 
 The lookups argument is a readonly array of resolved lookup values.
 
 The `info` argument contains additional metadata about the request:
 
-- `attributes`: the set of accessed keys (`keyof TItem`) that our children
-  need
+- `attributes`: the set of accessed keys (`keyof TItem`) that our children need
 - `params`: a map of params set via `.setParam(...)` (used to indicate
   pagination, filtering, etc)
 - `shared`: the resolved value from `loader.shared` (typically API/DB clients,
@@ -385,9 +395,8 @@ The `ioEquivalence` optional parameter can accept the following values:
 - `null` to indicate no input/output equivalence
 - a string to indicate that the same named property on the output is equivalent
   to the lookup value
-- if the lookup was an array, an array containing a list of keys (or
-  null for no relation) on the output that are equivalent to the same entry in the
-  input
+- if the lookup was an array, an array containing a list of keys (or null for no
+  relation) on the output that are equivalent to the same entry in the input
 - if the lookup was an object, an object that maps between the attributes of the
   object and the key(s) in the output that are equivalent to the given entry on
   the input
@@ -449,8 +458,10 @@ function User_friends($user, fieldArgs) {
   `LoadManyStep` exposes GraphQL pagination to your `load` via `info.params`,
   thereby setting:
   - `info.params.limit`: number of records to fetch, or null for no limit
-  - `info.params.offset`: number of records to skip past, or null to not skip (applied after `after` when cursors are used)
-  - `info.params.after`: exclusive lower bound cursor normally, or exclusive upper bound cursor in reverse mode, if specified
+  - `info.params.offset`: number of records to skip past, or null to not skip
+    (applied after `after` when cursors are used)
+  - `info.params.after`: exclusive lower bound cursor normally, or exclusive
+    upper bound cursor in reverse mode, if specified
   - `info.params.reverse`: whether the other parameters should be applied
     backwards from the end rather than forwards from the start of the collection
 - If you advertise `cursor: true` in `paginationSupport`, each returned item
@@ -459,9 +470,10 @@ function User_friends($user, fieldArgs) {
   `pageInfo { startCursor endCursor }`.
 - `fieldArgs` in `connection($step, { fieldArgs })` is the `fieldArgs` parameter
   from your plan resolver, and is assumed to represent arguments including the
-  `first`, `last`, `before`, `after` and `offset` pagination arguments. This saves
-  you from manually calling `$connection.setFirst(fieldArgs.getRaw('first'))` for
-  each of the pagination arguments in turn.
+  `first`, `last`, `before`, `after` and `offset` pagination arguments. This
+  saves you from manually calling
+  `$connection.setFirst(fieldArgs.getRaw('first'))` for each of the pagination
+  arguments in turn.
 
 :::warning Without `paginationSupport`, the entire list will be fetched
 
@@ -473,8 +485,8 @@ pagination for you, which requires the entire collection to be downloaded.
 ## Attribute merging
 
 `LoadManyStep`s that share the same `load` function **and** identical param
-signatures automatically merge their `attributes` sets before execution to maximize
-cache reuse (even if it means some requests will need to fetch more attributes
-than strictly required).
+signatures automatically merge their `attributes` sets before execution to
+maximize cache reuse (even if it means some requests will need to fetch more
+attributes than strictly required).
 
 [dataloader]: https://github.com/graphql/dataloader
