@@ -57,7 +57,7 @@ export function withFieldArgsForArguments<T extends Step>(
   }
 
   const applied = new Map<string, Step>();
-  let explicitlyApplied = false;
+  let autoApplyDisabled = false;
 
   const fieldArgs: FieldArgs = {
     typeAt(path) {
@@ -144,6 +144,19 @@ export function withFieldArgsForArguments<T extends Step>(
         );
       }
     },
+    autoApply($target) {
+      if (!autoApplyDisabled) {
+        autoApplyDisabled = true;
+        processAfter(
+          $parent,
+          fieldArgs,
+          $target,
+          args,
+          applyAfterMode,
+          coordinate,
+        );
+      }
+    },
     apply($target, inPathOrGetTargetFromParent, maybeGetTargetFromParent) {
       const inPath =
         typeof inPathOrGetTargetFromParent === "function"
@@ -163,7 +176,7 @@ export function withFieldArgsForArguments<T extends Step>(
         );
       }
       if (path.length === 0) {
-        explicitlyApplied = true;
+        autoApplyDisabled = true;
         // Auto-apply all the arguments
         for (const argName of Object.keys(args)) {
           fieldArgs.apply($target, [argName]);
@@ -211,8 +224,8 @@ export function withFieldArgsForArguments<T extends Step>(
   }
   assertNotPromise(result, callback, operationPlan.loc?.join(">") ?? "???");
 
-  if (!explicitlyApplied && result != null) {
-    processAfter($parent, fieldArgs, result, args, applyAfterMode, coordinate);
+  if (result != null) {
+    fieldArgs.autoApply(result);
   }
 
   if (operationPlan.loc !== null) operationPlan.loc.pop();
