@@ -258,51 +258,53 @@ stateDiagram
 
 ## Usage
 
-Called as `loadMany($lookup, loader)`; `$lookup` is a step (or multistep)
-representing a "lookup" value (identifying the records to look up) and `loader`
-is responsible for loading the related records.
-
-Here's a simplified form of the type signature:
-
 ```ts
-/**
- * @template TLookup - type used to identify the record to look up (typically an
- * string/UUID/integer, but composite types are supported).
- * @template TItem - The type of each individual record returned.
- * @template TData - The type of the collection for one lookup (array or async
- * iterable of `TItem`, including nullability concerns).
- * @template TParams - The shape of the `params` object available in the `info`
- * argument - add params using `$loadMany.setParam(...)`, see below.
- * @template TShared - Optional shared data, typically API or database clients,
- * current user or session information, or other values shared by all entries in
- * the batch.
- */
 function loadMany<TLookup, TItem, TData, TParams, TShared>(
-  lookup: Step<TLookup> | Multistep,
-  loader:
-    | LoadManyLoader<TLookup, TItem, TData, TParams, TShared>
-    | LoadManyCallback<TLookup, TItem, TData, TParams, undefined>,
-): LoadManyStep<TLookup, TItem, TData, TParams, TShared>;
+  lookup: TLookup,
+  loader: LoadManyCallback | LoadManyLoader,
+): Step;
 
-interface LoadManyLoader<TLookup, TItem, TData, TParams, TShared> {
-  load: LoadManyCallback<TLookup, TItem, TData, TParams, TShared>;
+type LoadManyCallback = (
+  lookups: TLookup[],
+  info: LoadManyInfo,
+) => PromiseOrDirect<TResult[]>;
+
+interface LoadManyLoader {
+  load: LoadManyCallback;
   name?: string;
   shared?: Thunk<Step<TShared>>;
   ioEquivalence?: IOEquivalence<TLookup>;
   paginationSupport?: PaginationFeatures; // see "Pagination interop"
 }
 
-type LoadManyCallback<TLookup, TItem, TData, TParams, TShared> = (
-  lookups: ReadonlyArray<TLookup>,
-  info: LoadManyInfo<TItem, TParams, TShared>,
-) => PromiseOrDirect<ReadonlyArray<TData>>;
-
-interface LoadManyInfo<TItem, TParams, TShared> {
-  attributes: ReadonlyArray<keyof TItem>;
-  params: Partial<TParams>;
+interface LoadManyInfo {
   shared: TShared;
+  attributes: string[];
+  params: Readonly<string, any>;
 }
 ```
+
+`loadMany` accepts two arguments (both required):
+
+- `lookup` – the step (or multistep) that specifies which records to look up, or `null` if no data is required.
+- `loader` – either a callback function or an object containing the callback and optional properties - see "Loader object" below.
+
+### Loader object
+
+The loader object contains a `load` callback function and additional properties that augment its behavior in Grafast:
+
+- `load` (required) – the callback function called with the values from lookup responsible for loading the associated records
+- `shared` (optional) – a thunk (callback) yielding a step or multistep to provide shared data/utilities to use across all inputs (e.g. database client, API credentials, etc)
+- `ioEquivalence` (optional, advanced) – a string, an array of strings, or a string-string object map used to indicate which attributes on output are equivalent to those on input
+- `paginationSupport` (optional) – enables pagination interop with `connection()`
+
+### `loader` should be a global variable
+
+The `loader` argument (either a callback function or a loader object) should be passed as a reference from a global variable (such as an import), rather than being defined inline at the callsite. This is important for several reasons:
+
+1. **Optimization via reference equality:** Grafast uses `===` checks to optimize and deduplicate calls. If you define the `load` function inline, each call will have a different function reference, preventing optimization. By referencing a global function, multiple `loadMany` steps using the same loader can be optimized together.
+2. **Configuration belongs with the loader:** The `ioEquivalence` property is a feature of the loader function itself, not of the callsite. It should hold for all `loadMany` calls using that function, so it makes sense to configure it alongside the function, rather than duplicating configuration inline each time. Similarly, the function typically needs the same `shared` information and pagination support.
+3. **Separation of concerns:** Keeping loader functions and their configuration separate from plan definitions helps maintain a clear distinction between planning (which relates to data flow and happens at planning time) and loading (which fetches data at execution time).
 
 ## Load callback
 
