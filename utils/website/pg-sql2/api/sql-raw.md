@@ -5,6 +5,8 @@ title: "sql.raw()"
 
 # `sql.raw(text)`
 
+**ADVANCED** - most users will not need this function.
+
 :::warning[DO NOT USE!]
 
 This function invites SQL injection vulnerabilities. There's almost always a
