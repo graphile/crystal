@@ -29,7 +29,7 @@ many features are applicable to other SQL databases as well.
 
 ### Compilation
 
-- [`sql.compile(query, options?)`](./sql-complie.md) - Compile SQL to `text` and `values` ready for execution
+- [`sql.compile(query, options?)`](./sql-compile.md) - Compile SQL to `text` and `values` ready for execution
 
 ### Advanced Features
 
