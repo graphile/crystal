@@ -5,7 +5,9 @@ title: "sql.literal()"
 
 # `sql.literal(val)`
 
-Embeds simple, trusted values directly into SQL text rather than using placeholders, for debugging convenience and performance.
+Embeds simple values directly into SQL text, falling back to `sql.value(val)`
+for more complex values. More readable and efficient than placeholders for
+constants.
 
 ## Syntax
 
@@ -15,15 +17,15 @@ sql.literal(val: string | number | boolean | null): SQL
 
 ## Parameters
 
-- `val` - A simple, trusted value to embed directly. Supported types:
+- `val` - A simple value to embed directly. Supported types:
   - `string` - Will be properly escaped with single quotes
   - `number` - Must be finite
   - `boolean` - Converted to `TRUE`/`FALSE`
   - `null` - Converted to `NULL`
 
-## Description
+## Return Value
 
-Embeds simple values directly in SQL instead of using placeholders when safe. Automatically falls back to `sql.value()` if unsafe. More readable and efficient than placeholders for constants.
+Returns a `SQL` fragment with the value embedded directly in the SQL text.
 
 ## Examples
 
@@ -40,30 +42,15 @@ sql`json_build_object(${sql.join(
 )})`;
 ```
 
-## Use Cases
+## Notes
 
-- **Constants:** `LIMIT ${sql.literal(50)}`, `OFFSET ${sql.literal(0)}`
-- **JSON keys:** `json_build_object(${sql.literal("key")}, value)`
-- **Known booleans:** `${sql.literal(true)}`, `${sql.literal(false)}`
-- **Application constants and enums**
+`sql.literal(val)` _should_ be perfectly safe to use with scalars and arrays
+thereof since it performs its own checks and falls back to `sql.value(val)` if
+it doesn't think they're safe. That said, you should only use it in positions
+where you're using somewhat validated user input (e.g. pagination limits), it's
+generally safer to default to `sql.value(val)` for arbitrary data.
 
-For user input or sensitive data, use `sql.value()` instead.
-
-## Return Value
-
-Returns a `SQL` fragment with the value embedded directly in the SQL text.
-
-## Error Handling
-
-```js
-// Throws error for infinite numbers
-sql.literal(Infinity); // Error: Infinite numbers not allowed
-
-// Throws error for unsupported types
-sql.literal({}); // Error: Objects not supported
-sql.literal([]); // Error: Arrays not supported
-```
-
-## Security Warning
-
-Remember: `sql.literal()` bypasses the parameterization that makes pg-sql2 safe. Only use it when you're absolutely certain the data is trusted and not user-controlled.
+`sql.literal(val)` may compile to different SQL for different values, making the
+compiled SQL less cacheable (particularly important for prepared statements).
+Use for constants and small lists of values, use `sql.value(val)` for values
+with high cardinality so that placeholders can be reused.

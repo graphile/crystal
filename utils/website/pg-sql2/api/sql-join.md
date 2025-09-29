@@ -5,7 +5,18 @@ title: "sql.join()"
 
 # `sql.join(arrayOfFragments, delimiter)`
 
-Joins an array of SQL fragments together using a delimiter, useful for building dynamic lists of columns, conditions, or other SQL elements.
+Joins an array of SQL fragments together using a delimiter, useful for building
+dynamic lists of columns, conditions, or other SQL elements.
+
+Joins SQL fragments with a delimiter. For joining SQL fragments, NOT table
+joins!
+
+:::tip[PostgreSQL Parameter Limit]
+
+For large bulk inserts, you may hit PostgreSQL's parameter limit (~65,535).
+Consider using `json_populate_recordset()` or `json_array_elements()` instead.
+
+:::
 
 ## Syntax
 
@@ -18,9 +29,10 @@ sql.join(items: ReadonlyArray<SQL>, separator?: string): SQL
 - `items` - Array of SQL fragments to join
 - `separator` - String delimiter to insert between fragments (defaults to empty string)
 
-## Description
+## Return Value
 
-Joins SQL fragments with a delimiter. For joining SQL fragments, NOT table joins!
+Returns a SQL fragment containing all joined elements joined by the separator.
+Return empty fragment if array is empty.
 
 ## Examples
 
@@ -42,7 +54,3 @@ sql`json_build_object(${sql.join(
   ", ",
 )})`;
 ```
-
-**⚠️ PostgreSQL Parameter Limit:** For large bulk inserts, you may hit PostgreSQL's parameter limit (~65,535). Consider using `json_populate_recordset()` or `json_array_elements()` instead.
-
-Returns a SQL fragment containing all joined elements, or empty fragment if array is empty.
