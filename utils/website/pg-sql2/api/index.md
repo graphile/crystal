@@ -26,7 +26,6 @@ many features are applicable to other SQL databases as well.
 - [`sql.parens(fragment, force?)`](./sql-parens.md) - Add parentheses when needed
 - [`sql.indent(fragment)`](./sql-indent.md) - Indent SQL for readability
 - [`sql.indentIf(condition, fragment)`](./sql-indent-if.md) - Conditionally indent SQL
-- [`sql.comment(text)`](./sql-comment.md) - Add SQL comments
 
 ### Compilation
 
@@ -34,6 +33,7 @@ many features are applicable to other SQL databases as well.
 
 ### Advanced Features
 
+- [`sql.comment(text)`](./sql-comment.md) - Add SQL comments
 - [`sql.isSQL(value)`](./sql-is-sql.md) - Check if a value is a SQL fragment
 - [`sql.isEquivalent(sql1, sql2, options?)`](./sql-is-equivalent.md) - Compare SQL fragments for equivalence
 - [`sql.placeholder(symbol, fallback?)`](./sql-placeholder.md) - Create replaceable placeholders

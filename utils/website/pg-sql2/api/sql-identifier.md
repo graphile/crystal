@@ -5,7 +5,15 @@ title: "sql.identifier()"
 
 # `sql.identifier(ident, ...)`
 
-Creates a safely escaped SQL identifier for table names, column names, schema names, and other database object names.
+Creates a safely escaped SQL identifier for table names, column names, schema
+names, and other database object names. If multiple arguments are passed, each
+will be escaped individually and then joined with dots (e.g.
+`"schema"."table"."column"`). This prevents SQL injection when using dynamic
+table/column names.
+
+Furthermore, symbols can be passed as identifiers to generate unique aliases,
+which is useful if your SQL might include the same table multiple times, or
+otherwise lead to alias confusion.
 
 ## Syntax
 
@@ -19,24 +27,25 @@ sql.identifier(name1: string | symbol, name2: string | symbol, ...): SQL
 - `name` - A string or symbol representing an identifier name
 - Multiple names can be passed to create qualified identifiers
 
-## Description
+## Return Value
 
-Represents a safely escaped SQL identifier. If multiple arguments are passed, each will be escaped individually and then joined with dots (e.g. `"schema"."table"."column"`). This prevents SQL injection when using dynamic table/column names.
+Returns a `SQL` fragment representing the escaped identifier that can be
+embedded in other SQL expressions.
 
 ## Examples
 
 ### Basic Identifiers
 
 ```js
-import sql from 'pg-sql2';
+import sql from "pg-sql2";
 
 // Table name
-const tableName = 'users';
+const tableName = "users";
 sql`SELECT * FROM ${sql.identifier(tableName)}`;
 // -> SELECT * FROM "users"
 
-// Column name  
-const columnName = 'user_name';
+// Column name
+const columnName = "user_name";
 sql`SELECT ${sql.identifier(columnName)} FROM users`;
 // -> SELECT "user_name" FROM users
 ```
@@ -45,61 +54,75 @@ sql`SELECT ${sql.identifier(columnName)} FROM users`;
 
 ```js
 // Schema.table
-const schema = 'public';
-const table = 'users';
-sql`SELECT * FROM ${sql.identifier(schema, table)}`;
+const schema = "public";
+const table = "users";
+const column = "name";
+sql`SELECT ${sql.identifier(column)} FROM ${sql.identifier(schema, table)}`;
 // -> SELECT * FROM "public"."users"
 
 // Table.column
-sql`SELECT ${sql.identifier('users', 'name')} FROM users`;
+sql`SELECT ${sql.identifier(table, column)} FROM users`;
 // -> SELECT "users"."name" FROM users
 
 // Schema.table.column
-sql`SELECT ${sql.identifier('public', 'users', 'email')} FROM public.users`;
-// -> SELECT "public"."users"."email" FROM public.users
+sql`COMMENT ON COLUMN ${sql.identifier(schema, table, column)} IS ''`;
+// -> COMMENT ON COLUMN "public"."users"."name" IS '';
 ```
 
 ### Using Symbols
 
-Symbols are automatically assigned unique identifiers, useful for aliases:
+Symbols are automatically assigned unique identifiers,
 
 ```js
-const alias = Symbol('user_alias');
-sql`SELECT u.name FROM users AS ${sql.identifier(alias)}`;
-// -> SELECT u.name FROM users AS "__local_0__"
+const worker = sql.identifier(Symbol("worker"));
+const boss = sql.identifier(Symbol("boss"));
+sql`
+SELECT
+  ${worker}.name,
+  ${boss}.salary/${worker}.salary as boss_multiplier
+FROM employees AS ${worker}
+INNER JOIN employees AS ${boss}
+ON ${worker}.manager_id = ${boss}.id
+`;
+// -> SELECT
+//      __worker__.name,
+//      __boss__.salary/__worker__.salary as boss_multiplier
+//    FROM employees AS __worker__
+//    INNER JOIN employees AS __boss__
+//    ON __worker__.manager_id = __boss__.id
 ```
 
-### Dynamic Column Selection
+:::tip[Give symbols meaningful names]
+
+The above would also work with naked symbols, but they'd be named `__local_0__`,
+`__local_1__`, etc. in the compiled SQL:
 
 ```js
-const columns = ['id', 'name', 'email', 'created_at'];
-const columnList = sql.join(
-  columns.map(col => sql.identifier(col)),
-  ', '
-);
-
-sql`SELECT ${columnList} FROM users`;
-// -> SELECT "id", "name", "email", "created_at" FROM users
+const worker = sql.identifier(Symbol());
+const boss = sql.identifier(Symbol());
+//    FROM employees AS __local_0__
+//    INNER JOIN employees AS __local_1__
 ```
+
+:::
 
 ### Handling Special Characters
 
 ```js
 // Identifiers with spaces or special characters are safely escaped
-sql`SELECT * FROM ${sql.identifier('user data')}`;
+sql`SELECT * FROM ${sql.identifier("user data")}`;
 // -> SELECT * FROM "user data"
 
-sql`SELECT * FROM ${sql.identifier('users-table')}`;  
-// -> SELECT * FROM "users-table"
+sql`SELECT * FROM ${sql.identifier('b"z')}`;
+// -> SELECT * FROM "b""z"
 ```
-
-## Return Value
-
-Returns a `SQL` fragment representing the escaped identifier that can be embedded in other SQL expressions.
 
 ## Notes
 
-- Identifiers are always double-quoted in the output SQL for safety
-- Reserved SQL keywords are handled correctly through escaping
-- Symbol identifiers are converted to unique string representations
+- `pg-sql2` intelligently determines when to use quoted identifiers (with double
+  quotes) based on PostgreSQL rules
 - Multiple arguments create dot-separated qualified identifiers
+- Reserved SQL keywords are handled correctly through escaping
+- Symbol identifiers are converted to unique string representations which will
+  always be consistent within a single compiled query, but may differ from query
+  to query if the same fragment is used in multiple queries

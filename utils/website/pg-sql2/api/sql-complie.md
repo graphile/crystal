@@ -15,7 +15,6 @@ sql.compile(query: SQL, options?: {
 }): {
   text: string;
   values: SQLRawValue[];
-  [$$symbolToIdentifier]: Map<symbol, string>;
 }
 ```
 
@@ -25,11 +24,24 @@ sql.compile(query: SQL, options?: {
 - `options` - Optional compilation options
   - `placeholderValues` - Map of symbol placeholders to their replacement SQL fragments
 
-## Description
+## Return Value
 
-Compiles SQL fragments into executable SQL text and parameter values for database drivers.
+An object with:
 
-## Basic Usage
+- `text: string` - The compiled SQL query string with placeholders (`$1`, `$2`, etc.)
+- `values: SQLRawValue[]` - Array of parameter values corresponding to the placeholders in order
+- private symbols you should ignore
+
+## Usage
+
+```js
+const { text, values } = sql.compile(query);
+await client.query(text, values);
+```
+
+## Examples
+
+### Basic Usage
 
 ```js
 import sql from "pg-sql2";
@@ -48,54 +60,11 @@ const { text, values } = sql.compile(query);
 
 console.log(text);
 // -> SELECT id, name, email FROM users WHERE id = $1 AND status = $2
-
 console.log(values);
 // -> [123, 'active']
 ```
 
-## Usage
-
-```js
-const { text, values } = sql.compile(query);
-await client.query(text, values);
-```
-
-## With Placeholders
-
-```js
-sql.compile(query, {
-  placeholderValues: new Map([[TABLE_SYMBOL, sql.identifier("users")]]),
-});
-
-// Compile with placeholder values
-const { text, values } = sql.compile(baseQuery, {
-  placeholderValues: new Map([
-    [TABLE_NAME, sql.identifier("users")],
-    [ORDER_BY, sql`ORDER BY created_at DESC`],
-  ]),
-});
-
-console.log(text);
-// -> SELECT * FROM "users" ORDER BY created_at DESC
-```
-
-## Return Value
-
-The `compile` function returns an object with:
-
-### `text: string`
-
-The compiled SQL query string with placeholders (`$1`, `$2`, etc.)
-
-### `values: SQLRawValue[]`
-
-Array of parameter values corresponding to the placeholders in order
-
-### `[$$symbolToIdentifier]: Map<symbol, string>`
-
-**Internal use only** - mapping of symbols to their generated identifiers. This is for internal pg-sql2 use and should not be used in application code.
-
-## Complex Example
+### Complex Example
 
 ```js
 const filters = {
@@ -111,10 +80,10 @@ const query = sql`
     columns.map((col) => sql.identifier(col)),
     ", ",
   )}
-   FROM ${sql.identifier("users")}
+  FROM ${sql.identifier("users")}
   WHERE status = ${sql.value(filters.status)}
-    AND age >= ${sql.value(filters.minAge)}
-    AND role = ANY(${sql.value(filters.roles)})
+  AND age >= ${sql.value(filters.minAge)}
+  AND role = ANY(${sql.value(filters.roles)})
   ORDER BY ${sql.identifier("created_at")} DESC
   LIMIT ${sql.literal(50)}
 `;
@@ -124,7 +93,9 @@ const compiled = sql.compile(query);
 console.log(compiled.text);
 // -> SELECT "id", "name", "email", "role", "created_at"
 //    FROM "users"
-//    WHERE status = $1 AND age >= $2 AND role = ANY($3)
+//    WHERE status = $1
+//    AND age >= $2
+//    AND role = ANY($3)
 //    ORDER BY "created_at" DESC
 //    LIMIT 50
 
@@ -132,75 +103,31 @@ console.log(compiled.values);
 // -> ['active', 18, ['admin', 'user', 'moderator']]
 ```
 
-## Error Handling
+### With Placeholders
 
 ```js
-try {
-  const query = sql`SELECT * FROM ${sql.value("invalid_table_name")}`;
-  const { text, values } = sql.compile(query);
-} catch (error) {
-  // Handle compilation errors (e.g., invalid SQL fragments)
-  console.error("Compilation failed:", error.message);
-}
-```
+const $$table = Symbol("table");
+const $$orderBy = Symbol("orderBy");
 
-## Performance Notes
+const sqlTable = sql.placeholder($$table, sql.identifier("default_table"));
+const sqlOrderBy = sql.placeholder($$orderBy, sql`id ASC`);
+const query = sql`
+  SELECT * FROM ${sqlTable}
+  ORDER BY ${sqlOrderBy}
+`;
 
-- Compilation is generally fast, but you may want to cache compiled queries for frequently-used patterns
-- The `values` array maintains parameter order, which is crucial for database execution
-- Symbol identifiers are generated deterministically during compilation
+// Compile with defaults
+const q1 = sql.compile(query);
+console.log(q1.text);
+// -> SELECT * FROM "default_table" ORDER BY id ASC
 
-## Integration Patterns
-
-### Query Builder Function
-
-```js
-function createUserQuery(filters = {}) {
-  const conditions = [];
-
-  if (filters.status) {
-    conditions.push(sql`status = ${sql.value(filters.status)}`);
-  }
-
-  if (filters.minAge) {
-    conditions.push(sql`age >= ${sql.value(filters.minAge)}`);
-  }
-
-  const whereClause =
-    conditions.length > 0 ? sql`WHERE ${sql.join(conditions, " AND ")}` : sql``;
-
-  return sql`SELECT * FROM users ${whereClause}`;
-}
-
-// Compile and execute
-const query = createUserQuery({ status: "active", minAge: 21 });
-const { text, values } = sql.compile(query);
-const result = await client.query(text, values);
-```
-
-### Transaction Helper
-
-```js
-async function executeTransaction(queries) {
-  const client = await pool.connect();
-
-  try {
-    await client.query("BEGIN");
-
-    const results = [];
-    for (const query of queries) {
-      const { text, values } = sql.compile(query);
-      const result = await client.query(text, values);
-      results.push(result);
-    }
-
-    await client.query("COMMIT");
-    return results;
-  } catch (error) {
-    await client.query("ROLLBACK");
-    throw error;
-  } finally {
-    client.release();
-  }
-}
+// Compile with placeholder values
+const q2 = sql.compile(query, {
+  placeholderValues: new Map([
+    [$$table, sql.identifier("users")],
+    [$$orderBy, sql`created_at DESC`],
+  ]),
+});
+console.log(q2.text);
+// -> SELECT * FROM "users" ORDER BY created_at DESC
 ```
