@@ -1095,10 +1095,7 @@ export function symbolAlias(symbol1: symbol, symbol2: symbol): SQL {
   return makeSymbolAliasNode(symbol1, symbol2);
 }
 
-export function placeholder(
-  symbol: symbol,
-  fallback?: SQL,
-): SQLPlaceholderNode {
+export function placeholder(symbol: symbol, fallback?: SQL): SQL {
   return makePlaceholderNode(symbol, fallback);
 }
 
