@@ -302,8 +302,8 @@ nitty-gritty: each entry in the list is an object with the following keys (only
   warning below.
 - `adaptor: PgAdaptor` - the module to use as the postgres adaptor; e.g. the
   result of `import("@dataplan/pg/adaptors/pg")` for the `pg` module
-- `adaptorSettings` - options to pass to the adaptor, these are different for
-  each adaptor (see [`adaptorSettings`](#adaptorsettings) below)
+- `adaptorSettings` - internal configuration object specific to the adaptor
+  (automatically created by `makePgService()`, see [`adaptorSettings`](#adaptorsettings) below)
 - `schemas: string[]` - an array of PostgreSQL schema names to use
 - `pgSettings: (requestContext: Grafast.RequestContext) => Record<string, string> | null` -
   a callback function that will be called by the server to determine the
@@ -327,7 +327,7 @@ nitty-gritty: each entry in the list is an object with the following keys (only
   `pgSubscriber` if `name` is `"main"` (the default), or `${name}_pgSubscriber`
   otherwise."
 
-```js title="Example manual configuration"
+```js title="Example manual configuration (advanced, usually not needed)"
 import * as pg from "pg";
 import * as adaptor from "@dataplan/pg/adaptors/pg";
 
@@ -340,11 +340,21 @@ const pgServices = [
     adaptor,
     adaptorSettings: {
       pool: new pg.Pool({ connectionString: process.env.DATABASE_URL }),
-      // superuserConnectionString: process.env.SUPERUSER_DATABASE_URL,
+      superuserPool: new pg.Pool({
+        connectionString: process.env.SUPERUSER_DATABASE_URL,
+      }),
     },
   },
 ];
 ```
+
+:::info
+
+The manual configuration approach above is advanced and usually not needed.
+Most users should use `makePgService()` as shown in the next example, which
+is simpler and handles the configuration for you.
+
+:::
 
 :::warning[Don’t set `name` unless you need to!]
 
@@ -393,6 +403,13 @@ common set of optional configuration parameters:
   - `pgSubscriber`
   - `pgSubscriberKey` (default with default `name`: `pgSubscriber`, otherwise: `${name}_pgSubscriber`)
 
+The `postgraphile/adaptors/pg` adaptor additionally accepts these options:
+
+- `pool` - pass your own pre-built `pg.Pool` instance to use, in which case `connectionString` and `poolConfig` will be ignored. You are responsible for releasing this pool!
+- `poolConfig` - additional configuration options (options other than `connectionString`) to pass through to `pg.Pool`; see the [pg.Pool options](https://node-postgres.com/apis/pool) which inherit the [pg.Client options](https://node-postgres.com/apis/client).
+- `superuserPool` - as `pool`, but for superuser connections (only used to install the watch fixtures in watch mode)
+- `superuserPoolConfig` - as `poolConfig`, but for superuser connections (only used to install the watch fixtures in watch mode)
+
 :::info
 
 These common options are those that the `postgraphile` CLI might pass, which is
@@ -416,7 +433,7 @@ we might want to add to core in future).
 inclusion into the `pgServices` array in your `graphile.config.mjs` (or similar)
 file.
 
-```js title="Example configuration via makePgService"
+```js title="Example configuration via makePgService (recommended)"
 import { makePgService } from "postgraphile/adaptors/pg";
 
 /** @type {GraphileConfig.Preset} */
@@ -433,8 +450,19 @@ const preset = {
       // Enable LISTEN/NOTIFY:
       pubsub: true,
 
+      // Optional: additional pg.Pool configuration
+      poolConfig: {
+        max: 10,
+        idleTimeoutMillis: 30000,
+      },
+
       // Optional, only needed for `--watch` mode:
       superuserConnectionString: process.env.SUPERUSER_DATABASE_URL,
+
+      // Optional: additional superuser pg.Pool configuration
+      superuserPoolConfig: {
+        max: 2,
+      },
     }),
   ],
 };
@@ -442,7 +470,14 @@ const preset = {
 
 #### `adaptorSettings`
 
-Each adaptor has its own adaptor-specific settings.
+The `adaptorSettings` property is an internal configuration object that is
+created automatically when you use `makePgService()`. In general, **you
+should not configure this directly.** Instead, pass the configuration options
+directly to `makePgService()` as shown in the examples above.
+
+If for some advanced reason you need to manually configure `pgServices`
+(rather than using `makePgService()`), then you would need to provide
+`adaptorSettings` with whatever the adaptor requires.
 
 ##### `postgraphile/adaptors/pg`
 

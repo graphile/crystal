@@ -415,11 +415,75 @@ with our own custom logic, so long as the result of the plan resolver is still
 a `PgSelectStep` representing a set of rows.
 
 One way to issue arbitrary SQL queries against the database is to use the
-`withPgClient` step, or its cousin `withPgClientTransaction`. These both accept
-an “executor” as the first argument, a step representing arbitrary data as the
-second argument, and an asynchronous callback as the third argument. The callback
-will be called with a `PgClient` instance and the resolved data from the step
-in the second argument.
+[`loadOneWithPgClient`](https://grafast.org/grafast/step-library/dataplan-pg/withPgClient#loadonewithpgclientexecutor-lookup-loader)
+step, or its cousin
+[`loadManyWithPgClient`](https://grafast.org/grafast/step-library/dataplan-pg/withPgClient#loadmanywithpgclientexecutor-lookup-loader).
+These both accept an “executor” as the first argument, a step representing
+arbitrary data as the second argument, and an asynchronous callback as the third
+argument. The callback will be called with a `PgClient` instance and the list of
+resolved data from the step in the second argument, and must return a list of
+values related to the input data.
+
+```ts
+import { normalizePhone } from "@localrepo/normalize-phone-numbers";
+
+export const MyPlugin = extendSchema((build) => {
+  const { pgExecutor } = build;
+  return {
+    typeDefs: /* GraphQL */ `
+      extend type User {
+        e164PhoneNumbers: [String]
+      }
+    `,
+    objects: {
+      User: {
+        plans: {
+          e164PhoneNumbers($user) {
+            const $userId = get($user, "id");
+            return loadManyWithPgClient(
+              pgExecutor,
+              $userId,
+              async (pgClient, userIds) => {
+                // NOTE: We're doing batched processing across all the userIds,
+                // fetching all their phone numbers at once and converting them.
+
+                // Step 1 - load the user's phone numbers
+                const { rows: userContacts } = await pgClient.query<{
+                  user_id: string;
+                  phone: string;
+                }>({
+                  text: `
+                    select user_id, phone
+                    from user_contacts
+                    where user_id = any($1::int[]);
+                  `,
+                  values: [userIds],
+                });
+
+                // Step 2 - normalize the phone numbers
+                const phoneNumbersByUserId: Record<string, string[]> = {};
+                for (const row of userContacts) {
+                  const { user_id: userId, phone: rawPhone } = row;
+                  const normalized = normalizePhone(rawPhone);
+                  (phoneNumbersByUserId[userId] ??= []).push(normalized);
+                }
+
+                // Optionally: query pgClient again using these normalized phone numbers
+
+                // Finally - match each input to its corresponding data to form
+                // the output
+                return userIds.map(
+                  (userId) => phoneNumbersByUserId[userId] ?? [],
+                );
+              },
+            );
+          },
+        },
+      },
+    },
+  };
+});
+```
 
 :::info[`PgClient` is an abstraction]
 
@@ -471,69 +535,6 @@ executor called `main` which you can access like this:
 ```ts
 // Normally equivalent to `build.pgExecutor`:
 const executor = build.input.pgRegistry.pgExecutors.main;
-```
-
-### Example
-
-Here’s the previous example again, this time rewritten to use `withPgClient` to
-retrieve the `organization_id` rather than the user resource:
-
-```ts
-import { extendSchema } from "postgraphile/utils";
-import { context } from "postgraphile/grafast";
-// highlight-next-line
-import { withPgClient } from "postgraphile/@dataplan/pg";
-
-export const MyChannelsPlugin = extendSchema((build) => {
-  const { channels } = build.pgResources;
-  const executor = channels.executor;
-  // Or `const executor = build.pgExecutor` if you only have one DB
-
-  return {
-    typeDefs: /* GraphQL */ `
-      extend type Query {
-        myChannels: [Channel]
-      }
-    `,
-    objects: {
-      Query: {
-        plans: {
-          myChannels() {
-            const $userId = context().get("userId");
-            // highlight-start
-            const $orgId = withPgClient(
-              executor,
-              $userId,
-              async (
-                // The PgClient instance, with all of the "claims" (if any) already set:
-                pgClient,
-                // This is the runtime data that the `$userId` step represented
-                userId,
-              ) => {
-                if (!userId) return null;
-
-                // Here we're using the standard `pgClient.query` function that
-                // all adaptors must provide, but if you're using an adaptor
-                // related to your ORM of choice, you could likely use its
-                // various methods to retrieve this value instead.
-                const result = await pgClient.query<{ id: number }>({
-                  text: `select id from get_organization_for_user_id($1)`,
-                  values: [userId],
-                });
-
-                // Return the 'id' value from the first (and only) row, if it exists:
-                return result.rows[0]?.id;
-              },
-            );
-            // highlight-end
-            const $channels = channels.find({ organization_id: $orgId });
-            return $channels;
-          },
-        },
-      },
-    },
-  };
-});
 ```
 
 <!-- TODO: update the above with an exitEarly once that functionality has been implemented -->
