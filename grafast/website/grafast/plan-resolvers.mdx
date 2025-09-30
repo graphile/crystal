@@ -100,20 +100,22 @@ const $valueAfter = $after.get("value1");
 
 const $log = sideEffect(
   [$valueBefore, $valueAfter],
-  ([before, after]) => void console.log({ before, after })
+  ([before, after]) => void console.log({ before, after }),
 );
 ```
 
 **Default graph (no extra side effects):**
 
-<Mermaid chart={`
+<Mermaid
+  chart={`
 ${init}
   $log:::plan
   $before:::plan --> $valueBefore:::plan --> $log
   $after:::plan --> $valueAfter:::plan --> $log
   class $log,$after sideeffectplan
   class $before,$valueBefore,$after,$valueAfter,$log bucket0
-`} />
+`}
+/>
 
 The engine may execute `$after` (mutation) before `$valueBefore`, because
 nothing forbids it according to the two rules above.
@@ -136,7 +138,8 @@ nothing forbids it according to the two rules above.
 
 This adds an _implicit_ edge from `$valueBefore` to later steps (including `$after`):
 
-<Mermaid chart={`
+<Mermaid
+  chart={`
 ${init}
   $log:::plan
   $before:::plan --> $valueBefore:::plan --> $log
@@ -144,7 +147,8 @@ ${init}
   $valueBefore -.-o $after
   class $log,$after,$valueBefore sideeffectplan
   class $before,$valueBefore,$after,$valueAfter,$log bucket0
-`} />
+`}
+/>
 
 Now `$valueBefore` must run before `$after`, so your log shows the true “before” and “after”.
 
@@ -296,109 +300,170 @@ type what the step actually is, you can use `assertStep: ExecutableStep` or
 
 :::
 
-## Argument and input field plan resolvers
-
-**THIS CONTENT IS WRONG!** TODO: update this to reflect the beta2 changes.
-
-:::tip
-
-This section is very advanced and rarely used, so feel free to skip to the next
-subsection. It's included here only because FieldArgs (the next section) relies
-on these behaviors if present.
-
-:::
-
-In addition to field plan resolvers, Gra*fast* allows you to attach an `inputPlan`
-and/or an `applyPlan` to individual arguments or to input fields on input
-objects. These plan resolvers work a little differently.
-
-### `inputPlan` plan resolvers
-
-An `inputPlan` plan resolver may exist on an argument or an input field. It is
-passed three arguments:
-
-1. the parent plan
-2. the FieldArgs relative to this argument or input field
-3. additional info (TODO: document)
-
-The `inputPlan` must return a step that shall be used in place of the argument
-or input value's raw value when `FieldArgs.get` references it.
-
-### `applyPlan` plan resolvers
-
-An `applyPlan` plan resolver may exist on an argument or an input field. It is
-passed three arguments:
-
-1. the target step - the step to apply changes to
-2. the FieldArgs relative to this argument or input field
-3. additional info (TODO: document)
-
-The `applyPlan` may either manipulate the target step directly, or it may return
-a ModifierStep which will gather changes and then apply them all at once. The
-ModifierStep is passed to child input fields `applyPlan` plan resolvers (if any)
-to allow the changes to stack up. This is particularly useful when building
-"patch" objects to be used with a mutation, or "filter" objects to be used
-against a collection.
-
 ## FieldArgs
 
-The `FieldArgs` object gives access to the arguments of a field (when used in a
-field plan resolver) or to the input fields of an input object (when used for
-`applyPlan`/`inputPlan`) or similar for other inputs. It contains three methods:
+The `FieldArgs` object gives ways of interacting with the values passed as
+arguments to a field.
 
-### FieldArgs.get
+### Accessing argument values
 
-Pass this method either the name of the argument you wish to get, or a path to
-the value you want through arguments and input objects (_but not lists_), and
-you shall receive a step that represents that value.
+You can retrieve a step representing a field argument's value either via the
+matching `$`-prefixed property of the `fieldArgs` object, or via the `.getRaw()`
+method.
 
-If the argument or input object field has an `inputPlan` method, it will be
-called, and the step that it returns will be used instead of the raw step that
-would represent the value.
+Consider this schema:
 
-:::note
+```graphql
+input BookFilter {
+  author: String
+  publishedAfter: Int
+}
 
-You may also call `fieldArgs.get()` with no arguments to get the value of the
-current argument/input field; but this may only be done inside `inputPlan` or
-`applyPlan`.
+type Query {
+  bookCount(search: String, filter: BookFilter): Int!
+}
+```
+
+You can access using the `$`-prefixed properties:
+
+```ts
+function bookCount($parent, fieldArgs) {
+  const { $search, $filter } = fieldArgs;
+  const { $author, $publishedAfter } = $filter;
+}
+```
+
+Or, equivalently, via `.getRaw()`:
+
+```ts
+function bookCount($parent, fieldArgs) {
+  const $search = fieldArgs.getRaw("search");
+  const $filter = fieldArgs.getRaw("filter");
+  const $author = fieldArgs.getRaw(["filter", "author"]);
+  const $publishedAfter = fieldArgs.getRaw(["filter", "publishedAfter"]);
+}
+```
+
+### Argument plans
+
+:::info[Advanced]
+
+You wouldn't typically use this if you're writing your schema by hand, but it
+can be helpful if you're using automatic schema generation as it allows
+arguments to handle their own logic.
 
 :::
 
-### FieldArgs.getRaw
+Sometimes rather than fetching and using the raw argument value directly, you
+want to apply the argument to your field plan. This allows you to keep your
+argument logic separate from your field plan logic. For this, your argument
+would have an `applyPlan` method defined on it:
 
-As FieldArgs.get, except it ignores any `inputPlan`s and just returns a step
-representing the raw value.
+```ts
+const schema = makeGrafastSchema({
+  typeDefs: /* GraphQL */ `
+    type Query {
+      users(first: Int, offset: Int): [User!]!
+    }
+  `,
+  objects: {
+    Query: {
+      plans: {
+        users: {
+          // The (simple) plan for the field
+          plan($query, fieldArgs) {
+            const $allUsers = users.find();
+            return $allUsers;
+          },
+          // These become `applyPlan` methods on the arguments:
+          args: {
+            // $target will be the return result of the field plan, i.e.
+            // `$allUsers` above
+            first($query, $target, val) {
+              const $first = val.getRaw();
+              $target.setFirst($first);
+            },
+            offset($query, $target, val) {
+              const $offset = val.getRaw();
+              $target.setOffset($offset);
+            },
+          },
+        },
+      },
+    },
+  },
+});
+```
 
-### FieldArgs.apply
+Grafast will automatically call each of the arguments' plans once the field plan
+resolver has returned, passing the step yielded from the field plan as the
+`$target` for the arguments.
 
-Pass this method a step to apply to and either the name of the argument you wish
-to apply, or a path to the input field you want to apply through arguments and
-input objects (_but not lists_), and the `applyPlan` for that argument or input
-field will be applied to the given step.
+:::info[Optimization: may be skipped in some circumstances]
 
-TODO: expand this section with examples of why you might do these things.
-
-## ~~Automatic application of `applyPlan` plan resolvers~~
-
-:::danger
-
-~~This section is now _wrong_. We changed this behavior, and now you need to add
-`autoApplyAfterParentApplyPlan` or similar in order to trigger your field to
-auto-apply (or `autoApplyAfterParentPlan` for an argument).~~
-
-Now even the statement this is wrong, is itself wrong...
-
-TODO: fix this documentation.
+If Grafast can determine statically that your argument will not be passed at
+runtime (i.e. will be `undefined`) then it may choose to skip calling the
+`applyPlan()` method for that argument.
 
 :::
 
-~~FieldArgs keeps track of the arguments/input fields that you `.get()`,
-`.getRaw()` or `.apply()`, and should there be any left unaccessed that have an
-`applyPlan` method, these will automatically be called passing the field plan
-resolver's resulting step as the argument.~~
+#### Triggering auto-application early
 
-~~This, for example, allows you to associate the "first" behavior with the
-argument rather than the plan resolver, such that you could share the
-first/last/before/after behavior via a common object that you spread into each
-of your arguments on connections, rather than having to rewrite the logic in
-each of your plan resolver functions.~~
+**ADVANCED**
+
+If you want to wrap a plan resolver with a higher order function, you might want
+all of the arguments to have already been applied before your wrapper plan's
+logic continues. You can trigger the auto-application early with the
+`fieldArgs.autoApply($target)` method:
+
+```ts
+const oldPlan = usersField.extensions.grafast.plan;
+usersField.extensions.grafast.plan = function (...params) {
+  // Call the old plan method
+  const $target = oldPlan.apply(this, params);
+
+  // Perform the auto-application of arguments early:
+  const [_, fieldArgs] = params;
+  fieldArgs.autoApply($target);
+
+  // Now do whatever logic we need to do:
+  if (!$target.getFirst()) {
+    $target.setFirst(constant(10));
+  }
+
+  return $target;
+};
+```
+
+#### Applying deeper inputs
+
+**INCREDIBLY ADVANCED**
+
+Sometimes complex inputs make more sense as "commands" than "data" - take for
+example a complex `filter` argument to a field that pulls from an SQL database.
+Here you want to manipulate the query that would be sent to the DB, rather than
+just passing the data into the DB; and the changes to the query will be dynamic
+based on the user input.
+
+For this, we have the [applyInput()][./standard-steps/applyInput.md] step, but
+calling it can be a little verbose, so we give you a shortcut:
+
+```ts
+fieldArgs.apply($target, path, callback)
+```
+
+- `$target`: the "applyable" step (has a `.apply()` method) to target
+- `path`: the position in the input tree to start applying, e.g. `["condition"]`
+- `callback(target, inputValue)`: called at runtime with the target and the
+input value, either applies the inputValue to the target, or returns a new
+target for child fields to be applied to
+
+:::note[Reach out!]
+
+We recognize this is under-documented; if you actually need it for something
+then reach out via [the Discord](https://discord.gg/graphile) or file an issue
+and we can look at expanding it.
+
+:::
+
+<!-- TODO: document `typeAt` too. -->
