@@ -58,17 +58,17 @@ console.log(sql.compile(query).text);
 
 ```js
 // You can also use sql.indent as a template literal
-const conditions = sql`status = ${sql.value("active")} AND age > ${sql.value(18)}`;
+const profileConditions = sql.indent`status = ${sql.value("active")} AND age > ${sql.value(18)}`;
 
+const where = sql.indent`
+(${profileConditions}) AND (
+  premium_member = true
+  OR trial_expires > NOW()
+)
+`;
 const query = sql`
 SELECT * FROM users
-WHERE ${sql.indent`
-  ${conditions}
-  AND (
-    premium_member = true
-    OR trial_expires > NOW()
-  )
-`}
+WHERE ${where}
 `;
 ```
 
