@@ -12,7 +12,7 @@ queries. Useful for improving the readability of complex, nested SQL queries.
 
 ## Syntax
 
-```typescript
+```ts
 sql.indent(fragment: SQL): SQL
 sql.indent`...`
 ```
@@ -22,39 +22,47 @@ sql.indent`...`
 - `fragment` - SQL fragment to indent
 - Alternative: Template literal form with `strings` and `values`
 
-## Return Value
+## Return value
 
 Returns a `SQL` fragment that will be indented when compiled with
 pretty-printing enabled.
 
 ## Examples
 
-### Basic Indentation
+### Basic indentation
 
 ```js
-import sql from "pg-sql2";
+import { sql } from "pg-sql2";
 
-const innerSelect = sql.indent(sql`
-  SELECT user_id, COUNT(*) as order_count
-  FROM orders
-  WHERE created_at > NOW() - interval '1 year'
-  GROUP BY user_id
-`);
+const innerSelect = sql`
+SELECT user_id, COUNT(*) as order_count
+FROM orders
+WHERE created_at > NOW() - interval '1 year'
+GROUP BY user_id
+`;
 
 const query = sql`
-WITH recent_orders AS (
-${innerSelect}
-)
+WITH recent_orders AS (${sql.indent(innerSelect)})
 SELECT u.name, ro.order_count
 FROM users u
 JOIN recent_orders ro ON u.id = ro.user_id
 `;
 
 console.log(sql.compile(query).text);
-// The inner SELECT will be indented relative to the WITH clause
+/*
+WITH recent_orders AS (
+  SELECT user_id, COUNT(*) as order_count
+  FROM orders
+  WHERE created_at > NOW() - interval '1 year'
+  GROUP BY user_id
+)
+SELECT u.name, ro.order_count
+FROM users u
+JOIN recent_orders ro ON u.id = ro.user_id
+*/
 ```
 
-### Template Literal Form
+### Template literal form
 
 ```js
 // You can also use sql.indent as a template literal
@@ -70,9 +78,21 @@ const query = sql`
 SELECT * FROM users
 WHERE ${where}
 `;
+
+console.log(sql.compile(query).text);
+/*
+SELECT * FROM users
+WHERE 
+  (
+    status = $1 AND age > $2
+  ) AND (
+    premium_member = true
+    OR trial_expires > NOW()
+  )
+*/
 ```
 
-### Nested Indentation
+### Nested indentation
 
 ```js
 const orderItems = sql`
@@ -89,6 +109,21 @@ const deeplyNestedQuery = sql`
 SELECT *
 FROM users u
 WHERE EXISTS (${sql.indent(middle)})`;
+
+console.log(sql.compile(deeplyNestedQuery).text);
+/*
+SELECT *
+FROM users u
+WHERE EXISTS (
+  SELECT 1 FROM orders o
+  WHERE o.user_id = u.id
+  AND EXISTS (
+    SELECT 1 FROM order_items oi
+    WHERE oi.order_id = o.id
+    AND oi.product_id IN ($1)
+  )
+)
+*/
 ```
 
 ## Notes

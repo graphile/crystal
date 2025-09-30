@@ -23,18 +23,16 @@ sql.symbolAlias(symbol1: symbol, symbol2: symbol): SQL
 - `symbol1` - The primary symbol
 - `symbol2` - The symbol that should be treated as equivalent to `symbol1`
 
-## Return Value
+## Return value
 
 Returns a `SQL` fragment that establishes the symbol alias relationship. This
 fragment needs to be included in the final query to take effect, typically at
 the beginning of the query.
 
-## Examples
-
-### Basic Symbol Aliasing
+## Example
 
 ```js
-import sql from "pg-sql2";
+import { sql } from "pg-sql2";
 
 const userTable = Symbol("users");
 const u = Symbol("u"); // Alias for shorter reference

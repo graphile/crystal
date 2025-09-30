@@ -14,7 +14,7 @@ updated.
 
 ## Syntax
 
-```typescript
+```ts
 sql.replaceSymbol(
   fragment: SQL,
   needle: symbol,
@@ -28,7 +28,7 @@ sql.replaceSymbol(
 - `needle` - The symbol to find and replace
 - `replacement` - The symbol to replace with
 
-## Return Value
+## Return value
 
 Returns a new `SQL` fragment with all occurrences of the `needle` symbol
 replaced with the `replacement` symbol. The original fragment is not modified.

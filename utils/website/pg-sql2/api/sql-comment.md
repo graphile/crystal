@@ -28,16 +28,16 @@ sql.comment(text: string): SQL
 
 - `text` - The comment text to include
 
-## Return Value
+## Return value
 
 Returns a `SQL` fragment containing the properly formatted SQL comment.
 
-## Example
+## Examples
 
-### Document Query
+### Document query
 
 ```js
-import sql from "pg-sql2";
+import { sql } from "pg-sql2";
 
 const query = sql`
 ${sql.comment("Fetch active users with their order counts")}
@@ -49,7 +49,7 @@ SELECT u.id, COUNT(o.id) as order_count ...
 // SELECT u.id, COUNT(o.id) as order_count ...
 ```
 
-### Inline Comment
+### Inline comment
 
 ```js
 const complexCalculation = sql`
@@ -64,7 +64,7 @@ WHERE id = ${sql.value(orderId)}
 `;
 ```
 
-### Conditional Comments
+### Conditional comments
 
 ```js
 const isDevelopment = process.env.NODE_ENV === "development";
@@ -87,7 +87,7 @@ const query = addDebugComments(
 );
 ```
 
-## Comment Formatting
+### Comment formatting
 
 ```js
 // Single line comments become /* comment */

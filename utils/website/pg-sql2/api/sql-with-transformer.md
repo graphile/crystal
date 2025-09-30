@@ -6,7 +6,7 @@ title: "sql.withTransformer()"
 # `sql.withTransformer(t, cb)`
 
 Sometimes you may want to embed non-SQL values into your SQL fragments and have
-them work automatically. By default we'll throw an error when we see non-SQL
+them work automatically. By default pg-sql2 throws an error when it sees non-SQL
 values, however by using "transformers" you can dictate how (and if) unknown
 values should be coerced to SQL.
 
@@ -17,14 +17,14 @@ forbidden by TypeScript).
 
 ## Syntax
 
-```typescript
+```ts
 sql.withTransformer<TNewEmbed, TResult = SQL>(
   transformer: Transformer<TNewEmbed>,
   callback: (sql: PgSQL<TNewEmbed>) => TResult,
 ): TResult
 ```
 
-## Return Value
+## Return value
 
 Returns the result of the callback, which typically will be an SQL fragment.
 

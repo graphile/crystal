@@ -17,13 +17,14 @@ sql.literal(val: string | number | boolean | null): SQL
 
 ## Parameters
 
-- `val` - A simple value to embed directly. Supported types:
-  - `string` - Will be properly escaped with single quotes
-  - `number` - Must be finite
-  - `boolean` - Converted to `TRUE`/`FALSE`
-  - `null` - Converted to `NULL`
+Uses `val` - A simple value to embed directly. Supported types:
 
-## Return Value
+- `string` - Will be properly escaped with single quotes
+- `number` - Must be finite
+- `boolean` - Converted to `TRUE`/`FALSE`
+- `null` - Converted to `NULL`
+
+## Return value
 
 Returns a `SQL` fragment with the value embedded directly in the SQL text.
 
@@ -36,10 +37,11 @@ sql`WHERE active = ${sql.literal(true)}`; // -> WHERE active = TRUE
 
 // JSON object keys
 const fields = ["name", "email"];
-sql`json_build_object(${sql.join(
-  fields.map((f) => sql`${sql.literal(f)}, ${sql.identifier(f)}`),
-  ", ",
-)})`;
+const sqlTuples = fields.map(
+  (f) => sql`${sql.literal(f)}, ${sql.identifier(f)}`,
+);
+sql`json_build_object(${sql.join(sqlTuples, ", ")})`;
+// json_build_object('name', name, 'email', email)
 ```
 
 ## Notes

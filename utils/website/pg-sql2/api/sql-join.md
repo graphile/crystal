@@ -29,7 +29,7 @@ sql.join(items: ReadonlyArray<SQL>, separator?: string): SQL
 - `items` - Array of SQL fragments to join
 - `separator` - String delimiter to insert between fragments (defaults to empty string)
 
-## Return Value
+## Return value
 
 Returns a SQL fragment containing all joined elements joined by the separator.
 Return empty fragment if array is empty.

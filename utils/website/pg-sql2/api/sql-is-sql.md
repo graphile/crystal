@@ -18,13 +18,11 @@ sql.isSQL(value: unknown): value is SQL
 
 - `value` - Any value to check
 
-## Return Value
+## Return value
 
 Returns `true` if the value is a valid SQL fragment, `false` otherwise.
 
-## Examples
-
-### Basic Type Checking
+## Example
 
 ```js
 import sql from "pg-sql2";

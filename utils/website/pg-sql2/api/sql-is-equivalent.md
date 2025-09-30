@@ -25,7 +25,7 @@ sql.isEquivalent(
 
 - `sql1` - First SQL fragment to compare
 - `sql2` - Second SQL fragment to compare
-- `options` - Optional comparison options
+- `options` - Optional comparison options:
   - `symbolSubstitutes` - Map of symbol substitutions for comparison
 
 ## Return Value
@@ -34,10 +34,10 @@ Returns `true` if the SQL fragments are functionally equivalent, `false` otherwi
 
 ## Examples
 
-### Basic Equivalence
+### Basic equivalence
 
 ```js
-import sql from "pg-sql2";
+import { sql } from "pg-sql2";
 
 const query1 = sql`SELECT * FROM users WHERE id = ${sql.value(123)}`;
 const query2 = sql`SELECT * FROM users WHERE id = ${sql.value(123)}`;
@@ -49,7 +49,7 @@ const query3 = sql`SELECT * FROM users WHERE id = ${sql.value(456)}`;
 console.log(sql.isEquivalent(query1, query3)); // false
 ```
 
-### Identifier Comparison
+### Identifier comparison
 
 ```js
 const table1 = sql.identifier("users");
@@ -60,7 +60,7 @@ console.log(sql.isEquivalent(table1, table2)); // true
 console.log(sql.isEquivalent(table1, table3)); // false
 ```
 
-### Symbol Equivalence
+### Symbol equivalence
 
 ```js
 const sym1 = Symbol("table");

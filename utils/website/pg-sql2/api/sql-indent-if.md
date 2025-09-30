@@ -14,7 +14,7 @@ See also: [`sql.indent(fragment)`](./sql-indent.md)
 
 ## Syntax
 
-```typescript
+```ts
 sql.indentIf(condition: boolean, fragment: SQL): SQL
 ```
 
@@ -23,11 +23,11 @@ sql.indentIf(condition: boolean, fragment: SQL): SQL
 - `condition` - Boolean condition that determines whether to apply indentation
 - `fragment` - The SQL fragment to potentially indent
 
-## Return Value
+## Return value
 
 Returns the `fragment` wrapped with indentation if `condition` is `true`, otherwise returns the `fragment` unchanged.
 
-## Examples
+## Example
 
 ```js
 const conditions = getSqlConditions();

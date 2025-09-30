@@ -13,7 +13,7 @@ need to be dynamically substituted.
 
 ## Syntax
 
-```typescript
+```ts
 sql.placeholder(symbol: symbol, fallback?: SQL): SQL
 ```
 
@@ -22,13 +22,13 @@ sql.placeholder(symbol: symbol, fallback?: SQL): SQL
 - `symbol` - A unique symbol to identify this placeholder
 - `fallback` - Optional SQL fragment to use if no replacement is provided
 
-## Return Value
+## Return value
 
 Returns a `SQL` fragment that will be replaced during compilation if a
 replacement is provided, or will use the fallback if no replacement is given (or
 throw an error if no replacement and no fallback is given).
 
-## Examples
+## Example
 
 ```js
 const $$table = Symbol("table");

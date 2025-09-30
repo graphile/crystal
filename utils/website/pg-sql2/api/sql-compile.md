@@ -9,7 +9,7 @@ Compiles a SQL fragment into executable SQL text with parameterized values, read
 
 ## Syntax
 
-```typescript
+```ts
 sql.compile(query: SQL, options?: {
   placeholderValues?: ReadonlyMap<symbol, SQL>
 }): {
@@ -24,7 +24,7 @@ sql.compile(query: SQL, options?: {
 - `options` - Optional compilation options
   - `placeholderValues` - Map of symbol placeholders to their replacement SQL fragments
 
-## Return Value
+## Return value
 
 An object with:
 
@@ -41,7 +41,7 @@ await client.query(text, values);
 
 ## Examples
 
-### Basic Usage
+### Basic usage
 
 ```js
 import sql from "pg-sql2";
@@ -64,7 +64,7 @@ console.log(values);
 // -> [123, 'active']
 ```
 
-### Complex Example
+### Complex example
 
 ```js
 const filters = {
@@ -103,7 +103,7 @@ console.log(compiled.values);
 // -> ['active', 18, ['admin', 'user', 'moderator']]
 ```
 
-### With Placeholders
+### With placeholders
 
 ```js
 const $$table = Symbol("table");

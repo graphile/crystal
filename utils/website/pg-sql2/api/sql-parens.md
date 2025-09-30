@@ -21,14 +21,14 @@ sql.parens(fragment: SQL, force?: boolean): SQL
 - `fragment` - The SQL fragment to potentially wrap in parentheses
 - `force` - Optional boolean to force parentheses even if not strictly needed
 
-## Return Value
+## Return value
 
 Returns a `SQL` fragment that is wrapped in parentheses if `force` is true, or
 if it might be needed to avoid syntactic ambiguity.
 
 ## Examples
 
-### Basic Usage
+### Basic usage
 
 ```js
 import sql from "pg-sql2";
@@ -50,7 +50,7 @@ sql`SELECT * FROM users WHERE ${sql.parens(sqlConditions)} OR admin = true`;
 // -> SELECT * FROM users WHERE ((age > 18) AND (status = 'active')) OR admin = true
 ```
 
-### Forced Parentheses
+### Forced parentheses
 
 ```js
 // Force parentheses for subqueries

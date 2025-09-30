@@ -27,14 +27,14 @@ sql.identifier(name1: string | symbol, name2: string | symbol, ...): SQL
 - `name` - A string or symbol representing an identifier name
 - Multiple names can be passed to create qualified identifiers
 
-## Return Value
+## Return value
 
 Returns a `SQL` fragment representing the escaped identifier that can be
 embedded in other SQL expressions.
 
 ## Examples
 
-### Basic Identifiers
+### Basic identifiers
 
 ```js
 import sql from "pg-sql2";
@@ -50,7 +50,7 @@ sql`SELECT ${sql.identifier(columnName)} FROM users`;
 // -> SELECT "user_name" FROM users
 ```
 
-### Qualified Identifiers
+### Qualified identifiers
 
 ```js
 // Schema.table
@@ -69,7 +69,7 @@ sql`COMMENT ON COLUMN ${sql.identifier(schema, table, column)} IS ''`;
 // -> COMMENT ON COLUMN "public"."users"."name" IS '';
 ```
 
-### Using Symbols
+### Using symbols
 
 Symbols are automatically assigned unique identifiers,
 
@@ -106,7 +106,7 @@ const boss = sql.identifier(Symbol());
 
 :::
 
-### Handling Special Characters
+### Handling special characters
 
 ```js
 // Identifiers with spaces or special characters are safely escaped
