@@ -5,9 +5,9 @@ dynamically without risking SQL injection. All functions are available as
 methods on the main `sql` export. It's designed for use with PostgreSQL, but
 many features are applicable to other SQL databases as well.
 
-## Core Functions
+## Core functions
 
-### Template Literal Function
+### Template literal function
 
 - [`` sql`...` ``](./sql.md) - The main template literal function for building
   SQL queries, supports embedding other SQL fragments (only! no raw values)
@@ -16,13 +16,20 @@ many features are applicable to other SQL databases as well.
 
 - [`sql.compile(query, options?)`](./sql-compile.md) - Compile SQL to `text` and `values` ready for execution
 
-### Value Handling
+### Value handling
 
 - [`sql.value(val)`](./sql-value.md) - Embed user values using placeholders
   (avoid SQLi)
 - [`sql.literal(val)`](./sql-literal.md) - Embed simple values directly if safe; fall back to `sql.value(val)` otherwise
 
-### Query Building
+### Common expressions
+
+- `sql.true` - equivalent to ``sql`true` ``
+- `sql.false` - equivalent to ``sql`false` ``
+- `sql.null` - equivalent to ``sql`null` ``
+- `sql.blank` - equivalent to `sql`` `
+
+### Query building
 
 - [`sql.join(fragments, delimiter)`](./sql-join.md) - Join multiple SQL fragments together
 - [`sql.identifier(...names)`](./sql-identifier.md) - Create safely escaped SQL identifiers
@@ -30,7 +37,7 @@ many features are applicable to other SQL databases as well.
 - [`sql.indent(fragment)`](./sql-indent.md) - Indent SQL for readability
 - [`sql.indentIf(condition, fragment)`](./sql-indent-if.md) - Conditionally indent SQL
 
-### Advanced Features
+### Advanced features
 
 Most users won't need these, but they are available for advanced use cases:
 
@@ -42,7 +49,7 @@ Most users won't need these, but they are available for advanced use cases:
 - [`sql.symbolAlias(symbol1, symbol2)`](./sql-symbol-alias.md) - Create symbol aliases (e.g. when merging fragments)
 - [`sql.replaceSymbol(fragment, needle, replacement)`](./sql-replace-symbol.md) - Replace symbols in SQL fragments
 
-### Escape Hatch
+### Escape hatch
 
 :::danger[HIGHLY DISCOURAGED]
 

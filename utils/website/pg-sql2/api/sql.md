@@ -13,11 +13,20 @@ passed in, an error will be thrown (unless you're using
 
 ## Syntax
 
-```typescript
+```ts
 sql`SQL template string with ${sqlExpressions}`;
 ```
 
-## Return Value
+### Deprecated aliases
+
+These are identical to the SQL tagged template literal function, above, and exist for compatibility for legacy versions.
+
+```ts
+sql.fragment`SQL template string with ${sqlExpressions}`;
+sql.query`SQL template string with ${sqlExpressions}`;
+```
+
+## Return value
 
 Returns a `SQL` fragment that can be:
 
@@ -27,7 +36,7 @@ Returns a `SQL` fragment that can be:
 
 ## Examples
 
-### Simple Query
+### Simple query
 
 ```js
 import sql from "pg-sql2";
@@ -40,7 +49,7 @@ const query = sql`
 `;
 ```
 
-### Embedding Identifiers and Values
+### Embedding identifiers and values
 
 ```ts
 // With safe value embedding
@@ -55,7 +64,7 @@ const userQuery = sql`
 `;
 ```
 
-### Composing Fragments
+### Composing fragments
 
 ```js
 const sqlWhere = sql`age > ${sql.literal(18)} AND status = ${sql.value("active")}`;
@@ -69,7 +78,7 @@ const query = sql`
 `;
 ```
 
-## SQL Fragments Only
+## SQL fragments only
 
 ```js
 // ❌ This will throw an error - prevents accidental inclusion of user-input
