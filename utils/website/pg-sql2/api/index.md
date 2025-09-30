@@ -12,6 +12,10 @@ many features are applicable to other SQL databases as well.
 - [`` sql`...` ``](./sql.md) - The main template literal function for building
   SQL queries, supports embedding other SQL fragments (only! no raw values)
 
+### Compilation
+
+- [`sql.compile(query, options?)`](./sql-compile.md) - Compile SQL to `text` and `values` ready for execution
+
 ### Value Handling
 
 - [`sql.value(val)`](./sql-value.md) - Embed user values using placeholders
@@ -25,10 +29,6 @@ many features are applicable to other SQL databases as well.
 - [`sql.parens(fragment, force?)`](./sql-parens.md) - Add parentheses when needed
 - [`sql.indent(fragment)`](./sql-indent.md) - Indent SQL for readability
 - [`sql.indentIf(condition, fragment)`](./sql-indent-if.md) - Conditionally indent SQL
-
-### Compilation
-
-- [`sql.compile(query, options?)`](./sql-compile.md) - Compile SQL to `text` and `values` ready for execution
 
 ### Advanced Features
 
