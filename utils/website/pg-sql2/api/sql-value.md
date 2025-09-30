@@ -5,12 +5,27 @@ title: "sql.value()"
 
 # `sql.value(val)`
 
-Safely embeds values in SQL queries using parameterized placeholders to prevent SQL injection.
+Represents an SQL value that will be replaced with a placeholder (e.g., `$1`,
+`$2`) in the compiled SQL statement. During [compile](./sql-compile.md), the
+`text` will include these placeholders, and `values` will contain the values,
+thereby preventing SQL injection.
 
 ## Syntax
 
 ```typescript
 sql.value(val: SQLRawValue): SQL
+
+```
+
+Where:
+
+```ts
+export type SQLRawValue =
+  | string
+  | number
+  | boolean
+  | null
+  | ReadonlyArray<SQLRawValue>;
 ```
 
 ## Parameters
@@ -22,39 +37,47 @@ sql.value(val: SQLRawValue): SQL
   - `null`
   - `ReadonlyArray<SQLRawValue>` (for arrays)
 
-## Description
+:::warning[Parameter is not validated!]
 
-Represents an SQL value that will be replaced with a placeholder (e.g., `$1`, `$2`) in the compiled SQL statement. The actual values are collected separately and passed to the database driver, preventing SQL injection attacks.
+We deliberately do not validate the parameter. We will use a placeholder in the
+compile SQL to represent it in the `text`, and it will be output it in the
+`values` list in the relevant position, but it's down to you to ensure that your
+PostgreSQL driver will not misinterpret the value. For example, the `pg` driver
+has special behavior when it receives an object in `values`.
+
+:::
+
+## Return Value
+
+Returns a `SQL` fragment representing the parameterized value that can be embedded in other SQL expressions.
 
 ## Examples
 
-### Basic Values
+### Scalars
 
 ```js
 import sql from "pg-sql2";
 
-// String values
 const name = "Alice";
-sql`SELECT * FROM users WHERE name = ${sql.value(name)}`;
-// Compiles to: SELECT * FROM users WHERE name = $1
-// Values: ['Alice']
-
-// Numbers
 const age = 25;
-sql`SELECT * FROM users WHERE age > ${sql.value(age)}`;
-// Compiles to: SELECT * FROM users WHERE age > $1
-// Values: [25]
-
-// Booleans
 const active = true;
-sql`SELECT * FROM users WHERE active = ${sql.value(active)}`;
-// Compiles to: SELECT * FROM users WHERE active = $1
-// Values: [true]
-
-// Null values (though sql.literal(null) would be more efficient for constants)
-sql`SELECT * FROM users WHERE deleted_at = ${sql.value(null)}`;
-// Compiles to: SELECT * FROM users WHERE deleted_at = $1
-// Values: [null]
+const query = sql`
+  SELECT *
+  FROM users
+  WHERE name = ${sql.value(name)}
+  AND age > ${sql.value(age)}
+  AND active = ${sql.value(active)}
+  AND deleted_at = ${sql.value(null)}
+`;
+const { text, values } = sql.compile(query);
+// text:
+//   SELECT *
+//   FROM users
+//   WHERE name = $1
+//   AND age > $2
+//   AND active = $3
+//   AND deleted_at = $4
+// values: ['Alice', 25, true, null]
 ```
 
 ### Array Values
@@ -74,71 +97,33 @@ const coordinates = [
 sql`SELECT * FROM locations WHERE coords = ${sql.value(coordinates)}`;
 ```
 
-### Complex Queries
+## Notes
+
+Values are output verbatim, make sure that they are encoded correctly before
+being passed to your database driver. Typically **objects are NOT valid values**
+and you must instead serialize them first.
+
+Values are completely isolated from the SQL text, preventing injection
+
+## Advanced Usage
+
+Since values are passed through as-is, you can use symbols to represent values that will be provided later.
 
 ```js
-const filters = {
-  minAge: 18,
-  status: "active",
-  roles: ["admin", "user"],
-};
-
+const organizationId = 10;
+const $$username = Symbol("username");
 const query = sql`
-  SELECT * FROM users 
-  WHERE age >= ${sql.value(filters.minAge)}
-    AND status = ${sql.value(filters.status)}
-    AND role = ANY(${sql.value(filters.roles)})
+  SELECT *
+  FROM users
+  WHERE organization_id = ${sql.value(organizationId)}
+  AND username = ${sql.value($$username)}
 `;
-// Compiles to:
-// SELECT * FROM users
-// WHERE age >= $1 AND status = $2 AND role = ANY($3)
-// Values: [18, 'active', ['admin', 'user']]
-```
+const { text, values: valuesIncludingSymbols } = sql.compile(query);
 
-### Compilation Example
+// When it's time to run the query, you can replace the symbol with an actual value:
+const values = valuesIncludingSymbols.map((v) =>
+  v === $$username ? "benjie" : v,
+);
 
-```js
-const userId = 123;
-const status = "active";
-
-const query = sql`
-  UPDATE users 
-  SET status = ${sql.value(status)}
-  WHERE id = ${sql.value(userId)}
-`;
-
-const { text, values } = sql.compile(query);
-console.log(text);
-// -> UPDATE users SET status = $1 WHERE id = $2
-
-console.log(values);
-// -> ['active', 123]
-
-// Use with your PostgreSQL client
-// const result = await client.query(text, values);
-```
-
-## Return Value
-
-Returns a `SQL` fragment representing the parameterized value that can be embedded in other SQL expressions.
-
-## Safety Notes
-
-- **Objects are NOT valid values** - you must serialize them first (e.g., `JSON.stringify(obj)`)
-- Values are completely isolated from the SQL text, preventing injection
-- Arrays are properly handled for PostgreSQL array operations
-- All values are type-checked at runtime for safety
-
-## Invalid Usage
-
-```js
-// ❌ Objects are not allowed
-const user = { name: "Alice", age: 25 };
-sql`INSERT INTO users VALUES (${sql.value(user)})`; // Will throw error
-
-// ✅ Serialize objects first
-sql`INSERT INTO users (data) VALUES (${sql.value(JSON.stringify(user))})`;
-
-// ❌ Functions are not allowed
-sql`SELECT ${sql.value(() => "hello")} FROM users`; // Will throw error
+const results = await pgClient.query({ text, values });
 ```
