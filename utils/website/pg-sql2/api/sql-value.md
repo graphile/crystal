@@ -14,7 +14,6 @@ thereby preventing SQL injection.
 
 ```typescript
 sql.value(val: SQLRawValue): SQL
-
 ```
 
 Where:

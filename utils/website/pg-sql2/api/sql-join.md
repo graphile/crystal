@@ -3,7 +3,7 @@ sidebar_position: 5
 title: "sql.join()"
 ---
 
-# `sql.join(arrayOfFragments, delimiter)`
+# `sql.join(frags, delimiter)`
 
 Joins an array of SQL fragments together using a delimiter, useful for building
 dynamic lists of columns, conditions, or other SQL elements.

@@ -14,10 +14,9 @@ many features are applicable to other SQL databases as well.
 
 ### Value Handling
 
-- [`sql.value(val)`](./sql-value.md) - Embed user values using placeholders. Be
-  sure these values are scalars or arrays thereof
-- [`sql.literal(val)`](./sql-literal.md) - Embed simple values directly if safe
-  (think: pagination limits), otherwise fall back to placeholders
+- [`sql.value(val)`](./sql-value.md) - Embed user values using placeholders
+  (avoid SQLi)
+- [`sql.literal(val)`](./sql-literal.md) - Embed simple values directly if safe; fall back to `sql.value(val)` otherwise
 
 ### Query Building
 
@@ -33,14 +32,26 @@ many features are applicable to other SQL databases as well.
 
 ### Advanced Features
 
+Most users won't need these, but they are available for advanced use cases:
+
 - [`sql.comment(text)`](./sql-comment.md) - Add SQL comments
+- [`sql.placeholder(symbol, fallback?)`](./sql-placeholder.md) - Create replaceable placeholders
+- [`sql.withTransformer(transformer, callback)`](./sql-with-transformer.md) - Allow non-SQL values to be interpolated
 - [`sql.isSQL(value)`](./sql-is-sql.md) - Check if a value is a SQL fragment
 - [`sql.isEquivalent(sql1, sql2, options?)`](./sql-is-equivalent.md) - Compare SQL fragments for equivalence
-- [`sql.placeholder(symbol, fallback?)`](./sql-placeholder.md) - Create replaceable placeholders
-- [`sql.withTransformer(transformer, callback)`](./sql-with-transformer.md) - Use custom value transformers (to allow non-SQL values to be safely interpolated)
 - [`sql.symbolAlias(symbol1, symbol2)`](./sql-symbol-alias.md) - Create symbol aliases (e.g. when merging fragments)
 - [`sql.replaceSymbol(fragment, needle, replacement)`](./sql-replace-symbol.md) - Replace symbols in SQL fragments
 
-### SQL-Injection-Enabling Escape Hatch
+### Escape Hatch
 
-- [`sql.raw(text)`](./sql-raw.md) - **DO NOT USE** - Embed raw, dynamic, SQL text
+:::danger[HIGHLY DISCOURAGED]
+
+This method bypasses all SQL injection protections. There are almost always
+better solutions. If you use `sql.raw` you're defeating the purpose of the
+library and opening yourself up to SQL injection vulnerabilities.
+
+**EXTREME CAUTION ADVISED.**
+
+:::
+
+- [`sql.raw(text)`](./sql-raw.md) - ⚠️ **DANGER** ⚠️ Embed raw, dynamic, SQL text

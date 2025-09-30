@@ -1,8 +1,9 @@
 ---
 sidebar_position: 1
+title: "sql`...`"
 ---
 
-# ``sql `...` ``
+# ``sql`...` ``
 
 The core template literal function that builds SQL queries by safely
 interpreting embedded expressions. This is the primary way to construct SQL in
