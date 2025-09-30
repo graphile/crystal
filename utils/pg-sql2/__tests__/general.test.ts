@@ -220,3 +220,27 @@ describe("sqli", () => {
     }).toThrowErrorMatchingSnapshot();
   });
 });
+
+describe("parens", () => {
+  it("simple (no need)", () => {
+    const id = sql`1`;
+    const query = sql`select * from users where id = ${sql.parens(id)} or admin = true`;
+    expect(sql.compile(query).text).toEqual(
+      "select * from users where id = 1 or admin = true",
+    );
+  });
+  it("simple (needed)", () => {
+    const id = sql`case when random() < 0.5 then 1 else 2 end`;
+    const query = sql`select * from users where id = ${sql.parens(id)} or admin = true`;
+    expect(sql.compile(query).text).toEqual(
+      "select * from users where id = (case when random() < 0.5 then 1 else 2 end) or admin = true",
+    );
+  });
+  it("simple (nested not needed)", () => {
+    const id = sql.parens(sql`case when random() < 0.5 then 1 else 2 end`);
+    const query = sql`select * from users where id = ${sql.parens(id)} or admin = true`;
+    expect(sql.compile(query).text).toEqual(
+      "select * from users where id = (case when random() < 0.5 then 1 else 2 end) or admin = true",
+    );
+  });
+});

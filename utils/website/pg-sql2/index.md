@@ -7,6 +7,7 @@ sidebar_position: 1
 Create highly dynamic SQL in a powerful and flexible manner without opening yourself to SQL injection attacks.
 
 A key aim of this library is to be very fast, if you think you can improve performance further please open a PR!
+That said, doing nothing is always faster than doing something, so do consider caching where it makes sense.
 
 ## Usage
 

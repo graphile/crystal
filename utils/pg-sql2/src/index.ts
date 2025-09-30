@@ -270,17 +270,17 @@ function makeRawNode(text: string, exportName?: string): SQLRawNode {
   return newNode;
 }
 
-function makeCommentNode(commentText: string): SQLCommentNode {
-  if (typeof commentText !== "string") {
+function makeCommentNode(rawCommentText: string): SQLCommentNode {
+  if (typeof rawCommentText !== "string") {
     throw new Error(
       `[pg-sql2] Invalid argument to makeCommentNode - expected string, but received '${inspect(
-        commentText,
+        rawCommentText,
       )}'`,
     );
   }
-  if (commentText.includes("*/") || commentText.includes("/*")) {
-    throw new Error(`Forbidden comment text!`);
-  }
+  const commentText = rawCommentText
+    .replace(/\*\//g, "* /")
+    .replace(/\/\*/g, "/ *");
   const newNode: SQLCommentNode = {
     __proto__: pgSQL2Proto,
     [$$type]: "COMMENT" as const,
@@ -1095,10 +1095,7 @@ export function symbolAlias(symbol1: symbol, symbol2: symbol): SQL {
   return makeSymbolAliasNode(symbol1, symbol2);
 }
 
-export function placeholder(
-  symbol: symbol,
-  fallback?: SQL,
-): SQLPlaceholderNode {
+export function placeholder(symbol: symbol, fallback?: SQL): SQL {
   return makePlaceholderNode(symbol, fallback);
 }
 
