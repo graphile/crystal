@@ -28,7 +28,7 @@ sql.isEquivalent(
 - `options` - Optional comparison options:
   - `symbolSubstitutes` - Map of symbol substitutions for comparison
 
-## Return Value
+## Return value
 
 Returns `true` if the SQL fragments are functionally equivalent, `false` otherwise.
 
