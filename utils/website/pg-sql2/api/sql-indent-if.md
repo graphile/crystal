@@ -30,8 +30,28 @@ Returns the `fragment` wrapped with indentation if `condition` is `true`, otherw
 ## Example
 
 ```js
-const conditions = getSqlConditions();
-const joinClause = sql`on ${sql.parens(
-  sql.indentIf(conditions.length > 1, conditions),
-)}`;
+import { sql, type SQL } from "pg-sql2";
+
+function joinClause(conditions: SQL[]) {
+  const sqlCondition = sql.join(
+    conditions.map((fragment) => sql.parens(fragment)),
+    " AND ",
+  );
+  return sql`on ${sql.parens(
+    sql.indentIf(conditions.length > 1, sqlCondition),
+  )}`;
+}
+console.log(sql.compile(joinClause([sql`age > 18`])).text);
+/*
+on (age > 18)
+*/
+
+console.log(
+  sql.compile(joinClause([sql`age > 18`, sql`status = 'active'`])).text,
+);
+/*
+on (
+  (age > 18) AND (status = 'active')
+)
+*/
 ```
