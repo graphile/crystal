@@ -180,7 +180,7 @@ Using a modifier makes the `OR` example cleaner: each child contributes its
 conditions to the modifier; once all entries are done, the modifier’s `apply()`
 method is called to add the combined `OR` clause to its parent.
 
-### In a plan resolver
+### Plan resolver
 
 `FieldArgs.apply()` is how you apply input arguments to a step:
 
@@ -201,11 +201,69 @@ to transform the step’s value before applying:
 ```ts
 fieldArgs.apply($target, ["filter"], (requestBuilder, inputValue) => {
   // Convert the step’s value (e.g. request builder) into a filter builder object
-  return new FilterBuilder(requestBuilder, inputValue);
-  // < FilterBuilder would
-  be a Modifier
+  return new FilterBuilder(requestBuilder, inputValue); // < a Modifier
 });
 ```
+
+### Applyable steps
+
+For applying to work, the `$target` you pass to `fieldArgs.apply($target)` must be an
+**applyable step** — i.e. a step that supports input-driven modifications at
+runtime.
+
+An applyable step has two responsibilities:
+
+1. **Collecting callback steps at planning time**
+
+   The step must implement an `apply($cb: Step<(parent: any) => void>)` method.
+   This should register `$cb` as a unary dependency. Since multiple arguments
+   may apply to the same step, you should expect multiple calls to `.apply()`
+   and thus store all dependency IDs in an array:
+
+   ```ts
+   class MyRequestStep extends Step {
+     applyDepIds: number[] = [];
+
+     apply($cb: Step<(parent: any) => void>) {
+       this.applyDepIds.push(this.addUnaryDependency($cb));
+     }
+
+     // ...
+   }
+   ```
+
+2. **Executing the collected callbacks at runtime**
+
+   In `execute()`, the step should prepare its internal object (e.g. a request
+   builder). This object **must not** be a `Modifier`; it should be the mutable
+   thing you want modified. Then iterate through the collected callbacks and
+   invoke them in order, passing in this object. Finally, carry out the request
+   using the fully-populated builder:
+
+   ```ts
+   class MyRequestStep extends Step {
+     // ...
+
+     async execute(details) {
+       const { values, indexMap } = details;
+       const builder = new RequestBuilder();
+       // Populate your request builder with the things you already know
+
+       // Apply the changes from all the `.apply($cb)` calls
+       for (const applyDepId of this.applyDepIds) {
+         const applyCallback = values[applyDepId].unaryValue();
+         applyCallback(builder);
+       }
+
+       // Execute the underlying request, and tie the results back
+       const results = await builder.execute();
+       return indexMap((batchIndex) => results.getResultForIndex(batchIndex));
+     }
+   }
+   ```
+
+This pattern ensures that all argument inputs get a chance to mutate the same
+builder before the step executes its action.
 
 ### Under the hood
 
