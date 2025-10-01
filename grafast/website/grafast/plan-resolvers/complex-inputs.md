@@ -207,63 +207,61 @@ fieldArgs.apply($target, ["filter"], (requestBuilder, inputValue) => {
 
 ### Applyable steps
 
-For applying to work, the `$target` you pass to `fieldArgs.apply($target)` must be an
-**applyable step** — i.e. a step that supports input-driven modifications at
-runtime.
+For applying to work, the `$target` you pass to `fieldArgs.apply($target)` must
+be an **applyable step** — i.e. a step that supports input-driven modifications
+at runtime.
 
-An applyable step has two responsibilities:
+An applyable step has two responsibilities to ensure all inputs get a chance to
+mutate the builder before the step executes its action:
 
-1. **Collecting callback steps at planning time**
+#### Collecting callback steps at planning time
 
-   The step must implement an `apply($cb: Step<(parent: any) => void>)` method.
-   This should register `$cb` as a unary dependency. Since multiple arguments
-   may apply to the same step, you should expect multiple calls to `.apply()`
-   and thus store all dependency IDs in an array:
+The step must implement an `apply($cb: Step<(parent: any) => void>)` method.
+This should register `$cb` as a unary dependency. Since multiple arguments
+may apply to the same step, you should expect multiple calls to `.apply()`
+and thus store all dependency IDs in an array:
 
-   ```ts
-   class MyRequestStep extends Step {
-     applyDepIds: number[] = [];
+```ts
+class MyRequestStep extends Step {
+  applyDepIds: number[] = [];
 
-     apply($cb: Step<(parent: any) => void>) {
-       this.applyDepIds.push(this.addUnaryDependency($cb));
-     }
+  apply($cb: Step<(parent: any) => void>) {
+    this.applyDepIds.push(this.addUnaryDependency($cb));
+  }
 
-     // ...
-   }
-   ```
+  // ...
+}
+```
 
-2. **Executing the collected callbacks at runtime**
+#### Executing the collected callbacks at runtime
 
-   In `execute()`, the step should prepare its internal object (e.g. a request
-   builder). This object **must not** be a `Modifier`; it should be the mutable
-   thing you want modified. Then iterate through the collected callbacks and
-   invoke them in order, passing in this object. Finally, carry out the request
-   using the fully-populated builder:
+In `execute()`, the step should prepare its internal object (e.g. a request
+builder). This object **must not** be a `Modifier`; it should be the mutable
+thing you want modified. Then iterate through the collected callbacks and
+invoke them in order, passing in this object. Finally, carry out the request
+using the fully-populated builder:
 
-   ```ts
-   class MyRequestStep extends Step {
-     // ...
+```ts
+class MyRequestStep extends Step {
+  // ...
 
-     async execute(details) {
-       const { values, indexMap } = details;
-       const builder = new RequestBuilder();
-       // Populate your request builder with the things you already know
+  async execute(details) {
+    const { values, indexMap } = details;
+    const builder = new RequestBuilder();
+    // Populate your request builder with the things you already know
 
-       // Apply the changes from all the `.apply($cb)` calls
-       for (const applyDepId of this.applyDepIds) {
-         const applyCallback = values[applyDepId].unaryValue();
-         applyCallback(builder);
-       }
+    // Apply the changes from all the `.apply($cb)` calls
+    for (const applyDepId of this.applyDepIds) {
+      const applyCallback = values[applyDepId].unaryValue();
+      applyCallback(builder);
+    }
 
-       // Execute the underlying request, and tie the results back
-       const results = await builder.execute();
-       return indexMap((batchIndex) => results.getResultForIndex(batchIndex));
-     }
-   }
-   ```
-
-This pattern ensures that all argument inputs get a chance to mutate the same
-builder before the step executes its action.
+    // Execute the underlying request, and tie the results back
+    const results = await builder.execute();
+    return indexMap((batchIndex) => results.getResultForIndex(batchIndex));
+  }
+}
+```
 
 ### Under the hood
 
