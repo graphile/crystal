@@ -200,6 +200,7 @@ export type FieldArgs<TObj extends BaseGraphQLArguments = any> = {
   getRaw(
     path?: ReadonlyArray<string | number>,
   ): AnyInputStep | ObjectStep<{ [argName: string]: AnyInputStep }>;
+  getBaked(path: ReadonlyArray<string | number>): Step;
   typeAt(path: keyof TObj & string): GraphQLInputType;
   typeAt(path: ReadonlyArray<string | number>): GraphQLInputType;
   /** This also works (without path) to apply each list entry against $target */
