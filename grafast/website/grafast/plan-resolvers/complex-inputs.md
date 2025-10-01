@@ -56,7 +56,8 @@ and bake it into your backend representation:
 ### Schema
 
 Baking is defined per input object type with the
-`extensions.grafast.baked` method, which is an `InputObjectTypeBakedResolver`:
+`extensions.grafast.baked(input, info)` method, which is an
+`InputObjectTypeBakedResolver`:
 
 ```ts
 type InputObjectTypeBakedResolver = (
@@ -115,11 +116,14 @@ type InputObjectFieldApplyResolver<TParent = any, TData = any, TScope = any> = (
 - `target` is the parent object (e.g. the request builder) passed in.
 - `input` is the raw input value for this input field
 
-You may mutate `target`, or return a new parent object for children to recurse into.
-For list types, you may return a factory function (e.g. `() => new Thing()`)
-which will be called for each list element to provide its own parent object.
-This enables patterns like `OR` filters where each entry in a list gets its
-own sub-condition.
+The apply method is expected to mutate `target`, either directly, or by
+returning a Modifier (see [fan-out and fan-in](#fan-out-and-fan-in) below).
+
+The apply method may return `undefined`, a new parent object to use with
+children when recursing, or (for list types) a factory function which is called
+for each list item to produces a parent object for that item to use. Returning a
+factory function (e.g. `() => new Thing()`) enables patterns like `OR` filters
+where each entry in a list gets its own sub-condition.
 
 #### Example
 
