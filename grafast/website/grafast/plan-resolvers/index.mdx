@@ -1,5 +1,6 @@
 ---
 sidebar_position: 5
+toc_max_heading_level: 4
 ---
 
 import Mermaid from "@theme/Mermaid";
@@ -46,9 +47,9 @@ The plan resolver must return a step that represents the result of the field.
 
 ### Source step
 
-The first argument, the `$source` step, is a step that represents the data from
+The `$source` step represents the data from
 the object that the field is being resolved against (i.e. the GraphQL object
-type that owns the field). For the root selection set, the parent object is
+type that owns the field). For the root selection set, the parent object
 represents either the GraphQL `rootValue` or the subscription event. For all
 other selection sets the source object will be derived from the parent field:
 
@@ -64,7 +65,7 @@ other selection sets the source object will be derived from the parent field:
 type FieldArgs = {
   getRaw(path: string | ReadonlyArray<string | number>): Step;
   // Shortcuts for getRaw for each argument:
-  [`$${string}`]: Step
+  [`$${string}`]: Step;
 
   // -- Advanced features --
   autoApply($target: Step): void;
@@ -77,7 +78,7 @@ type FieldArgs = {
 };
 ```
 
-The second argument, the "field arguments" (`fieldArgs`), is an object giving
+The "field arguments" (`fieldArgs`) is an object giving
 ways of interacting with the values passed as arguments to a field.
 
 #### Accessing argument values
@@ -174,10 +175,10 @@ interface FieldInfo {
 The info object contains information about the context in which the plan
 resolver is called:
 
-- `schema`: the full `GraphQLSchema` object the request is being executed
-against
 - `fieldName`: the name of the field being resolved (**not** its alias)
 - `field`: the field itself
+- `schema`: the full `GraphQLSchema` object the request is being executed
+  against
 
 It's very rare for hand-written plan resolvers to need this
 but it's useful for libraries that generate plan resolvers or when using the
@@ -186,7 +187,8 @@ resolver.
 
 ### Default plan resolver
 
-In a pure <Grafast /> schema (no traditional resolvers), if a field doesn't have
+In a pure <Grafast /> schema (no [traditional resolvers](#traditional-resolvers)),
+if a field doesn't have
 a plan resolver, a default plan resolver will be used that uses
 [`get()`](../standard-steps/get.md) to retrieve the property of the parent
 object with the same name as the field:
@@ -195,9 +197,6 @@ object with the same name as the field:
 const defaultPlanResolver: FieldPlanResolver = ($source, fieldArgs, info) =>
   get($source, info.fieldName);
 ```
-
-In "resolver emulation mode", the traditional `defaultFieldResolver` will be
-emulated instead.
 
 ### Example
 
@@ -216,7 +215,7 @@ function User_friends_plan(
   $parent: ExecutableStep,
   fieldArgs: FieldArgs,
 ): ExecutableStep {
-  const $limit = fieldArgs.getRaw('limit');
+  const $limit = fieldArgs.getRaw("limit");
   const $friends = $parent.getRelation("friends");
   $friends.limit($limit);
   return $friends;
@@ -225,7 +224,7 @@ function User_friends_plan(
 
 :::note[Convention: dollar prefix means "step"]
 
-By convention, when a variable represents a step we start the variable's name
+By convention, when a variable represents a step the variable's name starts
 with a `$`; this helps remind us that this is not the actual value, but a
 placeholder that represents the value that will be filled at execution time for
 each request that uses this plan.
@@ -259,10 +258,11 @@ users the ability to port a legacy schema to <Grafast /> on a field-by-field
 basis. We recommend starting with the fields that would yield the greatest
 benefit, and those that consume them.
 
-If a field with a traditional resolver is invoked, then Grafast will enter
+If a field with a traditional resolver is invoked, then <Grafast /> will enter
 "resolver emulation mode" for that tree, and will remain in resolver emulation
-until a field with a plan is met; this impacts the behavior of the default plan
-resolver.
+until a field with a plan is met; the [default plan resolver](#default-plan-resolver) will not be used
+in this mode, instead the traditional `defaultFieldResolver` will be
+emulated.
 
 ## Specifying a field plan resolver
 
@@ -377,7 +377,7 @@ resolver has returned, passing the step yielded from the field plan as the
 
 :::info[Optimization: may be skipped in some circumstances]
 
-If Grafast can determine statically that your argument will not be passed at
+If <Grafast /> can determine statically that your argument will not be passed at
 runtime (i.e. will be `undefined`) then it may choose to skip calling the
 `applyPlan()` method for that argument.
 
@@ -470,7 +470,6 @@ type what the step actually is, you can use `assertStep: ExecutableStep` or
 
 :::
 
-
 ## Execution order &amp; side effects
 
 Grafast is **declarative**: steps form a directed acyclic graph (DAG) and only
@@ -551,4 +550,3 @@ Now `$valueBefore` must run before `$after`, so your log shows the true “befor
 - Prefer **explicit data deps** when possible (e.g. make the read feed the write).
 - Use `hasSideEffect = true` when you need **ordering without data flow** (logging, metrics, authorization gates, idempotency checks).
 - Don’t sprinkle `hasSideEffect` on hot paths unnecessarily; it reduces reordering freedom.
-
