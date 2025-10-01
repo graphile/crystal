@@ -123,14 +123,20 @@ type InputObjectFieldApplyResolver<TParent = any, TData = any, TScope = any> = (
 Example (simplified from `postgraphile-plugin-connection-filter`):
 
 ```ts
-apply(parent: PgCondition, value: ReadonlyArray<LogicalOperatorInput> | null) {
-  if (value == null) return;
-  const orCondition = parent.orPlan();
-  // Each list entry is added to `orCondition` only once the entry itself is
-  // fully resolved - if an individual entry produces many clauses, they must be
-  // joined with `AND` first before being incorporated into the `OR`.
-  return () => orCondition.andPlan();
-}
+fields["or"] = {
+  apply(
+    parent: PgCondition,
+    value: ReadonlyArray<LogicalOperatorInput> | null,
+  ) {
+    if (value == null) return;
+    const orCondition = parent.orPlan();
+    // Each list entry is added to `orCondition` only once the entry itself is
+    // fully resolved - if an individual entry produces many clauses, they must be
+    // joined with `AND` first before being incorporated into the `OR`.
+    return () => orCondition.andPlan();
+  },
+  type: new GraphQLList(new GraphQLNonNull(UserFilter)),
+};
 ```
 
 ### Fan-out and fan-in
