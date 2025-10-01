@@ -680,8 +680,8 @@ const Cat = new GraphQLObjectType({
 
 ### listItem
 
-Implemented by `ListCapableStep` allowing list steps to create a per element step. 
-During planning, Grafast constructs a  `__ItemStep` for a list field and, if the parent step is list‑capable, calls `listItem` to obtain the per‑element step that descendants plan against.
+Implemented by `ListCapableStep` allowing list steps to create a per-element step. 
+During planning, Grafast constructs a `__ItemStep` for a list field and, if the parent step is list‑capable, calls `listItem` to obtain the per‑element step that descendants plan against.
 
 ```ts 
 class GetMyListStep extends Step implements ListCapableStep {
@@ -696,7 +696,7 @@ class GetMyListStep extends Step implements ListCapableStep {
 Resulting in a plan diagram as such:
 <Mermaid chart={listItemPlan} />
 
-Useful for changing the items interface without the need for getting the `__ItemSteps` dependency. 
+Useful for changing the item's interface without the need for getting the `__ItemSteps` dependency. 
 
 
 ## Built in methods
