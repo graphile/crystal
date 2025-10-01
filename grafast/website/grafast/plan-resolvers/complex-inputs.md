@@ -23,8 +23,6 @@ complex input data:
 Both patterns work by recursing over the tree of input values (objects, lists,
 scalars) at runtime and invoking per-field or per-type logic as needed.
 
----
-
 ## Baking (data transformations)
 
 Baking is about **data in, data out**. You start with a GraphQL input object value and
@@ -92,13 +90,13 @@ Applying is about using input values to **change what a step does**. Typical
 examples include pagination, filtering, or custom ordering.
 
 Rather than producing a baked value, inputs are _applied_ to a step that knows
-how to accept them — e.g. a step wrapping a query builder, REST call, or any
-other data source.
+how to accept them — e.g. a step that uses a request builder to prepare
+the request to send to a database, URL endpoint, or any other data source.
 
 ### Schema
 
-Applying is defined per input _field_ with
-`extensions.grafast.apply`:
+Applying is defined per input _field_ with a
+`inputField.extensions.grafast.apply(target, input, info)` method:
 
 ```ts
 type InputObjectFieldApplyResolver<TParent = any, TData = any, TScope = any> = (
@@ -113,13 +111,14 @@ type InputObjectFieldApplyResolver<TParent = any, TData = any, TScope = any> = (
 ) => any;
 ```
 
-- `target` is the parent object (e.g. a query builder) passed in.
-- `input` is the value for this field.
-- You may **mutate** `target`, or **return** a new parent object for children to
+- `target` is the parent object (e.g. the request builder) passed in.
+- `input` is the raw input value for this input field
+- You may mutate `target`, or return a new parent object for children to
   recurse into.
-- For list types, you may return a **factory function** `() => childParent`,
-  which will be called for each list element. This enables patterns like `OR`
-  filters where each entry gets its own sub-condition.
+- For list types, you may return a factory function (e.g. `() => new Thing()`)
+  which will be called for each list element to provide its own parent object.
+  This enables patterns like `OR` filters where each entry in a list gets its
+  own sub-condition.
 
 Example (simplified from `postgraphile-plugin-connection-filter`):
 
@@ -127,7 +126,9 @@ Example (simplified from `postgraphile-plugin-connection-filter`):
 apply(parent: PgCondition, value: ReadonlyArray<LogicalOperatorInput> | null) {
   if (value == null) return;
   const orCondition = parent.orPlan();
-  // Each entry is added to `$or`, but entries themselves should AND together.
+  // Each list entry is added to `orCondition` only once the entry itself is
+  // fully resolved - if an individual entry produces many clauses, they must be
+  // joined with `AND` first before being incorporated into the `OR`.
   return () => orCondition.andPlan();
 }
 ```
@@ -141,13 +142,22 @@ child field can add its own modifications in isolation. But what if you need to
 
 That’s where **modifiers** come in.
 
-If the object you return extends the `Modifier` class, Grafast will track it
+If the object you return extends the `Modifier` class, Gra*fast* will track it
 during the apply process. After the entire input tree has been traversed,
-Grafast goes back through the collected modifiers in reverse order and calls
+Gra*fast* goes back through the collected modifiers in reverse order and calls
 their `apply()` methods. This gives you a final hook to push the combined
 results back up into the parent.
 
 ```ts
+/** Will be applied in reverse order once fan-out is complete */
+const currentModifiers: Modifier<any>[] = [];
+
+/**
+ * Modifiers modify their parent (which may be another modifier or anything
+ * else). First they gather all the requirements from their children (if any)
+ * being applied to them, then they apply themselves to their parent. This
+ * application is done through the `apply()` method.
+ */
 export abstract class Modifier<TParent> {
   constructor(protected readonly parent: TParent) {
     currentModifiers.push(this);
@@ -183,21 +193,22 @@ You can also target a specific argument path, and optionally provide a callback
 to transform the step’s value before applying:
 
 ```ts
-fieldArgs.apply($target, ["pagination"], (qb, inputValue) => {
-  // Convert the step’s value (e.g. query builder) into a condition object
-  return new PgCondition(qb, inputValue);
+fieldArgs.apply($target, ["filter"], (requestBuilder, inputValue) => {
+  // Convert the step’s value (e.g. request builder) into a filter builder object
+  return new FilterBuilder(requestBuilder, inputValue);
+  // < FilterBuilder would
+  be a Modifier
 });
 ```
 
 ### Under the hood
 
-`fieldArgs.apply()` uses the [`applyInput()`](../standard-steps/applyInput.md)
-step internally. You don’t normally call this directly, but you may see
-`ApplyInput` nodes in plan diagrams.
+`fieldArgs.apply()` uses the `applyInput()` step internally. You don’t normally
+call this directly, but you may see `ApplyInput` nodes in plan diagrams.
 
 `applyScope` methods (experimental) can provide additional scope values to be
 passed through during applying — these live on input objects or enums at
-`extensions.grafast.applyScope`.
+`extensions.grafast.applyScope()`.
 
 ## Choosing between baking and applying
 
