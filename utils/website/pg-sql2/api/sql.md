@@ -60,7 +60,7 @@ console.log(sql.compile(query).text);
 
 ### Embedding identifiers and values
 
-This example uses [`sql.identifier`](./sql-identifier.md) and [`sql.value`](.sql-value),
+This example uses [`sql.identifier`](./sql-identifier.md) and [`sql.value`](./sql-value.md),
 during compile the `columnValue` is replaced by the placeholder `$1`.
 
 ```ts
