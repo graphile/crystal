@@ -35,7 +35,7 @@ The (simplified) new signature is:
 
 ```ts
 // V5 signature
-function makeAddPgTableConditionPlugin(
+function addPgTableCondition(
   match: { serviceName?: string; schemaName: string; tableName: string },
   conditionFieldName: string,
   fieldSpecGenerator: (build: GraphileBuild.Build) => GraphileInputFieldConfig,
@@ -94,10 +94,10 @@ request executes. We also need to declare the type of the data so that it can
 be cast correctly for the database.
 
 ```ts
-import { makeAddPgTableConditionPlugin } from "postgraphile/utils";
+import { addPgTableCondition } from "postgraphile/utils";
 import { TYPES } from "postgraphile/@dataplan/pg";
 
-const PetsCountPlugin = makeAddPgTableConditionPlugin(
+const PetsCountPlugin = addPgTableCondition(
   { schemaName: "graphile_utils", tableName: "users" },
   "petCountAtLeast",
   (build) => ({
