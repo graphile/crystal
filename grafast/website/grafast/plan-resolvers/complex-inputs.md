@@ -2,13 +2,13 @@
 sidebar_position: 6
 ---
 
-# Planning complex inputs
+# Handling complex inputs
 
 :::info[Optional helpers]
 
 It's totally fine to just take the raw input values and handle them in a plan
 resolver however you like. The features on this page are optional: they're
-provided for more advanced use cases where they can help keep your plans clean,
+provided for more advanced use cases where they can help keep your code clean,
 composable, and easier to reason about.
 
 :::
@@ -16,8 +16,8 @@ composable, and easier to reason about.
 Before diving in, it’s useful to distinguish between two patterns for handling
 complex input data:
 
-- **Baking** — transforming input *data* into a backend representation.
-- **Applying** — transforming *behavior* by having input data modify the
+- **Baking** — transforming input _data_ into another form (e.g. a backend representation).
+- **Applying** — transforming _behavior_ by having input data modify the
   actions a step will take.
 
 Both patterns work by recursing over the tree of input values (objects, lists,
@@ -27,17 +27,19 @@ scalars) at runtime and invoking per-field or per-type logic as needed.
 
 ## Baking (data transformations)
 
-Baking is about **data in, data out**. You start with a GraphQL input object and
+Baking is about **data in, data out**. You start with a GraphQL input object value and
 transform it into the representation your backend needs. For example:
 
 ```graphql
 input AvatarInput {
   url: String!
+  # ...
 }
 
 input UserInput {
   userId: Int!
   avatar: AvatarInput
+  # ...
 }
 ```
 
@@ -47,7 +49,7 @@ At runtime, you might receive:
 { "userId": 27, "avatar": { "url": "http://..." } }
 ```
 
-and bake it into:
+and bake it into your backend representation:
 
 ```json
 { "user_id": 27, "avatar_url": "http://..." }
@@ -69,47 +71,37 @@ type InputObjectTypeBakedResolver = (
 ) => any;
 ```
 
-- `input` is the raw GraphQL input object.
+- `input` is the raw GraphQL input object value.
 - Return value becomes the "baked" representation.
 - Call `info.applyChildren(parent)` if you want to recurse with a different
-  parent object.
+  parent object; this uses the "applying" runtime behaviors seen below
 - If you don’t implement `baked`, the raw input passes through unchanged.
 
-### In a plan resolver
+### Plan resolver
 
-You can wrap a raw input step in `bakedInput()` to invoke the baking logic:
+You can use the `fieldArgs.getBaked(path)` method to produce the baked version
+of a raw input value:
 
 ```ts
-const path = ["user"];
-const $raw = fieldArgs.getRaw(path);
-const inputType = fieldArgs.typeAt(path);
-const $baked = bakedInput(inputType, $raw);
+const $baked = fieldArgs.getBaked(["path", "to", "input"]);
 ```
-
-At execution time, `$baked` will resolve to the transformed value.
-
----
 
 ## Applying (behavior transformations)
 
 Applying is about using input values to **change what a step does**. Typical
 examples include pagination, filtering, or custom ordering.
 
-Rather than producing a baked value, inputs are *applied* to a step that knows
+Rather than producing a baked value, inputs are _applied_ to a step that knows
 how to accept them — e.g. a step wrapping a query builder, REST call, or any
 other data source.
 
 ### Schema
 
-Applying is defined per input *field* with
+Applying is defined per input _field_ with
 `extensions.grafast.apply`:
 
 ```ts
-type InputObjectFieldApplyResolver<
-  TParent = any,
-  TData = any,
-  TScope = any,
-> = (
+type InputObjectFieldApplyResolver<TParent = any, TData = any, TScope = any> = (
   target: TParent,
   input: TData,
   info: {
@@ -169,7 +161,7 @@ fieldArgs.apply($target, ["pagination"], (qb, inputValue) => {
 
 `fieldArgs.apply()` uses the [`applyInput()`](../standard-steps/applyInput.md)
 step internally. You don’t normally call this directly, but you may see
-`ApplyInput` nodes in plan diagrams.  
+`ApplyInput` nodes in plan diagrams.
 
 `applyScope` methods (experimental) can provide additional scope values to be
 passed through during applying — these live on input objects or enums at
