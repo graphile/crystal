@@ -5,7 +5,7 @@ title: "sql.literal()"
 
 # `sql.literal(val)`
 
-Embeds simple values directly into SQL text, falling back to `sql.value(val)`
+Embeds simple values directly into SQL text, falling back to [`sql.value(val)`](./sql-value)
 for more complex values. More readable and efficient than placeholders for
 constants.
 
@@ -31,6 +31,8 @@ Returns a `SQL` fragment with the value embedded directly in the SQL text.
 ## Examples
 
 ```js
+import { sql } from "pg-sql2";
+
 // Constants - more efficient than sql.value()
 sql`LIMIT ${sql.literal(50)}`; // -> LIMIT 50
 sql`WHERE active = ${sql.literal(true)}`; // -> WHERE active = TRUE
@@ -40,8 +42,10 @@ const fields = ["name", "email"];
 const sqlTuples = fields.map(
   (f) => sql`${sql.literal(f)}, ${sql.identifier(f)}`,
 );
-sql`json_build_object(${sql.join(sqlTuples, ", ")})`;
-// json_build_object('name', name, 'email', email)
+const query = sql`json_build_object(${sql.join(sqlTuples, ", ")})`;
+
+console.log(sql.compile(query).text);
+// json_build_object('name', "name", 'email', "email")
 ```
 
 ## Notes

@@ -44,7 +44,7 @@ await client.query(text, values);
 ### Basic usage
 
 ```js
-import sql from "pg-sql2";
+import { sql } from "pg-sql2";
 
 const userId = 123;
 const status = "active";
@@ -59,14 +59,16 @@ const query = sql`
 const { text, values } = sql.compile(query);
 
 console.log(text);
-// -> SELECT id, name, email FROM users WHERE id = $1 AND status = $2
+// SELECT id, name, email FROM users WHERE id = $1 AND status = $2
 console.log(values);
-// -> [123, 'active']
+// [123, 'active']
 ```
 
 ### Complex example
 
 ```js
+import { sql } from "pg-sql2";
+
 const filters = {
   status: "active",
   minAge: 18,
@@ -91,21 +93,24 @@ const query = sql`
 const compiled = sql.compile(query);
 
 console.log(compiled.text);
-// -> SELECT "id", "name", "email", "role", "created_at"
-//    FROM "users"
-//    WHERE status = $1
-//    AND age >= $2
-//    AND role = ANY($3)
-//    ORDER BY "created_at" DESC
-//    LIMIT 50
+/*  SELECT "id", "name", "email", "role", "created_at"
+    FROM "users"
+    WHERE status = $1
+    AND age >= $2
+    AND role = ANY($3)
+    ORDER BY "created_at" DESC
+    LIMIT 50
+*/
 
 console.log(compiled.values);
-// -> ['active', 18, ['admin', 'user', 'moderator']]
+// ['active', 18, ['admin', 'user', 'moderator']]
 ```
 
 ### With placeholders
 
 ```js
+import { sql } from "pg-sql2";
+
 const $$table = Symbol("table");
 const $$orderBy = Symbol("orderBy");
 
@@ -118,8 +123,9 @@ const query = sql`
 
 // Compile with defaults
 const q1 = sql.compile(query);
+
 console.log(q1.text);
-// -> SELECT * FROM "default_table" ORDER BY id ASC
+// SELECT * FROM "default_table" ORDER BY id ASC
 
 // Compile with placeholder values
 const q2 = sql.compile(query, {
@@ -128,6 +134,7 @@ const q2 = sql.compile(query, {
     [$$orderBy, sql`created_at DESC`],
   ]),
 });
+
 console.log(q2.text);
-// -> SELECT * FROM "users" ORDER BY created_at DESC
+// SELECT * FROM "users" ORDER BY created_at DESC
 ```

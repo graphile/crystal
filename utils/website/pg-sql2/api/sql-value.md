@@ -56,7 +56,7 @@ Returns a `SQL` fragment representing the parameterized value that can be embedd
 ### Scalars
 
 ```js
-import sql from "pg-sql2";
+import { sql } from "pg-sql2";
 
 const name = "Alice";
 const age = 25;
@@ -70,31 +70,53 @@ const query = sql`
   AND deleted_at = ${sql.value(null)}
 `;
 const { text, values } = sql.compile(query);
-// text:
-//   SELECT *
-//   FROM users
-//   WHERE name = $1
-//   AND age > $2
-//   AND active = $3
-//   AND deleted_at = $4
-// values: ['Alice', 25, true, null]
+
+console.log(text);
+/*
+SELECT *
+FROM users
+WHERE name = $1
+AND age > $2
+AND active = $3
+AND deleted_at = $4
+*/
+
+console.log(values);
+// ['Alice', 25, true, null]
 ```
 
 ### Array values
 
 ```js
+import { sql } from "pg-sql2";
+
 // Array of values (useful for IN clauses)
 const ids = [1, 2, 3, 4];
-sql`SELECT * FROM users WHERE id = ANY(${sql.value(ids)})`;
-// Compiles to: SELECT * FROM users WHERE id = ANY($1)
-// Values: [[1, 2, 3, 4]]
+const query = sql`SELECT * FROM users WHERE id = ANY(${sql.value(ids)})`;
+const { text, values } = sql.compile(query);
 
-// Nested arrays
+console.log(text);
+// SELECT * FROM users WHERE id = ANY($1)
+
+console.log(values);
+// [[1, 2, 3, 4]]
+```
+
+```js
+import { sql } from "pg-sql2";
+
 const coordinates = [
   [1, 2],
   [3, 4],
 ];
-sql`SELECT * FROM locations WHERE coords = ${sql.value(coordinates)}`;
+const query = sql`SELECT * FROM locations WHERE coords = ${sql.value(coordinates)}`;
+const { text, values } = sql.compile(query);
+
+console.log(text);
+// SELECT * FROM locations WHERE coords = $1
+
+console.log(values);
+// [[[1, 2], [3, 4]]]
 ```
 
 ## Notes

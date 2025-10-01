@@ -37,20 +37,32 @@ Return empty fragment if array is empty.
 ## Examples
 
 ```js
-// Column lists
-const columns = ["name", "email", "age"];
-sql`SELECT ${sql.join(columns.map(sql.identifier), ", ")} FROM users`;
-// -> SELECT "name", "email", "age" FROM users
+import { sql } from "pg-sql2";
 
 // WHERE conditions
 const conditions = [sql`age > 18`, sql`status = 'active'`];
-sql`WHERE ${sql.join(conditions.map(sql.parens), " AND ")}`;
-// -> WHERE (age > 18) AND (status = 'active')
+const query = sql`WHERE ${sql.join(conditions, " AND ")}`;
+
+console.log(sql.compile(query).text);
+// WHERE age > 18 AND status = 'active'
+
+// Column lists
+const columns = ["name", "email", "age"];
+const query = sql`SELECT ${sql.join(
+  columns.map((columnName) => sql.identifier(columnName)),
+  ", ",
+)} FROM users`;
+
+console.log(sql.compile(query).text);
+// SELECT "name", "email", "age" FROM users
 
 // JSON objects
 const fields = ["name", "email"];
-sql`json_build_object(${sql.join(
+const query = sql`json_build_object(${sql.join(
   fields.map((f) => sql`${sql.literal(f)}, ${sql.identifier(f)}`),
   ", ",
 )})`;
+
+console.log(sql.compile(query).text);
+// json_build_object('name', "name", 'email', "email")
 ```
