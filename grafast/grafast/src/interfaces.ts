@@ -42,7 +42,7 @@ import type { GrafastOperationOptions } from "./prepare.js";
 import type { Step } from "./step.js";
 import type { __InputDefaultStep } from "./steps/__inputDefault.js";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
-import type { ApplyableExecutableStep } from "./steps/applyInput.js";
+import type { ApplyableStep } from "./steps/applyInput.js";
 import type {
   __InputListStep,
   __InputObjectStep,
@@ -205,17 +205,17 @@ export type FieldArgs<TObj extends BaseGraphQLArguments = any> = {
   typeAt(path: ReadonlyArray<string | number>): GraphQLInputType;
   /** This also works (without path) to apply each list entry against $target */
   apply<TArg extends object>(
-    $target: ApplyableExecutableStep<TArg>,
+    $target: ApplyableStep<TArg>,
     path: keyof TObj & string,
     getTargetFromParent?: (parent: TArg, inputValue: any) => object | undefined,
   ): void;
   apply<TArg extends object>(
-    $target: ApplyableExecutableStep<TArg>,
+    $target: ApplyableStep<TArg>,
     path?: ReadonlyArray<string | number>,
     getTargetFromParent?: (parent: TArg, inputValue: any) => object | undefined,
   ): void;
   apply<TArg extends object>(
-    $target: ApplyableExecutableStep<TArg>,
+    $target: ApplyableStep<TArg>,
     getTargetFromParent: (parent: TArg, inputValue: any) => object | undefined,
     // TYPES: Really not sure why TypeScript requires this here?
     justTargetFromParent?: never,
@@ -247,12 +247,12 @@ export type FieldArg<TData = any> = {
   typeAt(path: string | ReadonlyArray<string | number>): GraphQLInputType;
   /** This also works (without path) to apply each list entry against $target */
   apply<TArg extends object>(
-    $target: ApplyableExecutableStep<TArg>,
+    $target: ApplyableStep<TArg>,
     path?: ReadonlyArray<string | number>,
     getTargetFromParent?: (parent: TArg, inputValue: any) => object | undefined,
   ): void;
   apply<TArg extends object>(
-    $target: ApplyableExecutableStep<TArg>,
+    $target: ApplyableStep<TArg>,
     getTargetFromParent: (parent: TArg, inputValue: any) => object | undefined,
     // TYPES: Really not sure why TypeScript requires this here?
     justTargetFromParent?: never,
