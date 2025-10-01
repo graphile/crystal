@@ -280,7 +280,9 @@ function processOmit(
     processOmit(omit);
   }
 
-  addBehaviorToTags(tags, behavior.join(" "), true);
+  if (behavior.length > 0) {
+    addBehaviorToTags(tags, behavior.join(" "), true);
+  }
 }
 
 function addBehaviorToTags(
