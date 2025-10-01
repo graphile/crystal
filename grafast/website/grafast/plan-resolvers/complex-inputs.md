@@ -6,8 +6,8 @@ sidebar_position: 6
 
 :::info[Optional helpers]
 
-It's totally fine to just take the raw input values and handle them in a plan
-resolver however you like. The features on this page are optional: they're
+It’s totally fine to just take the raw input values and handle them in a plan
+resolver however you like. The features on this page are optional: they’re
 provided for more advanced use cases where they can help keep your code clean,
 composable, and easier to reason about.
 
@@ -56,7 +56,7 @@ and bake it into your backend representation:
 ### Schema
 
 Baking is defined per input object type with the
-`extensions.grafast.baked` method:
+`extensions.grafast.baked` method, which is an `InputObjectTypeBakedResolver`:
 
 ```ts
 type InputObjectTypeBakedResolver = (
@@ -70,10 +70,11 @@ type InputObjectTypeBakedResolver = (
 ```
 
 - `input` is the raw GraphQL input object value.
-- Return value becomes the "baked" representation.
 - Call `info.applyChildren(parent)` if you want to recurse with a different
-  parent object; this uses the "applying" runtime behaviors seen below
-- If you don’t implement `baked`, the raw input passes through unchanged.
+  parent object; this uses the “applying” runtime behaviors seen below
+
+Return value becomes the “baked” representation.
+If you don’t implement `baked`, the raw input passes through unchanged.
 
 ### Plan resolver
 
@@ -96,7 +97,7 @@ the request to send to a database, URL endpoint, or any other data source.
 ### Schema
 
 Applying is defined per input _field_ with a
-`inputField.extensions.grafast.apply(target, input, info)` method:
+`inputField.extensions.grafast.apply(target, input, info)` method, which is an `InputObjectFieldApplyResolver`:
 
 ```ts
 type InputObjectFieldApplyResolver<TParent = any, TData = any, TScope = any> = (
@@ -113,14 +114,16 @@ type InputObjectFieldApplyResolver<TParent = any, TData = any, TScope = any> = (
 
 - `target` is the parent object (e.g. the request builder) passed in.
 - `input` is the raw input value for this input field
-- You may mutate `target`, or return a new parent object for children to
-  recurse into.
-- For list types, you may return a factory function (e.g. `() => new Thing()`)
-  which will be called for each list element to provide its own parent object.
-  This enables patterns like `OR` filters where each entry in a list gets its
-  own sub-condition.
 
-Example (simplified from `postgraphile-plugin-connection-filter`):
+You may mutate `target`, or return a new parent object for children to recurse into.
+For list types, you may return a factory function (e.g. `() => new Thing()`)
+which will be called for each list element to provide its own parent object.
+This enables patterns like `OR` filters where each entry in a list gets its
+own sub-condition.
+
+#### Example
+
+Simplified from `postgraphile-plugin-connection-filter`:
 
 ```ts
 fields["or"] = {
