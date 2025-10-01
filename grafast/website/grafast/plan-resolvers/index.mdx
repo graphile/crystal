@@ -385,40 +385,109 @@ runtime (i.e. will be `undefined`) then it may choose to skip calling the
 
 ## Asserting an object type's step
 
-Object types in <Grafast /> can indicate that they must be represented by a
-particular step or set of steps to guarantee that the methods on those steps
-are available to the field plan resolvers; this can help to catch bugs early.
+Sometimes a field plan resolver expects the source step to support specific
+methods. For example, imagine a `Post` type that represents a row from a `posts`
+database table. In the post list page on your website, you may want to fetch a
+truncated version of the post body to include with each post; to do this
+efficiently it's better to truncate in the database rather than fetch it all and
+truncate in the application layer; so you might use an SQL expression, requiring
+that the source step supports the ability to select SQL expressions. If an
+arbitrary step were passed in instead, the plan might fail at runtime because
+the method you expect doesn’t exist.
 
-This indication takes one of two forms, either it's explicitly the step class
-itself, or it's an assertion function that checks that the incoming step is of
-an appropriate type and throws an error otherwise.
+To guard against this, you can add an `assertStep` to your object type
+(`objectType.extensions.grafast.assertStep`). The value can either be a step
+class, in which case it will be asserted that each step is an `instanceof` this
+class, or an assertion function which will be called (and should throw an error
+if the step is not acceptable).
 
-When defining a schema programatically, `assertStep` is defined via
-`objectTypeConfig.extensions.grafast.assertStep`, for example:
+:::tip[Optional but recommended]
 
-```ts {8-14}
-import { GraphQLObjectType } from "graphql";
-import { ObjectStep } from "grafast";
+`assertStep` is optional, but highly recommended when your plan resolvers rely
+on methods that only exist on a specific step class to ensure errors in plans
+are caught early.
 
-const MyObject = new GraphQLObjectType({
-  name: "MyObject",
+:::
+
+### Example - step class
+
+Here `assertStep` asserts `$post` is a `PgSelectSingleStep`, therefore it's safe
+to use `.select()`:
+
+```ts
+const schema = makeGrafastSchema({
+  objects: {
+    Post: {
+      // highlight-next-line
+      assertStep: PgSelectSingleStep,
+      plans: {
+        truncatedBody($post: PgSelectSingleStep) {
+          return $post.select(sql`left(body, 200)`, TYPES.text);
+        },
+      },
+    },
+  },
+  typeDefs: /* GraphQL */ `
+    type Post {
+      truncatedBody: String
+    }
+    # ...
+  `,
+});
+```
+
+### Example - assertion function
+
+Using an assertion function allows you to accept a wider range of steps, perform
+duck typing, or throw more helpful error messages.
+
+```ts
+const schema = makeGrafastSchema({
+  objects: {
+    Post: {
+      // highlight-start
+      assertStep($step) {
+        if ($step instanceof PgSelectSingleStep) return;
+        throw new Error(
+          `Type 'Post' expects PgSelectSingleStep; received ${$step.constructor.name}`,
+        );
+      },
+      // highlight-end
+      plans: {
+        truncatedBody($post: PgSelectSingleStep) {
+          return $post.select(sql`left(body, 200)`, TYPES.text);
+        },
+      },
+    },
+  },
+  // ...
+});
+```
+
+### Example - extensions
+
+If using raw GraphQL.js objects, the `assertStep` method goes inside of
+`extensions.grafast`:
+
+```ts
+import { GraphQLObjectType, GraphQLString } from "graphql";
+import { PgSelectSingleStep, sql, TYPES } from "@dataplan/pg";
+
+const Post = new GraphQLObjectType({
+  name: "Post",
   extensions: {
     grafast: {
-      assertStep: ObjectStep,
-      /* Or:
-        assertStep($step) {
-          if ($step instanceof ObjectStep) return;
-          throw new Error(`Type 'MyObject' expects a step of type ObjectStep; instead received a step of type '${$step.constructor.name}'`);
-        }
-       */
+      // highlight-next-line
+      assertStep: PgSelectSingleStep,
     },
   },
   fields: {
-    a: {
+    truncatedBody: {
+      type: GraphQLString,
       extensions: {
         grafast: {
-          plan($obj: ObjectStep) {
-            return $obj.get("a");
+          plan($post: PgSelectSingleStep) {
+            return $post.select(sql`left(body, 200)`, TYPES.text);
           },
         },
       },
@@ -426,49 +495,6 @@ const MyObject = new GraphQLObjectType({
   },
 });
 ```
-
-When defined via `makeGrafastSchema` we cannot call the property `assertStep`
-directly as it might conflict with a field name, so instead we use
-`assertStep`, knowing that GraphQL forbids fields to start with `__` (two
-underscores) since those names are reserved for introspection:
-
-```ts {11-17}
-import { makeGrafastSchema, ObjectStep } from "grafast";
-
-const schema = makeGrafastSchema({
-  typeDefs: /* GraphQL */ `
-    type MyObject {
-      a: Int
-    }
-  `,
-  objects: {
-    MyObject: {
-      assertStep: ObjectStep,
-      /* Or:
-        assertStep($step) {
-          if ($step instanceof ObjectStep) return;
-          throw new Error(`Type 'MyObject' expects a step of type ObjectStep; instead received a step of type '${$step.constructor.name}'`);
-        }
-       */
-      plans: {
-        a($obj: ObjectStep) {
-          return $obj.get("a");
-        },
-      },
-    },
-  },
-});
-```
-
-:::tip
-
-Generally adding a step assertion is optional; however when there's a union or
-interface type all types within it must agree whether a step is expected or
-not. If you want to require steps everywhere but you don't care for a particular
-type what the step actually is, you can use `assertStep: ExecutableStep` or
-`assertStep: () => true`.
-
-:::
 
 ## Execution order &amp; side effects
 
