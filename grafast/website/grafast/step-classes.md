@@ -426,6 +426,10 @@ Functions that have special meanings/expectations can be found below:
 
 ### at
 
+```ts
+at(index: number): Step
+```
+
 Implement `.at()` if your step represents a list or an array. It should accept a single argument, an
 integer, which represents the index within the list-like value which should be accessed.
 
@@ -454,6 +458,10 @@ from steps which don't adhere to these expectations.
 :::
 
 ### get
+
+```ts
+get(key: string): Step
+```
 
 Implement `.get()` if your step represents an object. It should accept a single argument, a
 string, which represents an attribute to access an object-like value.
@@ -506,6 +514,10 @@ class MyStep extends Step {
 
 ### items
 
+```ts
+items(): Step<any[]>
+```
+
 Implement `.items()` if your step represents a collection and you want to give
 users an easy way of accessing the items of your collection (as opposed to
 metadata you may also wish to make available, such as pagination info). It
@@ -540,84 +552,25 @@ from steps which don't adhere to these expectations.
 
 ### apply()
 
+```ts
+apply($cb: Step<(parent: any) => any): void
+```
+
 Implement `.apply()` if your step wants to allow for runtime modification of
 its action based on non-trivial input values - for example, if your step
 represents an SQL query it might want to allow dynamic `WHERE` or `ORDER BY`
 clauses based on input arguments to a GraphQL field. `.apply()` will accept a
 single argument, a step that represents a runtime callback function. The step
-should then call this function from `.execute()`; a common implementation might
-look like:
+should then call this function from `.execute()` before running its main
+action.
 
-<!-- TODO: should we move this example somewhere else, it's a bit long! -->
-
-```ts
-import { Step, ExecutionDetails, GrafastResultsList, Maybe } from "grafast";
-
-interface QueryBuilder {
-  orderBy(columnName: string, ascending?: boolean): void;
-}
-
-type Callback = (queryBuilder: QueryBuilder) => void;
-
-class MyQueryStep extends Step {
-  private applyDepIds: number[] = [];
-
-  // [...]
-  //   this.foreignKeyDepId = this.addDependency($fkey);
-  // [...]
-
-  // Handling `Step<Callback>` is enough for some use cases, but
-  // handling this combination is the most flexible.
-  apply($step: Step<Maybe<Callback | ReadonlyArray<Callback>>>) {
-    this.applyDepIds.push(this.addUnaryDependency($step));
-  }
-
-  async execute(
-    executionDetails: ExecutionDetails,
-  ): Promise<GrafastResultsList<Record<string, any>>> {
-    const { values, indexMap } = executionDetails;
-    const foreignKeyEV = values[this.foreignKeyDepId];
-
-    // Create a query builder to collect together the orderBy values
-    const orderBys: string[] = [];
-    const queryBuilder: QueryBuilder = {
-      orderBy(columnName, asc = true) {
-        orderBys.push(`${columnName} ${asc ? "ASC" : "DESC"}`);
-      },
-    };
-
-    // For each of the `apply()` callbacks, run it against the query builder
-    for (const applyDepId of this.applyDepIds) {
-      const callback = values[applyDepId].unaryValue();
-      if (Array.isArray(callback)) {
-        callback.forEach((cb) => cb(queryBuilder));
-      } else if (callback != null) {
-        callback(queryBuilder);
-      }
-    }
-
-    // Now we can use `orderBys` to build a query:
-    const query = `
-      select *
-      from my_table
-      where foreign_key = any($1)
-      order by ${orderBys}
-    `;
-
-    // Then we can fetch the data:
-    const allForeignKeys = indexMap((i) => foreignKeyEV.at(i));
-    const rows = await runQuery(query, [allForeignKeys]);
-
-    // And return the right data to go with each input value:
-    return indexMap((i) => {
-      const foreignKey = foreignKeyEV.at(i);
-      return rows.filter((r) => r.foreign_key === foreignKey);
-    });
-  }
-}
-```
+For more information, see [handling complex inputs](./plan-resolvers/complex-inputs.md).
 
 ### toTypename()
+
+```ts
+toTypename($step: Step): Step<string>
+```
 
 Enables a step to return a step resolving to the typename, used by the
 `defaultPlanType` polymorphic type resolver function when the GraphQL union or
@@ -625,6 +578,10 @@ interface type does not implement the `planType` method. If not implemented,
 this default function will fall back to `get($step, '__typename')`.
 
 ### toSpecifier()
+
+```ts
+toSpecifier($step: Step): Step
+```
 
 This function name is reserved for convenience such that `$step.toSpecifier()`
 should mean the same as `abstractType.toSpecifier($step)`. Grafast does not

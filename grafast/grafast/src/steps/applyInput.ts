@@ -315,7 +315,7 @@ export function assertModifier<TParent>(
   }
 }
 
-export type ApplyableExecutableStep<
+export type ApplyableStep<
   TArg extends object = any,
   TData = any,
 > = Step<TData> & {
@@ -324,6 +324,6 @@ export type ApplyableExecutableStep<
 
 export function isApplyableStep<TArg extends object = any, TData = any>(
   s: Step<TData>,
-): s is ApplyableExecutableStep<TArg, TData> {
+): s is ApplyableStep<TArg, TData> {
   return typeof (s as any).apply === "function";
 }
