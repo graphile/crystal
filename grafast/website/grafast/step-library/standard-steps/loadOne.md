@@ -276,7 +276,7 @@ A unary step is a step that only ever represents one value, e.g. simple derivati
 
 In addition to the forms seen in "Basic usage" above, you can pass an additional
 `shared` step to `loadOne`. This step must be a [**unary
-step**](../../step-classes.md#addunarydependency), meaning that it must
+step**](../../step-classes.mdx#addunarydependency), meaning that it must
 represent exactly one value across the entire request (not a batch of values
 like most steps), and is useful for representing values from the GraphQL context
 or from input values (arguments, variables, etc).

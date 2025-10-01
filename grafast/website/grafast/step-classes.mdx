@@ -2,6 +2,9 @@
 sidebar_position: 7
 ---
 
+import Mermaid from "@theme/Mermaid";
+import listItemPlan from "../examples/step-classes/listItem.mermaid?raw";
+
 # Step classes
 
 A step details a particular action or transform that needs to be performed when
@@ -550,7 +553,7 @@ from steps which don't adhere to these expectations.
 
 :::
 
-### apply()
+### apply
 
 ```ts
 apply($cb: Step<(parent: any) => any): void
@@ -566,7 +569,7 @@ action.
 
 For more information, see [handling complex inputs](./plan-resolvers/complex-inputs.md).
 
-### toTypename()
+### toTypename
 
 ```ts
 toTypename($step: Step): Step<string>
@@ -577,7 +580,7 @@ Enables a step to return a step resolving to the typename, used by the
 interface type does not implement the `planType` method. If not implemented,
 this default function will fall back to `get($step, '__typename')`.
 
-### toSpecifier()
+### toSpecifier
 
 ```ts
 toSpecifier($step: Step): Step
@@ -633,6 +636,38 @@ const Cat = new GraphQLObjectType({
 });
 ```
 
+### listItem
+
+```ts
+listItem($item: __ItemStep): Step
+```
+
+If your step represents a list, it may implement `.listItem()` to wrap the
+Grafast internal `__ItemStep` that represents items of this list in a more
+useful step for child [field plan resolvers](./plan-resolvers/index.mdx) to
+use.
+
+A step class that implements `.listItem()` is called a "list-capable step" (it
+implements `ListCapableStep`).
+
+#### Example
+
+Here our list capable step wraps the `__ItemStep` in a `MyListItemStep` to
+ensure that the child field plan resolvers have access to the methods they
+expect:
+
+```ts
+class MyListStep extends Step implements ListCapableStep {
+  listItem($item: __ItemStep): SingleItemFromMyListStep {
+    return myListItem($item);
+  }
+}
+```
+
+This might result in a plan diagram as such:
+
+<Mermaid chart={listItemPlan} />
+
 ## Built in methods
 
 Your custom step class will have access to all the built-in methods that come
@@ -659,6 +694,7 @@ class AddStep extends Step {
     this.addDependency($a); // Returns 0
     this.addDependency($b); // Returns 1
   }
+}
 ```
 
 :::danger Steps are ephemeral, never store a reference to a step.
