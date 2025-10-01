@@ -143,7 +143,8 @@ export function withFieldArgsForArguments<T extends Step>(
         );
       }
     },
-    getBaked(path: ReadonlyArray<string | number>) {
+    getBaked(inPath: string | ReadonlyArray<string | number>) {
+      const path = typeof inPath === "string" ? [inPath] : inPath;
       const $raw = this.getRaw(path);
       const inputType = this.typeAt(path);
       const $baked = bakedInput(inputType, $raw);

@@ -200,6 +200,7 @@ export type FieldArgs<TObj extends BaseGraphQLArguments = any> = {
   getRaw(
     path?: ReadonlyArray<string | number>,
   ): AnyInputStep | ObjectStep<{ [argName: string]: AnyInputStep }>;
+  getBaked<TKey extends keyof TObj & string>(path: TKey): Step;
   getBaked(path: ReadonlyArray<string | number>): Step;
   typeAt(path: keyof TObj & string): GraphQLInputType;
   typeAt(path: ReadonlyArray<string | number>): GraphQLInputType;
