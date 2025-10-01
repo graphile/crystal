@@ -132,6 +132,38 @@ apply(parent: PgCondition, value: ReadonlyArray<LogicalOperatorInput> | null) {
 }
 ```
 
+### Fan-out and fan-in
+
+When you **return** a new object for children to use, you’ve “fanned out”: each
+child field can add its own modifications in isolation. But what if you need to
+**fan back in** afterwards — e.g. gather all child conditions, combine them with
+`OR`, and _then_ apply that combined condition to the parent?
+
+That’s where **modifiers** come in.
+
+If the object you return extends the `Modifier` class, Grafast will track it
+during the apply process. After the entire input tree has been traversed,
+Grafast goes back through the collected modifiers in reverse order and calls
+their `apply()` methods. This gives you a final hook to push the combined
+results back up into the parent.
+
+```ts
+export abstract class Modifier<TParent> {
+  constructor(protected readonly parent: TParent) {
+    currentModifiers.push(this);
+  }
+
+  /**
+   * In this method, you should apply the changes to your `this.parent` plan
+   */
+  abstract apply(): void;
+}
+```
+
+Using a modifier makes the `OR` example cleaner: each child contributes its
+conditions to the modifier; once all entries are done, the modifier’s `apply()`
+method is called to add the combined `OR` clause to its parent.
+
 ### In a plan resolver
 
 `FieldArgs.apply()` is how you apply input arguments to a step:
@@ -166,8 +198,6 @@ step internally. You don’t normally call this directly, but you may see
 `applyScope` methods (experimental) can provide additional scope values to be
 passed through during applying — these live on input objects or enums at
 `extensions.grafast.applyScope`.
-
----
 
 ## Choosing between baking and applying
 
