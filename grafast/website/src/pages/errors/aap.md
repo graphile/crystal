@@ -30,23 +30,8 @@ function applyPlan($parent, $field, fieldArg, info) {
 }
 ```
 
-This uses [`applyInput()`](/grafast/step-library/standard-steps/applyInput)
-under the hood to "apply" input values to a parent step, and thus requires that
-`$target` implements the [apply()](/grafast/step-classes#apply) method. The
-code is roughly equivalent to:
-
-```ts
-function applyPlan($parent, $field, fieldArg, info) {
-  // [...]
-  // fieldArg.apply($target) is roughly equivalent to:
-  const argType = info.arg.type;
-  const $value = fieldArg.getRaw();
-  const $callback = applyInput(argType, $value);
-  $target.apply($callback);
-}
-```
-
-Note that applying inputs like this happens at runtime (rather than plantime)
-since the inputs could be variables and we don't want to fork the plans based
-on runtime values; thus the mechanics have changed a bit - please see the
-`applyInput()` documentation for more details.
+See [handling complex inputs](/grafast/plan-resolvers/complex-inputs) for
+details of how this works. Note that applying inputs like this happens at
+runtime (rather than plantime) since the inputs could be variables and we don't
+want to fork the plans based on runtime values; thus the mechanics have changed
+a bit.

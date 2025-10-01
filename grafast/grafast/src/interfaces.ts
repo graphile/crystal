@@ -42,7 +42,7 @@ import type { GrafastOperationOptions } from "./prepare.js";
 import type { Step } from "./step.js";
 import type { __InputDefaultStep } from "./steps/__inputDefault.js";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
-import type { ApplyableExecutableStep } from "./steps/applyInput.js";
+import type { ApplyableStep } from "./steps/applyInput.js";
 import type {
   __InputListStep,
   __InputObjectStep,
@@ -200,21 +200,23 @@ export type FieldArgs<TObj extends BaseGraphQLArguments = any> = {
   getRaw(
     path?: ReadonlyArray<string | number>,
   ): AnyInputStep | ObjectStep<{ [argName: string]: AnyInputStep }>;
+  getBaked<TKey extends keyof TObj & string>(path: TKey): Step;
+  getBaked(path: ReadonlyArray<string | number>): Step;
   typeAt(path: keyof TObj & string): GraphQLInputType;
   typeAt(path: ReadonlyArray<string | number>): GraphQLInputType;
   /** This also works (without path) to apply each list entry against $target */
   apply<TArg extends object>(
-    $target: ApplyableExecutableStep<TArg>,
+    $target: ApplyableStep<TArg>,
     path: keyof TObj & string,
     getTargetFromParent?: (parent: TArg, inputValue: any) => object | undefined,
   ): void;
   apply<TArg extends object>(
-    $target: ApplyableExecutableStep<TArg>,
+    $target: ApplyableStep<TArg>,
     path?: ReadonlyArray<string | number>,
     getTargetFromParent?: (parent: TArg, inputValue: any) => object | undefined,
   ): void;
   apply<TArg extends object>(
-    $target: ApplyableExecutableStep<TArg>,
+    $target: ApplyableStep<TArg>,
     getTargetFromParent: (parent: TArg, inputValue: any) => object | undefined,
     // TYPES: Really not sure why TypeScript requires this here?
     justTargetFromParent?: never,
@@ -246,12 +248,12 @@ export type FieldArg<TData = any> = {
   typeAt(path: string | ReadonlyArray<string | number>): GraphQLInputType;
   /** This also works (without path) to apply each list entry against $target */
   apply<TArg extends object>(
-    $target: ApplyableExecutableStep<TArg>,
+    $target: ApplyableStep<TArg>,
     path?: ReadonlyArray<string | number>,
     getTargetFromParent?: (parent: TArg, inputValue: any) => object | undefined,
   ): void;
   apply<TArg extends object>(
-    $target: ApplyableExecutableStep<TArg>,
+    $target: ApplyableStep<TArg>,
     getTargetFromParent: (parent: TArg, inputValue: any) => object | undefined,
     // TYPES: Really not sure why TypeScript requires this here?
     justTargetFromParent?: never,
@@ -303,12 +305,12 @@ export interface FieldInfo {
  * executions.
  */
 export type FieldPlanResolver<
-  TParentStep extends Step = Step,
+  TSourceStep extends Step = Step,
   TArgs extends BaseGraphQLArguments = any,
   TResultStep extends Step = Step,
 > = (
-  $parentPlan: TParentStep,
-  args: FieldArgs<TArgs>,
+  $source: TSourceStep,
+  fieldArgs: FieldArgs<TArgs>,
   info: FieldInfo,
 ) => TResultStep | null;
 
@@ -357,9 +359,9 @@ export type ArgumentApplyPlanResolver<
  * return an executable plan.
  */
 export type ScalarPlanResolver<
-  TParentStep extends Step = Step,
+  TSourceStep extends Step = Step,
   TResultStep extends Step = Step,
-> = ($parentPlan: TParentStep, info: { schema: GraphQLSchema }) => TResultStep;
+> = ($source: TSourceStep, info: { schema: GraphQLSchema }) => TResultStep;
 
 // TODO: is this still implemented?
 /**
@@ -394,13 +396,13 @@ export type EnumValueApplyResolver<TParent = any, TScope = any> = (
  * Basically GraphQLFieldConfig but with an easy to access `plan` method.
  */
 export type GrafastFieldConfig<
-  TParentStep extends Step,
+  TSourceStep extends Step,
   TArgs extends BaseGraphQLArguments = any,
   TFieldStep extends Step = any,
 > = Omit<GraphQLFieldConfig<any, any>, "args" | "type"> & {
   type: GraphQLOutputType;
-  plan?: FieldPlanResolver<TParentStep, TArgs, TFieldStep>;
-  subscribePlan?: FieldPlanResolver<TParentStep, TArgs, TFieldStep>;
+  plan?: FieldPlanResolver<TSourceStep, TArgs, TFieldStep>;
+  subscribePlan?: FieldPlanResolver<TSourceStep, TArgs, TFieldStep>;
   args?: GrafastFieldConfigArgumentMap;
 };
 
