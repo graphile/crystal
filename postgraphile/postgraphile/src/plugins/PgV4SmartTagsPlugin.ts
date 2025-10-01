@@ -290,6 +290,7 @@ function addBehaviorToTags(
   behavior: string,
   prepend = false,
 ): void {
+  if (behavior === "") return;
   if (Array.isArray(tags.behavior)) {
     if (prepend) {
       tags.behavior = [behavior, ...tags.behavior];
