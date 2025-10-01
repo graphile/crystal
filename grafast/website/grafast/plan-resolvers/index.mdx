@@ -29,11 +29,7 @@ representing them as steps to be populated at execution time for each request.
 type FieldPlanResolver = (
   $source: Step,
   fieldArgs: FieldArgs,
-  info: {
-    fieldName: string;
-    field: GraphQLField<any, any, any>;
-    schema: GraphQLSchema;
-  },
+  info: FieldInfo,
 ) => Step;
 ```
 
@@ -50,26 +46,130 @@ The plan resolver must return a step that represents the result of the field.
 
 ### Source step
 
-The first argument, the "source step," is a step that represents the data from
-the source that the field is being resolved against &mdash; i.e. the type that
-owns the field &mdash; which will have been returned directly or indirectly from
-a parent field (except in the case of the root selection set).
+The first argument, the `$source` step, is a step that represents the data from
+the object that the field is being resolved against (i.e. the GraphQL object
+type that owns the field). For the root selection set, the parent object is
+either represents the GraphQL `rootValue` or the subscription event. For all
+other selection sets the source object will be derived from the parent field:
 
-When the parent field is of an object type, the "source step" is simply the step
-that the parent field resolved to. When the parent field has a list or abstract
-type, the "source step" will be the resolved step that represents an entry from
-the list, or the concrete object type for abstract types.
+- for a list type, the "source step" will represent an item in this list
+- for an object type, the "source step" is the step the parent field returned
+- for an abstract type, the "source step" will be the resolved step representing
+  the matching concrete object type
 
-### Field arguments
+### FieldArgs
 
-The second argument, the "field arguments" (`fieldArgs`), is an object with
-access methods to read the arguments. We'll expand on that below in the
-[FieldArgs](#fieldargs) section; but the main point is that you can retrieve a
-step representing the value of an argument either using the `.getRaw(argName)`
-method, or by extracting the `.$argName` property (dollar prefix preventing
-clash with method names, and also indicating this is a step).
+```ts
+// Simplified type
+type FieldArgs = {
+  getRaw(path: string | ReadonlyArray<string | number>): Step;
+  // Shortcuts for getRaw for each argument:
+  [`$${string}`]: Step
 
-### Info
+  // -- Advanced features --
+  autoApply($target: Step): void;
+  apply(
+    $target: ApplyableStep,
+    path?: ReadonlyArray<string | number>,
+    getTargetFromParent?: (parent: any, inputValue: any) => object | undefined,
+  ): void;
+  getBaked(path: string | ReadonlyArray<string | number>): Step;
+};
+```
+
+The second argument, the "field arguments" (`fieldArgs`), is an object giving
+ways of interacting with the values passed as arguments to a field.
+
+#### Accessing argument values
+
+You can retrieve a step representing a field argument's value either via the
+matching `$`-prefixed property of the `fieldArgs` object, or via the `.getRaw()`
+method.
+
+Consider this schema:
+
+```graphql
+input BookFilter {
+  author: String
+  publishedAfter: Int
+}
+
+type Query {
+  bookCount(search: String, filter: BookFilter): Int!
+}
+```
+
+You can access the argument steps using the `$`-prefixed properties:
+
+```ts
+function bookCount($parent, fieldArgs) {
+  const { $search, $filter } = fieldArgs;
+  const { $author, $publishedAfter } = $filter;
+}
+```
+
+or, equivalently, via `.getRaw()`:
+
+```ts
+function bookCount($parent, fieldArgs) {
+  const $search = fieldArgs.getRaw("search");
+  const $filter = fieldArgs.getRaw("filter");
+  const $author = fieldArgs.getRaw(["filter", "author"]);
+  const $publishedAfter = fieldArgs.getRaw(["filter", "publishedAfter"]);
+}
+```
+
+#### Triggering auto-application early
+
+**ADVANCED**
+
+Arguments can have their own plan resolvers, see [argument plan
+resolvers](#argument-plan-resolvers) below. <Grafast /> will invoke these
+automatically once the field plan resolver returns, but if you want to wrap a
+field plan resolver with a higher order function, you might want all of the
+arguments to have already been applied before your wrapper plan's logic
+continues.
+
+You can trigger the auto-application early with the
+`fieldArgs.autoApply($target)` method:
+
+```ts
+const oldPlan = usersField.extensions.grafast.plan;
+usersField.extensions.grafast.plan = function ($source, fieldArgs, info) {
+  // Call the old plan method
+  const $target = oldPlan($source, fieldArgs, info);
+
+  // Perform the auto-application of arguments early:
+  fieldArgs.autoApply($target);
+
+  // Now do whatever logic we need to do:
+  if (!$target.getFirst()) {
+    $target.setFirst(constant(10));
+  }
+
+  return $target;
+};
+```
+
+#### Handling complex inputs
+
+**VERY ADVANCED**
+
+`.getBaked()` and `.apply()` are documented in the [Handling complex
+inputs](./complex-inputs.md) article - these are advanced features you're
+unlikely to need when writing your schema by hand, but they can be helpful
+when generating schemas automatically or if you have particularly complex
+input structures (advanced filters, ordering, pagination, etc).
+
+### FieldInfo
+
+```ts
+interface FieldInfo {
+  fieldName: string;
+  field: GraphQLField<any, any, any>;
+  schema: GraphQLSchema;
+}
+```
 
 The info object contains information about the context in which the plan
 resolver is called:
@@ -306,57 +406,14 @@ type what the step actually is, you can use `assertStep: ExecutableStep` or
 
 :::
 
-## FieldArgs
-
-The `FieldArgs` object gives ways of interacting with the values passed as
-arguments to a field.
-
-### Accessing argument values
-
-You can retrieve a step representing a field argument's value either via the
-matching `$`-prefixed property of the `fieldArgs` object, or via the `.getRaw()`
-method.
-
-Consider this schema:
-
-```graphql
-input BookFilter {
-  author: String
-  publishedAfter: Int
-}
-
-type Query {
-  bookCount(search: String, filter: BookFilter): Int!
-}
-```
-
-You can access using the `$`-prefixed properties:
-
-```ts
-function bookCount($parent, fieldArgs) {
-  const { $search, $filter } = fieldArgs;
-  const { $author, $publishedAfter } = $filter;
-}
-```
-
-Or, equivalently, via `.getRaw()`:
-
-```ts
-function bookCount($parent, fieldArgs) {
-  const $search = fieldArgs.getRaw("search");
-  const $filter = fieldArgs.getRaw("filter");
-  const $author = fieldArgs.getRaw(["filter", "author"]);
-  const $publishedAfter = fieldArgs.getRaw(["filter", "publishedAfter"]);
-}
-```
-
-### Argument plans
+## Argument plan resolvers
 
 :::info[Advanced]
 
 You wouldn't typically use this if you're writing your schema by hand, but it
 can be helpful if you're using automatic schema generation as it allows
-arguments to handle their own logic.
+arguments to handle their own logic without having to "wrap" the underlying
+field plan resolver.
 
 :::
 
@@ -412,69 +469,6 @@ runtime (i.e. will be `undefined`) then it may choose to skip calling the
 `applyPlan()` method for that argument.
 
 :::
-
-#### Triggering auto-application early
-
-**ADVANCED**
-
-If you want to wrap a plan resolver with a higher order function, you might want
-all of the arguments to have already been applied before your wrapper plan's
-logic continues. You can trigger the auto-application early with the
-`fieldArgs.autoApply($target)` method:
-
-```ts
-const oldPlan = usersField.extensions.grafast.plan;
-usersField.extensions.grafast.plan = function (...params) {
-  // Call the old plan method
-  const $target = oldPlan.apply(this, params);
-
-  // Perform the auto-application of arguments early:
-  const [_, fieldArgs] = params;
-  fieldArgs.autoApply($target);
-
-  // Now do whatever logic we need to do:
-  if (!$target.getFirst()) {
-    $target.setFirst(constant(10));
-  }
-
-  return $target;
-};
-```
-
-#### Applying deeper inputs
-
-**INCREDIBLY ADVANCED**
-
-Sometimes complex inputs make more sense as "commands" than "data" - take for
-example a complex `filter` argument to a field that pulls from an SQL database.
-Here you want to manipulate the query that would be sent to the DB, rather than
-just passing the data into the DB; and the changes to the query will be dynamic
-based on the user input.
-
-For this, we have the [applyInput()][./standard-steps/applyInput.md] step, but
-calling it can be a little verbose, so we give you a shortcut:
-
-```ts
-fieldArgs.apply($target, path, callback)
-```
-
-- `$target`: the "applyable" step (has a `.apply()` method) to target
-- `path`: the position in the input tree to start applying, e.g. `["condition"]`
-- `callback(target, inputValue)`: called at runtime with the target and the
-input value, either applies the inputValue to the target, or returns a new
-target for child fields to be applied to
-
-:::note[Reach out!]
-
-We recognize this is under-documented; if you actually need it for something
-then reach out via [the Discord](https://discord.gg/graphile) or file an issue
-and we can look at expanding it.
-
-:::
-
-<!-- TODO: document `typeAt` too. -->
-
-
 
 ## Execution order &amp; side effects
 
