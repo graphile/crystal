@@ -214,6 +214,13 @@ fieldArgs.apply($target, ["filter"], (requestBuilder, inputValue) => {
 
 ### Applyable steps
 
+```ts
+// Simplified types
+type ApplyableStep = Step & {
+  apply($cb: Step<(arg: any) => void>): void;
+};
+```
+
 For applying to work, the `$target` you pass to `fieldArgs.apply($target)` must
 be an **applyable step** — i.e. a step that supports input-driven modifications
 at runtime.
@@ -254,8 +261,10 @@ class MyRequestStep extends Step {
 
   async execute(details) {
     const { values, indexMap } = details;
-    const builder = new RequestBuilder();
-    // Populate your request builder with the things you already know
+    const builder = {
+      //...
+      // Populate your request builder with the things you already know
+    };
 
     // Apply the changes from all the `.apply($cb)` calls
     for (const applyDepId of this.applyDepIds) {
@@ -266,6 +275,76 @@ class MyRequestStep extends Step {
     // Execute the underlying request, and tie the results back
     const results = await builder.execute();
     return indexMap((batchIndex) => results.getResultForIndex(batchIndex));
+  }
+}
+```
+
+Here's an example demonstrating how to use `.apply()` to dynamically change the
+order of results from a database dynamically based on user input:
+
+```ts
+import { Step, ExecutionDetails, GrafastResultsList, Maybe } from "grafast";
+
+interface MyQueryBuilder {
+  orderBy(columnName: string, ascending?: boolean): void;
+}
+
+type Callback = (builder: MyQueryBuilder) => void;
+
+class MyQueryStep extends Step {
+  private applyDepIds: number[] = [];
+
+  // [...]
+  //   this.foreignKeyDepId = this.addDependency($fkey);
+  // [...]
+
+  // Handling `Step<Callback>` is enough for some use cases, but
+  // handling this combination is the most flexible.
+  apply($cb: Step<Maybe<Callback | ReadonlyArray<Callback>>>) {
+    this.applyDepIds.push(this.addUnaryDependency($cb));
+  }
+
+  async execute(
+    executionDetails: ExecutionDetails,
+  ): Promise<GrafastResultsList<Record<string, any>>> {
+    const { values, indexMap } = executionDetails;
+    const foreignKeyEV = values[this.foreignKeyDepId];
+
+    // Create a query builder to collect together the orderBy values
+    const orderBys: string[] = [];
+    const builder: MyQueryBuilder = {
+      orderBy(columnName, asc = true) {
+        orderBys.push(`${columnName} ${asc ? "ASC" : "DESC"}`);
+      },
+    };
+
+    // For each of the `apply()` callbacks, run it against the query builder
+    for (const applyDepId of this.applyDepIds) {
+      const callback = values[applyDepId].unaryValue();
+      if (Array.isArray(callback)) {
+        callback.forEach((cb) => cb(builder));
+      } else if (callback != null) {
+        callback(builder);
+      }
+    }
+
+    // Now we can use `orderBys` to build a query:
+    const query = `
+      select *
+      from my_table
+      where foreign_key = any($1)
+      order by ${orderBys}
+    `;
+
+    // Then we can fetch the data:
+    const allForeignKeys = indexMap((i) => foreignKeyEV.at(i));
+    const rows = await runQuery(query, [allForeignKeys]);
+
+    // And return the right data to go with each input value:
+    return indexMap((i) => {
+      const foreignKey = foreignKeyEV.at(i);
+      return rows.filter((r) => r.foreign_key === foreignKey);
+    });
   }
 }
 ```
