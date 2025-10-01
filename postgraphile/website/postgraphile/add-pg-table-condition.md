@@ -46,20 +46,18 @@ export default addPgTableCondition(
   { schemaName: "app_public", tableName: "forums" },
   "idIn",
   (build) => {
+    const { sql } = build;
+    const { sqlValueWithCodec, listOfCodec, TYPES } = build.dataplanPg;
     const { GraphQLList, GraphQLNonNull, GraphQLInt } = build.graphql;
     return {
       description: "Filters to records matching one of these ids",
       // This is graphql-js for `[Int!]`; assumes you're using
       // an integer primary key.
       type: new GraphQLList(new GraphQLNonNull(GraphQLInt)),
-      applyPlan(
-        $condition /* : PgConditionStep<PgSelectStep<any>> */,
-        value /* : FieldArgs */,
-      ) {
-        const $ids = value.get();
-        $condition.where(
-          sql`${$condition.alias}.id = ANY(${$condition.placeholder(
-            $ids,
+      apply(condition /* : PgCondition */, ids) {
+        condition.where(
+          sql`${condition.alias}.id = ANY(${sqlValueWithCodec(
+            ids,
             listOfCodec(TYPES.int),
           )})`,
         );
@@ -84,24 +82,20 @@ export default addPgTableCondition(
   "containsPostsByUserId",
   (build) => {
     const { sql } = build;
+    const { sqlValueWithCodec, TYPES } = build.dataplanPg;
+    const { GraphQLInt } = build.graphql;
     return {
       description:
         "Filters the list of forums to only those which " +
         "contain posts written by the specified user.",
-      type: build.graphql.GraphQLInt,
-      applyPlan(
-        $condition /* : PgConditionStep<PgSelectStep<any>> */,
-        value /* : FieldArgs */,
-      ) {
+      type: GraphQLInt,
+      apply(condition /* : PgCondition */, userId) {
         const sqlIdentifier = sql.identifier(Symbol("postsByUser"));
-        $condition.where(sql`exists(
+        condition.where(sql`exists(
           select 1
           from app_public.posts as ${sqlIdentifier}
-          where ${sqlIdentifier}.forum_id = ${$condition.alias}.id
-          and ${sqlIdentifier}.user_id = ${$condition.placeholder(
-            value.get(),
-            TYPES.int,
-          )}
+          where ${sqlIdentifier}.forum_id = ${condition.alias}.id
+          and ${sqlIdentifier}.user_id = ${sqlValueWithCodec(userId, TYPES.int)}
         )`);
       },
     };
@@ -125,7 +119,7 @@ query ForumsContainingPostsByUser1 {
 
 :::tip
 
-`$condition.alias` represents the `app_public.forums` table in the example
+`condition.alias` represents the `app_public.forums` table in the example
 above (i.e. the schemaName.tableName table); if you don’t use it in your
 implementation then there’s a good chance your plugin is incorrect.
 
@@ -202,10 +196,10 @@ A new condition is added, named `conditionFieldName`, whose GraphQL
 representation is specified by the result of `fieldSpecGenerator`.
 
 Also inside `fieldSpecGenerator` should be an `applyPlan`, which indicates how
-this condition should work. It is passed two arguments, the `$condition` (which
+this condition should work. It is passed two arguments, the `condition` (which
 is a `PgConditionStep` wrapping the `PgSelectStep` that we’re applying
 conditions to) and the `value` (which is a `FieldArgs` instance representing
-the value of the field). The `applyPlan` should use `$conditon.where(...)` to
+the value of the field). The `applyPlan` should use `conditon.where(...)` to
 apply a condition to the fetch.
 
 When the field named in `conditionFieldName` is used in a query, the
