@@ -49,7 +49,7 @@ The plan resolver must return a step that represents the result of the field.
 The first argument, the `$source` step, is a step that represents the data from
 the object that the field is being resolved against (i.e. the GraphQL object
 type that owns the field). For the root selection set, the parent object is
-either represents the GraphQL `rootValue` or the subscription event. For all
+represents either the GraphQL `rootValue` or the subscription event. For all
 other selection sets the source object will be derived from the parent field:
 
 - for a list type, the "source step" will represent an item in this list
