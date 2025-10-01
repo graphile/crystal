@@ -1,30 +1,17 @@
 %%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
 flowchart TD
+  classDef plan fill:#fff,stroke-width:1px,color:#000
+  classDef itemplan fill:#fff,stroke-width:2px,color:#000
 
-    classDef plan fill:#fff,stroke-width:1px,color:#000
-    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+  %% plan dependencies
+  MyList[["MyList[10∈0]"]]:::plan
+  __Item14[/"__Item[14∈1]<br />ᐸ10ᐳ"\]:::itemplan
+  MyListItem["MyListItem[16∈1]"]:::plan
+  MyList ==> __Item14
+  __Item14 --> MyListItem
 
-
-    %% plan dependencies
-
-
-    GetMyList[["GetMyList[10∈0] <br />ᐸfriendshipsByUserIdᐳ"]]:::plan
- 
-    __Item14[/"__Item[14∈1]<br />ᐸ10ᐳ"\]:::itemplan
-
-    SingleItem["SingleItemFromMyList[16∈1]<br />ᐸoneFriendOfUserᐳ"]:::plan
-
-
-
-    GetMyList ==> __Item14
-
-    __Item14 --> SingleItem
-
-   
-    %% buckets 
-    classDef bucket0 stroke:#696969
-    class GetMyList bucket0
-
-    classDef bucket1 stroke:#00bfff
-    class __Item14,SingleItem bucket1
-
+  %% buckets 
+  classDef bucket0 stroke:#696969
+  class MyList bucket0
+  classDef bucket1 stroke:#00bfff
+  class __Item14,MyListItem bucket1
