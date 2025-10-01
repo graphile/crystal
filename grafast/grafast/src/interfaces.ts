@@ -303,12 +303,12 @@ export interface FieldInfo {
  * executions.
  */
 export type FieldPlanResolver<
-  TParentStep extends Step = Step,
+  TSourceStep extends Step = Step,
   TArgs extends BaseGraphQLArguments = any,
   TResultStep extends Step = Step,
 > = (
-  $parentPlan: TParentStep,
-  args: FieldArgs<TArgs>,
+  $source: TSourceStep,
+  fieldArgs: FieldArgs<TArgs>,
   info: FieldInfo,
 ) => TResultStep | null;
 
@@ -357,9 +357,9 @@ export type ArgumentApplyPlanResolver<
  * return an executable plan.
  */
 export type ScalarPlanResolver<
-  TParentStep extends Step = Step,
+  TSourceStep extends Step = Step,
   TResultStep extends Step = Step,
-> = ($parentPlan: TParentStep, info: { schema: GraphQLSchema }) => TResultStep;
+> = ($source: TSourceStep, info: { schema: GraphQLSchema }) => TResultStep;
 
 // TODO: is this still implemented?
 /**
@@ -394,13 +394,13 @@ export type EnumValueApplyResolver<TParent = any, TScope = any> = (
  * Basically GraphQLFieldConfig but with an easy to access `plan` method.
  */
 export type GrafastFieldConfig<
-  TParentStep extends Step,
+  TSourceStep extends Step,
   TArgs extends BaseGraphQLArguments = any,
   TFieldStep extends Step = any,
 > = Omit<GraphQLFieldConfig<any, any>, "args" | "type"> & {
   type: GraphQLOutputType;
-  plan?: FieldPlanResolver<TParentStep, TArgs, TFieldStep>;
-  subscribePlan?: FieldPlanResolver<TParentStep, TArgs, TFieldStep>;
+  plan?: FieldPlanResolver<TSourceStep, TArgs, TFieldStep>;
+  subscribePlan?: FieldPlanResolver<TSourceStep, TArgs, TFieldStep>;
   args?: GrafastFieldConfigArgumentMap;
 };
 
