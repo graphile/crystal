@@ -140,7 +140,7 @@ import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 
 // More presets you might want to mix in
 import { makeV4Preset } from "postgraphile/presets/v4";
-import { PgRelayPreset } from "postgraphile/presets/relay";
+import { PostGraphileRelayPreset } from "postgraphile/presets/relay";
 
 // Use the 'pg' module to connect to the database
 import { makePgService } from "postgraphile/adaptors/pg";
@@ -159,7 +159,8 @@ const preset: GraphileConfig.Preset = {
       graphiql: true,
       graphiqlRoute: "/",
     }),
-    PgRelayPreset,
+    // Uncomment this to opt into a smaller Relay-focussed schema
+    //PostGraphileRelayPreset,
   ],
 
   plugins: [
