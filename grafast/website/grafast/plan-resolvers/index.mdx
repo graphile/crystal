@@ -319,7 +319,71 @@ export const schema = makeGrafastSchema({
 });
 ```
 
-### Asserting an object type's step
+## Argument plan resolvers
+
+:::info[Advanced]
+
+You wouldn't typically use this if you're writing your schema by hand, but it
+can be helpful if you're using automatic schema generation as it allows
+arguments to handle their own logic without having to "wrap" the underlying
+field plan resolver.
+
+:::
+
+Sometimes rather than fetching and using the raw argument value directly, you
+want to apply the argument to your field plan. This allows you to keep your
+argument logic separate from your field plan logic. For this, your argument
+would have an `applyPlan` method defined on it:
+
+```ts
+const schema = makeGrafastSchema({
+  typeDefs: /* GraphQL */ `
+    type Query {
+      users(first: Int, offset: Int): [User!]!
+    }
+  `,
+  objects: {
+    Query: {
+      plans: {
+        users: {
+          // The (simple) plan for the field
+          plan($query, fieldArgs) {
+            const $allUsers = users.find();
+            return $allUsers;
+          },
+          // These become `applyPlan` methods on the arguments:
+          args: {
+            // $target will be the return result of the field plan, i.e.
+            // `$allUsers` above
+            first($query, $target, val) {
+              const $first = val.getRaw();
+              $target.setFirst($first);
+            },
+            offset($query, $target, val) {
+              const $offset = val.getRaw();
+              $target.setOffset($offset);
+            },
+          },
+        },
+      },
+    },
+  },
+});
+```
+
+Grafast will automatically call each of the arguments' plans once the field plan
+resolver has returned, passing the step yielded from the field plan as the
+`$target` for the arguments.
+
+:::info[Optimization: may be skipped in some circumstances]
+
+If Grafast can determine statically that your argument will not be passed at
+runtime (i.e. will be `undefined`) then it may choose to skip calling the
+`applyPlan()` method for that argument.
+
+:::
+
+## Asserting an object type's step
 
 Object types in <Grafast /> can indicate that they must be represented by a
 particular step or set of steps to guarantee that the methods on those steps
@@ -406,69 +470,6 @@ type what the step actually is, you can use `assertStep: ExecutableStep` or
 
 :::
 
-## Argument plan resolvers
-
-:::info[Advanced]
-
-You wouldn't typically use this if you're writing your schema by hand, but it
-can be helpful if you're using automatic schema generation as it allows
-arguments to handle their own logic without having to "wrap" the underlying
-field plan resolver.
-
-:::
-
-Sometimes rather than fetching and using the raw argument value directly, you
-want to apply the argument to your field plan. This allows you to keep your
-argument logic separate from your field plan logic. For this, your argument
-would have an `applyPlan` method defined on it:
-
-```ts
-const schema = makeGrafastSchema({
-  typeDefs: /* GraphQL */ `
-    type Query {
-      users(first: Int, offset: Int): [User!]!
-    }
-  `,
-  objects: {
-    Query: {
-      plans: {
-        users: {
-          // The (simple) plan for the field
-          plan($query, fieldArgs) {
-            const $allUsers = users.find();
-            return $allUsers;
-          },
-          // These become `applyPlan` methods on the arguments:
-          args: {
-            // $target will be the return result of the field plan, i.e.
-            // `$allUsers` above
-            first($query, $target, val) {
-              const $first = val.getRaw();
-              $target.setFirst($first);
-            },
-            offset($query, $target, val) {
-              const $offset = val.getRaw();
-              $target.setOffset($offset);
-            },
-          },
-        },
-      },
-    },
-  },
-});
-```
-
-Grafast will automatically call each of the arguments' plans once the field plan
-resolver has returned, passing the step yielded from the field plan as the
-`$target` for the arguments.
-
-:::info[Optimization: may be skipped in some circumstances]
-
-If Grafast can determine statically that your argument will not be passed at
-runtime (i.e. will be `undefined`) then it may choose to skip calling the
-`applyPlan()` method for that argument.
-
-:::
 
 ## Execution order &amp; side effects
 
