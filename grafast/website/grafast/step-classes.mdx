@@ -1,6 +1,8 @@
 ---
 sidebar_position: 7
 ---
+import Mermaid from "@theme/Mermaid";
+import listItemPlan from "../examples/step-classes/listItem.mermaid?raw";
 
 # Step classes
 
@@ -676,6 +678,27 @@ const Cat = new GraphQLObjectType({
 });
 ```
 
+### listItem
+
+Implemented by `ListCapableStep` allowing list steps to create a per element step. 
+During planning, Grafast constructs a  `__ItemStep` for a list field and, if the parent step is list‑capable, calls `listItem` to obtain the per‑element step that descendants plan against.
+
+```ts 
+class GetMyListStep extends Step implements ListCapableStep {
+
+  listItem(itemPlan: __ItemStep): SingleItemFromMyListStep{
+    ...
+    return singleItemFromMyListStep
+  }
+
+}
+```
+Resulting in a plan diagram as such:
+<Mermaid chart={listItemPlan} />
+
+Useful for changing the items interface without the need for getting the `__ItemSteps` dependency. 
+
+
 ## Built in methods
 
 Your custom step class will have access to all the built-in methods that come
@@ -702,6 +725,7 @@ class AddStep extends Step {
     this.addDependency($a); // Returns 0
     this.addDependency($b); // Returns 1
   }
+}
 ```
 
 :::danger Steps are ephemeral, never store a reference to a step.
@@ -915,3 +939,4 @@ value caching, you may want to look at them for more inspiration.
 [plan resolvers]: ./plan-resolvers
 [getting started]: ./getting-started
 [standard steps]: ./step-library/standard-steps/index.mdx
+
