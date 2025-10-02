@@ -37,9 +37,11 @@ import { sql } from "pg-sql2";
 const query1 = sql`LIMIT ${sql.literal(50)}`;
 console.log(sql.compile(query1).text);
 // LIMIT 50
+```
 
-const query2 = sql`WHERE active = ${sql.literal(true)}`;
-console.log(sql.compile(query2).text);
+```js
+const query = sql`WHERE active = ${sql.literal(true)}`;
+console.log(sql.compile(query).text);
 // WHERE active = TRUE
 ```
 
