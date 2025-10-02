@@ -45,7 +45,9 @@ const query = sql`WHERE ${sql.join(conditions, " AND ")}`;
 
 console.log(sql.compile(query).text);
 // WHERE age > 18 AND status = 'active'
+```
 
+```js
 // Column lists
 const columns = ["name", "email", "age"];
 const query = sql`SELECT ${sql.join(
@@ -55,7 +57,9 @@ const query = sql`SELECT ${sql.join(
 
 console.log(sql.compile(query).text);
 // SELECT "name", "email", "age" FROM users
+```
 
+```js
 // JSON objects
 const fields = ["name", "email"];
 const query = sql`json_build_object(${sql.join(

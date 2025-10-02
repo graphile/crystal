@@ -34,9 +34,16 @@ Returns a `SQL` fragment with the value embedded directly in the SQL text.
 import { sql } from "pg-sql2";
 
 // Constants - more efficient than sql.value()
-sql`LIMIT ${sql.literal(50)}`; // -> LIMIT 50
-sql`WHERE active = ${sql.literal(true)}`; // -> WHERE active = TRUE
+const query1 = sql`LIMIT ${sql.literal(50)}`;
+console.log(sql.compile(query1).text);
+// LIMIT 50
 
+const query2 = sql`WHERE active = ${sql.literal(true)}`;
+console.log(sql.compile(query2).text);
+// WHERE active = TRUE
+```
+
+```js
 // JSON object keys
 const fields = ["name", "email"];
 const sqlTuples = fields.map(

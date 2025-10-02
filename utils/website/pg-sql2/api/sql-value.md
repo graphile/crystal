@@ -132,6 +132,8 @@ Values are completely isolated from the SQL text, preventing injection.
 Since values are passed through as-is, you can use symbols to represent values that will be provided later.
 
 ```js
+import { sql } from "pg-sql2";
+
 const organizationId = 10;
 const $$username = Symbol("username");
 const query = sql`
@@ -147,5 +149,10 @@ const values = valuesIncludingSymbols.map((v) =>
   v === $$username ? "benjie" : v,
 );
 
-const results = await pgClient.query({ text, values });
+import { Pool } from "pg";
+const pool = new Pool();
+const result = await pool.query({ text, values });
+
+console.dir(result.rows);
+// [{ id: 1, organization_id: 10, username: 'benjie' }]
 ```
