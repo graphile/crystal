@@ -82,11 +82,25 @@ into 4 main categories based on the root folders, each of which have a
 - Add or adjust comments, JSDoc/TSDoc, README snippets.
 - Suggest CI/test commands **in prose**; do not execute them.
 
-## Preferred Patch Style
+## Preferred Style
 
 - Follow current formatting/lint rules; **do not** add style-only churn.
 - Keep code samples runnable in principle; **do not** add scripts to run them.
 - Wrap prose at 80 characters.
+
+When writing Grafast plan resolvers in documentation, try and only do one action
+per statement; for example instead of:
+
+```ts
+const $invoices = loadMany($customer.get("stripeId"), invoicesByStripId);
+```
+
+prefer:
+
+```ts
+const $stripeId = $customer.get("stripeId");
+const $invoices = loadMany($stripeId, invoicesByStripId);
+```
 
 ## Testing Rules
 
