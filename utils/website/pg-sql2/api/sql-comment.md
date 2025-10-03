@@ -3,15 +3,17 @@ sidebar_position: 10
 title: "sql.comment()"
 ---
 
-# `sql.comment(text, always)`
+# `sql.comment(text, include)`
 
 Creates an SQL comment fragment that can be embedded in queries. Comments are
 useful for documenting query logic, adding debugging information, or providing
 context for complex operations.
 
 Comments are ignored during SQL execution by default but
-can be valuable for debugging and maintenance; comments only appear when
-[`GRAPHILE_ENV=development`](../development-mode.md) is set or if `always` is `true`.
+can be valuable for debugging and maintenance. By default, comments only appear when
+[`GRAPHILE_ENV=development`](../development-mode.md) is set, but you can force
+them to appear by setting `include` to `true` (or force them to be hidden via
+`include` set to `false`).
 
 :::warning[Do not include user-generated content!]
 
@@ -24,12 +26,13 @@ vulnerable SQL.
 ## Syntax
 
 ```typescript
-sql.comment(text: string, always: true): SQL
+sql.comment(text: string, include?: boolean): SQL
 ```
 
 ## Parameters
 
 - `text` - The comment text to include
+- `include` - Optional boolean to force inclusion (`true`) or exclusion (`false`) of the comment regardless of environment. Defaults to `undefined`, which means comments are included only in development mode.
 
 ## Return value
 

@@ -33,7 +33,7 @@ const isDev =
   (process.env.GRAPHILE_ENV === "development" ||
     process.env.GRAPHILE_ENV === "test");
 
-const alwaysIncludeComments =
+const defaultIncludeComments =
   isDev || (typeof process !== "undefined" && process.env.PGSQL2_DEBUG === "1");
 
 const nodeInspect: CustomInspectFunction = function (
@@ -1101,9 +1101,9 @@ export function placeholder(symbol: symbol, fallback?: SQL): SQL {
 
 export function comment(
   text: string,
-  always = false,
+  include = defaultIncludeComments,
 ): SQLCommentNode | SQLRawNode {
-  if (always || alwaysIncludeComments) {
+  if (include) {
     return makeCommentNode(text);
   } else {
     return sql.blank;
