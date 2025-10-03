@@ -859,8 +859,7 @@ const spec_uniqueForeignKey = {
       notNull: false,
       hasDefault: false,
       extensions: {
-        tags: {},
-        isIndexed: false
+        tags: {}
       }
     }
   },
@@ -1067,8 +1066,7 @@ const compoundKeyCodec = recordCodec({
       notNull: true,
       hasDefault: false,
       extensions: {
-        tags: {},
-        isIndexed: false
+        tags: {}
       }
     },
     person_id_1: {
@@ -9613,8 +9611,7 @@ const registry = makeRegistry({
         extensions: {
           tags: {
             behavior: []
-          },
-          isIndexed: false
+          }
         }
       }
     },
@@ -13350,6 +13347,35 @@ type Person implements Node {
     """The method to use when ordering \`CompoundKey\`."""
     orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
   ): CompoundKeysConnection!
+
+  """Reads and enables pagination through a set of \`CompoundKey\`."""
+  compoundKeysByPersonId2(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: CompoundKeyCondition
+
+    """The method to use when ordering \`CompoundKey\`."""
+    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
+  ): CompoundKeysConnection!
 }
 
 type PersonComputedOutOutRecord {
@@ -14046,6 +14072,9 @@ A condition to be used against \`CompoundKey\` object types. All fields are test
 for equality and combined with a logical ‘and.’
 """
 input CompoundKeyCondition {
+  """Checks for equality with the object’s \`personId2\` field."""
+  personId2: Int
+
   """Checks for equality with the object’s \`personId1\` field."""
   personId1: Int
 }
@@ -14055,6 +14084,8 @@ enum CompoundKeysOrderBy {
   NATURAL
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
+  PERSON_ID_2_ASC
+  PERSON_ID_2_DESC
   PERSON_ID_1_ASC
   PERSON_ID_1_DESC
 }
@@ -28627,6 +28658,39 @@ export const objects = {
           }
         }
       },
+      compoundKeysByPersonId2: {
+        plan($record) {
+          const $records = resource_compound_keyPgResource.find({
+            person_id_2: $record.get("id")
+          });
+          return connection($records);
+        },
+        args: {
+          first(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          },
+          last(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          },
+          offset(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          },
+          before(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          },
+          after(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          },
+          condition(_condition, $connection, arg) {
+            const $select = $connection.getSubplan();
+            arg.apply($select, qbWhereBuilder);
+          },
+          orderBy(parent, $connection, value) {
+            const $select = $connection.getSubplan();
+            value.apply($select);
+          }
+        }
+      },
       computedComplex($in, args, _info) {
         const {
           selectArgs
@@ -30083,6 +30147,15 @@ export const inputObjects = {
         $condition.where({
           type: "attribute",
           attribute: "person_id_1",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
+          }
+        });
+      },
+      personId2($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "person_id_2",
           callback(expression) {
             return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.int)}`;
           }
@@ -34090,6 +34163,18 @@ export const enums = {
           direction: "DESC"
         });
         queryBuilder.setOrderIsUnique();
+      },
+      PERSON_ID_2_ASC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "person_id_2",
+          direction: "ASC"
+        });
+      },
+      PERSON_ID_2_DESC(queryBuilder) {
+        queryBuilder.orderBy({
+          attribute: "person_id_2",
+          direction: "DESC"
+        });
       },
       PRIMARY_KEY_ASC(queryBuilder) {
         compound_keyUniques[0].attributes.forEach(attributeName => {
