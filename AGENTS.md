@@ -1,16 +1,17 @@
 # AGENTS.md
 
 **Audience:** code assistants (Aider, Cody, Copilot Chat, etc.) working on this
-repository.  
-**Mode:** read-only + patch-only. No command execution.
+repository.
 
 ## Goals
 
-- Generate **patches/PRs** for:
-  - Tests and test coverage improvements.
-  - Documentation updates and migrations.
-  - Small, mechanical refactors (safe, localised).
+- Improve documentation. Be concice, clear, and accurate. Reflect nuances via
+  admonitions where appropriate. Only make essential changes, avoid stylistic
+  changes.
 - Spot mistakes in the docs where they do not correctly reflect the code.
+- When refactoring, keep changes to a minimum. For larger edits do the changes
+  in stages; for example: reorder the code first, get that committed by the
+  user, then edit the functionality.
 
 ## Repository Overview
 
@@ -55,11 +56,18 @@ into 4 main categories based on the root folders, each of which have a
 
 ## Hard Guardrails (must follow)
 
-1. **Never edit versioned docs:** files under: `*/website/versioned_docs/**` are
+1. **Never install dependencies**.
+1. **Never edit `package.json`** files unless specifically instructed.
+1. **Never edit versioned docs:** files under `*/website/versioned_docs/**` are
    snapshots taken at release time. Edit the source (unversioned) doc instead.
-2. **No shell commands.** The user already runs compilation and websites in
-   watch mode, and will run any other commands themself.
-3. **Keep scope tight.**
+1. **Avoid shell commands unless necessary.**
+   - The user already runs compilation and websites in watch mode.
+   - The user would rather commit, rebase, and change branches themself - do not
+     do this for them.
+   - The user would generally rather that you don't run your own commands, but
+     you may do so if it is necessary to apply your automated changes to
+     code/docs.
+1. **Keep scope tight.**
    - Prefer many small PRs over one large PR.
    - Avoid large refactors without an issue/plan.
    - Avoid stylistic rewrites without functional gain.
@@ -68,7 +76,7 @@ into 4 main categories based on the root folders, each of which have a
 
 ## Allowed Actions
 
-- Read files and propose edits.
+- Read files and make changes to markdown, TypeScript, and `*.test.*` files.
 - Write tests; update fixtures and test helpers.
 - Update docs (typically under the `<category>/website` folder).
 - Add or adjust comments, JSDoc/TSDoc, README snippets.
