@@ -280,7 +280,9 @@ function processOmit(
     processOmit(omit);
   }
 
-  addBehaviorToTags(tags, behavior.join(" "), true);
+  if (behavior.length > 0) {
+    addBehaviorToTags(tags, behavior.join(" "), true);
+  }
 }
 
 function addBehaviorToTags(
@@ -288,6 +290,7 @@ function addBehaviorToTags(
   behavior: string,
   prepend = false,
 ): void {
+  if (behavior === "") return;
   if (Array.isArray(tags.behavior)) {
     if (prepend) {
       tags.behavior = [behavior, ...tags.behavior];

@@ -7,13 +7,6 @@ import type {
 import * as graphql from "graphql";
 
 import type { OperationPlan } from "./engine/OperationPlan.js";
-import {
-  __InputObjectStep,
-  __TrackedValueStep,
-  applyInput,
-  ConstantStep,
-  object,
-} from "./index.js";
 import { inspect } from "./inspect.js";
 import type {
   AnyInputStep,
@@ -22,7 +15,13 @@ import type {
   TrackedArguments,
 } from "./interfaces.js";
 import type { Step } from "./step.js";
+import { __InputObjectStep } from "./steps/__inputObject.js";
 import type { __ItemStep } from "./steps/__item.js";
+import { __TrackedValueStep } from "./steps/__trackedValue.js";
+import { applyInput } from "./steps/applyInput.js";
+import { bakedInput } from "./steps/bakedInput.js";
+import { ConstantStep } from "./steps/constant.js";
+import { object } from "./steps/object.js";
 import { assertNotPromise } from "./utils.js";
 
 const { getNullableType, isInputObjectType, isListType } = graphql;
@@ -143,6 +142,13 @@ export function withFieldArgsForArguments<T extends Step>(
           )}`,
         );
       }
+    },
+    getBaked(inPath: string | ReadonlyArray<string | number>) {
+      const path = typeof inPath === "string" ? [inPath] : inPath;
+      const $raw = this.getRaw(path);
+      const inputType = this.typeAt(path);
+      const $baked = bakedInput(inputType, $raw);
+      return $baked;
     },
     autoApply($target) {
       if (!autoApplyDisabled) {

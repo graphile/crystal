@@ -56,17 +56,13 @@ export const PgIndexBehaviorsPlugin: GraphileConfig.Plugin = {
             if (cols.length < referencedAttributes.length) {
               return false;
             }
-            const firstColNames = cols
-              .slice(0, referencedAttributes.length)
-              .map((k) => k?.attname);
+            const firstColNames = cols.map((k) => k?.attname);
             return referencedAttributes.every((key) =>
               firstColNames.includes(key),
             );
           });
           if (!isIndexed) {
-            if (!relation.extensions) {
-              relation.extensions = Object.create(null);
-            }
+            relation.extensions ??= Object.create(null);
             relation.extensions!.isIndexed = false;
           }
         }
@@ -86,12 +82,14 @@ export const PgIndexBehaviorsPlugin: GraphileConfig.Plugin = {
             return false;
           }
           const keys = idx.getKeys();
-          return keys[0]?.attname === pgAttribute.attname;
+          // From PG18, Postgres can use indexes even if the column is not the
+          // first one in the index.
+          return keys.some(
+            (k) => k != null && k.attname === pgAttribute.attname,
+          );
         });
         if (!isIndexed) {
-          if (!attribute.extensions) {
-            attribute.extensions = Object.create(null);
-          }
+          attribute.extensions ??= Object.create(null);
           attribute.extensions!.isIndexed = false;
         }
       },

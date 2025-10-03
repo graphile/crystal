@@ -10,7 +10,7 @@ by wrapping the plans than you ever could by wrapping resolvers — not only doe
 it allow you to affect the data that's returned, it also allows you to change
 the very plan of what will be done!
 
-`makeWrapPlansPlugin` is the new plugin generator that replaces
+`wrapPlans` is the new plugin generator that replaces
 `makeWrapResolversPlugin`. It has a similar API, but it's somewhat simplified:
 
 - No need for `requires` any more, since you can use the methods on steps to get
@@ -34,7 +34,7 @@ even have to have the column in your GraphQL schema in order to set it any more!
 :sweat_smile:
 
 ```js
-makeWrapPlansPlugin({
+wrapPlans({
   Mutation: {
     // This same pattern works for 'update' mutations too
     createPost(plan, $source, { $firstName, $lastName }) {
@@ -72,9 +72,9 @@ want to throw an error before the mutation takes place we can do so like this:
 
 ```js
 import { sideEffect, context } from "postgraphile/grafast";
-import { makeWrapPlansPlugin } from "postgraphile/utils";
+import { wrapPlans } from "postgraphile/utils";
 
-const plugin = makeWrapPlansPlugin({
+const plugin = wrapPlans({
   Mutation: {
     createUser(plan) {
       // Extract the 'isAdmin' property from the GraphQL context
@@ -109,7 +109,7 @@ other users to be able to see someone's email address; so you could mask it out
 with a field plan wrapper:
 
 ```js
-const plugin = makeWrapPlansPlugin({
+const plugin = wrapPlans({
   User: {
     email(plan, $user, args, info) {
       // Get 'userId' from the GraphQL context

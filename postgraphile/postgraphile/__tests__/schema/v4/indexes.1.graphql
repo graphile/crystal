@@ -410,6 +410,9 @@ for equality and combined with a logical ‘and.’
 input CompoundKeyCondition {
   """Checks for equality with the object’s `personId1` field."""
   personId1: Int
+
+  """Checks for equality with the object’s `personId2` field."""
+  personId2: Int
 }
 
 """An input for mutations affecting `CompoundKey`"""
@@ -459,6 +462,8 @@ enum CompoundKeysOrderBy {
   NATURAL
   PERSON_ID_1_ASC
   PERSON_ID_1_DESC
+  PERSON_ID_2_ASC
+  PERSON_ID_2_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
 }
@@ -5877,6 +5882,35 @@ type Person implements Node {
 
   """Reads and enables pagination through a set of `CompoundKey`."""
   compoundKeysByPersonId1(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: CompoundKeyCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `CompoundKey`."""
+    orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
+  ): CompoundKeysConnection!
+
+  """Reads and enables pagination through a set of `CompoundKey`."""
+  compoundKeysByPersonId2(
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 

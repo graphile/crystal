@@ -6,7 +6,8 @@ sidebar_position: 1
 
 Create highly dynamic SQL in a powerful and flexible manner without opening yourself to SQL injection attacks.
 
-This library is highly optimized for performance - we've put enormous effort into making it as fast as possible. While doing nothing is always faster than doing something, pg-sql2's performance is excellent and suitable for high-throughput applications.
+A key aim of this library is to be very fast, if you think you can improve performance further please open a PR!
+That said, doing nothing is always faster than doing something, so do consider caching where it makes sense.
 
 ## Usage
 

@@ -12,11 +12,6 @@ import type {
   PgSelectQueryBuilder,
   PgSelectSingleStep,
 } from "@dataplan/pg";
-import {
-  pgSelectFromRecords,
-  pgSelectSingleFromRecord,
-  sqlValueWithCodec,
-} from "@dataplan/pg";
 import type {
   GrafastFieldConfig,
   InputObjectFieldApplyResolver,
@@ -116,7 +111,11 @@ function processAttribute(
   overrideName?: string,
   isNotNull?: boolean,
 ): void {
-  const { extend, inflection } = build;
+  const {
+    extend,
+    inflection,
+    dataplanPg: { pgSelectFromRecords, pgSelectSingleFromRecord },
+  } = build;
 
   const {
     scope: { pgCodec: rawPgCodec },
@@ -515,6 +514,7 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
           inflection,
           sql,
           graphql: { isInputType },
+          dataplanPg: { sqlValueWithCodec },
         } = build;
         const {
           scope: {

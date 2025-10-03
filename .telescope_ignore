@@ -17,6 +17,7 @@ postgraphile/postgraphile/__tests__/.*%.mermaid
 postgraphile/postgraphile/__tests__/.*%.export%.mjs
 .*/__tests__/.*%.json5
 .*/__tests__/.*%.snap
+.*/fwd/.*
 
 # If you only want source files
 # [a-z-]+/[a-z-]+/_*tests_*/.*

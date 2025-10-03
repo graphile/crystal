@@ -665,7 +665,7 @@ user into the database and also sends them an email:
 ```ts
 import { extendSchema } from "postgraphile/utils";
 import { access, constant, object } from "postgraphile/grafast";
-import { withPgClientTransaction } from "postgraphile/@dataplan/pg";
+import { sideEffectWithPgClientTransaction } from "postgraphile/@dataplan/pg";
 
 export const MyRegisterUserMutationPlugin = extendSchema((build) => {
   const { sql, pgResources } = build;
@@ -696,7 +696,7 @@ export const MyRegisterUserMutationPlugin = extendSchema((build) => {
         plans: {
           registerUser(_, fieldArgs) {
             const $input = fieldArgs.getRaw("input");
-            const $user = withPgClientTransaction(
+            const $user = sideEffectWithPgClientTransaction(
               executor,
               $input,
               async (pgClient, input) => {
@@ -771,7 +771,7 @@ check that the user performing the soft-delete is the owner of the record.
 ```ts
 import { extendSchema } from "postgraphile/utils";
 import { context, list, specFromNodeId } from "postgraphile/grafast";
-import { withPgClientTransaction } from "postgraphile/@dataplan/pg";
+import { sideEffectWithPgClientTransaction } from "postgraphile/@dataplan/pg";
 
 const DeleteItemByNodeIdPlugin = extendSchema((build) => {
   // We need the nodeId handler for the Item type so that we can decode the ID.
@@ -809,7 +809,7 @@ const DeleteItemByNodeIdPlugin = extendSchema((build) => {
             const spec = specFromNodeId(handler, $nodeId);
             const $itemId = spec.id;
 
-            const $success = withPgClientTransaction(
+            const $success = sideEffectWithPgClientTransaction(
               executor,
               // Passing a `list` step allows us to pass more than one dependency
               // through to our callback:
