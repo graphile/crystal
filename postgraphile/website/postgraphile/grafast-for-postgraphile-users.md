@@ -24,8 +24,8 @@ functions you registered in the context.
 ```ts
 import { context } from "postgraphile/grafast";
 
-const $ctx = context();
-const $currentUserId = $ctx.get("currentUserId");
+const $context = context();
+const $currentUserId = $context.get("currentUserId");
 ```
 
 You can also derive a new value and persist it back to context:
@@ -33,9 +33,9 @@ You can also derive a new value and persist it back to context:
 ```ts
 import { context, sideEffect } from "postgraphile/grafast";
 
-const $ctxForJwt = context();
+const $context = context();
 
-sideEffect([$ctxForJwt, $userId], (ctx, userId) => {
+sideEffect([$context, $userId], (ctx, userId) => {
   ctx.pgSettings["jwt.claims.userId"] = userId;
 });
 ```
@@ -53,9 +53,9 @@ microservices, etc.). For PostgreSQL, lean on `@dataplan/pg` steps and
 ```ts
 import { context, loadOne } from "postgraphile/grafast";
 
-const $ctxForCustomer = context();
-const $userIdForCustomer = $ctxForCustomer.get("currentUserId");
-const $customer = loadOne($userIdForCustomer, stripeCustomersByUserId);
+const $context = context();
+const $currentUserId = $context.get("currentUserId");
+const $customer = loadOne($currentUserId, stripeCustomersByUserId);
 ```
 
 Read more: <https://grafast.org/grafast/step-library/standard-steps/loadOne>
@@ -97,8 +97,8 @@ mutating the context (e.g. `pgSettings`) after you computed a value.
 ```ts
 import { context, sideEffect } from "postgraphile/grafast";
 
-const $ctxForLogout = context();
-const $logout = $ctxForLogout.get("logout");
+const $context = context();
+const $logout = $context.get("logout");
 
 sideEffect($logout, (logout) => logout());
 ```
