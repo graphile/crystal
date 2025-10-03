@@ -141,6 +141,7 @@ const sidebars = {
     "postgresql-schema-design",
     "evaluating",
     "best-practices",
+    "grafast-for-postgraphile-users",
     "production",
     "jwt-guide",
     "jwk-verification",

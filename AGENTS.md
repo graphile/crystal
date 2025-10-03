@@ -1,16 +1,17 @@
 # AGENTS.md
 
 **Audience:** code assistants (Aider, Cody, Copilot Chat, etc.) working on this
-repository.  
-**Mode:** read-only + patch-only. No command execution.
+repository.
 
 ## Goals
 
-- Generate **patches/PRs** for:
-  - Tests and test coverage improvements.
-  - Documentation updates and migrations.
-  - Small, mechanical refactors (safe, localised).
+- Improve documentation. Be concice, clear, and accurate. Reflect nuances via
+  admonitions where appropriate. Only make essential changes, avoid stylistic
+  changes.
 - Spot mistakes in the docs where they do not correctly reflect the code.
+- When refactoring, keep changes to a minimum. For larger edits do the changes
+  in stages; for example: reorder the code first, get that committed by the
+  user, then edit the functionality.
 
 ## Repository Overview
 
@@ -55,11 +56,18 @@ into 4 main categories based on the root folders, each of which have a
 
 ## Hard Guardrails (must follow)
 
-1. **Never edit versioned docs:** files under: `*/website/versioned_docs/**` are
+1. **Never install dependencies**.
+1. **Never edit `package.json`** files unless specifically instructed.
+1. **Never edit versioned docs:** files under `*/website/versioned_docs/**` are
    snapshots taken at release time. Edit the source (unversioned) doc instead.
-2. **No shell commands.** The user already runs compilation and websites in
-   watch mode, and will run any other commands themself.
-3. **Keep scope tight.**
+1. **Avoid shell commands unless necessary.**
+   - The user already runs compilation and websites in watch mode.
+   - The user would rather commit, rebase, and change branches themself - do not
+     do this for them.
+   - The user would generally rather that you don't run your own commands, but
+     you may do so if it is necessary to apply your automated changes to
+     code/docs.
+1. **Keep scope tight.**
    - Prefer many small PRs over one large PR.
    - Avoid large refactors without an issue/plan.
    - Avoid stylistic rewrites without functional gain.
@@ -68,17 +76,48 @@ into 4 main categories based on the root folders, each of which have a
 
 ## Allowed Actions
 
-- Read files and propose edits.
+- Read files and make changes to markdown, TypeScript, and `*.test.*` files.
 - Write tests; update fixtures and test helpers.
 - Update docs (typically under the `<category>/website` folder).
 - Add or adjust comments, JSDoc/TSDoc, README snippets.
 - Suggest CI/test commands **in prose**; do not execute them.
 
-## Preferred Patch Style
+## Preferred Style
 
+- Never use `<https://...>`-style links, always use `[text](https://...)`.
 - Follow current formatting/lint rules; **do not** add style-only churn.
 - Keep code samples runnable in principle; **do not** add scripts to run them.
 - Wrap prose at 80 characters.
+- Always use `Gra*fast*` in Markdown when referring to Gra*fast* - the "fast" is
+  stylized in italics. When in MDX use the `<Grafast />` component if available,
+  otherwise `Gra*fast*` is fine.
+
+When writing Grafast plan resolvers in documentation, try and only do one action
+per statement; for example instead of:
+
+```ts
+const $invoices = loadMany($customer.get("stripeId"), invoicesByStripId);
+```
+
+prefer:
+
+```ts
+const $stripeId = $customer.get("stripeId");
+const $invoices = loadMany($stripeId, invoicesByStripId);
+```
+
+This does not apply to literal object or array values passed as the first
+argument to `lambda()`, `sideEffect()`, `loadOne()` or `loadMany()` since these
+are "multistep" objects provided for user convenience. Similarly `list()` should
+always be called as `list([ ... ])` and `object()` as `object({ ... })` without
+separate definition of the argument.
+
+When representing the GraphQL context as a step, `const $context = context();`
+should always be used since it's always the same GraphQL context object being
+represented (even if the contents are mutated).
+
+Exception to the above: `const $foo = context().get("foo");` is fine, and
+preferred over the two statement equivalent.
 
 ## Testing Rules
 

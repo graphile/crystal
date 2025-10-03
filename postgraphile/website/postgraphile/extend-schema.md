@@ -853,7 +853,7 @@ transaction (in which case the transaction will be rolled back) and if they are
 the known, supported, errors then it will return the given error type.
 
 ```ts
-import { withPgClient } from "@dataplan/pg";
+import { sideEffectWithPgClientTransaction } from "@dataplan/pg";
 import { extendSchema } from "postgraphile/utils";
 import {
   ObjectStep,
@@ -901,36 +901,34 @@ export const RegisterUserPlugin = extendSchema((build) => {
       Mutation: {
         plans: {
           registerUser(_, { $input: { $username, $email } }) {
-            const $result = withPgClient(
+            const $result = sideEffectWithPgClientTransaction(
               executor,
               list([$username, $email]),
               async (pgClient, [username, email]) => {
                 try {
-                  return await pgClient.withTransaction(async (pgClient) => {
-                    const {
-                      rows: [user],
-                    } = await pgClient.query<{
-                      id: string;
-                      username: string;
-                    }>({
-                      text: `
-                      insert into app_public.users (username)
-                      values ($1)
-                      returning *`,
-                      values: [username],
-                    });
-
-                    await pgClient.query({
-                      text: `
-                      insert into app_public.user_emails(user_id, email)
-                      values ($1, $2)`,
-                      values: [user.id, email],
-                    });
-
-                    await sendEmail(email, "Welcome!");
-
-                    return { id: user.id };
+                  const {
+                    rows: [user],
+                  } = await pgClient.query<{
+                    id: string;
+                    username: string;
+                  }>({
+                    text: `
+                    insert into app_public.users (username)
+                    values ($1)
+                    returning *`,
+                    values: [username],
                   });
+
+                  await pgClient.query({
+                    text: `
+                    insert into app_public.user_emails(user_id, email)
+                    values ($1, $2)`,
+                    values: [user.id, email],
+                  });
+
+                  await sendEmail(email, "Welcome!");
+
+                  return { id: user.id };
                 } catch (e) {
                   if (e instanceof DatabaseError && e.code === "23505") {
                     if (e.constraint === "unique_user_username") {
