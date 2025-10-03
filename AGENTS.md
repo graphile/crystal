@@ -84,6 +84,7 @@ into 4 main categories based on the root folders, each of which have a
 
 ## Preferred Style
 
+- Never use `<https://...>`-style links, always use `[text](https://...)`.
 - Follow current formatting/lint rules; **do not** add style-only churn.
 - Keep code samples runnable in principle; **do not** add scripts to run them.
 - Wrap prose at 80 characters.
