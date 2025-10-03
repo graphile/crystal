@@ -8,7 +8,8 @@ title: "sql.comment()"
 Creates an SQL comment fragment that can be embedded in queries. Comments are
 useful for documenting query logic, adding debugging information, or providing
 context for complex operations. Comments are ignored during SQL execution but
-can be valuable for debugging and maintenance.
+can be valuable for debugging and maintenance; comments only appear when
+`GRAPHILE_ENV=development` is set.
 
 :::warning[Do not include user-generated content!]
 
