@@ -29,11 +29,17 @@ Returns a `SQL` fragment that establishes the symbol alias relationship. This
 fragment needs to be included in the final query to take effect, typically at
 the beginning of the query.
 
+## Symbol placeholders and underscores
+
+When you use a JavaScript `Symbol` inside `sql.identifier`, pg-sql2 does not
+render the symbol’s description directly (e.g. `"u"`). Instead, it generates a
+stable placeholder name wrapped in double underscores, such as `"__u__"`. This
+helps distinguish symbol-based identifiers (which can be replaced later) from
+literal identifiers (strings).
+
 ## Example
 
 ```js
-import { sql } from "pg-sql2";
-
 const userTable = Symbol("users");
 const u = Symbol("u"); // Alias for shorter reference
 
@@ -45,7 +51,10 @@ const query = sql`
   FROM users AS ${sql.identifier(u)}
 `;
 
-// Both userTable and u will resolve to the same identifier
+console.log(sql.compile(query).text);
+// Both userTable and u will resolve to the same identifier:
+//   SELECT __users__."name", __users__."email"
+//   FROM users AS __users__
 ```
 
 ## Notes

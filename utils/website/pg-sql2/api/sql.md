@@ -80,9 +80,13 @@ const userQuery = sql`
 const { text, values } = sql.compile(userQuery);
 console.log(text, values);
 /*
+  text:
   SELECT *
   FROM "users"
   WHERE "users"."id" = $1
+  
+  values: 
+  [ 123 ]
 */
 ```
 

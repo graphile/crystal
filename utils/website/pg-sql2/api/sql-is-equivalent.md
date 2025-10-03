@@ -52,6 +52,8 @@ console.log(sql.isEquivalent(query1, query3)); // false
 ### Identifier comparison
 
 ```js
+import { sql } from "pg-sql2";
+
 const table1 = sql.identifier("users");
 const table2 = sql.identifier("users");
 const table3 = sql.identifier("orders");
@@ -63,6 +65,8 @@ console.log(sql.isEquivalent(table1, table3)); // false
 ### Symbol equivalence
 
 ```js
+import { sql } from "pg-sql2";
+
 const sym1 = Symbol("table");
 const sym2 = Symbol("table"); // Different symbol, same description
 

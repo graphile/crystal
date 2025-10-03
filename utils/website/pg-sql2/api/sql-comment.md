@@ -106,7 +106,7 @@ console.log(sql.compile(query).values);
 ```js
 // Single line comments become /* comment */
 sql.comment("Single line comment");
-// -> /* Single line comment */
+// /* Single line comment */
 
 // Multi-line comments preserve formatting
 sql.comment(`
@@ -114,9 +114,9 @@ sql.comment(`
   Line 2
   Line 3
 `);
-// -> /*
-//      Line 1
-//      Line 2
-//      Line 3
-//    */
+//  /*
+//    Line 1
+//    Line 2
+//    Line 3
+//  */
 ```
