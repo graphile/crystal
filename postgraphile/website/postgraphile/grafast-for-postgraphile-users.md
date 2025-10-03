@@ -223,17 +223,23 @@ import { connection } from "postgraphile/grafast";
 
 const $productId = $product.get("id");
 const $rows = reviews.find({ product_id: $productId });
-const $reviews = connection($rows);
+return connection($rows);
 ```
 
 Read more: <https://grafast.org/grafast/step-library/standard-steps/connection>
 
 ## list
 
-`list()` bundles multiple dependency steps together so a downstream loader can
-see them all at once. Pair it with `loadManyWithPgClient()` or
-`sideEffectWithPgClientTransaction()` when your callback needs more than one
-input.
+`list()` bundles multiple steps together into a list step, typically useful so a
+downstream step can see them all via a single dependency.
+
+:::tip[Rarely needed]
+
+Many of the builtin steps support accepting an array of dependencies (`[$dep1,
+$dep2, ...]`) directly instead of calling `list([$dep1, $dep2, ...])`
+explicitly.
+
+:::
 
 ```ts
 import { context, list } from "postgraphile/grafast";
@@ -247,9 +253,9 @@ Read more: <https://grafast.org/grafast/step-library/standard-steps/list>
 
 ## access
 
-`access()` reads a property on plain JavaScript objects. Reach for it when the
-step you are working with does not provide `.get()` (for example, the temporary
-objects returned by custom SQL loaders).
+`access($step, key)` reads a property, `key`, from the result of any step,
+`$step`. It should be avoided in favour of `get($step, key)`, except when implementing a
+`$step.get(key)` method where using `get($step, key)` would cause an infinite loop.
 
 ```ts
 import { access } from "postgraphile/grafast";
@@ -270,17 +276,22 @@ import { specFromNodeId } from "postgraphile/grafast";
 
 const spec = specFromNodeId(itemHandler, $nodeId);
 const $itemId = spec.id;
+const $item = items.get({ id: $itemId });
 ```
 
 Read more:
 <https://grafast.org/grafast/step-library/standard-steps/node#specfromnodeid>
 
+## loadOneWithPgClient
+
 ## loadManyWithPgClient
 
-`loadManyWithPgClient()` (and its partner `loadOneWithPgClient()`) bridge the
-Grafast planner with custom SQL. They live in
-`postgraphile/@dataplan/pg` and give your callback a `pgClient` so you can run
-bespoke queries while still batching inputs.
+`loadOneWithPgClient()` and `loadManyWithPgClient()` are useful when you want
+`loadMany` (or `loadOne`)-style semantics, but you want to talk to the database.
+It's particularly useful if you want to do complex actions, perhaps using your
+ORM of choice. An additional argument is prepended to the list passed to the
+callback: a `pgClient` with the relevant `pgSettings` already applied. If you
+don't use this `pgClient`, you should use `loadOne`/`loadMany` directly instead.
 
 ```ts
 import { loadManyWithPgClient } from "postgraphile/@dataplan/pg";
@@ -299,34 +310,17 @@ const $phones = loadManyWithPgClient(
 
 Read more: <https://grafast.org/grafast/step-library/dataplan-pg/withPgClient>
 
-## withPgClient
-
-`withPgClient()` is the transaction-friendly variant that simply hands you a
-client and whatever inputs you passed. It is ideal for mutations that need to
-mix SQL with additional business logic (such as sending emails) before you
-shape the final payload.
-
-```ts
-import { list } from "postgraphile/grafast";
-import { withPgClient } from "postgraphile/@dataplan/pg";
-
-const $inputs = list([$username, $email]);
-const $result = withPgClient(
-  executor, // obtained from build.pgResources.users
-  $inputs,
-  async (pgClient, [username, email]) => {
-    return registerUser(pgClient, username, email);
-  },
-);
-```
-
-Read more: <https://grafast.org/grafast/step-library/dataplan-pg/withPgClient>
+## sideEffectWithPgClient
 
 ## sideEffectWithPgClientTransaction
 
-`sideEffectWithPgClientTransaction()` wraps your callback in a PostgreSQL
-transaction. Use it for custom mutations that should commit only if the entire
-callback succeeds.
+`sideEffectWithPgClient()` and `sideEffectWithPgClientTransaction()` pass a
+pgClient to your callback and expect it to perform a side effect - they both run
+_unbatched_, so do not use them anywhere but in the root mutation fields.
+`sideEffectWithPgClientTransaction()` guarantess that the callback is wrapped in
+a transaction. `sideEffectWithPgClient()` may or may not wrap the callback in a
+transaction, depending on if it's necessary to create one in order to apply the
+`pgSettings`.
 
 ```ts
 import { object } from "postgraphile/grafast";
@@ -345,7 +339,3 @@ return object({ user: $user });
 ```
 
 Read more: <https://grafast.org/grafast/step-library/dataplan-pg/withPgClient>
-
-Together these steps let you blend PostgreSQL data, external APIs, and custom
-business logic into a single plan. Grafast keeps execution efficient while
-PostGraphile gives you the extension points to shape the graph you need.
