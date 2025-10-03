@@ -15,20 +15,20 @@ classification. Many resolvers can skip `node()` entirely by using
 A `NodeIdHandler` describes how a single object type encodes and decodes its
 Global Object Identifier. Handlers are plain objects; the essential fields are:
 
-- `typeName` – GraphQL object type name the handler supports.
-- `codec` – a `NodeIdCodec` responsible for turning the specifier into an ID
-  string and back again.
-- `match(decoded)` – returns `true` when the decoded payload belongs to this
+- `typeName` – GraphQL object type name this handler serves.
+- `codec` – the `NodeIdCodec` used to encode/decode the NodeID string.
+- `match(decoded)` – returns `true` when the decoded value belongs to this
   type.
-- `getIdentifiers(decoded)` – extracts the identifier tuple (helpful for
-  logging or auditing).
-- `plan($node)` – takes a step representing the object and returns a step that
-  produces the encoded payload (later fed into `codec.encode`).
-- `getSpec($decoded)` – converts the decoded payload into whatever “specifier”
-  shape your data layer expects (commonly an object describing primary keys).
-- `get(spec)` – returns a step that loads the entity identified by the given
-  specifier (or whatever representation your schema uses).
-- `deprecationReason` (optional) – signals that the type is deprecated.
+- `getIdentifiers(decoded)` – extracts the underlying identifier tuple from the
+  decoded value.
+- `plan($node)` – produces the value that will be passed to `codec.encode`.
+  Feeding the result into `match` should yield `true`.
+- `getSpec($decoded)` – converts the decoded value into whatever specifier your
+  application expects. Useful for referencing a node without fetching it.
+- `get(spec)` – given the specifier from `getSpec`, returns a step that resolves
+  to the original node.
+- `deprecationReason` (optional) – indicates that the Node implementation is
+  deprecated.
 
 ```ts
 import { constant, list } from "grafast";
@@ -106,7 +106,6 @@ export const pipeStringCodec = {
 };
 pipeStringCodec.encode.isSyncAndSafe = true;
 pipeStringCodec.decode.isSyncAndSafe = true;
-
 ```
 
 Choose the codec that fits your data model: base64 for opaque IDs or pipe
