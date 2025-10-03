@@ -65,8 +65,7 @@ customer by customer ID". (For PostgreSQL, lean on `@dataplan/pg` steps and
 ```ts
 import { context, loadOne } from "postgraphile/grafast";
 
-const $context = context();
-const $currentUserId = $context.get("currentUserId");
+const $currentUserId = context().get("currentUserId");
 const $customer = loadOne($currentUserId, batchGetStripeCustomerByUserId);
 ```
 
@@ -160,8 +159,9 @@ the result:
 return $points;
 ```
 
-However, if it is fed into another step you will need to wrap it with
-`applyTransforms()` to ensure the mapping takes place:
+However, if you feed `$points` into another step you will need to call
+`applyTransforms($points)` first so the mapping occurs before the dependent
+step runs:
 
 ```ts
 sideEffect(applyTransforms($points), (points) => {
@@ -199,7 +199,7 @@ Read more: <https://grafast.org/grafast/step-library/standard-steps/lambda>
 as the result of a mutation plan resolver.
 
 ```ts
-import { object } from "postgraphile/grafast";
+import { constant, object } from "postgraphile/grafast";
 
 const $userIdForLoader = $user.get("id");
 const $includeArchived = constant(false);
@@ -211,3 +211,141 @@ const $loaderInput = object({
 ```
 
 Read more: <https://grafast.org/grafast/step-library/standard-steps/object>
+
+## connection
+
+`connection()` wraps a set of rows (typically a `PgSelectStep`) so connection
+fields keep the helper methods PostGraphile expects. Use it when returning
+Relay connections from custom fields.
+
+```ts
+import { connection } from "postgraphile/grafast";
+
+const $productId = $product.get("id");
+const $rows = reviews.find({ product_id: $productId });
+const $reviews = connection($rows);
+```
+
+Read more: <https://grafast.org/grafast/step-library/standard-steps/connection>
+
+## list
+
+`list()` bundles multiple dependency steps together so a downstream loader can
+see them all at once. Pair it with `loadManyWithPgClient()` or
+`sideEffectWithPgClientTransaction()` when your callback needs more than one
+input.
+
+```ts
+import { context, list } from "postgraphile/grafast";
+
+const $context = context();
+const $jwtClaims = $context.get("jwtClaims");
+const $inputs = list([$jwtClaims, $itemId]);
+```
+
+Read more: <https://grafast.org/grafast/step-library/standard-steps/list>
+
+## access
+
+`access()` reads a property on plain JavaScript objects. Reach for it when the
+step you are working with does not provide `.get()` (for example, the temporary
+objects returned by custom SQL loaders).
+
+```ts
+import { access } from "postgraphile/grafast";
+
+const $userId = access($user, "id");
+```
+
+Read more: <https://grafast.org/grafast/step-library/standard-steps/access>
+
+## specFromNodeId
+
+`specFromNodeId()` decodes a Node ID using a handler from
+`build.getNodeIdHandler("TypeName")`. It returns the step specifications you
+can feed into resources or other loaders.
+
+```ts
+import { specFromNodeId } from "postgraphile/grafast";
+
+const spec = specFromNodeId(itemHandler, $nodeId);
+const $itemId = spec.id;
+```
+
+Read more:
+<https://grafast.org/grafast/step-library/standard-steps/node#specfromnodeid>
+
+## loadManyWithPgClient
+
+`loadManyWithPgClient()` (and its partner `loadOneWithPgClient()`) bridge the
+Grafast planner with custom SQL. They live in
+`postgraphile/@dataplan/pg` and give your callback a `pgClient` so you can run
+bespoke queries while still batching inputs.
+
+```ts
+import { loadManyWithPgClient } from "postgraphile/@dataplan/pg";
+import { get } from "postgraphile/grafast";
+
+const $userId = get($user, "id");
+const $phones = loadManyWithPgClient(
+  executor, // obtained from build.pgResources.users
+  $userId,
+  async (pgClient, userIds) => {
+    // return an array aligned with userIds
+    return normalizePhones(pgClient, userIds);
+  },
+);
+```
+
+Read more: <https://grafast.org/grafast/step-library/dataplan-pg/withPgClient>
+
+## withPgClient
+
+`withPgClient()` is the transaction-friendly variant that simply hands you a
+client and whatever inputs you passed. It is ideal for mutations that need to
+mix SQL with additional business logic (such as sending emails) before you
+shape the final payload.
+
+```ts
+import { list } from "postgraphile/grafast";
+import { withPgClient } from "postgraphile/@dataplan/pg";
+
+const $inputs = list([$username, $email]);
+const $result = withPgClient(
+  executor, // obtained from build.pgResources.users
+  $inputs,
+  async (pgClient, [username, email]) => {
+    return registerUser(pgClient, username, email);
+  },
+);
+```
+
+Read more: <https://grafast.org/grafast/step-library/dataplan-pg/withPgClient>
+
+## sideEffectWithPgClientTransaction
+
+`sideEffectWithPgClientTransaction()` wraps your callback in a PostgreSQL
+transaction. Use it for custom mutations that should commit only if the entire
+callback succeeds.
+
+```ts
+import { object } from "postgraphile/grafast";
+import { sideEffectWithPgClientTransaction } from "postgraphile/@dataplan/pg";
+
+const $input = fieldArgs.getRaw("input");
+const $user = sideEffectWithPgClientTransaction(
+  executor, // obtained from build.pgResources.users
+  $input,
+  async (pgClient, input) => {
+    return insertUser(pgClient, input);
+  },
+);
+
+return object({ user: $user });
+```
+
+Read more: <https://grafast.org/grafast/step-library/dataplan-pg/withPgClient>
+
+Together these steps let you blend PostgreSQL data, external APIs, and custom
+business logic into a single plan. Grafast keeps execution efficient while
+PostGraphile gives you the extension points to shape the graph you need.
