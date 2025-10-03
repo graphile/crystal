@@ -105,6 +105,12 @@ const $stripeId = $customer.get("stripeId");
 const $invoices = loadMany($stripeId, invoicesByStripId);
 ```
 
+This does not apply to literal object or array values passed as the first
+argument to `lambda()`, `sideEffect()`, `loadOne()` or `loadMany()` since these
+are "multistep" objects provided for user convenience. Similarly `list()` should
+always be called as `list([ ... ])` and `object()` as `object({ ... })` without
+separate definition of the argument.
+
 When representing the GraphQL context as a step, `const $context = context();`
 should always be used since it's always the same GraphQL context object being
 represented (even if the contents are mutated).
