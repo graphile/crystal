@@ -10,10 +10,17 @@ import { UnbatchedStep } from "../step.js";
 import { lambda } from "./lambda.js";
 
 /**
- * A plan to get a Node by its global object identifier (string). Accepts an
- * object specifying the supported codecs, an object map detailing the
- * typeNames supported and their details (codec to use, how to find the record,
- * etc), and finally the Node id string plan.
+ * Decodes a GraphQL global object identifier and produces a specifier suitable
+ * for polymorphic resolution.
+ *
+ * The step resolves to either `null` (if the identifier cannot be decoded) or
+ * an object `{ __typename, specifier }`. The `specifier` is the decoded
+ * payload returned by the relevant {@link NodeIdHandler}; it should then be
+ * fed into an abstract type's `planType()` logic to obtain the concrete step
+ * required for that object type.
+ *
+ * This step does **not** fetch the underlying record; it only performs the
+ * decode and type discrimination.
  */
 export class NodeStep extends UnbatchedStep<{
   __typename: string;
@@ -62,10 +69,7 @@ export class NodeStep extends UnbatchedStep<{
 }
 
 /**
- * A plan to get a Node by its global object identifier (string). Accepts an
- * object specifying the supported codecs, an object map detailing the
- * typeNames supported and their details (codec to use, how to find the record,
- * etc), and finally the Node id string plan.
+ * Helper for constructing {@link NodeStep}. See the class docs for behaviour.
  */
 export function node(
   possibleTypes: {
@@ -76,6 +80,18 @@ export function node(
   return new NodeStep(possibleTypes, $id);
 }
 
+/**
+ * Decodes a global identifier that is expected to correspond to a specific
+ * {@link NodeIdHandler}. The returned specifier can be passed directly to
+ * whatever data-source helper understands that handler's spec (for example a
+ * `get`/`update` helper on your own resource abstraction) without invoking the
+ * polymorphic machinery.
+ *
+ * Prefer `specFromNodeId()` whenever the expected object type is already
+ * known (for example in `updateUser(id: ID!, ...)` mutations). It avoids the
+ * extra work performed by {@link NodeStep} and keeps plan resolvers
+ * straightforward.
+ */
 export function specFromNodeId(
   handler: NodeIdHandler<any>,
   $id: Step<Maybe<string>>,
