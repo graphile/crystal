@@ -3843,7 +3843,10 @@ function buildQueryParts<TResource extends PgResource<any, any, any, any, any>>(
   const extraSelectIndexes = extraSelects.map((_, i) => i + l);
 
   return {
-    comment: sql.comment(`From ${info.sourceStepDescription}`),
+    comment: sql.comment(
+      `From ${info.sourceStepDescription}`,
+      process.env.DATAPLAN_PG_DEBUG === "1",
+    ),
     selects,
     from,
     joins: info.joins,

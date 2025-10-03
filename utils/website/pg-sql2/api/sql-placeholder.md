@@ -31,6 +31,8 @@ throw an error if no replacement and no fallback is given).
 ## Example
 
 ```js
+import { sql } from "pg-sql2";
+
 const $$table = Symbol("table");
 const $$orderBy = Symbol("orderBy");
 
@@ -44,7 +46,7 @@ const query = sql`
 // Compile with defaults
 const q1 = sql.compile(query);
 console.log(q1.text);
-// -> SELECT * FROM "default_table" ORDER BY id ASC
+// SELECT * FROM "default_table" ORDER BY id ASC
 
 // Compile with placeholder values
 const q2 = sql.compile(query, {
@@ -54,5 +56,5 @@ const q2 = sql.compile(query, {
   ]),
 });
 console.log(q2.text);
-// -> SELECT * FROM "users" ORDER BY created_at DESC
+// SELECT * FROM "users" ORDER BY created_at DESC
 ```

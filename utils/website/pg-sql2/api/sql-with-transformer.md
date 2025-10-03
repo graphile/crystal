@@ -28,10 +28,10 @@ sql.withTransformer<TNewEmbed, TResult = SQL>(
 
 Returns the result of the callback, which typically will be an SQL fragment.
 
-## Examples
+## Example
 
 ```ts
-import sql, { type Transformer } from "pg-sql2";
+import { sql, type Transformer, type SQL } from "pg-sql2";
 
 const numberToValue: Transformer<number> = (sql, value) => {
   if (typeof value === "number") {
@@ -46,8 +46,17 @@ const numberToValue: Transformer<number> = (sql, value) => {
   }
 };
 
-const stmt: SQL = sql.withTransformer(
+const query: SQL = sql.withTransformer(
   numberToValue,
   (sql) => sql`select * from users where id = ${42}`,
 );
+console.log(sql.compile(query).text);
+// select * from users where id = $1
+
+const query2: SQL = sql.withTransformer(
+  numberToValue,
+  (sql) => sql`select * from users where id = ${Infinity}`,
+);
+console.log(sql.compile(query2).text);
+// Error: Infinity is not a finite number, so cannot safely be used in the SQL statement.
 ```

@@ -24,8 +24,11 @@ Returns `true` if the value is a valid SQL fragment, `false` otherwise.
 
 ## Example
 
+Note: `sql.raw()` will raise a warning, asking you to make ensure you intended to use it.
+See [sql.raw documentation](./sql-raw) for details on its proper usage.
+
 ```js
-import sql from "pg-sql2";
+import { sql } from "pg-sql2";
 
 // Valid SQL fragments
 console.log(sql.isSQL(sql`SELECT * FROM users`)); // true

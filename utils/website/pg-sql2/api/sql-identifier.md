@@ -37,46 +37,64 @@ embedded in other SQL expressions.
 ### Basic identifiers
 
 ```js
-import sql from "pg-sql2";
+import { sql } from "pg-sql2";
 
 // Table name
 const tableName = "users";
-sql`SELECT * FROM ${sql.identifier(tableName)}`;
-// -> SELECT * FROM "users"
 
+const query = sql`SELECT * FROM ${sql.identifier(tableName)}`;
+console.log(sql.compile(query).text);
+// SELECT * FROM "users"
+```
+
+```js
 // Column name
 const columnName = "user_name";
-sql`SELECT ${sql.identifier(columnName)} FROM users`;
-// -> SELECT "user_name" FROM users
+
+const query = sql`SELECT ${sql.identifier(columnName)} FROM users`;
+console.log(sql.compile(query).text);
+// SELECT "user_name" FROM users
 ```
 
 ### Qualified identifiers
 
 ```js
-// Schema.table
+import { sql } from "pg-sql2";
+
+// schema.table
 const schema = "public";
 const table = "users";
 const column = "name";
-sql`SELECT ${sql.identifier(column)} FROM ${sql.identifier(schema, table)}`;
-// -> SELECT * FROM "public"."users"
 
-// Table.column
-sql`SELECT ${sql.identifier(table, column)} FROM users`;
-// -> SELECT "users"."name" FROM users
+const query = sql`SELECT ${sql.identifier(column)} FROM ${sql.identifier(schema, table)}`;
+console.log(sql.compile(query).text);
+// SELECT * FROM "public"."users"
+```
 
-// Schema.table.column
-sql`COMMENT ON COLUMN ${sql.identifier(schema, table, column)} IS ''`;
-// -> COMMENT ON COLUMN "public"."users"."name" IS '';
+```js
+// table.column
+const query = sql`SELECT ${sql.identifier(table, column)} FROM users`;
+console.log(sql.compile(query).text);
+// SELECT "users"."name" FROM users
+```
+
+```js
+// schema.table.column
+const query = sql`COMMENT ON COLUMN ${sql.identifier(schema, table, column)} IS ''`;
+console.log(sql.compile(query).text);
+// COMMENT ON COLUMN "public"."users"."name" IS '';
 ```
 
 ### Using symbols
 
-Symbols are automatically assigned unique identifiers,
+Symbols are automatically assigned unique identifiers:
 
 ```js
+import { sql } from "pg-sql2";
+
 const worker = sql.identifier(Symbol("worker"));
 const boss = sql.identifier(Symbol("boss"));
-sql`
+const query = sql`
 SELECT
   ${worker}.name,
   ${boss}.salary/${worker}.salary as boss_multiplier
@@ -84,12 +102,16 @@ FROM employees AS ${worker}
 INNER JOIN employees AS ${boss}
 ON ${worker}.manager_id = ${boss}.id
 `;
-// -> SELECT
-//      __worker__.name,
-//      __boss__.salary/__worker__.salary as boss_multiplier
-//    FROM employees AS __worker__
-//    INNER JOIN employees AS __boss__
-//    ON __worker__.manager_id = __boss__.id
+
+console.log(sql.compile(query).text);
+/* 
+SELECT
+     __worker__.name,
+     __boss__.salary/__worker__.salary as boss_multiplier
+   FROM employees AS __worker__
+   INNER JOIN employees AS __boss__
+   ON __worker__.manager_id = __boss__.id
+*/
 ```
 
 :::tip[Give symbols meaningful names]
@@ -109,12 +131,19 @@ const boss = sql.identifier(Symbol());
 ### Handling special characters
 
 ```js
-// Identifiers with spaces or special characters are safely escaped
-sql`SELECT * FROM ${sql.identifier("user data")}`;
-// -> SELECT * FROM "user data"
+import { sql } from "pg-sql2";
 
-sql`SELECT * FROM ${sql.identifier('b"z')}`;
-// -> SELECT * FROM "b""z"
+// Identifiers with spaces are safely escaped
+const query = sql`SELECT * FROM ${sql.identifier("user data")}`;
+console.log(sql.compile(query).text);
+// SELECT * FROM "user data"
+```
+
+```js
+// Identifiers with special characters are also safely escaped
+const query = sql`SELECT * FROM ${sql.identifier('b"z')}`;
+console.log(sql.compile(query).text);
+// SELECT * FROM "b""z"
 ```
 
 ## Notes

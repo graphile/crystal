@@ -3,12 +3,17 @@ sidebar_position: 10
 title: "sql.comment()"
 ---
 
-# `sql.comment(text)`
+# `sql.comment(text, include)`
 
 Creates an SQL comment fragment that can be embedded in queries. Comments are
 useful for documenting query logic, adding debugging information, or providing
-context for complex operations. Comments are ignored during SQL execution but
-can be valuable for debugging and maintenance.
+context for complex operations.
+
+Comments are ignored during SQL execution by default but
+can be valuable for debugging and maintenance. By default, comments only appear when
+[`GRAPHILE_ENV=development`](../development-mode.md) is set, but you can force
+them to appear by setting `include` to `true` (or force them to be hidden via
+`include` set to `false`).
 
 :::warning[Do not include user-generated content!]
 
@@ -21,12 +26,13 @@ vulnerable SQL.
 ## Syntax
 
 ```typescript
-sql.comment(text: string): SQL
+sql.comment(text: string, include?: boolean): SQL
 ```
 
 ## Parameters
 
 - `text` - The comment text to include
+- `include` - Optional boolean to force inclusion (`true`) or exclusion (`false`) of the comment regardless of environment. Defaults to `undefined`, which means comments are included only in development mode.
 
 ## Return value
 
@@ -34,7 +40,7 @@ Returns a `SQL` fragment containing the properly formatted SQL comment.
 
 ## Examples
 
-### Document query
+### Leading comment
 
 ```js
 import { sql } from "pg-sql2";
@@ -44,36 +50,15 @@ ${sql.comment("Fetch active users with their order counts")}
 SELECT u.id, COUNT(o.id) as order_count ...
 `;
 
-// `sql.compile(query).text` will be something like:
+console.log(sql.compile(query).text);
 // /* Fetch active users with their order counts */
 // SELECT u.id, COUNT(o.id) as order_count ...
 ```
 
-### Inline comment
+### Dynamic comment content
 
 ```js
-const complexCalculation = sql`
-  ${sql.comment(`Calculate total with shipping and tax at ${parseFloat(taxPercentage)}%`)}
-  (price + ${sql.value(deliveryCharge)}) * ${sql.value(1 + taxPercentage / 100)}
-`;
-
-sql`
-UPDATE orders 
-SET total = ${complexCalculation}
-WHERE id = ${sql.value(orderId)}
-`;
-```
-
-### Conditional comments
-
-```js
-const isDevelopment = process.env.NODE_ENV === "development";
-
 function addDebugComments(query, debugInfo) {
-  if (!isDevelopment) {
-    return query;
-  }
-
   return sql`
     ${sql.comment(`DEBUG: Query generated at ${new Date().toISOString()}`)}
     ${sql.comment(`DEBUG: Filters applied - ${JSON.stringify(debugInfo)}`)}
@@ -87,12 +72,44 @@ const query = addDebugComments(
 );
 ```
 
+### Inline comment
+
+```js
+import { sql } from "pg-sql2";
+
+const taxPercentage = 20.0;
+const deliveryCharge = 1.99;
+const orderId = 123;
+
+const complexCalculation = sql`
+  ${sql.comment(`Calculate total with shipping and tax at ${parseFloat(taxPercentage)}%`)}
+  (price + ${sql.value(deliveryCharge)}) * ${sql.value(1 + taxPercentage / 100)}
+`;
+
+const query = sql`
+UPDATE orders 
+SET total = ${complexCalculation}
+WHERE id = ${sql.value(orderId)}
+`;
+
+console.log(sql.compile(query).text);
+// UPDATE orders
+// SET total =
+//   /* Calculate total with shipping and tax at 20% */
+//   (price + $1) * $2
+// WHERE id = $3
+
+console.log(sql.compile(query).values);
+// The values of $1, $2 and $3:
+// [1.99, 1.2, 123]
+```
+
 ### Comment formatting
 
 ```js
 // Single line comments become /* comment */
 sql.comment("Single line comment");
-// -> /* Single line comment */
+// /* Single line comment */
 
 // Multi-line comments preserve formatting
 sql.comment(`
@@ -100,9 +117,9 @@ sql.comment(`
   Line 2
   Line 3
 `);
-// -> /*
-//      Line 1
-//      Line 2
-//      Line 3
-//    */
+//  /*
+//    Line 1
+//    Line 2
+//    Line 3
+//  */
 ```

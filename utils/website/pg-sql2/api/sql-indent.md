@@ -8,7 +8,7 @@ title: "sql.indent()"
 Adds indentation to SQL fragments for better readability when pretty-printing
 queries. Useful for improving the readability of complex, nested SQL queries.
 
-**ONLY** indents when `GRAPHILE_ENV` envvar is set to `development` or `test`.
+**ONLY** indents when [`GRAPHILE_ENV`](../development-mode.md) is set to `development` or `test`.
 
 ## Syntax
 

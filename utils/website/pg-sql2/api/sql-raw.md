@@ -72,6 +72,9 @@ const column = COLUMNS[userInputColumn] || COLUMNS["created_at"];
 const direction = DIRECTIONS[userInputDirection] || DIRECTIONS["asc"];
 
 const query = sql`SELECT * FROM users ORDER BY ${column} ${direction}`;
+console.log(sql.compile(query).text);
+// If there is no userInput set, the compiled query is:
+// SELECT * FROM users ORDER BY "users"."created_at" 'ASC'
 ```
 
 This approach ensures that only predefined, safe values are used.
