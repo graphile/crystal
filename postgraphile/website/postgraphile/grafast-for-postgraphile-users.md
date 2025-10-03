@@ -48,7 +48,7 @@ sideEffect([$context, $userId], (context, userId) => {
 });
 ```
 
-Read more: <https://grafast.org/grafast/step-library/standard-steps/context>
+Read more: [`context()` at grafast.org](https://grafast.org/grafast/step-library/standard-steps/context)
 
 ## loadOne
 
@@ -69,7 +69,7 @@ const $currentUserId = context().get("currentUserId");
 const $customer = loadOne($currentUserId, batchGetStripeCustomerByUserId);
 ```
 
-Read more: <https://grafast.org/grafast/step-library/standard-steps/loadOne>
+Read more: [`loadOne()` at grafast.org](https://grafast.org/grafast/step-library/standard-steps/loadOne)
 
 ## loadMany
 
@@ -83,7 +83,7 @@ const $stripeId = $customer.get("stripeId");
 const $invoices = loadMany($stripeId, batchGetInvoicesByStripeCustomerId);
 ```
 
-Read more: <https://grafast.org/grafast/step-library/standard-steps/loadMany>
+Read more: [`loadMany()` at grafast.org](https://grafast.org/grafast/step-library/standard-steps/loadMany)
 
 ## get
 
@@ -98,7 +98,7 @@ import { get } from "postgraphile/grafast";
 const $userId = get($user, "id");
 ```
 
-Read more: <https://grafast.org/grafast/step-library/standard-steps/get>
+Read more: [`get()` at grafast.org](https://grafast.org/grafast/step-library/standard-steps/get)
 
 ## sideEffect
 
@@ -122,7 +122,7 @@ sideEffect($context, async (context) => {
 });
 ```
 
-Read more: <https://grafast.org/grafast/step-library/standard-steps/sideEffect>
+Read more: [`sideEffect()` at grafast.org](https://grafast.org/grafast/step-library/standard-steps/sideEffect)
 
 ## constant
 
@@ -135,7 +135,7 @@ import { constant } from "postgraphile/grafast";
 const $true = constant(true);
 ```
 
-Read more: <https://grafast.org/grafast/step-library/standard-steps/constant>
+Read more: [`constant()` at grafast.org](https://grafast.org/grafast/step-library/standard-steps/constant)
 
 ## each
 
@@ -169,7 +169,7 @@ sideEffect(applyTransforms($points), (points) => {
 });
 ```
 
-Read more: <https://grafast.org/grafast/step-library/standard-steps/each>
+Read more: [`each()` at grafast.org](https://grafast.org/grafast/step-library/standard-steps/each)
 
 ## lambda
 
@@ -191,7 +191,7 @@ const $fullName = lambda(
 );
 ```
 
-Read more: <https://grafast.org/grafast/step-library/standard-steps/lambda>
+Read more: [`lambda()` at grafast.org](https://grafast.org/grafast/step-library/standard-steps/lambda)
 
 ## object
 
@@ -210,7 +210,7 @@ const $loaderInput = object({
 });
 ```
 
-Read more: <https://grafast.org/grafast/step-library/standard-steps/object>
+Read more: [`object()` at grafast.org](https://grafast.org/grafast/step-library/standard-steps/object)
 
 ## connection
 
@@ -226,7 +226,7 @@ const $rows = reviews.find({ product_id: $productId });
 return connection($rows);
 ```
 
-Read more: <https://grafast.org/grafast/step-library/standard-steps/connection>
+Read more: [`connection()` at grafast.org](https://grafast.org/grafast/step-library/standard-steps/connection)
 
 ## list
 
@@ -249,7 +249,7 @@ const $jwtClaims = $context.get("jwtClaims");
 const $inputs = list([$jwtClaims, $itemId]);
 ```
 
-Read more: <https://grafast.org/grafast/step-library/standard-steps/list>
+Read more: [`list()` at grafast.org](https://grafast.org/grafast/step-library/standard-steps/list)
 
 ## access
 
@@ -263,7 +263,7 @@ import { access } from "postgraphile/grafast";
 const $userId = access($user, "id");
 ```
 
-Read more: <https://grafast.org/grafast/step-library/standard-steps/access>
+Read more: [`access()` at grafast.org](https://grafast.org/grafast/step-library/standard-steps/access)
 
 ## specFromNodeId
 
@@ -279,8 +279,7 @@ const $itemId = spec.id;
 const $item = items.get({ id: $itemId });
 ```
 
-Read more:
-<https://grafast.org/grafast/step-library/standard-steps/node#specfromnodeid>
+Read more: [`specFromNodeId()` at grafast.org](https://grafast.org/grafast/step-library/standard-steps/node#specfromnodeid)
 
 ## loadOneWithPgClient
 
@@ -302,7 +301,7 @@ const $user = loadOneWithPgClient(
 );
 ```
 
-Read more: <https://grafast.org/grafast/step-library/dataplan-pg/withPgClient>
+Read more: [`loadOneWithPgClient()` at grafast.org](https://grafast.org/grafast/step-library/dataplan-pg/withPgClient)
 
 ## loadManyWithPgClient
 
@@ -325,7 +324,7 @@ const $phones = loadManyWithPgClient(
 );
 ```
 
-Read more: <https://grafast.org/grafast/step-library/dataplan-pg/withPgClient>
+Read more: [`loadManyWithPgClient()` at grafast.org](https://grafast.org/grafast/step-library/dataplan-pg/withPgClient)
 
 ## sideEffectWithPgClient
 
@@ -355,4 +354,4 @@ const $user = sideEffectWithPgClientTransaction(
 return object({ user: $user });
 ```
 
-Read more: <https://grafast.org/grafast/step-library/dataplan-pg/withPgClient>
+Read more: [`sideEffectWithPgClientTransaction()` at grafast.org](https://grafast.org/grafast/step-library/dataplan-pg/withPgClient)
