@@ -8,7 +8,7 @@ title: "sql.indentIf()"
 Conditionally adds indentation to SQL fragments based on a boolean condition.
 Useful for applying formatting only in certain environments or configurations.
 
-**ONLY** indents when `GRAPHILE_ENV` envvar is set to `development` or `test`.
+**ONLY** indents when [`GRAPHILE_ENV`](../development-mode.md) is set to `development` or `test`.
 
 See also: [`sql.indent(fragment)`](./sql-indent.md)
 

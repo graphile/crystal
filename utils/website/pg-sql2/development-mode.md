@@ -12,9 +12,9 @@ stripped from production mode for greater efficiency.
 
 The following helpers are affected:
 
-- [`sql.comment`](./sql-comment)
-- [`sql.indent`](./sql-indent)
-- [`sql.indentIf`](./sql-indentIf)
+- [`sql.comment`](./api/sql-comment)
+- [`sql.indent`](./api/sql-indent)
+- [`sql.indentIf`](./api/sql-indentIf)
 
 ## Enabling SQL Debug Comments
 
