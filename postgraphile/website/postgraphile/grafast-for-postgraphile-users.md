@@ -254,8 +254,8 @@ Read more: <https://grafast.org/grafast/step-library/standard-steps/list>
 ## access
 
 `access($step, key)` reads a property, `key`, from the result of any step,
-`$step`. It should be avoided in favour of `get($step, key)`, except when implementing a
-`$step.get(key)` method where using `get($step, key)` would cause an infinite loop.
+`$step`. Prefer `get($step, key)` unless you are implementing a custom
+`$step.get(key)` method; using `get()` there would recurse forever.
 
 ```ts
 import { access } from "postgraphile/grafast";
@@ -284,14 +284,31 @@ Read more:
 
 ## loadOneWithPgClient
 
+`loadOneWithPgClient()` gives you DataLoader-style batching while letting the
+callback run custom SQL with the provided `pgClient`. Use it for single-row
+lookups that need bespoke queries.
+
+```ts
+import { loadOneWithPgClient } from "postgraphile/@dataplan/pg";
+import { get } from "postgraphile/grafast";
+
+const $userId = get($input, "userId");
+const $user = loadOneWithPgClient(
+  executor, // obtained from build.pgResources.users
+  $userId,
+  async (pgClient, userIds) => {
+    return selectUsersById(pgClient, userIds);
+  },
+);
+```
+
+Read more: <https://grafast.org/grafast/step-library/dataplan-pg/withPgClient>
+
 ## loadManyWithPgClient
 
-`loadOneWithPgClient()` and `loadManyWithPgClient()` are useful when you want
-`loadMany` (or `loadOne`)-style semantics, but you want to talk to the database.
-It's particularly useful if you want to do complex actions, perhaps using your
-ORM of choice. An additional argument is prepended to the list passed to the
-callback: a `pgClient` with the relevant `pgSettings` already applied. If you
-don't use this `pgClient`, you should use `loadOne`/`loadMany` directly instead.
+`loadManyWithPgClient()` mirrors `loadMany()` but still hands you the
+`pgClient`, so you can fan out SQL work using the same settings the
+rest of the request uses.
 
 ```ts
 import { loadManyWithPgClient } from "postgraphile/@dataplan/pg";
