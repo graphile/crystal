@@ -33,8 +33,8 @@ const isDev =
   (process.env.GRAPHILE_ENV === "development" ||
     process.env.GRAPHILE_ENV === "test");
 
-const includeComments =
-  typeof process !== "undefined" && process.env.PGSQL2_DEBUG === "1";
+const alwaysIncludeComments =
+  isDev || (typeof process !== "undefined" && process.env.PGSQL2_DEBUG === "1");
 
 const nodeInspect: CustomInspectFunction = function (
   this: SQLNode | SQLQuery,
@@ -1099,9 +1099,12 @@ export function placeholder(symbol: symbol, fallback?: SQL): SQL {
   return makePlaceholderNode(symbol, fallback);
 }
 
-export function comment(commentText: string): SQLCommentNode | SQLRawNode {
-  if (includeComments) {
-    return makeCommentNode(commentText);
+export function comment(
+  text: string,
+  always = false,
+): SQLCommentNode | SQLRawNode {
+  if (always || alwaysIncludeComments) {
+    return makeCommentNode(text);
   } else {
     return sql.blank;
   }
