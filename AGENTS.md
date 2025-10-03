@@ -87,6 +87,9 @@ into 4 main categories based on the root folders, each of which have a
 - Follow current formatting/lint rules; **do not** add style-only churn.
 - Keep code samples runnable in principle; **do not** add scripts to run them.
 - Wrap prose at 80 characters.
+- Always use `Gra*fast*` in Markdown when referring to Gra*fast* - the "fast" is
+  stylized in italics. When in MDX use the `<Grafast />` component if available,
+  otherwise `Gra*fast*` is fine.
 
 When writing Grafast plan resolvers in documentation, try and only do one action
 per statement; for example instead of:
