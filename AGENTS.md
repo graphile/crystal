@@ -102,6 +102,13 @@ const $stripeId = $customer.get("stripeId");
 const $invoices = loadMany($stripeId, invoicesByStripId);
 ```
 
+When representing the GraphQL context as a step, `const $context = context();`
+should always be used since it's always the same GraphQL context object being
+represented (even if the contents are mutated).
+
+Exception to the above: `const $foo = context().get("foo");` is fine, and
+preferred over the two statement equivalent.
+
 ## Testing Rules
 
 - Prefer **incremental** tests: cover public APIs and critical paths first.
