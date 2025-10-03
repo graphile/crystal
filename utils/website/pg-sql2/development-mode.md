@@ -14,7 +14,7 @@ The following helpers are affected:
 
 - [`sql.comment`](./api/sql-comment)
 - [`sql.indent`](./api/sql-indent)
-- [`sql.indentIf`](./api/sql-indentIf)
+- [`sql.indentIf`](./api/sql-indent-if)
 
 ## Enabling SQL Debug Comments
 
