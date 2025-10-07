@@ -7,6 +7,7 @@ import type {
 } from "../interfaces.js";
 import type { Step } from "../step.js";
 import { UnbatchedStep } from "../step.js";
+import { constant } from "./constant.js";
 import { lambda } from "./lambda.js";
 
 /** @see {@link noed} */
@@ -95,23 +96,32 @@ export function specFromNodeId(
   handler: NodeIdHandler<any>,
   $id: Step<Maybe<string>>,
 ) {
-  function decodeWithCodecAndHandler(raw: Maybe<string>) {
-    if (raw == null) return raw;
-    try {
-      const decoded = handler.codec.decode(raw);
-      if (handler.match(decoded)) {
-        return decoded;
-      }
-      return null;
-    } catch (e) {
-      return null;
-    }
-  }
-  decodeWithCodecAndHandler.displayName = `decode_${handler.typeName}_${handler.codec.name}`;
-  decodeWithCodecAndHandler.isSyncAndSafe = true; // Optimization
-  const $decoded = lambda($id as Step<string>, decodeWithCodecAndHandler);
+  const $decoded = lambda(
+    { handler: constant(handler), raw: $id as Step<string> },
+    decodeNodeIdWithHandler,
+  );
   return handler.getSpec($decoded);
 }
+
+interface DecodeNodeIdDetails {
+  handler: NodeIdHandler<any>;
+  raw: Maybe<string>;
+}
+
+function decodeNodeIdWithHandler(details: DecodeNodeIdDetails) {
+  const { handler, raw } = details;
+  if (raw == null) return raw;
+  try {
+    const decoded = handler.codec.decode(raw);
+    if (handler.match(decoded)) {
+      return decoded;
+    }
+    return null;
+  } catch (e) {
+    return null;
+  }
+}
+decodeNodeIdWithHandler.isSyncAndSafe = true; // Optimization
 
 export function nodeIdFromNode(handler: NodeIdHandler<any>, $node: Step) {
   const specifier = handler.plan($node);
