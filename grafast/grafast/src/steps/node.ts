@@ -9,19 +9,7 @@ import type { Step } from "../step.js";
 import { UnbatchedStep } from "../step.js";
 import { lambda } from "./lambda.js";
 
-/**
- * Decodes a GraphQL global object identifier and produces a specifier suitable
- * for polymorphic resolution.
- *
- * The step resolves to either `null` (if the identifier cannot be decoded) or
- * an object `{ __typename, specifier }`. The `specifier` is the decoded
- * payload returned by the relevant {@link NodeIdHandler}; it should then be
- * fed into an abstract type's `planType()` logic to obtain the concrete step
- * required for that object type.
- *
- * This step does **not** fetch the underlying record; it only performs the
- * decode and type discrimination.
- */
+/** @see {@link noed} */
 export class NodeStep extends UnbatchedStep<{
   __typename: string;
   specifier: any;
@@ -69,7 +57,18 @@ export class NodeStep extends UnbatchedStep<{
 }
 
 /**
- * Helper for constructing {@link NodeStep}. See the class docs for behaviour.
+ * Decodes a GraphQL global object identifier and produces a specifier suitable
+ * for polymorphic resolution.
+ *
+ * The step resolves to either `null` (if the identifier cannot be decoded) or
+ * an object `{ __typename, specifier }`. The `specifier` is the decoded
+ * payload returned by the relevant {@link NodeIdHandler}; it should then be
+ * fed into an abstract type's `planType()` logic to obtain the concrete step
+ * required for that object type - this is normally done automatically when the
+ * value is returned for an position with an abstract type.
+ *
+ * This step does **not** fetch the underlying record; it only performs the
+ * decode and type discrimination.
  */
 export function node(
   possibleTypes: {
