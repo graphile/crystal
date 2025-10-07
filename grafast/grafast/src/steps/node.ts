@@ -15,10 +15,12 @@ import { lambda } from "./lambda.js";
  * extra work performed by {@link NodeStep} and keeps plan resolvers
  * straightforward.
  */
-export function specFromNodeId(
-  handler: NodeIdHandler<any>,
+export function specFromNodeId<
+  THandler extends NodeIdHandler<any> = NodeIdHandler<any>,
+>(
+  handler: THandler,
   $id: Step<Maybe<string>>,
-) {
+): ReturnType<THandler["getSpec"]> {
   const $decoded = lambda(
     { handler: constant(handler), raw: $id as Step<string> },
     decodeNodeIdWithHandler,

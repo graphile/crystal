@@ -8,6 +8,13 @@ But what we do have is:
 
 ## specFromNodeId
 
+```ts
+function specFromNodeId<THandler extends NodeIdHandler<any>>(
+  handler: THandler,
+  $id: Step<Maybe<string>>,
+): ReturnType<THandler["getSpec"]>;
+```
+
 If you already know which object type the ID should represent (for example in a
 mutation such as `updateUser(id: ID!, ...)`), you can pass that type's
 `NodeIdHandler` along with the ID to `specFromNodeId(handler, $id)`, which will
@@ -23,6 +30,16 @@ const $update = userResource.update(specifier, $changes);
 Note that the specifier returned is not necessarily a step itself - typically
 it's an object that contains keyed steps, e.g. `{ id: Step<string> }`. This will
 vary based on the needs of the `NodeIdHandler`.
+
+## nodeIdFromNode
+
+```ts
+function nodeIdFromNode(handler: NodeIdHandler, $node: Step): Step<string>;
+```
+
+Given a `NodeIdHandler` for a given GraphQL object type, and a `$node` step
+representing that same object type, return a Step representing the GraphQL `ID`
+for `$node`.
 
 ## NodeIdHandler
 
