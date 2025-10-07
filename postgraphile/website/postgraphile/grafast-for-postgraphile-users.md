@@ -20,8 +20,114 @@ API.
 
 :::
 
-Below are the steps PostGraphile
-users encounter most when extending their schema.
+Below are the steps PostGraphile users encounter most when extending their
+schema.
+
+## Postgres-related steps
+
+Of course it makes sense that PostGraphile users will deal with the database a
+lot. Often the step that represents a specific type you're extending will be a
+`pgSelectSingle` step representing a row in the database. Sometimes you'll need
+to query or update other rows in the database.
+
+### pgResources
+
+For most query operations you'll start with the "resource" that represents your
+database table, and you'll `.get()` a single row or `.find()` many rows. This
+will, under the hood, create a `pgSelectSingle` or `pgSelect` step for you.
+
+Resources are found in the `build.pgResources` object (or, equivalently,
+`build.input.pgRegistry.pgResources`), keyed by the _inflected_ name of the
+resource. Typically this will be the name of the table/view/function/etc:
+
+```ts
+const { users, get_users_by_organization } = build.pgResources;
+```
+
+#### pgResource.get()
+
+You can then select a single row from a resource by passing a "specifier" object
+to `.get()`. This must identify the step to check equality with for each of the
+attributes in a unique constraint or primary key:
+
+```ts
+const $user = users.get({ id: $id });
+```
+
+(Returns a `pgSelectSingle` step.)
+
+#### pgResource.find()
+
+Alternatively, you might wish to select many rows from the resource. You may
+optionally still use a specifier object to give some equality constraints, but
+more typically you will want to add your own conditions:
+
+```ts
+const $users = users.find();
+$users.where(sql`${$users}.is_active = true`);
+```
+
+(Returns a `pgSelect` step.)
+
+#### pgResource.execute()
+
+"Resources" aren't limited to just being database tables; views, materialized
+views, and even functions are also resources. For a function, you would issue an
+execute command instead, passing descriptions of each argument:
+
+```ts
+const $users = get_users_by_organization.execute([
+  { step: $organizationId, pgCodec: TYPES.uuid },
+]);
+$users.where(sql`${$users}.is_active = true`);
+```
+
+(Returns a `pgSelect` step.)
+
+:::note[The codec is currently required]
+
+Unfortunately the work required to make the codecs optional didn't make the cut
+for the V5.0.0 release.
+
+:::
+
+### pgSelect
+
+A `pgSelect` step represents selecting a list of rows from a database. It's rare
+that you would construct a `pgSelect(...)` step directly; instead use the
+resources as shown above.
+
+A `pgSelect` step has loads of useful methods, including:
+
+- `.where(...)` - add a `WHERE` clause
+- `.orderBy(...)` - add an `ORDER BY` clause
+- `.setOrderIsUnique()` - if you know the ordering is stable (no two rows can
+  have the same values for the ordered columns) set this for efficiency
+- `.groupBy(...)` - add a `GROUP BY` clause
+- `.having(...)` - add a `HAVING` clause
+- `.setInliningForbidden()` - prevent this select being inlined into its parent
+- `.setTrusted()` - don't invoke the `selectAuth()` and other methods from the
+  resource (for efficiency, presumably because they were already validated some other way).
+- `.setUnique()` - indicate that this will return at most one row.
+- `.single()` - return the single row (or result if this is a scalar function) from this unique pgSelect
+
+### pgSelectSingle
+
+A single row from the database is represented by a `pgSelectSingle` step. It's
+used for accessing columns (`.get(columnName)`) and constructing expressions.
+Common methods:
+
+- `.get('column_name')` - read the column `column_name` from the row
+- `.record()` - return an object representing the full database record
+  (inefficient - avoid unless needed!)
+- `.select(...)` - return a step representing the result of an SQL expression using this row, decoded with the given codec
+- `.getPgRoot()` - return the fetching step this `pgSelectSingle` step came
+  from - this will typically be a `pgSelect` step, but need not be (e.g. in the
+  case of `pgCreateSingle`/`pgUpdateSingle`)
+- `.singleRelation(relationName)` - get a `pgSelectSingle` step representing the row from
+  traversing the `relationName` relation
+- `.manyRelation(relationName)` - get a `pgSelect` step representing the rows from
+  traversing the `relationName` relation
 
 ## context
 
