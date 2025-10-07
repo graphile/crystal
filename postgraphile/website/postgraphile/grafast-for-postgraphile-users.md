@@ -82,7 +82,6 @@ execute command instead, passing descriptions of each argument:
 const $users = get_users_by_organization.execute([
   { step: $organizationId, pgCodec: TYPES.uuid },
 ]);
-$users.where(sql`${$users}.is_active = true`);
 ```
 
 (Returns a `pgSelect` step.)
@@ -121,12 +120,16 @@ grafast.org](https://grafast.org/grafast/step-library/dataplan-pg/pgSelect)
 
 A single row from the database is represented by a `pgSelectSingle` step. It's
 used for accessing columns (`.get(columnName)`) and constructing expressions.
-Common methods:
+It's exceedingly rare to need to create a `pgSelectSingle()` directly, instead
+you would retrieve one via `pgResource.get()`, via regular list traversal of a
+`pgSelect` step, or via a `pgSelect` step's `.single()` method.
+
+Commonly used methods:
 
 - `.get('column_name')` - read the column `column_name` from the row
+- `.select(...)` - return a step representing the result of an SQL expression using this row, decoded with the given codec
 - `.record()` - return an object representing the full database record
   (inefficient - avoid unless needed!)
-- `.select(...)` - return a step representing the result of an SQL expression using this row, decoded with the given codec
 - `.getPgRoot()` - return the fetching step this `pgSelectSingle` step came
   from - this will typically be a `pgSelect` step, but need not be (e.g. in the
   case of `pgCreateSingle`/`pgUpdateSingle`)
