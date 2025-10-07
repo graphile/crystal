@@ -1,50 +1,47 @@
 # node
 
-`node(possibleTypes, $id)` decodes a GraphQL global ID and determines which
-object type it references. The step resolves to either `null` or an object of
-shape `{ __typename, specifier }`. The `specifier` is the decoded payload for
-that handler and should be fed into your abstract type’s `planType()` logic to
-produce the concrete step for the matching object type.
+We don't current have a `node()` step... it's not needed since you can typically
+just return the ID verbatim and rely on the `Node` interface's `planType()`
+method to resolve the type.
 
-This step doesn't fetch the underlying record; it only performs ID
-classification. Many resolvers can skip `node()` entirely by using
-`specFromNodeId()` (see below) when the target type is already known.
+But what we do have is:
 
 ## specFromNodeId
 
 If you already know which object type the ID should represent (for example in a
-mutation such as `updateUser(id: ID!, ...)`), prefer using
-`specFromNodeId(handler, $id)`. It returns the handler’s specifier directly and
-skips the polymorphic dispatch:
+mutation such as `updateUser(id: ID!, ...)`), you can pass that type's
+`NodeIdHandler` along with the ID to `specFromNodeId(handler, $id)`, which will
+then return a specifier object, skipping the polymorphic resolution:
 
 ```ts
 import { specFromNodeId } from "grafast";
 
-const $specifier = specFromNodeId(userHandler, $id);
-const $update = userResource.update($specifier, $changes);
-return $update;
+const specifier = specFromNodeId(userHandler, $id);
+const $update = userResource.update(specifier, $changes);
 ```
 
-`node()` is only needed when a field genuinely needs to branch between multiple
-handlers at runtime, such as the standard `Query.node` field.
+Note that the specifier returned is not necessarily a step itself - typically
+it's an object that contains keyed steps, e.g. `{ id: Step<string> }`. This will
+vary based on the needs of the `NodeIdHandler`.
 
 ## NodeIdHandler
 
-A `NodeIdHandler` describes how a single object type encodes and decodes its
-Global Object Identifier. Handlers are plain objects; the essential fields are:
+A `NodeIdHandler` describes how a single GraphQL object type encodes and decodes
+its Global Object Identifier. Handlers are plain objects; the essential fields
+are:
 
-- `typeName` – GraphQL object type name this handler serves.
+- `typeName` – GraphQL object type name (string) this handler serves.
 - `codec` – the `NodeIdCodec` (see below) used to encode/decode the NodeID string.
 - `match(decoded)` – returns `true` when the decoded value belongs to this
   type.
 - `getIdentifiers(decoded)` – extracts the underlying identifier tuple from the
   decoded value.
-- `plan($node)` – produces the value that will be passed to `codec.encode`.
-  Feeding the result into `match` should yield `true`.
 - `getSpec($decoded)` – converts the decoded value into whatever specifier your
   application expects. Useful for referencing a node without fetching it.
 - `get(spec)` – given the specifier from `getSpec`, returns a step that resolves
   to the original node.
+- `plan($node)` – produces the value that will be passed to `codec.encode`.
+  Feeding the result into `match` should yield `true`.
 - `deprecationReason` (optional) – indicates that the Node implementation is
   deprecated.
 
@@ -60,17 +57,21 @@ export const userHandler: NodeIdHandler<[number]> = {
   typeName: "User",
   codec: base64JSONCodec,
   match(decoded) {
-    return decoded[0] === "User";
+    const [typeName, id] = decoded;
+    return typeName === "User";
   },
   getIdentifiers(decoded) {
     const [typeName, id] = decoded;
     return [id];
   },
   plan($user) {
-    return list([constant("User", true), $user.get("id")]);
+    const $typeName = constant("User", true);
+    const $id = $user.get("id");
+    return list([$typeName, $id]);
   },
   getSpec($decoded) {
-    return { id: inhibitOnNull(access($decoded, 1)) };
+    const $id = access($decoded, 1); // e.g. `decoded[1]`
+    return { id: inhibitOnNull($id) };
   },
   get(spec) {
     return userResource.get(spec);
@@ -178,10 +179,4 @@ const handlers = {
   User: userHandler,
   Article: articleHandler,
 };
-```
-
-You can then pass it to `node()`:
-
-```ts
-const $node = node(handlers, $id);
 ```
