@@ -12,7 +12,7 @@ Together these steps let you blend PostgreSQL data, external APIs, and custom
 business logic into a single plan. Gra*fast* keeps the execution efficient while
 PostGraphile gives you the extension points to shape the graph you need.
 
-:::note
+:::note[Main docs at grafast.org]
 
 The authoritative reference for every step lives on
 [grafast.org](https://grafast.org); follow the links below for the full
