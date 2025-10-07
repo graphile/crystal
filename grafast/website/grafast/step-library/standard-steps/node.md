@@ -1,200 +1,199 @@
 # node
 
-A step to get a Node by its global object identifier (string). Accepts two parameters:
+We don't current have a `node()` step... it's not needed since you can typically
+just return the ID verbatim and rely on the `Node` interface's `planType()`
+method to resolve the type.
 
-- `handlers`: a map from typeName to handler spec (codec to use, how to find the record, etc) - see below
-- `$id`: the step (typically supplied from a field argument) representing the Node ID
-
-Returns a polymorphic-capable step representing the record this `$id` represents.
-
-Usage:
-
-```ts
-const $nodeIdString = fieldArgs.getRaw("id");
-const $node = node(handlers, $nodeIdString);
-```
-
-## codecs
-
-A node identifier is a string that uniquely identifies an entity in the GraphQL
-schema for the lifetime of that entity.
-
-A codec is responsible for parsing and de-parsing this string. There are many
-different ways of encoding node identifiers, so we allow for many different
-codecs.
-
-A code is made of a `name` (string) and two methods:
-
-- `encode` takes an intermediate representation and turns it into the final node identifier string
-- `decode` takes the final node identifier string and turns it back into an intermediate representation
-
-This intermediate representation is produced by and consumed by the handlers
-(see below).
-
-Here's an example `base64JSONCodec` which simply JSON stringifies the
-intermediate representation and then base64 encodes it:
-
-```js
-function base64JSONEncode(value: any): string | null {
-  return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-}
-base64JSONEncode.isSyncAndSafe = true; // Optimization
-
-function base64JSONDecode(value: string): any {
-  return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-}
-base64JSONDecode.isSyncAndSafe = true; // Optimization
-
-const base64JSONCodec = {
-  name: "base64JSON",
-  encode: base64JSONEncode,
-  decode: base64JSONDecode,
-};
-```
-
-## handlers
-
-Each GraphQL object type that supports the `Node` interface must have its own
-`NodeIdHandler`. This handler specifies:
-
-- `typeName` - the GraphQL object type name to which the handler applies
-- `codec` - the NodeID codec (see above) to use with this handler
-- `match` - determines whether a given intermediate representation of a node
-  identifier string (i.e. the result of `codec.decode()`) relates to this type
-  or not
-- `plan` - takes an entity of the given object type and return a step
-  representing the intermediate representation for this entity (ready to be fed
-  to `codec.encode()`)
-- `getSpec` - builds a "specification" of the entity from a step representing a
-  matching intermediate representation
-- `get` - given the specification from `getSpec` above, returns a step
-  representing the entity identified by the matching node identifier string, if
-  it exists
-
-Specifications (returned from `getSpec`) may differ for each object type. They
-could be something simple like just a step that represents the numeric primary
-key in the database, or they may be more complex such as an object with
-multiple keys where each key's value is a step representing a related value to
-match in the remote source.
-
-Here's an example of a `userHandler`, which could be used across a schema when
-handling node identifiers for the `User` type:
-
-```js
-const USER = "User";
-
-const userHandler = {
-  typeName: USER,
-
-  codec: base64JSONCodec,
-
-  // Given a User record, return a step describing the data to be encoded by
-  // the codec:
-  plan($user: PgSelectSingleStep) {
-    return list([constant(USER), $user.get("id")]);
-  },
-
-  // Given the data decoded by the codec, determine if the data is for our
-  // type. In this particular handler, the check looks at the first entry in
-  // the list to see if it matches our type name.
-  match(list) {
-    return list[0] === USER;
-  },
-
-  // Given a step representing decoded data that passes the `match` test above,
-  // return a specifier object that can be used to retrieve or reference
-  // this entity.
-  getSpec($list: ListStep<any[]>) {
-    return {
-      id: access($list, 1),
-    };
-  },
-
-  // Given a spec (the result of `getSpec` above), return a step that resolves
-  // to the entity (if found).
-  get(spec: any) {
-    return pgResource.get(spec);
-  },
-};
-
-const handlers = {
-  User: userHandler,
-  // Add more handlers here
-};
-```
+But what we do have is:
 
 ## specFromNodeId
 
-Given you have a Node ID represented by the step `$id` and you already know
-what type it should be (e.g. for an `updateUser` mutation you might know that
-the `$id` should represent a `User`), you can use `specFromNodeId` passing the
-relevant handler to get a specification for the entity in question. This is
-typically useful when you want to mutate an entity without having to actually
-retrieve it (if you want to retrieve it then use `node()` above instead).
-
-If the handler doesn't match then the executable steps inside the resulting
-spec will resolve to null-ish values (or maybe raise an error).
-
 ```ts
-function specFromNodeId(
-  handler: NodeIdHandler<any>,
-  $id: ExecutableStep<string> | AnyInputStep,
-): any;
+function specFromNodeId<THandler extends NodeIdHandler<any>>(
+  handler: THandler,
+  $id: Step<Maybe<string>>,
+): ReturnType<THandler["getSpec"]>;
 ```
 
-Here's an example of an `updateUser` mutation that uses the `userHandler`
-example handler from above:
+If you already know which object type the ID should represent (for example in a
+mutation such as `updateUser(id: ID!, ...)`), you can pass that type's
+`NodeIdHandler` along with the ID to `specFromNodeId(handler, $id)`, which will
+then return a specifier object, skipping the polymorphic resolution:
 
 ```ts
-const typeDefs = /* GraphQL */ `
-  extend type Mutation {
-    updateUser(id: ID!, patch: UserPatch!): UpdateUserPayload
-  }
-`;
+import { specFromNodeId } from "grafast";
 
-const objects = {
-  Mutation: {
-    plans: {
-      updateUser(parent, { $id }) {
-        // Turn the $id into a specifier:
-        const spec = specFromNodeId(userHandler, $id);
+const specifier = specFromNodeId(userHandler, $id);
+const $update = userResource.update(specifier, $changes);
+```
 
-        // Now use this specifier to plan an update for this user:
-        const $result = pgUpdateSingle(userSource, spec);
+Note that the specifier returned is not necessarily a step itself - typically
+it's an object that contains keyed steps, e.g. `{ id: Step<string> }`. This will
+vary based on the needs of the `NodeIdHandler`.
 
-        // Leave space in our result so we can add more properties later:
-        const $payload = object({ result: $result });
+## nodeIdFromNode
 
-        // Apply all the plans from the 'patch' argument (omitted for brevity):
-        fieldArgs.apply($payload);
+```ts
+function nodeIdFromNode(handler: NodeIdHandler, $node: Step): Step<string>;
+```
 
-        // Return the payload plan:
-        return $payload;
-      },
-    },
+Given a `NodeIdHandler` for a given GraphQL object type, and a `$node` step
+representing that same object type, return a Step representing the GraphQL `ID`
+for `$node`.
+
+## NodeIdHandler
+
+A `NodeIdHandler` describes how a single GraphQL object type encodes and decodes
+its Global Object Identifier. Handlers are plain objects; the essential fields
+are:
+
+- `typeName` – GraphQL object type name (string) this handler serves.
+- `codec` – the `NodeIdCodec` (see below) used to encode/decode the NodeID string.
+- `match(decoded)` – returns `true` when the decoded value belongs to this
+  type.
+- `getIdentifiers(decoded)` – extracts the underlying identifier tuple from the
+  decoded value.
+- `getSpec($decoded)` – converts the decoded value into whatever specifier your
+  application expects. Useful for referencing a node without fetching it.
+- `get(spec)` – given the specifier from `getSpec`, returns a step that resolves
+  to the original node.
+- `plan($node)` – produces the value that will be passed to `codec.encode`.
+  Feeding the result into `match` should yield `true`.
+- `deprecationReason` (optional) – indicates that the Node implementation is
+  deprecated.
+
+Here's an example `NodeIdHandler` for a `User` type where the NodeID encodes a
+tuple of `["User", userId]` using a base64-encoded JSON array:
+
+```ts
+import { constant, list } from "grafast";
+import type { NodeIdHandler } from "grafast";
+import { base64JSONCodec } from "./nodeIdCodecs"; // see NodeIdCodec section
+
+export const userHandler: NodeIdHandler<[number]> = {
+  typeName: "User",
+  codec: base64JSONCodec,
+  match(decoded) {
+    const [typeName, id] = decoded;
+    return typeName === "User";
+  },
+  getIdentifiers(decoded) {
+    const [typeName, id] = decoded;
+    return [id];
+  },
+  plan($user) {
+    const $typeName = constant("User", true);
+    const $id = $user.get("id");
+    return list([$typeName, $id]);
+  },
+  getSpec($decoded) {
+    const $id = access($decoded, 1); // e.g. `decoded[1]`
+    return { id: inhibitOnNull($id) };
+  },
+  get(spec) {
+    return userResource.get(spec);
   },
 };
 ```
 
-## nodeIdFromNode
-
-Given you have a step representing a node and you know the handler for it, this
-helper method will return a step representing the Node ID for this node.
+Here's how we might retrieve a user from a UserID:
 
 ```ts
-const typeDefs = /* GraphQL */ `
-  extend type User {
-    id: ID!
-  }
-`;
+const $id = constant("WyJVc2VyIiwxMjNd"); // base64(JSON.stringify(["User",123"]))
+const spec = specFromNodeId(userHandler, $id);
+const $user = userHandler.get(spec);
+```
 
-const objects = {
-  User: {
-    plans: {
-      id($user) {
-        return nodeIdFromNode(handlers.User, $user);
-      },
-    },
+And given that we now have a User in `$user`, we can get back to the `$id`:
+
+```ts
+const $specifier = handler.plan($user);
+const $id = lambda($specifier, userHandler.codec.encode);
+```
+
+:::note[Encoding, decoding, and matching happen at execution time]
+
+Matching an ID:
+
+```ts
+const id = "WyJVc2VyIiwxMjNd"; // base64(JSON.stringify(["User", 123]))
+const decoded = userHandler.codec.decode(id); // ["User", 123]
+const isMatch = userHandler.match(decoded); // true
+const identifiers = userHandler.getIdentifiers(decoded); // [123]
+```
+
+Encoding an ID:
+
+```ts
+const planResult = ["User", 123];
+const id = userHandler.codec.encode(planResult); // "WyJVc2VyIiwxMjNd"
+```
+
+:::
+
+## NodeIdCodec
+
+`NodeIdCodec` objects are responsible for converting a specifier to a string and
+back again. Implement `{ name, encode, decode }` and set
+`encode.isSyncAndSafe = true` / `decode.isSyncAndSafe = true` when the
+operations are synchronous and side-effect free so Grafast can inline them.
+
+Typically the same codec will be used for all IDs across your schema, but that
+is not a requirement. If in doubt, `base64JSONCodec` is a good default.
+
+### base64JSONCodec
+
+This is a fairly popular and safe way of encoding IDs; essentially it's a base64
+encoded JSON-stringified value, and should work with all identifiers.
+
+```ts
+export const base64JSONCodec = {
+  name: "base64JSON",
+  encode(value: any) {
+    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
   },
+  decode(value: string) {
+    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+  },
+};
+base64JSONCodec.encode.isSyncAndSafe = true;
+base64JSONCodec.decode.isSyncAndSafe = true;
+```
+
+e.g. `WyJVc2VyIiwxMjNd` might encode a `User` identified by `123`.
+
+### pipeStringCodec
+
+This is a more concise and less opaque encoding, using a pipe symbol to separate
+the various components, but it is not appropriate to use if any of the
+components may themselves contain a pipe symbol. It is purely presented as an
+example, not a recommendation.
+
+```ts
+export const pipeStringCodec = {
+  name: "pipeString",
+  encode(values: any[]) {
+    return Array.isArray(values) ? values.join("|") : null;
+  },
+  decode(value: string) {
+    return typeof value === "string" ? value.split("|") : null;
+  },
+};
+pipeStringCodec.encode.isSyncAndSafe = true;
+pipeStringCodec.decode.isSyncAndSafe = true;
+```
+
+e.g. `User|123` might encode a `User` identified by `123`.
+
+## Possible types
+
+The `possibleTypes` object is a generally useful object to have around your
+schema, a single place in which to look up all of your NodeIdHandlers. It's
+simply a map from type name to handler:
+
+```ts
+const handlers = {
+  User: userHandler,
+  Article: articleHandler,
 };
 ```

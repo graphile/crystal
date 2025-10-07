@@ -44,9 +44,7 @@ export {
 export {
   makeDecodeNodeId,
   makeDecodeNodeIdRuntime,
-  node,
   nodeIdFromNode,
-  NodeStep,
   specFromNodeId,
 } from "./node.js";
 export { object, ObjectPlanMeta, ObjectStep } from "./object.js";
