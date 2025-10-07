@@ -44,6 +44,9 @@ resource. Typically this will be the name of the table/view/function/etc:
 const { users, get_users_by_organization } = build.pgResources;
 ```
 
+Read more: [registry resources at
+grafast.org](https://grafast.org/grafast/step-library/dataplan-pg/registry/resources)
+
 #### pgResource.get()
 
 You can then select a single row from a resource by passing a "specifier" object
@@ -111,6 +114,9 @@ A `pgSelect` step has loads of useful methods, including:
 - `.setUnique()` - indicate that this will return at most one row.
 - `.single()` - return the single row (or result if this is a scalar function) from this unique pgSelect
 
+Read more: [pgSelect at
+grafast.org](https://grafast.org/grafast/step-library/dataplan-pg/pgSelect)
+
 ### pgSelectSingle
 
 A single row from the database is represented by a `pgSelectSingle` step. It's
@@ -128,6 +134,9 @@ Common methods:
   traversing the `relationName` relation
 - `.manyRelation(relationName)` - get a `pgSelect` step representing the rows from
   traversing the `relationName` relation
+
+Read more: [pgSelectSingle at
+grafast.org](https://grafast.org/grafast/step-library/dataplan-pg/pgSelect)
 
 ## context
 
