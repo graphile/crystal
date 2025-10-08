@@ -105,6 +105,80 @@ Key points:
 If you want to understand how claims map onto PostgreSQL session variables, see
 the [JWT specification](./jwt-specification) for the precise rules.
 
+## Supplying JWTs from clients
+
+Clients typically send JWTs via the `Authorization` header using the Bearer
+scheme:
+
+```ini
+Authorization: Bearer JWT_TOKEN_HERE
+```
+
+Below are a few JavaScript client examples; adapt them to your own stack.
+
+### Apollo Client
+
+```js
+const httpLink = createHttpLink({
+  uri: "/graphql",
+});
+
+const authLink = setContext((_, { headers }) => {
+  const token = getJWTToken();
+  return {
+    headers: {
+      ...headers,
+      ...(token ? { authorization: `Bearer ${token}` } : null),
+    },
+  };
+});
+
+const client = new ApolloClient({
+  link: authLink.concat(httpLink),
+  cache: new InMemoryCache(),
+});
+```
+
+If you are using Apollo’s websocket transport:
+
+```js {5,10}
+const token = getJWTToken();
+
+const wsLink = new WebSocketLink({
+  uri: "ws://localhost:3000/graphql",
+  options: {
+    reconnect: true,
+    connectionParams: token
+      ? { authorization: `Bearer ${token}` }
+      : {},
+  },
+});
+```
+
+### Relay
+
+```js
+function fetchQuery(operation, variables) {
+  const token = getJWTToken();
+  return fetch("/graphql", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      authorization: token ? `Bearer ${token}` : "",
+    },
+    body: JSON.stringify({
+      query: operation.text,
+      variables,
+    }),
+  }).then((response) => response.json());
+}
+
+const environment = new Environment({
+  network: Network.create(fetchQuery),
+  store: new Store(new RecordSource()),
+});
+```
+
 ## About the `lazy-jwt` preset
 
 `postgraphile/presets/lazy-jwt` exists for teams that need a quick stopgap while

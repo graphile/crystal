@@ -202,110 +202,20 @@ write (or by the `lazy-jwt` preset if you are still using it). Review the
 [PostgreSQL JWT specification](./jwt-specification) to ensure the fields you
 return map cleanly onto PostgreSQL session settings.
 
-## Sending JWTs to the server
+## Using values inside PostgreSQL
 
-JWTs are typically sent via the `Authorization` header:
+Whether you authenticate with sessions, JWTs, or another mechanism, PostGraphile
+ultimately sets PostgreSQL parameters with the data you place into `pgSettings`.
+The [PostgreSQL JWT specification](./jwt-specification) documents the exact
+`set_config` calls used for JWT claims, but the same principles apply to any
+custom prefix you choose.
 
-```ini
-Authorization: Bearer JWT_TOKEN_HERE
-```
-
-e.g.
-[with Apollo](https://www.apollographql.com/docs/react/networking/authentication/#header):
-
-```js
-const httpLink = createHttpLink({
-  uri: "/graphql",
-});
-
-const authLink = setContext((_, { headers }) => {
-  // get the authentication token from wherever you store it
-  const token = getJWTToken();
-  // return the headers to the context so httpLink can read them
-  return {
-    headers: {
-      ...headers,
-      // Only pass the authorization header if we have a JWT
-      ...(token ? { authorization: `Bearer ${token}` } : null),
-    },
-  };
-});
-
-const client = new ApolloClient({
-  link: authLink.concat(httpLink),
-  cache: new InMemoryCache(),
-});
-```
-
-or [with Relay](https://relay.dev/docs/guides/network-layer/)
-
-```js
-function fetchQuery( operation, variables, cacheConfig, uploadables) {
-  // get the authentication token from wherever you store it
-  const token = getJWTToken();
-  return fetch('/graphql', {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json'
-      authorization: token ? `Bearer ${token}` : "",
-    },
-    body: JSON.stringify({
-      query: operation.text, // GraphQL text from input
-      variables,
-    }),
-  }).then(response => {
-    return response.json();
-  });
-}
-
-const environment = new Environment({
-  network: Network.create(fetchQuery),
-  store: new Store(new RecordSource()),
-});
-```
-
-### Sending over a websocket
-
-If you are using Apollo:
-
-```js {5,10}
-// get the authentication token from wherever you store it
-const token = getJWTToken();
-
-const wsLink = new WebSocketLink({
-  uri: "ws://localhost:3000/graphql",
-  options: {
-    reconnect: true,
-    connectionParams: token
-      ? {
-          authorization: `Bearer ${token}`,
-        }
-      : {},
-  },
-});
-```
-
-### How it works
-
-Your JWT token will include a number of claims, something like:
-
-```json
-{
-  "aud": "postgraphile",
-  "role": "app_user",
-  "user_id": 27
-}
-```
-
-When we verify that the JWT token is for us (via `aud: "postgraphile"`) we can
-authenticate the PostgreSQL client that is used to perform the GraphQL query.
-The PostgreSQL adaptor might use something like this to achieve this goal:
+For example, if you push a user identifier through `pgSettings` then the
+database session might receive commands similar to:
 
 ```sql
 begin;
-set local role app_user;
-set local jwt.claims.role to 'app_user';
-set local jwt.claims.user_id to '2';
+set local myapp.user_id to '2';
 
 -- PERFORM GRAPHQL QUERIES HERE
 
@@ -324,17 +234,17 @@ but showing `set local` is simpler to understand.
 
 :::
 
-You can then access this information via `current_setting(name, true)` (the
-second argument says it's okay for the property to be missing); for example
-here's a helper function:
+You can then access the data via `current_setting(name, true)` (the second
+argument says it is okay for the property to be missing). A helper function such
+as the following can keep row level policies tidy:
 
 ```sql
 create function current_user_id() returns integer as $$
-  select nullif(current_setting('jwt.claims.user_id', true), '')::integer;
+  select nullif(current_setting('myapp.user_id', true), '')::integer;
 $$ language sql stable;
 ```
 
-e.g. you might have a row level policy such as:
+and you can rely on it inside policies:
 
 ```sql
 create policy update_if_author
