@@ -4,9 +4,10 @@ title: PostGraphile JWT guide
 
 JWTs are optional in PostGraphile. You can authenticate users with session
 cookies, API keys, mTLS, or any other mechanism that lets your web framework
-identify who is making the request. The key requirement is that you surface the
-relevant details to PostgreSQL via [`pgSettings`](./config.mdx#pgsettings) so that
-Row Level Security (RLS) policies and functions can make decisions. See the
+identify who is making the request. The key requirement is that you surface
+the relevant details to PostgreSQL via
+[`pgSettings`](./config.mdx#pgsettings) so that Row Level Security (RLS)
+policies and functions can make decisions. See the
 [security](./security.md) page for the broader architecture and trade-offs.
 
 Assuming that you choose to use JWTs to provide authentication to PostGraphile
@@ -103,7 +104,7 @@ Key points:
 - Do not leak entire JWT payloads blindly—only forward what your database schema needs.
 
 If you want to understand how claims map onto PostgreSQL session variables, see
-the [JWT specification](./jwt-specification) for the precise rules.
+the [JWT specification](./jwt-specification.md) for the precise rules.
 
 ## Supplying JWTs from clients
 
@@ -116,7 +117,7 @@ Authorization: Bearer JWT_TOKEN_HERE
 
 Below are a few JavaScript client examples; adapt them to your own stack.
 
-### Apollo Client
+### Apollo Client (v3, HTTP)
 
 ```js
 const httpLink = createHttpLink({
@@ -139,23 +140,29 @@ const client = new ApolloClient({
 });
 ```
 
-If you are using Apollo’s websocket transport:
+If you are using Apollo Client 3 with `graphql-ws` for subscriptions:
 
-```js {5,10}
+```js
+import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
+import { createClient } from "graphql-ws";
+
 const token = getJWTToken();
 
-const wsLink = new WebSocketLink({
-  uri: "ws://localhost:3000/graphql",
-  options: {
-    reconnect: true,
+const wsLink = new GraphQLWsLink(
+  createClient({
+    url: "ws://localhost:3000/graphql",
     connectionParams: token
       ? { authorization: `Bearer ${token}` }
       : {},
-  },
-});
+  }),
+);
 ```
 
-### Relay
+See the [Apollo authentication docs][apollo-auth] and the
+[subscriptions guide][apollo-subscriptions] for additional configuration
+options.
+
+### Relay (Modern)
 
 ```js
 function fetchQuery(operation, variables) {
@@ -178,6 +185,14 @@ const environment = new Environment({
   store: new Store(new RecordSource()),
 });
 ```
+
+Relay’s network layer setup is documented in the
+[Relay guides](https://relay.dev/docs/guides/network-layer/).
+
+[apollo-auth]:
+  https://www.apollographql.com/docs/react/networking/authentication/
+[apollo-subscriptions]:
+  https://www.apollographql.com/docs/react/data/subscriptions/
 
 ## About the `lazy-jwt` preset
 

@@ -22,9 +22,10 @@ Your web framework middleware will handle verification, refresh tokens,
 revocation lists, and other security concerns - the logic here is not specific
 to PostGraphile. Once you have a set of trusted claims you can expose them to
 PostgreSQL through PostGraphile's [`pgSettings`
-function](./config.mdx#pgsettings). See the [JWT guide](./jwt-guide.mdx) for the
-bigger picture and the [PostgreSQL JWT specification](./jwt-specification.md) for
-how claims map onto PostgreSQL session settings.
+function](./config.mdx#pgsettings). See the [JWT guide](./jwt-guide.mdx) for
+the bigger picture and the
+[PostgreSQL JWT specification](./jwt-specification.md) for how claims map onto
+PostgreSQL session settings.
 
 :::
 
@@ -186,5 +187,6 @@ and enforces your database policies accordingly.
 
 ---
 
-_This article was originally written by [BR](http://gitlab.com/benjamin-rood), but
-has since been heavily modified and updated._
+_This article was originally written by
+[BR](http://gitlab.com/benjamin-rood), but has since been heavily modified and
+updated._

@@ -37,8 +37,8 @@ database/table); and permission is selectively granted with the use of policies.
 If you already have a secure database schema that implements these technologies
 to protect your data at the lowest levels then you can leverage `postgraphile`
 to generate a powerful, secure and fast API very rapidly. PostGraphile simply
-needs enough context (via [`pgSettings`](./config#pgsettings)) to understand who
-is making the current request.
+needs enough context (via [`pgSettings`](./config.mdx#pgsettings)) to understand
+who is making the current request.
 
 ## Authentication strategies
 
@@ -46,9 +46,9 @@ is making the current request.
   `express-session`, `@fastify/session`). After the session has been validated
   you can copy the user identifier and any relevant flags into `pgSettings`.
 - **JWTs**: Verify the token in your middleware of choice, then map whichever
-  claims you require into PostgreSQL. The [JWT guide](./jwt-guide) walks through
-  that process and links to the
-  [PostgreSQL JWT specification](./jwt-specification) that PostGraphile
+  claims you require into PostgreSQL. The [JWT guide](./jwt-guide.mdx) walks
+  through that process and links to the
+  [PostgreSQL JWT specification](./jwt-specification.md) that PostGraphile
   follows.
 - **Other tokens**: API keys, mTLS attributes, OAuth access tokens, or other
   credentials can authenticate the caller; convert whatever identity or policy
@@ -224,10 +224,13 @@ commit;
 
 :::info
 
-To save round-trips, many adaptors perform just one query to set all configs via:
+To save round-trips, many adaptors perform just one query to set all configs
+via:
 
 ```sql
-select set_config('role', 'app_user', true), set_config('user_id', '2', true), ...
+select set_config('role', 'app_user', true),
+       set_config('user_id', '2', true),
+       ...;
 ```
 
 but showing `set local` is simpler to understand.
