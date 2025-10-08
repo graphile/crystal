@@ -93,6 +93,9 @@ into 4 main categories based on the root folders, each of which have a
 - Always use `Gra*fast*` in Markdown when referring to Gra*fast* - the "fast" is
   stylized in italics. When in MDX use the `<Grafast />` component if available,
   otherwise `Gra*fast*` is fine.
+- Keep Grafast documentation backend-agnostic: do not reference
+  PostGraphile-specific helpers (e.g. `@dataplan/pg`) unless the page is
+  explicitly about that integration.
 
 When writing Grafast plan resolvers in documentation, try and only do one action
 per statement; for example instead of:
