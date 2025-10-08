@@ -110,19 +110,27 @@ type DeleteGeomPayload {
 
 type Geom implements Node {
   box: Box
+  boxes: [Box]
   circle: Circle
+  circles: [Circle]
   closedPath: Path
+  closedPaths: [Path]
   id: Int!
   line: Line
+  lines: [Line]
   lseg: LineSegment
+  lsegs: [LineSegment]
 
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
   nodeId: ID!
   openPath: Path
+  openPaths: [Path]
   point: Point
+  points: [Point]
   polygon: Polygon
+  polygons: [Polygon]
 }
 
 """
@@ -132,11 +140,20 @@ input GeomCondition {
   """Checks for equality with the object’s `box` field."""
   box: BoxInput
 
+  """Checks for equality with the object’s `boxes` field."""
+  boxes: [BoxInput]
+
   """Checks for equality with the object’s `circle` field."""
   circle: CircleInput
 
+  """Checks for equality with the object’s `circles` field."""
+  circles: [CircleInput]
+
   """Checks for equality with the object’s `closedPath` field."""
   closedPath: PathInput
+
+  """Checks for equality with the object’s `closedPaths` field."""
+  closedPaths: [PathInput]
 
   """Checks for equality with the object’s `id` field."""
   id: Int
@@ -144,43 +161,74 @@ input GeomCondition {
   """Checks for equality with the object’s `line` field."""
   line: LineInput
 
+  """Checks for equality with the object’s `lines` field."""
+  lines: [LineInput]
+
   """Checks for equality with the object’s `lseg` field."""
   lseg: LineSegmentInput
+
+  """Checks for equality with the object’s `lsegs` field."""
+  lsegs: [LineSegmentInput]
 
   """Checks for equality with the object’s `openPath` field."""
   openPath: PathInput
 
+  """Checks for equality with the object’s `openPaths` field."""
+  openPaths: [PathInput]
+
   """Checks for equality with the object’s `point` field."""
   point: PointInput
 
+  """Checks for equality with the object’s `points` field."""
+  points: [PointInput]
+
   """Checks for equality with the object’s `polygon` field."""
   polygon: PolygonInput
+
+  """Checks for equality with the object’s `polygons` field."""
+  polygons: [PolygonInput]
 }
 
 """An input for mutations affecting `Geom`"""
 input GeomInput {
   box: BoxInput
+  boxes: [BoxInput]
   circle: CircleInput
+  circles: [CircleInput]
   closedPath: PathInput
+  closedPaths: [PathInput]
   id: Int
   line: LineInput
+  lines: [LineInput]
   lseg: LineSegmentInput
+  lsegs: [LineSegmentInput]
   openPath: PathInput
+  openPaths: [PathInput]
   point: PointInput
+  points: [PointInput]
   polygon: PolygonInput
+  polygons: [PolygonInput]
 }
 
 """Represents an update to a `Geom`. Fields that are set will be updated."""
 input GeomPatch {
   box: BoxInput
+  boxes: [BoxInput]
   circle: CircleInput
+  circles: [CircleInput]
   closedPath: PathInput
+  closedPaths: [PathInput]
   id: Int
   line: LineInput
+  lines: [LineInput]
   lseg: LineSegmentInput
+  lsegs: [LineSegmentInput]
   openPath: PathInput
+  openPaths: [PathInput]
   point: PointInput
+  points: [PointInput]
   polygon: PolygonInput
+  polygons: [PolygonInput]
 }
 
 """A connection to a list of `Geom` values."""
