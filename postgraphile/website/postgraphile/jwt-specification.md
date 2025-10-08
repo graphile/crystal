@@ -1,28 +1,28 @@
 ---
-title: PostGraphile JWT guide
+title: PostgreSQL JWT specification
 ---
 
 import styles from "@site/src/css/common.module.css";
 
 <div className={styles.intro}>
 
-This specification was authored by [Caleb
-Meredith](https://twitter.com/calebmer) for use in the PostGraphQL project.
-The language of the specification is meant to be generally applicable and
-adoptable by any who might want to use it.
+This specification was authored by
+[Caleb Meredith](https://twitter.com/calebmer) for use in the PostGraphQL
+project. The language of the specification is meant to be generally applicable
+and adoptable by any who might want to use it.
 
 </div>
 
 :::info[There are alternatives to JWTs available]
 
-What follows is a specification of how you can use JWTs to
-authenticate a user with PostgreSQL such that PostgreSQL may perform your
-authorization checks. **This is not the only way of achieving this goal with
-PostGraphile**, for example you can do as the PostGraphile maintainer does and use
-standard session-based authentication (i.e. with cookies) via the relevant
-Express/Koa/Fastify middleware and PostGraphile’s
-[`pgSettings` functionality](./config#pgsettings) allowing you to
-leverage powerful pre-built authentication stacks such as
+What follows is a specification of how you can use JWTs to authenticate a user
+with PostgreSQL such that PostgreSQL may perform your authorization checks.
+**This is not the only way of achieving this goal with PostGraphile**, for
+example you can do as the PostGraphile maintainer does and use standard
+session-based authentication (i.e. with cookies) via the relevant Express/Koa/
+Fastify middleware and PostGraphile’s
+[`pgSettings` functionality](./config#pgsettings) allowing you to leverage
+powerful pre-built authentication stacks such as
 [passport.js](http://www.passportjs.org/) which has OAuth integration with most
 major “social login” providers.
 
@@ -30,9 +30,9 @@ major “social login” providers.
 
 ## PostgreSQL JSON Web Token Serialization Specification
 
-This specification aims to define a standard way to serialize [JSON Web
-Tokens][jwt] (JWT, [RFC 7519][rfc7519]) to a PostgreSQL database for developers
-who want to move authorization logic into their PostgreSQL schema.
+This specification aims to define a standard way to serialize
+[JSON Web Tokens][jwt] (JWT, [RFC 7519][rfc7519]) to a PostgreSQL database for
+developers who want to move authorization logic into their PostgreSQL schema.
 
 [Terminology][jwt-terms] from the JSON Web Token specification will be used.
 
