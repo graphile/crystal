@@ -11,7 +11,21 @@
         x
         y
       }
+      points {
+        x
+        y
+      }
       line {
+        a {
+          x
+          y
+        }
+        b {
+          x
+          y
+        }
+      }
+      lines {
         a {
           x
           y
@@ -31,7 +45,27 @@
           y
         }
       }
+      lsegs {
+        a {
+          x
+          y
+        }
+        b {
+          x
+          y
+        }
+      }
       box {
+        a {
+          x
+          y
+        }
+        b {
+          x
+          y
+        }
+      }
+      boxes {
         a {
           x
           y
@@ -48,7 +82,21 @@
           y
         }
       }
+      openPaths {
+        isOpen
+        points {
+          x
+          y
+        }
+      }
       closedPath {
+        isOpen
+        points {
+          x
+          y
+        }
+      }
+      closedPaths {
         isOpen
         points {
           x
@@ -61,7 +109,20 @@
           y
         }
       }
+      polygons {
+        points {
+          x
+          y
+        }
+      }
       circle {
+        center {
+          x
+          y
+        }
+        radius
+      }
+      circles {
         center {
           x
           y

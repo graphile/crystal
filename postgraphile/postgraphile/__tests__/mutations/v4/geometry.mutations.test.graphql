@@ -6,9 +6,22 @@ mutation {
     input: {
       geom: {
         point: { x: 99, y: 1234 }
+        points: [{ x: 99, y: 1234 }, { x: 1234, y: 99 }]
         line: { a: { x: 25, y: 200 }, b: { x: 0, y: 100 } }
+        lines: [
+          { a: { x: 25, y: 200 }, b: { x: 0, y: 100 } }
+          { a: { x: 200, y: 25 }, b: { x: 100, y: 0 } }
+        ]
         lseg: { a: { x: 99, y: 111 }, b: { x: 2935, y: 3548 } }
+        lsegs: [
+          { a: { x: 99, y: 111 }, b: { x: 2935, y: 3548 } }
+          { a: { x: 111, y: 99 }, b: { x: 3548, y: 2935 } }
+        ]
         box: { a: { x: 123, y: 52635 }, b: { x: 2342, y: 12445 } }
+        boxes: [
+          { a: { x: 123, y: 52635 }, b: { x: 2342, y: 12445 } }
+          { a: { x: 52635, y: 123 }, b: { x: 12445, y: 2342 } }
+        ]
         openPath: {
           isOpen: true
           points: [
@@ -18,6 +31,26 @@ mutation {
             { x: 10, y: 0 }
           ]
         }
+        openPaths: [
+          {
+            isOpen: true
+            points: [
+              { x: 0, y: 0 }
+              { x: 0, y: 10 }
+              { x: 10, y: 10 }
+              { x: 10, y: 0 }
+            ]
+          }
+          {
+            isOpen: true
+            points: [
+              { x: 1, y: 1 }
+              { x: 1, y: 11 }
+              { x: 11, y: 11 }
+              { x: 11, y: 1 }
+            ]
+          }
+        ]
         closedPath: {
           isOpen: false
           points: [
@@ -27,6 +60,26 @@ mutation {
             { x: 10, y: 0 }
           ]
         }
+        closedPaths: [
+          {
+            isOpen: false
+            points: [
+              { x: 0, y: 0 }
+              { x: 0, y: 10 }
+              { x: 10, y: 10 }
+              { x: 10, y: 0 }
+            ]
+          }
+          {
+            isOpen: false
+            points: [
+              { x: 1, y: 1 }
+              { x: 1, y: 11 }
+              { x: 11, y: 11 }
+              { x: 11, y: 1 }
+            ]
+          }
+        ]
         polygon: {
           points: [
             { x: 0, y: 0 }
@@ -35,7 +88,29 @@ mutation {
             { x: 10, y: 0 }
           ]
         }
+        polygons: [
+          {
+            points: [
+              { x: 0, y: 0 }
+              { x: 0, y: 10 }
+              { x: 10, y: 10 }
+              { x: 10, y: 0 }
+            ]
+          }
+          {
+            points: [
+              { x: 1, y: 1 }
+              { x: 1, y: 11 }
+              { x: 11, y: 11 }
+              { x: 11, y: 1 }
+            ]
+          }
+        ]
         circle: { center: { x: 7, y: 11 }, radius: 3 }
+        circles: [
+          { center: { x: 7, y: 11 }, radius: 3 }
+          { center: { x: 8, y: 12 }, radius: 4 }
+        ]
       }
     }
   ) {
@@ -45,7 +120,21 @@ mutation {
         x
         y
       }
+      points {
+        x
+        y
+      }
       line {
+        a {
+          x
+          y
+        }
+        b {
+          x
+          y
+        }
+      }
+      lines {
         a {
           x
           y
@@ -65,7 +154,27 @@ mutation {
           y
         }
       }
+      lsegs {
+        a {
+          x
+          y
+        }
+        b {
+          x
+          y
+        }
+      }
       box {
+        a {
+          x
+          y
+        }
+        b {
+          x
+          y
+        }
+      }
+      boxes {
         a {
           x
           y
@@ -82,7 +191,21 @@ mutation {
           y
         }
       }
+      openPaths {
+        isOpen
+        points {
+          x
+          y
+        }
+      }
       closedPath {
+        isOpen
+        points {
+          x
+          y
+        }
+      }
+      closedPaths {
         isOpen
         points {
           x
@@ -95,7 +218,20 @@ mutation {
           y
         }
       }
+      polygons {
+        points {
+          x
+          y
+        }
+      }
       circle {
+        center {
+          x
+          y
+        }
+        radius
+      }
+      circles {
         center {
           x
           y
