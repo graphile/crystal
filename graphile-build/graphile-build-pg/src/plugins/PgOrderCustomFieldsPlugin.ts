@@ -80,10 +80,11 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
     },
     hooks: {
       GraphQLEnumType_values(values, build, context) {
-        const { inflection, sql } = build;
+        const { inflection, sql, options } = build;
         const {
           scope: { isPgRowSortEnum, pgCodec },
         } = context;
+        const { pgOrderByNullsLast } = options;
         if (
           !isPgRowSortEnum ||
           !pgCodec ||
@@ -139,6 +140,13 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
                                 direction: ascDesc.toUpperCase() as
                                   | "ASC"
                                   | "DESC",
+                                ...(pgOrderByNullsLast != null
+                                  ? {
+                                      nulls: pgOrderByNullsLast
+                                        ? "LAST"
+                                        : "FIRST",
+                                    }
+                                  : null),
                               });
                             }) as PgSelectQueryBuilderCallback,
                           [ascDesc, pgFieldSource, sql],
