@@ -479,16 +479,31 @@ insert into enum_tables.referencing_table(enum_1, enum_2, enum_3, simple_enum) v
 
 alter sequence geometry.geom_id_seq restart with 101;
 insert into geometry.geom(
-  point, line, lseg, box, open_path, closed_path, polygon, circle
+  point, points, line, lines, lseg, lsegs, box, boxes, open_path, open_paths, closed_path, closed_paths, polygon, polygons, circle, circles
 ) values (
   point(4, 2),
+  ARRAY[point(4, 2), point(2, 4)],
+
   line(point(7, 11), point(13, 17)),
+  ARRAY[line(point(7, 11), point(13, 17)), line(point(11, 7), point(17, 13))],
+
   lseg(point(7, 11), point(13, 17)),
+  ARRAY[lseg(point(7, 11), point(13, 17)), lseg(point(11, 7), point(17, 13))],
+
   box(point(7, 11), point(13, 17)),
+  ARRAY[box(point(7, 11), point(13, 17)), box(point(11, 7), point(17, 13))],
+
   '[(1,3),(3,4),(4,1)]',
+  ARRAY['[(1,3),(3,4),(4,1)]', '[(3,1),(4,3),(1,4)]']::path[],
+
   '((1,3),(3,4),(4,1))',
+  ARRAY['((1,3),(3,4),(4,1))', '((3,1),(4,3),(1,4))']::path[],
+
   '((1,3),(3,4),(4,1))',
-  '<(10, 10), 7>'
+  ARRAY['((1,3),(3,4),(4,1))','((3,1),(4,3),(1,4))']::polygon[],
+
+  '<(10, 10), 7>',
+  ARRAY['<(10, 10), 7>', '<(10, 0), 3>']::circle[]
 );
 
 

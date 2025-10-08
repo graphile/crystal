@@ -1,4 +1,4 @@
-import { PgDeleteSingleStep, PgExecutor, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec, sqlValueWithCodec } from "@dataplan/pg";
+import { PgDeleteSingleStep, PgExecutor, TYPES, assertPgClassSingleStep, enumCodec, listOfCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec, sqlValueWithCodec } from "@dataplan/pg";
 import { ConnectionStep, EdgeStep, ObjectStep, __ValueStep, access, assertExecutableStep, bakedInputRuntime, connection, constant, context, createObjectAndApplyChildren, first, get as get2, inhibitOnNull, inspect, lambda, list, makeDecodeNodeId, makeGrafastSchema, object, rootValue, specFromNodeId } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
@@ -79,6 +79,111 @@ const executor = new PgExecutor({
   }
 });
 const geomIdentifier = sql.identifier("geometry", "geom");
+const pointArrayCodec = listOfCodec(TYPES.point, {
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "pg_catalog",
+      name: "_point"
+    },
+    tags: {
+      __proto__: null
+    }
+  },
+  typeDelim: ",",
+  description: undefined,
+  name: "pointArray"
+});
+const lineArrayCodec = listOfCodec(TYPES.line, {
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "pg_catalog",
+      name: "_line"
+    },
+    tags: {
+      __proto__: null
+    }
+  },
+  typeDelim: ",",
+  description: undefined,
+  name: "lineArray"
+});
+const lsegArrayCodec = listOfCodec(TYPES.lseg, {
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "pg_catalog",
+      name: "_lseg"
+    },
+    tags: {
+      __proto__: null
+    }
+  },
+  typeDelim: ",",
+  description: undefined,
+  name: "lsegArray"
+});
+const boxArrayCodec = listOfCodec(TYPES.box, {
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "pg_catalog",
+      name: "_box"
+    },
+    tags: {
+      __proto__: null
+    }
+  },
+  typeDelim: ";",
+  description: undefined,
+  name: "boxArray"
+});
+const pathArrayCodec = listOfCodec(TYPES.path, {
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "pg_catalog",
+      name: "_path"
+    },
+    tags: {
+      __proto__: null
+    }
+  },
+  typeDelim: ",",
+  description: undefined,
+  name: "pathArray"
+});
+const polygonArrayCodec = listOfCodec(TYPES.polygon, {
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "pg_catalog",
+      name: "_polygon"
+    },
+    tags: {
+      __proto__: null
+    }
+  },
+  typeDelim: ",",
+  description: undefined,
+  name: "polygonArray"
+});
+const circleArrayCodec = listOfCodec(TYPES.circle, {
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "pg_catalog",
+      name: "_circle"
+    },
+    tags: {
+      __proto__: null
+    }
+  },
+  typeDelim: ",",
+  description: undefined,
+  name: "circleArray"
+});
 const geomCodec = recordCodec({
   name: "geom",
   identifier: geomIdentifier,
@@ -102,9 +207,27 @@ const geomCodec = recordCodec({
         tags: {}
       }
     },
+    points: {
+      description: undefined,
+      codec: pointArrayCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
     line: {
       description: undefined,
       codec: TYPES.line,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    lines: {
+      description: undefined,
+      codec: lineArrayCodec,
       notNull: false,
       hasDefault: false,
       extensions: {
@@ -120,9 +243,27 @@ const geomCodec = recordCodec({
         tags: {}
       }
     },
+    lsegs: {
+      description: undefined,
+      codec: lsegArrayCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
     box: {
       description: undefined,
       codec: TYPES.box,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    boxes: {
+      description: undefined,
+      codec: boxArrayCodec,
       notNull: false,
       hasDefault: false,
       extensions: {
@@ -138,9 +279,27 @@ const geomCodec = recordCodec({
         tags: {}
       }
     },
+    open_paths: {
+      description: undefined,
+      codec: pathArrayCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
     closed_path: {
       description: undefined,
       codec: TYPES.path,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    closed_paths: {
+      description: undefined,
+      codec: pathArrayCodec,
       notNull: false,
       hasDefault: false,
       extensions: {
@@ -156,9 +315,27 @@ const geomCodec = recordCodec({
         tags: {}
       }
     },
+    polygons: {
+      description: undefined,
+      codec: polygonArrayCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
     circle: {
       description: undefined,
       codec: TYPES.circle,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    circles: {
+      description: undefined,
+      codec: circleArrayCodec,
       notNull: false,
       hasDefault: false,
       extensions: {
@@ -203,12 +380,19 @@ const resource_geomPgResource = makeRegistry({
     int4: TYPES.int,
     point: TYPES.point,
     geom: geomCodec,
+    pointArray: pointArrayCodec,
     line: TYPES.line,
+    lineArray: lineArrayCodec,
     lseg: TYPES.lseg,
+    lsegArray: lsegArrayCodec,
     box: TYPES.box,
+    boxArray: boxArrayCodec,
     path: TYPES.path,
+    pathArray: pathArrayCodec,
     polygon: TYPES.polygon,
+    polygonArray: polygonArrayCodec,
     circle: TYPES.circle,
+    circleArray: circleArrayCodec,
     LetterAToDEnum: enumCodec({
       name: "LetterAToDEnum",
       identifier: TYPES.text.sqlType,
@@ -734,13 +918,21 @@ type Geom implements Node {
   nodeId: ID!
   id: Int!
   point: Point
+  points: [Point]
   line: Line
+  lines: [Line]
   lseg: LineSegment
+  lsegs: [LineSegment]
   box: Box
+  boxes: [Box]
   openPath: Path
+  openPaths: [Path]
   closedPath: Path
+  closedPaths: [Path]
   polygon: Polygon
+  polygons: [Polygon]
   circle: Circle
+  circles: [Circle]
 }
 
 """A cartesian point."""
@@ -840,26 +1032,50 @@ input GeomCondition {
   """Checks for equality with the object’s \`point\` field."""
   point: PointInput
 
+  """Checks for equality with the object’s \`points\` field."""
+  points: [PointInput]
+
   """Checks for equality with the object’s \`line\` field."""
   line: LineInput
+
+  """Checks for equality with the object’s \`lines\` field."""
+  lines: [LineInput]
 
   """Checks for equality with the object’s \`lseg\` field."""
   lseg: LineSegmentInput
 
+  """Checks for equality with the object’s \`lsegs\` field."""
+  lsegs: [LineSegmentInput]
+
   """Checks for equality with the object’s \`box\` field."""
   box: BoxInput
+
+  """Checks for equality with the object’s \`boxes\` field."""
+  boxes: [BoxInput]
 
   """Checks for equality with the object’s \`openPath\` field."""
   openPath: PathInput
 
+  """Checks for equality with the object’s \`openPaths\` field."""
+  openPaths: [PathInput]
+
   """Checks for equality with the object’s \`closedPath\` field."""
   closedPath: PathInput
+
+  """Checks for equality with the object’s \`closedPaths\` field."""
+  closedPaths: [PathInput]
 
   """Checks for equality with the object’s \`polygon\` field."""
   polygon: PolygonInput
 
+  """Checks for equality with the object’s \`polygons\` field."""
+  polygons: [PolygonInput]
+
   """Checks for equality with the object’s \`circle\` field."""
   circle: CircleInput
+
+  """Checks for equality with the object’s \`circles\` field."""
+  circles: [CircleInput]
 }
 
 """A cartesian point."""
@@ -1014,13 +1230,21 @@ input CreateGeomInput {
 input GeomInput {
   id: Int
   point: PointInput
+  points: [PointInput]
   line: LineInput
+  lines: [LineInput]
   lseg: LineSegmentInput
+  lsegs: [LineSegmentInput]
   box: BoxInput
+  boxes: [BoxInput]
   openPath: PathInput
+  openPaths: [PathInput]
   closedPath: PathInput
+  closedPaths: [PathInput]
   polygon: PolygonInput
+  polygons: [PolygonInput]
   circle: CircleInput
+  circles: [CircleInput]
 }
 
 """The output of our update \`Geom\` mutation."""
@@ -1069,13 +1293,21 @@ input UpdateGeomInput {
 input GeomPatch {
   id: Int
   point: PointInput
+  points: [PointInput]
   line: LineInput
+  lines: [LineInput]
   lseg: LineSegmentInput
+  lsegs: [LineSegmentInput]
   box: BoxInput
+  boxes: [BoxInput]
   openPath: PathInput
+  openPaths: [PathInput]
   closedPath: PathInput
+  closedPaths: [PathInput]
   polygon: PolygonInput
+  polygons: [PolygonInput]
   circle: CircleInput
+  circles: [CircleInput]
 }
 
 """All input for the \`updateGeomById\` mutation."""
@@ -1326,12 +1558,18 @@ export const objects = {
       closedPath($record) {
         return $record.get("closed_path");
       },
+      closedPaths($record) {
+        return $record.get("closed_paths");
+      },
       nodeId($parent) {
         const specifier = nodeIdHandler_Geom.plan($parent);
         return lambda(specifier, nodeIdCodecs[nodeIdHandler_Geom.codec.name].encode);
       },
       openPath($record) {
         return $record.get("open_path");
+      },
+      openPaths($record) {
+        return $record.get("open_paths");
       }
     },
     planType($specifier) {
@@ -1426,6 +1664,15 @@ export const inputObjects = {
           }
         });
       },
+      boxes($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "boxes",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, boxArrayCodec)}`;
+          }
+        });
+      },
       circle($condition, val) {
         $condition.where({
           type: "attribute",
@@ -1435,12 +1682,30 @@ export const inputObjects = {
           }
         });
       },
+      circles($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "circles",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, circleArrayCodec)}`;
+          }
+        });
+      },
       closedPath($condition, val) {
         $condition.where({
           type: "attribute",
           attribute: "closed_path",
           callback(expression) {
             return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.path)}`;
+          }
+        });
+      },
+      closedPaths($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "closed_paths",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, pathArrayCodec)}`;
           }
         });
       },
@@ -1462,12 +1727,30 @@ export const inputObjects = {
           }
         });
       },
+      lines($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "lines",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, lineArrayCodec)}`;
+          }
+        });
+      },
       lseg($condition, val) {
         $condition.where({
           type: "attribute",
           attribute: "lseg",
           callback(expression) {
             return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.lseg)}`;
+          }
+        });
+      },
+      lsegs($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "lsegs",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, lsegArrayCodec)}`;
           }
         });
       },
@@ -1480,6 +1763,15 @@ export const inputObjects = {
           }
         });
       },
+      openPaths($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "open_paths",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, pathArrayCodec)}`;
+          }
+        });
+      },
       point($condition, val) {
         $condition.where({
           type: "attribute",
@@ -1489,12 +1781,30 @@ export const inputObjects = {
           }
         });
       },
+      points($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "points",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, pointArrayCodec)}`;
+          }
+        });
+      },
       polygon($condition, val) {
         $condition.where({
           type: "attribute",
           attribute: "polygon",
           callback(expression) {
             return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, TYPES.polygon)}`;
+          }
+        });
+      },
+      polygons($condition, val) {
+        $condition.where({
+          type: "attribute",
+          attribute: "polygons",
+          callback(expression) {
+            return val === null ? sql`${expression} is null` : sql`${expression} = ${sqlValueWithCodec(val, polygonArrayCodec)}`;
           }
         });
       }
@@ -1509,17 +1819,35 @@ export const inputObjects = {
       }) {
         obj.set("box", bakedInputRuntime(schema, field.type, val));
       },
+      boxes(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("boxes", bakedInputRuntime(schema, field.type, val));
+      },
       circle(obj, val, {
         field,
         schema
       }) {
         obj.set("circle", bakedInputRuntime(schema, field.type, val));
       },
+      circles(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("circles", bakedInputRuntime(schema, field.type, val));
+      },
       closedPath(obj, val, {
         field,
         schema
       }) {
         obj.set("closed_path", bakedInputRuntime(schema, field.type, val));
+      },
+      closedPaths(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("closed_paths", bakedInputRuntime(schema, field.type, val));
       },
       id(obj, val, {
         field,
@@ -1533,11 +1861,23 @@ export const inputObjects = {
       }) {
         obj.set("line", bakedInputRuntime(schema, field.type, val));
       },
+      lines(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("lines", bakedInputRuntime(schema, field.type, val));
+      },
       lseg(obj, val, {
         field,
         schema
       }) {
         obj.set("lseg", bakedInputRuntime(schema, field.type, val));
+      },
+      lsegs(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("lsegs", bakedInputRuntime(schema, field.type, val));
       },
       openPath(obj, val, {
         field,
@@ -1545,17 +1885,35 @@ export const inputObjects = {
       }) {
         obj.set("open_path", bakedInputRuntime(schema, field.type, val));
       },
+      openPaths(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("open_paths", bakedInputRuntime(schema, field.type, val));
+      },
       point(obj, val, {
         field,
         schema
       }) {
         obj.set("point", bakedInputRuntime(schema, field.type, val));
       },
+      points(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("points", bakedInputRuntime(schema, field.type, val));
+      },
       polygon(obj, val, {
         field,
         schema
       }) {
         obj.set("polygon", bakedInputRuntime(schema, field.type, val));
+      },
+      polygons(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("polygons", bakedInputRuntime(schema, field.type, val));
       }
     }
   },
@@ -1568,17 +1926,35 @@ export const inputObjects = {
       }) {
         obj.set("box", bakedInputRuntime(schema, field.type, val));
       },
+      boxes(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("boxes", bakedInputRuntime(schema, field.type, val));
+      },
       circle(obj, val, {
         field,
         schema
       }) {
         obj.set("circle", bakedInputRuntime(schema, field.type, val));
       },
+      circles(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("circles", bakedInputRuntime(schema, field.type, val));
+      },
       closedPath(obj, val, {
         field,
         schema
       }) {
         obj.set("closed_path", bakedInputRuntime(schema, field.type, val));
+      },
+      closedPaths(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("closed_paths", bakedInputRuntime(schema, field.type, val));
       },
       id(obj, val, {
         field,
@@ -1592,11 +1968,23 @@ export const inputObjects = {
       }) {
         obj.set("line", bakedInputRuntime(schema, field.type, val));
       },
+      lines(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("lines", bakedInputRuntime(schema, field.type, val));
+      },
       lseg(obj, val, {
         field,
         schema
       }) {
         obj.set("lseg", bakedInputRuntime(schema, field.type, val));
+      },
+      lsegs(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("lsegs", bakedInputRuntime(schema, field.type, val));
       },
       openPath(obj, val, {
         field,
@@ -1604,17 +1992,35 @@ export const inputObjects = {
       }) {
         obj.set("open_path", bakedInputRuntime(schema, field.type, val));
       },
+      openPaths(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("open_paths", bakedInputRuntime(schema, field.type, val));
+      },
       point(obj, val, {
         field,
         schema
       }) {
         obj.set("point", bakedInputRuntime(schema, field.type, val));
       },
+      points(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("points", bakedInputRuntime(schema, field.type, val));
+      },
       polygon(obj, val, {
         field,
         schema
       }) {
         obj.set("polygon", bakedInputRuntime(schema, field.type, val));
+      },
+      polygons(obj, val, {
+        field,
+        schema
+      }) {
+        obj.set("polygons", bakedInputRuntime(schema, field.type, val));
       }
     }
   },

@@ -26,7 +26,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
  */
-import { parseArray } from "../dist/parseArray.js";
+import { parseBox } from "../dist/codecUtils/box.js";
+import { makeParseArrayWithTransform, parseArray } from "../dist/parseArray.js";
 
 test("empty", () => expect(parseArray("{}")).toEqual([]));
 test("empty string", () => expect(parseArray('{""}')).toEqual([""]));
@@ -51,6 +52,14 @@ test("null", () => expect(parseArray("{NULL,NULL}")).toEqual([null, null]));
 test("numerics parsed", () => expect(intArray("{1,2,3}")).toEqual([1, 2, 3]));
 test("numerics parsed with indicies", () =>
   expect(intArray("[0:2]={1,2,3}")).toEqual([1, 2, 3]));
+
+test("parses box array using ; delimeter", () => {
+  const boxArrayParser = makeParseArrayWithTransform(parseBox, ";");
+  expect(boxArrayParser("{(13,17),(7,11);(17,13),(11,7)}")).toEqual([
+    { a: { x: 13, y: 17 }, b: { x: 7, y: 11 } },
+    { a: { x: 17, y: 13 }, b: { x: 11, y: 7 } },
+  ]);
+});
 
 function intArray(string: string) {
   return parseArray(string).map((value) => parseInt(value, 10));
