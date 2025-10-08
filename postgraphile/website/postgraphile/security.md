@@ -50,8 +50,9 @@ is making the current request.
   that process and links to the
   [PostgreSQL JWT specification](./jwt-specification) that PostGraphile
   follows.
-- **Other tokens**: API keys, mTLS attributes, OAuth access tokens, or anything
-  else can drive authorization as long as you convert them into values for
+- **Other tokens**: API keys, mTLS attributes, OAuth access tokens, or other
+  credentials can authenticate the caller; convert whatever identity or policy
+  data you need into values for
   `pgSettings`.
 
 PostGraphile does not recommend one approach over another; pick whatever fits
