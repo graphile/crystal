@@ -183,3 +183,8 @@ functions. Adjust the key names to match whatever you added to `pgSettings`.
 
 Once everything is wired up, PostGraphile simply consumes the claims you provide
 and enforces your database policies accordingly.
+
+---
+
+_This article was originally written by [BR](http://gitlab.com/benjamin-rood), but
+has since been heavily modified and updated._
