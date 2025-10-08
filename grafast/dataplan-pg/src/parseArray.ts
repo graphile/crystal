@@ -21,6 +21,7 @@ type Transform<T> = (val: string) => T;
  */
 export function makeParseArrayWithTransform<T = string>(
   transform?: Transform<T>,
+  typeDelim = COMMA,
 ): (str: string) => readonly T[] {
   const haveTransform = transform != null;
   return function parseArray(str) {
@@ -86,7 +87,7 @@ export function makeParseArrayWithTransform<T = string>(
         current = newArray;
         currentStringStart = position + 1;
         expectValue = true;
-      } else if (char === COMMA) {
+      } else if (char === typeDelim) {
         expectValue = true;
       } else if (char === RBRACE) {
         expectValue = false;
@@ -98,7 +99,7 @@ export function makeParseArrayWithTransform<T = string>(
       } else if (expectValue) {
         currentStringStart = position;
         while (
-          (char = str[position]) !== COMMA &&
+          (char = str[position]) !== typeDelim &&
           char !== RBRACE &&
           position < rbraceIndex
         ) {

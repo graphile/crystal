@@ -716,9 +716,9 @@ export function listOfCodec<
     name,
     sqlType: identifier,
     fromPg:
-      innerCodecFromPg === identity
+      innerCodecFromPg === identity && typeDelim === ","
         ? parseArray
-        : makeParseArrayWithTransform(innerCodecFromPg),
+        : makeParseArrayWithTransform(innerCodecFromPg, typeDelim),
     toPg: (value) => {
       let result = "{";
       for (let i = 0, l = value.length; i < l; i++) {
