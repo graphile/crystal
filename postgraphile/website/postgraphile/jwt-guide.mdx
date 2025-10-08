@@ -190,7 +190,7 @@ building a real authentication layer. When enabled it:
   adaptors that populate this, such as `postgraphile/grafserv/express/v4`);
 - verifies the token with `jsonwebtoken` using a shared secret (set via
   `preset.grafserv.pgJwtSecret` or `preset.schema.pgJwtSecret`), default
-  algorithms `HS256`/`HS384`, and default audience `postgraphile` ( override via
+  algorithms `HS256`/`HS384`, and default audience `postgraphile` (override via
   `preset.grafserv.pgJwtVerifyOptions`);
 - copies the `role` claim and alphanumeric claims into `pgSettings` under the
   `jwt.claims.*` namespace.
