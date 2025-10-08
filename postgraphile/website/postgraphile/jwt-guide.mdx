@@ -2,117 +2,235 @@
 title: PostGraphile JWT guide
 ---
 
-import styles from "@site/src/css/common.module.css";
+JWTs are optional in PostGraphile. You can authenticate users with session
+cookies, API keys, mTLS, or any other mechanism that lets your web framework
+identify who is making the request. The key requirement is that you surface
+the relevant details to PostgreSQL via
+[`pgSettings`](./config.mdx#pgsettings) so that Row Level Security (RLS)
+policies and functions can make decisions. See the
+[security](./security.md) page for the broader architecture and trade-offs.
 
-<div className={styles.intro}>
+Assuming that you choose to use JWTs to provide authentication to PostGraphile
+(and the author would encourage you to consider alternatives), this guide
+explains how JWTs fit into that picture, how to populate `pgSettings` from a
+verified token, and when you might lean on the `postgraphile/presets/lazy-jwt`
+convenience preset.
 
-This specification was authored by [Caleb
-Meredith](https://twitter.com/calebmer) for use in the PostGraphQL project.
-The language of the specification is meant to be generally applicable and
-adoptable by any who might want to use it.
+:::info[You own JWT verification]
 
-</div>
-
-:::info[There are alternatives to JWTs available]
-
-What follows is a specification of how you can use JWTs to
-authenticate a user with PostgreSQL such that PostgreSQL may perform your
-authorization checks. **This is not the only way of achieving this goal with
-PostGraphile**, for example you can do as the PostGraphile maintainer does and use
-standard session-based authentication (i.e. with cookies) via the relevant
-Express/Koa/Fastify middleware and PostGraphile’s
-[`pgSettings` functionality](./config#pgsettings) allowing you to
-leverage powerful pre-built authentication stacks such as
-[passport.js](http://www.passportjs.org/) which has OAuth integration with most
-major “social login” providers.
+You are expected to verify tokens in your server framework (Express, Koa,
+Fastify, etc.) and feed the resulting claims to PostGraphile via the
+`preset.grafast.context` callback's `pgSettings` property. This means you can
+implement refresh tokens, revocation, clock skew handling, and other behaviours
+that PostGraphile cannot reasonably guess for you.
 
 :::
 
-## PostgreSQL JSON Web Token Serialization Specification
+## Typical request flow
 
-This specification aims to define a standard way to serialize [JSON Web
-Tokens][jwt] (JWT, [RFC 7519][rfc7519]) to a PostgreSQL database for developers
-who want to move authorization logic into their PostgreSQL schema.
+1. Your web framework receives the request and runs whichever authentication
+   middleware you have chosen (sessions, JWTs, mutual TLS, etc.).
+2. After verification you extract the claims you want PostgreSQL to know about
+   and pass them into `pgSettings` via `preset.grafast.context`.
+3. PostgreSQL reads those values with `current_setting(...)` inside policies and
+   functions, completing the authorization story.
 
-[Terminology][jwt-terms] from the JSON Web Token specification will be used.
+For JWT-based setups the first step is often done with
+[`jsonwebtoken`](https://github.com/auth0/node-jsonwebtoken), `jose`, or vendor
+SDKs. The second step is where PostGraphile comes in.
 
-After a JSON Web Token has been verified and decoded, the resulting claims will
-be serialized to the PostgreSQL database in two ways:
+## Populating `pgSettings` after verifying a JWT
 
-1.  Using the `role` claim, the corresponding role will be set in the database
-    using [`SET ROLE`][set-role]:
+Below is an Express-flavoured example that validates a Bearer token and exposes
+select claims to PostgreSQL.
 
-    ```sql
-    set local role $role;
-    ```
+```ts title="graphile.config.ts"
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+import { verify } from "jsonwebtoken";
 
-    Where `$role` is the claim value for the `role` claim. It is not an error if
-    the `role` claim is not set.
+const preset: GraphileConfig.Preset = {
+  extends: [PostGraphileAmberPreset],
 
-2.  All remaining claims will be set using the [`SET`][set] command under the
-    `jwt.claims` namespace. Using:
+  grafast: {
+    async context(requestContext, args) {
+      const req = requestContext.expressv4?.req;
+      const header = req?.get("authorization") ?? "";
+      const [, token] = header.split(" ");
 
-    ```sql
-    set local jwt.claims.$claim_name to $claim_value;
-    ```
+      const pgSettings = {
+        ...args.contextValue?.pgSettings,
+      } as Record<string, string>;
 
-    Will be run for every claim including registered claims like `iss`, `sub`,
-    and the claim specified 1 (`role`). `$claim_name` is the name of the claim
-    and `$claim_value` is the associated value.
+      if (token) {
+        try {
+          const claims = verify(token, process.env.JWT_SECRET!, {
+            audience: "postgraphile",
+            algorithms: ["HS256"],
+          });
+          if (typeof claims === "object" && claims !== null) {
+            if (claims.role && typeof claims.role === "string") {
+              pgSettings.role = claims.role;
+            }
+            for (const [key, value] of Object.entries(claims)) {
+              if (typeof value === "undefined" || value === null) continue;
+              if (!/^[a-z_][a-z0-9_]*$/i.test(key) || key.length > 52) continue;
+              pgSettings[`jwt.claims.${key}`] = String(value);
+            }
+          }
+        } catch (e) {
+          // Let the framework decide how to surface auth errors.
+          requestContext.expressv4?.res?.status(401);
+          throw e;
+        }
+      }
 
-### Example
+      return {
+        ...args.contextValue,
+        pgSettings,
+      };
+    },
+  },
+};
 
-A JSON Web Token with the following claims:
+export default preset;
+```
 
-```json
-{
-  "sub": "postgraphql",
-  "role": "user",
-  "user_id": 2
+Key points:
+
+- You decide which claims to trust and forward. You might strip or rename
+  values, or merge in data from a session store.
+- Anything placed inside `pgSettings` becomes available via
+  `current_setting('...', true)` when RLS policies run.
+- Do not leak entire JWT payloads blindly—only forward what your database schema needs.
+
+If you want to understand how claims map onto PostgreSQL session variables, see
+the [JWT specification](./jwt-specification.md) for the precise rules.
+
+## Supplying JWTs from clients
+
+Clients typically send JWTs via the `Authorization` header using the Bearer
+scheme:
+
+```ini
+Authorization: Bearer JWT_TOKEN_HERE
+```
+
+Below are a few JavaScript client examples; adapt them to your own stack.
+
+### Apollo Client (v3, HTTP)
+
+```js
+const httpLink = createHttpLink({
+  uri: "/graphql",
+});
+
+const authLink = setContext((_, { headers }) => {
+  const token = getJWTToken();
+  return {
+    headers: {
+      ...headers,
+      ...(token ? { authorization: `Bearer ${token}` } : null),
+    },
+  };
+});
+
+const client = new ApolloClient({
+  link: authLink.concat(httpLink),
+  cache: new InMemoryCache(),
+});
+```
+
+If you are using Apollo Client 3 with `graphql-ws` for subscriptions:
+
+```js
+import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
+import { createClient } from "graphql-ws";
+
+const token = getJWTToken();
+
+const wsLink = new GraphQLWsLink(
+  createClient({
+    url: "ws://localhost:3000/graphql",
+    connectionParams: token
+      ? { authorization: `Bearer ${token}` }
+      : {},
+  }),
+);
+```
+
+See the [Apollo authentication docs][apollo-auth] and the
+[subscriptions guide][apollo-subscriptions] for additional configuration
+options.
+
+### Relay (Modern)
+
+```js
+function fetchQuery(operation, variables) {
+  const token = getJWTToken();
+  return fetch("/graphql", {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+      authorization: token ? `Bearer ${token}` : "",
+    },
+    body: JSON.stringify({
+      query: operation.text,
+      variables,
+    }),
+  }).then((response) => response.json());
 }
+
+const environment = new Environment({
+  network: Network.create(fetchQuery),
+  store: new Store(new RecordSource()),
+});
 ```
 
-Would result in the following SQL being run:
+Relay’s network layer setup is documented in the
+[Relay guides](https://relay.dev/docs/guides/network-layer/).
 
-```sql
-set local role user;
-set local jwt.claims.sub to 'postgraphql';
-set local jwt.claims.role to 'user';
-set local jwt.claims.user_id to 2;
-```
+[apollo-auth]:
+  https://www.apollographql.com/docs/react/networking/authentication/
+[apollo-subscriptions]:
+  https://www.apollographql.com/docs/react/data/subscriptions/
 
-### A Note on `local`
+## About the `lazy-jwt` preset
 
-Using `local` for [`SET`][set] and [`SET ROLE`][set-role] is not required,
-however it is recommended. This is so that every transaction block (beginning
-with `BEGIN` and ending with `COMMIT` or `ROLLBACK`) will have its own local
-parameters. See the following demonstration:
+`postgraphile/presets/lazy-jwt` exists for teams that need a quick stopgap while
+building a real authentication layer. When enabled it:
 
-```sql
-begin;
-set local jwt.claims.user_id to 2;
+- runs only when you use a `grafserv` HTTP adaptor;
+- reads the `Authorization` header for Bearer tokens from
+  `requestContext.node?.req?.headers?.authorization` (thus only works with
+  adaptors that populate this, such as `postgraphile/grafserv/express/v4`);
+- verifies the token with `jsonwebtoken` using a shared secret (set via
+  `preset.grafserv.pgJwtSecret` or `preset.schema.pgJwtSecret`), default
+  algorithms `HS256`/`HS384`, and default audience `postgraphile` (override via
+  `preset.grafserv.pgJwtVerifyOptions`);
+- copies the `role` claim and alphanumeric claims into `pgSettings` under the
+  `jwt.claims.*` namespace.
 
--- Has access to `jwt.claims.user_id`
-commit;
+It does **not** handle refresh tokens, key rotation, token revocation, custom
+claim mapping, or multi-tenant secret lookup. Treat it as a temporary measure
+and plan to replace it with middleware that explicitly sets `pgSettings`.
 
--- Does not have access to `jwt.claims.user_id`
-```
+## Issuing JWTs from PostgreSQL
 
-### Retrieving Claims in PostgreSQL
+If you want to generate JWTs from your PostgreSQL schema, PostGraphile can sign
+composite types listed in `preset.gather.pgJwtTypes`. When a function returns
+one of those types the response will instead include a signed JWT string (signed
+using the `preset.schema.pgJwtSecret` and any `preset.schema.pgJwtSignOptions`).
+Combine that with your own authentication SQL to issue tokens. Remember that
+this feature does not manage refresh tokens or provide a complete auth system—
+it only signs the composite payloads you return.
 
-In order to retrieve a claim set by the serialization of a JSON Web Token as
-defined in this spec, either the `current_setting` function or the
-[`SHOW`][show] command may be used like so:
+## Choosing between JWTs and alternatives
 
-```sql
-select current_setting('jwt.claims.user_id');
--- Or…
-show jwt.claims.user_id;
-```
-
-[jwt]: https://jwt.io/
-[rfc7519]: https://tools.ietf.org/html/rfc7519
-[jwt-terms]: https://tools.ietf.org/html/rfc7519#section-2
-[set-role]: http://www.postgresql.org/docs/current/static/sql-set-role.html
-[set]: http://www.postgresql.org/docs/current/static/sql-set.html
-[show]: http://www.postgresql.org/docs/current/static/sql-show.html
+JWTs are one option amongst many. Session cookies, OAuth-backed passport
+strategies, or bespoke API keys all work as long as you populate `pgSettings`
+appropriately. The
+[`pgSettings` section of the config docs](./config.mdx#pgsettings)
+shows how to expose request data regardless of authentication style, and the
+[security](./security.md) page lists common approaches. Pick the strategy that
+fits your infrastructure, and make sure you're aware of the trade-offs of each
+approach.

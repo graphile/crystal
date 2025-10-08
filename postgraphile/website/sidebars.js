@@ -144,6 +144,7 @@ const sidebars = {
     "grafast-for-postgraphile-users",
     "production",
     "jwt-guide",
+    "jwt-specification",
     "jwk-verification",
     "default-role",
     "testing-jest",

@@ -86,6 +86,8 @@ into 4 main categories based on the root folders, each of which have a
 
 - Never use `<https://...>`-style links, always use `[text](https://...)`.
 - Follow current formatting/lint rules; **do not** add style-only churn.
+- Do not trim file suffixes from links (e.g. `.md`/`.mdx`) - we use Docusaurus
+  to resolve these.
 - Keep code samples runnable in principle; **do not** add scripts to run them.
 - Wrap prose at 80 characters.
 - Always use `Gra*fast*` in Markdown when referring to Gra*fast* - the "fast" is
