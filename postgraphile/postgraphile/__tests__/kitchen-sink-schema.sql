@@ -1319,13 +1319,21 @@ create schema geometry;
 create table geometry.geom (
   id serial primary key,
   point point,
+  points point[],
   line line,
+  lines line[],
   lseg lseg,
+  lsegs lseg[],
   box box,
+  boxes box[],
   open_path path,
+  open_paths path[],
   closed_path path,
+  closed_paths path[],
   polygon polygon,
-  circle circle
+  polygons polygon[],
+  circle circle,
+  circles circle[]
 );
 
 --------------------------------------------------------------------------------
