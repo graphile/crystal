@@ -1,10 +1,18 @@
-insert into "geometry"."geom" as __geom__ ("point", "line", "lseg", "box", "open_path", "closed_path", "polygon", "circle") values ($1::"point", $2::"line", $3::"lseg", $4::"box", $5::"path", $6::"path", $7::"polygon", $8::"circle") returning
+insert into "geometry"."geom" as __geom__ ("point", "points", "line", "lines", "lseg", "lsegs", "box", "boxes", "open_path", "open_paths", "closed_path", "closed_paths", "polygon", "polygons", "circle", "circles") values ($1::"point", $2::"point"[], $3::"line", $4::"line"[], $5::"lseg", $6::"lseg"[], $7::"box", $8::"box"[], $9::"path", $10::"path"[], $11::"path", $12::"path"[], $13::"polygon", $14::"polygon"[], $15::"circle", $16::"circle"[]) returning
   __geom__."id"::text as "0",
   __geom__."point"::text as "1",
-  __geom__."line"::text as "2",
-  __geom__."lseg"::text as "3",
-  __geom__."box"::text as "4",
-  __geom__."open_path"::text as "5",
-  __geom__."closed_path"::text as "6",
-  __geom__."polygon"::text as "7",
-  __geom__."circle"::text as "8";
+  __geom__."points"::text as "2",
+  __geom__."line"::text as "3",
+  __geom__."lines"::text as "4",
+  __geom__."lseg"::text as "5",
+  __geom__."lsegs"::text as "6",
+  __geom__."box"::text as "7",
+  __geom__."boxes"::text as "8",
+  __geom__."open_path"::text as "9",
+  __geom__."open_paths"::text as "10",
+  __geom__."closed_path"::text as "11",
+  __geom__."closed_paths"::text as "12",
+  __geom__."polygon"::text as "13",
+  __geom__."polygons"::text as "14",
+  __geom__."circle"::text as "15",
+  __geom__."circles"::text as "16";
