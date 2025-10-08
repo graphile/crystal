@@ -124,7 +124,7 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
                     extensions: {
                       grafast: {
                         apply: EXPORTABLE(
-                          (ascDesc, pgFieldSource, sql) =>
+                          (ascDesc, pgFieldSource, pgOrderByNullsLast, sql) =>
                             ((queryBuilder: PgSelectQueryBuilder) => {
                               if (typeof pgFieldSource.from !== "function") {
                                 throw new Error(
@@ -149,7 +149,7 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
                                   : null),
                               });
                             }) as PgSelectQueryBuilderCallback,
-                          [ascDesc, pgFieldSource, sql],
+                          [ascDesc, pgFieldSource, pgOrderByNullsLast, sql],
                         ),
                       },
                     },
