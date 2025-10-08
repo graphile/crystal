@@ -675,6 +675,17 @@ Presets may also add values to `pgSettings`, for example
 `postgraphile/presets/lazy-jwt` parses the `Authorization` header and adds the
 claims from the JWT to `pgSettings`.
 
+:::warning[`lazy-jwt` is intentionally minimal]
+
+`postgraphile/presets/lazy-jwt` is a stopgap for teams that are still wiring up
+their own authentication. It only supports Bearer tokens, expects a shared
+secret unless you override the verification options, and cannot help with
+common production concerns such as refresh tokens, revocation, or key rotation.
+Plan to replace it with middleware in your application framework that verifies
+credentials and sets `pgSettings` explicitly.
+
+:::
+
 For most PostGraphile users there’s only one pgService, and the default
 `pgSettingsKey` is `"pgSettings"`, so rather than configuring pgSettings via
 the adaptor you might opt to configure it via including a `pgSettings` key in
