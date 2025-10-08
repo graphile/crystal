@@ -682,7 +682,7 @@ their own authentication. It only supports Bearer tokens, expects a shared
 secret unless you override the verification options, and cannot help with
 common production concerns such as refresh tokens, revocation, or key rotation.
 Plan to replace it with middleware in your application framework that verifies
-credentials and sets `pgSettings` explicitly.
+credentials and then share that information with PostgreSQL through `pgSettings`.
 
 :::
 
