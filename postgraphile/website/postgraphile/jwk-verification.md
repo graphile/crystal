@@ -4,19 +4,27 @@ title: JWK Verification (e.g. Auth0)
 
 # PostGraphile JWT/JWK Verification Quickstart
 
-This guide adapts Auth0’s Node (Express) quickstart so that the verified JWT
-payload is forwarded to PostgreSQL through [`pgSettings`](./config#pgsettings).
-It assumes you are running PostGraphile V5 using the Express adaptor from
-Gra*fast*’s `grafserv`.
+This guide adapts [Auth0’s Node (Express)
+quickstart](https://auth0.com/docs/quickstart/backend/nodejs/01-authorization)
+so that the verified JWT payload is forwarded to PostgreSQL through
+[`pgSettings`](./config#pgsettings). It assumes you are running PostGraphile
+using the Express adaptor (`postgraphile/grafserv/express/v4`), but similar will
+apply for alternative servers.
 
-:::info
+Terms:
 
-PostGraphile no longer verifies JWTs for you. Your web framework middleware must
-handle verification, refresh tokens, revocation lists, and other security
-concerns. Once you have a set of trusted claims you can expose them to
-PostgreSQL. See the [JWT guide](./jwt-guide) for the bigger picture and the
-[PostgreSQL JWT specification](./jwt-specification) for how claims map onto
-PostgreSQL session settings.
+- [JWT Access Token](https://auth0.com/docs/tokens/concepts/jwts)
+- [JWKS (JSON Web Key Set)](https://auth0.com/docs/jwks)
+
+:::info[Processing a JWT is a middleware concern]
+
+Your web framework middleware will handle verification, refresh tokens,
+revocation lists, and other security concerns - the logic here is not specific
+to PostGraphile. Once you have a set of trusted claims you can expose them to
+PostgreSQL through PostGraphile's [`pgSettings`
+function](./config.mdx#pgsettings). See the [JWT guide](./jwt-guide.mdx) for the
+bigger picture and the [PostgreSQL JWT specification](./jwt-specification.md) for
+how claims map onto PostgreSQL session settings.
 
 :::
 
@@ -30,9 +38,7 @@ This walkthrough uses Express and the Auth0-maintained helpers:
 
 Install them with the package manager of your choice:
 
-```bash
-yarn add express express-jwt jwks-rsa
-# Or:
+```bash npm2yarn
 npm install --save express express-jwt jwks-rsa
 ```
 
@@ -79,13 +85,13 @@ const preset: GraphileConfig.Preset = {
       const claims = req?.auth;
       if (claims && typeof claims === "object") {
         if (typeof claims.scope === "string") {
-          pgSettings["auth0.scope"] = claims.scope;
+          pgSettings["jwt.claims.scope"] = claims.scope;
         }
         if (typeof claims.sub === "string") {
           pgSettings["jwt.claims.sub"] = claims.sub;
         }
         if (Array.isArray(claims.permissions)) {
-          pgSettings["auth0.permissions"] = claims.permissions.join(" ");
+          pgSettings["jwt.claims.permissions"] = claims.permissions.join(" ");
         }
       }
 
@@ -100,15 +106,14 @@ const preset: GraphileConfig.Preset = {
 export default preset;
 ```
 
-The example above stores the Auth0 scope and permissions under your own
-namespace and passes the `sub` claim (subject) using the conventional
-`jwt.claims.*` prefix so it behaves like the legacy preset.
+You can use alternative Postgres settings names, but ensure that you include at
+least one and at most two `.` characters, and that the text before the first `.`
+is not a scope reserved by PostgreSQL. Historically no-one has raised an issue
+with the `jwt.claims` prefix, so it seems to be a good choice.
 
 ## Wire Express to Grafserv
 
-Use the Auth0 middleware before mounting PostGraphile’s request handlers. The
-Express adaptor lets you mount PostGraphile onto both the Express app and the
-underlying HTTP server.
+Use the Auth0 middleware before adding PostGraphile to your express app.
 
 ```ts title="server.ts"
 import express from "express";
@@ -121,17 +126,18 @@ import { checkJwt } from "./auth0.ts";
 import { authErrors } from "./auth-errors.ts";
 
 const app = express();
+const server = createServer(app);
+server.on("error", (e) => void console.error(e));
 app.use("/graphql", checkJwt, authErrors);
 
-const server = createServer(app);
 const pgl = postgraphile(preset);
 const serv = pgl.createServ(grafserv);
-
 serv
   .addTo(app, server)
   .then(() => {
-    server.listen(5678);
-    console.log("GraphQL running at http://localhost:5678/graphql");
+    const port = preset.grafserv?.port ?? 5678;
+    server.listen(port);
+    console.log(`GraphQL running at http://localhost:${port}/graphql`);
   })
   .catch((e) => {
     console.error(e);
@@ -167,7 +173,7 @@ Anything placed in `pgSettings` is available inside PostgreSQL via
 `current_setting(...)`. For example:
 
 ```sql
-create function auth0_current_subject() returns text as $$
+create function current_subject() returns text as $$
   select nullif(current_setting('jwt.claims.sub', true), '');
 $$ language sql stable;
 ```
