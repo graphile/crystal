@@ -13,9 +13,9 @@ so!
 :::tip[Prefer JavaScript?]
 
 If you want to script your mutation in JavaScript/TypeScript, you can model it
-directly with [`extendSchema`](./extend-schema). That keeps the custom
-mutation logic alongside your Gra*fast* plans instead of a PostgreSQL
-function.
+directly with [`extendSchema`](./extend-schema). This lets you build the exact
+GraphQL schema you want using ergonomic GraphQL SDL, and lets you control
+exactly what mutation logic will be executed via Gra*fast* plans.
 
 :::
 

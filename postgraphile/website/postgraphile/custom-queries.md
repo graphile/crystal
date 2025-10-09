@@ -12,9 +12,11 @@ will assign them an auto-generated name such as `arg1`.
 
 :::tip[Prefer JavaScript?]
 
-If you would rather add the field from JavaScript/TypeScript, build a plugin
-with [`extendSchema`](./extend-schema). It offers the same schema flexibility
-without relying on a companion SQL function.
+If you would rather add the field from JavaScript/TypeScript, use
+[`extendSchema`](./extend-schema). It allows you to specify with ergonomic
+GraphQL type extension SDL exactly what you want to add to your schema, and also
+allows you to define arbitrary Gra*fast* plans to detail how to resolve the
+fields.
 
 :::
 
