@@ -759,6 +759,22 @@ export const MyRegisterUserMutationPlugin = extendSchema((build) => {
 });
 ```
 
+### Setting `pgSettings` after authenticating or registering a user
+
+You might want to **authenticate/register and immediately return the user** in the same mutation payload. If that user resource is protected by **Row-Level Security (RLS)**, your payload resolver may not see it unless the request is executing with the user's identity.
+
+Set the identity in the per-request PostgreSQL settings so that subsequent resolvers in the same operation run under that identity (e.g. RLS policies using `current_setting('jwt.claims.sub', true)` will pass):
+
+```ts
+import { context } from "postgraphile/grafast";
+
+// inside your mutation plan resolver, after you've verified credentials / created the user:
+const $ctx = context();
+$ctx.pgSettings["jwt.claims.sub"] = userId; // the authenticated/created user's ID
+```
+
+With this in place, fields in the mutation payload such as `payload.user` (which load the user from the DB) will execute as that user, allowing RLS-protected reads to succeed during the same GraphQL operation.
+
 ## Mutation Example with Node ID
 
 In this example we’ll use a GraphQL Global Object Identifier (aka Node ID) to
@@ -1022,6 +1038,8 @@ async function sendEmail(email: string, message: string) {
   */
 }
 ```
+
+
 
 ## Plugin SQL Privileges
 
