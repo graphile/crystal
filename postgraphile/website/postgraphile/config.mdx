@@ -547,6 +547,11 @@ to determine the options that they offer.
 - `dontSwallowErrors: boolean` - if true, errors during the schema build process
   will throw rather than the system trying to recover from them. Recommended,
   but not enabled by default as it can be a barrier to entry to new users.
+- `exportSchemaSDLPath: string | undefined` - when set, writes the latest
+  GraphQL schema definition (SDL) to the given path every time the schema is
+  rebuilt.
+- `exportSchemaIntrospectionResultPath: string | undefined` - when set, writes
+  the GraphQL introspection JSON to the given path alongside SDL exports.
 - `jsonScalarAsString: boolean` - if true, JSON values will be stringified
   rather than returned as “dynamic” objects.
 - `pgForbidSetofFunctionsToReturnNull: boolean` - if true, setof functions
@@ -559,6 +564,8 @@ to determine the options that they offer.
   the default ordering
 - `pgUseCustomNetworkScalars: boolean` - if not false, adds the `CidrAddress`,
   `MacAddress` and similar types for PostgreSQL network scalars.
+- `sortExport: boolean` - if true (default: `false`), sorts exported SDL and
+  introspection output for stable diffs.
 
 ### `grafast` options
 
