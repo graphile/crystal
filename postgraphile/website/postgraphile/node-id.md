@@ -166,7 +166,9 @@ be meaningless, you should use an approach like UUIDv4 or a Feistel cipher.
 When you need to turn a Node ID back into the identifiers that your database
 expects, use the Gra*fast* helper `specFromNodeId()`. Every GraphQL type that
 implements the `Node` interface registers a handler; you can retrieve it via
-`build.getNodeIdHandler(typeName)` inside `extendSchema()`.
+`build.getNodeIdHandler(typeName)` inside `extendSchema()`. The
+[mutation example](./extend-schema.md#mutation-example-with-node-id) shows this
+in context.
 
 ```ts
 import { specFromNodeId } from "postgraphile/grafast";
@@ -181,5 +183,21 @@ The specifier is often an object such as `{ id: Step<string> }`, but the
 shape depends on the handler. Pass the specifier to the relevant resource or
 loader to continue working with the record.
 
-For more info, see
-[specFromNodeId in the Gra*fast* docs](https://grafast.org/grafast/step-library/standard-steps/node#specfromnodeid).
+```ts
+const {
+  organization_id: $organizationId,
+  issue_id: $issueId,
+} = specFromNodeId(handler, $nodeId);
+```
+
+See [specFromNodeId documentation][spec-from-node] for more.
+
+:::note
+
+If the Node ID does not decode for the specified handler, the resulting steps
+resolve to `null`. Guard accordingly before continuing.
+
+:::
+
+[spec-from-node]:
+  https://grafast.org/grafast/step-library/standard-steps/node#specfromnodeid
