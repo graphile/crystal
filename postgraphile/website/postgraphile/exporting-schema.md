@@ -22,6 +22,10 @@ optionally
 in your configuration. PostGraphile will refresh those files every time it
 rebuilds the schema.
 
+Remember: the SDL does not have any implementation details, just a description
+of the type system. If you want to export an executable schema (with all the
+plan resolvers built in) then read on!
+
 :::
 
 Here’s a simple example:
