@@ -768,9 +768,11 @@ Set the identity in the per-request PostgreSQL settings so that subsequent resol
 ```ts
 import { context } from "postgraphile/grafast";
 
-// inside your mutation plan resolver, after you've verified credentials / created the user:
+// inside your mutation plan resolver
 const $ctx = context();
-$ctx.pgSettings["jwt.claims.sub"] = userId; // the authenticated/created user's ID
+
+// then in a side-effect step, after you've verified credentials / created the user:
+ctx.pgSettings["jwt.claims.sub"] = userId; // the authenticated/created user's ID
 ```
 
 With this in place, fields in the mutation payload such as `payload.user` (which load the user from the DB) will execute as that user, allowing RLS-protected reads to succeed during the same GraphQL operation.
