@@ -5208,10 +5208,7 @@ export function makeExampleSchema(
         plan: EXPORTABLE(
           (executor, object, sideEffectWithPgClientTransaction, sleep, sql) =>
             function plan(_$root, { $input: { $a } }) {
-              const $transactionResult = sideEffectWithPgClientTransaction<
-                { a: number | null | undefined },
-                number[]
-              >(
+              const $transactionResult = sideEffectWithPgClientTransaction(
                 executor,
                 object({
                   a: $a as ExecutableStep<number | null | undefined>,
