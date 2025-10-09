@@ -141,3 +141,21 @@ Further note: the test suite uses a lot of different schema configurations (see
 the `#>` comments at the top of `*.test.graphql` files), so it may be hard to
 determine which fields are available. Look for a test in the `schemas` folder
 that has a similar configuration, its snapshot can be a guide, or ask.
+
+## Error pages
+
+Graphile owns the domain `err.red` (to be read as "errored"), and automatically
+routes to the relevant website article based on a single character prefix:
+
+- `g` is for Grafast: `https://err.red/g<ERROR_CODE>` ->
+  `https://grafast.org/errors/<ERROR_CODE>` (which is
+  `grafast/website/src/pages/errors/<ERROR_CODE>.mdx`)
+  - e.g. `https://err.red/gasdd` redirects to `https://grafast.org/errors/asdd`
+    which renders the content from `grafast/website/src/pages/errors/asdd.mdx`
+- `p` is for PostGraphile: `https://err.red/p<ERROR_CODE>` ->
+  `https://postgraphile.org/postgraphile/next/errors/<ERROR_CODE>` (which is
+  `postgraphile/website/postgraphile/errors/<ERROR_CODE>.md`)
+
+When an error is too complex to explain in 5-6 words, it can be helpful to
+create an error page in the relevant location and then link to it from the error
+message.

@@ -677,7 +677,7 @@ export class PgResource<
           ", ",
         )}}) at child field (TODO: which one?) but that combination of attributes is not unique (uniques: ${JSON.stringify(
           this.uniques,
-        )}). Did you mean to call .find() instead?`,
+        )}). Did you mean to call .find() instead? See https://err.red/grgnu`,
       );
     }
     return this.find(spec).single(_internalOptionsDoNotPass) as any;
