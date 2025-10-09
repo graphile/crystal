@@ -1,0 +1,36 @@
+# PgResource.get - Not Unique
+
+Example:
+
+```
+Attempted to call PgResource(latest_machines).get({serial_number}) at child
+field but that combination of attributes is not unique (uniques: [...]). Did
+you mean to call .find() instead?
+```
+
+`PgResource(...).get()` is designed to fetch one row, and thus requires that
+the attributes you pass uniquely identify a single row. This error means
+Gra*fast* could not find any unique constraint in the resource that matches the
+attribute keys you supplied, so the query could potentially return more than
+one row - which would be unsafe.
+
+The `uniques: [...]` list in the error message shows the unique combinations
+currently known to the resource. Pick one and supply every attribute from that
+combination when calling `.get()`.
+
+:::tip[Define a matching unique constraint]
+
+If you believe this combination _is_ unique, then ensure you have a matching
+unique index or constraint in the database, and then make sure it's reflected
+in the resource's `uniques` list. `@dataplan/pg` will then recognise the unique
+combination and `.get()` should succeed.
+
+:::
+
+:::tip[Use `.find()` to fetch more than one row]
+
+If you intend to fetch more than one row, use `.find()` instead of `.get()`.
+`.find()` is expected to return any number of rows, and does not require the
+attributes passed match any unique constraints.
+
+:::
