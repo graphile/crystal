@@ -180,3 +180,6 @@ const $item = build.pgResources.items.get(spec);
 The specifier is often an object such as `{ id: Step<string> }`, but the
 shape depends on the handler. Pass the specifier to the relevant resource or
 loader to continue working with the record.
+
+For more info, see
+[specFromNodeId in the Gra*fast* docs](https://grafast.org/grafast/step-library/standard-steps/node#specfromnodeid).
