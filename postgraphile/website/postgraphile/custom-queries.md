@@ -10,6 +10,16 @@ or sets. Sets (denoted by `RETURNS SETOF ...`) are exposed as
 via GraphQL — named arguments are preferred, if your arguments are not named we
 will assign them an auto-generated name such as `arg1`.
 
+:::tip[Prefer JavaScript?]
+
+If you would rather add the field from JavaScript/TypeScript, use
+[`extendSchema`](./extend-schema). It allows you to specify with ergonomic
+GraphQL type extension SDL exactly what you want to add to your schema, and also
+allows you to define arbitrary Gra*fast* plans to detail how to resolve the
+fields.
+
+:::
+
 To create a function that PostGraphile will recognize as a custom query, it must
 obey the following rules:
 
