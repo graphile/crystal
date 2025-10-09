@@ -96,6 +96,8 @@ into 4 main categories based on the root folders, each of which have a
 - Keep Grafast documentation backend-agnostic: do not reference
   PostGraphile-specific helpers (e.g. `@dataplan/pg`) unless the page is
   explicitly about that integration.
+- When adding `:::` admonitions, be sure to have a blank line both above and
+  below each `:::` line.
 
 When writing Grafast plan resolvers in documentation, try and only do one action
 per statement; for example instead of:
