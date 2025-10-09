@@ -759,23 +759,36 @@ export const MyRegisterUserMutationPlugin = extendSchema((build) => {
 });
 ```
 
-### Setting `pgSettings` after authenticating or registering a user
+## Updating `pgSettings` in a mutation
 
-You might want to **authenticate/register and immediately return the user** in the same mutation payload. If that user resource is protected by **Row-Level Security (RLS)**, your payload resolver may not see it unless the request is executing with the user's identity.
+If your mutation changes the authorization posture of the user (e.g. `login`,
+`register`, `logout`, `viewAsUser`, `sudo`, etc), you may need to update the
+`pgSettings` the database connection uses in order to ensure that subsequent
+fields (such as those on the mutation payload object) resolve with the expected
+identity and permissions.
 
-Set the identity in the per-request PostgreSQL settings so that subsequent resolvers in the same operation run under that identity (e.g. RLS policies using `current_setting('jwt.claims.sub', true)` will pass):
+To update `pgSettings`, use a `sideEffect()` plan to modify the object. An
+example mutation plan might contain something like:
 
 ```ts
-import { context } from "postgraphile/grafast";
+// Or: `import { context, sideEffect } from "postgraphile/grafast";`
+const { context, sideEffect } = build.grafast;
 
-// inside your mutation plan resolver
+// Create the step(s) for your mutation work
+const $user = login(/*...*/);
+
+// Then plan to update the GraphQL context with the latest pgSettings
 const $ctx = context();
-
-// then in a side-effect step, after you've verified credentials / created the user:
-ctx.pgSettings["jwt.claims.sub"] = userId; // the authenticated/created user's ID
+const $userId = get($user, "id");
+sideEffect([$ctx, $userId], ([ctx, userId]) => {
+  ctx.pgSettings["jwt.claims.user_id"] = userId;
+});
 ```
 
-With this in place, fields in the mutation payload such as `payload.user` (which load the user from the DB) will execute as that user, allowing RLS-protected reads to succeed during the same GraphQL operation.
+With these changes, the next time a `pgSelect()` or similar database step
+executes, it will do so using the new `pgSettings` claims; the result:
+RLS-protected resources queried in subsequent fields will reflect the correct
+post-mutation permissions.
 
 ## Mutation Example with Node ID
 
@@ -1040,8 +1053,6 @@ async function sendEmail(email: string, message: string) {
   */
 }
 ```
-
-
 
 ## Plugin SQL Privileges
 
