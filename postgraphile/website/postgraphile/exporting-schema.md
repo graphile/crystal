@@ -13,6 +13,17 @@ this feature:
 1. build your schema
 2. call `exportSchema` on it
 
+:::tip[Just need SDL?]
+
+If you just want a GraphQL SDL file or an introspection JSON export, set
+[`preset.schema.exportSchemaSDLPath`](./config.mdx#schema-options) (and
+optionally
+[`preset.schema.exportSchemaIntrospectionResultPath`](./config.mdx#schema-options))
+in your configuration. PostGraphile will refresh those files every time it
+rebuilds the schema.
+
+:::
+
 Here’s a simple example:
 
 ```ts
