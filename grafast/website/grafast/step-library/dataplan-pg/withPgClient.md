@@ -85,7 +85,8 @@ You need to pass three arguments to `sideEffectWithPgClient`:
   executor from the registry directly or any of the
   [resources](./registry/resources) that you have in the same database
 - `$data` - an arbitrary step representing the data that your `callback` needs;
-  set this to `constant(null)` if you don't need anything
+  you may also pass a multistep (a list of steps, object with string keys and
+  step values, or `null` if no data is needed)
 - `callback(client, data)` - the (async) function to be called with the
   database client and the data from your `$data` step
 
