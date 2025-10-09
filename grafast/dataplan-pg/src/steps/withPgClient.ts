@@ -13,7 +13,7 @@ import type {
   Thunk,
   UnwrapMultistep,
 } from "grafast";
-import { constant, loadMany, loadOne, Step } from "grafast";
+import { constant, loadMany, loadOne, multistep, Step } from "grafast";
 
 import type {
   PgClient,
@@ -97,37 +97,38 @@ export class SideEffectWithPgClientStep<
 }
 
 export function sideEffectWithPgClient<
-  TData,
+  const TInMultistep extends Multistep,
   TResult,
   TPgClient extends PgClient = PgClient,
 >(
   executor: PgExecutor,
-  $data:
-    | Step<TData>
-    | (TData extends null | undefined ? null | undefined : never),
-  callback: SideEffectWithPgClientStepCallback<TData, TResult, TPgClient>,
+  $data: TInMultistep,
+  callback: SideEffectWithPgClientStepCallback<
+    UnwrapMultistep<TInMultistep>,
+    TResult,
+    TPgClient
+  >,
 ) {
-  return new SideEffectWithPgClientStep(
-    executor,
-    $data ?? constant($data as TData),
-    callback,
-  );
+  const $in = multistep($data);
+  return new SideEffectWithPgClientStep(executor, $in, callback);
 }
 
 export function sideEffectWithPgClientTransaction<
-  TData,
+  const TInMultistep extends Multistep,
   TResult,
   TPgClient extends PgClient = PgClient,
 >(
   executor: PgExecutor,
-  $data:
-    | Step<TData>
-    | (TData extends null | undefined ? null | undefined : never),
-  callback: SideEffectWithPgClientStepCallback<TData, TResult, TPgClient>,
+  $data: TInMultistep,
+  callback: SideEffectWithPgClientStepCallback<
+    UnwrapMultistep<TInMultistep>,
+    TResult,
+    TPgClient
+  >,
 ) {
-  return sideEffectWithPgClient<TData, TResult, TPgClient>(
+  return sideEffectWithPgClient<TInMultistep, TResult, TPgClient>(
     executor,
-    $data ?? constant($data as TData),
+    $data,
     (client, data) =>
       client.withTransaction((txClient) => callback(txClient, data)),
   );
