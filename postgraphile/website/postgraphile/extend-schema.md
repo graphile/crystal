@@ -657,6 +657,37 @@ export const MyProductReviewsPlugin = extendSchema((build) => {
 });
 ```
 
+## Updating `pgSettings` in a mutation
+
+If your mutation changes the authorization posture of the user (e.g. `login`,
+`register`, `logout`, `viewAsUser`, `sudo`, etc), you may need to update the
+`pgSettings` the database connection uses in order to ensure that subsequent
+fields (such as those on the mutation payload object) resolve with the expected
+identity and permissions.
+
+To update `pgSettings`, use a `sideEffect()` plan to modify the object. An
+example mutation plan might contain something like:
+
+```ts
+// Or: `import { context, sideEffect } from "postgraphile/grafast";`
+const { context, sideEffect } = build.grafast;
+
+// Create the step(s) for your mutation work
+const $user = login(/*...*/);
+
+// Then plan to update the GraphQL context with the latest pgSettings
+const $ctx = context();
+const $userId = get($user, "id");
+sideEffect([$ctx, $userId], ([ctx, userId]) => {
+  ctx.pgSettings["jwt.claims.user_id"] = userId;
+});
+```
+
+With these changes, the next time a `pgSelect()` or similar database step
+executes, it will do so using the new `pgSettings` claims; the result:
+RLS-protected resources queried in subsequent fields will reflect the correct
+post-mutation permissions.
+
 ## Mutation Example
 
 You might want to add a custom `registerUser` mutation which inserts the new
@@ -696,10 +727,11 @@ export const MyRegisterUserMutationPlugin = extendSchema((build) => {
         plans: {
           registerUser(_, fieldArgs) {
             const $input = fieldArgs.getRaw("input");
+            const $ctx = context();
             const $user = sideEffectWithPgClientTransaction(
               executor,
-              $input,
-              async (pgClient, input) => {
+              [$input, $ctx],
+              async (pgClient, [input, ctx]) => {
                 // Our custom logic to register the user:
                 const {
                   rows: [user],
@@ -719,6 +751,10 @@ export const MyRegisterUserMutationPlugin = extendSchema((build) => {
                   "Welcome to my site",
                   `You're user ${user.id} - thanks for being awesome`,
                 );
+
+                // Update the pgSettings to use for subsequent fields to reflect
+                // the user is logged in:
+                ctx.pgSettings["jwt.claims.user_id"] = user.id;
 
                 // Return the newly created user
                 return user;
@@ -758,37 +794,6 @@ export const MyRegisterUserMutationPlugin = extendSchema((build) => {
   };
 });
 ```
-
-## Updating `pgSettings` in a mutation
-
-If your mutation changes the authorization posture of the user (e.g. `login`,
-`register`, `logout`, `viewAsUser`, `sudo`, etc), you may need to update the
-`pgSettings` the database connection uses in order to ensure that subsequent
-fields (such as those on the mutation payload object) resolve with the expected
-identity and permissions.
-
-To update `pgSettings`, use a `sideEffect()` plan to modify the object. An
-example mutation plan might contain something like:
-
-```ts
-// Or: `import { context, sideEffect } from "postgraphile/grafast";`
-const { context, sideEffect } = build.grafast;
-
-// Create the step(s) for your mutation work
-const $user = login(/*...*/);
-
-// Then plan to update the GraphQL context with the latest pgSettings
-const $ctx = context();
-const $userId = get($user, "id");
-sideEffect([$ctx, $userId], ([ctx, userId]) => {
-  ctx.pgSettings["jwt.claims.user_id"] = userId;
-});
-```
-
-With these changes, the next time a `pgSelect()` or similar database step
-executes, it will do so using the new `pgSettings` claims; the result:
-RLS-protected resources queried in subsequent fields will reflect the correct
-post-mutation permissions.
 
 ## Mutation Example with Node ID
 
