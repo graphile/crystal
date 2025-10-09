@@ -665,8 +665,9 @@ If your mutation changes the authorization posture of the user (e.g. `login`,
 fields (such as those on the mutation payload object) resolve with the expected
 identity and permissions.
 
-To update `pgSettings`, use a `sideEffect()` plan to modify the object. An
-example mutation plan might contain something like:
+To update `pgSettings`, use a step with side effects (such as a `sideEffect()`
+step) to modify the object. An example mutation plan might contain something
+like:
 
 ```ts
 // Or: `import { context, sideEffect } from "postgraphile/grafast";`
