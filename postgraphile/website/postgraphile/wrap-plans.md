@@ -15,6 +15,14 @@ PostGraphile. You can [load the resulting schema
 plugin](./extending/#loading-plugins) via your `graphile.config.mjs` (or
 similar) preset.
 
+:::tip[Need new fields instead?]
+
+If you are creating new fields or types, [`extendSchema`](./extend-schema) will
+get you there faster. Reach for `wrapPlans` when you want to keep an existing
+field and only adjust how it plans or resolves.
+
+:::
+
 :::warning
 
 Some of the fields in the GraphQL schema expect their parent value to be of a
