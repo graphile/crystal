@@ -13,7 +13,7 @@ import type {
   Thunk,
   UnwrapMultistep,
 } from "grafast";
-import { constant, loadMany, loadOne, multistep, Step } from "grafast";
+import { loadMany, loadOne, multistep, Step } from "grafast";
 
 import type {
   PgClient,
@@ -102,15 +102,15 @@ export function sideEffectWithPgClient<
   TPgClient extends PgClient = PgClient,
 >(
   executor: PgExecutor,
-  $data: TInMultistep,
+  spec: TInMultistep,
   callback: SideEffectWithPgClientStepCallback<
     UnwrapMultistep<TInMultistep>,
     TResult,
     TPgClient
   >,
 ) {
-  const $in = multistep($data);
-  return new SideEffectWithPgClientStep(executor, $in, callback);
+  const $data = multistep(spec);
+  return new SideEffectWithPgClientStep(executor, $data, callback);
 }
 
 export function sideEffectWithPgClientTransaction<
@@ -119,7 +119,7 @@ export function sideEffectWithPgClientTransaction<
   TPgClient extends PgClient = PgClient,
 >(
   executor: PgExecutor,
-  $data: TInMultistep,
+  spec: TInMultistep,
   callback: SideEffectWithPgClientStepCallback<
     UnwrapMultistep<TInMultistep>,
     TResult,
@@ -128,7 +128,7 @@ export function sideEffectWithPgClientTransaction<
 ) {
   return sideEffectWithPgClient<TInMultistep, TResult, TPgClient>(
     executor,
-    $data,
+    spec,
     (client, data) =>
       client.withTransaction((txClient) => callback(txClient, data)),
   );
