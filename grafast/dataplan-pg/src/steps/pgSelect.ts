@@ -3680,13 +3680,52 @@ function applyConditionFromCursor<
     );
   }
 
+  const orderFragmentAndCodecs = orders.map((order) =>
+    getFragmentAndCodecFromOrder(alias, order, resource.codec),
+  );
+
+  /**
+   * We can use the `(a, b, c) < (a1, b1, c1)` syntax IF:
+   * - None of the order fragments are nullable
+   * - All the order directions are the same (all ASC or all DESC)
+   */
+  const firstDirection = orders[0].direction;
+  const tupleComparable = orderFragmentAndCodecs.every(
+    ({ isNullable }, i) =>
+      !isNullable && orders[i].direction === firstDirection,
+  );
+  if (tupleComparable) {
+    // We can do this with a tuple comparison
+    const direction = firstDirection;
+    const gt =
+      (direction === "ASC" && beforeOrAfter === "after") ||
+      (direction === "DESC" && beforeOrAfter === "before");
+    const comparator = gt ? sql`>` : sql`<`;
+    const expressionTuple: SQL[] = [];
+    const valueTuple: SQL[] = [];
+    for (let i = 0; i < orderCount; i++) {
+      const { fragment: orderFragment, codec: orderCodec } =
+        orderFragmentAndCodecs[i];
+      const sqlValue = sql`${sql.value(parsedCursor[i + 1])}::${
+        orderCodec.sqlType
+      }`;
+      expressionTuple.push(orderFragment);
+      valueTuple.push(sqlValue);
+    }
+    const sqlExpressions = sql.join(expressionTuple, ", ");
+    const sqlValues = sql.join(valueTuple, ", ");
+    const finalCondition = sql`${sql.parens(sqlExpressions, true)} ${comparator} ${sql.parens(sqlValues, true)}`;
+    info.conditions.push(finalCondition);
+    return;
+  }
+
   const condition = (i = 0): SQL => {
     const order = orders[i];
     const {
       fragment: orderFragment,
       codec: orderCodec,
       isNullable: nullable,
-    } = getFragmentAndCodecFromOrder(alias, order, resource.codec);
+    } = orderFragmentAndCodecs[i];
     const { nulls, direction } = order;
     const sqlValue = sql`${sql.value(parsedCursor[i + 1])}::${
       orderCodec.sqlType
@@ -3709,7 +3748,8 @@ function applyConditionFromCursor<
             direction === "DESC";
 
     // Simple less than or greater than
-    let fragment = sql`${orderFragment} ${gt ? sql`>` : sql`<`} ${sqlValue}`;
+    const comparator = gt ? sql`>` : sql`<`;
+    let fragment = sql`${orderFragment} ${comparator} ${sqlValue}`;
 
     // Nullable, so now handle if one is null but the other isn't
     if (nullable) {
