@@ -1,0 +1,102 @@
+---
+title: "Flow control"
+sidebar_position: 6
+---
+
+import Mermaid from "@theme/Mermaid";
+
+# Flow control
+
+Gra*fast* plans are declarative graphs. Steps describe where data comes from
+and how it should be transformed; the graph does not branch the way imperative
+code does. Every value flows along the dependency edges until it reaches a step
+that stops it (by producing `null`, raising an error, or signalling inhibition)
+or until it is consumed by the output plan.
+
+:::note[Think in values]
+When you read a plan diagram, imagine each row of data moving along the arrows.
+If a dependency is missing (because it was inhibited or errored), only the
+steps that rely on that value pause. Sibling subgraphs keep running.
+:::
+
+## Why "branching" feels different
+
+A frequent question is how to express conditional behaviour such as "if X then
+load Y". The plan already knows every step it may need. The conditional logic
+lives _inside_ the steps: they can consult predicates, call
+[`condition`](./step-library/standard-steps/condition.md), or combine values
+with [`coalesce`](./step-library/standard-steps/coalesce.md). The important
+part is that each step still returns (or inhibits) a value for every position in
+the batch.
+
+<Mermaid chart={`
+flowchart TD
+  Input["Input step"] --> Guard["condition('equals', …)"]
+  Guard -->|true| Fetch["loadOne"]
+  Guard -->|false| Default["constant(null)"]
+`}/>
+
+In this diagram both downstream branches exist in the plan. At execution time
+only the values that evaluate to `true` reach `loadOne`; the rest resolve from
+the constant. No control-flow statements are necessary.
+
+## Inhibition and "early exit"
+
+Gra*fast* distinguishes between a value that is literally `null` and a value
+that has been **inhibited**. An inhibited value tells the scheduler that it may
+skip derived work that depends on that input. This keeps plans efficient when a
+primary key or foreign key is absent, or when guards fail.
+
+- [`inhibitOnNull`](./step-library/standard-steps/inhibitOnNull.mdx) rejects the
+  `NULL` flag when its dependency resolves to `null`.
+- [`assertNotNull`](./step-library/standard-steps/assertNotNull.mdx) upgrades a
+  `null` into a `SafeError`, preventing downstream work and surfacing an
+  execution error instead.
+- [`trap`](./step-library/standard-steps/trap.mdx) converts inhibited or errored
+  values back into ordinary data so execution can continue.
+
+These helpers all wrap the same underlying `__FlagStep`. Most of the time the
+step is absorbed into the dependency edge, so plan diagrams display labels such
+as `rejectNull`, `trapError`, or `onReject="…"` rather than a distinct node.
+
+## Global dependencies
+
+Some steps need values that are shared across the whole request (for example
+GraphQL variables, the `contextValue`, or a database connection pulled from the
+context). Gra*fast* refers to these as **global dependencies**. They are added
+as unary dependencies: the dependency supplies a single value that each item in
+the batch can read.
+
+```ts
+const $context = context();
+const $db = $context.get("pg");
+const $row = loadOne($id, ({ batch }) => batchFetch(db, batch));
+```
+
+Because the context does not vary per item, Gra*fast* does not duplicate work.
+Plan diagrams may omit the edge altogether when it would be drawn many times;
+this keeps the diagram legible while the actual plan still tracks the
+relationship.
+
+## Putting it together
+
+The helpers above are building blocks. A typical pattern is to guard an input,
+inhibit downstream work when it is missing, and optionally trap that inhibition
+later so the field can return a benign value. Viewed as data flow:
+
+<Mermaid chart={`
+flowchart TD
+  Input["specFromNodeId"] --> Guard["inhibitOnNull"]
+  Guard -->|rejectNull| Fetch["loadMany"]
+  Fetch --> Recover["trap (trapInhibited→EMPTY_LIST)"]
+  Recover --> Output["Field return value"]
+`}/>
+
+Each piece of the chain acts on the stream of values. Once you approach plans
+through that lens—values in, values possibly inhibited, values out—Gra*fast*'s
+"early exit" behaviour becomes a natural consequence of the data dependencies
+rather than an imperative control-flow construct.
+
+For more about the individual helpers, see the
+[flow control steps](./step-library/standard-steps/index.mdx#flow-control) and
+the [plan diagram guide](./plan-diagrams.mdx) for visual cues.
