@@ -281,19 +281,14 @@ select
   __post__."id"::text as "2"
 from "a"."post" as __post__
 where (
-  (((__post__."author_id" < $1::"int4") or (__post__."author_id" is null and $1::"int4" is not null)))
+  (__post__."headline" < $1::"text")
   or (
-    __post__."author_id" is not distinct from $1::"int4"
+    __post__."headline" = $1::"text"
     and 
-      ((__post__."headline" < $2::"text")
-      or (
-        __post__."headline" = $2::"text"
-        and 
-          (__post__."id" > $3::"int4")
-      ))
+      (__post__."id" < $2::"int4")
   )
 )
-order by __post__."author_id" desc, __post__."headline" desc, __post__."id" asc
+order by __post__."headline" desc, __post__."id" desc
 limit 4;
 
 select
