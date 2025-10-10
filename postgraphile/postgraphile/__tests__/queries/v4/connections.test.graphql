@@ -48,7 +48,7 @@ query {
   w: allPeople(condition: { lastLoginFromSubnet: "192.168.0.0/24" }) { ...personConnection }
   x: allPeople(condition: { userMac: "0000.0000.0000" }) { ...personConnection }
   y: allPosts(orderBy: [HEADLINE_DESC, ID_DESC], after: "WyJmOTkxNGJlOTM5IiwiV2hhdOKAmXMgd2l0aCB5b3Uga2lkcz8gRXZlcnkgb3RoZXIgZGF5IGl04oCZcyBmb29kLCBmb29kLCBmb29kLiIsMTBd", first: 3) { ...postConnection }
-  z: allPosts(orderBy: [HEADLINE_DESC,], after: "WyJmOTkxNGJlOTM5IiwiV2hhdOKAmXMgd2l0aCB5b3Uga2lkcz8gRXZlcnkgb3RoZXIgZGF5IGl04oCZcyBmb29kLCBmb29kLCBmb29kLiIsMTBd", first: 3) { ...postConnection }
+  z: allPosts(orderBy: [HEADLINE_DESC,], after: "WyJmOTkxNGJlOTM5IiwiV2hhdOKAmXMgd2l0aCB5b3Uga2lkcz8gRXZlcnkgb3RoZXIgZGF5IGl04oCZcyBmb29kLCBmb29kLCBmb29kLiIsMTBd", first: 2) { ...postConnection }
   nullTest1: allNullTestRecords { nodes { nullableText nullableInt } }
 }
 

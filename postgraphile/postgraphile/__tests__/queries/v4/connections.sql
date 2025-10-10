@@ -313,15 +313,10 @@ select
   __post__."id"::text as "2"
 from "a"."post" as __post__
 where (
-  (__post__."headline" < $1::"text")
-  or (
-    __post__."headline" = $1::"text"
-    and 
-      (__post__."id" > $2::"int4")
-  )
+  (__post__."headline", __post__."id") < ($1::"text", $2::"int4")
 )
-order by __post__."headline" desc, __post__."id" asc
-limit 4;
+order by __post__."headline" desc, __post__."id" desc
+limit 3;
 
 select
   __null_test_record__."nullable_text" as "0",

@@ -1115,7 +1115,7 @@
   z: {
     pageInfo: {
       startCursor: "WyJmOTkxNGJlOTM5IiwiVGhleeKAmXJlIG5vdCBhbGllbnMsIHRoZXnigJlyZSBFYXJ0aOKApmxpZW5zISIsMTFd",
-      endCursor: "WyJmOTkxNGJlOTM5IiwiUGxlYXNlLCBEb24tQm904oCmIGxvb2sgaW50byB5b3VyIGhhcmQgZHJpdmUsIGFuZCBvcGVuIHlvdXIgbWVyY3kgZmlsZSEiLDVd",
+      endCursor: "WyJmOTkxNGJlOTM5IiwiU3RvcCB0YWxraW5nLCBicmFpbiB0aGlua2luZy4gSHVzaC4iLDZd",
       hasNextPage: true,
       hasPreviousPage: false,
     },
@@ -1133,13 +1133,6 @@
         node: {
           headline: "Stop talking, brain thinking. Hush.",
           authorId: 3,
-        },
-      },
-      {
-        cursor: "WyJmOTkxNGJlOTM5IiwiUGxlYXNlLCBEb24tQm904oCmIGxvb2sgaW50byB5b3VyIGhhcmQgZHJpdmUsIGFuZCBvcGVuIHlvdXIgbWVyY3kgZmlsZSEiLDVd",
-        node: {
-          headline: "Please, Don-Bot… look into your hard drive, and open your mercy file!",
-          authorId: 5,
         },
       },
     ],
