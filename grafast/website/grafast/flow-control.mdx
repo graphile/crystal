@@ -81,14 +81,26 @@ the entire list of `ids` at runtime.
 ## Why "branching" feels different
 
 A common question is how to express logic such as "if X then load Y otherwise
-load Z", but Gra*fast* does not exist to perform such logic - it is not a Turing
-complete programming language, instead it is a planning system that defines and
-optimizes the flow of data. All procedural and business logic belong inside the
-steps themselves, and a field plan must return exactly one step that represents
-data of the expected return type - so the decision as to which specific `Post` a
-field resolver should return (whether the English translation or the German one,
-for example) belongs inside the relevant single step that loads the `Post`, or
-maybe one of its dependencies.
+load Z", but Gra*fast* does not exist to perform such logic - it is not a
+programming language, but a system that plans and optimizes the flow of data.
+
+A field plan must return exactly one step, and that step must represent data of
+the expected return type. The decision as to which specific `Post` a field
+resolver should return (whether the English translation or the German one, for
+example) belongs inside the relevant single step that loads the `Post`, or maybe
+one of its dependencies.
+
+**All procedural and business logic happens inside the steps' `execute()`
+methods, not in plans.**
+
+:::note[Step execute methods should delegate to business logic]
+
+It's intended the step execute methods are generally lightweight if possible -
+they act as the gateway between Gra*fast*-land and your business logic; they are
+not typically for actually performing business logic directly, instead they
+should delegate to external business logic.
+
+:::
 
 ## Early exit
 
