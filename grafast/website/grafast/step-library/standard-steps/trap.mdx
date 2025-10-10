@@ -13,8 +13,8 @@ You can choose the replacement for inhibited or errored values via
 - `"NULL"` – use `null`.
 - `"EMPTY_LIST"` – use an empty frozen array.
 
-`trap` is frequently paired with [`inhibitOnNull`](./inhibitOnNull.md) or
-[`assertNotNull`](./assertNotNull.md) to recover a usable value after guarding
+`trap` is frequently paired with [`inhibitOnNull`](./inhibitOnNull.mdx) or
+[`assertNotNull`](./assertNotNull.mdx) to recover a usable value after guarding
 an upstream dependency. It also works with side-effect steps: trapping an error
 allows you to continue a plan that would otherwise halt once the error was
 raised.
