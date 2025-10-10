@@ -2656,7 +2656,7 @@ export function getFragmentAndCodecFromOrder(
   alias: SQL,
   order: PgOrderSpec,
   codecOrCodecs: PgCodec | PgCodec[],
-): [fragment: SQL, codec: PgCodec, isNullable?: boolean] {
+): { fragment: SQL; codec: PgCodec; isNullable: boolean | undefined } {
   if (order.attribute != null) {
     const isArray = Array.isArray(codecOrCodecs);
     const col = (isArray ? codecOrCodecs[0] : codecOrCodecs).attributes![
@@ -2680,7 +2680,7 @@ export function getFragmentAndCodecFromOrder(
         }
       }
     }
-    const isNullable = !col.notNull && !colCodec.notNull;
+    const colIsNullable = !col.notNull && !colCodec.notNull;
     let colFrag: SQL;
     if (colVia) {
       // TODO: consider solving this with a subquery.
@@ -2691,11 +2691,19 @@ export function getFragmentAndCodecFromOrder(
     } else {
       colFrag = sql`${alias}.${sql.identifier(order.attribute)}`;
     }
-    return order.callback
-      ? order.callback(colFrag, colCodec, isNullable)
-      : [colFrag, colCodec, isNullable];
+    if (order.callback) {
+      const [fragment, codec, isNullable] = order.callback(
+        colFrag,
+        colCodec,
+        colIsNullable,
+      );
+      return { fragment, codec, isNullable };
+    } else {
+      return { fragment: colFrag, codec: colCodec, isNullable: colIsNullable };
+    }
   } else {
-    return [order.fragment, order.codec, order.nullable];
+    const { fragment, codec, nullable: isNullable } = order;
+    return { fragment, codec, isNullable };
   }
 }
 
@@ -2723,7 +2731,11 @@ function calculateOrderBySQL(params: {
   return orders.length > 0
     ? sql`\norder by ${sql.join(
         orders.map((o) => {
-          const [frag] = getFragmentAndCodecFromOrder(alias, o, codec);
+          const { fragment: frag } = getFragmentAndCodecFromOrder(
+            alias,
+            o,
+            codec,
+          );
           return sql`${frag} ${o.direction === "ASC" ? sql`asc` : sql`desc`}${
             o.nulls === "LAST"
               ? sql` nulls last`
@@ -3008,7 +3020,7 @@ function buildTheQueryCore<
     // PERF: calculate cursorDigest here instead?
     if (info.orders.length > 0) {
       for (const o of info.orders) {
-        const [frag, codec] = getFragmentAndCodecFromOrder(
+        const { fragment: frag, codec } = getFragmentAndCodecFromOrder(
           info.alias,
           o,
           info.resource.codec,
@@ -3670,11 +3682,11 @@ function applyConditionFromCursor<
 
   const condition = (i = 0): SQL => {
     const order = orders[i];
-    const [orderFragment, orderCodec, nullable] = getFragmentAndCodecFromOrder(
-      alias,
-      order,
-      resource.codec,
-    );
+    const {
+      fragment: orderFragment,
+      codec: orderCodec,
+      isNullable: nullable,
+    } = getFragmentAndCodecFromOrder(alias, order, resource.codec);
     const { nulls, direction } = order;
     const sqlValue = sql`${sql.value(parsedCursor[i + 1])}::${
       orderCodec.sqlType
@@ -3766,7 +3778,11 @@ function getOrderByDigest<
   hash.update(
     JSON.stringify(
       orders.map((o) => {
-        const [frag] = getFragmentAndCodecFromOrder(alias, o, resource.codec);
+        const { fragment: frag } = getFragmentAndCodecFromOrder(
+          alias,
+          o,
+          resource.codec,
+        );
         const placeholderValues = new Map<symbol, SQL>(fixedPlaceholderValues);
         for (let i = 0; i < placeholderSymbols.length; i++) {
           const symbol = placeholderSymbols[i];

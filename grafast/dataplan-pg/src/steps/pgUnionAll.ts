@@ -1510,7 +1510,7 @@ function buildTheQuery<
               }
               case "order": {
                 const orderSpec = orders[s.orderIndex];
-                const [frag, codec] = getFragmentAndCodecFromOrder(
+                const { fragment: frag, codec } = getFragmentAndCodecFromOrder(
                   alias,
                   orderSpec,
                   memberDigest.finalResource.codec,
@@ -1548,7 +1548,7 @@ ${sql.indent`${
   orders.length > 0
     ? sql`${sql.join(
         orders.map((orderSpec) => {
-          const [frag] = getFragmentAndCodecFromOrder(
+          const { fragment: frag } = getFragmentAndCodecFromOrder(
             tableAlias,
             orderSpec,
             finalResource.codec,
@@ -1611,7 +1611,11 @@ from (${innerQuery}) as ${tableAlias}\
           }
           case "order": {
             const order = ordersForCursor[select.orderIndex];
-            codec = getFragmentAndCodecFromOrder(alias, order, memberCodecs)[1];
+            codec = getFragmentAndCodecFromOrder(
+              alias,
+              order,
+              memberCodecs,
+            ).codec;
             guaranteedNotNull = order.nullable === false;
             break;
           }
@@ -1857,7 +1861,7 @@ function applyConditionFromCursor<
       )}::"text"`;
     } else if (memberDigests.length > 0) {
       const memberCodecs = memberDigests.map((d) => d.finalResource.codec);
-      const [, codec] = getFragmentAndCodecFromOrder(
+      const { codec } = getFragmentAndCodecFromOrder(
         alias,
         order,
         memberCodecs,
@@ -1909,7 +1913,7 @@ function applyConditionFromCursor<
             false,
           ];
         } else {
-          const [frag, _codec, isNullable] = getFragmentAndCodecFromOrder(
+          const { fragment: frag, isNullable } = getFragmentAndCodecFromOrder(
             alias,
             order,
             mutableMemberDigest.finalResource.codec,
@@ -1997,7 +2001,11 @@ function getOrderByDigest<
   );
   const tuple = [
     ...orderSpecs.map((o) => {
-      const [frag] = getFragmentAndCodecFromOrder(alias, o, memberCodecs);
+      const { fragment: frag } = getFragmentAndCodecFromOrder(
+        alias,
+        o,
+        memberCodecs,
+      );
       const placeholderValues = new Map<symbol, SQL>();
       for (let i = 0; i < placeholders.length; i++) {
         const { symbol } = placeholders[i];
