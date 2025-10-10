@@ -42,56 +42,63 @@ is skipped; the rest continue through the graph.
 
 ## Why "branching" feels different
 
-A common question is how to express logic such as "if X then load Y". The plan
-already contains every helper step up front; the conditional behaviour lives
-_inside_ those steps. They can evaluate predicates via
-[`condition`](./step-library/standard-steps/condition.md), selectively inhibit
-values with [`inhibitOnNull`](./step-library/standard-steps/inhibitOnNull.mdx),
-combine alternatives with
-[`coalesce`](./step-library/standard-steps/coalesce.md), and so on. A field plan
-still returns exactly one step, but that step can depend on other steps that
-decide which values survive the journey.
+A common question is how to express logic such as "if X then load Y otherwise
+load Z", but Gra*fast* does not exist to perform such logic - it is not a Turing
+complete programming language, instead it is a planning system that defines and
+optimizes the flow of data. All procedural and business logic belong inside the
+steps themselves, and a field plan must return exactly one step that represents
+data of the expected return type - so the decision as to which specific `Post` a
+field resolver should return (whether the English translation or the German one,
+for example) belongs inside the relevant single step that loads the `Post`, or
+maybe one of its dependencies.
+
+## Early exit
+
+Though Gra*fast* doesn't support traditional branching, it does recognize that
+there are common "early exit" needs within the flow of data. Perhaps if a value
+is `null` then there's no need to continue. When an error occurs, of course
+processing should halt. Gra*fast* therefore gives you the tools to indicate when
+field plans should "exit early" by selectively inhibiting nulls with
+[`inhibitOnNull`](./step-library/standard-steps/inhibitOnNull.mdx) (or by
+returning the special `$$inhibit` value), or by raising errors from within your
+steps. 
+
+Here we only proceed to loading the user if the given ID is non-null:
 
 ```ts
-const $shouldLoad = condition("not null", $id);
-const $guardedId = inhibitOnNull($id, { if: $shouldLoad });
+const $guardedId = inhibitOnNull($id);
 const $user = loadOne($guardedId, batchGetUserById);
 return $user;
 ```
 
-All three helper steps remain in the plan for every future execution. At runtime
-any entry where `$shouldLoad` is false marks the corresponding `$guardedId` as
-inhibited, and `loadOne` simply skips that entry while continuing with the rest
-of the batch.
-
 <Mermaid chart={`
 flowchart TD
-  ID["Access('id')"] --> Should["condition('not null', …)"]
-  ID --> Guard["inhibitOnNull (if=Should)"]
-  Should --> Guard
+  ID["Access<'id'>"] --> Guard["inhibitOnNull"]
   Guard --> Load["loadOne"]
 `}/>
 
-## Inhibition and "early exit"
-
 Gra*fast* distinguishes between a value that is literally `null` and a value
-that has been **inhibited**. An inhibited value tells the scheduler that it may
-skip derived work that depends on that input. This keeps plans efficient when a
-primary key or foreign key is absent, or when guard conditions fail.
+that has been **inhibited**. An inhibited value tells the executor that it may
+skip the following work that depends on that input. This keeps plans efficient
+when a primary key or foreign key is absent, or when guard conditions fail.
 
-- [`inhibitOnNull`](./step-library/standard-steps/inhibitOnNull.mdx) rejects the
-  `NULL` flag when its dependency resolves to `null`.
+- [`inhibitOnNull`](./step-library/standard-steps/inhibitOnNull.mdx) prevents
+  dependents from executing when its dependency resolves to `null`, having them
+  resolve to `null` too.
 - [`assertNotNull`](./step-library/standard-steps/assertNotNull.mdx) upgrades a
   `null` into a `SafeError`, preventing downstream work and surfacing an
   execution error instead.
 - [`trap`](./step-library/standard-steps/trap.mdx) converts inhibited or errored
-  values back into ordinary data so execution can continue.
+  values back into ordinary data so execution can resume.
 
 These helpers all wrap the same underlying `__FlagStep`. Most of the time the
 step is absorbed into the dependency edge, so plan diagrams display labels such
 as `rejectNull`, `trapError`, or `onReject="…"` rather than a distinct node.
+
 When only one entry in a batch is inhibited or errored, only that entry is
-skipped; other entries continue to flow through the dependent steps.
+skipped; other entries continue to flow through the dependent steps. Gra*fast*
+handles this itself, the inhibited or errored values will simply never be passed
+to the execute methods of your step classes.
 
 ## Global dependencies
 
