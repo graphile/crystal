@@ -42,31 +42,42 @@ is skipped; the rest continue through the graph.
 
 ## Why "branching" feels different
 
-A frequent question is how to express conditional behaviour such as "if X then
-load Y". The plan already knows every step it may need. The conditional logic
-lives _inside_ the steps: they can consult predicates, call
-[`condition`](./step-library/standard-steps/condition.md), or combine values
-with [`coalesce`](./step-library/standard-steps/coalesce.md). The important
-part is that each step still returns (or inhibits) a value for every position in
-the batch.
+A common question is how to express logic such as "if X then load Y". The plan
+already contains every helper step up front; the conditional behaviour lives
+_inside_ those steps. They can evaluate predicates via
+[`condition`](./step-library/standard-steps/condition.md), selectively inhibit
+values with [`inhibitOnNull`](./step-library/standard-steps/inhibitOnNull.mdx),
+combine alternatives with
+[`coalesce`](./step-library/standard-steps/coalesce.md), and so on. A field plan
+still returns exactly one step, but that step can depend on other steps that
+decide which values survive the journey.
+
+```ts
+const $shouldLoad = condition("not null", $id);
+const $guardedId = inhibitOnNull($id, { if: $shouldLoad });
+const $user = loadOne($guardedId, batchGetUserById);
+return $user;
+```
+
+All three helper steps remain in the plan for every future execution. At runtime
+any entry where `$shouldLoad` is false marks the corresponding `$guardedId` as
+inhibited, and `loadOne` simply skips that entry while continuing with the rest
+of the batch.
 
 <Mermaid chart={`
 flowchart TD
-  Input["Input step"] --> Guard["condition('equals', …)"]
-  Guard -->|true| Fetch["loadOne"]
-  Guard -->|false| Default["constant(null)"]
+  ID["Access('id')"] --> Should["condition('not null', …)"]
+  ID --> Guard["inhibitOnNull (if=Should)"]
+  Should --> Guard
+  Guard --> Load["loadOne"]
 `}/>
-
-In this diagram both downstream branches exist in the plan. At execution time
-only the values that evaluate to `true` reach `loadOne`; the rest resolve from
-the constant. No control-flow statements are necessary.
 
 ## Inhibition and "early exit"
 
 Gra*fast* distinguishes between a value that is literally `null` and a value
 that has been **inhibited**. An inhibited value tells the scheduler that it may
 skip derived work that depends on that input. This keeps plans efficient when a
-primary key or foreign key is absent, or when guards fail.
+primary key or foreign key is absent, or when guard conditions fail.
 
 - [`inhibitOnNull`](./step-library/standard-steps/inhibitOnNull.mdx) rejects the
   `NULL` flag when its dependency resolves to `null`.
@@ -79,12 +90,14 @@ primary key or foreign key is absent, or when guards fail.
 These helpers all wrap the same underlying `__FlagStep`. Most of the time the
 step is absorbed into the dependency edge, so plan diagrams display labels such
 as `rejectNull`, `trapError`, or `onReject="…"` rather than a distinct node.
+When only one entry in a batch is inhibited or errored, only that entry is
+skipped; other entries continue to flow through the dependent steps.
 
 ## Global dependencies
 
-Some steps need values that are shared across the whole request (for example
-GraphQL variables, the `contextValue`, or a database connection pulled from the
-context). Gra*fast* refers to these as **global dependencies**. They are added
+Some steps need values that apply to the whole request — for example GraphQL
+variables, the `contextValue`, or a database connection retrieved from the
+context. Gra*fast* refers to these as **global dependencies** and they are added
 as unary dependencies: the dependency supplies a single value that each item in
 the batch can read.
 
@@ -95,9 +108,8 @@ const $row = loadOne($id, ({ batch }) => batchFetch(db, batch));
 ```
 
 Because the context does not vary per item, Gra*fast* does not duplicate work.
-Plan diagrams may omit the edge altogether when it would be drawn many times;
-this keeps the diagram legible while the actual plan still tracks the
-relationship.
+Plan diagrams may elide the arrow when it would otherwise be drawn many times;
+the actual execution plan still tracks the relationship.
 
 ## Putting it together
 
@@ -113,10 +125,10 @@ flowchart TD
   Recover --> Output["Field return value"]
 `}/>
 
-Each piece of the chain acts on the stream of values. Once you approach plans
-through that lens—values in, values possibly inhibited, values out—Gra*fast*'s
-"early exit" behaviour becomes a natural consequence of the data dependencies
-rather than an imperative control-flow construct.
+Once you approach plans through that lens — values in, values optionally
+flagged, values out — Gra*fast*'s "early exit" behaviour becomes a natural
+consequence of the data dependencies rather than an imperative control-flow
+construct.
 
 For more about the individual helpers, see the
 [flow control steps](./step-library/standard-steps/index.mdx#flow-control) and
