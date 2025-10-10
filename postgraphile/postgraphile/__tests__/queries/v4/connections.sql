@@ -276,6 +276,27 @@ where (
 order by __person__."id" asc;
 
 select
+  __post__."headline" as "0",
+  __post__."author_id"::text as "1",
+  __post__."id"::text as "2"
+from "a"."post" as __post__
+where (
+  (((__post__."author_id" < $1::"int4") or (__post__."author_id" is null and $1::"int4" is not null)))
+  or (
+    __post__."author_id" is not distinct from $1::"int4"
+    and 
+      ((__post__."headline" < $2::"text")
+      or (
+        __post__."headline" = $2::"text"
+        and 
+          (__post__."id" > $3::"int4")
+      ))
+  )
+)
+order by __post__."author_id" desc, __post__."headline" desc, __post__."id" asc
+limit 4;
+
+select
   __null_test_record__."nullable_text" as "0",
   __null_test_record__."nullable_int"::text as "1",
   __null_test_record__."id"::text as "2"
