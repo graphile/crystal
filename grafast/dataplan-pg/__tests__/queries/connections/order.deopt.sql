@@ -13,7 +13,7 @@ where
   ) and (
     __messages__.archived_at is null
   )
-order by __author__.username desc, __messages__.body asc, __messages__."id" asc
+order by __author__.username desc, __messages__.body asc, __messages__."id" desc
 limit 6;
 
 select

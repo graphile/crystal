@@ -10,7 +10,7 @@ select
     where (
       __log_entries__."person_id" = __people__."person_id"
     )
-    order by __log_entries__."text" desc, __log_entries__."id" asc
+    order by __log_entries__."text" desc, __log_entries__."id" desc
   )::text as "2"
 from "polymorphic"."people" as __people__
 where (
