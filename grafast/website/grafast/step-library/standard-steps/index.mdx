@@ -48,6 +48,12 @@ business logic layer.
 <!-- TODO: not a step! -->
 <!-- - [setter][]: a ModifierStep for setting given values onto a parent step -->
 
+## Flow control
+
+- [inhibitOnNull][]: inhibit dependent work when an input is null
+- [assertNotNull][]: raise an error when a value is unexpectedly null
+- [trap][]: turn inhibited or errored values back into usable data
+
 ## GraphQL
 
 - [context][]: returns the GraphQL contextValue
@@ -74,6 +80,9 @@ business logic layer.
 [last]: ./last
 [list]: ./list
 [listen]: ./listen
+[inhibitOnNull]: ./inhibitOnNull
+[assertNotNull]: ./assertNotNull
+[trap]: ./trap
 [loadmany]: ./loadMany
 [loadone]: ./loadOne
 [remapKeys]: ./remapKeys
