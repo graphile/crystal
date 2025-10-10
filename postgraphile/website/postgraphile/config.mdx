@@ -89,7 +89,8 @@ import { PgLazyJWTPreset } from "postgraphile/presets/lazy-jwt";
 Grafserv requests and populates `pgSettings` from the claims. It relies on the
 Grafserv adaptor (such as `grafserv/node`) and is intentionally limited; use
 your own `preset.grafast.context` if you need finer-grained control. Remember to
-extend Amber alongside it.
+extend Amber alongside it. For guidance on managing JWTs yourself, see the
+[JWT guide](./jwt-guide.mdx).
 
 ### Third-party preset bundles
 
