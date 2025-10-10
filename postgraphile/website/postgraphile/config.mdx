@@ -28,13 +28,89 @@ confusion!
 
 :::
 
-**If you’re coming from PostGraphile V4** you may then want to add your own
-V4-themed preset with the `makeV4Preset()` factory — see the [V4 migration
-docs](./migrating-from-v4) for more information.
+## PostGraphile presets
 
-If your schema is meant to be consumed by Relay, you may add the
-`postgraphile/presets/relay` preset which enables behaviors and plugins
-optimized for Relay consumption.
+PostGraphile ships a small set of presets that are designed to be composed;
+pick the foundational crystal preset that matches your starting point, and
+layer feature presets as needed.
+
+### `postgraphile/presets/amber`
+
+```ts
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+```
+
+Amber is the current baseline preset. It wires in the Graphile Build and
+Graphile Build PG default plugin lists and sensible options and inflection for
+new PostGraphile users. Every production schema should include Amber either
+directly or transitively.
+
+### `postgraphile/presets/v4`
+
+```ts
+import { makeV4Preset } from "postgraphile/presets/v4";
+```
+
+`makeV4Preset()` extends Amber and restores many PostGraphile V4 behaviours and
+inflection rules. Use it when upgrading an existing V4 project so that the
+generated schema and runtime defaults stay aligned with what your clients
+already expect. The [V4 migration docs](./migrating-from-v4) cover this path in
+more detail.
+
+### `postgraphile/presets/relay`
+
+```ts
+import { PostGraphileRelayPreset } from "postgraphile/presets/relay";
+```
+
+`PostGraphileRelayPreset` layers additional behaviours on top of your existing
+foundation to produce a Relay-focussed schema. It prefers connections over
+lists, hides primary-key columns that are surfaced via `nodeId`, and adjusts
+inflection so that `id` fields follow Relay conventions. Combine it with Amber
+or another foundational preset. The preset is currently marked experimental, so
+expect refinements between releases.
+
+:::warning[Where did my fields go?]
+
+The Relay preset tries to do away with primary key fields and fields that
+reference them as much as possible, opting instead for using the Node `ID` in as
+many places as possible. If you're coming from V4, probably stick with the v4
+preset unless you really want to make some significant changes to your schema.
+
+:::
+
+### `postgraphile/presets/lazy-jwt`
+
+```ts
+import { PgLazyJWTPreset } from "postgraphile/presets/lazy-jwt";
+```
+
+`PgLazyJWTPreset` enables a convenience flow that verifies bearer JWTs inside
+Grafserv requests and populates `pgSettings` from the claims. It relies on the
+Grafserv adaptor (such as `grafserv/node`) and is intentionally limited; use
+your own `preset.grafast.context` if you need finer-grained control. Remember to
+extend Amber alongside it. For guidance on managing JWTs yourself, see the
+[JWT guide](./jwt-guide.mdx).
+
+### Third-party preset bundles
+
+Many contrib plugins now publish presets (for example,
+`postgraphile-plugin-connection-filter` and
+`@graphile-contrib/pg-many-to-many`). These presets generally expose the plugin
+with some sensible defaults. They do not pull in a foundation preset for you, so
+include Amber (or whichever crystal preset you started with) before them.
+
+:::tip[Stay on your crystal]
+
+We expect to ship more crystal-themed foundational presets over time as the
+recommended defaults evolve. When you adopt a foundational preset, plan to stay
+on it for the life of that project unless you explicitly opt into the next
+crystal. New projects should take whichever foundational preset we recommend at
+the time; existing projects can continue extending the one they started with.
+
+Right now there is only one crystal: amber.
+
+:::
 
 ## Creating your configuration file
 
