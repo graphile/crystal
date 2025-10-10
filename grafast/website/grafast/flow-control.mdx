@@ -1,5 +1,5 @@
 ---
-title: "Flow control"
+title: "Data flow"
 sidebar_position: 6
 ---
 
@@ -150,7 +150,7 @@ skipped; other entries continue to flow through the dependent steps. Gra*fast*
 handles this itself, the inhibited or errored values will simply never be passed
 to the execute methods of your step classes.
 
-## Putting it together
+## Flow control
 
 The helpers above are building blocks. A typical pattern is to guard an input,
 inhibit downstream work when it is missing, and optionally trap that inhibition
