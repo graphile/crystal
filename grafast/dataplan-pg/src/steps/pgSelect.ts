@@ -3690,10 +3690,12 @@ function applyConditionFromCursor<
    * - All the order directions are the same (all ASC or all DESC)
    */
   const firstDirection = orders[0].direction;
-  const tupleComparable = orderFragmentAndCodecs.every(
-    ({ isNullable }, i) =>
-      !isNullable && orders[i].direction === firstDirection,
-  );
+  const tupleComparable =
+    orderCount > 1 &&
+    orderFragmentAndCodecs.every(
+      ({ isNullable }, i) =>
+        !isNullable && orders[i].direction === firstDirection,
+    );
   if (tupleComparable) {
     // We can do this with a tuple comparison
     const direction = firstDirection;
