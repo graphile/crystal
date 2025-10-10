@@ -184,10 +184,10 @@ shape depends on the handler. Pass the specifier to the relevant resource or
 loader to continue working with the record.
 
 ```ts
-const {
-  organization_id: $organizationId,
-  issue_id: $issueId,
-} = specFromNodeId(handler, $nodeId);
+const { organization_id: $organizationId, issue_id: $issueId } = specFromNodeId(
+  handler,
+  $nodeId,
+);
 ```
 
 See [specFromNodeId documentation][spec-from-node] for more.
@@ -199,5 +199,4 @@ resolve to `null`. Guard accordingly before continuing.
 
 :::
 
-[spec-from-node]:
-  https://grafast.org/grafast/step-library/standard-steps/node#specfromnodeid
+[spec-from-node]: https://grafast.org/grafast/step-library/standard-steps/node#specfromnodeid
