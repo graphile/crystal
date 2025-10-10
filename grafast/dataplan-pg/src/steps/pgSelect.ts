@@ -2242,11 +2242,13 @@ function makeOrderUniqueIfPossible<
   // Nothing unique to order by
   if (unique == null) return;
 
+  const firstDirection = info.orders[0]?.direction ?? "ASC";
+
   for (const c of unique.attributes) {
     info.orders.push({
       fragment: sql`${alias}.${sql.identifier(c as string)}`,
       codec: attributes![c].codec,
-      direction: "ASC",
+      direction: firstDirection,
     });
   }
   info.isOrderUnique = true;
