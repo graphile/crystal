@@ -220,6 +220,27 @@ order by __post__."author_id" desc, __post__."headline" desc, __post__."id" asc
 limit 4;
 
 select
+  __post__."headline" as "0",
+  __post__."author_id"::text as "1",
+  __post__."id"::text as "2"
+from "a"."post" as __post__
+where (
+  (((__post__."author_id" < $1::"int4") or (__post__."author_id" is null and $1::"int4" is not null)))
+  or (
+    __post__."author_id" is not distinct from $1::"int4"
+    and 
+      ((__post__."headline" < $2::"text")
+      or (
+        __post__."headline" = $2::"text"
+        and 
+          (__post__."id" > $3::"int4")
+      ))
+  )
+)
+order by __post__."author_id" desc, __post__."headline" desc, __post__."id" asc
+limit 4;
+
+select
   __person__."id"::text as "0",
   __person__."person_full_name" as "1",
   __person__."email" as "2",
