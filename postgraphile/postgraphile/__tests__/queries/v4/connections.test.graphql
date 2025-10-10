@@ -2,98 +2,27 @@
 #> schema: ["a", "b", "c"]
 #> subscriptions: true
 query {
-  a: allPeople {
-    ...personConnection
-  }
-  b: allPeople(first: 2) {
-    ...personConnection
-  }
-  c: allPeople(last: 2) {
-    ...personConnection
-  }
-  d: allPeople(orderBy: NAME_ASC) {
-    ...personConnection
-  }
-  e: allPeople(orderBy: NAME_DESC) {
-    ...personConnection
-  }
-  f: allPeople(orderBy: PRIMARY_KEY_ASC, before: "WyIwOGUwZDM0MmRlIiwyXQ==") {
-    ...personConnection
-  }
-  g: allPeople(orderBy: PRIMARY_KEY_ASC, after: "WyIwOGUwZDM0MmRlIiwyXQ==") {
-    ...personConnection
-  }
-  h: allUpdatableViews {
-    edges {
-      cursor
-      node {
-        x
-        name
-        constant
-      }
-    }
-  }
-  i: allUpdatableViews(orderBy: CONSTANT_ASC) {
-    edges {
-      cursor
-      node {
-        x
-        name
-        constant
-      }
-    }
-  }
-  j: allPosts(condition: { authorId: 2 }) {
-    ...postConnection
-  }
-  k: allPosts(first: 2, condition: { authorId: 2 }) {
-    ...postConnection
-  }
-  l: allPosts(last: 1, orderBy: HEADLINE_ASC, condition: { authorId: 1 }) {
-    ...postConnection
-  }
-  m: allPeople(first: 3, offset: 1) {
-    ...personConnection
-  }
-  n: allPeople(first: 0) {
-    ...personConnection
-  }
-  o: allEdgeCases(condition: { rowId: 2 }) {
-    nodes {
-      rowId
-    }
-  }
-  p: allPeople(
-    last: 2
-    before: "WyIwOGUwZDM0MmRlIiw2XQ=="
-    after: null
-    first: null
-  ) {
-    ...personConnection
-  }
-  q: allPeople(
-    orderBy: PRIMARY_KEY_ASC
-    after: "WyIwOGUwZDM0MmRlIiwyXQ=="
-    first: 1
-  ) {
-    ...personConnection
-  }
-  r: allPeople(
-    orderBy: PRIMARY_KEY_ASC
-    after: "WyIwOGUwZDM0MmRlIiwyXQ=="
-    last: 1
-  ) {
-    ...personConnection
-  }
-  s: allPeople(condition: { about: null }) {
-    ...personConnection
-  }
-  t: allPosts(orderBy: [AUTHOR_ID_DESC, HEADLINE_DESC], first: 3) {
-    ...postConnection
-  }
-  u: allPeople(condition: { lastLoginFromIp: "192.168.0.1" }) {
-    ...personConnection
-  }
+  a: allPeople { ...personConnection }
+  b: allPeople(first: 2) { ...personConnection }
+  c: allPeople(last: 2) { ...personConnection }
+  d: allPeople(orderBy: NAME_ASC) { ...personConnection }
+  e: allPeople(orderBy: NAME_DESC) { ...personConnection }
+  f: allPeople(orderBy: PRIMARY_KEY_ASC, before: "WyIwOGUwZDM0MmRlIiwyXQ==") { ...personConnection }
+  g: allPeople(orderBy: PRIMARY_KEY_ASC, after: "WyIwOGUwZDM0MmRlIiwyXQ==") { ...personConnection }
+  h: allUpdatableViews { edges { cursor node { x name constant } } }
+  i: allUpdatableViews(orderBy: CONSTANT_ASC) { edges { cursor node { x name constant } } }
+  j: allPosts(condition: { authorId: 2 }) { ...postConnection }
+  k: allPosts(first: 2, condition: { authorId: 2 }) { ...postConnection }
+  l: allPosts(last: 1, orderBy: HEADLINE_ASC, condition: { authorId: 1 }) { ...postConnection }
+  m: allPeople(first: 3, offset: 1) { ...personConnection }
+  n: allPeople(first: 0) { ...personConnection }
+  o: allEdgeCases(condition: { rowId: 2 }) { nodes { rowId } }
+  p: allPeople(last: 2, before: "WyIwOGUwZDM0MmRlIiw2XQ==", after: null, first: null) { ...personConnection }
+  q: allPeople(orderBy: PRIMARY_KEY_ASC, after: "WyIwOGUwZDM0MmRlIiwyXQ==", first: 1) { ...personConnection }
+  r: allPeople(orderBy: PRIMARY_KEY_ASC, after: "WyIwOGUwZDM0MmRlIiwyXQ==", last: 1) { ...personConnection }
+  s: allPeople(condition: { about: null }) { ...personConnection }
+  t: allPosts(orderBy: [AUTHOR_ID_DESC, HEADLINE_DESC], first: 3) { ...postConnection }
+  u: allPeople(condition: { lastLoginFromIp: "192.168.0.1"}) { ...personConnection }
   v: allPosts(first: 2) {
     e1: edges {
       n1: node {
@@ -115,25 +44,10 @@ query {
       }
     }
   }
-  w: allPeople(condition: { lastLoginFromSubnet: "192.168.0.0/24" }) {
-    ...personConnection
-  }
-  x: allPeople(condition: { userMac: "0000.0000.0000" }) {
-    ...personConnection
-  }
-  y: allPosts(
-    orderBy: [AUTHOR_ID_DESC, HEADLINE_DESC]
-    after: "WyJkNTY3OGM4NjBmIiwzLCJUaGV54oCZcmUgbm90IGFsaWVucywgdGhleeKAmXJlIEVhcnRo4oCmbGllbnMhIiwxMV0="
-    first: 3
-  ) {
-    ...postConnection
-  }
-  nullTest1: allNullTestRecords {
-    nodes {
-      nullableText
-      nullableInt
-    }
-  }
+  w: allPeople(condition: { lastLoginFromSubnet: "192.168.0.0/24" }) { ...personConnection }
+  x: allPeople(condition: { userMac: "0000.0000.0000" }) { ...personConnection }
+  y: allPosts(orderBy: [AUTHOR_ID_DESC, HEADLINE_DESC], after: "WyJkNTY3OGM4NjBmIiwzLCJUaGV54oCZcmUgbm90IGFsaWVucywgdGhleeKAmXJlIEVhcnRo4oCmbGllbnMhIiwxMV0=", first: 3) { ...postConnection }
+  nullTest1: allNullTestRecords { nodes { nullableText nullableInt } }
 }
 
 fragment personConnection on PeopleConnection {
