@@ -128,7 +128,7 @@ one of its dependencies.
 **All procedural and business logic happens inside the steps' `execute()`
 methods, not in plans.**
 
-:::note[Step execute methods should delegate to business logic]
+:::tip[Step execute methods should delegate to business logic]
 
 It's intended the step execute methods are generally lightweight if possible -
 they act as the gateway between Gra*fast*-land and your business logic; they are
@@ -143,8 +143,9 @@ Most plan resolvers do not need any extra flow control beyond the standard
 dataflow described above. Values propagate naturally through the graph, and
 nulls usually resolve to nulls without additional intervention. The helpers in
 this section are for the edge cases—typically when you are working with global
-identifiers, optional foreign keys, or other advanced scenarios where you need
-to suppress downstream work or turn those suppressions back into useful data.
+object identifiers ("Node IDs"), optional foreign keys, or other advanced
+scenarios where you need to suppress downstream work or turn those suppressions
+back into useful data.
 
 If you do reach for them, a common sequence is to guard an input, inhibit
 downstream work when that guard fails, and optionally trap the inhibition later
