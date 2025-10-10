@@ -6,12 +6,20 @@ Wrap a step such that it resolves to the same value as the original, but
 downstream works (dependents) are inhibited when that value is `null` or
 `undefined`.
 
+:::note[Declarative flow]
+
+The inhibition only affects steps that depend on the wrapper step (and those
+that depend on those, and so on); steps depending on the original (unwrapped)
+step are not otherwise impacted.
+
+:::
+
 ## Example
 
 ```ts
 const $parentId = get($post, "parentId");
 // If $parentId is null, the `loadOne` will be inhibited (will not execute)
-const $parent = loadOne(inhibitOnNull($parentId), getPostById);
+const $parent = loadOne(inhibitOnNull($parentId), batchGetPostById);
 ```
 
 In the example above, when a value of `$parentId` resolves to `null`, the
@@ -31,7 +39,7 @@ plan.
 
 Internally, `inhibitOnNull` currently creates a `__FlagStep`, but that step is
 usually converted into a dependency constraint when another step depends on it.
-Thus in plan diagrams it's more common to see it on the dependency edige:
+Thus in plan diagrams it's more common to see it on the dependency edge:
 instead of a visible node, you will see the dependency arrow annotated with
 labels such as `rejectNull`.
 
@@ -65,10 +73,3 @@ const $validUserIdOrNull = inhibitOnNull($userIdOrNull, {
 });
 ```
 
-:::note[Declarative flow]
-
-The inhibition only affects steps that depend on the wrapper step (and those
-that depend on those, and so on); steps depending on the original (unwrapped)
-step are not otherwise impacted.
-
-:::
