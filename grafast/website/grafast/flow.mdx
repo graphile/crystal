@@ -71,8 +71,8 @@ At the root of a query there's only one value for each step - they are all unary
 steps - but what happens when Gra*fast* traverses through a list field? Or hits
 a nullable position? Or polymorphism?
 
-Any time the size of a batch might change, Gra*fast* will create a new "layer
-plan" and the following field plans will have their steps planned into here.
+Any time the size of a batch might change, Gra*fast* creates a new "layer
+plan" and the following field plans have their steps planned there instead.
 
 Gra*fast* executes each step in a plan diagram just once for every request[^1],
 even if that step is handling thousands of list values. For every dependency a
