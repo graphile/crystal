@@ -9,4 +9,4 @@ select
   __person__."col_no_create_update" as "7",
   __person__."col_no_create_update_order_filter" as "8"
 from "d"."person" as __person__
-order by __person__."col_no_create_update" desc, __person__."id" asc;
+order by __person__."col_no_create_update" desc, __person__."id" desc;

@@ -25,7 +25,7 @@ select
   __person__."person_full_name" as "1",
   __person__."email" as "2"
 from "c"."person" as __person__
-order by __person__."person_full_name" desc, __person__."id" asc;
+order by __person__."person_full_name" desc, __person__."id" desc;
 
 select
   __post__."headline" as "0",
@@ -69,5 +69,5 @@ select
   __post__."headline" as "0",
   __post__."author_id"::text as "1"
 from "a"."post" as __post__
-order by __post__."author_id" desc, __post__."headline" desc, __post__."id" asc
+order by __post__."author_id" desc, __post__."headline" desc, __post__."id" desc
 limit 3;

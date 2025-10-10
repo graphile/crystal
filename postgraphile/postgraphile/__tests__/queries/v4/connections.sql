@@ -53,7 +53,7 @@ select
   __person__."last_login_from_subnet"::text as "5",
   __person__."user_mac"::text as "6"
 from "c"."person" as __person__
-order by __person__."person_full_name" desc, __person__."id" asc;
+order by __person__."person_full_name" desc, __person__."id" desc;
 
 select
   __person__."id"::text as "0",
@@ -216,7 +216,28 @@ select
   __post__."author_id"::text as "1",
   __post__."id"::text as "2"
 from "a"."post" as __post__
-order by __post__."author_id" desc, __post__."headline" desc, __post__."id" asc
+order by __post__."author_id" desc, __post__."headline" desc, __post__."id" desc
+limit 4;
+
+select
+  __post__."headline" as "0",
+  __post__."author_id"::text as "1",
+  __post__."id"::text as "2"
+from "a"."post" as __post__
+where (
+  (((__post__."author_id" < $1::"int4") or (__post__."author_id" is null and $1::"int4" is not null)))
+  or (
+    __post__."author_id" is not distinct from $1::"int4"
+    and 
+      ((__post__."headline" < $2::"text")
+      or (
+        __post__."headline" = $2::"text"
+        and 
+          (__post__."id" < $3::"int4")
+      ))
+  )
+)
+order by __post__."author_id" desc, __post__."headline" desc, __post__."id" desc
 limit 4;
 
 select
@@ -281,12 +302,7 @@ select
   __post__."id"::text as "2"
 from "a"."post" as __post__
 where (
-  (__post__."headline" < $1::"text")
-  or (
-    __post__."headline" = $1::"text"
-    and 
-      (__post__."id" < $2::"int4")
-  )
+  (__post__."headline", __post__."id") < ($1::"text", $2::"int4")
 )
 order by __post__."headline" desc, __post__."id" desc
 limit 4;
