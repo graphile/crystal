@@ -308,6 +308,17 @@ order by __post__."headline" desc, __post__."id" desc
 limit 4;
 
 select
+  __post__."headline" as "0",
+  __post__."author_id"::text as "1",
+  __post__."id"::text as "2"
+from "a"."post" as __post__
+where (
+  (__post__."headline", __post__."id") < ($1::"text", $2::"int4")
+)
+order by __post__."headline" desc, __post__."id" desc
+limit 3;
+
+select
   __null_test_record__."nullable_text" as "0",
   __null_test_record__."nullable_int"::text as "1",
   __null_test_record__."id"::text as "2"
