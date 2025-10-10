@@ -1,42 +1,50 @@
+import Mermaid from "@theme/Mermaid";
+
 # assertNotNull
 
 Guard a step so that `null` values become execution errors. The returned step
 shares the same value as the original when it resolves to a non-null result. If
-the wrapped step resolves to `null`, Grafast raises a `SafeError` with the
-message you provide, and any dependant steps are prevented from running.
-
-```ts
-const $id = assertNotNull($nodeId, "Expected a User ID");
-const $user = users.get($id);
-```
-
-Optionally pass `{ if: $cond }` to toggle the assertion dynamically. When the
-condition resolves to `false`, `assertNotNull` behaves like a pass-through.
+a value of the wrapped step resolves to `null`, Grafast raises a `SafeError`
+with the message you provide, and any dependant steps are thereby prevented from
+running for this value.
 
 :::note[Declarative flow]
+
 Only dependants of the returned step see the assertion. Other branches of the
 plan continue executing.
+
 :::
+
+## Example
+
+```ts
+const spec = specFromNodeId(userHandler, $id);
+// `spec.id` will be a step resolving to the database ID if `$id` is a valid
+// user ID, or `null` otherwise. Throw if `null`.
+const $databaseId = assertNotNull(spec.id, "Expected a User ID");
+const $user = loadOne($databaseId, batchGetUserById);
+```
+
+## Trapping
 
 Use [`trap`](./trap.md) when you need to turn the resulting error back into data
-(such as a nullable field or a dedicated error object).
-
-:::tip[Naming]
-The Graphile packages export this helper as `assertNotNull`. Historical
-references to `assertNonNull` refer to the same step.
-:::
+(such as a `null`, or perhaps the error as a data value).
 
 ## Plan diagrams
 
-`assertNotNull` also builds a `__FlagStep` (see `grafast/src/steps/__flag.ts`).
-Plan diagrams typically inline that step into the dependency edge, annotating
-the arrow with labels such as `rejectNull` and `onReject="Null ID"` rather than
-displaying a separate node.
+Internally, `assertNotNull` currently builds a `__FlagStep`, but that step is
+usually converted into a dependency constraint when another step depends on it.
+Thus in plan diagrams it's more common to see it on the dependency edge:
+instead of a visible node, you will see the dependency arrow annotated with
+labels such as `rejectNull`.
 
-```mermaid
+<Mermaid chart={`
 graph TD
-  A["Access"] -->|rejectNull, onReject="Null ID"| B["Lambda"]
-```
+  A["Access"] -->|"rejectNull;onReject=”Error: Expected a User ID”"| B["LoadOne"]
+`} />
 
-Those labels show that dependants skip execution when the input is `null`, and
-that a `SafeError("Null ID")` will be raised if the branch is reached.
+## Advanced
+
+Optionally pass `{ if: $cond }` to toggle the assertion dynamically. When the
+condition resolves to `false`, `assertNotNull` behaves like a pass-through. See
+[`inhibitOnNull`](./inhibitOnNull) for a similar example.
