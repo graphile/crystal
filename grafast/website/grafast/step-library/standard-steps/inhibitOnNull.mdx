@@ -1,0 +1,74 @@
+import Mermaid from "@theme/Mermaid";
+
+# inhibitOnNull
+
+Wrap a step such that it resolves to the same value as the original, but
+downstream works (dependents) are inhibited when that value is `null` or
+`undefined`.
+
+## Example
+
+```ts
+const $parentId = get($post, "parentId");
+// If $parentId is null, the `loadOne` will be inhibited (will not execute)
+const $parent = loadOne(inhibitOnNull($parentId), getPostById);
+```
+
+In the example above, when a value of `$parentId` resolves to `null`, the
+associated value for the `loadOne` step will automatically resolve with `null`
+(and be inhibited) without needing to execute. Only the uninhibited non-null
+values will be passed through to the `loadOne` step for execution. If all values
+for a step are inhibited then the step will not execute at all. When a value for
+`$parentId` is not nullish execution for that value proceeds as normal.
+
+## Trapping
+
+Combine `inhibitOnNull` with [`trap`](./trap.md) if you want to convert an
+inhibited value back into a regular `null` (or another value) further down the
+plan.
+
+## Plan diagrams
+
+Internally, `inhibitOnNull` currently creates a `__FlagStep`, but that step is
+usually converted into a dependency constraint when another step depends on it.
+Thus in plan diagrams it's more common to see it on the dependency edige:
+instead of a visible node, you will see the dependency arrow annotated with
+labels such as `rejectNull`.
+
+<Mermaid chart={`
+graph TD
+  A["Access"] -->|rejectNull| B["LoadOne"]
+`} />
+
+The label signals that downstream work will be inhibited if the value coming
+from `Access` is `null`.
+
+## Advanced
+
+`inhibitOnNull` accepts an optional condition step via `{ if: $cond }` (see
+[`condition`](./condition) for common conditions). When provided, the value is
+only inhibited if both the wrapped step resolves to `null` and `$cond` resolves
+to a truthy value:
+
+```ts
+// Decode `$id` assuming it is the Node `ID` for a user:
+const spec = specFromNodeId(userHandler, $id);
+// This will represent the value `null` if the ID is null or invalid
+const $userIdOrNull = spec.id;
+
+// If `$id` is `null`, we want a literal `null` here.
+// However, if `$id` is non-null, but `$userIdOrNull` evaluates to null
+// (because, for example, an invalid ID or ID for a different type was passed),
+// then we want to inhibit all proceeding steps.
+const $validUserIdOrNull = inhibitOnNull($userIdOrNull, {
+  if: condition("not null", $id),
+});
+```
+
+:::note[Declarative flow]
+
+The inhibition only affects steps that depend on the wrapper step (and those
+that depend on those, and so on); steps depending on the original (unwrapped)
+step are not otherwise impacted.
+
+:::
