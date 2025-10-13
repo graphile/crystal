@@ -1,20 +1,21 @@
 # Grafast technical overview
 
----
+Gra*fast* is a radical new approach to executing GraphQL requests.
 
-**INSTEAD** of reading this, Benjie's prepared a video that gives a much better
-overview. Direct message Jem/Benjie via the Graphile Discord, Twitter, or email
-us for access. https://discord.gg/graphile
+Traditional servers execute the request field by field at runtime, discovering
+data needs on the fly and thereby inviting over-fetching, under-fetching, and
+the classic N+1 cascade (or the explosion of Promises needed to avoid it via
+DataLoader).
 
----
-
-Grafast is a planning and execution engine for GraphQL:
-
-1. planning:
-   1. first we try and find a suitable existing plan for the GraphQL request
-   2. if we fail to do so, we plan the request (see "Planning" below)
-2. execution:
-   1. see "Execution" below
+Gra*fast* embraces GraphQL's declarative appearance. Plan resolvers describe
+each field's requirements, Gra*fast* walks the document and assembles these
+requirements into a draft execution plan, **eliminating over-fetching** by only
+requesting what's needed. Optimisation phases remove duplication and fuse
+related work, **eliminating under-fetching** by reducing the round-trips
+required to your backend data stores. And at execution-time, each step in the
+plan runs just once, **eliminating the N+1 problem** by design via built-in
+batching which bypasses the need for one-promise-per-item that traditional
+approaches such as DataLoader require.
 
 ## Parsing and validation
 
