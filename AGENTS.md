@@ -159,3 +159,55 @@ routes to the relevant website article based on a single character prefix:
 When an error is too complex to explain in 5-6 words, it can be helpful to
 create an error page in the relevant location and then link to it from the error
 message.
+
+## Glossary
+
+### Grafast
+
+- Operation plan - how to execute a GraphQL request, comprised of the "execution
+  plan" and the "output plan". Reusable for similar future requests (typically:
+  same document, same operation name, different variables/context).
+- Execution plan - the tree of "steps" that need to be executed to calculate the
+  result, and how data flows between them
+- Output plan - how to tie the result of steps back into the structure that
+  GraphQL requires we return to the user; importantly after all of the
+  optimization of the execution plan it might not even reflect the shape of the
+  operation any more, and so the Output Plan is vital for restructuring the
+  results to comply with the GraphQL spec.
+- Plan resolver - the function defined typically on a GraphQL field (though
+  other types of plan resolver exist) that detail steps sufficient to satisfy
+  the requirements of the
+- Step - a single action to perform in a GraphQL request, for example "load
+  users by ids" or "extract the `.firstName` property". Steps are executed
+  batched. The execution plan is formed from a tree of steps.
+- Layer plan - every step belongs to exactly one layer plan. Layer plans
+  represent a boundary that may result in a change in the size of the current
+  batch, for example traversing a list item, branching on polymorphism, or
+  eliminating nulls at a nullable boundary. Every layer plan except has a parent
+  layer plan except: the "root" layer plan has no parent, and the "combined"
+  layer plan has _multiple_ layer plans which it can combine.
+- Plan-time - whilst planning is occurring. Planning is synchronous and does not
+  involve any data fetching.
+- Execution-time - once the plan has been established it may be executed for
+  each suitable matching request. Each step will be executed according to the
+  execution plan, each step is executed once (with some exceptions) in a batched
+  manner, being fed all the input values and expected to return all the output
+  values. Each step may take as many or as few async operations (promises) as it
+  requires.
+
+## Out of date terminology and concepts
+
+"Aether" has been replaced with "operation plan".
+
+Plan-time evaluation - when the value of variables/inputs is evaluated at
+plan-time. This concept is being eradicated. It's removed from the public
+interfaces already, but is still used internally currently, particularly when
+evaluating `@skip` and `@include` directives. We hope to eliminate it further
+over time to avoid plan branching. Users should not need to know about this in
+the early parts of the documentation, perhaps only on a caveats-style page.
+
+Plan branching - when plan-time evaluation leads to multiple plans being used
+for the same GraphQL document + operationName combination.
+
+"Polymorphic types" should generally be replaced with "abstract types" as that's
+the more technically correct term. The data itself may be polymorphic though.
