@@ -180,12 +180,22 @@ message.
 - Step - a single action to perform in a GraphQL request, for example "load
   users by ids" or "extract the `.firstName` property". Steps are executed
   batched. The execution plan is formed from a tree of steps.
+- Unary step - a step that Gra*fast* has determined will always represent
+  exactly one value at run-time.
 - Layer plan - every step belongs to exactly one layer plan. Layer plans
   represent a boundary that may result in a change in the size of the current
-  batch, for example traversing a list item, branching on polymorphism, or
-  eliminating nulls at a nullable boundary. Every layer plan except has a parent
-  layer plan except: the "root" layer plan has no parent, and the "combined"
-  layer plan has _multiple_ layer plans which it can combine.
+  batch, which starts at `1` but changes as we traverse the GraphQL operation.
+  For example traversing a list item increases the batch size from the number of
+  lists represented to the number of items across all of the lists represented.
+  Abstract types may create "polymorphic branching" where the previous batch
+  size is now split across many different buckets. Eliminating nulls at a
+  nullable boundary may decrease the batch size. Every layer plan except has a
+  parent layer plan except: the "root" layer plan has no parent, and the
+  "combined" layer plan has _multiple_ layer plans which it can combine.
+- Bucket - a bucket is the runtime representation of a layer plan, it is where
+  results from the steps in that layer plan are stored during the execution of a
+  single GraphQL request. Layer plans belong to the execution plan and are
+  shared across many executions; buckets belong to an individual request.
 - Plan-time - whilst planning is occurring. Planning is synchronous and does not
   involve any data fetching.
 - Execution-time - once the plan has been established it may be executed for
@@ -213,3 +223,14 @@ for the same GraphQL document + operationName combination.
 
 "Polymorphic types" should generally be replaced with "abstract types" as that's
 the more technically correct term. The data itself may be polymorphic though.
+
+"Plan" used to be an overloaded term that referred to all the different parts
+including "step", "operation plan", "execution plan" and "output plan". In
+particular it was frequently used to refer to a "step", and we have a lot of
+`$plan` in the code and docs that should probably be `$step` instead. Maybe. A
+field plan resolver might result in the creation of many steps, and will return
+one step. That step can be thought of, however, as the result of planning that
+field, so it could be the field plan. We may need crispness here, or maybe not.
+
+"Global dependencies" is now referred to as "Unary dependencies" for more
+precision.
