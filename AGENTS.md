@@ -194,6 +194,8 @@ message.
   manner, being fed all the input values and expected to return all the output
   values. Each step may take as many or as few async operations (promises) as it
   requires.
+- Polymorphic positions - positions in a GraphQL document where an abstract type
+  is referenced and thus the data is likely polymorphic
 
 ## Out of date terminology and concepts
 
