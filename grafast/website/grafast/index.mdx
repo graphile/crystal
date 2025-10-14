@@ -48,7 +48,7 @@ Thus, with Gra*fast*, you can:
 - **eliminate under-fetching** by removing duplication and fusing related work,
   reducing the round-trips required to your backend data stores;
 - **eliminate the N+1 problem** by design, since Gra*fast* batch processes all
-  values via a single `execute()` method[^2]; and
+  values via a single `execute()` method[^1]; and
 - **reduce Promise usage by orders of magnitude** since, unlike [DataLoader][],
   Gra*fast*'s batching is built-in and does not need a promise for each
   individual item load.
@@ -56,7 +56,7 @@ Thus, with Gra*fast*, you can:
 Because the plan covers the whole operation, the optimisations apply across the
 entire operation rather than being sprinkled field-by-field in resolvers.
 
-[^2]:
+[^1]:
   Strictly speaking you can opt out of batch processing on a per-step
   basis, and some steps such as `lambda()` and `sideEffect()` do this, but
   Gra*fast*'s model is built around batching and unbatched execution is an
@@ -65,10 +65,10 @@ entire operation rather than being sprinkled field-by-field in resolvers.
 
 ### Spec compliant
 
-Gra*fast* is 100% spec compliant[^1], written by [a member of the GraphQL
+Gra*fast* is 100% spec compliant[^2], written by [a member of the GraphQL
 Technical Steering Committee](https://github.com/graphql/graphql-wg/blob/main/GraphQL-TSC.md#tsc-members)!
 
-[^1]:
+[^2]:
   The GraphQL specification describes how a GraphQL operation should be executed,
   talking in terms of layer–by–layer resolution of data using "resolvers." But
   critical to note is this sentence from the beginning of the specification:
@@ -77,15 +77,11 @@ Technical Steering Committee](https://github.com/graphql/graphql-wg/blob/main/Gr
   > the perceived result is equivalent._  
   > ─ https://spec.graphql.org/draft/#sec-Conforming-Algorithms
 
-  Resolvers are relatively straightforward to understand, hence why they are
-  what is written in the spec, but when implemented naively can very quickly
-  result in serious performance issues. [DataLoader][] is one of the approaches
-  suggested to solve the "N+1 problem," but it generates an explosion in the
-  number of promises your application uses at runtime; and besides, the N+1
-  problem is only the most egregious performance issue that a naive GraphQL
-  schema may face — there are others such as server–side over–fetching and
-  under–fetching and related issues that can really build up as your schemas and
-  operations get more complex.
+  Resolvers are straightforward to understand and implement the desired
+  behaviors from an observer's (client's) point of view, hence why they are the
+  chosen algorithm in the spec. However, when implemented naively on the server
+  they can very quickly result in the serious performance, efficiency and
+  scalability issues mentioned before.
 
 ### Compatible with resolvers
 
