@@ -1,11 +1,15 @@
----
-title: "Data flow"
-sidebar_position: 6
+title: "Thinking in plans"
+sidebar_position: 2
 ---
 
 import Mermaid from "@theme/Mermaid";
 
-# Data flow
+# Thinking in plans
+
+Gra*fast* is a dataflow engine: every request is satisfied by flowing values
+through a graph of steps that were planned ahead of time. This page expands on
+that mental model so you can reason about Gra*fast*'s optimisation choices and
+structure your own plan resolvers accordingly.
 
 Gra*fast* plans are declarative graphs. An operation plan is constructed the
 first time Gra*fast* sees a particular operation, and that same plan is then
@@ -18,7 +22,7 @@ output plan.
 There is no imperative branching inside the plan. Instead, values flow along the
 dependency edges being transformed by each step until they either are fed to the
 output plan, are transformed at a layer plan boundary (e.g. stopping at a null
-check, branching in a polymorphic position, increasing the batch size at a list
+check, branching in an abstract position, increasing the batch size at a list
 position, etc), or stopped due to the step raising an error or signalling
 inhibition.
 
@@ -89,7 +93,7 @@ each request... But again, don't worry too much about that.
 ### Lists
 
 When it traverses a list, Gra*fast* creates a new list "layer plan" to
-accomodate the likely change in batch size, and creates an `__ItemStep` that
+accommodate the likely change in batch size, and creates an `__ItemStep` that
 will be populated with the values of each of the list items from the parent
 list(s). This may happen multiple times nested in a request - for example you
 might fetch the first 10 users, then for each of these their top 5 posts, and
