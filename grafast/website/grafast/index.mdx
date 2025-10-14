@@ -115,18 +115,19 @@ plan** in its cache (keyed by schema, document, and operation name[^3]) and uses
 it for execution if found.
 
 To establish an operation plan for a never-seen-before operation, Gra*fast*
-walks the document and calls the relevant **plan resolver** for each field,
-argument, and abstract type that it finds. For fields, Gra*fast* will call the
-field's plan resolver, which returns a **step** suitable to produce its desired
-output (the plan resolver may construct a graph of steps for this, but only one
-step is returned). Ultimately these steps form the **execution plan**, a
-directed acyclic graph (DAG) that details the flow of information during
-execution, and an **output plan** which details how to turn the result of this
-graph into a valid GraphQL response. This execution plan is then optimized via
-principled communication with and between the various steps therein:
-deduplicating redundant work, fusing related steps (e.g. joins and subqueries in
-a database, additional "includes" in REST APIs, etc), creating optimized data
-flows, and ultimately building the most optimal plan for execution that it can.
+walks the document in a breadth-first manner and calls the relevant **plan
+resolver** for each field, argument, and abstract type that it finds. For
+fields, Gra*fast* will call the field's plan resolver, which returns a **step**
+suitable to produce its desired output (the plan resolver may construct a graph
+of steps for this, but only one step is returned). Ultimately these steps form
+the **execution plan**, a directed acyclic graph (DAG) that details the flow of
+information during execution, and an **output plan** which details how to turn
+the result of this graph into a valid GraphQL response. This execution plan is
+then optimized via principled communication with and between the various steps
+therein: deduplicating redundant work, fusing related steps (e.g. joins and
+subqueries in a database, additional "includes" in REST APIs, etc), creating
+optimized data flows, and ultimately building the most optimal plan for
+execution that it can.
 
 [^3]: Currently, plan reuse also considers some additional constraints to
 support the `@skip` and `@include` directives, but these constraints are being
