@@ -49,7 +49,7 @@ Thus, with Gra*fast*, you can:
   reducing the round-trips required to your backend data stores;
 - **eliminate the N+1 problem** by design, since Gra*fast* batch processes all
   values via a single `execute()` method[^2]; and
-- **reduces Promise usage by orders of magnitude** since, unlike [DataLoader][],
+- **reduce Promise usage by orders of magnitude** since, unlike [DataLoader][],
   Gra*fast*'s batching is built-in and does not need a promise for each
   individual item load.
 
@@ -57,7 +57,7 @@ Because the plan covers the whole operation, the optimisations apply across the
 entire operation rather than being sprinkled field-by-field in resolvers.
 
 [^2]:
-  Strictly speaking you an opt-out of batch processing on a per-step
+  Strictly speaking you can opt out of batch processing on a per-step
   basis, and some steps such as `lambda()` and `sideEffect()` do this, but
   Gra*fast*'s model is built around batching and unbatched execution is an
   optimization for certain shapes of logic (typically transforms) - it's the
