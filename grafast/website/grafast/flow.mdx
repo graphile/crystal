@@ -45,7 +45,7 @@ flowchart TD
 
 ### Unary dependencies
 
-_(aka "global dependencies")_
+_(previously called "global dependencies")_
 
 Some steps may need one or more of their dependencies to only have a single
 value shared across the entire batch — for example a database connection
@@ -202,9 +202,11 @@ normal. Other helpers build on the same idea:
   errored value and turns it back into ordinary data (for example a plain
   `null` or an empty list).
 
-All three helpers wrap the `__FlagStep`. In plan diagrams the step is usually
-absorbed into the dependency edge, so you will see labels such as `rejectNull`,
-`trapError`, or `onReject="…"` rather than a dedicated node. Crucially,
-Gra*fast* applies these flags per entry: if one item in a batch is inhibited or
-errored it is simply omitted from the `execute()` call while the rest of the
-items carry on unhindered.
+All three helpers wrap the `__FlagStep`. That name is reserved for Gra*fast*'s
+flow-control helpers and may change implementation over time, so plan logic
+should not depend on the specific step class. In plan diagrams the step is
+usually absorbed into the dependency edge, so you will see labels such as
+`rejectNull`, `trapError`, or `onReject="…"` rather than a dedicated node.
+Crucially, Gra*fast* applies these flags per entry: if one item in a batch is
+inhibited or errored it is simply omitted from the `execute()` call while the
+rest of the items carry on unhindered.

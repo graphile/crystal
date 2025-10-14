@@ -27,66 +27,46 @@ documents are validated!
 
 ## Planning
 
-### The Aether
+### Operation-plan reuse
 
-:: Before we can execute our plans we must first establish a context in which to
-create the plans. We call this context the _Aether_.
+Before we can execute a request Gra*fast* needs an operation plan (an execution
+plan plus the output plan). Gra*fast* keeps a cache of operation plans keyed by
+the schema, document, operation name, and a collection of tests over any values
+inspected during planning.
+If an existing entry passes every test for the incoming request we can skip
+straight to execution; otherwise Gra*fast* must build a new operation plan
+for the request.
+This reuse is particularly powerful for subscriptions where thousands of
+selection sets might execute in response to the same event.
 
-*Aether*s may be shared between multiple GraphQL requests so long as they meet
-the relevant requirements (based on matching {schema}, {document} and
-{operationName}, and passing relevant tests on the values that they have
-referenced within {variableValues} / {context} / {rootValue}).
+#### Relationships between variables and operation plans
 
-Sharing Aethers across GraphQL requests allows us to batch execution of certain
-plans across requests, leading to massively improved performance - especially
-for subscription operations which may result in thousands of concurrent GraphQL
-selection set executions all triggered at the same moment from the same pub/sub
-event.
+In general Gra*fast* defers evaluating variables until execution-time, so
+different variable values do not usually trigger new operation plans.
+Sometimes variables must be examined during planning though, and when this
+happens Gra*fast* records tests alongside the cached plan.
+Future requests that fail those tests will be planned again.
 
-If a suitable existing Aether is found for a request then we can skip straight
-to Execution, otherwise we must build an Aether.
+Directives such as `@skip`, `@include`, and `@stream` are common sources of this
+behaviour.
+Their arguments need to be evaluated while planning because they can change
+which branches of the document are explored, thereby requiring distinct
+operation plans.
+If those arguments are provided via variables the cache entry tracks the
+accepted values so that only compatible requests reuse the plan.
 
-#### Relationships between variables and Aethers
-
-In general we do not evaluate variables until "execution time", and thus
-different variable values will not result in different Aethers; however there
-are situations when variable values must be evaluated at planning time, and this
-will cause variable value tests to be attached to the Aether - if a future
-request comes in that does not pass the tests of any existing Aethers then a new
-Aether will be constructed.
-
-An example of having to evaluate variables at planning time are with the
-`@skip`, `@include` and `@stream` directives - the arguments to these directives
-must be evaluated at planning time because the inputs to these directives may
-cause plans to branch in different ways, and thus separate Aethers would be
-required to represent them even for the same document. If the arguments to these
-directive turn out to be variables then tests will be added to ensure that the
-same Aether can only be used with the same values of these variables.
-
-You may also have user code that needs to be evaluated at planning time, for
-example if you allow GraphQL clients to specify the order in which rows are
-pulled from the database then the variable that specifies this ordering may need
-to be evaluated at planning time as it may effect the SQL query that is to be
-generated for the request.
-
-Another situation that may require tests to be added is when walking through
-plannable input objects, however in these cases we don't require that the
-objects are identical each time, instead the tests added enforce that the inputs
-have the same "shape", for example the same number of entries in a list, or the
-same property names in an object, but not necessarily what the values themselves
-are.
-
-In general, this "planning-time evaluation" of variables should be avoided as
-much as possible, and where it cannot be then the checks added should be as
-lenient (non-specific) as possible. If care is not taken, an explosion of the
-number of Aethers can occur which will reduce performance significantly, and
-will make it much more likely that the same document will need to be planned
-many times.
+User-defined behaviour can have the same effect.
+For example, if clients supply an `orderBy` argument that influences the SQL
+you generate, planning may need to inspect that argument in order to build the
+right step tree.
+In these cases the tests should be as permissive as possible (for example
+checking the shape of an input object rather than the exact values) to avoid a
+proliferation of cache entries that hurt performance.
 
 ### Planning the request
 
-Now we have an Aether we must build the plan. Grafast will walk the document and
-call the relevant code for each field, argument, directive, fragment, etc that
-it finds. For fields, Grafast will call the field's plan resolver, which...
+When we need a new operation plan Gra*fast* walks the document and calls the
+relevant code for each field, argument, directive, fragment, etc that it finds.
+For fields, Gra*fast* will call the field's plan resolver, which...
 
 TBC
