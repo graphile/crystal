@@ -6,10 +6,11 @@ import Mermaid from "@theme/Mermaid";
 
 # Thinking in plans
 
-Gra*fast* is a dataflow engine: every request is satisfied by flowing values
-through a graph of steps that were planned ahead of time. This page expands on
-that mental model so you can reason about Gra*fast*'s optimisation choices and
-structure your own plan resolvers accordingly.
+Gra*fast* can be thought of as a dataflow engine: every request is satisfied by
+flowing values through a graph of steps that were the result of planning. This
+page expands on that mental model so you can reason about Gra*fast*'s
+optimisation choices and structure your own plan resolvers and step classes
+accordingly.
 
 Gra*fast* plans are declarative graphs. An operation plan is constructed the
 first time Gra*fast* sees a particular operation, and that same plan is then
