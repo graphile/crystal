@@ -28,15 +28,15 @@ One of the key concepts to understand is that Gra*fast* is **declarative**, not
 procedural. A plan resolver function is responsible for creating the graph of
 steps necessary to support resolution of that individual field, and this graph
 is combined with the graph for every other requested field to form the draft
-execution plan - the DAG through which the values will flow at execution time.
+execution plan — the DAG through which the values will flow at execution time.
 
 The steps in our graph are fluid; plan resolver functions only specify the order
 of operations in the form of dependencies and side effects between these steps,
 otherwise the steps can be reordered, manipulated, merged, replaced and
-optimized before execution - this is what enables Gra*fast*'s incredible
+optimized before execution — this is what enables Gra*fast*'s incredible
 efficiency gains over traditional GraphQL resolution techniques. Quite often,
 following optimization, the final execution plan will no longer resemble the
-shape of the GraphQL operation, but fortunately the Output Plan exists to format
+shape of the GraphQL operation, but fortunately the output plan exists to format
 the result data back into the shape that GraphQL specifies.
 
 ## No plan-time branching
@@ -95,9 +95,9 @@ entire list of `ids` at runtime.
 
 ## Batching
 
-At the root of a query there's only one value for each step - they are all unary
-steps - but what happens when Gra*fast* traverses through a list field? Or hits
-a nullable position? Or polymorphism?
+At the root of a query there's only one value for each step — they are all unary
+steps — but what happens when Gra*fast* traverses through a list field? Or hits
+a nullable position? Or encounters polymorphism?
 
 Any time the size of a batch might change, Gra*fast* creates a new "layer
 plan" and the following field plans have their steps planned there instead.
@@ -106,8 +106,8 @@ Gra*fast* executes each step in a plan diagram just once for every request[^1],
 even if that step is handling thousands of list values. For every dependency a
 step has, Gra*fast* takes the "execution value" that represents the list of
 values for that step, automatically filters out the entries that should not be
-executed (e.g. due to error or inhibition, see later), then passes the remaining
-values on to the step for processing.
+executed (e.g. due to error or inhibition, see [flow control](#flow-control)),
+then passes the remaining values on to the step for processing.
 
 [^1]:
     except for in incremental delivery with `@stream` and `@defer`; but you
@@ -120,15 +120,15 @@ values on to the step for processing.
 When it traverses a list, Gra*fast* creates a new list "layer plan" to
 accommodate the likely change in batch size, and creates an `__ItemStep` that
 will be populated with the values of each of the list items from the parent
-list(s). This may happen multiple times nested in a request - for example you
+list(s). This may happen multiple times nested in a request — for example you
 might fetch the first 10 users, then for each of these their top 5 posts, and
 then for each of these their top 3 comments. The result: comments might have a
 batch size up to 150 (10&times;5&times;3)!
 
 If we did all of our logic for each individual item, to fetch the author of each
 comment we might need to independently fetch the author 150 times, and that's
-just not cricket. Fortunately, as we read above, Gra*fast* does everything in
-batches - it would pass the step responsible for loading the comment author the
+woefully inefficient. Fortunately, as we read above, Gra*fast* does everything in
+batches — it would pass the step responsible for loading the comment author the
 list of all of the author ids in a single call, and that step's execute method
 would be responsible for efficiently fetching them all in as few operations as
 possible (typically just 1!).
@@ -145,7 +145,7 @@ never need to process these `null` values.
 ## Why "branching" feels different in Gra*fast*
 
 A common question is how to express logic such as "if X then load Y otherwise
-load Z", but Gra*fast* does not exist to perform such logic - it is not a
+load Z", but Gra*fast* does not exist to perform such logic — it is not a
 programming language, but a system that plans and optimizes the flow of data.
 
 A field plan must return exactly one step, and that step must represent data of
@@ -159,7 +159,7 @@ methods, not in plans.**
 
 :::tip[Step execute methods should delegate to business logic]
 
-It's intended the step execute methods are generally lightweight if possible -
+It's intended the step execute methods are generally lightweight if possible —
 they act as the gateway between Gra*fast*-land and your business logic; they are
 not typically for actually performing business logic directly, instead they
 should delegate to external business logic.
@@ -171,7 +171,7 @@ should delegate to external business logic.
 Most plan resolvers do not need any extra flow control beyond the standard
 dataflow described above. Values propagate naturally through the graph, and
 nulls usually resolve to nulls without additional intervention. The helpers in
-this section are for the edge cases—typically when you are working with global
+this section are for the edge cases — typically when you are working with global
 object identifiers ("Node IDs"), optional foreign keys, or other advanced
 scenarios where you need to suppress downstream work or turn those suppressions
 back into useful data.
@@ -195,8 +195,8 @@ advanced requirement. When you do, the helper docs provide the details:
 
 - [Flow control steps](./step-library/standard-steps/index.mdx#flow-control)
   documents the APIs (`inhibitOnNull`, `assertNotNull`, `trap`).
-- [Plan diagrams](./plan-diagrams.mdx) explains how labels such as `rejectNull`
-  and `trapError` appear in the rendered graphs.
+- [Plan diagrams](./plan-diagrams.mdx) gives an overview of the way different
+  types of steps — and the relationships between them — appear.
 
 ### Early exit
 
