@@ -85,6 +85,7 @@ into 4 main categories based on the root folders, each of which have a
 ## Preferred Style
 
 - Never use `<https://...>`-style links, always use `[text](https://...)`.
+- Links do not end in a slash
 - Follow current formatting/lint rules; **do not** add style-only churn.
 - Do not trim file suffixes from links (e.g. `.md`/`.mdx`) - we use Docusaurus
   to resolve these.
@@ -98,15 +99,22 @@ into 4 main categories based on the root folders, each of which have a
   explicitly about that integration.
 - When adding `:::` admonitions, be sure to have a blank line both above and
   below each `:::` line.
-- Graphile is an English company, the documentation is written in English UK
-  terms. However, the documentation is written for an English US audience. Where
-  a style is present and popular in English US, and is allowed in English UK
-  even when it is not the popular style, use the English US version:
+- Graphile is an English company, the documentation is written in British
+  English terms. However, the documentation is written for an American audience.
+  Where a style is present and popular in American English, and is allowed in
+  British English even when it is not the popular style, use the American
+  English version:
   - prefer "-ize" over "-ise"
-  - prefer to drop "u" in words such as "color"
-  - prefer to not use double consonants eg use "focused" over "focussed"
+  - prefer to drop "u" in words such as "behavior"
+  - prefer to not use double consonants when adding suffixes eg use "focused"
+    over "focussed"
+  - terms can be checked in the Cambridge dictionary
 - SQL terms such as "CREATE" are written in lowercase in code samples, and
   uppercase in documentation prose
+- Headings in the sidebar and inline in prose are in Sentence case
+- Modal verbs: avoid unnecessary language which suggests some is tentative or
+  unlikely (eg "may", "might"). Graphile follows RFC 2119 for the use of modal
+  verbs.
 
 When writing Grafast plan resolvers in documentation, try and only do one action
 per statement; for example instead of:
