@@ -1,3 +1,4 @@
+---
 title: "Thinking in plans"
 sidebar_position: 2
 ---
@@ -43,10 +44,12 @@ We call steps that Gra*fast* can prove will always have a batch size of 1,
 "unary steps", and we'll often mark them as such using the `➊` character in the
 plan diagram:
 
-<Mermaid chart={`
+<Mermaid
+  chart={`
 flowchart TD
   Object{{"Object[11∈0] ➊<br />ᐸ{ ... }ᐳ"}}:::plan
-`} />
+`}
+/>
 
 ### Unary dependencies
 
@@ -61,8 +64,8 @@ step is added as a "unary dependency" via `this.addUnaryDependency($step)`:
 const $db = context().get("db");
 const $row = loadOne($id, {
   shared: $db,
-  load: async (ids, { shared: db }) => db.getUsersByIds(ids)
-})
+  load: async (ids, { shared: db }) => db.getUsersByIds(ids),
+});
 ```
 
 Here, even though `$id` might represent hundreds of values when evaluated inside
@@ -84,12 +87,13 @@ even if that step is handling thousands of list values. For every dependency a
 step has, Gra*fast* takes the "execution value" that represents the list of
 values for that step, automatically filters out the entries that should not be
 executed (e.g. due to error or inhibition, see later), then passes the remaining
-values on to the step for processing. 
+values on to the step for processing.
 
-[^1]: except for in incremental delivery with `@stream` and `@defer`; but you
-don't need to think about that since Gra*fast* handles it for you. Also in
-subscriptions the steps run once for each event on the stream, rather than for
-each request... But again, don't worry too much about that.
+[^1]:
+    except for in incremental delivery with `@stream` and `@defer`; but you
+    don't need to think about that since Gra*fast* handles it for you. Also in
+    subscriptions the steps run once for each event on the stream, rather than for
+    each request... But again, don't worry too much about that.
 
 ### Lists
 
@@ -156,13 +160,15 @@ If you do reach for them, a common sequence is to guard an input, inhibit
 downstream work when that guard fails, and optionally trap the inhibition later
 so the field can return a benign value:
 
-<Mermaid chart={`
+<Mermaid
+  chart={`
 flowchart TD
   Input["specFromNodeId"] --> Guard["inhibitOnNull"]
   Guard -->|rejectNull| Fetch["loadMany"]
   Fetch --> Recover["trap (trapInhibited→EMPTY_LIST)"]
   Recover --> Output["Field return value"]
-`}/>
+`}
+/>
 
 Most readers can safely skim this section; only dive in when you encounter an
 advanced requirement. When you do, the helper docs provide the details:
@@ -189,11 +195,13 @@ const $user = loadOne($guardedId, batchGetUserById);
 return $user;
 ```
 
-<Mermaid chart={`
+<Mermaid
+  chart={`
 flowchart TD
   ID["Access<'id'>"] --> Guard["inhibitOnNull"]
   Guard --> Load["loadOne"]
-`}/>
+`}
+/>
 
 Here `inhibitOnNull` marks only the `null` entries as inhibited, so `loadOne`
 never attempts to fetch those users while the rest of the batch proceeds as
