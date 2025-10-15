@@ -161,6 +161,3 @@ export const PostGraphileRelayPreset: GraphileConfig.Preset = {
     pgFunctionsPreferNodeId: true,
   },
 };
-
-/** @deprecated use PostGraphileRelayPreset */
-export const PgRelayPreset = PostGraphileRelayPreset;

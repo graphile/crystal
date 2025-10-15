@@ -1,7 +1,7 @@
 ## expect(errors).toBeFalsy()
 #> schema: ["relay"]
 #> graphileBuildOptions: { defaultNodeIdCodec: "pipeString" }
-#> extends: ["postgraphile/presets/relay:PgRelayPreset"]
+#> extends: ["postgraphile/presets/relay:PostGraphileRelayPreset"]
 query Q {
   a: user(id: "users|1") {
     username # Alice

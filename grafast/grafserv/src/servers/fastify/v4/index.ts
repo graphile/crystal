@@ -13,7 +13,7 @@ import {
   GrafservBase,
 } from "../../../core/base.js";
 import type {
-  EventStreamHeandlerResult,
+  EventStreamHandlerResult,
   GrafservConfig,
   RequestDigest,
   Result,
@@ -250,7 +250,7 @@ export class FastifyGrafserv extends GrafservBase {
         handler: async (request, reply) => {
           const digest = getDigest(request, reply);
           // TODO: refactor this to use the eventStreamHandler once we write that...
-          const handlerResult: EventStreamHeandlerResult = {
+          const handlerResult: EventStreamHandlerResult = {
             type: "event-stream",
             request: normalizeRequest(digest),
             dynamicOptions: this.dynamicOptions,
