@@ -20,7 +20,6 @@ export interface PostGraphileInstance {
   getResolvedPreset(): GraphileConfig.ResolvedPreset;
   release(): PromiseOrDirect<void>;
 }
-function noop() {}
 
 export function postgraphile(
   preset: GraphileConfig.Preset,
