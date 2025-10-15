@@ -13,13 +13,33 @@ page expands on that mental model so you can reason about Gra*fast*'s
 optimisation choices and structure your own plan resolvers and step classes
 accordingly.
 
-Gra*fast* plans are declarative graphs. An operation plan is constructed the
-first time Gra*fast* sees a particular operation, and that same plan is then
-reused for every compatible request. Each step in the plan describes where a
-value comes from and how it should be transformed, and these steps form a
-directed acyclic graph (DAG) starting from the inputs of the request (variables,
-arguments, context, etc) and flowing all the way down to be consumed by the
-output plan.
+## Reusable plans
+
+An operation plan is constructed the first time Gra*fast* sees a particular
+operation, and that same plan is then reused for every compatible request. Each
+step in the plan describes where a value comes from and how it should be
+transformed, and these steps form a directed acyclic graph (DAG) starting from
+the inputs of the request (variables, arguments, context, etc) and flowing all
+the way down to be consumed by the output plan.
+
+## Declarative
+
+One of the key concepts to understand is that Gra*fast* is **declarative**, not
+procedural. A plan resolver function is responsible for creating the graph of
+steps necessary to support resolution of that individual field, and this graph
+is combined with the graph for every other requested field to form the draft
+execution plan - the DAG through which the values will flow at execution time.
+
+The steps in our graph are fluid; plan resolver functions only specify the order
+of operations in the form of dependencies and side effects between these steps,
+otherwise the steps can be reordered, manipulated, merged, replaced and
+optimized before execution - this is what enables Gra*fast*'s incredible
+efficiency gains over traditional GraphQL resolution techniques. Quite often,
+following optimization, the final execution plan will no longer resemble the
+shape of the GraphQL operation, but fortunately the Output Plan exists to format
+the result data back into the shape that GraphQL specifies.
+
+## No plan-time branching
 
 There is no imperative branching inside the plan. Instead, values flow along the
 dependency edges being transformed by each step until they either are fed to the
