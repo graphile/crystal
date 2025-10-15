@@ -101,8 +101,9 @@ into 4 main categories based on the root folders, each of which have a
   below each `:::` line.
 - The documentation uses UK English, but the code uses US English. If a spelling
   is valid in both US and UK English, it is preferred over the UK only spelling.
-- SQL terms such as "CREATE" are written in lowercase in code samples, and
-  uppercase in documentation prose
+- SQL statements should be lowercase throughout the code and documentation,
+  however when keywords such as `SELECT` and `DELETE` are presented alone in
+  prose they should be upper-cased for clarity.
 - Headings in the sidebar and inline in prose are in Sentence case
 - Modal verbs: avoid unnecessary language which suggests some is tentative or
   unlikely (eg "may", "might"). Graphile follows RFC 2119 for the use of modal
