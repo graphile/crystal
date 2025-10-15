@@ -1,0 +1,210 @@
+---
+title: "Data flow"
+sidebar_position: 6
+---
+
+import Mermaid from "@theme/Mermaid";
+
+# Data flow
+
+Gra*fast* plans are declarative graphs. An operation plan is constructed the
+first time Gra*fast* sees a particular operation, and that same plan is then
+reused for every compatible request. Each step in the plan describes where a
+value comes from and how it should be transformed, and these steps form a
+directed acyclic graph (DAG) starting from the inputs of the request (variables,
+arguments, context, etc) and flowing all the way down to be consumed by the
+output plan.
+
+There is no imperative branching inside the plan. Instead, values flow along the
+dependency edges being transformed by each step until they either are fed to the
+output plan, are transformed at a layer plan boundary (e.g. stopping at a null
+check, branching in a polymorphic position, increasing the batch size at a list
+position, etc), or stopped due to the step raising an error or signalling
+inhibition.
+
+## Unary steps
+
+The entrypoints to our graph, our operation plan, are the request values: the
+variables, static arguments, context, constants, and similar concerns. Each of
+these represent exactly one value per request, and thus they have a batch size
+of `1`. We add them all automatically to the "root" layer plan, which will also
+always have a batch size of `1`.
+
+Steps that depend on only these steps directly (and do not occur after any side
+effect steps) will also typically execute with a batch size of `1`. Similarly
+for steps that depend only on these!
+
+We call steps that Gra*fast* can prove will always have a batch size of 1,
+"unary steps", and we'll often mark them as such using the `➊` character in the
+plan diagram:
+
+<Mermaid chart={`
+flowchart TD
+  Object{{"Object[11∈0] ➊<br />ᐸ{ ... }ᐳ"}}:::plan
+`} />
+
+### Unary dependencies
+
+_(aka "global dependencies")_
+
+Some steps may need one or more of their dependencies to only have a single
+value shared across the entire batch — for example a database connection
+retrieved from the context. They can add this as a requirement by ensuring the
+step is added as a "unary dependency" via `this.addUnaryDependency($step)`:
+
+```ts
+const $db = context().get("db");
+const $row = loadOne($id, {
+  shared: $db,
+  load: async (ids, { shared: db }) => db.getUsersByIds(ids)
+})
+```
+
+Here, even though `$id` might represent hundreds of values when evaluated inside
+a list, `context()` and thus `context().get("db")` will only ever represent a
+single value—a unary value—so the same `db` client can be shared across the
+entire list of `ids` at runtime.
+
+## Batching
+
+At the root of a query there's only one value for each step - they are all unary
+steps - but what happens when Gra*fast* traverses through a list field? Or hits
+a nullable position? Or polymorphism?
+
+Any time the size of a batch might change, Gra*fast* creates a new "layer
+plan" and the following field plans have their steps planned there instead.
+
+Gra*fast* executes each step in a plan diagram just once for every request[^1],
+even if that step is handling thousands of list values. For every dependency a
+step has, Gra*fast* takes the "execution value" that represents the list of
+values for that step, automatically filters out the entries that should not be
+executed (e.g. due to error or inhibition, see later), then passes the remaining
+values on to the step for processing. 
+
+[^1]: except for in incremental delivery with `@stream` and `@defer`; but you
+don't need to think about that since Gra*fast* handles it for you. Also in
+subscriptions the steps run once for each event on the stream, rather than for
+each request... But again, don't worry too much about that.
+
+### Lists
+
+When it traverses a list, Gra*fast* creates a new list "layer plan" to
+accomodate the likely change in batch size, and creates an `__ItemStep` that
+will be populated with the values of each of the list items from the parent
+list(s). This may happen multiple times nested in a request - for example you
+might fetch the first 10 users, then for each of these their top 5 posts, and
+then for each of these their top 3 comments. The result: comments might have a
+batch size up to 150 (10&times;5&times;3)!
+
+If we did all of our logic for each individual item, to fetch the author of each
+comment we might need to independently fetch the author 150 times, and that's
+just not cricket. Fortunately, as we read above, Gra*fast* does everything in
+batches - it would pass the step responsible for loading the comment author the
+list of all of the author ids in a single call, and that step's execute method
+would be responsible for efficiently fetching them all in as few operations as
+possible (typically just 1!).
+
+### Nullable boundaries
+
+When a `null` hits a nullable type in GraphQL, no further processing is
+required. For efficiency, Gra*fast* will create a nullable boundary layer plan
+to represent this that will filter out these nulls such that dependent steps
+never need to process these `null` values.
+
+{/* TODO: polymorphism and the other boundary types */}
+
+## Why "branching" feels different in Gra*fast*
+
+A common question is how to express logic such as "if X then load Y otherwise
+load Z", but Gra*fast* does not exist to perform such logic - it is not a
+programming language, but a system that plans and optimizes the flow of data.
+
+A field plan must return exactly one step, and that step must represent data of
+the expected return type. The decision as to which specific `Post` a field
+resolver should return (whether the English translation or the German one, for
+example) belongs inside the relevant single step that loads the `Post`, or maybe
+one of its dependencies.
+
+**All procedural and business logic happens inside the steps' `execute()`
+methods, not in plans.**
+
+:::tip[Step execute methods should delegate to business logic]
+
+It's intended the step execute methods are generally lightweight if possible -
+they act as the gateway between Gra*fast*-land and your business logic; they are
+not typically for actually performing business logic directly, instead they
+should delegate to external business logic.
+
+:::
+
+## Flow control
+
+Most plan resolvers do not need any extra flow control beyond the standard
+dataflow described above. Values propagate naturally through the graph, and
+nulls usually resolve to nulls without additional intervention. The helpers in
+this section are for the edge cases—typically when you are working with global
+object identifiers ("Node IDs"), optional foreign keys, or other advanced
+scenarios where you need to suppress downstream work or turn those suppressions
+back into useful data.
+
+If you do reach for them, a common sequence is to guard an input, inhibit
+downstream work when that guard fails, and optionally trap the inhibition later
+so the field can return a benign value:
+
+<Mermaid chart={`
+flowchart TD
+  Input["specFromNodeId"] --> Guard["inhibitOnNull"]
+  Guard -->|rejectNull| Fetch["loadMany"]
+  Fetch --> Recover["trap (trapInhibited→EMPTY_LIST)"]
+  Recover --> Output["Field return value"]
+`}/>
+
+Most readers can safely skim this section; only dive in when you encounter an
+advanced requirement. When you do, the helper docs provide the details:
+
+- [Flow control steps](./step-library/standard-steps/index.mdx#flow-control)
+  documents the APIs (`inhibitOnNull`, `assertNotNull`, `trap`).
+- [Plan diagrams](./plan-diagrams.mdx) explains how labels such as `rejectNull`
+  and `trapError` appear in the rendered graphs.
+
+### Early exit
+
+Early exit is the most common flow-control requirement, but it is still a
+special case. Most fields can rely on the default behaviour: `null` values flow
+through as `null`, and errors thrown inside `execute()` already halt work for
+the affected entry. Reach for the helpers only when you need tighter control,
+for example when validating decoded Node IDs or when a nullable foreign key
+should prevent a related fetch from executing.
+
+The pattern usually looks like this:
+
+```ts
+const $guardedId = inhibitOnNull($id);
+const $user = loadOne($guardedId, batchGetUserById);
+return $user;
+```
+
+<Mermaid chart={`
+flowchart TD
+  ID["Access<'id'>"] --> Guard["inhibitOnNull"]
+  Guard --> Load["loadOne"]
+`}/>
+
+Here `inhibitOnNull` marks only the `null` entries as inhibited, so `loadOne`
+never attempts to fetch those users while the rest of the batch proceeds as
+normal. Other helpers build on the same idea:
+
+- [`inhibitOnNull`](./step-library/standard-steps/inhibitOnNull.mdx) skips
+  dependent work for `null` inputs while still returning `null` to the caller.
+- [`assertNotNull`](./step-library/standard-steps/assertNotNull.mdx) upgrades a
+  `null` into a `SafeError`, making the failure visible to clients.
+- [`trap`](./step-library/standard-steps/trap.mdx) recovers an inhibited or
+  errored value and turns it back into ordinary data (for example a plain
+  `null` or an empty list).
+
+All three helpers wrap the `__FlagStep`. In plan diagrams the step is usually
+absorbed into the dependency edge, so you will see labels such as `rejectNull`,
+`trapError`, or `onReject="…"` rather than a dedicated node. Crucially,
+Gra*fast* applies these flags per entry: if one item in a batch is inhibited or
+errored it is simply omitted from the `execute()` call while the rest of the
+items carry on unhindered.
