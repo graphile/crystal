@@ -52,7 +52,11 @@ we could promise a stable 1.0:
   stop exploding into exponential branches.
 
 Those projects are now merged, shipped in production, and form the backbone of
-this release candidate.
+this release candidate. They also complete the mental model we advocate in
+[“Thinking in plans”](/grafast/flow): you describe the desired dataflow once,
+Gra*fast* optimizes it, and execution reuses that plan safely across requests.
+With unary dependencies tidied, branching controlled, and polymorphism tamed,
+it is now straightforward to reason about how values move through the graph.
 
 ## Why call it a release candidate now?
 
@@ -69,6 +73,11 @@ the occasional annotation tweak in your code. TSDoc comments are also lagging
 behind; treat them as a helpful hint, not a contract, until we finish the doc
 refresh.
 
+Now is the perfect moment to validate that the “plans as dataflow” approach
+clicks for you: do the steps Gra*fast* produces line up with the dependencies you
+expect? Does the separation between execution and output plan match how you
+reason about your schema? Tell us.
+
 ## Documentation: where we need you
 
 - Read through the planners, step references, and tutorial content. Tell us
@@ -77,6 +86,13 @@ refresh.
   from your patterns.
 - Help us document the new combined-step APIs and the unary helper utilities.
 - File issues when terminology disagrees with what you see in code.
+- Treat plans as a reusable dataflow graph: each plan resolver contributes steps
+  that describe how values move from inputs through unary dependencies and layer
+  plans until they reach the output plan. Skim the refreshed
+  [“Thinking in plans” overview](/grafast/flow), try mapping one of your own
+  fields using that mindset, and tell us where the explanation still trips you
+  up or leaves you guessing. Concrete anecdotes and suggested wording tweaks are
+  incredibly valuable.
 
 Feedback via [GitHub issues](https://github.com/graphile/crystal) or the
 [Discord server](https://discord.gg/graphile) is hugely appreciated. Patches

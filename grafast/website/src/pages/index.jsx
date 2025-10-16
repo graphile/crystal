@@ -52,8 +52,9 @@ function HomepageHeader() {
               GraphQL.
             </p>
             <p className={styles.heroSubtitle}>
-              🆕 <strong>v0.1 is here!</strong> <Grafast /> is now MIT Licensed
-              Open Source Software!
+              🆕 <strong>v1 release candidate is here!</strong> <Grafast /> is
+              production ready, feature complete, and waiting for your feedback
+              before 1.0.
             </p>
             <div className={styles.buttons}>
               <Link
@@ -61,6 +62,15 @@ function HomepageHeader() {
                 to="/grafast/"
               >
                 Overview - 5min ⏱️
+              </Link>
+              <Link
+                className={clsx(
+                  "button button--outline button--lg margin-left--md",
+                  styles.heroButtonOutline,
+                )}
+                to="/news/2025-10-16-grafast-v1-release-candidate/"
+              >
+                Read the RC announcement
               </Link>
             </div>
           </div>
