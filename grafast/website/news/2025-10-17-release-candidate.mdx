@@ -70,28 +70,17 @@ reason about your schema? Share your feedback in our [Discord](https://discord.g
 
 ## Documentation: where we need you
 
-- Read through the planners, step references, and tutorial content. Tell us
-  where it is wrong or missing detail.
-- Share recipes for multi-data-source plan resolvers so that others can learn
-  from your patterns.
-- Help us document the new combined-step APIs and the unary helper utilities.
-- File issues when terminology disagrees with what you see in code.
-- Treat plans as a reusable dataflow graph: each plan resolver contributes steps
-  that describe how values move from inputs through unary dependencies and layer
-  plans until they reach the output plan. Skim the refreshed
-  [“Thinking in plans” overview](/grafast/flow), try mapping one of your own
-  fields using that mindset, and tell us where the explanation still trips you
-  up or leaves you guessing. Concrete anecdotes and suggested wording tweaks are
-  incredibly valuable.
+The code moved faster than the words that describe it. Parts of the docs are
+out of date, others are missing, and a few contradict the behaviour you see in
+practice. We need review, issue reports, and small patches. Your first-hand notes
+about what is unclear are invaluable.
 
 Feedback via [GitHub issues](https://github.com/graphile/crystal) or the
-[Discord server](https://discord.gg/graphile) is hugely appreciated. Patches
-are golden, but reproducible bug reports and annotated screenshots are just as
-valuable.
+[Discord server](https://discord.gg/graphile) is hugely appreciated.
 
 ## Try Gra*fast* v1 today
 
-Grab the release candidate from npm, we are keeping under the `@beta` tag to
+Install the release candidate from npm, we are keeping it under the `@beta` tag to
 make transition as smooth as possible:
 
 ```bash
