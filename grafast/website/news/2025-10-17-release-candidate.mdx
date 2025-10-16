@@ -3,7 +3,7 @@ title: Grafast v1 reaches release candidate stage
 description:
   Grafast v1 is functionally complete and powering production workloads, now
   we need your help to finish the docs ahead of the 1.0 final.
-slug: 2025-10-16-grafast-v1-release-candidate
+slug: 2025-10-17-grafast-v1-release-candidate
 authors: [benjie, jem]
 tags: [Release candidate]
 hide_table_of_contents: false
@@ -49,25 +49,24 @@ refined cache behaviour, and validated the architecture inside PostGraphile V5.
 The result is a planning engine that delivers holistic visibility across a
 GraphQL operation while still feeling ergonomic to write against.
 
-## Why call it a release candidate now?
+## What does release candidate mean for Gra*fast*?
 
-The runtime APIs, wire protocol, and behaviour have settled. The teams running
-Gra*fast* in production have shipped upgrades for months without regressions.
-We also know that the documentation needs to catch up, and that some TypeScript
-types are still rough. An RC gives us the space to focus entirely on quality
-before stamping the final 1.0.
+The runtime APIs, wire protocol, and behaviour have settled but the documentation
+needs to catch up, and some TypeScript types are still rough. An RC gives us
+the space to focus entirely on quality before stamping the final 1.0 release.
 
-You should not expect further breaking changes to runtime behaviour. However,
-we will continue to refine TypeScript typings during the RC window. Most of the
-changes will be improvements to inference and generics, but they may require
-the occasional annotation tweak in your code. TSDoc comments are also lagging
-behind; treat them as a helpful hint, not a contract, until we finish the doc
-refresh.
+The teams running Gra*fast* in production have shipped upgrades for months without
+regressions. The project is stable enough that you should not expect further breaking
+changes to runtime behaviour. However, we will continue to refine TypeScript typings
+during the RC window. Most of the changes will be improvements to inference and generics,
+but they may require the occasional annotation tweak in your code. TSDoc comments are
+also lagging behind; treat them as a helpful hint, not a contract, until we finish the
+documentation refresh.
 
-Now is the perfect moment to validate that the “plans as dataflow” approach
-clicks for you: do the steps Gra*fast* produces line up with the dependencies you
+Now is the perfect moment to validate that the “[plans as dataflow](/grafast/flow)” approach
+clicks for you: do the steps Gra*fast* produce line up with the dependencies you
 expect? Does the separation between execution and output plan match how you
-reason about your schema? Tell us.
+reason about your schema? Share your feedback in our [Discord](https://discord.gg/graphile).
 
 ## Documentation: where we need you
 
