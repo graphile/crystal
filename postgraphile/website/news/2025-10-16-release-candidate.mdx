@@ -68,6 +68,23 @@ Please [open issues or pull requests](https://github.com/graphile/crystal) and
 talk to us on [Discord](https://discord.gg/graphile). We are prioritising doc
 fixes above new features during the RC period.
 
+## Fresh polish in the RC
+
+While the new features are largely locked down, the RC includes a few quality
+of life improvements you should know about:
+
+- Partitioned tables can now expose their child partitions via smart tags or a
+  global option, making it easier to target specific shards in GraphQL.
+- Enum table domains from V4 return, so PostgreSQL functions can accept and
+  return enum-backed domain values without custom glue code.
+- The simple subscriptions plugin learned an `initialEvent` argument, restoring
+  parity with V4’s behaviour and smoothing websocket migrations.
+- `@dataplan/pg` now forwards the `pg-sql2` helpers, so plan resolvers can rely
+  on a single import for PostgreSQL-aware SQL building.
+
+If you bump into rough edges while trying these changes, please raise an issue
+so we can address it before the final release.
+
 ## Try the release candidate today
 
 Install the release candidate from npm:
