@@ -54,7 +54,7 @@ function HomepageHeader() {
             <p className={styles.heroSubtitle}>
               🆕 <strong>v1 release candidate is here!</strong> <Grafast /> is
               production ready, feature complete, and waiting for your feedback
-              before 1.0.
+              before 1.0 officially launches.
             </p>
             <div className={styles.buttons}>
               <Link
@@ -65,8 +65,7 @@ function HomepageHeader() {
               </Link>
               <Link
                 className={clsx(
-                  "button button--outline button--lg margin-left--md",
-                  styles.heroButtonOutline,
+                  "button button--secondary button--lg margin-left--md",
                 )}
                 to="/news/2025-10-16-grafast-v1-release-candidate/"
               >
