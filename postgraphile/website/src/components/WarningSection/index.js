@@ -21,14 +21,14 @@ export default function WarningContent({
               <div className={v5betaStyles.progressBackground}>
                 <div
                   className={v5betaStyles.progressForeground}
-                  style={{ width: "99.5%" }}
+                  style={{ width: "100%" }}
                 >
-                  <div className={v5betaStyles.progressLabel}>99.5%</div>
+                  <div className={v5betaStyles.progressLabel}>100%</div>
                 </div>
               </div>
             </div>
             <p>
-              Progress towards release candidate stage.{" "}
+              PostGraphile V5 release candidate is available now!{" "}
               <Link className={styles.progressLink} to="./v5beta">
                 Find out more.
               </Link>
@@ -38,10 +38,9 @@ export default function WarningContent({
         <div className={clsx("row", styles.warningRow)}>
           <div className={clsx("col col--6", styles.inner)}>
             <h3 className={styles.warningInfo}>
-              PostGraphile V5 is still work-in-progress. Whilst{" "}
-              <strong>suitable to run in production</strong>, we need your help
-              to get it past the finish line; please read the beta announcement{" "}
-              <strong>and get involved</strong>.
+              The runtime is ready; this is the last stop before the final
+              release. Try the RC, tell us what needs polish, and{" "}
+              <strong>help us ship V5</strong>.
             </h3>
             <p>
               PostGraphile V4 is feature frozen; it will still receive updates

@@ -85,9 +85,9 @@ export default function Home() {
       description="Extensible high-performance automatic GraphQL API for PostgreSQL"
     >
       <WarningSection
-        title={`PostGraphile Version 5 Public Beta`}
-        primaryLink={`/news/2023-08-03-version-5-beta/`}
-        primaryButtonText={`Beta Announcement`}
+        title={`PostGraphile Version 5 Release Candidate`}
+        primaryLink={`/news/2025-10-16-v5-release-candidate/`}
+        primaryButtonText={`Read the RC announcement`}
         secondaryLink={`/postgraphile/5/migrating-from-v4/`}
         secondaryButtonText={<>V4&rarr;V5 Migration Guide</>}
       />
