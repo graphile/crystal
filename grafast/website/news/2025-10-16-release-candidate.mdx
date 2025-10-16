@@ -14,7 +14,7 @@ import styles from "@site/src/css/common.module.css";
 
 <div className={styles.intro}>
 
-Gra*fast* v1.0.0-rc.1 is now available. The engine has stabilised, the plan
+Gra*fast* v1.0.0-rc.1 is now available. The engine has stabilized, the plan
 epics are complete, and the runtime has been hardened by more than a year of
 production use through PostGraphile V5 and standalone adopters. All that
 remains is to finish the documentation and tighten the TypeScript experience.
@@ -36,6 +36,23 @@ Along the way we rewrote countless plan resolvers, improved SQL generation,
 refined cache behaviour, and validated the architecture inside PostGraphile V5.
 The result is a planning engine that delivers holistic visibility across a
 GraphQL operation while still feeling ergonomic to write against.
+
+## Four epics complete
+
+Each Gra*fast* epic represented a foundational rethink that had to land before
+we could promise a stable 1.0:
+
+- **Unary dependencies**: replaced global dependencies so plan resolvers can
+  rely on precise, single-value inputs.
+- **Early exit controls**: now use flags, preventing needless downstream work
+  when a branch is no longer required.
+- **Plan-time evaluation removal**: eliminated `$step.eval*()` and other brittle
+  shortcuts, giving us safer, more predictable execution flows.
+- **Polymorphism convergence**: introduced combined steps so abstract types
+  stop exploding into exponential branches.
+
+Those projects are now merged, shipped in production, and form the backbone of
+this release candidate.
 
 ## Why call it a release candidate now?
 

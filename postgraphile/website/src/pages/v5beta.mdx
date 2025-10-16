@@ -19,8 +19,8 @@ import clsx from "clsx";
 
 <div className={v5betaStyles.progressContainerStatusPage}>
   <div className={v5betaStyles.progressBackground}>
-    <div className={v5betaStyles.progressForeground} style={{ width: "99.5%" }}>
-      <div className={v5betaStyles.progressLabel}>99.5%</div>
+    <div className={v5betaStyles.progressForeground} style={{ width: "100%" }}>
+      <div className={v5betaStyles.progressLabel}>100%</div>
     </div>
   </div>
 </div>
@@ -57,27 +57,42 @@ should experience particularly smooth sailing!
 
 ## Current Status
 
-Now that all four epics are complete, all that remains is fixing the types, smoothing the edges,
-tracking down and adding tests for all the edge cases, adding documentation
-and a final review of the exposed APIs. Much of this you can help with!
+Now that all four epics are complete, the release candidate is available and
+waiting for your sign-off. The runtime is ready, but the documentation and
+TypeScript types still need polish. This is the final opportunity to try
+PostGraphile V5 before the stable release and tell us what needs to be clearer
+or smoother.
+
+### Release candidate highlights
+
+- Partitioned tables can expose child partitions via smart tags or a global
+  option, helping you target specific shards.
+- Enum table domains from V4 return, so PostgreSQL functions work with enum
+  domains out of the box.
+- The simple subscriptions plugin gained an `initialEvent` argument for smoother
+  websocket migrations.
+- `@dataplan/pg` now forwards the `pg-sql2` helpers so plan resolvers can rely
+  on a single import for PostgreSQL-aware SQL building.
 
 ## How to help
 
-To aid us in reaching the release candidate stage faster, you can:
+To help us shape the final release, you can:
 
-- Try V5 out on your real use cases and report back
-  - Try in production, or just on a test branch
-  - Send us feedback &mdash; **good &amp; bad** &mdash; through [GitHub](https://github.com/graphile/crystal) or [Discord](https://discord.gg/graphile)
-  - Use [benjie/ouch-my-finger](https://github.com/benjie/ouch-my-finger) to generate minimal reproductions
+- Try the release candidate on your real use cases and report back
+  - Ship it in production, or run it on a staging branch
+  - Send feedback &mdash; **good &amp; bad** &mdash; through [GitHub](https://github.com/graphile/crystal)
+    or [Discord](https://discord.gg/graphile)
+  - Use [benjie/ouch-my-finger](https://github.com/benjie/ouch-my-finger) to
+    generate minimal reproductions
 - Help address issues in the [V5 Project Board](https://github.com/orgs/graphile/projects/3)
-- Contribute to documentation and examples
+- Contribute to documentation, examples, and missing TypeScript annotations
 - [Sponsor us](https://graphile.org/sponsor) &mdash; **you rely on our software, we rely on your financial support**
 
 </div>
 
 <CalloutSection
   title={`Crowd-funded open-source software`}
-  body={`Sponsoring the Graphile project directly increases the time and resources we can spend on getting PostGraphile V5 to release candidate stage. THANK YOU to all our sponsors!`}
+  body={`Sponsoring the Graphile project directly increases the time and resources we can spend on polishing the PostGraphile V5 release candidate. THANK YOU to all our sponsors!`}
   link={`https://graphile.org/sponsor/`}
   buttonText={`Learn more about sponsorship`}
 />
