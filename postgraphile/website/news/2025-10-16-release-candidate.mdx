@@ -17,13 +17,11 @@ import styles from "@site/src/css/common.module.css";
 After five and a half years of work, countless beta drops, and four Gra*fast*
 epics, PostGraphile V5 has now reached **release candidate** status. This is
 the last checkpoint before the final release. The runtime is ready, many of you
-are already shipping it in production, and now we urgently need your feedback
-on the RC builds. Try them today, note anything confusing, missing, or rough,
-and tell us straight away so we can still fix it in time.
+are already shipping it in production, and now we urgently need your feedback.
+The release candidate includes some quality of life improvements, and the APIs are
+stable, ready for you to try V5 today.
 
 </div>
-
-<!-- truncate-->
 
 ## Four epics, countless lessons
 
@@ -33,25 +31,26 @@ and 49 beta releases. Every stage refined the ergonomics, uncovered tricky edge
 cases, and ultimately solved the four Gra*fast* epics that blocked a stable
 release.
 
-- Global dependencies are now tidy unary steps.
-- Early exits are handled with flags that avoid wasted work.
-- `$step.eval*()` is gone, enabling safer and simpler planning.
-- Polymorphic plans now converge without exponential branching.
+- ✅ Global dependencies are now tidy unary steps.
+- ✅ Early exits are handled with flags that avoid wasted work.
+- ✅ Eval is eradicated, enabling safer and simpler planning.
+- ✅ Polymorphic plans now converge without exponential branching.
 
 The result is a platform that is faster, more expressive, and easier to extend
 than anything we have shipped before.
 
+<!-- truncate-->
+
 ## Fresh polish in the RC
 
 While the new features are largely locked down, the RC includes a few quality
-of life improvements you should know about:
+of life improvements:
 
 - Partitioned tables can now expose their child partitions via smart tags or a
   global option, making it easier to target specific shards in GraphQL.
 - Enum table domains from V4 return, so PostgreSQL functions can accept and
   return enum-backed domain values without custom glue code.
-- The simple subscriptions plugin learned an `initialEvent` argument, restoring
-  parity with V4’s behaviour and smoothing websocket migrations.
+- The simple subscriptions plugin better matches V4’s behaviour, smoothing websocket migrations.
 - `@dataplan/pg` now forwards the `pg-sql2` helpers, so plan resolvers can rely
   on a single import for PostgreSQL-aware SQL building.
 
@@ -75,7 +74,7 @@ TSDoc comments are behind reality; we will update them alongside the docs.
 
 The code moved faster than the words that describe it. Parts of the docs are
 out of date, others are missing, and a few contradict the behaviour you see in
-practice. We need review, issue reports, and patches. Your first-hand notes
+practice. We need review, issue reports, and small patches. Your first-hand notes
 about what is unclear are invaluable.
 
 - Walk through the guides and flag inaccuracies.
