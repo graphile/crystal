@@ -88,16 +88,17 @@ fixes above new features during the RC period.
 
 ## Try the release candidate today
 
-Install the release candidate from npm:
+Install the release candidate from npm, we are still using the `@beta` tag to
+make the transition as smooth as possible:
 
 ```bash
-yarn add postgraphile@rc
+yarn add postgraphile@beta
 ```
 
 You can also try the bundled CLI without installing:
 
 ```bash
-npx pgl@rc -P pgl/amber -e -c postgres:///my_db -s public
+npx pgl@beta -P pgl/amber -e -c postgres:///my_db -s public
 ```
 
 Replace the connection string and schema with your own values. If you are

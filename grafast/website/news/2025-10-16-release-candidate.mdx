@@ -1,10 +1,10 @@
 ---
-title: Gra*fast* v1 release candidate seeks final feedback
+title: Grafast v1 reaches release candidate stage
 description:
-  Gra*fast* v1 is functionally complete and powering production workloads, now
+  Grafast v1 is functionally complete and powering production workloads, now
   we need your help to finish the docs ahead of the 1.0 final.
 slug: 2025-10-16-grafast-v1-release-candidate
-authors: benjie
+authors: [benjie, jem]
 tags: [Release candidate]
 hide_table_of_contents: false
 toc_max_heading_level: 2
@@ -14,49 +14,40 @@ import styles from "@site/src/css/common.module.css";
 
 <div className={styles.intro}>
 
-Gra*fast* v1.0.0-rc.1 is now available. The engine has stabilized, the plan
-epics are complete, and the runtime has been hardened by more than a year of
+The Gra*fast* v1.0 release candidate is now available. The engine has stabilized, the
+epic milestones are complete, and the runtime has been hardened by more than a year of
 production use through PostGraphile V5 and standalone adopters. All that
 remains is to finish the documentation and tighten the TypeScript experience.
 
 </div>
 
-<!-- truncate-->
-
-## From working group sketches to a stable engine
+## From working group sketches to a stable execution engine
 
 We debuted Gra*fast* in 2020 as an answer to the limits of resolver-driven
 execution. The Gra*fast* working group helped us identify four epics that had
-to be solved before we could call v1: global dependencies, early exit
-ergonomics, plan-time evaluation, and polymorphic explosion. Each of these has
-landed in the past 18 months, culminating in the combined-step work shipped
-this summer.
+to be solved before we could release Version 1:
+
+- ✅ **Global dependencies**: replace global dependencies so plan resolvers can
+  rely on precise, single-value inputs.
+- ✅ **Early exit controls**: use flags, preventing needless downstream work
+  when a branch is no longer required.
+- ✅ **Plan-time evaluation removal**: eliminate `$step.eval*()` and other brittle
+  shortcuts, giving us safer, more predictable execution flows.
+- ✅ **Polymorphism convergence**: introduce combined steps so abstract types
+  stop exploding into exponential branches.
+
+These epics also complete the mental model we now advocate in
+[“Thinking in plans”](/grafast/flow): you describe the desired dataflow once,
+Gra*fast* optimizes it, and reuses that plan safely across execution requests.
+With unary dependencies tidied, branching controlled, and polymorphism tamed,
+it is now straightforward to reason about how values flow through the graph.
+
+<!-- truncate-->
 
 Along the way we rewrote countless plan resolvers, improved SQL generation,
 refined cache behaviour, and validated the architecture inside PostGraphile V5.
 The result is a planning engine that delivers holistic visibility across a
 GraphQL operation while still feeling ergonomic to write against.
-
-## Four epics complete
-
-Each Gra*fast* epic represented a foundational rethink that had to land before
-we could promise a stable 1.0:
-
-- **Unary dependencies**: replaced global dependencies so plan resolvers can
-  rely on precise, single-value inputs.
-- **Early exit controls**: now use flags, preventing needless downstream work
-  when a branch is no longer required.
-- **Plan-time evaluation removal**: eliminated `$step.eval*()` and other brittle
-  shortcuts, giving us safer, more predictable execution flows.
-- **Polymorphism convergence**: introduced combined steps so abstract types
-  stop exploding into exponential branches.
-
-Those projects are now merged, shipped in production, and form the backbone of
-this release candidate. They also complete the mental model we advocate in
-[“Thinking in plans”](/grafast/flow): you describe the desired dataflow once,
-Gra*fast* optimizes it, and execution reuses that plan safely across requests.
-With unary dependencies tidied, branching controlled, and polymorphism tamed,
-it is now straightforward to reason about how values move through the graph.
 
 ## Why call it a release candidate now?
 
@@ -101,10 +92,11 @@ valuable.
 
 ## Try Gra*fast* v1 today
 
-Grab the release candidate from npm:
+Grab the release candidate from npm, we are keeping under the `@beta` tag to
+make transition as smooth as possible:
 
 ```bash
-yarn add grafast@rc
+yarn add grafast@beta
 ```
 
 If you are integrating Gra*fast* outside of PostGraphile, start with the
