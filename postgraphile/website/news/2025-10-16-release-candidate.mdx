@@ -17,7 +17,9 @@ import styles from "@site/src/css/common.module.css";
 After five and a half years of work, countless beta drops, and four Gra*fast*
 epics, PostGraphile V5 has now reached **release candidate** status. The
 software is ready, many of you already run it in production, and now we need
-your help to take it over the finish line.
+your help to take it over the finish line. The release candidate contains some
+quality of life improvements, and the APIs are stable, now is the perfect time
+to experiment with PostGraphile Version 5 before the final release.
 
 </div>
 
@@ -38,6 +40,23 @@ release.
 
 The result is a platform that is faster, more expressive, and easier to extend
 than anything we have shipped before.
+
+## Fresh polish in the RC
+
+While the new features are largely locked down, the RC includes a few quality
+of life improvements you should know about:
+
+- Partitioned tables can now expose their child partitions via smart tags or a
+  global option, making it easier to target specific shards in GraphQL.
+- Enum table domains from V4 return, so PostgreSQL functions can accept and
+  return enum-backed domain values without custom glue code.
+- The simple subscriptions plugin learned an `initialEvent` argument, restoring
+  parity with V4’s behaviour and smoothing websocket migrations.
+- `@dataplan/pg` now forwards the `pg-sql2` helpers, so plan resolvers can rely
+  on a single import for PostgreSQL-aware SQL building.
+
+If you bump into rough edges while trying these changes, please raise an issue
+so we can address it before the final release.
 
 ## Why this is still a release candidate
 
@@ -67,23 +86,6 @@ about what is unclear are invaluable.
 Please [open issues or pull requests](https://github.com/graphile/crystal) and
 talk to us on [Discord](https://discord.gg/graphile). We are prioritising doc
 fixes above new features during the RC period.
-
-## Fresh polish in the RC
-
-While the new features are largely locked down, the RC includes a few quality
-of life improvements you should know about:
-
-- Partitioned tables can now expose their child partitions via smart tags or a
-  global option, making it easier to target specific shards in GraphQL.
-- Enum table domains from V4 return, so PostgreSQL functions can accept and
-  return enum-backed domain values without custom glue code.
-- The simple subscriptions plugin learned an `initialEvent` argument, restoring
-  parity with V4’s behaviour and smoothing websocket migrations.
-- `@dataplan/pg` now forwards the `pg-sql2` helpers, so plan resolvers can rely
-  on a single import for PostgreSQL-aware SQL building.
-
-If you bump into rough edges while trying these changes, please raise an issue
-so we can address it before the final release.
 
 ## Try the release candidate today
 
