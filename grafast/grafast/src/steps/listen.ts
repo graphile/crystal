@@ -9,6 +9,19 @@ import { isExecutableStep, Step } from "../step.js";
 import type { __ItemStep } from "./__item.js";
 import { constant } from "./constant.js";
 
+function identity<T>(t: T): T {
+  return t;
+}
+
+export interface ListenOptions<
+  TTopics extends { [topic: string]: any },
+  TTopic extends keyof TTopics,
+  TPayloadStep extends Step,
+> {
+  itemPlan?: (itemPlan: __ItemStep<TTopics[TTopic]>) => TPayloadStep;
+  $initialEvent?: Step<TTopics[TTopic]>;
+}
+
 /**
  * Subscribes to the given `pubsubOrPlan` to get realtime updates on a given
  * topic (`topicOrPlan`), mapping the resulting event via the `itemPlan`
@@ -37,16 +50,14 @@ export class ListenStep<
 
   private initialEventDep: number | null = null;
 
+  public itemPlan: (itemPlan: __ItemStep<TTopics[TTopic]>) => TPayloadStep;
   constructor(
     pubsubOrPlan:
       | Step<GrafastSubscriber<TTopics> | null>
       | GrafastSubscriber<TTopics>
       | null,
     topicOrPlan: Step<TTopic> | string,
-    public itemPlan: (itemPlan: __ItemStep<TTopics[TTopic]>) => TPayloadStep = (
-      $item,
-    ) => $item as any,
-    $initialEvent?: Step<TTopics[TTopic]>,
+    options: ListenOptions<TTopics, TTopic, TPayloadStep>,
   ) {
     super();
     const $topic =
@@ -56,8 +67,10 @@ export class ListenStep<
       : constant(pubsubOrPlan, false);
     this.pubsubDep = this.addDependency($pubsub);
     this.topicDep = this.addDependency($topic);
-    if ($initialEvent) {
-      this.initialEventDep = this.addDependency($initialEvent);
+    this.itemPlan = options?.itemPlan ?? (identity as any);
+
+    if (options?.$initialEvent) {
+      this.initialEventDep = this.addDependency(options.$initialEvent);
     }
   }
 
@@ -118,14 +131,47 @@ export function listen<
     | GrafastSubscriber<TTopics>
     | null,
   topicOrPlan: Step<TTopic> | string,
+  options?: ListenOptions<TTopics, TTopic, TPayloadStep>,
+): ListenStep<TTopics, TTopic, TPayloadStep>;
+/**
+ * @deprecated Please use object form for third argument.
+ */
+export function listen<
+  TTopics extends { [topic: string]: any },
+  TTopic extends keyof TTopics,
+  TPayloadStep extends Step,
+>(
+  pubsubOrPlan:
+    | Step<GrafastSubscriber<TTopics> | null>
+    | GrafastSubscriber<TTopics>
+    | null,
+  topicOrPlan: Step<TTopic> | string,
   itemPlan?: (itemPlan: __ItemStep<TTopics[TTopic]>) => TPayloadStep,
   $initialEvent?: Step<TTopics[TTopic]>,
+): ListenStep<TTopics, TTopic, TPayloadStep>;
+export function listen<
+  TTopics extends { [topic: string]: any },
+  TTopic extends keyof TTopics,
+  TPayloadStep extends Step,
+>(
+  pubsubOrPlan:
+    | Step<GrafastSubscriber<TTopics> | null>
+    | GrafastSubscriber<TTopics>
+    | null,
+  topicOrPlan: Step<TTopic> | string,
+  itemPlanOrOptions?:
+    | ListenOptions<TTopics, TTopic, TPayloadStep>
+    | ((itemPlan: __ItemStep<TTopics[TTopic]>) => TPayloadStep),
+  $initialEvent?: Step<TTopics[TTopic]>,
 ): ListenStep<TTopics, TTopic, TPayloadStep> {
+  const options: ListenOptions<TTopics, TTopic, TPayloadStep> =
+    typeof itemPlanOrOptions === "function" || itemPlanOrOptions === undefined
+      ? { itemPlan: itemPlanOrOptions, $initialEvent }
+      : itemPlanOrOptions;
   return new ListenStep<TTopics, TTopic, TPayloadStep>(
     pubsubOrPlan,
     topicOrPlan,
-    itemPlan,
-    $initialEvent,
+    options,
   );
 }
 
