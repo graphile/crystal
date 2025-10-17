@@ -63,8 +63,10 @@ export const PgV4SimpleSubscriptionsPlugin = extendSchema((build) => {
                   return listen(
                     $pgSubscriber,
                     $derivedTopic,
-                    jsonParse,
-                    $initialEvent,
+                    {
+                      itemPlan: jsonParse,
+                      $initialEvent,
+                    },
                   );
                 },
               [context, initialEvent, jsonParse, lambda, listen],

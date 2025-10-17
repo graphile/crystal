@@ -5317,7 +5317,7 @@ export function makeExampleSchema(
                 "pgSubscriber",
               ) as unknown as AccessStep<GrafastSubscriber>;
 
-              return listen($pgSubscriber, $topic, jsonParse);
+              return listen($pgSubscriber, $topic, { itemPlan: jsonParse });
             },
           [context, jsonParse, lambda, listen],
         ),

@@ -33,7 +33,7 @@ export { groupBy, GroupByPlanMemo } from "./groupBy.js";
 export { lambda, LambdaStep } from "./lambda.js";
 export { last, LastStep } from "./last.js";
 export { list, ListStep } from "./list.js";
-export { listen, ListenStep } from "./listen.js";
+export { listen, ListenOptions, ListenStep } from "./listen.js";
 export {
   __ListTransformStep,
   listTransform,

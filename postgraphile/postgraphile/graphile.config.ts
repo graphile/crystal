@@ -451,9 +451,10 @@ const preset: GraphileConfig.Preset = {
               (context, jsonParse, listen, object) => (_$root, args) => {
                 const $topic = args.getRaw("topic");
                 const $pgSubscriber = context().get("pgSubscriber");
-                return listen($pgSubscriber, $topic, ($payload) =>
-                  object({ sub: jsonParse($payload).get("a" as never) }),
-                );
+                return listen($pgSubscriber, $topic, {
+                  itemPlan: ($payload) =>
+                    object({ sub: jsonParse($payload).get("a" as never) }),
+                });
               },
               [context, jsonParse, listen, object],
             ),

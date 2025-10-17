@@ -91,11 +91,12 @@ forum, substituting `FORUM_ID` for the id of the forum that we're interested in
 
 The following is an example pulling it all together. In this example when a new
 message is created an event will be sent to `forum:FORUM_ID:message` containing
-the payload `{"event": "create", "sub": FORUM_ID, "id": MESSAGE_ID}`. This event will be picked up
-by the `pgSubscriber`, which `listen()` subscribes to. This event will then be
-parsed by `listen()` using the `jsonParse` method, and the resulting object
-will be passed to the `Subscription.forumMessage.plan()` plan resolver, which
-does no further processing. The data then flows down to the
+the payload `{"event": "create", "sub": FORUM_ID, "id": MESSAGE_ID}`. This
+event will be picked up by the `pgSubscriber`, which `listen()` subscribes to.
+This event will then be parsed by `listen()` using the `itemPlan` option (set
+to `jsonParse`), and the resulting object will be passed to the
+`Subscription.forumMessage.plan()` plan resolver, which does no further
+processing. The data then flows down to the
 `ForumMessageSubscriptionPayload` field steps, which will extract the details
 that they care about and use them to provide the relevant data to the user.
 
@@ -125,7 +126,7 @@ const MySubscriptionPlugin = extendSchema((build) => {
               const $pgSubscriber = context().get("pgSubscriber");
               const $forumId = args.get("forumId");
               const $topic = lambda($forumId, (id) => `forum:${id}:message`);
-              return listen($pgSubscriber, $topic, jsonParse);
+              return listen($pgSubscriber, $topic, { itemPlan: jsonParse });
             },
             plan($event) {
               return $event;
