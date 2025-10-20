@@ -24,30 +24,40 @@ remains is to finish the documentation and tighten the TypeScript experience.
 ## From working group sketches to a stable execution engine
 
 We debuted Gra*fast* in 2020 as an answer to the limits of resolver-driven
-execution. The Gra*fast* working group helped us identify four epics that had
-to be solved before we could release Version 1:
+execution. The working group codified a plan-first mental model: every field
+should describe the graph of steps it requires, and the planner is responsible
+for weaving those graphs into a reusable dataflow that the runtime can execute
+efficiently. Four epics stood between that vision and a stable 1.0:
 
-- ✅ **Global dependencies**: replace global dependencies so plan resolvers can
-  rely on precise, single-value inputs.
-- ✅ **Early exit controls**: use flags, preventing needless downstream work
-  when a branch is no longer required.
-- ✅ **Plan-time evaluation removal**: eliminate `$step.eval*()` and other brittle
-  shortcuts, giving us safer, more predictable execution flows.
-- ✅ **Polymorphism convergence**: introduce combined steps so abstract types
-  stop exploding into exponential branches.
+- ✅ **Global dependencies → unary dependencies**: we rewrote the planning
+  infrastructure so shared inputs (like database connections) are explicitly
+  marked as unary. Plan diagrams now make it obvious when a value is reused
+  across the batch, and the engine can enforce those guarantees automatically.
+- ✅ **Early exit controls → flags**: instead of scattering manual branching
+  logic through plan resolvers, Gra*fast* now propagates inhibition flags along
+  the dataflow. Downstream steps see a clean graph with the noisy branches
+  already pruned.
+- ✅ **Plan-time evaluation removal**: we eliminated `$step.eval*()` and other
+  hooks that mutated the plan mid-build. Today, plan resolvers stay declarative;
+  all decision making happens in step execution where it belongs, so the same
+  plan can be safely reused for every compatible request.
+- ✅ **Polymorphism convergence**: combined layer plans merge abstract-type
+  branches back together before the next layer is planned. That keeps the
+  mental model manageable: each layer still represents a single batch of work,
+  even when unions or interfaces are involved.
 
-These epics also complete the mental model we now advocate in
-[“Thinking in plans”](/grafast/flow): you describe the desired dataflow once,
-Gra*fast* optimizes it, and reuses that plan safely across execution requests.
-With unary dependencies tidied, branching controlled, and polymorphism tamed,
-it is now straightforward to reason about how values flow through the graph.
+Together these projects solidify the [“thinking in plans”](/grafast/flow) model:
+describe your desired dataflow once, let Gra*fast* optimise it, and rely on the
+engine to reuse that plan across every matching request.
 
 <!-- truncate-->
 
-Along the way we rewrote countless plan resolvers, improved SQL generation,
-refined cache behaviour, and validated the architecture inside PostGraphile V5.
-The result is a planning engine that delivers holistic visibility across a
-GraphQL operation while still feeling ergonomic to write against.
+Delivering those shifts meant rewriting plan resolvers to embrace the new unary
+contracts, teaching the SQL layers to build queries at execute-time, and
+validating the diagrams against real production workloads inside PostGraphile
+V5. The payoff is a planning engine that exposes the entire dataflow, keeps
+resolution ergonomic, and still lets Gra*fast* squeeze out every possible
+optimisation.
 
 ## What does release candidate mean for Gra*fast*?
 
