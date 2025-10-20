@@ -1,3 +1,4 @@
+<!-- prettier-ignore -->
 # AGENTS.md
 
 **Audience:** code assistants (Aider, Cody, Copilot Chat, etc.) working on this
@@ -100,7 +101,10 @@ into 4 main categories based on the root folders, each of which have a
 - When adding `:::` admonitions, be sure to have a blank line both above and
   below each `:::` line.
 - The documentation uses UK English, but the code uses US English. If a spelling
-  is valid in both US and UK English, it is preferred over the UK only spelling.
+  is valid in both US and UK English, prefer that shared form (e.g. `centralize`
+  rather than the UK-only `centralise`). Use UK spellings such as `behaviour` in
+  prose, but match US spellings in code identifiers and when quoting API names
+  (e.g. `BehaviorPlugin`).
 - SQL statements should be lowercase throughout the code and documentation,
   however when keywords such as `SELECT` and `DELETE` are presented alone in
   prose they should be upper-cased for clarity.
