@@ -28,7 +28,8 @@ import clsx from "clsx";
 The V5 pre-alpha phase completed after 38 releases.<br />
 The V5 alpha phase completed after 20 releases.<br />
 The V5 beta phase is completed after 49 releases.<br />
-➡️ **<a className={v5betaStyles.progressLink} href="/news/2025-10-17-v5-release-candidate">Try the PostGraphile V5 release candidate now</a>** ⬅️
+➡️ **<a className={v5betaStyles.progressLink} href="/news/2025-10-17-v5-release-candidate">
+Try the PostGraphile V5 release candidate now</a>** ⬅️
 
 </div>
 </div>
@@ -64,17 +65,6 @@ TypeScript types still need polish. This is the final opportunity to try
 PostGraphile V5 before the stable release and tell us what needs to be clearer
 or smoother.
 
-### Release candidate highlights
-
-- Partitioned tables can expose child partitions via smart tags or a global
-  option, helping you target specific shards.
-- Enum table domains from V4 return, so PostgreSQL functions work with enum
-  domains out of the box.
-- The simple subscriptions plugin gained an `initialEvent` argument for smoother
-  websocket migrations.
-- `@dataplan/pg` now forwards the `pg-sql2` helpers so plan resolvers can rely
-  on a single import for PostgreSQL-aware SQL building.
-
 ## How to help
 
 To help us shape the final release, you can:
@@ -87,14 +77,33 @@ To help us shape the final release, you can:
     generate minimal reproductions
 - Help address issues in the [V5 Project Board](https://github.com/orgs/graphile/projects/3)
 - Contribute to documentation, examples, and missing TypeScript annotations
-- [Sponsor us](https://graphile.org/sponsor) &mdash; **you rely on our software, we rely on your financial support**
+- [Sponsor us](/sponsor) &mdash; **you rely on our software, we rely on your financial support**
+
+## Try the release candidate today
+
+Install the release candidate from npm, we are still using the `@beta` tag to
+make the transition as smooth as possible:
+
+```bash
+yarn add postgraphile@beta
+```
+
+You can also try the bundled CLI without installing:
+
+```bash
+npx pgl@beta -P pgl/amber -e -c postgres:///my_db -s public
+```
+
+Replace the connection string and schema with your own values. If you are
+upgrading from V4, follow the [migration guide](/postgraphile/5/migrating-from-v4)
+and let us know where it can be improved.
 
 </div>
 
 <CalloutSection
   title={`Crowd-funded open-source software`}
   body={`Sponsoring the Graphile project directly increases the time and resources we can spend on polishing the PostGraphile V5 release candidate. THANK YOU to all our sponsors!`}
-  link={`https://graphile.org/sponsor/`}
+  link={`/sponsor/`}
   buttonText={`Learn more about sponsorship`}
 />
 
@@ -118,7 +127,7 @@ works &mdash; re-architectures that took many months to complete &mdash; we call
 
 ## Milestone releases
 
-Some of the more notable recent releases are listed below. [Graphile sponsors](https://graphile.org/sponsor) have access to release notes through our community support channels.
+Some of the more notable recent releases are listed below. [Graphile sponsors](/sponsor) have access to release notes through our community support channels.
 Everyone else can see some detail in the PostGraphile [changelog](https://github.com/graphile/crystal/blob/main/postgraphile/postgraphile/CHANGELOG.md).
 
 </div>
@@ -143,7 +152,7 @@ Everyone else can see some detail in the PostGraphile [changelog](https://github
   <td>2025-10-17</td>
   <td>rc.1</td>
   <td>
-    Release Candidate ready (
+    Release candidate ready (
     <a href="https://www.graphile.org/news/2025-10-17-v5-release-candidate">
       read more
     </a>
